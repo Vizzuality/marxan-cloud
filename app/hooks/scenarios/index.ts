@@ -121,6 +121,11 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
   const parsedFilters = Object.keys(filters)
     .reduce((acc, k) => {
+      // Backend isn't able to deal with this one yet; it'll always return an empty array
+      // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
+      // move forward useable the filters.
+      if (k === 'status') return acc;
+
       return {
         ...acc,
         [`filter[${k}]`]: (filters[k] && filters[k].toString) ? filters[k].toString() : filters[k],
@@ -169,10 +174,11 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
       return pageData.map((d): ItemProps => {
         const {
-          id, projectId, name, lastModifiedAt,
+          id, projectId, name, lastModifiedAt, status,
         } = d;
 
-        const status = statusScenarios.find((s) => s.id === id);
+        const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
+        const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
@@ -187,7 +193,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           lastUpdate: lastModifiedAt,
           lastUpdateDistance: lastUpdateDistance(),
           warnings: false,
-          jobs: status?.jobs || [],
+          runStatus,
+          jobs,
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
           },
@@ -198,11 +205,19 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       });
     })) : [];
 
+    // Backend can't deal with the `status` filter just yet, so we'll just manually
+    // filter it out manually in the frontend. It'll allow us to make the feature work
+    // in the frontend for now, albeit in a non-ideal way.
+    const filteredData = parsedData.filter((parsedDataItem) => {
+      if (!filters?.status) return true;
+      return (filters?.status as Array<string> || []).includes(parsedDataItem.runStatus);
+    });
+
     return {
       ...query,
-      data: parsedData,
+      data: filteredData,
     };
-  }, [query, pages, push, statusScenarios]);
+  }, [query, pages, filters, push, statusScenarios]);
 }
 
 export function useScenario(id) {

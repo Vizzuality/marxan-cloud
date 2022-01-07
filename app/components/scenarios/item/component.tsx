@@ -63,6 +63,7 @@ export interface ItemProps {
   progress?: number;
   lastUpdate: string;
   jobs?: Record<string, any>[];
+  runStatus: 'created' | 'running' | 'done' | 'failure',
   lastUpdateDistance: string;
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -79,7 +80,8 @@ export const Item: React.FC<ItemProps> = ({
   progress,
   lastUpdateDistance,
   className,
-  jobs = [],
+  jobs,
+  runStatus,
   onEdit,
   onView,
   onCancelRun,
@@ -96,7 +98,6 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureSplit = jobs.find((j) => j.kind === 'geofeatureSplit');
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
     const specification = jobs.find((j) => j.kind === 'specification');
-    const run = jobs.find((j) => j.kind === 'run');
 
     // PROTECTED AREAS
     if (planningAreaProtectedCalculation && planningAreaProtectedCalculation.status === 'running') return 'pa-running';
@@ -119,13 +120,13 @@ export const Item: React.FC<ItemProps> = ({
       || (specification && specification.status === 'failure')
     ) return 'features-failure';
 
-    // RUN
-    if (run && run.status === 'running') return 'run-running';
-    if (run && run.status === 'failure') return 'run-failure';
-    if (run && run.status === 'done') return 'run-done';
+    // RUN STATUS
+    if (runStatus === 'running') return 'run-running';
+    if (runStatus === 'failure') return 'run-failure';
+    if (runStatus === 'done') return 'run-done';
 
     return 'draft';
-  }, [jobs]);
+  }, [jobs, runStatus]);
 
   const onSettings = useCallback(() => {
     setSettings(!settings);
