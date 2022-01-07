@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Repository, Not } from 'typeorm';
+import { getConnection, Repository, Not, QueryFailedError } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
@@ -21,6 +21,7 @@ import {
   forbiddenError,
   lastOwner,
   transactionFailed,
+  queryFailed,
 } from '@marxan-api/modules/access-control';
 
 /**
@@ -173,7 +174,10 @@ export class ProjectAclService implements ProjectAccessControl {
     loggedUserId: string,
   ): Promise<
     Either<
-      typeof transactionFailed | typeof forbiddenError | typeof lastOwner,
+      | typeof transactionFailed
+      | typeof forbiddenError
+      | typeof lastOwner
+      | typeof queryFailed,
       void
     >
   > {
@@ -222,6 +226,9 @@ export class ProjectAclService implements ProjectAccessControl {
       return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
+      if (err instanceof QueryFailedError) {
+        return left(queryFailed);
+      }
       return left(transactionFailed);
     } finally {
       await apiQueryRunner.release();

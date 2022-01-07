@@ -4,4 +4,5 @@ export {
   forbiddenError,
   transactionFailed,
   lastOwner,
+  queryFailed,
 } from './access-control.types';
