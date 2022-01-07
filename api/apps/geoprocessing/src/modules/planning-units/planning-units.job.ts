@@ -103,7 +103,7 @@ const createPlanningUnitGridFromJobSpec = async (
                         select st_transform(geom, 4326) as the_geom,
                         '${job.data.planningUnitGridShape}' as type,
                         ${job.data.planningUnitAreakm2} as size from (${subquery}) grid
-                        ON CONFLICT (the_geom, type, COALESCE(project_id, '00000000-0000-0000-0000-000000000000')) DO NOTHING;`);
+                        ON CONFLICT (the_geom_hash, type, COALESCE(project_id, '00000000-0000-0000-0000-000000000000')) DO NOTHING;`);
       return queryResult;
     } catch (err) {
       logger.error(err);
