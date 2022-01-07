@@ -56,7 +56,7 @@ export const getFixtures = async () => {
           range: blmRange,
         })
         .expect(HttpStatus.CREATED),
-    ThenCalibrationResultsShouldBeAvailableViaAPI: async () => {
+    ThenCalibrationResultsShouldBeAvailable: async () => {
       const response: { body: BlmCalibrationRunResultDto[] } = await request(
         app.getHttpServer(),
       )

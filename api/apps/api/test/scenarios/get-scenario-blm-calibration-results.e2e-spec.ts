@@ -17,6 +17,6 @@ describe('get-scenario-blm-calibration-results', () => {
 
     await fixtures.WhenBlmCalibrationIsLaunched();
 
-    await fixtures.ThenCalibrationResultsShouldBeAvailableViaAPI();
+    await fixtures.ThenCalibrationResultsShouldBeAvailable();
   }, 100000);
 });
