@@ -15,7 +15,7 @@ export class BlmValuesCalculator {
     );
     const blmValues = [min, ...formulaResults];
 
-    return blmValues.map((value) => value);
+    return blmValues;
   }
 
   with(range: [number, number]) {

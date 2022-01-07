@@ -10,7 +10,6 @@ import {
   invalidRange,
   updateFailure,
 } from './change-blm-range.command';
-import { PlanningUnitAreaFetcher } from './planning-unit-area-fetcher';
 import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(ChangeBlmRange)
@@ -20,7 +19,6 @@ export class ChangeBlmRangeHandler
 
   constructor(
     private readonly blmRepository: ProjectBlmRepo,
-    private readonly planningUnitAreaFetcher: PlanningUnitAreaFetcher,
     private readonly blmPolicyFactory: BlmValuesPolicyFactory,
   ) {}
 
@@ -34,16 +32,6 @@ export class ChangeBlmRangeHandler
       );
 
       return left(invalidRange);
-    }
-
-    const result = await this.planningUnitAreaFetcher.execute(projectId);
-
-    if (isLeft(result)) {
-      this.logger.error(
-        `Could not get Planning Unit area for project with ID: ${projectId}`,
-      );
-
-      return result;
     }
 
     const calculator = this.blmPolicyFactory.get();
