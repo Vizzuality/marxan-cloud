@@ -9,6 +9,7 @@ import { SetProjectBlmHandler } from './set-project-blm-handler';
 import { ChangeBlmRangeHandler } from './change-blm-range.handler';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-values-policy-factory';
+import { ProjectBlmSaga } from './project-blm.saga';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-val
   providers: [
     SetProjectBlmHandler,
     ChangeBlmRangeHandler,
+    ProjectBlmSaga,
     BlmValuesPolicyFactory,
   ],
   exports: [BlmModule],
