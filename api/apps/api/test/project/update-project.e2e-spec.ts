@@ -4,7 +4,6 @@ import { getFixtures } from './update-project.fixtures';
 let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
-  console.error = () => {};
   fixtures = await getFixtures();
 });
 
