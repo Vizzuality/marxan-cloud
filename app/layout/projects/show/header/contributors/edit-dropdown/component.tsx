@@ -26,7 +26,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
     };
   }, [onSearch]);
 
-  const contributorsSpelling = users.length !== 1 ? 'contributors' : 'contributor';
+  const contributorsSpelling = users?.length !== 1 ? 'contributors' : 'contributor';
 
   return (
     <div className="absolute z-40 overflow-x-visible overflow-y-auto bg-white top-14 -right-2 p-9 rounded-3xl">
@@ -41,9 +41,9 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
           onChange={onChangeSearchDebounced}
           theme="light"
         />
-        <p className="self-start py-6 text-xs text-black uppercase font-heading">{`${users.length} ${contributorsSpelling}`}</p>
+        <p className="self-start py-6 text-xs text-black uppercase font-heading">{`${users?.length} ${contributorsSpelling}`}</p>
         <div className="w-full space-y-2.5 flex-grow flex flex-col overflow-x-visible overflow-y-auto max-h-64">
-          {!!users.length && users.map((u) => {
+          {!!users?.length && users.map((u) => {
             const {
               user: {
                 displayName, id, avatarDataUrl,

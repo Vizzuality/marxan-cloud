@@ -26,6 +26,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
   const { pid } = query;
 
   const { data: roleMe } = useRoleMe(pid);
+
   const VIEWER = roleMe === 'project_viewer';
 
   const handleEdition = () => setEditable(!editable);
