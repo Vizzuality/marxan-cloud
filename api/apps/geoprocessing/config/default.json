@@ -1,4 +1,7 @@
 {
+  "postgresApi": {
+    "runMigrationsOnStartup": false
+  },
   "redisApi": {
     "concurrency": 50,
     "connection": {
@@ -12,7 +15,9 @@
     "host": null,
     "username": null,
     "password": null,
-    "database": null
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
   },
   "postgresGeoApi": {
     "url": null,
@@ -20,7 +25,9 @@
     "host": null,
     "username": null,
     "password": null,
-    "database": null
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
   },
   "api": {
     "url": "http://api:3000"

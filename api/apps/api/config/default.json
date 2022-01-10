@@ -1,4 +1,7 @@
 {
+  "logging": {
+    "muteAll": "API_LOGGING_MUTE_ALL"
+  },
   "network": {
     "cors": {
       "origins": [
@@ -19,7 +22,9 @@
     "host": null,
     "username": null,
     "password": null,
-    "database": null
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
   },
   "postgresGeoApi": {
     "url": null,
@@ -27,7 +32,9 @@
     "host": null,
     "username": null,
     "password": null,
-    "database": null
+    "database": null,
+    "runMigrationsOnStartup": false,
+    "logging": "error"
   },
   "api": {
     "url": "http://api:3000",

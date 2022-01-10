@@ -101,8 +101,11 @@ export class OrganizationsService extends AppBaseService<
      * from entities and just use a separate event log, and a view to obtain the
      * same information (who created an entity and when, and when it was last
      * modified) from that log, kind of event sourcing way.
+     *
+     * @TODO Figure out what's the best way to re-enable eslint rule
      */
     const organization = await super.setDataCreate(create, info);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
     organization.createdBy = info?.authenticatedUser?.id!;
     return organization;
   }

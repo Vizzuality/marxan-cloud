@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, OneToOne } from 'typeorm';
 import { ScenariosPlanningUnitGeoEntity } from './scenarios-planning-unit.geo.entity';
 import { ScenariosPuCostDataGeo } from './scenarios-pu-cost-data.geo.entity';
 import { ScenariosPuOutputGeoEntity } from './scenarios-pu-output.geo.entity';

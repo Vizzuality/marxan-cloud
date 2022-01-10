@@ -6,10 +6,7 @@ import {
   JSONAPISerializerConfig,
 } from '../../utils/app-base.service';
 
-import {
-  ScenarioFeaturesGapData,
-  ScenarioFeaturesOutputGapData,
-} from '@marxan/features';
+import { ScenarioFeaturesOutputGapData } from '@marxan/features';
 import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';

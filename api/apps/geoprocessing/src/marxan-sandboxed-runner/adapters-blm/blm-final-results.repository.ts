@@ -29,8 +29,8 @@ export class BlmFinalResultsRepository {
       });
 
       const query = `
-        insert into blm_final_results (scenario_id, blm_value, score, boundary_length)
-        select scenario_id, blm_value, score, boundary_length from blm_partial_results
+        insert into blm_final_results (scenario_id, blm_value, cost, boundary_length)
+        select scenario_id, blm_value, cost, boundary_length from blm_partial_results
         where blm_partial_results.scenario_id = $1 and blm_partial_results.calibration_id = $2
       `;
 

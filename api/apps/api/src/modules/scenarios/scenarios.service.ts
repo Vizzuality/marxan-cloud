@@ -60,11 +60,11 @@ import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
-import { StartBlmCalibration } from './blm-calibration/start-blm-calibration.command';
 import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { StartBlmCalibration, CancelBlmCalibration } from './blm-calibration';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -143,6 +143,7 @@ export class ScenariosService {
     input: CreateScenarioDTO,
     info: AppInfoDTO,
   ): Promise<Either<ProjectNotReady | ProjectDoesntExist, Scenario>> {
+    assertDefined(info.authenticatedUser);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const isProjectReady = await this.projectChecker.isProjectReady(
       input.projectId,
@@ -158,6 +159,10 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
+    await this.crudService.assignCreatorRole(
+      scenario.id,
+      info.authenticatedUser.id,
+    );
 
     return right(scenario);
   }
@@ -292,7 +297,13 @@ export class ScenariosService {
     );
   }
 
-  async cancel(scenarioId: string): Promise<void> {
+  async cancelBlmCalibration(scenarioId: string): Promise<void> {
+    await this.assertScenario(scenarioId);
+
+    await this.commandBus.execute(new CancelBlmCalibration(scenarioId));
+  }
+
+  async cancelMarxanRun(scenarioId: string): Promise<void> {
     await this.assertScenario(scenarioId);
     const result = await this.runService.cancel(scenarioId);
     if (isLeft(result)) {

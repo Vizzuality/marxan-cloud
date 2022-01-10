@@ -1,18 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
 import { JobInput } from '@marxan-jobs/planning-unit-protection-level';
-import {
-  ScenariosPlanningUnitGeoEntity,
-} from '@marxan/scenarios-planning-unit';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class ScenarioProtectedAreaCalculationProcessor
   implements WorkerProcessor<JobInput, true> {
-    private readonly logger: Logger = new Logger(ScenarioProtectedAreaCalculationProcessor.name);
+  private readonly logger: Logger = new Logger(
+    ScenarioProtectedAreaCalculationProcessor.name,
+  );
+
   constructor(
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,
@@ -25,10 +26,16 @@ export class ScenarioProtectedAreaCalculationProcessor
    * we should update the area intersected.
    */
   async process(job: Job<JobInput, true>): Promise<true> {
-    this.logger.debug(`start processing pa for scenario: ${job.data.scenarioId}`)
+    this.logger.debug(
+      `start processing pa for scenario: ${job.data.scenarioId}`,
+    );
     const scenarioId = job.data.scenarioId;
     const wdpaList = job.data.protectedAreaFilterByIds!.join(`','`);
-    const wdpaFilter = (job.data.protectedAreaFilterByIds! && job.data.protectedAreaFilterByIds!.length>0) ? `where id IN ('${wdpaList}')`: ``
+    const wdpaFilter =
+      job.data.protectedAreaFilterByIds! &&
+      job.data.protectedAreaFilterByIds!.length > 0
+        ? `where id IN ('${wdpaList}')`
+        : ``;
     const query = `
     with pu as (
       select spd.id, pug.the_geom, pug.area as pu_area
@@ -48,17 +55,15 @@ export class ScenarioProtectedAreaCalculationProcessor
           WHERE scenarios_pu_data.id = result.id)
       WHERE scenario_id = $1;
     `;
-    const queryBuilder = this.scenarioPlanningUnitsRepo.query(
-      query,
-      [scenarioId]
-    );
-    await queryBuilder.catch((err) =>{
+    const queryBuilder = this.scenarioPlanningUnitsRepo.query(query, [
+      scenarioId,
+    ]);
+    await queryBuilder.catch((err) => {
       this.logger.error(queryBuilder);
       this.logger.error(err);
       throw err;
-    })
+    });
 
     return true;
   }
-
 }

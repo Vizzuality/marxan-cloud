@@ -10,18 +10,15 @@ import {
   invalidRange,
   updateFailure,
 } from './change-blm-range.command';
-import { SetProjectBlm } from './set-project-blm';
-import { PlanningUnitAreaFetcher } from './planning-unit-area-fetcher';
 import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(ChangeBlmRange)
 export class ChangeBlmRangeHandler
   implements IInferredCommandHandler<ChangeBlmRange> {
-  private readonly logger: Logger = new Logger(SetProjectBlm.name);
+  private readonly logger: Logger = new Logger(ChangeBlmRange.name);
 
   constructor(
     private readonly blmRepository: ProjectBlmRepo,
-    private readonly planningUnitAreaFetcher: PlanningUnitAreaFetcher,
     private readonly blmPolicyFactory: BlmValuesPolicyFactory,
   ) {}
 
@@ -37,18 +34,8 @@ export class ChangeBlmRangeHandler
       return left(invalidRange);
     }
 
-    const result = await this.planningUnitAreaFetcher.execute(projectId);
-
-    if (isLeft(result)) {
-      this.logger.error(
-        `Could not get Planning Unit area for project with ID: ${projectId}`,
-      );
-
-      return result;
-    }
-
     const calculator = this.blmPolicyFactory.get();
-    const blmValues = calculator.with(range, result.right);
+    const blmValues = calculator.with(range);
 
     const updateResult = await this.blmRepository.update(
       projectId,

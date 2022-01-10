@@ -13,9 +13,10 @@ import {
   ForbiddenException,
   HttpStatus,
   Query,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { ProjectAclService } from './project-acl.service';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import {
   ApiBearerAuth,
@@ -28,7 +29,13 @@ import { isLeft } from 'fp-ts/lib/These';
 import {
   UserRoleInProjectDto,
   UsersInProjectResult,
-} from './dto/user-role-project.dto';
+} from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import {
+  forbiddenError,
+  lastOwner,
+  transactionFailed,
+} from '@marxan-api/modules/access-control';
+import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -81,7 +88,7 @@ export class ProjectAclController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      aclErrorHandler(result.left);
     }
   }
 
@@ -104,7 +111,7 @@ export class ProjectAclController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      aclErrorHandler(result.left);
     }
   }
 }

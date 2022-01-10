@@ -1,4 +1,4 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 const tableName = `blm_final_results`;
 
@@ -26,16 +26,16 @@ export class BlmFinalResultEntity {
   blmValue!: number;
 
   /**
-   * Score of the run
+   * Cost output parameter
    */
   @Column({
-    name: `score`,
+    name: `cost`,
     type: 'float',
   })
-  score!: number;
+  cost!: number;
 
   /**
-   * Score of the run
+   * Boundary length output parameter
    */
   @Column({
     name: `boundary_length`,

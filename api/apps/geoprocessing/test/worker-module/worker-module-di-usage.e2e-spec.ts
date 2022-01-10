@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Injectable, Module, Logger } from '@nestjs/common';
+import { Injectable, Module } from '@nestjs/common';
 import { Job, Queue, Worker } from 'bullmq';
 import * as config from 'config';
 import {
+  WorkerBuilder,
   WorkerModule,
   WorkerProcessor,
-  WorkerBuilder,
 } from '../../src/modules/worker';
 
 let app: TestingModule;
@@ -40,14 +40,28 @@ afterAll(async () => {
 
 describe(`when submitting a job`, () => {
   it(`should process the job by relevant worker`, async () => {
-    // Act - simulate pushing a job to queue
-    const job = await queue.add('test-job', jobInput);
-    expect(job.id).toBeDefined();
+    const onCompleteMockCallback = (resolve: (value?: any) => void) => (
+      result: any,
+    ) => {
+      expect(result).toEqual({
+        finish: initValue + addValue,
+      });
+      resolve();
+    };
 
-    await delay(1000);
-    expect(processor.onFailedMock.mock.calls).toEqual([]);
-    expect(processor.onCompleteMock.mock.calls[0][0]).toEqual({
-      finish: initValue + addValue,
+    const onFailedMockCallback = (
+      resolve: (value?: any) => void,
+      reject: (reason?: any) => void,
+    ) => () => {
+      reject('Fail callback called, not expected');
+    };
+
+    return new Promise(async (resolve, reject) => {
+      processor.onFailedMock = jest.fn(onFailedMockCallback(resolve, reject));
+      processor.onCompleteMock = jest.fn(onCompleteMockCallback(resolve));
+
+      const job = await queue.add('test-job', jobInput);
+      expect(job.id).toBeDefined();
     });
   });
 });
@@ -56,31 +70,29 @@ const jobInput = Object.freeze({
   init: initValue,
 });
 
-const delay = (ms = 1000) => new Promise((resolve) => setTimeout(resolve, ms));
-
 @Injectable()
-class ModuleADepdendency {
+class ModuleADependency {
   getOne() {
     return addValue;
   }
 }
 
 @Module({
-  providers: [ModuleADepdendency],
-  exports: [ModuleADepdendency],
+  providers: [ModuleADependency],
+  exports: [ModuleADependency],
 })
 class ModuleA {}
 
 @Injectable()
 class JobProcessor
   implements WorkerProcessor<{ init: number }, { finish: number }> {
-  constructor(private readonly moduleADepdendency: ModuleADepdendency) {}
+  constructor(private readonly moduleADependency: ModuleADependency) {}
 
   process(
     job: Job<{ init: number }, { finish: number }>,
   ): Promise<{ finish: number }> {
     return Promise.resolve({
-      finish: job.data.init + this.moduleADepdendency.getOne(),
+      finish: job.data.init + this.moduleADependency.getOne(),
     });
   }
 }

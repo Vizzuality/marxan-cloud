@@ -33,11 +33,11 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling marxan run during fetching assets`, async (done) => {
+  test.only(`cancelling marxan run during fetching assets`, async (done) => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
         done(`Shouldn't finish Marxan run.`);
       })
@@ -53,14 +53,17 @@ describe(`given input data is delayed`, () => {
 
 describe(`given input data is available`, () => {
   beforeEach(async () => {
-    fixtures.GivenInputFilesAreAvailable();
+    // We add a delay to the file loading mocks, so we can
+    // artificially extend the duration of the Marxan run
+    // thus ensuring it's still running when we cancel it
+    fixtures.GivenInputFilesAreAvailable(500);
     await fixtures.GivenScenarioDataExists();
     await fixtures.GivenScenarioPuDataExists();
   }, 60000 * 2);
   test(
     `marxan run during binary execution`,
     async () => {
-      const output = await fixtures.GivenMarxanIsRunning();
+      const output = await fixtures.GivenBLMCalibrationIsRunning();
       fixtures.ThenHasValidOutput(output);
       await fixtures.ThenOutputScenarioPuDataWasPersisted();
       fixtures.ThenProgressWasReported();
@@ -72,7 +75,7 @@ describe(`given input data is available`, () => {
     expect.assertions(1);
 
     fixtures
-      .GivenMarxanIsRunning()
+      .GivenBLMCalibrationIsRunning()
       .then(() => {
         done(`Shouldn't finish Marxan run.`);
       })
@@ -149,7 +152,7 @@ const getFixtures = async () => {
       nock.enableNetConnect();
     },
     progressMock: jest.fn(),
-    async GivenMarxanIsRunning() {
+    async GivenBLMCalibrationIsRunning() {
       return await sut.run(
         {
           scenarioId,

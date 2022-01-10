@@ -47,6 +47,8 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
 import { ProjectCheckerModule } from '@marxan-api/modules/scenarios/project-checker/project-checker.module';
+import { AccessControlModule } from '@marxan-api/modules/access-control';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 
 @Module({
   imports: [
@@ -58,6 +60,7 @@ import { ProjectCheckerModule } from '@marxan-api/modules/scenarios/project-chec
       Project,
       Scenario,
       ScenariosOutputResultsApiEntity,
+      UsersScenariosApiEntity,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
@@ -81,6 +84,7 @@ import { ProjectCheckerModule } from '@marxan-api/modules/scenarios/project-chec
     ProtectedAreasCrudModule,
     BlmValuesModule,
     BlmCalibrationModule,
+    AccessControlModule,
   ],
   providers: [
     ScenariosService,

@@ -18,7 +18,9 @@ export class PieceExportRequestedSaga {
             event.exportId,
             event.componentId,
             event.resourceId,
+            event.resourceKind,
             event.piece,
+            event.allPieces,
           ),
       ),
     );

@@ -17,7 +17,7 @@ export class BlmPartialResultEntity {
   scenarioId!: string;
 
   /**
-   * references Scenarios.id
+   * Id of the calibration process
    */
   @Column({
     type: 'uuid',
@@ -35,16 +35,16 @@ export class BlmPartialResultEntity {
   blmValue!: number;
 
   /**
-   * Score of the run
+   * Cost output parameter
    */
   @Column({
-    name: `score`,
+    name: `cost`,
     type: 'float',
   })
-  score!: number;
+  cost!: number;
 
   /**
-   * Score of the run
+   * Boundary length output parameter
    */
   @Column({
     name: `boundary_length`,

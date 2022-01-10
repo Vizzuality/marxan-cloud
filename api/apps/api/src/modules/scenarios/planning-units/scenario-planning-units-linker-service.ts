@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -20,6 +20,7 @@ type QueryPartsForLinker = {
   planningUnitSelectionQueryPart: string;
   planningUnitIntersectionQueryPart: string;
 };
+
 @Injectable()
 export class ScenarioPlanningUnitsLinkerService {
   constructor(

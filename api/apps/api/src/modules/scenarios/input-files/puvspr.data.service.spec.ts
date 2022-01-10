@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { ScenarioPuvsprGeoEntity } from '@marxan/scenario-puvspr';
-import { getConnectionToken, getRepositoryToken } from '@nestjs/typeorm';
+import { getConnectionToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
