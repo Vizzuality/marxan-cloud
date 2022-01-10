@@ -118,7 +118,7 @@ describe('ProjectsModule (e2e)', () => {
       );
     });
 
-    test('A user should be able to get a list of projects as owner', async () => {
+    test('A user with owner role on some projects should be able to get a list of the projects they have a role in', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -130,7 +130,7 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data).toHaveLength(4);
     });
 
-    test('A user should be able to get a list of projects as contributor', async () => {
+    test('A user with contributor role on some projects should be able to get a list of the projects they have a role in', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${contributorToken}`)
@@ -142,7 +142,7 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data).toHaveLength(2);
     });
 
-    test('A user should be able to get a list of projects as viewer', async () => {
+    test('A user with viewer role on some projects should be able to get a list of the projects they have a role in', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${viewerToken}`)
@@ -154,7 +154,7 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data).toHaveLength(2);
     });
 
-    test('A user should be able to get a list of projects with q param', async () => {
+    test('A user with owner role should be able to get a list of the projects with q param where they have a role in', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects?q=User')
         .set('Authorization', `Bearer ${jwtToken}`)
