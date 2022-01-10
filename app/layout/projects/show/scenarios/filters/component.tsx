@@ -18,7 +18,7 @@ export interface ProjectScenariosFiltersProps {
 const STATUS = [
   { id: 'created', label: 'Created' },
   { id: 'running', label: 'Running' },
-  { id: 'completed', label: 'Completed' },
+  { id: 'done', label: 'Completed' },
   { id: 'failure', label: 'Failed' },
 ];
 
