@@ -16,6 +16,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { bootstrapApplication } from './utils/api-application';
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -76,22 +77,10 @@ describe('UsersModule (e2e)', () => {
   };
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    app = await bootstrapApplication();
 
-    apiEventsService = moduleFixture.get<ApiEventsService>(ApiEventsService);
-    usersService = moduleFixture.get<UsersService>(UsersService);
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
+    apiEventsService = app.get<ApiEventsService>(ApiEventsService);
+    usersService = app.get<UsersService>(UsersService);
   });
 
   afterAll(async () => {
