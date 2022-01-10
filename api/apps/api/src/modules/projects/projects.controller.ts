@@ -78,9 +78,11 @@ import {
 import { forbiddenError } from '../access-control/access-control.types';
 import { projectNotFound, unknownError } from '../blm';
 import { Response } from 'express';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import {
+  ImplementsAcl,
+  IsMissingAclImplementation,
+} from '@marxan-api/decorators/acl.decorator';
 
-@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(projectResource.className)
@@ -91,10 +93,11 @@ export class ProjectsController {
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
     private readonly geoFeatureService: GeoFeaturesService,
     private readonly projectSerializer: ProjectSerializer,
-    private readonly jobsStatusSerizalizer: JobStatusSerializer,
+    private readonly jobsStatusSerializer: JobStatusSerializer,
     private readonly shapefileService: ShapefileService,
   ) {}
 
+  @IsMissingAclImplementation()
   @ApiOperation({
     description: 'Find all geo features',
   })
@@ -136,6 +139,7 @@ export class ProjectsController {
    *
    * @debt We may want to use a custom interceptor to process import files
    */
+  @ImplementsAcl()
   @ApiOperation({
     description: 'Import a Marxan project via file upload',
     summary: 'Import a Marxan project',
@@ -158,6 +162,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @ImplementsAcl()
   @ApiOperation({ description: 'Create project' })
   @ApiOkResponse({ type: ProjectResultSingular })
   @ApiTags(asyncJobTag)
@@ -181,6 +186,7 @@ export class ProjectsController {
     );
   }
 
+  @ImplementsAcl()
   @ApiOperation({ description: 'Update project' })
   @ApiOkResponse({ type: ProjectResultSingular })
   @ApiTags(asyncJobTag)
@@ -202,6 +208,7 @@ export class ProjectsController {
     );
   }
 
+  @ImplementsAcl()
   @ApiOperation({ description: 'Delete project' })
   @ApiOkResponse()
   @Delete(':id')
@@ -217,6 +224,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @IsMissingAclImplementation()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: 'Upload shapefile for project-specific planning unit grid',
@@ -238,6 +246,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @IsMissingAclImplementation()
   @ApiOperation({
     description: `Find running jobs for each scenario under given project`,
   })
@@ -253,12 +262,10 @@ export class ProjectsController {
         authenticatedUser: req.user,
       },
     );
-    return this.jobsStatusSerizalizer.serialize(
-      projectId,
-      projectWithScenarios,
-    );
+    return this.jobsStatusSerializer.serialize(projectId, projectWithScenarios);
   }
 
+  @IsMissingAclImplementation()
   @ApiConsumesShapefile({
     withGeoJsonResponse: true,
     type: PlanningAreaResponseDto,
@@ -286,6 +293,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @IsMissingAclImplementation()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description: `Upload shapefiles of species or bioregional features.`,
@@ -314,6 +322,7 @@ export class ProjectsController {
     return { success: true };
   }
 
+  @ImplementsAcl()
   @ApiOperation({
     description: 'Updates the project BLM range and calculate its values',
   })
@@ -357,6 +366,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @ImplementsAcl()
   @ApiOperation({
     description: 'Shows the project BLM values of a project',
   })
@@ -390,6 +400,7 @@ export class ProjectsController {
     return result.right;
   }
 
+  @IsMissingAclImplementation()
   @Post(`:id/export`)
   async requestProjectExport(@Param('id') id: string) {
     return {
@@ -397,6 +408,7 @@ export class ProjectsController {
     };
   }
 
+  @IsMissingAclImplementation()
   @Get(`:id/export/:exportId`)
   @Header(`Content-Type`, `application/zip`)
   @Header('Content-Disposition', 'attachment; filename="export.zip"')

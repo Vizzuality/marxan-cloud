@@ -30,9 +30,9 @@ import {
   UsersInScenarioResult,
 } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
-@IsMissingAclImplementation()
+@ImplementsAcl()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Scenarios-Users Roles')
