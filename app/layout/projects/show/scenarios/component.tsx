@@ -1,11 +1,9 @@
 import React, { Fragment, useCallback, useState } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
-
-import { setFilters } from 'store/slices/projects/[id]';
 
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -34,13 +32,11 @@ import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-import REMOVE_SVG from 'svgs/ui/remove.svg?sprite';
 
 export interface ProjectScenariosProps {
 }
 
 export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
-  const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const { addToast } = useToasts();
 
@@ -63,7 +59,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   } = useScenarios(pid, {
     filters: {
       projectId: pid,
-      ...filters,
     },
   });
 
@@ -259,37 +254,6 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               >
                 <span className="mr-5">Create scenario</span>
                 <Icon icon={PLUS_SVG} className="w-4 h-4" />
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {!loading && filters && !rawScenariosData.length && (
-          <motion.div
-            key="project-scenarios-empty"
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            className="flex items-center h-full pl-20 bg-gray-700 bg-right bg-no-repeat bg-contain rounded-4xl"
-            style={{
-              backgroundImage: `url(${bgScenariosDashboard})`,
-            }}
-          >
-            <div>
-              <h2 className="text-lg font-medium font-heading">
-                No scenarios found matching the current filters
-              </h2>
-
-              <h3 className="mt-1 text-lg font-medium text-gray-300 font-heading">Remove filters by clicking the button below</h3>
-
-              <Button
-                theme="primary"
-                size="lg"
-                className="mt-10"
-                onClick={() => dispatch(setFilters(null))}
-              >
-                <span className="mr-5">Remove filters</span>
-                <Icon icon={REMOVE_SVG} className="w-4 h-4" />
               </Button>
             </div>
           </motion.div>

@@ -209,8 +209,9 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     // filter it out manually in the frontend. It'll allow us to make the feature work
     // in the frontend for now, albeit in a non-ideal way.
     const filteredData = parsedData.filter((parsedDataItem) => {
-      if (!filters?.status) return true;
-      return (filters?.status as Array<string> || []).includes(parsedDataItem.runStatus);
+      const statusFiltersArr = (filters?.status as Array<string> || []);
+      if (!statusFiltersArr || !statusFiltersArr?.length) return true;
+      return statusFiltersArr.includes(parsedDataItem.runStatus);
     });
 
     return {
