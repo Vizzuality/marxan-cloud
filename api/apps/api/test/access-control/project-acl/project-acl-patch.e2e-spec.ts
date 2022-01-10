@@ -95,7 +95,7 @@ test(`adds a not allowed user role to project`, async () => {
 
 test(`adds nonsensical userId`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  const nonsenseUserIdResponse = await fixtures.WhenAddingNonSenseUserId(
+  const nonsenseUserIdResponse = await fixtures.WhenAddingNonsenseUserId(
     projectId,
   );
   fixtures.ThenBadRequestAndUserIdMessageIsReturned(nonsenseUserIdResponse);

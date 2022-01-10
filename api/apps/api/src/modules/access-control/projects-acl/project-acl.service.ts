@@ -71,8 +71,10 @@ export class ProjectAclService implements ProjectAccessControl {
   ) {}
 
   // TODO: this will be changed in the following release of user requirements.
-  // For now, anyone should be able to create projects, regardless of having roles or not.
-  // In the future project creation will be limited to organization contributors, so this logic will be moved to the access control module
+  // For now, anyone should be able to create projects, regardless of having
+  // roles or not. In the future project creation will be limited to
+  // organization contributors, so this logic will be moved to the access
+  // control module
   async canCreateProject(_userId: string): Promise<Permit> {
     return true;
   }
@@ -130,10 +132,10 @@ export class ProjectAclService implements ProjectAccessControl {
     return otherOwnersInProject >= 1;
   }
   /**
-   * @debt This module should not involve user details and it should deal with it
-   * using a standalone module that will access the data just to read it. We
-   * have to get back to it once scenarios, organizations and solutions are included
-   * inside the access-module.
+   * @debt This module should not involve user details and it should deal with
+   * it using a standalone module that will access the data just to read it. We
+   * have to get back to it once scenarios, organizations and solutions are
+   * included inside the access-module.
    */
   async findUsersInProject(
     projectId: string,
