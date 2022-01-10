@@ -3,6 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import Button from 'components/button';
+import Checkbox from 'components/forms/checkbox';
 import Label from 'components/forms/label';
 import Radio from 'components/forms/radio';
 
@@ -14,11 +15,12 @@ export interface ProjectScenariosFiltersProps {
   onDismiss?: () => void;
 }
 
-// const STATUS = [
-//   { id: 'created', label: 'created' },
-//   { id: 'running', label: 'running' },
-//   { id: 'completed', label: 'completed' },
-// ];
+const STATUS = [
+  { id: 'created', label: 'Created' },
+  { id: 'running', label: 'Running' },
+  { id: 'done', label: 'Completed' },
+  { id: 'failure', label: 'Failed' },
+];
 
 const SORT = [
   { id: '-lastModifiedAt', label: 'Most recent' },
@@ -66,7 +68,7 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
           <h2 className="pl-8 mb-5 text-lg pr-28 font-heading">Filters</h2>
 
           <div className="flex flex-col px-8 space-y-5">
-            {/* <div>
+            <div>
               <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Filter by type</h3>
               <div className="flex flex-col space-y-2">
                 {STATUS.map(({ id, label }) => {
@@ -87,7 +89,7 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
                   );
                 })}
               </div>
-            </div> */}
+            </div>
 
             <div>
               <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Order by</h3>
