@@ -271,7 +271,7 @@ export function useSaveScenario({
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.setQueryData(['scenarios', id], data?.data);
 
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -300,7 +300,7 @@ export function useDeleteScenario({
 
   return useMutation(deleteScenario, {
     onSuccess: (data, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -330,7 +330,7 @@ export function useUploadScenarioPU({
 
   return useMutation(uploadScenarioPUShapefile, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -361,7 +361,7 @@ export function useUploadPA({
 
   return useMutation(uploadPAShapefile, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
@@ -432,7 +432,7 @@ export function useDownloadCostSurface({
       document.body.appendChild(link);
       link.click();
       link.remove();
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -462,7 +462,7 @@ export function useUploadCostSurface({
 
   return useMutation(uploadScenarioCostSurface, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -550,7 +550,7 @@ export function useSaveScenarioPU({
 
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
       const { id } = variables;
       queryClient.invalidateQueries(['scenarios-pu', id]);
     },
@@ -584,7 +584,7 @@ export function useDuplicateScenario({
       const { id, projectId } = data;
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.invalidateQueries(['scenarios', id]);
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -613,7 +613,7 @@ export function useRunScenario({
 
   return useMutation(duplicateScenario, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -642,7 +642,7 @@ export function useCancelRunScenario({
 
   return useMutation(duplicateScenario, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
