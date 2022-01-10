@@ -28,7 +28,9 @@ import { projectResource } from '@marxan-api/modules/projects/project.api.entity
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { isLeft } from 'fp-ts/Either';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(projectResource.className)

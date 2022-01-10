@@ -78,7 +78,9 @@ import {
 import { forbiddenError } from '../access-control/access-control.types';
 import { projectNotFound, unknownError } from '../blm';
 import { Response } from 'express';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(projectResource.className)

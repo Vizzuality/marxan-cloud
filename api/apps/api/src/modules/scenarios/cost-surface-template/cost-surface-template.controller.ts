@@ -21,7 +21,9 @@ import {
   FileNotReady,
   ScenarioCostSurfaceTemplateService,
 } from './scenario-cost-surface-template.service';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)

@@ -1,19 +1,18 @@
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import {
+  Body,
   Controller,
-  Get,
-  Req,
-  Param,
-  ParseUUIDPipe,
-  UseGuards,
-  ForbiddenException,
   Delete,
-  Patch,
+  ForbiddenException,
+  Get,
   HttpCode,
   HttpStatus,
-  Body,
-  InternalServerErrorException,
+  Param,
+  ParseUUIDPipe,
+  Patch,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios-acl/scenario-acl.service';
@@ -27,16 +26,13 @@ import {
 } from '@nestjs/swagger';
 import { isLeft } from 'fp-ts/lib/These';
 import {
-  lastOwner,
-  forbiddenError,
-  transactionFailed,
-} from '@marxan-api/modules/access-control';
-import {
   UserRoleInScenarioDto,
   UsersInScenarioResult,
 } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Scenarios-Users Roles')

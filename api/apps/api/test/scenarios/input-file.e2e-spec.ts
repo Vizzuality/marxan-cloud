@@ -134,7 +134,7 @@ describe(`when a user updates scenario with input data with input keys`, () => {
   });
 
   // then
-  it(`should return set metdata but without input keys`, async () => {
+  it(`should return set metadata but without input keys`, async () => {
     await fixtures.ThenScenarioHasMetadata(
       scenarioId,
       fixtures.scenarioMetadata,
@@ -144,13 +144,13 @@ describe(`when a user updates scenario with input data with input keys`, () => {
 
 describe(`when a user updates scenario with invalid input data`, () => {
   let scenarioId: string;
-  let originalMedatadata: Record<string, unknown> | undefined;
+  let originalMetadata: Record<string, unknown> | undefined;
   let result: request.Response;
   beforeEach(async () => {
     // given
     const scenarioData = await fixtures.GivenScenarioExists();
     scenarioId = scenarioData.id;
-    originalMedatadata = scenarioData.attributes.metadata;
+    originalMetadata = scenarioData.attributes.metadata;
     // when
     result = await fixtures.WhenUpdatesScenarioWithInput(
       scenarioId,
@@ -161,7 +161,7 @@ describe(`when a user updates scenario with invalid input data`, () => {
   // then
   it(`should return not changed metadata to user`, async () => {
     await fixtures.ThenScenarioHasMetadata(scenarioId, {
-      metadata: originalMedatadata,
+      metadata: originalMetadata,
     });
   });
 

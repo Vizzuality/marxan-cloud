@@ -1,19 +1,18 @@
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import {
+  Body,
   Controller,
+  Delete,
+  ForbiddenException,
   Get,
-  Req,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
-  UseGuards,
-  Delete,
   Patch,
-  Body,
-  HttpCode,
-  ForbiddenException,
-  HttpStatus,
   Query,
-  InternalServerErrorException,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
@@ -30,13 +29,10 @@ import {
   UserRoleInProjectDto,
   UsersInProjectResult,
 } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import {
-  forbiddenError,
-  lastOwner,
-  transactionFailed,
-} from '@marxan-api/modules/access-control';
 import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Projects-Users Roles')
