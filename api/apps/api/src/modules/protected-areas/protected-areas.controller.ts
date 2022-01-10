@@ -36,7 +36,9 @@ import { IUCNProtectedAreaCategoryResult } from './dto/iucn-protected-area-categ
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(protectedAreaResource.className)

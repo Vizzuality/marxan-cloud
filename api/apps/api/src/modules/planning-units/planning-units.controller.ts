@@ -13,10 +13,12 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { Request, Response } from 'express';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags('Plannig units')
+@ApiTags('Planning units')
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
   constructor(private readonly proxyService: ProxyService) {}

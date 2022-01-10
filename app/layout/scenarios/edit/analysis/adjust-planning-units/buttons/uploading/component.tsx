@@ -2,6 +2,7 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 
+import { PLANNING_UNIT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF } from 'react-final-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -11,6 +12,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
+import { bytesToMegabytes } from 'utils/units';
 
 import { useSaveScenarioPU, useUploadScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -49,6 +51,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
+
   const { uploadingValue, puIncludedValue, puExcludedValue } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const INITIAL_VALUES = useMemo(() => {
@@ -119,13 +122,20 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         dispatch(setUploadingValue(validGeoJSON));
         console.info('Shapefile uploaded', g);
       },
-      onError: () => {
+      onError: ({ response }) => {
+        const { errors } = response.data;
+
         setLoading(false);
         setSuccessFile(null);
+
         addToast('error-upload-shapefile', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Shapefile could not be uploaded</p>
+            <ul className="text-sm">
+              {errors.map((e) => (
+                <li key={`${e.status}`}>{e.title}</li>
+              ))}
+            </ul>
           </>
         ), {
           level: 'error',
@@ -136,7 +146,14 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
-    const { errors } = r;
+
+    // `file-too-large` backend error message is not friendly.
+    // It'll display the max size in bytes which the average user may not understand.
+    const errors = r.errors.map((error) => {
+      return error.code === 'file-too-large'
+        ? { error, message: `File is larger than ${bytesToMegabytes(PLANNING_UNIT_UPLOADER_MAX_SIZE)} MB` }
+        : error;
+    });
 
     addToast('drop-error', (
       <>
@@ -161,7 +178,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   } = useDropzone({
     // accept: 'image/*',
     multiple: false,
-    maxSize: 1000000,
+    maxSize: PLANNING_UNIT_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -328,7 +345,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
                         or click here to upload
                       </p>
 
-                      <p className="mt-2 text-gray-300 text-xxs">{'Recommended file size < 1 MB'}</p>
+                      <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PLANNING_UNIT_UPLOADER_MAX_SIZE)} MB`}</p>
 
                       <Loading
                         visible={loading}

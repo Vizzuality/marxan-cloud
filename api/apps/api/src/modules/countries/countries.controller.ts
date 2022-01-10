@@ -19,7 +19,9 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(countryResource.className)

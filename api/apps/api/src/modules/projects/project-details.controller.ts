@@ -26,6 +26,7 @@ import { notFound, ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
 import { isLeft } from 'fp-ts/lib/Either';
 import { forbiddenError } from '../access-control';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -36,6 +37,7 @@ export class ProjectDetailsController {
   ) {}
 
   @ApiBearerAuth()
+  @ImplementsAcl()
   @UseGuards(JwtAuthGuard)
   @SingleProject()
   @Get(':id')

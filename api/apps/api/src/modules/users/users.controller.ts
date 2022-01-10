@@ -29,7 +29,9 @@ import {
 } from 'nestjs-base-service';
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(userResource.className)
