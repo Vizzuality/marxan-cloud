@@ -28,7 +28,9 @@ import {
 } from 'nestjs-base-service';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { Request, Response } from 'express';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(adminAreaResource.className)

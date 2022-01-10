@@ -26,6 +26,7 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { projectResource, ProjectResultPlural } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -36,6 +37,7 @@ export class ProjectsListingController {
   ) {}
 
   @ApiBearerAuth()
+  @IsMissingAclImplementation()
   @UseGuards(JwtAuthGuard)
   @ProjectsListing()
   @Get()
