@@ -230,7 +230,7 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: projectOwnerRole,
         }),
-    WhenAddingNonSenseUserId: async (scenarioId: string) =>
+    WhenAddingNonsenseUserId: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)
