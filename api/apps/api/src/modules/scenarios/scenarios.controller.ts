@@ -762,7 +762,10 @@ export class ScenariosController {
       }
     }
 
-    return AsyncJobDto.forScenario().asJsonApiMetadata();
+    return {
+      ...AsyncJobDto.forScenario().asJsonApiMetadata(),
+      data: { scenarioId: id },
+    };
   }
 
   @ApiOperation({
