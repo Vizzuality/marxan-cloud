@@ -9,6 +9,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   doesntExist,
+  hasPendingExport,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
 import { ProjectCheckerReal } from '@marxan-api/modules/scenarios/project-checker/project-checker.service-real';
@@ -128,6 +129,34 @@ it(`should return false for projects without planning area assigned yet`, async 
   });
 });
 
+it(`should return false for a project without pending exports`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  const hasPendingExports = await service.hasProjectPendingExports(`projectId`);
+  // then
+  expect(hasPendingExports).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
+});
+
+it(`should return an error for a project with pending exports`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenExportJob(
+    API_EVENT_KINDS.project__export__submitted__v1__alpha,
+  );
+  // and
+  const hasPendingExports = await service.hasProjectPendingExports(`projectId`);
+  // then
+  expect(hasPendingExports).toEqual({
+    _tag: 'Left',
+    left: hasPendingExport,
+  });
+});
+
 it(`should fail when project can't be find`, async () => {
   // given
   const service = fixtures.getService();
@@ -199,6 +228,9 @@ async function getFixtures() {
     gridKinds: Object.values(API_EVENT_KINDS)
       .filter((kind) => kind.startsWith(`project.grid.`))
       .sort(),
+    exportKinds: Object.values(API_EVENT_KINDS)
+      .filter((kind) => kind.startsWith(`project.export.`))
+      .sort(),
     ThenShouldAskAllPlanningUnitsStatuses() {
       expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledTimes(2);
       expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledWith({
@@ -222,6 +254,20 @@ async function getFixtures() {
       fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
         async (args) => {
           if (isEqual(args.kind, In(fixtures.planningUnitsKinds))) {
+            return {
+              kind,
+              timestamp: new Date(),
+              topic: `projectId`,
+            };
+          }
+          throw new NotFoundException();
+        },
+      );
+    },
+    GivenExportJob(kind: API_EVENT_KINDS) {
+      fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
+        async (_args) => {
+          if (fixtures.exportKinds.includes(kind)) {
             return {
               kind,
               timestamp: new Date(),

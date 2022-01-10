@@ -28,7 +28,20 @@ export class ProjectCheckerReal implements ProjectChecker {
   async hasProjectPendingExports(
     projectId: string,
   ): Promise<Either<HasPendingExport, boolean>> {
-    const pendingExportExist = false;
+    const exportEvent = await this.apiEvents
+      .getLatestEventForTopic({
+        topic: projectId,
+        kind: In([
+          API_EVENT_KINDS.project__export__finished__v1__alpha,
+          API_EVENT_KINDS.project__export__failed__v1__alpha,
+          API_EVENT_KINDS.project__export__submitted__v1__alpha,
+        ]),
+      })
+      .catch(this.createNotFoundHandler());
+
+    const pendingExportExist =
+      exportEvent?.kind ===
+      API_EVENT_KINDS.project__export__submitted__v1__alpha;
 
     if (pendingExportExist) return left(hasPendingExport);
 
