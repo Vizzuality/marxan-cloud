@@ -2,6 +2,7 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 
+import { PROTECTED_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -14,6 +15,7 @@ import {
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+import { bytesToMegabytes } from 'utils/units';
 
 import { useUploadPA } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -48,12 +50,6 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   const { addToast } = useToasts();
 
   const dispatch = useDispatch();
-
-  const bytesToMb = (bytes) => {
-    return (bytes / 1048576).toFixed(0);
-  };
-
-  const maxSize = 3000000;
 
   const scenarioSlice = getScenarioEditSlice(sid);
 
@@ -95,7 +91,14 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   const onDropRejected = (rejectedFiles) => {
     const r = rejectedFiles[0];
-    const { errors } = r;
+
+    // `file-too-large` backend error message is not friendly.
+    // It'll display the max size in bytes which the average user may not understand.
+    const errors = r.errors.map((error) => {
+      return error.code === 'file-too-large'
+        ? { error, message: `File is larger than ${bytesToMegabytes(PROTECTED_AREA_UPLOADER_MAX_SIZE)} MB` }
+        : error;
+    });
 
     addToast('drop-error', (
       <>
@@ -124,14 +127,20 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
         dispatch(setCache(Date.now()));
         setOpened(false);
       },
-      onError: () => {
+      onError: ({ response }) => {
+        const { errors } = response.data;
+
         setLoading(false);
         setSuccessFile(null);
 
         addToast('error-upload-protected-area', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Protected area could not be uploaded</p>
+            <ul className="text-sm">
+              {errors.map((e) => (
+                <li key={`${e.status}`}>{e.title}</li>
+              ))}
+            </ul>
           </>
         ), {
           level: 'error',
@@ -148,7 +157,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
-    maxSize: 3000000,
+    maxSize: PROTECTED_AREA_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -217,7 +226,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                             to upload
                           </p>
 
-                          <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMb(maxSize)} MB`}</p>
+                          <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PROTECTED_AREA_UPLOADER_MAX_SIZE)} MB`}</p>
 
                           <Loading
                             visible={loading}
