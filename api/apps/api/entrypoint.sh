@@ -10,6 +10,10 @@ case "$1" in
         echo "Running Development Server"
         exec yarn api:start:dev
         ;;
+    debug)
+        echo "Running Development Server with inspector"
+        exec yarn api:debug
+        ;;
     test-unit)
         echo "Running Unit Tests"
         exec yarn test:unit:ci apps/api libs

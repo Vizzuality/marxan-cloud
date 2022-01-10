@@ -6,6 +6,10 @@ case "$1" in
         echo "Running Development Server"
         exec yarn geoprocessing:start:dev
         ;;
+    debug)
+        echo "Running Development Server with inspector"
+        exec yarn geoprocessing:debug
+        ;;
     test-unit)
         echo "Running Unit Tests"
         exec yarn test:unit:ci apps/geoprocessing libs
