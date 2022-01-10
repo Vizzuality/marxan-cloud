@@ -72,6 +72,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         ), {
           level: 'success',
         });
+
         setBlmGraph(true);
         console.info('Calibration range sent succesfully');
       },

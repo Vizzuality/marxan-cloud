@@ -194,7 +194,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
           <Modal
             title="Run scenario"
             open={runOpen}
-            size="wide"
+            size="narrow"
             onDismiss={() => setRunOpen(false)}
           >
             <Run />
