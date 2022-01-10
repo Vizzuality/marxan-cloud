@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  api:
+    ports:
+      - "127.0.0.1:${API_DEBUG_INSPECT_PORT:-9230}:9229"
+    command: debug
+
+  geoprocessing:
+    ports:
+      - "127.0.0.1:${GEOPROCESSING_DEBUG_INSPECT_PORT:-9240}:9229"
+    command: debug
