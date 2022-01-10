@@ -123,7 +123,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     .reduce((acc, k) => {
       // Backend isn't able to deal with this one yet; it'll always return an empty array
       // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
-      // move forward useable the filters.
+      // move forward with useable filters.
       if (k === 'status') return acc;
 
       return {
@@ -210,7 +210,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     // in the frontend for now, albeit in a non-ideal way.
     const filteredData = parsedData.filter((parsedDataItem) => {
       const statusFiltersArr = (filters?.status as Array<string> || []);
-      if (!statusFiltersArr || !statusFiltersArr?.length) return true;
+      // No filters to apply, return everything
+      if (!statusFiltersArr.length) return true;
       return statusFiltersArr.includes(parsedDataItem.runStatus);
     });
 
