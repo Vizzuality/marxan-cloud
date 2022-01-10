@@ -127,7 +127,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
-      expect(jsonAPIResponse.data).toHaveLength(2);
+      expect(jsonAPIResponse.data).toHaveLength(4);
     });
 
     test('A user should be able to get a list of projects as contributor', async () => {
@@ -163,7 +163,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
-      expect(jsonAPIResponse.data).toHaveLength(2);
+      expect(jsonAPIResponse.data).toHaveLength(4);
     });
 
     test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
