@@ -163,8 +163,13 @@ export class ProjectsService {
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
-  async requestExport(projectId: string): Promise<string> {
+  async requestExport(
+    projectId: string,
+    requester: ProjectsRequest['authenticatedUser'],
+  ): Promise<string> {
     // ACL slot
+    await this.assertProject(projectId, requester);
+
     return (
       await this.commandBus.execute(
         new ExportProject(new ResourceId(projectId)),

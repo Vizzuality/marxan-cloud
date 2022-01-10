@@ -389,9 +389,12 @@ export class ProjectsController {
   }
 
   @Post(`:id/export`)
-  async requestProjectExport(@Param('id') id: string) {
+  async requestProjectExport(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
     return {
-      id: await this.projectsService.requestExport(id),
+      id: await this.projectsService.requestExport(id, req.user),
     };
   }
 
