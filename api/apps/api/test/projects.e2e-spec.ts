@@ -25,6 +25,8 @@ afterAll(async () => {
 describe('ProjectsModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
+  let contributorToken: string;
+  let viewerToken: string;
   const Deserializer = new JSONAPISerializer.Deserializer({
     keyForAttribute: 'camelCase',
   });
@@ -37,6 +39,8 @@ describe('ProjectsModule (e2e)', () => {
   beforeAll(async () => {
     app = await bootstrapApplication();
     jwtToken = await GivenUserIsLoggedIn(app);
+    contributorToken = await GivenUserIsLoggedIn(app, 'bb');
+    viewerToken = await GivenUserIsLoggedIn(app, 'cc');
   });
 
   afterAll(async () => {
@@ -114,7 +118,7 @@ describe('ProjectsModule (e2e)', () => {
       );
     });
 
-    test('A user should be able to get a list of projects', async () => {
+    test('A user should be able to get a list of projects as owner', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
@@ -123,6 +127,31 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
+      expect(jsonAPIResponse.data).toHaveLength(2);
+    });
+
+    test('A user should be able to get a list of projects as contributor', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/projects')
+        .set('Authorization', `Bearer ${contributorToken}`)
+        .expect(200);
+
+      const jsonAPIResponse: ProjectResultPlural = response.body;
+
+      expect(jsonAPIResponse.data[0].type).toBe('projects');
+      expect(jsonAPIResponse.data).toHaveLength(2);
+    });
+
+    test('A user should be able to get a list of projects as viewer', async () => {
+      const response = await request(app.getHttpServer())
+        .get('/api/v1/projects')
+        .set('Authorization', `Bearer ${viewerToken}`)
+        .expect(200);
+
+      const jsonAPIResponse: ProjectResultPlural = response.body;
+
+      expect(jsonAPIResponse.data[0].type).toBe('projects');
+      expect(jsonAPIResponse.data).toHaveLength(2);
     });
 
     test('A user should be able to get a list of projects with q param', async () => {
@@ -134,6 +163,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
+      expect(jsonAPIResponse.data).toHaveLength(2);
     });
 
     test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
