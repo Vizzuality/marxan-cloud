@@ -30,9 +30,9 @@ import {
   UsersInProjectResult,
 } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
-@IsMissingAclImplementation()
+@ImplementsAcl()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Projects-Users Roles')
