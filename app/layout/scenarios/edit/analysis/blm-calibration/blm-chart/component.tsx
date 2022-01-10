@@ -13,6 +13,9 @@ import {
   scaleLinear, line, area,
 } from 'd3';
 
+import { useSaveScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import {
   VISUALIZATION_PADDING,
   X_AXIS_HEIGHT,
@@ -59,6 +62,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
   const { query } = useRouter();
   const { sid } = query;
+
+  const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setBlm, setBlmImage } = scenarioSlice.actions;
@@ -111,6 +116,47 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
       setDimensions({ width: w, height: h });
     }
   }, [containerRef, setDimensions]);
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const onSaveBlm = useCallback((value) => {
+    const scenarioData = {
+      metadata: {
+        marxanInputParameterFile: {
+          BLM: value,
+        },
+      },
+    };
+
+    saveScenarioMutation.mutate({ id: `${sid}`, data: scenarioData }, {
+      onSuccess: ({ data: { data: s } }) => {
+        addToast('success-save-blm-value', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario blm calibration saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Scenario blm calibration saved', s);
+      },
+      onError: () => {
+        addToast('error-save-blm-value', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario blm calibration not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, saveScenarioMutation, addToast]);
 
   /**
    * When containerRef changes, we update the dimensions of the SVG
@@ -200,6 +246,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                     'bg-blue-500': blmValue === blm,
                   })}
                   onClick={() => {
+                    onSaveBlm(blmValue);
                     dispatch(setBlm(blmValue));
                     dispatch(setBlmImage(thumbnail));
                   }}
