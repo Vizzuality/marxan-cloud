@@ -13,10 +13,11 @@ import {
   DoesntExist,
   hasPendingExport,
   HasPendingExport,
-} from '@marxan-api/modules/scenarios/project-checker.service';
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
 
 @Injectable()
-export class ProjectCheckerReal {
+export class ProjectCheckerReal implements ProjectChecker {
   constructor(
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)

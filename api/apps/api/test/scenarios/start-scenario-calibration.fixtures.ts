@@ -7,7 +7,7 @@ import { HttpStatus } from '@nestjs/common';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { GivenProjectExists } from '../steps/given-project';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
+import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 
 export const getFixtures = async () => {

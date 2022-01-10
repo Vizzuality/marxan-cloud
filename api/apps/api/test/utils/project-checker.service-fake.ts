@@ -5,17 +5,23 @@ import {
   doesntExist,
   HasPendingExport,
   hasPendingExport,
-} from '@marxan-api/modules/scenarios/project-checker.service';
+  ProjectChecker,
+} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
 
 @Injectable()
-export class ProjectCheckerFake {
-  #projectsWithPendingExports: string[] = [];
-  #projectsThatAreNotReady: string[] = [];
+export class ProjectCheckerFake implements ProjectChecker {
+  private projectsWithPendingExports: string[];
+  private projectsThatAreNotReady: string[];
+
+  constructor() {
+    this.projectsWithPendingExports = [];
+    this.projectsThatAreNotReady = [];
+  }
 
   async hasProjectPendingExports(
     projectId: string,
   ): Promise<Either<HasPendingExport, boolean>> {
-    return this.#projectsWithPendingExports.includes(projectId)
+    return this.projectsWithPendingExports.includes(projectId)
       ? left(hasPendingExport)
       : right(false);
   }
@@ -23,12 +29,12 @@ export class ProjectCheckerFake {
   async isProjectReady(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    return this.#projectsThatAreNotReady.includes(projectId)
+    return this.projectsThatAreNotReady.includes(projectId)
       ? left(doesntExist)
       : right(true);
   }
 
   addPendingExportForProject(projectId: string) {
-    this.#projectsWithPendingExports.push(projectId);
+    this.projectsWithPendingExports.push(projectId);
   }
 }

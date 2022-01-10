@@ -31,6 +31,7 @@ import { GetProjectHandler } from './get-project.handler';
 import { ProjectBlmModule } from './blm';
 import { CloneModule } from '@marxan-api/modules/clone';
 import { AccessControlModule } from '../access-control';
+import { ProjectCheckerModule } from '@marxan-api/modules/scenarios/project-checker/project-checker.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { AccessControlModule } from '../access-control';
     ProjectBlmModule,
     CloneModule,
     AccessControlModule,
+    ProjectCheckerModule,
   ],
   providers: [
     ProjectsCrudService,

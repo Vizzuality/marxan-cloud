@@ -64,7 +64,7 @@ import { StartBlmCalibration } from './blm-calibration/start-blm-calibration.com
 import {
   DoesntExist,
   ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker.service';
+} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {

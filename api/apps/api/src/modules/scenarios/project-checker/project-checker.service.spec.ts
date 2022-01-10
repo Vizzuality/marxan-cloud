@@ -10,8 +10,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   doesntExist,
   ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker.service';
-import { ProjectCheckerReal } from '@marxan-api/modules/scenarios/project-checker.service-real';
+} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { ProjectCheckerReal } from '@marxan-api/modules/scenarios/project-checker/project-checker.service-real';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
