@@ -237,9 +237,6 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                     <div className="flex items-center space-x-5">
                       <div className="text-left">
                         <div className="text-lg">Run scenario</div>
-                        {/*
-                          <div className="text-sm text-gray-500">This will take 10 minutes</div>
-                        */}
                       </div>
 
                       <Icon icon={RUN_SVG} className="flex-shrink-0 w-7 h-7" />

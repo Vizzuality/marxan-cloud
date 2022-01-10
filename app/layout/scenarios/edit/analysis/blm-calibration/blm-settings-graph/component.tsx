@@ -1,11 +1,9 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 
@@ -32,11 +30,6 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm } = scenarioSlice.actions;
-
-  const dispatch = useDispatch();
-
   const { blm, blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const {
@@ -44,10 +37,6 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
     isFetching: calibrationResultsAreFetching,
     isFetched: calibrationResultsAreFetched,
   } = useScenarioCalibrationResults(sid);
-
-  const onSaveBlm = useCallback((values) => {
-    dispatch(setBlm(values?.blmCalibration));
-  }, [dispatch, setBlm]);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
@@ -60,7 +49,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
       <div className="flex">
         {calibrationResultsAreFetched && !!calibrationResultsData.length && (
           <FormRFF
-            onSubmit={onSaveBlm}
+            onSubmit={() => { }}
             initialValues={INITIAL_VALUES}
           >
             {({ handleSubmit }) => {

@@ -74,7 +74,7 @@ export const FIELDS = [
   },
   {
     id: 'BLM',
-    label: 'Clumping',
+    label: 'Blm',
     description: (
       <div className="space-y-2">
         <h4 className="font-heading text-lg mb-2.5">Boundary Length Modifier (BLM)</h4>
