@@ -28,7 +28,7 @@ test(`getting project users as viewer`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   await fixtures.GivenViewerWasAddedToProject(projectId);
   const response = await fixtures.WhenGettingProjectUsersAsViewer(projectId);
-  fixtures.ThenForbiddenIsReturned(response);
+  fixtures.ThenOwnerUserAndNewUserAddedToProjectAreReturned(response);
 });
 
 test(`getting project users as contributor`, async () => {
@@ -37,7 +37,7 @@ test(`getting project users as contributor`, async () => {
   const response = await fixtures.WhenGettingProjectUsersAsContributor(
     projectId,
   );
-  fixtures.ThenForbiddenIsReturned(response);
+  fixtures.ThenOwnerUserAndNewUserAddedToProjectAreReturned(response);
 });
 
 test(`getting project users as owner with a search query`, async () => {

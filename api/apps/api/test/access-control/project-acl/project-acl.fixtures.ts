@@ -352,6 +352,13 @@ export const getFixtures = async () => {
       expect(newUserCreated.roleName).toEqual(projectOwnerRole);
     },
 
+    ThenOwnerUserAndNewUserAddedToProjectAreReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+    },
+
     ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned: (
       response: request.Response,
     ) => {
