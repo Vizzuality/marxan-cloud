@@ -14,7 +14,7 @@ export class ExportComponent {
     readonly piece: ClonePiece,
     readonly resourceId: ResourceId,
     private finished: boolean = false,
-    private uris?: ComponentLocation[],
+    private uris: ComponentLocation[] = [],
   ) {}
 
   static newOne(resourceId: ResourceId, piece: ClonePiece): ExportComponent {
