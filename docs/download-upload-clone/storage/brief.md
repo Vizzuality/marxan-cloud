@@ -38,6 +38,12 @@ large files (e.g. > 4GiB) on personal computers.
 This would be available for download for a limited timeframe, typically
 configured by the platform admins of each MarxanCloud instance.
 
+- removing individual pieces
+
+This may be needed if pieces are eventually included in a single downloadable
+artifact. If ongoing engineering considerations lead to making the individual
+pieces available for download, this step may not be necessary.
+
 - allowing users to download the archive for a given project
 
 Users with suitable permissions on a project (see [relevant entries in the
@@ -56,3 +62,13 @@ and its scenarios, without having to download any archive artifacts, in some
 cases they may choose to first download a copy of the final archive: for
 example, for offline safeguarding/archiving, or to upload the archive to a
 different MarxanCloud instance.
+
+- checking the integrity of an uploaded archive
+
+Although some users may wish to edit project archives offline in order to tweak
+some of the data/metadata, MarxanCloud instances will prevent this by default in
+order to avoid data issues that may lead to uploading projects in an
+inconsistent state.
+
+- garbage-collecting archives that are not yet expired if their source project
+  is deleted
