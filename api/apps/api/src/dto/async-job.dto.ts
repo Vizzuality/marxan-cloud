@@ -49,11 +49,6 @@ export class AsyncJobDto {
   }
 }
 
-export class AdditionalData {
-  @ApiProperty()
-  scenarioId!: string;
-}
-
 export class JsonApiAsyncJobMeta {
   @ApiProperty({
     type: AsyncJobDto,
