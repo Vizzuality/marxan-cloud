@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Repository, Not } from 'typeorm';
+import { getConnection, Repository, Not, QueryFailedError } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
@@ -21,6 +21,7 @@ import {
   forbiddenError,
   lastOwner,
   transactionFailed,
+  queryFailed,
 } from '@marxan-api/modules/access-control';
 
 /**
@@ -70,8 +71,10 @@ export class ProjectAclService implements ProjectAccessControl {
   ) {}
 
   // TODO: this will be changed in the following release of user requirements.
-  // For now, anyone should be able to create projects, regardless of having roles or not.
-  // In the future project creation will be limited to organization contributors, so this logic will be moved to the access control module
+  // For now, anyone should be able to create projects, regardless of having
+  // roles or not. In the future project creation will be limited to
+  // organization contributors, so this logic will be moved to the access
+  // control module
   async canCreateProject(_userId: string): Promise<Permit> {
     return true;
   }
@@ -129,10 +132,10 @@ export class ProjectAclService implements ProjectAccessControl {
     return otherOwnersInProject >= 1;
   }
   /**
-   * @debt This module should not involve user details and it should deal with it
-   * using a standalone module that will access the data just to read it. We
-   * have to get back to it once scenarios, organizations and solutions are included
-   * inside the access-module.
+   * @debt This module should not involve user details and it should deal with
+   * it using a standalone module that will access the data just to read it. We
+   * have to get back to it once scenarios, organizations and solutions are
+   * included inside the access-module.
    */
   async findUsersInProject(
     projectId: string,
@@ -173,7 +176,10 @@ export class ProjectAclService implements ProjectAccessControl {
     loggedUserId: string,
   ): Promise<
     Either<
-      typeof transactionFailed | typeof forbiddenError | typeof lastOwner,
+      | typeof transactionFailed
+      | typeof forbiddenError
+      | typeof lastOwner
+      | typeof queryFailed,
       void
     >
   > {
@@ -217,9 +223,14 @@ export class ProjectAclService implements ProjectAccessControl {
           { roleName },
         );
       }
+
+      await apiQueryRunner.commitTransaction();
       return right(void 0);
     } catch (err) {
       await apiQueryRunner.rollbackTransaction();
+      if (err instanceof QueryFailedError) {
+        return left(queryFailed);
+      }
       return left(transactionFailed);
     } finally {
       await apiQueryRunner.release();

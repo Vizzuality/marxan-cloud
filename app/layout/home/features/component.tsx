@@ -67,14 +67,10 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
             >
               <Link href="/community/projects">
                 <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
-                  Explore
-                  <br />
-                  planning
-                  <br />
-                  examples
+                  Explore planning examples from around the world and learn
                 </p>
               </Link>
-              <div className="w-full overflow-hidden mt-14">
+              <div className="w-full overflow-hidden mt-10">
                 {EXAMPLE_PROJECTS.map(({
                   id, image, alt,
                 }, index) => (
