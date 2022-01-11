@@ -734,13 +734,13 @@ export class ScenariosController {
     summary: `Start BLM calibration process for a scenario.`,
   })
   @ApiOkResponse({
-    type: JsonApiAsyncJobMeta,
+    type: ScenarioResult,
   })
   @Post(`:id/calibration`)
   async startCalibration(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() { range }: StartScenarioBlmCalibrationDto,
-  ): Promise<JsonApiAsyncJobMeta> {
+  ): Promise<ScenarioResult> {
     const result = await this.service.startBlmCalibration(id, range);
 
     if (isLeft(result)) {
@@ -762,10 +762,7 @@ export class ScenariosController {
       }
     }
 
-    return {
-      ...AsyncJobDto.forScenario().asJsonApiMetadata(),
-      data: { scenarioId: id },
-    };
+    return this.scenarioSerializer.serialize(result.right, undefined, true);
   }
 
   @ApiOperation({

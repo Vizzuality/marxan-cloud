@@ -59,9 +59,4 @@ export class JsonApiAsyncJobMeta {
     type: AsyncJobDto,
   })
   meta!: AsyncJobDto;
-
-  @ApiProperty({
-    type: AdditionalData,
-  })
-  data?: AdditionalData;
 }

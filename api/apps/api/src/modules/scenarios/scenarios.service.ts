@@ -265,7 +265,7 @@ export class ScenariosService {
   async startBlmCalibration(
     id: string,
     rangeToUpdate?: [number, number],
-  ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
+  ): Promise<Either<ChangeRangeErrors | GetFailure, Scenario>> {
     const scenario = await this.getById(id);
     const projectId = scenario.projectId;
     if (rangeToUpdate) {
@@ -281,7 +281,7 @@ export class ScenariosService {
       new StartBlmCalibration(id, projectBlmValues.right.values),
     );
 
-    return right(true);
+    return right(scenario);
   }
 
   async getBlmCalibrationResults(
