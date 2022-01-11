@@ -25,17 +25,17 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
       <HeroAnimation />
       <Wrapper>
         <div className="relative flex flex-col justify-between max-w-5xl z-10 w-full h-full m-auto py-8 md:py-0 md:mt-64 md:mb-48">
-          <div className="lg:pr-96">
+          <div className="lg:pr-80">
             <h1
               className="pb-8 text-5xl font-semibold leading-tight"
             >
-              Spatial conservation planning in the cloud
+              Spatial Conservation Planning for Nature and People
             </h1>
 
-            <p className="md:pr-40">
-              This platform supports decision-making for biodiversity
-              {' '}
-              and people on land, freshwater and ocean systems.
+            <p className="md:pr-32">
+              The Marxan Planning Platform (MaPP) supports collaboration and decision-making for
+              biodiversity conservation and socio-economic objectives for land, freshwater and
+              ocean systems.
             </p>
 
             <div className="space-y-4 xs:flex xs:space-x-4 xs:space-y-0 mt-10 md:mt-18 md:mb-18">
@@ -61,7 +61,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
           <div className="relative md:absolute bottom-0 mt-10 md:mt-0 text-center md:text-left">
             <Link href="#features">
               <a className="mt-8" href="#features">
-                Scroll down
+                Discover more
                 <ARROW_DOWN_SVG className="inline w-3 ml-3" fill="white" />
               </a>
             </Link>
