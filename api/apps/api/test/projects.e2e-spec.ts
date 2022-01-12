@@ -130,13 +130,18 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data[0].type).toBe('projects');
       expect(jsonAPIResponse.data).toHaveLength(4);
 
-      const projectsArray: JSONAPIProjectData[] = jsonAPIResponse.data
-        .filter((p) => p.attributes.name !== 'Example Project 1 Org 1')
-        .filter((p) => p.attributes.name !== 'Example Project 2 Org 2')
-        .filter((p) => p.attributes.name !== completeProject.name)
-        .filter((p) => p.attributes.name !== minimalProject.name);
+      const projectNames: string[] = jsonAPIResponse.data.map(
+        (p) => p.attributes.name,
+      );
 
-      expect(projectsArray).toHaveLength(0);
+      expect(projectNames.sort()).toEqual(
+        [
+          'Example Project 1 Org 1',
+          'Example Project 2 Org 2',
+          completeProject.name,
+          minimalProject.name,
+        ].sort(),
+      );
     });
 
     test('A user with contributor role on some projects should be able to get a list of the projects they have a role in', async () => {
@@ -149,15 +154,13 @@ describe('ProjectsModule (e2e)', () => {
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
       expect(jsonAPIResponse.data).toHaveLength(2);
-      const projectsArray: JSONAPIProjectData[] = jsonAPIResponse.data.sort(
-        (a, b) => (a.attributes.name < b.attributes.name ? -1 : 1),
+      const projectsNames: string[] = jsonAPIResponse.data.map(
+        (p) => p.attributes.name,
       );
-      expect(projectsArray[0].attributes.name).toEqual(
+      expect(projectsNames.sort()).toEqual([
         'Example Project 1 Org 1',
-      );
-      expect(projectsArray[1].attributes.name).toEqual(
         'Example Project 2 Org 2',
-      );
+      ]);
     });
 
     test('A user with viewer role on some projects should be able to get a list of the projects they have a role in', async () => {
@@ -170,15 +173,13 @@ describe('ProjectsModule (e2e)', () => {
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
       expect(jsonAPIResponse.data).toHaveLength(2);
-      const projectsArray: JSONAPIProjectData[] = jsonAPIResponse.data.sort(
-        (a, b) => (a.attributes.name < b.attributes.name ? -1 : 1),
+      const projectsNames: string[] = jsonAPIResponse.data.map(
+        (p) => p.attributes.name,
       );
-      expect(projectsArray[0].attributes.name).toEqual(
+      expect(projectsNames.sort()).toEqual([
         'Example Project 1 Org 1',
-      );
-      expect(projectsArray[1].attributes.name).toEqual(
         'Example Project 2 Org 2',
-      );
+      ]);
     });
 
     test('A user with owner role should be able to get a list of the projects with q param where they have a role in', async () => {
@@ -191,13 +192,19 @@ describe('ProjectsModule (e2e)', () => {
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
       expect(jsonAPIResponse.data).toHaveLength(4);
-      const projectsArray: JSONAPIProjectData[] = jsonAPIResponse.data
-        .filter((p) => p.attributes.name !== 'Example Project 1 Org 1')
-        .filter((p) => p.attributes.name !== 'Example Project 2 Org 2')
-        .filter((p) => p.attributes.name !== completeProject.name)
-        .filter((p) => p.attributes.name !== minimalProject.name);
 
-      expect(projectsArray).toHaveLength(0);
+      const projectNames: string[] = jsonAPIResponse.data.map(
+        (p) => p.attributes.name,
+      );
+
+      expect(projectNames.sort()).toEqual(
+        [
+          'Example Project 1 Org 1',
+          'Example Project 2 Org 2',
+          completeProject.name,
+          minimalProject.name,
+        ].sort(),
+      );
     });
 
     test('A user should be get a list of projects without any included relationships if these have not been requested', async () => {
