@@ -23,25 +23,25 @@ export class CompletePieceHandler
     componentLocation,
     componentId,
   }: CompletePiece): Promise<void> {
-    const exportInstance = await this.exportRepository.find(exportId);
+    await this.exportRepository.transaction(async (repo) => {
+      const exportInstance = await repo.find(exportId);
 
-    if (!exportInstance) {
-      this.logger.error(
-        `${CompletePieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`,
+      if (!exportInstance) {
+        this.logger.error(
+          `${CompletePieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`,
+        );
+        // TODO: could emit event as compensation action to remove the artifact
+        return;
+      }
+
+      const exportAggregate = this.eventPublisher.mergeObjectContext(
+        exportInstance,
       );
-      // TODO: could emit event as compensation action to remove the artifact
-      return;
-    }
 
-    const exportAggregate = this.eventPublisher.mergeObjectContext(
-      exportInstance,
-    );
+      exportAggregate.completeComponent(componentId, componentLocation);
 
-    exportAggregate.completeComponent(componentId, componentLocation);
-
-    await this.exportRepository.save(exportAggregate);
-    exportAggregate.commit();
-
-    return Promise.resolve(undefined);
+      await repo.save(exportAggregate);
+      exportAggregate.commit();
+    });
   }
 }

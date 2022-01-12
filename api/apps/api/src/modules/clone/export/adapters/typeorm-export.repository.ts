@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import {
   ComponentId,
   ComponentLocation,
@@ -8,12 +8,17 @@ import {
 import { ExportRepository } from '../application/export-repository.port';
 import { Export, ExportId } from '../domain';
 import { ExportEntity } from './entities/exports.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class TypeormExportRepository implements ExportRepository {
+  private inTransaction = false;
+
   constructor(
     @InjectRepository(ExportEntity)
     private readonly exportRepo: Repository<ExportEntity>,
+    @InjectEntityManager(DbConnections.default)
+    private readonly entityManager: EntityManager,
   ) {}
 
   async find(exportId: ExportId): Promise<Export | undefined> {
@@ -22,7 +27,7 @@ export class TypeormExportRepository implements ExportRepository {
     });
     if (!exportEntity) return undefined;
 
-    const exportInstance = Export.fromSnapshot({
+    return Export.fromSnapshot({
       id: exportEntity.id,
       resourceId: exportEntity.resourceId,
       resourceKind: exportEntity.resourceKind,
@@ -37,13 +42,22 @@ export class TypeormExportRepository implements ExportRepository {
         ),
       })),
     });
-
-    return exportInstance;
   }
 
   async save(exportInstance: Export): Promise<void> {
     const exportEntity = ExportEntity.fromAggregate(exportInstance);
 
     await this.exportRepo.save(exportEntity);
+  }
+
+  transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
+    return this.entityManager.transaction((transactionEntityManager) => {
+      const transactionalRepository = new TypeormExportRepository(
+        transactionEntityManager.getRepository(ExportEntity),
+        transactionEntityManager,
+      );
+      transactionalRepository.inTransaction = true;
+      return code(transactionalRepository);
+    });
   }
 }

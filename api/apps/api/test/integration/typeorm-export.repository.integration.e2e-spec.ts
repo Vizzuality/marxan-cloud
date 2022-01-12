@@ -11,7 +11,6 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
 describe('Typeorm export repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
-  let repo: ExportRepository;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
@@ -25,7 +24,7 @@ describe('Typeorm export repository', () => {
     await fixtures.WhenSavingAnExportItShouldNotFail();
 
     await fixtures.ThenWhenReadingItFromRepositoryExportDataShouldBeOk({
-      componentIsCompleted: false,
+      componentsAreCompleted: false,
     });
   });
 
@@ -33,7 +32,15 @@ describe('Typeorm export repository', () => {
     await fixtures.WhenSavingAnExportItShouldNotFail();
     await fixtures.ThenWhenCompletingAComponent();
     await fixtures.ThenWhenReadingItFromRepositoryExportDataShouldBeOk({
-      componentIsCompleted: true,
+      componentsAreCompleted: true,
+    });
+  });
+
+  it('should save entities working with transaction', async () => {
+    await fixtures.WhenSavingAnExportWithTransactionItShouldNotFail();
+    await fixtures.ThenWhenCompletingEveryAComponentWithTransaction();
+    await fixtures.ThenWhenReadingItFromRepositoryExportDataShouldBeOk({
+      componentsAreCompleted: true,
     });
   });
 });
@@ -78,6 +85,30 @@ const getFixtures = async () => {
       exportId = exportInstance.id;
       await repo.save(exportInstance);
     },
+    WhenSavingAnExportWithTransactionItShouldNotFail: async () => {
+      resourceId = new ResourceId(v4());
+      componentId = new ComponentId(v4());
+      componentLocationUri = '/foo/bar/project-metadata.json';
+      componentLocationRelativePath = 'project-metadata.json';
+      const exportInstance = Export.newOne(resourceId, ResourceKind.Project, [
+        {
+          finished: false,
+          piece: ClonePiece.ProjectMetadata,
+          resourceId: resourceId.value,
+          id: componentId,
+          uris: [
+            new ComponentLocation(
+              componentLocationUri,
+              componentLocationRelativePath,
+            ),
+          ],
+        },
+      ]);
+      exportId = exportInstance.id;
+      await repo.transaction(async (repository) => {
+        await repository.save(exportInstance);
+      });
+    },
     ThenWhenCompletingAComponent: async () => {
       const componentLocation = new ComponentLocation(
         componentLocationUri,
@@ -89,10 +120,29 @@ const getFixtures = async () => {
       exportInstance.completeComponent(componentId, [componentLocation]);
       await repo.save(exportInstance);
     },
+    ThenWhenCompletingEveryAComponentWithTransaction: async () => {
+      const componentLocation = new ComponentLocation(
+        componentLocationUri,
+        componentLocationRelativePath,
+      );
+      const exportInstance = (await repo.find(exportId)) as Export;
+      expect(exportInstance).toBeDefined();
+
+      exportInstance
+        .toSnapshot()
+        .exportPieces.map((piece) => piece.id)
+        .forEach((id) =>
+          exportInstance.completeComponent(id, [componentLocation]),
+        );
+
+      await repo.transaction(async (repository) => {
+        await repository.save(exportInstance);
+      });
+    },
     ThenWhenReadingItFromRepositoryExportDataShouldBeOk: async ({
-      componentIsCompleted,
+      componentsAreCompleted,
     }: {
-      componentIsCompleted: boolean;
+      componentsAreCompleted: boolean;
     }) => {
       const result = (await repo.find(exportId)) as Export;
 
@@ -107,17 +157,18 @@ const getFixtures = async () => {
 
       const [exportComponent] = resultSnapshot.exportPieces;
 
-      expect(exportComponent.finished).toBe(componentIsCompleted);
+      expect(exportComponent.finished).toBe(componentsAreCompleted);
       expect(exportComponent.piece).toBe(ClonePiece.ProjectMetadata);
       expect(exportComponent.resourceId).toBe(resourceId.value);
 
-      if (componentIsCompleted) {
+      if (componentsAreCompleted) {
         expect(exportComponent.uris).toBeDefined();
-        expect(exportComponent.uris).toHaveLength(1);
-        expect(exportComponent.uris[0].uri).toBe(componentLocationUri);
-        expect(exportComponent.uris[0].relativePath).toBe(
-          componentLocationRelativePath,
-        );
+        expect(exportComponent.uris.length).toBeGreaterThan(0);
+
+        exportComponent.uris.forEach((el) => {
+          expect(el.uri).toEqual(componentLocationUri);
+          expect(el.relativePath).toEqual(componentLocationRelativePath);
+        });
       }
     },
   };
