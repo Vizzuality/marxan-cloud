@@ -688,10 +688,10 @@ export function useSaveScenarioCalibrationRange({
     method: 'POST',
   },
 }: UseSaveScenarioCalibrationRangeProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveScenarioCalibrationRange = ({ id, data }: SaveScenarioCalibrationRangeProps) => {
-    // queryClient.invalidateQueries(['scenario-calibration', id]);
     return SCENARIOS.request({
       url: `/${id}/calibration`,
       data,
@@ -705,11 +705,8 @@ export function useSaveScenarioCalibrationRange({
   return useMutation(saveScenarioCalibrationRange, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succcess', data, variables, context);
-
-      // const { refetch: refecthCalibrationResults } = useScenarioCalibrationResults({
-      //   scenarioId: data.scenarioId,
-      // });
-      // refecthCalibrationResults();
+      const { id } = variables;
+      queryClient.invalidateQueries(['scenario-calibration', id]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
