@@ -41,6 +41,8 @@ export class ExportComponentEntity {
   @ManyToOne(() => ExportEntity, (exportInstance) => exportInstance.components)
   export!: ExportEntity;
 
-  @OneToMany(() => ComponentLocationEntity, (uri) => uri.component)
+  @OneToMany(() => ComponentLocationEntity, (uri) => uri.component, {
+    cascade: true,
+  })
   uris!: ComponentLocationEntity[];
 }

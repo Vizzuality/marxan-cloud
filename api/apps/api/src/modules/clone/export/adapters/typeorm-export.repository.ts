@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
-
-import { Export, ExportId } from '../domain';
-import { ExportRepository } from '../application/export-repository.port';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExportEntity } from './entities/exports.api.entity';
-import { ExportComponentEntity } from './entities/export-components.api.entity';
 import { Repository } from 'typeorm';
 import {
   ComponentId,
   ComponentLocation,
 } from '../application/complete-piece.command';
+import { ExportRepository } from '../application/export-repository.port';
+import { Export, ExportId } from '../domain';
+import { ExportEntity } from './entities/exports.api.entity';
 
 @Injectable()
 export class TypeormExportRepository implements ExportRepository {
@@ -34,7 +32,7 @@ export class TypeormExportRepository implements ExportRepository {
         finished: component.finished,
         piece: component.piece,
         resourceId: component.resourceId,
-        uri: component.uris.map(
+        uris: component.uris.map(
           (element) => new ComponentLocation(element.uri, element.relativePath),
         ),
       })),
@@ -43,7 +41,9 @@ export class TypeormExportRepository implements ExportRepository {
     return exportInstance;
   }
 
-  save(exportInstance: Export): Promise<void> {
-    return Promise.resolve(undefined);
+  async save(exportInstance: Export): Promise<void> {
+    const exportEntity = ExportEntity.fromAggregate(exportInstance);
+
+    await this.exportRepo.save(exportEntity);
   }
 }
