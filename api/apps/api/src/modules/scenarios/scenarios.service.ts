@@ -29,8 +29,15 @@ import { CreateScenarioDTO } from './dto/create.scenario.dto';
 import { UpdateScenarioDTO } from './dto/update.scenario.dto';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
-import { OutputFilesService } from './output-files/output-files.service';
-import { InputFilesArchiverService, InputFilesService } from './input-files';
+import {
+  OutputFilesService,
+  OutputZipFailure,
+} from './output-files/output-files.service';
+import {
+  InputFilesArchiverService,
+  InputFilesService,
+  InputZipFailure,
+} from './input-files';
 import { notFound, RunService } from './marxan-run';
 import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { Scenario, SimpleJobStatus } from './scenario.api.entity';
@@ -65,6 +72,15 @@ import {
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
 import { StartBlmCalibration, CancelBlmCalibration } from './blm-calibration';
+import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
+import { LastUpdatedSpecificationError } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { PaginationMeta } from '@marxan-api/utils/app-base.service';
+import { ScenarioFeaturesData } from '@marxan/features';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
+import { string } from 'fp-ts';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -121,6 +137,7 @@ export class ScenariosService {
     private readonly commandBus: CommandBus,
     private readonly blmValuesRepository: ProjectBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
+    private readonly scenarioAclService: ScenarioAccessControl,
   ) {}
 
   async findAllPaginated(
@@ -130,20 +147,62 @@ export class ScenariosService {
     return this.crudService.findAllPaginated(fetchSpecification, appInfo);
   }
 
-  async getById(scenarioId: string, fetchSpecification?: FetchSpecification) {
-    return this.crudService.getById(scenarioId, fetchSpecification);
+  async getById(
+    scenarioId: string,
+    info: AppInfoDTO,
+    fetchSpecification?: FetchSpecification,
+  ): Promise<Either<typeof notFound | typeof forbiddenError, Scenario>> {
+    try {
+      assertDefined(info.authenticatedUser);
+      const scenario = await this.crudService.getById(
+        scenarioId,
+        fetchSpecification,
+      );
+      if (
+        !(await this.scenarioAclService.canViewScenario(
+          info.authenticatedUser.id,
+          scenarioId,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
+      return right(scenario);
+    } catch (error) {
+      return left(notFound);
+    }
   }
 
-  async remove(scenarioId: string): Promise<void> {
+  async remove(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
     await this.assertScenario(scenarioId);
-    return this.crudService.remove(scenarioId);
+    if (
+      !(await this.scenarioAclService.canDeleteScenario(userId, scenarioId))
+    ) {
+      return left(forbiddenError);
+    }
+    return right(await this.crudService.remove(scenarioId));
   }
 
   async create(
     input: CreateScenarioDTO,
     info: AppInfoDTO,
-  ): Promise<Either<ProjectNotReady | ProjectDoesntExist, Scenario>> {
+  ): Promise<
+    Either<
+      ProjectNotReady | ProjectDoesntExist | typeof forbiddenError,
+      Scenario
+    >
+  > {
     assertDefined(info.authenticatedUser);
+    if (
+      !(await this.scenarioAclService.canCreateScenario(
+        info.authenticatedUser.id,
+        input.projectId,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     const isProjectReady = await this.projectChecker.isProjectReady(
       input.projectId,
@@ -166,31 +225,66 @@ export class ScenariosService {
     return right(scenario);
   }
 
-  async update(scenarioId: string, input: UpdateScenarioDTO) {
+  async update(
+    scenarioId: string,
+    userId: string,
+    input: UpdateScenarioDTO,
+  ): Promise<Either<typeof forbiddenError, Scenario>> {
     await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
-    return await this.crudService.update(scenarioId, validatedMetadata);
+    return right(await this.crudService.update(scenarioId, validatedMetadata));
   }
 
-  async getFeatures(scenarioId: string) {
+  async getFeatures(
+    scenarioId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      typeof forbiddenError,
+      {
+        data: (Partial<ScenarioFeaturesData> | undefined)[];
+        metadata: PaginationMeta | undefined;
+      }
+    >
+  > {
     await this.assertScenario(scenarioId);
-    return await this.scenarioFeatures.findAllPaginated(undefined, {
-      params: {
-        scenarioId,
-      },
-    });
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(
+      await this.scenarioFeatures.findAllPaginated(undefined, {
+        params: {
+          scenarioId,
+        },
+      }),
+    );
   }
 
-  async getInputParameterFile(scenarioId: string): Promise<string> {
+  async getInputParameterFile(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, string>> {
     await this.assertScenario(scenarioId);
-    return this.inputFilesService.getInputParameterFile(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(
+      await this.inputFilesService.getInputParameterFile(scenarioId),
+    );
   }
 
   async changeLockStatus(
     scenarioId: string,
+    userId: string,
     input: UpdateScenarioPlanningUnitLockStatusDto,
-  ) {
+  ): Promise<Either<typeof forbiddenError, void>> {
     await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     await this.updatePlanningUnits.update(scenarioId, {
       include: {
         geo: input.byGeoJson?.include,
@@ -201,16 +295,30 @@ export class ScenariosService {
         geo: input.byGeoJson?.exclude,
       },
     });
-    return;
+    return right(void 0);
   }
 
-  processCostSurfaceShapefile(scenarioId: string, file: Express.Multer.File) {
+  async processCostSurfaceShapefile(
+    scenarioId: string,
+    userId: string,
+    file: Express.Multer.File,
+  ): Promise<Either<typeof forbiddenError, void>> {
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     this.costSurface.convert(scenarioId, file);
-    return;
+    return right(void 0);
   }
 
-  async uploadLockInShapeFile(scenarioId: string, file: Express.Multer.File) {
+  async uploadLockInShapeFile(
+    scenarioId: string,
+    userId: string,
+    file: Express.Multer.File,
+  ): Promise<Either<typeof forbiddenError, any>> {
     await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     /**
      * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
      * in case a shapefile is not validated and a status 4xx is sent back.
@@ -238,36 +346,67 @@ export class ScenariosService {
 
   async getCostSurfaceCsv(
     scenarioId: string,
+    userId: string,
     stream: stream.Writable,
-  ): Promise<void> {
+  ): Promise<Either<typeof forbiddenError, void>> {
     await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     await this.inputFilesService.readCostSurface(scenarioId, stream);
+    return right(void 0);
   }
 
-  async getSpecDatCsv(scenarioId: string): Promise<string> {
+  async getSpecDatCsv(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, string>> {
     await this.assertScenario(scenarioId);
-    return this.inputFilesService.getSpecDatContent(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.inputFilesService.getSpecDatContent(scenarioId));
   }
 
-  async getBoundDatCsv(scenarioId: string): Promise<string> {
+  async getBoundDatCsv(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, string>> {
     await this.assertScenario(scenarioId);
-    return this.inputFilesService.getBoundDatContent(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.inputFilesService.getBoundDatContent(scenarioId));
   }
 
-  async run(scenarioId: string, blm?: number): Promise<void> {
+  async run(
+    scenarioId: string,
+    userId: string,
+    blm?: number,
+  ): Promise<Either<typeof forbiddenError, void>> {
     const scenario = await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     await this.runService.run(
       pick(scenario, 'id', 'boundaryLengthModifier'),
       blm,
     );
+    return right(void 0);
   }
 
   async startBlmCalibration(
     id: string,
+    userInfo: AppInfoDTO,
     rangeToUpdate?: [number, number],
-  ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
-    const scenario = await this.getById(id);
-    const projectId = scenario.projectId;
+  ): Promise<
+    Either<ChangeRangeErrors | GetFailure | typeof forbiddenError, true>
+  > {
+    const scenario = await this.getById(id, userInfo);
+    if (isLeft(scenario)) {
+      return left(forbiddenError);
+    }
+    const projectId = scenario.right.projectId;
     if (rangeToUpdate) {
       const result = await this.commandBus.execute(
         new ChangeBlmRange(projectId, rangeToUpdate),
@@ -286,20 +425,38 @@ export class ScenariosService {
 
   async getBlmCalibrationResults(
     scenarioId: string,
-  ): Promise<CalibrationRunResult[]> {
-    return this.scenarioCalibrationRepository.getScenarioCalibrationResults(
-      scenarioId,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, CalibrationRunResult[]>> {
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(
+      await this.scenarioCalibrationRepository.getScenarioCalibrationResults(
+        scenarioId,
+      ),
     );
   }
 
-  async cancelBlmCalibration(scenarioId: string): Promise<void> {
+  async cancelBlmCalibration(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
     await this.assertScenario(scenarioId);
-
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     await this.commandBus.execute(new CancelBlmCalibration(scenarioId));
+    return right(void 0);
   }
 
-  async cancelMarxanRun(scenarioId: string): Promise<void> {
+  async cancelMarxanRun(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
     await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     const result = await this.runService.cancel(scenarioId);
     if (isLeft(result)) {
       switch (result.left) {
@@ -310,6 +467,7 @@ export class ScenariosService {
           throw new InternalServerErrorException();
       }
     }
+    return right(void 0);
   }
 
   private async assertScenario(scenarioId: string) {
@@ -319,49 +477,86 @@ export class ScenariosService {
   async getOneSolution(
     scenarioId: string,
     runId: string,
+    userId: string,
     _fetchSpecification: FetchSpecification,
-  ) {
+  ): Promise<Either<typeof forbiddenError, ScenariosOutputResultsApiEntity>> {
     await this.assertScenario(scenarioId);
-    // TODO permissions guard
-    // TODO runId is part of scenarioId
-    return this.solutionsCrudService.getById(runId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.solutionsCrudService.getById(runId));
   }
 
   async getBestSolution(
     scenarioId: string,
+    userId: string,
     fetchSpecification: FetchSpecification,
-  ) {
+  ): Promise<
+    Either<typeof forbiddenError, Partial<ScenariosOutputResultsApiEntity>[]>
+  > {
     await this.assertScenario(scenarioId);
-    // TODO permissions guard
-    return await this.solutionsCrudService
-      .findAll({
-        ...fetchSpecification,
-        filter: { ...fetchSpecification.filter, best: true, scenarioId },
-      })
-      .then((results) => results[0]);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(
+      await this.solutionsCrudService
+        .findAll({
+          ...fetchSpecification,
+          filter: { ...fetchSpecification.filter, best: true, scenarioId },
+        })
+        .then((results) => results[0]),
+    );
   }
 
   async getMostDifferentSolutions(
     scenarioId: string,
+    userId: string,
     fetchSpecification: FetchSpecification,
-  ) {
+  ): Promise<
+    Either<
+      typeof forbiddenError,
+      [Partial<ScenariosOutputResultsApiEntity>[], number]
+    >
+  > {
     await this.assertScenario(scenarioId);
-    // TODO permissions guard
-    return this.solutionsCrudService.findAll({
-      ...fetchSpecification,
-      filter: { ...fetchSpecification.filter, distinctFive: true, scenarioId },
-    });
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(
+      await this.solutionsCrudService.findAll({
+        ...fetchSpecification,
+        filter: {
+          ...fetchSpecification.filter,
+          distinctFive: true,
+          scenarioId,
+        },
+      }),
+    );
   }
 
   async findAllSolutionsPaginated(
     scenarioId: string,
+    userId: string,
     fetchSpecification: FetchSpecification,
-  ) {
+  ): Promise<
+    Either<
+      typeof forbiddenError,
+      {
+        data: (Partial<ScenariosOutputResultsApiEntity> | undefined)[];
+        metadata: PaginationMeta | undefined;
+      }
+    >
+  > {
     await this.assertScenario(scenarioId);
-    return this.solutionsCrudService.findAllPaginated({
-      ...fetchSpecification,
-      filter: { ...fetchSpecification.filter, scenarioId },
-    });
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(
+      await this.solutionsCrudService.findAllPaginated({
+        ...fetchSpecification,
+        filter: { ...fetchSpecification.filter, scenarioId },
+      }),
+    );
   }
 
   /**
@@ -396,9 +591,13 @@ export class ScenariosService {
    */
   async getFeatureSetForScenario(
     scenarioId: string,
-  ): Promise<GeoFeatureSetSpecification | undefined> {
-    const scenario = await this.getById(scenarioId);
-    assertDefined(scenario);
+    userInfo: AppInfoDTO,
+  ): Promise<GeoFeatureSetSpecification | typeof forbiddenError | undefined> {
+    const scenario = await this.getById(scenarioId, userInfo);
+    if (isLeft(scenario)) {
+      return forbiddenError;
+    }
+    assertDefined(scenario.right);
     return await this.crudService
       .getById(scenarioId)
       .then((result) => {
@@ -408,35 +607,68 @@ export class ScenariosService {
         result
           ? this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
               result,
-              scenario,
+              scenario.right,
             )
           : EmptyGeoFeaturesSpecification,
       )
       .catch((e) => Logger.error(e));
   }
 
-  async getMarxanExecutionOutputArchive(scenarioId: string) {
+  async getMarxanExecutionOutputArchive(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError | OutputZipFailure, Buffer>> {
     await this.assertScenario(scenarioId);
-    return this.outputFilesService.get(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return await this.outputFilesService.get(scenarioId);
   }
 
-  async getPuvsprDatCsv(scenarioId: string) {
+  async getPuvsprDatCsv(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, string>> {
     await this.assertScenario(scenarioId);
-    return this.inputFilesService.getPuvsprDatContent(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.inputFilesService.getPuvsprDatContent(scenarioId));
   }
 
-  async getMarxanExecutionInputArchive(scenarioId: string) {
+  async getMarxanExecutionInputArchive(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError | InputZipFailure, Buffer>> {
     await this.assertScenario(scenarioId);
-    return this.inputArchiveService.archive(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return await this.inputArchiveService.archive(scenarioId);
   }
 
-  async getPlanningUnits(scenarioId: string) {
+  async getPlanningUnits(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, ScenariosPlanningUnitGeoEntity[]>> {
     await this.assertScenario(scenarioId);
-    return this.planningUnitsService.get(scenarioId);
+
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+
+    return right(await this.planningUnitsService.get(scenarioId));
   }
 
-  async createSpecification(scenarioId: string, dto: CreateGeoFeatureSetDTO) {
+  async createSpecification(
+    scenarioId: string,
+    userId: string,
+    dto: CreateGeoFeatureSetDTO,
+  ): Promise<Either<typeof forbiddenError | typeof internalError, any>> {
     const scenario = await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     return await this.specificationService.submit(
       scenarioId,
       scenario.projectId,
@@ -444,21 +676,45 @@ export class ScenariosService {
     );
   }
 
-  async getLastUpdatedSpecification(scenarioId: string) {
+  async getLastUpdatedSpecification(
+    scenarioId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      LastUpdatedSpecificationError | typeof forbiddenError,
+      CreateGeoFeatureSetDTO
+    >
+  > {
     const scenario = await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     return await this.specificationService.getLastUpdatedFor(
       scenarioId,
       scenario.projectId,
     );
   }
 
-  getCostRange(scenarioId: string): Promise<CostRange> {
-    return this.costService.getRange(scenarioId);
+  async getCostRange(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, CostRange>> {
+    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.costService.getRange(scenarioId));
   }
 
-  async resetLockStatus(scenarioId: string) {
+  async resetLockStatus(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
     await this.assertScenario(scenarioId);
+    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
     await this.planningUnitsService.resetLockStatus(scenarioId);
+    return right(void 0);
   }
 
   async addProtectedAreaFor(
@@ -466,9 +722,18 @@ export class ScenariosService {
     file: Express.Multer.File,
     info: AppInfoDTO,
     dto: UploadShapefileDto,
-  ): Promise<Either<SubmitProtectedAreaError, true>> {
+  ): Promise<Either<SubmitProtectedAreaError | typeof forbiddenError, true>> {
     try {
       const scenario = await this.assertScenario(scenarioId);
+      assertDefined(info.authenticatedUser);
+      if (
+        !(await this.scenarioAclService.canEditScenario(
+          info.authenticatedUser.id,
+          scenarioId,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
       const projectResponse = await this.queryBus.execute(
         new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
       );
@@ -496,9 +761,23 @@ export class ScenariosService {
   async getProtectedAreasFor(
     scenarioId: string,
     info: AppInfoDTO,
-  ): Promise<Either<GetProtectedAreasError, ScenarioProtectedArea[]>> {
+  ): Promise<
+    Either<
+      GetProtectedAreasError | typeof forbiddenError,
+      ScenarioProtectedArea[]
+    >
+  > {
     try {
       const scenario = await this.assertScenario(scenarioId);
+      assertDefined(info.authenticatedUser);
+      if (
+        !(await this.scenarioAclService.canViewScenario(
+          info.authenticatedUser?.id,
+          scenarioId,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
       const projectResponse = await this.queryBus.execute(
         new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
       );
@@ -524,8 +803,17 @@ export class ScenariosService {
     scenarioId: string,
     dto: ProtectedAreasChangeDto,
     info: AppInfoDTO,
-  ): Promise<Either<UpdateProtectedAreasError, true>> {
+  ): Promise<Either<UpdateProtectedAreasError | typeof forbiddenError, true>> {
     const scenario = await this.assertScenario(scenarioId);
+    assertDefined(info.authenticatedUser);
+    if (
+      !(await this.scenarioAclService.canEditScenario(
+        info.authenticatedUser?.id,
+        scenarioId,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
     const projectResponse = await this.queryBus.execute(
       new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
     );
