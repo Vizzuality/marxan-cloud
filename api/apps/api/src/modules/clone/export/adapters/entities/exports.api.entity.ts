@@ -45,13 +45,11 @@ export class ExportEntity {
       exportComponentEntity.id = piece.id.value;
       exportComponentEntity.piece = piece.piece;
       exportComponentEntity.resourceId = piece.resourceId;
-      exportComponentEntity.exportId = snapshot.id;
       exportComponentEntity.finished = piece.finished;
       exportComponentEntity.uris = piece.uris.map((uri) => {
         const componentLocationEntity = new ComponentLocationEntity();
         componentLocationEntity.uri = uri.uri;
         componentLocationEntity.relativePath = uri.relativePath;
-        componentLocationEntity.exportComponentId = piece.id.value;
 
         return componentLocationEntity;
       });

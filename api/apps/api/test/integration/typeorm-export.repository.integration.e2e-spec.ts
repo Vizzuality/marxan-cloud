@@ -8,6 +8,8 @@ import { ExportRepository } from '../../src/modules/clone/export/application/exp
 import { Export, ExportId } from '../../src/modules/clone/export/domain';
 import { bootstrapApplication } from '../utils/api-application';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { ExportComponentEntity } from '@marxan-api/modules/clone/export/adapters/entities/export-components.api.entity';
+import { ComponentLocationEntity } from '@marxan-api/modules/clone/export/adapters/entities/component-locations.api.entity';
 
 describe('Typeorm export repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -59,7 +61,13 @@ const getFixtures = async () => {
     cleanup: async () => {
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
+      const exportComponentRepo = connection.getRepository(
+        ExportComponentEntity,
+      );
+      const locationRepo = connection.getRepository(ComponentLocationEntity);
 
+      await locationRepo.delete({});
+      await exportComponentRepo.delete({});
       await exportRepo.delete({});
       await app.close();
     },

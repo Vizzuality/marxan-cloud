@@ -6,15 +6,25 @@ import { ExportRepository } from '../application/export-repository.port';
 import { ResourcePieces } from '../application/resource-pieces.port';
 import { ArchiveCreator } from '../application/archive-creator.port';
 import { ResourcePiecesAdapter } from './resource-pieces.adapter';
-import { InMemoryExportRepo } from './in-memory-export.repository';
 import { NodeArchiveCreator } from './node-archive-creator';
+import { TypeormExportRepository } from '@marxan-api/modules/clone/export/adapters/typeorm-export.repository';
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { ExportComponentEntity } from '@marxan-api/modules/clone/export/adapters/entities/export-components.api.entity';
+import { ComponentLocationEntity } from '@marxan-api/modules/clone/export/adapters/entities/component-locations.api.entity';
 
 @Module({
-  imports: [FileRepositoryModule, TypeOrmModule.forFeature([])],
+  imports: [
+    FileRepositoryModule,
+    TypeOrmModule.forFeature([
+      ExportEntity,
+      ExportComponentEntity,
+      ComponentLocationEntity,
+    ]),
+  ],
   providers: [
     {
       provide: ExportRepository,
-      useClass: InMemoryExportRepo, // TODO TypeormExportRepository
+      useClass: TypeormExportRepository,
     },
     {
       provide: ResourcePieces,
