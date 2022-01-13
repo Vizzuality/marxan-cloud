@@ -3,11 +3,11 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 
 import {
-  ResourceKind,
-  ResourceId,
   ArchiveLocation,
-  ComponentLocation,
   ComponentId,
+  ComponentLocation,
+  ResourceId,
+  ResourceKind,
 } from '@marxan/cloning/domain';
 import { ExportId } from './export.id';
 
@@ -80,7 +80,7 @@ export class Export extends AggregateRoot {
     if (!piece) {
       return left(pieceNotFound);
     }
-    piece.finish(pieceLocation);
+    // piece.finish(pieceLocation);
     this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
 
     if (this.#allPiecesReady()) {
