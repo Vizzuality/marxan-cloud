@@ -3,8 +3,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Request, Response } from 'express';
 import { get } from 'http';
-import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { forbiddenError } from '@marxan-api/modules/access-control';
+// import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
+// import { forbiddenError } from '@marxan-api/modules/access-control';
 
 @Injectable()
 export class ProxyService {
@@ -13,17 +13,12 @@ export class ProxyService {
   ) as string;
   private readonly logger = new Logger(ProxyService.name);
 
-  constructor(private readonly scenarioAclService: ScenarioAccessControl) {}
+  // constructor(private readonly scenarioAclService: ScenarioAccessControl) {}
 
-  async proxyTileRequest(
-    req: Request,
-    res: Response,
-    userId: string,
-    scenarioId: string,
-  ) {
-    if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
-      return forbiddenError;
-    }
+  async proxyTileRequest(req: Request, res: Response) {
+    // if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
+    //   return forbiddenError;
+    // }
 
     const url =
       this.geoprocessingServiceUrl +
