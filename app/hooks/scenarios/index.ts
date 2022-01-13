@@ -670,8 +670,6 @@ export function useScenarioCalibrationResults(scenarioId, calibrationStatus) {
 
   const { data } = query;
 
-  console.log('useScenarioCalibrationResults', data?.data);
-
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data) ? data?.data : [];
 
