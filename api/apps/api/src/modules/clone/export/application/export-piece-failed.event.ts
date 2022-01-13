@@ -6,6 +6,6 @@ export class ExportPieceFailed implements IEvent {
   constructor(
     public readonly exportId: ExportId,
     public readonly componentId: ComponentId,
-    public readonly location: ComponentLocation[],
+    public readonly location?: ComponentLocation[],
   ) {}
 }

@@ -80,7 +80,7 @@ export class Export extends AggregateRoot {
     if (!piece) {
       return left(pieceNotFound);
     }
-    // piece.finish(pieceLocation);
+    piece.finish(pieceLocation);
     this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
 
     if (this.#allPiecesReady()) {

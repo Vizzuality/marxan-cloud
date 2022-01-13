@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, EventBus } from '@nestjs/cqrs';
 
 import { JobInput, JobOutput } from '@marxan/cloning';
 
@@ -20,6 +20,7 @@ import {
   ComponentLocation,
   ExportId,
 } from '../../export/application/complete-piece.command';
+import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
 
 @Injectable()
 export class ExportPieceEventsHandler
@@ -30,9 +31,11 @@ export class ExportPieceEventsHandler
     @Inject(exportPieceEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<JobInput, JobOutput>,
     private readonly commandBus: CommandBus,
+    private readonly eventBus: EventBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
     this.queueEvents.on(`completed`, (data) => this.completed(data));
+    this.queueEvents.on(`failed`, (data) => this.failed(data));
   }
 
   async createCompletedEvent(
@@ -79,6 +82,16 @@ export class ExportPieceEventsHandler
         result.uris.map(
           ({ uri, relativePath }) => new ComponentLocation(uri, relativePath),
         ),
+      ),
+    );
+  }
+
+  private async failed(event: EventData<JobInput, unknown>) {
+    const { exportId, componentId } = await event.data;
+    this.eventBus.publish(
+      new ExportPieceFailed(
+        new ExportId(exportId),
+        new ComponentId(componentId),
       ),
     );
   }
