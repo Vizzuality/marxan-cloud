@@ -111,16 +111,44 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
         const validGeoJSON = {
           ...g,
-          features: g.features.map((fe) => fe.geometry.coordinates.map((c) => {
-            return {
-              ...c,
+          features: g.features.map((fe) => (
+             {
+              type: "Feature",
+              geometry: {
+                type: fe.geometry.type,
+                /**
+                 * @hack The mangling of coordinates below is _only_ a way to
+                 * dig into the issue we are tracking in MARXAN-987. Basically
+                 * without this, and with the current setup,
+                 * @math.gl/web-mercator seems to not process multipolygon
+                 * coordinates correctly: it tries to assert that coordinates
+                 * are a finite number via `Number.isFinite()` but in the case
+                 * of multipolygons, where a polygon would have [lon, lat] pairs
+                 * we only have a further array, which in turn holds the actual
+                 * coordinate pairs for one of the polygons (and is obviously
+                 * not a finite number, nor a number for that matter).
+                 *
+                 * This hack only allows to work around the issue when
+                 * processing the GeoJSON received back from the API, as
+                 * generated from the uploaded shapefile. But the GeoJSON we
+                 * reshape below _seems_ enough to please @math.gl/web-mercator
+                 * (though I'm skeptical about this) but it would then be
+                 * rejected by the API, because the Multipolygon geometries are
+                 * then messed up since we don't have an array of Polygon
+                 * coordinate arrays
+                 * (https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.7)
+                 * due to the mangling we do here.
+                 */
+                coordinates: Array.isArray(fe.geometry.coordinates[0][0][0]) ? fe.geometry.coordinates[0][0] : fe.geometry.coordinates,
+              },
               properties: fe.properties || {},
-            };
-          })),
+            }
+          )),
         };
 
         dispatch(setUploadingValue(validGeoJSON));
         console.info('Shapefile uploaded', g);
+        console.debug('Shapefile uploaded with validGeoJSON', validGeoJSON);
       },
       onError: ({ response }) => {
         const { errors } = response.data;
@@ -185,12 +213,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
   // Callbacks
   const onSubmit = useCallback((values) => {
-    const coordinates = [
-      Object.values(values.uploadingValue.features[0][0]).filter((i) => Array.isArray(i)),
-    ];
-    const { properties } = values.uploadingValue.features[0][0];
-    const { type: byGeoJsonType } = values.uploadingValue;
-
     setSubmitting(true);
     // Save current uploaded shape
     scenarioPUMutation.mutate({
@@ -201,17 +223,7 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
           exclude: puExcludedValue,
         },
         byGeoJson: {
-          [values.type]: [{
-            type: byGeoJsonType,
-            features: [{
-              type: 'Feature',
-              geometry: {
-                type: 'Polygon',
-                coordinates,
-                properties,
-              },
-            }],
-          }],
+          [values.type]: [values.uploadingValue],
         },
       },
     }, {
