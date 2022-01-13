@@ -654,7 +654,7 @@ export function useCancelRunScenario({
     },
   });
 }
-export function useScenarioCalibrationResults(scenarioId) {
+export function useScenarioCalibrationResults(scenarioId, calibrationStatus) {
   const [session] = useSession();
 
   const query = useQuery('scenario-calibration', async () => SCENARIOS.request({
@@ -665,7 +665,7 @@ export function useScenarioCalibrationResults(scenarioId) {
     },
     transformResponse: (data) => JSON.parse(data),
   }), {
-    cacheTime: Infinity,
+    enabled: calibrationStatus === 'done',
   });
 
   const { data } = query;

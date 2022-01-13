@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 
-import { useScenarioCalibrationResults } from 'hooks/scenarios';
+import { useScenarioCalibrationResults, useScenarioStatus } from 'hooks/scenarios';
 
 import BLMChart from 'layout/scenarios/edit/analysis/blm-calibration/blm-chart';
 
@@ -28,15 +28,18 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
   minBlmValue,
 }: ScenariosBlmSettingsGraphProps) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
   const { blm, blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
+  const { jobs } = scenarioStatusData;
+  const calibrationStatus = jobs.find((j) => j.kind === 'calibration').status;
 
   const {
     data: calibrationResultsData,
     isFetching: calibrationResultsAreFetching,
     isFetched: calibrationResultsAreFetched,
-  } = useScenarioCalibrationResults(sid);
+  } = useScenarioCalibrationResults(sid, calibrationStatus);
 
   const INITIAL_VALUES = useMemo(() => {
     return {
