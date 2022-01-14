@@ -17,6 +17,9 @@ import { ExportPieceEventsHandler } from './export-piece.events-handler';
 import { MarkExportAsSubmittedHandler } from './mark-export-as-submitted.handler';
 import { MarkExportAsFinishedHandler } from './mark-export-as-finished.handler';
 import { ArchiveReadySaga } from './archive-ready.saga';
+import { ExportPieceFailedSaga } from './export-piece-failed.saga';
+import { CancelExportPendingJobsHandler } from './cancel-export-pending-jobs.handler';
+import { MarkExportAsFailedHandler } from './mark-export-as-failed.handler';
 
 @Module({
   imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
@@ -24,6 +27,7 @@ import { ArchiveReadySaga } from './archive-ready.saga';
     SchedulePieceExportHandler,
     PieceExportRequestedSaga,
     ExportStartedSaga,
+    ExportPieceFailedSaga,
     ArchiveReadySaga,
     exportPieceQueueProvider,
     exportPiecenQueueEventsProvider,
@@ -31,6 +35,8 @@ import { ArchiveReadySaga } from './archive-ready.saga';
     ExportPieceEventsHandler,
     MarkExportAsSubmittedHandler,
     MarkExportAsFinishedHandler,
+    CancelExportPendingJobsHandler,
+    MarkExportAsFailedHandler,
   ],
 })
 export class ExportInfraModule {}

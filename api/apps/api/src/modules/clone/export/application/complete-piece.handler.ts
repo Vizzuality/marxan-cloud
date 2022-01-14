@@ -10,6 +10,7 @@ import { CompletePiece } from './complete-piece.command';
 import { ExportRepository } from './export-repository.port';
 import { isLeft } from 'fp-ts/Either';
 import { ExportPieceFailed } from '@marxan-api/modules/clone/export/application/export-piece-failed.event';
+import { Export } from '../domain';
 
 @CommandHandler(CompletePiece)
 export class CompletePieceHandler
@@ -27,9 +28,10 @@ export class CompletePieceHandler
     componentLocation,
     componentId,
   }: CompletePiece): Promise<void> {
+    let exportInstance: Export | undefined;
     await this.exportRepository
       .transaction(async (repo) => {
-        const exportInstance = await repo.find(exportId);
+        exportInstance = await repo.find(exportId);
 
         if (!exportInstance) {
           const errorMessage = `${CompletePieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`;
@@ -56,9 +58,17 @@ export class CompletePieceHandler
         exportAggregate.commit();
       })
       .catch(() => {
-        this.eventBus.publish(
-          new ExportPieceFailed(exportId, componentId, componentLocation),
-        );
+        if (exportInstance) {
+          this.eventBus.publish(
+            new ExportPieceFailed(
+              exportId,
+              componentId,
+              exportInstance.resourceId,
+              exportInstance.resourceKind,
+              componentLocation,
+            ),
+          );
+        }
       });
   }
 }

@@ -21,6 +21,7 @@ import {
   ExportId,
 } from '../../export/application/complete-piece.command';
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
+import { ResourceId } from '../../export';
 
 @Injectable()
 export class ExportPieceEventsHandler
@@ -87,11 +88,18 @@ export class ExportPieceEventsHandler
   }
 
   private async failed(event: EventData<JobInput, unknown>) {
-    const { exportId, componentId } = await event.data;
+    const {
+      exportId,
+      componentId,
+      resourceId,
+      resourceKind,
+    } = await event.data;
     this.eventBus.publish(
       new ExportPieceFailed(
         new ExportId(exportId),
         new ComponentId(componentId),
+        new ResourceId(resourceId),
+        resourceKind,
       ),
     );
   }
