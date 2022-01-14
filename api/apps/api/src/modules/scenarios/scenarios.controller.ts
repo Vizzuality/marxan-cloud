@@ -120,6 +120,7 @@ import {
 } from './input-files';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
+import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -127,6 +128,7 @@ const solutionsSubPath = `:id/marxan/solutions`;
 const marxanRunTag = 'Marxan Run';
 const marxanRunFiles = 'Marxan Run - Files';
 
+@ImplementsAcl()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
@@ -145,9 +147,9 @@ export class ScenariosController {
     private readonly proxyService: ProxyService,
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
+    private readonly scenarioAclService: ScenarioAccessControl,
   ) {}
 
-  @ImplementsAcl()
   @ApiOperation({
     description: 'Find all scenarios',
   })
@@ -181,7 +183,6 @@ export class ScenariosController {
     return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: 'Get planning unit tiles for selected scenario.',
   })
@@ -233,25 +234,22 @@ export class ScenariosController {
   @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
     @Req() request: Request,
-    // @Req() req: RequestWithAuthenticatedUser,
+    @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
-    // @Param('id', ParseUUIDPipe) scenarioId: string,
+    @Param('id', ParseUUIDPipe) scenarioId: string,
   ) {
-    const result = await this.proxyService.proxyTileRequest(
-      request,
-      response,
-      // req.user.id,
-      // scenarioId,
-    );
-
-    // if (result === forbiddenError) {
-    //   throw new ForbiddenException();
-    // }
+    /* Due to the usage of proxyService in other modules
+    the ACL control for this endpoint is placed in the controller */
+    if (
+      !(await this.scenarioAclService.canViewScenario(req.user.id, scenarioId))
+    ) {
+      throw new ForbiddenException();
+    }
+    const result = await this.proxyService.proxyTileRequest(request, response);
 
     return result;
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: 'Find scenario by id' })
   @ApiOkResponse({ type: ScenarioResult })
   @JSONAPISingleEntityQueryParams({
@@ -286,7 +284,6 @@ export class ScenariosController {
     return await this.scenarioSerializer.serialize(result.right);
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: 'Create scenario' })
   @ApiCreatedResponse({ type: ScenarioResult })
   @ApiTags(asyncJobTag)
@@ -318,7 +315,6 @@ export class ScenariosController {
     );
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: 'Create feature set for scenario' })
   @ApiTags(asyncJobTag)
   @Post(':id/features/specification')
@@ -348,7 +344,6 @@ export class ScenariosController {
     );
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: 'Get feature set for scenario' })
   @ApiOkResponse({ type: GeoFeatureSetResult })
   @Get(':id/features/specification')
@@ -374,7 +369,6 @@ export class ScenariosController {
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 
-  @ImplementsAcl()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @GeometryFileInterceptor(GeometryKind.ComplexWithProperties)
   @ApiTags(asyncJobTag)
@@ -396,7 +390,6 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
-  @ImplementsAcl()
   @Get(`:id/cost-surface`)
   @ApiOkResponse({ type: CostRangeDto })
   async getCostRange(
@@ -410,7 +403,6 @@ export class ScenariosController {
     return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
 
-  @ImplementsAcl()
   @ApiConsumesShapefile()
   @ApiTags(inlineJobTag)
   @Post(':id/planning-unit-shapefile')
@@ -431,7 +423,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: 'Update scenario' })
   @ApiOkResponse({ type: ScenarioResult })
   @ApiTags(asyncJobTag)
@@ -454,7 +445,6 @@ export class ScenariosController {
     );
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: 'Delete scenario' })
   @ApiOkResponse()
   @Delete(':id')
@@ -469,7 +459,6 @@ export class ScenariosController {
     }
   }
 
-  @ImplementsAcl()
   @ApiTags(asyncJobTag)
   @ApiOkResponse()
   @Post(':id/planning-units')
@@ -485,7 +474,6 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
-  @ImplementsAcl()
   @Delete(`:id/planning-units`)
   @ApiOkResponse()
   async resetPlanningUnitsLockStatus(
@@ -499,7 +487,6 @@ export class ScenariosController {
     }
   }
 
-  @ImplementsAcl()
   @Get(':id/planning-units')
   @ApiOkResponse({ type: ScenarioPlanningUnitDto, isArray: true })
   async getPlanningUnits(
@@ -515,7 +502,6 @@ export class ScenariosController {
     return this.planningUnitsSerializer.serialize(result.right);
   }
 
-  @ImplementsAcl()
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
   @ApiOkResponse({
     type: ScenarioFeaturesData,
@@ -535,7 +521,6 @@ export class ScenariosController {
     );
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Retrieve protection gap data for the features of a scenario.`,
   })
@@ -550,7 +535,7 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(
+    const result = await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
       fetchSpecification,
       {
         params: {
@@ -560,10 +545,16 @@ export class ScenariosController {
         authenticatedUser: req.user,
       },
     );
-    return this.scenarioFeaturesGapData.serialize(result.data, result.metadata);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return this.scenarioFeaturesGapData.serialize(
+      result.right.data,
+      result.right.metadata,
+    );
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's input parameter file.` })
   @Get(':id/marxan/dat/input.dat')
@@ -580,7 +571,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's spec file.` })
   @Get(':id/marxan/dat/spec.dat')
@@ -597,7 +587,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's puvspr file.` })
   @Get(':id/marxan/dat/puvspr.dat')
@@ -614,7 +603,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @ApiOperation({ description: `Resolve scenario's bound file.` })
   @Get(':id/marxan/dat/bound.dat')
@@ -631,7 +619,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @ApiOperation({
     description: `Get archived output files`,
@@ -657,7 +644,7 @@ export class ScenariosController {
           throw new InternalServerErrorException('Marxan failed');
         case outputZipNotYetAvailable:
           throw new InternalServerErrorException(
-            'marxan output file - output file not available, possible error',
+            'Marxan output file - output file not available, possible error',
           );
         case metadataNotFound:
           throw new InternalServerErrorException('Marxan was not yet executed');
@@ -670,7 +657,6 @@ export class ScenariosController {
     response.send(this.zipFilesSerializer.serialize(result));
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @ApiOperation({
     description: `Get archived input files`,
@@ -708,7 +694,6 @@ export class ScenariosController {
     response.send(this.zipFilesSerializer.serialize(result));
   }
 
-  @ImplementsAcl()
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
   })
@@ -745,7 +730,6 @@ export class ScenariosController {
     );
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Request start of the Marxan execution.`,
     summary: `Request start of the Marxan execution.`,
@@ -772,7 +756,6 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Cancel running Marxan execution.`,
     summary: `Cancel running Marxan execution.`,
@@ -793,7 +776,6 @@ export class ScenariosController {
     }
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunTag)
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
@@ -818,7 +800,6 @@ export class ScenariosController {
     return this.scenarioSolutionSerializer.serialize(result.right[0]);
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunTag)
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
@@ -843,7 +824,6 @@ export class ScenariosController {
     return this.scenarioSolutionSerializer.serialize(result.right[0]);
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Retrieve Marxan protection data for the features of a scenario.`,
   })
@@ -862,30 +842,31 @@ export class ScenariosController {
   @Get(`${solutionsSubPath}/gap-data`)
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
-    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(
+    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginatedAcl(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
           searchPhrase: featureClassAndAliasFilter,
         },
+        authenticatedUser: req.user,
       },
     );
 
-    // if (isLeft(result)) {
-    //   throw new ForbiddenException();
-    // }
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
 
     return this.scenarioFeaturesOutputGapData.serialize(
-      result.data,
-      result.metadata,
+      result.right.data,
+      result.right.metadata,
     );
   }
 
-  @ImplementsAcl()
   @ApiOkResponse({
     type: ScenarioSolutionResultDto,
   })
@@ -911,7 +892,6 @@ export class ScenariosController {
     return this.scenarioSolutionSerializer.serialize(result.right);
   }
 
-  @ImplementsAcl()
   @ApiTags(marxanRunFiles)
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
@@ -935,7 +915,6 @@ export class ScenariosController {
     }
   }
 
-  @ImplementsAcl()
   @ApiOkResponse({
     type: ProtectedAreaDto,
     isArray: true,
@@ -966,7 +945,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiOkResponse({
     type: ProtectedAreaDto,
     isArray: true,
@@ -999,7 +977,6 @@ export class ScenariosController {
     return await this.getProtectedAreasForScenario(scenarioId, req);
   }
 
-  @ImplementsAcl()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
   @ApiOperation({
     description:
@@ -1033,7 +1010,6 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Start BLM calibration process for a scenario.`,
     summary: `Start BLM calibration process for a scenario.`,
@@ -1079,7 +1055,6 @@ export class ScenariosController {
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Retrieve BLM calibration results for a scenario.`,
     summary: `Retrieve BLM calibration results for a scenario.`,
@@ -1102,7 +1077,6 @@ export class ScenariosController {
     return result.right;
   }
 
-  @ImplementsAcl()
   @ApiOperation({
     description: `Cancel BLM calibration execution.`,
     summary: `Cancel BLM calibration execution.`,
