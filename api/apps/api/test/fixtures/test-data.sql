@@ -35,3 +35,9 @@ VALUES
 ('Example scenario 2 Project 1 Org 1', (select id from projects where name = 'Example Project 1 Org 1'), 'marxan', 50, 100, 1, (SELECT id FROM users WHERE email = 'aa@example.com') ),
 ('Example scenario 1 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 30, 100, 1, (SELECT id FROM users WHERE email = 'aa@example.com') ),
 ('Example scenario 2 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 50, 100, 1, (SELECT id FROM users WHERE email = 'aa@example.com') );
+
+INSERT INTO users_scenarios
+(user_id, project_id, role_id)
+VALUES
+((SELECT id FROM users WHERE lower(email) = 'aa@example.com'), (SELECT id FROM scenarios WHERE name = 'Example scenario 1 Project 2 Org 2'), 'scenario_owner'),
+((SELECT id FROM users WHERE lower(email) = 'aa@example.com'), (SELECT id FROM scenarios WHERE name = 'Example scenario 2 Project 2 Org 2'), 'scenario_owner'),

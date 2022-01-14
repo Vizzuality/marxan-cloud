@@ -660,9 +660,7 @@ export class ScenariosController {
             'marxan output file - output file not available, possible error',
           );
         case metadataNotFound:
-          throw new InternalServerErrorException(
-            'marxan output file - metadata not found',
-          );
+          throw new InternalServerErrorException('Marxan was not yet executed');
         default:
           const _check: never = result.left;
           throw new InternalServerErrorException();
