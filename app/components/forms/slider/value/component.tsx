@@ -56,7 +56,8 @@ export const Value: React.FC<ValueProps> = ({
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   // Percentages come in a range from 0.0 to 1, so we have to multiply by 100 to display them
-  const displayValue = (formatOptions.style === 'percent') ? value * 100 : value;
+  // Due to floating point precision issues, we need to trunc percentages' display values
+  const displayValue = (formatOptions.style === 'percent') ? Math.round(value * 100) : value;
 
   // CANCELLING AND SAVING EDITS
 
