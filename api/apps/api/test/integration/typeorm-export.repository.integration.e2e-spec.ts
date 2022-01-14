@@ -16,33 +16,42 @@ describe('Typeorm export repository', () => {
 
   beforeEach(async () => {
     fixtures = await getFixtures();
-  }, 100000);
+  }, 20000);
 
   afterAll(async () => {
     await fixtures.cleanup();
   });
 
   it('should expose methods for getting an export by id and storing exports', async () => {
-    await fixtures.WhenSavingAnExportItShouldNotFail();
+    await fixtures.WhenAnExportIsSavedSuccessfully();
 
-    await fixtures.ThenWhenReadingItFromRepositoryExportDataShouldBeOk({
+    const exportData = await fixtures.WhenReadingTheSavedExportFromRepository();
+
+    await fixtures.ThenExportDataShouldBeOk({
+      exportData,
       componentsAreCompleted: false,
     });
   });
 
-  it('should update nested entities', async () => {
-    await fixtures.WhenSavingAnExportItShouldNotFail();
-    await fixtures.ThenWhenCompletingAComponent();
-    await fixtures.ThenWhenReadingItFromRepositoryExportDataShouldBeOk({
+  it('should update an export when a nested piece is completed', async () => {
+    await fixtures.WhenAnExportIsSavedSuccessfully();
+    await fixtures.WhenAComponentIsCompleted();
+    const exportData = await fixtures.WhenReadingTheSavedExportFromRepository();
+
+    await fixtures.ThenExportDataShouldBeOk({
+      exportData,
       componentsAreCompleted: true,
     });
   });
 
   it('should save entities working with transaction', async () => {
-    await fixtures.WhenSavingAnExportWithTransactionItShouldNotFail();
-    await fixtures.ThenWhenCompletingEveryAComponentWithTransaction();
-    await fixtures.ThenWhenReadingItFromRepositoryExportDataShouldBeOk({
-      componentsAreCompleted: true,
+    await fixtures.WhenAnExportIsSavedSuccessfullyWithinATransaction();
+    await fixtures.WhenAllComponentsAreCompletedWithTransactions();
+
+    const exportData = await fixtures.WhenReadingTheSavedExportFromRepository();
+
+    fixtures.ThenAllExportComponentsShouldBeFinished({
+      exportData,
     });
   });
 });
@@ -71,7 +80,7 @@ const getFixtures = async () => {
       await exportRepo.delete({});
       await app.close();
     },
-    WhenSavingAnExportItShouldNotFail: async () => {
+    WhenAnExportIsSavedSuccessfully: async () => {
       resourceId = new ResourceId(v4());
       componentId = new ComponentId(v4());
       componentLocationUri = '/foo/bar/project-metadata.json';
@@ -93,31 +102,36 @@ const getFixtures = async () => {
       exportId = exportInstance.id;
       await repo.save(exportInstance);
     },
-    WhenSavingAnExportWithTransactionItShouldNotFail: async () => {
+    WhenAnExportIsSavedSuccessfullyWithinATransaction: async () => {
       resourceId = new ResourceId(v4());
-      componentId = new ComponentId(v4());
-      componentLocationUri = '/foo/bar/project-metadata.json';
-      componentLocationRelativePath = 'project-metadata.json';
-      const exportInstance = Export.newOne(resourceId, ResourceKind.Project, [
-        {
-          finished: false,
-          piece: ClonePiece.ProjectMetadata,
-          resourceId: resourceId.value,
-          id: componentId,
-          uris: [
-            new ComponentLocation(
-              componentLocationUri,
-              componentLocationRelativePath,
-            ),
-          ],
-        },
-      ]);
+
+      componentLocationUri = `/foo/bar/project-metadata.json`;
+      componentLocationRelativePath = `project-metadata.json`;
+
+      const components = Array(10).map(() => ({
+        finished: false,
+        piece: ClonePiece.ProjectMetadata,
+        resourceId: resourceId.value,
+        id: new ComponentId(v4()),
+        uris: [
+          new ComponentLocation(
+            componentLocationUri,
+            componentLocationRelativePath,
+          ),
+        ],
+      }));
+
+      const exportInstance = Export.newOne(
+        resourceId,
+        ResourceKind.Project,
+        components,
+      );
       exportId = exportInstance.id;
       await repo.transaction(async (repository) => {
         await repository.save(exportInstance);
       });
     },
-    ThenWhenCompletingAComponent: async () => {
+    WhenAComponentIsCompleted: async () => {
       const componentLocation = new ComponentLocation(
         componentLocationUri,
         componentLocationRelativePath,
@@ -128,7 +142,7 @@ const getFixtures = async () => {
       exportInstance.completeComponent(componentId, [componentLocation]);
       await repo.save(exportInstance);
     },
-    ThenWhenCompletingEveryAComponentWithTransaction: async () => {
+    WhenAllComponentsAreCompletedWithTransactions: async () => {
       const componentLocation = new ComponentLocation(
         componentLocationUri,
         componentLocationRelativePath,
@@ -136,34 +150,35 @@ const getFixtures = async () => {
       const exportInstance = (await repo.find(exportId)) as Export;
       expect(exportInstance).toBeDefined();
 
-      exportInstance
-        .toSnapshot()
-        .exportPieces.map((piece) => piece.id)
-        .forEach((id) =>
-          exportInstance.completeComponent(id, [componentLocation]),
-        );
-
-      await repo.transaction(async (repository) => {
-        await repository.save(exportInstance);
-      });
+      await Promise.all(
+        exportInstance.toSnapshot().exportPieces.map((piece) =>
+          repo.transaction(async (repository) => {
+            exportInstance.completeComponent(piece.id, [componentLocation]);
+            await repository.save(exportInstance);
+          }),
+        ),
+      );
     },
-    ThenWhenReadingItFromRepositoryExportDataShouldBeOk: async ({
+    WhenReadingTheSavedExportFromRepository: async () => {
+      return await repo.find(exportId);
+    },
+    ThenExportDataShouldBeOk: async ({
+      exportData,
       componentsAreCompleted,
     }: {
+      exportData: Export | undefined;
       componentsAreCompleted: boolean;
     }) => {
-      const result = (await repo.find(exportId)) as Export;
+      expect(exportData).toBeDefined();
+      expect(exportData!.id.value).toBe(exportId.value);
+      expect(exportData!.resourceKind).toBe(ResourceKind.Project);
+      expect(exportData!.resourceId.value).toBe(resourceId.value);
 
-      expect(result).toBeDefined();
-      expect(result.id.value).toBe(exportId.value);
-      expect(result.resourceKind).toBe(ResourceKind.Project);
-      expect(result.resourceId.value).toBe(resourceId.value);
+      const exportSnapshot = exportData!.toSnapshot();
 
-      const resultSnapshot = result.toSnapshot();
+      expect(exportSnapshot.exportPieces).toHaveLength(1);
 
-      expect(resultSnapshot.exportPieces).toHaveLength(1);
-
-      const [exportComponent] = resultSnapshot.exportPieces;
+      const [exportComponent] = exportSnapshot.exportPieces;
 
       expect(exportComponent.finished).toBe(componentsAreCompleted);
       expect(exportComponent.piece).toBe(ClonePiece.ProjectMetadata);
@@ -178,6 +193,16 @@ const getFixtures = async () => {
           expect(el.relativePath).toEqual(componentLocationRelativePath);
         });
       }
+    },
+    ThenAllExportComponentsShouldBeFinished: ({
+      exportData,
+    }: {
+      exportData: Export | undefined;
+    }) => {
+      expect(exportData).toBeDefined();
+      exportData!.toSnapshot().exportPieces.map((piece) => {
+        expect(piece.finished).toEqual(true);
+      });
     },
   };
 };
