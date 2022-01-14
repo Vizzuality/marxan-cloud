@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { xor } from 'lodash';
 
 import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -33,10 +34,12 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 }: ScenariosSidebarAnalysisSectionsProps) => {
   const [clearing, setClearing] = useState(false);
 
+  const dispatch = useDispatch();
   const { query } = useRouter();
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
+
   const {
     setJob,
     setPUAction,
@@ -45,8 +48,15 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
     setTmpPuIncludedValue,
     setTmpPuExcludedValue,
   } = scenarioSlice.actions;
-  const dispatch = useDispatch();
-  const { puAction } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const {
+    clicking,
+    puAction,
+    puIncludedValue,
+    puExcludedValue,
+    puTmpIncludedValue,
+    puTmpExcludedValue,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { addToast } = useToasts();
 
@@ -56,10 +66,30 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   useEffect(() => {
     if (PUData && PUisFetched) {
       const { included, excluded } = PUData;
-      dispatch(setPuIncludedValue(included));
-      dispatch(setPuExcludedValue(excluded));
-      dispatch(setTmpPuIncludedValue(included));
-      dispatch(setTmpPuExcludedValue(excluded));
+
+      // If PUData.included is different from puIncluded
+      if (xor(included, puIncludedValue).length > 0) {
+        dispatch(setPuIncludedValue(included));
+      }
+
+      // If PUData.excluded is different from puExcluded
+      if (xor(excluded, puExcludedValue).length > 0) {
+        dispatch(setPuExcludedValue(excluded));
+      }
+
+      // If the user is clicking on the map, we don't want to touch the
+      // temporary PU included/excluded values as they're being handled.
+      if (clicking) return;
+
+      // If PUData.included is different from tmp puIncluded
+      if (xor(included, puTmpIncludedValue).length > 0) {
+        dispatch(setTmpPuIncludedValue(included));
+      }
+
+      // If PUData.excluded is different from tmp puExcluded
+      if (xor(excluded, puTmpExcludedValue).length > 0) {
+        dispatch(setTmpPuExcludedValue(excluded));
+      }
     }
   }, [PUData]); //eslint-disable-line
 
