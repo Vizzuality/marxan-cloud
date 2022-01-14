@@ -412,7 +412,16 @@ export class ScenariosService {
     Either<ChangeRangeErrors | GetFailure | typeof forbiddenError, true>
   > {
     const scenario = await this.getById(id, userInfo);
+    assertDefined(userInfo.authenticatedUser);
     if (isLeft(scenario)) {
+      return left(forbiddenError);
+    }
+    if (
+      !(await this.scenarioAclService.canEditScenario(
+        userInfo.authenticatedUser?.id,
+        id,
+      ))
+    ) {
       return left(forbiddenError);
     }
     const projectId = scenario.right.projectId;
@@ -491,6 +500,7 @@ export class ScenariosService {
     _fetchSpecification: FetchSpecification,
   ): Promise<Either<typeof forbiddenError, ScenariosOutputResultsApiEntity>> {
     await this.assertScenario(scenarioId);
+    // TODO runId is part of scenarioId
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
