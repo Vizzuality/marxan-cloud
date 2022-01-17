@@ -172,6 +172,7 @@ export class GeoFeaturesService extends AppBaseService<
     if (projectId && info?.params?.bbox) {
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
+        .select('"geoFeatureGeometries"."feature_id"', 'featureId')
         .distinctOn(['"geoFeatureGeometries"."feature_id"'])
         .where(
           `st_intersects(
@@ -185,7 +186,7 @@ export class GeoFeaturesService extends AppBaseService<
             ymax: info.params.bbox[2],
           },
         )
-        .getMany()
+        .getRawMany()
         .then((result) => result.map((i) => i.featureId))
         .catch((error) => {
           throw new Error(error);
