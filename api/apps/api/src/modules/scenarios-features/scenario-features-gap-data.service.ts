@@ -37,7 +37,7 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     });
   }
 
-  async findAllPaginatedAcl(
+  async findAllPaginated(
     fetchSpecification?: FetchSpecification,
     info?: UserSearchCriteria,
   ): Promise<

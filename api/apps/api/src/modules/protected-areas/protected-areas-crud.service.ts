@@ -24,6 +24,7 @@ import { apiConnections } from '../../ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IUCNCategory } from '@marxan/iucn';
 import { isDefined } from '@marxan/utils';
+import { isRight } from 'fp-ts/lib/Either';
 
 const protectedAreaFilterKeyNames = [
   'fullName',
@@ -180,11 +181,13 @@ export class ProtectedAreasCrudService extends AppBaseService<
       // is a subset of the former, with the twist that the only property we
       // are interested in (iucnCategory) *may* be undefined in ProtectedArea
       // so we need to filter out entities where this property is undefined.
-      results.data
-        .map((i) => ({
-          iucnCategory: i?.iucnCategory,
-        }))
-        .filter((i): i is IUCNProtectedAreaCategoryDTO => !!i.iucnCategory),
+      isRight(results)
+        ? results.right.data
+            .map((i) => ({
+              iucnCategory: i?.iucnCategory,
+            }))
+            .filter((i): i is IUCNProtectedAreaCategoryDTO => !!i.iucnCategory)
+        : results.left,
     );
 
     const serializer = new JSONAPISerializer.Serializer(

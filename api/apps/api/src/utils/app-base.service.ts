@@ -9,6 +9,8 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { DEFAULT_PAGINATION } from 'nestjs-base-service';
 import { castArray } from 'lodash';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { Either, right } from 'fp-ts/lib/Either';
 
 export class PaginationMeta {
   totalPages: number;
@@ -101,12 +103,17 @@ export abstract class AppBaseService<
   async findAllPaginatedRaw(
     fetchSpecification?: FetchSpecification,
     info?: Info,
-  ): Promise<{
-    data: (Partial<Entity> | undefined)[];
-    metadata: PaginationMeta | undefined;
-  }> {
+  ): Promise<
+    Either<
+      typeof forbiddenError,
+      {
+        data: (Partial<Entity> | undefined)[];
+        metadata: PaginationMeta | undefined;
+      }
+    >
+  > {
     const entitiesAndCount = await this.findAllRaw(fetchSpecification, info);
-    return this._paginate(entitiesAndCount, fetchSpecification);
+    return right(this._paginate(entitiesAndCount, fetchSpecification));
   }
 
   async findAllPaginated(

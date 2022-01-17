@@ -535,7 +535,7 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
+    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(
       fetchSpecification,
       {
         params: {
