@@ -1,4 +1,7 @@
+import { ComponentLocationEntity } from '@marxan-api/modules/clone/export/adapters/entities/component-locations.api.entity';
+import { ExportComponentEntity } from '@marxan-api/modules/clone/export/adapters/entities/export-components.api.entity';
 import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
 import { ResourceId } from '../../src/modules/clone/export';
@@ -7,9 +10,6 @@ import { ComponentLocation } from '../../src/modules/clone/export/application/co
 import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
 import { Export, ExportId } from '../../src/modules/clone/export/domain';
 import { bootstrapApplication } from '../utils/api-application';
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { ExportComponentEntity } from '@marxan-api/modules/clone/export/adapters/entities/export-components.api.entity';
-import { ComponentLocationEntity } from '@marxan-api/modules/clone/export/adapters/entities/component-locations.api.entity';
 
 describe('Typeorm export repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -188,10 +188,14 @@ const getFixtures = async () => {
         expect(exportComponent.uris).toBeDefined();
         expect(exportComponent.uris.length).toBeGreaterThan(0);
 
-        exportComponent.uris.forEach((el) => {
-          expect(el.uri).toEqual(componentLocationUri);
-          expect(el.relativePath).toEqual(componentLocationRelativePath);
-        });
+        expect(
+          exportComponent.uris.every((el) => el.uri === componentLocationUri),
+        ).toEqual(true);
+        expect(
+          exportComponent.uris.every(
+            (el) => el.relativePath === componentLocationRelativePath,
+          ),
+        ).toBe(true);
       }
     },
     ThenAllExportComponentsShouldBeFinished: ({
@@ -200,9 +204,9 @@ const getFixtures = async () => {
       exportData: Export | undefined;
     }) => {
       expect(exportData).toBeDefined();
-      exportData!.toSnapshot().exportPieces.map((piece) => {
-        expect(piece.finished).toEqual(true);
-      });
+      expect(
+        exportData!.toSnapshot().exportPieces.every((piece) => piece.finished),
+      ).toBe(true);
     },
   };
 };
