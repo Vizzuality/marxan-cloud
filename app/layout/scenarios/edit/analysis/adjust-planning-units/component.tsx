@@ -91,7 +91,20 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         dispatch(setTmpPuExcludedValue(excluded));
       }
     }
-  }, [PUData]); //eslint-disable-line
+  }, [
+    PUData,
+    PUisFetched,
+    clicking,
+    dispatch,
+    puExcludedValue,
+    puIncludedValue,
+    puTmpExcludedValue,
+    puTmpIncludedValue,
+    setPuExcludedValue,
+    setPuIncludedValue,
+    setTmpPuExcludedValue,
+    setTmpPuIncludedValue,
+  ]);
 
   const onChangeTab = useCallback((t) => {
     dispatch(setPUAction(t));
