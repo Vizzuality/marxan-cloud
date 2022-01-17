@@ -1,5 +1,9 @@
 import React, { ReactNode } from 'react';
 
+import { useRouter } from 'next/router';
+
+import { useRoleMe } from 'hooks/project-users';
+
 import ComingSoon from 'layout/help/coming-soon';
 
 import Button from 'components/button';
@@ -15,6 +19,11 @@ export const Item: React.FC<ItemSettingsProps> = ({
   onDelete,
   onDuplicate,
 }: ItemSettingsProps) => {
+  const { query } = useRouter();
+  const { pid } = query;
+  const { data: roleMe } = useRoleMe(pid);
+  const VIEWER = roleMe === 'project_viewer';
+
   return (
     <div className="w-full px-8 pt-6 pb-4 bg-gray-700 rounded-b-3xl">
       {children}
@@ -25,6 +34,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
             className="flex-shrink-0"
             size="s"
             theme="secondary"
+            disabled={VIEWER}
             onClick={onDuplicate}
           >
             Duplicate
@@ -35,6 +45,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
           className="flex-shrink-0"
           size="s"
           theme="secondary"
+          disabled={VIEWER}
           onClick={onDelete}
         >
           Delete
