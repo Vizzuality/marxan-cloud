@@ -101,6 +101,10 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
     const { includedDefault, excludedDefault } = PUData;
     setClearing(true);
 
+    // Clear all temp PU values
+    dispatch(setTmpPuIncludedValue(includedDefault));
+    dispatch(setTmpPuExcludedValue(excludedDefault));
+
     // Save current clicked pu ids
     scenarioPUMutation.mutate({
       id: `${sid}`,
@@ -140,7 +144,16 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         setClearing(false);
       },
     });
-  }, [sid, PUData, scenarioPUMutation, addToast, dispatch, setJob]);
+  }, [
+    PUData,
+    dispatch,
+    scenarioPUMutation,
+    sid,
+    setJob,
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
+    addToast,
+  ]);
 
   return (
     <motion.div
