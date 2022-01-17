@@ -1,5 +1,6 @@
 import {
   CommandHandler,
+  EventBus,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
@@ -10,6 +11,7 @@ import { isDefined } from '@marxan/utils';
 import { FinalizeArchive } from './finalize-archive.command';
 import { ExportRepository } from './export-repository.port';
 import { ArchiveCreator } from './archive-creator.port';
+import { ExportFailed } from '@marxan-api/modules/clone/export/application/export-failed.event';
 
 @CommandHandler(FinalizeArchive)
 export class FinalizeArchiveHandler
@@ -20,15 +22,16 @@ export class FinalizeArchiveHandler
     private readonly exportRepo: ExportRepository,
     private readonly archiveCreator: ArchiveCreator,
     private readonly eventPublisher: EventPublisher,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute({ exportId }: FinalizeArchive): Promise<void> {
     const exportInstance = await this.exportRepo.find(exportId);
-
     if (!exportInstance) {
       this.logger.error(
         `${FinalizeArchiveHandler.name} could not find export ${exportId.value} to complete archive.`,
       );
+
       return;
     }
 
@@ -48,6 +51,14 @@ export class FinalizeArchiveHandler
       this.logger.error(
         `${FinalizeArchiveHandler.name} could not create archive for ${exportId.value}.`,
       );
+      this.eventBus.publish(
+        new ExportFailed(
+          exportId,
+          exportInstance.resourceId,
+          exportInstance.resourceKind,
+          exportInstance.toSnapshot().archiveLocation,
+        ),
+      );
       return;
     }
 
@@ -60,6 +71,14 @@ export class FinalizeArchiveHandler
     if (isLeft(result)) {
       this.logger.error(
         `${FinalizeArchiveHandler.name} tried to complete Export with archive but pieces were not ready.`,
+      );
+      this.eventBus.publish(
+        new ExportFailed(
+          exportId,
+          exportInstance.resourceId,
+          exportInstance.resourceKind,
+          exportInstance.toSnapshot().archiveLocation,
+        ),
       );
       return;
     }
