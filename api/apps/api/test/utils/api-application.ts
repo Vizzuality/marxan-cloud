@@ -11,6 +11,8 @@ import {
   FileRepository,
   TempStorageRepository,
 } from '@marxan/files-repository';
+import { ScenarioCalibrationRepo } from '../../src/modules/blm/values/scenario-calibration-repo';
+import { FakeScenarioCalibrationRepo } from './scenario-calibration-repo.test.utils';
 
 export const fakeProjectChecker: Pick<ProjectChecker, 'isProjectReady'> = {
   isProjectReady: async () => right(true),
@@ -30,6 +32,8 @@ export const bootstrapApplication = async (
     .useValue(fakeProjectChecker)
     .overrideProvider(FileRepository)
     .useClass(TempStorageRepository)
+    .overrideProvider(ScenarioCalibrationRepo)
+    .useClass(FakeScenarioCalibrationRepo)
     .compile();
 
   return await moduleFixture

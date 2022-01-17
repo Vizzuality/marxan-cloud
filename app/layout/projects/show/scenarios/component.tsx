@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+import { flatten } from 'lodash';
 
 import { useRoleMe } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
@@ -58,24 +59,13 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   } = useProject(pid);
 
   const {
-    data: rawScenariosData,
-    isFetching: rawScenariosIsFetching,
-    isFetched: rawScenariosIsFetched,
-  } = useScenarios(pid, {
-    filters: {
-      projectId: pid,
-    },
-  });
-
-  const {
-    data: allScenariosData,
-    fetchNextPage: allScenariosfetchNextPage,
+    data: scenariosData,
+    fetchNextPage: scenariosFetchNextPage,
     hasNextPage,
-    isFetching: allScenariosIsFetching,
-    isFetchingNextPage: allScenariosIsFetchingNextPage,
-    isFetched: allScenariosIsFetched,
+    isFetching: scenariosIsFetching,
+    isFetchingNextPage: scenariosIsFetchingNextPage,
+    isFetched: scenariosIsFetched,
   } = useScenarios(pid, {
-
     search,
     filters: {
       projectId: pid,
@@ -83,14 +73,17 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
     },
     sort,
   });
+
   const scrollRef = useBottomScrollListener(
     () => {
-      if (hasNextPage) allScenariosfetchNextPage();
+      if (hasNextPage) scenariosFetchNextPage();
     },
   );
 
-  const loading = (projectIsFetching && !projectIsFetched)
-    || (rawScenariosIsFetching && !rawScenariosIsFetched);
+  const projectLoading = projectIsFetching && !projectIsFetched;
+  const scenariosLoading = scenariosIsFetching && !scenariosIsFetched;
+  const hasScenarios = !!scenariosData.length;
+  const hasFilters = !!flatten(Object.values(filters)).length;
 
   // DELETE
   const deleteMutation = useDeleteScenario({});
@@ -152,7 +145,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
           level: 'success',
         });
 
-        console.info('Scenario duplicated succesfully', s);
+        console.info('Scenario duplicated successfully', s);
       },
       onError: () => {
         addToast('error-duplicate-scenario', (
@@ -195,7 +188,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
           level: 'success',
         });
 
-        console.info('Scenario canceled succesfully', s);
+        console.info('Scenario canceled successfully', s);
       },
       onError: () => {
         addToast('error-cancel-scenario', (
@@ -221,131 +214,125 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   return (
     <AnimatePresence>
       <div key="project-scenarios-sidebar" className="flex flex-col flex-grow col-span-7 overflow-hidden">
-        {!loading && !rawScenariosData.length && (
-          <motion.div
-            key="project-scenarios-empty"
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            className="flex items-center h-full pl-20 bg-gray-700 bg-right bg-no-repeat bg-contain rounded-4xl"
-            style={{
-              backgroundImage: `url(${bgScenariosDashboard})`,
-            }}
-          >
-            <div>
-              <div className="flex space-x-3">
-                <h2 className="text-lg font-medium font-heading">Scenario dashboard</h2>
-                <InfoButton>
-                  <span className="space-y-2">
-                    <p>
-                      A scenario is an individual planning activity with specific configurations
-                      of conservation areas, features, targets and parameters.
-                    </p>
-                    <p>
-                      You can create as
-                      many scenarios as needed to explore different possibilities.
-                    </p>
-                  </span>
-                </InfoButton>
-              </div>
-              <h3 className="mt-1 text-lg font-medium text-gray-300 font-heading">Get started by creating a scenario</h3>
+        <Loading
+          visible={projectLoading || scenariosLoading}
+          className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+          iconClassName="w-10 h-10 text-primary-500"
+        />
 
-              <Button
-                theme="primary"
-                size="lg"
-                className="mt-10"
-                disabled={VIEWER}
-                onClick={() => setModal(true)}
-              >
-                <span className="mr-5">Create scenario</span>
-                <Icon icon={PLUS_SVG} className="w-4 h-4" />
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {!loading && !!rawScenariosData.length && (
-          <motion.div key="projects-scenarios" className="relative flex flex-col flex-grow overflow-hidden">
+        <div key="projects-scenarios" className="relative flex flex-col flex-grow overflow-hidden">
+          {(hasScenarios || search || hasFilters) && (
             <ScenarioToolbar />
+          )}
 
-            <Loading
-              visible={allScenariosIsFetching && !allScenariosIsFetched}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-              iconClassName="w-10 h-10 text-primary-500"
-            />
+          <div className="relative overflow-hidden" id="scenarios-list">
+            {!hasScenarios && (search || hasFilters) && (
+              <div className="py-6">
+                <>No results found</>
+              </div>
+            )}
 
-            <ConfirmationPrompt
-              title={`Are you sure you want to delete "${deleteScenario?.name}"?`}
-              description="The action cannot be reverted."
-              icon={DELETE_WARNING_SVG}
-              open={!!deleteScenario}
-              onAccept={onDelete}
-              onRefuse={() => setDelete(null)}
-              onDismiss={() => setDelete(null)}
-            />
-
-            <div className="relative overflow-hidden" id="scenarios-list">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-black via-black" />
+            {hasScenarios && (
               <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
-                {!!allScenariosData.length
-                  && allScenariosData.map((s, i) => {
-                    const TAG = i === 0 ? HelpBeacon : Fragment;
+                {scenariosData.map((s, i) => {
+                  const TAG = i === 0 ? HelpBeacon : Fragment;
 
-                    return (
-                      <TAG
-                        key={`${s.id}`}
-                        {...i === 0 && {
-                          id: `project-scenario-${s.id}`,
-                          title: 'Scenario list',
-                          subtitle: 'List and detail overview',
-                          content: (
-                            <div>
-                              Here you can see listed all the scenarios under the same project.
-                              You can access a scenario and edit it at any time, unless there is
-                              a contributor working on the same scenario. In this case, you will see
-                              a warning.
-                            </div>
-                          ),
-                        }}
+                  return (
+                    <TAG
+                      key={`${s.id}`}
+                      {...i === 0 && {
+                        id: `project-scenario-${s.id}`,
+                        title: 'Scenario list',
+                        subtitle: 'List and detail overview',
+                        content: (
+                          <div>
+                            Here you can see listed all the scenarios under the same project.
+                            You can access a scenario and edit it at any time, unless there is
+                            a contributor working on the same scenario. In this case, you will
+                            see a warning.
+                          </div>
+                        ),
+                      }}
+                    >
+                      <div
+                        className={cx({
+                          'mt-3': i !== 0,
+                        })}
                       >
-                        <div
-                          className={cx({
-                            'mt-3': i !== 0,
-                          })}
-                        >
-                          <ScenarioItem
-                            {...s}
-                            onDelete={() => {
-                              setDelete(s);
-                            }}
-                            onDuplicate={() => onDuplicate(s.id, s.name)}
-                            onCancelRun={() => onCancelRun(s.id, s.name)}
-                            SettingsC={<ScenarioSettings sid={s.id} />}
-                          />
+                        <ScenarioItem
+                          {...s}
+                          onDelete={() => {
+                            setDelete(s);
+                          }}
+                          onDuplicate={() => onDuplicate(s.id, s.name)}
+                          onCancelRun={() => onCancelRun(s.id, s.name)}
+                          SettingsC={<ScenarioSettings sid={s.id} />}
+                        />
 
-                        </div>
-                      </TAG>
-                    );
-                  })}
-
-                {!allScenariosData.length && (
-                  <div>
-                    No results found
-                  </div>
-                )}
-              </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-black via-black" />
-              <div
-                className={cx({
-                  'opacity-100': allScenariosIsFetchingNextPage,
-                  'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition opacity-0 pointer-events-none': true,
+                      </div>
+                    </TAG>
+                  );
                 })}
-              >
-                <div className="py-1 bg-gray-200">Loading more...</div>
-                <div className="w-full h-6 bg-white" />
               </div>
-            </div>
+            )}
 
+            <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-black via-black" />
+
+            <div
+              className={cx({
+                'opacity-100': scenariosIsFetchingNextPage,
+                'absolute left-0 z-20 w-full text-xs text-center uppercase bottom-0 font-heading transition opacity-0 pointer-events-none': true,
+              })}
+            >
+              <div className="py-1 bg-gray-200">Loading more...</div>
+              <div className="w-full h-6 bg-white" />
+            </div>
+          </div>
+
+          {!hasScenarios && !search && !hasFilters && (
+            <motion.div
+              key="project-scenarios-empty"
+              initial={{ y: -10, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -10, opacity: 0 }}
+              className="flex items-center h-full pl-20 bg-gray-700 bg-right bg-no-repeat bg-contain rounded-4xl"
+              style={{
+                backgroundImage: `url(${bgScenariosDashboard})`,
+              }}
+            >
+              <div>
+                <div className="flex space-x-3">
+                  <h2 className="text-lg font-medium font-heading">Scenario dashboard</h2>
+                  <InfoButton>
+                    <span className="space-y-2">
+                      <p>
+                        A scenario is an individual planning activity with specific configurations
+                        of conservation areas, features, targets and parameters.
+                      </p>
+                      <p>
+                        You can create as
+                        many scenarios as needed to explore different possibilities.
+                      </p>
+                    </span>
+                  </InfoButton>
+                </div>
+                <h3 className="mt-1 text-lg font-medium text-gray-300 font-heading">Get started by creating a scenario</h3>
+
+                <Button
+                  theme="primary"
+                  size="lg"
+                  className="mt-10"
+                  disabled={VIEWER}
+                  onClick={() => setModal(true)}
+                >
+                  <span className="mr-5">Create scenario</span>
+                  <Icon icon={PLUS_SVG} className="w-4 h-4" />
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {(hasScenarios || search || hasFilters) && (
             <button
               type="button"
               className="flex items-center justify-center flex-shrink-0 w-full h-16 px-8 space-x-3 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800"
@@ -355,18 +342,28 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               <span>Create scenario</span>
               <Icon icon={PLUS_SVG} className="w-4 h-4 transition transform group-hover:rotate-90" />
             </button>
-          </motion.div>
-        )}
-      </div>
+          )}
+        </div>
 
-      <Modal
-        title="Hello"
-        open={modal}
-        size="wide"
-        onDismiss={() => setModal(false)}
-      >
-        <ScenarioTypes />
-      </Modal>
+        <Modal
+          title="Hello"
+          open={modal}
+          size="wide"
+          onDismiss={() => setModal(false)}
+        >
+          <ScenarioTypes />
+        </Modal>
+
+        <ConfirmationPrompt
+          title={`Are you sure you want to delete "${deleteScenario?.name}"?`}
+          description="The action cannot be reverted."
+          icon={DELETE_WARNING_SVG}
+          open={!!deleteScenario}
+          onAccept={onDelete}
+          onRefuse={() => setDelete(null)}
+          onDismiss={() => setDelete(null)}
+        />
+      </div>
     </AnimatePresence>
   );
 };

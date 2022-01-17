@@ -185,6 +185,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
   // Callbacks
   const onSubmit = useCallback((values) => {
+    const coordinates = [
+      Object.values(values.uploadingValue.features[0][0]).filter((i) => Array.isArray(i)),
+    ];
+    const { properties } = values.uploadingValue.features[0][0];
+    const { type: byGeoJsonType } = values.uploadingValue;
+
     setSubmitting(true);
     // Save current uploaded shape
     scenarioPUMutation.mutate({
@@ -195,7 +201,17 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
           exclude: puExcludedValue,
         },
         byGeoJson: {
-          [values.type]: [values.uploadingValue],
+          [values.type]: [{
+            type: byGeoJsonType,
+            features: [{
+              type: 'Feature',
+              geometry: {
+                type: 'Polygon',
+                coordinates,
+                properties,
+              },
+            }],
+          }],
         },
       },
     }, {

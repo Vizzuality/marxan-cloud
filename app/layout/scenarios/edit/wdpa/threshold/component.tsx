@@ -272,21 +272,23 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                           be covered by a protected area to be considered “protected”.
                         </p>
 
-                        <Slider
-                          labelRef={labelRef}
-                          theme="dark"
-                          defaultValue={values.wdpaThreshold}
-                          formatOptions={{
-                            style: 'percent',
-                          }}
-                          maxValue={1}
-                          minValue={0.01}
-                          step={0.01}
-                          onChange={(s) => {
-                            flprops.input.onChange(s);
-                            dispatch(setWDPAThreshold(s));
-                          }}
-                        />
+                        <div className="px-5">
+                          <Slider
+                            labelRef={labelRef}
+                            theme="dark"
+                            defaultValue={values.wdpaThreshold}
+                            formatOptions={{
+                              style: 'percent',
+                            }}
+                            maxValue={1}
+                            minValue={0.01}
+                            step={0.01}
+                            onChange={(s) => {
+                              flprops.input.onChange(s);
+                              dispatch(setWDPAThreshold(s));
+                            }}
+                          />
+                        </div>
                       </Field>
                     )}
                   </FieldRFF>

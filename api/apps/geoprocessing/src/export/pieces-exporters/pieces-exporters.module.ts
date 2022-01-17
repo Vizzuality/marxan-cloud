@@ -8,6 +8,7 @@ import { ProjectConfig } from './project-config';
 import { PlanningAreaGadm } from './planning-area-gadm';
 import { PlanningAreaCustomGrid } from './planning-area-custom-grid';
 import { PlanningAreaCustom } from './planning-area-custom';
+import { ScenarioMetadata } from './scenario-metadata';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { PlanningAreaCustom } from './planning-area-custom';
     PlanningAreaGadm,
     PlanningAreaCustom,
     PlanningAreaCustomGrid,
+    ScenarioMetadata,
   ],
 })
 export class PiecesExportersModule {}

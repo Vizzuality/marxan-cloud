@@ -4,4 +4,5 @@ export enum ClonePiece {
   PlanningAreaGAdm = 'planning-area-gadm',
   PlanningAreaCustom = 'planning-area-shapefile',
   PlanningAreaGridCustom = 'planning-area-grid-shapefile',
+  ScenarioMetadata = 'scenario-metadata',
 }
