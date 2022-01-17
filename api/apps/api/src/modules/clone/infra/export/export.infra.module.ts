@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
@@ -20,14 +20,34 @@ import { ArchiveReadySaga } from './archive-ready.saga';
 import { ExportPieceFailedSaga } from './export-piece-failed.saga';
 import { CancelExportPendingJobsHandler } from './cancel-export-pending-jobs.handler';
 import { MarkExportAsFailedHandler } from './mark-export-as-failed.handler';
+<<<<<<< HEAD
 import { MarkExportPiecesAsFailedHandler } from './mark-export-pieces-as-failed.handler';
+=======
+import { ExportFailedSaga } from '@marxan-api/modules/clone/infra/export/export-failed.saga';
+import { RemoveExportFilesHandler } from '@marxan-api/modules/clone/infra/export/remove-export-files.handler';
+import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
+import { TypeormExportRepository } from '@marxan-api/modules/clone/export/adapters/typeorm-export.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+>>>>>>> a267d524 (feat: removes metadata files of an export if its zip creation fails)
 
 @Module({
-  imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
+  imports: [
+    ApiEventsModule,
+    QueueApiEventsModule,
+    CqrsModule,
+    TypeOrmModule.forFeature([ExportEntity]),
+  ],
   providers: [
+    Logger,
     SchedulePieceExportHandler,
+    {
+      provide: ExportRepository,
+      useClass: TypeormExportRepository,
+    },
     PieceExportRequestedSaga,
     ExportStartedSaga,
+    ExportFailedSaga,
     ExportPieceFailedSaga,
     ArchiveReadySaga,
     exportPieceQueueProvider,
@@ -38,7 +58,11 @@ import { MarkExportPiecesAsFailedHandler } from './mark-export-pieces-as-failed.
     MarkExportAsFinishedHandler,
     CancelExportPendingJobsHandler,
     MarkExportAsFailedHandler,
+<<<<<<< HEAD
     MarkExportPiecesAsFailedHandler,
+=======
+    RemoveExportFilesHandler,
+>>>>>>> a267d524 (feat: removes metadata files of an export if its zip creation fails)
   ],
 })
 export class ExportInfraModule {}
