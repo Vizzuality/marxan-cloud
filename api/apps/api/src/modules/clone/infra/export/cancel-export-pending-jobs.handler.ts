@@ -4,6 +4,7 @@ import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Job, Queue } from 'bullmq';
 import { CancelExportPendingJobs } from './cancel-export-pending-jobs.command';
 import { exportPieceQueueToken } from './export-queue.provider';
+import { exists } from '@marxan/utils/exists';
 
 @CommandHandler(CancelExportPendingJobs)
 export class CancelExportPendingJobsHandler
@@ -25,8 +26,9 @@ export class CancelExportPendingJobsHandler
 
     await Promise.all(
       exportJobs
-        .filter((job) => job.id)
-        .map((job) => this.queue.remove(job.id!)),
+        .map((job) => job.id)
+        .filter(exists)
+        .map((id) => this.queue.remove(id)),
     );
   }
 }
