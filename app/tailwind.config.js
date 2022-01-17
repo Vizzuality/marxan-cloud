@@ -180,7 +180,7 @@ module.exports = {
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       bounce: 'bounce 1s infinite',
-      banner: 'banner 6s linear infinite',
+      banner: 'banner 6s cubic-bezier(0, 0, 0.2, 1) infinite',
     },
     backgroundColor: (theme) => theme('colors'),
     backgroundImage: {
@@ -553,28 +553,34 @@ module.exports = {
       },
       banner: {
         '0%': {
-          marginTop: '20px',
+          transform: 'translateY(0%)',
         },
-        '15%': {
-          marginTop: '20px',
+        '11.11%': {
+          transform: 'translateY(0%)',
         },
-        '30%': {
-          marginTop: '-90px',
+        '22.22%': {
+          transform: 'translateY(0%)',
         },
-        '45%': {
-          marginTop: '-90px',
+        '33.33%': {
+          transform: 'translateY(-33.33%)',
         },
-        '60%': {
-          marginTop: '-90px',
+        '44.44%': {
+          transform: 'translateY(-33.33%)',
         },
-        '70%': {
-          marginTop: '-210px',
+        '55.55%': {
+          transform: 'translateY(-33.33%)',
         },
-        '85%': {
-          marginTop: '-210px',
+        '66.66%': {
+          transform: 'translateY(-66.66%)',
+        },
+        '77.77%': {
+          transform: 'translateY(-66.66%)',
+        },
+        '88.88%': {
+          transform: 'translateY(-66.66%)',
         },
         '100%': {
-          marginTop: '-10px',
+          transform: 'translateY(0%)',
         },
       },
     },
