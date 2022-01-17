@@ -123,7 +123,6 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         ), {
           level: 'success',
         });
-        setClearing(false);
       },
       onError: () => {
         addToast('clear-planning-units-error', (
@@ -136,6 +135,8 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
         setClearing(false);
       },
     });
