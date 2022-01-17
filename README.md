@@ -77,8 +77,13 @@ via a Docker volume.
 
 ### Running the Marxan Cloud platform
 
-Run `make start` to start all the 4 services needed to run Marxan, as well as
-the required database services.
+Run `make start-api` to start all the 4 services needed to run Marxan, as well
+as the required database services, in containers via Docker Compose.
+
+To enable the Node inspector while running the MarxanCloud API services in
+containers, use `make debug-api` instead. Example configuration files for
+debugger setup in popular editors are provided in the `docs/developers/editors/`
+documentation folder.
 
 The docker build process may take a few minutes, depending on your hardware,
 software and internet connection. Once completed, the applications will start,
