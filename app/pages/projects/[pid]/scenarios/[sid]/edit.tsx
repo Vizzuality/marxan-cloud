@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -9,7 +9,7 @@ import { withScenario } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { useScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
@@ -28,6 +28,7 @@ import Wrapper from 'layout/wrapper';
 export const getServerSideProps = withProtection(withUser(withScenario()));
 
 const EditScenarioPage: React.FC = () => {
+  const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
   const { data: scenarioData } = useScenario(sid);
@@ -36,17 +37,51 @@ const EditScenarioPage: React.FC = () => {
   const {
     tab: metaTab,
     subtab: metaSubtab,
+    lastJobCheck,
   } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
   useEffect(() => {
     if (metaTab) dispatch(setTab(metaTab));
     if (metaSubtab) dispatch(setSubTab(metaSubtab));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [metaTab, metaSubtab]);
+
+  // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
+  useEffect(() => {
+    if (!lastJobCheck && !submitting) {
+      setSubmitting(true);
+
+      saveScenarioMutation.mutate({
+        id: `${sid}`,
+        data: {
+          metadata: {
+            ...metadata,
+            scenarioEditingMetadata: {
+              lastJobCheck: new Date().getTime(),
+              ...scenarioEditingMetadata,
+            },
+          },
+        },
+      }, {
+        onSuccess: () => {
+          setSubmitting(false);
+        },
+        onError: () => {
+          setSubmitting(false);
+        },
+      });
+    }
+  }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
 
   return (
     <Protected>
