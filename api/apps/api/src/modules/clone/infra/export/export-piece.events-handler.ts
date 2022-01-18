@@ -45,6 +45,7 @@ export class ExportPieceEventsHandler
     const data = await eventData.data;
     const output = await eventData.result;
     const kind = API_EVENT_KINDS.project__export__piece__finished__v1__alpha;
+
     return {
       topic: data.resourceId,
       kind,
@@ -62,6 +63,7 @@ export class ExportPieceEventsHandler
     const data = await eventData.data;
     const output = await eventData.result;
     const kind = API_EVENT_KINDS.project__export__piece__failed__v1__alpha;
+
     return {
       topic: data.resourceId,
       kind,
