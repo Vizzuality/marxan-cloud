@@ -1,15 +1,17 @@
-import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
+import {
+  ClonePiece,
+  ComponentId,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
-import { ResourceId } from '../../src/modules/clone/export';
-import { ExportEntity } from '../../src/modules/clone/export/adapters/entities/exports.api.entity';
-import { ComponentLocation } from '../../src/modules/clone/export/application/complete-piece.command';
-import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
-import { Export, ExportId } from '../../src/modules/clone/export/domain';
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { ComponentLocation } from '@marxan-api/modules/clone/export/application/complete-piece.command';
+import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
+import { Export, ExportId } from '@marxan-api/modules/clone/export/domain';
 import { bootstrapApplication } from '../utils/api-application';
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { ExportComponentEntity } from '@marxan-api/modules/clone/export/adapters/entities/export-components.api.entity';
-import { ComponentLocationEntity } from '@marxan-api/modules/clone/export/adapters/entities/component-locations.api.entity';
 
 describe('Typeorm export repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -23,7 +25,7 @@ describe('Typeorm export repository', () => {
   });
 
   it('should expose methods for getting an export by id and storing exports', async () => {
-    await fixtures.WhenAnExportIsSavedSuccessfully();
+    await fixtures.GivenExportWasRequested();
 
     const exportData = await fixtures.WhenReadingTheSavedExportFromRepository();
 
@@ -34,7 +36,7 @@ describe('Typeorm export repository', () => {
   });
 
   it('should update an export when a nested piece is completed', async () => {
-    await fixtures.WhenAnExportIsSavedSuccessfully();
+    await fixtures.GivenExportWasRequested();
     await fixtures.WhenAComponentIsCompleted();
     const exportData = await fixtures.WhenReadingTheSavedExportFromRepository();
 
@@ -45,8 +47,8 @@ describe('Typeorm export repository', () => {
   });
 
   it('should save entities working with transaction', async () => {
-    await fixtures.WhenAnExportIsSavedSuccessfullyWithinATransaction();
-    await fixtures.WhenAllComponentsAreCompletedWithTransactions();
+    await fixtures.GivenExportWithMultipleComponentsWasRequested();
+    await fixtures.WhenAllComponentsAreCompletedConcurrentlyWithTransactions();
 
     const exportData = await fixtures.WhenReadingTheSavedExportFromRepository();
 
@@ -70,17 +72,11 @@ const getFixtures = async () => {
     cleanup: async () => {
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
-      const exportComponentRepo = connection.getRepository(
-        ExportComponentEntity,
-      );
-      const locationRepo = connection.getRepository(ComponentLocationEntity);
 
-      await locationRepo.delete({});
-      await exportComponentRepo.delete({});
       await exportRepo.delete({});
       await app.close();
     },
-    WhenAnExportIsSavedSuccessfully: async () => {
+    GivenExportWasRequested: async () => {
       resourceId = new ResourceId(v4());
       componentId = new ComponentId(v4());
       componentLocationUri = '/foo/bar/project-metadata.json';
@@ -102,7 +98,7 @@ const getFixtures = async () => {
       exportId = exportInstance.id;
       await repo.save(exportInstance);
     },
-    WhenAnExportIsSavedSuccessfullyWithinATransaction: async () => {
+    GivenExportWithMultipleComponentsWasRequested: async () => {
       resourceId = new ResourceId(v4());
 
       componentLocationUri = `/foo/bar/project-metadata.json`;
@@ -142,7 +138,7 @@ const getFixtures = async () => {
       exportInstance.completeComponent(componentId, [componentLocation]);
       await repo.save(exportInstance);
     },
-    WhenAllComponentsAreCompletedWithTransactions: async () => {
+    WhenAllComponentsAreCompletedConcurrentlyWithTransactions: async () => {
       const componentLocation = new ComponentLocation(
         componentLocationUri,
         componentLocationRelativePath,
@@ -188,10 +184,14 @@ const getFixtures = async () => {
         expect(exportComponent.uris).toBeDefined();
         expect(exportComponent.uris.length).toBeGreaterThan(0);
 
-        exportComponent.uris.forEach((el) => {
-          expect(el.uri).toEqual(componentLocationUri);
-          expect(el.relativePath).toEqual(componentLocationRelativePath);
-        });
+        expect(
+          exportComponent.uris.every((el) => el.uri === componentLocationUri),
+        ).toEqual(true);
+        expect(
+          exportComponent.uris.every(
+            (el) => el.relativePath === componentLocationRelativePath,
+          ),
+        ).toEqual(true);
       }
     },
     ThenAllExportComponentsShouldBeFinished: ({
@@ -200,9 +200,9 @@ const getFixtures = async () => {
       exportData: Export | undefined;
     }) => {
       expect(exportData).toBeDefined();
-      exportData!.toSnapshot().exportPieces.map((piece) => {
-        expect(piece.finished).toEqual(true);
-      });
+      expect(
+        exportData!.toSnapshot().exportPieces.every((piece) => piece.finished),
+      ).toEqual(true);
     },
   };
 };

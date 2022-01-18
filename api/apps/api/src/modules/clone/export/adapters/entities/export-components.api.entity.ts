@@ -1,4 +1,4 @@
-import { ClonePiece } from '@marxan/cloning/domain';
+import { ClonePiece, ComponentId } from '@marxan/cloning/domain';
 import {
   Column,
   Entity,
@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
+import { ExportComponentSnapshot } from '../../domain';
 import { ComponentLocationEntity } from './component-locations.api.entity';
 import { ExportEntity } from './exports.api.entity';
 
@@ -45,4 +46,29 @@ export class ExportComponentEntity {
     cascade: true,
   })
   uris!: ComponentLocationEntity[];
+
+  static fromSnapshot(
+    componentSnapshot: ExportComponentSnapshot,
+  ): ExportComponentEntity {
+    const exportComponentEntity = new ExportComponentEntity();
+    exportComponentEntity.id = componentSnapshot.id.value;
+    exportComponentEntity.piece = componentSnapshot.piece;
+    exportComponentEntity.resourceId = componentSnapshot.resourceId;
+    exportComponentEntity.finished = componentSnapshot.finished;
+    exportComponentEntity.uris = componentSnapshot.uris.map(
+      ComponentLocationEntity.fromSnapshot,
+    );
+
+    return exportComponentEntity;
+  }
+
+  toSnapshot(): ExportComponentSnapshot {
+    return {
+      id: new ComponentId(this.id),
+      finished: this.finished,
+      piece: this.piece,
+      resourceId: this.resourceId,
+      uris: this.uris.map((uri) => uri.toComponentLocationClass()),
+    };
+  }
 }

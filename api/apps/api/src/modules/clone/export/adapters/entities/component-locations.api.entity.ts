@@ -1,4 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { ComponentLocation } from '../../application/complete-piece.command';
 import { ExportComponentEntity } from './export-components.api.entity';
 
 @Entity('component_locations')
@@ -18,4 +19,18 @@ export class ComponentLocationEntity {
     referencedColumnName: 'id',
   })
   component!: ExportComponentEntity;
+
+  static fromSnapshot(
+    locationSnapshot: ComponentLocation,
+  ): ComponentLocationEntity {
+    const componentLocationEntity = new ComponentLocationEntity();
+    componentLocationEntity.uri = locationSnapshot.uri;
+    componentLocationEntity.relativePath = locationSnapshot.relativePath;
+
+    return componentLocationEntity;
+  }
+
+  toComponentLocationClass(): ComponentLocation {
+    return new ComponentLocation(this.uri, this.relativePath);
+  }
 }

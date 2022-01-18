@@ -1,7 +1,6 @@
 import { ResourceKind } from '@marxan/cloning/domain';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { Export } from '../../domain';
-import { ComponentLocationEntity } from './component-locations.api.entity';
 import { ExportComponentEntity } from './export-components.api.entity';
 
 @Entity('exports')
@@ -40,23 +39,20 @@ export class ExportEntity {
     exportEntity.resourceId = snapshot.resourceId;
     exportEntity.resourceKind = snapshot.resourceKind;
     exportEntity.archiveLocation = snapshot.archiveLocation;
-    exportEntity.components = snapshot.exportPieces.map((piece) => {
-      const exportComponentEntity = new ExportComponentEntity();
-      exportComponentEntity.id = piece.id.value;
-      exportComponentEntity.piece = piece.piece;
-      exportComponentEntity.resourceId = piece.resourceId;
-      exportComponentEntity.finished = piece.finished;
-      exportComponentEntity.uris = piece.uris.map((uri) => {
-        const componentLocationEntity = new ComponentLocationEntity();
-        componentLocationEntity.uri = uri.uri;
-        componentLocationEntity.relativePath = uri.relativePath;
-
-        return componentLocationEntity;
-      });
-
-      return exportComponentEntity;
-    });
+    exportEntity.components = snapshot.exportPieces.map(
+      ExportComponentEntity.fromSnapshot,
+    );
 
     return exportEntity;
+  }
+
+  toAggregate(): Export {
+    return Export.fromSnapshot({
+      id: this.id,
+      resourceId: this.resourceId,
+      resourceKind: this.resourceKind,
+      archiveLocation: this.archiveLocation,
+      exportPieces: this.components.map((component) => component.toSnapshot()),
+    });
   }
 }

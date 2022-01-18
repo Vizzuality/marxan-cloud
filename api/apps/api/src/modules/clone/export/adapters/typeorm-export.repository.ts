@@ -1,14 +1,10 @@
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
-import {
-  ComponentId,
-  ComponentLocation,
-} from '../application/complete-piece.command';
 import { ExportRepository } from '../application/export-repository.port';
 import { Export, ExportId } from '../domain';
 import { ExportEntity } from './entities/exports.api.entity';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class TypeormExportRepository implements ExportRepository {
@@ -27,21 +23,7 @@ export class TypeormExportRepository implements ExportRepository {
     });
     if (!exportEntity) return undefined;
 
-    return Export.fromSnapshot({
-      id: exportEntity.id,
-      resourceId: exportEntity.resourceId,
-      resourceKind: exportEntity.resourceKind,
-      archiveLocation: exportEntity.archiveLocation,
-      exportPieces: exportEntity.components.map((component) => ({
-        id: new ComponentId(component.id),
-        finished: component.finished,
-        piece: component.piece,
-        resourceId: component.resourceId,
-        uris: component.uris.map(
-          (element) => new ComponentLocation(element.uri, element.relativePath),
-        ),
-      })),
-    });
+    return exportEntity.toAggregate();
   }
 
   async save(exportInstance: Export): Promise<void> {
