@@ -97,7 +97,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
     uploadScenarioPUMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: ({ data: { data: g } }) => {
-        setLoading(false);
         setSuccessFile({ id: g.id, name: f.name });
 
         addToast('success-upload-shapefile', (
@@ -125,7 +124,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
       onError: ({ response }) => {
         const { errors } = response.data;
 
-        setLoading(false);
         setSuccessFile(null);
 
         addToast('error-upload-shapefile', (
@@ -140,6 +138,9 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
+        setLoading(false);
       },
     });
   };
@@ -217,7 +218,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
     }, {
       onSuccess: ({ data: { meta } }) => {
         dispatch(setJob(new Date(meta.isoDate).getTime()));
-        setSubmitting(false);
         onSelected(null);
         dispatch(setUploading(false));
         dispatch(setUploadingValue(null));
@@ -235,7 +235,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         });
       },
       onError: () => {
-        setSubmitting(false);
         addToast('adjust-planning-units-error', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -246,6 +245,9 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
+        setSubmitting(false);
       },
     });
   }, [
