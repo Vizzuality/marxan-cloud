@@ -24,9 +24,12 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   onChangeFPF,
 }: TargetSPFItemProps) => {
   const [targetValue, setTargetValue] = useState((target || defaultTarget) / 100);
-  const [inputTargetValue, setInputTargetValue] = useState(targetValue);
+  const [inputTargetValue, setInputTargetValue] = useState(String(targetValue));
   const [targetInputFocused, setTargetInputFocused] = useState(false);
+
   const [FPFValue, setFPFValue] = useState(fpf || defaultFPF);
+  const [inputFPFValue, setInputFPFValue] = useState(String(FPFValue));
+
   const sliderLabelRef = useRef(null);
 
   useEffect(() => {
@@ -39,8 +42,12 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
 
   useEffect(() => {
     const percentValue = Math.round(targetValue * 100);
-    setInputTargetValue(percentValue);
+    setInputTargetValue(String(percentValue));
   }, [targetValue]);
+
+  useEffect(() => {
+    setInputFPFValue(String(FPFValue));
+  }, [FPFValue]);
 
   return (
     <div
@@ -75,18 +82,23 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
                 min={0}
                 max={100}
                 step={1}
-                value={targetInputFocused ? inputTargetValue : `${inputTargetValue}%`}
+                value={`${inputTargetValue}${targetInputFocused ? '' : '%'}`}
                 onFocusChange={setTargetInputFocused}
                 onChange={((event) => {
                   const percentValue = parseInt(event.target.value, 10);
                   if (percentValue < 0 || percentValue > 100) return;
-                  setInputTargetValue(percentValue);
+                  setInputTargetValue(String(percentValue));
                 })}
                 onBlur={() => {
+                  // If user leaves the input empty, we'll revert to the original targetValue
+                  if (Number.isNaN(Number(inputTargetValue))) {
+                    setInputTargetValue(String(Math.round(targetValue * 100)));
+                    return;
+                  }
                   // Prevent changing all targets if user didn't actually change it
                   // (despite clicking on the input)
-                  if (Math.round(targetValue * 100) === inputTargetValue) return;
-                  setTargetValue(inputTargetValue / 100);
+                  if (Math.round(targetValue * 100) === Number(inputTargetValue)) return;
+                  setTargetValue(Number(inputTargetValue) / 100);
                   if (onChangeTarget) onChangeTarget(inputTargetValue);
                 }}
               />
@@ -97,10 +109,21 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
                 className="w-16 ml-3 text-center text-sm"
                 theme="dark"
                 type="number"
-                value={FPFValue}
+                value={inputFPFValue}
                 onChange={({ target: { value: inputValue } }) => {
-                  setFPFValue(Number(inputValue));
-                  if (onChangeFPF) onChangeFPF(Number(inputValue));
+                  setInputFPFValue(inputValue);
+                }}
+                onBlur={() => {
+                  // If user leaves the input empty, we'll revert to the original targetValue
+                  if (!inputFPFValue) {
+                    setInputFPFValue(String(FPFValue));
+                    return;
+                  }
+                  // Prevent changing all targets if user didn't actually change it
+                  // (despite clicking on the input)
+                  if (FPFValue === Number(inputFPFValue)) return;
+                  setFPFValue(Number(inputFPFValue));
+                  if (onChangeFPF) onChangeFPF(Number(inputFPFValue));
                 }}
               />
             </div>
@@ -116,7 +139,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               onChange={(sliderValue) => {
                 const percentValue = +(sliderValue * 100).toFixed(0);
                 setTargetValue(sliderValue);
-                setInputTargetValue(percentValue);
+                setInputTargetValue(String(percentValue));
                 if (onChangeTarget) onChangeTarget(percentValue);
               }}
             />
