@@ -10,7 +10,7 @@ import cx from 'classnames';
 const THEME = {
   dark: {
     thumb:
-      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+      'absolute w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
@@ -22,7 +22,7 @@ const THEME = {
   },
   light: {
     thumb:
-      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+      'absolute w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
@@ -34,7 +34,7 @@ const THEME = {
   },
   'dark-small': {
     thumb:
-      'cursor-pointer absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+      'cursor-pointer absolute w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
@@ -52,6 +52,7 @@ export interface ThumbProps {
   sliderState: SliderState;
   trackRef: React.MutableRefObject<HTMLElement | null>;
   isDisabled: boolean;
+  showValue: boolean;
   id?: string;
 }
 
@@ -61,6 +62,7 @@ export const Thumb: React.FC<ThumbProps> = ({
   sliderState,
   trackRef,
   isDisabled,
+  showValue,
   id = undefined,
   ...rest
 }: ThumbProps) => {
@@ -102,6 +104,8 @@ export const Thumb: React.FC<ThumbProps> = ({
       className={cx({
         [THEME[theme].thumb]: true,
         [THEME[theme].status[status]]: true,
+        'top-0': showValue,
+        'top-4': !showValue,
       })}
       style={{
         left: `${sliderState.getThumbPercent(0) * 100}%`,

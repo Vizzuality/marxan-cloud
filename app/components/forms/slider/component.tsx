@@ -11,17 +11,17 @@ import Value from './value';
 
 const THEME = {
   dark: {
-    base: 'relative w-full h-12 pt-8 touch-action-none',
+    base: 'relative w-full h-12 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-white rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
   light: {
-    base: 'relative w-full h-12 pt-8 touch-action-none',
+    base: 'relative w-full h-12 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-gray-800 rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
   'dark-small': {
-    base: 'relative w-full h-12 pt-8 touch-action-none',
+    base: 'relative w-full h-12 touch-action-none',
     filledTrack: 'absolute left-0 h-1.5 bg-black rounded',
     track: 'w-full h-1.5 bg-gray-300 rounded opacity-20',
   },
@@ -46,9 +46,13 @@ export interface SliderProps {
    */
   disabled?: boolean;
   /**
-   * Whether to allow the user to click the output and edit it directly. Defaults to `true`
+   * Whether to allow the user to click the output and edit it directly
    */
   allowEdit?: boolean,
+  /**
+   * Where or not to display the slider value above the thumb
+   */
+  showValue?: boolean,
   /**
    * Format of the value
    */
@@ -95,6 +99,7 @@ export const Slider: React.FC<SliderProps> = ({
   theme = 'dark',
   status: rawState = 'none',
   allowEdit = true,
+  showValue = true,
   disabled = false,
   formatOptions = { style: 'percent' },
   labelRef,
@@ -170,6 +175,7 @@ export const Slider: React.FC<SliderProps> = ({
       {...groupProps}
       className={cx({
         [THEME[theme].base]: true,
+        'pt-8': showValue,
         'opacity-30': status === 'disabled',
       })}
     >
@@ -192,22 +198,25 @@ export const Slider: React.FC<SliderProps> = ({
           sliderState={sliderState}
           trackRef={trackRef}
           isDisabled={disabled}
+          showValue={showValue}
         />
       </div>
-      <Value
-        minValue={minValue}
-        maxValue={maxValue}
-        step={step}
-        allowEdit={allowEdit}
-        isDisabled={disabled}
-        theme={theme}
-        sliderState={sliderState}
-        outputProps={outputProps}
-        formatOptions={formatOptions}
-        style={{
-          left: `${sliderState.getThumbPercent(0) * 100}%`,
-        }}
-      />
+      { showValue && (
+        <Value
+          minValue={minValue}
+          maxValue={maxValue}
+          step={step}
+          allowEdit={allowEdit}
+          isDisabled={disabled}
+          theme={theme}
+          sliderState={sliderState}
+          outputProps={outputProps}
+          formatOptions={formatOptions}
+          style={{
+            left: `${sliderState.getThumbPercent(0) * 100}%`,
+          }}
+        />
+      )}
     </div>
   );
 };
