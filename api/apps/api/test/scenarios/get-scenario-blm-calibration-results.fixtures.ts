@@ -65,7 +65,7 @@ export const getFixtures = async () => {
     },
     GivenContributorWasAddedToScenario: async () => {
       const userCreated = await userScenariosRepo.save({
-        scenarioId: scenarioId,
+        scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
       });
@@ -73,7 +73,7 @@ export const getFixtures = async () => {
     },
     GivenViewerWasAddedToScenario: async () => {
       const userCreated = await userScenariosRepo.save({
-        scenarioId: scenarioId,
+        scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
       });
