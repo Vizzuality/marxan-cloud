@@ -130,7 +130,6 @@ describe('CountriesModule (e2e)', () => {
           maxPuAreaSize: 1252305,
           minPuAreaSize: 136,
           name0: 'Angola',
-          theGeom: expect.any(Object),
         },
         id: 'AGO',
         type: 'countries',
