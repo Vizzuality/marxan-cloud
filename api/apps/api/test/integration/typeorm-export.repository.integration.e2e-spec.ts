@@ -1,10 +1,12 @@
-import { ComponentLocationEntity } from '@marxan-api/modules/clone/export/adapters/entities/component-locations.api.entity';
-import { ExportComponentEntity } from '@marxan-api/modules/clone/export/adapters/entities/export-components.api.entity';
-import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
+import {
+  ClonePiece,
+  ComponentId,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
-import { ResourceId } from '@marxan/cloning/domain';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ComponentLocation } from '@marxan-api/modules/clone/export/application/complete-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
@@ -70,13 +72,7 @@ const getFixtures = async () => {
     cleanup: async () => {
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
-      const exportComponentRepo = connection.getRepository(
-        ExportComponentEntity,
-      );
-      const locationRepo = connection.getRepository(ComponentLocationEntity);
 
-      // await locationRepo.delete({});
-      // await exportComponentRepo.delete({});
       await exportRepo.delete({});
       await app.close();
     },
