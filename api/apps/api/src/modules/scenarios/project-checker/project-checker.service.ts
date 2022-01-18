@@ -6,7 +6,7 @@ export type DoesntExist = typeof doesntExist;
 export type HasPendingExport = typeof hasPendingExport;
 
 export abstract class ProjectChecker {
-  abstract hasProjectPendingExports(
+  abstract hasPendingExports(
     projectId: string,
   ): Promise<Either<HasPendingExport, boolean>>;
 

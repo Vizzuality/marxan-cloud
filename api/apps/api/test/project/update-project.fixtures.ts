@@ -49,7 +49,7 @@ export const getFixtures = async () => {
         .send({
           name: updatedName,
         }),
-    WhenProjectIsUpdatedWithARunningExport: async () => {
+    WhenProjectIsUpdatedWhileAnExportIsPending: async () => {
       projectChecker.addPendingExportForProject(projectId);
 
       return request(app.getHttpServer())

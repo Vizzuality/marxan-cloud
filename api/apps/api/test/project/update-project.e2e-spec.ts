@@ -22,7 +22,7 @@ test(`updating a project should work`, async () => {
 test(`updating a project should fail if an export is running`, async () => {
   await fixtures.GivenProjectWasCreated();
 
-  await fixtures.WhenProjectIsUpdatedWithARunningExport();
+  await fixtures.WhenProjectIsUpdatedWhileAnExportIsPending();
 
   await fixtures.ThenWhenReadingProjectItHasTheOriginalData();
 });

@@ -64,7 +64,7 @@ import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
-import { StartBlmCalibration, CancelBlmCalibration } from './blm-calibration';
+import { CancelBlmCalibration, StartBlmCalibration } from './blm-calibration';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -557,7 +557,7 @@ export class ScenariosService {
   private async canEditGuard(scenarioId: string) {
     const scenario = await this.crudService.getById(scenarioId);
     // TODO: Check where do we should use the guard
-    const editIsBlocked = await this.projectChecker.hasProjectPendingExports(
+    const editIsBlocked = await this.projectChecker.hasPendingExports(
       scenario.projectId,
     );
 

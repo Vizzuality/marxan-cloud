@@ -25,7 +25,7 @@ export class ProjectCheckerReal implements ProjectChecker {
     private readonly planningAreas: PlanningAreasService,
   ) {}
 
-  async hasProjectPendingExports(
+  async hasPendingExports(
     projectId: string,
   ): Promise<Either<HasPendingExport, boolean>> {
     const exportEvent = await this.apiEvents
@@ -39,11 +39,11 @@ export class ProjectCheckerReal implements ProjectChecker {
       })
       .catch(this.createNotFoundHandler());
 
-    const pendingExportExist =
+    const pendingExportExists =
       exportEvent?.kind ===
       API_EVENT_KINDS.project__export__submitted__v1__alpha;
 
-    if (pendingExportExist) return left(hasPendingExport);
+    if (pendingExportExists) return left(hasPendingExport);
 
     return right(false);
   }

@@ -222,7 +222,7 @@ export class ProjectsService {
 
   private async canEditGuard(projectId: string) {
     // TODO: Check where do we should use the guard
-    const editIsBlocked = await this.projectChecker.hasProjectPendingExports(
+    const editIsBlocked = await this.projectChecker.hasPendingExports(
       projectId,
     );
 

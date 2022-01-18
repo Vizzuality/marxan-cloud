@@ -26,20 +26,20 @@ describe('update scenario', () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures
-      .WhenUpdatingNameAndDescriptionFromAnScenario()
+      .WhenUpdatingNameAndDescriptionOfAScenario()
       .ThatDoesNotHaveAnOngoingExport();
 
-    await fixtures.ThenWhenReadingTheScenarioDataItIsUpdated();
+    await fixtures.ThenScenarioWasUpdatedSuccessfully();
   });
 
   it(`should not update an scenario if an export is running`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures
-      .WhenUpdatingNameAndDescriptionFromAnScenario()
+      .WhenUpdatingNameAndDescriptionOfAScenario()
       .ThatHasAnOngoingExport();
 
-    await fixtures.ThenWhenReadingTheScenarioDataItIsNotUpdated();
+    await fixtures.ThenScenarioIsUnchanged();
   });
 });
 
@@ -84,7 +84,7 @@ async function getFixtures() {
       });
       scenarioId = result.data.id;
     },
-    WhenUpdatingNameAndDescriptionFromAnScenario: () => {
+    WhenUpdatingNameAndDescriptionOfAScenario: () => {
       return {
         ThatDoesNotHaveAnOngoingExport: async () => {
           await request(app.getHttpServer())
@@ -103,7 +103,7 @@ async function getFixtures() {
         },
       };
     },
-    ThenWhenReadingTheScenarioDataItIsUpdated: async () => {
+    ThenScenarioWasUpdatedSuccessfully: async () => {
       const scenarioData = await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}`)
         .set('Authorization', `Bearer ${token}`);
@@ -112,7 +112,7 @@ async function getFixtures() {
         updatedDescription,
       );
     },
-    ThenWhenReadingTheScenarioDataItIsNotUpdated: async () => {
+    ThenScenarioIsUnchanged: async () => {
       const scenarioData = await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}`)
         .set('Authorization', `Bearer ${token}`);

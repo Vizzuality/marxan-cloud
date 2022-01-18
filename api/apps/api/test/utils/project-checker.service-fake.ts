@@ -18,7 +18,7 @@ export class ProjectCheckerFake implements ProjectChecker {
     this.projectsThatAreNotReady = [];
   }
 
-  async hasProjectPendingExports(
+  async hasPendingExports(
     projectId: string,
   ): Promise<Either<HasPendingExport, boolean>> {
     return this.projectsWithPendingExports.includes(projectId)
