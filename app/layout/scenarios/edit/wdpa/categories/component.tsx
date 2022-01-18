@@ -132,6 +132,14 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     }
   }, [scenarioData.wdpaThreshold]); //eslint-disable-line
 
+  useEffect(() => {
+    dispatch(setWDPACategories(INITIAL_VALUES));
+    // We need to setWDPACategories' initial values on first render only.
+    // The way to pull this off is to add no dependencies to useEffect, but
+    // eslint will complain about it. So we disable this check.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -189,12 +197,17 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             autoComplete="off"
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
-            <FormSpyRFF onChange={(state) => {
-              dispatch(setWDPACategories(state.values));
-              if (state.touched.uploadedProtectedArea) {
-                refetchProtectedAreas();
-              }
-            }}
+            <FormSpyRFF
+              subscription={{ dirty: true, touched: true }}
+              onChange={(state) => {
+                if (state.touched.wdpaIucnCategories) {
+                  dispatch(setWDPACategories(values));
+                }
+
+                if (state.touched.uploadedProtectedArea) {
+                  refetchProtectedAreas();
+                }
+              }}
             />
 
             <div className="relative flex flex-col flex-grow overflow-hidden">

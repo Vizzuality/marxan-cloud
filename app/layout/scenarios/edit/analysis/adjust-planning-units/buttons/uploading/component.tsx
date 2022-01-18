@@ -97,7 +97,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
     uploadScenarioPUMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: ({ data: { data: g } }) => {
-        setLoading(false);
         setSuccessFile({ id: g.id, name: f.name });
 
         addToast('success-upload-shapefile', (
@@ -109,14 +108,35 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
           level: 'success',
         });
 
+        const features = g.features.map((fe) => {
+          if (fe?.geometry?.type === 'MultiPolygon') {
+            const polygons = fe.geometry.coordinates.map((c) => {
+              return {
+                type: 'Feature',
+                geometry: {
+                  coordinates: c,
+                  type: 'Polygon',
+                },
+                properties: fe.properties || {},
+              };
+            });
+
+            return polygons;
+          }
+
+          return {
+            ...fe,
+            properties: fe.properties || {},
+          };
+        });
+
+        const isMulti = features.every((fe) => {
+          return Array.isArray(fe);
+        });
+
         const validGeoJSON = {
           ...g,
-          features: g.features.map((fe) => fe.geometry.coordinates.map((c) => {
-            return {
-              ...c,
-              properties: fe.properties || {},
-            };
-          })),
+          features: isMulti ? features.flat() : features,
         };
 
         dispatch(setUploadingValue(validGeoJSON));
@@ -125,7 +145,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
       onError: ({ response }) => {
         const { errors } = response.data;
 
-        setLoading(false);
         setSuccessFile(null);
 
         addToast('error-upload-shapefile', (
@@ -140,6 +159,9 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
+        setLoading(false);
       },
     });
   };
@@ -185,11 +207,12 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
 
   // Callbacks
   const onSubmit = useCallback((values) => {
-    const coordinates = [
-      Object.values(values.uploadingValue.features[0][0]).filter((i) => Array.isArray(i)),
-    ];
-    const { properties } = values.uploadingValue.features[0][0];
-    const { type: byGeoJsonType } = values.uploadingValue;
+    // const coordinates = [
+    //   Object.values(values.uploadingValue.features[0][0]).filter((i) => Array.isArray(i)),
+    // ];
+    // const { properties } = values.uploadingValue.features[0][0];
+
+    // console.log(coordinates, properties, values.uploadingValue);
 
     setSubmitting(true);
     // Save current uploaded shape
@@ -201,23 +224,14 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
           exclude: puExcludedValue,
         },
         byGeoJson: {
-          [values.type]: [{
-            type: byGeoJsonType,
-            features: [{
-              type: 'Feature',
-              geometry: {
-                type: 'Polygon',
-                coordinates,
-                properties,
-              },
-            }],
-          }],
+          [values.type]: [
+            values.uploadingValue,
+          ],
         },
       },
     }, {
       onSuccess: ({ data: { meta } }) => {
         dispatch(setJob(new Date(meta.isoDate).getTime()));
-        setSubmitting(false);
         onSelected(null);
         dispatch(setUploading(false));
         dispatch(setUploadingValue(null));
@@ -235,7 +249,6 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         });
       },
       onError: () => {
-        setSubmitting(false);
         addToast('adjust-planning-units-error', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -246,6 +259,9 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
+        setSubmitting(false);
       },
     });
   }, [

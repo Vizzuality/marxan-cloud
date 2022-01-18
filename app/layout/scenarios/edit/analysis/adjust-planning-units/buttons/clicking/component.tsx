@@ -94,7 +94,6 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
     }, {
       onSuccess: ({ data: { meta } }) => {
         dispatch(setJob(new Date(meta.isoDate).getTime()));
-        setSubmitting(false);
         onSelected(null);
         dispatch(setClicking(false));
 
@@ -110,7 +109,6 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
         });
       },
       onError: () => {
-        setSubmitting(false);
         addToast('adjust-planning-units-error', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -121,6 +119,9 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
+        setSubmitting(false);
       },
     });
   }, [sid,

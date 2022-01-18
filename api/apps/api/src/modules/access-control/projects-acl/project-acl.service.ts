@@ -142,7 +142,7 @@ export class ProjectAclService implements ProjectAccessControl {
     userId: string,
     nameSearch?: string,
   ): Promise<Either<Denied, UserRoleInProjectDto[]>> {
-    if (!(await this.isOwner(userId, projectId))) {
+    if (!(await this.canViewProject(userId, projectId))) {
       return left(false);
     }
 
