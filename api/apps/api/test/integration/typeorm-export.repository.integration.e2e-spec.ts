@@ -4,11 +4,11 @@ import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
-import { ResourceId } from '../../src/modules/clone/export';
-import { ExportEntity } from '../../src/modules/clone/export/adapters/entities/exports.api.entity';
-import { ComponentLocation } from '../../src/modules/clone/export/application/complete-piece.command';
-import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
-import { Export, ExportId } from '../../src/modules/clone/export/domain';
+import { ResourceId } from '@marxan/cloning/domain';
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { ComponentLocation } from '@marxan-api/modules/clone/export/application/complete-piece.command';
+import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
+import { Export, ExportId } from '@marxan-api/modules/clone/export/domain';
 import { bootstrapApplication } from '../utils/api-application';
 
 describe('Typeorm export repository', () => {
@@ -75,8 +75,8 @@ const getFixtures = async () => {
       );
       const locationRepo = connection.getRepository(ComponentLocationEntity);
 
-      await locationRepo.delete({});
-      await exportComponentRepo.delete({});
+      // await locationRepo.delete({});
+      // await exportComponentRepo.delete({});
       await exportRepo.delete({});
       await app.close();
     },
