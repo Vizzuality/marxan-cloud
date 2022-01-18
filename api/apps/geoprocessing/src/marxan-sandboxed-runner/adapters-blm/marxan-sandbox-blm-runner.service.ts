@@ -49,9 +49,7 @@ export class MarxanSandboxBlmRunnerService
     const { blmValues, scenarioId } = input;
     const calibrationId = v4();
 
-    await this.eventBus.publish(
-      new BlmCalibrationStarted(scenarioId, calibrationId),
-    );
+    this.eventBus.publish(new BlmCalibrationStarted(scenarioId, calibrationId));
 
     const inputFilesHandler = await this.moduleRef.create(BlmInputFiles);
     const abortController = this.getAbortControllerForRun(scenarioId, [

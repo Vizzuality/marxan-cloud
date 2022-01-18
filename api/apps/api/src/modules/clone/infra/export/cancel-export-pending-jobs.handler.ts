@@ -1,6 +1,10 @@
 import { JobInput } from '@marxan/cloning/job-input';
 import { Inject } from '@nestjs/common';
-import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import {
+  CommandHandler,
+  EventBus,
+  IInferredCommandHandler,
+} from '@nestjs/cqrs';
 import { Job, Queue } from 'bullmq';
 import { CancelExportPendingJobs } from './cancel-export-pending-jobs.command';
 import { exportPieceQueueToken } from './export-queue.provider';
@@ -12,6 +16,7 @@ export class CancelExportPendingJobsHandler
   constructor(
     @Inject(exportPieceQueueToken)
     private readonly queue: Queue<JobInput>,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute({ exportId }: CancelExportPendingJobs): Promise<void> {
