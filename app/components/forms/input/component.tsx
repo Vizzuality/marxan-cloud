@@ -1,11 +1,14 @@
 import React, { InputHTMLAttributes } from 'react';
-import Icon from 'components/icon';
+
+import { useFocus } from '@react-aria/interactions';
 import cx from 'classnames';
+
+import Icon from 'components/icon';
 
 const THEME = {
   dark: {
     base:
-      'w-full leading-tight text-white bg-gray-800 bg-opacity-0 focus:outline-none focus:bg-gray-700',
+      'leading-tight text-white bg-gray-800 bg-opacity-0 focus:outline-none focus:bg-gray-700',
     status: {
       none: 'border-gray-500',
       valid: 'border-gray-500',
@@ -20,7 +23,7 @@ const THEME = {
   },
   light: {
     base:
-      'w-full leading-tight text-gray-800 bg-white focus:outline-none focus:bg-gray-100',
+      'leading-tight text-gray-800 bg-white focus:outline-none focus:bg-gray-100',
     status: {
       none: 'border-gray-800',
       valid: 'border-gray-800',
@@ -43,6 +46,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     id: string;
     viewBox: string;
   };
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onFocusChange?: (isFocused: boolean) => void;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -52,9 +58,18 @@ export const Input: React.FC<InputProps> = ({
   disabled = false,
   icon,
   className,
+  onFocus,
+  onBlur,
+  onFocusChange,
   ...props
 }: InputProps) => {
   const st = disabled ? 'disabled' : status;
+
+  const { focusProps: inputFocusProps } = useFocus({
+    onFocus,
+    onBlur,
+    onFocusChange,
+  });
 
   return (
     <div className="relative">
@@ -77,8 +92,10 @@ export const Input: React.FC<InputProps> = ({
           [THEME[theme].status[st]]: true,
           [THEME[theme].mode[mode]]: true,
           'pl-10': icon,
+          'w-full': !className,
           [className]: !!className,
         })}
+        {...inputFocusProps}
       />
     </div>
   );
