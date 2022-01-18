@@ -54,7 +54,10 @@ export class Country {
    * type.
    */
   @ApiProperty()
-  @Column('geometry', { name: 'the_geom' })
+  @Column('geometry', {
+    select: false,
+    name: 'the_geom',
+  })
   theGeom!: Geometry;
 
   /**
