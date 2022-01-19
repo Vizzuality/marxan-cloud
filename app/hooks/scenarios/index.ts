@@ -654,7 +654,7 @@ export function useCancelRunScenario({
     },
   });
 }
-export function useScenarioCalibrationResults(scenarioId, calibrationStatus) {
+export function useScenarioCalibrationResults(scenarioId) {
   const [session] = useSession();
 
   const query = useQuery('scenario-calibration', async () => SCENARIOS.request({
@@ -664,9 +664,7 @@ export function useScenarioCalibrationResults(scenarioId, calibrationStatus) {
       Authorization: `Bearer ${session.accessToken}`,
     },
     transformResponse: (data) => JSON.parse(data),
-  }), {
-    enabled: calibrationStatus === 'done',
-  });
+  }));
 
   const { data } = query;
 
@@ -703,8 +701,8 @@ export function useSaveScenarioCalibrationRange({
   return useMutation(saveScenarioCalibrationRange, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succcess', data, variables, context);
-      const { id } = variables;
-      queryClient.invalidateQueries(['scenario-calibration', id]);
+      const { id: scenarioId } = variables;
+      queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);

@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
@@ -12,7 +10,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { format } from 'd3';
 import { motion } from 'framer-motion';
 
-import { useSaveScenarioCalibrationRange } from 'hooks/scenarios';
+import { useSaveScenarioCalibrationRange, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
@@ -35,12 +33,17 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   onChangeSection,
 }: ScenariosBLMCalibrationProps) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
   const dispatch = useDispatch();
   const { addToast } = useToasts();
 
-  const [blmGraph, setBlmGraph] = useState(false);
+  const [blmResults, setBlmResults] = useState(false);
+
+  const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
+  const { jobs } = scenarioStatusData;
+
+  const calibrationStatus = jobs.find((j) => j.kind === 'calibration')?.status;
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
 
@@ -52,6 +55,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 
   useEffect(() => {
     dispatch(setBlm(null));
+    setBlmResults(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -72,8 +76,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         ), {
           level: 'success',
         });
-
-        setBlmGraph(true);
+        setBlmResults(true);
         console.info('Calibration range sent succesfully');
       },
       onError: () => {
@@ -190,22 +193,23 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                 </div>
               </div>
 
-              {!blmGraph && (
-                <div className="pt-16">
-                  <Button
-                    type="submit"
-                    theme="primary-alt"
-                    size="base"
-                    className="w-full"
-                  >
-                    Calibrate BLM
-                  </Button>
-                </div>
-              )}
+              <div className="pt-16">
+                <Button
+                  type="submit"
+                  theme="primary-alt"
+                  size="base"
+                  className="w-full"
+                >
+                  Calibrate BLM
+                </Button>
+              </div>
+
             </form>
           )}
         </FormRFF>
-        {blmGraph && (
+
+        {/* status a done */}
+        {calibrationStatus === 'done' && blmResults && (
           <BlmSettingsGraph
             maxBlmValue={maxBlmValue}
             minBlmValue={minBlmValue}
