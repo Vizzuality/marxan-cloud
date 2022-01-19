@@ -41,10 +41,6 @@ import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-pl
 import { CreateGeoFeatureSetDTO } from '../geo-features/dto/create.geo-feature-set.dto';
 import { SpecificationService } from './specification';
 import { CostRange, CostRangeService } from './cost-range-service';
-import {
-  DoesntExist,
-  ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker.service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
@@ -64,7 +60,12 @@ import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
-import { StartBlmCalibration, CancelBlmCalibration } from './blm-calibration';
+import {
+  DoesntExist,
+  ProjectChecker,
+} from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { CancelBlmCalibration, StartBlmCalibration } from './blm-calibration';
+import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -115,6 +116,7 @@ export class ScenariosService {
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
+    private readonly editGuard: EditGuard,
     private readonly projectChecker: ProjectChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
@@ -163,12 +165,15 @@ export class ScenariosService {
       scenario.id,
       info.authenticatedUser.id,
     );
+
     return right(scenario);
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
-    await this.assertScenario(scenarioId);
+    const scenario = await this.getById(scenarioId);
+    await this.editGuard.ensureEditingIsAllowedFor(scenario.projectId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
+
     return await this.crudService.update(scenarioId, validatedMetadata);
   }
 
@@ -268,6 +273,8 @@ export class ScenariosService {
   ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
     const scenario = await this.getById(id);
     const projectId = scenario.projectId;
+    await this.editGuard.ensureEditingIsAllowedFor(projectId);
+
     if (rangeToUpdate) {
       const result = await this.commandBus.execute(
         new ChangeBlmRange(projectId, rangeToUpdate),

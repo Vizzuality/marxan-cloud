@@ -42,6 +42,7 @@ import {
 } from '@marxan-api/modules/clone';
 import { ResourceId } from '@marxan/cloning/domain';
 import { createReadStream } from 'fs';
+import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -58,6 +59,7 @@ export class ProjectsService {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
+    private readonly editGuard: EditGuard,
   ) {}
 
   async findAllGeoFeatures(
@@ -146,6 +148,8 @@ export class ProjectsService {
     input: UpdateProjectDTO,
     userId: string,
   ): Promise<Either<Permit, Project>> {
+    await this.editGuard.ensureEditingIsAllowedFor(projectId);
+
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(false);
     }
