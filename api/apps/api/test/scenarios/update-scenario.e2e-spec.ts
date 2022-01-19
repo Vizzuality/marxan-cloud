@@ -9,7 +9,7 @@ import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity'
 import { GivenProjectExists } from '../steps/given-project';
 import { HttpStatus } from '@nestjs/common';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

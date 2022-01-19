@@ -4,7 +4,7 @@ import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { E2E_CONFIG } from '../e2e.config';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import * as request from 'supertest';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { HttpStatus } from '@nestjs/common';
 

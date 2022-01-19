@@ -9,7 +9,7 @@ import {
   FileRepository,
   TempStorageRepository,
 } from '@marxan/files-repository';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from './project-checker.service-fake';
 
 export const bootstrapApplication = async (

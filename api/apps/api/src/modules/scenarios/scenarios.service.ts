@@ -63,8 +63,9 @@ import {
 import {
   DoesntExist,
   ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+} from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { CancelBlmCalibration, StartBlmCalibration } from './blm-calibration';
+import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -115,6 +116,7 @@ export class ScenariosService {
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
+    private readonly editGuard: EditGuard,
     private readonly projectChecker: ProjectChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
@@ -168,8 +170,8 @@ export class ScenariosService {
   }
 
   async update(scenarioId: string, input: UpdateScenarioDTO) {
-    await this.canEditGuard(scenarioId);
-    await this.assertScenario(scenarioId);
+    const scenario = await this.getById(scenarioId);
+    await this.editGuard.ensureEditingIsAllowedFor(scenario.projectId);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
 
     return await this.crudService.update(scenarioId, validatedMetadata);
@@ -269,10 +271,10 @@ export class ScenariosService {
     id: string,
     rangeToUpdate?: [number, number],
   ): Promise<Either<ChangeRangeErrors | GetFailure, true>> {
-    await this.canEditGuard(id);
-
     const scenario = await this.getById(id);
     const projectId = scenario.projectId;
+    await this.editGuard.ensureEditingIsAllowedFor(projectId);
+
     if (rangeToUpdate) {
       const result = await this.commandBus.execute(
         new ChangeBlmRange(projectId, rangeToUpdate),
@@ -552,18 +554,5 @@ export class ScenariosService {
       return result;
     }
     return right(true);
-  }
-
-  private async canEditGuard(scenarioId: string) {
-    const scenario = await this.crudService.getById(scenarioId);
-    // TODO: Check where do we should use the guard
-    const editIsBlocked = await this.projectChecker.hasPendingExports(
-      scenario.projectId,
-    );
-
-    if (isLeft(editIsBlocked))
-      throw new BadRequestException(
-        `Scenario ${scenarioId} editing is blocked because of pending export`,
-      );
   }
 }

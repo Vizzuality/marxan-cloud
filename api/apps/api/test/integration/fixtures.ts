@@ -12,7 +12,7 @@ import {
   Specification,
   SpecificationOperation,
 } from '@marxan-api/modules/specification/domain';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 
 export const getFixtures = async () => {

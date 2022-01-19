@@ -11,8 +11,8 @@ import {
   doesntExist,
   hasPendingExport,
   ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
-import { MarxanProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service-real';
+} from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -133,7 +133,7 @@ it(`should return false for a project without pending exports`, async () => {
   // given
   const service = fixtures.getService();
   // and
-  const hasPendingExports = await service.hasProjectPendingExports(`projectId`);
+  const hasPendingExports = await service.hasPendingExports(`projectId`);
   // then
   expect(hasPendingExports).toEqual({
     _tag: 'Right',
@@ -149,7 +149,7 @@ it(`should return an error for a project with pending exports`, async () => {
     API_EVENT_KINDS.project__export__submitted__v1__alpha,
   );
   // and
-  const hasPendingExports = await service.hasProjectPendingExports(`projectId`);
+  const hasPendingExports = await service.hasPendingExports(`projectId`);
   // then
   expect(hasPendingExports).toEqual({
     _tag: 'Left',

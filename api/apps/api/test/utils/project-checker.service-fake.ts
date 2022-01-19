@@ -6,7 +6,7 @@ import {
   HasPendingExport,
   hasPendingExport,
   ProjectChecker,
-} from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+} from '@marxan-api/modules/projects/project-checker/project-checker.service';
 
 @Injectable()
 export class ProjectCheckerFake implements ProjectChecker {

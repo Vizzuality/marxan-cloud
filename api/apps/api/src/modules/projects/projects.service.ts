@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
@@ -42,7 +42,7 @@ import {
 } from '@marxan-api/modules/clone';
 import { ResourceId } from '@marxan/cloning/domain';
 import { createReadStream } from 'fs';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
+import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -59,7 +59,7 @@ export class ProjectsService {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
-    private readonly projectChecker: ProjectChecker,
+    private readonly editGuard: EditGuard,
   ) {}
 
   async findAllGeoFeatures(
@@ -148,7 +148,7 @@ export class ProjectsService {
     input: UpdateProjectDTO,
     userId: string,
   ): Promise<Either<Permit, Project>> {
-    await this.canEditGuard(projectId);
+    await this.editGuard.ensureEditingIsAllowedFor(projectId);
 
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(false);
@@ -218,17 +218,5 @@ export class ProjectsService {
     );
     // MARXAN-1129
     return location ? createReadStream(location.value) : null;
-  }
-
-  private async canEditGuard(projectId: string) {
-    // TODO: Check where do we should use the guard
-    const editIsBlocked = await this.projectChecker.hasPendingExports(
-      projectId,
-    );
-
-    if (isLeft(editIsBlocked))
-      throw new BadRequestException(
-        `Project ${projectId} editing is blocked because of pending export`,
-      );
   }
 }
