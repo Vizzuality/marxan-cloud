@@ -26,6 +26,7 @@ import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserAccountValidationDTO } from './dto/user-account.validation.dto';
 import { LocalAuthGuard } from './local-auth.guard';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
 @Controller('/auth')
 @ApiTags('Authentication')
@@ -50,6 +51,7 @@ export class AuthenticationController {
     return this.authenticationService.login(req.user);
   }
 
+  @IsMissingAclImplementation()
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     description:
@@ -91,6 +93,7 @@ export class AuthenticationController {
    * the time the JWT token being presented was issued and the attempt to
    * refresh the JWT.
    */
+  @IsMissingAclImplementation()
   @UseGuards(JwtAuthGuard)
   @Post('refresh-token')
   @ApiOperation({

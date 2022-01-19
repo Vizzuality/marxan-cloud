@@ -90,5 +90,63 @@ test(`adds a not allowed user role to project`, async () => {
   const incorrectRoleResponse = await fixtures.WhenAddingIncorrectUserRole(
     projectId,
   );
-  fixtures.ThenBadRequestIsReturned(incorrectRoleResponse);
+  fixtures.ThenBadRequestAndEnumMessageIsReturned(incorrectRoleResponse);
+});
+
+test(`adds nonsensical userId`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  const nonsenseUserIdResponse = await fixtures.WhenAddingNonsenseUserId(
+    projectId,
+  );
+  fixtures.ThenBadRequestAndUserIdMessageIsReturned(nonsenseUserIdResponse);
+});
+
+test(`adds non-existent userId`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  const nonExistentUserIdResponse = await fixtures.WhenAddingNonExistentUserId(
+    projectId,
+  );
+  fixtures.ThenQueryFailedReturned(nonExistentUserIdResponse);
+});
+
+test(`adds and deletes users alternately`, async () => {
+  /* The purpose of this test is to check that all the transactions are
+  executed correctly and that no users are deleted/reinstated because
+  the transaction wasn't committed before initiating a new one */
+
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenViewerWasAddedToProject(projectId);
+
+  const viewerResponse = await fixtures.WhenAddingANewViewerToTheProjectAsOwner(
+    projectId,
+  );
+  const contributorResponse = await fixtures.WhenAddingANewContributorToTheProjectAsOwner(
+    projectId,
+  );
+  fixtures.ThenNoContentIsReturned(viewerResponse);
+  fixtures.ThenNoContentIsReturned(contributorResponse);
+
+  await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(projectId);
+  await fixtures.WhenChangingUserRole(projectId);
+  let currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole(
+    currentUsersResponse,
+  );
+
+  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheProjectAsOwner(
+    projectId,
+  );
+  fixtures.ThenNoContentIsReturned(ownerResponse);
+  currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenThreeCorrectUsersAreReturned(currentUsersResponse);
+
+  await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(projectId);
+  currentUsersResponse = await fixtures.WhenGettingProjectUsersAsOwner(
+    projectId,
+  );
+  fixtures.ThenLastTwoCorrectUsersAreReturned(currentUsersResponse);
 });

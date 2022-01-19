@@ -102,6 +102,7 @@ import {
 } from '@marxan-api/modules/projects/blm/change-blm-range.command';
 import { projectNotFound } from '@marxan-api/modules/blm';
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -109,6 +110,7 @@ const solutionsSubPath = `:id/marxan/solutions`;
 const marxanRunTag = 'Marxan Run';
 const marxanRunFiles = 'Marxan Run - Files';
 
+@IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)

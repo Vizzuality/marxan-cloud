@@ -121,6 +121,11 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
   const parsedFilters = Object.keys(filters)
     .reduce((acc, k) => {
+      // Backend isn't able to deal with this one yet; it'll always return an empty array
+      // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
+      // move forward with useable filters.
+      if (k === 'status') return acc;
+
       return {
         ...acc,
         [`filter[${k}]`]: (filters[k] && filters[k].toString) ? filters[k].toString() : filters[k],
@@ -169,10 +174,11 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
       return pageData.map((d): ItemProps => {
         const {
-          id, projectId, name, lastModifiedAt,
+          id, projectId, name, lastModifiedAt, status,
         } = d;
 
-        const status = statusScenarios.find((s) => s.id === id);
+        const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
+        const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
@@ -187,7 +193,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           lastUpdate: lastModifiedAt,
           lastUpdateDistance: lastUpdateDistance(),
           warnings: false,
-          jobs: status?.jobs || [],
+          runStatus,
+          jobs,
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
           },
@@ -198,11 +205,21 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       });
     })) : [];
 
+    // Backend can't deal with the `status` filter just yet, so we'll just manually
+    // filter it out manually in the frontend. It'll allow us to make the feature work
+    // in the frontend for now, albeit in a non-ideal way.
+    const filteredData = parsedData.filter((parsedDataItem) => {
+      const statusFiltersArr = (filters?.status as Array<string> || []);
+      // No filters to apply, return everything
+      if (!statusFiltersArr.length) return true;
+      return statusFiltersArr.includes(parsedDataItem.runStatus);
+    });
+
     return {
       ...query,
-      data: parsedData,
+      data: filteredData,
     };
-  }, [query, pages, push, statusScenarios]);
+  }, [query, pages, filters, push, statusScenarios]);
 }
 
 export function useScenario(id) {
@@ -256,7 +273,7 @@ export function useSaveScenario({
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.setQueryData(['scenarios', id], data?.data);
 
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -285,7 +302,7 @@ export function useDeleteScenario({
 
   return useMutation(deleteScenario, {
     onSuccess: (data, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -315,7 +332,7 @@ export function useUploadScenarioPU({
 
   return useMutation(uploadScenarioPUShapefile, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -346,7 +363,7 @@ export function useUploadPA({
 
   return useMutation(uploadPAShapefile, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
@@ -417,7 +434,7 @@ export function useDownloadCostSurface({
       document.body.appendChild(link);
       link.click();
       link.remove();
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -447,7 +464,7 @@ export function useUploadCostSurface({
 
   return useMutation(uploadScenarioCostSurface, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -535,7 +552,7 @@ export function useSaveScenarioPU({
 
   return useMutation(saveScenario, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
       const { id } = variables;
       queryClient.invalidateQueries(['scenarios-pu', id]);
     },
@@ -569,7 +586,7 @@ export function useDuplicateScenario({
       const { id, projectId } = data;
       queryClient.invalidateQueries(['scenarios', projectId]);
       queryClient.invalidateQueries(['scenarios', id]);
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -598,7 +615,7 @@ export function useRunScenario({
 
   return useMutation(duplicateScenario, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -627,7 +644,7 @@ export function useCancelRunScenario({
 
   return useMutation(duplicateScenario, {
     onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       // An error happened!

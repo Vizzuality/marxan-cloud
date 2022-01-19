@@ -9,6 +9,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsACLTestUtils } from '../../utils/projects-acl.test.utils';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { v4 } from 'uuid';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -27,6 +28,7 @@ export const getFixtures = async () => {
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
+  const nonExistentUserId = v4();
   const cleanups: (() => Promise<void>)[] = [];
 
   return {
@@ -228,6 +230,25 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: scenarioOwnerRole,
         }),
+    WhenAddingNonsenseUserId: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: 'nonsense',
+          roleName: projectOwnerRole,
+        }),
+
+    WhenAddingNonExistentUserId: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: nonExistentUserId,
+          roleName: projectOwnerRole,
+        }),
     WhenRevokingAccessToViewerFromProjectAsOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .delete(`/api/v1/roles/projects/${projectId}/users/${viewerUserId}`)
@@ -281,8 +302,22 @@ export const getFixtures = async () => {
       expect(response.status).toEqual(403);
     },
 
-    ThenBadRequestIsReturned: (response: request.Response) => {
+    ThenBadRequestAndUserIdMessageIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0].meta.rawError.response;
+      expect(error?.message[0]).toEqual('userId must be an UUID');
+    },
+
+    ThenBadRequestAndEnumMessageIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0].meta.rawError.response;
+      expect(error?.message[0]).toEqual('roleName must be a valid enum value');
+    },
+
+    ThenQueryFailedReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual(`Error while adding record to the database`);
     },
 
     ThenNoContentIsReturned: (response: request.Response) => {
@@ -317,6 +352,36 @@ export const getFixtures = async () => {
       expect(newUserCreated.roleName).toEqual(projectOwnerRole);
     },
 
+    ThenOwnerAndViewerInProjectAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+
+      const projectRoleNames: string[] = response.body.data.map(
+        (p: any) => p.roleName,
+      );
+
+      expect(projectRoleNames.sort()).toEqual([
+        projectOwnerRole,
+        projectViewerRole,
+      ]);
+    },
+
+    ThenOwnerAndContributorInProjectAreReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+
+      const projectRoleNames: string[] = response.body.data.map(
+        (p: any) => p.roleName,
+      );
+
+      expect(projectRoleNames.sort()).toEqual([
+        projectContributorRole,
+        projectOwnerRole,
+      ]);
+    },
+
     ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned: (
       response: request.Response,
     ) => {
@@ -330,6 +395,48 @@ export const getFixtures = async () => {
         (user: any) => user.user.id === viewerUserId,
       );
       expect(newUserCreated.roleName).toEqual(projectContributorRole);
+    },
+    ThenThreeCorrectUsersAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(3);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const thirdUser = response.body.data.find(
+        (user: any) => user.user.id === otherOwnerUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectContributorRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
+      expect(thirdUser.roleName).toEqual(projectOwnerRole);
+    },
+    ThenCorrectUsersAreReturnedAfterDeletionAndChangingRole: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === viewerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectContributorRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
+    },
+    ThenLastTwoCorrectUsersAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === otherOwnerUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectOwnerRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
     },
   };
 };
