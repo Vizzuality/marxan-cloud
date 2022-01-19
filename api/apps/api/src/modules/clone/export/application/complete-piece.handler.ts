@@ -15,13 +15,14 @@ import { Export } from '../domain';
 @CommandHandler(CompletePiece)
 export class CompletePieceHandler
   implements IInferredCommandHandler<CompletePiece> {
-  private readonly logger = new Logger(this.constructor.name);
-
   constructor(
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly eventBus: EventBus,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(this.constructor.name);
+  }
 
   async execute({
     exportId,

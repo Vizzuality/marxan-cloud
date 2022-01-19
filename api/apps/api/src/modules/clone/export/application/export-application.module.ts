@@ -1,4 +1,4 @@
-import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common';
+import { DynamicModule, Logger, Module, ModuleMetadata } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ExportProjectHandler } from './export-project.handler';
@@ -21,6 +21,7 @@ export class ExportApplicationModule {
         CompletePieceHandler,
         FinalizeArchiveHandler,
         GetArchiveHandler,
+        Logger,
       ],
       exports: [],
     };
