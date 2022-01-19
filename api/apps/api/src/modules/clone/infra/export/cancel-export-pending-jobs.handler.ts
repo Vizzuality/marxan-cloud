@@ -8,9 +8,8 @@ import {
 import { Job, Queue } from 'bullmq';
 import { CancelExportPendingJobs } from './cancel-export-pending-jobs.command';
 import { exportPieceQueueToken } from './export-queue.provider';
-import { exists } from '@marxan/utils/exists';
-import { MarkExportPieceAsFailed } from '@marxan-api/modules/clone/infra/export/mark-export-piece-as-failed.command';
-import { ComponentId, ResourceId } from '@marxan/cloning/domain';
+import { ComponentId } from '@marxan/cloning/domain';
+import { MarkExportPiecesAsFailed } from '@marxan-api/modules/clone/infra/export/mark-export-pieces-as-failed.command';
 
 @CommandHandler(CancelExportPendingJobs)
 export class CancelExportPendingJobsHandler
@@ -21,7 +20,11 @@ export class CancelExportPendingJobsHandler
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute({ exportId }: CancelExportPendingJobs): Promise<void> {
+  async execute({
+    exportId,
+    resourceKind,
+    resourceId,
+  }: CancelExportPendingJobs): Promise<void> {
     const pendingJobs: Job<JobInput>[] = await this.queue.getJobs([
       'waiting',
       'delayed',
@@ -31,24 +34,25 @@ export class CancelExportPendingJobsHandler
       (job) => job.data.exportId === exportId.value,
     );
 
+    if (exportJobs.length === 0) return;
+
     await Promise.all(
-      exportJobs
-        .filter((job) => exists(job.id))
-        .flatMap((job) => {
-          if (job.id) {
-            return [
-              this.commandBus.execute(
-                new MarkExportPieceAsFailed(
-                  exportId,
-                  new ComponentId(job.data.componentId),
-                  job.data.resourceKind,
-                  new ResourceId(job.data.resourceId),
-                ),
-              ),
-              this.queue.remove(job.id),
-            ];
-          }
-        }),
+      exportJobs.map((job) => {
+        if (!job.id) {
+          return;
+        }
+
+        return this.queue.remove(job.id);
+      }),
+    );
+
+    await this.commandBus.execute(
+      new MarkExportPiecesAsFailed(
+        exportId,
+        resourceId,
+        resourceKind,
+        exportJobs.map((job) => new ComponentId(job.data.componentId)),
+      ),
     );
   }
 }

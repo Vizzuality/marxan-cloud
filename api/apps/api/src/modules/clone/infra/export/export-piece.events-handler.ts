@@ -49,7 +49,7 @@ export class ExportPieceEventsHandler
     return {
       topic: data.resourceId,
       kind,
-      externalId: eventData.eventId,
+      externalId: `${kind}-${data.componentId}`,
       data: {
         kind,
         ...output,
@@ -60,17 +60,23 @@ export class ExportPieceEventsHandler
   async createFailedEvent(
     eventData: EventData<JobInput, JobOutput>,
   ): Promise<CreateApiEventDTO> {
-    const data = await eventData.data;
-    const output = await eventData.result;
+    const {
+      resourceId,
+      resourceKind,
+      exportId,
+      componentId,
+    } = await eventData.data;
     const kind = API_EVENT_KINDS.project__export__piece__failed__v1__alpha;
 
     return {
-      topic: data.resourceId,
+      topic: resourceId,
       kind,
-      externalId: eventData.eventId,
+      externalId: `${kind}-${componentId}`,
       data: {
-        kind,
-        ...output,
+        exportId,
+        resourceId,
+        resourceKind,
+        componentId,
       },
     };
   }

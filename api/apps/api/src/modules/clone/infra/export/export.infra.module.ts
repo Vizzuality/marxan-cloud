@@ -20,6 +20,7 @@ import { ArchiveReadySaga } from './archive-ready.saga';
 import { ExportPieceFailedSaga } from './export-piece-failed.saga';
 import { CancelExportPendingJobsHandler } from './cancel-export-pending-jobs.handler';
 import { MarkExportAsFailedHandler } from './mark-export-as-failed.handler';
+import { MarkExportPiecesAsFailedHandler } from './mark-export-pieces-as-failed.handler';
 
 @Module({
   imports: [ApiEventsModule, QueueApiEventsModule, CqrsModule],
@@ -37,6 +38,7 @@ import { MarkExportAsFailedHandler } from './mark-export-as-failed.handler';
     MarkExportAsFinishedHandler,
     CancelExportPendingJobsHandler,
     MarkExportAsFailedHandler,
+    MarkExportPiecesAsFailedHandler,
   ],
 })
 export class ExportInfraModule {}

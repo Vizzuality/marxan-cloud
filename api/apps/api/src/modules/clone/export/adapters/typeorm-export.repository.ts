@@ -33,13 +33,16 @@ export class TypeormExportRepository implements ExportRepository {
   }
 
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
-    return this.entityManager.transaction((transactionEntityManager) => {
-      const transactionalRepository = new TypeormExportRepository(
-        transactionEntityManager.getRepository(ExportEntity),
-        transactionEntityManager,
-      );
-      transactionalRepository.inTransaction = true;
-      return code(transactionalRepository);
-    });
+    return this.entityManager.transaction(
+      'REPEATABLE READ',
+      (transactionEntityManager) => {
+        const transactionalRepository = new TypeormExportRepository(
+          transactionEntityManager.getRepository(ExportEntity),
+          transactionEntityManager,
+        );
+        transactionalRepository.inTransaction = true;
+        return code(transactionalRepository);
+      },
+    );
   }
 }
