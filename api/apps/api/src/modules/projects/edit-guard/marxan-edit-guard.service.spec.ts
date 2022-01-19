@@ -18,13 +18,17 @@ describe('MarxanEditGuard', () => {
 
     await fixtures.WhenExportIsRequested(projectId);
 
-    await fixtures.ThenAnExceptionIsThrown(projectId);
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAnExceptionIsThrown();
   });
 
   it(`does nothing if the given project does not have an ongoing export`, async () => {
     const projectId = fixtures.GivenProjectWasCreated();
 
-    await fixtures.ThenNothingHappens(projectId);
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenNoExceptionIsThrown();
   });
 });
 
@@ -52,17 +56,21 @@ const getFixtures = async () => {
     WhenExportIsRequested: async (projectId: string) => {
       await projectChecker.addPendingExportForProject(projectId);
     },
-    ThenAnExceptionIsThrown: async (projectId: string) => {
-      await expect(
-        editGuard.ensureEditingIsAllowedFor(projectId),
-      ).rejects.toThrow(
-        `Project ${projectId} editing is blocked because of pending export`,
-      );
-    },
-    ThenNothingHappens: async (projectId: string) => {
-      await expect(
-        editGuard.ensureEditingIsAllowedFor(projectId),
-      ).resolves.not.toThrow();
+    WhenCheckingWhetherTheProjectCanBeEdited: (projectId: string) => {
+      return {
+        ThenAnExceptionIsThrown: async () => {
+          await expect(
+            editGuard.ensureEditingIsAllowedFor(projectId),
+          ).rejects.toThrow(
+            `Project ${projectId} editing is blocked because of pending export`,
+          );
+        },
+        ThenNoExceptionIsThrown: async () => {
+          await expect(
+            editGuard.ensureEditingIsAllowedFor(projectId),
+          ).resolves.not.toThrow();
+        },
+      };
     },
   };
 };
