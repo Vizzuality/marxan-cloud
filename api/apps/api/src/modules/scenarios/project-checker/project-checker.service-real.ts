@@ -17,7 +17,7 @@ import {
 } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
 
 @Injectable()
-export class ProjectCheckerReal implements ProjectChecker {
+export class MarxanProjectChecker implements ProjectChecker {
   constructor(
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)

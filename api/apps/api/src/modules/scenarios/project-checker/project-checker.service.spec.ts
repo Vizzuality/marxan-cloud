@@ -12,7 +12,7 @@ import {
   hasPendingExport,
   ProjectChecker,
 } from '@marxan-api/modules/scenarios/project-checker/project-checker.service';
-import { ProjectCheckerReal } from '@marxan-api/modules/scenarios/project-checker/project-checker.service-real';
+import { MarxanProjectChecker } from '@marxan-api/modules/scenarios/project-checker/project-checker.service-real';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -207,7 +207,7 @@ async function getFixtures() {
       },
       {
         provide: ProjectChecker,
-        useClass: ProjectCheckerReal,
+        useClass: MarxanProjectChecker,
       },
     ],
   })
