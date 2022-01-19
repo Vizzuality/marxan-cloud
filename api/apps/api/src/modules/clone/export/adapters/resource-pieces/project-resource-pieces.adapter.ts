@@ -23,30 +23,35 @@ export class ProjectResourcePiecesAdapter implements ResourcePieces {
         resourceId: id.value,
         piece: ClonePiece.ProjectMetadata,
         finished: false,
+        uri: [],
       },
       {
         id: new ComponentId(v4()),
         resourceId: id.value,
         piece: ClonePiece.ExportConfig,
         finished: false,
+        uri: [],
       },
       {
         id: new ComponentId(v4()),
         resourceId: id.value,
         piece: ClonePiece.PlanningAreaCustom,
         finished: false,
+        uri: [],
       },
       {
         id: new ComponentId(v4()),
         resourceId: id.value,
         piece: ClonePiece.PlanningAreaGAdm,
         finished: false,
+        uri: [],
       },
       {
         id: new ComponentId(v4()),
         resourceId: id.value,
         piece: ClonePiece.PlanningAreaGridCustom,
         finished: false,
+        uri: [],
       },
     ];
   }

@@ -25,7 +25,9 @@ export class ResourcePiecesAdapter implements ResourcePieces {
     );
 
     if (!resourcePiecesProvider) {
-      throw new Error(`ResourcePieces adapter not found for ${kind}`);
+      throw new Error(
+        `ResourcePieces adapter not found for ${kind} resource kind. This is probably caused by a missing provider in export-adapters module`,
+      );
     }
 
     return resourcePiecesProvider.discoveredClass.instance as ResourcePieces;
