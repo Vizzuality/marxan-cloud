@@ -5,8 +5,11 @@ import React, {
 import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
@@ -39,9 +42,13 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
   const [successFile, setSuccessFile] = useState(null);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid, sid } = query;
 
   const { addToast } = useToasts();
+
+  const dispatch = useDispatch();
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setCache } = scenarioSlice.actions;
 
   const uploadFeaturesShapefileMutation = useUploadFeaturesShapefile({
     requestConfig: {
@@ -109,8 +116,8 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
       onSuccess: ({ data: { data: g, id: shapefileId } }) => {
         setLoading(false);
         setSuccessFile({ ...successFile });
+        dispatch(setCache(Date.now()));
         onClose();
-
         addToast('success-upload-feature-shapefile', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -142,7 +149,15 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
         });
       },
     });
-  }, [pid, addToast, onClose, uploadFeaturesShapefileMutation]);
+  }, [
+    pid,
+    addToast,
+    onClose,
+    uploadFeaturesShapefileMutation,
+    successFile,
+    dispatch,
+    setCache,
+  ]);
 
   const {
     getRootProps,

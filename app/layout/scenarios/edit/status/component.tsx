@@ -106,7 +106,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
             <p className="text-xs tracking-wide text-center font-heading">
               This task may take some time.
               <br />
-              Meanwhile, you can go to the project and do some other stuff.
+              You can wait here or go back to your project dashboard.
             </p>
             <div className="flex justify-center space-x-2">
               {/* <Button

@@ -3,11 +3,12 @@ export class ScenarioEditingMetadata {
     scenarioEditingMetadata: {
       status: {
         "protected-areas": "draft",
-        features: "draft",
-        analysis: "draft",
+        features: "empty",
+        analysis: "empty",
       },
-      tab: "analysis",
-      subtab: "analysis-preview",
+      tab: "protected-areas",
+      subtab: "protected-areas-preview",
+      lastJobCheck: new Date().getTime(),
     },
   });
 }
