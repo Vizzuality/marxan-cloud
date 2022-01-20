@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { flatten } from 'lodash';
 
-import { useRoleMe } from 'hooks/project-users';
+import { useProjectRole } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import {
   useDeleteScenario, useScenarios, useDuplicateScenario, useCancelRunScenario,
@@ -50,8 +50,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: roleMe } = useRoleMe(pid);
-  const VIEWER = roleMe === 'project_viewer';
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
 
   const {
     isFetching: projectIsFetching,

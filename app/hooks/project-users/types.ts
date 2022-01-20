@@ -5,12 +5,12 @@ export interface UseProjectUsersOptionsProps {
   search?: string;
 }
 
-// UseEditProjectUserRole
-export interface EditProjectUserRoleProps {
+// UseSaveProjectUserRole
+export interface SaveProjectUserRoleProps {
   projectId: string,
   data: unknown,
 }
-export interface UseEditProjectUserRoleProps {
+export interface UseSaveProjectUserRoleProps {
   requestConfig?: AxiosRequestConfig,
 }
 

@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 
 import { useMe } from 'hooks/me';
-import { useRoleMe } from 'hooks/project-users';
+import { useProjectRole } from 'hooks/project-users';
 import { useProject, usePublishProject } from 'hooks/projects';
 import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';
@@ -33,8 +33,8 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   const { data: projectData } = useProject(pid);
   const { user } = useMe();
 
-  const { data: roleMe } = useRoleMe(pid);
-  const OWNER = roleMe === 'project_owner';
+  const { data: projectRole } = useProjectRole(pid);
+  const OWNER = projectRole === 'project_owner';
 
   const { data: publishedProjectsData } = usePublishedProjects({});
 

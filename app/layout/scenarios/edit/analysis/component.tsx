@@ -8,7 +8,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useRoleMe } from 'hooks/project-users';
+import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -49,8 +49,8 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data: roleMe } = useRoleMe(pid);
-  const VIEWER = roleMe === 'project_viewer';
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;

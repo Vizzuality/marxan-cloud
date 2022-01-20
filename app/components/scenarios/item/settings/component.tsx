@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useRoleMe } from 'hooks/project-users';
+import { useProjectRole } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -21,8 +21,8 @@ export const Item: React.FC<ItemSettingsProps> = ({
 }: ItemSettingsProps) => {
   const { query } = useRouter();
   const { pid } = query;
-  const { data: roleMe } = useRoleMe(pid);
-  const VIEWER = roleMe === 'project_viewer';
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
 
   return (
     <div className="w-full px-8 pt-6 pb-4 bg-gray-700 rounded-b-3xl">

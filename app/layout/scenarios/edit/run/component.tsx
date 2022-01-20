@@ -10,7 +10,7 @@ import cx from 'classnames';
 import { usePlausible } from 'next-plausible';
 
 import { useMe } from 'hooks/me';
-import { useRoleMe } from 'hooks/project-users';
+import { useProjectRole } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -40,8 +40,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
 
   const { user } = useMe();
 
-  const { data: roleMe } = useRoleMe(pid);
-  const VIEWER = roleMe === 'project_viewer';
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
 
   const { data: projectData } = useProject(pid);
 

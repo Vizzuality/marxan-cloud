@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 
-import { useRoleMe } from 'hooks/project-users';
+import { useProjectRole } from 'hooks/project-users';
 
 import Title from 'layout/header/title';
 import Contributors from 'layout/projects/show/header/contributors';
@@ -25,9 +25,8 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
   const [editable, setEditable] = useState(false);
   const { pid } = query;
 
-  const { data: roleMe } = useRoleMe(pid);
-
-  const VIEWER = roleMe === 'project_viewer';
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
 
   const handleEdition = () => setEditable(!editable);
 

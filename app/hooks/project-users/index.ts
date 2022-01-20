@@ -14,8 +14,8 @@ import {
   UseProjectUsersOptionsProps,
   DeleteProjectUserProps,
   UseDeleteProjectUserProps,
-  UseEditProjectUserRoleProps,
-  EditProjectUserRoleProps,
+  UseSaveProjectUserRoleProps,
+  SaveProjectUserRoleProps,
 } from './types';
 
 export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps = {}) {
@@ -51,15 +51,47 @@ export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps 
   }, [query, data?.data?.data]);
 }
 
-export function useEditProjectUserRole({
+export function useProjectRole(projectId) {
+  const [session] = useSession();
+
+  const { data: me } = useMe();
+  const meId = me?.data?.id;
+
+  const query = useQuery(['project-role', projectId], async () => ROLES.request({
+    method: 'GET',
+    url: `/${projectId}/users`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response;
+  }), {
+    enabled: !!projectId,
+  });
+
+  const { data } = query;
+  const projectRoles = data?.data?.data;
+
+  const projectRole = projectRoles?.find((r) => r.user.id === meId).roleName;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: projectRole,
+    };
+  }, [query, projectRole]);
+}
+
+export function useSaveProjectUserRole({
   requestConfig = {
     method: 'PATCH',
   },
-}: UseEditProjectUserRoleProps) {
+}: UseSaveProjectUserRoleProps) {
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const editProjectUserRole = ({ projectId, data }: EditProjectUserRoleProps) => {
+  const saveProjectUserRole = ({ projectId, data }: SaveProjectUserRoleProps) => {
     return ROLES.request({
       url: `/${projectId}/users`,
       data,
@@ -70,9 +102,11 @@ export function useEditProjectUserRole({
     });
   };
 
-  return useMutation(editProjectUserRole, {
-    onSuccess: (data, variables, context) => {
+  return useMutation(saveProjectUserRole, {
+    onSuccess: (data: any, variables, context) => {
+      const { projectId } = variables;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['projects', projectId]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -104,42 +138,11 @@ export function useDeleteProjectUser({
     onSuccess: (data: any, variables, context) => {
       const { projectId } = data;
       queryClient.invalidateQueries(['projects', projectId]);
+      queryClient.invalidateQueries('projects');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });
-}
-
-export function useRoleMe(projectId) {
-  const [session] = useSession();
-
-  const { data: me } = useMe();
-  const meId = me?.data?.id;
-
-  const query = useQuery(['roles', projectId], async () => ROLES.request({
-    method: 'GET',
-    url: `/${projectId}/users`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response;
-  }), {
-    enabled: !!projectId,
-  });
-
-  const { data } = query;
-  const projectRoles = data?.data?.data;
-
-  const roleMe = projectRoles?.find((r) => r.user.id === meId).roleName;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: roleMe,
-    };
-  }, [query, roleMe]);
 }
