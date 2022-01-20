@@ -54,6 +54,7 @@ export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps 
 export function useProjectRole(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
+
   const meId = me?.data?.id;
 
   const projectRole = projectUsers?.find((r) => r.user.id === meId).roleName;
@@ -88,7 +89,7 @@ export function useSaveProjectUserRole({
     onSuccess: (data: any, variables, context) => {
       const { projectId } = variables;
       queryClient.invalidateQueries('projects');
-      queryClient.invalidateQueries(['projects', projectId]);
+      queryClient.invalidateQueries(['roles', projectId]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -118,9 +119,9 @@ export function useDeleteProjectUser({
 
   return useMutation(deleteProjectUser, {
     onSuccess: (data: any, variables, context) => {
-      const { projectId } = data;
-      queryClient.invalidateQueries(['projects', projectId]);
+      const { projectId } = variables;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['roles', projectId]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

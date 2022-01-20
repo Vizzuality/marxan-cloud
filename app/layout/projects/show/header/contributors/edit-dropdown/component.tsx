@@ -10,11 +10,10 @@ export interface EditContributorsDropdownProps {
   users: any,
   search?: string;
   onSearch: (selected: string) => void;
-  refetch: () => void;
 }
 
 export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = ({
-  users, search, onSearch, refetch,
+  users, search, onSearch,
 }: EditContributorsDropdownProps) => {
   const onChangeSearchDebounced = useDebouncedCallback((value) => {
     onSearch(value);
@@ -57,7 +56,6 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
                 image={avatarDataUrl}
                 name={displayName}
                 roleName={roleName}
-                refetch={refetch}
               />
             );
           })}

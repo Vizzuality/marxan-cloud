@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -28,12 +28,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
 
   const {
     data: projectUsers,
-    refetch: refetchProjectUsers,
   } = useProjectUsers(pid, { search });
-
-  useEffect(() => {
-    refetchProjectUsers();
-  }, [search, refetchProjectUsers]);
 
   const handleEditUsers = () => setEditUsers(!editUsers);
 
@@ -95,7 +90,6 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                     users={projectUsers}
                     search={search}
                     onSearch={onSearch}
-                    refetch={refetchProjectUsers}
                   />
                 )}
               </div>
