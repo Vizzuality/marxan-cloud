@@ -1,11 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { JSONAPICountryData } from '@marxan-api/modules/countries/country.geo.entity';
 import { JSONAPIAdminAreaData } from '@marxan-api/modules/admin-areas/admin-area.geo.entity';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
 
 afterAll(async () => {
   await tearDown();
@@ -17,19 +16,7 @@ describe('CountriesModule (e2e)', () => {
   let jwtToken: string;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
+    app = await bootstrapApplication();
 
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
@@ -130,7 +117,6 @@ describe('CountriesModule (e2e)', () => {
           maxPuAreaSize: 1252305,
           minPuAreaSize: 136,
           name0: 'Angola',
-          theGeom: expect.any(Object),
         },
         id: 'AGO',
         type: 'countries',

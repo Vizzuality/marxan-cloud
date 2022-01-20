@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
@@ -267,8 +269,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       {({ handleSubmit, values }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
           <FormSpyRFF
-            subscription={{ dirty: true }}
-            onChange={() => dispatch(setFeatures(values.features))}
+            subscription={{ dirty: true, touched: true }}
+            onChange={(state) => {
+              if (state.touched.features) {
+                dispatch(setFeatures(values.features));
+              }
+            }}
           />
 
           <Loading

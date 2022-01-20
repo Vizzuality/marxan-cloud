@@ -41,14 +41,15 @@ import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
 import { CostRangeService } from './cost-range-service';
-import { ProjectChecker } from './project-checker.service';
 import { ProtectedAreaModule } from './protected-area';
 import { ProtectedAreasCrudModule } from '@marxan-api/modules/protected-areas/protected-areas-crud.module';
 import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
+import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-guard.module';
 
 @Module({
   imports: [
@@ -66,6 +67,8 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
+    EditGuardModule,
+    ProjectCheckerModule,
     PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,
@@ -86,7 +89,6 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
     AccessControlModule,
   ],
   providers: [
-    ProjectChecker,
     ScenariosService,
     ScenariosCrudService,
     ProxyService,
