@@ -1,16 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { format } from 'd3';
 import { motion } from 'framer-motion';
 
-import { useSaveScenarioCalibrationRange, useScenarioStatus } from 'hooks/scenarios';
+import { useSaveScenarioCalibrationRange } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
@@ -33,31 +30,14 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   onChangeSection,
 }: ScenariosBLMCalibrationProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { sid } = query;
 
-  const dispatch = useDispatch();
   const { addToast } = useToasts();
-
-  const [blmResults, setBlmResults] = useState(false);
-
-  const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
-  const { jobs } = scenarioStatusData;
-
-  const calibrationStatus = jobs.find((j) => j.kind === 'calibration')?.status;
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
 
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm } = scenarioSlice.actions;
-
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
-
-  useEffect(() => {
-    dispatch(setBlm(null));
-    setBlmResults(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const onSaveBlmRange = useCallback((values) => {
     const { blmCalibrationFrom, blmCalibrationTo } = values;
@@ -76,7 +56,6 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         ), {
           level: 'success',
         });
-        setBlmResults(true);
         console.info('Calibration range sent succesfully');
       },
       onError: () => {
@@ -207,14 +186,10 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
             </form>
           )}
         </FormRFF>
-
-        {/* status a done */}
-        {calibrationStatus === 'done' && blmResults && (
-          <BlmSettingsGraph
-            maxBlmValue={maxBlmValue}
-            minBlmValue={minBlmValue}
-          />
-        )}
+        <BlmSettingsGraph
+          maxBlmValue={maxBlmValue}
+          minBlmValue={minBlmValue}
+        />
       </div>
     </motion.div>
   );

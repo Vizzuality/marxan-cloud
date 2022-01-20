@@ -258,6 +258,8 @@ export const useScenarioActionsDone = () => {
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
+        const scenarioId = sid;
+        queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
         JOB_REF.current = null;
       },
       onError: () => {
@@ -277,6 +279,7 @@ export const useScenarioActionsDone = () => {
     dispatch,
     setJob,
     addToast,
+    queryClient,
   ]);
 
   // Run

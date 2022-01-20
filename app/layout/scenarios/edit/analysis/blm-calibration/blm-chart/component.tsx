@@ -13,7 +13,7 @@ import {
   scaleLinear, line, area,
 } from 'd3';
 
-import { useSaveScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import {
@@ -117,6 +117,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
     }
   }, [containerRef, setDimensions]);
 
+  const { data: scenarioData } = useScenario(sid);
+
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
@@ -124,15 +126,16 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   });
 
   const onSaveBlm = useCallback((value) => {
-    const scenarioData = {
+    const scenarioMetaData = {
       metadata: {
+        ...scenarioData.metadata,
         marxanInputParameterFile: {
           BLM: value,
         },
       },
     };
 
-    saveScenarioMutation.mutate({ id: `${sid}`, data: scenarioData }, {
+    saveScenarioMutation.mutate({ id: `${sid}`, data: scenarioMetaData }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-save-blm-value', (
           <>
@@ -156,7 +159,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
         });
       },
     });
-  }, [sid, saveScenarioMutation, addToast]);
+  }, [sid, saveScenarioMutation, addToast, scenarioData.metadata]);
 
   /**
    * When containerRef changes, we update the dimensions of the SVG

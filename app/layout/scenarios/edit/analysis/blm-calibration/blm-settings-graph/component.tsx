@@ -38,6 +38,8 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
     isFetched: calibrationResultsAreFetched,
   } = useScenarioCalibrationResults(sid);
 
+  console.log({ calibrationResultsData });
+
   const INITIAL_VALUES = useMemo(() => {
     return {
       blmCalibration: blm?.toFixed(2),
