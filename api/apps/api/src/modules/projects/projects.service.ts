@@ -41,12 +41,14 @@ import {
   GetExportArchive,
 } from '@marxan-api/modules/clone';
 import { ResourceId } from '@marxan/cloning/domain';
-import { createReadStream } from 'fs';
+import { createReadStream, ReadStream } from 'fs';
 import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
 
 export { validationFailed } from '../planning-areas';
 
-export const notFound = Symbol(`project not found`);
+export const projectNotFound = Symbol(`project not found`);
+export const notAllowed = Symbol(`not allowed to that action`);
+export const locationNotFound = Symbol(`location not found`);
 
 @Injectable()
 export class ProjectsService {
@@ -93,7 +95,7 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Either<typeof notFound | typeof forbiddenError, Project>> {
+  ): Promise<Either<typeof projectNotFound | typeof forbiddenError, Project>> {
     try {
       const project = await this.projectsCrud.getById(id, undefined, info);
       if (
@@ -107,7 +109,7 @@ export class ProjectsService {
       return right(project);
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
-      return left(notFound);
+      return left(projectNotFound);
     }
   }
 
@@ -216,12 +218,23 @@ export class ProjectsService {
     );
   }
 
-  async getExportedArchive(projectId: string, exportId: string) {
-    // ACL
+  async getExportedArchive(
+    projectId: string,
+    userId: string,
+    exportId: string,
+  ): Promise<Either<typeof notAllowed | typeof locationNotFound, ReadStream>> {
+    const userIsAllowedToDownloadExport = await this.projectAclService.canDownloadProjectExport(
+      userId,
+      projectId,
+    );
+    if (!userIsAllowedToDownloadExport) return left(notAllowed);
+
     const location = await this.queryBus.execute(
       new GetExportArchive(new ExportId(exportId)),
     );
-    // MARXAN-1129
-    return location ? createReadStream(location.value) : null;
+
+    if (!location) return left(locationNotFound);
+
+    return right(createReadStream(location.value));
   }
 }

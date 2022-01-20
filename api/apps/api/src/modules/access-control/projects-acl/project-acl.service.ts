@@ -42,6 +42,7 @@ export class ProjectAclService implements ProjectAccessControl {
   ];
   private readonly canDeleteProjectRoles = [ProjectRoles.project_owner];
   private readonly canExportProjectRoles = [ProjectRoles.project_owner];
+  private readonly canDownloadExportProjectRoles = [ProjectRoles.project_owner];
 
   private async getRolesWithinProjectForUser(
     userId: string,
@@ -113,6 +114,16 @@ export class ProjectAclService implements ProjectAccessControl {
     return this.doesUserHaveRole(
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canExportProjectRoles,
+    );
+  }
+
+  async canDownloadProjectExport(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canDownloadExportProjectRoles,
     );
   }
 

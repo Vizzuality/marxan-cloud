@@ -3,8 +3,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   ForbiddenException,
+  Get,
   Header,
   InternalServerErrorException,
   NotFoundException,
@@ -49,7 +49,12 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { ProjectsService, validationFailed } from './projects.service';
+import {
+  locationNotFound,
+  notAllowed,
+  ProjectsService,
+  validationFailed,
+} from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
@@ -418,21 +423,38 @@ export class ProjectsController {
     };
   }
 
-  @IsMissingAclImplementation()
-  @Get(`:id/export/:exportId`)
+  @ImplementsAcl()
+  @Get(`:projectId/export/:exportId`)
   @Header(`Content-Type`, `application/zip`)
   @Header('Content-Disposition', 'attachment; filename="export.zip"')
   async getProjectExportArchive(
-    @Param('id') id: string,
+    @Param('projectId') projectId: string,
     @Param('exportId') exportId: string,
     @Res() response: Response,
+    @Req() req: RequestWithAuthenticatedUser,
   ) {
-    const stream = await this.projectsService.getExportedArchive(id, exportId);
+    const result = await this.projectsService.getExportedArchive(
+      projectId,
+      req.user.id,
+      exportId,
+    );
 
-    if (stream) {
-      stream.pipe(response);
-    } else {
-      response.send(null);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case locationNotFound:
+          throw new NotFoundException(
+            `Could not find export .zip location for export with ID: ${exportId} for project with ID: ${projectId}`,
+          );
+        case notAllowed:
+          throw new ForbiddenException(
+            `Your role cannot retrieve export .zip files for project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
     }
+
+    result.right.pipe(response);
   }
 }
