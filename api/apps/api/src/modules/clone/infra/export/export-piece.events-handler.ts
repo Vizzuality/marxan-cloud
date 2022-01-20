@@ -47,7 +47,7 @@ export class ExportPieceEventsHandler
     const kind = API_EVENT_KINDS.project__export__piece__finished__v1__alpha;
 
     return {
-      topic: data.resourceId,
+      topic: data.componentId,
       kind,
       externalId: `${kind}-${data.componentId}`,
       data: {
@@ -69,7 +69,7 @@ export class ExportPieceEventsHandler
     const kind = API_EVENT_KINDS.project__export__piece__failed__v1__alpha;
 
     return {
-      topic: resourceId,
+      topic: componentId,
       kind,
       externalId: `${kind}-${componentId}`,
       data: {

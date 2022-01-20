@@ -83,6 +83,8 @@ export class FakeQueue implements Partial<Queue> {
 
   close = jest.fn();
   disconnect = jest.fn();
+  getJobs = jest.fn();
+  remove = jest.fn();
 
   private keepThisInstance() {
     const newKey = new Key();

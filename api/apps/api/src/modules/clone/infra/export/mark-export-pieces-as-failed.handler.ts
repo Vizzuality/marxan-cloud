@@ -30,7 +30,7 @@ export class MarkExportPiecesAsFailedHandler
         this.apiEvents.createIfNotExists({
           externalId: `${kind}-${componentId.value}`,
           kind,
-          topic: resourceId.value,
+          topic: componentId.value,
           data: {
             exportId,
             resourceId,

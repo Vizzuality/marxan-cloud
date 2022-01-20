@@ -45,7 +45,7 @@ export class SchedulePieceExportHandler
 
     await this.apiEvents.createIfNotExists({
       kind: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
-      topic: resourceId.value,
+      topic: componentId.value,
       data: {
         piece,
         exportId,
