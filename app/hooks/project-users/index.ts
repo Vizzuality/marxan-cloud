@@ -52,35 +52,17 @@ export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps 
 }
 
 export function useProjectRole(projectId) {
-  const [session] = useSession();
-
   const { data: me } = useMe();
+  const { data: projectUsers } = useProjectUsers(projectId);
   const meId = me?.data?.id;
 
-  const query = useQuery(['project-role', projectId], async () => ROLES.request({
-    method: 'GET',
-    url: `/${projectId}/users`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response;
-  }), {
-    enabled: !!projectId,
-  });
-
-  const { data } = query;
-  const projectRoles = data?.data?.data;
-
-  const projectRole = projectRoles?.find((r) => r.user.id === meId).roleName;
+  const projectRole = projectUsers?.find((r) => r.user.id === meId).roleName;
 
   return useMemo(() => {
     return {
-      ...query,
       data: projectRole,
     };
-  }, [query, projectRole]);
+  }, [projectRole]);
 }
 
 export function useSaveProjectUserRole({
