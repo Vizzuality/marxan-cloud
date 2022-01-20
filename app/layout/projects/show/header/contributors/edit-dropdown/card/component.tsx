@@ -9,11 +9,10 @@ import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
 import Button from 'components/button';
+import ConfirmationPrompt from 'components/confirmation-prompt';
 import Select from 'components/forms/select';
-import Icon from 'components/icon';
-import Tooltip from 'components/tooltip';
 
-import USER_REMOVE_SVG from 'svgs/users/user-remove.svg?sprite';
+import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?sprite';
 
 import { ROLES, ROLE_OPTIONS } from './constants';
 
@@ -139,63 +138,25 @@ export const UserCard: React.FC<UserCardProps> = ({
           />
         </div>
       </div>
-      <Tooltip
-        arrow
-        interactive
-        popup
-        visible={open}
-        content={(
-          <div className="flex flex-row p-2 space-x-3 text-sm text-gray-500 bg-white rounded-2xl" style={{ position: 'absolute', zIndex: 99 }}>
-            <Icon className="w-10 h-10" icon={USER_REMOVE_SVG} />
-            <p>
-              Are you sure you want to
-              <br />
-              remove
-              <strong>
-                {' '}
-                {name}
-                {' '}
-              </strong>
-              from
-              <br />
-              this project?
-            </p>
-            <div className="flex flex-col w-16 space-y-2">
-              <Button
-                theme="primary"
-                size="xs"
-                className="cursor-pointer"
-                onClick={() => onDelete()}
-              >
-                Yes
-              </Button>
-              <Button
-                data-close
-                theme="tertiary"
-                size="xs"
-                className="cursor-pointer"
-                onClick={() => setOpen(false)}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-        )}
-        placement="top-end"
-      >
-        <span>
-          <Button
-            className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group"
-            theme="secondary-alt"
-            size="xs"
-            disabled={!OWNER}
-            onClick={() => setOpen(true)}
-          >
-            <span className="text-white group-hover:text-gray-600">Remove</span>
-          </Button>
-        </span>
-      </Tooltip>
 
+      <Button
+        className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group"
+        theme="secondary-alt"
+        size="xs"
+        disabled={!OWNER}
+        onClick={() => setOpen(true)}
+      >
+        <span className="text-white group-hover:text-gray-600">Remove</span>
+      </Button>
+
+      <ConfirmationPrompt
+        title={`Are you sure you want to remove ${name} from this project?`}
+        icon={DELETE_USER_WARNING_SVG}
+        open={!!open}
+        onAccept={onDelete}
+        onRefuse={() => setOpen(null)}
+        onDismiss={() => setOpen(null)}
+      />
     </div>
   );
 };
