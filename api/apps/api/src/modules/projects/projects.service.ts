@@ -27,7 +27,7 @@ import {
   ChangeRangeErrors,
 } from '@marxan-api/modules/projects/blm';
 import {
-  GetFailure,
+  GetFailure as GetBlmFailure,
   ProjectBlm,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
@@ -40,15 +40,14 @@ import {
   ExportProject,
   GetExportArchive,
 } from '@marxan-api/modules/clone';
-import { ResourceId } from '@marxan/cloning/domain';
-import { createReadStream, ReadStream } from 'fs';
+import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
+import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
 
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
 export const notAllowed = Symbol(`not allowed to that action`);
-export const locationNotFound = Symbol(`location not found`);
 
 @Injectable()
 export class ProjectsService {
@@ -116,7 +115,7 @@ export class ProjectsService {
   async findProjectBlm(
     projectId: string,
     userId: string,
-  ): Promise<Either<GetFailure | typeof forbiddenError, ProjectBlm>> {
+  ): Promise<Either<GetBlmFailure | typeof forbiddenError, ProjectBlm>> {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -222,19 +221,15 @@ export class ProjectsService {
     projectId: string,
     userId: string,
     exportId: string,
-  ): Promise<Either<typeof notAllowed | typeof locationNotFound, ReadStream>> {
+  ): Promise<
+    Either<GetArchiveLocationFailure | typeof notAllowed, ArchiveLocation>
+  > {
     const userIsAllowedToDownloadExport = await this.projectAclService.canDownloadProjectExport(
       userId,
       projectId,
     );
     if (!userIsAllowedToDownloadExport) return left(notAllowed);
 
-    const location = await this.queryBus.execute(
-      new GetExportArchive(new ExportId(exportId)),
-    );
-
-    if (!location) return left(locationNotFound);
-
-    return right(createReadStream(location.value));
+    return this.queryBus.execute(new GetExportArchive(new ExportId(exportId)));
   }
 }

@@ -135,10 +135,8 @@ export class ProjectAclService implements ProjectAccessControl {
         roleName: ProjectRoles.project_owner,
       },
     });
-    if (!userIsProjectOwner) {
-      return false;
-    }
-    return true;
+
+    return Boolean(userIsProjectOwner);
   }
 
   async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {

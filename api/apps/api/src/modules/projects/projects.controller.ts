@@ -50,7 +50,6 @@ import {
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
-  locationNotFound,
   notAllowed,
   ProjectsService,
   validationFailed,
@@ -87,6 +86,8 @@ import {
   ImplementsAcl,
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
+import { createReadStream } from 'fs';
+import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -455,6 +456,6 @@ export class ProjectsController {
       }
     }
 
-    result.right.pipe(response);
+    createReadStream(result.right.value).pipe(response);
   }
 }
