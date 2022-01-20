@@ -51,6 +51,9 @@ export const Item: React.FC<ItemProps> = ({
 
   const { data: projectUsers } = useProjectUsers(id);
 
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
+
   const handleMouseEnter = useCallback(() => {
     setAnimate('enter');
   }, [setAnimate]);
@@ -176,7 +179,7 @@ export const Item: React.FC<ItemProps> = ({
           <div className="flex items-center mt-4 text-sm">
             <p>Contributors:</p>
             <ul className="flex ml-2">
-              {!!projectUsers?.length && projectUsers.map((u, i) => {
+              {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
                 const { user: { displayName, id: userId, avatarDataUrl } } = u;
 
                 return (
@@ -196,6 +199,14 @@ export const Item: React.FC<ItemProps> = ({
                   </li>
                 );
               })}
+
+              {projectUsers?.length > projectUsersVisibleSize && (
+                <Avatar
+                  className="-ml-3 text-sm text-white uppercase bg-primary-700"
+                >
+                  {`+${projectUsers.length - projectUsersVisibleSize}`}
+                </Avatar>
+              )}
 
               <ComingSoon>
                 <li

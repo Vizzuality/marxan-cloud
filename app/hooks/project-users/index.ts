@@ -57,7 +57,7 @@ export function useProjectRole(projectId) {
 
   const meId = me?.data?.id;
 
-  const projectRole = projectUsers?.find((r) => r.user.id === meId).roleName;
+  const projectRole = projectUsers?.find((r) => r.user.id === meId)?.roleName;
 
   return useMemo(() => {
     return {

@@ -35,7 +35,6 @@ export const SingleSelect: React.FC<SelectProps> = ({
 }: SelectProps) => {
   const triggerRef = useRef();
   const menuRef = useRef();
-
   const getOptions = useMemo(() => {
     return [
       ...clearSelectionActive ? [
@@ -151,6 +150,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
     <div
       className={cx({
         'w-full leading-tight overflow-hidden': true,
+        'pointer-events-none opacity-50': disabled,
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
         [THEME.states[status]]: true,

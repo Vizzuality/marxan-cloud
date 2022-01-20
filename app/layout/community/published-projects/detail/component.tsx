@@ -27,8 +27,8 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const { pid } = query;
 
   const { data: projectUsers } = useProjectUsers(pid);
-  const size = 3;
-  const firstProjectUsers = projectUsers?.slice(0, size);
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
 
   const {
     data: publishedProject,
@@ -99,9 +99,9 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                     <div>
                       <h3 className="mb-5 text-sm font-semibold">Contributors</h3>
-                      {!!firstProjectUsers?.length && (
+                      {!!projectUsersVisible?.length && (
                         <div className="space-y-4">
-                          {firstProjectUsers.map((u) => {
+                          {projectUsersVisible.map((u) => {
                             const { user: { displayName, id: userId, avatarDataUrl } } = u;
 
                             return (
@@ -117,6 +117,14 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                               </div>
                             );
                           })}
+                          {projectUsers?.length > projectUsersVisibleSize && (
+                            <div className="flex flex-row items-center space-x-2.5">
+                              <Avatar className="text-sm text-white uppercase border bg-primary-700" />
+                              <p className="text-sm">
+                                {`(+${projectUsers.length - projectUsersVisibleSize})`}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>

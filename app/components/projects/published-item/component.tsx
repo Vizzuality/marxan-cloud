@@ -23,8 +23,8 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   const planningArea = area || 'Custom';
 
   const { data: projectUsers } = useProjectUsers(id);
-  const size = 3;
-  const firstProjectUsers = projectUsers?.slice(0, size);
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
 
   return (
     <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
@@ -38,8 +38,13 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="pr-6">
         <p className="text-sm">{planningArea}</p>
       </td>
-      <td className="pr-6">
-        {!!firstProjectUsers?.length && firstProjectUsers?.map((u) => <p key={`${u.user.id}`} className="text-sm">{u.user.displayName}</p>)}
+      <td className="pr-6 text-sm">
+        {!!projectUsersVisible?.length && projectUsersVisible?.map((u) => <p key={`${u.user.id}`}>{u.user.displayName}</p>)}
+        {projectUsers?.length > projectUsersVisibleSize && (
+          <p>
+            {`(+${projectUsers.length - projectUsersVisibleSize})`}
+          </p>
+        )}
       </td>
       <td className="">
         <div className="flex flex-row justify-between pl-10">

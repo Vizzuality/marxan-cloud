@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -21,16 +21,28 @@ export interface ContributorsProps {
 export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
-  const [editUsers, setEditUsers] = useState(false);
+
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState(null);
 
   const { data = {} } = useProject(pid);
 
   const {
     data: projectUsers,
+    refetch: refetchProjectUsers,
   } = useProjectUsers(pid, { search });
 
-  const handleEditUsers = () => setEditUsers(!editUsers);
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
+
+  useEffect(() => {
+    refetchProjectUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  const handleClick = useCallback(() => {
+    setOpen(!open);
+  }, [open, setOpen]);
 
   const onSearch = useCallback((s) => {
     setSearch(s);
@@ -49,7 +61,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
             <div className="text-sm">Contributors to this project:</div>
 
             <ul className="flex ml-2.5">
-              {!!projectUsers?.length && projectUsers.map((u, i) => {
+              {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
                 const { user: { displayName, id, avatarDataUrl } } = u;
                 return (
                   <li
@@ -69,29 +81,37 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                 );
               })}
 
+              {projectUsers?.length > projectUsersVisibleSize && (
+                <Avatar className="-ml-3 text-sm text-white uppercase bg-primary-700">
+                  {`+${projectUsers.length - projectUsersVisibleSize}`}
+                </Avatar>
+              )}
+
               <div className="relative ml-3">
                 <button
                   aria-label="add-contributor"
                   type="button"
                   className="border border-transparent rounded-full hover:border hover:border-white"
-                  onClick={handleEditUsers}
+                  onClick={handleClick}
                 >
                   <Avatar className={cx({
-                    'text-white bg-gray-500': !editUsers,
-                    'bg-white text-gray-500': editUsers,
+                    'text-white bg-gray-500': !open,
+                    'bg-white text-gray-500': open,
                   })}
                   >
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
 
                 </button>
-                {editUsers && (
+
+                {open && (
                   <EditDropdown
                     users={projectUsers}
                     search={search}
                     onSearch={onSearch}
                   />
                 )}
+
               </div>
 
             </ul>

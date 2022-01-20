@@ -145,7 +145,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         popup
         visible={open}
         content={(
-          <div className="flex flex-row p-2 space-x-3 text-sm text-gray-500 bg-white rounded-2xl">
+          <div className="flex flex-row p-2 space-x-3 text-sm text-gray-500 bg-white rounded-2xl" style={{ position: 'absolute', zIndex: 99 }}>
             <Icon className="w-10 h-10" icon={USER_REMOVE_SVG} />
             <p>
               Are you sure you want to
@@ -195,6 +195,7 @@ export const UserCard: React.FC<UserCardProps> = ({
           </Button>
         </span>
       </Tooltip>
+
     </div>
   );
 };
