@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Repository, Not, QueryFailedError } from 'typeorm';
+import { getConnection, Not, QueryFailedError, Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
@@ -20,8 +20,8 @@ import { assertDefined } from '@marxan/utils';
 import {
   forbiddenError,
   lastOwner,
-  transactionFailed,
   queryFailed,
+  transactionFailed,
 } from '@marxan-api/modules/access-control';
 
 /**
@@ -41,6 +41,7 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_owner,
   ];
   private readonly canDeleteProjectRoles = [ProjectRoles.project_owner];
+  private readonly canExportProjectRoles = [ProjectRoles.project_owner];
 
   private async getRolesWithinProjectForUser(
     userId: string,
@@ -55,6 +56,7 @@ export class ProjectAclService implements ProjectAccessControl {
         select: ['roleName'],
       })
     ).flatMap((role) => role.roleName);
+
     return rolesToCheck;
   }
 
@@ -104,6 +106,13 @@ export class ProjectAclService implements ProjectAccessControl {
     return this.doesUserHaveRole(
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canPublishProjectRoles,
+    );
+  }
+
+  async canExportProject(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canExportProjectRoles,
     );
   }
 

@@ -339,8 +339,8 @@ export class ProjectsController {
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
     const result = await this.projectsService.updateBlmValues(
-      req.user.id,
       id,
+      req.user.id,
       range,
     );
 
@@ -400,11 +400,21 @@ export class ProjectsController {
     return result.right;
   }
 
-  @IsMissingAclImplementation()
-  @Post(`:id/export`)
-  async requestProjectExport(@Param('id') id: string) {
+  @ImplementsAcl()
+  @Post(`:projectId/export`)
+  async requestProjectExport(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const result = await this.projectsService.requestExport(
+      projectId,
+      req.user.id,
+    );
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return {
-      id: await this.projectsService.requestExport(id),
+      id: result.right,
     };
   }
 

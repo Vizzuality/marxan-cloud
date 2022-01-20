@@ -8,4 +8,5 @@ export abstract class ProjectAccessControl {
     projectId: string,
   ): Promise<Permit>;
   abstract canDeleteProject(userId: string, projectId: string): Promise<Permit>;
+  abstract canExportProject(userId: string, projectId: string): Promise<Permit>;
 }

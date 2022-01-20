@@ -157,8 +157,8 @@ export class ProjectsService {
   }
 
   async updateBlmValues(
-    userId: string,
     projectId: string,
+    userId: string,
     range: [number, number],
   ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
@@ -167,14 +167,18 @@ export class ProjectsService {
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
-  async requestExport(projectId: string): Promise<string> {
-    // ACL slot
+  async requestExport(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, string>> {
+    if (!(await this.projectAclService.canExportProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
 
-    return (
-      await this.commandBus.execute(
-        new ExportProject(new ResourceId(projectId)),
-      )
-    ).value;
+    const exportId = await this.commandBus.execute(
+      new ExportProject(new ResourceId(projectId)),
+    );
+    return right(exportId.value);
   }
 
   async remove(
