@@ -14,6 +14,8 @@ import { validate, version } from 'uuid';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
+import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { FakeQueue } from '../utils/queues';
 
 interface FakePendingJob {
@@ -57,7 +59,7 @@ it('should remove pending export-piece jobs and mark expor pieces as failed', as
 const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
-  const { projectId } = await GivenProjectExists(app, token);
+  const { projectId, organizationId } = await GivenProjectExists(app, token);
 
   const repo = app.get(ExportRepository);
   const eventBus = app.get(EventBus);
@@ -74,6 +76,12 @@ const getFixtures = async () => {
       const exportRepo = connection.getRepository(ExportEntity);
 
       await exportRepo.delete({});
+      await ProjectsTestUtils.deleteProject(app, token, projectId);
+      await OrganizationsTestUtils.deleteOrganization(
+        app,
+        token,
+        organizationId,
+      );
       await app.close();
     },
     GivenExportWasRequested: async () => {
