@@ -59,22 +59,18 @@ export const getFixtures = async () => {
       await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await cleanup();
     },
-    GivenContributorWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
-        scenarioId,
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
-      });
-      return userCreated;
-    },
-    GivenViewerWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
-        scenarioId,
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
-      });
-      return userCreated;
-    },
+      }),
     GivenOutputZipIsAvailable: async () => {
       const zipBuffer = await createArchive();
       filesToRemove.push(...zipBuffer.filesToClean);

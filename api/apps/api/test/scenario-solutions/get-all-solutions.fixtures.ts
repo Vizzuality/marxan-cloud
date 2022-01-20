@@ -55,22 +55,19 @@ export const getFixtures = async () => {
         }),
       );
     },
-    GivenContributorWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
-        scenarioId,
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
-      });
-      return userCreated;
-    },
-    GivenViewerWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
-        scenarioId,
+      }),
+
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
-      });
-      return userCreated;
-    },
+      }),
     WhenGettingSolutionsAsOwner: async () =>
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions`)

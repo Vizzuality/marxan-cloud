@@ -86,22 +86,18 @@ export const getFixtures = async () => {
       });
       scenarioId = result.data.id;
     },
-    GivenContributorWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
-        scenarioId,
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
-      });
-      return userCreated;
-    },
-    GivenViewerWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
-        scenarioId,
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
-      });
-      return userCreated;
-    },
+      }),
     WhenScenarioCalibrationIsLaunchedAsOwner: () => ({
       WithRange: async () =>
         await request(app.getHttpServer())

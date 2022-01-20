@@ -187,23 +187,19 @@ async function getFixtures() {
       return result.data.id;
     },
 
-    GivenContributorWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
         scenarioId: scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
-      });
-      return userCreated;
-    },
+      }),
 
-    GivenViewerWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
         scenarioId: scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
-      });
-      return userCreated;
-    },
+      }),
 
     WhenCreatingAScenarioWithIncompleteData: async () => {
       return await request(app.getHttpServer())

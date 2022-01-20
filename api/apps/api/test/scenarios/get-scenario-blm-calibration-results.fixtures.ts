@@ -17,8 +17,8 @@ import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
-  const contributorUserToken = await GivenUserIsLoggedIn(app, 'bb');
-  const viewerUserToken = await GivenUserIsLoggedIn(app, 'cc');
+  const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
+  const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerUserId = await GivenUserExists(app, 'cc');
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
@@ -63,22 +63,18 @@ export const getFixtures = async () => {
       });
       scenarioId = result.data.id;
     },
-    GivenContributorWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
         scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
-      });
-      return userCreated;
-    },
-    GivenViewerWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
         scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
-      });
-      return userCreated;
-    },
+      }),
     WhenBlmCalibrationIsLaunchedAsOwner: async () =>
       await request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/calibration`)
@@ -90,7 +86,7 @@ export const getFixtures = async () => {
     WhenContributorLaunchesCalibration: async () => {
       await request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-        .set('Authorization', `Bearer ${contributorUserToken}`)
+        .set('Authorization', `Bearer ${contributorToken}`)
         .send({
           range: blmRange,
         });
@@ -98,7 +94,7 @@ export const getFixtures = async () => {
     WhenViewerLaunchesCalibration: async () => {
       const response = await request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-        .set('Authorization', `Bearer ${viewerUserToken}`)
+        .set('Authorization', `Bearer ${viewerToken}`)
         .send({
           range: blmRange,
         });

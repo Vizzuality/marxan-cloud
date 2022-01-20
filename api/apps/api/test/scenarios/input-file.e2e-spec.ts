@@ -487,22 +487,18 @@ async function getFixtures() {
       scenarioId = scenario.data.id;
       return scenario.data;
     },
-    GivenContributorWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
         scenarioId: scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
-      });
-      return userCreated;
-    },
-    GivenViewerWasAddedToScenario: async () => {
-      const userCreated = await userScenariosRepo.save({
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
         scenarioId: scenarioId,
         roleName: scenarioViewerRole,
         userId: viewerUserId,
-      });
-      return userCreated;
-    },
+      }),
     async cleanup() {
       for (const cleanup of cleanups.reverse()) {
         await cleanup();
