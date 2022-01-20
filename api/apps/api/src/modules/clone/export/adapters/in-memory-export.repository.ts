@@ -11,4 +11,8 @@ export class InMemoryExportRepo implements ExportRepository {
   async save(exportInstance: Export): Promise<void> {
     this.#memory[exportInstance.id.value] = exportInstance;
   }
+
+  transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
+    return code(this);
+  }
 }

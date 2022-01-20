@@ -73,18 +73,21 @@ const getFixtures = async () => {
           resourceId: projectId,
           finished: false,
           piece: ClonePiece.ProjectMetadata,
+          uris: [],
         },
         {
           id: new ComponentId(v4()),
           resourceId: someScenarioId,
           finished: true,
           piece: ClonePiece.PlanningAreaCustom,
+          uris: [],
         },
         {
           id: new ComponentId(v4()),
           resourceId: someScenarioId,
           finished: false,
           piece: ClonePiece.ExportConfig,
+          uris: [],
         },
       ]);
       return { projectId, someScenarioId };
