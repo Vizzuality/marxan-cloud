@@ -1,9 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { tearDown } from './utils/tear-down';
+import { bootstrapApplication } from './utils/api-application';
 
 afterAll(async () => {
   await tearDown();
@@ -14,12 +13,7 @@ describe('AppController (e2e)', () => {
 
   beforeAll(async () => {
     try {
-      const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule],
-      }).compile();
-
-      app = moduleFixture.createNestApplication();
-      await app.init();
+      app = await bootstrapApplication();
     } catch (e) {
       console.error(e);
     }

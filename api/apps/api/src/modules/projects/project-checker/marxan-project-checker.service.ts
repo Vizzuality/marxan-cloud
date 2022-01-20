@@ -8,18 +8,45 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PlanningAreasService } from '@marxan-api/modules/planning-areas/planning-areas.service';
 import { isDefined } from '@marxan/utils';
-
-export const doesntExist = Symbol(`doesn't exist`);
-export type DoesntExist = typeof doesntExist;
+import {
+  doesntExist,
+  DoesntExist,
+  hasPendingExport,
+  HasPendingExport,
+  ProjectChecker,
+} from '@marxan-api/modules/projects/project-checker/project-checker.service';
 
 @Injectable()
-export class ProjectChecker {
+export class MarxanProjectChecker implements ProjectChecker {
   constructor(
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
     private readonly planningAreas: PlanningAreasService,
   ) {}
+
+  async hasPendingExports(
+    projectId: string,
+  ): Promise<Either<HasPendingExport, boolean>> {
+    const exportEvent = await this.apiEvents
+      .getLatestEventForTopic({
+        topic: projectId,
+        kind: In([
+          API_EVENT_KINDS.project__export__finished__v1__alpha,
+          API_EVENT_KINDS.project__export__failed__v1__alpha,
+          API_EVENT_KINDS.project__export__submitted__v1__alpha,
+        ]),
+      })
+      .catch(this.createNotFoundHandler());
+
+    const pendingExportExists =
+      exportEvent?.kind ===
+      API_EVENT_KINDS.project__export__submitted__v1__alpha;
+
+    if (pendingExportExists) return left(hasPendingExport);
+
+    return right(false);
+  }
 
   async isProjectReady(
     projectId: string,

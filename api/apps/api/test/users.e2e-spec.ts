@@ -7,12 +7,7 @@ import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
 import { SignUpDto } from '@marxan-api/modules/authentication/dto/sign-up.dto';
 import { User } from '@marxan-api/modules/users/user.api.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { apiConnections } from '@marxan-api/ormconfig';
-import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
-import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
-import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
@@ -21,6 +16,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { bootstrapApplication } from './utils/api-application';
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -81,31 +77,10 @@ describe('UsersModule (e2e)', () => {
   };
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        AppModule,
-        ApiEventsModule,
-        TypeOrmModule.forRoot({
-          ...apiConnections.default,
-          keepConnectionAlive: true,
-        }),
-        TypeOrmModule.forFeature([ApiEvent]),
-        UsersModule,
-      ],
-    }).compile();
+    app = await bootstrapApplication();
 
-    apiEventsService = moduleFixture.get<ApiEventsService>(ApiEventsService);
-    usersService = moduleFixture.get<UsersService>(UsersService);
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-      }),
-    );
-    await app.init();
+    apiEventsService = app.get<ApiEventsService>(ApiEventsService);
+    usersService = app.get<UsersService>(UsersService);
   });
 
   afterAll(async () => {

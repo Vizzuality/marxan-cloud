@@ -99,7 +99,6 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
       onSuccess: ({ data: { meta } }) => {
         // Let's wait unitl we can track fast async jobs
         dispatch(setJob(new Date(meta.isoDate).getTime()));
-        setSubmitting(false);
         onSelected(null);
         dispatch(setDrawing(null));
         dispatch(setDrawingValue(null));
@@ -116,7 +115,6 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
         });
       },
       onError: () => {
-        setSubmitting(false);
         addToast('adjust-planning-units-error', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -127,6 +125,9 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
         ), {
           level: 'error',
         });
+      },
+      onSettled: () => {
+        setSubmitting(false);
       },
     });
   }, [

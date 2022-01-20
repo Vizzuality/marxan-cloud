@@ -5,18 +5,14 @@ import { AppModule } from '@marxan-api/app.module';
 import { QueueToken } from '../../src/modules/queue/queue.tokens';
 import { FakeQueue, FakeQueueBuilder } from './queues';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
-import { ProjectChecker } from '@marxan-api/modules/scenarios/project-checker.service';
-import { right } from 'fp-ts/Either';
 import {
   FileRepository,
   TempStorageRepository,
 } from '@marxan/files-repository';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ScenarioCalibrationRepo } from '../../src/modules/blm/values/scenario-calibration-repo';
 import { FakeScenarioCalibrationRepo } from './scenario-calibration-repo.test.utils';
-
-export const fakeProjectChecker: Pick<ProjectChecker, 'isProjectReady'> = {
-  isProjectReady: async () => right(true),
-};
+import { ProjectCheckerFake } from './project-checker.service-fake';
 
 export const bootstrapApplication = async (
   imports: ModuleMetadata['imports'] = [],
@@ -29,7 +25,7 @@ export const bootstrapApplication = async (
     .overrideProvider(QueueBuilder)
     .useClass(FakeQueueBuilder)
     .overrideProvider(ProjectChecker)
-    .useValue(fakeProjectChecker)
+    .useClass(ProjectCheckerFake)
     .overrideProvider(FileRepository)
     .useClass(TempStorageRepository)
     .overrideProvider(ScenarioCalibrationRepo)

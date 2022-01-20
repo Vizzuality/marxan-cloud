@@ -34,7 +34,7 @@ export class FinalizeArchiveHandler
 
     const pieces = exportInstance
       .toSnapshot()
-      .exportPieces.flatMap((piece) => piece.uri)
+      .exportPieces.flatMap((piece) => piece.uris)
       .filter(isDefined);
 
     const archiveResult = await this.archiveCreator.zip(

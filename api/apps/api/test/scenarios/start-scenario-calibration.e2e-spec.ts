@@ -20,7 +20,7 @@ describe('start-scenario-calibration', () => {
       .WithoutRange();
   });
 
-  it(`starts an scenario calibration properly when sending a range`, async () => {
+  it(`starts a scenario calibration properly when sending a range`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures
@@ -30,18 +30,26 @@ describe('start-scenario-calibration', () => {
     await fixtures.ThenWhenReadingProjectCalibrationItHasTheNewRange();
   });
 
+  it(`throws an exception if an export is running`, async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    await fixtures
+      .ThenShouldFailWhenStartingAScenarioCalibrationWithA()
+      .RunningExport();
+  });
+
   it(`throws an exception when providing an invalid range`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures
-      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
+      .ThenShouldFailWhenStartingAScenarioCalibrationWithA()
       .RangeWithAMinGreaterThanMax();
 
     await fixtures
-      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
+      .ThenShouldFailWhenStartingAScenarioCalibrationWithA()
       .RangeWithValuesThatAreNotNumbers();
     await fixtures
-      .ThenShouldFailWhenStartingAnScenarioCalibrationWithA()
+      .ThenShouldFailWhenStartingAScenarioCalibrationWithA()
       .RangeWithNegativeNumbers();
   });
 });

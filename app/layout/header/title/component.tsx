@@ -192,9 +192,6 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                             'h-6': header,
                             'h-16': !header,
                           })}
-                          style={{
-                            minWidth: !header && '150px',
-                          }}
                         >
 
                           <input
@@ -215,7 +212,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                           />
 
                           <h1 className={cx({
-                            'invisible h-full px-1.5 font-heading font-normal overflow-ellipsis': true,
+                            'invisible h-full px-1.5 text-4xl font-heading font-normal overflow-ellipsis': true,
                           })}
                           >
                             {input.value}

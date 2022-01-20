@@ -9,5 +9,5 @@ export interface ExportComponentSnapshot {
   readonly piece: ClonePiece;
   readonly resourceId: string;
   readonly finished: boolean;
-  readonly uri?: ComponentLocation[];
+  readonly uris: ComponentLocation[];
 }
