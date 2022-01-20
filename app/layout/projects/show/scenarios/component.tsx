@@ -221,52 +221,58 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
           )}
 
           <div className="relative overflow-hidden" id="scenarios-list">
-            <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
-              {!hasScenarios && (search || hasFilters) && (
+            {!hasScenarios && (search || hasFilters) && (
+              <div className="py-6">
                 <>No results found</>
-              )}
+              </div>
+            )}
 
-              {hasScenarios && scenariosData.map((s, i) => {
-                const TAG = i === 0 ? HelpBeacon : Fragment;
+            {hasScenarios && (
+              <div ref={scrollRef} className="relative z-0 flex flex-col flex-grow h-full py-6 overflow-x-hidden overflow-y-auto">
+                {scenariosData.map((s, i) => {
+                  const TAG = i === 0 ? HelpBeacon : Fragment;
 
-                return (
-                  <TAG
-                    key={`${s.id}`}
-                    {...i === 0 && {
-                      id: `project-scenario-${s.id}`,
-                      title: 'Scenario list',
-                      subtitle: 'List and detail overview',
-                      content: (
-                        <div>
-                          Here you can see listed all the scenarios under the same project.
-                          You can access a scenario and edit it at any time, unless there is
-                          a contributor working on the same scenario. In this case, you will
-                          see a warning.
-                        </div>
-                      ),
-                    }}
-                  >
-                    <div
-                      className={cx({
-                        'mt-3': i !== 0,
-                      })}
+                  return (
+                    <TAG
+                      key={`${s.id}`}
+                      {...i === 0 && {
+                        id: `project-scenario-${s.id}`,
+                        title: 'Scenario list',
+                        subtitle: 'List and detail overview',
+                        content: (
+                          <div>
+                            Here you can see listed all the scenarios under the same project.
+                            You can access a scenario and edit it at any time, unless there is
+                            a contributor working on the same scenario. In this case, you will
+                            see a warning.
+                          </div>
+                        ),
+                      }}
                     >
-                      <ScenarioItem
-                        {...s}
-                        onDelete={() => {
-                          setDelete(s);
-                        }}
-                        onDuplicate={() => onDuplicate(s.id, s.name)}
-                        onCancelRun={() => onCancelRun(s.id, s.name)}
-                        SettingsC={<ScenarioSettings sid={s.id} />}
-                      />
+                      <div
+                        className={cx({
+                          'mt-3': i !== 0,
+                        })}
+                      >
+                        <ScenarioItem
+                          {...s}
+                          onDelete={() => {
+                            setDelete(s);
+                          }}
+                          onDuplicate={() => onDuplicate(s.id, s.name)}
+                          onCancelRun={() => onCancelRun(s.id, s.name)}
+                          SettingsC={<ScenarioSettings sid={s.id} />}
+                        />
 
-                    </div>
-                  </TAG>
-                );
-              })}
-            </div>
+                      </div>
+                    </TAG>
+                  );
+                })}
+              </div>
+            )}
+
             <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-black via-black" />
+
             <div
               className={cx({
                 'opacity-100': scenariosIsFetchingNextPage,

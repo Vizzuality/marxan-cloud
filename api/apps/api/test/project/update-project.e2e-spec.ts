@@ -19,6 +19,14 @@ test(`updating a project should work`, async () => {
   await fixtures.ThenWhenReadingProjectItHasNewData();
 });
 
+test(`updating a project should fail if an export is running`, async () => {
+  await fixtures.GivenProjectWasCreated();
+
+  await fixtures.WhenProjectIsUpdatedWhileAnExportIsPending();
+
+  await fixtures.ThenWhenReadingProjectItHasTheOriginalData();
+});
+
 test(`updating a project does not work if user is not in project`, async () => {
   await fixtures.GivenProjectWasCreated();
 

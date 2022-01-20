@@ -352,6 +352,36 @@ export const getFixtures = async () => {
       expect(newUserCreated.roleName).toEqual(projectOwnerRole);
     },
 
+    ThenOwnerAndViewerInProjectAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+
+      const projectRoleNames: string[] = response.body.data.map(
+        (p: any) => p.roleName,
+      );
+
+      expect(projectRoleNames.sort()).toEqual([
+        projectOwnerRole,
+        projectViewerRole,
+      ]);
+    },
+
+    ThenOwnerAndContributorInProjectAreReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+
+      const projectRoleNames: string[] = response.body.data.map(
+        (p: any) => p.roleName,
+      );
+
+      expect(projectRoleNames.sort()).toEqual([
+        projectContributorRole,
+        projectOwnerRole,
+      ]);
+    },
+
     ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned: (
       response: request.Response,
     ) => {
