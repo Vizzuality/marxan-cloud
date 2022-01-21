@@ -8,9 +8,6 @@ This document still does not contemplate the calls necessary to obtain the infor
 
 In addition, there will be missing next calls:
 * Add and edit Advanced settings.
-
-* Add, edit and obtain output of BLM.
-
 * Recalculate and be able to exempt the application from an overexertion, in the event that this possibility exists.
 
 ## Planning units
@@ -89,7 +86,13 @@ In addition, there will be missing next calls:
 ## Parameters
 
 ### BLM calibration
-Add new endpoints 
+
+ **POST range**
+ '/scenarios/${scenarioId}/calibration'
+ **GET blm results**
+  '/scenarios/${scenarioId}/calibration'
+ **GET range**
+  '/scenarios/${scenarioId}/blm/range'
 ### Advanced settings
 Add new endpoint (not part of run anymore)
 
