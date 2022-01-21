@@ -4,6 +4,8 @@ import React, {
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
+
 import { useSaveProjectUserRole, useDeleteProjectUser, useProjectRole } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
@@ -122,25 +124,30 @@ export const UserCard: React.FC<UserCardProps> = ({
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
         <p className="w-40 text-sm text-black clamp-1">{name}</p>
         <div className="w-40 pr-4">
-          <Select
-            initialSelected={ROLES[roleName]}
-            maxHeight={300}
-            size="s"
-            status="none"
-            theme="light"
-            placeholder={ROLES[roleName]}
-            options={OPTIONS}
-            disabled={!OWNER}
-            onChange={(value: string) => {
-              onEditRole(value);
-              setUserRole(value);
-            }}
-          />
+          {OWNER && (
+            <Select
+              initialSelected={ROLES[roleName]}
+              maxHeight={300}
+              size="s"
+              status="none"
+              theme="light"
+              placeholder={ROLES[roleName]}
+              options={OPTIONS}
+              onChange={(value: string) => {
+                onEditRole(value);
+                setUserRole(value);
+              }}
+            />
+          )}
+          {!OWNER && (<p className="text-sm text-black">{ROLES[roleName]}</p>)}
         </div>
       </div>
 
       <Button
-        className="flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group"
+        className={cx({
+          'flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group': true,
+          invisible: !OWNER,
+        })}
         theme="secondary-alt"
         size="xs"
         disabled={!OWNER}
