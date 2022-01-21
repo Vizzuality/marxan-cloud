@@ -192,6 +192,35 @@ export const useScenarioActionsFailure = () => {
     });
   }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
 
+  // Calibration
+  const onCalibrationFailure = useCallback(() => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+      },
+      onError: () => {
+        addToast('onCalibrationFailure', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
+
   // Run marxan
   const onRunFailure = useCallback(() => {
     scenarioMutation.mutate({
@@ -227,6 +256,7 @@ export const useScenarioActionsFailure = () => {
     protectedAreas: onProtectedAreasFailure,
     costSurface: onCostSurfaceFailure,
     planningUnitsInclusion: onPlanningUnitsInclusionFailure,
+    calibration: onCalibrationFailure,
     run: onRunFailure,
   };
 };

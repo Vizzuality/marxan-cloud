@@ -40,6 +40,8 @@ import {
   RunScenarioProps,
   UseCancelRunScenarioProps,
   CancelRunScenarioProps,
+  UseSaveScenarioCalibrationRangeProps,
+  SaveScenarioCalibrationRangeProps,
 } from './types';
 
 // SCENARIO STATUS
@@ -648,6 +650,61 @@ export function useCancelRunScenario({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+export function useScenarioCalibrationResults(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenario-calibration', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/calibration`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+
+    return {
+      ...query,
+      data: parsedData,
+    };
+  }, [query, data?.data]);
+}
+
+// BLM
+export function useSaveScenarioCalibrationRange({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveScenarioCalibrationRangeProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveScenarioCalibrationRange = ({ id, data }: SaveScenarioCalibrationRangeProps) => {
+    return SCENARIOS.request({
+      url: `/${id}/calibration`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveScenarioCalibrationRange, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succcess', data, variables, context);
+      const { id: scenarioId } = variables;
+      queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

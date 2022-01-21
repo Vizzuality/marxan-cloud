@@ -33,6 +33,11 @@ interface ScenarioEditStateProps {
   // SETTINGS
   layerSettings: Record<string, Record<string, unknown>>
 
+  // BLM CALIBRATION
+  blm: number,
+  blmRange: number[],
+  blmImage: string,
+
   // JOBS
   lastJobTimestamp: number;
 }
@@ -65,6 +70,11 @@ const initialState = {
 
   // SETTINGS
   layerSettings: {},
+
+  // BLM CALIBRATION
+  blm: null,
+  blmRange: [],
+  blmImage: null,
 
   // ASYNC
   lastJobTimestamp: null,
@@ -150,6 +160,17 @@ export function getScenarioEditSlice(id) {
           },
         };
         state.layerSettings = newSettings;
+      },
+
+      // BLM CALIBRATION
+      setBlm: (state, action: PayloadAction<number>) => {
+        state.blm = action.payload;
+      },
+      setBlmRange: (state, action: PayloadAction<number[]>) => {
+        state.blmRange = action.payload;
+      },
+      setBlmImage: (state, action: PayloadAction<string>) => {
+        state.blmImage = action.payload;
       },
 
       // ASYNC JOBS

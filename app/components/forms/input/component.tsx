@@ -1,6 +1,9 @@
 import React, { InputHTMLAttributes } from 'react';
-import Icon from 'components/icon';
+
+import { useFocus } from '@react-aria/interactions';
 import cx from 'classnames';
+
+import Icon from 'components/icon';
 
 const THEME = {
   dark: {
@@ -43,6 +46,9 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
     id: string;
     viewBox: string;
   };
+  onFocus?: () => void;
+  onBlur?: () => void;
+  onFocusChange?: (isFocused: boolean) => void;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -52,9 +58,18 @@ export const Input: React.FC<InputProps> = ({
   disabled = false,
   icon,
   className,
+  onFocus,
+  onBlur,
+  onFocusChange,
   ...props
 }: InputProps) => {
   const st = disabled ? 'disabled' : status;
+
+  const { focusProps: inputFocusProps } = useFocus({
+    onFocus,
+    onBlur,
+    onFocusChange,
+  });
 
   return (
     <div className="relative">
@@ -79,6 +94,7 @@ export const Input: React.FC<InputProps> = ({
           'pl-10': icon,
           [className]: !!className,
         })}
+        {...inputFocusProps}
       />
     </div>
   );

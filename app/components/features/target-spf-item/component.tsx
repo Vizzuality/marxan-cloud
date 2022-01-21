@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
+
 import cx from 'classnames';
+
 import Button from 'components/button';
-import Slider from 'components/forms/slider';
-import Label from 'components/forms/label';
 import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import Slider from 'components/forms/slider';
 
 import { TargetSPFItemProps, Type } from './types';
 
@@ -23,6 +25,8 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
 }: TargetSPFItemProps) => {
   const [targetValue, setTargetValue] = useState((target || defaultTarget) / 100);
   const [FPFValue, setFPFValue] = useState(fpf || defaultFPF);
+  const [inputFPFValue, setInputFPFValue] = useState(String(FPFValue));
+
   const sliderLabelRef = useRef(null);
 
   useEffect(() => {
@@ -33,12 +37,18 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
     if (typeof fpf !== 'undefined') setFPFValue(fpf);
   }, [fpf]);
 
+  useEffect(() => {
+    setInputFPFValue(String(FPFValue));
+  }, [FPFValue]);
+
   return (
     <div
       key={id}
       className={cx({
-        'bg-gray-700 text-white text-xs pl-5 py-2 relative border-transparent': true,
+        'text-white text-xs pl-5 py-2 mb-2 relative border-transparent': true,
         [className]: !!className,
+        'bg-gray-700': !isAllTargets,
+        'bg-gray-500 border rounded-lg': isAllTargets,
       })}
     >
       <div
@@ -83,18 +93,29 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             <span>100%</span>
           </div>
         </div>
-        <div className="flex flex-col justify-between w-24 px-4 border-l">
+        <div className="flex flex-col justify-between w-24 px-4 border-l border-gray-500">
           <span>{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
           <div className="w-10 mb-6">
             <Input
-              className="px-0 py-1"
+              className="px-0 py-1 rounded"
               theme="dark"
               mode="dashed"
               type="number"
-              value={FPFValue}
+              value={inputFPFValue}
               onChange={({ target: { value: inputValue } }) => {
-                setFPFValue(Number(inputValue));
-                if (onChangeFPF) onChangeFPF(Number(inputValue));
+                setInputFPFValue(inputValue);
+              }}
+              onBlur={() => {
+                // If user leaves the input empty, we'll revert to the original targetValue
+                if (!inputFPFValue) {
+                  setInputFPFValue(String(FPFValue));
+                  return;
+                }
+                // Prevent changing all targets if user didn't actually change it
+                // (despite clicking on the input)
+                if (FPFValue === Number(inputFPFValue)) return;
+                setFPFValue(Number(inputFPFValue));
+                if (onChangeFPF) onChangeFPF(Number(inputFPFValue));
               }}
             />
           </div>

@@ -28,7 +28,7 @@ const CONTENT_CLASSES = {
   wide: `sm:w-10/12 md:w-10/12 lg:w-10/12 xl:w-9/12 2xl:w-6/12 ${COMMON_CONTENT_CLASSES}`,
 };
 
-const OVERLAY_CLASSES = 'z-40 fixed inset-0 bg-black bg-blur';
+const OVERLAY_CLASSES = 'z-50 fixed inset-0 bg-black bg-blur';
 
 export const Modal: React.FC<ModalProps> = ({
   id,
