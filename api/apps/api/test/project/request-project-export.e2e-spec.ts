@@ -1,10 +1,12 @@
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import * as request from 'supertest';
+import { Connection } from 'typeorm';
+import { GivenProjectExists } from '../steps/given-project';
+import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
-import * as request from 'supertest';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { GivenProjectExists } from '../steps/given-project';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -41,6 +43,10 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
+      const connection = app.get<Connection>(Connection);
+      const exportRepo = connection.getRepository(ExportEntity);
+
+      await exportRepo.delete({});
       await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
       await OrganizationsTestUtils.deleteOrganization(
         app,
