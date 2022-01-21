@@ -13,6 +13,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
+import Recalculate from 'layout/scenarios/edit/tabs/recalculate';
 
 import Tabs from 'components/tabs';
 import { TabsProps } from 'components/tabs/component';
@@ -38,6 +39,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const dispatch = useDispatch();
 
   const TABS_PARSED = useMemo<TabsProps['items']>(() => {
@@ -132,6 +134,11 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
               onSelected={onSelectedTab}
             />
           )}
+
+          <Recalculate
+            visible={false}
+            onRecalculate={() => { }}
+          />
 
         </Pill>
 

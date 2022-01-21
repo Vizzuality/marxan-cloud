@@ -12,7 +12,6 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import Recalculate from 'layout/scenarios/show/tabs/recalculate';
 
 import Tabs from 'components/tabs';
 
@@ -104,11 +103,6 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
               onSelected={onSelectedTab}
             />
           )}
-
-          <Recalculate
-            visible={false}
-            onRecalculate={() => { }}
-          />
 
         </Pill>
 
