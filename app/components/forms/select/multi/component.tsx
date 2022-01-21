@@ -199,6 +199,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
   return (
     <div
       className={cx({
+        'c-multi-select': true,
         'w-full leading-tight overflow-hidden': true,
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
@@ -229,6 +230,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
       {createPortal(
         <div
           className={cx({
+            'c-multi-select-dropdown': true,
             'z-50': true,
             // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
             // to the `<ul />` element through `getMenuProps`

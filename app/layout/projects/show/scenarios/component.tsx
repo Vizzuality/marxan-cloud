@@ -9,6 +9,7 @@ import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { flatten } from 'lodash';
 
+import { useProjectRole } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import {
   useDeleteScenario, useScenarios, useDuplicateScenario, useCancelRunScenario,
@@ -48,6 +49,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   const { query } = useRouter();
   const { pid } = query;
+
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
+
   const {
     isFetching: projectIsFetching,
     isFetched: projectIsFetched,
@@ -317,6 +322,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   theme="primary"
                   size="lg"
                   className="mt-10"
+                  disabled={VIEWER}
                   onClick={() => setModal(true)}
                 >
                   <span className="mr-5">Create scenario</span>
@@ -329,7 +335,11 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
           {(hasScenarios || search || hasFilters) && (
             <button
               type="button"
-              className="flex items-center justify-center flex-shrink-0 w-full h-16 px-8 space-x-3 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800"
+              className={cx({
+                'flex items-center justify-center flex-shrink-0 w-full h-16 px-8 space-x-3 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800': true,
+                'pointer-events-none': VIEWER,
+              })}
+              disabled={VIEWER}
               onClick={() => setModal(true)}
             >
               <span>Create scenario</span>

@@ -23,7 +23,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   country,
   region,
   subRegion,
-  onClick
+  onClick,
 }: CountryRegionSelectorProps) => {
   const [selectedCountry, setSelectedCountry] = useState(country);
   const [selectedRegion, setSelectedRegion] = useState(region);

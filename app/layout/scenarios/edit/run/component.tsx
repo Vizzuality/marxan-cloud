@@ -10,6 +10,7 @@ import cx from 'classnames';
 import { usePlausible } from 'next-plausible';
 
 import { useMe } from 'hooks/me';
+import { useProjectRole } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -37,6 +38,9 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const { pid, sid } = query;
 
   const { user } = useMe();
+
+  const { data: projectRole } = useProjectRole(pid);
+  const VIEWER = projectRole === 'project_viewer';
 
   const { data: projectData } = useProject(pid);
 
@@ -232,7 +236,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                     theme="primary"
                     size="base"
                     className="w-full"
-                    disabled={submitting}
+                    disabled={submitting || VIEWER}
                   >
                     <div className="flex items-center space-x-5">
                       <div className="text-left">

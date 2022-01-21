@@ -6,4 +6,5 @@ export interface TooltipProps extends TippyProps {
   arrowClassName?: string;
   children: ReactElement;
   maxHeight?: number | string;
+  popup?: boolean;
 }
