@@ -13,6 +13,8 @@ import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/pro
 import { ScenarioCalibrationRepo } from '../../src/modules/blm/values/scenario-calibration-repo';
 import { FakeScenarioCalibrationRepo } from './scenario-calibration-repo.test.utils';
 import { ProjectCheckerFake } from './project-checker.service-fake';
+import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
+import { InMemoryExportRepo } from '@marxan-api/modules/clone/export/adapters/in-memory-export.repository';
 
 export const bootstrapApplication = async (
   imports: ModuleMetadata['imports'] = [],
@@ -30,6 +32,8 @@ export const bootstrapApplication = async (
     .useClass(TempStorageRepository)
     .overrideProvider(ScenarioCalibrationRepo)
     .useClass(FakeScenarioCalibrationRepo)
+    .overrideProvider(ExportRepository)
+    .useClass(InMemoryExportRepo)
     .compile();
 
   return await moduleFixture

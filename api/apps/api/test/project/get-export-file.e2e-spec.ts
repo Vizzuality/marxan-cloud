@@ -11,7 +11,6 @@ import {
 } from '@marxan-api/modules/clone/export/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, EventBus, IEvent } from '@nestjs/cqrs';
-import { string } from 'fp-ts';
 import { isLeft } from 'fp-ts/lib/These';
 import { Subscription } from 'rxjs';
 import { Readable } from 'stream';
@@ -51,7 +50,7 @@ beforeEach(async () => {
 }, 10000);
 
 afterEach(async () => {
-  await fixtures?.cleanup();
+  // await fixtures?.cleanup();
 });
 
 test('should forbid getting export file to non owner users', async () => {
@@ -61,7 +60,7 @@ test('should forbid getting export file to non owner users', async () => {
   const response = await fixtures.WhenNonOwnerUserRequestExportFile();
 
   fixtures.ThenForbiddenIsReturned(response);
-});
+}, 150000);
 
 test('should permit getting export file for owner users ', async () => {
   await fixtures.GivenExportWasRequested();
@@ -70,7 +69,7 @@ test('should permit getting export file for owner users ', async () => {
   const response = await fixtures.WhenOwnerUserRequestExportFile();
 
   fixtures.ThenFileIsRetrieved(response);
-});
+}, 150000);
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -91,11 +90,14 @@ export const getFixtures = async () => {
   const piecesUris: Record<string, string> = {};
   const savePiecesFiles = async (exportInstance: Export) => {
     await Promise.all(
-      exportInstance.toSnapshot().exportPieces.map(async (piece) => {
+      exportInstance.toSnapshot().exportPieces.map(async (piece, i) => {
         const result = await fileRepo.save(
           Readable.from(`${piece.piece}`),
           '.txt',
         );
+
+        console.log(i);
+        console.dir(piece, { depth: Infinity });
 
         if (isLeft(result)) {
           throw new Error(`Error while saving ${piece.id.value} file`);
@@ -154,12 +156,16 @@ export const getFixtures = async () => {
         .get(`/api/v1/projects/${projectId}/export`)
         .set('Authorization', `Bearer ${ownerToken}`),
     WhenExportFileIsReady: async () => {
+      //   await new Promise((resolve) => setTimeout(resolve, 200000));
+
       await untilEventIsEmitted(ArchiveReady, eventBus);
     },
     ThenFileIsRetrieved: (response: request.Response) => {
+      console.dir(response, { depth: Infinity });
       expect(response.status).toBe(200);
     },
     ThenForbiddenIsReturned: (response: request.Response) => {
+      console.dir(response, { depth: Infinity });
       expect(response.status).toBe(403);
     },
   };

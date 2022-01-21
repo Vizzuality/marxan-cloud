@@ -40,9 +40,9 @@ export const apiConnections: Record<
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
     // logging.
-    logging: `${AppConfig.get('postgresApi.logging')}`.split(
-      ',',
-    ) as LoggerOptions,
+    logging: ['query', 'error', 'schema', 'warn', 'info', 'log'], // logging: `${AppConfig.get('postgresApi.logging')}`.split(
+    //   ',',
+    // ) as LoggerOptions,
     cache: false,
     migrations: [__dirname + '/migrations/api/**/*.ts'],
     /** Migrations will run automatically on startup, unless the
