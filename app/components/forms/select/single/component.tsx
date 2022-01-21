@@ -149,6 +149,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   return (
     <div
       className={cx({
+        'c-select': true,
         'w-full leading-tight overflow-hidden': true,
         'pointer-events-none opacity-50': disabled,
         [THEME[theme].container]: true,
@@ -180,6 +181,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
 
         <div
           className={cx({
+            'c-select-dropdown': true,
             'z-50': true,
             // The content of `<Menu />` must always be in the DOM so that Downshift can get the ref
             // to the `<ul />` element through `getMenuProps`

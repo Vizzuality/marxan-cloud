@@ -12,6 +12,7 @@ import EditDropdown from 'layout/projects/show/header/contributors/edit-dropdown
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
+import Tooltip from 'components/tooltip';
 
 import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 
@@ -43,6 +44,21 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const handleClick = useCallback(() => {
     setOpen(!open);
   }, [open, setOpen]);
+
+  const handleClickOutside = useCallback((tooltip, event) => {
+    const $overlay = document.getElementById('overlay');
+    const $select = document.querySelectorAll('.c-select-dropdown');
+    const $multiselect = document.querySelectorAll('.c-multi-select-dropdown');
+
+    const isSelect = !!$select && [...$select].some((s) => s.contains(event.target));
+    const isMultiSelect = !!$multiselect && [...$multiselect].some((s) => s.contains(event.target));
+
+    if (
+      !((!!$overlay && $overlay.contains(event.target)) || isSelect || isMultiSelect)
+    ) {
+      setOpen(false);
+    }
+  }, [setOpen]);
 
   const onSearch = useCallback((s) => {
     setSearch(s);
@@ -87,7 +103,21 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                 </Avatar>
               )}
 
-              <div className="relative ml-3">
+              <Tooltip
+                placement="bottom-end"
+                interactive
+                popup
+                visible={open}
+                onClickOutside={handleClickOutside}
+                zIndex={49}
+                content={(
+                  <EditDropdown
+                    users={projectUsers}
+                    search={search}
+                    onSearch={onSearch}
+                  />
+                )}
+              >
                 <button
                   aria-label="add-contributor"
                   type="button"
@@ -103,16 +133,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                   </Avatar>
 
                 </button>
-
-                {open && (
-                  <EditDropdown
-                    users={projectUsers}
-                    search={search}
-                    onSearch={onSearch}
-                  />
-                )}
-
-              </div>
+              </Tooltip>
 
             </ul>
           </div>

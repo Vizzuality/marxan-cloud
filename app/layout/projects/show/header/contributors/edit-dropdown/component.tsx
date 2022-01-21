@@ -28,7 +28,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
   const contributorsSpelling = users?.length !== 1 ? 'contributors' : 'contributor';
 
   return (
-    <div className="absolute z-40 overflow-x-visible overflow-y-auto bg-white top-14 -right-2 p-9 rounded-3xl">
+    <div className="overflow-x-visible overflow-y-auto bg-white p-9 rounded-3xl">
       <div className="flex flex-col items-center w-96">
         <div className="text-sm text-black pb-9">Project members</div>
         <Search
