@@ -21,7 +21,6 @@ import Icon from 'components/icon';
 
 import RUN_SVG from 'svgs/ui/run.svg?sprite';
 
-import RunChart from './chart';
 import { FIELDS } from './constants';
 import RunField from './field';
 
@@ -238,9 +237,6 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                     <div className="flex items-center space-x-5">
                       <div className="text-left">
                         <div className="text-lg">Run scenario</div>
-                        {/*
-                          <div className="text-sm text-gray-500">This will take 10 minutes</div>
-                        */}
                       </div>
 
                       <Icon icon={RUN_SVG} className="flex-shrink-0 w-7 h-7" />
@@ -249,41 +245,6 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
                 </div>
               </div>
             </HelpBeacon>
-
-            <div className="w-full h-full">
-              <HelpBeacon
-                id="run-chart"
-                title="BLM calibration"
-                subtitle="Find the optimum BLM"
-                content={(
-                  <div className="space-y-2">
-                    <p>
-                      On this chart you can see the effect of
-                      using different BLM values on your final
-                      conservation plan.
-                    </p>
-                    <p>
-                      The recommended value represents the one that
-                      minimizes the boundary length and the cost.
-                    </p>
-                    <p>
-                      However, you may prefer to select a different value
-                      if your plan requires more or less aggregation of planning
-                      units. You can make that decision by
-                      looking at the images, where you can see the approximate
-                      distribution of your planning units with each BLM value.
-                    </p>
-                  </div>
-                )}
-                beaconClassName="z-50"
-                modifiers={['flip']}
-                tooltipPlacement="left"
-              >
-                <div className="w-full h-full">
-                  <RunChart />
-                </div>
-              </HelpBeacon>
-            </div>
           </div>
         </form>
 

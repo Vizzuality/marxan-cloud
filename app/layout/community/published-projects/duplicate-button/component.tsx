@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 
+import classnames from 'classnames';
+
 import { useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
-
-import classnames from 'classnames';
 
 import Button from 'components/button';
 import Icon from 'components/icon';

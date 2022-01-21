@@ -106,7 +106,6 @@ const EditScenarioPage: React.FC = () => {
             </div>
           </Wrapper>
         </div>
-
         <ScenarioStatus />
       </main>
     </Protected>

@@ -13,6 +13,7 @@ import { useScenario } from 'hooks/scenarios';
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AdjustPanningUnits from 'layout/scenarios/edit/analysis/adjust-planning-units';
+import BLMCalibration from 'layout/scenarios/edit/analysis/blm-calibration';
 import CostSurface from 'layout/scenarios/edit/analysis/cost-surface';
 import GapAnalysis from 'layout/scenarios/edit/analysis/gap-analysis';
 import Run from 'layout/scenarios/edit/run';
@@ -36,6 +37,11 @@ const SECTIONS = [
     id: 'adjust-planning-units',
     name: 'Adjust planning units (optional)',
     description: 'The status of a planning unit determines whether it is included in every solution (i.e. locked in) or excluded (i.e. locked out). The default status is neither included or excluded but determined during the Marxan analysis.',
+  },
+  {
+    id: 'blm-calibration',
+    name: 'BLM Calibration',
+    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.',
   },
 ];
 export interface ScenariosSidebarEditAnalysisProps {
@@ -157,6 +163,14 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
                   onChangeSection={onChangeSection}
                 />
               )}
+
+              {section === 'blm-calibration' && (
+                <BLMCalibration
+                  key="blm-calibration"
+                  onChangeSection={onChangeSection}
+                />
+              )}
+
             </Pill>
 
             {!section && (
@@ -180,7 +194,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
           <Modal
             title="Run scenario"
             open={runOpen}
-            size="wide"
+            size="narrow"
             onDismiss={() => setRunOpen(false)}
           >
             <Run />
