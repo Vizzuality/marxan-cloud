@@ -19,56 +19,25 @@ such files efficiently is therefore a key requirement during preparation,
 storage, download, upload and processing while creating a MarxanCloud project
 from an uploaded archive.
 
-In broad strokes, we need to account for:
+In broad strokes, we need to account for the following steps. Details are
+outlined in the [high-level design document](./high-level-design.md).
 
 - storing one or more archive pieces as they are prepared and finalized
 
-For anything else than small metadata files, these pieces should be streamed to
-their eventual storage destination.
-
 - preparing a final archive file that includes all the finalized pieces
-
-This would typically be a zip (ZIP64) file. It may also be advisable to keep all
-the archive files alone and distribute them as a downloadable set of individual
-pieces instead, in order to avoid typical user challenges while handling very
-large files (e.g. > 4GiB) on personal computers.
 
 - storing the final archive
 
-This would be available for download for a limited timeframe, typically
-configured by the platform admins of each MarxanCloud instance.
-
 - removing individual pieces
 
-This may be needed if pieces are eventually included in a single downloadable
-artifact. If ongoing engineering considerations lead to making the individual
-pieces available for download, this step may not be necessary.
-
 - allowing users to download the archive for a given project
-
-Users with suitable permissions on a project (see [relevant entries in the
-MarxanCloud permissions
-matrix](../../features/role-based-access-control/high-level-design.md)) must be
-able to download the archive for a project, whether its creation was initiated
-by themselves or by another user with access to the project.
 
 - removing the archive and any related files once its validity expires
 
 - allowing users to upload an archive to a MarxanCloud instance to get the
   archived project "rehydrated" as a new project on the target instance
 
-Whereas users may normally use the in-app "clone" feature to duplicate a project
-and its scenarios, without having to download any archive artifacts, in some
-cases they may choose to first download a copy of the final archive: for
-example, for offline safeguarding/archiving, or to upload the archive to a
-different MarxanCloud instance.
-
 - checking the integrity of an uploaded archive
-
-Although some users may wish to edit project archives offline in order to tweak
-some of the data/metadata, MarxanCloud instances will prevent this by default in
-order to avoid data issues that may lead to uploading projects in an
-inconsistent state.
 
 - garbage-collecting archives that are not yet expired if their source project
   is deleted
