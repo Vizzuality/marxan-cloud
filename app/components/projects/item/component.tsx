@@ -14,7 +14,7 @@ import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
+// import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ItemProps extends Project {
@@ -208,7 +208,7 @@ export const Item: React.FC<ItemProps> = ({
                 </Avatar>
               )}
 
-              <ComingSoon>
+              {/* <ComingSoon>
                 <li
                   key="add-contributor"
                   className={cx({
@@ -219,7 +219,7 @@ export const Item: React.FC<ItemProps> = ({
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
                 </li>
-              </ComingSoon>
+              </ComingSoon> */}
             </ul>
           </div>
         </div>
