@@ -1,4 +1,4 @@
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/show/sidebar/types';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
 
 export const TABS = [
   {
