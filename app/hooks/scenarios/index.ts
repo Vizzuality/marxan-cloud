@@ -657,7 +657,7 @@ export function useCancelRunScenario({
 export function useScenarioCalibrationResults(scenarioId) {
   const [session] = useSession();
 
-  const query = useQuery('scenario-calibration', async () => SCENARIOS.request({
+  const query = useQuery(['scenario-calibration', scenarioId], async () => SCENARIOS.request({
     method: 'GET',
     url: `/${scenarioId}/calibration`,
     headers: {

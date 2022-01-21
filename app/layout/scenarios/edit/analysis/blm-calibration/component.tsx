@@ -105,7 +105,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
             </div>
           </InfoButton>
         </div>
-        <div className="flex flex-col w-full min-h-0 space-y-12 text-sm">
+        <div className="flex flex-col w-full min-h-0 space-y-10 text-sm">
           <FormRFF onSubmit={onSaveBlmRange}>
             {({ handleSubmit }) => (
               <form
@@ -141,7 +141,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                         )}
                       </FieldRFF>
                     </div>
-                    <p className="ml-5 text-sm text-white opacity-60">{`min ${format(',d')(minBlmValue)}`}</p>
+                    <p className="ml-5 text-sm text-white opacity-60 whitespace-nowrap">{`min ${format(',d')(minBlmValue)}`}</p>
                   </div>
 
                   <div className="flex items-center">
@@ -170,11 +170,11 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                         )}
                       </FieldRFF>
                     </div>
-                    <p className="ml-5 text-sm text-white opacity-60">{`max ${format(',d')(maxBlmValue)}`}</p>
+                    <p className="ml-5 text-sm text-white opacity-60 whitespace-nowrap">{`max ${format(',d')(maxBlmValue)}`}</p>
                   </div>
                 </div>
 
-                <div className="pt-16">
+                <div className="pt-5">
                   <Button
                     type="submit"
                     theme="primary-alt"
