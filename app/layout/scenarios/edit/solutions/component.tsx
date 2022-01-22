@@ -40,7 +40,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
   const scenarioSlice = getScenarioSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
