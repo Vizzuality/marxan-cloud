@@ -1,14 +1,12 @@
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
+import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
-
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
-import { FileRepository } from '@marxan/files-repository';
-
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-
+import { Readable } from 'stream';
+import { EntityManager } from 'typeorm';
 import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
 
 @Injectable()
@@ -29,11 +27,10 @@ export class ScenarioMetadata extends PieceProcessor {
   async run(input: JobInput): Promise<JobOutput> {
     const scenarioData: Array<{
       name: string;
-      description: string;
     }> = await this.entityManager.query(
       `
-    SELECT scenarios.name FROM scenarios WHERE scenarios.id = $1
-    `,
+        SELECT scenarios.name FROM scenarios WHERE scenarios.id = $1
+      `,
       [input.resourceId],
     );
 
@@ -63,7 +60,10 @@ export class ScenarioMetadata extends PieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: `scenario-metadata.json`,
+          relativePath:
+            input.resourceKind === ResourceKind.Scenario
+              ? `scenario-metadata.json`
+              : `scenarios/${input.resourceId}/scenario-metadata.json`,
         },
       ],
     };
