@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioSlice } from 'store/slices/scenarios/detail';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 
@@ -25,16 +25,16 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const {
-    setHighlightFeatures,
+    setPostHighlightFeatures,
   } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
   const {
     selectedSolution,
-    highlightFeatures,
-  } = useSelector((state) => state[`/scenarios/${sid}`]);
+    postHighlightFeatures,
+  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const {
     data: bestSolutionData,
@@ -61,26 +61,26 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   );
 
   const toggleHighlight = useCallback((id) => {
-    const newHighlightFeatures = [...highlightFeatures];
+    const newHighlightFeatures = [...postHighlightFeatures];
     if (!newHighlightFeatures.includes(id)) {
       newHighlightFeatures.push(id);
     } else {
       const i = newHighlightFeatures.indexOf(id);
       newHighlightFeatures.splice(i, 1);
     }
-    dispatch(setHighlightFeatures(newHighlightFeatures));
-  }, [dispatch, setHighlightFeatures, highlightFeatures]);
+    dispatch(setPostHighlightFeatures(newHighlightFeatures));
+  }, [dispatch, setPostHighlightFeatures, postHighlightFeatures]);
 
   const isHighlighted = useCallback((id) => {
-    if (!highlightFeatures.includes(id)) {
+    if (!postHighlightFeatures.includes(id)) {
       return false;
     }
     return true;
-  }, [highlightFeatures]);
+  }, [postHighlightFeatures]);
 
   useEffect(() => {
     return () => {
-      dispatch(setHighlightFeatures([]));
+      dispatch(setPostHighlightFeatures([]));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

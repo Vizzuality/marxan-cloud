@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioSlice } from 'store/slices/scenarios/detail';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -37,10 +37,10 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setLayerSettings } = scenarioSlice.actions;
 
-  const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
 

@@ -26,10 +26,10 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
-    setHighlightFeatures,
+    setPreHighlightFeatures,
   } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const { highlightFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { preHighlightFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const {
     data: allFeaturesData,
@@ -49,26 +49,26 @@ export const ScenariosPreGapAnalysisList: React.FC<ScenariosPreGapAnalysisListPr
   );
 
   const toggleHighlight = useCallback((id) => {
-    const newHighlightFeatures = [...highlightFeatures];
+    const newHighlightFeatures = [...preHighlightFeatures];
     if (!newHighlightFeatures.includes(id)) {
       newHighlightFeatures.push(id);
     } else {
       const i = newHighlightFeatures.indexOf(id);
       newHighlightFeatures.splice(i, 1);
     }
-    dispatch(setHighlightFeatures(newHighlightFeatures));
-  }, [dispatch, setHighlightFeatures, highlightFeatures]);
+    dispatch(setPreHighlightFeatures(newHighlightFeatures));
+  }, [dispatch, setPreHighlightFeatures, preHighlightFeatures]);
 
   const isHighlighted = useCallback((id) => {
-    if (!highlightFeatures.includes(id)) {
+    if (!preHighlightFeatures.includes(id)) {
       return false;
     }
     return true;
-  }, [highlightFeatures]);
+  }, [preHighlightFeatures]);
 
   useEffect(() => {
     return () => {
-      dispatch(setHighlightFeatures([]));
+      dispatch(setPreHighlightFeatures([]));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -24,6 +24,7 @@ import {
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
+import { useBestSolution } from 'hooks/solutions';
 
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
@@ -52,11 +53,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  // const { data: projectData } = useProject(pid);
-  // const {
-  //   countryId, adminAreaLevel1Id, adminAreaLevel2Id,
-  // } = projectData;
-
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
     setTmpPuIncludedValue,
@@ -78,7 +74,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     // Features
     features: featuresRecipe,
     featureHoverId,
-    highlightFeatures,
+    preHighlightFeatures,
+    postHighlightFeatures,
 
     // Adjust planning units
     clicking,
@@ -86,11 +83,16 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     puTmpIncludedValue,
     puTmpExcludedValue,
 
+    // Solutions
+    selectedSolution,
+
     // Settings
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const { data = {} } = useProject(pid);
+  const {
+    data = {},
+  } = useProject(pid);
   const { bbox } = data;
 
   const {
@@ -111,6 +113,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     enabled: !!sid,
   });
 
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid);
+  const bestSolution = bestSolutionData;
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -118,22 +125,30 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const include = useMemo(() => {
     if (tab === 'protected-areas' || tab === 'features') return 'protection';
+
     if (tab === 'analysis' && subtab === 'analysis-preview') return 'protection,features';
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return 'features';
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return 'cost';
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
-    if (tab === 'solutions') return 'results';
+
+    if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return 'results';
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return 'results,features';
 
     return 'protection';
   }, [tab, subtab]);
 
   const sublayers = useMemo(() => {
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage') return ['wdpa-percentage'];
+
     if (tab === 'features') return ['wdpa-percentage'];
+
     if (tab === 'analysis' && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features'];
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost'];
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+
+    if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return ['solutions'];
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return ['features'];
 
     return [];
   }, [tab, subtab]);
@@ -145,6 +160,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
     if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
+
     if (tab === 'features') {
       return [
         ...protectedCategories.length ? ['wdpa-percentage'] : [],
@@ -153,10 +169,14 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         'pugrid',
       ];
     }
+
     if (tab === 'analysis' && subtab === 'analysis-gap-analysis') return ['features', 'pugrid'];
     if (tab === 'analysis' && subtab === 'analysis-cost-surface') return ['cost', 'pugrid'];
     if (tab === 'analysis' && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (tab === 'analysis') return ['wdpa-percentage', 'features', 'pugrid'];
+
+    if (tab === 'solutions' && subtab !== 'solutions-gap-analysis') return ['frequency', 'solution', 'pugrid'];
+    if (tab === 'solutions' && subtab === 'solutions-gap-analysis') return ['features'];
 
     return ['pugrid'];
   }, [tab, subtab, wdpaCategories?.wdpaIucnCategories, scenarioData?.wdpaIucnCategories]);
@@ -168,23 +188,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return [];
   }, [allGapAnalysisData]);
 
-  // const PUGridPreviewLayer = usePUGridPreviewLayer({
-  //   cache,
-  //   active: projectData.planningUnitGridShape !== 'from_shapefile' && !sid,
-  //   bbox,
-  //   planningUnitGridShape: projectData.planningUnitGridShape,
-  //   planningUnitAreakm2: projectData.planningUnitAreakm2 || null,
-  //   options: {
-  //     settings: layerSettings.pugrid,
-  //   },
-  // });
-
-  // const AdminPreviewLayer = useAdminPreviewLayer({
-  //   active: !sid,
-  //   country: countryId,
-  //   region: adminAreaLevel1Id,
-  //   subregion: adminAreaLevel2Id,
-  // });
+  const postHighlightedFeaturesIds = useMemo(() => {
+    return postHighlightFeatures.map((h) => {
+      return h.replace(`_run${selectedSolution?.runId || bestSolution?.runId}`, '');
+    });
+  }, [postHighlightFeatures, selectedSolution, bestSolution]);
 
   const WDPApreviewLayer = useWDPAPreviewLayer({
     ...wdpaCategories,
@@ -225,8 +233,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
       features: featuresIds,
-      highlightFeatures,
+      preHighlightFeatures,
+      postHighlightFeatures: postHighlightedFeaturesIds,
       cost: costSurfaceRangeData,
+      runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
@@ -257,6 +267,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
+      runId: selectedSolution?.runId || bestSolution?.runId,
       layerSettings,
     },
   });

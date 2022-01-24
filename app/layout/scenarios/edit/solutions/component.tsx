@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioSlice } from 'store/slices/scenarios/detail';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -37,7 +37,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
@@ -51,6 +51,15 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
     const subtab = s ? `solutions-${s}` : 'solutions-preview';
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
+
+  // EFFECTS
+  useEffect(() => {
+    return () => {
+      if (tab !== 'solutions') {
+        setSection(null);
+      }
+    };
+  }, [tab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 

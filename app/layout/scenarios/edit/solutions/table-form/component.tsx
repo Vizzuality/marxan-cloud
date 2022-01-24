@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioSlice } from 'store/slices/scenarios/detail';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import useBottomScrollListener from 'hooks/scroll';
 import {
@@ -35,7 +35,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   const { query } = useRouter();
   const { sid } = query;
 
-  const scenarioSlice = getScenarioSlice(sid);
+  const scenarioSlice = getScenarioEditSlice(sid);
   const { setSelectedSolution } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
@@ -44,7 +44,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   } = useBestSolution(sid);
 
-  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}`]);
+  const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const [selectSolution, setSelectSolution] = useState(
     selectedSolution?.id || bestSolutionData?.id,
   );
