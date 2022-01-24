@@ -69,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
           </Link>
 
           {!published && (
-            <Title header />
+            <Title />
           )}
 
           <div
