@@ -27,12 +27,13 @@ import { ExportRepository } from '@marxan-api/modules/clone/export/application/e
 import { TypeormExportRepository } from '@marxan-api/modules/clone/export/adapters/typeorm-export.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { ExportComponentEntity } from '../../export/adapters/entities/export-components.api.entity';
 @Module({
   imports: [
     ApiEventsModule,
     QueueApiEventsModule,
     CqrsModule,
-    TypeOrmModule.forFeature([ExportEntity]),
+    TypeOrmModule.forFeature([ExportEntity, ExportComponentEntity]),
   ],
   providers: [
     Logger,
@@ -55,7 +56,6 @@ import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities
     CancelExportPendingJobsHandler,
     MarkExportAsFailedHandler,
     MarkExportPiecesAsFailedHandler,
-    RemoveExportFilesHandler,
     RemoveExportFilesHandler,
   ],
 })
