@@ -41,8 +41,16 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_owner,
   ];
   private readonly canDeleteProjectRoles = [ProjectRoles.project_owner];
-  private readonly canExportProjectRoles = [ProjectRoles.project_owner];
-  private readonly canDownloadExportProjectRoles = [ProjectRoles.project_owner];
+  private readonly canExportProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_viewer,
+  ];
+  private readonly canDownloadExportProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_viewer,
+  ];
 
   private async getRolesWithinProjectForUser(
     userId: string,
