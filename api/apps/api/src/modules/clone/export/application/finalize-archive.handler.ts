@@ -23,7 +23,6 @@ export class FinalizeArchiveHandler
   ) {}
 
   async execute({ exportId }: FinalizeArchive): Promise<void> {
-    console.log('yepaaaaaaaa');
     const exportInstance = await this.exportRepo.find(exportId);
 
     if (!exportInstance) {

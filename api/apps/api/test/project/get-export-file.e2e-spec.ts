@@ -31,7 +31,6 @@ async function untilEventIsEmitted<T extends IEvent>(
   let subscription: Subscription;
   const event = await new Promise<T>((resolve) => {
     subscription = eventBus.subscribe((event) => {
-      console.log('Event of type:', event.constructor.name);
       if (event instanceof eventClass) {
         resolve(event);
       }
@@ -50,7 +49,7 @@ beforeEach(async () => {
 }, 10000);
 
 afterEach(async () => {
-  // await fixtures?.cleanup();
+  await fixtures?.cleanup();
 });
 
 test('should forbid getting export file to non owner users', async () => {
@@ -60,7 +59,7 @@ test('should forbid getting export file to non owner users', async () => {
   const response = await fixtures.WhenNonOwnerUserRequestExportFile();
 
   fixtures.ThenForbiddenIsReturned(response);
-}, 150000);
+}, 15000);
 
 test('should permit getting export file for owner users ', async () => {
   await fixtures.GivenExportWasRequested();
@@ -69,7 +68,7 @@ test('should permit getting export file for owner users ', async () => {
   const response = await fixtures.WhenOwnerUserRequestExportFile();
 
   fixtures.ThenFileIsRetrieved(response);
-}, 150000);
+}, 15000);
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -93,11 +92,8 @@ export const getFixtures = async () => {
       exportInstance.toSnapshot().exportPieces.map(async (piece, i) => {
         const result = await fileRepo.save(
           Readable.from(`${piece.piece}`),
-          '.txt',
+          'txt',
         );
-
-        console.log(i);
-        console.dir(piece, { depth: Infinity });
 
         if (isLeft(result)) {
           throw new Error(`Error while saving ${piece.id.value} file`);
@@ -149,23 +145,19 @@ export const getFixtures = async () => {
     },
     WhenNonOwnerUserRequestExportFile: () =>
       request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/export`)
+        .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
         .set('Authorization', `Bearer ${notIncludedUserToken}`),
     WhenOwnerUserRequestExportFile: () =>
       request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/export`)
+        .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
         .set('Authorization', `Bearer ${ownerToken}`),
     WhenExportFileIsReady: async () => {
-      //   await new Promise((resolve) => setTimeout(resolve, 200000));
-
       await untilEventIsEmitted(ArchiveReady, eventBus);
     },
     ThenFileIsRetrieved: (response: request.Response) => {
-      console.dir(response, { depth: Infinity });
       expect(response.status).toBe(200);
     },
     ThenForbiddenIsReturned: (response: request.Response) => {
-      console.dir(response, { depth: Infinity });
       expect(response.status).toBe(403);
     },
   };

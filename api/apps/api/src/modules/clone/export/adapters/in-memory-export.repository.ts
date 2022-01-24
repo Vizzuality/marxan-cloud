@@ -13,7 +13,6 @@ export class InMemoryExportRepo implements ExportRepository {
   }
 
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
-    console.dir(this.#memory, { depth: Infinity });
     return code(this);
   }
 }

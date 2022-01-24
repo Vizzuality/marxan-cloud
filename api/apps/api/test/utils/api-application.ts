@@ -32,8 +32,6 @@ export const bootstrapApplication = async (
     .useClass(TempStorageRepository)
     .overrideProvider(ScenarioCalibrationRepo)
     .useClass(FakeScenarioCalibrationRepo)
-    .overrideProvider(ExportRepository)
-    .useClass(InMemoryExportRepo)
     .compile();
 
   return await moduleFixture

@@ -72,14 +72,6 @@ export class Export extends AggregateRoot {
     return exportRequest;
   }
 
-  checkThatPiecesAreFinished() {
-    console.log('allPiecesReady', this.#allPiecesReady());
-    console.dir(this.#pieces, { depth: Infinity });
-    if (this.#allPiecesReady()) {
-      this.apply(new ExportAllComponentsFinished(this.id));
-    }
-  }
-
   completeComponent(
     id: ComponentId,
     pieceLocation: ComponentLocation[],
@@ -91,7 +83,6 @@ export class Export extends AggregateRoot {
     piece.finish(pieceLocation);
     this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
 
-    console.log('completeComponent', this.#allPiecesReady());
     if (this.#allPiecesReady()) {
       this.apply(new ExportAllComponentsFinished(this.id));
     }
