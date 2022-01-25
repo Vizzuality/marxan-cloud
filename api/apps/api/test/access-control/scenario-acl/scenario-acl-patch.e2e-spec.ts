@@ -27,7 +27,7 @@ test(`add every type of user to a scenario as scenario owner`, async () => {
   fixtures.ThenNoContentIsReturned(viewerResponse);
   fixtures.ThenNoContentIsReturned(contributorResponse);
   fixtures.ThenNoContentIsReturned(ownerResponse);
-  fixtures.ThenAllUsersinScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned(
+  fixtures.ThenAllUsersInScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned(
     allUsersInScenarioResponse,
   );
 });

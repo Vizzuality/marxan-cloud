@@ -162,6 +162,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
       .where({
         scenarioId,
       })
+      .andWhere('userId.isDeleted is false')
       .select([
         'users_scenarios.roleName',
         'userId.displayName',

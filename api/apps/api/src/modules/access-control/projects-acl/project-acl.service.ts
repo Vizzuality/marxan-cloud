@@ -152,6 +152,7 @@ export class ProjectAclService implements ProjectAccessControl {
       .where({
         projectId,
       })
+      .andWhere('userId.isDeleted is false')
       .select([
         'users_projects.roleName',
         'userId.displayName',

@@ -27,7 +27,7 @@ test(`add every type of user to a project as project owner`, async () => {
   fixtures.ThenNoContentIsReturned(viewerResponse);
   fixtures.ThenNoContentIsReturned(contributorResponse);
   fixtures.ThenNoContentIsReturned(ownerResponse);
-  fixtures.ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned(
+  fixtures.ThenAllUsersInProjectAfterEveryTypeOfUserHasBeenAddedAreReturned(
     allUsersInProjectResponse,
   );
 });

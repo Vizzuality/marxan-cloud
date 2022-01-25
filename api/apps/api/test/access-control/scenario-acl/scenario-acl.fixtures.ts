@@ -3,6 +3,8 @@ import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 import { GivenUserExists } from '../../steps/given-user-exists';
+import { GivenUserIsCreated } from '../../steps/given-user-is-created';
+import { GivenUserIsDeleted } from '../../steps/given-user-is-deleted';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ProjectsTestUtils } from '../../utils/projects.test.utils';
@@ -31,6 +33,7 @@ export const getFixtures = async () => {
     getRepositoryToken(UsersScenariosApiEntity),
   );
   const nonExistentUserId = v4();
+  const randomUserInfo = await GivenUserIsCreated(app);
 
   const { projectId } = await GivenProjectExists(
     app,
@@ -71,7 +74,6 @@ export const getFixtures = async () => {
       scenarioId = result.data.id;
       return result.data.id;
     },
-
     GivenViewerWasAddedToScenario: async (scenarioId: string) => {
       const userCreated = await userScenariosRepo.save({
         scenarioId,
@@ -95,6 +97,16 @@ export const getFixtures = async () => {
         userId: otherOwnerUserId,
       });
       return userCreated;
+    },
+    GivenUserWasAddedToScenario: async (scenarioId: string) => {
+      await userScenariosRepo.save({
+        scenarioId,
+        userId: randomUserInfo.user.id,
+        roleName: scenarioOwnerRole,
+      });
+    },
+    GivenUserIsDeleted: async () => {
+      await GivenUserIsDeleted(app, randomUserInfo.accessToken);
     },
 
     WhenGettingScenarioUsersAsNotInScenario: async (scenarioId: string) =>
@@ -347,7 +359,7 @@ export const getFixtures = async () => {
       expect(response.body.data).toHaveLength(0);
     },
 
-    ThenAllUsersinScenarioAfterAddingAnOwnerAreReturned: (
+    ThenAllUsersInScenarioAfterAddingAnOwnerAreReturned: (
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
@@ -358,7 +370,7 @@ export const getFixtures = async () => {
       expect(newUserCreated.roleName).toEqual(scenarioOwnerRole);
     },
 
-    ThenAllUsersinScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned: (
+    ThenAllUsersInScenarioAfterEveryTypeOfUserHasBeenAddedAreReturned: (
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
@@ -413,6 +425,36 @@ export const getFixtures = async () => {
       );
       expect(firstUser.roleName).toEqual(scenarioOwnerRole);
       expect(secondUser.roleName).toEqual(scenarioOwnerRole);
+    },
+    ThenAllUsersBeforeDeletingAnyFromAppAreReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(3);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === randomUserInfo.user.id,
+      );
+      const thirdUser = response.body.data.find(
+        (user: any) => user.user.id === contributorUserId,
+      );
+      expect(firstUser.roleName).toEqual(scenarioOwnerRole);
+      expect(secondUser.roleName).toEqual(scenarioOwnerRole);
+      expect(thirdUser.roleName).toEqual(scenarioContributorRole);
+    },
+    ThenAllUsersExceptDeletedAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === contributorUserId,
+      );
+      expect(firstUser.roleName).toEqual(scenarioOwnerRole);
+      expect(secondUser.roleName).toEqual(scenarioContributorRole);
     },
   };
 };
