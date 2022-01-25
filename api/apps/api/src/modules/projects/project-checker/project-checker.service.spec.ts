@@ -13,6 +13,7 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -175,6 +176,24 @@ it(`should fail when project can't be find`, async () => {
   });
 });
 
+it(`should check that a project is public`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists('projectId');
+  // and
+  fixtures.GivenProjectIsPublic('projectId');
+  // when
+  const isPublic = await service.isPublic(`projectId`);
+  // then
+  expect(isPublic).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
+
+it.todo(`should check that a project is not public`);
+
 async function getFixtures() {
   const fakeApiEventsService: jest.Mocked<
     Pick<ApiEventsService, 'getLatestEventForTopic'>
@@ -185,6 +204,12 @@ async function getFixtures() {
   };
   const fakeProjectsService: jest.Mocked<
     Pick<Repository<Project>, 'findOne'>
+  > = {
+    findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
+  };
+
+  const fakePublishedProjectService: jest.Mocked<
+    Pick<Repository<PublishedProject>, 'findOne'>
   > = {
     findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
   };
@@ -200,6 +225,10 @@ async function getFixtures() {
       {
         provide: getRepositoryToken(Project),
         useValue: fakeProjectsService,
+      },
+      {
+        provide: getRepositoryToken(PublishedProject),
+        useValue: fakePublishedProjectService,
       },
       {
         provide: `PlanningAreasService`,
@@ -311,6 +340,22 @@ async function getFixtures() {
       fakeProjectsService.findOne.mockImplementation(
         (_id: string | undefined | FindConditions<Project>) =>
           Promise.resolve(undefined),
+      );
+    },
+    GivenProjectExists(projectId: string) {
+      const fakeProject = { id: projectId } as Project;
+
+      fakeProjectsService.findOne.mockImplementation(
+        (_id: string | undefined | FindConditions<Project>) =>
+          Promise.resolve(fakeProject),
+      );
+    },
+    GivenProjectIsPublic(projectId: string) {
+      const fakePublishedProject = { id: projectId } as PublishedProject;
+
+      fakePublishedProjectService.findOne.mockImplementation(
+        (_id: string | undefined | FindConditions<PublishedProject>) =>
+          Promise.resolve(fakePublishedProject),
       );
     },
   };
