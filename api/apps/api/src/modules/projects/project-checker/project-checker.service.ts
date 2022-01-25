@@ -6,6 +6,7 @@ export type DoesntExist = typeof doesntExist;
 export type HasPendingExport = typeof hasPendingExport;
 
 export abstract class ProjectChecker {
+  // REFACTOR
   abstract hasPendingExports(
     projectId: string,
   ): Promise<Either<HasPendingExport, boolean>>;
@@ -13,4 +14,6 @@ export abstract class ProjectChecker {
   abstract isProjectReady(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>>;
+
+  abstract isPublic(projectId: string): Promise<Either<DoesntExist, boolean>>;
 }

@@ -1,5 +1,7 @@
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
@@ -9,8 +11,8 @@ import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
-import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -30,7 +32,16 @@ test('should forbid export to unrelated users', async () => {
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test('should permit export for owner users ', async () => {
+test('should permit public project export for unrelated users', async () => {
+  await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenProjectIsPublic();
+
+  const response = await fixtures.WhenUnrelatedUserRequestAnExport();
+
+  fixtures.ThenExportIsLaunched(response);
+});
+
+test('should permit export for owner users', async () => {
   await fixtures.GivenProjectWasCreated();
 
   const response = await fixtures.WhenOwnerUserRequestAnExport();
@@ -38,7 +49,7 @@ test('should permit export for owner users ', async () => {
   fixtures.ThenExportIsLaunched(response);
 });
 
-test('should permit export for contributor users ', async () => {
+test('should permit export for contributor users', async () => {
   await fixtures.GivenProjectWasCreated();
 
   await fixtures.GivenContributorWasAddedToProject();
@@ -47,7 +58,7 @@ test('should permit export for contributor users ', async () => {
   fixtures.ThenExportIsLaunched(response);
 });
 
-test('should permit export for viewer users ', async () => {
+test('should permit export for viewer users', async () => {
   await fixtures.GivenProjectWasCreated();
 
   await fixtures.GivenViewerWasAddedToProject();
@@ -61,6 +72,7 @@ export const getFixtures = async () => {
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
     getRepositoryToken(UsersProjectsApiEntity),
   );
+  const projectCheckerFake = app.get(ProjectChecker) as ProjectCheckerFake;
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
@@ -89,6 +101,9 @@ export const getFixtures = async () => {
       const result = await GivenProjectExists(app, ownerToken);
       projectId = result.projectId;
       organizationId = result.organizationId;
+    },
+    GivenProjectIsPublic: async () => {
+      projectCheckerFake.addPublicProject(projectId);
     },
     GivenContributorWasAddedToProject: async () => {
       await userProjectsRepo.save({

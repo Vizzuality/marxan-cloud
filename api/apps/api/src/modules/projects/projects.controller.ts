@@ -51,6 +51,7 @@ import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.a
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
   notAllowed,
+  projectNotFound,
   ProjectsService,
   validationFailed,
 } from './projects.service';
@@ -80,7 +81,7 @@ import {
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { forbiddenError } from '../access-control/access-control.types';
-import { projectNotFound, unknownError } from '../blm';
+import { projectNotFound as blmProjectNotFound, unknownError } from '../blm';
 import { Response } from 'express';
 import {
   ImplementsAcl,
@@ -391,7 +392,7 @@ export class ProjectsController {
 
     if (isLeft(result))
       switch (result.left) {
-        case projectNotFound:
+        case blmProjectNotFound:
           throw new NotFoundException(
             `Could not find project BLM values for project with ID: ${id}`,
           );
@@ -416,8 +417,19 @@ export class ProjectsController {
       projectId,
       req.user.id,
     );
+
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
     }
     return {
       id: result.right,
@@ -449,6 +461,10 @@ export class ProjectsController {
         case notAllowed:
           throw new ForbiddenException(
             `Your role cannot retrieve export .zip files for project with ID: ${projectId}`,
+          );
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
           );
 
         default:

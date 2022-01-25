@@ -11,6 +11,7 @@ import {
   Export,
   ExportId,
 } from '@marxan-api/modules/clone/export/domain';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { FileRepository } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, EventBus, IEvent } from '@nestjs/cqrs';
@@ -26,6 +27,7 @@ import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 async function untilEventIsEmitted<T extends IEvent>(
@@ -56,7 +58,7 @@ afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test('should forbid getting export file to unrelated users', async () => {
+test('should forbid downloading export file to unrelated users', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenExportWasRequested();
 
@@ -66,17 +68,28 @@ test('should forbid getting export file to unrelated users', async () => {
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test('should permit getting export file for owner users ', async () => {
+test('should permit downloading public project export file for unrelated users', async () => {
+  await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenProjectIsPublic();
+  await fixtures.GivenExportWasRequested();
+
+  await fixtures.WhenExportFileIsReady();
+  const response = await fixtures.WhenUnrelatedUserRequestExportFile();
+
+  fixtures.ThenFileIsDownloaded(response);
+});
+
+test('should permit downloading export file for owner users ', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenExportFileIsReady();
   const response = await fixtures.WhenOwnerUserRequestExportFile();
 
-  fixtures.ThenFileIsRetrieved(response);
+  fixtures.ThenFileIsDownloaded(response);
 });
 
-test('should permit getting export file for contributor users ', async () => {
+test('should permit downloading export file for contributor users ', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenContributorWasAddedToProject();
   await fixtures.GivenExportWasRequested();
@@ -84,10 +97,10 @@ test('should permit getting export file for contributor users ', async () => {
   await fixtures.WhenExportFileIsReady();
   const response = await fixtures.WhenContributorUserRequestExportFile();
 
-  fixtures.ThenFileIsRetrieved(response);
+  fixtures.ThenFileIsDownloaded(response);
 });
 
-test('should permit getting export file for viewer users ', async () => {
+test('should permit downloading export file for viewer users ', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenViewerWasAddedToProject();
   await fixtures.GivenExportWasRequested();
@@ -95,7 +108,7 @@ test('should permit getting export file for viewer users ', async () => {
   await fixtures.WhenExportFileIsReady();
   const response = await fixtures.WhenViewerUserRequestExportFile();
 
-  fixtures.ThenFileIsRetrieved(response);
+  fixtures.ThenFileIsDownloaded(response);
 });
 
 export const getFixtures = async () => {
@@ -107,6 +120,7 @@ export const getFixtures = async () => {
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
     getRepositoryToken(UsersProjectsApiEntity),
   );
+  const projectCheckerFake = app.get(ProjectChecker) as ProjectCheckerFake;
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
@@ -155,6 +169,9 @@ export const getFixtures = async () => {
       const result = await GivenProjectExists(app, ownerToken);
       projectId = result.projectId;
       organizationId = result.organizationId;
+    },
+    GivenProjectIsPublic: async () => {
+      projectCheckerFake.addPublicProject(projectId);
     },
     GivenContributorWasAddedToProject: async () => {
       await userProjectsRepo.save({
@@ -214,7 +231,7 @@ export const getFixtures = async () => {
     WhenExportFileIsReady: async () => {
       await untilEventIsEmitted(ArchiveReady, eventBus);
     },
-    ThenFileIsRetrieved: (response: request.Response) => {
+    ThenFileIsDownloaded: (response: request.Response) => {
       expect(response.status).toBe(200);
     },
     ThenForbiddenIsReturned: (response: request.Response) => {

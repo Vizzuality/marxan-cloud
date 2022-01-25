@@ -15,6 +15,7 @@ import {
   HasPendingExport,
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { PublishedProject } from '../../published-project/entities/published-project.api.entity';
 
 @Injectable()
 export class MarxanProjectChecker implements ProjectChecker {
@@ -22,6 +23,8 @@ export class MarxanProjectChecker implements ProjectChecker {
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
+    @InjectRepository(PublishedProject)
+    private readonly publishedProjectRepo: Repository<PublishedProject>,
     private readonly planningAreas: PlanningAreasService,
   ) {}
 
@@ -83,6 +86,20 @@ export class MarxanProjectChecker implements ProjectChecker {
           gridEvent.kind ===
             API_EVENT_KINDS.project__grid__finished__v1__alpha),
     );
+  }
+
+  async isPublic(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId);
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    const publicProject = await this.publishedProjectRepo.findOne(projectId);
+
+    return right(Boolean(publicProject));
   }
 
   private createNotFoundHandler() {
