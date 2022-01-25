@@ -175,7 +175,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <button
                             type="button"
                             className={cx({
-                              'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 flex items-center justify-center transition-colors': true,
+                              'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 hover:border-gray-300 flex items-center justify-center transition-colors': true,
                               'bg-white': editable && !blurring,
                               'bg-transparent': !editable || blurring,
                             })}

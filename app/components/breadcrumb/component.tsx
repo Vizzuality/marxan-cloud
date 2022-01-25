@@ -19,18 +19,20 @@ export const Breadcrum: React.FC<BreadcrumProps> = ({
   className,
   onClick,
 }: BreadcrumProps) => (
-  <button
-    type="button"
-    className={cx({
-      'flex items-center text-sm text-primary-500 hover:text-primary-300 focus:outline-none h-6 overflow-hidden': true,
-      [className]: !!className,
-    })}
-    onClick={onClick}
-  >
-    <Icon className="flex-shrink-0 w-3 h-3" icon={ARROW_LEFT_SVG} />
-    <Icon className="flex-shrink-0 w-5 h-5 ml-1" icon={FOLDER_SVG} />
-    <div className="ml-3 overflow-hidden whitespace-nowrap overflow-ellipsis">{children}</div>
-  </button>
+  <div className="inline-flex">
+    <button
+      type="button"
+      className={cx({
+        'flex items-center text-sm text-primary-500 hover:text-primary-300 focus:outline-none h-6 overflow-hidden': true,
+        [className]: !!className,
+      })}
+      onClick={onClick}
+    >
+      <Icon className="flex-shrink-0 w-3 h-3" icon={ARROW_LEFT_SVG} />
+      <Icon className="flex-shrink-0 w-5 h-5 ml-1" icon={FOLDER_SVG} />
+      <div className="ml-3 overflow-hidden whitespace-nowrap overflow-ellipsis">{children}</div>
+    </button>
+  </div>
 );
 
 export default Breadcrum;

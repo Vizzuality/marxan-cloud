@@ -34,7 +34,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   const { addToast } = useToasts();
   const plausible = usePlausible();
 
-  const { query, push } = useRouter();
+  const { query } = useRouter();
   const { pid, sid } = query;
 
   const { user } = useMe();
@@ -99,7 +99,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
               level: 'success',
             });
             console.info('Scenario name saved succesfully', s);
-            push(`/projects/${pid}`);
+
             plausible('Run scenario', {
               props: {
                 userId: `${user.id}`,
@@ -141,7 +141,6 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
   }, [
     pid,
     sid,
-    push,
     saveScenarioMutation,
     runScenarioMutation,
     addToast,
