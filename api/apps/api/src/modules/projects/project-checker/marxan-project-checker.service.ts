@@ -11,8 +11,6 @@ import { isDefined } from '@marxan/utils';
 import {
   doesntExist,
   DoesntExist,
-  hasPendingExport,
-  HasPendingExport,
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { PublishedProject } from '../../published-project/entities/published-project.api.entity';
@@ -30,7 +28,13 @@ export class MarxanProjectChecker implements ProjectChecker {
 
   async hasPendingExports(
     projectId: string,
-  ): Promise<Either<HasPendingExport, boolean>> {
+  ): Promise<Either<DoesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId);
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
     const exportEvent = await this.apiEvents
       .getLatestEventForTopic({
         topic: projectId,
@@ -46,9 +50,7 @@ export class MarxanProjectChecker implements ProjectChecker {
       exportEvent?.kind ===
       API_EVENT_KINDS.project__export__submitted__v1__alpha;
 
-    if (pendingExportExists) return left(hasPendingExport);
-
-    return right(false);
+    return right(pendingExportExists);
   }
 
   async isProjectReady(

@@ -1,10 +1,13 @@
-import { Test } from '@nestjs/testing';
 import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
-import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
-import { ProjectCheckerFake } from '../../../../test/utils/project-checker.service-fake';
-import { v4 } from 'uuid';
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { MarxanEditGuard } from '@marxan-api/modules/projects/edit-guard/marxan-edit-guard.service';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { v4 } from 'uuid';
+import { ProjectCheckerFake } from '../../../../test/utils/project-checker.service-fake';
+import { Project } from '../project.api.entity';
 
 describe('MarxanEditGuard', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -33,6 +36,12 @@ describe('MarxanEditGuard', () => {
 });
 
 const getFixtures = async () => {
+  const fakeProjectsService: jest.Mocked<
+    Pick<Repository<Project>, 'findOne'>
+  > = {
+    findOne: jest.fn(),
+  };
+
   const sandbox = await Test.createTestingModule({
     providers: [
       {
@@ -43,6 +52,10 @@ const getFixtures = async () => {
         provide: EditGuard,
         useClass: MarxanEditGuard,
       },
+      {
+        provide: getRepositoryToken(Project),
+        useValue: fakeProjectsService,
+      },
     ],
   }).compile();
   await sandbox.init();
@@ -51,7 +64,9 @@ const getFixtures = async () => {
 
   return {
     GivenProjectWasCreated: () => {
-      return v4();
+      const id = v4();
+      fakeProjectsService.findOne.mockResolvedValueOnce({ id } as Project);
+      return id;
     },
     WhenExportIsRequested: async (projectId: string) => {
       await projectChecker.addPendingExportForProject(projectId);
