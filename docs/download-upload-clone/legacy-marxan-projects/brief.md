@@ -46,8 +46,8 @@ requirements in terms of geospatial data available:
 This will be used in the MarxanCloud platform as the geospatial "scaffolding"
 on which other data is projected.
 
-Each planning unit must have a `puid` property set to match the value used in
-the `pu.dat` input file.
+Each planning unit in the grid shapefile must have a `puid` property set to
+match the value used in the `pu.dat` input file.
 
 ### Marxan results
 
