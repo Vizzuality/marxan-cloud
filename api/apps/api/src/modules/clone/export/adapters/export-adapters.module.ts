@@ -14,7 +14,6 @@ import { ResourcePiecesAdapter } from './resource-pieces.adapter';
 import { ProjectResourcePiecesAdapter } from './resource-pieces/project-resource-pieces.adapter';
 import { ScenarioResourcePiecesAdapter } from './resource-pieces/scenario-resource-pieces.adapter';
 import { TypeormExportRepository } from './typeorm-export.repository';
-import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
