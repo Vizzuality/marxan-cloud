@@ -92,6 +92,13 @@ export const Title: React.FC<TitleProps> = () => {
     setEditable(false);
   }, [projectData, addToast, saveProjectMutation]);
 
+  const invisibleValue = useCallback((value) => {
+    if (value) {
+      return value.replace(/\s/g, '-');
+    }
+    return value;
+  }, []);
+
   return (
     <AnimatePresence>
       {projectData?.name && (
@@ -107,7 +114,7 @@ export const Title: React.FC<TitleProps> = () => {
               mutators={{
                 setTrimName: (args, state, utils) => {
                   const [name] = args;
-                  utils.changeValue(state, 'name', () => name);
+                  utils.changeValue(state, 'name', () => name.trim());
                 },
               }}
               initialValues={{
@@ -157,7 +164,11 @@ export const Title: React.FC<TitleProps> = () => {
                             }}
                           />
 
-                          <h1 className="invisible h-full px-0 py-1 text-4xl font-normal font-heading overflow-ellipsis">{input?.value}</h1>
+                          <h1
+                            className="invisible h-full px-0 py-1 text-4xl font-normal font-heading overflow-ellipsis"
+                          >
+                            {invisibleValue(input?.value)}
+                          </h1>
                         </div>
 
                         {OWNER && (
