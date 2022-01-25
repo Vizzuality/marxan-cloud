@@ -28,7 +28,10 @@ export class MarkExportPiecesAsFailedHandler
     await Promise.all(
       componentsId.map((componentId) =>
         this.apiEvents.createIfNotExists({
-          externalId: `${kind}-${componentId.value}`,
+          externalId: ApiEventsService.composeExternalId(
+            componentId.value,
+            kind,
+          ),
           kind,
           topic: componentId.value,
           data: {

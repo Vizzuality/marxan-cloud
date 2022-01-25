@@ -54,7 +54,7 @@ it('should not publish any event if export instance is not found', async () => {
   const exportId = new ExportId(v4());
   await fixtures.GivenNoneExportWasRequested(exportId);
   await fixtures.WhenAPieceOfAnUnexistingExportIsCompleted(exportId);
-  fixtures.ThenNoneEventIsEmitted();
+  fixtures.ThenNoEventIsEmitted();
 });
 
 it('should emit a ExportPieceFailed event if a piece is not found', async () => {
@@ -186,7 +186,7 @@ const getFixtures = async () => {
         ExportAllComponentsFinished,
       );
     },
-    ThenNoneEventIsEmitted: () => {
+    ThenNoEventIsEmitted: () => {
       expect(events).toHaveLength(0);
     },
     ThenExportPieceFailedEventIsEmitted: (exportId: ExportId) => {
