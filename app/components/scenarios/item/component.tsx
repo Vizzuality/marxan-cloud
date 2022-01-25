@@ -75,7 +75,6 @@ export interface ItemProps {
   lastUpdateDistance: string;
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDuplicate?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -91,7 +90,6 @@ export const Item: React.FC<ItemProps> = ({
   jobs,
   runStatus,
   onEdit,
-  onView,
   onCancelRun,
   onDelete,
   onDuplicate,
@@ -226,15 +224,6 @@ export const Item: React.FC<ItemProps> = ({
                     {settings && 'Close'}
                     {!settings && 'Settings'}
                   </Button>
-
-                  <Button
-                    className="flex-shrink-0"
-                    size="s"
-                    theme="primary"
-                    onClick={onEdit}
-                  >
-                    Edit
-                  </Button>
                 </>
               )}
 
@@ -255,13 +244,12 @@ export const Item: React.FC<ItemProps> = ({
 
         <button
           type="button"
-          onClick={onView}
+          onClick={onEdit}
           disabled={status.includes('running')}
           className={cx({
             'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl': true,
+            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': true,
             'rounded-br-none': settings,
-            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': status === 'run-done',
-            'text-gray-400 pointer-events-none': status !== 'run-done',
           })}
         >
           <span className="mr-2 text-sm">View</span>

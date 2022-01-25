@@ -200,9 +200,6 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
           },
-          onView: () => {
-            push(`/projects/${projectId}/scenarios/${id}`);
-          },
         };
       });
     })) : [];

@@ -213,7 +213,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
 
   return (
     <AnimatePresence>
-      <div key="project-scenarios-sidebar" className="flex flex-col flex-grow col-span-7 overflow-hidden">
+      <div key="project-scenarios-sidebar" className="relative flex flex-col flex-grow col-span-7 overflow-hidden">
         <Loading
           visible={projectLoading || scenariosLoading}
           className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
@@ -289,7 +289,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             </div>
           </div>
 
-          {!hasScenarios && !search && !hasFilters && (
+          {!hasScenarios && !search && !hasFilters && !scenariosLoading && (
             <motion.div
               key="project-scenarios-empty"
               initial={{ y: -10, opacity: 0 }}
