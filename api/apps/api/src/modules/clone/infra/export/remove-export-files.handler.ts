@@ -27,7 +27,14 @@ export class RemoveExportFilesHandler
       .toSnapshot()
       .exportPieces.flatMap((item) => item.uris)
       .forEach((location) => {
-        fs.rmSync(location.uri);
+        try {
+          fs.rmSync(location.uri);
+          this.logger.log(`Deleted ${location.uri}`);
+        } catch {
+          this.logger.error(
+            `Trying to delete from ${location.uri} and no file was found`,
+          );
+        }
       });
   }
 }
