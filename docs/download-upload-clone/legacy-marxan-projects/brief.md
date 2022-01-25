@@ -18,6 +18,13 @@ order to, for example:
   _community_ area, thus contributing to a public archive/showcase of Marxan
   planning projects
 
+_@todo Legacy projects - examples from Okavango demo_
+
+_@todo Decision tree to guide through choices about what a user may want to
+achieve depending on use case, then provide information on what parts of the
+MarxanCloud flow could be enabled according to the user choices **and** which
+data is available for them to upload._
+
 ## Legacy Marxan projects import in MarxanWeb
 
 For reference, the Python-based [MarxanWeb
@@ -65,13 +72,6 @@ ever being overwritten.
 
 ### Geospatial data
 
-_@todo Legacy projects - examples from Okavango demo_
-
-_@todo Decision tree to guide through choices about what a user may want to
-achieve depending on use case, then provide information on what parts of the
-MarxanCloud flow could be enabled according to the user choices **and** which
-data is available for them to upload._
-
 Other spatial data would "unlock" key features of the MarxanCloud platform:
 
 **Shapefiles of features**
@@ -79,8 +79,49 @@ Other spatial data would "unlock" key features of the MarxanCloud platform:
 Without these, only presence/absence of each feature in any given planning unit
 could be visualized (this data is inferred from `puvspr.dat` and `spec.dat`).
 
+However, although the portion of each planning unit where each given feature can
+be found is known from `puvspr.dat`, the exact spatial range of the feature will
+be unknown. Therefore, a visual representation of such features can only be a
+rough proxy, made up of the spatial union of all the planning units where the
+feature is found (that is, of all the planning units linked to the feature in
+`puvspr.dat`). Nevertheless, the `amount` property of each `puvspr.dat` row
+could be locked to the value provided when the feature is uploaded [*].
+
+The accuracy of pre-run gap data will likewise be dependent on the methods used
+to populate the `amount` column of the legacy `puvspr.dat` file: the MarxanCloud
+platform will use `amount` as a proxy of portion of each planning unit covered
+by a feature, irrespective of possible metrics such as count of individuals,
+feature density and so on.
+
+The absence of detailed feature spatial data will also prevent users from
+splitting and intersecting imported features: these will be only usable
+verbatim, not in combination with other feature spatial data.
+
+[*] This is normally calculated in the MarxanCloud platform by intersecting
+feature spatial data with planning units, but this logic can be excluded by
+recording in a separate column the value of feature `amount` per planning unit
+when a legacy project is uploaded.
+
 **Shapefiles of protected areas**
+
+When users can provide a shapefile with the protected areas considered in the
+legacy project, these areas can be shown in MarxanCloud maps, and - if combined
+with a threshold for protected status - the default protection status of each
+planning unit can be set.
+
+Without spatial data for protected areas, the lock status (lock-in/lock-out) of
+each protected area will be set from the imported `pu.dat`, but if users wish to
+continue working on the imported project in MarxanCloud, they won't be able to
+rely on protected area data in order to lock protected units in by default.
 
 **Shapefiles of locked-in or locked-out areas**
 
-**Cost surface shapefiles**
+These are not essential. A proxy to such shapefiles will be created while
+importing a legacy project, as spatial union of all the planning unit marked as
+locked-in or locked-out, respectively, in the imported `pu.dat` file.
+
+**Cost surface shapefile**
+
+This is not essential. A proxy to such shapefile will be created while importing
+a legacy project, from the `cost` property of each planning unit listed in the
+imported `pu.dat` file.
