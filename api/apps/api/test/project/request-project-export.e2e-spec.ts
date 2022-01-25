@@ -52,7 +52,6 @@ test('should permit export for owner users', async () => {
 test('should permit export for contributor users', async () => {
   await fixtures.GivenProjectWasCreated();
 
-  await fixtures.GivenContributorWasAddedToProject();
   const response = await fixtures.WhenContributorUserRequestAnExport();
 
   fixtures.ThenExportIsLaunched(response);
@@ -61,7 +60,6 @@ test('should permit export for contributor users', async () => {
 test('should permit export for viewer users', async () => {
   await fixtures.GivenProjectWasCreated();
 
-  await fixtures.GivenViewerWasAddedToProject();
   const response = await fixtures.WhenViewerUserRequestAnExport();
 
   fixtures.ThenExportIsLaunched(response);
@@ -105,20 +103,6 @@ export const getFixtures = async () => {
     GivenProjectIsPublic: async () => {
       projectCheckerFake.addPublicProject(projectId);
     },
-    GivenContributorWasAddedToProject: async () => {
-      await userProjectsRepo.save({
-        projectId,
-        userId: contributorUserId,
-        roleName: ProjectRoles.project_contributor,
-      });
-    },
-    GivenViewerWasAddedToProject: async () => {
-      await userProjectsRepo.save({
-        projectId,
-        userId: viewerUserId,
-        roleName: ProjectRoles.project_viewer,
-      });
-    },
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toBe(403);
     },
@@ -130,14 +114,28 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
         .set('Authorization', `Bearer ${ownerToken}`),
-    WhenContributorUserRequestAnExport: () =>
-      request(app.getHttpServer())
+    WhenContributorUserRequestAnExport: async () => {
+      await userProjectsRepo.save({
+        projectId,
+        userId: contributorUserId,
+        roleName: ProjectRoles.project_contributor,
+      });
+
+      return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${contributorToken}`),
-    WhenViewerUserRequestAnExport: () =>
-      request(app.getHttpServer())
+        .set('Authorization', `Bearer ${contributorToken}`);
+    },
+    WhenViewerUserRequestAnExport: async () => {
+      await userProjectsRepo.save({
+        projectId,
+        userId: viewerUserId,
+        roleName: ProjectRoles.project_viewer,
+      });
+
+      return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${viewerToken}`),
+        .set('Authorization', `Bearer ${viewerToken}`);
+    },
     ThenExportIsLaunched: (response: request.Response) => {
       expect(response.status).toBe(201);
       expect(response.body.id).toBeDefined();

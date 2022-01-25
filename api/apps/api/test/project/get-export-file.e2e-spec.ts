@@ -220,14 +220,28 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
         .set('Authorization', `Bearer ${ownerToken}`),
-    WhenContributorUserRequestExportFile: () =>
-      request(app.getHttpServer())
+    WhenContributorUserRequestExportFile: async () => {
+      await userProjectsRepo.save({
+        projectId,
+        userId: contributorUserId,
+        roleName: ProjectRoles.project_contributor,
+      });
+
+      return request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
-        .set('Authorization', `Bearer ${contributorToken}`),
-    WhenViewerUserRequestExportFile: () =>
-      request(app.getHttpServer())
+        .set('Authorization', `Bearer ${contributorToken}`);
+    },
+    WhenViewerUserRequestExportFile: async () => {
+      await userProjectsRepo.save({
+        projectId,
+        userId: viewerUserId,
+        roleName: ProjectRoles.project_viewer,
+      });
+
+      return request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
-        .set('Authorization', `Bearer ${viewerToken}`),
+        .set('Authorization', `Bearer ${viewerToken}`);
+    },
     WhenExportFileIsReady: async () => {
       await untilEventIsEmitted(ArchiveReady, eventBus);
     },
