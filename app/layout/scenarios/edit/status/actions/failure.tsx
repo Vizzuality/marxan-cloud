@@ -106,6 +106,7 @@ export const useScenarioActionsFailure = () => {
               'protected-areas': 'draft',
               features: 'draft',
               analysis: 'empty',
+              solutions: 'empty',
             },
             lastJobCheck: new Date().getTime(),
           },
@@ -230,6 +231,14 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
+            tab: 'analysis',
+            subtab: 'analysis-preview',
+            status: {
+              'protected-areas': 'draft',
+              features: 'draft',
+              analysis: 'draft',
+              solutions: 'empty',
+            },
             lastJobCheck: new Date().getTime(),
           },
         },

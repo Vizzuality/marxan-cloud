@@ -80,6 +80,12 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
           lastJobCheck: new Date().getTime(),
           tab: 'solutions',
           subtab: 'solutions-preview',
+          status: {
+            'protected-areas': 'draft',
+            features: 'draft',
+            analysis: 'draft',
+            solutions: 'draft',
+          },
         },
       },
     };

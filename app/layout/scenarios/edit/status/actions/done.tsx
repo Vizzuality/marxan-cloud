@@ -305,6 +305,7 @@ export const useScenarioActionsDone = () => {
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
+        dispatch(setCache(Date.now()));
         JOB_REF.current = null;
       },
       onError: () => {
@@ -323,6 +324,7 @@ export const useScenarioActionsDone = () => {
     scenarioData?.metadata,
     dispatch,
     setJob,
+    setCache,
     addToast,
   ]);
 
