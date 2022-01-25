@@ -11,12 +11,29 @@ order to, for example:
 
 - continue working on an existing Marxan project taking advantage of the user
   workflows and data visualization features of the MarxanCloud platform
-- share a legacy Marxan project broadly, through the MarxanCloud platform's
-  _community_ area
-- collaborate on a legacy Marxan project, by keeping the project private while
+- collaborate on a legacy Marxan project which is still being developed, by
+  moving it to the MarxanCloud platform and keeping the project private, while
   giving access to other MarxanCloud users as contributors
+- share a legacy Marxan project broadly, through the MarxanCloud platform's
+  _community_ area, thus contributing to a public archive/showcase of Marxan
+  planning projects
 
-### Requirements
+## Legacy Marxan projects import in MarxanWeb
+
+For reference, the Python-based [MarxanWeb
+platform](https://docs.marxanweb.org/) supports importing legacy Marxan projects
+(`.dat` files alongside a matching planning unit grid as shapefile), with the
+following restrictions for the imported projects:
+
+- Project features cannot be added or removed
+- Showing the project features on the map is not supported
+- Zooming to project features on the map is not supported
+- Project features have only basic metadata, e.g. simple names and no
+  descriptions
+
+## Requirements
+
+### Essential project data
 
 As the MarxanCloud platform has a core component of data visualization and
 mapping, legacy Marxan projects may only be imported if they match some minimum
