@@ -1,22 +1,24 @@
-import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { MarkExportAsSubmitted } from './mark-export-as-submitted.command';
+import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 
-@CommandHandler(MarkExportAsSubmitted)
-export class MarkExportAsSubmittedHandler
-  implements IInferredCommandHandler<MarkExportAsSubmitted> {
+import { ResourceKind } from '@marxan/cloning/domain';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+
+import { MarkExportAsFailed } from './mark-export-as-failed.command';
+
+@CommandHandler(MarkExportAsFailed)
+export class MarkExportAsFailedHandler
+  implements IInferredCommandHandler<MarkExportAsFailed> {
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async execute({
-    exportId,
-    resourceId,
     resourceKind,
-  }: MarkExportAsSubmitted): Promise<void> {
+    resourceId,
+    exportId,
+  }: MarkExportAsFailed): Promise<void> {
     const kind =
       resourceKind === ResourceKind.Project
-        ? API_EVENT_KINDS.project__export__submitted__v1__alpha
+        ? API_EVENT_KINDS.project__export__failed__v1__alpha
         : null;
 
     if (!kind) {
@@ -27,6 +29,7 @@ export class MarkExportAsSubmittedHandler
     await this.apiEvents.createIfNotExists({
       kind,
       topic: resourceId.value,
+      externalId: ApiEventsService.composeExternalId(exportId.value, kind),
       data: {
         exportId,
         resourceId,

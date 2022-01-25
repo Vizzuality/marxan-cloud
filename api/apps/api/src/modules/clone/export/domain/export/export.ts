@@ -3,11 +3,11 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 
 import {
-  ResourceKind,
-  ResourceId,
   ArchiveLocation,
-  ComponentLocation,
   ComponentId,
+  ComponentLocation,
+  ResourceId,
+  ResourceKind,
 } from '@marxan/cloning/domain';
 import { ExportId } from './export.id';
 

@@ -79,6 +79,6 @@ export class SetProjectGridFromShapefileHandler
       externalId: v4(),
     });
 
-    await this.eventBus.publish(new PlanningUnitSet(projectId));
+    this.eventBus.publish(new PlanningUnitSet(projectId));
   }
 }

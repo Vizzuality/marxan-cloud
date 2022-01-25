@@ -28,7 +28,7 @@ beforeEach(async () => {
 
 describe(`when emitting event`, () => {
   beforeEach(async () => {
-    await eventBus.publish(
+    eventBus.publish(
       new ApiEvent(
         'resource',
         API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha,

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, EventBus } from '@nestjs/cqrs';
 
 import { JobInput, JobOutput } from '@marxan/cloning';
 
@@ -20,6 +20,9 @@ import {
   ComponentLocation,
   ExportId,
 } from '../../export/application/complete-piece.command';
+import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
+import { ResourceId } from '../../export';
+import { ApiEventsService } from '../../../api-events';
 
 @Injectable()
 export class ExportPieceEventsHandler
@@ -30,9 +33,11 @@ export class ExportPieceEventsHandler
     @Inject(exportPieceEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<JobInput, JobOutput>,
     private readonly commandBus: CommandBus,
+    private readonly eventBus: EventBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
     this.queueEvents.on(`completed`, (data) => this.completed(data));
+    this.queueEvents.on(`failed`, (data) => this.failed(data));
   }
 
   async createCompletedEvent(
@@ -41,10 +46,11 @@ export class ExportPieceEventsHandler
     const data = await eventData.data;
     const output = await eventData.result;
     const kind = API_EVENT_KINDS.project__export__piece__finished__v1__alpha;
+
     return {
-      topic: data.resourceId,
+      topic: data.componentId,
       kind,
-      externalId: eventData.eventId,
+      externalId: ApiEventsService.composeExternalId(data.componentId, kind),
       data: {
         kind,
         ...output,
@@ -55,16 +61,23 @@ export class ExportPieceEventsHandler
   async createFailedEvent(
     eventData: EventData<JobInput, JobOutput>,
   ): Promise<CreateApiEventDTO> {
-    const data = await eventData.data;
-    const output = await eventData.result;
+    const {
+      resourceId,
+      resourceKind,
+      exportId,
+      componentId,
+    } = await eventData.data;
     const kind = API_EVENT_KINDS.project__export__piece__failed__v1__alpha;
+
     return {
-      topic: data.resourceId,
+      topic: componentId,
       kind,
-      externalId: eventData.eventId,
+      externalId: ApiEventsService.composeExternalId(componentId, kind),
       data: {
-        kind,
-        ...output,
+        exportId,
+        resourceId,
+        resourceKind,
+        componentId,
       },
     };
   }
@@ -79,6 +92,23 @@ export class ExportPieceEventsHandler
         result.uris.map(
           ({ uri, relativePath }) => new ComponentLocation(uri, relativePath),
         ),
+      ),
+    );
+  }
+
+  private async failed(event: EventData<JobInput, unknown>) {
+    const {
+      exportId,
+      componentId,
+      resourceId,
+      resourceKind,
+    } = await event.data;
+    this.eventBus.publish(
+      new ExportPieceFailed(
+        new ExportId(exportId),
+        new ComponentId(componentId),
+        new ResourceId(resourceId),
+        resourceKind,
       ),
     );
   }
