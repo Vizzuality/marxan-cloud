@@ -10,22 +10,33 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { GivenProjectExists } from '../steps/given-project';
+import { GivenUserExists } from '../steps/given-user-exists';
 
-export const createWorld = async () => {
+export const getFixtures = async () => {
   const app = await bootstrapApplication();
-  const token = await GivenUserIsLoggedIn(app);
-  const { projectId, cleanup } = await GivenProjectExists(app, token, {
+  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
+  const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
+  const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
+  const contributorUserId = await GivenUserExists(app, 'bb');
+  const viewerUserId = await GivenUserExists(app, 'cc');
+  const scenarioViewerRole = ScenarioRoles.scenario_viewer;
+  const scenarioContributorRole = ScenarioRoles.scenario_contributor;
+
+  const { projectId, cleanup } = await GivenProjectExists(app, ownerToken, {
     countryCode: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });
-  const scenario = await GivenScenarioExists(app, projectId, token);
+  const scenario = await GivenScenarioExists(app, projectId, ownerToken);
+  const scenarioId = scenario.id;
   const filesToRemove: string[] = [];
 
   const marxanExecutionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
@@ -35,15 +46,31 @@ export const createWorld = async () => {
     ),
   );
 
+  const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
+    getRepositoryToken(UsersScenariosApiEntity),
+  );
+
   return {
     cleanup: async () => {
       filesToRemove.forEach((file) => unlinkSync(file));
       await marxanExecutionMetadataRepo.delete({
-        scenarioId: scenario.id,
+        scenarioId,
       });
-      await ScenariosTestUtils.deleteScenario(app, token, scenario.id);
+      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await cleanup();
     },
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
+        roleName: scenarioContributorRole,
+        userId: contributorUserId,
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
+        roleName: scenarioViewerRole,
+        userId: viewerUserId,
+      }),
     GivenOutputZipIsAvailable: async () => {
       const zipBuffer = await createArchive();
       filesToRemove.push(...zipBuffer.filesToClean);
@@ -51,14 +78,24 @@ export const createWorld = async () => {
         marxanExecutionMetadataRepo.create({
           outputZip: zipBuffer.archive,
           inputZip: Buffer.from('abcd', 'utf-8'),
-          scenarioId: scenario.id,
+          scenarioId,
         }),
       );
     },
-    WhenGettingZipArchive: async () =>
+    WhenGettingZipArchiveAsOwner: async () =>
       request(app.getHttpServer())
-        .get(`/api/v1/scenarios/${scenario.id}/marxan/output`)
-        .set('Authorization', `Bearer ${token}`)
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/output`)
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .responseType('blob'),
+    WhenGettingZipArchiveAsContributor: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/output`)
+        .set('Authorization', `Bearer ${contributorToken}`)
+        .responseType('blob'),
+    WhenGettingZipArchiveAsViewer: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/output`)
+        .set('Authorization', `Bearer ${viewerToken}`)
         .responseType('blob'),
     ThenZipContainsOutputFiles: async (response: request.Response) => {
       expect(response.header['content-type']).toEqual('application/zip');

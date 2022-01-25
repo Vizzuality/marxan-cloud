@@ -18,26 +18,30 @@ import { GivenProjectExists } from '../../steps/given-project';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { v4 } from 'uuid';
+import { GivenUserExists } from '../../steps/given-user-exists';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 
-export const createWorld = async () => {
+export const getFixtures = async () => {
   const app = await bootstrapApplication();
-  const jwt = await GivenUserIsLoggedIn(app);
+  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
+  const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
+  const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
+  const userNotInScenarioToken = await GivenUserIsLoggedIn(app, 'dd');
+  const contributorUserId = await GivenUserExists(app, 'bb');
+  const viewerUserId = await GivenUserExists(app, 'cc');
+  const scenarioViewerRole = ScenarioRoles.scenario_viewer;
+  const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const { cleanup: projectCleanup, projectId } = await GivenProjectExists(
     app,
-    jwt,
+    ownerToken,
     {
       countryCode: 'BWA',
       adminAreaLevel1Id: 'BWA.12_1',
       adminAreaLevel2Id: 'BWA.12.1_1',
     },
   );
-  const scenarioId = (
-    await ScenariosTestUtils.createScenario(app, jwt, {
-      name: `scenario-name`,
-      type: ScenarioType.marxan,
-      projectId,
-    })
-  ).data.id;
+  let scenarioId: string;
   const geometries: string[] = [];
   const scenariosPuData: string[] = [];
 
@@ -54,9 +58,13 @@ export const createWorld = async () => {
     getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
   );
 
+  const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
+    getRepositoryToken(UsersScenariosApiEntity),
+  );
+
   return {
     cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, jwt, scenarioId);
+      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await projectCleanup();
       await scenarioPuDataCostRepo.delete({
         scenariosPuDataId: In(scenariosPuData),
@@ -68,6 +76,14 @@ export const createWorld = async () => {
         scenarioId,
       });
       await app.close();
+    },
+    GivenScenarioWasCreated: async () => {
+      const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
+        name: `Test scenario`,
+        type: ScenarioType.marxan,
+        projectId,
+      });
+      scenarioId = result.data.id;
     },
     GivenScenarioWithPuAndLocks: async () => {
       const polygons: Polygon[] = [1, 2, 3, 4].map((i) => ({
@@ -120,17 +136,64 @@ export const createWorld = async () => {
         })),
       );
     },
-    WhenGettingMarxanData: async () =>
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId,
+        roleName: scenarioContributorRole,
+        userId: contributorUserId,
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId,
+        roleName: scenarioViewerRole,
+        userId: viewerUserId,
+      }),
+    WhenGettingMarxanDataAsOwner: async () =>
       (
         await request(app.getHttpServer())
           .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
-          .set('Authorization', `Bearer ${jwt}`)
+          .set('Authorization', `Bearer ${ownerToken}`)
       ).text,
-    WhenGettingPuInclusionState: async () =>
+    WhenGettingMarxanDataAsContributor: async () =>
+      (
+        await request(app.getHttpServer())
+          .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+          .set('Authorization', `Bearer ${contributorToken}`)
+      ).text,
+    WhenGettingMarxanDataAsViewer: async () =>
+      (
+        await request(app.getHttpServer())
+          .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+          .set('Authorization', `Bearer ${viewerToken}`)
+      ).text,
+    WhenGettingMarxanDataAsUserNotInScenario: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/dat/pu.dat`)
+        .set('Authorization', `Bearer ${userNotInScenarioToken}`),
+    WhenGettingPuInclusionStateAsOwner: async () =>
       (
         await request(app.getHttpServer())
           .get(`/api/v1/scenarios/${scenarioId}/planning-units`)
-          .set('Authorization', `Bearer ${jwt}`)
+          .set('Authorization', `Bearer ${ownerToken}`)
       ).body,
+    WhenGettingPuInclusionStateAsContributor: async () =>
+      (
+        await request(app.getHttpServer())
+          .get(`/api/v1/scenarios/${scenarioId}/planning-units`)
+          .set('Authorization', `Bearer ${contributorToken}`)
+      ).body,
+    WhenGettingPuInclusionStateAsViewer: async () =>
+      (
+        await request(app.getHttpServer())
+          .get(`/api/v1/scenarios/${scenarioId}/planning-units`)
+          .set('Authorization', `Bearer ${viewerToken}`)
+      ).body,
+    WhenGettingPuInclusionStateAsUserNotInScenario: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/planning-units`)
+        .set('Authorization', `Bearer ${userNotInScenarioToken}`),
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(403);
+    },
   };
 };

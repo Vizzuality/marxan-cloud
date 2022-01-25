@@ -18,6 +18,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -195,12 +196,34 @@ export class ScenariosCrudService extends AppBaseService<
     info?: ScenarioInfoDTO,
   ): Promise<SelectQueryBuilder<Scenario>> {
     const nameAndDescriptionFilter = info?.params?.nameAndDescriptionFilter;
+    const loggedUser = info?.authenticatedUser;
+
+    query.leftJoin(
+      UsersScenariosApiEntity,
+      `acl`,
+      `${this.alias}.id = acl.scenario_id`,
+    );
+
     if (nameAndDescriptionFilter) {
       const nameAndDescriptionFilterField = 'nameAndDescriptionFilter' as const;
       query.andWhere(
         `(${this.alias}.name ||' '|| COALESCE(${this.alias}.description, '')) ILIKE :${nameAndDescriptionFilterField}`,
         { [nameAndDescriptionFilterField]: `%${nameAndDescriptionFilter}%` },
       );
+    }
+
+    if (loggedUser) {
+      query
+        .andWhere(`acl.user_id = :userId`, {
+          userId: info?.authenticatedUser?.id,
+        })
+        .andWhere(`acl.role_id IN (:...roleId)`, {
+          roleId: [
+            Roles.scenario_owner,
+            Roles.scenario_contributor,
+            Roles.scenario_viewer,
+          ],
+        });
     }
 
     return query;

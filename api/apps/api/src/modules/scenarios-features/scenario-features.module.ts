@@ -28,6 +28,7 @@ import {
   StratificationOperation,
   StratificationQuery,
 } from './stratification';
+import { AccessControlModule } from '@marxan-api/modules/access-control';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import {
     ProjectsModule,
     ApiEventsModule,
     IntersectWithPuModule,
+    AccessControlModule,
   ],
   providers: [
     ScenarioFeaturesService,
