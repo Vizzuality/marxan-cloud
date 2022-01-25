@@ -84,7 +84,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
                       <h4 className="text-sm text-left">Planning area</h4>
                     </th>
                     <th className="py-12 font-normal w-44">
-                      {/* <h4 className="text-sm text-left">Creators</h4> */}
+                      <h4 className="text-sm text-left">Contributors</h4>
                     </th>
                     <th className="py-12 font-normal w-72">
                       <div className="flex flex-row">

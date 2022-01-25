@@ -19,7 +19,7 @@ export default {
   },
   light: {
     container: 'text-gray-600 bg-white ring-1 ring-gray-400 rounded-3xl',
-    open: 'ring-2 ring-primary-400 bg-white text-gray-600 rounded-2xl',
+    open: 'ring-2 ring-primary-400 bg-white text-gray-600 rounded-xl',
     closed: 'text-gray-400',
     prefix: {
       base: 'text-gray-800',

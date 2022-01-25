@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
 
+import { signOut } from 'next-auth/client';
+
 import { useDeleteMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
-
-import { signOut } from 'next-auth/client';
 
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';

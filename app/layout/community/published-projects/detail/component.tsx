@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 
+import { useProjectUsers } from 'hooks/project-users';
 import { usePublishedProject } from 'hooks/published-projects';
 import { useScenarios } from 'hooks/scenarios';
 
@@ -14,7 +15,7 @@ import ComingSoon from 'layout/help/coming-soon';
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
-// import Avatar from 'components/avatar';
+import Avatar from 'components/avatar';
 import Loading from 'components/loading';
 
 export interface CommunityProjectsDetailProps {
@@ -24,6 +25,10 @@ export interface CommunityProjectsDetailProps {
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
+
+  const { data: projectUsers } = useProjectUsers(pid);
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
 
   const {
     data: publishedProject,
@@ -41,7 +46,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   });
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, /* contributors, */
+    id, description, name, planningAreaName, timesDuplicated,
   } = publishedProject || {};
 
   const scenarios = publishedProjectScenarios || [];
@@ -92,20 +97,37 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                   <div className="grid grid-cols-2 grid-rows-2 gap-y-9 gap-x-9">
 
-                    {/* <div>
-                        <h3 className="mb-5 text-sm font-semibold">Creators</h3>
-                        {!!contributors?.length && (
-                          <div className="space-y-4">
-                            {contributors.map((c) => (
-                              <div key={c.id} className="flex flex-row items-center">
-                                <Avatar bgImage={c.bgImage} size="s" />
-                                <p className="ml-2.5 text-sm">{c.name}</p>
+                    <div>
+                      <h3 className="mb-5 text-sm font-semibold">Contributors</h3>
+                      {!!projectUsersVisible?.length && (
+                        <div className="space-y-4">
+                          {projectUsersVisible.map((u) => {
+                            const { user: { displayName, id: userId, avatarDataUrl } } = u;
+
+                            return (
+                              <div key={userId} className="flex flex-row items-center space-x-2.5">
+                                <Avatar
+                                  className="text-sm text-white uppercase border bg-primary-700"
+                                  bgImage={avatarDataUrl}
+                                  name={displayName}
+                                >
+                                  {!avatarDataUrl && displayName.slice(0, 2)}
+                                </Avatar>
+                                <p className="text-sm">{displayName}</p>
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    */}
+                            );
+                          })}
+                          {projectUsers?.length > projectUsersVisibleSize && (
+                            <div className="flex flex-row items-center space-x-2.5">
+                              <Avatar className="text-sm text-white uppercase border bg-primary-700" />
+                              <p className="text-sm">
+                                {`(+${projectUsers.length - projectUsersVisibleSize})`}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
                     <div>
                       <h3 className="mb-6 text-sm font-semibold">Planning area</h3>

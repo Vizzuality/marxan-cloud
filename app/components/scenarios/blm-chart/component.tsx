@@ -29,7 +29,7 @@ type DataRow = {
   /**
    * Whether the point is the Boundary Length Modifier
    */
-  isBlm: boolean;
+  isBlm?: boolean;
   /**
    * Image thumbnail associated with the point.
    * The BLM point shouldn't have one.
@@ -311,6 +311,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                   onMouseLeave={
                     () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
                   }
+                  aria-hidden="true"
                 />
               </foreignObject>
             ))}

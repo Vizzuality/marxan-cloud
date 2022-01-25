@@ -4,6 +4,7 @@ import {
   ConflictException,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Header,
   InternalServerErrorException,
@@ -20,7 +21,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { scenarioResource, ScenarioResult } from './scenario.api.entity';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import {
   FetchSpecification,
   ProcessFetchSpecification,
@@ -62,6 +63,7 @@ import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator
 import {
   projectDoesntExist,
   projectNotReady,
+  scenarioNotFound,
   ScenariosService,
 } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
@@ -102,7 +104,23 @@ import {
 } from '@marxan-api/modules/projects/blm/change-blm-range.command';
 import { projectNotFound } from '@marxan-api/modules/blm';
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { notFound } from './marxan-run';
+import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
+import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
+import {
+  marxanFailed,
+  metadataNotFound,
+  outputZipNotYetAvailable,
+} from './output-files/output-files.service';
+import {
+  inputZipNotYetAvailable,
+  metadataNotFound as inputMetadataNotFound,
+} from './input-files';
+import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
+import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
+import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -110,7 +128,7 @@ const solutionsSubPath = `:id/marxan/solutions`;
 const marxanRunTag = 'Marxan Run';
 const marxanRunFiles = 'Marxan Run - Files';
 
-@IsMissingAclImplementation()
+@ImplementsAcl()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags(scenarioResource.className)
@@ -129,6 +147,7 @@ export class ScenariosController {
     private readonly proxyService: ProxyService,
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
+    private readonly scenarioAclService: ScenarioAccessControl,
   ) {}
 
   @ApiOperation({
@@ -154,10 +173,12 @@ export class ScenariosController {
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Req() req: RequestWithAuthenticatedUser,
     @Query('q') nameAndDescriptionFilter?: string,
   ): Promise<ScenarioResult> {
     const results = await this.service.findAllPaginated(fetchSpecification, {
       params: { nameAndDescriptionFilter },
+      authenticatedUser: req.user,
     });
     return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
@@ -212,10 +233,18 @@ export class ScenariosController {
   })
   @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
   async proxyProtectedAreaTile(
-    @Req() request: Request,
+    @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
+    @Param('id', ParseUUIDPipe) scenarioId: string,
   ) {
-    return this.proxyService.proxyTileRequest(request, response);
+    /* Due to the usage of proxyService in other modules
+    the ACL control for this endpoint is placed in the controller */
+    if (
+      !(await this.scenarioAclService.canViewScenario(req.user.id, scenarioId))
+    ) {
+      throw new ForbiddenException();
+    }
+    return await this.proxyService.proxyTileRequest(req, response);
   }
 
   @ApiOperation({ description: 'Find scenario by id' })
@@ -227,10 +256,29 @@ export class ScenariosController {
   async findOne(
     @Param('id', ParseUUIDPipe) id: string,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioResult> {
-    return await this.scenarioSerializer.serialize(
-      await this.service.getById(id, fetchSpecification),
+    const result = await this.service.getById(
+      id,
+      {
+        authenticatedUser: req.user,
+      },
+      fetchSpecification,
     );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case notFound:
+          throw new NotFoundException(`Scenario ${id} could not be found`);
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return await this.scenarioSerializer.serialize(result.right);
   }
 
   @ApiOperation({ description: 'Create scenario' })
@@ -250,6 +298,8 @@ export class ScenariosController {
           throw new ConflictException();
         case projectDoesntExist:
           throw new NotFoundException(`Project doesn't exist`);
+        case forbiddenError:
+          throw new ForbiddenException();
         default:
           const _check: never = result.left;
           throw new InternalServerErrorException();
@@ -268,11 +318,22 @@ export class ScenariosController {
   async createSpecification(
     @Body(new ValidationPipe()) dto: CreateGeoFeatureSetDTO,
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<GeoFeatureSetResult> {
-    const result = await this.service.createSpecification(id, dto);
+    const result = await this.service.createSpecification(id, req.user.id, dto);
+
     if (isLeft(result)) {
-      throw new InternalServerErrorException(result.left.description);
+      switch (result.left) {
+        case internalError:
+          throw new InternalServerErrorException(result.left.description);
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
+
     return await this.geoFeatureSetSerializer.serialize(
       result.right,
       undefined,
@@ -285,10 +346,22 @@ export class ScenariosController {
   @Get(':id/features/specification')
   async getFeatureSetFor(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<GeoFeatureSetResult> {
-    const result = await this.service.getLastUpdatedSpecification(id);
+    const result = await this.service.getLastUpdatedSpecification(
+      id,
+      req.user.id,
+    );
     if (isLeft(result)) {
-      return this.geoFeatureSetSerializer.emptySpecification();
+      switch (result.left) {
+        case notFoundSpec:
+          return this.geoFeatureSetSerializer.emptySpecification();
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
@@ -299,17 +372,32 @@ export class ScenariosController {
   @Post(`:id/cost-surface/shapefile`)
   async processCostSurfaceShapefile(
     @Param('id') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<JsonApiAsyncJobMeta> {
-    this.service.processCostSurfaceShapefile(scenarioId, file);
+    const result = await this.service.processCostSurfaceShapefile(
+      scenarioId,
+      req.user.id,
+      file,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
   @Get(`:id/cost-surface`)
   @ApiOkResponse({ type: CostRangeDto })
-  async getCostRange(@Param('id') scenarioId: string): Promise<CostRangeDto> {
-    const range = await this.service.getCostRange(scenarioId);
-    return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, range);
+  async getCostRange(
+    @Param('id') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<CostRangeDto> {
+    const result = await this.service.getCostRange(scenarioId, req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
 
   @ApiConsumesShapefile()
@@ -318,9 +406,18 @@ export class ScenariosController {
   @GeometryFileInterceptor(GeometryKind.Simple)
   async uploadLockInShapeFile(
     @Param('id', ParseUUIDPipe) scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<ShapefileGeoJSONResponseDTO> {
-    return this.service.uploadLockInShapeFile(scenarioId, file);
+    const result = await this.service.uploadLockInShapeFile(
+      scenarioId,
+      req.user.id,
+      file,
+    );
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiOperation({ description: 'Update scenario' })
@@ -329,10 +426,17 @@ export class ScenariosController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @Body(new ValidationPipe()) dto: UpdateScenarioDTO,
   ): Promise<ScenarioResult> {
+    const result = await this.service.update(id, req.user.id, dto);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
     return await this.scenarioSerializer.serialize(
-      await this.service.update(id, dto),
+      result.right,
       undefined,
       true,
     );
@@ -341,8 +445,15 @@ export class ScenariosController {
   @ApiOperation({ description: 'Delete scenario' })
   @ApiOkResponse()
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
-    return await this.service.remove(id);
+  async delete(
+    @Param('id') id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.service.remove(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 
   @ApiTags(asyncJobTag)
@@ -350,9 +461,13 @@ export class ScenariosController {
   @Post(':id/planning-units')
   async changePlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @Body() input: UpdateScenarioPlanningUnitLockStatusDto,
   ): Promise<JsonApiAsyncJobMeta> {
-    await this.service.changeLockStatus(id, input);
+    const result = await this.service.changeLockStatus(id, req.user.id, input);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
@@ -360,19 +475,28 @@ export class ScenariosController {
   @ApiOkResponse()
   async resetPlanningUnitsLockStatus(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    await this.service.resetLockStatus(id);
-    return;
+    const result = await this.service.resetLockStatus(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 
   @Get(':id/planning-units')
   @ApiOkResponse({ type: ScenarioPlanningUnitDto, isArray: true })
   async getPlanningUnits(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioPlanningUnitDto[]> {
-    return this.planningUnitsSerializer.serialize(
-      await this.service.getPlanningUnits(id),
-    );
+    const result = await this.service.getPlanningUnits(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return this.planningUnitsSerializer.serialize(result.right);
   }
 
   @ApiOperation({ description: `Resolve scenario's features pre-gap data.` })
@@ -382,11 +506,15 @@ export class ScenariosController {
   @Get(':id/features')
   async getScenarioFeatures(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<Partial<ScenarioFeaturesData>[]> {
-    const result = await this.service.getFeatures(id);
+    const result = await this.service.getFeatures(id, req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return this.scenarioFeatureSerializer.serialize(
-      result.data,
-      result.metadata,
+      result.right.data,
+      result.right.metadata,
     );
   }
 
@@ -400,19 +528,28 @@ export class ScenariosController {
   @Get(':id/features/gap-data')
   async getScenarioFeaturesGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginated(
+    const result = await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
           searchPhrase: featureClassAndAliasFilter,
         },
+        authenticatedUser: req.user,
       },
     );
-    return this.scenarioFeaturesGapData.serialize(result.data, result.metadata);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return this.scenarioFeaturesGapData.serialize(
+      result.right.data,
+      result.right.metadata,
+    );
   }
 
   @ApiTags(marxanRunFiles)
@@ -422,8 +559,13 @@ export class ScenariosController {
   @Header('Content-Type', 'text/csv')
   async getInputParameterFile(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<string> {
-    return await this.service.getInputParameterFile(id);
+    const result = await this.service.getInputParameterFile(id, req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiTags(marxanRunFiles)
@@ -433,8 +575,13 @@ export class ScenariosController {
   @Header('Content-Type', 'text/csv')
   async getSpecDatFile(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<string> {
-    return await this.service.getSpecDatCsv(id);
+    const result = await this.service.getSpecDatCsv(id, req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiTags(marxanRunFiles)
@@ -444,8 +591,13 @@ export class ScenariosController {
   @Header('Content-Type', 'text/csv')
   async getPuvsprDatFile(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<string> {
-    return await this.service.getPuvsprDatCsv(id);
+    const result = await this.service.getPuvsprDatCsv(id, req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiTags(marxanRunFiles)
@@ -455,8 +607,13 @@ export class ScenariosController {
   @Header('Content-Type', 'text/csv')
   async getBoundDatFile(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<string> {
-    return await this.service.getBoundDatCsv(id);
+    const result = await this.service.getBoundDatCsv(id, req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
   }
 
   @ApiTags(marxanRunFiles)
@@ -468,11 +625,34 @@ export class ScenariosController {
   @Header('Content-Disposition', 'attachment; filename="output.zip"')
   async getOutputArchive(
     @Param(`id`, ParseUUIDPipe) scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
   ) {
     const result = await this.service.getMarxanExecutionOutputArchive(
       scenarioId,
+      req.user.id,
     );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case marxanFailed:
+          throw new InternalServerErrorException('Marxan failed');
+        case outputZipNotYetAvailable:
+          throw new InternalServerErrorException(
+            'Marxan output file - output file not available, possible error',
+          );
+        case metadataNotFound:
+          throw new InternalServerErrorException(
+            'Marxan was not yet executed.',
+          );
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
+    }
+
     response.send(this.zipFilesSerializer.serialize(result));
   }
 
@@ -485,11 +665,31 @@ export class ScenariosController {
   @Header('Content-Disposition', 'attachment; filename="input.zip"')
   async getInputArchive(
     @Param(`id`, ParseUUIDPipe) scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
   ) {
     const result = await this.service.getMarxanExecutionInputArchive(
       scenarioId,
+      req.user.id,
     );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case inputZipNotYetAvailable:
+          throw new InternalServerErrorException(
+            'marxan input file - input file not available, possible error',
+          );
+        case inputMetadataNotFound:
+          throw new InternalServerErrorException(
+            'marxan input file - metadata not found',
+          );
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
+    }
     response.send(this.zipFilesSerializer.serialize(result));
   }
 
@@ -510,15 +710,22 @@ export class ScenariosController {
   @Get(solutionsSubPath)
   async getScenarioRunSolutions(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
     const result = await this.service.findAllSolutionsPaginated(
       id,
+      req.user.id,
       fetchSpecification,
     );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
     return this.scenarioSolutionSerializer.serialize(
-      result.data,
-      result.metadata,
+      result.right.data,
+      result.right.metadata,
     );
   }
 
@@ -538,9 +745,13 @@ export class ScenariosController {
   @Post(`:id/marxan`)
   async executeMarxanRun(
     @Param(`id`, ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @Query(`blm`) blm?: number,
   ): Promise<JsonApiAsyncJobMeta> {
-    await this.service.run(id, blm);
+    const result = await this.service.run(id, req.user.id, blm);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
 
@@ -553,8 +764,15 @@ export class ScenariosController {
     description: `No content.`,
   })
   @Delete(`:id/marxan`)
-  async cancelMarxanRun(@Param(`id`, ParseUUIDPipe) id: string) {
-    await this.service.cancelMarxanRun(id);
+  async cancelMarxanRun(
+    @Param(`id`, ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const result = await this.service.cancelMarxanRun(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 
   @ApiTags(marxanRunTag)
@@ -565,10 +783,20 @@ export class ScenariosController {
   @Get(`${solutionsSubPath}/best`)
   async getScenarioRunBestSolutions(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
-    const result = await this.service.getBestSolution(id, fetchSpecification);
-    return this.scenarioSolutionSerializer.serialize(result[0]);
+    const result = await this.service.getBestSolution(
+      id,
+      req.user.id,
+      fetchSpecification,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return this.scenarioSolutionSerializer.serialize(result.right[0]);
   }
 
   @ApiTags(marxanRunTag)
@@ -579,13 +807,20 @@ export class ScenariosController {
   @Get(`${solutionsSubPath}/most-different`)
   async getScenarioRunMostDifferentSolutions(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
     const result = await this.service.getMostDifferentSolutions(
       id,
+      req.user.id,
       fetchSpecification,
     );
-    return this.scenarioSolutionSerializer.serialize(result[0]);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return this.scenarioSolutionSerializer.serialize(result.right[0]);
   }
 
   @ApiOperation({
@@ -606,21 +841,28 @@ export class ScenariosController {
   @Get(`${solutionsSubPath}/gap-data`)
   async getScenarioFeaturesOutputGapData(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
-    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginated(
+    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginatedAcl(
       fetchSpecification,
       {
         params: {
           scenarioId: id,
           searchPhrase: featureClassAndAliasFilter,
         },
+        authenticatedUser: req.user,
       },
     );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
     return this.scenarioFeaturesOutputGapData.serialize(
-      result.data,
-      result.metadata,
+      result.right.data,
+      result.right.metadata,
     );
   }
 
@@ -632,11 +874,21 @@ export class ScenariosController {
   async getScenarioRunId(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('runId', ParseUUIDPipe) runId: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<ScenarioFeatureResultDto> {
-    return this.scenarioSolutionSerializer.serialize(
-      await this.service.getOneSolution(id, runId, fetchSpecification),
+    const result = await this.service.getOneSolution(
+      id,
+      runId,
+      req.user.id,
+      fetchSpecification,
     );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return this.scenarioSolutionSerializer.serialize(result.right);
   }
 
   @ApiTags(marxanRunFiles)
@@ -652,10 +904,14 @@ export class ScenariosController {
   @Get(`:id/marxan/dat/pu.dat`)
   async getScenarioCostSurface(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
     @Res() res: Response,
   ): Promise<void> {
-    await this.service.getCostSurfaceCsv(id, res);
-    return;
+    const result = await this.service.getCostSurfaceCsv(id, req.user.id, res);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 
   @ApiOkResponse({
@@ -672,7 +928,17 @@ export class ScenariosController {
     });
 
     if (isLeft(result)) {
-      throw new NotFoundException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case scenarioNotFound:
+          throw new NotFoundException('Scenario not found');
+        case protectedAreaProjectNotFound:
+          throw new NotFoundException('Project not found');
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
 
     return result.right;
@@ -693,11 +959,21 @@ export class ScenariosController {
     });
 
     if (isLeft(result)) {
-      // TODO map error
-      throw new BadRequestException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case scenarioNotFound:
+          throw new NotFoundException('Scenario not found');
+        case protectedAreaProjectNotFound:
+          throw new NotFoundException('Project not found');
+        case invalidProtectedAreaId:
+          throw new BadRequestException('Invalid protected area id');
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
-
-    return this.getProtectedAreasForScenario(scenarioId, req);
+    return await this.getProtectedAreasForScenario(scenarioId, req);
   }
 
   @ApiConsumesShapefile({ withGeoJsonResponse: false })
@@ -722,6 +998,8 @@ export class ScenariosController {
     );
     if (isLeft(outcome)) {
       switch (outcome.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
         case submissionFailed:
           throw new InternalServerErrorException();
         default:
@@ -742,11 +1020,20 @@ export class ScenariosController {
   async startCalibration(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() { range }: StartScenarioBlmCalibrationDto,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<JsonApiAsyncJobMeta> {
-    const result = await this.service.startBlmCalibration(id, range);
+    const result = await this.service.startBlmCalibration(
+      id,
+      {
+        authenticatedUser: req.user,
+      },
+      range,
+    );
 
     if (isLeft(result)) {
       switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
         case planningUnitAreaNotFound:
           throw new InternalServerErrorException(
             `Could not found planning units area for scenario with ID: ${id}`,
@@ -778,8 +1065,15 @@ export class ScenariosController {
   @Get(`:id/calibration`)
   async getCalibrationResults(
     @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<BlmCalibrationRunResultDto[]> {
-    return this.service.getBlmCalibrationResults(id);
+    const result = await this.service.getBlmCalibrationResults(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return result.right;
   }
 
   @ApiOperation({
@@ -787,7 +1081,14 @@ export class ScenariosController {
     summary: `Cancel BLM calibration execution.`,
   })
   @Delete(`:id/calibration`)
-  async cancelBlmCalibration(@Param(`id`, ParseUUIDPipe) id: string) {
-    await this.service.cancelBlmCalibration(id);
+  async cancelBlmCalibration(
+    @Param(`id`, ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.service.cancelBlmCalibration(id, req.user.id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 }

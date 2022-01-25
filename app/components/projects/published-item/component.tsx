@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { format } from 'd3';
 import type { Project } from 'types/project-model';
 
+import { useProjectUsers } from 'hooks/project-users';
+
 import DuplicateButton from 'layout/community/published-projects/duplicate-button/component';
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -16,10 +18,13 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   name,
   description,
   area,
-  // contributors = [],
   timesDuplicated,
 }: PublishedItemProps) => {
   const planningArea = area || 'Custom';
+
+  const { data: projectUsers } = useProjectUsers(id);
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
 
   return (
     <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
@@ -33,9 +38,13 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="pr-6">
         <p className="text-sm">{planningArea}</p>
       </td>
-      <td className="pr-6">
-        {/* {!!contributors.length && contributors?.map((c) =>
-          <p key={`${c.id}`} className="text-sm">{c.name}</p>)} */}
+      <td className="pr-6 text-sm">
+        {!!projectUsersVisible?.length && projectUsersVisible?.map((u) => <p key={`${u.user.id}`}>{u.user.displayName}</p>)}
+        {projectUsers?.length > projectUsersVisibleSize && (
+          <p>
+            {`(+${projectUsers.length - projectUsersVisibleSize})`}
+          </p>
+        )}
       </td>
       <td className="">
         <div className="flex flex-row justify-between pl-10">

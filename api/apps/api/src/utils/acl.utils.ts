@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   forbiddenError,
@@ -9,13 +10,15 @@ import {
   transactionFailed,
   queryFailed,
 } from '@marxan-api/modules/access-control';
+import { notFound } from '@marxan-api/modules/scenarios/marxan-run';
 
 export const aclErrorHandler = (
   errorToCheck:
     | typeof forbiddenError
     | typeof lastOwner
     | typeof transactionFailed
-    | typeof queryFailed,
+    | typeof queryFailed
+    | typeof notFound,
 ) => {
   switch (errorToCheck) {
     case forbiddenError:
@@ -28,7 +31,10 @@ export const aclErrorHandler = (
       );
     case transactionFailed:
       throw new InternalServerErrorException(`Transaction failed`);
+    case notFound:
+      throw new NotFoundException(`Entity not found`);
     default:
-      throw new InternalServerErrorException();
+      const _check: never = errorToCheck;
+      throw _check;
   }
 };

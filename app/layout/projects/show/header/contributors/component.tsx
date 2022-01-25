@@ -1,31 +1,68 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
+
+import EditDropdown from 'layout/projects/show/header/contributors/edit-dropdown';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
+import Tooltip from 'components/tooltip';
 
 import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 
 export interface ContributorsProps {
 }
 
-// const USERS = [
-//   { id: 1, avatarDataUrl: '/images/avatar.png', displayName: 'Hello' },
-//   { id: 2, avatarDataUrl: null, displayName: 'Hello 2' },
-//   { id: 3, avatarDataUrl: null, displayName: 'Hello 3' },
-// ];
-
 export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
+
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState(null);
+
   const { data = {} } = useProject(pid);
-  const { users = [] } = data;
+
+  const {
+    data: projectUsers,
+    refetch: refetchProjectUsers,
+  } = useProjectUsers(pid, { search });
+
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
+
+  useEffect(() => {
+    refetchProjectUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search]);
+
+  const handleClick = useCallback(() => {
+    setOpen(!open);
+  }, [open, setOpen]);
+
+  const handleClickOutside = useCallback((tooltip, event) => {
+    const $overlay = document.getElementById('overlay');
+    const $select = document.querySelectorAll('.c-select-dropdown');
+    const $multiselect = document.querySelectorAll('.c-multi-select-dropdown');
+
+    const isSelect = !!$select && [...$select].some((s) => s.contains(event.target));
+    const isMultiSelect = !!$multiselect && [...$multiselect].some((s) => s.contains(event.target));
+
+    if (
+      !((!!$overlay && $overlay.contains(event.target)) || isSelect || isMultiSelect)
+    ) {
+      setOpen(false);
+    }
+  }, [setOpen]);
+
+  const onSearch = useCallback((s) => {
+    setSearch(s);
+  }, []);
 
   return (
     <AnimatePresence>
@@ -40,41 +77,63 @@ export const Contributors: React.FC<ContributorsProps> = () => {
             <div className="text-sm">Contributors to this project:</div>
 
             <ul className="flex ml-2.5">
-              {!!users && !!users.length && users.map((u, i) => {
+              {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
+                const { user: { displayName, id, avatarDataUrl } } = u;
                 return (
                   <li
-                    key={u.id}
+                    key={id}
                     className={cx({
                       '-ml-3': i !== 0,
                     })}
                   >
-                    {/* <Avatar
-                    className="text-sm text-white uppercase bg-primary-700"
-                    bgImage={u.avatarDataUrl}
-                    name={u.displayName}
+                    <Avatar
+                      className="text-sm text-white uppercase bg-primary-700"
+                      bgImage={avatarDataUrl}
+                      name={displayName}
                     >
-                      {!u.avatarDataUrl && u.displayName.slice(0, 2)}
-                    </Avatar> */}
-                    <Avatar className="text-sm text-white uppercase bg-gray-500">
-                      <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
+                      {!avatarDataUrl && displayName.slice(0, 2)}
                     </Avatar>
                   </li>
                 );
               })}
 
-              <li className="ml-3">
+              {projectUsers?.length > projectUsersVisibleSize && (
+                <Avatar className="-ml-3 text-sm text-white uppercase bg-primary-700">
+                  {`+${projectUsers.length - projectUsersVisibleSize}`}
+                </Avatar>
+              )}
+
+              <Tooltip
+                placement="bottom-end"
+                interactive
+                popup
+                visible={open}
+                onClickOutside={handleClickOutside}
+                zIndex={49}
+                content={(
+                  <EditDropdown
+                    users={projectUsers}
+                    search={search}
+                    onSearch={onSearch}
+                  />
+                )}
+              >
                 <button
                   aria-label="add-contributor"
                   type="button"
-                  onClick={() => {
-                    console.info('Add contributor');
-                  }}
+                  className="border border-transparent rounded-full hover:border hover:border-white"
+                  onClick={handleClick}
                 >
-                  <Avatar className="text-sm text-white uppercase bg-gray-500">
+                  <Avatar className={cx({
+                    'text-white bg-gray-500': !open,
+                    'bg-white text-gray-500': open,
+                  })}
+                  >
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
+
                 </button>
-              </li>
+              </Tooltip>
 
             </ul>
           </div>

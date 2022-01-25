@@ -6,6 +6,7 @@ import { usePlausible } from 'next-plausible';
 import type { Project } from 'types/project-model';
 
 import { useMe } from 'hooks/me';
+import { useProjectRole, useProjectUsers } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -13,7 +14,7 @@ import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
+// import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ItemProps extends Project {
@@ -35,7 +36,6 @@ export const Item: React.FC<ItemProps> = ({
   area,
   description,
   lastUpdateDistance,
-  contributors = [],
   style,
   onClick,
   onDownload,
@@ -45,6 +45,14 @@ export const Item: React.FC<ItemProps> = ({
   const [animate, setAnimate] = useState('leave');
   const plausible = usePlausible();
   const { user } = useMe();
+
+  const { data: projectRole } = useProjectRole(id);
+  const OWNER = projectRole === 'project_owner';
+
+  const { data: projectUsers } = useProjectUsers(id);
+
+  const projectUsersVisibleSize = 3;
+  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
 
   const handleMouseEnter = useCallback(() => {
     setAnimate('enter');
@@ -168,25 +176,39 @@ export const Item: React.FC<ItemProps> = ({
 
         {/* CONTRIBUTORS */}
         <div className="inline-flex">
-          <ComingSoon>
-            <div className="flex items-center mt-4 text-sm">
-              <p>Contributors:</p>
-              <ul className="flex ml-2">
-                {contributors.map((c, i) => {
-                  return (
-                    <li
-                      key={`${c.id}`}
-                      className={cx({
-                        '-ml-3': i !== 0,
-                      })}
-                    >
-                      <Avatar className="text-sm text-white uppercase bg-gray-500">
-                        <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
-                      </Avatar>
-                    </li>
-                  );
-                })}
+          <div className="flex items-center mt-4 text-sm">
+            <p>Contributors:</p>
+            <ul className="flex ml-2">
+              {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
+                const { user: { displayName, id: userId, avatarDataUrl } } = u;
 
+                return (
+                  <li
+                    key={userId}
+                    className={cx({
+                      '-ml-3': i !== 0,
+                    })}
+                  >
+                    <Avatar
+                      className="text-sm text-white uppercase bg-primary-700"
+                      bgImage={avatarDataUrl}
+                      name={displayName}
+                    >
+                      {!avatarDataUrl && displayName.slice(0, 2)}
+                    </Avatar>
+                  </li>
+                );
+              })}
+
+              {projectUsers?.length > projectUsersVisibleSize && (
+                <Avatar
+                  className="-ml-3 text-sm text-white uppercase bg-primary-700"
+                >
+                  {`+${projectUsers.length - projectUsersVisibleSize}`}
+                </Avatar>
+              )}
+
+              {/* <ComingSoon>
                 <li
                   key="add-contributor"
                   className={cx({
@@ -197,9 +219,9 @@ export const Item: React.FC<ItemProps> = ({
                     <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
                   </Avatar>
                 </li>
-              </ul>
-            </div>
-          </ComingSoon>
+              </ComingSoon> */}
+            </ul>
+          </div>
         </div>
 
         <footer className="mt-7">
@@ -232,6 +254,7 @@ export const Item: React.FC<ItemProps> = ({
               theme="secondary"
               size="xs"
               onClick={handleDelete}
+              disabled={!OWNER}
             >
               Delete
             </Button>
