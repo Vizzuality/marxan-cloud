@@ -16,6 +16,7 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { GivenUserExists } from '../steps/given-user-exists';
+import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -157,7 +158,7 @@ export const getFixtures = async () => {
       return ids[0].id;
     },
     ThenItContainsSelectedCustomArea: async (
-      response: any[],
+      response: ProtectedAreaDto[],
       areaId: string,
     ) => {
       expect(response.find((e) => e.id === areaId)).toEqual({
@@ -168,7 +169,7 @@ export const getFixtures = async () => {
       });
     },
     ThenItDoesNotContainsSelectedCustomArea: async (
-      response: any[],
+      response: ProtectedAreaDto[],
       areaId: string,
     ) => {
       expect(response.find((e) => e.id === areaId)).toEqual({
@@ -178,7 +179,9 @@ export const getFixtures = async () => {
         selected: false,
       });
     },
-    ThenItContainsNonSelectedCustomArea: async (response: any[]) => {
+    ThenItContainsNonSelectedCustomArea: async (
+      response: ProtectedAreaDto[],
+    ) => {
       expect(response.find((e) => e.kind === `project`)).toEqual({
         id: expect.any(String),
         kind: `project`,
@@ -252,7 +255,7 @@ export const getFixtures = async () => {
           threshold: 50,
         }),
     ThenItContainsSelectedGlobalArea: async (
-      response: any[],
+      response: ProtectedAreaDto[],
       category: IUCNCategory,
     ) => {
       expect(response.find((e) => e.id === category)).toEqual({
@@ -263,7 +266,7 @@ export const getFixtures = async () => {
       });
     },
     ThenItDoesNotContainsSelectedGlobalArea: async (
-      response: any[],
+      response: ProtectedAreaDto[],
       category: IUCNCategory,
     ) => {
       expect(response.find((e) => e.id === category)).toEqual({
@@ -282,9 +285,7 @@ export const getFixtures = async () => {
         ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
       ).toEqual(scenario);
     },
-    ThenCalculationsOfProtectionLevelWereNotTriggered: async (
-      scenario: string,
-    ) => {
+    ThenCalculationsOfProtectionLevelWereNotTriggered: async () => {
       expect(
         (commands.find(
           (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,

@@ -66,7 +66,7 @@ test(`selecting protected areas as viewer`, async () => {
   );
   await fixtures.ThenItDoesNotContainsSelectedCustomArea(areas, areaId);
 
-  await fixtures.ThenCalculationsOfProtectionLevelWereNotTriggered(scenario);
+  await fixtures.ThenCalculationsOfProtectionLevelWereNotTriggered();
 });
 
 test(`getting NAM.2_1 protected areas for scenario as owner`, async () => {

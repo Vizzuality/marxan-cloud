@@ -15,14 +15,7 @@ describe(`As owner, when scenario has PUs with cost and lock status`, () => {
     const [headers, ...costAndStatus] = result.split('\n');
 
     expect(headers).toEqual('id\tcost\tstatus');
-    expect(costAndStatus).toMatchInlineSnapshot(`
-      Array [
-        "0	200	0",
-        "1	400	2",
-        "2	600	3",
-        "3	800	0",
-      ]
-    `);
+    expect(costAndStatus).toEqual(['0	200	0', '1	400	2', '2	600	3', '3	800	0']);
   });
 
   it(`returns relevant data for PU listing`, async () => {
@@ -59,14 +52,7 @@ describe(`As contributor, when scenario has PUs with cost and lock status`, () =
     const [headers, ...costAndStatus] = result.split('\n');
 
     expect(headers).toEqual('id\tcost\tstatus');
-    expect(costAndStatus).toMatchInlineSnapshot(`
-      Array [
-        "0	200	0",
-        "1	400	2",
-        "2	600	3",
-        "3	800	0",
-      ]
-    `);
+    expect(costAndStatus).toEqual(['0	200	0', '1	400	2', '2	600	3', '3	800	0']);
   });
 
   it(`returns relevant data for PU listing`, async () => {
@@ -103,14 +89,7 @@ describe(`As viewer, when scenario has PUs with cost and lock status`, () => {
     const [headers, ...costAndStatus] = result.split('\n');
 
     expect(headers).toEqual('id\tcost\tstatus');
-    expect(costAndStatus).toMatchInlineSnapshot(`
-      Array [
-        "0	200	0",
-        "1	400	2",
-        "2	600	3",
-        "3	800	0",
-      ]
-    `);
+    expect(costAndStatus).toEqual(['0	200	0', '1	400	2', '2	600	3', '3	800	0']);
   });
 
   it(`returns relevant data for PU listing`, async () => {

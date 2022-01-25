@@ -81,30 +81,21 @@ export const getFixtures = async () => {
         .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions`)
         .set('Authorization', `Bearer ${viewerToken}`),
     ThenSolutionsShouldBeResolved: async (response: request.Response) => {
-      expect(response.body.meta).toMatchInlineSnapshot(`
-      Object {
-        "page": 1,
-        "size": 25,
-        "totalItems": 1,
-        "totalPages": 1,
-      }
-    `);
+      expect(response.body.meta).toEqual({
+        page: 1,
+        size: 25,
+        totalItems: 1,
+        totalPages: 1,
+      });
       expect(response.body.data.length).toEqual(1);
-      expect(response.body.data[0].attributes).toMatchInlineSnapshot(
-        {
-          id: expect.any(String),
-        },
-        `
-      Object {
-        "costValue": 2000,
-        "id": Any<String>,
-        "missingValues": 1,
-        "planningUnits": 123,
-        "runId": 1,
-        "scoreValue": 4000,
-      }
-    `,
-      );
+      expect(response.body.data[0].attributes).toEqual({
+        costValue: 2000,
+        id: expect.any(String),
+        missingValues: 1,
+        planningUnits: 123,
+        runId: 1,
+        scoreValue: 4000,
+      });
     },
     cleanup: async () => {
       await marxanOutputRepo.delete({
