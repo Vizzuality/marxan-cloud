@@ -4,7 +4,6 @@ import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import {
-  JSONAPIProjectData,
   Project,
   ProjectResultPlural,
   ProjectResultSingular,

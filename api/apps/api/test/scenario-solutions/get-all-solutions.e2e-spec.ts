@@ -1,47 +1,35 @@
-import { PromiseType } from 'utility-types';
-import { createWorld } from './world';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { getFixtures } from './get-all-solutions.fixtures';
 
-let world: PromiseType<ReturnType<typeof createWorld>>;
+let fixtures: FixtureType<typeof getFixtures>;
 
 beforeAll(async () => {
-  world = await createWorld();
+  fixtures = await getFixtures();
 });
 
 describe(`When getting scenario solution results`, () => {
   beforeAll(async () => {
-    await world.GivenScenarioHasSolutionsReady();
+    await fixtures.GivenScenarioHasSolutionsReady();
   });
 
-  it(`should resolve solutions`, async () => {
-    const response = await world.WhenGettingSolutions();
-    expect(response.body.meta).toMatchInlineSnapshot(`
-      Object {
-        "page": 1,
-        "size": 25,
-        "totalItems": 1,
-        "totalPages": 1,
-      }
-    `);
-
-    expect(response.body.data.length).toEqual(1);
-    expect(response.body.data[0].attributes).toMatchInlineSnapshot(
-      {
-        id: expect.any(String),
-      },
-      `
-      Object {
-        "costValue": 2000,
-        "id": Any<String>,
-        "missingValues": 1,
-        "planningUnits": 123,
-        "runId": 1,
-        "scoreValue": 4000,
-      }
-    `,
-    );
+  afterAll(async () => {
+    await fixtures?.cleanup();
   });
-});
 
-afterAll(async () => {
-  await world?.cleanup();
+  it(`should resolve solutions as owner`, async () => {
+    const response = await fixtures.WhenGettingSolutionsAsOwner();
+    fixtures.ThenSolutionsShouldBeResolved(response);
+  });
+
+  it(`should resolve solutions as contributor`, async () => {
+    await fixtures.GivenContributorWasAddedToScenario();
+    const response = await fixtures.WhenGettingSolutionsAsContributor();
+    fixtures.ThenSolutionsShouldBeResolved(response);
+  });
+
+  it(`should resolve solutions as viewer`, async () => {
+    await fixtures.GivenViewerWasAddedToScenario();
+    const response = await fixtures.WhenGettingSolutionsAsViewer();
+    fixtures.ThenSolutionsShouldBeResolved(response);
+  });
 });

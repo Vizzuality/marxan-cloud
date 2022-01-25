@@ -242,6 +242,47 @@ export const useScenarioActionsDone = () => {
     queryClient,
   ]);
 
+  // Calibration
+  const onCalibrationDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: {
+          ...scenarioData?.metadata,
+          scenarioEditingMetadata: {
+            ...scenarioData?.metadata?.scenarioEditingMetadata,
+            lastJobCheck: new Date().getTime(),
+          },
+        },
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        const scenarioId = sid;
+        queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onCalibrationDone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    addToast,
+    queryClient,
+  ]);
+
+  // Run
   const onRunDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
@@ -284,6 +325,7 @@ export const useScenarioActionsDone = () => {
     protectedAreas: onProtectedAreasDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
+    calibration: onCalibrationDone,
     run: onRunDone,
   };
 };

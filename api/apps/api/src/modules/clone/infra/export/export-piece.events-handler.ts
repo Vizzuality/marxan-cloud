@@ -22,6 +22,7 @@ import {
 } from '../../export/application/complete-piece.command';
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
 import { ResourceId } from '../../export';
+import { ApiEventsService } from '../../../api-events';
 
 @Injectable()
 export class ExportPieceEventsHandler
@@ -49,7 +50,7 @@ export class ExportPieceEventsHandler
     return {
       topic: data.componentId,
       kind,
-      externalId: `${kind}-${data.componentId}`,
+      externalId: ApiEventsService.composeExternalId(data.componentId, kind),
       data: {
         kind,
         ...output,
@@ -71,7 +72,7 @@ export class ExportPieceEventsHandler
     return {
       topic: componentId,
       kind,
-      externalId: `${kind}-${componentId}`,
+      externalId: ApiEventsService.composeExternalId(componentId, kind),
       data: {
         exportId,
         resourceId,
