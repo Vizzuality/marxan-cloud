@@ -77,6 +77,7 @@ const getFixtures = async () => {
             leftJoinAndSelect: jest.fn().mockReturnThis(),
             select: jest.fn().mockReturnThis(),
             where: jest.fn().mockReturnThis(),
+            andWhere: jest.fn().mockReturnThis(),
             getMany: jest.fn(() => [
               {
                 roleName: ProjectRoles.project_owner,
