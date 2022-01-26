@@ -13,7 +13,6 @@ import {
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
-import { PublishedProject } from '../../published-project/entities/published-project.api.entity';
 
 @Injectable()
 export class MarxanProjectChecker implements ProjectChecker {
@@ -21,8 +20,6 @@ export class MarxanProjectChecker implements ProjectChecker {
     private readonly apiEvents: ApiEventsService,
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
-    @InjectRepository(PublishedProject)
-    private readonly publishedProjectRepo: Repository<PublishedProject>,
     private readonly planningAreas: PlanningAreasService,
   ) {}
 
