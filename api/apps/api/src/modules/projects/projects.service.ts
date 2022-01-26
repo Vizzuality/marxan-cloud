@@ -43,11 +43,16 @@ import {
 import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
+import { ApiEventsService } from '../api-events';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
 export const notAllowed = Symbol(`not allowed to that action`);
+export const notFound = Symbol(`project not found`);
+export const exportNotFound = Symbol(`project export not found`);
+export const apiEventDataNotFound = Symbol(`missing data in api event`);
 
 @Injectable()
 export class ProjectsService {
@@ -61,6 +66,7 @@ export class ProjectsService {
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
     private readonly blockGuard: BlockGuard,
+    private readonly apiEventsService: ApiEventsService,
   ) {}
 
   async findAllGeoFeatures(
@@ -248,5 +254,44 @@ export class ProjectsService {
     if (!canDownloadExport) return left(notAllowed);
 
     return this.queryBus.execute(new GetExportArchive(new ExportId(exportId)));
+  }
+
+  async getLatestExportForProject(
+    projectId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      | typeof exportNotFound
+      | typeof forbiddenError
+      | typeof apiEventDataNotFound
+      | typeof projectNotFound,
+      string
+    >
+  > {
+    const response = await this.assertProject(projectId, { id: userId });
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
+      userId,
+      projectId,
+    );
+
+    if (!canDownloadExport) return left(forbiddenError);
+
+    try {
+      const latestExportFinishedApiEvent = await this.apiEventsService.getLatestEventForTopic(
+        {
+          kind: API_EVENT_KINDS.project__export__finished__v1__alpha,
+          topic: projectId,
+        },
+      );
+      const exportId = latestExportFinishedApiEvent.data?.exportId as
+        | string
+        | undefined;
+      if (!exportId) return left(apiEventDataNotFound);
+      return right(exportId);
+    } catch (err) {
+      return left(exportNotFound);
+    }
   }
 }
