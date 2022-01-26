@@ -24,6 +24,7 @@ import { compare, hash } from 'bcrypt';
 import { AuthenticationService } from '@marxan-api/modules/authentication/authentication.service';
 import { v4 } from 'uuid';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { ProjectAclService } from '../access-control/projects-acl/project-acl.service';
 
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -37,6 +38,8 @@ export class UsersService extends AppBaseService<
     protected readonly repository: Repository<User>,
     @Inject(forwardRef(() => AuthenticationService))
     private readonly authenticationService: AuthenticationService,
+    @Inject(forwardRef(() => ProjectAclService))
+    private readonly projectAclService: ProjectAclService,
   ) {
     super(repository, userResource.name.singular, userResource.name.plural, {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
@@ -144,6 +147,7 @@ export class UsersService extends AppBaseService<
    * regulations.
    */
   async markAsDeleted(userId: string): Promise<void> {
+    // PromiseHasOtherOwner ACL check
     await this.repository.update(
       { id: userId },
       {

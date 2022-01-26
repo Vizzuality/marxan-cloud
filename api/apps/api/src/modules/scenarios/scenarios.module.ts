@@ -70,7 +70,7 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
     EditGuardModule,
     ProjectCheckerModule,
     PlanningAreasModule,
-    UsersModule,
+    forwardRef(() => UsersModule),
     ScenarioFeaturesModule,
     AnalysisModule,
     CostSurfaceModule,
@@ -86,7 +86,7 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
     ProtectedAreasCrudModule,
     BlmValuesModule,
     BlmCalibrationModule,
-    AccessControlModule,
+    forwardRef(() => AccessControlModule),
   ],
   providers: [
     ScenariosService,

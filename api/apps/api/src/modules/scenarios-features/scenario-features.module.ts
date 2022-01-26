@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ScenarioFeaturesService } from './scenario-features.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -42,7 +42,7 @@ import {
       ],
       DbConnections.geoprocessingDB,
     ),
-    ProjectsModule,
+    forwardRef(() => ProjectsModule),
     ApiEventsModule,
     IntersectWithPuModule,
   ],
