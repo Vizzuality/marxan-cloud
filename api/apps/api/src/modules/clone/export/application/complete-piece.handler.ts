@@ -21,7 +21,7 @@ export class CompletePieceHandler
     private readonly eventBus: EventBus,
     private readonly logger: Logger,
   ) {
-    this.logger.setContext(this.constructor.name);
+    this.logger.setContext(CompletePieceHandler.name);
   }
 
   async execute({
