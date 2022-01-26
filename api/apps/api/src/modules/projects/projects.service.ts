@@ -27,7 +27,7 @@ import {
   ChangeRangeErrors,
 } from '@marxan-api/modules/projects/blm';
 import {
-  GetFailure,
+  GetFailure as GetBlmFailure,
   ProjectBlm,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
@@ -40,13 +40,14 @@ import {
   ExportProject,
   GetExportArchive,
 } from '@marxan-api/modules/clone';
-import { ResourceId } from '@marxan/cloning/domain';
-import { createReadStream } from 'fs';
+import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
+import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
 
 export { validationFailed } from '../planning-areas';
 
-export const notFound = Symbol(`project not found`);
+export const projectNotFound = Symbol(`project not found`);
+export const notAllowed = Symbol(`not allowed to that action`);
 
 @Injectable()
 export class ProjectsService {
@@ -93,7 +94,7 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Either<typeof notFound | typeof forbiddenError, Project>> {
+  ): Promise<Either<typeof projectNotFound | typeof forbiddenError, Project>> {
     try {
       const project = await this.projectsCrud.getById(id, undefined, info);
       if (
@@ -107,14 +108,14 @@ export class ProjectsService {
       return right(project);
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
-      return left(notFound);
+      return left(projectNotFound);
     }
   }
 
   async findProjectBlm(
     projectId: string,
     userId: string,
-  ): Promise<Either<GetFailure | typeof forbiddenError, ProjectBlm>> {
+  ): Promise<Either<GetBlmFailure | typeof forbiddenError, ProjectBlm>> {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -157,8 +158,8 @@ export class ProjectsService {
   }
 
   async updateBlmValues(
-    userId: string,
     projectId: string,
+    userId: string,
     range: [number, number],
   ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
@@ -167,14 +168,24 @@ export class ProjectsService {
     return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
   }
 
-  async requestExport(projectId: string): Promise<string> {
-    // ACL slot
+  async requestExport(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError | typeof projectNotFound, string>> {
+    const response = await this.assertProject(projectId, { id: userId });
+    if (isLeft(response)) return left(projectNotFound);
 
-    return (
-      await this.commandBus.execute(
-        new ExportProject(new ResourceId(projectId)),
-      )
-    ).value;
+    const canExportProject = await this.projectAclService.canExportProject(
+      userId,
+      projectId,
+    );
+
+    if (!canExportProject) return left(forbiddenError);
+
+    const exportId = await this.commandBus.execute(
+      new ExportProject(new ResourceId(projectId)),
+    );
+    return right(exportId.value);
   }
 
   async remove(
@@ -212,12 +223,26 @@ export class ProjectsService {
     );
   }
 
-  async getExportedArchive(projectId: string, exportId: string) {
-    // ACL
-    const location = await this.queryBus.execute(
-      new GetExportArchive(new ExportId(exportId)),
+  async getExportedArchive(
+    projectId: string,
+    userId: string,
+    exportId: string,
+  ): Promise<
+    Either<
+      GetArchiveLocationFailure | typeof notAllowed | typeof projectNotFound,
+      ArchiveLocation
+    >
+  > {
+    const response = await this.assertProject(projectId, { id: userId });
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
+      userId,
+      projectId,
     );
-    // MARXAN-1129
-    return location ? createReadStream(location.value) : null;
+
+    if (!canDownloadExport) return left(notAllowed);
+
+    return this.queryBus.execute(new GetExportArchive(new ExportId(exportId)));
   }
 }

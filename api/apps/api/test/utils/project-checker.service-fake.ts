@@ -3,27 +3,32 @@ import { Either, left, right } from 'fp-ts/Either';
 import {
   DoesntExist,
   doesntExist,
-  HasPendingExport,
-  hasPendingExport,
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Project } from '../../src/modules/projects/project.api.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProjectCheckerFake implements ProjectChecker {
   private projectsWithPendingExports: string[];
   private projectsThatAreNotReady: string[];
 
-  constructor() {
+  constructor(
+    @InjectRepository(Project)
+    private readonly projectRepo: Repository<Project>,
+  ) {
     this.projectsWithPendingExports = [];
     this.projectsThatAreNotReady = [];
   }
 
   async hasPendingExports(
     projectId: string,
-  ): Promise<Either<HasPendingExport, boolean>> {
-    return this.projectsWithPendingExports.includes(projectId)
-      ? left(hasPendingExport)
-      : right(false);
+  ): Promise<Either<DoesntExist, boolean>> {
+    const project = await this.projectRepo.findOne(projectId);
+    if (!project) return left(doesntExist);
+
+    return right(this.projectsWithPendingExports.includes(projectId));
   }
 
   async isProjectReady(

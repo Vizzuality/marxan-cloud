@@ -3,8 +3,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   ForbiddenException,
+  Get,
   Header,
   InternalServerErrorException,
   NotFoundException,
@@ -49,7 +49,12 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { ProjectsService, validationFailed } from './projects.service';
+import {
+  notAllowed,
+  projectNotFound,
+  ProjectsService,
+  validationFailed,
+} from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
@@ -76,12 +81,14 @@ import {
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { forbiddenError } from '../access-control/access-control.types';
-import { projectNotFound, unknownError } from '../blm';
+import { projectNotFound as blmProjectNotFound, unknownError } from '../blm';
 import { Response } from 'express';
 import {
   ImplementsAcl,
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
+import { createReadStream } from 'fs';
+import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -339,8 +346,8 @@ export class ProjectsController {
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
     const result = await this.projectsService.updateBlmValues(
-      req.user.id,
       id,
+      req.user.id,
       range,
     );
 
@@ -385,7 +392,7 @@ export class ProjectsController {
 
     if (isLeft(result))
       switch (result.left) {
-        case projectNotFound:
+        case blmProjectNotFound:
           throw new NotFoundException(
             `Could not find project BLM values for project with ID: ${id}`,
           );
@@ -400,29 +407,71 @@ export class ProjectsController {
     return result.right;
   }
 
-  @IsMissingAclImplementation()
-  @Post(`:id/export`)
-  async requestProjectExport(@Param('id') id: string) {
+  @ImplementsAcl()
+  @Post(`:projectId/export`)
+  async requestProjectExport(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const result = await this.projectsService.requestExport(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
     return {
-      id: await this.projectsService.requestExport(id),
+      id: result.right,
     };
   }
 
-  @IsMissingAclImplementation()
-  @Get(`:id/export/:exportId`)
+  @ImplementsAcl()
+  @Get(`:projectId/export/:exportId`)
   @Header(`Content-Type`, `application/zip`)
   @Header('Content-Disposition', 'attachment; filename="export.zip"')
   async getProjectExportArchive(
-    @Param('id') id: string,
+    @Param('projectId') projectId: string,
     @Param('exportId') exportId: string,
     @Res() response: Response,
+    @Req() req: RequestWithAuthenticatedUser,
   ) {
-    const stream = await this.projectsService.getExportedArchive(id, exportId);
+    const result = await this.projectsService.getExportedArchive(
+      projectId,
+      req.user.id,
+      exportId,
+    );
 
-    if (stream) {
-      stream.pipe(response);
-    } else {
-      response.send(null);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case locationNotFound:
+          throw new NotFoundException(
+            `Could not find export .zip location for export with ID: ${exportId} for project with ID: ${projectId}`,
+          );
+        case notAllowed:
+          throw new ForbiddenException(
+            `Your role cannot retrieve export .zip files for project with ID: ${projectId}`,
+          );
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
     }
+
+    createReadStream(result.right.value).pipe(response);
   }
 }

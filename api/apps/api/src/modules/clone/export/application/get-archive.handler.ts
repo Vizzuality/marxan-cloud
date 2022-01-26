@@ -1,7 +1,12 @@
-import { QueryHandler, IInferredQueryHandler } from '@nestjs/cqrs';
+import { IInferredQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { ArchiveLocation } from '@marxan/cloning/domain';
-import { GetExportArchive } from './get-archive.query';
+import {
+  GetExportArchive,
+  GetFailure,
+  locationNotFound,
+} from './get-archive.query';
 import { ExportRepository } from './export-repository.port';
+import { Either, left, right } from 'fp-ts/Either';
 
 @QueryHandler(GetExportArchive)
 export class GetArchiveHandler
@@ -10,9 +15,12 @@ export class GetArchiveHandler
 
   async execute({
     exportId,
-  }: GetExportArchive): Promise<ArchiveLocation | null> {
+  }: GetExportArchive): Promise<Either<GetFailure, ArchiveLocation>> {
     const archive = (await this.exportRepo.find(exportId))?.toSnapshot()
       .archiveLocation;
-    return archive ? new ArchiveLocation(archive) : null;
+
+    return archive
+      ? right(new ArchiveLocation(archive))
+      : left(locationNotFound);
   }
 }

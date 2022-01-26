@@ -9,6 +9,7 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { isLeft } from 'fp-ts/Either';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -16,11 +17,21 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-test(`no roles assigned at all`, async () => {
+test(`no roles assigned at all in a private project`, async () => {
   fixtures.GivenNoRoles();
   await fixtures.ThenCannotPublishProject();
   await fixtures.ThenCanCreateProject();
   await fixtures.ThenCannotViewProject();
+  await fixtures.ThenCannotDeleteProject();
+  await fixtures.ThenCannotEditProject();
+});
+
+test(`no roles assigned at all in a public project`, async () => {
+  fixtures.GivenNoRoles();
+  await fixtures.GivenProjectIsPublic();
+  await fixtures.ThenCannotPublishProject();
+  await fixtures.ThenCanCreateProject();
+  await fixtures.ThenCanViewProject();
   await fixtures.ThenCannotDeleteProject();
   await fixtures.ThenCannotEditProject();
 });
@@ -65,6 +76,8 @@ const getFixtures = async () => {
   const userId = v4();
   const viewerUserId = v4();
 
+  const publicProjects: string[] = [];
+
   const sandbox = await Test.createTestingModule({
     providers: [
       ProjectAclService,
@@ -73,6 +86,30 @@ const getFixtures = async () => {
         useValue: {
           find: jest.fn(),
           findOne: jest.fn(),
+          createQueryBuilder: jest.fn(() => ({
+            leftJoinAndSelect: jest.fn().mockReturnThis(),
+            select: jest.fn().mockReturnThis(),
+            where: jest.fn().mockReturnThis(),
+            getMany: jest.fn(() => [
+              {
+                roleName: ProjectRoles.project_owner,
+                projectId,
+                userId,
+              },
+              {
+                roleName: ProjectRoles.project_viewer,
+                projectId,
+                userId: viewerUserId,
+              },
+            ]),
+          })),
+        },
+      },
+      {
+        provide: getRepositoryToken(PublishedProject),
+        useValue: {
+          find: jest.fn(),
+          findOne: (id: string) => publicProjects.find((p) => p === id),
           createQueryBuilder: jest.fn(() => ({
             leftJoinAndSelect: jest.fn().mockReturnThis(),
             select: jest.fn().mockReturnThis(),
@@ -112,6 +149,9 @@ const getFixtures = async () => {
           userId,
         },
       ]),
+    GivenProjectIsPublic: async () => {
+      publicProjects.push(projectId);
+    },
     GivenProjectOwnerRoleIsAssigned: () =>
       userProjectsRepoMock.find.mockImplementation(async () => [
         {
@@ -200,6 +240,14 @@ const getFixtures = async () => {
         },
         select: ['roleName'],
       });
+    },
+    ThenCanExportProject: async () => {
+      expect(await sut.canExportProject(userId, projectId)).toEqual(true);
+    },
+    ThenCanDownloadProjectExport: async () => {
+      expect(await sut.canDownloadProjectExport(userId, projectId)).toEqual(
+        true,
+      );
     },
     ThenCannotPublishProject: async () => {
       expect(await sut.canPublishProject(userId, projectId)).toEqual(false);
