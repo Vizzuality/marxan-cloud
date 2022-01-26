@@ -98,7 +98,18 @@ test(`adds non-existent userId`, async () => {
   const nonExistentUserIdResponse = await fixtures.WhenAddingNonExistentUserId(
     scenarioId,
   );
-  fixtures.ThenQueryFailedReturned(nonExistentUserIdResponse);
+  fixtures.ThenQueryFailedIsReturned(nonExistentUserIdResponse);
+});
+
+test(`changes user role after user is soft-deleted from the app`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  await fixtures.GivenUserWasAddedToScenario(scenarioId);
+  await fixtures.GivenUserIsDeleted();
+
+  const response = await fixtures.WhenChangingUserRoleFromDeletedUser(
+    scenarioId,
+  );
+  fixtures.ThenTransactionFailedIsReturned(response);
 });
 
 test(`adds and deletes users alternately`, async () => {

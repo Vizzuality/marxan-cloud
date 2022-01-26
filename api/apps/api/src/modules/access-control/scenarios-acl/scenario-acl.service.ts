@@ -216,16 +216,19 @@ export class ScenarioAclService implements ScenarioAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInScenario = await apiQueryRunner.manager.findOne(
-        UsersScenariosApiEntity,
-        undefined,
-        {
-          where: {
-            scenarioId,
-            userId,
-          },
-        },
-      );
+      const existingUserInScenario = await apiQueryRunner.manager
+        .createQueryBuilder(UsersScenariosApiEntity, 'users_scenarios')
+        .where({
+          scenarioId,
+          userId,
+        })
+        .leftJoinAndSelect('users_scenarios.user', 'userId')
+        .select(['users_scenarios.roleName', 'userId.isDeleted'])
+        .getOne();
+
+      if (existingUserInScenario?.user?.isDeleted) {
+        return left(transactionFailed);
+      }
 
       if (!existingUserInScenario) {
         const userRoleToSave = new UsersScenariosApiEntity();

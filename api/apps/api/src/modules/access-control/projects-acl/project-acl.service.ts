@@ -205,16 +205,19 @@ export class ProjectAclService implements ProjectAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInProject = await apiQueryRunner.manager.findOne(
-        UsersProjectsApiEntity,
-        undefined,
-        {
-          where: {
-            projectId,
-            userId,
-          },
-        },
-      );
+      const existingUserInProject = await apiQueryRunner.manager
+        .createQueryBuilder(UsersProjectsApiEntity, 'users_projects')
+        .where({
+          projectId,
+          userId,
+        })
+        .leftJoinAndSelect('users_projects.user', 'userId')
+        .select(['users_projects.roleName', 'userId.isDeleted'])
+        .getOne();
+
+      if (existingUserInProject?.user?.isDeleted) {
+        return left(transactionFailed);
+      }
 
       if (!existingUserInProject) {
         const userRoleToSave = new UsersProjectsApiEntity();

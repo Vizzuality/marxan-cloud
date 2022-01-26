@@ -236,6 +236,15 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: projectContributorRole,
         }),
+    WhenChangingUserRoleFromDeletedUser: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: randomUserInfo.user.id,
+          roleName: projectContributorRole,
+        }),
     WhenAddingIncorrectUserRole: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
@@ -329,10 +338,16 @@ export const getFixtures = async () => {
       expect(error?.message[0]).toEqual('roleName must be a valid enum value');
     },
 
-    ThenQueryFailedReturned: (response: request.Response) => {
+    ThenQueryFailedIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
       expect(error.title).toEqual(`Error while adding record to the database`);
+    },
+
+    ThenTransactionFailedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(500);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual(`Transaction failed`);
     },
 
     ThenNoContentIsReturned: (response: request.Response) => {

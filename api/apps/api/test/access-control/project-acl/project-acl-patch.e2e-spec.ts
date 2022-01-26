@@ -106,10 +106,21 @@ test(`adds non-existent userId`, async () => {
   const nonExistentUserIdResponse = await fixtures.WhenAddingNonExistentUserId(
     projectId,
   );
-  fixtures.ThenQueryFailedReturned(nonExistentUserIdResponse);
+  fixtures.ThenQueryFailedIsReturned(nonExistentUserIdResponse);
 });
 
-test(`adds and deletes users alternately`, async () => {
+test(`changes user role after user is soft-deleted from the app`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenUserWasAddedToProject(projectId);
+  await fixtures.GivenUserIsDeleted();
+
+  const response = await fixtures.WhenChangingUserRoleFromDeletedUser(
+    projectId,
+  );
+  fixtures.ThenTransactionFailedIsReturned(response);
+});
+
+test(`adds and deletes users from projects alternately`, async () => {
   /* The purpose of this test is to check that all the transactions are
   executed correctly and that no users are deleted/reinstated because
   the transaction wasn't committed before initiating a new one */
