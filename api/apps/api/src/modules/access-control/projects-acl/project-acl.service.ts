@@ -122,15 +122,21 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {
-    const otherOwnersInProject = await this.roles.count({
-      where: {
+    const query = this.roles
+      .createQueryBuilder('users_projects')
+      .leftJoin('users_projects.user', 'userId')
+      .where({
         projectId,
         roleName: ProjectRoles.project_owner,
         userId: Not(userId),
-      },
-    });
+      })
+      .andWhere('userId.isDeleted is false');
+
+    const otherOwnersInProject = await query.getCount();
+
     return otherOwnersInProject >= 1;
   }
+
   /**
    * @debt This module should not involve user details and it should deal with
    * it using a standalone module that will access the data just to read it. We

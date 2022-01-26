@@ -137,13 +137,18 @@ export class ScenarioAclService implements ScenarioAccessControl {
   }
 
   async hasOtherOwner(userId: string, scenarioId: string): Promise<Permit> {
-    const otherOwnersInScenario = await this.roles.count({
-      where: {
+    const query = this.roles
+      .createQueryBuilder('users_scenarios')
+      .leftJoin('users_scenarios.user', 'userId')
+      .where({
         scenarioId,
         roleName: ScenarioRoles.scenario_owner,
         userId: Not(userId),
-      },
-    });
+      })
+      .andWhere('userId.isDeleted is false');
+
+    const otherOwnersInScenario = await query.getCount();
+
     return otherOwnersInScenario >= 1;
   }
 
