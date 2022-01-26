@@ -90,20 +90,6 @@ export class MarxanProjectChecker implements ProjectChecker {
     );
   }
 
-  async isPublic(
-    projectId: string,
-  ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId);
-
-    if (!project) {
-      return left(doesntExist);
-    }
-
-    const publicProject = await this.publishedProjectRepo.findOne(projectId);
-
-    return right(Boolean(publicProject));
-  }
-
   private createNotFoundHandler() {
     return (error: unknown) => {
       if (!(error instanceof NotFoundException)) throw error;

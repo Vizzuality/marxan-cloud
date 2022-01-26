@@ -12,12 +12,16 @@ import { ScenarioAclModule } from './scenarios-acl/scenario-acl.module';
 import { ScenarioAccessControl } from './scenarios-acl/scenario-access-control';
 import { ScenarioAclService } from './scenarios-acl/scenario-acl.service';
 import { ScenarioAclController } from './scenarios-acl/scenario-acl.controller';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersProjectsApiEntity]),
+    TypeOrmModule.forFeature([
+      UsersProjectsApiEntity,
+      UsersScenariosApiEntity,
+      PublishedProject,
+    ]),
     ProjectAclModule,
-    TypeOrmModule.forFeature([UsersScenariosApiEntity]),
     ScenarioAclModule,
   ],
   providers: [

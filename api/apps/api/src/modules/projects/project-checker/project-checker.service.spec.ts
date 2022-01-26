@@ -12,7 +12,6 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
-import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -189,52 +188,6 @@ it(`hasPendingExports() should return doesntExist if the project does not exists
   });
 });
 
-it(`isPublic() should return true if a project is public`, async () => {
-  // given
-  const service = fixtures.getService();
-  // and
-  fixtures.GivenProjectExists('projectId');
-  // and
-  fixtures.GivenProjectIsPublic('projectId');
-  // when
-  const isPublic = await service.isPublic(`projectId`);
-  // then
-  expect(isPublic).toEqual({
-    _tag: 'Right',
-    right: true,
-  });
-});
-
-it(`isPublic() should return false if a project is not public`, async () => {
-  // given
-  const service = fixtures.getService();
-  // and
-  fixtures.GivenProjectExists('projectId');
-  // and
-  fixtures.GivenProjectIsNotPublic();
-  // when
-  const isPublic = await service.isPublic(`projectId`);
-  // then
-  expect(isPublic).toEqual({
-    _tag: 'Right',
-    right: false,
-  });
-});
-
-it('isPublic() should return doesntExist if the project does not exists', async () => {
-  // given
-  const service = fixtures.getService();
-  // and
-  fixtures.GivenProjectDoesntExist();
-  // when
-  const isPublic = await service.isPublic(`projectId`);
-  // then
-  expect(isPublic).toEqual({
-    _tag: 'Left',
-    left: doesntExist,
-  });
-});
-
 async function getFixtures() {
   const fakeApiEventsService: jest.Mocked<
     Pick<ApiEventsService, 'getLatestEventForTopic'>
@@ -249,11 +202,6 @@ async function getFixtures() {
     findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
   };
 
-  const fakePublishedProjectService: jest.Mocked<
-    Pick<Repository<PublishedProject>, 'findOne'>
-  > = {
-    findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
-  };
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),
   };
@@ -266,10 +214,6 @@ async function getFixtures() {
       {
         provide: getRepositoryToken(Project),
         useValue: fakeProjectsService,
-      },
-      {
-        provide: getRepositoryToken(PublishedProject),
-        useValue: fakePublishedProjectService,
       },
       {
         provide: `PlanningAreasService`,
@@ -389,20 +333,6 @@ async function getFixtures() {
       fakeProjectsService.findOne.mockImplementation(
         (_id: string | undefined | FindConditions<Project>) =>
           Promise.resolve(fakeProject),
-      );
-    },
-    GivenProjectIsPublic(projectId: string) {
-      const fakePublishedProject = { id: projectId } as PublishedProject;
-
-      fakePublishedProjectService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<PublishedProject>) =>
-          Promise.resolve(fakePublishedProject),
-      );
-    },
-    GivenProjectIsNotPublic() {
-      fakePublishedProjectService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<PublishedProject>) =>
-          Promise.resolve(undefined),
       );
     },
   };

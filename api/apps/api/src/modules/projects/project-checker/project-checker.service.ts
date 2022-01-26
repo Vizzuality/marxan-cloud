@@ -11,6 +11,4 @@ export abstract class ProjectChecker {
   abstract isProjectReady(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>>;
-
-  abstract isPublic(projectId: string): Promise<Either<DoesntExist, boolean>>;
 }

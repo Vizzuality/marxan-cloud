@@ -43,7 +43,6 @@ import {
 import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
 import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
-import { ProjectChecker } from './project-checker/project-checker.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -62,7 +61,6 @@ export class ProjectsService {
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
     private readonly editGuard: EditGuard,
-    private readonly projectChecker: ProjectChecker,
   ) {}
 
   async findAllGeoFeatures(
@@ -174,17 +172,15 @@ export class ProjectsService {
     projectId: string,
     userId: string,
   ): Promise<Either<typeof forbiddenError | typeof projectNotFound, string>> {
-    const userCanExportProject = await this.projectAclService.canExportProject(
+    const response = await this.assertProject(projectId, { id: userId });
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canExportProject = await this.projectAclService.canExportProject(
       userId,
       projectId,
     );
-    const isPublicProject = await this.projectChecker.isPublic(projectId);
 
-    if (isLeft(isPublicProject)) return left(projectNotFound);
-
-    if (!userCanExportProject && !isPublicProject.right) {
-      return left(forbiddenError);
-    }
+    if (!canExportProject) return left(forbiddenError);
 
     const exportId = await this.commandBus.execute(
       new ExportProject(new ResourceId(projectId)),
@@ -237,16 +233,15 @@ export class ProjectsService {
       ArchiveLocation
     >
   > {
-    const userIsAllowedToDownloadExport = await this.projectAclService.canDownloadProjectExport(
+    const response = await this.assertProject(projectId, { id: userId });
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
       userId,
       projectId,
     );
-    const isPublicProject = await this.projectChecker.isPublic(projectId);
 
-    if (isLeft(isPublicProject)) return left(projectNotFound);
-
-    if (!userIsAllowedToDownloadExport && !isPublicProject.right)
-      return left(notAllowed);
+    if (!canDownloadExport) return left(notAllowed);
 
     return this.queryBus.execute(new GetExportArchive(new ExportId(exportId)));
   }

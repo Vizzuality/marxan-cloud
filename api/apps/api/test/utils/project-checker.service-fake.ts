@@ -13,7 +13,6 @@ import { Repository } from 'typeorm';
 export class ProjectCheckerFake implements ProjectChecker {
   private projectsWithPendingExports: string[];
   private projectsThatAreNotReady: string[];
-  private publicProjects: string[];
 
   constructor(
     @InjectRepository(Project)
@@ -21,7 +20,6 @@ export class ProjectCheckerFake implements ProjectChecker {
   ) {
     this.projectsWithPendingExports = [];
     this.projectsThatAreNotReady = [];
-    this.publicProjects = [];
   }
 
   async hasPendingExports(
@@ -41,20 +39,7 @@ export class ProjectCheckerFake implements ProjectChecker {
       : right(true);
   }
 
-  async isPublic(
-    projectId: string,
-  ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId);
-    if (!project) return left(doesntExist);
-
-    return right(this.publicProjects.includes(projectId));
-  }
-
   addPendingExportForProject(projectId: string) {
     this.projectsWithPendingExports.push(projectId);
-  }
-
-  addPublicProject(projectId: string) {
-    this.publicProjects.push(projectId);
   }
 }
