@@ -11,7 +11,6 @@ import {
   Export,
   ExportId,
 } from '@marxan-api/modules/clone/export/domain';
-import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { FileRepository } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, EventBus, IEvent } from '@nestjs/cqrs';
@@ -27,8 +26,8 @@ import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 async function untilEventIsEmitted<T extends IEvent>(
   eventClass: Class<T>,
@@ -120,7 +119,9 @@ export const getFixtures = async () => {
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
     getRepositoryToken(UsersProjectsApiEntity),
   );
-  const projectCheckerFake = app.get(ProjectChecker) as ProjectCheckerFake;
+  const publishedProjectsRepo = app.get<Repository<PublishedProject>>(
+    getRepositoryToken(PublishedProject),
+  );
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
@@ -171,7 +172,9 @@ export const getFixtures = async () => {
       organizationId = result.organizationId;
     },
     GivenProjectIsPublic: async () => {
-      projectCheckerFake.addPublicProject(projectId);
+      await publishedProjectsRepo.save([
+        { id: projectId, name: 'name', description: 'description' },
+      ]);
     },
     GivenContributorWasAddedToProject: async () => {
       await userProjectsRepo.save({
