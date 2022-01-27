@@ -49,7 +49,7 @@ import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
 import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
-import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-guard.module';
+import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
 
 @Module({
   imports: [
@@ -67,7 +67,7 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
-    EditGuardModule,
+    BlockGuardModule,
     ProjectCheckerModule,
     PlanningAreasModule,
     UsersModule,

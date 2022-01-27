@@ -72,7 +72,7 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { CancelBlmCalibration, StartBlmCalibration } from './blm-calibration';
-import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
+import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
@@ -131,7 +131,7 @@ export class ScenariosService {
     private readonly planningUnitsLinkerService: ScenarioPlanningUnitsLinkerService,
     private readonly specificationService: SpecificationService,
     private readonly costService: CostRangeService,
-    private readonly editGuard: EditGuard,
+    private readonly blockGuard: BlockGuard,
     private readonly projectChecker: ProjectChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
@@ -242,7 +242,9 @@ export class ScenariosService {
     if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    await this.editGuard.ensureEditingIsAllowedFor(scenario.right.projectId);
+    await this.blockGuard.ensureThatProjectIsNotBlocked(
+      scenario.right.projectId,
+    );
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     return right(await this.crudService.update(scenarioId, validatedMetadata));
   }
@@ -425,7 +427,7 @@ export class ScenariosService {
       return left(forbiddenError);
     }
     const projectId = scenario.right.projectId;
-    await this.editGuard.ensureEditingIsAllowedFor(projectId);
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
     if (rangeToUpdate) {
       const result = await this.commandBus.execute(
         new ChangeBlmRange(projectId, rangeToUpdate),
