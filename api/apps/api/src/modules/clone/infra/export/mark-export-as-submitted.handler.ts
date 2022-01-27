@@ -7,6 +7,11 @@ import { MarkExportAsSubmitted } from './mark-export-as-submitted.command';
 @CommandHandler(MarkExportAsSubmitted)
 export class MarkExportAsSubmittedHandler
   implements IInferredCommandHandler<MarkExportAsSubmitted> {
+  private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__export__submitted__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__export__submitted__v1__alpha,
+  };
+
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async execute({
@@ -14,15 +19,7 @@ export class MarkExportAsSubmittedHandler
     resourceId,
     resourceKind,
   }: MarkExportAsSubmitted): Promise<void> {
-    const kind =
-      resourceKind === ResourceKind.Project
-        ? API_EVENT_KINDS.project__export__submitted__v1__alpha
-        : null;
-
-    if (!kind) {
-      // TODO update with Scenario once supported.
-      return;
-    }
+    const kind = this.eventMapper[resourceKind];
 
     await this.apiEvents.createIfNotExists({
       kind,

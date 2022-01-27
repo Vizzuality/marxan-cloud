@@ -9,6 +9,11 @@ import { MarkExportAsFailed } from './mark-export-as-failed.command';
 @CommandHandler(MarkExportAsFailed)
 export class MarkExportAsFailedHandler
   implements IInferredCommandHandler<MarkExportAsFailed> {
+  private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__export__failed__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__export__failed__v1__alpha,
+  };
+
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async execute({
@@ -16,15 +21,7 @@ export class MarkExportAsFailedHandler
     resourceId,
     exportId,
   }: MarkExportAsFailed): Promise<void> {
-    const kind =
-      resourceKind === ResourceKind.Project
-        ? API_EVENT_KINDS.project__export__failed__v1__alpha
-        : null;
-
-    if (!kind) {
-      // TODO update with Scenario once supported.
-      return;
-    }
+    const kind = this.eventMapper[resourceKind];
 
     await this.apiEvents.createIfNotExists({
       kind,
