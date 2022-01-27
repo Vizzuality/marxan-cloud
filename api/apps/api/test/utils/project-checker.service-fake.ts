@@ -72,4 +72,11 @@ export class ProjectCheckerFake implements ProjectChecker {
   addPendingMarxanRunForProject(projectId: string) {
     this.projectsWithPendingMarxanRun.push(projectId);
   }
+
+  clear() {
+    this.projectsThatAreNotReady = [];
+    this.projectsWithPendingExports = [];
+    this.projectsWithPendingBlmCalibration = [];
+    this.projectsWithPendingMarxanRun = [];
+  }
 }

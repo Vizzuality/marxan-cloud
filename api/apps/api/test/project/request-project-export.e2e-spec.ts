@@ -33,9 +33,27 @@ test('should forbid export to unrelated users', async () => {
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test('should return bad request error if the project is blocked', async () => {
+test('should return bad request error if the project has a pending export', async () => {
+  await fixtures.GivenProjectWasCreated();
+  fixtures.GivenProjectHasAPendingExport();
+
+  const response = await fixtures.WhenOwnerUserRequestAnExport();
+
+  fixtures.ThenBadRequestIsReturned(response);
+});
+
+test('should return bad request error if the project has a scenario with a pending blm calibration', async () => {
   await fixtures.GivenProjectWasCreated();
   fixtures.GivenProjectHasAPendingBLMCalibration();
+
+  const response = await fixtures.WhenOwnerUserRequestAnExport();
+
+  fixtures.ThenBadRequestIsReturned(response);
+});
+
+test('should return bad request error if the project has a scenario with a pending marxan run', async () => {
+  await fixtures.GivenProjectWasCreated();
+  fixtures.GivenProjectHasAPendingMarxanRun();
 
   const response = await fixtures.WhenOwnerUserRequestAnExport();
 
@@ -96,6 +114,8 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
+      fakeProjectChecker.clear();
+
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
 
@@ -118,8 +138,14 @@ export const getFixtures = async () => {
         { id: projectId, name: 'name', description: 'description' },
       ]);
     },
+    GivenProjectHasAPendingExport: () => {
+      fakeProjectChecker.addPendingExportForProject(projectId);
+    },
     GivenProjectHasAPendingBLMCalibration: () => {
       fakeProjectChecker.addPendingBlmCalibrationForProject(projectId);
+    },
+    GivenProjectHasAPendingMarxanRun: () => {
+      fakeProjectChecker.addPendingMarxanRunForProject(projectId);
     },
     WhenUnrelatedUserRequestAnExport: () =>
       request(app.getHttpServer())

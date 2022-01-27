@@ -19,7 +19,7 @@ export class MarxanBlockGuard implements BlockGuard {
     ] = await Promise.all([
       this.projectChecker.hasPendingExports(projectId),
       this.projectChecker.hasPendingBlmCalibration(projectId),
-      this.projectChecker.hasPendingBlmCalibration(projectId),
+      this.projectChecker.hasPendingMarxanRun(projectId),
     ]);
 
     if (
