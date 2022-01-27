@@ -65,11 +65,11 @@ const getFixtures = async () => {
   return {
     GivenProjectWasCreated: () => {
       const id = v4();
-      fakeProjectsService.findOne.mockResolvedValueOnce({ id } as Project);
+      fakeProjectsService.findOne.mockResolvedValue({ id } as Project);
       return id;
     },
     WhenExportIsRequested: async (projectId: string) => {
-      await projectChecker.addPendingExportForProject(projectId);
+      projectChecker.addPendingExportForProject(projectId);
     },
     WhenCheckingWhetherTheProjectCanBeEdited: (projectId: string) => {
       return {
