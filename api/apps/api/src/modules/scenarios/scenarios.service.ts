@@ -81,6 +81,8 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
+import { ResourceId } from '../clone';
+import { ExportScenario } from '../clone/export/application/export-scenario.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -489,6 +491,20 @@ export class ScenariosService {
       }
     }
     return right(void 0);
+  }
+
+  async requestExport(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, string>> {
+    // Block guard
+    // ACL slot
+
+    const result = await this.commandBus.execute(
+      new ExportScenario(new ResourceId(scenarioId)),
+    );
+
+    return right(result.value);
   }
 
   private async assertScenario(scenarioId: string) {
