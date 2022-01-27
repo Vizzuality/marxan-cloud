@@ -1,50 +1,47 @@
-import { Injectable } from '@nestjs/common';
-import { FetchSpecification } from 'nestjs-base-service';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
-
-import {
-  FindResult,
-  GeoFeaturesService,
-} from '@marxan-api/modules/geo-features/geo-features.service';
-import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
-
-import { ProjectsCrudService } from './projects-crud.service';
-import { JobStatusService } from './job-status';
-import { Project } from './project.api.entity';
-import { CreateProjectDTO } from './dto/create.project.dto';
-import { UpdateProjectDTO } from './dto/update.project.dto';
-import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
-import { assertDefined } from '@marxan/utils';
-
-import {
-  ProjectsRequest,
-  ProjectsServiceRequest,
-} from './project-requests-info';
-import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
-import {
-  ChangeBlmRange,
-  ChangeRangeErrors,
-} from '@marxan-api/modules/projects/blm';
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import {
   GetFailure as GetBlmFailure,
   ProjectBlm,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
-import { ProjectAccessControl } from '../access-control';
-import { forbiddenError } from '@marxan-api/modules/access-control';
-import { Permit } from '../access-control/access-control.types';
-
 import {
   ExportId,
   ExportProject,
   GetExportArchive,
 } from '@marxan-api/modules/clone';
-import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
-import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
-import { ApiEventsService } from '../api-events';
+import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
+import {
+  FindResult,
+  GeoFeaturesService,
+} from '@marxan-api/modules/geo-features/geo-features.service';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
+import {
+  ChangeBlmRange,
+  ChangeRangeErrors,
+} from '@marxan-api/modules/projects/blm';
+import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ResourceId } from '@marxan/cloning/domain';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
+import { assertDefined } from '@marxan/utils';
+import { Injectable } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { FetchSpecification } from 'nestjs-base-service';
+import { Readable } from 'stream';
+import { ProjectAccessControl } from '../access-control';
+import { Permit } from '../access-control/access-control.types';
+import { ApiEventsService } from '../api-events';
+import { CreateProjectDTO } from './dto/create.project.dto';
+import { UpdateProjectDTO } from './dto/update.project.dto';
+import { JobStatusService } from './job-status';
+import {
+  ProjectsRequest,
+  ProjectsServiceRequest,
+} from './project-requests-info';
+import { Project } from './project.api.entity';
+import { ProjectsCrudService } from './projects-crud.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -240,7 +237,7 @@ export class ProjectsService {
   ): Promise<
     Either<
       GetArchiveLocationFailure | typeof notAllowed | typeof projectNotFound,
-      ArchiveLocation
+      Readable
     >
   > {
     const response = await this.assertProject(projectId, { id: userId });

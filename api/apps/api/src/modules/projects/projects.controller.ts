@@ -487,7 +487,7 @@ export class ProjectsController {
       }
     }
 
-    createReadStream(result.right.value).pipe(response);
+    result.right.pipe(response);
   }
 
   @ImplementsAcl()
