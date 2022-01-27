@@ -18,11 +18,11 @@ import Protected from 'layout/protected';
 import SidebarEditAnalysis from 'layout/scenarios/edit/analysis';
 import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioEditsMap from 'layout/scenarios/edit/map';
+import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
 import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
 import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
 import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
-import SidebarEditWDPA from 'layout/scenarios/edit/wdpa';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
@@ -99,7 +99,7 @@ const EditScenarioPage: React.FC = () => {
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosEditSidebar>
-                <SidebarEditWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
+                <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
                 <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
                 <SidebarEditAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
                 <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />

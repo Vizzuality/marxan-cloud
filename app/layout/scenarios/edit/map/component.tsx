@@ -124,6 +124,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const [bounds, setBounds] = useState(null);
 
   const include = useMemo(() => {
+    if (tab === 'planning-unit' && subtab === 'planning-unit-preview') return 'lock-status,protection';
+    if (tab === 'planning-unit' && subtab === 'planning-unit-protected-areas') return 'protection';
+    if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return 'cost';
+    if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return 'lock-status,protection';
+
     if (tab === 'protected-areas' || tab === 'features') return 'protection';
 
     if (tab === 'analysis' && subtab === 'analysis-preview') return 'protection,features';
@@ -138,6 +143,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }, [tab, subtab]);
 
   const sublayers = useMemo(() => {
+    if (tab === 'planning-unit' && subtab === 'planning-unit-preview') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+    if (tab === 'planning-unit' && subtab === 'planning-unit-protected-areas') return ['wdpa-percentage'];
+    if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return ['cost'];
+    if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage') return ['wdpa-percentage'];
 
     if (tab === 'features') return ['wdpa-percentage'];
@@ -157,6 +167,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     const protectedCategories = wdpaCategories?.wdpaIucnCategories
       || scenarioData?.wdpaIucnCategories
       || [];
+
+    // PLANNING UNIT
+    if (tab === 'planning-unit' && subtab === 'planning-unit-preview') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === 'planning-unit' && subtab === 'planning-unit-protected-areas') return ['wdpa-percentage', 'pugrid'];
+    if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return ['cost', 'pugrid'];
+    if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
 
     if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
     if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];

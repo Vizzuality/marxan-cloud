@@ -2,9 +2,9 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/ed
 
 export const TABS = [
   {
-    id: ScenarioSidebarTabs.PROTECTED_AREAS,
-    subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
-    name: 'Protected areas',
+    id: ScenarioSidebarTabs.PLANNING_UNIT,
+    subtab: ScenarioSidebarSubTabs.PLANNING_UNIT_PREVIEW,
+    name: 'Planning unit',
   },
   {
     id: ScenarioSidebarTabs.FEATURES,
