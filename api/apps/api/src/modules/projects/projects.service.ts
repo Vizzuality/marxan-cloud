@@ -41,7 +41,7 @@ import {
   GetExportArchive,
 } from '@marxan-api/modules/clone';
 import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
-import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
+import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
 
 export { validationFailed } from '../planning-areas';
@@ -60,7 +60,7 @@ export class ProjectsService {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
-    private readonly editGuard: EditGuard,
+    private readonly blockGuard: BlockGuard,
   ) {}
 
   async findAllGeoFeatures(
@@ -149,7 +149,7 @@ export class ProjectsService {
     input: UpdateProjectDTO,
     userId: string,
   ): Promise<Either<Permit, Project>> {
-    await this.editGuard.ensureEditingIsAllowedFor(projectId);
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(false);
@@ -162,6 +162,8 @@ export class ProjectsService {
     userId: string,
     range: [number, number],
   ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
+
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -172,8 +174,7 @@ export class ProjectsService {
     projectId: string,
     userId: string,
   ): Promise<Either<typeof forbiddenError | typeof projectNotFound, string>> {
-    const response = await this.assertProject(projectId, { id: userId });
-    if (isLeft(response)) return left(projectNotFound);
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
     const canExportProject = await this.projectAclService.canExportProject(
       userId,
@@ -192,6 +193,8 @@ export class ProjectsService {
     projectId: string,
     userId: string,
   ): Promise<Either<Permit, void>> {
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
+
     if (!(await this.projectAclService.canDeleteProject(userId, projectId))) {
       return left(false);
     }
@@ -210,6 +213,7 @@ export class ProjectsService {
     return right(new Project());
   }
 
+  // TODO add ensureThatProjectIsNotBlocked guard
   savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
     this.planningAreaService,
   );

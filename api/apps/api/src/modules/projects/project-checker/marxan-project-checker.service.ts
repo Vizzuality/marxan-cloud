@@ -1,18 +1,17 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
-
-import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { Either, left, right } from 'fp-ts/Either';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { PlanningAreasService } from '@marxan-api/modules/planning-areas/planning-areas.service';
-import { isDefined } from '@marxan/utils';
 import {
   doesntExist,
   DoesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { isDefined } from '@marxan/utils';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Either, left, right } from 'fp-ts/Either';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class MarxanProjectChecker implements ProjectChecker {
@@ -22,6 +21,50 @@ export class MarxanProjectChecker implements ProjectChecker {
     private readonly repository: Repository<Project>,
     private readonly planningAreas: PlanningAreasService,
   ) {}
+
+  async hasPendingBlmCalibration(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    if (!project.scenarios) return right(false);
+
+    const result = await Promise.all(
+      project.scenarios.map((scenario) =>
+        this.checkPendingBlmCalibration(scenario.id),
+      ),
+    );
+
+    return right(result.some((hasPendingExport) => hasPendingExport));
+  }
+
+  async hasPendingMarxanRun(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    if (!project.scenarios) return right(false);
+
+    const result = await Promise.all(
+      project.scenarios.map((scenario) =>
+        this.checkPendingMarxanRun(scenario.id),
+      ),
+    );
+
+    return right(result.some((hasPendingMarxanRun) => hasPendingMarxanRun));
+  }
 
   async hasPendingExports(
     projectId: string,
@@ -97,5 +140,46 @@ export class MarxanProjectChecker implements ProjectChecker {
   private async hasRequiredPlanningArea(project: Project): Promise<boolean> {
     const area = await this.planningAreas.locatePlanningAreaEntity(project);
     return isDefined(area);
+  }
+
+  private async checkPendingBlmCalibration(
+    scenarioId: string,
+  ): Promise<boolean> {
+    const exportEvent = await this.apiEvents
+      .getLatestEventForTopic({
+        topic: scenarioId,
+        kind: In([
+          API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1,
+          API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1,
+          API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1,
+        ]),
+      })
+      .catch(this.createNotFoundHandler());
+
+    const pendingBlmCalibration =
+      exportEvent?.kind ===
+      API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1;
+
+    return pendingBlmCalibration;
+  }
+
+  private async checkPendingMarxanRun(scenarioId: string): Promise<boolean> {
+    const exportEvent = await this.apiEvents
+      .getLatestEventForTopic({
+        topic: scenarioId,
+        kind: In([
+          API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
+          API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1,
+          API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
+          API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
+        ]),
+      })
+      .catch(this.createNotFoundHandler());
+
+    const pendingMarxanRun =
+      exportEvent?.kind ===
+      API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
+
+    return pendingMarxanRun;
   }
 }

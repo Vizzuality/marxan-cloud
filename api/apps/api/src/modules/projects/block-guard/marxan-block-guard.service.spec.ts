@@ -1,5 +1,5 @@
-import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
-import { MarxanEditGuard } from '@marxan-api/modules/projects/edit-guard/marxan-edit-guard.service';
+import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
+import { MarxanBlockGuard } from '@marxan-api/modules/projects/block-guard/marxan-block-guard.service';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
@@ -9,7 +9,7 @@ import { v4 } from 'uuid';
 import { ProjectCheckerFake } from '../../../../test/utils/project-checker.service-fake';
 import { Project } from '../project.api.entity';
 
-describe('MarxanEditGuard', () => {
+describe('MarxanBlockGuard', () => {
   let fixtures: FixtureType<typeof getFixtures>;
 
   beforeEach(async () => {
@@ -49,8 +49,8 @@ const getFixtures = async () => {
         useClass: ProjectCheckerFake,
       },
       {
-        provide: EditGuard,
-        useClass: MarxanEditGuard,
+        provide: BlockGuard,
+        useClass: MarxanBlockGuard,
       },
       {
         provide: getRepositoryToken(Project),
@@ -60,7 +60,7 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
   const projectChecker = sandbox.get(ProjectChecker) as ProjectCheckerFake;
-  const editGuard = sandbox.get(EditGuard);
+  const blockGuard = sandbox.get(BlockGuard);
 
   return {
     GivenProjectWasCreated: () => {
@@ -75,14 +75,14 @@ const getFixtures = async () => {
       return {
         ThenAnExceptionIsThrown: async () => {
           await expect(
-            editGuard.ensureEditingIsAllowedFor(projectId),
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
           ).rejects.toThrow(
             `Project ${projectId} editing is blocked because of pending export`,
           );
         },
         ThenNoExceptionIsThrown: async () => {
           await expect(
-            editGuard.ensureEditingIsAllowedFor(projectId),
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
           ).resolves.not.toThrow();
         },
       };

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
+import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
-import { MarxanEditGuard } from '@marxan-api/modules/projects/edit-guard/marxan-edit-guard.service';
+import { MarxanBlockGuard } from '@marxan-api/modules/projects/block-guard/marxan-block-guard.service';
 
 @Module({
   imports: [
@@ -16,10 +16,10 @@ import { MarxanEditGuard } from '@marxan-api/modules/projects/edit-guard/marxan-
   ],
   providers: [
     {
-      useClass: MarxanEditGuard,
-      provide: EditGuard,
+      useClass: MarxanBlockGuard,
+      provide: BlockGuard,
     },
   ],
-  exports: [EditGuard],
+  exports: [BlockGuard],
 })
-export class EditGuardModule {}
+export class BlockGuardModule {}

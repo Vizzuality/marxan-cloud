@@ -12,6 +12,8 @@ import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ProjectChecker } from '../../src/modules/projects/project-checker/project-checker.service';
+import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -29,6 +31,15 @@ test('should forbid export to unrelated users', async () => {
   const response = await fixtures.WhenUnrelatedUserRequestAnExport();
 
   fixtures.ThenForbiddenIsReturned(response);
+});
+
+test('should return bad request error if the project is blocked', async () => {
+  await fixtures.GivenProjectWasCreated();
+  fixtures.GivenProjectHasAPendingBLMCalibration();
+
+  const response = await fixtures.WhenOwnerUserRequestAnExport();
+
+  fixtures.ThenBadRequestIsReturned(response);
 });
 
 test('should permit public project export for unrelated users', async () => {
@@ -72,6 +83,7 @@ export const getFixtures = async () => {
   const publishedProjectsRepo = app.get<Repository<PublishedProject>>(
     getRepositoryToken(PublishedProject),
   );
+  const fakeProjectChecker = app.get(ProjectChecker) as ProjectCheckerFake;
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
@@ -106,8 +118,8 @@ export const getFixtures = async () => {
         { id: projectId, name: 'name', description: 'description' },
       ]);
     },
-    ThenForbiddenIsReturned: (response: request.Response) => {
-      expect(response.status).toBe(403);
+    GivenProjectHasAPendingBLMCalibration: () => {
+      fakeProjectChecker.addPendingBlmCalibrationForProject(projectId);
     },
     WhenUnrelatedUserRequestAnExport: () =>
       request(app.getHttpServer())
@@ -142,6 +154,12 @@ export const getFixtures = async () => {
     ThenExportIsLaunched: (response: request.Response) => {
       expect(response.status).toBe(201);
       expect(response.body.id).toBeDefined();
+    },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toBe(403);
+    },
+    ThenBadRequestIsReturned: (response: request.Response) => {
+      expect(response.status).toBe(400);
     },
   };
 };
