@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
@@ -39,6 +39,7 @@ import { MarkExportPiecesAsFailedHandler } from './mark-export-pieces-as-failed.
     CancelExportPendingJobsHandler,
     MarkExportAsFailedHandler,
     MarkExportPiecesAsFailedHandler,
+    Logger,
   ],
 })
 export class ExportInfraModule {}
