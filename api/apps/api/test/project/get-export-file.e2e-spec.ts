@@ -92,7 +92,7 @@ test('should permit downloading export file for viewer users ', async () => {
 });
 
 export const getFixtures = async () => {
-  const app = await bootstrapApplication([CqrsModule]);
+  const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
   const eventBusTestUtils = app.get(EventBusTestUtils);
   eventBusTestUtils.startInspectingEvents();
   const commandBus = app.get(CommandBus);

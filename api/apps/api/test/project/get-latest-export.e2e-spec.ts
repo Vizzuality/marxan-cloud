@@ -98,7 +98,7 @@ test('should permit getting latest exportId for viewer users ', async () => {
 });
 
 export const getFixtures = async () => {
-  const app = await bootstrapApplication([CqrsModule]);
+  const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
   const eventBusTestUtils = app.get(EventBusTestUtils);
   const commandBus = app.get(CommandBus);
   const exportRepo = app.get(ExportRepository);
