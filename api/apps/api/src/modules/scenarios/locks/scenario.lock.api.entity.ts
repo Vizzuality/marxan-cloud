@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity(`scenario_locks`)
@@ -21,4 +22,9 @@ export class ScenarioLockEntity {
     default: 'now()',
   })
   createdAt!: Date;
+}
+
+export class ScenarioLockResult {
+  @ApiProperty()
+  data!: ScenarioLockEntity;
 }

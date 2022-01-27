@@ -36,6 +36,7 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
+import { LockService } from './locks/lock.service';
 
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
@@ -50,6 +51,7 @@ import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-check
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
+import { ScenarioLockEntity } from './locks/scenario.lock.api.entity';
 
 @Module({
   imports: [
@@ -87,6 +89,7 @@ import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block
     BlmValuesModule,
     BlmCalibrationModule,
     AccessControlModule,
+    TypeOrmModule.forFeature([ScenarioLockEntity]),
   ],
   providers: [
     ScenariosService,
@@ -104,6 +107,7 @@ import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block
     ZipFilesSerializer,
     ScenarioPlanningUnitSerializer,
     CostRangeService,
+    LockService,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],
