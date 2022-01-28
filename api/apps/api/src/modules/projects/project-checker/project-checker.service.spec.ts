@@ -12,6 +12,9 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
+import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -202,6 +205,10 @@ async function getFixtures() {
     findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
   };
 
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Project>, 'findOne'>> = {
+    findOne: jest.fn(),
+  };
+
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),
   };
@@ -216,12 +223,20 @@ async function getFixtures() {
         useValue: fakeProjectsService,
       },
       {
+        provide: getRepositoryToken(Scenario),
+        useValue: fakeScenariosRepo,
+      },
+      {
         provide: `PlanningAreasService`,
         useValue: fakePlaningAreaFacade,
       },
       {
         provide: ProjectChecker,
         useClass: MarxanProjectChecker,
+      },
+      {
+        provide: ScenarioChecker,
+        useClass: ScenarioCheckerFake,
       },
     ],
   })

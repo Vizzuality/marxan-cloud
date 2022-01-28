@@ -15,6 +15,7 @@ export class ProjectCheckerFake implements ProjectChecker {
   private projectsWithPendingBlmCalibration: string[];
   private projectsWithPendingMarxanRun: string[];
   private projectsThatAreNotReady: string[];
+  private projectsWithPendingImports: string[];
 
   constructor(
     @InjectRepository(Project)
@@ -24,6 +25,15 @@ export class ProjectCheckerFake implements ProjectChecker {
     this.projectsWithPendingBlmCalibration = [];
     this.projectsWithPendingMarxanRun = [];
     this.projectsThatAreNotReady = [];
+    this.projectsWithPendingImports = [];
+  }
+  async hasPendingImports(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.projectRepo.findOne(projectId);
+    if (!project) return left(doesntExist);
+
+    return right(this.projectsWithPendingImports.includes(projectId));
   }
 
   async hasPendingExports(
@@ -65,6 +75,10 @@ export class ProjectCheckerFake implements ProjectChecker {
     this.projectsWithPendingExports.push(projectId);
   }
 
+  addPendingImportsForProject(projectId: string) {
+    this.projectsWithPendingImports.push(projectId);
+  }
+
   addPendingBlmCalibrationForProject(projectId: string) {
     this.projectsWithPendingBlmCalibration.push(projectId);
   }
@@ -78,5 +92,6 @@ export class ProjectCheckerFake implements ProjectChecker {
     this.projectsWithPendingExports = [];
     this.projectsWithPendingBlmCalibration = [];
     this.projectsWithPendingMarxanRun = [];
+    this.projectsWithPendingImports = [];
   }
 }

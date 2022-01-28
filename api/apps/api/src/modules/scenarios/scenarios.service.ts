@@ -497,8 +497,8 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
   ): Promise<Either<typeof forbiddenError, string>> {
-    // TODO Block guard
     const scenario = await this.assertScenario(scenarioId);
+    await this.blockGuard.ensureThatScenarioIsNotBlocked(scenarioId);
     const userCanCloneScenario = await this.scenarioAclService.canCloneScenario(
       userId,
       scenario.projectId,

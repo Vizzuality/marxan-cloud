@@ -1,9 +1,12 @@
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { MarxanBlockGuard } from '@marxan-api/modules/projects/block-guard/marxan-block-guard.service';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { ProjectCheckerFake } from '../../../../test/utils/project-checker.service-fake';
@@ -42,11 +45,19 @@ const getFixtures = async () => {
     findOne: jest.fn(),
   };
 
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Project>, 'findOne'>> = {
+    findOne: jest.fn(),
+  };
+
   const sandbox = await Test.createTestingModule({
     providers: [
       {
         provide: ProjectChecker,
         useClass: ProjectCheckerFake,
+      },
+      {
+        provide: ScenarioChecker,
+        useClass: ScenarioCheckerFake,
       },
       {
         provide: BlockGuard,
@@ -55,6 +66,10 @@ const getFixtures = async () => {
       {
         provide: getRepositoryToken(Project),
         useValue: fakeProjectsService,
+      },
+      {
+        provide: getRepositoryToken(Scenario),
+        useValue: fakeScenariosRepo,
       },
     ],
   }).compile();

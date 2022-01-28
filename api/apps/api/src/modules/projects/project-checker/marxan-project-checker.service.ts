@@ -6,6 +6,7 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { isDefined } from '@marxan/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -20,7 +21,14 @@ export class MarxanProjectChecker implements ProjectChecker {
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
     private readonly planningAreas: PlanningAreasService,
+    private readonly scenarioChecker: ScenarioChecker,
   ) {}
+
+  async hasPendingImports(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    throw new Error('Method not implemented.');
+  }
 
   async hasPendingBlmCalibration(
     projectId: string,
@@ -37,7 +45,7 @@ export class MarxanProjectChecker implements ProjectChecker {
 
     const result = await Promise.all(
       project.scenarios.map((scenario) =>
-        this.checkPendingBlmCalibration(scenario.id),
+        this.scenarioChecker.hasPendingBlmCalibration(scenario.id),
       ),
     );
 
@@ -59,7 +67,7 @@ export class MarxanProjectChecker implements ProjectChecker {
 
     const result = await Promise.all(
       project.scenarios.map((scenario) =>
-        this.checkPendingMarxanRun(scenario.id),
+        this.scenarioChecker.hasPendingMarxanRun(scenario.id),
       ),
     );
 
@@ -140,46 +148,5 @@ export class MarxanProjectChecker implements ProjectChecker {
   private async hasRequiredPlanningArea(project: Project): Promise<boolean> {
     const area = await this.planningAreas.locatePlanningAreaEntity(project);
     return isDefined(area);
-  }
-
-  private async checkPendingBlmCalibration(
-    scenarioId: string,
-  ): Promise<boolean> {
-    const exportEvent = await this.apiEvents
-      .getLatestEventForTopic({
-        topic: scenarioId,
-        kind: In([
-          API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1,
-          API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1,
-          API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1,
-        ]),
-      })
-      .catch(this.createNotFoundHandler());
-
-    const pendingBlmCalibration =
-      exportEvent?.kind ===
-      API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1;
-
-    return pendingBlmCalibration;
-  }
-
-  private async checkPendingMarxanRun(scenarioId: string): Promise<boolean> {
-    const exportEvent = await this.apiEvents
-      .getLatestEventForTopic({
-        topic: scenarioId,
-        kind: In([
-          API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
-          API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1,
-          API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
-          API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
-        ]),
-      })
-      .catch(this.createNotFoundHandler());
-
-    const pendingMarxanRun =
-      exportEvent?.kind ===
-      API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
-
-    return pendingMarxanRun;
   }
 }
