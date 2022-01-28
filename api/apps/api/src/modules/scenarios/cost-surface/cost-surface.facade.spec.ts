@@ -52,11 +52,11 @@ beforeEach(async () => {
 
 describe(`when job submits successfully`, () => {
   let result: unknown;
-  beforeEach(() => {
+  beforeEach(async () => {
     // Asset
     addJobMock.mockResolvedValue({ job: { id: 1 } });
     // Act
-    result = sut.convert(scenarioId, file);
+    result = await sut.convert(scenarioId, file);
   });
 
   it(`should return`, () => {
@@ -92,12 +92,12 @@ describe(`when job submits successfully`, () => {
 
 describe(`when job submission fails`, () => {
   let result: unknown;
-  beforeEach(() => {
+  beforeEach(async () => {
     // Asset
     addJobMock.mockRejectedValue(new Error('Oups'));
     // Act
     try {
-      result = sut.convert(scenarioId, file);
+      result = await sut.convert(scenarioId, file);
     } catch (error) {
       //expected error, do nothing
     }

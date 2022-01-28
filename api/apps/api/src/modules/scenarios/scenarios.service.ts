@@ -317,7 +317,7 @@ export class ScenariosService {
     if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    this.costSurface.convert(scenarioId, file);
+    await this.costSurface.convert(scenarioId, file);
     return right(void 0);
   }
 

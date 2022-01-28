@@ -14,17 +14,17 @@ export class CostSurfaceFacade {
     private readonly logger: Logger = new Logger(CostSurfaceFacade.name),
   ) {}
 
-  convert(scenarioId: string, file: Express.Multer.File): void {
-    this.queueService.queue
-      .add(`cost-surface-for-${scenarioId}`, {
+  async convert(scenarioId: string, file: Express.Multer.File): Promise<void> {
+    try {
+      await this.queueService.queue.add(`cost-surface-for-${scenarioId}`, {
         scenarioId,
         shapefile: file,
-      })
-      .then(() => this.events.event(scenarioId, CostSurfaceState.Submitted))
-      .catch(async (error) => {
-        await this.markAsFailedSubmission(scenarioId, error);
-        throw error;
       });
+      await this.events.event(scenarioId, CostSurfaceState.Submitted);
+    } catch (error) {
+      await this.markAsFailedSubmission(scenarioId, error);
+      throw error;
+    }
   }
 
   private markAsFailedSubmission = async (
