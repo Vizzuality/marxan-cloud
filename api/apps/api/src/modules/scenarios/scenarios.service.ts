@@ -159,7 +159,9 @@ export class ScenariosService {
     scenarioId: string,
     info: AppInfoDTO,
     fetchSpecification?: FetchSpecification,
-  ): Promise<Either<typeof notFound | typeof forbiddenError, Scenario>> {
+  ): Promise<
+    Either<typeof scenarioNotFound | typeof forbiddenError, Scenario>
+  > {
     try {
       assertDefined(info.authenticatedUser);
       const scenario = await this.crudService.getById(
@@ -176,7 +178,7 @@ export class ScenariosService {
       }
       return right(scenario);
     } catch (error) {
-      return left(notFound);
+      return left(scenarioNotFound);
     }
   }
 
@@ -427,6 +429,21 @@ export class ScenariosService {
       blm,
     );
     return right(void 0);
+  }
+
+  async getBlmRange(
+    scenarioId: string,
+    userId: string,
+  ): Promise<
+    Either<typeof scenarioNotFound | typeof forbiddenError, [number, number]>
+  > {
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenario)) return left(forbiddenError);
+
+    return left(scenarioNotFound);
   }
 
   async startBlmCalibration(

@@ -106,7 +106,6 @@ import { projectNotFound } from '@marxan-api/modules/blm';
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { notFound } from './marxan-run';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 import {
@@ -121,6 +120,7 @@ import {
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
 import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
+import { BlmRangeDto } from '@marxan-api/modules/scenarios/dto/blm-range.dto';
 import {
   LockService,
   lockedScenario,
@@ -277,8 +277,8 @@ export class ScenariosController {
       switch (result.left) {
         case forbiddenError:
           throw new ForbiddenException();
-        case notFound:
-          throw new NotFoundException(`Scenario ${id} could not be found.`);
+        case scenarioNotFound:
+          throw new NotFoundException(`Scenario ${id} could not be found`);
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
@@ -1085,11 +1085,45 @@ export class ScenariosController {
   ): Promise<BlmCalibrationRunResultDto[]> {
     const result = await this.service.getBlmCalibrationResults(id, req.user.id);
 
-    if (isLeft(result)) {
-      throw new ForbiddenException();
-    }
+    if (isLeft(result))
+      throw new ForbiddenException(
+        `User with ID: ${req.user.id} cannot view scenario with ID: ${id}`,
+      );
 
     return result.right;
+  }
+
+  @ApiOperation({
+    description: `Retrieve BLM range for a scenario.`,
+    summary: `Retrieve BLM range for a scenario.`,
+  })
+  @ApiOkResponse({
+    type: BlmRangeDto,
+    isArray: true,
+  })
+  @Get(`:id/blm/range`)
+  async getBlmRange(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<BlmRangeDto> {
+    const result = await this.service.getBlmRange(id, req.user.id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException(
+            `User with ID: ${req.user.id} cannot view scenario with ID: ${id}`,
+          );
+        case scenarioNotFound:
+          throw new NotFoundException(
+            `Could not found project for scenario with ID: ${id}`,
+          );
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return BlmRangeDto.fromBlmValues(result.right);
   }
 
   @ApiOperation({
