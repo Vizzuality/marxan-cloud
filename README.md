@@ -24,7 +24,7 @@ details.
 
 ### Dependencies
 
-- Nodejs v14
+- Nodejs v14.18
 - PostgreSQL v14
 - Postgis v3
 - Redis v6
