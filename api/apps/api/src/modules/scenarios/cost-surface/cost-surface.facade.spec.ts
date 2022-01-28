@@ -96,7 +96,11 @@ describe(`when job submission fails`, () => {
     // Asset
     addJobMock.mockRejectedValue(new Error('Oups'));
     // Act
-    result = sut.convert(scenarioId, file);
+    try {
+      result = sut.convert(scenarioId, file);
+    } catch (error) {
+      //expected error, do nothing
+    }
   });
 
   it(`should return`, () => {
