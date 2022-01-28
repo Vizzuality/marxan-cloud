@@ -40,6 +40,10 @@ export class ScenarioAclService implements ScenarioAccessControl {
     ScenarioRoles.scenario_owner,
   ];
   private readonly canDeleteScenarioRoles = [ScenarioRoles.scenario_owner];
+  private readonly canCloneScenarioRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
 
   private async getRolesWithinScenarioForUser(
     userId: string,
@@ -119,6 +123,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return this.doesUserHaveRole(
       await this.getRolesWithinScenarioForUser(userId, scenarioId),
       this.canViewScenarioRoles,
+    );
+  }
+
+  async canCloneScenario(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRoleInProject(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canCloneScenarioRoles,
     );
   }
 

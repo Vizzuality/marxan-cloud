@@ -497,8 +497,16 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
   ): Promise<Either<typeof forbiddenError, string>> {
-    // Block guard
-    // ACL slot
+    // TODO Block guard
+    const scenario = await this.assertScenario(scenarioId);
+    const userCanCloneScenario = await this.scenarioAclService.canCloneScenario(
+      userId,
+      scenario.projectId,
+    );
+
+    if (!userCanCloneScenario) {
+      return left(forbiddenError);
+    }
 
     const result = await this.commandBus.execute(
       new ExportScenario(new ResourceId(scenarioId)),
