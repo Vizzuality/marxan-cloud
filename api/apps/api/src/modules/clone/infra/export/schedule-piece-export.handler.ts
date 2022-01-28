@@ -13,10 +13,16 @@ import { SchedulePieceExport } from './schedule-piece-export.command';
 import { exportPieceQueueToken } from './export-queue.provider';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
+import { ResourceKind } from '@marxan/cloning/domain';
 
 @CommandHandler(SchedulePieceExport)
 export class SchedulePieceExportHandler
   implements IInferredCommandHandler<SchedulePieceExport> {
+  private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__export__piece__submitted__v1__alpha,
+  };
+
   constructor(
     private readonly apiEvents: ApiEventsService,
     @Inject(exportPieceQueueToken) private readonly queue: Queue<JobInput>,
@@ -53,8 +59,10 @@ export class SchedulePieceExportHandler
       return;
     }
 
+    const kind = this.eventMapper[resourceKind];
+
     await this.apiEvents.createIfNotExists({
-      kind: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
+      kind,
       topic: componentId.value,
       data: {
         piece,

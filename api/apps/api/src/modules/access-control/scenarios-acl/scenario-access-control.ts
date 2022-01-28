@@ -10,4 +10,5 @@ export abstract class ScenarioAccessControl {
     userId: string,
     projectId: string,
   ): Promise<Permit>;
+  abstract canCloneScenario(userId: string, projectId: string): Promise<Permit>;
 }

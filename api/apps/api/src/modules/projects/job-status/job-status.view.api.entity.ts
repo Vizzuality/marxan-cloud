@@ -146,4 +146,13 @@ const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
     JobStatus.running,
   [API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1]: JobStatus.failure,
   [API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1]: JobStatus.done,
+  [API_EVENT_KINDS.scenario__export__failed__v1__alpha]: JobStatus.failure,
+  [API_EVENT_KINDS.scenario__export__finished__v1__alpha]: JobStatus.done,
+  [API_EVENT_KINDS.scenario__export__submitted__v1__alpha]: JobStatus.running,
+  [API_EVENT_KINDS.scenario__export__piece__failed__v1__alpha]:
+    JobStatus.failure,
+  [API_EVENT_KINDS.scenario__export__piece__finished__v1__alpha]:
+    JobStatus.done,
+  [API_EVENT_KINDS.scenario__export__piece__submitted__v1__alpha]:
+    JobStatus.running,
 };

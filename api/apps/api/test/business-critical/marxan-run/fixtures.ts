@@ -41,10 +41,9 @@ export const getFixtures = async () => {
       );
     },
     GivenCostSurfaceTemplateFilled: async () => {
-      const template = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenario}/cost-surface/shapefile-template`)
         .set('Authorization', `Bearer ${authToken}`);
-      console.log(template.body);
     },
     WhenMarxanExecutionIsRequested: async () => {
       // TODO currently not implemented yet: 501

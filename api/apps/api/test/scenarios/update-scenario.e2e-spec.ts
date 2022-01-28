@@ -67,6 +67,7 @@ async function getFixtures() {
 
   return {
     cleanup: async () => {
+      projectChecker.clear();
       await ProjectsTestUtils.deleteProject(app, token, projectId);
       await ScenariosTestUtils.deleteScenario(app, token, scenarioId);
       await OrganizationsTestUtils.deleteOrganization(

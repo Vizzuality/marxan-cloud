@@ -23,11 +23,22 @@ import {
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
 import { ResourceId } from '../../export';
 import { ApiEventsService } from '../../../api-events';
+import { ResourceKind } from '@marxan/cloning/domain';
 
 @Injectable()
 export class ExportPieceEventsHandler
   implements EventFactory<JobInput, JobOutput> {
   private queueEvents: QueueEventsAdapter<JobInput, JobOutput>;
+
+  private failEventsMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__export__piece__failed__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__export__piece__failed__v1__alpha,
+  };
+
+  private successEventsMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__export__piece__finished__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__export__piece__finished__v1__alpha,
+  };
 
   constructor(
     @Inject(exportPieceEventsFactoryToken)
@@ -45,7 +56,7 @@ export class ExportPieceEventsHandler
   ): Promise<CreateApiEventDTO> {
     const data = await eventData.data;
     const output = await eventData.result;
-    const kind = API_EVENT_KINDS.project__export__piece__finished__v1__alpha;
+    const kind = this.successEventsMapper[data.resourceKind];
 
     return {
       topic: data.componentId,
@@ -67,7 +78,7 @@ export class ExportPieceEventsHandler
       exportId,
       componentId,
     } = await eventData.data;
-    const kind = API_EVENT_KINDS.project__export__piece__failed__v1__alpha;
+    const kind = this.failEventsMapper[resourceKind];
 
     return {
       topic: componentId,
