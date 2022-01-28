@@ -32,69 +32,74 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-}, 10_000);
+}, 20_000);
 
 afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test('should forbid downloading export file to unrelated users', async () => {
+test('should forbid getting latest exportId to unrelated users', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenExportFileIsReady();
-  const response = await fixtures.WhenUnrelatedUserRequestExportFile();
+  const response = await fixtures.WhenUnrelatedUserRequestLatestExportId();
 
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test('should permit downloading public project export file for unrelated users', async () => {
+test('should permit getting latest exportId of public projects for unrelated users', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenProjectIsPublic();
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenExportFileIsReady();
-  const response = await fixtures.WhenUnrelatedUserRequestExportFile();
+  const response = await fixtures.WhenUnrelatedUserRequestLatestExportId();
 
-  fixtures.ThenFileIsDownloaded(response);
+  fixtures.ThenLatestExportIdIsObtained(response);
 });
 
-test('should permit downloading export file for owner users ', async () => {
+test('should permit getting latest exportId for owner users ', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenExportFileIsReady();
-  const response = await fixtures.WhenOwnerUserRequestExportFile();
+  const response = await fixtures.WhenOwnerUserRequestLatestExportId();
 
-  fixtures.ThenFileIsDownloaded(response);
+  fixtures.ThenLatestExportIdIsObtained(response);
 });
 
-test('should permit downloading export file for contributor users ', async () => {
+test('should return not found code when trying to obtain latest exportId of a project without exports', async () => {
   await fixtures.GivenProjectWasCreated();
-  await fixtures.GivenContributorWasAddedToProject();
+
+  const response = await fixtures.WhenOwnerUserRequestLatestExportId();
+
+  fixtures.ThenNotFoundIsReturned(response);
+});
+
+test('should permit getting latest exportId for contributor users ', async () => {
+  await fixtures.GivenProjectWasCreated();
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenExportFileIsReady();
-  const response = await fixtures.WhenContributorUserRequestExportFile();
+  const response = await fixtures.WhenContributorUserRequestLatestExportId();
 
-  fixtures.ThenFileIsDownloaded(response);
+  fixtures.ThenLatestExportIdIsObtained(response);
 });
 
-test('should permit downloading export file for viewer users ', async () => {
+test('should permit getting latest exportId for viewer users ', async () => {
   await fixtures.GivenProjectWasCreated();
-  await fixtures.GivenViewerWasAddedToProject();
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenExportFileIsReady();
-  const response = await fixtures.WhenViewerUserRequestExportFile();
+  const response = await fixtures.WhenViewerUserRequestLatestExportId();
 
-  fixtures.ThenFileIsDownloaded(response);
+  fixtures.ThenLatestExportIdIsObtained(response);
 });
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
   const eventBusTestUtils = app.get(EventBusTestUtils);
-  eventBusTestUtils.startInspectingEvents();
   const commandBus = app.get(CommandBus);
   const exportRepo = app.get(ExportRepository);
   const fileRepo = app.get(FileRepository);
@@ -146,31 +151,31 @@ export const getFixtures = async () => {
         ownerToken,
         organizationId,
       );
-      eventBusTestUtils.stopInspectingEvents();
       await app.close();
     },
     GivenProjectWasCreated: async () => {
       const result = await GivenProjectExists(app, ownerToken);
       projectId = result.projectId;
       organizationId = result.organizationId;
-    },
-    GivenProjectIsPublic: async () => {
-      await publishedProjectsRepo.save([
-        { id: projectId, name: 'name', description: 'description' },
-      ]);
-    },
-    GivenContributorWasAddedToProject: async () => {
+
+      await userProjectsRepo.save({
+        projectId,
+        userId: viewerUserId,
+        roleName: ProjectRoles.project_viewer,
+      });
+
       await userProjectsRepo.save({
         projectId,
         userId: contributorUserId,
         roleName: ProjectRoles.project_contributor,
       });
     },
-    GivenViewerWasAddedToProject: async () => {
-      await userProjectsRepo.save({
-        projectId,
-        userId: viewerUserId,
-        roleName: ProjectRoles.project_viewer,
+    GivenProjectIsPublic: async () => {
+      await publishedProjectsRepo.save({
+        id: projectId,
+        name: '',
+        description: '',
+        originalProject: { id: projectId },
       });
     },
     GivenExportWasRequested: async () => {
@@ -198,44 +203,34 @@ export const getFixtures = async () => {
         );
       });
     },
-    WhenUnrelatedUserRequestExportFile: () =>
+    WhenUnrelatedUserRequestLatestExportId: () =>
       request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
+        .get(`/api/v1/projects/${projectId}/export`)
         .set('Authorization', `Bearer ${unrelatedUserToken}`),
-    WhenOwnerUserRequestExportFile: () =>
+    WhenOwnerUserRequestLatestExportId: () =>
       request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
+        .get(`/api/v1/projects/${projectId}/export`)
         .set('Authorization', `Bearer ${ownerToken}`),
-    WhenContributorUserRequestExportFile: async () => {
-      await userProjectsRepo.save({
-        projectId,
-        userId: contributorUserId,
-        roleName: ProjectRoles.project_contributor,
-      });
-
-      return request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
-        .set('Authorization', `Bearer ${contributorToken}`);
-    },
-    WhenViewerUserRequestExportFile: async () => {
-      await userProjectsRepo.save({
-        projectId,
-        userId: viewerUserId,
-        roleName: ProjectRoles.project_viewer,
-      });
-
-      return request(app.getHttpServer())
-        .get(`/api/v1/projects/${projectId}/export/${exportId.value}`)
-        .set('Authorization', `Bearer ${viewerToken}`);
-    },
+    WhenContributorUserRequestLatestExportId: () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/export`)
+        .set('Authorization', `Bearer ${contributorToken}`),
+    WhenViewerUserRequestLatestExportId: () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/export`)
+        .set('Authorization', `Bearer ${viewerToken}`),
     WhenExportFileIsReady: async () => {
       await eventBusTestUtils.waitUntilEventIsPublished(ArchiveReady);
     },
-    ThenFileIsDownloaded: (response: request.Response) => {
+    ThenLatestExportIdIsObtained: (response: request.Response) => {
       expect(response.status).toBe(200);
+      expect(response.body.id).toEqual(exportId.value);
     },
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toBe(403);
+    },
+    ThenNotFoundIsReturned: (response: request.Response) => {
+      expect(response.status).toBe(404);
     },
   };
 };

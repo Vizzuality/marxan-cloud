@@ -52,6 +52,7 @@ import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
   notAllowed,
   projectNotFound,
+  exportNotFound,
   ProjectsService,
   validationFailed,
 } from './projects.service';
@@ -89,6 +90,7 @@ import {
 } from '@marxan-api/decorators/acl.decorator';
 import { createReadStream } from 'fs';
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
+import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -408,6 +410,11 @@ export class ProjectsController {
   }
 
   @ImplementsAcl()
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: RequestProjectExportResponseDto })
   @Post(`:projectId/export`)
   async requestProjectExport(
     @Param('projectId') projectId: string,
@@ -437,6 +444,14 @@ export class ProjectsController {
   }
 
   @ImplementsAcl()
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiParam({
+    name: 'exportId',
+    description: 'ID of the Export',
+  })
   @Get(`:projectId/export/:exportId`)
   @Header(`Content-Type`, `application/zip`)
   @Header('Content-Disposition', 'attachment; filename="export.zip"')
@@ -473,5 +488,39 @@ export class ProjectsController {
     }
 
     createReadStream(result.right.value).pipe(response);
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Returns the latest exportId of a given project',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: RequestProjectExportResponseDto })
+  @Get(`:projectId/export`)
+  async getLatestExportId(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const exportIdOrError = await this.projectsService.getLatestExportForProject(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(exportIdOrError)) {
+      switch (exportIdOrError.left) {
+        case exportNotFound:
+          throw new NotFoundException(
+            `Export for project with id ${projectId} not found`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+    return { id: exportIdOrError.right };
   }
 }
