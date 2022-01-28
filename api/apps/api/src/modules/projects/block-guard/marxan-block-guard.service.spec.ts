@@ -16,6 +16,10 @@ describe('MarxanBlockGuard', () => {
     fixtures = await getFixtures();
   });
 
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
   it(`throws an exception if the given project has an ongoing export`, async () => {
     const projectId = fixtures.GivenProjectWasCreated();
 
@@ -63,6 +67,9 @@ const getFixtures = async () => {
   const blockGuard = sandbox.get(BlockGuard);
 
   return {
+    cleanup: () => {
+      projectChecker.clear();
+    },
     GivenProjectWasCreated: () => {
       const id = v4();
       fakeProjectsService.findOne.mockResolvedValue({ id } as Project);

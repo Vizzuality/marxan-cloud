@@ -147,7 +147,7 @@ export class FakeQueueEvents {
     failed: [],
   };
 
-  private constructor(eventFactory: EventFactory<JobInput, JobOutput>) {
+  private constructor(private eventFactory: EventFactory<JobInput, JobOutput>) {
     this.on('completed', eventFactory.createCompletedEvent);
     this.on('failed', eventFactory.createFailedEvent);
   }
@@ -163,7 +163,7 @@ export class FakeQueueEvents {
   }
 
   on(type: JobEvent, callback: JobEventListener) {
-    this.#listeners[type].push(callback);
+    this.#listeners[type].push(callback.bind(this.eventFactory));
   }
 
   triggerJobEvent(
