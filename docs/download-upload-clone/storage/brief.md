@@ -24,20 +24,31 @@ outlined in the [high-level design document](./high-level-design.md).
 
 - storing one or more archive pieces as they are prepared and finalized
 
+- streaming archive pieces from their cloud storage location when cloning the
+  exported project/scenarios
+
+- checking the integrity of all the pieces of a project and its scenarios as
+  they are being used to create a clone of the original project/scenarios
+
+- removing from cloud storage all the archive pieces once their validity expires
+
+- garbage-collecting archive pieces that are not yet expired, if their source
+  project or scenario is deleted
+
+Moreover, _only when users request to be able to download a single zip file_
+with all the contents of a project and any scenarios the following steps will
+also apply:
+
 - preparing a final archive file that includes all the finalized pieces
 
 - storing the final archive
 
-- removing individual pieces
-
 - allowing users to download the archive for a given project
 
-- removing the archive and any related files once its validity expires
+- removing the archive once its validity expires
 
-- allowing users to upload an archive to a MarxanCloud instance to get the
+- allowing users to upload a zip archive to a MarxanCloud instance to get the
   archived project "rehydrated" as a new project on the target instance
 
-- checking the integrity of an uploaded archive
-
-- garbage-collecting archives that are not yet expired if their source project
-  is deleted
+- garbage-collecting archive zip artifacts that are not yet expired, if their
+  source project or scenario is deleted
