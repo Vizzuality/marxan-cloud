@@ -1,6 +1,6 @@
+import { FromShapefileJobInput } from '@marxan/scenarios-planning-unit';
 import { GeoJSON } from 'geojson';
-import { CostSurfaceJobInput } from '../../cost-surface-job-input';
 
 export abstract class ShapefileConverterPort {
-  abstract convert(file: CostSurfaceJobInput['shapefile']): Promise<GeoJSON>;
+  abstract convert(file: FromShapefileJobInput['shapefile']): Promise<GeoJSON>;
 }

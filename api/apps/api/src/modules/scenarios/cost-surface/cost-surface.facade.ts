@@ -1,16 +1,16 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { QueueService } from '@marxan-api/modules/queue/queue.service';
+import { JobInput } from '@marxan/scenarios-planning-unit';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from './cost-surface-events.port';
-import { CostSurfaceJobInput } from './job-input';
 
 @Injectable()
 export class CostSurfaceFacade {
   constructor(
     private readonly events: CostSurfaceEventsPort,
-    private readonly queueService: QueueService<CostSurfaceJobInput>,
+    private readonly queueService: QueueService<JobInput>,
     private readonly logger: Logger = new Logger(CostSurfaceFacade.name),
   ) {}
 

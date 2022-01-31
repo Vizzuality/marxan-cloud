@@ -1,8 +1,10 @@
+import { FromShapefileJobInput } from '@marxan/scenarios-planning-unit';
 import { Job } from 'bullmq';
-import { CostSurfaceJobInput } from '../../cost-surface-job-input';
 
-export const getJob = (scenarioId: string): Job<CostSurfaceJobInput, true> => {
-  const input: CostSurfaceJobInput = {
+export const getJob = (
+  scenarioId: string,
+): Job<FromShapefileJobInput, true> => {
+  const input: FromShapefileJobInput = {
     shapefile: {
       filename: '',
       path: '',
@@ -11,5 +13,5 @@ export const getJob = (scenarioId: string): Job<CostSurfaceJobInput, true> => {
   };
   return ({
     data: input,
-  } as unknown) as Job<CostSurfaceJobInput, true>;
+  } as unknown) as Job<FromShapefileJobInput, true>;
 };
