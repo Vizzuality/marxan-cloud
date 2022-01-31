@@ -92,7 +92,7 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                   id="form-description-project"
                   onSubmit={fprops.handleSubmit}
                   autoComplete="off"
-                  className="relative w-full h-12 px-2"
+                  className="relative w-full h-12 px-2 pr-24"
                 >
                   <FieldRFF
                     name="name"
@@ -106,8 +106,9 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                       <div className="relative h-12">
                         <input
                           {...input}
-                          className="absolute top-0 left-0 w-full h-full font-normal bg-transparent border-none cursor-pointer text-s leading-1 overflow-ellipsis opacity-80 font-heading focus:outline-none"
+                          className="absolute top-0 left-0 w-full h-full font-normal bg-transparent border-none cursor-pointer focus:bg-primary-300 focus:text-gray-500 focus:outline-none text-s leading-1 overflow-ellipsis opacity-80 font-heading"
                           value={`${input.value}`}
+                          maxLength={160}
                           disabled={!editable}
                           onBlur={() => {
                             input.onBlur();

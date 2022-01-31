@@ -8,6 +8,7 @@ import { useProjectRole } from 'hooks/project-users';
 
 import Title from 'layout/header/title';
 import Contributors from 'layout/projects/show/header/contributors';
+import Description from 'layout/projects/show/header/description';
 import Toolbar from 'layout/projects/show/header/toolbar';
 import Wrapper from 'layout/wrapper';
 
@@ -64,7 +65,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
               />
             </button>
           </div>
-          {/* <Description editable={editable} /> */}
+          <Description editable={editable} />
         </div>
 
         <div className="flex flex-col items-end flex-shrink-0 space-y-6">

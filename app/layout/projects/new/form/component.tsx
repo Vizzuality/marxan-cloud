@@ -247,7 +247,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                           {(fprops) => (
                             <Field id="description" {...fprops}>
                               <Label theme="dark" className="mb-3 uppercase">Description</Label>
-                              <Textarea rows={4} placeholder="Write your project description..." />
+                              <Textarea maxLength={160} rows={4} placeholder="Write your project description..." />
                             </Field>
                           )}
                         </FieldRFF>
