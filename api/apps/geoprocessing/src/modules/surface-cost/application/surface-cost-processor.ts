@@ -1,19 +1,19 @@
+import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
+import {
+  canPlanningUnitsBeLocked,
+  FromShapefileJobInput,
+  InitialCostJobInput,
+  JobInput,
+} from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
-
-import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
-import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
-
-import { CostSurfaceJobInput } from '../cost-surface-job-input';
-
+import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
-import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
 import { ShapefileConverterPort } from '../ports/shapefile-converter/shapefile-converter.port';
 
 @Injectable()
-export class SurfaceCostProcessor
-  implements WorkerProcessor<CostSurfaceJobInput, true> {
+export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   constructor(
     private readonly repo: CostSurfacePersistencePort,
     private readonly puExtractor: PuExtractorPort,
@@ -21,7 +21,9 @@ export class SurfaceCostProcessor
     private readonly shapefileConverter: ShapefileConverterPort,
   ) {}
 
-  async process(job: Job<CostSurfaceJobInput, true>): Promise<true> {
+  private async fromShapefileProcessor(
+    job: Job<FromShapefileJobInput, true>,
+  ): Promise<true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
     const surfaceCosts = this.puExtractor.extract(geoJson);
     const scenarioPlanningUnitIds = (
@@ -35,6 +37,28 @@ export class SurfaceCostProcessor
       throw new Error(errors.join('.'));
     }
     await this.repo.save(job.data.scenarioId, surfaceCosts);
+
     return true;
+  }
+
+  private async initialCostProcessor(
+    job: Job<InitialCostJobInput, true>,
+  ): Promise<true> {
+    // TODO
+
+    return true;
+  }
+
+  async process(job: Job<JobInput, true>): Promise<true> {
+    const { data } = job;
+
+    if ((data as FromShapefileJobInput).shapefile)
+      return this.fromShapefileProcessor(
+        job as Job<FromShapefileJobInput, true>,
+      );
+    if ((data as InitialCostJobInput).puGridShape)
+      return this.initialCostProcessor(job as Job<InitialCostJobInput, true>);
+
+    throw new Error('Unknown type of job');
   }
 }
