@@ -5,62 +5,127 @@ import {
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Either, left, right } from 'fp-ts/Either';
+import { Either, isRight, left, right } from 'fp-ts/Either';
 import { Repository } from 'typeorm';
 import { Project } from '../../src/modules/projects/project.api.entity';
+import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
 
 @Injectable()
 export class ProjectCheckerFake implements ProjectChecker {
   private projectsWithPendingExports: string[];
-  private projectsWithPendingBlmCalibration: string[];
-  private projectsWithPendingMarxanRun: string[];
   private projectsThatAreNotReady: string[];
   private projectsWithPendingImports: string[];
 
   constructor(
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,
+    private readonly scenarioChecker: ScenarioChecker,
   ) {
     this.projectsWithPendingExports = [];
-    this.projectsWithPendingBlmCalibration = [];
-    this.projectsWithPendingMarxanRun = [];
     this.projectsThatAreNotReady = [];
     this.projectsWithPendingImports = [];
   }
+
   async hasPendingImports(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId);
+    const project = await this.projectRepo.findOne(projectId, {
+      relations: ['scenarios'],
+    });
     if (!project) return left(doesntExist);
 
-    return right(this.projectsWithPendingImports.includes(projectId));
+    const projectPendingImport = this.projectsWithPendingImports.includes(
+      projectId,
+    );
+
+    if (!project.scenarios || projectPendingImport)
+      return right(projectPendingImport);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingImport(scenario.id);
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(
+      projectPendingImport ||
+        results.some((scenarioPendingImport) => scenarioPendingImport),
+    );
   }
 
   async hasPendingExports(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId);
+    const project = await this.projectRepo.findOne(projectId, {
+      relations: ['scenarios'],
+    });
     if (!project) return left(doesntExist);
 
-    return right(this.projectsWithPendingExports.includes(projectId));
+    const projectPendingExport = this.projectsWithPendingExports.includes(
+      projectId,
+    );
+
+    if (!project.scenarios || projectPendingExport)
+      return right(projectPendingExport);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingExport(scenario.id);
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(
+      projectPendingExport ||
+        results.some((scenarioPendingExport) => scenarioPendingExport),
+    );
   }
 
   async hasPendingBlmCalibration(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId);
+    const project = await this.projectRepo.findOne(projectId, {
+      relations: ['scenarios'],
+    });
     if (!project) return left(doesntExist);
 
-    return right(this.projectsWithPendingBlmCalibration.includes(projectId));
+    if (!project.scenarios) return right(false);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingBlmCalibration(
+          scenario.id,
+        );
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(
+      results.some((pendingBlmCalibration) => pendingBlmCalibration),
+    );
   }
 
   async hasPendingMarxanRun(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId);
+    const project = await this.projectRepo.findOne(projectId, {
+      relations: ['scenarios'],
+    });
     if (!project) return left(doesntExist);
 
-    return right(this.projectsWithPendingMarxanRun.includes(projectId));
+    if (!project.scenarios) return right(false);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingMarxanRun(
+          scenario.id,
+        );
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(results.some((pendingMarxanRun) => pendingMarxanRun));
   }
 
   async isProjectReady(
@@ -79,19 +144,9 @@ export class ProjectCheckerFake implements ProjectChecker {
     this.projectsWithPendingImports.push(projectId);
   }
 
-  addPendingBlmCalibrationForProject(projectId: string) {
-    this.projectsWithPendingBlmCalibration.push(projectId);
-  }
-
-  addPendingMarxanRunForProject(projectId: string) {
-    this.projectsWithPendingMarxanRun.push(projectId);
-  }
-
   clear() {
     this.projectsThatAreNotReady = [];
     this.projectsWithPendingExports = [];
-    this.projectsWithPendingBlmCalibration = [];
-    this.projectsWithPendingMarxanRun = [];
     this.projectsWithPendingImports = [];
   }
 }

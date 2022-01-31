@@ -12,6 +12,7 @@ import { isDefined } from '@marxan/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/Either';
+import { isRight } from 'fp-ts/lib/These';
 import { In, Repository } from 'typeorm';
 
 @Injectable()
@@ -30,54 +31,12 @@ export class MarxanProjectChecker implements ProjectChecker {
     throw new Error('Method not implemented.');
   }
 
-  async hasPendingBlmCalibration(
-    projectId: string,
-  ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
-    });
-
-    if (!project) {
-      return left(doesntExist);
-    }
-
-    if (!project.scenarios) return right(false);
-
-    const result = await Promise.all(
-      project.scenarios.map((scenario) =>
-        this.scenarioChecker.hasPendingBlmCalibration(scenario.id),
-      ),
-    );
-
-    return right(result.some((hasPendingExport) => hasPendingExport));
-  }
-
-  async hasPendingMarxanRun(
-    projectId: string,
-  ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
-    });
-
-    if (!project) {
-      return left(doesntExist);
-    }
-
-    if (!project.scenarios) return right(false);
-
-    const result = await Promise.all(
-      project.scenarios.map((scenario) =>
-        this.scenarioChecker.hasPendingMarxanRun(scenario.id),
-      ),
-    );
-
-    return right(result.some((hasPendingMarxanRun) => hasPendingMarxanRun));
-  }
-
   async hasPendingExports(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId);
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
 
     if (!project) {
       return left(doesntExist);
@@ -94,11 +53,74 @@ export class MarxanProjectChecker implements ProjectChecker {
       })
       .catch(this.createNotFoundHandler());
 
-    const pendingExportExists =
+    const projectPendingExport =
       exportEvent?.kind ===
       API_EVENT_KINDS.project__export__submitted__v1__alpha;
 
-    return right(pendingExportExists);
+    if (!project.scenarios || projectPendingExport)
+      return right(projectPendingExport);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingExport(scenario.id);
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(
+      projectPendingExport ||
+        results.some((scenarioPendingExport) => scenarioPendingExport),
+    );
+  }
+
+  async hasPendingBlmCalibration(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    if (!project.scenarios) return right(false);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingBlmCalibration(
+          scenario.id,
+        );
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(results.some((hasPendingExport) => hasPendingExport));
+  }
+
+  async hasPendingMarxanRun(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    if (!project.scenarios) return right(false);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingMarxanRun(
+          scenario.id,
+        );
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(results.some((hasPendingMarxanRun) => hasPendingMarxanRun));
   }
 
   async isProjectReady(

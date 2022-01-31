@@ -14,6 +14,9 @@ import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectChecker } from '../../src/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
+import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
+import { ScenarioCheckerFake } from '../utils/scenario-checker.service-fake';
+import { GivenScenarioExists } from '../steps/given-scenario-exists';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -42,9 +45,26 @@ test('should return bad request error if the project has a pending export', asyn
   fixtures.ThenBadRequestIsReturned(response);
 });
 
+test('should return bad request error if the project has a scenario with a pending export', async () => {
+  await fixtures.GivenProjectWasCreated();
+  fixtures.GivenProjectHasAScenarioWithAPendingExport();
+
+  const response = await fixtures.WhenOwnerUserRequestAnExport();
+
+  fixtures.ThenBadRequestIsReturned(response);
+});
+
+test.todo(
+  'should return bad request error if the project has a pending import',
+);
+
+test.todo(
+  'should return bad request error if the project has a scenario with a pending import',
+);
+
 test('should return bad request error if the project has a scenario with a pending blm calibration', async () => {
   await fixtures.GivenProjectWasCreated();
-  fixtures.GivenProjectHasAPendingBLMCalibration();
+  fixtures.GivenProjectHasAScenarioWithAPendingBLMCalibration();
 
   const response = await fixtures.WhenOwnerUserRequestAnExport();
 
@@ -53,7 +73,7 @@ test('should return bad request error if the project has a scenario with a pendi
 
 test('should return bad request error if the project has a scenario with a pending marxan run', async () => {
   await fixtures.GivenProjectWasCreated();
-  fixtures.GivenProjectHasAPendingMarxanRun();
+  fixtures.GivenProjectHasAScenarioWithAPendingMarxanRun();
 
   const response = await fixtures.WhenOwnerUserRequestAnExport();
 
@@ -102,6 +122,7 @@ export const getFixtures = async () => {
     getRepositoryToken(PublishedProject),
   );
   const fakeProjectChecker = app.get(ProjectChecker) as ProjectCheckerFake;
+  const fakeScenarioChecker = app.get(ScenarioChecker) as ScenarioCheckerFake;
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
@@ -111,10 +132,12 @@ export const getFixtures = async () => {
   const unrelatedUserToken = await GivenUserIsLoggedIn(app, 'dd');
   let projectId: string;
   let organizationId: string;
+  let scenarioId: string;
 
   return {
     cleanup: async () => {
       fakeProjectChecker.clear();
+      fakeScenarioChecker.clear();
 
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
@@ -129,9 +152,11 @@ export const getFixtures = async () => {
       await app.close();
     },
     GivenProjectWasCreated: async () => {
-      const result = await GivenProjectExists(app, ownerToken);
-      projectId = result.projectId;
-      organizationId = result.organizationId;
+      const project = await GivenProjectExists(app, ownerToken);
+      projectId = project.projectId;
+      organizationId = project.organizationId;
+      const scenario = await GivenScenarioExists(app, projectId, ownerToken);
+      scenarioId = scenario.id;
     },
     GivenProjectIsPublic: async () => {
       await publishedProjectsRepo.save([
@@ -141,11 +166,14 @@ export const getFixtures = async () => {
     GivenProjectHasAPendingExport: () => {
       fakeProjectChecker.addPendingExportForProject(projectId);
     },
-    GivenProjectHasAPendingBLMCalibration: () => {
-      fakeProjectChecker.addPendingBlmCalibrationForProject(projectId);
+    GivenProjectHasAScenarioWithAPendingExport: () => {
+      fakeScenarioChecker.addPendingExportForScenario(scenarioId);
     },
-    GivenProjectHasAPendingMarxanRun: () => {
-      fakeProjectChecker.addPendingMarxanRunForProject(projectId);
+    GivenProjectHasAScenarioWithAPendingBLMCalibration: () => {
+      fakeScenarioChecker.addPendingBlmCalibrationForScenario(scenarioId);
+    },
+    GivenProjectHasAScenarioWithAPendingMarxanRun: () => {
+      fakeScenarioChecker.addPendingMarxanRunForScenario(scenarioId);
     },
     WhenUnrelatedUserRequestAnExport: () =>
       request(app.getHttpServer())

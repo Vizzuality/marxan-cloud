@@ -57,7 +57,7 @@ export class MarxanScenarioChecker implements ScenarioChecker {
 
     if (!scenarioExist) return left(scenarioDoesntExist);
 
-    const exportEvent = await this.apiEvents
+    const blmCalibrationEvent = await this.apiEvents
       .getLatestEventForTopic({
         topic: scenarioId,
         kind: In([
@@ -69,7 +69,7 @@ export class MarxanScenarioChecker implements ScenarioChecker {
       .catch(this.createNotFoundHandler());
 
     const pendingBlmCalibration =
-      exportEvent?.kind ===
+      blmCalibrationEvent?.kind ===
       API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1;
 
     return right(pendingBlmCalibration);
@@ -82,7 +82,7 @@ export class MarxanScenarioChecker implements ScenarioChecker {
 
     if (!scenarioExist) return left(scenarioDoesntExist);
 
-    const exportEvent = await this.apiEvents
+    const marxanRunEvent = await this.apiEvents
       .getLatestEventForTopic({
         topic: scenarioId,
         kind: In([
@@ -95,7 +95,7 @@ export class MarxanScenarioChecker implements ScenarioChecker {
       .catch(this.createNotFoundHandler());
 
     const pendingMarxanRun =
-      exportEvent?.kind ===
+      marxanRunEvent?.kind ===
       API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
 
     return right(pendingMarxanRun);
