@@ -50,9 +50,9 @@ import {
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
+  exportNotFound,
   notAllowed,
   projectNotFound,
-  exportNotFound,
   ProjectsService,
   validationFailed,
 } from './projects.service';
@@ -64,7 +64,7 @@ import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
 import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
-import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
@@ -75,13 +75,13 @@ import { invalidRange } from '@marxan-api/modules/projects/blm';
 import {
   planningUnitAreaNotFound,
   updateFailure,
-} from '@marxan-api/modules/projects/blm/change-blm-range.command';
+} from '@marxan-api/modules/projects/blm/change-project-blm-range.command';
 import { ProjectBlmValuesResponseDto } from '@marxan-api/modules/projects/dto/project-blm-values-response.dto';
 import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
-import { forbiddenError } from '../access-control/access-control.types';
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import { projectNotFound as blmProjectNotFound, unknownError } from '../blm';
 import { Response } from 'express';
 import {

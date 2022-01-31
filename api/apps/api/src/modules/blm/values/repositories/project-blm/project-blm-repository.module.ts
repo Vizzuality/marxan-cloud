@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { TypeormProjectBlmRepository } from './typeorm-project-blm-repository';
 import { ProjectBlm } from './project-blm.api.entity';
-import { ProjectBlmRepo } from '../../project-blm-repo';
+import { ProjectBlmRepo } from '../../blm-repos';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProjectBlm])],

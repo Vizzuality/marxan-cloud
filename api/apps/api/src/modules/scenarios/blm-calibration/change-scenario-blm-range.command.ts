@@ -1,6 +1,7 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/Either';
-import { GetFailure, ProjectBlm } from '@marxan-api/modules/blm';
+import { Blm } from '@marxan-api/modules/blm';
+import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 
 export const invalidRange = Symbol(`invalid range`);
 export const unknownError = Symbol(`unknown error`);
@@ -11,18 +12,18 @@ export const planningUnitAreaNotFound = Symbol(
 
 export type PlanningUnitAreaNotFoundError = typeof planningUnitAreaNotFound;
 
-export type ChangeRangeErrors =
+export type ChangeScenarioRangeErrors =
   | typeof invalidRange
   | typeof unknownError
   | typeof updateFailure
   | PlanningUnitAreaNotFoundError
-  | GetFailure;
+  | GetScenarioFailure;
 
-export class ChangeBlmRange extends Command<
-  Either<ChangeRangeErrors, ProjectBlm>
+export class ChangeScenarioBlmRange extends Command<
+  Either<ChangeScenarioRangeErrors, Blm>
 > {
   constructor(
-    public readonly projectId: string,
+    public readonly scenarioId: string,
     public readonly range: [number, number],
   ) {
     super();

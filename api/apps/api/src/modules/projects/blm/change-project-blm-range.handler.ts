@@ -2,20 +2,20 @@ import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left } from 'fp-ts/Either';
 import { Logger } from '@nestjs/common';
 
-import { ProjectBlm, ProjectBlmRepo } from '@marxan-api/modules/blm';
+import { Blm, ProjectBlmRepo } from '@marxan-api/modules/blm';
 
 import {
-  ChangeBlmRange,
-  ChangeRangeErrors,
+  ChangeProjectBlmRange,
+  ChangeProjectRangeErrors,
   invalidRange,
   updateFailure,
-} from './change-blm-range.command';
+} from './change-project-blm-range.command';
 import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
-@CommandHandler(ChangeBlmRange)
-export class ChangeBlmRangeHandler
-  implements IInferredCommandHandler<ChangeBlmRange> {
-  private readonly logger: Logger = new Logger(ChangeBlmRange.name);
+@CommandHandler(ChangeProjectBlmRange)
+export class ChangeProjectBlmRangeHandler
+  implements IInferredCommandHandler<ChangeProjectBlmRange> {
+  private readonly logger: Logger = new Logger(ChangeProjectBlmRange.name);
 
   constructor(
     private readonly blmRepository: ProjectBlmRepo,
@@ -25,7 +25,7 @@ export class ChangeBlmRangeHandler
   async execute({
     projectId,
     range,
-  }: ChangeBlmRange): Promise<Either<ChangeRangeErrors, ProjectBlm>> {
+  }: ChangeProjectBlmRange): Promise<Either<ChangeProjectRangeErrors, Blm>> {
     if (this.isInvalidRange(range)) {
       this.logger.error(
         `Received invalid range [${range}] for project with ID: ${projectId}`,

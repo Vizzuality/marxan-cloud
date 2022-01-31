@@ -2,11 +2,15 @@ import { Either } from 'fp-ts/Either';
 
 export const unknownError = Symbol(`unknown error`);
 export const projectNotFound = Symbol(`project not found`);
+export const scenarioNotFound = Symbol(`scenario not found`);
 export const alreadyCreated = Symbol(`project already has defaults`);
 export type CreateFailure = typeof unknownError | typeof alreadyCreated;
 export type SaveFailure = typeof unknownError | typeof projectNotFound;
-export type GetFailure = typeof unknownError | typeof projectNotFound;
-export interface ProjectBlm {
+export type SaveSuccess = true;
+export type GetProjectFailure = typeof unknownError | typeof projectNotFound;
+export type GetScenarioFailure = typeof unknownError | typeof scenarioNotFound;
+
+export interface Blm {
   id: string;
 
   /**
@@ -25,19 +29,32 @@ export interface ProjectBlm {
   defaults: number[];
 }
 
-type SaveSuccess = true;
-
 export abstract class ProjectBlmRepo {
   abstract create(
     projectId: string,
-    defaults: ProjectBlm['defaults'],
+    defaults: Blm['defaults'],
   ): Promise<Either<CreateFailure, SaveSuccess>>;
 
   abstract update(
     projectId: string,
-    range: ProjectBlm['range'],
-    values: ProjectBlm['values'],
+    range: Blm['range'],
+    values: Blm['values'],
   ): Promise<Either<SaveFailure, SaveSuccess>>;
 
-  abstract get(projectId: string): Promise<Either<GetFailure, ProjectBlm>>;
+  abstract get(projectId: string): Promise<Either<GetProjectFailure, Blm>>;
+}
+
+export abstract class ScenarioBlmRepo {
+  abstract copy(
+    scenarioId: string,
+    blm: Blm,
+  ): Promise<Either<CreateFailure, SaveSuccess>>;
+
+  abstract update(
+    projectId: string,
+    range: Blm['range'],
+    values: Blm['values'],
+  ): Promise<Either<SaveFailure, SaveSuccess>>;
+
+  abstract get(scenarioId: string): Promise<Either<GetScenarioFailure, Blm>>;
 }

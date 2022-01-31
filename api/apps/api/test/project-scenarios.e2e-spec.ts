@@ -262,12 +262,11 @@ async function getFixtures() {
         userId: viewerUserId,
       }),
 
-    WhenCreatingAScenarioWithIncompleteData: async () => {
-      return await request(app.getHttpServer())
+    WhenCreatingAScenarioWithIncompleteData: async () =>
+      request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
-        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields());
-    },
+        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields()),
 
     WhenCreatingAScenarioWithMinimumRequiredDataAsOwner: async () => {
       const response = await request(app.getHttpServer())

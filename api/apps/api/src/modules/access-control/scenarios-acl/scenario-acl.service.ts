@@ -17,9 +17,9 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { assertDefined } from '@marxan/utils';
 import {
   forbiddenError,
-  transactionFailed,
   lastOwner,
   queryFailed,
+  transactionFailed,
 } from '@marxan-api/modules/access-control';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
@@ -49,7 +49,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     userId: string,
     scenarioId: string,
   ): Promise<Array<ScenarioRoles>> {
-    const rolesToCheck = (
+    return (
       await this.roles.find({
         where: {
           scenarioId,
@@ -58,14 +58,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
         select: ['roleName'],
       })
     ).flatMap((role) => role.roleName);
-    return rolesToCheck;
   }
 
   private async getRolesWithinProjectForUser(
     userId: string,
     projectId: string,
   ): Promise<Array<ProjectRoles>> {
-    const rolesToCheck = (
+    return (
       await this.projectRoles.find({
         where: {
           projectId,
@@ -74,7 +73,6 @@ export class ScenarioAclService implements ScenarioAccessControl {
         select: ['roleName'],
       })
     ).flatMap((role) => role.roleName);
-    return rolesToCheck;
   }
 
   private async doesUserHaveRole(

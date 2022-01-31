@@ -91,15 +91,13 @@ export const getFixtures = async () => {
           range: blmRange,
         });
     },
-    WhenViewerLaunchesCalibration: async () => {
-      const response = await request(app.getHttpServer())
+    WhenViewerLaunchesCalibration: async () =>
+      request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/calibration`)
         .set('Authorization', `Bearer ${viewerToken}`)
         .send({
           range: blmRange,
-        });
-      return response;
-    },
+        }),
     ThenCalibrationResultsShouldBeAvailable: async () => {
       const response: { body: BlmCalibrationRunResultDto[] } = await request(
         app.getHttpServer(),

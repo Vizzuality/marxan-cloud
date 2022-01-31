@@ -7,6 +7,7 @@ import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import * as request from 'supertest';
+import { HttpStatus } from '@nestjs/common';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -16,22 +17,55 @@ describe('get-scenario-blm-calibration-results', () => {
   }, 100000);
 
   afterEach(async () => {
-    await fixtures?.cleanup();
+    await fixtures.cleanup();
   });
 
-  it.todo(
-    'should retrieve the default BLM range that it is the same as the project range',
-  );
-  it.todo('should retrieve the updated BLM range');
-  it.todo('should block retrieving the BLM range for non authenticated users');
+  it('should retrieve the default BLM range that it is the same as the project range', async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    const response = await fixtures
+      .WhenAskingForBlmRangeForScenario()
+      .WithTheOwnerUser();
+
+    await fixtures
+      .ThenBlmRangeShouldBeRetrieved(response)
+      .AndBeEqualToItsProjectBlm();
+  });
+
+  it('should retrieve the updated BLM range', async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    await fixtures.GivenScenarioBlmWasUpdated();
+
+    const response = await fixtures
+      .WhenAskingForBlmRangeForScenario()
+      .WithTheOwnerUser();
+
+    await fixtures
+      .ThenBlmRangeShouldBeRetrieved(response)
+      .AndBeEqualToItsProjectBlm();
+  });
+
+  it('should block retrieving the BLM range for non allowed users', async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    const response = await fixtures
+      .WhenAskingForBlmRangeForScenario()
+      .WithANonViewerUser();
+
+    await fixtures.ThenAForbiddenErrorShouldBeReturned(response);
+  });
 });
 
 const getFixtures = async () => {
   const app = await bootstrapApplication();
-  const token = await GivenUserIsLoggedIn(app);
+
+  const anotherToken = await GivenUserIsLoggedIn(app, 'aa');
+  const ownerToken = await GivenUserIsLoggedIn(app, 'bb');
+
   const { projectId, organizationId } = await GivenProjectExists(
     app,
-    token,
+    ownerToken,
     {
       countryCode: 'AGO',
       name: `Project name ${Date.now()}`,
@@ -43,35 +77,69 @@ const getFixtures = async () => {
 
   await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
-  const blmRange = [0, 100];
+  const updatedBlmRange = [1, 50];
 
   return {
     cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, token, projectId);
-      await ScenariosTestUtils.deleteScenario(app, token, scenarioId);
+      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
+      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await OrganizationsTestUtils.deleteOrganization(
         app,
-        token,
+        ownerToken,
         organizationId,
       );
       await app.close();
     },
     GivenScenarioWasCreated: async () => {
-      const result = await ScenariosTestUtils.createScenario(app, token, {
+      const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,
         type: ScenarioType.marxan,
         projectId,
       });
+
       scenarioId = result.data.id;
     },
-    WhenAskingForBlmRangeForScenario: async () =>
-      request(app.getHttpServer())
-        .get(`/api/v1/scenarios/${scenarioId}/blm/range`)
-        .set('Authorization', `Bearer ${token}`),
-    ThenBlmRangeShouldBeDefined: async (response: request.Response) => {
+    GivenScenarioBlmWasUpdated: async () => {
+      await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+        .send({ range: updatedBlmRange })
+        .set('Authorization', `Bearer ${ownerToken}`);
+    },
+    WhenAskingForBlmRangeForScenario: () => {
+      return {
+        WithTheOwnerUser: async () => {
+          return request(app.getHttpServer())
+            .get(`/api/v1/scenarios/${scenarioId}/blm/range`)
+            .set('Authorization', `Bearer ${ownerToken}`);
+        },
+        WithANonViewerUser: async () => {
+          return request(app.getHttpServer())
+            .get(`/api/v1/scenarios/${scenarioId}/blm/range`)
+            .set('Authorization', `Bearer ${anotherToken}`);
+        },
+      };
+    },
+    ThenBlmRangeShouldBeRetrieved: (response: request.Response) => {
       expect(response.body.range).toBeDefined();
       expect(response.body.range).toHaveLength(2);
-      expect(response.body.range).toEqual(blmRange);
+
+      return {
+        AndBeEqualToItsProjectBlm: async () => {
+          const projectBlm = await request(app.getHttpServer())
+            .get(`/api/v1/projects/${projectId}/calibration`)
+            .set('Authorization', `Bearer ${ownerToken}`);
+
+          expect(response.body.range).toEqual(projectBlm.body.range);
+        },
+        AndBeUpdatedWithTheNewRange: async () => {
+          expect(response.body.range).toEqual(updatedBlmRange);
+        },
+      };
+    },
+    ThenAForbiddenErrorShouldBeReturned: (response: request.Response) => {
+      expect(response.body.errors[0].status).toBe(HttpStatus.FORBIDDEN);
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+      expect(response.forbidden).toEqual(true);
     },
   };
 };

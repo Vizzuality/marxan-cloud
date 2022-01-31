@@ -1,11 +1,12 @@
 export { BlmValuesModule } from './blm-values.module';
 export {
   ProjectBlmRepo,
-  ProjectBlm,
+  ScenarioBlmRepo,
+  Blm,
   SaveFailure,
-  GetFailure,
+  GetProjectFailure,
   CreateFailure,
   alreadyCreated,
   projectNotFound,
   unknownError,
-} from './project-blm-repo';
+} from './blm-repos';

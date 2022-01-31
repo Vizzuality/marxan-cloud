@@ -1,7 +1,31 @@
 import { forbiddenError } from '@marxan-api/modules/access-control';
+import { Injectable } from '@nestjs/common';
+import { FetchSpecification } from 'nestjs-base-service';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
+
 import {
-  GetFailure as GetBlmFailure,
-  ProjectBlm,
+  FindResult,
+  GeoFeaturesService,
+} from '@marxan-api/modules/geo-features/geo-features.service';
+import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
+
+import { ProjectsCrudService } from './projects-crud.service';
+import { JobStatusService } from './job-status';
+import { Project } from './project.api.entity';
+import { CreateProjectDTO } from './dto/create.project.dto';
+import { UpdateProjectDTO } from './dto/update.project.dto';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
+import { assertDefined } from '@marxan/utils';
+
+import {
+  ProjectsRequest,
+  ProjectsServiceRequest,
+} from './project-requests-info';
+import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
+import {
+  Blm,
+  GetProjectFailure as GetBlmFailure,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
 import {
@@ -10,38 +34,17 @@ import {
   GetExportArchive,
 } from '@marxan-api/modules/clone';
 import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
-import { GeoFeaturesRequestInfo } from '@marxan-api/modules/geo-features';
-import {
-  FindResult,
-  GeoFeaturesService,
-} from '@marxan-api/modules/geo-features/geo-features.service';
-import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
-import {
-  ChangeBlmRange,
-  ChangeRangeErrors,
-} from '@marxan-api/modules/projects/blm';
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
-import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
-import { assertDefined } from '@marxan/utils';
-import { Injectable } from '@nestjs/common';
-import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
-import { FetchSpecification } from 'nestjs-base-service';
 import { Readable } from 'stream';
 import { ProjectAccessControl } from '../access-control';
 import { Permit } from '../access-control/access-control.types';
 import { ApiEventsService } from '../api-events';
-import { CreateProjectDTO } from './dto/create.project.dto';
-import { UpdateProjectDTO } from './dto/update.project.dto';
-import { JobStatusService } from './job-status';
 import {
-  ProjectsRequest,
-  ProjectsServiceRequest,
-} from './project-requests-info';
-import { Project } from './project.api.entity';
-import { ProjectsCrudService } from './projects-crud.service';
+  ChangeProjectBlmRange,
+  ChangeProjectRangeErrors,
+} from '@marxan-api/modules/projects/blm';
 
 export { validationFailed } from '../planning-areas';
 
@@ -118,7 +121,7 @@ export class ProjectsService {
   async findProjectBlm(
     projectId: string,
     userId: string,
-  ): Promise<Either<GetBlmFailure | typeof forbiddenError, ProjectBlm>> {
+  ): Promise<Either<GetBlmFailure | typeof forbiddenError, Blm>> {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -164,13 +167,15 @@ export class ProjectsService {
     projectId: string,
     userId: string,
     range: [number, number],
-  ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
+  ): Promise<Either<ChangeProjectRangeErrors | typeof forbiddenError, Blm>> {
     await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(forbiddenError);
     }
-    return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
+    return await this.commandBus.execute(
+      new ChangeProjectBlmRange(projectId, range),
+    );
   }
 
   async requestExport(
