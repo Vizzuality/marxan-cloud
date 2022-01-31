@@ -1,14 +1,11 @@
-import { Test } from '@nestjs/testing';
-import { Logger } from '@nestjs/common';
-import { Queue } from 'bullmq';
-
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 import { QueueService } from '@marxan-api/modules/queue/queue.service';
-
-import { CostSurfaceFacade } from './cost-surface.facade';
-import { CostSurfaceJobInput } from './job-input';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { JobInput } from '@marxan/scenarios-planning-unit';
+import { Logger } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { Queue } from 'bullmq';
 import { CostSurfaceEventsPort } from './cost-surface-events.port';
-
+import { CostSurfaceFacade } from './cost-surface.facade';
 import { CostSurfaceEventsFake } from './__mocks__/cost-surface-events-fake';
 
 let sut: CostSurfaceFacade;
@@ -32,7 +29,7 @@ beforeEach(async () => {
           queue: ({
             add: addJobMock,
           } as unknown) as Queue,
-        } as unknown) as QueueService<CostSurfaceJobInput>,
+        } as unknown) as QueueService<JobInput>,
       },
       {
         provide: Logger,

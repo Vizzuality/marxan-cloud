@@ -8,4 +8,11 @@ export { ScenarioPlanningUnitsProtectedStatusCalculatorService } from './scenari
 export { ProtectionStatusModule } from './protection-status.module';
 export { PlanningUnitGridShape } from './planning-unit-grid-shape';
 
+export {
+  JobInput,
+  FromShapefileJobInput,
+  InitialCostJobInput,
+} from './surface-cost-job-input';
+export { surfaceCostQueueName } from './surface-cost-queue-name';
+
 export * from './domain';

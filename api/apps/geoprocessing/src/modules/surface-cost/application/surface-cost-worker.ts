@@ -3,12 +3,13 @@ import { EventBus } from '@nestjs/cqrs';
 import { Job, Worker } from 'bullmq';
 
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import {
+  JobInput,
+  surfaceCostQueueName,
+} from '@marxan/scenarios-planning-unit';
 import { ApiEvent } from '@marxan-geoprocessing/modules/api-events';
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 
-import { CostSurfaceJobInput } from '../cost-surface-job-input';
-
-import { queueName } from './queue-name';
 import { SurfaceCostProcessor } from './surface-cost-processor';
 
 @Injectable()
@@ -20,8 +21,8 @@ export class SurfaceCostWorker {
     private readonly processor: SurfaceCostProcessor,
     private readonly eventBus: EventBus,
   ) {
-    this.#worker = wrapper.build(queueName, processor);
-    this.#worker.on('completed', ({ data }: Job<CostSurfaceJobInput>) => {
+    this.#worker = wrapper.build(surfaceCostQueueName, processor);
+    this.#worker.on('completed', ({ data }: Job<JobInput>) => {
       this.eventBus.publish(
         new ApiEvent(
           data.scenarioId,
@@ -31,12 +32,7 @@ export class SurfaceCostWorker {
     });
     this.#worker.on(
       'failed',
-      ({
-        data,
-        failedReason,
-        attemptsMade,
-        opts,
-      }: Job<CostSurfaceJobInput>) => {
+      ({ data, failedReason, attemptsMade, opts }: Job<JobInput>) => {
         if (attemptsMade !== opts.attempts) {
           return;
         }
