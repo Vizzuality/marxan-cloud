@@ -55,11 +55,6 @@ export const createWorld = async (app: INestApplication) => {
       await GivenApiEvent(
         app,
         scenario.id,
-        API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1,
-      );
-      await GivenApiEvent(
-        app,
-        scenario.id,
         API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,
       );
     },
