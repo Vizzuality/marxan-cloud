@@ -385,7 +385,7 @@ async function getFixtures() {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
       expect(error.title).toEqual(
-        `Scenario ${scenarioId} is already being edited`,
+        `Scenario ${scenarioId} is already being edited.`,
       );
     },
 

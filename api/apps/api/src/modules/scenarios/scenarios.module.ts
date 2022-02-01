@@ -51,7 +51,7 @@ import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-check
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
-import { ScenarioLockEntity } from './locks/scenario.lock.api.entity';
+import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
 
 @Module({
   imports: [

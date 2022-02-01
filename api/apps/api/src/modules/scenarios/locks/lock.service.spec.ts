@@ -4,12 +4,22 @@ import { Either, left, right } from 'fp-ts/Either';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { AcquireFailure, lockedScenario, LockService } from './lock.service';
-import { ScenarioLockEntity } from './scenario.lock.api.entity';
+import { ScenarioLockEntity } from './entity/scenario.lock.api.entity';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { ScenarioAccessControlMock } from './__mocks__/scenario-access-control.mock';
+import { ScenarioLockDto } from './dto/scenario.lock.dto';
 
 let fixtures: FixtureType<typeof getFixtures>;
+interface LockInterface {
+  userId: string;
+  scenarioId: string;
+  createdAt: Date;
+}
+
+interface saveMethod {
+  save: () => LockInterface;
+}
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -72,7 +82,7 @@ async function getFixtures() {
         provide: getRepositoryToken(ScenarioLockEntity),
         useValue: {
           manager: {
-            transaction: (fn: (em: any) => Promise<void>) =>
+            transaction: (fn: (em: saveMethod) => Promise<void>) =>
               fn(mockEntityManager),
           },
           count: jest.fn(),
@@ -107,10 +117,7 @@ async function getFixtures() {
     WhenCheckingIfAScenarioIsLocked: async () => sut.isLocked(SCENARIO_ID),
 
     ThenScenarioIsLocked: async (
-      result: Either<
-        AcquireFailure | typeof forbiddenError,
-        ScenarioLockEntity
-      >,
+      result: Either<AcquireFailure | typeof forbiddenError, ScenarioLockDto>,
     ) => {
       expect(result).toStrictEqual(
         right({
@@ -126,10 +133,7 @@ async function getFixtures() {
       });
     },
     ThenALockedScenarioErrorIsReturned: async (
-      result: Either<
-        AcquireFailure | typeof forbiddenError,
-        ScenarioLockEntity
-      >,
+      result: Either<AcquireFailure | typeof forbiddenError, ScenarioLockDto>,
     ) => {
       expect(result).toStrictEqual(left(lockedScenario));
       expect(mockEntityManager.save).not.toHaveBeenCalled();

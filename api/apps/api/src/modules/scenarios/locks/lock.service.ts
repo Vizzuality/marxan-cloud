@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
-import { ScenarioLockEntity } from '@marxan-api/modules/scenarios/locks/scenario.lock.api.entity';
+import { ScenarioLockEntity } from '@marxan-api/modules/scenarios/locks/entity/scenario.lock.api.entity';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
+import { ScenarioLockDto } from './dto/scenario.lock.dto';
 
 export const unknownError = Symbol(`unknown error`);
 export const lockedScenario = Symbol(`scenario is already locked`);
@@ -23,9 +24,7 @@ export class LockService {
   async acquireLock(
     scenarioId: string,
     userId: string,
-  ): Promise<
-    Either<AcquireFailure | typeof forbiddenError, ScenarioLockEntity>
-  > {
+  ): Promise<Either<AcquireFailure | typeof forbiddenError, ScenarioLockDto>> {
     if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }

@@ -126,7 +126,7 @@ import {
   lockedScenario,
   unknownError,
 } from './locks/lock.service';
-import { ScenarioLockResult } from './locks/scenario.lock.api.entity';
+import { ScenarioLockResult } from './locks/dto/scenario.lock.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -278,7 +278,7 @@ export class ScenariosController {
         case forbiddenError:
           throw new ForbiddenException();
         case notFound:
-          throw new NotFoundException(`Scenario ${id} could not be found`);
+          throw new NotFoundException(`Scenario ${id} could not be found.`);
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
@@ -1117,7 +1117,7 @@ export class ScenariosController {
           throw new ForbiddenException();
         case lockedScenario:
           throw new BadRequestException(
-            `Scenario ${id} is already being edited`,
+            `Scenario ${id} is already being edited.`,
           );
         case unknownError:
           throw new InternalServerErrorException();
