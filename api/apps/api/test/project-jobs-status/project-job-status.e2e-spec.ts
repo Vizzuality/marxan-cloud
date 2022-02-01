@@ -53,6 +53,11 @@ test(`job statuses for project`, async () => {
       id: world.scenarioIdWithPendingJob(),
       jobs: [
         {
+          kind: 'costSurface',
+          status: 'running',
+          isoDate: expect.any(String),
+        },
+        {
           kind: 'planningUnitsInclusion',
           status: 'running',
           isoDate: expect.any(String),
