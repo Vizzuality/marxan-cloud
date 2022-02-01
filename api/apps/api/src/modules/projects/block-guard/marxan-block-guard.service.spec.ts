@@ -24,7 +24,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
     fixtures?.cleanup();
   });
 
-  it(`throws an exception if the project does not exists`, async () => {
+  it(`throws an exception if the project does not exist`, async () => {
     const projectId = 'foo bar';
 
     await fixtures
@@ -98,7 +98,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
     fixtures?.cleanup();
   });
 
-  it(`throws an exception if the scenario does not exists`, async () => {
+  it(`throws an exception if the scenario does not exist`, async () => {
     const scenario = 'foo bar';
 
     await fixtures
@@ -116,7 +116,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
       .ThenAPendingExportErrorIsThrown();
   });
 
-  it(`throws an exception if scenario project has an ongoing export`, async () => {
+  it(`throws an exception if the given scenario's parent project has an ongoing export`, async () => {
     const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingExport(projectId);
@@ -128,7 +128,9 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
 
   it.todo(`throws an exception if the given scenario has an ongoing import`);
 
-  it.todo(`throws an exception if scenario project has an ongoing import`);
+  it.todo(
+    `throws an exception if the given scenario's parent project has an ongoing import`,
+  );
 
   it(`throws an exception if the given scenario has an ongoing blm calibration`, async () => {
     const [_, scenarioId] = fixtures.GivenProjectWasCreated();

@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { isRight } from 'fp-ts/lib/These';
 import { Repository } from 'typeorm';
+import { Project } from '../project.api.entity';
 
 @Injectable()
 export class MarxanBlockGuard implements BlockGuard {
@@ -19,9 +20,19 @@ export class MarxanBlockGuard implements BlockGuard {
     private readonly scenarioChecker: ScenarioChecker,
     @InjectRepository(Scenario)
     private readonly scenarioRepo: Repository<Scenario>,
+    @InjectRepository(Project)
+    private readonly projectRepo: Repository<Project>,
   ) {}
 
   async ensureThatProjectIsNotBlocked(projectId: string): Promise<void> {
+    const project = await this.projectRepo.findOne(projectId);
+
+    if (!project) {
+      throw new NotFoundException(
+        `Could not find project with ID: ${projectId}`,
+      );
+    }
+
     const [
       hasPendingExports,
       hasPendingBlmCalibration,
@@ -33,27 +44,17 @@ export class MarxanBlockGuard implements BlockGuard {
       //TODO this.projectChecker.hasPendingImports(projectId)
     ]);
 
-    if (
-      isLeft(hasPendingExports) ||
-      isLeft(hasPendingBlmCalibration) ||
-      isLeft(hasPendingMarxanRun)
-    ) {
-      throw new NotFoundException(
-        `Could not find project with ID: ${projectId}`,
-      );
-    }
-
-    if (hasPendingExports.right)
+    if (isRight(hasPendingExports) && hasPendingExports.right)
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending export`,
       );
 
-    if (hasPendingBlmCalibration.right)
+    if (isRight(hasPendingBlmCalibration) && hasPendingBlmCalibration.right)
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending blm calibration`,
       );
 
-    if (hasPendingMarxanRun.right)
+    if (isRight(hasPendingMarxanRun) && hasPendingMarxanRun.right)
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending marxan run`,
       );

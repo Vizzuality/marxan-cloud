@@ -36,7 +36,7 @@ test('should forbid export to unrelated users', async () => {
   fixtures.ThenForbiddenIsReturned(response);
 });
 
-test('should return bad request error if the project has a pending export', async () => {
+test('rejects a request to export a project if this has a pending export', async () => {
   await fixtures.GivenProjectWasCreated();
   fixtures.GivenProjectHasAPendingExport();
 
@@ -45,7 +45,7 @@ test('should return bad request error if the project has a pending export', asyn
   fixtures.ThenBadRequestIsReturned(response);
 });
 
-test('should return bad request error if the project has a scenario with a pending export', async () => {
+test('rejects a request to export a project if this has a scenario with a pending export', async () => {
   await fixtures.GivenProjectWasCreated();
   fixtures.GivenProjectHasAScenarioWithAPendingExport();
 
@@ -54,15 +54,13 @@ test('should return bad request error if the project has a scenario with a pendi
   fixtures.ThenBadRequestIsReturned(response);
 });
 
-test.todo(
-  'should return bad request error if the project has a pending import',
-);
+test.todo('rejects a request to export a project if this has a pending import');
 
 test.todo(
-  'should return bad request error if the project has a scenario with a pending import',
+  'rejects a request to export a project if this has a scenario with a pending import',
 );
 
-test('should return bad request error if the project has a scenario with a pending blm calibration', async () => {
+test('rejects a request to export a project if this has a scenario with a pending blm calibration', async () => {
   await fixtures.GivenProjectWasCreated();
   fixtures.GivenProjectHasAScenarioWithAPendingBLMCalibration();
 
@@ -71,7 +69,7 @@ test('should return bad request error if the project has a scenario with a pendi
   fixtures.ThenBadRequestIsReturned(response);
 });
 
-test('should return bad request error if the project has a scenario with a pending marxan run', async () => {
+test('rejects a request to export a project if this has a scenario with a pending marxan run', async () => {
   await fixtures.GivenProjectWasCreated();
   fixtures.GivenProjectHasAScenarioWithAPendingMarxanRun();
 

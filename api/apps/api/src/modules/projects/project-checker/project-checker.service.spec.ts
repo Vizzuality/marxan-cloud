@@ -203,7 +203,7 @@ it(`hasPendingExports() should return true for a project with a scenario with a 
   });
 });
 
-it(`hasPendingExports() should return doesntExist if the project does not exists`, async () => {
+it(`hasPendingExports() should return doesntExist if the project does not exist`, async () => {
   // given
   const service = fixtures.getService();
   // and
@@ -230,7 +230,7 @@ it.todo(
 );
 
 it.todo(
-  `hasPendingImports() should return doesntExist if the project does not exists`,
+  `hasPendingImports() should return doesntExist if the project does not exist`,
 );
 
 it(`hasPendingBlmCalibration() should return false for a project without scenarios running blm calibration`, async () => {
@@ -277,7 +277,7 @@ it(`hasPendingBlmCalibration() should return true for a project with a scenario 
   });
 });
 
-it(`hasPendingBlmCalibration() should return doesntExist if the project does not exists`, async () => {
+it(`hasPendingBlmCalibration() should return doesntExist if the project does not exist`, async () => {
   // given
   const service = fixtures.getService();
   // and
@@ -333,7 +333,7 @@ it(`hasPendingMarxanRun() should return true for a project with a scenario with 
   });
 });
 
-it(`hasPendingMarxanRun() should return doesntExist if the project does not exists`, async () => {
+it(`hasPendingMarxanRun() should return doesntExist if the project does not exist`, async () => {
   // given
   const service = fixtures.getService();
   // and

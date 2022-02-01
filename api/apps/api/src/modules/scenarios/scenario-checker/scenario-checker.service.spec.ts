@@ -23,7 +23,7 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it(`hasPendingExport() should return scenarioDoesntExist if the scenario does not exists`, async () => {
+it(`hasPendingExport() should return scenarioDoesntExist if the scenario does not exist`, async () => {
   fixtures.GivenScenarioDoesntExist();
 
   const result = await fixtures.WhenHasPendingExportMethodIsCalled(v4());
@@ -49,7 +49,7 @@ it(`hasPendingExport() should return true if given scenario has an ongoing expor
 });
 
 it.todo(
-  `hasPendingImport() should return scenarioDoesntExist if the scenario does not exists`,
+  `hasPendingImport() should return scenarioDoesntExist if the scenario does not exist`,
 );
 
 it.todo(
@@ -60,7 +60,7 @@ it.todo(
   `hasPendingImport() should return true if given scenario has an ongoing import`,
 );
 
-it(`hasPendingBlmCalibration() should return scenarioDoesntExist if the scenario does not exists`, async () => {
+it(`hasPendingBlmCalibration() should return scenarioDoesntExist if the scenario does not exist`, async () => {
   fixtures.GivenScenarioDoesntExist();
 
   const result = await fixtures.WhenHasPendingBlmCalibrationMethodIsCalled(
@@ -87,7 +87,7 @@ it(`hasPendingBlmCalibration() should return true if given scenario has an ongoi
   fixtures.ThenTrueIsReturned(result);
 });
 
-it(`hasPendingMarxanRun() should return scenarioDoesntExist if the scenario does not exists`, async () => {
+it(`hasPendingMarxanRun() should return scenarioDoesntExist if the scenario does not exist`, async () => {
   fixtures.GivenScenarioDoesntExist();
 
   const result = await fixtures.WhenHasPendingMarxanRunMethodIsCalled(v4());
