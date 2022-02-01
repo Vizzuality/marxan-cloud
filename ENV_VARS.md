@@ -1,10 +1,14 @@
 # Environment variables
 
-This document covers the different [environment variables](https://en.wikipedia.org/wiki/Environment_variable) supported
-by Marxan Cloud and how these affect the behavior of the platform. These variables are imported using [node-config](https://www.npmjs.com/package/config)
-through [this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/api/config/custom-environment-variables.json)
-for the API app, and [this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/geoprocessing/config/custom-environment-variables.json)
-for the Geoprocessing app. Some environment variables are shared by both applications.
+This document covers the different [environment
+variables](https://en.wikipedia.org/wiki/Environment_variable) supported by
+Marxan Cloud and how these affect the behavior of the platform. These variables
+are imported using [node-config](https://www.npmjs.com/package/config) through
+[this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/api/config/custom-environment-variables.json)
+for the API app, and
+[this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/geoprocessing/config/custom-environment-variables.json)
+for the Geoprocessing app. Some environment variables are shared by both
+applications.
 
 * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
   signing of API JWT tokens; can be generated via a command such as `dd
@@ -49,7 +53,8 @@ for the Geoprocessing app. Some environment variables are shared by both applica
     * `API_POSTGRES_DB` (string, required): name of the database to be used for
       the PostgreSQL connection (API)
     * `API_POSTGRES_LOGGING` (string, required): comma separated list of logging
-      options to pass to typeorm. [More info](https://typeorm.io/#/logging/logging-options)
+      options to pass to typeorm. [More
+      info](https://typeorm.io/#/logging/logging-options)
 * `GEOPROCESSING_SERVICE_PORT` (number, required): the port exposed by Docker
   for the Geoprocessing service; when running an instance under Docker
   Compose, NestJS will always be listening on port 3000 internally, and this
@@ -72,7 +77,8 @@ for the Geoprocessing app. Some environment variables are shared by both applica
     * `GEO_POSTGRES_DB` (string, required): name of the database to be used for
       the geoprocessing PostgreSQL connection (API)
     * `GEO_POSTGRES_LOGGING` (string, required): comma separated list of logging
-      options to pass to typeorm. [More info](https://typeorm.io/#/logging/logging-options)
+      options to pass to typeorm. [More
+      info](https://typeorm.io/#/logging/logging-options)
 * `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
   PostgreSQL for Airflow service should listen on the local machine
 * `AIRFLOW_PORT` (number, required): the port on which the
