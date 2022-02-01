@@ -8,6 +8,10 @@ export abstract class ProjectChecker {
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>>;
 
+  abstract hasPendingImports(
+    projectId: string,
+  ): Promise<Either<DoesntExist, boolean>>;
+
   abstract hasPendingBlmCalibration(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>>;

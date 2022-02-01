@@ -12,6 +12,9 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
+import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -159,14 +162,20 @@ it(`hasPendingExports() should return false for a project without pending export
 });
 
 it(`hasPendingExports() should return true for a project with pending exports`, async () => {
+  const projectId = 'projectId';
+
   // given
   const service = fixtures.getService();
   // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
   fixtures.GivenExportJob(
     API_EVENT_KINDS.project__export__submitted__v1__alpha,
   );
   // and
-  const hasPendingExports = await service.hasPendingExports(`projectId`);
+  const hasPendingExports = await service.hasPendingExports(projectId);
   // then
   expect(hasPendingExports).toEqual({
     _tag: 'Right',
@@ -174,7 +183,27 @@ it(`hasPendingExports() should return true for a project with pending exports`, 
   });
 });
 
-it(`hasPendingExports() should return doesntExist if the project does not exists`, async () => {
+it(`hasPendingExports() should return true for a project with a scenario with a pending export`, async () => {
+  const projectId = 'projectId';
+
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  fixtures.GivenScenarioIsBeingExported('scenario-2');
+  // and
+  const hasPendingExports = await service.hasPendingExports(projectId);
+  // then
+  expect(hasPendingExports).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
+
+it(`hasPendingExports() should return doesntExist if the project does not exist`, async () => {
   // given
   const service = fixtures.getService();
   // and
@@ -183,6 +212,136 @@ it(`hasPendingExports() should return doesntExist if the project does not exists
   const hasPendingExports = await service.hasPendingExports(`projectId`);
   // then
   expect(hasPendingExports).toEqual({
+    _tag: 'Left',
+    left: doesntExist,
+  });
+});
+
+it.todo(
+  `hasPendingImports() should return false for a project without pending imports`,
+);
+
+it.todo(
+  `hasPendingImports() should return true for a project with pending imports`,
+);
+
+it.todo(
+  `hasPendingImports() should return true for a project with a scenario with a pending import`,
+);
+
+it.todo(
+  `hasPendingImports() should return doesntExist if the project does not exist`,
+);
+
+it(`hasPendingBlmCalibration() should return false for a project without scenarios running blm calibration`, async () => {
+  const projectId = 'projectId';
+
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  // and
+  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
+    projectId,
+  );
+
+  // then
+  expect(hasPendingBlmCalibration).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
+});
+
+it(`hasPendingBlmCalibration() should return true for a project with a scenario with a pending blm calibration`, async () => {
+  const projectId = 'projectId';
+
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  fixtures.GivenScenarioIsRunningBlmCalibration('scenario-1');
+  // and
+  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
+    projectId,
+  );
+  // then
+  expect(hasPendingBlmCalibration).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
+
+it(`hasPendingBlmCalibration() should return doesntExist if the project does not exist`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectDoesntExist();
+  // and
+  const hasPendingBlmCalibration = await service.hasPendingBlmCalibration(
+    `projectId`,
+  );
+  // then
+  expect(hasPendingBlmCalibration).toEqual({
+    _tag: 'Left',
+    left: doesntExist,
+  });
+});
+
+it(`hasPendingMarxanRun() should return false for a project without scenarios running marxan`, async () => {
+  const projectId = 'projectId';
+
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  // and
+  const hasPendingMarxanRun = await service.hasPendingMarxanRun(projectId);
+
+  // then
+  expect(hasPendingMarxanRun).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
+});
+
+it(`hasPendingMarxanRun() should return true for a project with a scenario with a pending marxan run`, async () => {
+  const projectId = 'projectId';
+
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  fixtures.GivenScenarioIsRunningMarxanRun('scenario-2');
+  // and
+  const hasPendingMarxanRun = await service.hasPendingMarxanRun(projectId);
+  // then
+  expect(hasPendingMarxanRun).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
+
+it(`hasPendingMarxanRun() should return doesntExist if the project does not exist`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectDoesntExist();
+  // and
+  const hasPendingMarxanRun = await service.hasPendingMarxanRun(`projectId`);
+  // then
+  expect(hasPendingMarxanRun).toEqual({
     _tag: 'Left',
     left: doesntExist,
   });
@@ -202,6 +361,12 @@ async function getFixtures() {
     findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
   };
 
+  const fakeScenariosRepo: jest.Mocked<
+    Pick<Repository<Scenario>, 'findOne'>
+  > = {
+    findOne: jest.fn(() => Promise.resolve({} as Scenario)),
+  };
+
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),
   };
@@ -216,12 +381,20 @@ async function getFixtures() {
         useValue: fakeProjectsService,
       },
       {
+        provide: getRepositoryToken(Scenario),
+        useValue: fakeScenariosRepo,
+      },
+      {
         provide: `PlanningAreasService`,
         useValue: fakePlaningAreaFacade,
       },
       {
         provide: ProjectChecker,
         useClass: MarxanProjectChecker,
+      },
+      {
+        provide: ScenarioChecker,
+        useClass: ScenarioCheckerFake,
       },
     ],
   })
@@ -230,6 +403,10 @@ async function getFixtures() {
       console.log(error);
       throw error;
     });
+
+  const fakeScenarioChecker = testingModule.get(
+    ScenarioChecker,
+  ) as ScenarioCheckerFake;
 
   return {
     fakeApiEventsService,
@@ -327,13 +504,22 @@ async function getFixtures() {
           Promise.resolve(undefined),
       );
     },
-    GivenProjectExists(projectId: string) {
-      const fakeProject = { id: projectId } as Project;
+    GivenProjectExists(projectId: string, scenarios?: { id: string }[]) {
+      const fakeProject = { id: projectId, scenarios } as Project;
 
       fakeProjectsService.findOne.mockImplementation(
         (_id: string | undefined | FindConditions<Project>) =>
           Promise.resolve(fakeProject),
       );
+    },
+    GivenScenarioIsBeingExported(scenarioId: string) {
+      fakeScenarioChecker.addPendingExportForScenario(scenarioId);
+    },
+    GivenScenarioIsRunningBlmCalibration(scenarioId: string) {
+      fakeScenarioChecker.addPendingBlmCalibrationForScenario(scenarioId);
+    },
+    GivenScenarioIsRunningMarxanRun(scenarioId: string) {
+      fakeScenarioChecker.addPendingMarxanRunForScenario(scenarioId);
     },
   };
 }

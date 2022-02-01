@@ -1,33 +1,85 @@
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { MarxanBlockGuard } from '@marxan-api/modules/projects/block-guard/marxan-block-guard.service';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ScenarioCheckerFake } from '../../../../test/utils/scenario-checker.service-fake';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { ProjectCheckerFake } from '../../../../test/utils/project-checker.service-fake';
 import { Project } from '../project.api.entity';
+import { NotFoundException } from '@nestjs/common';
 
-describe('MarxanBlockGuard', () => {
+describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   let fixtures: FixtureType<typeof getFixtures>;
 
   beforeEach(async () => {
     fixtures = await getFixtures();
   });
 
-  it(`throws an exception if the given project has an ongoing export`, async () => {
-    const projectId = fixtures.GivenProjectWasCreated();
+  afterEach(() => {
+    fixtures?.cleanup();
+  });
 
-    await fixtures.WhenExportIsRequested(projectId);
+  it(`throws an exception if the project does not exist`, async () => {
+    const projectId = 'foo bar';
 
     await fixtures
       .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
-      .ThenAnExceptionIsThrown();
+      .ThenANotFoundExceptionIsThrown();
   });
 
-  it(`does nothing if the given project does not have an ongoing export`, async () => {
-    const projectId = fixtures.GivenProjectWasCreated();
+  it(`throws an exception if the given project has an ongoing export`, async () => {
+    const [projectId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAnOngoingExport(projectId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingExportErrorIsThrown();
+  });
+
+  it(`throws an exception if the given project has a scenario with an ongoing export`, async () => {
+    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingExport(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingExportErrorIsThrown();
+  });
+
+  it.todo(`throws an exception if the given project has an ongoing import`);
+
+  it.todo(
+    `throws an exception if the given project has a scenario with an ongoing import`,
+  );
+
+  it(`throws an exception if the given project has a scenario with an ongoing blm calibration`, async () => {
+    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingBlmCalibration(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingBlmCalibrationErrorIsThrown();
+  });
+
+  it(`throws an exception if the given project has a scenario with an ongoing marxan run`, async () => {
+    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingMarxanRun(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingMarxanRunErrorIsThrown();
+  });
+
+  it(`does nothing if the given project is not blocked`, async () => {
+    const [projectId] = fixtures.GivenProjectWasCreated();
 
     await fixtures
       .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
@@ -35,9 +87,87 @@ describe('MarxanBlockGuard', () => {
   });
 });
 
+describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
+  let fixtures: FixtureType<typeof getFixtures>;
+
+  beforeEach(async () => {
+    fixtures = await getFixtures();
+  });
+
+  afterEach(() => {
+    fixtures?.cleanup();
+  });
+
+  it(`throws an exception if the scenario does not exist`, async () => {
+    const scenario = 'foo bar';
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenario)
+      .ThenANotFoundExceptionIsThrown();
+  });
+
+  it(`throws an exception if the given scenario has an ongoing export`, async () => {
+    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingExport(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingExportErrorIsThrown();
+  });
+
+  it(`throws an exception if the given scenario's parent project has an ongoing export`, async () => {
+    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAnOngoingExport(projectId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingProjectExportErrorIsThrown();
+  });
+
+  it.todo(`throws an exception if the given scenario has an ongoing import`);
+
+  it.todo(
+    `throws an exception if the given scenario's parent project has an ongoing import`,
+  );
+
+  it(`throws an exception if the given scenario has an ongoing blm calibration`, async () => {
+    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingBlmCalibration(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingBlmCalibrationErrorIsThrown();
+  });
+
+  it(`throws an exception if the given scenario has an ongoing marxan run`, async () => {
+    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingMarxanRun(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingMarxanRunErrorIsThrown();
+  });
+
+  it(`does nothing if the given scenario is not blocked`, async () => {
+    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenNoExceptionIsThrown();
+  });
+});
+
 const getFixtures = async () => {
-  const fakeProjectsService: jest.Mocked<
-    Pick<Repository<Project>, 'findOne'>
+  const fakeProjectsRepo: jest.Mocked<Pick<Repository<Project>, 'findOne'>> = {
+    findOne: jest.fn(),
+  };
+
+  const fakeScenariosRepo: jest.Mocked<
+    Pick<Repository<Scenario>, 'findOne'>
   > = {
     findOne: jest.fn(),
   };
@@ -49,41 +179,121 @@ const getFixtures = async () => {
         useClass: ProjectCheckerFake,
       },
       {
+        provide: ScenarioChecker,
+        useClass: ScenarioCheckerFake,
+      },
+      {
         provide: BlockGuard,
         useClass: MarxanBlockGuard,
       },
       {
         provide: getRepositoryToken(Project),
-        useValue: fakeProjectsService,
+        useValue: fakeProjectsRepo,
+      },
+      {
+        provide: getRepositoryToken(Scenario),
+        useValue: fakeScenariosRepo,
       },
     ],
   }).compile();
   await sandbox.init();
   const projectChecker = sandbox.get(ProjectChecker) as ProjectCheckerFake;
+  const scenarioChecker = sandbox.get(ScenarioChecker) as ScenarioCheckerFake;
   const blockGuard = sandbox.get(BlockGuard);
 
   return {
-    GivenProjectWasCreated: () => {
-      const id = v4();
-      fakeProjectsService.findOne.mockResolvedValue({ id } as Project);
-      return id;
+    cleanup: () => {
+      projectChecker.clear();
+      scenarioChecker.clear();
     },
-    WhenExportIsRequested: async (projectId: string) => {
+    GivenProjectWasCreated: () => {
+      const projectId = v4();
+      const scenarioId = v4();
+      fakeProjectsRepo.findOne.mockResolvedValue({
+        id: projectId,
+        scenarios: [{ id: scenarioId }],
+      } as Project);
+      fakeScenariosRepo.findOne.mockResolvedValue({
+        id: scenarioId,
+        projectId,
+      } as Scenario);
+
+      return [projectId, scenarioId];
+    },
+    WhenProjectHasAScenarioWithAnOngoingExport: (scenarioId: string) => {
+      scenarioChecker.addPendingExportForScenario(scenarioId);
+    },
+    WhenProjectHasAScenarioWithAnOngoingBlmCalibration: (
+      scenarioId: string,
+    ) => {
+      scenarioChecker.addPendingBlmCalibrationForScenario(scenarioId);
+    },
+    WhenProjectHasAScenarioWithAnOngoingMarxanRun: (scenarioId: string) => {
+      scenarioChecker.addPendingMarxanRunForScenario(scenarioId);
+    },
+    WhenProjectHasAnOngoingExport: (projectId: string) => {
       projectChecker.addPendingExportForProject(projectId);
     },
     WhenCheckingWhetherTheProjectCanBeEdited: (projectId: string) => {
       return {
-        ThenAnExceptionIsThrown: async () => {
+        ThenAPendingExportErrorIsThrown: async () => {
           await expect(
             blockGuard.ensureThatProjectIsNotBlocked(projectId),
-          ).rejects.toThrow(
-            `Project ${projectId} editing is blocked because of pending export`,
-          );
+          ).rejects.toThrow(/project.+pending export/gi);
+        },
+        ThenAPendingBlmCalibrationErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
+          ).rejects.toThrow(/pending blm calibration/gi);
+        },
+        ThenAPendingMarxanRunErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
+          ).rejects.toThrow(/pending marxan run/gi);
+        },
+        ThenANotFoundExceptionIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
+          ).rejects.toThrow(NotFoundException);
         },
         ThenNoExceptionIsThrown: async () => {
           await expect(
             blockGuard.ensureThatProjectIsNotBlocked(projectId),
           ).resolves.not.toThrow();
+        },
+      };
+    },
+    WhenCheckingWhetherTheScenarioCanBeEdited: (scenarioId: string) => {
+      return {
+        ThenNoExceptionIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).resolves.not.toThrow();
+        },
+        ThenANotFoundExceptionIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(NotFoundException);
+        },
+        ThenAPendingExportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+pending export/gi);
+        },
+        ThenAPendingProjectExportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+project pending export/gi);
+        },
+        ThenAPendingBlmCalibrationErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+pending blm calibration/gi);
+        },
+        ThenAPendingMarxanRunErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+pending marxan run/gi);
         },
       };
     },

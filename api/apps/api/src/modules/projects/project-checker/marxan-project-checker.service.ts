@@ -6,11 +6,13 @@ import {
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { isDefined } from '@marxan/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/Either';
+import { isRight } from 'fp-ts/lib/These';
 import { In, Repository } from 'typeorm';
 
 @Injectable()
@@ -20,56 +22,21 @@ export class MarxanProjectChecker implements ProjectChecker {
     @InjectRepository(Project)
     private readonly repository: Repository<Project>,
     private readonly planningAreas: PlanningAreasService,
+    private readonly scenarioChecker: ScenarioChecker,
   ) {}
 
-  async hasPendingBlmCalibration(
+  async hasPendingImports(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
-    });
-
-    if (!project) {
-      return left(doesntExist);
-    }
-
-    if (!project.scenarios) return right(false);
-
-    const result = await Promise.all(
-      project.scenarios.map((scenario) =>
-        this.checkPendingBlmCalibration(scenario.id),
-      ),
-    );
-
-    return right(result.some((hasPendingExport) => hasPendingExport));
-  }
-
-  async hasPendingMarxanRun(
-    projectId: string,
-  ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
-    });
-
-    if (!project) {
-      return left(doesntExist);
-    }
-
-    if (!project.scenarios) return right(false);
-
-    const result = await Promise.all(
-      project.scenarios.map((scenario) =>
-        this.checkPendingMarxanRun(scenario.id),
-      ),
-    );
-
-    return right(result.some((hasPendingMarxanRun) => hasPendingMarxanRun));
+    throw new Error('Method not implemented.');
   }
 
   async hasPendingExports(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId);
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
 
     if (!project) {
       return left(doesntExist);
@@ -86,11 +53,74 @@ export class MarxanProjectChecker implements ProjectChecker {
       })
       .catch(this.createNotFoundHandler());
 
-    const pendingExportExists =
+    const projectPendingExport =
       exportEvent?.kind ===
       API_EVENT_KINDS.project__export__submitted__v1__alpha;
 
-    return right(pendingExportExists);
+    if (!project.scenarios || projectPendingExport)
+      return right(projectPendingExport);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingExport(scenario.id);
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(
+      projectPendingExport ||
+        results.some((scenarioPendingExport) => scenarioPendingExport),
+    );
+  }
+
+  async hasPendingBlmCalibration(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    if (!project.scenarios) return right(false);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingBlmCalibration(
+          scenario.id,
+        );
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(results.some((hasPendingExport) => hasPendingExport));
+  }
+
+  async hasPendingMarxanRun(
+    projectId: string,
+  ): Promise<Either<typeof doesntExist, boolean>> {
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    if (!project.scenarios) return right(false);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingMarxanRun(
+          scenario.id,
+        );
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(results.some((hasPendingMarxanRun) => hasPendingMarxanRun));
   }
 
   async isProjectReady(
@@ -140,46 +170,5 @@ export class MarxanProjectChecker implements ProjectChecker {
   private async hasRequiredPlanningArea(project: Project): Promise<boolean> {
     const area = await this.planningAreas.locatePlanningAreaEntity(project);
     return isDefined(area);
-  }
-
-  private async checkPendingBlmCalibration(
-    scenarioId: string,
-  ): Promise<boolean> {
-    const exportEvent = await this.apiEvents
-      .getLatestEventForTopic({
-        topic: scenarioId,
-        kind: In([
-          API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1,
-          API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1,
-          API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1,
-        ]),
-      })
-      .catch(this.createNotFoundHandler());
-
-    const pendingBlmCalibration =
-      exportEvent?.kind ===
-      API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1;
-
-    return pendingBlmCalibration;
-  }
-
-  private async checkPendingMarxanRun(scenarioId: string): Promise<boolean> {
-    const exportEvent = await this.apiEvents
-      .getLatestEventForTopic({
-        topic: scenarioId,
-        kind: In([
-          API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
-          API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1,
-          API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
-          API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
-        ]),
-      })
-      .catch(this.createNotFoundHandler());
-
-    const pendingMarxanRun =
-      exportEvent?.kind ===
-      API_EVENT_KINDS.scenario__run__submitted__v1__alpha1;
-
-    return pendingMarxanRun;
   }
 }

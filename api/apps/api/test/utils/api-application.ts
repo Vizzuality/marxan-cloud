@@ -10,9 +10,11 @@ import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadat
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { ScenarioCalibrationRepo } from '../../src/modules/blm/values/scenario-calibration-repo';
 import { QueueToken } from '../../src/modules/queue/queue.tokens';
+import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
 import { ProjectCheckerFake } from './project-checker.service-fake';
 import { FakeQueue, FakeQueueBuilder } from './queues';
 import { FakeScenarioCalibrationRepo } from './scenario-calibration-repo.test.utils';
+import { ScenarioCheckerFake } from './scenario-checker.service-fake';
 
 type Overridable = { provider: any; implementation: any };
 type Overrides = {
@@ -26,6 +28,7 @@ const defaultOverrides: Overrides = {
     { provider: QueueToken, implementation: FakeQueue },
     { provider: QueueBuilder, implementation: FakeQueueBuilder },
     { provider: ProjectChecker, implementation: ProjectCheckerFake },
+    { provider: ScenarioChecker, implementation: ScenarioCheckerFake },
     { provider: FileRepository, implementation: TempStorageRepository },
     {
       provider: ScenarioCalibrationRepo,
