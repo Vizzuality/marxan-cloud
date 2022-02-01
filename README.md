@@ -194,7 +194,7 @@ tracker](https://github.com/Vizzuality/marxan-cloud/issues) to report bugs.
 
 ## License
 
-(C) Copyright 2020-2021 Vizzuality.
+(C) Copyright 2020-2022 Vizzuality.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the [MIT License](LICENSE) as included in this repository.
