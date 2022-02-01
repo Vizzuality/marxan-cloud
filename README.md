@@ -57,32 +57,37 @@ Run `make notebooks` to start the jupyterlab service.
 
 ### Seed data
 
-To seed the geodb database after a clean state, you need to follow the next instructions:
+To seed the geodb database after a clean state, please follow the steps below:
 
 ``` bash
 make seed-geodb-data
 ```
-This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.  
-Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in order to fulfill
-some of these tasks (GADM and WDPA data import pipelines). Also, the number of
-CPU cores will impact the time needed to seed a new instance with the complete
-GADM and WDPA datasets.
-___
 
-or if you only wants to populate the newly fresh instance with a small subset of test data:
+This will populate the metadata DB and will trigger the geo-pipelines to seed
+the geoDB.
+
+Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in
+order to carry out some of these tasks (GADM and WDPA data import pipelines).
+Also, the number of CPU cores will impact the time needed to seed a new instance
+with the complete GADM and WDPA datasets.
+
+To populate a new instance with a small subset of test data, instead:
 
 ``` bash
 make seed-dbs
 ```
 
-We also provide a way to freshly clean the dbs instances(we recommend do it regularly):
+We also provide a way to reset db instances from scratch. This can be useful to
+do regularly, to avoid keeping obsolete data in the local development instance.
 
 ``` bash
 make clean-slate
 ```
 
-And finally, we provided a set of commands to create new dbs dumps, upload them to 
-an Azure instance and restore both dbs, that is faster than triggering the geodb pipes.
+And finally, we provide a set of commands to create new dbs dumps from upstream
+data sources, upload these dunps to an Azure storage bucket, and populate both
+dbs from these dumps. This will typically be faster than triggering the full
+geodb ETL pipelines.
 
 ``` bash
 make generate-content-dumps && make upload-dump-data
@@ -95,7 +100,7 @@ make restore-dumps
 ## Running API and Geoprocessing services natively
 
 Make sure you have installed and configured all the [dependencies](#Dependencies) 
-locally. PostgreSQL (with Postgis) and Redis need to be up and running.
+locally. PostgreSQL (with PostGIS) and Redis need to be up and running.
 
 When running the API and Geoprocessing services without relying on Docker
 Compose for container orchestration, be sure to review and set the correct
@@ -116,9 +121,11 @@ make native-seed-api-with-test-data
 
 ### Running the API/Geoprocessing
 
-You can find the source code for the API/Geoprocessing applications inside the `api` folder.
-Be sure to install the necessary `nodejs` dependencies using `yarn` prior to running 
-the applications
+You can find the source code for the API/Geoprocessing applications inside the
+`api` folder.
+
+Be sure to install the necessary `nodejs` dependencies using `yarn` prior to
+running the applications
 
 To start the API, run:
 
@@ -134,7 +141,8 @@ yarn start geoprocessing
 
 ### Running tests
 
-Running the whole test suite requires running 3 commands, each focused on a specific type of test:
+Running the whole test suite requires running 3 commands, each focused on a
+specific type of test:
 
 To run the unit tests for both the API and the Geoprocessing app:
 ``` bash
@@ -153,11 +161,14 @@ yarn run geoprocessing:test:e2e
 ```
 
 Note that E2E tests may trigger cross-application requests, so:
-- When running E2E tests for the API, you must have the Geoprocessing application running in the background.
-- When running E2E tests for the Geoprocessing application, you must have the API running in the background.
+- When running E2E tests for the API, you must have the Geoprocessing
+  application running in the background.
+- When running E2E tests for the Geoprocessing application, you must have the
+  API running in the background.
 
-Running tests require previously loading the [test seed data](#setting-up-test-seed-data), and may modify
-data in the database - do not run tests using a database which data you don't want to lose.
+Running tests require previously loading the [test seed
+data](#setting-up-test-seed-data), and may modify data in the database - do not
+run tests using a database whose data you don't want to lose.
 
 ## Development workflow (TBD)
 
