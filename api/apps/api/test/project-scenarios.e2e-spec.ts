@@ -165,6 +165,17 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenScenarioIsLockedIsReturned(response);
   });
 
+  it('Updates a scenario correctly as lock is in place by same user', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario();
+
+    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    fixtures.ThenScenarioLockInfoIsReturned(response);
+
+    response = await fixtures.WhenUpdatingScenarioAsOwner();
+    fixtures.ThenScenarioIsUpdated(response);
+  });
+
   it('should not allow to create scenario with invalid marxan properties', async () => {
     const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
@@ -380,6 +391,11 @@ async function getFixtures() {
         .post(`/api/v1/scenarios/${scenarioId}/lock`)
         .set('Authorization', `Bearer ${viewerToken}`),
 
+    WhenUpdatingScenarioAsOwner: async () =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/scenarios/${scenarioId}`)
+        .send({ name: 'Updated Scenario', description: 'Updated Description' })
+        .set('Authorization', `Bearer ${ownerToken}`),
     WhenUpdatingScenarioAsContributor: async () =>
       await request(app.getHttpServer())
         .patch(`/api/v1/scenarios/${scenarioId}`)
@@ -434,6 +450,14 @@ async function getFixtures() {
       expect(response.body.data.type).toBe('scenarios');
       expect(response.body.data.attributes.name).toEqual(
         minimalCreateScenarioDTO.name,
+      );
+    },
+
+    ThenScenarioIsUpdated: (response: request.Response) => {
+      expect(response.body.data.type).toBe('scenarios');
+      expect(response.body.data.attributes.name).toEqual('Updated Scenario');
+      expect(response.body.data.attributes.description).toEqual(
+        'Updated Description',
       );
     },
 
