@@ -34,6 +34,7 @@ describe(`when an owner updates scenario with input data`, () => {
   beforeEach(async () => {
     // given
     scenarioId = (await fixtures.GivenScenarioExists()).id;
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
 
     // when
     await fixtures.WhenUpdatesScenarioWithInputAsOwner(
@@ -107,6 +108,7 @@ describe(`when a contributor updates scenario with input data`, () => {
     // given
     scenarioId = (await fixtures.GivenScenarioExists()).id;
     await fixtures.GivenContributorWasAddedToScenario();
+    await fixtures.WhenAcquiringLockForScenarioAsContributor(scenarioId);
 
     // when
     await fixtures.WhenUpdatesScenarioWithInputAsContributor(
@@ -209,6 +211,7 @@ describe(`when an owner user updates scenario with input data with verbosity`, (
   beforeEach(async () => {
     // given
     scenarioId = (await fixtures.GivenScenarioExists()).id;
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
 
     // when
     await fixtures.WhenUpdatesScenarioWithInputAsOwner(
@@ -232,6 +235,7 @@ describe(`when a contributor user updates scenario with input data with verbosit
     // given
     scenarioId = (await fixtures.GivenScenarioExists()).id;
     await fixtures.GivenContributorWasAddedToScenario();
+    await fixtures.WhenAcquiringLockForScenarioAsContributor(scenarioId);
 
     // when
     await fixtures.WhenUpdatesScenarioWithInputAsContributor(
@@ -284,6 +288,7 @@ describe(`when an owner updates scenario with input data with input keys`, () =>
   beforeEach(async () => {
     // given
     scenarioId = (await fixtures.GivenScenarioExists()).id;
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
 
     // when
     await fixtures.WhenUpdatesScenarioWithInputAsOwner(
@@ -307,6 +312,7 @@ describe(`when a contributor updates scenario with input data with input keys`, 
     // given
     scenarioId = (await fixtures.GivenScenarioExists()).id;
     await fixtures.GivenContributorWasAddedToScenario();
+    await fixtures.WhenAcquiringLockForScenarioAsContributor(scenarioId);
 
     // when
     await fixtures.WhenUpdatesScenarioWithInputAsContributor(
@@ -363,6 +369,7 @@ describe(`when an owner updates scenario with invalid input data`, () => {
     const scenarioData = await fixtures.GivenScenarioExists();
     scenarioId = scenarioData.id;
     originalMetadata = scenarioData.attributes.metadata;
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
     // when
     response = await fixtures.WhenUpdatesScenarioWithInputAsOwner(
       scenarioId,
@@ -392,6 +399,7 @@ describe(`when a contributor updates scenario with invalid input data`, () => {
     const scenarioData = await fixtures.GivenScenarioExists();
     scenarioId = scenarioData.id;
     originalMetadata = scenarioData.attributes.metadata;
+    await fixtures.WhenAcquiringLockForScenarioAsContributor(scenarioId);
     await fixtures.GivenContributorWasAddedToScenario();
     // when
     response = await fixtures.WhenUpdatesScenarioWithInputAsContributor(
@@ -578,6 +586,16 @@ async function getFixtures() {
         .patch(`/api/v1/scenarios/${id}`)
         .set('Authorization', `Bearer ${contributorToken}`)
         .send(input);
+    },
+    async WhenAcquiringLockForScenarioAsOwner(id: string) {
+      return await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${id}/lock`)
+        .set('Authorization', `Bearer ${ownerToken}`);
+    },
+    async WhenAcquiringLockForScenarioAsContributor(id: string) {
+      return await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${id}/lock`)
+        .set('Authorization', `Bearer ${contributorToken}`);
     },
     async WhenUpdatesScenarioWithInputAsViewer(
       id: string,
