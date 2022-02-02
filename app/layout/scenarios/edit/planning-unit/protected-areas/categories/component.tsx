@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 
-import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import intersection from 'lodash/intersection';
@@ -79,7 +79,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     });
   }, [wdpaCategories, wdpaData]);
 
-  const calculatePAs = useCallback(() => {
+  const onCalculateProtectedAreas = useCallback(() => {
     saveScenarioProtectedAreasMutation.mutate({
       id: `${sid}`,
       data: {
@@ -166,6 +166,21 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       }}
       initialValues={INITIAL_VALUES}
       render={({ form, values, handleSubmit }) => {
+        const { touched, values: stateValues } = form.getState();
+        const protectedAreasTouched = Object.values(touched).includes(true);
+
+        const {
+          wdpaIucnCategories: wdpaIucnCategoriesTouched,
+          uploadedProtectedArea: uploadedProtectedAreaTouched,
+        } = touched;
+
+        if (wdpaIucnCategoriesTouched) {
+          dispatch(setWDPACategories(stateValues));
+        }
+        if (uploadedProtectedAreaTouched) {
+          refetchProtectedAreas();
+        }
+
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
@@ -181,18 +196,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             autoComplete="off"
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
-            <FormSpyRFF
-              // subscription={{ dirty: true }}
-              onChange={(state) => {
-                if (state.touched.wdpaIucnCategories) {
-                  dispatch(setWDPACategories(state?.values));
-                }
-
-                if (state.touched.uploadedProtectedArea) {
-                  refetchProtectedAreas();
-                }
-              }}
-            />
 
             <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
@@ -316,7 +319,15 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                   size="lg"
                   type="button"
                   className="relative px-20"
-                  onClick={calculatePAs}
+                  onClick={() => {
+                    if (protectedAreasTouched) {
+                      onCalculateProtectedAreas();
+                    }
+
+                    if (selectedProtectedAreas && !protectedAreasTouched) {
+                      onSuccess();
+                    }
+                  }}
                 >
                   <span>Continue</span>
                 </Button>
