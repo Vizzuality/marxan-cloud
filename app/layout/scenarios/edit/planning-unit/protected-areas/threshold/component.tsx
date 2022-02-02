@@ -16,7 +16,7 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
-import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
+import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';

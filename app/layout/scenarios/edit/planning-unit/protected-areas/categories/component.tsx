@@ -13,8 +13,8 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
-import ProtectedAreaUploader from 'layout/scenarios/edit/wdpa/categories/pa-uploader';
-import ProtectedAreasSelected from 'layout/scenarios/edit/wdpa/pa-selected';
+import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
+import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -198,7 +198,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
             <FormSpyRFF
-              subscription={{ dirty: true, touched: true }}
+              // subscription={{ dirty: true }}
               onChange={(state) => {
                 if (state.touched.wdpaIucnCategories) {
                   dispatch(setWDPACategories(values));

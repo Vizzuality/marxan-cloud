@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -11,9 +11,9 @@ import { motion } from 'framer-motion';
 import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
+import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
+import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
-import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/wdpa/categories';
-import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/wdpa/threshold';
 
 import Icon from 'components/icon';
 // import Steps from 'components/steps';
@@ -39,27 +39,27 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
+  // const { metadata } = scenarioData || {};
+  // const { scenarioEditingMetadata } = metadata || {};
 
-  const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || {};
+  // const {
+  //   subtab: metaSubtab,
+  // } = scenarioEditingMetadata || {};
 
-  useEffect(() => {
-    setStep(metaSubtab === 'protected-areas-percentage' ? 1 : 0);
-  }, [metaSubtab]);
+  // useEffect(() => {
+  //   setStep(metaSubtab === 'planning-unit-protected-areas' ? 1 : 0);
+  // }, [metaSubtab]);
 
   // EFFECTS
-  useEffect(() => {
-    return () => {
-      if (tab !== 'protected-areas') {
-        setStep(0);
-      }
-    };
-  }, [tab]);
+  // useEffect(() => {
+  //   return () => {
+  //     if (tab !== 'planning-unit') {
+  //       setStep(0);
+  //     }
+  //   };
+  // }, [tab]);
 
-  if (!scenarioData || tab !== 'protected-areas') return null;
+  if (!scenarioData || tab !== 'planning-unit') return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">

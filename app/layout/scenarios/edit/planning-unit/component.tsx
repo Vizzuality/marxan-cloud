@@ -95,32 +95,32 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
             </header>
 
             {!section && (
-            <Sections
-              key="sections"
-              sections={SECTIONS}
-              onChangeSection={onChangeSection}
-            />
+              <Sections
+                key="sections"
+                sections={SECTIONS}
+                onChangeSection={onChangeSection}
+              />
             )}
 
             {section === 'protected-areas' && (
-            <ProtectedAreas
-              key="protected-areas"
-              onChangeSection={onChangeSection}
-            />
+              <ProtectedAreas
+                key="protected-areas"
+                onChangeSection={onChangeSection}
+              />
             )}
 
             {section === 'cost-surface' && (
-            <CostSurface
-              key="cost-surface"
-              onChangeSection={onChangeSection}
-            />
+              <CostSurface
+                key="cost-surface"
+                onChangeSection={onChangeSection}
+              />
             )}
 
             {section === 'adjust-planning-units' && (
-            <AdjustPanningUnits
-              key="adjust-planning-units"
-              onChangeSection={onChangeSection}
-            />
+              <AdjustPanningUnits
+                key="adjust-planning-units"
+                onChangeSection={onChangeSection}
+              />
             )}
           </Pill>
 
