@@ -26,12 +26,10 @@ import Loading from 'components/loading';
 
 export interface WDPACategoriesProps {
   onSuccess: () => void,
-  onDismiss: () => void,
 }
 
 export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
-  onDismiss,
 }: WDPACategoriesProps) => {
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -148,20 +146,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         className="relative flex items-center justify-center w-full h-16"
         iconClassName="w-10 h-10 text-white"
       />
-    );
-  }
-
-  if (!wdpaData || !wdpaData.length) {
-    return (
-      <div>
-        <div className="text-sm">This planning area doesn&apos;t have any protected areas associated with it. You can go directly to the features tab.</div>
-
-        <div className="flex justify-center mt-20">
-          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onDismiss}>
-            <span>Continue to features</span>
-          </Button>
-        </div>
-      </div>
     );
   }
 
@@ -325,25 +309,19 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               </div>
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
-            <div className="flex justify-center mt-5 space-x-2">
-              <Button
-                theme="secondary-alt"
-                size="lg"
-                type="button"
-                className="relative px-20"
-                onClick={() => (
-                  values.wdpaIucnCategories.length > 0
-                    ? calculatePAs() : onDismiss())}
-              >
-                {!!values.wdpaIucnCategories.length && (
+            {!!values.wdpaIucnCategories.length && (
+              <div className="flex justify-center mt-5 space-x-2">
+                <Button
+                  theme="secondary-alt"
+                  size="lg"
+                  type="button"
+                  className="relative px-20"
+                  onClick={calculatePAs}
+                >
                   <span>Continue</span>
-                )}
-
-                {!values.wdpaIucnCategories.length && (
-                  <span>Skip to features</span>
-                )}
-              </Button>
-            </div>
+                </Button>
+              </div>
+            )}
           </form>
         );
       }}

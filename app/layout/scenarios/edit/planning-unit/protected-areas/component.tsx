@@ -121,7 +121,6 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
                 setStep(1);
                 dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
               }}
-              onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
             />
           )}
           {step === 1 && (
