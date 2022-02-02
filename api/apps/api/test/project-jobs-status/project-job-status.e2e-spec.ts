@@ -38,31 +38,39 @@ test(`job statuses for project`, async () => {
       isoDate: expect.any(String),
     },
   ]);
-  expect(result.body.data.attributes.scenarios).toEqual([
-    {
-      id: world.scenarioIdWithCostSurfaceFinished(),
-      jobs: [
-        {
-          kind: 'costSurface',
-          status: 'done',
-          isoDate: expect.any(String),
-        },
-      ],
-    },
-    {
-      id: world.scenarioIdWithPendingJob(),
-      jobs: [
-        {
-          kind: 'costSurface',
-          status: 'running',
-          isoDate: expect.any(String),
-        },
-        {
-          kind: 'planningUnitsInclusion',
-          status: 'running',
-          isoDate: expect.any(String),
-        },
-      ],
-    },
-  ]);
+
+  expect(result.body.data.attributes.scenarios).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        id: world.scenarioIdWithCostSurfaceFinished(),
+        jobs: [
+          {
+            kind: 'costSurface',
+            status: 'done',
+            isoDate: expect.any(String),
+          },
+        ],
+      }),
+    ]),
+  );
+
+  expect(result.body.data.attributes.scenarios).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({
+        id: world.scenarioIdWithPendingJob(),
+        jobs: [
+          {
+            kind: 'costSurface',
+            status: 'running',
+            isoDate: expect.any(String),
+          },
+          {
+            kind: 'planningUnitsInclusion',
+            status: 'running',
+            isoDate: expect.any(String),
+          },
+        ],
+      }),
+    ]),
+  );
 });
