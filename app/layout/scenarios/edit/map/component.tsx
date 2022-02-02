@@ -214,7 +214,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     ...wdpaCategories,
     pid: `${pid}`,
     cache,
-    active: tab === 'planning-unit' && subtab === 'planning-unit-protected-areas',
+    active: tab === 'planning-unit' && subtab === 'protected-areas-preview',
     bbox,
     options: {
       ...layerSettings['wdpa-preview'],
@@ -243,8 +243,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     include,
     sublayers,
     options: {
-      wdpaIucnCategories: tab === 'protected-areas' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
-      wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold * 100 : scenarioData?.wdpaThreshold,
+      wdpaIucnCategories: tab === 'planning-unit' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
+      wdpaThreshold: tab === 'planning-unit' && subtab === 'protected-areas-percentage' ? wdpaThreshold * 100 : scenarioData?.wdpaThreshold,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
@@ -277,8 +277,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const LEGEND = useLegend({
     layers,
     options: {
-      wdpaIucnCategories: tab === 'protected-areas' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
-      wdpaThreshold: tab === 'protected-areas' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData?.wdpaThreshold,
+      wdpaIucnCategories: tab === 'planning-unit' && subtab === 'protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
+      wdpaThreshold: tab === 'planning-unit' && subtab === 'protected-areas-percentage' ? wdpaThreshold : scenarioData?.wdpaThreshold,
       cost: costSurfaceRangeData,
       puAction,
       puIncludedValue: puTmpIncludedValue,
