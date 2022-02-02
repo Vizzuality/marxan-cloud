@@ -148,7 +148,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return ['cost'];
     if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
 
-    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage') return ['wdpa-percentage'];
+    if (tab === 'planning-unit' && subtab === 'protected-areas-percentage') return ['wdpa-percentage'];
 
     if (tab === 'features') return ['wdpa-percentage'];
 
@@ -174,8 +174,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return ['cost', 'pugrid'];
     if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
 
-    if (tab === 'protected-areas' && subtab === 'protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
-    if (tab === 'protected-areas' && subtab === 'protected-areas-percentage' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
+    if (tab === 'planning-unit' && subtab === 'protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
+    if (tab === 'planning-unit' && subtab === 'protected-areas-percentage' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
 
     if (tab === 'features') {
       return [
