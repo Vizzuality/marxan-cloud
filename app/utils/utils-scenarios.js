@@ -1,12 +1,12 @@
 export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
   status: {
-    'protected-areas': 'draft',
+    'planning-unit': 'draft', // Possible values: empty, draft and outdated
     features: 'empty',
     analysis: 'empty',
     solutions: 'empty',
   },
-  tab: 'protected-areas',
-  subtab: 'protected-areas-preview',
+  tab: 'planning-unit',
+  subtab: 'planning-unit-preview',
 };
 
 export const STATUS_VALUES = {
@@ -17,6 +17,9 @@ export const STATUS_VALUES = {
   },
   features: {
     analysis: 'empty',
+    solutions: 'empty',
+  },
+  analysis: {
     solutions: 'empty',
   },
 };
@@ -30,7 +33,11 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
       status: {
         ...scenarioEditingMetadata.status,
         [tab]: 'draft',
-        ...STATUS_VALUES[tab],
+        ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
+          return {
+            [v]: (scenarioEditingMetadata.status[v] !== 'empty') ? 'outdated' : 'empty',
+          };
+        }, {}),
       },
       tab: `${tab}`,
       subtab: `${subtab}`,
