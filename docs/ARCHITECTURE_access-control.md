@@ -1,14 +1,34 @@
 # Access Control
 
 The Marxan Cloud platform protects user and project/scenario data via Role-Based
-Access Control (RBAC), through modules that are part of the platform itself:
+Access Control (RBAC), through the application modules detailed below, which in
+turn rely on proven mainstream free software/open source modules for sensitive
+and complex tasks such as password encryption and verification, and for signing
+and verifying authorization tokens.
 
-- Users (sign up, account management)
-- Authentication (signing in to the platform)
-- Access Control (management of user roles and their permissions on projects and
-  scenarios)
+- **User management** (signing up for an account, updating one's own account)
+
+Modules used: [bcrypt](https://www.npmjs.com/package/bcrypt) for password
+hashing and verification.
+
+- **Authentication** (signing in to the platform)
+
+Modules used: [PassportJS Local
+Strategy](https://www.npmjs.com/package/passport-local), via the [NestJS
+Passport module](https://www.npmjs.com/package/@nestjs/passport);
+[jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken), via the [NestJS JWT
+module](https://www.npmjs.com/package/@nestjs/jwt).
+
+- **Authorization** (management of user roles and their permissions on projects
+  and scenarios)
+
+Modules used: [PassportJS JWT
+Strategy](https://www.npmjs.com/package/passport-jwt), via the [NestJS JWT
+module](https://www.npmjs.com/package/@nestjs/jwt].
 
 ## User management
+
+User data is stored in the application's own PostgreSQL database.
 
 The Users module enables users to sign up by providing:
 
@@ -29,8 +49,8 @@ update this in their user profile.
 
 - A password
 
-User passwords are stored as salted hashes using the `bcrypt` password hashing
-function.
+User passwords are stored as salted (generated salt with ten rounds) hashes
+using the `bcrypt` password hashing function.
 
 Users who are in possession of a valid JWT token can update their own account's
 password.
@@ -42,15 +62,15 @@ No password entropy is enforced on passwords that users choose.
 Once a user account has been activated, the user can sign in to the Marxan Cloud
 platform (or its API, if using the API directly) via an authentication endpoint,
 which accepts a payload that includes the username (verified email address) and
-password.
+password. The PassportJS Local strategy is used to authenticate users.
 
-All Marxan Cloud instances should be set up with TLS fronting on the reverse
+All Marxan Cloud instances should be set up with TLS termination on the reverse
 proxies for both the frontend app and the backend API: in this setup, user
 credentials for authentication will be encrypted in transit.
 
 With default settings, HTTP traffic between reverse proxies and the backend API
-will be unencrypted, so it is fundamental to ensure that the routes between
-reverse proxies and API instances are over private subnets with no adversarial
+will be unencrypted, so it is fundamental to ensure that the cloud networks
+between reverse proxies and API instances are fully private, with no adversarial
 access.
 
 If the credentials supplied match those stored in the instance's database, the
@@ -74,7 +94,7 @@ out of all their sessions. This is done by removing all the session ids for the
 user, resulting in them being signed out from all the devices/browsers/API
 clients they may have been using.
 
-## Access control
+## Authorization
 
 Access control strategies, roles and role management are described in detail in
 the [Role-Based Access Control -
