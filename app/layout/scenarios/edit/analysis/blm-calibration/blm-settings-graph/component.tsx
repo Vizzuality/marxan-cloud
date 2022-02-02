@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useSelector } from 'react-redux';
@@ -15,8 +15,11 @@ import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
+import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+
+import ZOOM_SVG from 'svgs/ui/zoom.svg?sprite';
 
 export interface ScenariosBlmSettingsGraphProps {
   maxBlmValue: number,
@@ -27,6 +30,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
   maxBlmValue,
   minBlmValue,
 }: ScenariosBlmSettingsGraphProps) => {
+  const [zoomImage, setZoomImage] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
 
@@ -60,9 +64,17 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                   noValidate
                   onSubmit={handleSubmit}
                 >
-                  {!!blmImage && (
-                    <img src={blmImage} alt="selected blm" className="absolute right-0 rounded-lg" />
-                  )}
+                  <div className="absolute right-0">
+                    <img src={blmImage || '/images/mock/blm-mock-image.png'} alt="selected blm" className="rounded-lg " />
+                    <button
+                      className="absolute bottom-0 right-0 z-50 w-5 h-5 rounded-tl-lg rounded-br-lg bg-primary-500"
+                      type="button"
+                      onClick={() => setZoomImage(true)}
+                    >
+                      <Icon icon={ZOOM_SVG} />
+                    </button>
+                  </div>
+
                   <div className="flex flex-col">
                     <div className="flex items-center space-x-2">
                       <Label theme="dark" className="text-xs uppercase">BLM:</Label>
@@ -127,6 +139,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
           />
         </div>
       )}
+      {zoomImage && <div>Here we have big blm image</div>}
     </>
   );
 };
