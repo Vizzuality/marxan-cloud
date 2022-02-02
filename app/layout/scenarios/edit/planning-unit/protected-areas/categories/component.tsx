@@ -201,7 +201,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               // subscription={{ dirty: true }}
               onChange={(state) => {
                 if (state.touched.wdpaIucnCategories) {
-                  dispatch(setWDPACategories(values));
+                  dispatch(setWDPACategories(state?.values));
                 }
 
                 if (state.touched.uploadedProtectedArea) {
