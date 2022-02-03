@@ -83,6 +83,7 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { ResourceId } from '../clone';
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
+import { lockedScenario, LockService } from './locks/lock.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -141,6 +142,7 @@ export class ScenariosService {
     private readonly blmValuesRepository: ProjectBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly lockService: LockService,
   ) {}
 
   async findAllPaginated(
@@ -233,7 +235,7 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     input: UpdateScenarioDTO,
-  ): Promise<Either<typeof forbiddenError, Scenario>> {
+  ): Promise<Either<typeof forbiddenError | typeof lockedScenario, Scenario>> {
     await this.assertScenario(scenarioId);
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
@@ -243,6 +245,9 @@ export class ScenariosService {
     }
     if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
+    }
+    if (!(await this.lockService.isLockedByUser(scenarioId, userId))) {
+      return left(lockedScenario);
     }
     await this.blockGuard.ensureThatProjectIsNotBlocked(
       scenario.right.projectId,

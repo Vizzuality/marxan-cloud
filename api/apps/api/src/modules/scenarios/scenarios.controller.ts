@@ -439,7 +439,17 @@ export class ScenariosController {
     const result = await this.service.update(id, req.user.id, dto);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case lockedScenario:
+          throw new BadRequestException(
+            `Scenario ${id} is already being edited.`,
+          );
+        default:
+          const _check: never = result.left;
+          throw new InternalServerErrorException();
+      }
     }
 
     return await this.scenarioSerializer.serialize(
