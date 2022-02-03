@@ -26,7 +26,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     const scenarioData = await this.scenarioDataRepo.find({
       where: {
         scenarioId,
-        id: In(values.map((pair) => pair.puid)),
+        id: In(values.map((pair) => pair.puUuid)),
       },
     });
     const puDataIds = scenarioData.map((sd) => sd.id);
@@ -42,7 +42,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
           ScenariosPuCostDataGeo,
           rows.map((row) => ({
             cost: row.cost,
-            scenariosPuDataId: row.puid,
+            scenariosPuDataId: row.puUuid,
           })),
         );
       }

@@ -5,10 +5,11 @@ export const getGeoJson = (
   planningUnitsIds: string[],
 ): FeatureCollection<MultiPolygon | Polygon, PlanningUnitCost> => ({
   type: 'FeatureCollection',
-  features: planningUnitsIds.map((id) => ({
+  features: planningUnitsIds.map((id, index) => ({
     properties: {
       cost: 200,
-      puid: id,
+      puid: index,
+      puUuid: id,
     },
     type: 'Feature',
     geometry: {

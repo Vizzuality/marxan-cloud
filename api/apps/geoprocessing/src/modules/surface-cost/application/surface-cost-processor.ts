@@ -33,7 +33,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
       await this.availablePlanningUnits.get(job.data.scenarioId)
     ).ids;
     const { errors } = canPlanningUnitsBeLocked(
-      surfaceCosts.map((cost) => cost.puid),
+      surfaceCosts.map((cost) => cost.puUuid),
       scenarioPlanningUnitIds,
     );
     if (errors.length > 0) {

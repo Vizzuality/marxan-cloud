@@ -4,7 +4,8 @@ export const getCostByPlanningUnit = (
   planningUnitsIds: string[],
   expectedCost?: number,
 ): PlanningUnitCost[] =>
-  planningUnitsIds.map((pu) => ({
+  planningUnitsIds.map((pu, index) => ({
     cost: expectedCost ?? 200,
-    puid: pu,
+    puid: index,
+    puUuid: pu,
   }));
