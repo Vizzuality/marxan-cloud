@@ -1,6 +1,10 @@
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { Injectable } from '@nestjs/common';
+import { Either, left, right } from 'fp-ts/lib/Either';
+import { ScenarioLockDto } from '../dto/scenario.lock.dto';
+import { lockedScenario } from '../lock.service';
 
 @Injectable()
 export class ScenarioAccessControlMock implements ScenarioAccessControl {
@@ -23,5 +27,28 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
   }
   async canReleaseLock(userId: string, scenarioId: string): Promise<Permit> {
     return this.mock(userId, scenarioId);
+  }
+  async acquireLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<
+    Either<typeof forbiddenError | typeof lockedScenario, ScenarioLockDto>
+  > {
+    if (this.mock(userId, scenarioId)) {
+      return left(lockedScenario);
+    }
+    if(this.mock(userId, scenarioId)) {
+      return left(forbiddenError);
+    } 
+    return right({ userId, scenarioId, createdAt: new Date()});
+  };
+  async releaseLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
+      if(this.mock(userId, scenarioId)) {
+        return left(forbiddenError);
+      } 
+      return right(void 0);
   }
 }

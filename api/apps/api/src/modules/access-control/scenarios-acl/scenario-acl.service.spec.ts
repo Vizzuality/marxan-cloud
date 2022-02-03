@@ -9,6 +9,8 @@ import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '../projects-acl/dto/user-role-project.dto';
+import { LockService } from './locks/lock.service';
+import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -83,6 +85,14 @@ const getFixtures = async () => {
           findOne: jest.fn(),
         },
       },
+      {
+        provide: getRepositoryToken(ScenarioLockEntity),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+        },
+      },
+      LockService,
     ],
   }).compile();
 
