@@ -5,6 +5,7 @@ import {
   surfaceCostQueueEventsProvider,
   surfaceCostQueueProvider,
 } from './surface-cost-queue.provider';
+import { SurfaceCostEventsHandler } from './surface-cost.events-handler';
 
 @Module({
   imports: [QueueApiEventsModule],
@@ -12,6 +13,7 @@ import {
     surfaceCostQueueProvider,
     surfaceCostQueueEventsProvider,
     surfaceCostEventsFactoryProvider,
+    SurfaceCostEventsHandler,
   ],
   exports: [
     surfaceCostQueueProvider,
