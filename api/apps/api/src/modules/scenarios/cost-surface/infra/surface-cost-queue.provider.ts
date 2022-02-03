@@ -3,7 +3,6 @@ import {
   CreateWithEventFactory,
   QueueEventsAdapterFactory,
 } from '@marxan-api/modules/queue-api-events';
-import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry';
 import { JobInput, surfaceCostQueueName } from '@marxan/scenario-cost-surface';
 import { FactoryProvider } from '@nestjs/common';
 import { Queue, QueueEvents } from 'bullmq';
@@ -30,12 +29,12 @@ export const surfaceCostQueueEventsProvider: FactoryProvider<QueueEvents> = {
 };
 
 export const surfaceCostEventsFactoryProvider: FactoryProvider<
-  CreateWithEventFactory<PlanningUnitsJob>
+  CreateWithEventFactory<JobInput>
 > = {
   provide: surfaceCostEventsFactoryToken,
   useFactory: (
     factory: QueueEventsAdapterFactory,
-    queue: Queue<PlanningUnitsJob>,
+    queue: Queue<JobInput>,
     queueEvents: QueueEvents,
   ) => factory.create(queue, queueEvents),
   inject: [
