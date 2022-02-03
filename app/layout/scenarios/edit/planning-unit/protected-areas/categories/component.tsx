@@ -32,7 +32,7 @@ export interface WDPACategoriesProps {
 export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
 }: WDPACategoriesProps) => {
-  const formRef = useRef();
+  const formRef = useRef(null);
 
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -72,7 +72,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  const onSubmit = useCallback((values) => {
+  const onCalculateProtectedAreas = useCallback((values) => {
     const { wdpaIucnCategories } = values;
 
     const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
@@ -82,16 +82,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
           selected: true,
         };
       });
-    // const { touched, values: stateValues } = form.getState();
-    // const protectedAreasTouched = Object.values(touched).includes(true);
-
-    // if (protectedAreasTouched) {
-    //   onCalculateProtectedAreas();
-    // }
-
-    // if (selectedProtectedAreas && !protectedAreasTouched) {
-    //   onSuccess();
-    // }
 
     saveScenarioProtectedAreasMutation.mutate({
       id: `${sid}`,
@@ -111,6 +101,19 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     wdpaData,
     onSuccess,
   ]);
+
+  const onSubmit = (values) => {
+    const { touched } = formRef.current?.getState();
+    const protectedAreasTouched = Object.values(touched).includes(true);
+
+    if (protectedAreasTouched) {
+      onCalculateProtectedAreas(values);
+    }
+
+    if (!protectedAreasTouched) {
+      onSuccess();
+    }
+  };
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -170,7 +173,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   return (
     <FormRFF
-      ref={formRef}
       onSubmit={onSubmit}
       key="protected-areas-categories"
       mutators={{
@@ -188,6 +190,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ form, values, handleSubmit }) => {
+        formRef.current = form;
         const { touched, values: stateValues } = form.getState();
 
         const {
