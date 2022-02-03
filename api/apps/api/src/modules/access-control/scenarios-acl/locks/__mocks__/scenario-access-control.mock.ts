@@ -21,4 +21,7 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
   async canCloneScenario(userId: string, scenarioId: string): Promise<Permit> {
     return this.mock(userId, scenarioId);
   }
+  async canReleaseLock(userId: string, scenarioId: string): Promise<Permit> {
+    return this.mock(userId, scenarioId);
+  }
 }

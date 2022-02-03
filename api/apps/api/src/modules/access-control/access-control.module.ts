@@ -13,6 +13,8 @@ import { ScenarioAccessControl } from './scenarios-acl/scenario-access-control';
 import { ScenarioAclService } from './scenarios-acl/scenario-acl.service';
 import { ScenarioAclController } from './scenarios-acl/scenario-acl.controller';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ScenarioLockEntity } from './scenarios-acl/locks/entity/scenario.lock.api.entity';
+import { LockService } from './scenarios-acl/locks/lock.service';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
       UsersProjectsApiEntity,
       UsersScenariosApiEntity,
       PublishedProject,
+      ScenarioLockEntity,
     ]),
     ProjectAclModule,
     ScenarioAclModule,
@@ -33,6 +36,7 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
       provide: ScenarioAccessControl,
       useClass: ScenarioAclService,
     },
+    LockService,
   ],
   controllers: [ProjectAclController, ScenarioAclController],
   exports: [ProjectAccessControl, ScenarioAccessControl],
