@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import intersection from 'lodash/intersection';
 
@@ -41,7 +41,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
-  // const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
 
@@ -192,17 +192,14 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       {({ form, values, handleSubmit }) => {
         formRef.current = form;
 
-        const { modified, values: stateValues } = formRef?.current?.getState();
+        const { touched, values: stateValues } = formRef?.current?.getState();
+        dispatch(setWDPACategories(stateValues));
 
         const {
-          wdpaIucnCategories: wdpaIucnCategoriesModified,
-          uploadedProtectedArea: uploadedProtectedAreaModified,
-        } = modified;
+          uploadedProtectedArea: uploadedProtectedAreaTouched,
+        } = touched;
 
-        if (wdpaIucnCategoriesModified) {
-          dispatch(setWDPACategories(stateValues));
-        }
-        if (uploadedProtectedAreaModified) {
+        if (uploadedProtectedAreaTouched) {
           refetchProtectedAreas();
         }
 
@@ -338,16 +335,18 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
 
-            <div className="flex justify-center mt-5 space-x-2">
-              <Button
-                theme="secondary-alt"
-                size="lg"
-                type="submit"
-                className="relative px-20"
-              >
-                Continue
-              </Button>
-            </div>
+            {!!wdpaCategories.wdpaIucnCategories.length && (
+              <div className="flex justify-center mt-5 space-x-2">
+                <Button
+                  theme="secondary-alt"
+                  size="lg"
+                  type="submit"
+                  className="relative px-20"
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
 
           </form>
         );
