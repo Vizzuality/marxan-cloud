@@ -3,7 +3,8 @@ import { PlanningUnitCost } from '../../ports/planning-unit-cost';
 export const getCostByPlanningUnit = (
   planningUnitsIds: string[],
 ): PlanningUnitCost[] =>
-  planningUnitsIds.map((pu) => ({
+  planningUnitsIds.map((pu, index) => ({
     cost: 200,
-    puid: pu,
+    puid: index,
+    puUuid: pu,
   }));

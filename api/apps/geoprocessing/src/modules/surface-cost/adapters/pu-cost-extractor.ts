@@ -25,6 +25,7 @@ export class PuCostExtractor implements PuExtractorPort {
 
     return puCosts.map((puCost) => ({
       puid: puCost.puid,
+      puUuid: puCost.puUuid,
       cost: puCost.cost,
     }));
   }

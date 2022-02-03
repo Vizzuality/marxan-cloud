@@ -37,11 +37,13 @@ describe(`when given GeoJson has pu costs`, () => {
       Array [
         Object {
           "cost": 200,
-          "puid": "uuid-1",
+          "puUuid": "uuid-1",
+          "puid": 0,
         },
         Object {
           "cost": 200,
-          "puid": "uuid-2",
+          "puUuid": "uuid-2",
+          "puid": 1,
         },
       ]
     `);
