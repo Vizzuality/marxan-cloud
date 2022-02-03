@@ -161,15 +161,21 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {
-    const otherOwnersInProject = await this.roles.count({
-      where: {
+    const query = this.roles
+      .createQueryBuilder('users_projects')
+      .leftJoin('users_projects.user', 'userId')
+      .where({
         projectId,
         roleName: ProjectRoles.project_owner,
         userId: Not(userId),
-      },
-    });
+      })
+      .andWhere('userId.isDeleted is false');
+
+    const otherOwnersInProject = await query.getCount();
+
     return otherOwnersInProject >= 1;
   }
+
   /**
    * @debt This module should not involve user details and it should deal with
    * it using a standalone module that will access the data just to read it. We
@@ -191,6 +197,7 @@ export class ProjectAclService implements ProjectAccessControl {
       .where({
         projectId,
       })
+      .andWhere('userId.isDeleted is false')
       .select([
         'users_projects.roleName',
         'userId.displayName',
@@ -237,16 +244,23 @@ export class ProjectAclService implements ProjectAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInProject = await apiQueryRunner.manager.findOne(
-        UsersProjectsApiEntity,
-        undefined,
-        {
-          where: {
-            projectId,
-            userId,
-          },
-        },
-      );
+      const existingUserInProject = await apiQueryRunner.manager
+        .createQueryBuilder(UsersProjectsApiEntity, 'users_projects')
+        .where({
+          projectId,
+          userId,
+        })
+        .leftJoinAndSelect('users_projects.user', 'userId')
+        .select(['users_projects.roleName', 'userId.isDeleted'])
+        .getOne();
+      /**
+       * If a role was already granted to the user, but the user is marked
+       * as deleted, we don't want to touch their existing role: we consider it,
+       * for the time being, as an archived fact, kept untouched.
+       */
+      if (existingUserInProject?.user?.isDeleted) {
+        return left(transactionFailed);
+      }
 
       if (!existingUserInProject) {
         const userRoleToSave = new UsersProjectsApiEntity();

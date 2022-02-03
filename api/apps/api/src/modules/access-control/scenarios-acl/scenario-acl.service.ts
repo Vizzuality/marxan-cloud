@@ -148,13 +148,18 @@ export class ScenarioAclService implements ScenarioAccessControl {
   }
 
   async hasOtherOwner(userId: string, scenarioId: string): Promise<Permit> {
-    const otherOwnersInScenario = await this.roles.count({
-      where: {
+    const query = this.roles
+      .createQueryBuilder('users_scenarios')
+      .leftJoin('users_scenarios.user', 'userId')
+      .where({
         scenarioId,
         roleName: ScenarioRoles.scenario_owner,
         userId: Not(userId),
-      },
-    });
+      })
+      .andWhere('userId.isDeleted is false');
+
+    const otherOwnersInScenario = await query.getCount();
+
     return otherOwnersInScenario >= 1;
   }
 
@@ -173,6 +178,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
       .where({
         scenarioId,
       })
+      .andWhere('userId.isDeleted is false')
       .select([
         'users_scenarios.roleName',
         'userId.displayName',
@@ -221,16 +227,25 @@ export class ScenarioAclService implements ScenarioAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInScenario = await apiQueryRunner.manager.findOne(
-        UsersScenariosApiEntity,
-        undefined,
-        {
-          where: {
-            scenarioId,
-            userId,
-          },
-        },
-      );
+      const existingUserInScenario = await apiQueryRunner.manager
+        .createQueryBuilder(UsersScenariosApiEntity, 'users_scenarios')
+        .where({
+          scenarioId,
+          userId,
+        })
+        .leftJoinAndSelect('users_scenarios.user', 'userId')
+        .select(['users_scenarios.roleName', 'userId.isDeleted'])
+        .getOne();
+
+      /**
+       * If a role was already granted to the user, but the user is marked
+       * as deleted, we don't want to touch their existing role: we consider it,
+       * for the time being, as an archived fact, kept untouched.
+       */
+
+      if (existingUserInScenario?.user?.isDeleted) {
+        return left(transactionFailed);
+      }
 
       if (!existingUserInScenario) {
         const userRoleToSave = new UsersScenariosApiEntity();
