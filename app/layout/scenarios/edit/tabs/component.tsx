@@ -129,15 +129,15 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
         <div
           className={cx({
             'bg-gray-700 rounded-4xl': true,
-            'flex flex-col flex-grow overflow-hidden': true,
+            'flex flex-col flex-grow': true,
           })}
         >
           <div
             className={cx({
-              'flex flex-col flex-grow px-10 overflow-hidden': true,
+              'flex flex-col flex-grow px-10': true,
             })}
           >
-            <div className="flex flex-col flex-grow overflow-hidden py-0.5 px-0.5">
+            <div className="flex flex-col flex-grow py-0.5 px-0.5">
               {scenarioFetched && (
                 <Tabs
                   items={TABS_PARSED}

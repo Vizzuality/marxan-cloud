@@ -35,6 +35,7 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
         [tab]: 'draft',
         ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
           return {
+            ...acc,
             [v]: (scenarioEditingMetadata.status[v] !== 'empty') ? 'outdated' : 'empty',
           };
         }, {}),
@@ -43,6 +44,7 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
       subtab: `${subtab}`,
     },
   };
+
   return metadata;
 };
 

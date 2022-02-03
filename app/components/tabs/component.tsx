@@ -42,7 +42,7 @@ export const Tabs: React.FC<TabsProps> = ({
           >
             {tab.name}
             {tab.warning && (
-              <div className="absolute w-2 h-2 bg-red-500 rounded-full -top-0 -right-3" />
+              <div className="absolute w-2 h-2 bg-yellow-500 rounded-full top-3 -right-3" />
             )}
 
             {tab.id === selected && tab.status !== 'disabled' && (
