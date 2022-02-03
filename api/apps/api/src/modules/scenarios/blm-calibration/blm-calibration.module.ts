@@ -15,8 +15,9 @@ import { BlmCalibrationEventsService } from './blm-calibration-events.service';
 import { CancelBlmCalibrationHandler } from './cancel-blm-calibration.handler';
 import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 import { CreateInitialBlmHandler } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-blm.handler';
-import { ChangeScenarioBlmRange } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
+import { ChangeScenarioBlmRangeHandler } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.handler';
+import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-values-policy-factory';
 
 @Module({
   imports: [
@@ -27,10 +28,11 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
     CqrsModule,
   ],
   providers: [
+    BlmValuesPolicyFactory,
     StartBlmCalibrationHandler,
     CancelBlmCalibrationHandler,
     CreateInitialBlmHandler,
-    ChangeScenarioBlmRange,
+    ChangeScenarioBlmRangeHandler,
     calibrationQueueProvider,
     calibrationQueueEventsProvider,
     calibrationQueueEventsFactoryProvider,

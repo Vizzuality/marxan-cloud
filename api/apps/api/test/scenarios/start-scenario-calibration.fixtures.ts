@@ -175,7 +175,7 @@ export const getFixtures = async () => {
             }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
-          return await request(app.getHttpServer())
+          return request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
             .set('Authorization', `Bearer ${ownerToken}`)
             .send({
@@ -209,7 +209,7 @@ export const getFixtures = async () => {
             }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
-          return await request(app.getHttpServer())
+          return request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
             .set('Authorization', `Bearer ${contributorToken}`)
             .send({
@@ -243,7 +243,7 @@ export const getFixtures = async () => {
             }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
-          return await request(app.getHttpServer())
+          return request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
             .set('Authorization', `Bearer ${viewerToken}`)
             .send({
@@ -252,19 +252,16 @@ export const getFixtures = async () => {
         },
       };
     },
-    ThenScenarioCalibrationIsCreated: async (response: request.Response) => {
+    ThenScenarioCalibrationIsCreated: (response: request.Response) => {
       expect(response.status).toBe(HttpStatus.CREATED);
     },
-    ThenForbiddenIsReturned: async (response: request.Response) => {
+    ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toBe(HttpStatus.FORBIDDEN);
     },
-    ThenBadRequestIsReturned: async (response: request.Response) => {
+    ThenBadRequestIsReturned: (response: request.Response) => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
     },
-    ThenItHasTheUpdatedRange: async (response: request.Response) => {
-      expect(response.body.range).toEqual(updatedRange);
-    },
-    ThenItHasNoUpdatedRange: async (response: request.Response) => {
+    ThenItHasNoUpdatedRange: (response: request.Response) => {
       expect(response.body.range).toEqual(defaultRange);
     },
   };

@@ -17,6 +17,7 @@ import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
+import { ProjectsTestUtils } from './utils/projects.test.utils';
 
 afterAll(async () => {
   await tearDown();
@@ -86,6 +87,16 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     test('Creating a project with complete data should succeed', async () => {
+      const response1 = await request(app.getHttpServer())
+        .post('/api/v1/organizations')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(E2E_CONFIG.organizations.valid.minimal())
+        .expect(201);
+
+      const jsonAPIResponse1: OrganizationResultSingular = response1.body;
+      anOrganization = await Deserializer.deserialize(response1.body);
+      expect(jsonAPIResponse1.data.type).toBe('organizations');
+
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.complete({ countryCode: 'NAM' }),
         organizationId: anOrganization.id,
@@ -96,9 +107,11 @@ describe('ProjectsModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .send(createProjectDTO)
         .expect(201);
-
       const jsonAPIResponse: ProjectResultSingular = response.body;
+
       completeProject = await Deserializer.deserialize(response.body);
+      await ProjectsTestUtils.generateBlmValues(app, completeProject.id);
+
       expect(jsonAPIResponse.data.type).toBe('projects');
       expect(jsonAPIResponse.meta.started).toBeTruthy();
 

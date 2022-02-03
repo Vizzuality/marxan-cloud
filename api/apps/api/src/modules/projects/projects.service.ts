@@ -271,6 +271,7 @@ export class ProjectsService {
     >
   > {
     const response = await this.assertProject(projectId, { id: userId });
+
     if (isLeft(response)) return left(projectNotFound);
 
     const canDownloadExport = await this.projectAclService.canDownloadProjectExport(

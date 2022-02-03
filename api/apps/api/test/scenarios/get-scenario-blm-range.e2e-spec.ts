@@ -43,7 +43,7 @@ describe('get-scenario-blm-calibration-results', () => {
 
     await fixtures
       .ThenBlmRangeShouldBeRetrieved(response)
-      .AndBeEqualToItsProjectBlm();
+      .AndBeUpdatedWithTheNewRange();
   });
 
   it('should block retrieving the BLM range for non allowed users', async () => {

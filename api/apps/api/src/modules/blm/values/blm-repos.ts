@@ -1,7 +1,7 @@
 import { Either } from 'fp-ts/Either';
 
 export const unknownError = Symbol(`unknown error`);
-export const projectNotFound = Symbol(`project not found`);
+export const projectNotFound = Symbol(`project blm not found`);
 export const scenarioNotFound = Symbol(`scenario not found`);
 export const alreadyCreated = Symbol(`project already has defaults`);
 export type CreateFailure = typeof unknownError | typeof alreadyCreated;

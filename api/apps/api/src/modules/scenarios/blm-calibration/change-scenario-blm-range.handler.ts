@@ -34,7 +34,6 @@ export class ChangeScenarioBlmRangeHandler
 
       return left(invalidRange);
     }
-
     const calculator = this.blmPolicyFactory.get();
     const blmValues = calculator.with(range);
 
@@ -48,11 +47,10 @@ export class ChangeScenarioBlmRangeHandler
       this.logger.error(
         `Could not update BLM for scenario with ID: ${scenarioId}`,
       );
-
       return left(updateFailure);
     }
 
-    return await this.blmRepository.get(scenarioId);
+    return this.blmRepository.get(scenarioId);
   }
 
   private isInvalidRange(range: [number, number]) {
