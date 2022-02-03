@@ -36,7 +36,6 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
-import { LockService } from './locks/lock.service';
 
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
@@ -51,7 +50,8 @@ import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-check
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
-import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
+import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
+import { LockService } from '../access-control/scenarios-acl/locks/lock.service';
 
 @Module({
   imports: [
@@ -64,6 +64,7 @@ import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
       Scenario,
       ScenariosOutputResultsApiEntity,
       UsersScenariosApiEntity,
+      ScenarioLockEntity,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
@@ -89,7 +90,6 @@ import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
     BlmValuesModule,
     BlmCalibrationModule,
     AccessControlModule,
-    TypeOrmModule.forFeature([ScenarioLockEntity]),
   ],
   providers: [
     ScenariosService,

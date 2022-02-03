@@ -90,13 +90,16 @@ import {
 } from '@marxan-api/modules/blm/values/blm-repos';
 import { ResourceId } from '../clone';
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
-import { lockedScenario, LockService } from './locks/lock.service';
 import {
   SetInitialCostSurface,
   SetInitialCostSurfaceError,
 } from './cost-surface/application/set-initial-cost-surface.command';
 import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
 import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
+import {
+  lockedScenario,
+  LockService,
+} from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {

@@ -123,10 +123,9 @@ import {
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
   lockedScenario,
-  LockService,
   unknownError as lockUnknownError,
-} from './locks/lock.service';
-import { ScenarioLockResult } from './locks/dto/scenario.lock.dto';
+} from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
+import { ScenarioLockResult } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -154,7 +153,6 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
-    private readonly lockService: LockService,
   ) {}
 
   @ApiOperation({
@@ -1159,7 +1157,7 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioLockResult> {
-    const result = await this.lockService.acquireLock(id, req.user.id);
+    const result = await this.scenarioAclService.acquireLock(req.user.id, id);
 
     if (isLeft(result)) {
       switch (result.left) {
@@ -1169,13 +1167,28 @@ export class ScenariosController {
           throw new BadRequestException(
             `Scenario ${id} is already being edited.`,
           );
-        case lockUnknownError:
-          throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
       }
     }
     return { data: result.right };
+  }
+
+  @ApiOperation({
+    description: `End Scenario Editing session.`,
+    summary: `Releases the lock created on a scenario so other
+    users can start editing the scenario.`,
+  })
+  @Post(`:id/release-lock`)
+  async endScenarioEditingSession(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.scenarioAclService.releaseLock(req.user.id, id);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 }

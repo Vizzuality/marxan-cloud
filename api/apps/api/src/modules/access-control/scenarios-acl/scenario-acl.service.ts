@@ -12,7 +12,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { assertDefined } from '@marxan/utils';
 import {
@@ -23,10 +23,20 @@ import {
 } from '@marxan-api/modules/access-control';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
+import {
+  AcquireFailure,
+  lockedScenario,
+  LockService,
+} from './locks/lock.service';
+import { ScenarioLockDto } from './locks/dto/scenario.lock.dto';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
   private readonly canCreateScenarioRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
+  private readonly canReleaseLockRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
   ];
@@ -94,6 +104,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     private readonly roles: Repository<UsersScenariosApiEntity>,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly projectRoles: Repository<UsersProjectsApiEntity>,
+    private readonly lockService: LockService,
   ) {}
 
   async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
@@ -131,6 +142,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
     );
   }
 
+  async canReleaseLock(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRoleInProject(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canReleaseLockRoles,
+    );
+  }
+
   async isOwner(userId: string, scenarioId: string): Promise<Permit> {
     const userIsScenarioOwner = await this.roles.findOne({
       where: {
@@ -159,6 +177,34 @@ export class ScenarioAclService implements ScenarioAccessControl {
     const otherOwnersInScenario = await query.getCount();
 
     return otherOwnersInScenario >= 1;
+  }
+
+  async acquireLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<
+    Either<typeof forbiddenError | typeof lockedScenario, ScenarioLockDto>
+  > {
+    if (!(await this.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    const result = await this.lockService.acquireLock(scenarioId, userId);
+    if (isLeft(result)) {
+      return left(lockedScenario);
+    }
+    return result;
+  }
+
+  async releaseLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
+    if (!(await this.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    await this.lockService.releaseLock(scenarioId);
+
+    return right(void 0);
   }
 
   async findUsersInScenario(
