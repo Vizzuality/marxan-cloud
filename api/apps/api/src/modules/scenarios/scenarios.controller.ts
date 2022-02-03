@@ -121,6 +121,12 @@ import {
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
 import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
+import {
+  LockService,
+  lockedScenario,
+  unknownError,
+} from './locks/lock.service';
+import { ScenarioLockResult } from './locks/dto/scenario.lock.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -148,6 +154,7 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly lockService: LockService,
   ) {}
 
   @ApiOperation({
@@ -271,7 +278,7 @@ export class ScenariosController {
         case forbiddenError:
           throw new ForbiddenException();
         case notFound:
-          throw new NotFoundException(`Scenario ${id} could not be found`);
+          throw new NotFoundException(`Scenario ${id} could not be found.`);
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
@@ -1090,5 +1097,35 @@ export class ScenariosController {
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
+  }
+
+  @ApiOperation({
+    description: `Start Scenario Editing session.`,
+    summary: `Creates a Lock entity with related scenario
+     and user data to prevent other users from editing at the same time.`,
+  })
+  @Post(`:id/lock`)
+  async startScenarioEditingSession(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ScenarioLockResult> {
+    const result = await this.lockService.acquireLock(id, req.user.id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case lockedScenario:
+          throw new BadRequestException(
+            `Scenario ${id} is already being edited.`,
+          );
+        case unknownError:
+          throw new InternalServerErrorException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+    return { data: result.right };
   }
 }

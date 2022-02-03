@@ -123,6 +123,37 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenOkIsReturned(response);
   });
 
+  it('Viewer fails to acquire a lock for a scenario', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenViewerWasAddedToScenario();
+    const response = await fixtures.WhenAcquiringLockForScenarioAsViewer();
+    fixtures.ThenForbiddenIsReturned(response);
+  });
+
+  it('Contributor acquires a lock for a scenario', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario();
+    const response = await fixtures.WhenAcquiringLockForScenarioAsContributor();
+    fixtures.ThenScenarioLockInfoIsReturned(response);
+  });
+
+  it('Owner acquires a lock for a scenario', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    const response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    fixtures.ThenScenarioLockInfoIsReturned(response);
+  });
+
+  it('Fails to acquire a lock for a scenario as there was one already', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario();
+
+    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    fixtures.ThenScenarioLockInfoIsReturned(response);
+
+    response = await fixtures.WhenAcquiringLockForScenarioAsContributor();
+    fixtures.ThenScenarioIsLockedIsReturned(response);
+  });
+
   it('should not allow to create scenario with invalid marxan properties', async () => {
     const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
@@ -325,6 +356,19 @@ async function getFixtures() {
           },
         }),
 
+    WhenAcquiringLockForScenarioAsOwner: async () =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/lock`)
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenAcquiringLockForScenarioAsContributor: async () =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/lock`)
+        .set('Authorization', `Bearer ${contributorToken}`),
+    WhenAcquiringLockForScenarioAsViewer: async () =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/lock`)
+        .set('Authorization', `Bearer ${viewerToken}`),
+
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
     },
@@ -335,6 +379,14 @@ async function getFixtures() {
 
     ThenOkIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
+    },
+
+    ThenScenarioIsLockedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual(
+        `Scenario ${scenarioId} is already being edited.`,
+      );
     },
 
     ThenScenarioIsCreatedAndNoJobHasBeenSubmitted: (
@@ -451,6 +503,11 @@ async function getFixtures() {
         response.body.errors[0].meta.rawError.response.message[0].constraints
           .isEnum,
       ).toMatchInlineSnapshot(`"HEURTYPE must be a valid enum value"`);
+    },
+
+    ThenScenarioLockInfoIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(201);
+      expect(response.body.data.scenarioId).toEqual(scenarioId);
     },
   };
 }
