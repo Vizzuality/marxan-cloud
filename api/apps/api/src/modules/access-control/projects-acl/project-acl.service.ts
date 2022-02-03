@@ -214,7 +214,11 @@ export class ProjectAclService implements ProjectAccessControl {
         .leftJoinAndSelect('users_projects.user', 'userId')
         .select(['users_projects.roleName', 'userId.isDeleted'])
         .getOne();
-
+      /**
+       * If a role was already granted to the user, but the user is marked
+       * as deleted, we don't want to touch their existing role: we consider it,
+       * for the time being, as an archived fact, kept untouched.
+       */
       if (existingUserInProject?.user?.isDeleted) {
         return left(transactionFailed);
       }

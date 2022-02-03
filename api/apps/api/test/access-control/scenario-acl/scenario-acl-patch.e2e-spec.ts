@@ -106,7 +106,7 @@ test(`changes user role after user is soft-deleted from the app`, async () => {
   await fixtures.GivenUserWasAddedToScenario(scenarioId);
   await fixtures.GivenUserIsDeleted();
 
-  const response = await fixtures.WhenChangingUserRoleFromDeletedUser(
+  const response = await fixtures.WhenChangingUserRoleForDeletedUser(
     scenarioId,
   );
   fixtures.ThenTransactionFailedIsReturned(response);

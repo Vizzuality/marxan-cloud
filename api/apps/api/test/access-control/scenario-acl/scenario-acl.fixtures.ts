@@ -233,7 +233,7 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: scenarioContributorRole,
         }),
-    WhenChangingUserRoleFromDeletedUser: async (scenarioId: string) =>
+    WhenChangingUserRoleForDeletedUser: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/scenarios/${scenarioId}/users`)
         .set('Authorization', `Bearer ${ownerUserToken}`)

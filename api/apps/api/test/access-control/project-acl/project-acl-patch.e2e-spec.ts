@@ -114,9 +114,7 @@ test(`changes user role after user is soft-deleted from the app`, async () => {
   await fixtures.GivenUserWasAddedToProject(projectId);
   await fixtures.GivenUserIsDeleted();
 
-  const response = await fixtures.WhenChangingUserRoleFromDeletedUser(
-    projectId,
-  );
+  const response = await fixtures.WhenChangingUserRoleForDeletedUser(projectId);
   fixtures.ThenTransactionFailedIsReturned(response);
 });
 
