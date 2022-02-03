@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import intersection from 'lodash/intersection';
 
@@ -33,6 +33,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
 }: WDPACategoriesProps) => {
   const formRef = useRef();
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -40,7 +41,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
-  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  // const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
 
@@ -54,7 +55,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
-    // refetch: refetchProtectedAreas,
+    refetch: refetchProtectedAreas,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
       || projectData?.adminAreaLevel1I
@@ -71,17 +72,27 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  const selectedProtectedAreas = useMemo(() => {
-    const { wdpaIucnCategories } = wdpaCategories;
-    return wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id)).map((pa) => {
-      return {
-        id: pa.id,
-        selected: true,
-      };
-    });
-  }, [wdpaCategories, wdpaData]);
+  const onSubmit = useCallback((values) => {
+    const { wdpaIucnCategories } = values;
 
-  const onCalculateProtectedAreas = useCallback(() => {
+    const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
+      .map((pa) => {
+        return {
+          id: pa.id,
+          selected: true,
+        };
+      });
+    // const { touched, values: stateValues } = form.getState();
+    // const protectedAreasTouched = Object.values(touched).includes(true);
+
+    // if (protectedAreasTouched) {
+    //   onCalculateProtectedAreas();
+    // }
+
+    // if (selectedProtectedAreas && !protectedAreasTouched) {
+    //   onSuccess();
+    // }
+
     saveScenarioProtectedAreasMutation.mutate({
       id: `${sid}`,
       data: {
@@ -93,18 +104,13 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         onSuccess();
       },
     });
-  }, [saveScenarioProtectedAreasMutation, selectedProtectedAreas, scenarioData, sid, onSuccess]);
-
-  const onSubmit = useCallback((...args) => {
-    console.log('onsubmit', args);
-    if (false) {
-      onCalculateProtectedAreas();
-    }
-
-    // if (selectedProtectedAreas && !protectedAreasTouched) {
-    //   onSuccess();
-    // }
-  }, [onCalculateProtectedAreas]);
+  }, [
+    saveScenarioProtectedAreasMutation,
+    scenarioData,
+    sid,
+    wdpaData,
+    onSuccess,
+  ]);
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -162,8 +168,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     );
   }
 
-  console.log('RENDER');
-
   return (
     <FormRFF
       ref={formRef}
@@ -184,20 +188,19 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       initialValues={INITIAL_VALUES}
     >
       {({ form, values, handleSubmit }) => {
-        // const { touched, values: stateValues } = form.getState();
-        // const protectedAreasTouched = Object.values(touched).includes(true);
+        const { touched, values: stateValues } = form.getState();
 
-        // const {
-        //   wdpaIucnCategories: wdpaIucnCategoriesTouched,
-        //   uploadedProtectedArea: uploadedProtectedAreaTouched,
-        // } = touched;
+        const {
+          wdpaIucnCategories: wdpaIucnCategoriesTouched,
+          uploadedProtectedArea: uploadedProtectedAreaTouched,
+        } = touched;
 
-        // if (wdpaIucnCategoriesTouched) {
-        //   dispatch(setWDPACategories(stateValues));
-        // }
-        // if (uploadedProtectedAreaTouched) {
-        //   refetchProtectedAreas();
-        // }
+        if (wdpaIucnCategoriesTouched) {
+          dispatch(setWDPACategories(stateValues));
+        }
+        if (uploadedProtectedAreaTouched) {
+          refetchProtectedAreas();
+        }
 
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
@@ -211,7 +214,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         return (
           <form
             onSubmit={handleSubmit}
-            // autoComplete="off"
+            autoComplete="off"
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
 
