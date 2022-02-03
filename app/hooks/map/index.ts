@@ -93,8 +93,6 @@ export function useWDPAPreviewLayer({
 }: UseWDPAPreviewLayer) {
   const { opacity = 1, visibility = true } = options || {};
 
-  console.log('estoy en preview');
-
   return useMemo(() => {
     if (!active || !bbox) return null;
 

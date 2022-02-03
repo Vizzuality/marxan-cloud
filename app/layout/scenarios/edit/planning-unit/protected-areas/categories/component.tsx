@@ -138,6 +138,17 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const onSubmit = (protectedAreasTouched) => {
+    console.log('onsubmit', protectedAreasTouched);
+    if (protectedAreasTouched) {
+      onCalculateProtectedAreas();
+    }
+
+    // if (selectedProtectedAreas && !protectedAreasTouched) {
+    //   onSuccess();
+    // }
+  };
+
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -151,7 +162,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   return (
     <FormRFF
-      onSubmit={() => { }}
+      key="protected-areas-categories"
+      onSubmit={onSubmit}
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
           const [id, arr] = args;
@@ -165,9 +177,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         },
       }}
       initialValues={INITIAL_VALUES}
-      render={({ form, values, handleSubmit }) => {
+    >
+      {({ form, values, handleSubmit }) => {
         const { touched, values: stateValues } = form.getState();
-        const protectedAreasTouched = Object.values(touched).includes(true);
+        // const protectedAreasTouched = Object.values(touched).includes(true);
 
         const {
           wdpaIucnCategories: wdpaIucnCategoriesTouched,
@@ -317,26 +330,17 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                 <Button
                   theme="secondary-alt"
                   size="lg"
-                  type="button"
+                  type="submit"
                   className="relative px-20"
-                  onClick={() => {
-                    if (protectedAreasTouched) {
-                      onCalculateProtectedAreas();
-                    }
-
-                    if (selectedProtectedAreas && !protectedAreasTouched) {
-                      onSuccess();
-                    }
-                  }}
                 >
-                  <span>Continue</span>
+                  Continue
                 </Button>
               </div>
             )}
           </form>
         );
       }}
-    />
+    </FormRFF>
   );
 };
 
