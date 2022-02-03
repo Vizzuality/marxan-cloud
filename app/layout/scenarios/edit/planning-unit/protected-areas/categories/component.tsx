@@ -160,24 +160,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    if (formRef.current) {
-      const { touched = false, values: stateValues } = formRef?.current?.getState();
-
-      const {
-        wdpaIucnCategories: wdpaIucnCategoriesTouched,
-        uploadedProtectedArea: uploadedProtectedAreaTouched,
-      } = touched;
-
-      if (wdpaIucnCategoriesTouched) {
-        dispatch(setWDPACategories(stateValues));
-      }
-      if (uploadedProtectedAreaTouched) {
-        refetchProtectedAreas();
-      }
-    }
-  }, [dispatch, refetchProtectedAreas, setWDPACategories, formRef]); //eslint-disable-line
-
   // Loading
   if ((scenarioIsFetching && !scenarioIsFetched) || (wdpaIsFetching && !wdpaIsFetched)) {
     return (
@@ -209,6 +191,20 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     >
       {({ form, values, handleSubmit }) => {
         formRef.current = form;
+
+        const { modified, values: stateValues } = formRef?.current?.getState();
+
+        const {
+          wdpaIucnCategories: wdpaIucnCategoriesModified,
+          uploadedProtectedArea: uploadedProtectedAreaModified,
+        } = modified;
+
+        if (wdpaIucnCategoriesModified) {
+          dispatch(setWDPACategories(stateValues));
+        }
+        if (uploadedProtectedAreaModified) {
+          refetchProtectedAreas();
+        }
 
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
