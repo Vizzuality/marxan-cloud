@@ -119,15 +119,15 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
             <ScenariosSidebarWDPACategories
               onSuccess={() => {
                 setStep(1);
-                dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
+                dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
               }}
             />
           )}
           {step === 1 && (
             <ScenariosSidebarWDPAThreshold
               onSuccess={() => {
-                dispatch(setTab(ScenarioSidebarTabs.FEATURES));
-                dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
+                dispatch(setSubTab(ScenarioSidebarSubTabs.PLANNING_UNIT_PREVIEW));
               }}
               onBack={() => {
                 setStep(0);

@@ -70,7 +70,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-    const subtab = s ? `planning-unit-${s}` : 'planning-unit-preview';
+    const subtab = s ? `pu-${s}-preview` : 'planning-unit-preview';
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
 
@@ -125,20 +125,20 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
           </Pill>
 
           {!section && (
-          <motion.div
-            key="continue-scenario-button"
-            className="flex justify-center flex-shrink-0 mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <Button
-              theme="primary"
-              size="lg"
-              disabled={VIEWER}
+            <motion.div
+              key="continue-scenario-button"
+              className="flex justify-center flex-shrink-0 mt-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
             >
-              Continue
-            </Button>
-          </motion.div>
+              <Button
+                theme="primary"
+                size="lg"
+                disabled={VIEWER}
+              >
+                Continue
+              </Button>
+            </motion.div>
           )}
         </AnimatePresence>
       </motion.div>

@@ -40,7 +40,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'protected-areas-preview',
+            subtab: 'pu-protected-areas-preview',
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -70,7 +70,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'protected-areas-preview',
+            subtab: 'pu-protected-areas-preview',
             lastJobCheck: new Date().getTime(),
           },
         },

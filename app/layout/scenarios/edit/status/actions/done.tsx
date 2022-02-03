@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -22,10 +22,6 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
   } = scenarioSlice.actions;
-
-  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { wdpaIucnCategories } = wdpaCategories;
 
   const { data: scenarioData } = useScenario(sid);
 
@@ -86,8 +82,8 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: wdpaIucnCategories.length > 0 ? 'features' : 'protected-areas',
-            subtab: wdpaIucnCategories.length > 0 ? 'features-preview' : 'protected-areas-preview',
+            tab: 'planning-unit',
+            subtab: 'pu-protected-areas-preview',
             status: {
               'protected-areas': 'draft',
               features: 'empty',
@@ -122,7 +118,7 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
-    wdpaIucnCategories?.length,
+
   ]);
 
   const onFeaturesDone = useCallback((JOB_REF) => {

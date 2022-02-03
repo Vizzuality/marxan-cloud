@@ -5,8 +5,8 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
     analysis: 'empty',
     solutions: 'empty',
   },
-  tab: 'protected-areas',
-  subtab: 'protected-areas-preview',
+  tab: 'planning-unit',
+  subtab: 'pu-protected-areas-preview',
 };
 
 export const STATUS_VALUES = {
@@ -39,7 +39,7 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
   return metadata;
 };
 
-export const mergeScenarioStatusEditingMetaData = (obj = {}, newObj = { }) => {
+export const mergeScenarioStatusEditingMetaData = (obj = {}, newObj = {}) => {
   const { scenarioEditingMetadata = {} } = obj;
   const metadata = {
     ...obj,

@@ -48,8 +48,8 @@ interface ScenarioEditStateProps {
 }
 
 const initialState = {
-  tab: 'protected-areas',
-  subtab: 'protected-areas-preview',
+  tab: 'planning-unit',
+  subtab: 'pu-protected-areas-preview',
 
   // WDPA
   wdpaCategories: {},

@@ -161,18 +161,20 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   }, []);
 
   useEffect(() => {
-    const { touched, values: stateValues } = formRef.current?.getState();
+    if (formRef.current) {
+      const { touched = false, values: stateValues } = formRef?.current?.getState();
 
-    const {
-      wdpaIucnCategories: wdpaIucnCategoriesTouched,
-      uploadedProtectedArea: uploadedProtectedAreaTouched,
-    } = touched;
+      const {
+        wdpaIucnCategories: wdpaIucnCategoriesTouched,
+        uploadedProtectedArea: uploadedProtectedAreaTouched,
+      } = touched;
 
-    if (wdpaIucnCategoriesTouched) {
-      dispatch(setWDPACategories(stateValues));
-    }
-    if (uploadedProtectedAreaTouched) {
-      refetchProtectedAreas();
+      if (wdpaIucnCategoriesTouched) {
+        dispatch(setWDPACategories(stateValues));
+      }
+      if (uploadedProtectedAreaTouched) {
+        refetchProtectedAreas();
+      }
     }
   }, [dispatch, refetchProtectedAreas, setWDPACategories, formRef]); //eslint-disable-line
 
