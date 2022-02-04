@@ -50,7 +50,7 @@ describe(`when given GeoJson has pu costs`, () => {
 });
 
 describe(`when given GeoJson has some negative pu costs`, () => {
-  it(`resolves them`, () => {
+  it(`throws exception`, () => {
     expect(() => sut.extract(fixtures.geoFeaturesWithNegativeCost())).toThrow(
       /invalid cost/,
     );
