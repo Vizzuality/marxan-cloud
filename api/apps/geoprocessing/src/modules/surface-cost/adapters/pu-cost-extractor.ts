@@ -15,13 +15,18 @@ export class PuCostExtractor implements PuExtractorPort {
 
     const puCosts = input.features
       .map((feature) => feature.properties)
-      .filter(this.hasCostValues)
-      .filter(this.costIsEqualOrGreaterThanZero);
+      .filter(this.hasCostValues);
 
     if (puCosts.length !== input.features.length) {
       throw new Error(
-        `Some of the Features has an invalid cost or are missing cost and/or planning unit id.`,
+        `Some of the Features are missing cost and/or planning unit id.`,
       );
+    }
+
+    const validPUCosts = puCosts.every(this.hasACostEqualOrGreaterThanZero);
+
+    if (!validPUCosts) {
+      throw new Error(`Some of the Features has invalid cost values`);
     }
 
     return puCosts.map((puCost) => ({
@@ -42,7 +47,7 @@ export class PuCostExtractor implements PuExtractorPort {
     );
   }
 
-  private costIsEqualOrGreaterThanZero(puCost: PlanningUnitCost): boolean {
+  private hasACostEqualOrGreaterThanZero(puCost: PlanningUnitCost): boolean {
     return puCost.cost >= 0;
   }
 }
