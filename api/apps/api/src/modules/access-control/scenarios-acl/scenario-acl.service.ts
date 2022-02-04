@@ -28,6 +28,7 @@ import {
   lockedByAnotherUser,
   lockedScenario,
   LockService,
+  noLockInPlace,
 } from './locks/lock.service';
 import { ScenarioLockDto } from './locks/dto/scenario.lock.dto';
 
@@ -187,9 +188,6 @@ export class ScenarioAclService implements ScenarioAccessControl {
     if (!(await this.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    if (!(await this.lockService.isLocked(scenarioId))) {
-      return left(lockedScenario);
-    }
     const result = await this.lockService.acquireLock(scenarioId, userId);
     if (isLeft(result)) {
       return result;
@@ -201,14 +199,38 @@ export class ScenarioAclService implements ScenarioAccessControl {
     userId: string,
     scenarioId: string,
     projectId: string,
-  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
-    if (
-      !(await this.canEditScenario(userId, scenarioId)) ||
-      !(await this.canReleaseLock(userId, projectId))
-    ) {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      void
+    >
+  > {
+    /*
+     * Using named variables instead of direct usage of functions
+     * for clarity when understanding the steps to release a lock
+     */
+    const scenarioIsLocked = await this.lockService.isLocked(scenarioId);
+    const canReleaseLockFromProjectLevel = await this.canReleaseLock(
+      userId,
+      projectId,
+    );
+    const canEditScenario = await this.canEditScenario(userId, scenarioId);
+    const scenarioIsLockedByUser = await this.lockService.isLockedByUser(
+      scenarioId,
+      userId,
+    );
+
+    if (!scenarioIsLocked) {
+      return left(noLockInPlace);
+    }
+    if (!canEditScenario && !canReleaseLockFromProjectLevel) {
       return left(forbiddenError);
     }
-    if (!(await this.lockService.isLockedByUser(scenarioId, userId))) {
+    if (
+      !canReleaseLockFromProjectLevel &&
+      canEditScenario &&
+      !scenarioIsLockedByUser
+    ) {
       return left(lockedByAnotherUser);
     }
     await this.lockService.releaseLock(scenarioId);
@@ -216,7 +238,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return right(void 0);
   }
 
-  async userCanEditLock(
+  async canEditScenarioAndOwnsLock(
     userId: string,
     scenarioId: string,
   ): Promise<

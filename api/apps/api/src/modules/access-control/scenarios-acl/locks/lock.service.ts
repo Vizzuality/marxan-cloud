@@ -11,6 +11,7 @@ export const lockedScenario = Symbol(`scenario is already locked`);
 export const lockedByAnotherUser = Symbol(
   `scenario is locked by a different user`,
 );
+export const noLockInPlace = Symbol(`scenario has no locks`);
 
 export type AcquireFailure = typeof unknownError | typeof lockedScenario;
 
