@@ -2,6 +2,8 @@ import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Queue } from 'bullmq';
+import { Either, Left, Right } from 'fp-ts/lib/Either';
+import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
 import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
 import { CostSurfaceEventsPort } from '../ports/cost-surface-events.port';
 import { UpdateCostSurface } from './update-cost-surface.command';
@@ -46,7 +48,7 @@ beforeEach(async () => {
 });
 
 describe(`when job submits successfully`, () => {
-  let result: unknown;
+  let result: Either<typeof jobSubmissionFailed, true>;
   beforeEach(async () => {
     // Asset
     addJobMock.mockResolvedValue({ job: { id: 1 } });
@@ -54,8 +56,8 @@ describe(`when job submits successfully`, () => {
     result = await sut.execute(new UpdateCostSurface(scenarioId, shapefile));
   });
 
-  it(`should return`, () => {
-    expect(result).toEqual(undefined);
+  it(`should return right`, () => {
+    expect((result as Right<true>).right).toBe(true);
   });
 
   it(`should put job to queue`, () => {
@@ -86,7 +88,7 @@ describe(`when job submits successfully`, () => {
 });
 
 describe(`when job submission fails`, () => {
-  let result: unknown;
+  let result: Either<typeof jobSubmissionFailed, true>;
   beforeEach(async () => {
     // Asset
     addJobMock.mockRejectedValue(new Error('Oups'));
@@ -94,8 +96,10 @@ describe(`when job submission fails`, () => {
     result = await sut.execute(new UpdateCostSurface(scenarioId, shapefile));
   });
 
-  it(`should return`, () => {
-    expect(result).toEqual(undefined);
+  it(`should return left`, () => {
+    expect((result as Left<typeof jobSubmissionFailed>).left).toBe(
+      jobSubmissionFailed,
+    );
   });
 
   it(`should log the error`, () => {
