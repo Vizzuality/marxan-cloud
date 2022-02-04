@@ -122,6 +122,7 @@ import {
   unknownError as scenarioUnknownError,
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
+  lockedByAnotherUser,
   lockedScenario,
   unknownError as lockUnknownError,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
@@ -1167,6 +1168,8 @@ export class ScenariosController {
           throw new BadRequestException(
             `Scenario ${id} is already being edited.`,
           );
+        case lockUnknownError:
+          throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
@@ -1185,10 +1188,20 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    const result = await this.scenarioAclService.releaseLock(req.user.id, id);
+    const result = await this.service.releaseLock(req.user.id, id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case lockedByAnotherUser:
+          throw new BadRequestException(
+            'Scenario lock belong to a different user.',
+          );
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
   }
 }

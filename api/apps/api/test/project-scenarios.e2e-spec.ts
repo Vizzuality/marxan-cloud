@@ -3,7 +3,7 @@ import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { FakeQueue } from './utils/queues';
 import { bootstrapApplication } from './utils/api-application';
-import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { GivenUserIsLoggedIn, userObj } from './steps/given-user-is-logged-in';
 import { queueName } from '@marxan-api/modules/planning-units-protection-level/queue.name';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
@@ -179,6 +179,29 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenScenarioIsUpdated(response);
   });
 
+  it('Releases a scenario lock correctly', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    const userToken = await fixtures.GivenUserIsLoggedIn('owner');
+
+    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    fixtures.ThenScenarioLockInfoIsReturned(response);
+
+    response = await fixtures.WhenReleasingLockForScenario(userToken);
+    fixtures.ThenOkIsReturned(response);
+  });
+
+  it('Fails to release a scenario lock as its not the same user', async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario();
+    const userToken = await fixtures.GivenUserIsLoggedIn('contributor');
+
+    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    fixtures.ThenScenarioLockInfoIsReturned(response);
+
+    response = await fixtures.WhenReleasingLockForScenario(userToken);
+    fixtures.ThenScenarioIsLockedByAnotherUserIsReturned(response);
+  });
+
   it('should not allow to create scenario with invalid marxan properties', async () => {
     const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
@@ -226,6 +249,11 @@ async function getFixtures() {
       await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
       await app.close();
+    },
+
+    GivenUserIsLoggedIn: async (user: string) => {
+      const userToken = userObj[user as keyof typeof userObj];
+      return await GivenUserIsLoggedIn(app, userToken);
     },
 
     GivenScenarioWasCreated: async () => {
@@ -394,6 +422,11 @@ async function getFixtures() {
         .send({ name: 'Updated Scenario', description: 'Updated Description' })
         .set('Authorization', `Bearer ${contributorToken}`),
 
+    WhenReleasingLockForScenario: async (token: string) =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/lock`)
+        .set('Authorization', `Bearer ${token}`),
+
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
     },
@@ -412,6 +445,14 @@ async function getFixtures() {
       expect(error.title).toEqual(
         `Scenario ${scenarioId} is already being edited.`,
       );
+    },
+
+    ThenScenarioIsLockedByAnotherUserIsReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(400);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual('Scenario lock belong to a different user.');
     },
 
     ThenScenarioIsCreatedAndNoJobHasBeenSubmitted: (

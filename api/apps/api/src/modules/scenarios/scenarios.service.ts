@@ -97,6 +97,7 @@ import {
 import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
 import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
 import {
+  lockedByAnotherUser,
   lockedScenario,
   LockService,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
@@ -949,5 +950,23 @@ export class ScenariosService {
       return result;
     }
     return right(true);
+  }
+
+  async releaseLock(
+    scenarioId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+    if (isLeft(scenario)) {
+      return left(forbiddenError);
+    }
+    const projectId = scenario.right.projectId;
+    return await this.scenarioAclService.releaseLock(
+      userId,
+      scenarioId,
+      projectId,
+    );
   }
 }
