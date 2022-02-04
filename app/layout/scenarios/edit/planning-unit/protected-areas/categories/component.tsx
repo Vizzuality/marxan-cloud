@@ -73,7 +73,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   });
 
   const onCalculateProtectedAreas = useCallback((values) => {
-    console.log('entro en oncalculate protected areas');
     const { wdpaIucnCategories } = values;
 
     const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
@@ -104,7 +103,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   ]);
 
   const onSubmit = (values) => {
-    console.log('enttro en onSubmit');
     const { touched } = formRef.current?.getState();
     const protectedAreasTouched = Object.values(touched).includes(true);
 
