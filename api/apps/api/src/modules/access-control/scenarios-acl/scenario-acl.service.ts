@@ -26,7 +26,6 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 import {
   AcquireFailure,
   lockedByAnotherUser,
-  lockedScenario,
   LockService,
   noLockInPlace,
 } from './locks/lock.service';
@@ -219,12 +218,11 @@ export class ScenarioAclService implements ScenarioAccessControl {
       scenarioId,
       userId,
     );
-
-    if (!scenarioIsLocked) {
-      return left(noLockInPlace);
-    }
     if (!canEditScenario && !canReleaseLockFromProjectLevel) {
       return left(forbiddenError);
+    }
+    if (!scenarioIsLocked) {
+      return left(noLockInPlace);
     }
     if (
       !canReleaseLockFromProjectLevel &&
@@ -238,20 +236,31 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return right(void 0);
   }
 
-  async canEditScenarioAndOwnsLock(
+  async canEditScenarioAndLockLogicIsCorrect(
     userId: string,
     scenarioId: string,
   ): Promise<
-    Either<typeof forbiddenError | typeof lockedByAnotherUser, boolean>
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      boolean
+    >
   > {
-    if (!(await this.canEditScenario(userId, scenarioId))) {
+    const scenarioIsLocked = await this.lockService.isLocked(scenarioId);
+    const canEditScenario = await this.canEditScenario(userId, scenarioId);
+    const scenarioIsLockedByUser = await this.lockService.isLockedByUser(
+      scenarioId,
+      userId,
+    );
+    if (!canEditScenario) {
       return left(forbiddenError);
     }
-    const result = await this.lockService.isLockedByUser(scenarioId, userId);
-    if (!result) {
+    if (!scenarioIsLocked) {
+      return left(noLockInPlace);
+    }
+    if (!scenarioIsLockedByUser) {
       return left(lockedByAnotherUser);
     }
-    return right(result);
+    return right(scenarioIsLocked && canEditScenario && scenarioIsLockedByUser);
   }
 
   async findUsersInScenario(

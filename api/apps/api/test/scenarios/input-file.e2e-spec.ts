@@ -399,8 +399,8 @@ describe(`when a contributor updates scenario with invalid input data`, () => {
     const scenarioData = await fixtures.GivenScenarioExists();
     scenarioId = scenarioData.id;
     originalMetadata = scenarioData.attributes.metadata;
-    await fixtures.WhenAcquiringLockForScenarioAsContributor(scenarioId);
     await fixtures.GivenContributorWasAddedToScenario();
+    await fixtures.WhenAcquiringLockForScenarioAsContributor(scenarioId);
     // when
     response = await fixtures.WhenUpdatesScenarioWithInputAsContributor(
       scenarioId,
