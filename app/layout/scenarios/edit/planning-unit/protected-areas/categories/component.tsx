@@ -55,7 +55,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
-    refetch: refetchProtectedAreas,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
       || projectData?.adminAreaLevel1I
@@ -143,16 +142,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       {({ form, values, handleSubmit }) => {
         formRef.current = form;
 
-        const { touched, values: stateValues } = formRef?.current?.getState();
+        const { values: stateValues } = formRef?.current?.getState();
         dispatch(setWDPACategories(stateValues));
-
-        const {
-          uploadedProtectedArea: uploadedProtectedAreaTouched,
-        } = touched;
-
-        if (uploadedProtectedAreaTouched) {
-          refetchProtectedAreas();
-        }
 
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
