@@ -1,5 +1,4 @@
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
-import { string } from 'fp-ts';
 import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '..';
 import { ScenarioLockDto } from './locks/dto/scenario.lock.dto';
