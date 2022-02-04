@@ -8,6 +8,7 @@ import {
   AcquireFailure,
   lockedByAnotherUser,
   lockedScenario,
+  noLockInPlace,
 } from '../lock.service';
 
 @Injectable()
@@ -48,13 +49,18 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
     userId: string,
     scenarioId: string,
     projectId: string,
-  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      void
+    >
+  > {
     if (this.mock(userId, scenarioId)) {
       return left(forbiddenError);
     }
     return right(void 0);
   }
-  async userCanEditLock(
+  async canEditScenarioAndOwnsLock(
     userId: string,
     scenarioId: string,
   ): Promise<

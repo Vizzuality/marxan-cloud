@@ -122,6 +122,7 @@ import {
   unknownError as scenarioUnknownError,
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
+  noLockInPlace,
   lockedByAnotherUser,
   lockedScenario,
   unknownError as lockUnknownError,
@@ -1198,6 +1199,8 @@ export class ScenariosController {
           throw new BadRequestException(
             'Scenario lock belong to a different user.',
           );
+        case noLockInPlace:
+          throw new NotFoundException(`Scenario ${id} has no locks in place.`);
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;

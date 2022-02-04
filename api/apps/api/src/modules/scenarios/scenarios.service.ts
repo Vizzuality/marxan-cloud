@@ -100,6 +100,7 @@ import {
   lockedByAnotherUser,
   lockedScenario,
   LockService,
+  noLockInPlace,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 
 /** @debt move to own module */
@@ -955,7 +956,12 @@ export class ScenariosService {
   async releaseLock(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      void
+    >
+  > {
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
     });
