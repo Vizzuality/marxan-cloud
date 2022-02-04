@@ -5,7 +5,11 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import {
+  OverlayContainer,
+} from '@react-aria/overlays';
 import { format } from 'd3';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { useScenarioCalibrationResults } from 'hooks/scenarios';
 
@@ -19,6 +23,7 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
+import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import ZOOM_SVG from 'svgs/ui/zoom.svg?sprite';
 
 export interface ScenariosBlmSettingsGraphProps {
@@ -31,6 +36,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
   minBlmValue,
 }: ScenariosBlmSettingsGraphProps) => {
   const [zoomImage, setZoomImage] = useState(false);
+
   const { query } = useRouter();
   const { sid } = query;
 
@@ -64,16 +70,16 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                   noValidate
                   onSubmit={handleSubmit}
                 >
-                  <div className="absolute right-0">
-                    <img src={blmImage || '/images/mock/blm-mock-image.png'} alt="selected blm" className="rounded-lg " />
-                    <button
-                      className="absolute bottom-0 right-0 z-50 w-5 h-5 rounded-tl-lg rounded-br-lg bg-primary-500"
-                      type="button"
-                      onClick={() => setZoomImage(true)}
-                    >
+                  <button
+                    className="absolute right-0"
+                    type="button"
+                    onClick={() => setZoomImage(true)}
+                  >
+                    <img src={blmImage || '/images/mock/blm-mock-image.png'} alt="selected blm" className="border-2 border-transparent rounded-lg hover:border-primary-500" />
+                    <div className="absolute bottom-0 right-0 z-50 w-5 h-5 mb-0.5 mr-0.5 rounded-tl-lg rounded-br-lg bg-primary-500">
                       <Icon icon={ZOOM_SVG} />
-                    </button>
-                  </div>
+                    </div>
+                  </button>
 
                   <div className="flex flex-col">
                     <div className="flex items-center space-x-2">
@@ -139,7 +145,46 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
           />
         </div>
       )}
-      {zoomImage && <div>Here we have big blm image</div>}
+      <AnimatePresence>
+        {zoomImage && (
+          <OverlayContainer>
+            <motion.div
+              id="overlay"
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: zoomImage ? 1 : 0,
+                transition: {
+                  delay: 0,
+                },
+              }}
+              exit={{
+                opacity: 0,
+                transition: {
+                  delay: 0.125,
+                },
+              }}
+              className="fixed inset-0 z-50 bg-black bg-blur"
+            >
+              <div className="absolute left-0 right-0 w-full h-full mx-auto text-center top-2/4">
+                <button
+                  className="relative"
+                  type="button"
+                  onClick={() => setZoomImage(false)}
+                >
+                  <img src={blmImage || '/images/mock/blm-mock-image.png'} alt="selected blm" className="border-4 border-transparent rounded-xl hover:border-primary-500 w-60 h-60" />
+                  <div className="absolute bottom-0 right-0 z-50 flex items-center justify-center w-6 h-6 mb-1 mr-1 rounded-tl-lg rounded-br-xl bg-primary-500">
+                    <Icon icon={CLOSE_SVG} className="w-3 h-3 text-black" />
+                  </div>
+                </button>
+              </div>
+
+            </motion.div>
+          </OverlayContainer>
+        )}
+      </AnimatePresence>
+
     </>
   );
 };
