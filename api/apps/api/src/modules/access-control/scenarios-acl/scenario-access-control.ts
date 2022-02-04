@@ -1,8 +1,9 @@
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
+import { string } from 'fp-ts';
 import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '..';
 import { ScenarioLockDto } from './locks/dto/scenario.lock.dto';
-import { lockedScenario } from './locks/lock.service';
+import { AcquireFailure, lockedByAnotherUser } from './locks/lock.service';
 export abstract class ScenarioAccessControl {
   abstract canEditScenario(scenarioId: string, userId: string): Promise<Permit>;
   abstract canViewScenario(scenarioId: string, userId: string): Promise<Permit>;
@@ -19,11 +20,16 @@ export abstract class ScenarioAccessControl {
   abstract acquireLock(
     userId: string,
     scenarioId: string,
-  ): Promise<
-    Either<typeof forbiddenError | typeof lockedScenario, ScenarioLockDto>
-  >;
+  ): Promise<Either<typeof forbiddenError | AcquireFailure, ScenarioLockDto>>;
   abstract releaseLock(
     userId: string,
     scenarioId: string,
-  ): Promise<Either<typeof forbiddenError, void>>;
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>>;
+  abstract userCanEditLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<
+    Either<typeof forbiddenError | typeof lockedByAnotherUser, boolean>
+  >;
 }

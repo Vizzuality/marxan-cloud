@@ -25,6 +25,7 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import {
   AcquireFailure,
+  lockedByAnotherUser,
   lockedScenario,
   LockService,
 } from './locks/lock.service';
@@ -182,15 +183,16 @@ export class ScenarioAclService implements ScenarioAccessControl {
   async acquireLock(
     userId: string,
     scenarioId: string,
-  ): Promise<
-    Either<typeof forbiddenError | typeof lockedScenario, ScenarioLockDto>
-  > {
+  ): Promise<Either<typeof forbiddenError | AcquireFailure, ScenarioLockDto>> {
     if (!(await this.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
+    if (!(await this.lockService.isLocked(scenarioId))) {
+      return left(lockedScenario);
+    }
     const result = await this.lockService.acquireLock(scenarioId, userId);
     if (isLeft(result)) {
-      return left(lockedScenario);
+      return result;
     }
     return result;
   }
@@ -198,13 +200,36 @@ export class ScenarioAclService implements ScenarioAccessControl {
   async releaseLock(
     userId: string,
     scenarioId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
-    if (!(await this.canEditScenario(userId, scenarioId))) {
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
+    if (
+      !(await this.canEditScenario(userId, scenarioId)) ||
+      !(await this.canReleaseLock(userId, projectId))
+    ) {
       return left(forbiddenError);
+    }
+    if (!(await this.lockService.isLockedByUser(scenarioId, userId))) {
+      return left(lockedByAnotherUser);
     }
     await this.lockService.releaseLock(scenarioId);
 
     return right(void 0);
+  }
+
+  async userCanEditLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<
+    Either<typeof forbiddenError | typeof lockedByAnotherUser, boolean>
+  > {
+    if (!(await this.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    const result = await this.lockService.isLockedByUser(scenarioId, userId);
+    if (!result) {
+      return left(lockedByAnotherUser);
+    }
+    return right(result);
   }
 
   async findUsersInScenario(

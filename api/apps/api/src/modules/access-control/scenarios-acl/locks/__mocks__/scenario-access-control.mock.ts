@@ -4,7 +4,11 @@ import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenar
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { ScenarioLockDto } from '../dto/scenario.lock.dto';
-import { lockedScenario } from '../lock.service';
+import {
+  AcquireFailure,
+  lockedByAnotherUser,
+  lockedScenario,
+} from '../lock.service';
 
 @Injectable()
 export class ScenarioAccessControlMock implements ScenarioAccessControl {
@@ -31,24 +35,34 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
   async acquireLock(
     userId: string,
     scenarioId: string,
-  ): Promise<
-    Either<typeof forbiddenError | typeof lockedScenario, ScenarioLockDto>
-  > {
+  ): Promise<Either<typeof forbiddenError | AcquireFailure, ScenarioLockDto>> {
     if (this.mock(userId, scenarioId)) {
       return left(lockedScenario);
     }
-    if(this.mock(userId, scenarioId)) {
+    if (this.mock(userId, scenarioId)) {
       return left(forbiddenError);
-    } 
-    return right({ userId, scenarioId, createdAt: new Date()});
-  };
+    }
+    return right({ userId, scenarioId, createdAt: new Date() });
+  }
   async releaseLock(
     userId: string,
     scenarioId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
-      if(this.mock(userId, scenarioId)) {
-        return left(forbiddenError);
-      } 
-      return right(void 0);
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
+    if (this.mock(userId, scenarioId)) {
+      return left(forbiddenError);
+    }
+    return right(void 0);
+  }
+  async userCanEditLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<
+    Either<typeof forbiddenError | typeof lockedByAnotherUser, boolean>
+  > {
+    if (this.mock(userId, scenarioId)) {
+      return left(forbiddenError);
+    }
+    return right(this.mock(userId, scenarioId));
   }
 }
