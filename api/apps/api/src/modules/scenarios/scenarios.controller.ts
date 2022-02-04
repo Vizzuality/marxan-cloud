@@ -7,6 +7,8 @@ import {
   ForbiddenException,
   Get,
   Header,
+  HttpCode,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -33,6 +35,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -450,10 +453,12 @@ export class ScenariosController {
       switch (result.left) {
         case forbiddenError:
           throw new ForbiddenException();
-        case lockedScenario:
+        case lockedByAnotherUser:
           throw new BadRequestException(
             `Scenario ${id} is already being edited.`,
           );
+        case noLockInPlace:
+          throw new NotFoundException(`Scenario ${id} has no locks in place.`);
         default:
           const _check: never = result.left;
           throw new InternalServerErrorException();
@@ -1184,12 +1189,17 @@ export class ScenariosController {
     summary: `Releases the lock created on a scenario so other
     users can start editing the scenario.`,
   })
-  @Post(`:id/release-lock`)
+  @ApiNoContentResponse({
+    status: 204,
+    description: 'User was deleted correctly',
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Patch(`:id/release-lock`)
   async endScenarioEditingSession(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    const result = await this.service.releaseLock(req.user.id, id);
+    const result = await this.service.releaseLock(id, req.user.id);
 
     if (isLeft(result)) {
       switch (result.left) {

@@ -98,7 +98,6 @@ import { UpdateCostSurface } from './cost-surface/application/update-cost-surfac
 import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
 import {
   lockedByAnotherUser,
-  lockedScenario,
   LockService,
   noLockInPlace,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
@@ -274,7 +273,12 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     input: UpdateScenarioDTO,
-  ): Promise<Either<typeof forbiddenError | typeof lockedScenario, Scenario>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      Scenario
+    >
+  > {
     await this.assertScenario(scenarioId);
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
@@ -282,11 +286,12 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return left(forbiddenError);
     }
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
-    }
-    if (!(await this.lockService.isLockedByUser(scenarioId, userId))) {
-      return left(lockedScenario);
+    const aclAndLockLogic = await this.scenarioAclService.canEditScenarioAndLockLogicIsCorrect(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(aclAndLockLogic)) {
+      return aclAndLockLogic;
     }
     await this.blockGuard.ensureThatProjectIsNotBlocked(
       scenario.right.projectId,
