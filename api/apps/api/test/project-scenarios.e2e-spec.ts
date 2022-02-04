@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
@@ -14,13 +13,16 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { GivenUserExists } from './steps/given-user-exists';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { GivenProjectExists } from './steps/given-project';
+import { UsersProjectsApiEntity } from '../src/modules/access-control/projects-acl/entity/users-projects.api.entity';
+import { ProjectRoles } from '../src/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { ProjectsTestUtils } from './utils/projects.test.utils';
 
 let fixtures: FixtureType<typeof getFixtures>;
-const logger = new Logger('test');
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-});
+}, 12_000);
 afterEach(async () => {
   await fixtures?.cleanup();
 });
@@ -53,6 +55,7 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Creating a scenario will succeed because the user is a project contributor', async () => {
+    await fixtures.GivenContributorWasAddedToProject();
     const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsContributor();
     fixtures.ThenScenarioIsCreated(response);
   });
@@ -195,11 +198,7 @@ async function getFixtures() {
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
 
-  const allProjectsResponse = await request(app.getHttpServer())
-    .get('/api/v1/projects')
-    .set('Authorization', `Bearer ${ownerToken}`)
-    .expect(200);
-  const projectId = allProjectsResponse.body.data[0].id;
+  const { projectId } = await GivenProjectExists(app, ownerToken);
 
   const minimalCreateScenarioDTO: Partial<CreateScenarioDTO> = {
     ...E2E_CONFIG.scenarios.valid.minimal(),
@@ -219,14 +218,15 @@ async function getFixtures() {
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
   );
-  const cleanups: (() => Promise<void>)[] = [];
+  const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
+    getRepositoryToken(UsersProjectsApiEntity),
+  );
 
   return {
     cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
+      if (scenarioId)
+        await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
+      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
       await app.close();
     },
 
@@ -237,8 +237,16 @@ async function getFixtures() {
         projectId,
       });
       scenarioId = result.data.id;
-      return result.data.id;
+
+      return scenarioId;
     },
+
+    GivenContributorWasAddedToProject: async () =>
+      await userProjectsRepo.save({
+        projectId,
+        roleName: ProjectRoles.project_contributor,
+        userId: contributorUserId,
+      }),
 
     GivenContributorWasAddedToScenario: async () =>
       await userScenariosRepo.save({
@@ -266,14 +274,8 @@ async function getFixtures() {
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
         .send(minimalCreateScenarioDTO);
-      cleanups.push(
-        async () =>
-          await ScenariosTestUtils.deleteScenario(
-            app,
-            ownerToken,
-            response.body.data.attributes.id,
-          ),
-      );
+
+      scenarioId = response.body.data.id;
       return response;
     },
 
@@ -282,14 +284,8 @@ async function getFixtures() {
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${contributorToken}`)
         .send(minimalCreateScenarioDTO);
-      cleanups.push(
-        async () =>
-          await ScenariosTestUtils.deleteScenario(
-            app,
-            contributorToken,
-            response.body.data.attributes.id,
-          ),
-      );
+
+      scenarioId = response.body.data.id;
       return response;
     },
 
@@ -304,14 +300,8 @@ async function getFixtures() {
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
         .send(completeCreateScenarioDTO);
-      cleanups.push(
-        async () =>
-          await ScenariosTestUtils.deleteScenario(
-            app,
-            ownerToken,
-            response.body.data.attributes.id,
-          ),
-      );
+
+      scenarioId = response.body.data.id;
       return response;
     },
 
