@@ -60,7 +60,7 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
     }
     return right(void 0);
   }
-  async canEditScenarioAndOwnsLock(
+  async canEditScenarioAndLockLogicIsCorrect(
     userId: string,
     scenarioId: string,
   ): Promise<
