@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef,
+  useEffect, useMemo, useRef,
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
@@ -13,7 +13,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
-import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
+import { useWDPACategories } from 'hooks/wdpa';
 
 import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
@@ -65,55 +65,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
       && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
   });
-
-  const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
-    requestConfig: {
-      method: 'POST',
-    },
-  });
-
-  const onCalculateProtectedAreas = useCallback((values) => {
-    const { wdpaIucnCategories } = values;
-
-    const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
-      .map((pa) => {
-        return {
-          id: pa.id,
-          selected: true,
-        };
-      });
-
-    saveScenarioProtectedAreasMutation.mutate({
-      id: `${sid}`,
-      data: {
-        areas: selectedProtectedAreas,
-        threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
-      },
-    }, {
-      onSuccess: () => {
-        onSuccess();
-      },
-    });
-  }, [
-    saveScenarioProtectedAreasMutation,
-    scenarioData,
-    sid,
-    wdpaData,
-    onSuccess,
-  ]);
-
-  const onSubmit = (values) => {
-    const { touched } = formRef.current?.getState();
-    const protectedAreasTouched = Object.values(touched).includes(true);
-
-    if (protectedAreasTouched) {
-      onCalculateProtectedAreas(values);
-    }
-
-    if (!protectedAreasTouched) {
-      onSuccess();
-    }
-  };
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -173,7 +124,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   return (
     <FormRFF
-      onSubmit={onSubmit}
+      onSubmit={onSuccess}
       key="protected-areas-categories"
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
