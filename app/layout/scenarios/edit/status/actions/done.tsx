@@ -47,7 +47,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: 'planning-unit',
-            subtab: 'pu-protected-areas-threshold',
+            subtab: scenarioData?.metadata?.scenarioEditingMetadata.subtab === 'pu-protected-areas-threshold' ? null : 'pu-protected-areas-threshold',
             status: {
               'protected-areas': 'draft',
               features: 'empty',
