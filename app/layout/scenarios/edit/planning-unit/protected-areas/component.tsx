@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -27,14 +27,13 @@ export interface ScenariosSidebarEditWDPAProps {
 export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = ({
   onChangeSection,
 }: ScenariosSidebarEditWDPAProps) => {
-  const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
 
@@ -115,22 +114,21 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
             </button>
           </header>
 
-          {step === 0 && (
+          {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW) && (
             <ScenariosSidebarWDPACategories
               onSuccess={() => {
-                setStep(1);
                 dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
               }}
             />
           )}
-          {step === 1 && (
+
+          {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD) && (
             <ScenariosSidebarWDPAThreshold
               onSuccess={() => {
                 dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
                 dispatch(setSubTab(null));
               }}
               onBack={() => {
-                setStep(0);
                 dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW));
               }}
             />

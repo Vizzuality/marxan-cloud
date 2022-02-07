@@ -88,32 +88,28 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         areas: selectedProtectedAreas,
         threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
       },
-    }, {
-      onSuccess: () => {
-        onSuccess();
-      },
     });
   }, [
     saveScenarioProtectedAreasMutation,
     scenarioData,
     sid,
     wdpaData,
-    onSuccess,
   ]);
 
-  const onSubmit = (values) => {
-    const { touched } = formRef.current?.getState();
+  const onSubmit = useCallback((values) => {
+    const isModified = (values.wdpaIucnCategories.length !== wdpaData.length)
+                        || values.wdpaIucnCategories.some((v) => {
+                          return !wdpaData.filter((w) => w.selected).find((w) => w.id === v);
+                        });
 
-    const protectedAreasTouched = Object.values(touched).includes(true);
+    console.log({ isModified, wdpaData, values: values.wdpaIucnCategories });
 
-    if (protectedAreasTouched) {
+    if (isModified) {
       onCalculateProtectedAreas(values);
-    }
-
-    if (!protectedAreasTouched) {
+    } else {
       onSuccess();
     }
-  };
+  }, [wdpaData, onSuccess, onCalculateProtectedAreas]);
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {

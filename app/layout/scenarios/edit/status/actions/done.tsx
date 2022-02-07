@@ -21,6 +21,8 @@ export const useScenarioActionsDone = () => {
   const {
     setJob,
     setCache,
+    setTab,
+    setSubTab,
   } = scenarioSlice.actions;
 
   const { data: scenarioData } = useScenario(sid);
@@ -44,6 +46,14 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
+            tab: 'planning-unit',
+            subtab: 'pu-protected-areas-threshold',
+            status: {
+              'protected-areas': 'draft',
+              features: 'empty',
+              analysis: 'empty',
+              solutions: 'empty',
+            },
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -52,6 +62,9 @@ export const useScenarioActionsDone = () => {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        dispatch(setTab('planning-unit'));
+        dispatch(setSubTab('pu-protected-areas-threshold'));
+        queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
       },
       onError: () => {
@@ -71,7 +84,10 @@ export const useScenarioActionsDone = () => {
     dispatch,
     setJob,
     setCache,
+    setTab,
+    setSubTab,
     addToast,
+    queryClient,
   ]);
   // Protected Areas
   const onProtectedAreasDone = useCallback((JOB_REF) => {
@@ -83,7 +99,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: 'planning-unit',
-            subtab: 'pu-protected-areas-preview',
+            subtab: 'pu-protected-areas-threshold',
             status: {
               'protected-areas': 'draft',
               features: 'empty',
