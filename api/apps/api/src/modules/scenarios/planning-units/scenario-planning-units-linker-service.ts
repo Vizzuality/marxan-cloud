@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import {
   PlanningUnitGridShape,
-  Project,
-} from '@marxan-api/modules/projects/project.api.entity';
+  ScenariosPlanningUnitGeoEntity,
+} from '@marxan/scenarios-planning-unit';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '../scenario.api.entity';
 import { isNil } from 'lodash';
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';

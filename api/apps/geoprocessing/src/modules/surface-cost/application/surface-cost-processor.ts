@@ -1,10 +1,10 @@
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
 import {
-  canPlanningUnitsBeLocked,
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/scenarios-planning-unit';
+} from '@marxan/scenario-cost-surface';
+import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
