@@ -6,8 +6,10 @@ import {
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { JobInput } from '@marxan/scenario-cost-surface';
+import { JobInput, InitialCostJobInput } from '@marxan/scenario-cost-surface';
 import { Inject, Injectable } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { DeleteScenario } from './delete-scenario.command';
 import { surfaceCostEventsFactoryToken } from './surface-cost-queue.provider';
 
 type EventKind = { event: API_EVENT_KINDS };
@@ -27,6 +29,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
   constructor(
     @Inject(surfaceCostEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<JobInput, true>,
+    private readonly commandBus: CommandBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
     this.queueEvents.on('failed', this.failed);
@@ -59,6 +62,16 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
   }
 
   async failed(eventData: EventData<JobInput, true>): Promise<void> {
-    // TODO Remove scenario sending a command
+    const jobInput = await eventData.data;
+
+    if (this.isInitialCostJobInput(jobInput)) {
+      await this.commandBus.execute(new DeleteScenario(jobInput.scenarioId));
+    }
+  }
+
+  private isInitialCostJobInput(
+    jobInput: JobInput,
+  ): jobInput is InitialCostJobInput {
+    return (jobInput as InitialCostJobInput).puGridShape !== undefined;
   }
 }
