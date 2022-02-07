@@ -194,7 +194,6 @@ async function getFixtures() {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const noScenariosUserToken = await GivenUserIsLoggedIn(app, 'dd');
   const queue = FakeQueue.getByName(queueName);
-
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
 
@@ -224,8 +223,7 @@ async function getFixtures() {
 
   return {
     cleanup: async () => {
-      if (scenarioId)
-        await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
+      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
       await app.close();
     },
@@ -262,12 +260,11 @@ async function getFixtures() {
         userId: viewerUserId,
       }),
 
-    WhenCreatingAScenarioWithIncompleteData: async () => {
-      return await request(app.getHttpServer())
+    WhenCreatingAScenarioWithIncompleteData: async () =>
+      request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
-        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields());
-    },
+        .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields()),
 
     WhenCreatingAScenarioWithMinimumRequiredDataAsOwner: async () => {
       const response = await request(app.getHttpServer())
@@ -280,6 +277,11 @@ async function getFixtures() {
     },
 
     WhenCreatingAScenarioWithMinimumRequiredDataAsContributor: async () => {
+      await userProjectsRepo.save({
+        projectId,
+        roleName: ProjectRoles.project_contributor,
+        userId: contributorUserId,
+      });
       const response = await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${contributorToken}`)

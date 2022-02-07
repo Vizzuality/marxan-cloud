@@ -5,33 +5,35 @@ import {
   alreadyCreated,
   Blm,
   CreateFailure,
-  GetProjectFailure,
-  ProjectBlmRepo,
+  GetScenarioFailure,
   projectNotFound,
   SaveFailure,
+  SaveSuccess,
+  ScenarioBlmRepo,
+  scenarioNotFound,
 } from '../../blm-repos';
 
 @Injectable()
-export class MemoryProjectBlmRepository extends ProjectBlmRepo {
+export class MemoryScenarioBlmRepository extends ScenarioBlmRepo {
   constructor(private readonly memory: Record<string, Blm | undefined> = {}) {
     super();
   }
-  async get(projectId: string): Promise<Either<GetProjectFailure, Blm>> {
-    const blm = this.memory[projectId];
-    if (!blm) return left(projectNotFound);
+  async get(scenarioId: string): Promise<Either<GetScenarioFailure, Blm>> {
+    const blm = this.memory[scenarioId];
+    if (!blm) return left(scenarioNotFound);
 
     return right(blm);
   }
 
   async create(
-    projectId: string,
+    scenarioId: string,
     defaults: Blm['defaults'],
   ): Promise<Either<CreateFailure, true>> {
-    if (this.memory[projectId]) return left(alreadyCreated);
+    if (this.memory[scenarioId]) return left(alreadyCreated);
 
-    this.memory[projectId] = {
+    this.memory[scenarioId] = {
       defaults,
-      id: projectId,
+      id: scenarioId,
       range: [0.001, 100],
       values: [],
     };
@@ -52,6 +54,20 @@ export class MemoryProjectBlmRepository extends ProjectBlmRepo {
       range,
       values,
     };
+    return right(true);
+  }
+
+  async copy(
+    scenarioId: string,
+    blm: Blm,
+  ): Promise<Either<CreateFailure, SaveSuccess>> {
+    if (this.memory[scenarioId]) return left(alreadyCreated);
+
+    this.memory[scenarioId] = {
+      ...blm,
+      id: scenarioId,
+    };
+
     return right(true);
   }
 }

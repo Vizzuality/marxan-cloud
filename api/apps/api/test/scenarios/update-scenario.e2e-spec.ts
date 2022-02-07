@@ -63,7 +63,6 @@ async function getFixtures() {
     },
   );
 
-  await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
   const updatedName = 'Updated name';
   const updatedDescription = 'Updated description';

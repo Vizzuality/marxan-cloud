@@ -53,7 +53,7 @@ describe('start-scenario-calibration', () => {
     fixtures.ThenScenarioCalibrationIsCreated(response);
 
     response = await fixtures.WhenReadingProjectCalibrationAsOwner();
-    fixtures.ThenItHasTheUpdatedRange(response);
+    fixtures.ThenItHasNoUpdatedRange(response);
   });
 
   it(`starts an scenario calibration properly as contributor when sending a range`, async () => {
@@ -66,7 +66,7 @@ describe('start-scenario-calibration', () => {
     fixtures.ThenScenarioCalibrationIsCreated(response);
 
     response = await fixtures.WhenReadingProjectCalibrationAsContributor();
-    fixtures.ThenItHasTheUpdatedRange(response);
+    fixtures.ThenItHasNoUpdatedRange(response);
   });
 
   it(`starts an scenario calibration properly as viewer when sending a range`, async () => {
@@ -146,6 +146,7 @@ describe('start-scenario-calibration', () => {
 
     fixtures.ThenBadRequestIsReturned(response);
   });
+
   it(`throws an exception if an export is running when starting calibration as contributor`, async () => {
     await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenContributorWasAddedToScenario();
@@ -156,6 +157,7 @@ describe('start-scenario-calibration', () => {
 
     fixtures.ThenBadRequestIsReturned(response);
   });
+
   it(`throws an exception if an export is running when starting calibration as viewer`, async () => {
     await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenViewerWasAddedToScenario();

@@ -63,7 +63,6 @@ import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator
 import {
   projectDoesntExist,
   projectNotReady,
-  scenarioNotFound,
   ScenariosService,
 } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
@@ -98,15 +97,9 @@ import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-ar
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import { ProtectedAreasChangeDto } from '@marxan-api/modules/scenarios/dto/protected-area-change.dto';
 import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
-import {
-  invalidRange,
-  planningUnitAreaNotFound,
-} from '@marxan-api/modules/projects/blm/change-blm-range.command';
-import { projectNotFound } from '@marxan-api/modules/blm';
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { notFound } from './marxan-run';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 import {
@@ -121,10 +114,17 @@ import {
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
 import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
+import { BlmRangeDto } from '@marxan-api/modules/scenarios/dto/blm-range.dto';
+import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
+import { invalidRange } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
 import {
-  LockService,
+  scenarioNotFound,
+  unknownError as scenarioUnknownError,
+} from '@marxan-api/modules/blm/values/blm-repos';
+import {
   lockedScenario,
-  unknownError,
+  LockService,
+  unknownError as lockUnknownError,
 } from './locks/lock.service';
 import { ScenarioLockResult } from './locks/dto/scenario.lock.dto';
 
@@ -277,8 +277,10 @@ export class ScenariosController {
       switch (result.left) {
         case forbiddenError:
           throw new ForbiddenException();
-        case notFound:
-          throw new NotFoundException(`Scenario ${id} could not be found.`);
+        case scenarioNotFound:
+          throw new NotFoundException(`Scenario ${id} could not be found`);
+        case scenarioUnknownError:
+          throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
@@ -306,7 +308,14 @@ export class ScenariosController {
         case projectDoesntExist:
           throw new NotFoundException(`Project doesn't exist`);
         case forbiddenError:
-          throw new ForbiddenException();
+          throw new ForbiddenException(
+            `User with ID: ${req.user.id} is not allowed to create scenarios`,
+          );
+        case blmCreationFailure:
+          throw new InternalServerErrorException(
+            `Could not create initial BLM for scenario`,
+          );
+
         default:
           throw new InternalServerErrorException();
       }
@@ -1049,14 +1058,12 @@ export class ScenariosController {
     if (isLeft(result)) {
       switch (result.left) {
         case forbiddenError:
-          throw new ForbiddenException();
-        case planningUnitAreaNotFound:
-          throw new InternalServerErrorException(
-            `Could not found planning units area for scenario with ID: ${id}`,
+          throw new ForbiddenException(
+            `User with ID: ${req.user.id} is not allowed to start a calibration for scenario with ID: ${id}`,
           );
-        case projectNotFound:
+        case scenarioNotFound:
           throw new NotFoundException(
-            `Could not found project for scenario with ID: ${id}`,
+            `Could not found scenario with ID: ${id}`,
           );
         case invalidRange:
           throw new BadRequestException(
@@ -1085,11 +1092,45 @@ export class ScenariosController {
   ): Promise<BlmCalibrationRunResultDto[]> {
     const result = await this.service.getBlmCalibrationResults(id, req.user.id);
 
-    if (isLeft(result)) {
-      throw new ForbiddenException();
-    }
+    if (isLeft(result))
+      throw new ForbiddenException(
+        `User with ID: ${req.user.id} cannot view scenario with ID: ${id}`,
+      );
 
     return result.right;
+  }
+
+  @ApiOperation({
+    description: `Retrieve BLM range for a scenario.`,
+    summary: `Retrieve BLM range for a scenario.`,
+  })
+  @ApiOkResponse({
+    type: BlmRangeDto,
+    isArray: true,
+  })
+  @Get(`:id/blm/range`)
+  async getBlmRange(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<BlmRangeDto> {
+    const result = await this.service.getBlmRange(id, req.user.id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException(
+            `User with ID: ${req.user.id} cannot retrieve BLM range for scenario with ID: ${id}`,
+          );
+        case scenarioNotFound:
+          throw new NotFoundException(
+            `Could not found project for scenario with ID: ${id}`,
+          );
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return BlmRangeDto.fromBlmValues(result.right);
   }
 
   @ApiOperation({
@@ -1128,7 +1169,7 @@ export class ScenariosController {
           throw new BadRequestException(
             `Scenario ${id} is already being edited.`,
           );
-        case unknownError:
+        case lockUnknownError:
           throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;

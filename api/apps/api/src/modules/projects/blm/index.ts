@@ -1,8 +1,8 @@
 export { ProjectBlmModule } from './project-blm.module';
 
 export {
-  ChangeRangeErrors,
+  ChangeProjectRangeErrors,
   unknownError,
   invalidRange,
-  ChangeBlmRange,
-} from './change-blm-range.command';
+  ChangeProjectBlmRange,
+} from './change-project-blm-range.command';

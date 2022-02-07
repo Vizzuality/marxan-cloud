@@ -569,7 +569,7 @@ async function getFixtures() {
         };
       },
     ) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .patch(`/api/v1/scenarios/${id}`)
         .set('Authorization', `Bearer ${ownerToken}`)
         .send(input);
@@ -582,7 +582,7 @@ async function getFixtures() {
         };
       },
     ) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .patch(`/api/v1/scenarios/${id}`)
         .set('Authorization', `Bearer ${contributorToken}`)
         .send(input);
@@ -605,7 +605,7 @@ async function getFixtures() {
         };
       },
     ) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .patch(`/api/v1/scenarios/${id}`)
         .set('Authorization', `Bearer ${viewerToken}`)
         .send(input);

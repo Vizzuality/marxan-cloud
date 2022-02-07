@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
@@ -59,9 +58,6 @@ test(`project viewer role assigned`, async () => {
 });
 
 const getFixtures = async () => {
-  let userScenariosRepoMock: jest.Mocked<Repository<UsersScenariosApiEntity>>;
-  let userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>>;
-
   const userScenariosToken = getRepositoryToken(UsersScenariosApiEntity);
   const userProjectsToken = getRepositoryToken(UsersProjectsApiEntity);
 
@@ -92,8 +88,8 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ScenarioAclService);
 
-  userScenariosRepoMock = sandbox.get(userScenariosToken);
-  userProjectsRepoMock = sandbox.get(userProjectsToken);
+  const userScenariosRepoMock = sandbox.get(userScenariosToken);
+  const userProjectsRepoMock = sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>

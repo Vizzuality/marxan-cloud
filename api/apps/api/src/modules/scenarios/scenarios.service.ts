@@ -58,11 +58,6 @@ import {
 import { ProtectedAreasChangeDto } from './dto/protected-area-change.dto';
 import { UploadShapefileDto } from '@marxan-api/modules/scenarios/dto/upload.shapefile.dto';
 import {
-  ChangeBlmRange,
-  ChangeRangeErrors,
-} from '@marxan-api/modules/projects/blm';
-import { GetFailure, ProjectBlmRepo } from '@marxan-api/modules/blm';
-import {
   CalibrationRunResult,
   ScenarioCalibrationRepo,
 } from '../blm/values/scenario-calibration-repo';
@@ -80,6 +75,19 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
+import {
+  blmCreationFailure,
+  CreateInitialScenarioBlm,
+} from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
+import {
+  ChangeScenarioBlmRange,
+  ChangeScenarioRangeErrors,
+} from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
+import { ScenarioBlmRepo } from '@marxan-api/modules/blm/values';
+import {
+  GetScenarioFailure,
+  scenarioNotFound,
+} from '@marxan-api/modules/blm/values/blm-repos';
 import { ResourceId } from '../clone';
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
 import { lockedScenario, LockService } from './locks/lock.service';
@@ -100,8 +108,6 @@ export type ProjectNotReady = typeof projectNotReady;
 
 export const projectDoesntExist = Symbol(`project doesn't exist`);
 export type ProjectDoesntExist = typeof projectDoesntExist;
-
-export const scenarioNotFound = Symbol(`scenario not found`);
 
 export type SubmitProtectedAreaError =
   | GetProjectErrors
@@ -142,7 +148,7 @@ export class ScenariosService {
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
-    private readonly blmValuesRepository: ProjectBlmRepo,
+    private readonly blmValuesRepository: ScenarioBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
     private readonly scenarioAclService: ScenarioAccessControl,
     private readonly lockService: LockService,
@@ -159,7 +165,7 @@ export class ScenariosService {
     scenarioId: string,
     info: AppInfoDTO,
     fetchSpecification?: FetchSpecification,
-  ): Promise<Either<typeof notFound | typeof forbiddenError, Scenario>> {
+  ): Promise<Either<GetScenarioFailure | typeof forbiddenError, Scenario>> {
     try {
       assertDefined(info.authenticatedUser);
       const scenario = await this.crudService.getById(
@@ -176,7 +182,7 @@ export class ScenariosService {
       }
       return right(scenario);
     } catch (error) {
-      return left(notFound);
+      return left(scenarioNotFound);
     }
   }
 
@@ -198,6 +204,8 @@ export class ScenariosService {
     info: AppInfoDTO,
   ): Promise<
     Either<
+      | typeof forbiddenError
+      | typeof blmCreationFailure
       | ProjectNotReady
       | ProjectDoesntExist
       | SetInitialCostSurfaceError
@@ -226,8 +234,17 @@ export class ScenariosService {
         return left(projectNotReady);
       }
     }
-
     const scenario = await this.crudService.create(validatedMetadata, info);
+    const blmCreationResult = await this.commandBus.execute(
+      new CreateInitialScenarioBlm(scenario.id, scenario.projectId),
+    );
+
+    if (isLeft(blmCreationResult)) {
+      await this.crudService.remove(scenario.id);
+
+      return blmCreationResult;
+    }
+
     await this.planningUnitsLinkerService.link(scenario);
 
     const costSurfaceInitializationResult = await this.commandBus.execute(
@@ -429,18 +446,40 @@ export class ScenariosService {
     return right(void 0);
   }
 
+  async getBlmRange(
+    scenarioId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      typeof scenarioNotFound | typeof forbiddenError | GetScenarioFailure,
+      [number, number]
+    >
+  > {
+    const userIsAllowed = await this.scenarioAclService.canViewScenario(
+      userId,
+      scenarioId,
+    );
+    if (!userIsAllowed) return left(forbiddenError);
+    const blm = await this.blmValuesRepository.get(scenarioId);
+    if (isLeft(blm)) return blm;
+
+    return right(blm.right.range);
+  }
+
   async startBlmCalibration(
     id: string,
     userInfo: AppInfoDTO,
     rangeToUpdate?: [number, number],
   ): Promise<
-    Either<ChangeRangeErrors | GetFailure | typeof forbiddenError, true>
+    Either<
+      ChangeScenarioRangeErrors | GetScenarioFailure | typeof forbiddenError,
+      true
+    >
   > {
     const scenario = await this.getById(id, userInfo);
     assertDefined(userInfo.authenticatedUser);
-    if (isLeft(scenario)) {
-      return left(forbiddenError);
-    }
+    if (isLeft(scenario)) return left(forbiddenError);
+
     if (
       !(await this.scenarioAclService.canEditScenario(
         userInfo.authenticatedUser?.id,
@@ -451,17 +490,20 @@ export class ScenariosService {
     }
     const projectId = scenario.right.projectId;
     await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
+
     if (rangeToUpdate) {
       const result = await this.commandBus.execute(
-        new ChangeBlmRange(projectId, rangeToUpdate),
+        new ChangeScenarioBlmRange(scenario.right.id, rangeToUpdate),
       );
       if (isLeft(result)) return result;
     }
-    const projectBlmValues = await this.blmValuesRepository.get(projectId);
-    if (isLeft(projectBlmValues)) return projectBlmValues;
+    const scenarioBlmValues = await this.blmValuesRepository.get(
+      scenario.right.id,
+    );
+    if (isLeft(scenarioBlmValues)) return scenarioBlmValues;
 
     await this.commandBus.execute(
-      new StartBlmCalibration(id, projectBlmValues.right.values),
+      new StartBlmCalibration(id, scenarioBlmValues.right.values),
     );
 
     return right(true);
