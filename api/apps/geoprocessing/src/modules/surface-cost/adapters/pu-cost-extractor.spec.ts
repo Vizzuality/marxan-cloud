@@ -3,6 +3,7 @@ import { PromiseType } from 'utility-types';
 import {
   getGeoJson,
   getGeoJsonWithMissingCost,
+  getGeoJsonWithNegativeCost,
   getGeometryMultiPolygon,
 } from '../application/__mocks__/geojson';
 import { PuCostExtractor } from './pu-cost-extractor';
@@ -48,6 +49,14 @@ describe(`when given GeoJson has pu costs`, () => {
   });
 });
 
+describe(`when given GeoJson has some negative pu costs`, () => {
+  it(`throws exception`, () => {
+    expect(() => sut.extract(fixtures.geoFeaturesWithNegativeCost())).toThrow(
+      /invalid cost/,
+    );
+  });
+});
+
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     providers: [PuCostExtractor],
@@ -57,6 +66,7 @@ const getFixtures = async () => {
     getService: () => sandbox.get(PuCostExtractor),
     geoFeaturesWithoutCost: () => getGeoJsonWithMissingCost(),
     geoFeaturesWithData: () => getGeoJson(['uuid-1', 'uuid-2']),
+    geoFeaturesWithNegativeCost: () => getGeoJsonWithNegativeCost(),
     simpleGeometry: () => getGeometryMultiPolygon(),
   };
 };
