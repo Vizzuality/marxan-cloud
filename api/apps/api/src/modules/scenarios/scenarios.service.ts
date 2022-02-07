@@ -241,7 +241,7 @@ export class ScenariosService {
     );
 
     if (isLeft(blmCreationResult)) {
-      await this.crudService.remove(scenario.id);
+      await this.commandBus.execute(new DeleteScenario(scenario.id));
 
       return blmCreationResult;
     }
