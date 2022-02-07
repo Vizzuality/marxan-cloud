@@ -1,0 +1,29 @@
+<xml version="1.0" encoding="UTF-8">
+  <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+      <loc>https://marxan.vercel.app/</loc>
+          <priority>1.0</priority>
+      <lastmod>2022-31-01</lastmod>
+    </url>
+    <url>
+      <loc>https://marxan.vercel.app/community</loc>
+      <priority>0.9</priority>
+      <lastmod>2022-31-01</lastmod>
+    </url>
+     <url>
+      <loc>https://marxan.vercel.app/about</loc>
+      <priority>0.8</priority>
+      <lastmod>2022-31-01</lastmod>
+    </url>
+       <url>
+      <loc>https://marxan.vercel.app/auth/sign-up</loc>
+      <priority>0.7</priority>
+      <lastmod>2022-31-01</lastmod>
+    </url>
+    <url>
+      <loc>https://marxan.vercel.app/auth/sign-in</loc>
+      <priority>0.6</priority>
+      <lastmod>2022-31-01</lastmod>
+    </url>
+  </urlset>
+</xml>
