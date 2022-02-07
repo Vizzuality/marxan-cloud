@@ -51,7 +51,7 @@ export abstract class ScenarioBlmRepo {
   ): Promise<Either<CreateFailure, SaveSuccess>>;
 
   abstract update(
-    projectId: string,
+    scenarioId: string,
     range: Blm['range'],
     values: Blm['values'],
   ): Promise<Either<SaveFailure, SaveSuccess>>;

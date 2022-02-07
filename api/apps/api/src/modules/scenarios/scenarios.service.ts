@@ -77,8 +77,8 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import {
   blmCreationFailure,
-  CreateInitialBlm,
-} from '@marxan-api/modules/scenarios/blm-calibration/create-initial-blm.command';
+  CreateInitialScenarioBlm,
+} from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
 import {
   ChangeScenarioBlmRange,
   ChangeScenarioRangeErrors,
@@ -236,7 +236,7 @@ export class ScenariosService {
     }
     const scenario = await this.crudService.create(validatedMetadata, info);
     const blmCreationResult = await this.commandBus.execute(
-      new CreateInitialBlm(scenario.id, scenario.projectId),
+      new CreateInitialScenarioBlm(scenario.id, scenario.projectId),
     );
 
     if (isLeft(blmCreationResult)) {

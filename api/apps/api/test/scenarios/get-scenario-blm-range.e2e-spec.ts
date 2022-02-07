@@ -14,7 +14,7 @@ let fixtures: FixtureType<typeof getFixtures>;
 describe('get-scenario-blm-calibration-results', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
-  }, 100000);
+  });
 
   afterEach(async () => {
     await fixtures.cleanup();

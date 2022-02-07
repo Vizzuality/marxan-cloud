@@ -5,7 +5,7 @@ export const blmCreationFailure = Symbol('could not create BLM values');
 export type CreationFailure = typeof blmCreationFailure;
 export type CreationSuccess = true;
 
-export class CreateInitialBlm extends Command<
+export class CreateInitialScenarioBlm extends Command<
   Either<CreationFailure, CreationSuccess>
 > {
   constructor(

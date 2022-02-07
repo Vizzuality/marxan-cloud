@@ -115,15 +115,15 @@ import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
 import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
 import { BlmRangeDto } from '@marxan-api/modules/scenarios/dto/blm-range.dto';
-import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-blm.command';
+import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { invalidRange } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
 import {
-  unknownError as scenarioUnknownError,
   scenarioNotFound,
+  unknownError as scenarioUnknownError,
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
-  LockService,
   lockedScenario,
+  LockService,
   unknownError as lockUnknownError,
 } from './locks/lock.service';
 import { ScenarioLockResult } from './locks/dto/scenario.lock.dto';

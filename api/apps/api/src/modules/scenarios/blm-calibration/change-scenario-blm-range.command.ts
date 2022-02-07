@@ -16,7 +16,6 @@ export type ChangeScenarioRangeErrors =
   | typeof invalidRange
   | typeof unknownError
   | typeof updateFailure
-  | PlanningUnitAreaNotFoundError
   | GetScenarioFailure;
 
 export class ChangeScenarioBlmRange extends Command<

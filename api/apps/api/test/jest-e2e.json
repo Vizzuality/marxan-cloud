@@ -1,7 +1,7 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
   "moduleDirectories": ["node_modules", "src"],
-  "testTimeout": 60000,
+  "testTimeout": 6000,
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",

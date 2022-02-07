@@ -6,17 +6,17 @@ import { calibrationQueueToken } from './blm-calibration-queue.providers';
 import { JobData } from '@marxan/blm-calibration';
 import {
   blmCreationFailure,
-  CreateInitialBlm,
+  CreateInitialScenarioBlm,
   CreationFailure,
   CreationSuccess,
-} from '@marxan-api/modules/scenarios/blm-calibration/create-initial-blm.command';
+} from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { ProjectBlmRepo } from '@marxan-api/modules/blm';
 import { ScenarioBlmRepo } from '@marxan-api/modules/blm/values';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 
-@CommandHandler(CreateInitialBlm)
-export class CreateInitialBlmHandler
-  implements IInferredCommandHandler<CreateInitialBlm> {
+@CommandHandler(CreateInitialScenarioBlm)
+export class CreateInitialScenarioBlmHandler
+  implements IInferredCommandHandler<CreateInitialScenarioBlm> {
   constructor(
     @Inject(calibrationQueueToken)
     private readonly queue: Queue<JobData>,
@@ -27,7 +27,9 @@ export class CreateInitialBlmHandler
   async execute({
     scenarioId,
     projectId,
-  }: CreateInitialBlm): Promise<Either<CreationFailure, CreationSuccess>> {
+  }: CreateInitialScenarioBlm): Promise<
+    Either<CreationFailure, CreationSuccess>
+  > {
     const projectBlm = await this.projectBlmRepository.get(projectId);
 
     if (isLeft(projectBlm)) return left(blmCreationFailure);
