@@ -1,4 +1,4 @@
-import { FromShapefileJobInput } from '@marxan/scenarios-planning-unit';
+import { FromShapefileJobInput } from '@marxan/scenario-cost-surface';
 import { GeoJSON } from 'geojson';
 
 export abstract class ShapefileConverterPort {

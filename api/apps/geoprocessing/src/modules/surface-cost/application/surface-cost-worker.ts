@@ -3,10 +3,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { Job, Worker } from 'bullmq';
 
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import {
-  JobInput,
-  surfaceCostQueueName,
-} from '@marxan/scenarios-planning-unit';
+import { JobInput, surfaceCostQueueName } from '@marxan/scenario-cost-surface';
 import { ApiEvent } from '@marxan-geoprocessing/modules/api-events';
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 

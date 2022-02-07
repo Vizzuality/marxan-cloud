@@ -1,20 +1,20 @@
-import { QueueService } from '@marxan-api/modules/queue/queue.service';
 import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
-import { JobInput } from '@marxan/scenarios-planning-unit';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Queue } from 'bullmq';
-import { CostSurfaceEventsPort } from './cost-surface-events.port';
-import { CostSurfaceFacade } from './cost-surface.facade';
+import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
+import { CostSurfaceEventsPort } from '../ports/cost-surface-events.port';
+import { UpdateCostSurface } from './update-cost-surface.command';
+import { UpdateCostSurfaceHandler } from './update-cost-surface.handler';
 import { CostSurfaceEventsFake } from './__mocks__/cost-surface-events-fake';
 
-let sut: CostSurfaceFacade;
+let sut: UpdateCostSurfaceHandler;
 let logger: FakeLogger;
 let addJobMock: jest.SpyInstance;
 let eventsService: CostSurfaceEventsFake;
 
 const scenarioId = 'scenarioId-id';
-const file: Express.Multer.File = {
+const shapefile: Express.Multer.File = {
   filename: 'file-name',
 } as Express.Multer.File;
 
@@ -22,14 +22,12 @@ beforeEach(async () => {
   addJobMock = jest.fn();
   const sandbox = await Test.createTestingModule({
     providers: [
-      CostSurfaceFacade,
+      UpdateCostSurfaceHandler,
       {
-        provide: QueueService,
+        provide: surfaceCostQueueToken,
         useValue: ({
-          queue: ({
-            add: addJobMock,
-          } as unknown) as Queue,
-        } as unknown) as QueueService<JobInput>,
+          add: addJobMock,
+        } as unknown) as Queue,
       },
       {
         provide: Logger,
@@ -42,18 +40,18 @@ beforeEach(async () => {
     ],
   }).compile();
 
-  sut = sandbox.get(CostSurfaceFacade);
+  sut = sandbox.get(UpdateCostSurfaceHandler);
   logger = sandbox.get(Logger);
   eventsService = sandbox.get(CostSurfaceEventsPort);
 });
 
 describe(`when job submits successfully`, () => {
   let result: unknown;
-  beforeEach(() => {
+  beforeEach(async () => {
     // Asset
     addJobMock.mockResolvedValue({ job: { id: 1 } });
     // Act
-    result = sut.convert(scenarioId, file);
+    result = await sut.execute(new UpdateCostSurface(scenarioId, shapefile));
   });
 
   it(`should return`, () => {
@@ -89,11 +87,11 @@ describe(`when job submits successfully`, () => {
 
 describe(`when job submission fails`, () => {
   let result: unknown;
-  beforeEach(() => {
+  beforeEach(async () => {
     // Asset
     addJobMock.mockRejectedValue(new Error('Oups'));
     // Act
-    result = sut.convert(scenarioId, file);
+    result = await sut.execute(new UpdateCostSurface(scenarioId, shapefile));
   });
 
   it(`should return`, () => {
@@ -103,7 +101,7 @@ describe(`when job submission fails`, () => {
   it(`should log the error`, () => {
     expect(logger.error.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "Failed submitting job to queue for scenarioId-id",
+        "Failed submitting cost-surface-for-scenarioId-id job",
         "Error: Oups",
       ]
     `);
