@@ -6,7 +6,7 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
     solutions: 'empty',
   },
   tab: 'planning-unit',
-  subtab: 'pu-protected-areas-preview',
+  subtab: null,
 };
 
 export const STATUS_VALUES = {
