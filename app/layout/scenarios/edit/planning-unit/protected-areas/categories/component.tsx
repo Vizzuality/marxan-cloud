@@ -244,6 +244,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                             </InfoButton>
                           </div>
 
+                          {WDPA_CATEGORIES_OPTIONS.length < 1 && (
+                            <div className="py-6 text-sm">This planning area doesn&apos;t have any protected areas categories associated with it. You can upload a new one using the button below.</div>
+                          )}
+
                           {WDPA_CATEGORIES_OPTIONS.length === 1 && (
                             <Select
                               theme="dark"
@@ -284,7 +288,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     </FieldRFF>
                   </div>
 
-                  <p className="py-4 text-sm text-center">or</p>
+                  {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                    <p className="py-4 text-sm text-center">or</p>
+                  )}
 
                   <FieldRFF
                     name="uploadedProtectedArea"
