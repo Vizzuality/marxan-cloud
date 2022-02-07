@@ -9,7 +9,6 @@ export const getAreaByPlanningUnit = (
     area: Math.random(),
   }));
 
-// move this to application and use it in surface-cost-processor
 export const getCostByAreaOfPlanningUnit = (
   puWithArea: PUWithArea[],
   referenceArea: number,
