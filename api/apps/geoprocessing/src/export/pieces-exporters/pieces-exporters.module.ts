@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 import { ProjectMetadata } from './project-metadata';
-import { ProjectConfig } from './project-config';
+import { ExportConfig } from './export-config';
 import { PlanningAreaGadm } from './planning-area-gadm';
 import { PlanningAreaCustomGrid } from './planning-area-custom-grid';
 import { PlanningAreaCustom } from './planning-area-custom';
@@ -17,7 +17,7 @@ import { ScenarioMetadata } from './scenario-metadata';
   ],
   providers: [
     ProjectMetadata,
-    ProjectConfig,
+    ExportConfig,
     PlanningAreaGadm,
     PlanningAreaCustom,
     PlanningAreaCustomGrid,
