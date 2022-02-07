@@ -3,7 +3,7 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/ed
 export const TABS = [
   {
     id: ScenarioSidebarTabs.PLANNING_UNIT,
-    subtab: ScenarioSidebarSubTabs.PLANNING_UNIT_PREVIEW,
+    subtab: null,
     name: 'Planning unit',
   },
   {

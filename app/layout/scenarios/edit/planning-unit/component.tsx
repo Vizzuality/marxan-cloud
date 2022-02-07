@@ -70,7 +70,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-    const subtab = s ? `pu-${s}-preview` : 'planning-unit-preview';
+    const subtab = s ? `pu-${s}-preview` : null;
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
 

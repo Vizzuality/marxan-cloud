@@ -49,7 +49,7 @@ interface ScenarioEditStateProps {
 
 const initialState = {
   tab: 'planning-unit',
-  subtab: 'planning-unit-preview',
+  subtab: null,
 
   // WDPA
   wdpaCategories: {},

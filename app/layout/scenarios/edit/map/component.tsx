@@ -124,7 +124,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const [bounds, setBounds] = useState(null);
 
   const include = useMemo(() => {
-    if (tab === 'planning-unit' && subtab === 'planning-unit-preview') return 'lock-status,protection';
+    if (tab === 'planning-unit' && subtab === null) return 'lock-status,protection';
     if (tab === 'planning-unit' && subtab === 'pu-protected-areas-preview') return 'protection';
     if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return 'cost';
     if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return 'lock-status,protection';
@@ -143,7 +143,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }, [tab, subtab]);
 
   const sublayers = useMemo(() => {
-    if (tab === 'planning-unit' && subtab === 'planning-unit-preview') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+    if (tab === 'planning-unit' && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out'];
     if (tab === 'planning-unit' && subtab === 'pu-protected-areas-threshold') return ['wdpa-percentage'];
     if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return ['cost'];
     if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
@@ -167,7 +167,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       || [];
 
     // PLANNING UNIT
-    if (tab === 'planning-unit' && subtab === 'planning-unit-preview') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === 'planning-unit' && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (tab === 'planning-unit' && subtab === 'planning-unit-cost-surface') return ['cost', 'pugrid'];
     if (tab === 'planning-unit' && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
 
@@ -284,6 +284,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       layerSettings,
     },
   });
+
+  console.log('tab', tab, 'subtab', subtab);
 
   useEffect(() => {
     setBounds({

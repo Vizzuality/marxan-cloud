@@ -127,7 +127,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
             <ScenariosSidebarWDPAThreshold
               onSuccess={() => {
                 dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
-                dispatch(setSubTab(ScenarioSidebarSubTabs.PLANNING_UNIT_PREVIEW));
+                dispatch(setSubTab(null));
               }}
               onBack={() => {
                 setStep(0);

@@ -7,7 +7,6 @@ export enum ScenarioSidebarTabs {
 }
 
 export enum ScenarioSidebarSubTabs {
-  PLANNING_UNIT_PREVIEW = 'planning-unit-preview',
   PLANNING_UNIT_COST_SURFACE = 'planning-unit-cost-surface',
   PLANNING_UNIT_ADDJUST_PLANNING_UNITS = 'planning-unit-adjust-planning-units',
 
