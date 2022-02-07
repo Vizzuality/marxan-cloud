@@ -12,6 +12,8 @@ import { EventData, EventFactory } from '../../../queue-api-events';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { SurfaceCostEventsHandler } from './surface-cost.events-handler';
 import { surfaceCostEventsFactoryToken } from './surface-cost-queue.provider';
+import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
+import { DeleteScenario } from './delete-scenario.command';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -35,7 +37,15 @@ it('should create a failed cost surface api event when a initial cost job fails'
   fixtures.ThenACostSurfaceFailedApiEventShouldBeCreated();
 });
 
-it('should create a finished cost surface api event when a fromShape file job finishes successfully', async () => {
+it('should send a delete scenario command when a initial cost job fails', async () => {
+  const jobInput = fixtures.GivenInitialCostJob();
+
+  await fixtures.WhenJobFails(jobInput);
+
+  fixtures.ThenADeleteScenarioCommandShouldBeSent();
+});
+
+it('should create a finished cost surface api event when a fromShapefile job finishes successfully', async () => {
   const jobInput = fixtures.GivenFromShapeFileJob();
 
   await fixtures.WhenJobFinishes(jobInput);
@@ -43,7 +53,7 @@ it('should create a finished cost surface api event when a fromShape file job fi
   fixtures.ThenACostSurfaceFinishedApiEventShouldBeCreated();
 });
 
-it('should create a failed cost surface api event when a fromShape file job fails', async () => {
+it('should create a failed cost surface api event when a fromShapefile job fails', async () => {
   const jobInput = fixtures.GivenFromShapeFileJob();
 
   await fixtures.WhenJobFails(jobInput);
@@ -51,21 +61,36 @@ it('should create a failed cost surface api event when a fromShape file job fail
   fixtures.ThenACostSurfaceFailedApiEventShouldBeCreated();
 });
 
+it('should not send a delete scenario command when a fromShapefile job fails', async () => {
+  const jobInput = fixtures.GivenFromShapeFileJob();
+
+  await fixtures.WhenJobFails(jobInput);
+
+  fixtures.ThenADeleteScenarioCommandShouldNotBeSent();
+});
+
 const getFixtures = async () => {
+  let fakeQueueEvents: FakeQueueEvents;
   const sandbox = await Test.createTestingModule({
-    imports: [],
+    imports: [CqrsModule],
     providers: [
       SurfaceCostEventsHandler,
       {
         provide: surfaceCostEventsFactoryToken,
-        useValue: (eventFactory: EventFactory<JobInput, true>) =>
-          FakeQueueEvents.create(eventFactory),
+        useValue: (eventFactory: EventFactory<JobInput, true>) => {
+          fakeQueueEvents = new FakeQueueEvents(eventFactory);
+          return fakeQueueEvents;
+        },
       },
+      FakeDeleteScenarioHandler,
     ],
   }).compile();
   await sandbox.init();
 
-  const fakeQueueEvents = FakeQueueEvents.singleton!;
+  const commands: ICommand[] = [];
+  sandbox.get(CommandBus).subscribe((command) => {
+    commands.push(command);
+  });
 
   let results: unknown[] = [];
   const getEventDataFromInput = (
@@ -113,6 +138,14 @@ const getFixtures = async () => {
         API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,
       );
     },
+    ThenADeleteScenarioCommandShouldBeSent: () => {
+      expect(commands).toHaveLength(1);
+      const [deleteScenarioCommand] = commands;
+      expect(deleteScenarioCommand).toBeInstanceOf(DeleteScenario);
+    },
+    ThenADeleteScenarioCommandShouldNotBeSent: () => {
+      expect(commands).toHaveLength(0);
+    },
     ThenACostSurfaceFailedApiEventShouldBeCreated: () => {
       const [failedApiEvent] = results as [CreateApiEventDTO];
 
@@ -130,23 +163,14 @@ type JobEventListener = (
 ) => Promise<unknown>;
 
 export class FakeQueueEvents {
-  static singleton: FakeQueueEvents | undefined = undefined;
   #listeners: Record<JobEvent, JobEventListener[]> = {
     completed: [],
     failed: [],
   };
 
-  private constructor(private eventFactory: EventFactory<JobInput, true>) {
+  public constructor(private eventFactory: EventFactory<JobInput, true>) {
     this.on('completed', eventFactory.createCompletedEvent);
     this.on('failed', eventFactory.createFailedEvent);
-  }
-
-  static create(eventFactory: EventFactory<JobInput, true>): FakeQueueEvents {
-    if (!this.singleton) {
-      this.singleton = new FakeQueueEvents(eventFactory);
-    }
-
-    return this.singleton;
   }
 
   on(type: JobEvent, callback: JobEventListener) {
@@ -159,4 +183,9 @@ export class FakeQueueEvents {
   ): Promise<unknown>[] {
     return this.#listeners[type].map((listener) => listener(eventData));
   }
+}
+
+@CommandHandler(DeleteScenario)
+export class FakeDeleteScenarioHandler {
+  async execute(): Promise<void> {}
 }
