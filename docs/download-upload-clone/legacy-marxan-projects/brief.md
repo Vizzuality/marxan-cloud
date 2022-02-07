@@ -18,12 +18,11 @@ order to, for example:
   _community_ area, thus contributing to a public archive/showcase of Marxan
   planning projects
 
-_@todo Legacy projects - examples from Okavango demo_
-
-_@todo Decision tree to guide through choices about what a user may want to
-achieve depending on use case, then provide information on what parts of the
-MarxanCloud flow could be enabled according to the user choices **and** which
-data is available for them to upload._
+For reference, the main expected use cases, depending on user intentions and
+available legacy data, as well as relevant features available in the Marxan
+Cloud platform once a legacy project has been uploaded are outlined in the
+companion document *[Use cases and available
+features](./use-cases-and-available-features.md)*.
 
 ## Legacy Marxan projects import in MarxanWeb
 
