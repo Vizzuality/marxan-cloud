@@ -103,6 +103,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   const onSubmit = (values) => {
     const { touched } = formRef.current?.getState();
+
     const protectedAreasTouched = Object.values(touched).includes(true);
 
     if (protectedAreasTouched) {
