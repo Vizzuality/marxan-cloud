@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   CostSurfaceEventsPort,
   CostSurfaceState,
-} from '../cost-surface-events.port';
+} from '../../ports/cost-surface-events.port';
 
 @Injectable()
 export class CostSurfaceEventsFake implements CostSurfaceEventsPort {

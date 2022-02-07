@@ -5,16 +5,7 @@ import {
   IsPositive,
   IsUUID,
 } from 'class-validator';
-
-/**
- * @todo We have this enum duplicated in the api service
- * @file api/src/modules/projects/project.api.entity.ts
- */
-export enum PlanningUnitGridShape {
-  square = 'square',
-  hexagon = 'hexagon',
-  fromShapefile = 'irregular',
-}
+import { PlanningUnitGridShape } from '../../scenarios-planning-unit/src';
 
 /**
  * @todo We have this interface partially duplicated in the api service

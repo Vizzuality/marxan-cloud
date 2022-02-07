@@ -1,4 +1,5 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -8,19 +9,20 @@ import { Transform } from 'class-transformer';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileRequest } from '@marxan/tiles';
 
+enum RegularPlanningUnitGridShape {
+  hexagon = PlanningUnitGridShape.hexagon,
+  square = PlanningUnitGridShape.square,
+}
+
 export class tileSpecification extends TileRequest {
   @ApiProperty()
   @IsString()
-  planningUnitGridShape!: PlanningUnitGridShape;
+  planningUnitGridShape!: RegularPlanningUnitGridShape;
 
   @ApiProperty()
   @IsNumber()
   @Transform((value) => Number.parseInt(value))
   planningUnitAreakm2!: number;
-}
-export enum PlanningUnitGridShape {
-  square = 'square',
-  hexagon = 'hexagon',
 }
 
 export class PlanningUnitsFilters {
@@ -94,7 +96,7 @@ export class PlanningUnitsService {
     x: number,
     y: number,
     z: number,
-    planningUnitGridShape: PlanningUnitGridShape,
+    planningUnitGridShape: RegularPlanningUnitGridShape,
     planningUnitAreakm2: number,
     filters?: PlanningUnitsFilters,
   ): string {
@@ -136,10 +138,10 @@ export class PlanningUnitsService {
    * can be square or hexagon. If any grid shape is provided, square would be the default.
    */
   private regularFunctionGridSelector(
-    planningUnitGridShape: PlanningUnitGridShape,
+    planningUnitGridShape: RegularPlanningUnitGridShape,
   ): string {
     const functionEquivalence: {
-      [key in keyof typeof PlanningUnitGridShape]: string;
+      [key in keyof typeof RegularPlanningUnitGridShape]: string;
     } = {
       hexagon: 'ST_HexagonGrid',
       square: 'ST_SquareGrid',

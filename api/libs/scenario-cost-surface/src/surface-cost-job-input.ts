@@ -1,4 +1,4 @@
-import { PlanningUnitGridShape } from './planning-unit-grid-shape';
+import { PlanningUnitGridShape } from '../../scenarios-planning-unit/src/planning-unit-grid-shape';
 
 export type ParentJobInput = {
   scenarioId: string;

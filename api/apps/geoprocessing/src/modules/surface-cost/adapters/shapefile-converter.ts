@@ -1,4 +1,4 @@
-import { FromShapefileJobInput } from '@marxan/scenarios-planning-unit';
+import { FromShapefileJobInput } from '@marxan/scenario-cost-surface';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { Injectable } from '@nestjs/common';
 import { GeoJSON } from 'geojson';
