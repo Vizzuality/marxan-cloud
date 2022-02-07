@@ -1,8 +1,6 @@
 import * as faker from 'faker';
-import {
-  PlanningUnitsJob,
-  PlanningUnitGridShape,
-} from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 interface OptionsWithCountryCode {
   countryCode: string;

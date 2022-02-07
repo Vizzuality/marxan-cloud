@@ -8,7 +8,7 @@ import { Job } from 'bullmq';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { PlanningUnitCost } from '@marxan-geoprocessing/modules/surface-cost/ports/planning-unit-cost';
-import { CostSurfaceJobInput } from '@marxan-geoprocessing/modules/surface-cost/cost-surface-job-input';
+import { FromShapefileJobInput } from '@marxan/scenario-cost-surface';
 import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 
 import { getFixtures } from '../../planning-unit-fixtures';
@@ -34,7 +34,7 @@ export const createWorld = async (app: INestApplication) => {
           shapefile,
         },
         id: 'test-job',
-      } as unknown) as Job<CostSurfaceJobInput>),
+      } as unknown) as Job<FromShapefileJobInput>),
     ThenCostIsUpdated: async () => {
       const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
       expect(newCost).toEqual(
@@ -51,7 +51,7 @@ export const createWorld = async (app: INestApplication) => {
 const getShapefileForPlanningUnits = async (
   ids: string[],
   costs: number[],
-): Promise<CostSurfaceJobInput['shapefile']> => {
+): Promise<FromShapefileJobInput['shapefile']> => {
   const baseDir = AppConfig.get<string>(
     'storage.sharedFileStorage.localPath',
   ) as string;

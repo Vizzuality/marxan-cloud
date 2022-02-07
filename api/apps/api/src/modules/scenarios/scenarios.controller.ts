@@ -308,7 +308,6 @@ export class ScenariosController {
         case forbiddenError:
           throw new ForbiddenException();
         default:
-          const _check: never = result.left;
           throw new InternalServerErrorException();
       }
     }

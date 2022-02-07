@@ -1,23 +1,22 @@
-import { Test } from '@nestjs/testing';
-import { Logger } from '@nestjs/common';
-import { Queue } from 'bullmq';
-
 import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
-import { QueueService } from '@marxan-api/modules/queue/queue.service';
-
-import { CostSurfaceFacade } from './cost-surface.facade';
-import { CostSurfaceJobInput } from './job-input';
-import { CostSurfaceEventsPort } from './cost-surface-events.port';
-
+import { Logger } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { Queue } from 'bullmq';
+import { Either, Left, Right } from 'fp-ts/lib/Either';
+import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
+import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
+import { CostSurfaceEventsPort } from '../ports/cost-surface-events.port';
+import { UpdateCostSurface } from './update-cost-surface.command';
+import { UpdateCostSurfaceHandler } from './update-cost-surface.handler';
 import { CostSurfaceEventsFake } from './__mocks__/cost-surface-events-fake';
 
-let sut: CostSurfaceFacade;
+let sut: UpdateCostSurfaceHandler;
 let logger: FakeLogger;
 let addJobMock: jest.SpyInstance;
 let eventsService: CostSurfaceEventsFake;
 
 const scenarioId = 'scenarioId-id';
-const file: Express.Multer.File = {
+const shapefile: Express.Multer.File = {
   filename: 'file-name',
 } as Express.Multer.File;
 
@@ -25,14 +24,12 @@ beforeEach(async () => {
   addJobMock = jest.fn();
   const sandbox = await Test.createTestingModule({
     providers: [
-      CostSurfaceFacade,
+      UpdateCostSurfaceHandler,
       {
-        provide: QueueService,
+        provide: surfaceCostQueueToken,
         useValue: ({
-          queue: ({
-            add: addJobMock,
-          } as unknown) as Queue,
-        } as unknown) as QueueService<CostSurfaceJobInput>,
+          add: addJobMock,
+        } as unknown) as Queue,
       },
       {
         provide: Logger,
@@ -45,22 +42,22 @@ beforeEach(async () => {
     ],
   }).compile();
 
-  sut = sandbox.get(CostSurfaceFacade);
+  sut = sandbox.get(UpdateCostSurfaceHandler);
   logger = sandbox.get(Logger);
   eventsService = sandbox.get(CostSurfaceEventsPort);
 });
 
 describe(`when job submits successfully`, () => {
-  let result: unknown;
-  beforeEach(() => {
+  let result: Either<typeof jobSubmissionFailed, true>;
+  beforeEach(async () => {
     // Asset
     addJobMock.mockResolvedValue({ job: { id: 1 } });
     // Act
-    result = sut.convert(scenarioId, file);
+    result = await sut.execute(new UpdateCostSurface(scenarioId, shapefile));
   });
 
-  it(`should return`, () => {
-    expect(result).toEqual(undefined);
+  it(`should return right`, () => {
+    expect((result as Right<true>).right).toBe(true);
   });
 
   it(`should put job to queue`, () => {
@@ -91,22 +88,24 @@ describe(`when job submits successfully`, () => {
 });
 
 describe(`when job submission fails`, () => {
-  let result: unknown;
-  beforeEach(() => {
+  let result: Either<typeof jobSubmissionFailed, true>;
+  beforeEach(async () => {
     // Asset
     addJobMock.mockRejectedValue(new Error('Oups'));
     // Act
-    result = sut.convert(scenarioId, file);
+    result = await sut.execute(new UpdateCostSurface(scenarioId, shapefile));
   });
 
-  it(`should return`, () => {
-    expect(result).toEqual(undefined);
+  it(`should return left`, () => {
+    expect((result as Left<typeof jobSubmissionFailed>).left).toBe(
+      jobSubmissionFailed,
+    );
   });
 
   it(`should log the error`, () => {
     expect(logger.error.mock.calls[0]).toMatchInlineSnapshot(`
       Array [
-        "Failed submitting job to queue for scenarioId-id",
+        "Failed submitting cost-surface-for-scenarioId-id job",
         "Error: Oups",
       ]
     `);

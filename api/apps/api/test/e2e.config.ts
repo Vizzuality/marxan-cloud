@@ -2,7 +2,6 @@ import * as faker from 'faker';
 import { CreateOrganizationDTO } from '@marxan-api/modules/organizations/dto/create.organization.dto';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
-import { PlanningUnitGridShape } from '@marxan-api/modules/projects/project.api.entity';
 import {
   JobStatus,
   ScenarioType,
@@ -10,6 +9,7 @@ import {
 import { CreateUserDTO } from '@marxan-api/modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from '@marxan-api/modules/users/dto/update.user.dto';
 import { IUCNCategory } from '@marxan/iucn';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 interface CountryCodeInput {
   countryCode?: string;

@@ -19,7 +19,6 @@ import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features'
 import { AdjustPlanningUnits } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 
-import { CostSurfaceFacade } from './cost-surface/cost-surface.facade';
 import {
   ScenarioInfoDTO,
   ScenariosCrudService,
@@ -84,6 +83,11 @@ import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { ResourceId } from '../clone';
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
 import { lockedScenario, LockService } from './locks/lock.service';
+import {
+  SetInitialCostSurface,
+  SetInitialCostSurfaceError,
+} from './cost-surface/application/set-initial-cost-surface.command';
+import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -121,7 +125,6 @@ export class ScenariosService {
     private readonly crudService: ScenariosCrudService,
     private readonly scenarioFeatures: ScenarioFeaturesService,
     private readonly updatePlanningUnits: AdjustPlanningUnits,
-    private readonly costSurface: CostSurfaceFacade,
     private readonly httpService: HttpService,
     private readonly solutionsCrudService: SolutionResultCrudService,
     private readonly marxanInputValidator: MarxanInput,
@@ -195,7 +198,10 @@ export class ScenariosService {
     info: AppInfoDTO,
   ): Promise<
     Either<
-      ProjectNotReady | ProjectDoesntExist | typeof forbiddenError,
+      | ProjectNotReady
+      | ProjectDoesntExist
+      | SetInitialCostSurfaceError
+      | typeof forbiddenError,
       Scenario
     >
   > {
@@ -223,6 +229,15 @@ export class ScenariosService {
 
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
+
+    const costSurfaceInitializationResult = await this.commandBus.execute(
+      new SetInitialCostSurface(scenario.id, scenario.projectId),
+    );
+
+    if (isLeft(costSurfaceInitializationResult))
+      // TODO Remove scenario sending a command
+      return costSurfaceInitializationResult;
+
     await this.crudService.assignCreatorRole(
       scenario.id,
       info.authenticatedUser.id,
@@ -324,7 +339,8 @@ export class ScenariosService {
     if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    this.costSurface.convert(scenarioId, file);
+
+    await this.commandBus.execute(new UpdateCostSurface(scenarioId, file));
     return right(void 0);
   }
 
