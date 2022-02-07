@@ -6,19 +6,19 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
-import Pill from 'layout/pill';
-import Recalculate from 'layout/scenarios/edit/tabs/recalculate';
+// import Recalculate from 'layout/scenarios/edit/tabs/recalculate';
 
 import Tabs from 'components/tabs';
 import { TabsProps } from 'components/tabs/component';
 
-import { TABS } from './constants';
+import { TABS, STATUS } from './constants';
 import { ScenariosSidebarTabsProps } from './types';
 
 export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
@@ -48,7 +48,8 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
     return TABS.map((t) => {
       return {
         ...t,
-        status: metaStatus[t.id] === 'empty' ? 'disabled' : 'active',
+        status: STATUS[metaStatus[t.id]],
+        warning: STATUS[metaStatus[t.id]] === 'outdated',
       };
     });
   }, [metaStatus]);
@@ -125,23 +126,33 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
         animate={{ opacity: 1, y: 0 }}
       >
 
-        <Pill>
+        <div
+          className={cx({
+            'bg-gray-700 rounded-4xl': true,
+            'flex flex-col flex-grow': true,
+          })}
+        >
+          <div
+            className={cx({
+              'flex flex-col flex-grow px-10': true,
+            })}
+          >
+            <div className="flex flex-col flex-grow py-0.5 px-0.5">
+              {scenarioFetched && (
+                <Tabs
+                  items={TABS_PARSED}
+                  selected={tab}
+                  onSelected={onSelectedTab}
+                />
+              )}
 
-          {scenarioFetched && (
-            <Tabs
-              items={TABS_PARSED}
-              selected={tab}
-              onSelected={onSelectedTab}
-            />
-          )}
-
-          <Recalculate
-            visible={false}
-            onRecalculate={() => { }}
-          />
-
-        </Pill>
-
+              {/* <Recalculate
+                visible={false}
+                onRecalculate={() => { }}
+              /> */}
+            </div>
+          </div>
+        </div>
       </motion.div>
 
     </HelpBeacon>

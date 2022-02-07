@@ -22,3 +22,9 @@ export const TABS = [
     name: 'Solutions',
   },
 ];
+
+export const STATUS = {
+  empty: 'disabled',
+  outdated: 'outdated',
+  draft: 'active',
+};
