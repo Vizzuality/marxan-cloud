@@ -6,6 +6,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import intersection from 'lodash/intersection';
+import isEqual from 'lodash/isEqual';
 
 import { useRouter } from 'next/router';
 
@@ -97,12 +98,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   ]);
 
   const onSubmit = useCallback((values) => {
-    const isModified = (values.wdpaIucnCategories.length !== wdpaData.length)
-                        || values.wdpaIucnCategories.some((v) => {
-                          return !wdpaData.filter((w) => w.selected).find((w) => w.id === v);
-                        });
-
-    console.log({ isModified, wdpaData, values: values.wdpaIucnCategories });
+    const wdpaSelected = wdpaData.filter((w) => !!w.selected).map((w) => w.id);
+    const isModified = !isEqual(wdpaSelected, values.wdpaIucnCategories);
 
     if (isModified) {
       onCalculateProtectedAreas(values);

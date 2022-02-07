@@ -285,8 +285,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     },
   });
 
-  console.log('tab', tab, 'subtab', subtab);
-
   useEffect(() => {
     setBounds({
       bbox,
