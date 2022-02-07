@@ -96,6 +96,7 @@ import {
   SetInitialCostSurfaceError,
 } from './cost-surface/application/set-initial-cost-surface.command';
 import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
+import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -251,9 +252,10 @@ export class ScenariosService {
       new SetInitialCostSurface(scenario.id, scenario.projectId),
     );
 
-    if (isLeft(costSurfaceInitializationResult))
-      // TODO Remove scenario sending a command
+    if (isLeft(costSurfaceInitializationResult)) {
+      await this.commandBus.execute(new DeleteScenario(scenario.id));
       return costSurfaceInitializationResult;
+    }
 
     await this.crudService.assignCreatorRole(
       scenario.id,

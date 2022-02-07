@@ -45,14 +45,18 @@ it('should create a failed api event and publish a ExportPieceFailed event when 
 });
 
 const getFixtures = async () => {
+  let fakeQueueEvents: FakeQueueEvents;
+
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule, QueueModule],
     providers: [
       ExportPieceEventsHandler,
       {
         provide: exportPieceEventsFactoryToken,
-        useValue: (eventFactory: EventFactory<JobInput, JobOutput>) =>
-          FakeQueueEvents.create(eventFactory),
+        useValue: (eventFactory: EventFactory<JobInput, JobOutput>) => {
+          fakeQueueEvents = new FakeQueueEvents(eventFactory);
+          return fakeQueueEvents;
+        },
       },
       FakeCompletePieceHandler,
     ],
@@ -62,7 +66,6 @@ const getFixtures = async () => {
   const events: IEvent[] = [];
   const commands: ICommand[] = [];
 
-  const fakeQueueEvents = FakeQueueEvents.singleton!;
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
   });
@@ -141,25 +144,14 @@ type JobEventListener = (
 ) => Promise<unknown>;
 
 export class FakeQueueEvents {
-  static singleton: FakeQueueEvents | undefined = undefined;
   #listeners: Record<JobEvent, JobEventListener[]> = {
     completed: [],
     failed: [],
   };
 
-  private constructor(private eventFactory: EventFactory<JobInput, JobOutput>) {
+  public constructor(private eventFactory: EventFactory<JobInput, JobOutput>) {
     this.on('completed', eventFactory.createCompletedEvent);
     this.on('failed', eventFactory.createFailedEvent);
-  }
-
-  static create(
-    eventFactory: EventFactory<JobInput, JobOutput>,
-  ): FakeQueueEvents {
-    if (!this.singleton) {
-      this.singleton = new FakeQueueEvents(eventFactory);
-    }
-
-    return this.singleton;
   }
 
   on(type: JobEvent, callback: JobEventListener) {
