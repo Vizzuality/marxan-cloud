@@ -11,6 +11,16 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+
+export interface Gadm {
+  country: string;
+  l1: string | null;
+  l2: string | null;
+  puGridShape: PlanningUnitGridShape;
+  planningUnitAreakm2: number;
+  bbox: number[];
+}
 
 @Injectable()
 @PieceExportProvider()
@@ -32,24 +42,31 @@ export class PlanningAreaGadm extends PieceProcessor {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const gadm: {
-      country: string | null;
-      l1: string | null;
-      l2: string | null;
-    }[] = await this.entityManager.query(
+    const result: [Gadm] = await this.entityManager.query(
       `
-    SELECT country_id as country, admin_area_l1_id as l1, admin_area_l2_id as l2 from projects
-    WHERE id = $1
-    `,
+        SELECT 
+          country_id as country, 
+          admin_area_l1_id as l1, 
+          admin_area_l2_id as l2, 
+          planning_unit_grid_shape as puGridShape, 
+          planning_unit_area_km2 as planningUnitAreakm2,
+          bbox
+        FROM projects
+        WHERE id = $1
+      `,
       [input.resourceId],
     );
 
+    if (result.length !== 1) {
+      throw new Error(
+        `Gadm data not found for project with ID: ${input.resourceId}`,
+      );
+    }
+
+    const [gadm] = result;
+
     const metadata = JSON.stringify({
-      gadm: {
-        country: gadm?.[0]?.country,
-        l1: gadm?.[0]?.l1,
-        l2: gadm?.[0]?.l2,
-      },
+      gadm,
     });
 
     const outputFile = await this.fileRepository.save(
