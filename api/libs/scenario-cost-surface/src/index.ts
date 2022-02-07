@@ -6,5 +6,6 @@ export {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
+  jobSubmissionFailed,
 } from './surface-cost-job-input';
 export { surfaceCostQueueName } from './surface-cost-queue-name';

@@ -1,8 +1,12 @@
-import { InitialCostJobInput } from '@marxan/scenario-cost-surface';
+import {
+  InitialCostJobInput,
+  jobSubmissionFailed,
+} from '@marxan/scenario-cost-surface';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bullmq';
+import { right, left, Either } from 'fp-ts/lib/Either';
 import { Repository } from 'typeorm';
 import { Project } from '../../../projects/project.api.entity';
 import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
@@ -10,7 +14,12 @@ import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from '../ports/cost-surface-events.port';
-import { SetInitialCostSurface } from './set-initial-cost-surface.command';
+import {
+  nullPlanningUnitGridShape,
+  projectNotFound,
+  SetInitialCostSurface,
+  SetInitialCostSurfaceError,
+} from './set-initial-cost-surface.command';
 
 @CommandHandler(SetInitialCostSurface)
 export class SetInitialCostSurfaceHandler
@@ -29,23 +38,26 @@ export class SetInitialCostSurfaceHandler
   async execute({
     scenarioId,
     projectId,
-  }: SetInitialCostSurface): Promise<void> {
+  }: SetInitialCostSurface): Promise<Either<SetInitialCostSurfaceError, true>> {
     const project = await this.projectRepo.findOne(projectId);
 
-    if (!project || !project.planningUnitGridShape) return;
-
+    if (!project) return left(projectNotFound);
     const { planningUnitGridShape } = project;
 
-    await this.queue
-      .add(`set-initial-cost-surface`, {
+    if (!planningUnitGridShape) return left(nullPlanningUnitGridShape);
+
+    try {
+      await this.queue.add(`set-initial-cost-surface`, {
         puGridShape: planningUnitGridShape,
         scenarioId,
-      })
-      .then(() => this.events.event(scenarioId, CostSurfaceState.Submitted))
-      .catch(async (error) => {
-        await this.markAsFailedSubmission(scenarioId, error);
-        throw error;
       });
+      await this.events.event(scenarioId, CostSurfaceState.Submitted);
+    } catch (error) {
+      await this.markAsFailedSubmission(scenarioId, error);
+      return left(jobSubmissionFailed);
+    }
+
+    return right(true);
   }
 
   private markAsFailedSubmission = async (

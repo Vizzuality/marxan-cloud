@@ -83,7 +83,10 @@ import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
 import { ResourceId } from '../clone';
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
 import { lockedScenario, LockService } from './locks/lock.service';
-import { SetInitialCostSurface } from './cost-surface/application/set-initial-cost-surface.command';
+import {
+  SetInitialCostSurface,
+  SetInitialCostSurfaceError,
+} from './cost-surface/application/set-initial-cost-surface.command';
 import { UpdateCostSurface } from './cost-surface/application/update-cost-surface.command';
 
 /** @debt move to own module */
@@ -195,7 +198,10 @@ export class ScenariosService {
     info: AppInfoDTO,
   ): Promise<
     Either<
-      ProjectNotReady | ProjectDoesntExist | typeof forbiddenError,
+      | ProjectNotReady
+      | ProjectDoesntExist
+      | SetInitialCostSurfaceError
+      | typeof forbiddenError,
       Scenario
     >
   > {
@@ -224,9 +230,13 @@ export class ScenariosService {
     const scenario = await this.crudService.create(validatedMetadata, info);
     await this.planningUnitsLinkerService.link(scenario);
 
-    await this.commandBus.execute(
+    const costSurfaceInitializationResult = await this.commandBus.execute(
       new SetInitialCostSurface(scenario.id, scenario.projectId),
     );
+
+    if (isLeft(costSurfaceInitializationResult))
+      // TODO Remove scenario sending a command
+      return costSurfaceInitializationResult;
 
     await this.crudService.assignCreatorRole(
       scenario.id,
