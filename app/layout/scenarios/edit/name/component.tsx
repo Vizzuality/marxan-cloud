@@ -55,13 +55,13 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
           ...data.metadata,
           scenarioEditingMetadata: {
             status: {
-              'protected-areas': 'draft',
+              'planning-unit': 'draft',
               features: 'empty',
               analysis: 'empty',
               solutions: 'empty',
             },
-            tab: 'protected-areas',
-            subtab: 'protected-areas-preview',
+            tab: 'planning-unit',
+            subtab: 'planning-unit-preview',
             lastJobCheck: new Date().getTime(),
           },
         },
