@@ -29,6 +29,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     queueEventsFactory: CreateWithEventFactory<JobInput, true>,
   ) {
     this.queueEvents = queueEventsFactory(this);
+    this.queueEvents.on('failed', this.failed);
   }
 
   async createCompletedEvent(
@@ -55,5 +56,9 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
       kind,
       data: {},
     };
+  }
+
+  async failed(eventData: EventData<JobInput, true>): Promise<void> {
+    // TODO Remove scenario sending a command
   }
 }

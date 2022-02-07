@@ -1,7 +1,11 @@
-import { FromShapefileJobInput } from '@marxan/scenario-cost-surface';
+import {
+  FromShapefileJobInput,
+  jobSubmissionFailed,
+} from '@marxan/scenario-cost-surface';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
+import { Either, left, right } from 'fp-ts/lib/Either';
 import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
 import {
   CostSurfaceEventsPort,
@@ -21,17 +25,23 @@ export class UpdateCostSurfaceHandler
     this.logger.setContext(UpdateCostSurfaceHandler.name);
   }
 
-  async execute({ scenarioId, shapefile }: UpdateCostSurface): Promise<void> {
-    this.queue
-      .add(`cost-surface-for-${scenarioId}`, {
+  async execute({
+    scenarioId,
+    shapefile,
+  }: UpdateCostSurface): Promise<Either<typeof jobSubmissionFailed, true>> {
+    try {
+      await this.queue.add(`cost-surface-for-${scenarioId}`, {
         scenarioId,
         shapefile,
-      })
-      .then(() => this.events.event(scenarioId, CostSurfaceState.Submitted))
-      .catch(async (error) => {
-        await this.markAsFailedSubmission(scenarioId, error);
-        throw error;
       });
+
+      await this.events.event(scenarioId, CostSurfaceState.Submitted);
+    } catch (error) {
+      await this.markAsFailedSubmission(scenarioId, error);
+      return left(jobSubmissionFailed);
+    }
+
+    return right(true);
   }
 
   private markAsFailedSubmission = async (
