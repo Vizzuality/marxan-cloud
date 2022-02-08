@@ -81,7 +81,7 @@ const getFixtures = async () => {
       await app.close();
     },
     GivenExportWasRequested: async () => {
-      resourceId = new ResourceId(v4());
+      resourceId = ResourceId.create();
       componentId = ComponentId.create();
       componentLocationUri = '/foo/bar/project-metadata.json';
       componentLocationRelativePath = 'project-metadata.json';
@@ -103,7 +103,7 @@ const getFixtures = async () => {
       await repo.save(exportInstance);
     },
     GivenExportWithMultipleComponentsWasRequested: async () => {
-      resourceId = new ResourceId(v4());
+      resourceId = ResourceId.create();
 
       componentLocationUri = `/foo/bar/project-metadata.json`;
       componentLocationRelativePath = `project-metadata.json`;
