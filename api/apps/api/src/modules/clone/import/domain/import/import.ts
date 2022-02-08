@@ -1,7 +1,6 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { ImportSnapshot } from './import.snapshot';
 import { Either, left, right } from 'fp-ts/Either';
-import { v4 } from 'uuid';
 import {
   ArchiveLocation,
   ResourceId,
@@ -14,6 +13,7 @@ import {
   PieceImportRequested,
 } from '../events';
 import { ImportComponent } from '@marxan-api/modules/clone/import/domain/import/import-component';
+import { ImportId } from '@marxan-api/modules/clone/import';
 
 export const componentNotFound = Symbol(`component not found`);
 export const componentAlreadyCompleted = Symbol(`component already completed`);
@@ -25,7 +25,7 @@ export type CompletePieceErrors =
 
 export class Import extends AggregateRoot {
   private constructor(
-    private readonly id: string,
+    readonly id: ImportId,
     private readonly resourceId: ResourceId,
     private readonly resourceKind: ResourceKind,
     private readonly archiveLocation: ArchiveLocation,
@@ -45,7 +45,7 @@ export class Import extends AggregateRoot {
   }
 
   static new(data: Omit<ImportSnapshot, 'id'>): Import {
-    const id = v4();
+    const id = ImportId.create();
     const instance = new Import(
       id,
       data.resourceId,
@@ -53,7 +53,9 @@ export class Import extends AggregateRoot {
       data.archiveLocation,
       data.importPieces.map(ImportComponent.from),
     );
-    instance.apply(new ImportRequested(id, data.resourceId, data.resourceKind));
+    instance.apply(
+      new ImportRequested(id.value, data.resourceId, data.resourceKind),
+    );
     instance.requestFirstBatch();
     return instance;
   }

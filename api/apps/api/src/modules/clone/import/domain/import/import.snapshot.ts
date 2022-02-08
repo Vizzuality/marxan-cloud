@@ -4,11 +4,12 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { ImportComponentSnapshot } from './import-component.snapshot';
+import { ImportId } from '@marxan-api/modules/clone/import';
 
 export type ImportComponents = ImportComponentSnapshot[];
 
 export interface ImportSnapshot {
-  id: string;
+  id: ImportId;
   resourceId: ResourceId;
   resourceKind: ResourceKind;
   archiveLocation: ArchiveLocation;

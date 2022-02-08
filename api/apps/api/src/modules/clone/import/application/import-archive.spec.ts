@@ -25,6 +25,8 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import {
+  Import,
+  ImportId,
   ImportRequested,
   ImportSnapshot,
   PieceImportRequested,
@@ -96,11 +98,12 @@ const getFixtures = async () => {
           resourceKind: ResourceKind.Project,
           importPieces: [
             {
+              finished: false,
               order: 0,
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`import component unique id`),
               piece: ClonePiece.ProjectMetadata,
-              uri: [
+              uris: [
                 new ComponentLocation(
                   `/tmp/project-metadata-random-uuid.json`,
                   `project-metadata.json`,
@@ -108,11 +111,12 @@ const getFixtures = async () => {
               ],
             },
             {
+              finished: false,
               order: 1,
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`some other piece`),
               piece: ClonePiece.PlanningAreaGAdm,
-              uri: [
+              uris: [
                 new ComponentLocation(
                   `/tmp/project-planning-area-random-uuid.json`,
                   `planning-area/config.json`,
@@ -131,11 +135,12 @@ const getFixtures = async () => {
           resourceKind: ResourceKind.Project,
           importPieces: [
             {
+              finished: false,
               order: 2,
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`import component unique id`),
               piece: ClonePiece.ProjectMetadata,
-              uri: [
+              uris: [
                 new ComponentLocation(
                   `/tmp/project-metadata-random-uuid.json`,
                   `project-metadata.json`,
@@ -143,11 +148,12 @@ const getFixtures = async () => {
               ],
             },
             {
+              finished: false,
               order: 2,
               resourceId: new ResourceId(`project-id`),
               id: new ComponentId(`some other piece`),
               piece: ClonePiece.PlanningAreaGAdm,
-              uri: [
+              uris: [
                 new ComponentLocation(
                   `/tmp/project-planning-area-random-uuid.json`,
                   `planning-area/config.json`,
@@ -192,7 +198,7 @@ const getFixtures = async () => {
           id: new ComponentId(`import component unique id`),
           resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
-          assets: [
+          uris: [
             {
               relativePath: `project-metadata.json`,
               uri: `/tmp/project-metadata-random-uuid.json`,
@@ -209,7 +215,7 @@ const getFixtures = async () => {
           id: new ComponentId(`import component unique id`),
           resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
-          assets: [
+          uris: [
             {
               relativePath: `project-metadata.json`,
               uri: `/tmp/project-metadata-random-uuid.json`,
@@ -220,7 +226,7 @@ const getFixtures = async () => {
           id: new ComponentId(`some other piece`),
           resourceId: new ResourceId(`project-id`),
           piece: `planning-area-gadm`,
-          assets: [
+          uris: [
             {
               relativePath: `planning-area/config.json`,
               uri: `/tmp/project-planning-area-random-uuid.json`,
@@ -245,14 +251,16 @@ class FakeArchiveReader extends ArchiveReader {
 class InMemoryRepo extends ImportRepository {
   entities: Record<string, ImportSnapshot> = {};
 
-  async find(importId: string): Promise<ImportSnapshot | undefined> {
-    return this.entities[importId];
+  async find(importId: ImportId): Promise<Import | undefined> {
+    const snapshot = this.entities[importId.value];
+    if (!snapshot) return;
+
+    return Import.from(snapshot);
   }
 
-  async save(
-    importRequest: ImportSnapshot,
-  ): Promise<Either<RepoFailure, Success>> {
-    this.entities[importRequest.id] = importRequest;
+  async save(importRequest: Import): Promise<Either<RepoFailure, Success>> {
+    const snapshot = importRequest.toSnapshot();
+    this.entities[snapshot.id.value] = snapshot;
     return right(true);
   }
 }
