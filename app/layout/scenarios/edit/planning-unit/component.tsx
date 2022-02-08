@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
@@ -15,7 +16,6 @@ import Pill from 'layout/pill';
 import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
 import CostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
 import ProtectedAreas from 'layout/scenarios/edit/planning-unit/protected-areas';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
 import Sections from 'layout/sections';
 
 import Button from 'components/button';

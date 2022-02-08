@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
@@ -17,7 +18,6 @@ import Pill from 'layout/pill';
 import AddFeaturesModal from 'layout/scenarios/edit/features/add';
 import ListFeatures from 'layout/scenarios/edit/features/list';
 import TargetFeatures from 'layout/scenarios/edit/features/targets';
-import { ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
