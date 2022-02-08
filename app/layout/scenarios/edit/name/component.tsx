@@ -61,7 +61,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
               solutions: 'empty',
             },
             tab: 'planning-unit',
-            subtab: 'pu-protected-areas-preview',
+            subtab: null,
             lastJobCheck: new Date().getTime(),
           },
         },
