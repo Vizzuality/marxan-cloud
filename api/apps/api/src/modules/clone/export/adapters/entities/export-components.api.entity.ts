@@ -1,4 +1,4 @@
-import { ClonePiece, ComponentId } from '@marxan/cloning/domain';
+import { ClonePiece } from '@marxan/cloning/domain';
 import {
   Column,
   Entity,
@@ -51,7 +51,7 @@ export class ExportComponentEntity {
     componentSnapshot: ExportComponentSnapshot,
   ): ExportComponentEntity {
     const exportComponentEntity = new ExportComponentEntity();
-    exportComponentEntity.id = componentSnapshot.id.value;
+    exportComponentEntity.id = componentSnapshot.id;
     exportComponentEntity.piece = componentSnapshot.piece;
     exportComponentEntity.resourceId = componentSnapshot.resourceId;
     exportComponentEntity.finished = componentSnapshot.finished;
@@ -64,7 +64,7 @@ export class ExportComponentEntity {
 
   toSnapshot(): ExportComponentSnapshot {
     return {
-      id: new ComponentId(this.id),
+      id: this.id,
       finished: this.finished,
       piece: this.piece,
       resourceId: this.resourceId,

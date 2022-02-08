@@ -1,4 +1,3 @@
-import { v4 } from 'uuid';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 
@@ -45,7 +44,7 @@ export class Export extends AggregateRoot {
     kind: ResourceKind,
     parts: ExportComponentSnapshot[],
   ): Export {
-    const exportRequest = new Export(new ExportId(v4()), id, kind, parts);
+    const exportRequest = new Export(ExportId.create(), id, kind, parts);
     const allPieces = parts.map((part) => part.piece);
     parts
       .filter((part) => !part.finished)
@@ -53,7 +52,7 @@ export class Export extends AggregateRoot {
         (part) =>
           new ExportComponentRequested(
             exportRequest.id,
-            part.id,
+            new ComponentId(part.id),
             new ResourceId(part.resourceId),
             kind,
             part.piece,

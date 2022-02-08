@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ComponentLocation } from '../../application/complete-piece.command';
 import { ExportComponentEntity } from './export-components.api.entity';
+import { ComponentLocationSnapshot } from '@marxan/cloning/domain/component-location.snapshot';
 
 @Entity('component_locations')
 export class ComponentLocationEntity {
@@ -21,7 +22,7 @@ export class ComponentLocationEntity {
   component!: ExportComponentEntity;
 
   static fromSnapshot(
-    locationSnapshot: ComponentLocation,
+    locationSnapshot: ComponentLocationSnapshot,
   ): ComponentLocationEntity {
     const componentLocationEntity = new ComponentLocationEntity();
     componentLocationEntity.uri = locationSnapshot.uri;

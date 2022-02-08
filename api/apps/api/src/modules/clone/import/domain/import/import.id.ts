@@ -4,7 +4,7 @@ export class ImportId {
   private readonly _token = 'import-id';
   constructor(public readonly value: string) {}
 
-  static create() {
+  static create(): ImportId {
     return new ImportId(v4());
   }
 }

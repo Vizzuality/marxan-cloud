@@ -99,14 +99,14 @@ const getFixtures = async () => {
         exportPieces: [
           {
             finished: false,
-            id: new ComponentId(v4()),
+            id: v4(),
             piece: ClonePiece.ProjectMetadata,
             resourceId,
             uris: [],
           },
           {
             finished: false,
-            id: new ComponentId(v4()),
+            id: v4(),
             piece: ClonePiece.ExportConfig,
             resourceId,
             uris: [],
@@ -124,15 +124,14 @@ const getFixtures = async () => {
       const result = await repo.find(exportId);
       expect(result).toBeUndefined();
     },
-    WhenAPieceIsCompleted: async (
-      exportId: ExportId,
-      componentId: ComponentId,
-    ) => {
+    WhenAPieceIsCompleted: async (exportId: ExportId, componentId: string) => {
       const location = [
         new ComponentLocation(`${v4()}.json`, 'relative-path.json'),
       ];
 
-      await sut.execute(new CompletePiece(exportId, componentId, location));
+      await sut.execute(
+        new CompletePiece(exportId, new ComponentId(componentId), location),
+      );
     },
     WhenTryingToCompleteAnUnexistingPiece: async (exportId: ExportId) => {
       const exportInstance = await repo.find(exportId);
@@ -141,7 +140,7 @@ const getFixtures = async () => {
       const componentId = new ComponentId(v4());
       const piece = exportInstance
         ?.toSnapshot()
-        .exportPieces.find((piece) => piece.id === componentId);
+        .exportPieces.find((piece) => piece.id === componentId.value);
       expect(piece).toBeUndefined();
 
       await sut.execute(new CompletePiece(exportId, componentId, []));
@@ -151,7 +150,7 @@ const getFixtures = async () => {
     },
     ThenComponentIsFinished: async (
       exportId: ExportId,
-      componentId: ComponentId,
+      componentId: string,
     ) => {
       const exportInstance = await repo.find(exportId);
 
@@ -165,13 +164,13 @@ const getFixtures = async () => {
       expect(component?.finished).toEqual(true);
     },
     ThenExportComponentFinishedEventIsEmitted: (
-      componentId: ComponentId,
+      componentId: string,
       exportId: ExportId,
     ) => {
       const componentFinishedEvent = events[0];
 
       expect(componentFinishedEvent).toMatchObject({
-        componentId,
+        componentId: new ComponentId(componentId),
         exportId,
         location: expect.any(Array),
       });

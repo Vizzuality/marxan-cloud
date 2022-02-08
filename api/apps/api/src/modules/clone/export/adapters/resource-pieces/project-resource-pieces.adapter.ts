@@ -1,9 +1,4 @@
-import {
-  ClonePiece,
-  ComponentId,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -42,35 +37,35 @@ export class ProjectResourcePiecesAdapter implements ResourcePieces {
 
     return [
       {
-        id: new ComponentId(v4()),
+        id: v4(),
         resourceId: id.value,
         piece: ClonePiece.ProjectMetadata,
         finished: false,
         uris: [],
       },
       {
-        id: new ComponentId(v4()),
+        id: v4(),
         resourceId: id.value,
         piece: ClonePiece.ExportConfig,
         finished: false,
         uris: [],
       },
       {
-        id: new ComponentId(v4()),
+        id: v4(),
         resourceId: id.value,
         piece: ClonePiece.PlanningAreaCustom,
         finished: false,
         uris: [],
       },
       {
-        id: new ComponentId(v4()),
+        id: v4(),
         resourceId: id.value,
         piece: ClonePiece.PlanningAreaGAdm,
         finished: false,
         uris: [],
       },
       {
-        id: new ComponentId(v4()),
+        id: v4(),
         resourceId: id.value,
         piece: ClonePiece.PlanningAreaGridCustom,
         finished: false,

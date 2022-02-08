@@ -5,12 +5,7 @@ import { v4 } from 'uuid';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import {
-  ClonePiece,
-  ComponentId,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 
 import { ExportComponentSnapshot, ExportId } from '../domain';
 
@@ -69,21 +64,21 @@ const getFixtures = async () => {
       const someScenarioId = v4();
       piecesResolver.resolveMock.mockImplementationOnce(async () => [
         {
-          id: new ComponentId(v4()),
+          id: v4(),
           resourceId: projectId,
           finished: false,
           piece: ClonePiece.ProjectMetadata,
           uris: [],
         },
         {
-          id: new ComponentId(v4()),
+          id: v4(),
           resourceId: someScenarioId,
           finished: true,
           piece: ClonePiece.PlanningAreaCustom,
           uris: [],
         },
         {
-          id: new ComponentId(v4()),
+          id: v4(),
           resourceId: someScenarioId,
           finished: false,
           piece: ClonePiece.ExportConfig,
