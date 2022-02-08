@@ -11,7 +11,6 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { string } from 'fp-ts';
 
 @Injectable()
 @PieceExportProvider()
@@ -67,9 +66,10 @@ export class ExportConfig extends PieceProcessor {
     const [scenario]: {
       name: string;
       project_id: string;
+      description: string;
     }[] = await this.entityManager.query(
       `
-       SELECT name, project_id FROM scenarios where id = $1
+       SELECT name, project_id, description FROM scenarios where id = $1
     `,
       [input.resourceId],
     );
@@ -81,6 +81,7 @@ export class ExportConfig extends PieceProcessor {
     const metadata = JSON.stringify({
       version: `0.1.0`,
       name: scenario.name,
+      description: scenario.description,
       projectId: scenario.project_id,
       kind: input.resourceKind,
       pieces: input.allPieces,
