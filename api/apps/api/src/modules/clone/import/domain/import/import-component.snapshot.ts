@@ -1,8 +1,8 @@
 import {
-  ComponentId,
   ClonePiece,
-  ResourceId,
+  ComponentId,
   ComponentLocation,
+  ResourceId,
 } from '@marxan/cloning/domain';
 
 export interface ImportComponentSnapshot {
@@ -10,5 +10,6 @@ export interface ImportComponentSnapshot {
   readonly piece: ClonePiece;
   readonly resourceId: ResourceId;
   readonly order: number;
-  readonly uri: ComponentLocation[];
+  readonly uris: ComponentLocation[];
+  readonly finished: boolean;
 }

@@ -1,12 +1,11 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 import { ImportSnapshot } from './import.snapshot';
-import { ImportComponentSnapshot } from './import.component.snapshot';
 import { Either, left, right } from 'fp-ts/Either';
 import { v4 } from 'uuid';
 import {
-  ResourceKind,
   ArchiveLocation,
   ResourceId,
+  ResourceKind,
 } from '@marxan/cloning/domain';
 import {
   AllPiecesImported,
@@ -14,8 +13,7 @@ import {
   PieceImported,
   PieceImportRequested,
 } from '../events';
-
-type ImportComponent = ImportComponentSnapshot;
+import { ImportComponent } from '@marxan-api/modules/clone/import/domain/import/import-component';
 
 export const componentNotFound = Symbol(`component not found`);
 export const componentAlreadyCompleted = Symbol(`component already completed`);
@@ -42,7 +40,7 @@ export class Import extends AggregateRoot {
       snapshot.resourceId,
       snapshot.resourceKind,
       snapshot.archiveLocation,
-      snapshot.importPieces.sort(this.orderSorter),
+      snapshot.importPieces.map(ImportComponent.from),
     );
   }
 
@@ -53,7 +51,7 @@ export class Import extends AggregateRoot {
       data.resourceId,
       data.resourceKind,
       data.archiveLocation,
-      data.importPieces.sort(this.orderSorter),
+      data.importPieces.map(ImportComponent.from),
     );
     instance.apply(new ImportRequested(id, data.resourceId, data.resourceKind));
     instance.requestFirstBatch();
@@ -61,19 +59,13 @@ export class Import extends AggregateRoot {
   }
 
   completePiece(
-    piece: ImportComponentSnapshot &
-      Required<Pick<ImportComponentSnapshot, 'uri'>>,
+    piece: ImportComponent,
   ): Either<CompletePieceErrors, CompletePieceSuccess> {
     const pieceToComplete = this.pieces.find(
       (pc) => pc.id.value === piece.id.value,
     );
-    if (!pieceToComplete) {
-      return left(componentNotFound);
-    }
-
-    if (pieceToComplete.uri) {
-      return left(componentAlreadyCompleted);
-    }
+    if (!pieceToComplete) return left(componentNotFound);
+    if (pieceToComplete.isFinished()) return left(componentAlreadyCompleted);
 
     this.apply(
       new PieceImported(
@@ -83,21 +75,27 @@ export class Import extends AggregateRoot {
       ),
     );
 
-    const nextBatch = this.getNextComponents(pieceToComplete);
+    pieceToComplete.complete();
 
-    if (nextBatch.finished) {
-      this.apply(new AllPiecesImported());
-    } else {
-      for (const nextPiece of nextBatch.components) {
-        this.apply(
-          new PieceImportRequested(
-            nextPiece.id,
-            nextPiece.piece,
-            nextPiece.resourceId,
-            nextPiece.uri,
-          ),
-        );
-      }
+    const isThisTheLastBatch = false;
+    const isThisBatchCompleted = false;
+
+    if (isThisTheLastBatch) this.apply(new AllPiecesImported());
+    if (isThisTheLastBatch || !isThisBatchCompleted) return right(true);
+
+    const nextBatch = this.pieces.filter(
+      (piece) => piece.order === pieceToComplete.order + 1,
+    );
+
+    for (const nextPiece of nextBatch) {
+      this.apply(
+        new PieceImportRequested(
+          nextPiece.id,
+          nextPiece.piece,
+          nextPiece.resourceId,
+          nextPiece.uris,
+        ),
+      );
     }
 
     return right(true);
@@ -108,7 +106,7 @@ export class Import extends AggregateRoot {
       id: this.id,
       resourceId: this.resourceId,
       resourceKind: this.resourceKind,
-      importPieces: this.pieces,
+      importPieces: this.pieces.map((piece) => piece.toSnapshot()),
       archiveLocation: this.archiveLocation,
     };
   }
@@ -116,55 +114,23 @@ export class Import extends AggregateRoot {
   private requestFirstBatch() {
     if (this.pieces.length === 0) {
       this.apply(new AllPiecesImported());
-    } else {
-      // we kindly assume that first batch is not done already
-      for (const component of this.pieces.filter(
-        (pc) => pc.order === this.pieces[0].order,
-      )) {
-        this.apply(
-          new PieceImportRequested(
-            component.id,
-            component.piece,
-            component.resourceId,
-            component.uri,
-          ),
-        );
-      }
+      return;
     }
-  }
+    const firstBatchOrder = Math.min(
+      ...this.pieces.map((piece) => piece.order),
+    );
 
-  private getNextComponents(
-    lastPiece: ImportComponent,
-  ): { components: ImportComponent[]; finished: boolean } {
-    const elements = this.pieces.filter((pc) => pc.order === lastPiece.order);
-    const hasIncompletePiecesForBatch = elements.some((pc) => !Boolean(pc.uri));
-
-    if (hasIncompletePiecesForBatch) {
-      return {
-        components: [],
-        finished: false,
-      };
-    }
-
-    const location = this.pieces.indexOf(lastPiece);
-    const nextComponentLocation = location + 1;
-    const nextComponent = this.pieces[nextComponentLocation];
-
-    if (nextComponent) {
-      return {
-        components: this.pieces.filter(
-          (pc) => pc.order === nextComponent.order,
+    for (const component of this.pieces.filter(
+      (pc) => pc.order === firstBatchOrder,
+    )) {
+      this.apply(
+        new PieceImportRequested(
+          component.id,
+          component.piece,
+          component.resourceId,
+          component.uris,
         ),
-        finished: false,
-      };
+      );
     }
-
-    return {
-      components: [],
-      finished: true,
-    };
   }
-
-  private static orderSorter = (a: { order: number }, b: { order: number }) =>
-    a.order - b.order;
 }
