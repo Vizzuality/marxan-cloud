@@ -1,6 +1,6 @@
 import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Either } from 'fp-ts/Either';
-import { ImportSnapshot } from '../domain/import/import.snapshot';
+import { ImportSnapshot } from '../../domain/import/import.snapshot';
 
 export const archiveCorrupted = Symbol(`archive couldn't be extracted`);
 export const invalidFiles = Symbol(`archive files structure is not recognized`);

@@ -1,7 +1,7 @@
 import { Either } from 'fp-ts/Either';
-import { Import, ImportId } from '../domain';
+import { Import, ImportId } from '../../domain';
 
-const unknownError = Symbol(`unknown error`);
+export const unknownError = Symbol(`unknown error`);
 
 export type Failure = typeof unknownError;
 export type Success = true;

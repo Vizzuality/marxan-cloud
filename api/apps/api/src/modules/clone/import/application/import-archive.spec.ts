@@ -3,18 +3,14 @@ import { Test } from '@nestjs/testing';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 
-import {
-  Failure as RepoFailure,
-  ImportRepository,
-  Success,
-} from './import.repository.port';
+import { ImportRepository } from './import-repository/import.repository.port';
 
 import {
   ArchiveReader,
   Failure as ArchiveFailure,
   invalidFiles,
   Success as ArchiveSuccess,
-} from './archive-reader.port';
+} from './archive-reader/archive-reader.port';
 
 import {
   ArchiveLocation,
@@ -24,15 +20,11 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  Import,
-  ImportId,
-  ImportRequested,
-  ImportSnapshot,
-  PieceImportRequested,
-} from '../domain';
+import { ImportRequested, PieceImportRequested } from '../domain';
 import { ImportArchive } from './import-archive';
 import { PromiseType } from 'utility-types';
+import { MemoryImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/memory--import.repository.adapter';
+import { ImportRepositoryModule } from '@marxan-api/modules/clone/import/application/import-repository/import-repository.module';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -64,12 +56,8 @@ test(`importing archive with equal order components`, async () => {
 
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
-    imports: [CqrsModule],
+    imports: [CqrsModule, ImportRepositoryModule],
     providers: [
-      {
-        provide: ImportRepository,
-        useClass: InMemoryRepo,
-      },
       {
         provide: ArchiveReader,
         useClass: FakeArchiveReader,
@@ -83,7 +71,7 @@ const getFixtures = async () => {
   sandbox.get(EventBus).subscribe((event) => events.push(event));
 
   const sut = sandbox.get(ImportArchive);
-  const repo: InMemoryRepo = sandbox.get(ImportRepository);
+  const repo: MemoryImportRepository = sandbox.get(ImportRepository);
   const archiveReader: FakeArchiveReader = sandbox.get(ArchiveReader);
 
   return {
@@ -245,22 +233,5 @@ class FakeArchiveReader extends ArchiveReader {
     archive: ArchiveLocation,
   ): Promise<Either<ArchiveFailure, ArchiveSuccess>> {
     return this.mock(archive);
-  }
-}
-
-class InMemoryRepo extends ImportRepository {
-  entities: Record<string, ImportSnapshot> = {};
-
-  async find(importId: ImportId): Promise<Import | undefined> {
-    const snapshot = this.entities[importId.value];
-    if (!snapshot) return;
-
-    return Import.from(snapshot);
-  }
-
-  async save(importRequest: Import): Promise<Either<RepoFailure, Success>> {
-    const snapshot = importRequest.toSnapshot();
-    this.entities[snapshot.id.value] = snapshot;
-    return right(true);
   }
 }

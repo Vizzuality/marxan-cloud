@@ -8,11 +8,11 @@ import { Import } from '../domain';
 import {
   ArchiveReader,
   Failure as ArchiveReadError,
-} from './archive-reader.port';
+} from './archive-reader/archive-reader.port';
 import {
   Failure as PersistenceError,
   ImportRepository,
-} from './import.repository.port';
+} from './import-repository/import.repository.port';
 
 export type ImportError = PersistenceError | ArchiveReadError;
 
