@@ -12,12 +12,15 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useProject } from 'hooks/projects';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
 import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
 import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -52,6 +55,14 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
 
+  const { metadata } = scenarioData || {};
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
   const {
     data: wdpaData,
     isFetching: wdpaIsFetching,
@@ -72,6 +83,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     },
   });
 
+  console.log('------------>', metadata);
+
   const onCalculateProtectedAreas = useCallback((values) => {
     const { wdpaIucnCategories } = values;
 
@@ -89,12 +102,26 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         areas: selectedProtectedAreas,
         threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
       },
+    }, {
+      onSuccess: () => {
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, {
+              tab: ScenarioSidebarTabs.PLANNING_UNIT,
+              subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
+            }),
+          },
+        });
+      },
     });
   }, [
     saveScenarioProtectedAreasMutation,
     scenarioData,
     sid,
     wdpaData,
+    saveScenarioMutation,
+    metadata,
   ]);
 
   const onSubmit = useCallback((values) => {
