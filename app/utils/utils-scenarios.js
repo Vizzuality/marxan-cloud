@@ -1,7 +1,7 @@
 export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
   status: {
     'planning-unit': 'draft', // Possible values: empty, draft and outdated
-    features: 'empty',
+    features: 'draft',
     analysis: 'empty',
     solutions: 'empty',
   },
@@ -10,7 +10,7 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
 };
 
 export const STATUS_VALUES = {
-  'protected-areas': {
+  'planning-unit': {
     analysis: 'empty',
     solutions: 'empty',
   },

@@ -83,8 +83,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  console.log('------------>', metadata);
-
   const onCalculateProtectedAreas = useCallback((values) => {
     const { wdpaIucnCategories } = values;
 
