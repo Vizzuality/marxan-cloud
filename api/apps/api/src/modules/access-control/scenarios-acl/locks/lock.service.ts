@@ -4,7 +4,10 @@ import { Repository } from 'typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
 import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
-import { ScenarioLockDto } from './dto/scenario.lock.dto';
+import {
+  ScenarioLockDto,
+  ScenarioLockResultPlural,
+} from './dto/scenario.lock.dto';
 
 export const unknownError = Symbol(`unknown error`);
 export const lockedScenario = Symbol(`scenario is already locked`);
@@ -40,6 +43,25 @@ export class LockService {
 
       return right(result);
     });
+  }
+
+  async getAllLocksByProject(
+    projectId: string,
+  ): Promise<ScenarioLockResultPlural> {
+    const query = this.locksRepo
+      .createQueryBuilder('scenario_locks')
+      .leftJoinAndSelect('scenario_locks.scenario', 'scenario')
+      .leftJoinAndSelect('scenario.project', 'project')
+      .where('project.id = :projectId', { projectId })
+      .select([
+        'scenario_locks.userId',
+        'scenario_locks.scenarioId',
+        'scenario_locks.createdAt',
+      ]);
+
+    const allLocksByProject = await query.getMany();
+
+    return { data: allLocksByProject };
   }
 
   async releaseLock(scenarioId: string): Promise<void> {

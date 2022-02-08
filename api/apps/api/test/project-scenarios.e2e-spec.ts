@@ -128,107 +128,6 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenOkIsReturned(response);
   });
 
-  it('Viewer fails to acquire lock for a scenario', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenViewerWasAddedToScenario();
-    const response = await fixtures.WhenAcquiringLockForScenarioAsViewer();
-    fixtures.ThenForbiddenIsReturned(response);
-  });
-
-  it('Contributor acquires lock for a scenario', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
-    const response = await fixtures.WhenAcquiringLockForScenarioAsContributor();
-    fixtures.ThenScenarioLockInfoForContributorIsReturned(response);
-  });
-
-  it('Owner acquires lock for a scenario', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    const response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-  });
-
-  it('Fails to acquire lock for a scenario as there was one already', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-
-    response = await fixtures.WhenAcquiringLockForScenarioAsContributor();
-    fixtures.ThenScenarioIsLockedIsReturned(response);
-  });
-
-  it('Fails to update scenario as there was a lock in place by a different user', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-
-    response = await fixtures.WhenUpdatingScenarioAsContributor();
-    fixtures.ThenScenarioIsLockedIsReturned(response);
-  });
-
-  it('Updates scenario correctly as lock is in place by same user', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-
-    response = await fixtures.WhenUpdatingScenarioAsOwner();
-    fixtures.ThenScenarioIsUpdated(response);
-  });
-
-  it('Releases scenario lock correctly', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    const userToken = await fixtures.GivenUserIsLoggedIn('owner');
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-
-    response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenLockIsSuccessfullyReleased(response);
-  });
-
-  it('Releases scenario lock correctly because user is not owner of lock but is project owner', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
-    const userToken = await fixtures.GivenUserIsLoggedIn('owner');
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsContributor();
-    fixtures.ThenScenarioLockInfoForContributorIsReturned(response);
-
-    response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenLockIsSuccessfullyReleased(response);
-  });
-
-  it('Releases scenario lock correctly because user is not owner of lock but is project contributor', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
-    await fixtures.GivenContributorWasAddedToProject();
-    const userToken = await fixtures.GivenUserIsLoggedIn('contributor');
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-
-    response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenLockIsSuccessfullyReleased(response);
-  });
-
-  it('Fails to release scenario lock as its not owned by the same user and this is not a project owner/contributor', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenUserWasAddedToScenario();
-    const userToken = await fixtures.GivenUserIsLoggedIn('random');
-
-    let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-    fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
-
-    response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenScenarioIsLockedByAnotherUserIsReturned(response);
-  });
-
   it('should not allow to create scenario with invalid marxan properties', async () => {
     const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
@@ -238,7 +137,6 @@ describe('ScenariosModule (e2e)', () => {
 async function getFixtures() {
   const app = await bootstrapApplication();
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
-  const ownerUserId = await GivenUserExists(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
@@ -448,35 +346,6 @@ async function getFixtures() {
           },
         }),
 
-    WhenAcquiringLockForScenarioAsOwner: async () =>
-      await request(app.getHttpServer())
-        .post(`/api/v1/scenarios/${scenarioId}/lock`)
-        .set('Authorization', `Bearer ${ownerToken}`),
-    WhenAcquiringLockForScenarioAsContributor: async () =>
-      await request(app.getHttpServer())
-        .post(`/api/v1/scenarios/${scenarioId}/lock`)
-        .set('Authorization', `Bearer ${contributorToken}`),
-    WhenAcquiringLockForScenarioAsViewer: async () =>
-      await request(app.getHttpServer())
-        .post(`/api/v1/scenarios/${scenarioId}/lock`)
-        .set('Authorization', `Bearer ${viewerToken}`),
-
-    WhenUpdatingScenarioAsOwner: async () =>
-      await request(app.getHttpServer())
-        .patch(`/api/v1/scenarios/${scenarioId}`)
-        .send({ name: 'Updated Scenario', description: 'Updated Description' })
-        .set('Authorization', `Bearer ${ownerToken}`),
-    WhenUpdatingScenarioAsContributor: async () =>
-      await request(app.getHttpServer())
-        .patch(`/api/v1/scenarios/${scenarioId}`)
-        .send({ name: 'Updated Scenario', description: 'Updated Description' })
-        .set('Authorization', `Bearer ${contributorToken}`),
-
-    WhenReleasingLockForScenario: async (token: string) =>
-      await request(app.getHttpServer())
-        .patch(`/api/v1/scenarios/${scenarioId}/release-lock`)
-        .set('Authorization', `Bearer ${token}`),
-
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
     },
@@ -487,26 +356,6 @@ async function getFixtures() {
 
     ThenOkIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
-    },
-
-    ThenLockIsSuccessfullyReleased: (response: request.Response) => {
-      expect(response.status).toEqual(204);
-    },
-
-    ThenScenarioIsLockedIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(400);
-      const error: any = response.body.errors[0];
-      expect(error.title).toEqual(
-        `Scenario ${scenarioId} is already being edited.`,
-      );
-    },
-
-    ThenScenarioIsLockedByAnotherUserIsReturned: (
-      response: request.Response,
-    ) => {
-      expect(response.status).toEqual(400);
-      const error: any = response.body.errors[0];
-      expect(error.title).toEqual('Scenario lock belongs to a different user.');
     },
 
     ThenScenarioIsCreatedAndNoJobHasBeenSubmitted: (
@@ -631,19 +480,6 @@ async function getFixtures() {
         response.body.errors[0].meta.rawError.response.message[0].constraints
           .isEnum,
       ).toMatchInlineSnapshot(`"HEURTYPE must be a valid enum value"`);
-    },
-
-    ThenScenarioLockInfoForOwnerIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(201);
-      expect(response.body.data.scenarioId).toEqual(scenarioId);
-      expect(response.body.data.userId).toEqual(ownerUserId);
-    },
-    ThenScenarioLockInfoForContributorIsReturned: (
-      response: request.Response,
-    ) => {
-      expect(response.status).toEqual(201);
-      expect(response.body.data.scenarioId).toEqual(scenarioId);
-      expect(response.body.data.userId).toEqual(contributorUserId);
     },
   };
 }

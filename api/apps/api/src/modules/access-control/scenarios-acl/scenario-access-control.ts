@@ -1,7 +1,10 @@
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
 import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '..';
-import { ScenarioLockDto } from './locks/dto/scenario.lock.dto';
+import {
+  ScenarioLockDto,
+  ScenarioLockResultPlural,
+} from './locks/dto/scenario.lock.dto';
 import {
   AcquireFailure,
   lockedByAnotherUser,
@@ -38,4 +41,9 @@ export abstract class ScenarioAccessControl {
       boolean
     >
   >;
+  abstract findAllLocks(
+    userId: string,
+    scenarioId: string,
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>>;
 }
