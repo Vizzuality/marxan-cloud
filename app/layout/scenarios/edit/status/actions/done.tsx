@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -43,7 +43,8 @@ export const useScenarioActionsDone = () => {
 
   // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
-    const subt = subtab === 'pu-protected-areas-preview' ? 'pu-protected-areas-threshold' : null;
+    const subt = subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+      ? ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD : null;
 
     scenarioMutation.mutate({
       id: `${sid}`,
@@ -106,7 +107,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: ScenarioSidebarTabs.PLANNING_UNIT,
-            subtab: 'pu-protected-areas-threshold',
+            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
             status: {
               'protected-areas': 'draft',
               features: 'empty',

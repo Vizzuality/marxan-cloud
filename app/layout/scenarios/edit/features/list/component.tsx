@@ -12,7 +12,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
@@ -188,7 +188,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
-              subtab: 'features-preview',
+              subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
             }),
           },
         }, {
@@ -230,7 +230,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
-              subtab: 'features-fpf',
+              subtab: ScenarioSidebarSubTabs.FEATURES_FPF,
             }),
           },
         }, {

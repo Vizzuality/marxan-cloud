@@ -57,7 +57,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   });
 
   useEffect(() => {
-    setStep(metaSubtab === 'pu-protected-areas-threshold' ? 1 : 0);
+    setStep(metaSubtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD ? 1 : 0);
   }, [metaSubtab]);
 
   // EFFECTS

@@ -10,7 +10,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useAccessToken } from 'hooks/auth';
 import { useSelectedFeatures } from 'hooks/features';
@@ -126,38 +126,36 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const include = useMemo(() => {
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return 'lock-status,protection';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-preview') return 'protection';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'planning-unit-cost-surface') return 'cost';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'planning-unit-adjust-planning-units') return 'lock-status,protection';
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW) return 'protection';
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE) return 'cost';
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS) return 'lock-status,protection';
 
-    if (tab === 'protected-areas' || tab === ScenarioSidebarTabs.FEATURES) return 'protection';
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_PREVIEW) return 'protection,features';
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return 'features';
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return 'cost';
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return 'lock-status,protection';
 
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-preview') return 'protection,features';
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-gap-analysis') return 'features';
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-cost-surface') return 'cost';
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-adjust-planning-units') return 'lock-status,protection';
-
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== 'solutions-gap-analysis') return 'results';
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === 'solutions-gap-analysis') return 'results,features';
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return 'results';
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return 'results,features';
 
     return 'protection';
   }, [tab, subtab]);
 
   const sublayers = useMemo(() => {
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-threshold') return ['wdpa-percentage'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'planning-unit-cost-surface') return ['cost'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD) return ['wdpa-percentage'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE) return ['cost'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out'];
 
     if (tab === ScenarioSidebarTabs.FEATURES) return ['wdpa-percentage'];
 
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-preview') return ['wdpa-percentage', 'features'];
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-gap-analysis') return ['features'];
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-cost-surface') return ['cost'];
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_PREVIEW) return ['wdpa-percentage', 'features'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return ['cost'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out'];
 
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== 'solutions-gap-analysis') return ['solutions'];
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === 'solutions-gap-analysis') return ['features'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return ['solutions'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return ['features'];
 
     return [];
   }, [tab, subtab]);
@@ -169,11 +167,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
     // PLANNING UNIT
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'planning-unit-cost-surface') return ['cost', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'planning-unit-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE) return ['cost', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
 
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-preview' && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-threshold' && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
 
     if (tab === ScenarioSidebarTabs.FEATURES) {
       return [
@@ -184,13 +182,13 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       ];
     }
 
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-gap-analysis') return ['features', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-cost-surface') return ['cost', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === 'analysis-adjust-planning-units') return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return ['cost', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.ANALYSIS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (tab === ScenarioSidebarTabs.ANALYSIS) return ['wdpa-percentage', 'features', 'pugrid'];
 
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== 'solutions-gap-analysis') return ['frequency', 'solution', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === 'solutions-gap-analysis') return ['features'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['frequency', 'solution', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features'];
 
     return ['pugrid'];
   }, [tab, subtab, wdpaCategories?.wdpaIucnCategories, scenarioData?.wdpaIucnCategories]);
@@ -212,7 +210,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     ...wdpaCategories,
     pid: `${pid}`,
     cache,
-    active: tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-preview',
+    active: tab === ScenarioSidebarTabs.PLANNING_UNIT
+      && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
     bbox,
     options: {
       ...layerSettings['wdpa-preview'],
@@ -243,7 +242,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     options: {
       wdpaIucnCategories: tab === ScenarioSidebarTabs.PLANNING_UNIT
         ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
-      wdpaThreshold: tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-threshold' ? wdpaThreshold * 100 : scenarioData?.wdpaThreshold,
+      wdpaThreshold: tab === ScenarioSidebarTabs.PLANNING_UNIT
+        && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
+        ? wdpaThreshold * 100 : scenarioData?.wdpaThreshold,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
@@ -276,8 +277,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const LEGEND = useLegend({
     layers,
     options: {
-      wdpaIucnCategories: tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-preview' ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
-      wdpaThreshold: tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === 'pu-protected-areas-threshold' ? wdpaThreshold : scenarioData?.wdpaThreshold,
+      wdpaIucnCategories: tab === ScenarioSidebarTabs.PLANNING_UNIT
+        && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+        ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
+      wdpaThreshold: tab === ScenarioSidebarTabs.PLANNING_UNIT
+        && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
+        ? wdpaThreshold : scenarioData?.wdpaThreshold,
       cost: costSurfaceRangeData,
       puAction,
       puIncludedValue: puTmpIncludedValue,

@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import {
@@ -138,7 +138,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
-              subtab: 'features-preview',
+              subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
             }),
           },
         }, {

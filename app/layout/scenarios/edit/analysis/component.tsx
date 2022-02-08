@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
@@ -79,7 +79,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-    const subtab = s ? `analysis-${s}` : 'analysis-preview';
+    const subtab = s ? `analysis-${s}` : ScenarioSidebarSubTabs.ANALYSIS_PREVIEW;
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
 

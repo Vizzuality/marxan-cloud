@@ -67,14 +67,14 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
       data: {
         metadata: mergeScenarioStatusMetaData(metadata, {
           tab: ScenarioSidebarTabs.FEATURES,
-          subtab: 'features-preview',
+          subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
         }),
       },
     });
   }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
-    setStep(metaSubtab === 'features-fpf' ? 1 : 0);
+    setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_FPF ? 1 : 0);
   }, [metaSubtab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;

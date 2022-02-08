@@ -5,7 +5,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import {
@@ -173,7 +173,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.ANALYSIS,
-              subtab: 'analysis-preview',
+              subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
             }),
           },
         }, {

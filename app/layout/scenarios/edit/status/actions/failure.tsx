@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -42,7 +42,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'pu-protected-areas-preview',
+            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -72,7 +72,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'pu-protected-areas-preview',
+            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -103,7 +103,7 @@ export const useScenarioActionsFailure = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: ScenarioSidebarTabs.FEATURES,
-            subtab: 'features-preview',
+            subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
             status: {
               'protected-areas': 'draft',
               features: 'draft',
@@ -234,7 +234,7 @@ export const useScenarioActionsFailure = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: ScenarioSidebarTabs.ANALYSIS,
-            subtab: 'analysis-preview',
+            subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
             status: {
               'protected-areas': 'draft',
               features: 'draft',
