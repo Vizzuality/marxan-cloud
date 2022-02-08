@@ -17,7 +17,7 @@ export class ScenarioResourcePiecesAdapter implements ResourcePieces {
     id: ResourceId,
     kind: ResourceKind,
   ): Promise<ExportComponentSnapshot[]> {
-    return [
+    const pieces: ExportComponentSnapshot[] = [
       {
         id: new ComponentId(v4()),
         resourceId: id.value,
@@ -26,5 +26,17 @@ export class ScenarioResourcePiecesAdapter implements ResourcePieces {
         uris: [],
       },
     ];
+
+    if (kind === ResourceKind.Scenario) {
+      pieces.push({
+        id: new ComponentId(v4()),
+        resourceId: id.value,
+        piece: ClonePiece.ExportConfig,
+        finished: false,
+        uris: [],
+      });
+    }
+
+    return pieces;
   }
 }

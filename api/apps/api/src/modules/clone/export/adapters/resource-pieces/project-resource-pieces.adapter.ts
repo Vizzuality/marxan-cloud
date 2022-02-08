@@ -35,7 +35,7 @@ export class ProjectResourcePiecesAdapter implements ResourcePieces {
       scenarios.map((scenario) =>
         this.scenarioResourcePieces.resolveFor(
           new ResourceId(scenario.id),
-          ResourceKind.Scenario,
+          kind,
         ),
       ),
     );
