@@ -34,7 +34,7 @@ export class Import extends AggregateRoot {
     super();
   }
 
-  static from(snapshot: ImportSnapshot): Import {
+  static fromSnapshot(snapshot: ImportSnapshot): Import {
     return new Import(
       snapshot.id,
       snapshot.resourceId,

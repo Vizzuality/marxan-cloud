@@ -17,7 +17,7 @@ export class MemoryImportRepository extends ImportRepository {
     const snapshot = this.entities[importId.value];
     if (!snapshot) return;
 
-    return Import.from(snapshot);
+    return Import.fromSnapshot(snapshot);
   }
 
   async save(importRequest: Import): Promise<Either<RepoFailure, Success>> {

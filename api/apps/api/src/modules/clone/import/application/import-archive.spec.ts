@@ -23,7 +23,7 @@ import {
 import { ImportRequested, PieceImportRequested } from '../domain';
 import { ImportArchive } from './import-archive';
 import { PromiseType } from 'utility-types';
-import { MemoryImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/memory--import.repository.adapter';
+import { MemoryImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/memory-import.repository.adapter';
 import { ImportRepositoryModule } from '@marxan-api/modules/clone/import/application/import-repository/import-repository.module';
 
 let fixtures: FixtureType<typeof getFixtures>;
