@@ -32,8 +32,10 @@ export class ImportArchive {
     if (isLeft(extractResult)) return extractResult;
 
     const importRequest = this.eventPublisher.mergeObjectContext(
-      Import.new(extractResult.right),
+      extractResult.right,
     );
+
+    importRequest.run();
 
     const result = await this.importRepo.save(importRequest);
 

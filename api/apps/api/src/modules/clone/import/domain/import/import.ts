@@ -54,9 +54,15 @@ export class Import extends AggregateRoot {
       new ArchiveLocation(data.archiveLocation),
       data.importPieces.map(ImportComponent.from),
     );
-    instance.apply(new ImportRequested(id, resourceId, data.resourceKind));
-    instance.requestFirstBatch();
+
     return instance;
+  }
+
+  run(): void {
+    this.apply(
+      new ImportRequested(this.id, this.resourceId, this.resourceKind),
+    );
+    this.requestFirstBatch();
   }
 
   completePiece(
