@@ -11,7 +11,6 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
 
 export const STATUS_VALUES = {
   'protected-areas': {
-    features: 'empty',
     analysis: 'empty',
     solutions: 'empty',
   },

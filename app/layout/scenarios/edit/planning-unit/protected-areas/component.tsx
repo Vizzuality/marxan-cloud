@@ -21,12 +21,9 @@ import Icon from 'components/icon';
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ScenariosSidebarEditWDPAProps {
-  onChangeSection: (s: string) => void;
 }
 
-export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = ({
-  onChangeSection,
-}: ScenariosSidebarEditWDPAProps) => {
+export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
 
@@ -97,8 +94,8 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
         <motion.div
           key="protected-areas"
           className="flex flex-col min-h-0 overflow-hidden"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
           <header className="flex items-center pt-5 pb-1 space-x-3">
             <button
@@ -106,7 +103,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
               type="button"
               className="flex items-center w-full space-x-2 text-left focus:outline-none"
               onClick={() => {
-                onChangeSection(null);
+                dispatch(setSubTab(null));
               }}
             >
               <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />

@@ -56,7 +56,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
           scenarioEditingMetadata: {
             status: {
               'planning-unit': 'draft',
-              features: 'empty',
+              features: 'draft',
               analysis: 'empty',
               solutions: 'empty',
             },

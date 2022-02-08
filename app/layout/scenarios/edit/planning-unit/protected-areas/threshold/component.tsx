@@ -106,12 +106,16 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const selectedProtectedAreas = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
-    return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
-      return {
-        id: pa.id,
-        selected: true,
-      };
-    });
+    if (!wdpaData && Array.isArray(wdpaData)) {
+      return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
+        return {
+          id: pa.id,
+          selected: true,
+        };
+      });
+    }
+
+    return [];
   }, [wdpaCategories, wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {

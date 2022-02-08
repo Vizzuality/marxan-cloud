@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -15,23 +15,24 @@ import Pill from 'layout/pill';
 import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
 import CostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
 import ProtectedAreas from 'layout/scenarios/edit/planning-unit/protected-areas';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
 import Sections from 'layout/sections';
 
 import Button from 'components/button';
 
 const SECTIONS = [
   {
-    id: 'protected-areas',
+    id: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
     name: 'Protected Areas',
     description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
   },
   {
-    id: 'adjust-planning-units',
+    id: ScenarioSidebarSubTabs.PLANNING_UNIT_ADDJUST_PLANNING_UNITS,
     name: 'Adjust planning units (optional)',
     description: 'The status of a planning unit determines whether it is included in every solution (i.e. locked in) or excluded (i.e. locked out). The default status is neither included or excluded but determined during the Marxan analysis.',
   },
   {
-    id: 'cost-surface',
+    id: ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE,
     name: 'Cost surface',
     description: 'Costs reflect any variety of socioeconomic factors, which if minimized, might help the conservation plan be implemented more effectively and reduce conflicts with other uses.',
   },
@@ -43,7 +44,6 @@ export interface ScenariosSidebarEditPlanningUnitProps {
 export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlanningUnitProps> = (
 
 ) => {
-  const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -51,28 +51,31 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   const VIEWER = projectRole === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSubTab } = scenarioSlice.actions;
+  const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
   // EFFECTS
   useEffect(() => {
-    return () => {
-      if (tab !== 'planning-unit') {
-        setSection(null);
-      }
-    };
-  }, [tab]);
+    // Check that the subtab is a valid planning unit subtab
+    if (!SECTIONS.find((s) => s.id === subtab)) {
+      dispatch(setSubTab(null));
+    }
+  }, []); // eslint-disable-line
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
-    setSection(s);
-    const subtab = s ? `pu-${s}-preview` : null;
-    dispatch(setSubTab(subtab));
+    const sub = s || null;
+    dispatch(setSubTab(sub));
   }, [dispatch, setSubTab]);
+
+  const onContinue = useCallback(() => {
+    dispatch(setTab(ScenarioSidebarTabs.FEATURES));
+    dispatch(setSubTab(null));
+  }, [dispatch, setTab, setSubTab]);
 
   if (!scenarioData || tab !== 'planning-unit') return null;
 
@@ -94,7 +97,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
               </div>
             </header>
 
-            {!section && (
+            {!subtab && (
               <Sections
                 key="sections"
                 sections={SECTIONS}
@@ -102,21 +105,22 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
               />
             )}
 
-            {section === 'protected-areas' && (
+            {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+            || subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD)
+            && (
               <ProtectedAreas
                 key="protected-areas"
-                onChangeSection={onChangeSection}
               />
             )}
 
-            {section === 'cost-surface' && (
+            {subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE && (
               <CostSurface
                 key="cost-surface"
                 onChangeSection={onChangeSection}
               />
             )}
 
-            {section === 'adjust-planning-units' && (
+            {subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_ADDJUST_PLANNING_UNITS && (
               <AdjustPanningUnits
                 key="adjust-planning-units"
                 onChangeSection={onChangeSection}
@@ -124,7 +128,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
             )}
           </Pill>
 
-          {!section && (
+          {!subtab && (
             <motion.div
               key="continue-scenario-button"
               className="flex justify-center flex-shrink-0 mt-4"
@@ -135,6 +139,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
                 theme="primary"
                 size="lg"
                 disabled={VIEWER}
+                onClick={onContinue}
               >
                 Continue
               </Button>
