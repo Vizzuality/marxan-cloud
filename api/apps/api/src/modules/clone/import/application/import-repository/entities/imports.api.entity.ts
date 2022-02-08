@@ -1,10 +1,6 @@
-import { Import, ImportId } from '@marxan-api/modules/clone/import';
+import { Import } from '@marxan-api/modules/clone/import';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
-import {
-  ArchiveLocation,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { ImportComponentEntity } from '@marxan-api/modules/clone/import/application/import-repository/entities/import-components.api.entity';
 
 @Entity('imports')
@@ -38,10 +34,10 @@ export class ImportEntity {
 
     const entity = new ImportEntity();
 
-    entity.id = snapshot.id.value;
-    entity.resourceId = snapshot.resourceId.value;
+    entity.id = snapshot.id;
+    entity.resourceId = snapshot.resourceId;
     entity.resourceKind = snapshot.resourceKind;
-    entity.archiveLocation = snapshot.archiveLocation.value;
+    entity.archiveLocation = snapshot.archiveLocation;
     entity.components = snapshot.importPieces.map(
       ImportComponentEntity.fromSnapshot,
     );
@@ -51,10 +47,10 @@ export class ImportEntity {
 
   toAggregate(): Import {
     return Import.fromSnapshot({
-      id: new ImportId(this.id),
-      resourceId: new ResourceId(this.resourceId),
+      id: this.id,
+      resourceId: this.resourceId,
       resourceKind: this.resourceKind,
-      archiveLocation: new ArchiveLocation(this.archiveLocation),
+      archiveLocation: this.archiveLocation,
       importPieces: this.components.map((component) => component.toSnapshot()),
     });
   }

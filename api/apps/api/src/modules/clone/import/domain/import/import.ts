@@ -36,26 +36,25 @@ export class Import extends AggregateRoot {
 
   static fromSnapshot(snapshot: ImportSnapshot): Import {
     return new Import(
-      snapshot.id,
-      snapshot.resourceId,
+      new ImportId(snapshot.id),
+      new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
-      snapshot.archiveLocation,
+      new ArchiveLocation(snapshot.archiveLocation),
       snapshot.importPieces.map(ImportComponent.from),
     );
   }
 
   static new(data: Omit<ImportSnapshot, 'id'>): Import {
     const id = ImportId.create();
+    const resourceId = new ResourceId(data.resourceId);
     const instance = new Import(
       id,
-      data.resourceId,
+      resourceId,
       data.resourceKind,
-      data.archiveLocation,
+      new ArchiveLocation(data.archiveLocation),
       data.importPieces.map(ImportComponent.from),
     );
-    instance.apply(
-      new ImportRequested(id.value, data.resourceId, data.resourceKind),
-    );
+    instance.apply(new ImportRequested(id, resourceId, data.resourceKind));
     instance.requestFirstBatch();
     return instance;
   }
@@ -105,11 +104,11 @@ export class Import extends AggregateRoot {
 
   toSnapshot(): ImportSnapshot {
     return {
-      id: this.id,
-      resourceId: this.resourceId,
+      id: this.id.value,
+      resourceId: this.resourceId.value,
       resourceKind: this.resourceKind,
       importPieces: this.pieces.map((piece) => piece.toSnapshot()),
-      archiveLocation: this.archiveLocation,
+      archiveLocation: this.archiveLocation.value,
     };
   }
 

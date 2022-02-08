@@ -19,11 +19,11 @@ export class ImportComponent {
 
   static from(snapshot: ImportComponentSnapshot) {
     return new ImportComponent(
-      snapshot.id,
+      new ComponentId(snapshot.id),
       snapshot.piece,
-      snapshot.resourceId,
+      new ResourceId(snapshot.resourceId),
       snapshot.order,
-      snapshot.uris,
+      snapshot.uris.map(ComponentLocation.fromSnapshot),
       snapshot.finished,
     );
   }
@@ -53,11 +53,11 @@ export class ImportComponent {
 
   toSnapshot(): ImportComponentSnapshot {
     return {
-      id: this.id,
+      id: this.id.value,
       order: this.order,
       finished: this.finished,
       piece: this.piece,
-      resourceId: this.resourceId,
+      resourceId: this.resourceId.value,
       uris: this.uris,
     };
   }

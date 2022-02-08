@@ -16,11 +16,15 @@ import {
   ArchiveLocation,
   ClonePiece,
   ComponentId,
-  ComponentLocation,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ImportRequested, PieceImportRequested } from '../domain';
+import {
+  Import,
+  ImportId,
+  ImportRequested,
+  PieceImportRequested,
+} from '../domain';
 import { ImportArchive } from './import-archive';
 import { PromiseType } from 'utility-types';
 import { MemoryImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/memory-import.repository.adapter';
@@ -80,76 +84,82 @@ const getFixtures = async () => {
     },
     GivenExtractingArchiveHasSequentialComponents: () => {
       archiveReader.mock.mockImplementation(async () =>
-        right({
-          archiveLocation: new ArchiveLocation('whatever'),
-          resourceId: new ResourceId(`resource-id`),
-          resourceKind: ResourceKind.Project,
-          importPieces: [
-            {
-              finished: false,
-              order: 0,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`import component unique id`),
-              piece: ClonePiece.ProjectMetadata,
-              uris: [
-                new ComponentLocation(
-                  `/tmp/project-metadata-random-uuid.json`,
-                  `project-metadata.json`,
-                ),
-              ],
-            },
-            {
-              finished: false,
-              order: 1,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`some other piece`),
-              piece: ClonePiece.PlanningAreaGAdm,
-              uris: [
-                new ComponentLocation(
-                  `/tmp/project-planning-area-random-uuid.json`,
-                  `planning-area/config.json`,
-                ),
-              ],
-            },
-          ],
-        }),
+        right(
+          Import.fromSnapshot({
+            id: ImportId.create().value,
+            archiveLocation: 'whatever',
+            resourceId: `resource-id`,
+            resourceKind: ResourceKind.Project,
+            importPieces: [
+              {
+                finished: false,
+                order: 0,
+                resourceId: `project-id`,
+                id: `import component unique id`,
+                piece: ClonePiece.ProjectMetadata,
+                uris: [
+                  {
+                    uri: `/tmp/project-metadata-random-uuid.json`,
+                    relativePath: `project-metadata.json`,
+                  },
+                ],
+              },
+              {
+                finished: false,
+                order: 1,
+                resourceId: `project-id`,
+                id: `some other piece`,
+                piece: ClonePiece.PlanningAreaGAdm,
+                uris: [
+                  {
+                    uri: `/tmp/project-planning-area-random-uuid.json`,
+                    relativePath: `planning-area/config.json`,
+                  },
+                ],
+              },
+            ],
+          }),
+        ),
       );
     },
     GivenExtractingArchiveHasEqualComponents: () => {
       archiveReader.mock.mockImplementation(async () =>
-        right({
-          archiveLocation: new ArchiveLocation('whatever'),
-          resourceId: new ResourceId(`resource-id`),
-          resourceKind: ResourceKind.Project,
-          importPieces: [
-            {
-              finished: false,
-              order: 2,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`import component unique id`),
-              piece: ClonePiece.ProjectMetadata,
-              uris: [
-                new ComponentLocation(
-                  `/tmp/project-metadata-random-uuid.json`,
-                  `project-metadata.json`,
-                ),
-              ],
-            },
-            {
-              finished: false,
-              order: 2,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`some other piece`),
-              piece: ClonePiece.PlanningAreaGAdm,
-              uris: [
-                new ComponentLocation(
-                  `/tmp/project-planning-area-random-uuid.json`,
-                  `planning-area/config.json`,
-                ),
-              ],
-            },
-          ],
-        }),
+        right(
+          Import.fromSnapshot({
+            id: ImportId.create().value,
+            archiveLocation: 'whatever',
+            resourceId: `resource-id`,
+            resourceKind: ResourceKind.Project,
+            importPieces: [
+              {
+                finished: false,
+                order: 2,
+                resourceId: `project-id`,
+                id: `import component unique id`,
+                piece: ClonePiece.ProjectMetadata,
+                uris: [
+                  {
+                    uri: `/tmp/project-metadata-random-uuid.json`,
+                    relativePath: `project-metadata.json`,
+                  },
+                ],
+              },
+              {
+                finished: false,
+                order: 2,
+                resourceId: `project-id`,
+                id: `some other piece`,
+                piece: ClonePiece.PlanningAreaGAdm,
+                uris: [
+                  {
+                    uri: `/tmp/project-planning-area-random-uuid.json`,
+                    relativePath: `planning-area/config.json`,
+                  },
+                ],
+              },
+            ],
+          }),
+        ),
       );
     },
     WhenRequestingImport: async () =>

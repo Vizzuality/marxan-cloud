@@ -22,7 +22,7 @@ export class MemoryImportRepository extends ImportRepository {
 
   async save(importRequest: Import): Promise<Either<RepoFailure, Success>> {
     const snapshot = importRequest.toSnapshot();
-    this.entities[snapshot.id.value] = snapshot;
+    this.entities[snapshot.id] = snapshot;
     return right(true);
   }
 }
