@@ -10,7 +10,11 @@ import { v4 } from 'uuid';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ComponentLocation } from '@marxan-api/modules/clone/export/application/complete-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
-import { Export, ExportId } from '@marxan-api/modules/clone/export/domain';
+import {
+  Export,
+  ExportComponent,
+  ExportId,
+} from '@marxan-api/modules/clone/export/domain';
 import { bootstrapApplication } from '../utils/api-application';
 
 describe('Typeorm export repository', () => {
@@ -78,22 +82,22 @@ const getFixtures = async () => {
     },
     GivenExportWasRequested: async () => {
       resourceId = new ResourceId(v4());
-      componentId = new ComponentId(v4());
+      componentId = ComponentId.create();
       componentLocationUri = '/foo/bar/project-metadata.json';
       componentLocationRelativePath = 'project-metadata.json';
       const exportInstance = Export.newOne(resourceId, ResourceKind.Project, [
-        {
+        ExportComponent.fromSnapshot({
           finished: false,
           piece: ClonePiece.ProjectMetadata,
           resourceId: resourceId.value,
-          id: componentId,
+          id: componentId.value,
           uris: [
             new ComponentLocation(
               componentLocationUri,
               componentLocationRelativePath,
             ),
           ],
-        },
+        }),
       ]);
       exportId = exportInstance.id;
       await repo.save(exportInstance);
@@ -104,18 +108,20 @@ const getFixtures = async () => {
       componentLocationUri = `/foo/bar/project-metadata.json`;
       componentLocationRelativePath = `project-metadata.json`;
 
-      const components = Array(10).map(() => ({
-        finished: false,
-        piece: ClonePiece.ProjectMetadata,
-        resourceId: resourceId.value,
-        id: new ComponentId(v4()),
-        uris: [
-          new ComponentLocation(
-            componentLocationUri,
-            componentLocationRelativePath,
-          ),
-        ],
-      }));
+      const components = Array(10).map(() =>
+        ExportComponent.fromSnapshot({
+          finished: false,
+          piece: ClonePiece.ProjectMetadata,
+          resourceId: resourceId.value,
+          id: ComponentId.create().value,
+          uris: [
+            new ComponentLocation(
+              componentLocationUri,
+              componentLocationRelativePath,
+            ),
+          ],
+        }),
+      );
 
       const exportInstance = Export.newOne(
         resourceId,
@@ -149,7 +155,9 @@ const getFixtures = async () => {
       await Promise.all(
         exportInstance.toSnapshot().exportPieces.map((piece) =>
           repo.transaction(async (repository) => {
-            exportInstance.completeComponent(piece.id, [componentLocation]);
+            exportInstance.completeComponent(new ComponentId(piece.id), [
+              componentLocation,
+            ]);
             await repository.save(exportInstance);
           }),
         ),

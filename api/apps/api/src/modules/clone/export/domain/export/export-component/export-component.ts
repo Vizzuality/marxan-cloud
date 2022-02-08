@@ -18,7 +18,7 @@ export class ExportComponent {
   ) {}
 
   static newOne(resourceId: ResourceId, piece: ClonePiece): ExportComponent {
-    return new ExportComponent(new ComponentId(v4()), piece, resourceId);
+    return new ExportComponent(ComponentId.create(), piece, resourceId);
   }
 
   finish(location: ComponentLocation[]) {

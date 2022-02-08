@@ -35,7 +35,7 @@ export class ImportComponent {
     uris: ComponentLocation[],
   ): ImportComponent {
     return new ImportComponent(
-      new ComponentId(v4()),
+      ComponentId.create(),
       piece,
       resourceId,
       order,

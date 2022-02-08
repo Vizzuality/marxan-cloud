@@ -80,7 +80,7 @@ const getFixtures = async () => {
     GivenSchedulePieceExportCommand: (): SchedulePieceExport => {
       command = new SchedulePieceExport(
         new ExportId(v4()),
-        new ComponentId(v4()),
+        ComponentId.create(),
         new ResourceId(v4()),
         ResourceKind.Project,
         ClonePiece.ProjectMetadata,

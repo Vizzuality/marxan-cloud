@@ -137,7 +137,7 @@ const getFixtures = async () => {
       const exportInstance = await repo.find(exportId);
 
       expect(exportInstance).toBeDefined();
-      const componentId = new ComponentId(v4());
+      const componentId = ComponentId.create();
       const piece = exportInstance
         ?.toSnapshot()
         .exportPieces.find((piece) => piece.id === componentId.value);
@@ -146,7 +146,7 @@ const getFixtures = async () => {
       await sut.execute(new CompletePiece(exportId, componentId, []));
     },
     WhenAPieceOfAnUnexistingExportIsCompleted: async (exportId: ExportId) => {
-      await sut.execute(new CompletePiece(exportId, new ComponentId(v4()), []));
+      await sut.execute(new CompletePiece(exportId, ComponentId.create(), []));
     },
     ThenComponentIsFinished: async (
       exportId: ExportId,
@@ -170,7 +170,7 @@ const getFixtures = async () => {
       const componentFinishedEvent = events[0];
 
       expect(componentFinishedEvent).toMatchObject({
-        componentId: new ComponentId(componentId),
+        componentId: ComponentId.create(),
         exportId,
         location: expect.any(Array),
       });
