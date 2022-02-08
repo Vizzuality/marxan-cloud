@@ -187,11 +187,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     if (!(await this.canEditScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    const result = await this.lockService.acquireLock(scenarioId, userId);
-    if (isLeft(result)) {
-      return result;
-    }
-    return result;
+    return await this.lockService.acquireLock(scenarioId, userId);
   }
 
   async releaseLock(
@@ -214,7 +210,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
       projectId,
     );
     const canEditScenario = await this.canEditScenario(userId, scenarioId);
-    const scenarioIsLockedByUser = await this.lockService.isLockedByUser(
+    const scenarioIsLockedByCurrentUser = await this.lockService.isLockedByUser(
       scenarioId,
       userId,
     );
@@ -227,7 +223,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     if (
       !canReleaseLockFromProjectLevel &&
       canEditScenario &&
-      !scenarioIsLockedByUser
+      !scenarioIsLockedByCurrentUser
     ) {
       return left(lockedByAnotherUser);
     }
@@ -247,7 +243,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
   > {
     const scenarioIsLocked = await this.lockService.isLocked(scenarioId);
     const canEditScenario = await this.canEditScenario(userId, scenarioId);
-    const scenarioIsLockedByUser = await this.lockService.isLockedByUser(
+    const scenarioIsLockedByCurrentUser = await this.lockService.isLockedByUser(
       scenarioId,
       userId,
     );
@@ -257,10 +253,12 @@ export class ScenarioAclService implements ScenarioAccessControl {
     if (!scenarioIsLocked) {
       return left(noLockInPlace);
     }
-    if (!scenarioIsLockedByUser) {
+    if (!scenarioIsLockedByCurrentUser) {
       return left(lockedByAnotherUser);
     }
-    return right(scenarioIsLocked && canEditScenario && scenarioIsLockedByUser);
+    return right(
+      scenarioIsLocked && canEditScenario && scenarioIsLockedByCurrentUser,
+    );
   }
 
   async findUsersInScenario(
