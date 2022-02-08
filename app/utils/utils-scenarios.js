@@ -39,8 +39,9 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
           };
         }, {}),
       },
-      tab: `${tab}`,
-      subtab: `${subtab}`,
+      tab,
+      subtab,
+      lastJobCheck: new Date().getTime(),
     },
   };
 

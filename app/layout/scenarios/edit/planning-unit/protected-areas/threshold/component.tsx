@@ -175,7 +175,10 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         saveScenarioMutation.mutate({
           id: `${sid}`,
           data: {
-            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'planning-unit', subtab: null }),
+            metadata: mergeScenarioStatusMetaData(metadata, {
+              tab: 'planning-unit',
+              subtab: null,
+            }),
           },
         });
       },

@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -25,6 +25,9 @@ export const useScenarioActionsDone = () => {
     setSubTab,
   } = scenarioSlice.actions;
 
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  console.log({ subtab });
+
   const { data: scenarioData } = useScenario(sid);
 
   const scenarioMutation = useSaveScenario({
@@ -39,6 +42,8 @@ export const useScenarioActionsDone = () => {
 
   // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
+    const subt = subtab === 'pu-protected-areas-preview' ? 'pu-protected-areas-threshold' : null;
+    console.log({ subt });
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -47,7 +52,7 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: 'planning-unit',
-            subtab: scenarioData?.metadata?.scenarioEditingMetadata.subtab === 'pu-protected-areas-threshold' ? null : 'pu-protected-areas-threshold',
+            subtab: subt,
             status: {
               'protected-areas': 'draft',
               features: 'empty',
@@ -63,7 +68,7 @@ export const useScenarioActionsDone = () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
         dispatch(setTab('planning-unit'));
-        dispatch(setSubTab('pu-protected-areas-threshold'));
+        dispatch(setSubTab(subt));
         queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
       },
@@ -86,6 +91,7 @@ export const useScenarioActionsDone = () => {
     setCache,
     setTab,
     setSubTab,
+    subtab,
     addToast,
     queryClient,
   ]);
