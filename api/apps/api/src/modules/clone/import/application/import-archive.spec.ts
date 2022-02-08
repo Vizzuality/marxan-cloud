@@ -182,7 +182,7 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof ImportRequested),
       ).toEqual([
         {
-          id: expect.any(String),
+          id: expect.any(ImportId),
           resourceId: new ResourceId(`resource-id`),
           resourceKind: `project`,
         },

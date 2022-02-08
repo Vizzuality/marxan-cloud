@@ -2,7 +2,7 @@ import { DiscoveryService } from '@golevelup/nestjs-discovery';
 import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { Injectable, SetMetadata } from '@nestjs/common';
 import { ResourcePieces } from '../application/resource-pieces.port';
-import { ExportComponentSnapshot } from '../domain';
+import { ExportComponent } from '../domain';
 
 export const ResourcePiecesProviderMetadata = Symbol(
   `Resource pieces provider`,
@@ -36,7 +36,7 @@ export class ResourcePiecesAdapter implements ResourcePieces {
   async resolveFor(
     id: ResourceId,
     kind: ResourceKind,
-  ): Promise<ExportComponentSnapshot[]> {
+  ): Promise<ExportComponent[]> {
     const adapter = await this.getAdapterFor(kind);
 
     return adapter.resolveFor(id, kind);
