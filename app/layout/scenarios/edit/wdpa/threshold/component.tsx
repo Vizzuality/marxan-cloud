@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useProject } from 'hooks/projects';
@@ -171,7 +172,10 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         saveScenarioMutation.mutate({
           id: `${sid}`,
           data: {
-            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'planning-unit', subtab: null }),
+            metadata: mergeScenarioStatusMetaData(metadata, {
+              tab: ScenarioSidebarTabs.PLANNING_UNIT,
+              subtab: null,
+            }),
           },
         });
       },

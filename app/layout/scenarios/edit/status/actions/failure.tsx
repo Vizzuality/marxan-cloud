@@ -8,6 +8,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs } from 'utils/tabs';
+
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -100,7 +102,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'features',
+            tab: ScenarioSidebarTabs.FEATURES,
             subtab: 'features-preview',
             status: {
               'protected-areas': 'draft',
@@ -231,7 +233,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'analysis',
+            tab: ScenarioSidebarTabs.ANALYSIS,
             subtab: 'analysis-preview',
             status: {
               'protected-areas': 'draft',

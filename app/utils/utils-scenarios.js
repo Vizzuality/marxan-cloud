@@ -1,3 +1,5 @@
+import { ScenarioSidebarTabs } from './tabs';
+
 export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
   status: {
     'planning-unit': 'draft', // Possible values: empty, draft and outdated
@@ -5,7 +7,7 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
     analysis: 'empty',
     solutions: 'empty',
   },
-  tab: 'planning-unit',
+  tab: ScenarioSidebarTabs.PLANNING_UNIT,
   subtab: null,
 };
 

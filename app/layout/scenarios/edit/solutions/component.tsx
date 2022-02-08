@@ -55,7 +55,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
   // EFFECTS
   useEffect(() => {
     return () => {
-      if (tab !== 'solutions') {
+      if (tab !== ScenarioSidebarTabs.SOLUTIONS) {
         setSection(null);
       }
     };

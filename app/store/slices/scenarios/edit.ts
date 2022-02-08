@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { injectReducer } from 'store';
 import { Solution } from 'types/project-model';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 interface ScenarioEditStateProps {
   tab: string,
@@ -48,7 +49,7 @@ interface ScenarioEditStateProps {
 }
 
 const initialState = {
-  tab: 'planning-unit',
+  tab: ScenarioSidebarTabs.PLANNING_UNIT,
   subtab: null,
 
   // WDPA

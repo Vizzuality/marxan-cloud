@@ -9,6 +9,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs } from 'utils/tabs';
+
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -50,7 +52,7 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'planning-unit',
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
             subtab: subt,
             status: {
               'protected-areas': 'draft',
@@ -66,7 +68,7 @@ export const useScenarioActionsDone = () => {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
-        dispatch(setTab('planning-unit'));
+        dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
         dispatch(setSubTab(subt));
         queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
@@ -103,7 +105,7 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'planning-unit',
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
             subtab: 'pu-protected-areas-threshold',
             status: {
               'protected-areas': 'draft',

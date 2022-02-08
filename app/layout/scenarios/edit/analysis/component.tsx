@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
@@ -69,7 +70,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   // EFFECTS
   useEffect(() => {
     return () => {
-      if (tab !== 'analysis') {
+      if (tab !== ScenarioSidebarTabs.ANALYSIS) {
         setSection(null);
       }
     };
@@ -82,7 +83,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
 
-  if (!scenarioData || tab !== 'analysis') return null;
+  if (!scenarioData || tab !== ScenarioSidebarTabs.ANALYSIS) return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">

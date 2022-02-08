@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import {
@@ -27,7 +28,7 @@ import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
 
 import Uploader from './uploader';
 
-export interface ScenariosFeaturesAddProps {}
+export interface ScenariosFeaturesAddProps { }
 
 export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   const [open, setOpen] = useState(false);
@@ -135,7 +136,10 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
         saveScenarioMutation.mutate({
           id: `${sid}`,
           data: {
-            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+            metadata: mergeScenarioStatusMetaData(metadata, {
+              tab: ScenarioSidebarTabs.FEATURES,
+              subtab: 'features-preview',
+            }),
           },
         }, {
           onSuccess: () => {

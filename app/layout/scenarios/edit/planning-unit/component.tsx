@@ -77,7 +77,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
     dispatch(setSubTab(null));
   }, [dispatch, setTab, setSubTab]);
 
-  if (!scenarioData || tab !== 'planning-unit') return null;
+  if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">

@@ -49,13 +49,13 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   // EFFECTS
   // useEffect(() => {
   //   return () => {
-  //     if (tab !== 'planning-unit') {
+  //     if (tab !== ScenarioSidebarTabs.PLANNING_UNIT) {
   //       setStep(0);
   //     }
   //   };
   // }, [tab]);
 
-  if (!scenarioData || tab !== 'planning-unit') return null;
+  if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
