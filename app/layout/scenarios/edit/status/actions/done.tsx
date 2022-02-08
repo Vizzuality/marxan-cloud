@@ -26,7 +26,6 @@ export const useScenarioActionsDone = () => {
   } = scenarioSlice.actions;
 
   const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-  console.log({ subtab });
 
   const { data: scenarioData } = useScenario(sid);
 
@@ -43,7 +42,7 @@ export const useScenarioActionsDone = () => {
   // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
     const subt = subtab === 'pu-protected-areas-preview' ? 'pu-protected-areas-threshold' : null;
-    console.log({ subt });
+
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
