@@ -54,7 +54,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     data: bestSolutionData,
     isFetching: bestSolutionisFetching,
     isFetched: bestSolutionisFetched,
-  } = useBestSolution(sid);
+  } = useBestSolution(sid, {});
 
   const isBestSolution = (selectedSolution
     && bestSolutionData

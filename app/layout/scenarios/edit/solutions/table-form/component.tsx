@@ -41,8 +41,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   const {
     data: bestSolutionData,
-
-  } = useBestSolution(sid);
+  } = useBestSolution(sid, {});
 
   const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const [selectSolution, setSelectSolution] = useState(

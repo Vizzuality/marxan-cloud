@@ -162,7 +162,7 @@ export function useMostDifferentSolutions(sid) {
   }, [query, data]);
 }
 
-export function useBestSolution(sid) {
+export function useBestSolution(sid, queryOptions) {
   const [session] = useSession();
 
   const query = useQuery(['solutions-best', sid], async () => SCENARIOS.request({
@@ -173,7 +173,9 @@ export function useBestSolution(sid) {
     },
   }).then((response) => {
     return response.data;
-  }));
+  }), {
+    ...queryOptions,
+  });
 
   const { data } = query;
 

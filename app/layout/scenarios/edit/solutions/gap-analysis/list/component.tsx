@@ -38,7 +38,7 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
 
   const {
     data: bestSolutionData,
-  } = useBestSolution(sid);
+  } = useBestSolution(sid, {});
 
   const {
     data: allFeaturesData,
