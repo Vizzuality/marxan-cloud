@@ -9,6 +9,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import cx from 'classnames';
 
 import { usePostGapAnalysis } from 'hooks/gap-analysis';
+import { useScenario } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import { useBestSolution } from 'hooks/solutions';
 
@@ -37,8 +38,14 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const {
     data: bestSolutionData,
-  } = useBestSolution(sid);
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
 
   const {
     data: allFeaturesData,

@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { useScenario } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import {
   useSolutions, useBestSolution, useMostDifferentSolutions, useDownloadSolutions,
@@ -40,9 +41,14 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   const dispatch = useDispatch();
 
   const {
-    data: bestSolutionData,
+    data: scenarioData,
+  } = useScenario(sid);
 
-  } = useBestSolution(sid);
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
 
   const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const [selectSolution, setSelectSolution] = useState(

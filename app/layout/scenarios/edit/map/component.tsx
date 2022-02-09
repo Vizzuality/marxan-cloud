@@ -116,7 +116,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const {
     data: bestSolutionData,
-  } = useBestSolution(sid);
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
   const bestSolution = bestSolutionData;
 
   const minZoom = 2;
