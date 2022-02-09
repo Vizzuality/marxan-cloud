@@ -1191,7 +1191,7 @@ export class ScenariosController {
   })
   @ApiNoContentResponse({
     status: 204,
-    description: 'User was deleted correctly',
+    description: 'Lock was released correctly',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Patch(`:id/release-lock`)
@@ -1207,10 +1207,14 @@ export class ScenariosController {
           throw new ForbiddenException();
         case lockedByAnotherUser:
           throw new BadRequestException(
-            'Scenario lock belong to a different user.',
+            'Scenario lock belongs to a different user.',
           );
         case noLockInPlace:
           throw new NotFoundException(`Scenario ${id} has no locks in place.`);
+        case scenarioNotFound:
+          throw new NotFoundException(`Scenario ${id} could not be found`);
+        case scenarioUnknownError:
+          throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
