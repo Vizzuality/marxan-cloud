@@ -9,10 +9,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
-
 import { useProject } from 'hooks/projects';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
@@ -36,7 +34,6 @@ export interface WDPAThresholdCategories {
 }
 
 export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
-  onSuccess,
   onBack,
 }: WDPAThresholdCategories) => {
   const [submitting, setSubmitting] = useState(false);
@@ -59,8 +56,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetched: scenarioIsFetched,
   } = useScenario(sid);
 
-  const { metadata } = scenarioData || {};
-
   const {
     data: wdpaData,
     isFetching: wdpaIsFetching,
@@ -73,12 +68,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       && !projectData?.adminAreaLevel1I
       && !projectData?.countryId ? projectData?.planningAreaId : null,
     scenarioId: sid,
-  });
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
   });
 
   const saveScenarioProtectedAreasMutation = useSaveScenarioProtectedAreas({
@@ -106,12 +95,16 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const selectedProtectedAreas = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
-    return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
-      return {
-        id: pa.id,
-        selected: true,
-      };
-    });
+    if (!wdpaData && Array.isArray(wdpaData)) {
+      return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
+        return {
+          id: pa.id,
+          selected: true,
+        };
+      });
+    }
+
+    return [];
   }, [wdpaCategories, wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {
@@ -158,7 +151,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
       },
     }, {
       onSuccess: () => {
-        onSuccess();
         setSubmitting(false);
         addToast('save-scenario-wdpa', (
           <>
@@ -167,12 +159,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
           </>
         ), {
           level: 'success',
-        });
-        saveScenarioMutation.mutate({
-          id: `${sid}`,
-          data: {
-            metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
-          },
         });
       },
       onError: () => {
@@ -192,10 +178,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     saveScenarioProtectedAreasMutation,
     selectedProtectedAreas,
     sid,
-    saveScenarioMutation,
-    metadata,
     addToast,
-    onSuccess]);
+  ]);
 
   const handleBack = useCallback(() => {
     onBack();
@@ -272,23 +256,22 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                           be covered by a protected area to be considered “protected”.
                         </p>
 
-                        <div className="px-5">
-                          <Slider
-                            labelRef={labelRef}
-                            theme="dark"
-                            defaultValue={values.wdpaThreshold}
-                            formatOptions={{
-                              style: 'percent',
-                            }}
-                            maxValue={1}
-                            minValue={0.01}
-                            step={0.01}
-                            onChange={(s) => {
-                              flprops.input.onChange(s);
-                              dispatch(setWDPAThreshold(s));
-                            }}
-                          />
-                        </div>
+                        <Slider
+                          labelRef={labelRef}
+                          theme="dark"
+                          defaultValue={values.wdpaThreshold}
+                          formatOptions={{
+                            style: 'percent',
+                          }}
+                          maxValue={1}
+                          minValue={0.01}
+                          step={0.01}
+                          onChange={(s) => {
+                            flprops.input.onChange(s);
+                            dispatch(setWDPAThreshold(s));
+                          }}
+                        />
+
                       </Field>
                     )}
                   </FieldRFF>
@@ -325,7 +308,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
               disabled={submitting}
               onClick={handleBack}
             >
-              <span>Back</span>
+              <span>Set areas</span>
             </Button>
 
             <Button

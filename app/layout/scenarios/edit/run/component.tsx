@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 import { usePlausible } from 'next-plausible';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useMe } from 'hooks/me';
 import { useProjectRole } from 'hooks/project-users';
@@ -78,8 +79,8 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
         scenarioEditingMetadata: {
           ...scenarioEditingMetadata,
           lastJobCheck: new Date().getTime(),
-          tab: 'solutions',
-          subtab: 'solutions-preview',
+          tab: ScenarioSidebarTabs.SOLUTIONS,
+          subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
           status: {
             'protected-areas': 'draft',
             features: 'draft',

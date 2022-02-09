@@ -329,7 +329,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               <Button
                 theme="secondary-alt"
                 size="lg"
-                type="button"
+                type="submit"
                 className="relative px-20"
                 onClick={() => (
                   values.wdpaIucnCategories.length > 0

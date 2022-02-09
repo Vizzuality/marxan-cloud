@@ -9,6 +9,8 @@ import { withScenario } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs } from 'utils/tabs';
+
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Header from 'layout/header';
@@ -20,7 +22,6 @@ import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioEditsMap from 'layout/scenarios/edit/map';
 import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
 import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
-import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
 import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
 import Title from 'layout/title/scenario-title';

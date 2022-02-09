@@ -8,6 +8,8 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -40,7 +42,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'protected-areas-preview',
+            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -70,7 +72,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'protected-areas-preview',
+            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -100,8 +102,8 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'features',
-            subtab: 'features-preview',
+            tab: ScenarioSidebarTabs.FEATURES,
+            subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
             status: {
               'protected-areas': 'draft',
               features: 'draft',
@@ -231,8 +233,8 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'analysis',
-            subtab: 'analysis-preview',
+            tab: ScenarioSidebarTabs.ANALYSIS,
+            subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
             status: {
               'protected-areas': 'draft',
               features: 'draft',

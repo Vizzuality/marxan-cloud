@@ -1,9 +1,12 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useRef,
+} from 'react';
 
-import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import intersection from 'lodash/intersection';
+import isEqual from 'lodash/isEqual';
 
 import { useRouter } from 'next/router';
 
@@ -20,19 +23,18 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
-import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
 export interface WDPACategoriesProps {
   onSuccess: () => void,
-  onDismiss: () => void,
 }
 
 export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
-  onDismiss,
 }: WDPACategoriesProps) => {
+  const formRef = useRef(null);
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -54,7 +56,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     data: wdpaData,
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
-    refetch: refetchProtectedAreas,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
       || projectData?.adminAreaLevel1I
@@ -71,29 +72,41 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  const selectedProtectedAreas = useMemo(() => {
-    const { wdpaIucnCategories } = wdpaCategories;
-    return wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id)).map((pa) => {
-      return {
-        id: pa.id,
-        selected: true,
-      };
-    });
-  }, [wdpaCategories, wdpaData]);
+  const onCalculateProtectedAreas = useCallback((values) => {
+    const { wdpaIucnCategories } = values;
 
-  const calculatePAs = useCallback(() => {
+    const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
+      .map((pa) => {
+        return {
+          id: pa.id,
+          selected: true,
+        };
+      });
+
     saveScenarioProtectedAreasMutation.mutate({
       id: `${sid}`,
       data: {
         areas: selectedProtectedAreas,
         threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
       },
-    }, {
-      onSuccess: () => {
-        onSuccess();
-      },
     });
-  }, [saveScenarioProtectedAreasMutation, selectedProtectedAreas, scenarioData, sid, onSuccess]);
+  }, [
+    saveScenarioProtectedAreasMutation,
+    scenarioData,
+    sid,
+    wdpaData,
+  ]);
+
+  const onSubmit = useCallback((values) => {
+    const wdpaSelected = wdpaData.filter((w) => !!w.selected).map((w) => w.id);
+    const isModified = !isEqual(wdpaSelected, values.wdpaIucnCategories);
+
+    if (isModified) {
+      onCalculateProtectedAreas(values);
+    } else {
+      onSuccess();
+    }
+  }, [wdpaData, onSuccess, onCalculateProtectedAreas]);
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -151,23 +164,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     );
   }
 
-  if (!wdpaData || !wdpaData.length) {
-    return (
-      <div>
-        <div className="text-sm">This planning area doesn&apos;t have any protected areas associated with it. You can go directly to the features tab.</div>
-
-        <div className="flex justify-center mt-20">
-          <Button theme="secondary-alt" size="lg" type="button" className="relative px-20" onClick={onDismiss}>
-            <span>Continue to features</span>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <FormRFF
-      onSubmit={() => { }}
+      onSubmit={onSubmit}
+      key="protected-areas-categories"
       mutators={{
         removeWDPAFilter: (args, state, utils) => {
           const [id, arr] = args;
@@ -181,7 +181,14 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         },
       }}
       initialValues={INITIAL_VALUES}
-      render={({ form, values, handleSubmit }) => {
+    >
+      {({ form, values, handleSubmit }) => {
+        formRef.current = form;
+
+        const { values: stateValues } = formRef?.current?.getState();
+
+        dispatch(setWDPACategories(stateValues));
+
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
@@ -197,18 +204,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             autoComplete="off"
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
-            <FormSpyRFF
-              // subscription={{ dirty: true }}
-              onChange={(state) => {
-                if (state.touched.wdpaIucnCategories) {
-                  dispatch(setWDPACategories(values));
-                }
-
-                if (state.touched.uploadedProtectedArea) {
-                  refetchProtectedAreas();
-                }
-              }}
-            />
 
             <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
@@ -248,6 +243,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                               </span>
                             </InfoButton>
                           </div>
+
+                          {WDPA_CATEGORIES_OPTIONS.length < 1 && (
+                            <div className="py-6 text-sm">This planning area doesn&apos;t have any protected areas categories associated with it. You can upload a new one using the button below.</div>
+                          )}
 
                           {WDPA_CATEGORIES_OPTIONS.length === 1 && (
                             <Select
@@ -289,10 +288,12 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     </FieldRFF>
                   </div>
 
-                  <p className="py-4 text-sm text-center">or</p>
+                  {WDPA_CATEGORIES_OPTIONS.length > 1 && (
+                    <p className="py-4 text-sm text-center">or</p>
+                  )}
+
                   <FieldRFF
                     name="uploadedProtectedArea"
-                    validate={composeValidators([{ presence: true }])}
                   >
                     {(flprops) => {
                       return (
@@ -325,29 +326,24 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               </div>
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
-            <div className="flex justify-center mt-5 space-x-2">
-              <Button
-                theme="secondary-alt"
-                size="lg"
-                type="button"
-                className="relative px-20"
-                onClick={() => (
-                  values.wdpaIucnCategories.length > 0
-                    ? calculatePAs() : onDismiss())}
-              >
-                {!!values.wdpaIucnCategories.length && (
-                  <span>Continue</span>
-                )}
 
-                {!values.wdpaIucnCategories.length && (
-                  <span>Skip to features</span>
-                )}
-              </Button>
-            </div>
+            {!!wdpaCategories?.wdpaIucnCategories?.length && (
+              <div className="flex justify-center mt-5 space-x-2">
+                <Button
+                  theme="secondary-alt"
+                  size="lg"
+                  type="submit"
+                  className="relative px-20"
+                >
+                  Continue
+                </Button>
+              </div>
+            )}
+
           </form>
         );
       }}
-    />
+    </FormRFF>
   );
 };
 

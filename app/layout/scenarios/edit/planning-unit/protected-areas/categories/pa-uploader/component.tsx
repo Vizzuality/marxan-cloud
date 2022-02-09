@@ -114,7 +114,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     });
   };
 
-  const handleSubmit = useCallback(() => {
+  const onSubmit = useCallback(() => {
     const { name } = formRef.current.getState().values;
 
     fileData.append('name', name);
@@ -176,8 +176,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     >
       <FormRFF
         ref={formRef}
-        onSubmit={onDropAccepted}
-        render={({ form: uploaderForm }) => {
+        onSubmit={onSubmit}
+        render={({ form: uploaderForm, handleSubmit }) => {
           formRef.current = uploaderForm;
           const { name } = formRef.current.getState().values;
 
