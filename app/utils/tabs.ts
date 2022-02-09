@@ -14,6 +14,8 @@ export enum ScenarioSidebarSubTabs {
   FEATURES_ADD = 'fe-features-add',
   FEATURES_TARGET = 'fe-features-target',
 
+  PRE_GAP_ANALYSIS = 'fe-pre-gap-analysis',
+
   ANALYSIS_PREVIEW = 'analysis-preview',
   ANALYSIS_GAP_ANALYSIS = 'analysis-gap-analysis',
   ANALYSIS_COST_SURFACE = 'analysis-cost-surface',
