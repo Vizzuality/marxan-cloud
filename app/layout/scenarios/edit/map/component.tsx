@@ -116,7 +116,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     data: bestSolutionData,
   } = useBestSolution(sid, {
-    enabled: scenarioData.ranAtLeastOnce,
+    enabled: scenarioData?.ranAtLeastOnce,
   });
   const bestSolution = bestSolutionData;
 

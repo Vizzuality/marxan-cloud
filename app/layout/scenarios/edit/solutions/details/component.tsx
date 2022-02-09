@@ -9,6 +9,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { motion } from 'framer-motion';
 
 import { LEGEND_LAYERS } from 'hooks/map/constants';
+import { useScenario } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import ComingSoon from 'layout/help/coming-soon';
@@ -45,6 +46,10 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   const dispatch = useDispatch();
 
   const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const {
     data: selectedSolutionData,
     isFetching: selectedSolutionisFetching,
     isFetched: selectedSolutionisFetched,
@@ -54,7 +59,9 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
     data: bestSolutionData,
     isFetching: bestSolutionisFetching,
     isFetched: bestSolutionisFetched,
-  } = useBestSolution(sid, {});
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
 
   const isBestSolution = (selectedSolution
     && bestSolutionData
