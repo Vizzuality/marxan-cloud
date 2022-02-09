@@ -70,7 +70,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   // EFFECTS
   useEffect(() => {
     return () => {
-      if (tab !== ScenarioSidebarTabs.ANALYSIS) {
+      if (tab !== ScenarioSidebarTabs.PARAMETERS) {
         setSection(null);
       }
     };
@@ -83,7 +83,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
 
-  if (!scenarioData || tab !== ScenarioSidebarTabs.ANALYSIS) return null;
+  if (!scenarioData || tab !== ScenarioSidebarTabs.PARAMETERS) return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">

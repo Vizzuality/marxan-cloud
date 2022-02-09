@@ -12,9 +12,9 @@ export const TABS = [
     name: 'Features',
   },
   {
-    id: ScenarioSidebarTabs.ANALYSIS,
+    id: ScenarioSidebarTabs.PARAMETERS,
     subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
-    name: 'Analysis',
+    name: 'Parameters',
   },
   {
     id: ScenarioSidebarTabs.SOLUTIONS,
