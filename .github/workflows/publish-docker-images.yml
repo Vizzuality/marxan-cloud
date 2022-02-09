@@ -1,5 +1,9 @@
 name: Publish Docker images
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   push:
 #    branches:
