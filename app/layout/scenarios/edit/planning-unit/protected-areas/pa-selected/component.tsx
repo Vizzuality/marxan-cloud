@@ -22,7 +22,6 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
   return (
     <div className="mt-10">
       <h3 className="text-sm">{title}</h3>
-
       <div className="flex flex-wrap mt-2.5">
         {wdpaIucnCategories.map((w) => {
           const wdpa = options.find((o) => o.value === w);

@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
@@ -21,17 +22,17 @@ import Button from 'components/button';
 
 const SECTIONS = [
   {
-    id: 'protected-areas',
+    id: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
     name: 'Protected Areas',
     description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
   },
   {
-    id: 'adjust-planning-units',
+    id: ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS,
     name: 'Adjust planning units (optional)',
     description: 'The status of a planning unit determines whether it is included in every solution (i.e. locked in) or excluded (i.e. locked out). The default status is neither included or excluded but determined during the Marxan analysis.',
   },
   {
-    id: 'cost-surface',
+    id: ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE,
     name: 'Cost surface',
     description: 'Costs reflect any variety of socioeconomic factors, which if minimized, might help the conservation plan be implemented more effectively and reduce conflicts with other uses.',
   },
@@ -43,7 +44,6 @@ export interface ScenariosSidebarEditPlanningUnitProps {
 export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlanningUnitProps> = (
 
 ) => {
-  const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -51,30 +51,33 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   const VIEWER = projectRole === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSubTab } = scenarioSlice.actions;
+  const { setTab, setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
   // EFFECTS
   useEffect(() => {
-    return () => {
-      if (tab !== 'planning-unit') {
-        setSection(null);
-      }
-    };
-  }, [tab]);
+    // Check that the subtab is a valid planning unit subtab
+    if (!SECTIONS.find((s) => s.id === subtab)) {
+      dispatch(setSubTab(null));
+    }
+  }, []); // eslint-disable-line
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
-    setSection(s);
-    const subtab = s ? `planning-unit-${s}` : 'planning-unit-preview';
-    dispatch(setSubTab(subtab));
+    const sub = s || null;
+    dispatch(setSubTab(sub));
   }, [dispatch, setSubTab]);
 
-  if (!scenarioData || tab !== 'planning-unit') return null;
+  const onContinue = useCallback(() => {
+    dispatch(setTab(ScenarioSidebarTabs.FEATURES));
+    dispatch(setSubTab(null));
+  }, [dispatch, setTab, setSubTab]);
+
+  if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -94,7 +97,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
               </div>
             </header>
 
-            {!section && (
+            {!subtab && (
               <Sections
                 key="sections"
                 sections={SECTIONS}
@@ -102,21 +105,22 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
               />
             )}
 
-            {section === 'protected-areas' && (
-              <ProtectedAreas
-                key="protected-areas"
-                onChangeSection={onChangeSection}
-              />
-            )}
+            {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+              || subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD)
+              && (
+                <ProtectedAreas
+                  key="protected-areas"
+                />
+              )}
 
-            {section === 'cost-surface' && (
+            {subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE && (
               <CostSurface
                 key="cost-surface"
                 onChangeSection={onChangeSection}
               />
             )}
 
-            {section === 'adjust-planning-units' && (
+            {subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS && (
               <AdjustPanningUnits
                 key="adjust-planning-units"
                 onChangeSection={onChangeSection}
@@ -124,21 +128,22 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
             )}
           </Pill>
 
-          {!section && (
-          <motion.div
-            key="continue-scenario-button"
-            className="flex justify-center flex-shrink-0 mt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <Button
-              theme="primary"
-              size="lg"
-              disabled={VIEWER}
+          {!subtab && (
+            <motion.div
+              key="continue-scenario-button"
+              className="flex justify-center flex-shrink-0 mt-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
             >
-              Continue
-            </Button>
-          </motion.div>
+              <Button
+                theme="primary"
+                size="lg"
+                disabled={VIEWER}
+                onClick={onContinue}
+              >
+                Continue
+              </Button>
+            </motion.div>
           )}
         </AnimatePresence>
       </motion.div>

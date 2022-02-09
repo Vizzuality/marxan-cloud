@@ -7,12 +7,12 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
 import SolutionsDetails from 'layout/scenarios/edit/solutions/details';
 import SolutionsGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
 import Sections from 'layout/sections';
@@ -48,14 +48,14 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     setSection(s);
-    const subtab = s ? `solutions-${s}` : 'solutions-preview';
+    const subtab = s ? `solutions-${s}` : ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW;
     dispatch(setSubTab(subtab));
   }, [dispatch, setSubTab]);
 
   // EFFECTS
   useEffect(() => {
     return () => {
-      if (tab !== 'solutions') {
+      if (tab !== ScenarioSidebarTabs.SOLUTIONS) {
         setSection(null);
       }
     };

@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
@@ -17,7 +18,6 @@ import Pill from 'layout/pill';
 import AddFeaturesModal from 'layout/scenarios/edit/features/add';
 import ListFeatures from 'layout/scenarios/edit/features/list';
 import TargetFeatures from 'layout/scenarios/edit/features/targets';
-import { ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -65,16 +65,19 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
     saveScenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: mergeScenarioStatusMetaData(metadata, { tab: 'features', subtab: 'features-preview' }),
+        metadata: mergeScenarioStatusMetaData(metadata, {
+          tab: ScenarioSidebarTabs.FEATURES,
+          subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+        }),
       },
     });
   }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
-    setStep(metaSubtab === 'features-fpf' ? 1 : 0);
+    setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_FPF ? 1 : 0);
   }, [metaSubtab]);
 
-  if (!scenarioData || tab !== 'features') return null;
+  if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">

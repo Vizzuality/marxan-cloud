@@ -1,17 +1,18 @@
+import { ScenarioSidebarTabs } from './tabs';
+
 export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
   status: {
     'planning-unit': 'draft', // Possible values: empty, draft and outdated
-    features: 'empty',
+    features: 'draft',
     analysis: 'empty',
     solutions: 'empty',
   },
-  tab: 'planning-unit',
-  subtab: 'planning-unit-preview',
+  tab: ScenarioSidebarTabs.PLANNING_UNIT,
+  subtab: null,
 };
 
 export const STATUS_VALUES = {
-  'protected-areas': {
-    features: 'empty',
+  'planning-unit': {
     analysis: 'empty',
     solutions: 'empty',
   },
@@ -40,15 +41,16 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
           };
         }, {}),
       },
-      tab: `${tab}`,
-      subtab: `${subtab}`,
+      tab,
+      subtab,
+      lastJobCheck: new Date().getTime(),
     },
   };
 
   return metadata;
 };
 
-export const mergeScenarioStatusEditingMetaData = (obj = {}, newObj = { }) => {
+export const mergeScenarioStatusEditingMetaData = (obj = {}, newObj = {}) => {
   const { scenarioEditingMetadata = {} } = obj;
   const metadata = {
     ...obj,

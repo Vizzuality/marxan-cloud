@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -14,7 +15,6 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/wdpa/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/wdpa/threshold';
 
@@ -57,7 +57,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   });
 
   useEffect(() => {
-    setStep(metaSubtab === 'protected-areas-percentage' ? 1 : 0);
+    setStep(metaSubtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD ? 1 : 0);
   }, [metaSubtab]);
 
   // EFFECTS
@@ -126,7 +126,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
               <ScenariosSidebarWDPACategories
                 onSuccess={() => {
                   setStep(1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_PERCENTAGE));
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
                 }}
                 onDismiss={() => dispatch(setTab(ScenarioSidebarTabs.FEATURES))}
               />

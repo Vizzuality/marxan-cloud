@@ -173,7 +173,9 @@ export function useBestSolution(sid) {
     },
   }).then((response) => {
     return response.data;
-  }));
+  }), {
+    enabled: !!sid,
+  });
 
   const { data } = query;
 

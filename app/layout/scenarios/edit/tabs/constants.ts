@@ -1,9 +1,9 @@
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/edit/sidebar/types';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 export const TABS = [
   {
     id: ScenarioSidebarTabs.PLANNING_UNIT,
-    subtab: ScenarioSidebarSubTabs.PLANNING_UNIT_PREVIEW,
+    subtab: null,
     name: 'Planning unit',
   },
   {

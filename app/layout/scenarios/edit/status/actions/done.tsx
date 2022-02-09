@@ -3,11 +3,13 @@ import React, {
 } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -21,11 +23,11 @@ export const useScenarioActionsDone = () => {
   const {
     setJob,
     setCache,
+    setTab,
+    setSubTab,
   } = scenarioSlice.actions;
 
-  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { wdpaIucnCategories } = wdpaCategories;
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: scenarioData } = useScenario(sid);
 
@@ -41,6 +43,9 @@ export const useScenarioActionsDone = () => {
 
   // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
+    const subt = subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+      ? ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD : null;
+
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -48,6 +53,14 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
+            subtab: subt,
+            status: {
+              'protected-areas': 'draft',
+              features: 'empty',
+              analysis: 'empty',
+              solutions: 'empty',
+            },
             lastJobCheck: new Date().getTime(),
           },
         },
@@ -56,6 +69,9 @@ export const useScenarioActionsDone = () => {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
+        dispatch(setSubTab(subt));
+        queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
       },
       onError: () => {
@@ -75,7 +91,11 @@ export const useScenarioActionsDone = () => {
     dispatch,
     setJob,
     setCache,
+    setTab,
+    setSubTab,
+    subtab,
     addToast,
+    queryClient,
   ]);
   // Protected Areas
   const onProtectedAreasDone = useCallback((JOB_REF) => {
@@ -86,8 +106,8 @@ export const useScenarioActionsDone = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: wdpaIucnCategories.length > 0 ? 'features' : 'protected-areas',
-            subtab: wdpaIucnCategories.length > 0 ? 'features-preview' : 'protected-areas-preview',
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
+            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
             status: {
               'protected-areas': 'draft',
               features: 'empty',
@@ -122,7 +142,7 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
-    wdpaIucnCategories?.length,
+
   ]);
 
   const onFeaturesDone = useCallback((JOB_REF) => {
