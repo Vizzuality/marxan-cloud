@@ -651,6 +651,8 @@ export function useCancelRunScenario({
     },
   });
 }
+
+// BLM
 export function useScenarioCalibrationResults(scenarioId) {
   const [session] = useSession();
 
@@ -666,7 +668,8 @@ export function useScenarioCalibrationResults(scenarioId) {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const parsedData = Array.isArray(data?.data)
+      ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)) : [];
 
     return {
       ...query,
@@ -675,7 +678,28 @@ export function useScenarioCalibrationResults(scenarioId) {
   }, [query, data?.data]);
 }
 
-// BLM
+export function useScenarioCalibrationRange(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenario-calibration-range', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/blm/range`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.range,
+    };
+  }, [query, data?.data]);
+}
+
 export function useSaveScenarioCalibrationRange({
   requestConfig = {
     method: 'POST',
@@ -700,6 +724,7 @@ export function useSaveScenarioCalibrationRange({
       console.info('Succcess', data, variables, context);
       const { id: scenarioId } = variables;
       queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
+      queryClient.invalidateQueries(['scenario-calibration-range', scenarioId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
