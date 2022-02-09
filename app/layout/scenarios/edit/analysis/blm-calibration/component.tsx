@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import { format } from 'd3';
 import { motion } from 'framer-motion';
 
-import { useSaveScenarioCalibrationRange } from 'hooks/scenarios';
+import { useSaveScenarioCalibrationRange, useScenarioCalibrationRange } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
@@ -35,6 +35,8 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const { addToast } = useToasts();
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
+
+  const { data: calibrationRange } = useScenarioCalibrationRange(sid);
 
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
@@ -73,6 +75,11 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
     });
   }, [addToast, saveScenarioCalibrationRange, sid]);
 
+  const INITIAL_VALUES = {
+    blmCalibrationFrom: calibrationRange ? calibrationRange[0] : null,
+    blmCalibrationTo: calibrationRange ? calibrationRange[1] : null,
+  };
+
   return (
     <motion.div
       key="cost-surface"
@@ -106,7 +113,10 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           </InfoButton>
         </div>
         <div className="flex flex-col w-full min-h-0 space-y-10 text-sm">
-          <FormRFF onSubmit={onSaveBlmRange}>
+          <FormRFF
+            initialValues={INITIAL_VALUES}
+            onSubmit={onSaveBlmRange}
+          >
             {({ handleSubmit }) => (
               <form
                 className="flex flex-col w-full mt-5 text-gray-500"

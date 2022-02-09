@@ -678,6 +678,28 @@ export function useScenarioCalibrationResults(scenarioId) {
   }, [query, data?.data]);
 }
 
+export function useScenarioCalibrationRange(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenario-calibration-range', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/blm/range`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.range,
+    };
+  }, [query, data?.data]);
+}
+
 export function useSaveScenarioCalibrationRange({
   requestConfig = {
     method: 'POST',
