@@ -1,18 +1,17 @@
 import { Test } from '@nestjs/testing';
 import { Injectable } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
-import { v4 } from 'uuid';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import {
-  ClonePiece,
-  ComponentId,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 
-import { ExportComponentSnapshot, ExportId } from '../domain';
+import {
+  ExportComponent,
+  ExportComponentRequested,
+  ExportId,
+  ExportRequested,
+} from '../domain';
 
 import { ExportProjectHandler } from './export-project.handler';
 import { ResourcePieces } from './resource-pieces.port';
@@ -27,14 +26,11 @@ beforeEach(async () => {
 });
 
 test(`requesting new project export`, async () => {
-  const { projectId, someScenarioId } = fixtures.GivenProjectWasCreated();
+  const { projectId } = fixtures.GivenProjectWasCreated();
   const exportId = await fixtures.WhenExportIsRequested(projectId);
   await fixtures.ThenExportRequestIsSaved(exportId);
-  await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(
-    projectId,
-    someScenarioId,
-  );
-  await fixtures.ThenExportRequestsEventIsPresent(exportId);
+  await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(projectId);
+  fixtures.ThenExportRequestsEventIsPresent(exportId);
 });
 
 const getFixtures = async () => {
@@ -65,45 +61,27 @@ const getFixtures = async () => {
 
   return {
     GivenProjectWasCreated: () => {
-      const projectId = v4();
-      const someScenarioId = v4();
+      const projectId = ResourceId.create();
       piecesResolver.resolveMock.mockImplementationOnce(async () => [
-        {
-          id: new ComponentId(v4()),
-          resourceId: projectId,
-          finished: false,
-          piece: ClonePiece.ProjectMetadata,
-          uris: [],
-        },
-        {
-          id: new ComponentId(v4()),
-          resourceId: someScenarioId,
-          finished: true,
-          piece: ClonePiece.PlanningAreaCustom,
-          uris: [],
-        },
-        {
-          id: new ComponentId(v4()),
-          resourceId: someScenarioId,
-          finished: false,
-          piece: ClonePiece.ExportConfig,
-          uris: [],
-        },
+        ExportComponent.newOne(projectId, ClonePiece.ProjectMetadata),
+        ExportComponent.newOne(projectId, ClonePiece.PlanningAreaCustom),
+        ExportComponent.newOne(projectId, ClonePiece.ExportConfig),
       ]);
-      return { projectId, someScenarioId };
+      return { projectId };
     },
-    WhenExportIsRequested: async (projectId: string) =>
-      sut.execute(new ExportProject(new ResourceId(projectId))),
+    WhenExportIsRequested: async (projectId: ResourceId) =>
+      sut.execute(new ExportProject(projectId)),
     ThenExportRequestIsSaved: async (exportId: ExportId) => {
       expect((await repo.find(exportId))?.toSnapshot()).toBeDefined();
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
-      projectId: string,
-      scenarioId: string,
+      projectId: ResourceId,
     ) => {
       const projectMetadataExport = events[0];
-      const projectSettingsExport = events[1];
+      const projectPlanningAreaCustomExport = events[1];
+      const exportConfigExport = events[2];
 
+      expect(projectMetadataExport).toBeInstanceOf(ExportComponentRequested);
       expect(projectMetadataExport).toMatchObject({
         componentId: {
           value: expect.any(String),
@@ -113,11 +91,28 @@ const getFixtures = async () => {
         },
         piece: 'project-metadata',
         resourceId: {
-          value: projectId,
+          value: projectId.value,
         },
       });
 
-      expect(projectSettingsExport).toMatchObject({
+      expect(projectPlanningAreaCustomExport).toBeInstanceOf(
+        ExportComponentRequested,
+      );
+      expect(projectPlanningAreaCustomExport).toMatchObject({
+        componentId: {
+          value: expect.any(String),
+        },
+        exportId: {
+          value: expect.any(String),
+        },
+        piece: 'planning-area-shapefile',
+        resourceId: {
+          value: projectId.value,
+        },
+      });
+
+      expect(exportConfigExport).toBeInstanceOf(ExportComponentRequested);
+      expect(exportConfigExport).toMatchObject({
         componentId: {
           value: expect.any(String),
         },
@@ -126,12 +121,13 @@ const getFixtures = async () => {
         },
         piece: 'export-config',
         resourceId: {
-          value: scenarioId,
+          value: projectId.value,
         },
       });
     },
     ThenExportRequestsEventIsPresent(exportId: ExportId) {
-      const exportRequested = events[2];
+      const exportRequested = events[3];
+      expect(exportRequested).toBeInstanceOf(ExportRequested);
       expect(exportRequested).toMatchObject({
         exportId,
       });
@@ -146,7 +142,7 @@ class FakePiecesProvider implements ResourcePieces {
   async resolveFor(
     id: ResourceId,
     kind: ResourceKind,
-  ): Promise<ExportComponentSnapshot[]> {
+  ): Promise<ExportComponent[]> {
     return this.resolveMock(id, kind);
   }
 }

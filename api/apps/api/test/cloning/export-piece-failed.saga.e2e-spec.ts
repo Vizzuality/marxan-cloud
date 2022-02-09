@@ -6,6 +6,7 @@ import { ExportRepository } from '@marxan-api/modules/clone/export/application/e
 import { ExportId } from '@marxan-api/modules/clone/export/domain';
 import { exportPieceQueueToken } from '@marxan-api/modules/clone/infra/export/export-queue.provider';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ComponentId } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { EventBus } from '@nestjs/cqrs';
 import * as request from 'supertest';
@@ -117,8 +118,8 @@ const getFixtures = async () => {
 
       if (withPendingJobs) {
         fakePendingJobs = rest.map((piece) => ({
-          id: piece.id.value,
-          data: { exportId: exportId.value, componentId: piece.id.value },
+          id: piece.id,
+          data: { exportId: exportId.value, componentId: piece.id },
         }));
 
         expect(fakePendingJobs.length).toBeGreaterThan(0);
@@ -128,7 +129,7 @@ const getFixtures = async () => {
       eventBus.publish(
         new ExportPieceFailed(
           exportId,
-          failedPiece.id,
+          new ComponentId(failedPiece.id),
           new ResourceId(resourceId),
           resourceKind,
           [],

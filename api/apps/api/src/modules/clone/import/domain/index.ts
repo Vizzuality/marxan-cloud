@@ -10,4 +10,4 @@ export {
 } from './import/import';
 
 export { ImportComponents, ImportSnapshot } from './import/import.snapshot';
-export { ImportComponentSnapshot } from './import/import.component.snapshot';
+export { ImportComponentSnapshot } from './import/import-component.snapshot';

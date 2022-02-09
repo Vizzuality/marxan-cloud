@@ -66,9 +66,9 @@ export class SchedulePieceExportHandler
       topic: componentId.value,
       data: {
         piece,
-        exportId,
-        componentId,
-        resourceId,
+        exportId: exportId.value,
+        componentId: componentId.value,
+        resourceId: resourceId.value,
       },
     });
   }

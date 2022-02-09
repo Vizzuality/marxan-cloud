@@ -32,10 +32,10 @@ export class MarkExportPiecesAsFailedHandler
           kind,
           topic: componentId.value,
           data: {
-            exportId,
-            resourceId,
+            exportId: exportId.value,
+            resourceId: resourceId.value,
             resourceKind,
-            componentId,
+            componentId: componentId.value,
           },
         }),
       ),

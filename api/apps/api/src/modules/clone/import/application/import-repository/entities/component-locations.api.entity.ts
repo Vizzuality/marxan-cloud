@@ -1,30 +1,30 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { ComponentLocation } from '../../application/complete-piece.command';
-import { ExportComponentEntity } from './export-components.api.entity';
+import { ImportComponentEntity } from './import-components.api.entity';
+import { ComponentLocation } from '@marxan/cloning/domain';
 import { ComponentLocationSnapshot } from '@marxan/cloning/domain/component-location.snapshot';
 
-@Entity('export_component_locations')
-export class ComponentLocationEntity {
+@Entity('import_component_locations')
+export class ImportComponentLocationEntity {
   @Column({ type: 'text', name: 'uri', primary: true })
   uri!: string;
 
   @Column({ type: 'text', name: 'relative_path', primary: true })
   relativePath!: string;
 
-  @Column({ type: 'uuid', name: 'export_component_id' })
-  exportComponentId!: string;
+  @Column({ type: 'uuid', name: 'import_component_id' })
+  importComponentId!: string;
 
-  @ManyToOne(() => ExportComponentEntity, (component) => component.uris)
+  @ManyToOne(() => ImportComponentEntity, (component) => component.uris)
   @JoinColumn({
-    name: 'export_component_id',
+    name: 'import_component_id',
     referencedColumnName: 'id',
   })
-  component!: ExportComponentEntity;
+  component!: ImportComponentEntity;
 
   static fromSnapshot(
     locationSnapshot: ComponentLocationSnapshot,
-  ): ComponentLocationEntity {
-    const componentLocationEntity = new ComponentLocationEntity();
+  ): ImportComponentLocationEntity {
+    const componentLocationEntity = new ImportComponentLocationEntity();
     componentLocationEntity.uri = locationSnapshot.uri;
     componentLocationEntity.relativePath = locationSnapshot.relativePath;
 

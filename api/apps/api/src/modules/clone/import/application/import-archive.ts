@@ -8,11 +8,11 @@ import { Import } from '../domain';
 import {
   ArchiveReader,
   Failure as ArchiveReadError,
-} from './archive-reader.port';
+} from './archive-reader/archive-reader.port';
 import {
-  ImportRepository,
   Failure as PersistenceError,
-} from './import.repository.port';
+  ImportRepository,
+} from './import-repository/import.repository.port';
 
 export type ImportError = PersistenceError | ArchiveReadError;
 
@@ -29,23 +29,20 @@ export class ImportArchive {
   ): Promise<Either<ImportError, string>> {
     const extractResult = await this.archiveReader.get(fromArchive);
 
-    if (isLeft(extractResult)) {
-      return extractResult;
-    }
+    if (isLeft(extractResult)) return extractResult;
 
     const importRequest = this.eventPublisher.mergeObjectContext(
-      Import.new(extractResult.right),
+      extractResult.right,
     );
-    const snapshot = importRequest.toSnapshot();
 
-    const result = await this.importRepo.save(snapshot);
+    importRequest.run();
 
-    if (isLeft(result)) {
-      return result;
-    }
+    const result = await this.importRepo.save(importRequest);
+
+    if (isLeft(result)) return result;
 
     importRequest.commit();
 
-    return right(snapshot.id);
+    return right(importRequest.id.value);
   }
 }

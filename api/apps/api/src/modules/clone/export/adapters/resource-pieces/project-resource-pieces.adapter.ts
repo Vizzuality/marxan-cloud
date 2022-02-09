@@ -1,16 +1,10 @@
-import {
-  ClonePiece,
-  ComponentId,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 } from 'uuid';
 import { Scenario } from '../../../../scenarios/scenario.api.entity';
 import { ResourcePieces } from '../../application/resource-pieces.port';
-import { ExportComponentSnapshot } from '../../domain';
+import { ExportComponent } from '../../domain';
 import { ResourcePiecesProvider } from '../resource-pieces.adapter';
 import { ScenarioResourcePiecesAdapter } from './scenario-resource-pieces.adapter';
 
@@ -26,7 +20,7 @@ export class ProjectResourcePiecesAdapter implements ResourcePieces {
   async resolveFor(
     id: ResourceId,
     kind: ResourceKind,
-  ): Promise<ExportComponentSnapshot[]> {
+  ): Promise<ExportComponent[]> {
     const scenarios = await this.scenarioRepository.find({
       where: { projectId: id.value },
     });
@@ -41,41 +35,11 @@ export class ProjectResourcePiecesAdapter implements ResourcePieces {
     );
 
     return [
-      {
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.ProjectMetadata,
-        finished: false,
-        uris: [],
-      },
-      {
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.ExportConfig,
-        finished: false,
-        uris: [],
-      },
-      {
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.PlanningAreaCustom,
-        finished: false,
-        uris: [],
-      },
-      {
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.PlanningAreaGAdm,
-        finished: false,
-        uris: [],
-      },
-      {
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.PlanningAreaGridCustom,
-        finished: false,
-        uris: [],
-      },
+      ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
+      ExportComponent.newOne(id, ClonePiece.ExportConfig),
+      ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom),
+      ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
+      ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
       ...scenarioPieces.flat(),
     ];
   }

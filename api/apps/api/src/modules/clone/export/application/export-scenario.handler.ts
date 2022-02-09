@@ -5,7 +5,7 @@ import {
 } from '@nestjs/cqrs';
 
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Export, ExportComponentSnapshot, ExportId } from '../domain';
+import { Export, ExportId } from '../domain';
 
 import { ExportScenario } from './export-scenario.command';
 import { ResourcePieces } from './resource-pieces.port';
@@ -22,10 +22,7 @@ export class ExportScenarioHandler
 
   async execute({ id }: ExportScenario): Promise<ExportId> {
     const kind = ResourceKind.Scenario;
-    const pieces: ExportComponentSnapshot[] = await this.resourcePieces.resolveFor(
-      id,
-      kind,
-    );
+    const pieces = await this.resourcePieces.resolveFor(id, kind);
     const exportRequest = this.eventPublisher.mergeObjectContext(
       Export.newOne(id, kind, pieces),
     );
