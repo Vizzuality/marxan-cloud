@@ -188,7 +188,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
-              subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+              subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
             }),
           },
         }, {
@@ -230,7 +230,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
-              subtab: ScenarioSidebarSubTabs.FEATURES_FPF,
+              subtab: ScenarioSidebarSubTabs.FEATURES_TARGET,
             }),
           },
         }, {

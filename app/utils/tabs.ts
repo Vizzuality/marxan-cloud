@@ -1,19 +1,18 @@
 export enum ScenarioSidebarTabs {
   PLANNING_UNIT = 'planning-unit',
   FEATURES = 'features',
-  ANALYSIS = 'analysis',
+  PARAMETERS = 'parameters',
   SOLUTIONS = 'solutions',
 }
 
 export enum ScenarioSidebarSubTabs {
-  PLANNING_UNIT_COST_SURFACE = 'pu-planning-unit-cost-surface',
-  PLANNING_UNIT_ADJUST_PLANNING_UNITS = 'pu-planning-unit-adjust-planning-units',
-
   PROTECTED_AREAS_PREVIEW = 'pu-protected-areas-preview',
   PROTECTED_AREAS_THRESHOLD = 'pu-protected-areas-threshold',
+  COST_SURFACE = 'pu-cost-surface',
+  ADJUST_PLANNING_UNITS = 'pu-planning-units',
 
-  FEATURES_PREVIEW = 'features-preview',
-  FEATURES_FPF = 'features-fpf',
+  FEATURES_ADD = 'fe-features-add',
+  FEATURES_TARGET = 'fe-features-target',
 
   ANALYSIS_PREVIEW = 'analysis-preview',
   ANALYSIS_GAP_ANALYSIS = 'analysis-gap-analysis',

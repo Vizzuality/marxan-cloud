@@ -67,14 +67,14 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
       data: {
         metadata: mergeScenarioStatusMetaData(metadata, {
           tab: ScenarioSidebarTabs.FEATURES,
-          subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+          subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
         }),
       },
     });
   }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
-    setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_FPF ? 1 : 0);
+    setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_TARGET ? 1 : 0);
   }, [metaSubtab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
@@ -231,7 +231,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
               <ListFeatures
                 onSuccess={() => {
                   setStep(step + 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_FPF));
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
                 }}
               />
             )}
@@ -240,7 +240,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
               <TargetFeatures
                 onBack={() => {
                   setStep(step - 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_PREVIEW));
+                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
                   saveScenarioStatusOnBack();
                 }}
                 onSuccess={() => {

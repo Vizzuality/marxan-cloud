@@ -102,7 +102,7 @@ const EditScenarioPage: React.FC = () => {
               <ScenariosEditSidebar>
                 <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
                 <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
-                <SidebarEditAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
+                <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
                 <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosEditSidebar>
               <ScenarioEditsMap />

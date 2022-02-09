@@ -103,7 +103,7 @@ export const useScenarioActionsFailure = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             tab: ScenarioSidebarTabs.FEATURES,
-            subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+            subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
             status: {
               'protected-areas': 'draft',
               features: 'draft',
@@ -233,7 +233,7 @@ export const useScenarioActionsFailure = () => {
           ...scenarioData?.metadata,
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: ScenarioSidebarTabs.ANALYSIS,
+            tab: ScenarioSidebarTabs.PARAMETERS,
             subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
             status: {
               'protected-areas': 'draft',
