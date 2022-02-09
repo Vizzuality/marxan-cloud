@@ -11,6 +11,9 @@ data "azurerm_resource_group" "resource_group" {
   name = var.project_name
 }
 
+data "azurerm_subscription" "subscription" {
+}
+
 module "network" {
   source = "./modules/network"
   resource_group = data.azurerm_resource_group.resource_group
