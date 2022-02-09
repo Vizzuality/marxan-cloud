@@ -83,20 +83,22 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
       >
         <AnimatePresence>
           <Pill selected>
-            <header className="flex justify-between flex-shrink-0">
-              <div>
-                <div className="flex items-baseline space-x-4">
-                  <h2 className="text-lg font-medium font-heading">Sorting out the features</h2>
-                </div>
-              </div>
-            </header>
 
             {!subtab && (
-              <Sections
-                key="sections"
-                sections={SECTIONS}
-                onChangeSection={onChangeSection}
-              />
+              <>
+                <header className="flex justify-between flex-shrink-0">
+                  <div>
+                    <div className="flex items-baseline space-x-4">
+                      <h2 className="text-lg font-medium font-heading">Sorting out the features</h2>
+                    </div>
+                  </div>
+                </header>
+                <Sections
+                  key="sections"
+                  sections={SECTIONS}
+                  onChangeSection={onChangeSection}
+                />
+              </>
             )}
 
             {(subtab === ScenarioSidebarSubTabs.FEATURES_ADD

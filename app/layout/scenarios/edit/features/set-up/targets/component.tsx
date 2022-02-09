@@ -291,7 +291,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                 size="lg"
                 onClick={onBack}
               >
-                Back
+                Set features
               </Button>
 
               <Button
