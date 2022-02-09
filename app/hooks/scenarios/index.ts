@@ -724,6 +724,7 @@ export function useSaveScenarioCalibrationRange({
       console.info('Succcess', data, variables, context);
       const { id: scenarioId } = variables;
       queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
+      queryClient.invalidateQueries(['scenario-calibration-range', scenarioId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
