@@ -61,6 +61,7 @@ export class ImportComponentEntity {
     entity.piece = componentSnapshot.piece;
     entity.resourceId = componentSnapshot.resourceId;
     entity.finished = componentSnapshot.finished;
+    entity.order = componentSnapshot.order;
     entity.uris = componentSnapshot.uris.map(
       ImportComponentLocationEntity.fromSnapshot,
     );

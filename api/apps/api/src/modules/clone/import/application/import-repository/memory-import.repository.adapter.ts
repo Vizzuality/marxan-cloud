@@ -1,5 +1,5 @@
 import {
-  Failure as RepoFailure,
+  SaveError,
   ImportRepository,
   Success,
 } from '@marxan-api/modules/clone/import/application/import-repository/import.repository.port';
@@ -20,9 +20,13 @@ export class MemoryImportRepository extends ImportRepository {
     return Import.fromSnapshot(snapshot);
   }
 
-  async save(importRequest: Import): Promise<Either<RepoFailure, Success>> {
+  async save(importRequest: Import): Promise<Either<SaveError, Success>> {
     const snapshot = importRequest.toSnapshot();
     this.entities[snapshot.id] = snapshot;
     return right(true);
+  }
+
+  transaction<T>(code: (repo: ImportRepository) => Promise<T>): Promise<T> {
+    return code(this);
   }
 }

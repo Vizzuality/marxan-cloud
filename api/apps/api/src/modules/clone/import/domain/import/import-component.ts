@@ -17,7 +17,7 @@ export class ImportComponent {
     private finished: boolean = false,
   ) {}
 
-  static from(snapshot: ImportComponentSnapshot) {
+  static fromSnapshot(snapshot: ImportComponentSnapshot) {
     return new ImportComponent(
       new ComponentId(snapshot.id),
       snapshot.piece,

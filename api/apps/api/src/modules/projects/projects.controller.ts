@@ -88,7 +88,6 @@ import {
   ImplementsAcl,
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
-import { createReadStream } from 'fs';
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
 

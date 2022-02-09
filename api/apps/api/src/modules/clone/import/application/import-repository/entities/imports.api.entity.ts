@@ -1,7 +1,7 @@
 import { Import } from '@marxan-api/modules/clone/import';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ImportComponentEntity } from '@marxan-api/modules/clone/import/application/import-repository/entities/import-components.api.entity';
+import { ImportComponentEntity } from './import-components.api.entity';
 
 @Entity('imports')
 export class ImportEntity {
