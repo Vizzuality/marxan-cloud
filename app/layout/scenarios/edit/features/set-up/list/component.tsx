@@ -18,7 +18,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
-import IntersectFeatures from 'layout/scenarios/edit/features/intersect';
+import IntersectFeatures from 'layout/scenarios/edit/features/set-up/intersect';
 
 import Button from 'components/button';
 import Item from 'components/features/selected-item';

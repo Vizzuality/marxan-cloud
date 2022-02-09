@@ -13,9 +13,8 @@ import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
 
 import Pill from 'layout/pill';
-// import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
+import SetUpFeatures from 'layout/scenarios/edit/features/set-up';
 // import CostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
-// import ProtectedAreas from 'layout/scenarios/edit/planning-unit/protected-areas';
 import Sections from 'layout/sections';
 
 import Button from 'components/button';
@@ -100,13 +99,13 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
               />
             )}
 
-            {/* {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
-              || subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD)
+            {(subtab === ScenarioSidebarSubTabs.FEATURES_ADD
+              || subtab === ScenarioSidebarSubTabs.FEATURES_TARGET)
               && (
-                <ProtectedAreas
-                  key="protected-areas"
+                <SetUpFeatures
+                  key="set-up-features"
                 />
-              )} */}
+              )}
             {/*
             {subtab === ScenarioSidebarSubTabs.COST_SURFACE && (
               <CostSurface

@@ -6,8 +6,8 @@ import { useRouter } from 'next/router';
 
 import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 
-import List from 'layout/scenarios/edit/features/intersect/list';
-import Toolbar from 'layout/scenarios/edit/features/intersect/toolbar';
+import List from 'layout/scenarios/edit/features/set-up/intersect/list';
+import Toolbar from 'layout/scenarios/edit/features/set-up/intersect/toolbar';
 
 import Button from 'components/button';
 import { composeValidators } from 'components/forms/validations';

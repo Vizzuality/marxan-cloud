@@ -15,9 +15,9 @@ import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import AddFeaturesModal from 'layout/scenarios/edit/features/add/add-btn';
-import ListFeatures from 'layout/scenarios/edit/features/list';
-import TargetFeatures from 'layout/scenarios/edit/features/targets';
+import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add-btn';
+import ListFeatures from 'layout/scenarios/edit/features/set-up/list';
+import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
