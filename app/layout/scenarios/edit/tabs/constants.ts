@@ -8,7 +8,7 @@ export const TABS = [
   },
   {
     id: ScenarioSidebarTabs.FEATURES,
-    subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+    subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
     name: 'Features',
   },
   {

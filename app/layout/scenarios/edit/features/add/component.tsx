@@ -138,7 +138,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
               tab: ScenarioSidebarTabs.FEATURES,
-              subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+              subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
             }),
           },
         }, {

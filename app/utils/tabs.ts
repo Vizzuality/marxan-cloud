@@ -12,8 +12,8 @@ export enum ScenarioSidebarSubTabs {
   COST_SURFACE = 'pu-cost-surface',
   ADJUST_PLANNING_UNITS = 'pu-planning-units',
 
-  FEATURES_PREVIEW = 'features-preview',
-  FEATURES_FPF = 'features-fpf',
+  FEATURES_ADD = 'fe-features-add',
+  FEATURES_TARGET = 'fe-features-target',
 
   ANALYSIS_PREVIEW = 'analysis-preview',
   ANALYSIS_GAP_ANALYSIS = 'analysis-gap-analysis',
