@@ -14,7 +14,6 @@ import { useSelectedFeatures } from 'hooks/features';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
-import Pill from 'layout/pill';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add-btn';
 import ListFeatures from 'layout/scenarios/edit/features/set-up/list';
 import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets';
@@ -122,133 +121,133 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Pill selected>
-            <header className="flex items-start justify-between flex-shrink-0">
-              <div>
-                <div className="flex items-baseline space-x-4">
-                  <h2 className="text-lg font-medium font-heading">Features</h2>
-                  <Steps step={step + 1} length={2} />
-                  <InfoButton>
-                    <div>
-                      <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
-                      <div className="space-y-2">
-                        <p>
-                          Features are the important habitats, species, processes,
-                          activities, and discrete areas that you want to consider
-                          in your planning process. Common feature data formats are
-                          range maps, polygons, abundances, and continuous scale or
-                          probability of occurrence maps (e.g. 0-1). Features can
-                          include more than just ecological data but also be cultural
-                          and socio-economic areas like community fishing grounds
-                          or traditional-use areas, and other human activities and
-                          industries. Every feature must have a minimum target
-                          amount set.
-                          Some examples include:
-                        </p>
-                        <img src={FEATURE_SPECIES_IMG} alt="Feature-Range" />
-                        <img src={FEATURE_ABUND_IMG} alt="Feature-Abundance" />
-                        <img src={FEATURE_SOCIAL_IMG} alt="Feature-Social" />
-                      </div>
+
+          <header className="flex items-start justify-between flex-shrink-0">
+            <div>
+              <div className="flex items-baseline space-x-4">
+                <h2 className="text-lg font-medium font-heading">Features</h2>
+                <Steps step={step + 1} length={2} />
+                <InfoButton>
+                  <div>
+                    <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
+                    <div className="space-y-2">
+                      <p>
+                        Features are the important habitats, species, processes,
+                        activities, and discrete areas that you want to consider
+                        in your planning process. Common feature data formats are
+                        range maps, polygons, abundances, and continuous scale or
+                        probability of occurrence maps (e.g. 0-1). Features can
+                        include more than just ecological data but also be cultural
+                        and socio-economic areas like community fishing grounds
+                        or traditional-use areas, and other human activities and
+                        industries. Every feature must have a minimum target
+                        amount set.
+                        Some examples include:
+                      </p>
+                      <img src={FEATURE_SPECIES_IMG} alt="Feature-Range" />
+                      <img src={FEATURE_ABUND_IMG} alt="Feature-Abundance" />
+                      <img src={FEATURE_SOCIAL_IMG} alt="Feature-Social" />
                     </div>
-                  </InfoButton>
-                </div>
-
-                <div className="flex items-center mt-2 space-x-2">
-
-                  {step === 0 && (
-                    <>
-                      <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
-                      <div className="text-xs uppercase font-heading">
-                        Features added:
-                        {' '}
-                        {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
-                      </div>
-                    </>
-                  )}
-
-                  {step === 1 && (
-                    <div className="text-xs uppercase font-heading">
-                      Set the target and FPF for your features.
-
-                    </div>
-
-                  )}
-                  {step === 1 && (
-                    <>
-                      <InfoButton>
-                        <div>
-                          <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                          <div className="space-y-2">
-                            <p>
-                              This value represents how much you want to conserve of a particular
-                              feature. In an ideal conservation, land or sea use plan,
-                              all your features meet their targets.
-                            </p>
-                            <p>
-                              You can set a default
-                              value for all of your features
-                              or you can set individual the targets separately for each feature.
-                              You can set your targets to 100% if you want the whole extent of
-                              your feature to be included in the solution.
-                            </p>
-                          </div>
-                          <h4 className="font-heading text-lg mt-5 mb-2.5">What is the FPF?</h4>
-                          <div className="space-y-2">
-                            <p>
-                              FPF stands for
-                              {' '}
-                              <b>Feature Penalty Factor</b>
-                              .
-                              A higher FPF value forces the Marxan algorithm
-                              to choose the planning units where this feature
-                              is present by applying a penalty if the target
-                              is missed, thereby increasing
-                              the cost of the solution. It comes into play when
-                              some of your targets fail to be met.
-                            </p>
-                            <p>
-                              In a typical
-                              workflow you start out with all FPF values set at
-                              1 and after checking the results, increase the FPF
-                              values for the particular features where targets have
-                              been missed.
-                            </p>
-                          </div>
-                        </div>
-                      </InfoButton>
-                    </>
-                  )}
-
-                </div>
+                  </div>
+                </InfoButton>
               </div>
 
-              {step === 0 && (
-                <AddFeaturesModal />
-              )}
-            </header>
+              <div className="flex items-center mt-2 space-x-2">
+
+                {step === 0 && (
+                  <>
+                    <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
+                    <div className="text-xs uppercase font-heading">
+                      Features added:
+                      {' '}
+                      {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
+                    </div>
+                  </>
+                )}
+
+                {step === 1 && (
+                  <div className="text-xs uppercase font-heading">
+                    Set the target and FPF for your features.
+
+                  </div>
+
+                )}
+                {step === 1 && (
+                  <>
+                    <InfoButton>
+                      <div>
+                        <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
+                        <div className="space-y-2">
+                          <p>
+                            This value represents how much you want to conserve of a particular
+                            feature. In an ideal conservation, land or sea use plan,
+                            all your features meet their targets.
+                          </p>
+                          <p>
+                            You can set a default
+                            value for all of your features
+                            or you can set individual the targets separately for each feature.
+                            You can set your targets to 100% if you want the whole extent of
+                            your feature to be included in the solution.
+                          </p>
+                        </div>
+                        <h4 className="font-heading text-lg mt-5 mb-2.5">What is the FPF?</h4>
+                        <div className="space-y-2">
+                          <p>
+                            FPF stands for
+                            {' '}
+                            <b>Feature Penalty Factor</b>
+                            .
+                            A higher FPF value forces the Marxan algorithm
+                            to choose the planning units where this feature
+                            is present by applying a penalty if the target
+                            is missed, thereby increasing
+                            the cost of the solution. It comes into play when
+                            some of your targets fail to be met.
+                          </p>
+                          <p>
+                            In a typical
+                            workflow you start out with all FPF values set at
+                            1 and after checking the results, increase the FPF
+                            values for the particular features where targets have
+                            been missed.
+                          </p>
+                        </div>
+                      </div>
+                    </InfoButton>
+                  </>
+                )}
+
+              </div>
+            </div>
 
             {step === 0 && (
-              <ListFeatures
-                onSuccess={() => {
-                  setStep(step + 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-                }}
-              />
+              <AddFeaturesModal />
             )}
+          </header>
 
-            {step === 1 && (
-              <TargetFeatures
-                onBack={() => {
-                  setStep(step - 1);
-                  dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
-                  saveScenarioStatusOnBack();
-                }}
-                onSuccess={() => {
-                  console.info('success');
-                }}
-              />
-            )}
-          </Pill>
+          {step === 0 && (
+            <ListFeatures
+              onSuccess={() => {
+                setStep(step + 1);
+                dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+              }}
+            />
+          )}
+
+          {step === 1 && (
+            <TargetFeatures
+              onBack={() => {
+                setStep(step - 1);
+                dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
+                saveScenarioStatusOnBack();
+              }}
+              onSuccess={() => {
+                console.info('success');
+              }}
+            />
+          )}
+
         </motion.div>
       </HelpBeacon>
     </div>

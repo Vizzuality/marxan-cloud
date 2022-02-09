@@ -13,8 +13,8 @@ import { useProjectRole } from 'hooks/project-users';
 import { useScenario } from 'hooks/scenarios';
 
 import Pill from 'layout/pill';
+import GapAnalysis from 'layout/scenarios/edit/features/gap-analysis';
 import SetUpFeatures from 'layout/scenarios/edit/features/set-up';
-// import CostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
 import Sections from 'layout/sections';
 
 import Button from 'components/button';
@@ -106,20 +106,13 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
                   key="set-up-features"
                 />
               )}
-            {/*
-            {subtab === ScenarioSidebarSubTabs.COST_SURFACE && (
-              <CostSurface
-                key="cost-surface"
+
+            {subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && (
+              <GapAnalysis
+                key="gap-analysis"
                 onChangeSection={onChangeSection}
               />
             )}
-
-            {subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS && (
-              <AdjustPanningUnits
-                key="adjust-planning-units"
-                onChangeSection={onChangeSection}
-              />
-            )} */}
           </Pill>
 
           {!subtab && (
