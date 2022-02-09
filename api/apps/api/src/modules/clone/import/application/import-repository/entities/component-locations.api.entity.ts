@@ -3,7 +3,7 @@ import { ImportComponentEntity } from './import-components.api.entity';
 import { ComponentLocation } from '@marxan/cloning/domain';
 import { ComponentLocationSnapshot } from '@marxan/cloning/domain/component-location.snapshot';
 
-@Entity('component_locations')
+@Entity('import_component_locations')
 export class ImportComponentLocationEntity {
   @Column({ type: 'text', name: 'uri', primary: true })
   uri!: string;
