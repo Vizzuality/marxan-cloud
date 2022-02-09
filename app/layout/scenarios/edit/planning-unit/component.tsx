@@ -27,12 +27,12 @@ const SECTIONS = [
     description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
   },
   {
-    id: ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS,
+    id: ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS,
     name: 'Adjust planning units (optional)',
     description: 'The status of a planning unit determines whether it is included in every solution (i.e. locked in) or excluded (i.e. locked out). The default status is neither included or excluded but determined during the Marxan analysis.',
   },
   {
-    id: ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE,
+    id: ScenarioSidebarSubTabs.COST_SURFACE,
     name: 'Cost surface',
     description: 'Costs reflect any variety of socioeconomic factors, which if minimized, might help the conservation plan be implemented more effectively and reduce conflicts with other uses.',
   },
@@ -113,14 +113,14 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
                 />
               )}
 
-            {subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_COST_SURFACE && (
+            {subtab === ScenarioSidebarSubTabs.COST_SURFACE && (
               <CostSurface
                 key="cost-surface"
                 onChangeSection={onChangeSection}
               />
             )}
 
-            {subtab === ScenarioSidebarSubTabs.PLANNING_UNIT_ADJUST_PLANNING_UNITS && (
+            {subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS && (
               <AdjustPanningUnits
                 key="adjust-planning-units"
                 onChangeSection={onChangeSection}
