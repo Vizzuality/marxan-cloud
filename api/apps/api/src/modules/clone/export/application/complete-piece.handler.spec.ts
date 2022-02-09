@@ -31,21 +31,30 @@ beforeEach(async () => {
 it('should mark a component as finished and emit ExportComponentFinished event', async () => {
   const exportInstance = await fixtures.GivenExportWasRequested();
   const [firstPiece] = exportInstance.toSnapshot().exportPieces;
+  const componentId = new ComponentId(firstPiece.id);
 
-  await fixtures.WhenAPieceIsCompleted(exportInstance.id, firstPiece.id);
-  await fixtures.ThenComponentIsFinished(exportInstance.id, firstPiece.id);
+  await fixtures.WhenAPieceIsCompleted(exportInstance.id, componentId);
+  await fixtures.ThenComponentIsFinished(exportInstance.id, componentId);
   fixtures.ThenExportComponentFinishedEventIsEmitted(
-    firstPiece.id,
     exportInstance.id,
+    componentId,
   );
 });
 
 it('should emit a ExportAllComponentsFinished event if all components are finished', async () => {
   const exportInstance = await fixtures.GivenExportWasRequested();
   const [firstPiece, secondPiece] = exportInstance.toSnapshot().exportPieces;
+  const firstPieceComponentId = new ComponentId(firstPiece.id);
+  const secondPieceComponentId = new ComponentId(secondPiece.id);
 
-  await fixtures.WhenAPieceIsCompleted(exportInstance.id, firstPiece.id);
-  await fixtures.WhenAPieceIsCompleted(exportInstance.id, secondPiece.id);
+  await fixtures.WhenAPieceIsCompleted(
+    exportInstance.id,
+    firstPieceComponentId,
+  );
+  await fixtures.WhenAPieceIsCompleted(
+    exportInstance.id,
+    secondPieceComponentId,
+  );
 
   fixtures.ThenExportAllComponentsFinishedEventIsEmitted(exportInstance.id);
 });
@@ -124,14 +133,15 @@ const getFixtures = async () => {
       const result = await repo.find(exportId);
       expect(result).toBeUndefined();
     },
-    WhenAPieceIsCompleted: async (exportId: ExportId, componentId: string) => {
+    WhenAPieceIsCompleted: async (
+      exportId: ExportId,
+      componentId: ComponentId,
+    ) => {
       const location = [
         new ComponentLocation(`${v4()}.json`, 'relative-path.json'),
       ];
 
-      await sut.execute(
-        new CompletePiece(exportId, new ComponentId(componentId), location),
-      );
+      await sut.execute(new CompletePiece(exportId, componentId, location));
     },
     WhenTryingToCompleteAnUnexistingPiece: async (exportId: ExportId) => {
       const exportInstance = await repo.find(exportId);
@@ -150,7 +160,7 @@ const getFixtures = async () => {
     },
     ThenComponentIsFinished: async (
       exportId: ExportId,
-      componentId: string,
+      componentId: ComponentId,
     ) => {
       const exportInstance = await repo.find(exportId);
 
@@ -158,14 +168,14 @@ const getFixtures = async () => {
 
       const component = exportInstance
         ?.toSnapshot()
-        .exportPieces.find((piece) => piece.id === componentId);
+        .exportPieces.find((piece) => piece.id === componentId.value);
 
       expect(component).toBeDefined();
       expect(component?.finished).toEqual(true);
     },
     ThenExportComponentFinishedEventIsEmitted: (
-      componentId: string,
       exportId: ExportId,
+      componentId: ComponentId,
     ) => {
       const componentFinishedEvent = events[0];
 

@@ -43,7 +43,7 @@ export class ImportComponent {
     );
   }
 
-  isFinished() {
+  isReady() {
     return this.finished;
   }
 

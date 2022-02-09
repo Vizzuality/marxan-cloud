@@ -72,7 +72,7 @@ export class Import extends AggregateRoot {
       (pc) => pc.id.value === piece.id.value,
     );
     if (!pieceToComplete) return left(componentNotFound);
-    if (pieceToComplete.isFinished()) return left(componentAlreadyCompleted);
+    if (pieceToComplete.isReady()) return left(componentAlreadyCompleted);
 
     this.apply(
       new PieceImported(
