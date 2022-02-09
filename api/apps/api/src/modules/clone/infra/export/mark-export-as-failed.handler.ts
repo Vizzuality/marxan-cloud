@@ -28,8 +28,8 @@ export class MarkExportAsFailedHandler
       topic: resourceId.value,
       externalId: ApiEventsService.composeExternalId(exportId.value, kind),
       data: {
-        exportId,
-        resourceId,
+        exportId: exportId.value,
+        resourceId: resourceId.value,
         resourceKind,
       },
     });
