@@ -988,7 +988,9 @@ export class ScenariosService {
   async findAllLocks(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+  ): Promise<
+    Either<typeof forbiddenError | GetScenarioFailure, ScenarioLockResultPlural>
+  > {
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
     });

@@ -255,7 +255,7 @@ export async function getFixtures() {
     ) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual('Scenario lock belong to a different user.');
+      expect(error.title).toEqual('Scenario lock belongs to a different user.');
     },
 
     ThenScenarioLockInfoForOwnerIsReturned: (response: request.Response) => {
