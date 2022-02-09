@@ -10,6 +10,7 @@ import {
   lockedByAnotherUser,
   noLockInPlace,
 } from './locks/lock.service';
+
 export abstract class ScenarioAccessControl {
   abstract canEditScenario(scenarioId: string, userId: string): Promise<Permit>;
   abstract canViewScenario(scenarioId: string, userId: string): Promise<Permit>;

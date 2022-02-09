@@ -993,7 +993,7 @@ export class ScenariosService {
       authenticatedUser: { id: userId },
     });
     if (isLeft(scenario)) {
-      return left(forbiddenError);
+      return scenario;
     }
     const projectId = scenario.right.projectId;
     return await this.scenarioAclService.findAllLocks(

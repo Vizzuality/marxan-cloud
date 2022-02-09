@@ -1,13 +1,7 @@
-import {
-  ClonePiece,
-  ComponentId,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
-import { v4 } from 'uuid';
 import { ResourcePieces } from '../../application/resource-pieces.port';
-import { ExportComponentSnapshot } from '../../domain';
+import { ExportComponent } from '../../domain';
 import { ResourcePiecesProvider } from '../resource-pieces.adapter';
 
 @Injectable()
@@ -16,25 +10,13 @@ export class ScenarioResourcePiecesAdapter implements ResourcePieces {
   async resolveFor(
     id: ResourceId,
     kind: ResourceKind,
-  ): Promise<ExportComponentSnapshot[]> {
-    const pieces: ExportComponentSnapshot[] = [
-      {
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.ScenarioMetadata,
-        finished: false,
-        uris: [],
-      },
+  ): Promise<ExportComponent[]> {
+    const pieces: ExportComponent[] = [
+      ExportComponent.newOne(id, ClonePiece.ScenarioMetadata),
     ];
 
     if (kind === ResourceKind.Scenario) {
-      pieces.push({
-        id: new ComponentId(v4()),
-        resourceId: id.value,
-        piece: ClonePiece.ExportConfig,
-        finished: false,
-        uris: [],
-      });
+      pieces.push(ExportComponent.newOne(id, ClonePiece.ExportConfig));
     }
 
     return pieces;

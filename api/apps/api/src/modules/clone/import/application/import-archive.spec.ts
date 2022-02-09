@@ -3,34 +3,32 @@ import { Test } from '@nestjs/testing';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 
-import {
-  Failure as RepoFailure,
-  ImportRepository,
-  Success,
-} from './import.repository.port';
+import { ImportRepository } from './import-repository/import.repository.port';
 
 import {
   ArchiveReader,
   Failure as ArchiveFailure,
   invalidFiles,
   Success as ArchiveSuccess,
-} from './archive-reader.port';
+} from './archive-reader/archive-reader.port';
 
 import {
   ArchiveLocation,
   ClonePiece,
   ComponentId,
-  ComponentLocation,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
 import {
+  Import,
+  ImportId,
   ImportRequested,
-  ImportSnapshot,
   PieceImportRequested,
 } from '../domain';
 import { ImportArchive } from './import-archive';
 import { PromiseType } from 'utility-types';
+import { MemoryImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/memory-import.repository.adapter';
+import { ImportRepositoryModule } from '@marxan-api/modules/clone/import/application/import-repository/import-repository.module';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -62,12 +60,8 @@ test(`importing archive with equal order components`, async () => {
 
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
-    imports: [CqrsModule],
+    imports: [CqrsModule, ImportRepositoryModule],
     providers: [
-      {
-        provide: ImportRepository,
-        useClass: InMemoryRepo,
-      },
       {
         provide: ArchiveReader,
         useClass: FakeArchiveReader,
@@ -81,7 +75,7 @@ const getFixtures = async () => {
   sandbox.get(EventBus).subscribe((event) => events.push(event));
 
   const sut = sandbox.get(ImportArchive);
-  const repo: InMemoryRepo = sandbox.get(ImportRepository);
+  const repo: MemoryImportRepository = sandbox.get(ImportRepository);
   const archiveReader: FakeArchiveReader = sandbox.get(ArchiveReader);
 
   return {
@@ -90,72 +84,82 @@ const getFixtures = async () => {
     },
     GivenExtractingArchiveHasSequentialComponents: () => {
       archiveReader.mock.mockImplementation(async () =>
-        right({
-          archiveLocation: new ArchiveLocation('whatever'),
-          resourceId: new ResourceId(`resource-id`),
-          resourceKind: ResourceKind.Project,
-          importPieces: [
-            {
-              order: 0,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`import component unique id`),
-              piece: ClonePiece.ProjectMetadata,
-              uri: [
-                new ComponentLocation(
-                  `/tmp/project-metadata-random-uuid.json`,
-                  `project-metadata.json`,
-                ),
-              ],
-            },
-            {
-              order: 1,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`some other piece`),
-              piece: ClonePiece.PlanningAreaGAdm,
-              uri: [
-                new ComponentLocation(
-                  `/tmp/project-planning-area-random-uuid.json`,
-                  `planning-area/config.json`,
-                ),
-              ],
-            },
-          ],
-        }),
+        right(
+          Import.fromSnapshot({
+            id: ImportId.create().value,
+            archiveLocation: 'whatever',
+            resourceId: `resource-id`,
+            resourceKind: ResourceKind.Project,
+            importPieces: [
+              {
+                finished: false,
+                order: 0,
+                resourceId: `project-id`,
+                id: `import component unique id`,
+                piece: ClonePiece.ProjectMetadata,
+                uris: [
+                  {
+                    uri: `/tmp/project-metadata-random-uuid.json`,
+                    relativePath: `project-metadata.json`,
+                  },
+                ],
+              },
+              {
+                finished: false,
+                order: 1,
+                resourceId: `project-id`,
+                id: `some other piece`,
+                piece: ClonePiece.PlanningAreaGAdm,
+                uris: [
+                  {
+                    uri: `/tmp/project-planning-area-random-uuid.json`,
+                    relativePath: `planning-area/config.json`,
+                  },
+                ],
+              },
+            ],
+          }),
+        ),
       );
     },
     GivenExtractingArchiveHasEqualComponents: () => {
       archiveReader.mock.mockImplementation(async () =>
-        right({
-          archiveLocation: new ArchiveLocation('whatever'),
-          resourceId: new ResourceId(`resource-id`),
-          resourceKind: ResourceKind.Project,
-          importPieces: [
-            {
-              order: 2,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`import component unique id`),
-              piece: ClonePiece.ProjectMetadata,
-              uri: [
-                new ComponentLocation(
-                  `/tmp/project-metadata-random-uuid.json`,
-                  `project-metadata.json`,
-                ),
-              ],
-            },
-            {
-              order: 2,
-              resourceId: new ResourceId(`project-id`),
-              id: new ComponentId(`some other piece`),
-              piece: ClonePiece.PlanningAreaGAdm,
-              uri: [
-                new ComponentLocation(
-                  `/tmp/project-planning-area-random-uuid.json`,
-                  `planning-area/config.json`,
-                ),
-              ],
-            },
-          ],
-        }),
+        right(
+          Import.fromSnapshot({
+            id: ImportId.create().value,
+            archiveLocation: 'whatever',
+            resourceId: `resource-id`,
+            resourceKind: ResourceKind.Project,
+            importPieces: [
+              {
+                finished: false,
+                order: 2,
+                resourceId: `project-id`,
+                id: `import component unique id`,
+                piece: ClonePiece.ProjectMetadata,
+                uris: [
+                  {
+                    uri: `/tmp/project-metadata-random-uuid.json`,
+                    relativePath: `project-metadata.json`,
+                  },
+                ],
+              },
+              {
+                finished: false,
+                order: 2,
+                resourceId: `project-id`,
+                id: `some other piece`,
+                piece: ClonePiece.PlanningAreaGAdm,
+                uris: [
+                  {
+                    uri: `/tmp/project-planning-area-random-uuid.json`,
+                    relativePath: `planning-area/config.json`,
+                  },
+                ],
+              },
+            ],
+          }),
+        ),
       );
     },
     WhenRequestingImport: async () =>
@@ -178,7 +182,7 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof ImportRequested),
       ).toEqual([
         {
-          id: expect.any(String),
+          id: expect.any(ImportId),
           resourceId: new ResourceId(`resource-id`),
           resourceKind: `project`,
         },
@@ -192,7 +196,7 @@ const getFixtures = async () => {
           id: new ComponentId(`import component unique id`),
           resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
-          assets: [
+          uris: [
             {
               relativePath: `project-metadata.json`,
               uri: `/tmp/project-metadata-random-uuid.json`,
@@ -209,7 +213,7 @@ const getFixtures = async () => {
           id: new ComponentId(`import component unique id`),
           resourceId: new ResourceId(`project-id`),
           piece: `project-metadata`,
-          assets: [
+          uris: [
             {
               relativePath: `project-metadata.json`,
               uri: `/tmp/project-metadata-random-uuid.json`,
@@ -220,7 +224,7 @@ const getFixtures = async () => {
           id: new ComponentId(`some other piece`),
           resourceId: new ResourceId(`project-id`),
           piece: `planning-area-gadm`,
-          assets: [
+          uris: [
             {
               relativePath: `planning-area/config.json`,
               uri: `/tmp/project-planning-area-random-uuid.json`,
@@ -239,20 +243,5 @@ class FakeArchiveReader extends ArchiveReader {
     archive: ArchiveLocation,
   ): Promise<Either<ArchiveFailure, ArchiveSuccess>> {
     return this.mock(archive);
-  }
-}
-
-class InMemoryRepo extends ImportRepository {
-  entities: Record<string, ImportSnapshot> = {};
-
-  async find(importId: string): Promise<ImportSnapshot | undefined> {
-    return this.entities[importId];
-  }
-
-  async save(
-    importRequest: ImportSnapshot,
-  ): Promise<Either<RepoFailure, Success>> {
-    this.entities[importRequest.id] = importRequest;
-    return right(true);
   }
 }

@@ -3,6 +3,7 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import {
   CompletePiece,
+  ComponentId,
   ComponentLocation,
 } from '@marxan-api/modules/clone/export/application/complete-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
@@ -126,10 +127,10 @@ export const getFixtures = async () => {
         );
 
         if (isLeft(result)) {
-          throw new Error(`Error while saving ${piece.id.value} file`);
+          throw new Error(`Error while saving ${piece.id} file`);
         }
 
-        piecesUris[piece.id.value] = result.right;
+        piecesUris[piece.id] = result.right;
       }),
     );
   };
@@ -189,10 +190,10 @@ export const getFixtures = async () => {
 
       exportInstance!.toSnapshot().exportPieces.forEach((piece) => {
         commandBus.execute(
-          new CompletePiece(exportId, piece.id, [
+          new CompletePiece(exportId, new ComponentId(piece.id), [
             new ComponentLocation(
-              piecesUris[piece.id.value],
-              `${piece.id.value}-${piece.piece}.txt`,
+              piecesUris[piece.id],
+              `${piece.id}-${piece.piece}.txt`,
             ),
           ]),
         );
