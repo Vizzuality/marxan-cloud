@@ -651,6 +651,8 @@ export function useCancelRunScenario({
     },
   });
 }
+
+// BLM
 export function useScenarioCalibrationResults(scenarioId) {
   const [session] = useSession();
 
@@ -666,7 +668,8 @@ export function useScenarioCalibrationResults(scenarioId) {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const parsedData = Array.isArray(data?.data)
+      ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)) : [];
 
     return {
       ...query,
@@ -675,7 +678,6 @@ export function useScenarioCalibrationResults(scenarioId) {
   }, [query, data?.data]);
 }
 
-// BLM
 export function useSaveScenarioCalibrationRange({
   requestConfig = {
     method: 'POST',
