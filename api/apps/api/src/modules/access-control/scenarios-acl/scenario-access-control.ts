@@ -28,13 +28,8 @@ export abstract class ScenarioAccessControl {
     userId: string,
     scenarioId: string,
     projectId: string,
-  ): Promise<
-    Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
-      void
-    >
-  >;
-  abstract canEditScenarioAndLockLogicIsCorrect(
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>>;
+  abstract canEditScenarioAndOwnsLock(
     userId: string,
     scenarioId: string,
   ): Promise<

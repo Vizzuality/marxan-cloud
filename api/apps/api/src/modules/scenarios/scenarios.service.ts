@@ -286,12 +286,12 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return left(forbiddenError);
     }
-    const aclAndLockLogic = await this.scenarioAclService.canEditScenarioAndLockLogicIsCorrect(
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
     );
-    if (isLeft(aclAndLockLogic)) {
-      return aclAndLockLogic;
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     await this.blockGuard.ensureThatProjectIsNotBlocked(
       scenario.right.projectId,
@@ -963,7 +963,10 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      | typeof forbiddenError
+      | GetScenarioFailure
+      | typeof lockedByAnotherUser
+      | typeof noLockInPlace,
       void
     >
   > {
@@ -971,7 +974,7 @@ export class ScenariosService {
       authenticatedUser: { id: userId },
     });
     if (isLeft(scenario)) {
-      return left(forbiddenError);
+      return scenario;
     }
     const projectId = scenario.right.projectId;
     return await this.scenarioAclService.releaseLock(

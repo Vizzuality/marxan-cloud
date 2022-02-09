@@ -189,7 +189,7 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
     response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenNoContentIsReturned(response);
+    fixtures.ThenLockIsSuccessfullyReleased(response);
   });
 
   it('Releases scenario lock correctly because user is not owner of lock but is project owner', async () => {
@@ -201,7 +201,7 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenScenarioLockInfoForContributorIsReturned(response);
 
     response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenNoContentIsReturned(response);
+    fixtures.ThenLockIsSuccessfullyReleased(response);
   });
 
   it('Releases scenario lock correctly because user is not owner of lock but is project contributor', async () => {
@@ -214,10 +214,10 @@ describe('ScenariosModule (e2e)', () => {
     fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
     response = await fixtures.WhenReleasingLockForScenario(userToken);
-    fixtures.ThenNoContentIsReturned(response);
+    fixtures.ThenLockIsSuccessfullyReleased(response);
   });
 
-  it('Fails to release scenario lock as its not the same user and it is not a project owner/contributor', async () => {
+  it('Fails to release scenario lock as its not owned by the same user and this is not a project owner/contributor', async () => {
     await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenUserWasAddedToScenario();
     const userToken = await fixtures.GivenUserIsLoggedIn('random');
@@ -489,7 +489,7 @@ async function getFixtures() {
       expect(response.status).toEqual(200);
     },
 
-    ThenNoContentIsReturned: (response: request.Response) => {
+    ThenLockIsSuccessfullyReleased: (response: request.Response) => {
       expect(response.status).toEqual(204);
     },
 
@@ -506,7 +506,7 @@ async function getFixtures() {
     ) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual('Scenario lock belong to a different user.');
+      expect(error.title).toEqual('Scenario lock belongs to a different user.');
     },
 
     ThenScenarioIsCreatedAndNoJobHasBeenSubmitted: (

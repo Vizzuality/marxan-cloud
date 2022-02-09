@@ -49,18 +49,13 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
     userId: string,
     scenarioId: string,
     projectId: string,
-  ): Promise<
-    Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
-      void
-    >
-  > {
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
     if (this.mock(userId, scenarioId)) {
       return left(forbiddenError);
     }
     return right(void 0);
   }
-  async canEditScenarioAndLockLogicIsCorrect(
+  async canEditScenarioAndOwnsLock(
     userId: string,
     scenarioId: string,
   ): Promise<

@@ -194,17 +194,11 @@ export class ScenarioAclService implements ScenarioAccessControl {
     userId: string,
     scenarioId: string,
     projectId: string,
-  ): Promise<
-    Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
-      void
-    >
-  > {
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
     /*
      * Using named variables instead of direct usage of functions
      * for clarity when understanding the steps to release a lock
      */
-    const scenarioIsLocked = await this.lockService.isLocked(scenarioId);
     const canReleaseLockFromProjectLevel = await this.canReleaseLock(
       userId,
       projectId,
@@ -216,9 +210,6 @@ export class ScenarioAclService implements ScenarioAccessControl {
     );
     if (!canEditScenario && !canReleaseLockFromProjectLevel) {
       return left(forbiddenError);
-    }
-    if (!scenarioIsLocked) {
-      return left(noLockInPlace);
     }
     if (
       !canReleaseLockFromProjectLevel &&
@@ -232,7 +223,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return right(void 0);
   }
 
-  async canEditScenarioAndLockLogicIsCorrect(
+  async canEditScenarioAndOwnsLock(
     userId: string,
     scenarioId: string,
   ): Promise<
