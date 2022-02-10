@@ -22,7 +22,6 @@ COPY --chown=$USER:$USER libs ./libs
 
 RUN mkdir -p ./test/integration/protected-areas/steps/new-shape-name
 RUN chown $USER ./test/integration/protected-areas/steps/new-shape-name
-RUN chown $UID ./test/integration/protected-areas/steps/new-shape-name
 
 RUN chown -R $USER:$USER ./test/integration
 
