@@ -29,7 +29,10 @@ import {
   LockService,
   noLockInPlace,
 } from './locks/lock.service';
-import { ScenarioLockDto } from './locks/dto/scenario.lock.dto';
+import {
+  ScenarioLockDto,
+  ScenarioLockResultPlural,
+} from './locks/dto/scenario.lock.dto';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -250,6 +253,17 @@ export class ScenarioAclService implements ScenarioAccessControl {
     return right(
       scenarioIsLocked && canEditScenario && scenarioIsLockedByCurrentUser,
     );
+  }
+
+  async findAllLocks(
+    userId: string,
+    scenarioId: string,
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+    if (!(await this.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.lockService.getAllLocksByProject(projectId));
   }
 
   async findUsersInScenario(

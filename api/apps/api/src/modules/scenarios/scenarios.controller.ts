@@ -116,7 +116,7 @@ import {
 } from './input-files';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
-import { ScenarioAccessControl } from '../access-control/scenarios-acl/scenario-access-control';
+import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { BlmRangeDto } from '@marxan-api/modules/scenarios/dto/blm-range.dto';
 import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { invalidRange } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
@@ -130,7 +130,10 @@ import {
   lockedScenario,
   unknownError as lockUnknownError,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
-import { ScenarioLockResult } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import {
+  ScenarioLockResultPlural,
+  ScenarioLockResultSingular,
+} from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -1163,7 +1166,7 @@ export class ScenariosController {
   async startScenarioEditingSession(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<ScenarioLockResult> {
+  ): Promise<ScenarioLockResultSingular> {
     const result = await this.scenarioAclService.acquireLock(req.user.id, id);
 
     if (isLeft(result)) {
@@ -1220,5 +1223,34 @@ export class ScenariosController {
           throw _exhaustiveCheck;
       }
     }
+  }
+
+  @Get(':scenarioId/editing-locks')
+  @ApiOperation({
+    summary: "Get all locks for scenarios of this scenario's parent project",
+  })
+  async findLocksForScenariosWithinParentProject(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ScenarioLockResultPlural> {
+    const result = await this.service.findAllLocks(scenarioId, req.user.id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case scenarioNotFound:
+          throw new NotFoundException(
+            `Scenario ${scenarioId} could not be found`,
+          );
+        case scenarioUnknownError:
+          throw new InternalServerErrorException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return result.right;
   }
 }

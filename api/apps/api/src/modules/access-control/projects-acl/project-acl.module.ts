@@ -9,15 +9,21 @@ import { ProjectAclController } from '@marxan-api/modules/access-control/project
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
+import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UsersProjectsApiEntity, PublishedProject]),
+    TypeOrmModule.forFeature([
+      UsersProjectsApiEntity,
+      PublishedProject,
+      ScenarioLockEntity,
+    ]),
     forwardRef(() => UsersModule),
     forwardRef(() => ProjectsModule),
   ],
-  providers: [ProjectAclService],
+  providers: [ProjectAclService, LockService],
   exports: [ProjectAclService],
   controllers: [ProjectAclController],
 })

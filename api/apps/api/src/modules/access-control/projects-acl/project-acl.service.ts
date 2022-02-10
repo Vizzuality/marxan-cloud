@@ -24,6 +24,8 @@ import {
   transactionFailed,
 } from '@marxan-api/modules/access-control';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -58,6 +60,7 @@ export class ProjectAclService implements ProjectAccessControl {
     private readonly roles: Repository<UsersProjectsApiEntity>,
     @InjectRepository(PublishedProject)
     private readonly publishedProjectRepo: Repository<PublishedProject>,
+    private readonly lockService: LockService,
   ) {}
 
   private async getRolesWithinProjectForUser(
@@ -174,6 +177,16 @@ export class ProjectAclService implements ProjectAccessControl {
     const otherOwnersInProject = await query.getCount();
 
     return otherOwnersInProject >= 1;
+  }
+
+  async findAllLocks(
+    userId: string,
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+    if (!(await this.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.lockService.getAllLocksByProject(projectId));
   }
 
   /**

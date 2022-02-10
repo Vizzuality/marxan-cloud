@@ -38,8 +38,9 @@ import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
 import { Readable } from 'stream';
-import { ProjectAccessControl } from '../access-control';
-import { Permit } from '../access-control/access-control.types';
+import { ProjectAccessControl } from '@marxan-api/modules/access-control';
+import { Permit } from '@marxan-api/modules/access-control/access-control.types';
+import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { ApiEventsService } from '../api-events';
 import {
   ChangeProjectBlmRange,
@@ -296,5 +297,12 @@ export class ProjectsService {
     } catch (err) {
       return left(exportNotFound);
     }
+  }
+
+  async findAllLocks(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+    return await this.projectAclService.findAllLocks(userId, projectId);
   }
 }

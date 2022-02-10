@@ -15,7 +15,11 @@ export class ScenarioLockDto {
   createdAt?: Date;
 }
 
-export class ScenarioLockResult {
+export class ScenarioLockResultSingular {
   @ApiProperty()
   data!: ScenarioLockDto;
+}
+export class ScenarioLockResultPlural {
+  @ApiProperty()
+  data!: ScenarioLockDto[];
 }

@@ -90,6 +90,7 @@ import {
 } from '@marxan-api/decorators/acl.decorator';
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
+import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -521,5 +522,23 @@ export class ProjectsController {
       }
     }
     return { id: exportIdOrError.right };
+  }
+
+  @ImplementsAcl()
+  @Get(':projectId/editing-locks')
+  @ApiOperation({ summary: 'Get all locks by project' })
+  async findLocksForProject(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ScenarioLockResultPlural> {
+    const result = await this.projectsService.findAllLocks(
+      projectId,
+      req.user.id,
+    );
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return result.right;
   }
 }
