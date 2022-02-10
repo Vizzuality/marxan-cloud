@@ -4,10 +4,6 @@ services:
     build:
       context: ./api
       dockerfile: api.Dockerfile
-      args:
-        UID: 5000
-        GID: 5000
-        UPLOADS_TEMP_DIR: "/tmp/storage"
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
@@ -58,9 +54,6 @@ services:
     build:
       context: ./api
       dockerfile: geo.Dockerfile
-      args:
-        UID: 5000
-        GID: 5000
     ports:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-geoprocessing

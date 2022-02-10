@@ -1,9 +1,6 @@
 FROM node:14.18-alpine3.15
 LABEL maintainer="hello@vizzuality.com"
 
-ARG UID
-ARG GID
-
 ENV NAME marxan-geoprocessing
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
@@ -28,7 +25,6 @@ RUN chown $USER ./test/integration/protected-areas/steps/new-shape-name
 RUN chown $UID ./test/integration/protected-areas/steps/new-shape-name
 
 RUN chown -R $USER:$USER ./test/integration
-RUN chown -R $UID:$UID ./test/integration
 
 RUN mkdir -p ./test/integration/protected-areas/steps/test_multiple_features_v2
 
