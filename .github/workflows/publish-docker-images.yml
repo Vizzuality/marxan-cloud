@@ -32,14 +32,14 @@ jobs:
       - name: Wait for API tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: API Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Wait for Client tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Client Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -71,14 +71,14 @@ jobs:
       - name: Wait for API tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: API Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Wait for Client tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Client Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -111,14 +111,14 @@ jobs:
       - name: Wait for API tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: API Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Wait for Client tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Client Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
