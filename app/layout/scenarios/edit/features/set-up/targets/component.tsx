@@ -5,7 +5,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import {
@@ -172,8 +172,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           id: `${sid}`,
           data: {
             metadata: mergeScenarioStatusMetaData(metadata, {
-              tab: ScenarioSidebarTabs.PARAMETERS,
-              subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
+              tab: ScenarioSidebarTabs.FEATURES,
+              subtab: null,
             }),
           },
         }, {
@@ -192,7 +192,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     });
 
     // onSuccess();
-  }, [sid,
+  }, [
+    sid,
     metadata,
     selectedFeaturesData,
     selectedFeaturesMutation,
@@ -224,7 +225,11 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
             className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
             iconClassName="w-10 h-10 text-white"
           />
-
+          <p className="text-base opacity-40">
+            Set the minimum targets amount you want to
+            <br />
+            achieve for your features.
+          </p>
           {(!targetedFeaturesData || !targetedFeaturesData.length) && (
             <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
               No results found

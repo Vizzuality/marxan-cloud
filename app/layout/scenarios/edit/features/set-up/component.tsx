@@ -39,12 +39,12 @@ export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () =>
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <motion.div
-        key="protected-areas"
+        key="set-up-features"
         className="flex flex-col min-h-0 overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <header className="flex items-center pt-5 pb-1 space-x-3">
+        <header className="flex items-center py-5 space-x-3">
           <button
             aria-label="return"
             type="button"
