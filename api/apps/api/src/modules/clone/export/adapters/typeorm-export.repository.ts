@@ -1,8 +1,14 @@
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { Either, left, right } from 'fp-ts/lib/Either';
 import { EntityManager, Repository } from 'typeorm';
-import { ExportRepository } from '../application/export-repository.port';
+import {
+  ExportRepository,
+  saveError,
+  SaveError,
+  Success,
+} from '../application/export-repository.port';
 import { Export, ExportId } from '../domain';
 import { ExportComponentEntity } from './entities/export-components.api.entity';
 import { ExportEntity } from './entities/exports.api.entity';
@@ -47,10 +53,16 @@ export class TypeormExportRepository implements ExportRepository {
     return exportEntity.toAggregate();
   }
 
-  async save(exportInstance: Export): Promise<void> {
+  async save(exportInstance: Export): Promise<Either<SaveError, Success>> {
     const exportEntity = ExportEntity.fromAggregate(exportInstance);
 
-    await this.exportRepo.save(exportEntity);
+    try {
+      await this.exportRepo.save(exportEntity);
+    } catch (err) {
+      return left(saveError);
+    }
+
+    return right(true);
   }
 
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { ImportModule } from './import';
 import { ExportModule } from './export';
+import { ImportModule } from './import/import.module';
 import { ExportInfraModule } from './infra/export/export.infra.module';
 
 @Module({

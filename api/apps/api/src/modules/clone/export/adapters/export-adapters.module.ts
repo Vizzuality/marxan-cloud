@@ -6,7 +6,7 @@ import { Scenario } from '../../../scenarios/scenario.api.entity';
 import { ArchiveCreator } from '../application/archive-creator.port';
 import { ExportRepository } from '../application/export-repository.port';
 import { ResourcePieces } from '../application/resource-pieces.port';
-import { ComponentLocationEntity } from './entities/component-locations.api.entity';
+import { ExportComponentLocationEntity } from './entities/export-component-locations.api.entity';
 import { ExportComponentEntity } from './entities/export-components.api.entity';
 import { ExportEntity } from './entities/exports.api.entity';
 import { NodeArchiveCreator } from './node-archive-creator';
@@ -23,7 +23,7 @@ import { TypeormExportRepository } from './typeorm-export.repository';
       Scenario,
       ExportEntity,
       ExportComponentEntity,
-      ComponentLocationEntity,
+      ExportComponentLocationEntity,
     ]),
   ],
   providers: [

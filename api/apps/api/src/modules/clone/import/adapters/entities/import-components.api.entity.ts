@@ -7,9 +7,9 @@ import {
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
-import { ImportComponentLocationEntity } from './component-locations.api.entity';
+import { ImportComponentSnapshot } from '../../domain';
+import { ImportComponentLocationEntity } from './import-component-locations.api.entity';
 import { ImportEntity } from './imports.api.entity';
-import { ImportComponentSnapshot } from '@marxan-api/modules/clone/import';
 
 @Entity('import_components')
 export class ImportComponentEntity {
@@ -61,6 +61,7 @@ export class ImportComponentEntity {
     entity.piece = componentSnapshot.piece;
     entity.resourceId = componentSnapshot.resourceId;
     entity.finished = componentSnapshot.finished;
+    entity.order = componentSnapshot.order;
     entity.uris = componentSnapshot.uris.map(
       ImportComponentLocationEntity.fromSnapshot,
     );

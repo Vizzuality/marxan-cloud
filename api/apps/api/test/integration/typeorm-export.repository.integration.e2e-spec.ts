@@ -6,7 +6,6 @@ import {
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
-import { v4 } from 'uuid';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ComponentLocation } from '@marxan-api/modules/clone/export/application/complete-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';

@@ -4,8 +4,7 @@ import {
   ComponentLocation,
   ResourceId,
 } from '@marxan/cloning/domain';
-import { v4 } from 'uuid';
-import { ImportComponentSnapshot } from '@marxan-api/modules/clone/import';
+import { ImportComponentSnapshot } from '../import/import-component.snapshot';
 
 export class ImportComponent {
   private constructor(
@@ -17,7 +16,7 @@ export class ImportComponent {
     private finished: boolean = false,
   ) {}
 
-  static from(snapshot: ImportComponentSnapshot) {
+  static fromSnapshot(snapshot: ImportComponentSnapshot) {
     return new ImportComponent(
       new ComponentId(snapshot.id),
       snapshot.piece,
@@ -43,7 +42,7 @@ export class ImportComponent {
     );
   }
 
-  isFinished() {
+  isReady() {
     return this.finished;
   }
 

@@ -1,20 +1,14 @@
+import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
 import { EventPublisher } from '@nestjs/cqrs';
 import { Either, isLeft, right } from 'fp-ts/Either';
-
-import { ArchiveLocation } from '@marxan/cloning/domain';
-import { Import } from '../domain';
-
 import {
   ArchiveReader,
   Failure as ArchiveReadError,
-} from './archive-reader/archive-reader.port';
-import {
-  Failure as PersistenceError,
-  ImportRepository,
-} from './import-repository/import.repository.port';
+} from './archive-reader.port';
+import { ImportRepository, SaveError } from './import.repository.port';
 
-export type ImportError = PersistenceError | ArchiveReadError;
+export type ImportError = SaveError | ArchiveReadError;
 
 @Injectable()
 export class ImportArchive {

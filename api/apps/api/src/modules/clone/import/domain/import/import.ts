@@ -1,19 +1,18 @@
-import { AggregateRoot } from '@nestjs/cqrs';
-import { ImportSnapshot } from './import.snapshot';
-import { Either, left, right } from 'fp-ts/Either';
 import {
   ArchiveLocation,
+  ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  AllPiecesImported,
-  ImportRequested,
-  PieceImported,
-  PieceImportRequested,
-} from '../events';
-import { ImportComponent } from '@marxan-api/modules/clone/import/domain/import/import-component';
-import { ImportId } from '@marxan-api/modules/clone/import';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { Either, left, right } from 'fp-ts/Either';
+import { AllPiecesImported } from '../events/all-pieces-imported.event';
+import { ImportRequested } from '../events/import-requested.event';
+import { PieceImportRequested } from '../events/piece-import-requested.event';
+import { PieceImported } from '../events/piece-imported.event';
+import { ImportComponent } from './import-component';
+import { ImportId } from './import.id';
+import { ImportSnapshot } from './import.snapshot';
 
 export const componentNotFound = Symbol(`component not found`);
 export const componentAlreadyCompleted = Symbol(`component already completed`);
@@ -40,20 +39,18 @@ export class Import extends AggregateRoot {
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
       new ArchiveLocation(snapshot.archiveLocation),
-      snapshot.importPieces.map(ImportComponent.from),
+      snapshot.importPieces.map(ImportComponent.fromSnapshot),
     );
   }
 
-  static new(data: Omit<ImportSnapshot, 'id'>): Import {
+  static newOne(
+    resourceId: ResourceId,
+    kind: ResourceKind,
+    archiveLocation: ArchiveLocation,
+    pieces: ImportComponent[],
+  ): Import {
     const id = ImportId.create();
-    const resourceId = new ResourceId(data.resourceId);
-    const instance = new Import(
-      id,
-      resourceId,
-      data.resourceKind,
-      new ArchiveLocation(data.archiveLocation),
-      data.importPieces.map(ImportComponent.from),
-    );
+    const instance = new Import(id, resourceId, kind, archiveLocation, pieces);
 
     return instance;
   }
@@ -66,13 +63,13 @@ export class Import extends AggregateRoot {
   }
 
   completePiece(
-    piece: ImportComponent,
+    pieceId: ComponentId,
   ): Either<CompletePieceErrors, CompletePieceSuccess> {
     const pieceToComplete = this.pieces.find(
-      (pc) => pc.id.value === piece.id.value,
+      (pc) => pc.id.value === pieceId.value,
     );
     if (!pieceToComplete) return left(componentNotFound);
-    if (pieceToComplete.isFinished()) return left(componentAlreadyCompleted);
+    if (pieceToComplete.isReady()) return left(componentAlreadyCompleted);
 
     this.apply(
       new PieceImported(
