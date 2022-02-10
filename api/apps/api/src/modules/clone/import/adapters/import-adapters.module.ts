@@ -5,6 +5,9 @@ import { TypeormImportRepository } from './typeorm-import.repository.adapter';
 import { ImportComponentLocationEntity } from './entities/import-component-locations.api.entity';
 import { ImportComponentEntity } from './entities/import-components.api.entity';
 import { ImportEntity } from './entities/imports.api.entity';
+import { FakeArchiveReader } from './fake-archive-reader.adapter';
+import { ArchiveReader } from '../application/archive-reader.port';
+import { FileRepositoryModule } from '@marxan/files-repository';
 
 @Module({
   imports: [
@@ -13,11 +16,16 @@ import { ImportEntity } from './entities/imports.api.entity';
       ImportComponentEntity,
       ImportComponentLocationEntity,
     ]),
+    FileRepositoryModule,
   ],
   providers: [
     {
       provide: ImportRepository,
       useClass: TypeormImportRepository,
+    },
+    {
+      provide: ArchiveReader,
+      useClass: FakeArchiveReader,
     },
   ],
   exports: [],
