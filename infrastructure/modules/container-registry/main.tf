@@ -54,9 +54,9 @@ resource "azurerm_role_assignment" "resource-group-contributor" {
   principal_id         = azuread_service_principal.github-actions-access.object_id
 }
 
-#resource "azuread_application_password" "github-actions-access" {
-#  application_object_id = azuread_application.github-actions-access.object_id
-#}
+resource "azuread_application_password" "github-actions-access" {
+  application_object_id = azuread_application.github-actions-access.object_id
+}
 
 resource "azurerm_role_assignment" "acr-push" {
   scope                = azurerm_container_registry.acr.id

@@ -11,10 +11,14 @@
 #output "azuread_application" {
 #  value = module.container_registry.azuread_application
 #}
-#
-#output "azuread_service_principal" {
-#  value = module.container_registry.azuread_service_principal
-#}
+
+output "azurerm_container_registry_login_server" {
+  value = module.container_registry.azurerm_container_registry_login_server
+}
+
+output "azuread_application_password" {
+  value = module.container_registry.azuread_application_password
+}
 
 
 output "azure_client_id" {
