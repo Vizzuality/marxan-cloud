@@ -75,6 +75,7 @@ test(`getting all locks of scenarios from projects as project contributor`, asyn
 });
 
 test(`getting all locks of scenarios from projects as project viewer`, async () => {
+  const ownerUserId = await fixtures.GivenOwnerExists();
   const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
   const viewerToken = await fixtures.GivenUserIsLoggedIn('viewer');
   const projectId = await fixtures.GivenProjectWasCreated();
@@ -94,7 +95,12 @@ test(`getting all locks of scenarios from projects as project viewer`, async () 
     projectId,
     viewerToken,
   );
-  fixtures.ThenForbiddenIsReturned(response);
+  fixtures.ThenAllLocksAreReturned(
+    response,
+    ownerUserId,
+    scenarioIdObj.firstScenarioId,
+    scenarioIdObj.secondScenarioId,
+  );
 });
 
 test(`getting all locks of scenarios as scenario owner`, async () => {
@@ -180,6 +186,7 @@ test(`getting all locks of scenarios as scenario contributor`, async () => {
 });
 
 test(`getting all locks of scenarios as scenario viewer`, async () => {
+  const ownerUserId = await fixtures.GivenOwnerExists();
   const viewerUserId = await fixtures.GivenViewerExists();
   const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
   const viewerToken = await fixtures.GivenUserIsLoggedIn('viewer');
@@ -206,12 +213,22 @@ test(`getting all locks of scenarios as scenario viewer`, async () => {
     scenarioIdObj.firstScenarioId,
     viewerToken,
   );
-  fixtures.ThenForbiddenIsReturned(firstScenarioResponse);
+  fixtures.ThenAllLocksAreReturned(
+    firstScenarioResponse,
+    ownerUserId,
+    scenarioIdObj.firstScenarioId,
+    scenarioIdObj.secondScenarioId,
+  );
   const secondScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
     scenarioIdObj.secondScenarioId,
     viewerToken,
   );
-  fixtures.ThenForbiddenIsReturned(secondScenarioResponse);
+  fixtures.ThenAllLocksAreReturned(
+    secondScenarioResponse,
+    ownerUserId,
+    scenarioIdObj.firstScenarioId,
+    scenarioIdObj.secondScenarioId,
+  );
 });
 
 test('Viewer fails to acquire lock for a scenario', async () => {
@@ -269,24 +286,24 @@ test('Updates scenario correctly as lock is in place by same user', async () => 
 
 test('Releases scenario lock correctly', async () => {
   await fixtures.GivenScenarioWasCreated();
-  const userToken = await fixtures.GivenUserIsLoggedIn('owner');
+  const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
 
   let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
   fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
-  response = await fixtures.WhenReleasingLockForScenario(userToken);
+  response = await fixtures.WhenReleasingLockForScenario(ownerToken);
   fixtures.ThenLockIsSuccessfullyReleased(response);
 });
 
 test('Releases scenario lock correctly because user is not owner of lock but is project owner', async () => {
   await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenContributorWasAddedToScenario();
-  const userToken = await fixtures.GivenUserIsLoggedIn('owner');
+  const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
 
   let response = await fixtures.WhenAcquiringLockForScenarioAsContributor();
   fixtures.ThenScenarioLockInfoForContributorIsReturned(response);
 
-  response = await fixtures.WhenReleasingLockForScenario(userToken);
+  response = await fixtures.WhenReleasingLockForScenario(ownerToken);
   fixtures.ThenLockIsSuccessfullyReleased(response);
 });
 
@@ -294,23 +311,23 @@ test('Releases scenario lock correctly because user is not owner of lock but is 
   await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenContributorWasAddedToScenario();
   await fixtures.GivenContributorWasAddedToProject();
-  const userToken = await fixtures.GivenUserIsLoggedIn('contributor');
+  const contributorToken = await fixtures.GivenUserIsLoggedIn('contributor');
 
   let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
   fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
-  response = await fixtures.WhenReleasingLockForScenario(userToken);
+  response = await fixtures.WhenReleasingLockForScenario(contributorToken);
   fixtures.ThenLockIsSuccessfullyReleased(response);
 });
 
 test('Fails to release scenario lock as it is not owned by the same user and this is not a project owner/contributor', async () => {
   await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenUserWasAddedToScenario();
-  const userToken = await fixtures.GivenUserIsLoggedIn('random');
+  const randomUserToken = await fixtures.GivenUserIsLoggedIn('random');
 
   let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
   fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
-  response = await fixtures.WhenReleasingLockForScenario(userToken);
+  response = await fixtures.WhenReleasingLockForScenario(randomUserToken);
   fixtures.ThenScenarioIsLockedByAnotherUserIsReturned(response);
 });

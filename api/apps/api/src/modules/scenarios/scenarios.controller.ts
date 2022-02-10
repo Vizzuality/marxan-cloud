@@ -1226,15 +1226,29 @@ export class ScenariosController {
   }
 
   @Get(':scenarioId/editing-locks')
-  @ApiOperation({ summary: 'Get all locks' })
-  async findLocksForScenario(
+  @ApiOperation({
+    summary: "Get all locks for scenarios of this scenario's parent project",
+  })
+  async findLocksForScenariosWithinParentProject(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ScenarioLockResultPlural> {
     const result = await this.service.findAllLocks(scenarioId, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case scenarioNotFound:
+          throw new NotFoundException(
+            `Scenario ${scenarioId} could not be found`,
+          );
+        case scenarioUnknownError:
+          throw new InternalServerErrorException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
 
     return result.right;

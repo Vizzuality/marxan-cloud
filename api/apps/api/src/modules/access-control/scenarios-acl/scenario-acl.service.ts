@@ -260,7 +260,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     scenarioId: string,
     projectId: string,
   ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
-    if (!(await this.canEditScenario(userId, scenarioId))) {
+    if (!(await this.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
     return right(await this.lockService.getAllLocksByProject(projectId));

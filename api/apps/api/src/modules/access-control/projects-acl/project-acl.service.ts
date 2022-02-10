@@ -183,7 +183,7 @@ export class ProjectAclService implements ProjectAccessControl {
     userId: string,
     projectId: string,
   ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
-    if (!(await this.canEditProject(userId, projectId))) {
+    if (!(await this.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
     return right(await this.lockService.getAllLocksByProject(projectId));
