@@ -1,13 +1,13 @@
+import { FileRepositoryModule } from '@marxan/files-repository';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ArchiveReader } from '../application/archive-reader.port';
 import { ImportRepository } from '../application/import.repository.port';
-import { TypeormImportRepository } from './typeorm-import.repository.adapter';
+import { ArchiveReaderAdapter } from './archive-reader.adapter';
 import { ImportComponentLocationEntity } from './entities/import-component-locations.api.entity';
 import { ImportComponentEntity } from './entities/import-components.api.entity';
 import { ImportEntity } from './entities/imports.api.entity';
-import { FakeArchiveReader } from './fake-archive-reader.adapter';
-import { ArchiveReader } from '../application/archive-reader.port';
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { TypeormImportRepository } from './typeorm-import.repository.adapter';
 
 @Module({
   imports: [
@@ -25,9 +25,9 @@ import { FileRepositoryModule } from '@marxan/files-repository';
     },
     {
       provide: ArchiveReader,
-      useClass: FakeArchiveReader,
+      useClass: ArchiveReaderAdapter,
     },
   ],
-  exports: [],
+  exports: [ArchiveReader, ImportRepository],
 })
 export class ImportAdaptersModule {}
