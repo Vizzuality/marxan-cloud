@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -49,21 +50,10 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: ScenarioSidebarTabs.PLANNING_UNIT,
-            subtab: subt,
-            status: {
-              'protected-areas': 'draft',
-              features: 'empty',
-              analysis: 'empty',
-              solutions: 'empty',
-            },
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PLANNING_UNIT,
+          subtab: subt,
+        }),
       },
     }, {
       onSuccess: () => {
@@ -102,21 +92,11 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: ScenarioSidebarTabs.PLANNING_UNIT,
-            subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
-            status: {
-              'protected-areas': 'draft',
-              features: 'empty',
-              analysis: 'empty',
-              solutions: 'empty',
-            },
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PLANNING_UNIT,
+          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
+        }),
+
       },
     }, {
       onSuccess: () => {
