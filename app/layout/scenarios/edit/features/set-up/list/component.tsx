@@ -38,7 +38,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatures, setFeatureHoverId } = scenarioSlice.actions;
+  const { setFeatures, setFeatureHoverId, setSubTab } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
@@ -218,6 +218,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     const { features } = values;
     const data = getFeaturesRecipe(features);
     setSubmitting(true);
+    dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
 
     // Save current features
     selectedFeaturesMutation.mutate({
@@ -225,34 +226,19 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       data,
     }, {
       onSuccess: () => {
-        saveScenarioMutation.mutate({
-          id: `${sid}`,
-          data: {
-            metadata: mergeScenarioStatusMetaData(metadata, {
-              tab: ScenarioSidebarTabs.FEATURES,
-              subtab: ScenarioSidebarSubTabs.FEATURES_TARGET,
-            }),
-          },
-        }, {
-          onSuccess: () => {
-            onSuccess();
-            setSubmitting(false);
-          },
-          onError: () => {
-            setSubmitting(false);
-          },
-        });
+        onSuccess();
       },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [sid,
-    metadata,
+  }, [
+    sid,
     selectedFeaturesMutation,
-    saveScenarioMutation,
     onSuccess,
     getFeaturesRecipe,
+    dispatch,
+    setSubTab,
   ]);
 
   // Render

@@ -19,12 +19,10 @@ import Loading from 'components/loading';
 
 export interface ScenariosFeaturesListProps {
   onBack: () => void;
-  onSuccess: () => void;
 }
 
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   onBack,
-  onSuccess,
 }: ScenariosFeaturesListProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
@@ -178,7 +176,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           },
         }, {
           onSuccess: () => {
-            onSuccess();
             setSubmitting(false);
           },
           onError: () => {
@@ -190,15 +187,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
         setSubmitting(false);
       },
     });
-
-    // onSuccess();
   }, [
     sid,
     metadata,
     selectedFeaturesData,
     selectedFeaturesMutation,
     saveScenarioMutation,
-    onSuccess,
   ]);
 
   // Render

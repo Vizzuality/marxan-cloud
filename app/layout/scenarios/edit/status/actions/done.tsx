@@ -87,6 +87,7 @@ export const useScenarioActionsDone = () => {
     addToast,
     queryClient,
   ]);
+
   // Protected Areas
   const onProtectedAreasDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
@@ -129,18 +130,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.FEATURES,
+          subtab: null,
+        }),
       },
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        dispatch(setSubTab(null));
         JOB_REF.current = null;
       },
       onError: () => {
@@ -161,6 +160,7 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
+    setSubTab,
   ]);
 
   // Cost surface

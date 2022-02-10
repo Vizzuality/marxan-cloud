@@ -26,7 +26,7 @@ export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () =>
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTab, setSubTab } = scenarioSlice.actions;
+  const { setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -64,10 +64,6 @@ export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () =>
 
         {(subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) && (
           <ScenariosSidebarSetupFeaturesTarget
-            onSuccess={() => {
-              dispatch(setTab(ScenarioSidebarTabs.FEATURES));
-              dispatch(setSubTab(null));
-            }}
             onBack={() => {
               dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
             }}

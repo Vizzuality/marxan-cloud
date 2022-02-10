@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -33,22 +33,17 @@ export interface ScenariosSidebarEditFeaturesProps {
 }
 
 export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
-  const [step, setStep] = useState(0);
   const { query } = useRouter();
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
-  const {
-    subtab: metaSubtab,
-  } = scenarioEditingMetadata || {};
 
   const {
     data: selectedFeaturesData,
@@ -73,10 +68,12 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
-    setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_TARGET ? 1 : 0);
-  }, [metaSubtab]);
+    // setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_TARGET ? 1 : 0);
+  }, []);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
+
+  const step = ScenarioSidebarSubTabs.FEATURES_ADD && ScenarioSidebarSubTabs.FEATURES_ADD ? 0 : 1;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -154,7 +151,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
 
               <div className="flex items-center mt-2 space-x-2">
 
-                {step === 0 && (
+                {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && (
                   <>
                     <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
                     <div className="text-xs uppercase font-heading">
@@ -165,14 +162,14 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                   </>
                 )}
 
-                {step === 1 && (
+                {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
                   <div className="text-xs uppercase font-heading">
                     Set the target and FPF for your features.
 
                   </div>
-
                 )}
-                {step === 1 && (
+
+                {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
                   <>
                     <InfoButton>
                       <div>
@@ -221,29 +218,25 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
               </div>
             </div>
 
-            {step === 0 && (
+            {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && (
               <AddFeaturesModal />
             )}
+
           </header>
 
-          {step === 0 && (
+          {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && (
             <ListFeatures
               onSuccess={() => {
-                setStep(step + 1);
                 dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
               }}
             />
           )}
 
-          {step === 1 && (
+          {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
             <TargetFeatures
               onBack={() => {
-                setStep(step - 1);
                 dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
                 saveScenarioStatusOnBack();
-              }}
-              onSuccess={() => {
-                console.info('success');
               }}
             />
           )}
