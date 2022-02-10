@@ -180,9 +180,7 @@ const getFixtures = async () => {
       const componentFinishedEvent = events[0];
 
       expect(componentFinishedEvent).toMatchObject({
-        componentId: {
-          value: componentId,
-        },
+        componentId,
         exportId,
         location: expect.any(Array),
       });

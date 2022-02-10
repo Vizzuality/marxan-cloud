@@ -1,17 +1,4 @@
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Test } from '@nestjs/testing';
-import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
-import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
-
-import { ImportRepository } from './import-repository/import.repository.port';
-
-import {
-  ArchiveReader,
-  Failure as ArchiveFailure,
-  invalidFiles,
-  Success as ArchiveSuccess,
-} from './archive-reader/archive-reader.port';
-
+import { MemoryImportRepository } from '@marxan-api/modules/clone/import/adapters/memory-import.repository.adapter';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -19,16 +6,22 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  Import,
-  ImportId,
-  ImportRequested,
-  PieceImportRequested,
-} from '../domain';
-import { ImportArchive } from './import-archive';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
+import { Test } from '@nestjs/testing';
+import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
-import { MemoryImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/memory-import.repository.adapter';
-import { ImportRepositoryModule } from '@marxan-api/modules/clone/import/application/import-repository/import-repository.module';
+import { ImportRequested, PieceImportRequested } from '../domain/events';
+import { Import } from '../domain/import/import';
+import { ImportId } from '../domain/import/import.id';
+import {
+  ArchiveReader,
+  Failure as ArchiveFailure,
+  invalidFiles,
+  Success as ArchiveSuccess,
+} from './archive-reader.port';
+import { ImportArchive } from './import-archive';
+import { ImportRepository } from './import.repository.port';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -37,13 +30,13 @@ beforeEach(async () => {
 });
 
 test(`importing invalid archive`, async () => {
-  await fixtures.GivenExtractingArchiveFails();
+  fixtures.GivenExtractingArchiveFails();
   const result = await fixtures.WhenRequestingImport();
   fixtures.ThenImportFails(result);
 });
 
 test(`importing archive with sequential components`, async () => {
-  await fixtures.GivenExtractingArchiveHasSequentialComponents();
+  fixtures.GivenExtractingArchiveHasSequentialComponents();
   const result = await fixtures.WhenRequestingImport();
   fixtures.ThenRequestImportIsSaved(result);
   fixtures.ThenImportRequestedIsEmitted();
@@ -51,7 +44,7 @@ test(`importing archive with sequential components`, async () => {
 });
 
 test(`importing archive with equal order components`, async () => {
-  await fixtures.GivenExtractingArchiveHasEqualComponents();
+  fixtures.GivenExtractingArchiveHasEqualComponents();
   const result = await fixtures.WhenRequestingImport();
   fixtures.ThenRequestImportIsSaved(result);
   fixtures.ThenImportRequestedIsEmitted();
@@ -60,11 +53,15 @@ test(`importing archive with equal order components`, async () => {
 
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
-    imports: [CqrsModule, ImportRepositoryModule],
+    imports: [CqrsModule],
     providers: [
       {
         provide: ArchiveReader,
         useClass: FakeArchiveReader,
+      },
+      {
+        provide: ImportRepository,
+        useClass: MemoryImportRepository,
       },
       ImportArchive,
     ],

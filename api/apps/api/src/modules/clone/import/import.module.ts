@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ImportRepositoryModule } from './application/import-repository/import-repository.module';
+import { ImportApplicationModule } from './application/import-application.module';
 
 @Module({
-  imports: [CqrsModule, ImportRepositoryModule],
+  imports: [CqrsModule, ImportApplicationModule],
   exports: [],
 })
 export class ImportModule {}

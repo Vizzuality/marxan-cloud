@@ -1,6 +1,11 @@
-import { ImportEntity } from '@marxan-api/modules/clone/import/application/import-repository/entities/imports.api.entity';
-import { ImportRepository } from '@marxan-api/modules/clone/import/application/import-repository/import.repository.port';
-import { Import, ImportId } from '@marxan-api/modules/clone/import/domain';
+import {
+  Import,
+  ImportComponent,
+  ImportId,
+} from '@marxan-api/modules/clone/import';
+import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
+import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
+import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -13,17 +18,12 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { ImportComponentLocationEntity } from '../../src/modules/clone/import/application/import-repository/entities/component-locations.api.entity';
-import { ImportComponentEntity } from '../../src/modules/clone/import/application/import-repository/entities/import-components.api.entity';
-import { MemoryImportRepository } from '../../src/modules/clone/import/application/import-repository/memory-import.repository.adapter';
-import { ImportComponent } from '../../src/modules/clone/import/domain/import/import-component';
 import { apiConnections } from '../../src/ormconfig';
 
 describe('Typeorm import repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
 
   beforeEach(async () => {
-    console.log('hey');
     fixtures = await getFixtures();
   }, 20000);
 
@@ -61,21 +61,18 @@ describe('Typeorm import repository', () => {
 });
 
 const getFixtures = async () => {
-  console.log('hola');
   let importId: ImportId;
   let resourceId: ResourceId;
   let componentId: ComponentId;
   let archiveLocation: ArchiveLocation;
 
-  // TODO Use actual typeorm implementation
-  // const app = await bootstrapApplication();
   const testingModule = await Test.createTestingModule({
-    imports: [],
-    providers: [
-      {
-        provide: ImportRepository,
-        useClass: MemoryImportRepository,
-      },
+    imports: [
+      TypeOrmModule.forRoot({
+        ...apiConnections.default,
+        keepConnectionAlive: true,
+      }),
+      ImportAdaptersModule,
     ],
   }).compile();
 

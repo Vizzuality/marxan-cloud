@@ -24,11 +24,11 @@ export class ImportComponentLocationEntity {
   static fromSnapshot(
     locationSnapshot: ComponentLocationSnapshot,
   ): ImportComponentLocationEntity {
-    const componentLocationEntity = new ImportComponentLocationEntity();
-    componentLocationEntity.uri = locationSnapshot.uri;
-    componentLocationEntity.relativePath = locationSnapshot.relativePath;
+    const importComponentLocation = new ImportComponentLocationEntity();
+    importComponentLocation.uri = locationSnapshot.uri;
+    importComponentLocation.relativePath = locationSnapshot.relativePath;
 
-    return componentLocationEntity;
+    return importComponentLocation;
   }
 
   toComponentLocationClass(): ComponentLocation {

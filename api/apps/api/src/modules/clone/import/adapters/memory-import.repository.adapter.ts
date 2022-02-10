@@ -2,7 +2,7 @@ import {
   SaveError,
   ImportRepository,
   Success,
-} from '@marxan-api/modules/clone/import/application/import-repository/import.repository.port';
+} from '@marxan-api/modules/clone/import/application/import.repository.port';
 import {
   Import,
   ImportId,

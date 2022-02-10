@@ -1,4 +1,4 @@
-import { Import } from '@marxan-api/modules/clone/import';
+import { Import } from '@marxan-api/modules/clone/import/domain/import/import';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ImportComponentEntity } from './import-components.api.entity';

@@ -4,7 +4,7 @@ import { ExportComponentEntity } from './export-components.api.entity';
 import { ComponentLocationSnapshot } from '@marxan/cloning/domain/component-location.snapshot';
 
 @Entity('export_component_locations')
-export class ComponentLocationEntity {
+export class ExportComponentLocationEntity {
   @Column({ type: 'text', name: 'uri', primary: true })
   uri!: string;
 
@@ -23,8 +23,8 @@ export class ComponentLocationEntity {
 
   static fromSnapshot(
     locationSnapshot: ComponentLocationSnapshot,
-  ): ComponentLocationEntity {
-    const componentLocationEntity = new ComponentLocationEntity();
+  ): ExportComponentLocationEntity {
+    const componentLocationEntity = new ExportComponentLocationEntity();
     componentLocationEntity.uri = locationSnapshot.uri;
     componentLocationEntity.relativePath = locationSnapshot.relativePath;
 

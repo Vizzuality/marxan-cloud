@@ -7,11 +7,8 @@ import { ArchiveLocation } from '@marxan/cloning/domain';
 import {
   ArchiveReader,
   Failure as ArchiveReadError,
-} from './archive-reader/archive-reader.port';
-import {
-  SaveError,
-  ImportRepository,
-} from './import-repository/import.repository.port';
+} from './archive-reader.port';
+import { SaveError, ImportRepository } from './import.repository.port';
 
 export type ImportError = SaveError | ArchiveReadError;
 
