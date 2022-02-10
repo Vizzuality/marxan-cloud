@@ -49,9 +49,9 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-          - run: |
-              docker build ./api -f api/api.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
-              docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
+      - run: |
+          docker build ./api -f api/api.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
 
   push_geoprocessing_to_registry:
     name: Push Geoprocessing Docker image to Azure Container Registry
@@ -87,10 +87,10 @@ jobs:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
-        - run: |
-            docker build ./api -f api/geo.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
-            docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
-            docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:latest
+    - run: |
+        docker build ./api -f api/geo.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
+        docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:latest
 
   push_client_to_registry:
     name: Push API Docker image to Azure Container Registry
@@ -126,6 +126,6 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
-            - run: |
-                docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
-                docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+      - run: |
+          docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
