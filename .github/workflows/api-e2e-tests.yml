@@ -4,7 +4,6 @@ on:
     paths:
       - 'api/**'
       - 'geoprocessing/**'
-      - '.github/**'
   workflow_dispatch:
 jobs:
   test-api-e2e:
