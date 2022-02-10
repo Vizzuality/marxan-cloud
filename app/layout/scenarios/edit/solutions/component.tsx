@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,53 +13,50 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
-import SolutionsDetails from 'layout/scenarios/edit/solutions/details';
-import SolutionsGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
+import SolutionsDetails from 'layout/scenarios/edit/solutions/overview';
+import ScheduleScenario from 'layout/scenarios/edit/solutions/schedule';
 import Sections from 'layout/sections';
 
 import { ScenariosSidebarShowSolutionsProps } from './types';
 
 export const SECTIONS = [
   {
-    id: 'details',
-    name: 'Details',
+    id: ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW,
+    name: 'Solutions Overview',
     description: 'Each solution gives you an alternative answer to your planning problem showing which planning units have been selected in the proposed conservation network, the overall cost, and whether targets have been met.',
   },
   {
-    id: 'gap-analysis',
-    name: 'Gap Analysis',
-    description: 'This gap analysis shows the amount of each feature that would be included if the new conservation plan your are working on is implemented.',
+    id: ScenarioSidebarSubTabs.SCHEDULE_SCENARIO,
+    name: 'Schedule scenario',
+    description: 'Comming feature...',
   },
 ];
 
 export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = () => {
-  const [section, setSection] = useState(null);
   const { query } = useRouter();
   const { sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
-    setSection(s);
-    const subtab = s ? `solutions-${s}` : ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW;
-    dispatch(setSubTab(subtab));
+    const sub = s || null;
+    dispatch(setSubTab(sub));
   }, [dispatch, setSubTab]);
 
   // EFFECTS
   useEffect(() => {
-    return () => {
-      if (tab !== ScenarioSidebarTabs.SOLUTIONS) {
-        setSection(null);
-      }
-    };
-  }, [tab]);
+    // Check that the subtab is a valid planning unit subtab
+    if (!SECTIONS.find((s) => s.id === subtab)) {
+      dispatch(setSubTab(null));
+    }
+  }, []); // eslint-disable-line
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.SOLUTIONS) return null;
 
@@ -115,7 +112,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                 </div>
               </header>
 
-              {!section && (
+              {!subtab && (
                 <Sections
                   key="sections"
                   sections={SECTIONS}
@@ -123,18 +120,18 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                 />
               )}
 
-              {section === 'details' && (
+              {subtab === ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW && (
                 <SolutionsDetails
-                  key="details"
+                  key="solutions-overview"
                   onChangeSection={onChangeSection}
                   onScheduleScenario={() => console.info('Schedule scenario - solutions')}
                   numberOfSchedules={2}
                 />
               )}
 
-              {section === 'gap-analysis' && (
-                <SolutionsGapAnalysis
-                  key="gap-analysis"
+              {subtab === ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW && (
+                <ScheduleScenario
+                  key="schedule-scenario"
                   onChangeSection={onChangeSection}
                 />
               )}

@@ -18,7 +18,7 @@ export const TABS = [
   },
   {
     id: ScenarioSidebarTabs.SOLUTIONS,
-    subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
+    subtab: null,
     name: 'Solutions',
   },
 ];

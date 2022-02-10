@@ -25,15 +25,14 @@ import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOCK_SVG from 'svgs/ui/clock.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
-import SolutionsTableForm from '../table-form/component';
+import SolutionsTableForm from './table/table-form/component';
+import { ScenariosSolutionsOverviewProps } from './types';
 
-import { ScenariosSolutionsDetailsProps } from './types';
-
-export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps> = ({
+export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProps> = ({
   onChangeSection,
   onScheduleScenario,
   numberOfSchedules,
-}: ScenariosSolutionsDetailsProps) => {
+}: ScenariosSolutionsOverviewProps) => {
   const { query } = useRouter();
   const { sid } = query;
   const [showTable, setShowTable] = useState<boolean>(false);
@@ -84,7 +83,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
 
   return (
     <motion.div
-      key="details"
+      key="solutions-overview"
       className="flex flex-col items-start justify-start flex-grow min-h-0 overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -100,7 +99,7 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
           }}
         >
           <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Details</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Soluctions Overview</h4>
         </button>
       </header>
 
@@ -186,4 +185,4 @@ export const ScenariosSolutionsDetails: React.FC<ScenariosSolutionsDetailsProps>
   );
 };
 
-export default ScenariosSolutionsDetails;
+export default ScenariosSolutionsOverview;

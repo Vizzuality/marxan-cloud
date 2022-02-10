@@ -80,7 +80,7 @@ export const ScenariosRun: React.FC<ScenariosRunProps> = () => {
           ...scenarioEditingMetadata,
           lastJobCheck: new Date().getTime(),
           tab: ScenarioSidebarTabs.SOLUTIONS,
-          subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
+          subtab: ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW,
           status: {
             'protected-areas': 'draft',
             features: 'draft',
