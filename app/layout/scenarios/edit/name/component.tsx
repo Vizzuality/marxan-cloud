@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { SCENARIO_EDITING_META_DATA_DEFAULT_VALUES } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
 import { useProject } from 'hooks/projects';
@@ -55,14 +55,7 @@ export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
         metadata: {
           ...data.metadata,
           scenarioEditingMetadata: {
-            status: {
-              'planning-unit': 'draft',
-              features: 'draft',
-              analysis: 'empty',
-              solutions: 'empty',
-            },
-            tab: ScenarioSidebarTabs.PLANNING_UNIT,
-            subtab: null,
+            ...SCENARIO_EDITING_META_DATA_DEFAULT_VALUES,
             lastJobCheck: new Date().getTime(),
           },
         },

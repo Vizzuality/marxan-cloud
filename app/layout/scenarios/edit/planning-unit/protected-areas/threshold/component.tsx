@@ -94,9 +94,8 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
   const GLOBAL_PA_OPTIONS = WDPA_CATEGORIES_OPTIONS.filter((w) => w.kind === 'global');
 
   const selectedProtectedAreas = useMemo(() => {
-    const { wdpaIucnCategories } = wdpaCategories;
-    if (!wdpaData && Array.isArray(wdpaData)) {
-      return wdpaData.filter((pa) => wdpaIucnCategories.includes(pa.id)).map((pa) => {
+    if (wdpaData && Array.isArray(wdpaData)) {
+      return wdpaData.filter((pa) => pa.selected).map((pa) => {
         return {
           id: pa.id,
           selected: true,
@@ -105,7 +104,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     }
 
     return [];
-  }, [wdpaCategories, wdpaData]);
+  }, [wdpaData]);
 
   const INITIAL_VALUES = useMemo(() => {
     const { wdpaThreshold, wdpaIucnCategories } = scenarioData;
@@ -155,7 +154,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         addToast('save-scenario-wdpa', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario WDPA threshold saved</p>
+            <p className="text-sm">Scenario Protected Areas threshold saved</p>
           </>
         ), {
           level: 'success',
@@ -167,7 +166,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         addToast('error-scenario-wdpa', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario WDPA threshold not saved</p>
+            <p className="text-sm">Scenario Protected Areas threshold not saved</p>
           </>
         ), {
           level: 'error',

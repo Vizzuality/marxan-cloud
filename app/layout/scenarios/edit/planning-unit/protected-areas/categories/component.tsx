@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useEffect, useMemo, useRef,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
@@ -14,6 +14,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
 import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
@@ -33,6 +34,8 @@ export interface WDPACategoriesProps {
 export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   onSuccess,
 }: WDPACategoriesProps) => {
+  const [submitting, setSubmitting] = useState(false);
+  const { addToast } = useToasts();
   const formRef = useRef(null);
 
   const { query } = useRouter();
@@ -73,6 +76,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   });
 
   const onCalculateProtectedAreas = useCallback((values) => {
+    setSubmitting(true);
     const { wdpaIucnCategories } = values;
 
     const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
@@ -89,12 +93,37 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         areas: selectedProtectedAreas,
         threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
       },
+    }, {
+      onSuccess: () => {
+        setSubmitting(false);
+        addToast('save-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario Protected Areas saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+      },
+      onError: () => {
+        setSubmitting(false);
+
+        addToast('error-scenario-wdpa', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario Protected Areas not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
     });
   }, [
     saveScenarioProtectedAreasMutation,
-    scenarioData,
     sid,
     wdpaData,
+    scenarioData,
+    addToast,
   ]);
 
   const onSubmit = useCallback((values) => {
@@ -204,6 +233,11 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
             autoComplete="off"
             className="relative flex flex-col flex-grow w-full overflow-hidden"
           >
+            <Loading
+              visible={submitting}
+              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+              iconClassName="w-10 h-10 text-white"
+            />
 
             <div className="relative flex flex-col flex-grow overflow-hidden">
               <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
