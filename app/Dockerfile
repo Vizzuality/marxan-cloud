@@ -22,7 +22,7 @@ USER $USER
 COPY --chown=$USER:$USER package.json yarn.lock next.config.js \
     next-env.d.ts local.d.ts \
 	postcss.config.js tailwind.config.js cypress.json entrypoint.sh \
-	tsconfig.json .browserlistrc ./
+	tsconfig.json ./
 
 COPY --chown=$USER:$USER .storybook        ./.storybook
 COPY --chown=$USER:$USER components        ./components
@@ -34,7 +34,6 @@ COPY --chown=$USER:$USER hoc               ./hoc
 COPY --chown=$USER:$USER hooks             ./hooks
 COPY --chown=$USER:$USER images            ./images
 COPY --chown=$USER:$USER layout            ./layout
-COPY --chown=$USER:$USER node_modules      ./node_modules
 COPY --chown=$USER:$USER pages             ./pages
 COPY --chown=$USER:$USER public            ./public
 COPY --chown=$USER:$USER services          ./services
