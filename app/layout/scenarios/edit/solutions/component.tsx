@@ -124,15 +124,15 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                 <SolutionsDetails
                   key="solutions-overview"
                   onChangeSection={onChangeSection}
-                  onScheduleScenario={() => console.info('Schedule scenario - solutions')}
-                  numberOfSchedules={2}
                 />
               )}
 
-              {subtab === ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW && (
+              {subtab === ScenarioSidebarSubTabs.SCHEDULE_SCENARIO && (
                 <ScheduleScenario
                   key="schedule-scenario"
                   onChangeSection={onChangeSection}
+                  onScheduleScenario={() => console.info('Schedule scenario - solutions')}
+                  numberOfSchedules={2}
                 />
               )}
             </Pill>
