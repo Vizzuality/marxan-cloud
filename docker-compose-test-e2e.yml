@@ -9,7 +9,6 @@ services:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-api
     command: develop
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
@@ -42,7 +41,6 @@ services:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-geoprocessing
     command: develop
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs

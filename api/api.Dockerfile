@@ -11,8 +11,6 @@ WORKDIR $APP_HOME
 RUN chown $USER:$USER $APP_HOME
 RUN mkdir /tmp/storage && chown $USER /tmp/storage
 
-USER $USER
-
 COPY --chown=$USER:$USER package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
 
@@ -24,4 +22,6 @@ COPY --chown=$USER:$USER libs ./libs
 RUN yarn prestart:prod
 
 EXPOSE 3000
+USER $USER
+
 ENTRYPOINT ["./apps/api/entrypoint.sh"]
