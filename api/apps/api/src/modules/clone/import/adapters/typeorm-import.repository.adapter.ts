@@ -1,14 +1,14 @@
-import { Import, ImportId } from '@marxan-api/modules/clone/import';
-import {
-  ImportRepository,
-  saveError,
-  SaveError,
-} from '@marxan-api/modules/clone/import/application/import.repository.port';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { EntityManager, Repository } from 'typeorm';
 import { DbConnections } from '../../../../ormconfig.connections';
-import { Success } from '../application/import.repository.port';
+import {
+  ImportRepository,
+  saveError,
+  SaveError,
+  Success,
+} from '../application/import.repository.port';
+import { Import, ImportId } from '../domain';
 import { ImportComponentEntity } from './entities/import-components.api.entity';
 import { ImportEntity } from './entities/imports.api.entity';
 

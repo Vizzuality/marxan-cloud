@@ -2,7 +2,7 @@ import {
   Import,
   ImportComponent,
   ImportId,
-} from '@marxan-api/modules/clone/import';
+} from '@marxan-api/modules/clone/import/domain';
 import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
 import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';

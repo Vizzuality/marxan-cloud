@@ -16,7 +16,6 @@ import { ArchiveReady } from '../events/archive-ready.event';
 
 import { ExportComponent } from './export-component/export-component';
 import { ExportSnapshot } from './export.snapshot';
-import { ExportComponentSnapshot } from './export-component.snapshot';
 import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
 import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 

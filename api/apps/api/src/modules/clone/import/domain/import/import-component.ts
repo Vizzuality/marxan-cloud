@@ -4,8 +4,7 @@ import {
   ComponentLocation,
   ResourceId,
 } from '@marxan/cloning/domain';
-import { v4 } from 'uuid';
-import { ImportComponentSnapshot } from '@marxan-api/modules/clone/import';
+import { ImportComponentSnapshot } from '../import/import-component.snapshot';
 
 export class ImportComponent {
   private constructor(

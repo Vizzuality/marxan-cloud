@@ -7,9 +7,9 @@ import {
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
+import { ImportComponentSnapshot } from '../../domain';
 import { ImportComponentLocationEntity } from './import-component-locations.api.entity';
 import { ImportEntity } from './imports.api.entity';
-import { ImportComponentSnapshot } from '@marxan-api/modules/clone/import';
 
 @Entity('import_components')
 export class ImportComponentEntity {

@@ -1,14 +1,12 @@
+import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
 import { EventPublisher } from '@nestjs/cqrs';
 import { Either, isLeft, right } from 'fp-ts/Either';
-
-import { ArchiveLocation } from '@marxan/cloning/domain';
-
 import {
   ArchiveReader,
   Failure as ArchiveReadError,
 } from './archive-reader.port';
-import { SaveError, ImportRepository } from './import.repository.port';
+import { ImportRepository, SaveError } from './import.repository.port';
 
 export type ImportError = SaveError | ArchiveReadError;
 

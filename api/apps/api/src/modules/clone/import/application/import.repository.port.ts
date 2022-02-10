@@ -1,6 +1,5 @@
 import { Either } from 'fp-ts/Either';
-import { Import } from '../domain/import/import';
-import { ImportId } from '../domain/import/import.id';
+import { Import, ImportId } from '../domain';
 
 export const saveError = Symbol(`save error`);
 

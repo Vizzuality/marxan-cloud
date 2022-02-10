@@ -1,4 +1,3 @@
-import { MemoryImportRepository } from '@marxan-api/modules/clone/import/adapters/memory-import.repository.adapter';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -11,9 +10,13 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
-import { ImportRequested, PieceImportRequested } from '../domain/events';
-import { Import } from '../domain/import/import';
-import { ImportId } from '../domain/import/import.id';
+import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
+import {
+  Import,
+  ImportId,
+  ImportRequested,
+  PieceImportRequested,
+} from '../domain';
 import {
   ArchiveReader,
   Failure as ArchiveFailure,

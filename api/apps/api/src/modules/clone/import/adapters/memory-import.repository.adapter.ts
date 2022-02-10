@@ -1,14 +1,10 @@
-import {
-  SaveError,
-  ImportRepository,
-  Success,
-} from '@marxan-api/modules/clone/import/application/import.repository.port';
-import {
-  Import,
-  ImportId,
-  ImportSnapshot,
-} from '@marxan-api/modules/clone/import';
 import { Either, right } from 'fp-ts/Either';
+import {
+  ImportRepository,
+  SaveError,
+  Success,
+} from '../application/import.repository.port';
+import { Import, ImportId, ImportSnapshot } from '../domain';
 
 export class MemoryImportRepository extends ImportRepository {
   entities: Record<string, ImportSnapshot> = {};

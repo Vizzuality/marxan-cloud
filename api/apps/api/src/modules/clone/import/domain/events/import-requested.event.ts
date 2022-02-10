@@ -1,6 +1,6 @@
 import { IEvent } from '@nestjs/cqrs';
 import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
-import { ImportId } from '@marxan-api/modules/clone/import';
+import { ImportId } from '../import/import.id';
 
 export class ImportRequested implements IEvent {
   constructor(

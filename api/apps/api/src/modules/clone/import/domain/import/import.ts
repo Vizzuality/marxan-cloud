@@ -1,20 +1,18 @@
-import { AggregateRoot } from '@nestjs/cqrs';
-import { ImportSnapshot } from './import.snapshot';
-import { Either, left, right } from 'fp-ts/Either';
 import {
   ArchiveLocation,
   ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  AllPiecesImported,
-  ImportRequested,
-  PieceImported,
-  PieceImportRequested,
-} from '../events';
-import { ImportComponent } from '@marxan-api/modules/clone/import/domain/import/import-component';
-import { ImportId } from '@marxan-api/modules/clone/import';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { Either, left, right } from 'fp-ts/Either';
+import { AllPiecesImported } from '../events/all-pieces-imported.event';
+import { ImportRequested } from '../events/import-requested.event';
+import { PieceImportRequested } from '../events/piece-import-requested.event';
+import { PieceImported } from '../events/piece-imported.event';
+import { ImportComponent } from './import-component';
+import { ImportId } from './import.id';
+import { ImportSnapshot } from './import.snapshot';
 
 export const componentNotFound = Symbol(`component not found`);
 export const componentAlreadyCompleted = Symbol(`component already completed`);
