@@ -97,7 +97,7 @@ jobs:
           docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:latest
 
   push_client_to_registry:
-    name: Push API Docker image to Azure Container Registry
+    name: Push Client Docker image to Azure Container Registry
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the repo
@@ -132,5 +132,6 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./app -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
+          docker build ./app -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }}
+          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }}
+          docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:latest
