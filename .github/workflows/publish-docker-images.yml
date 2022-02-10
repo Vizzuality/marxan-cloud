@@ -49,6 +49,7 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+
       - run: |
           docker build ./api -f api/api.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
@@ -87,6 +88,7 @@ jobs:
         login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
+
     - run: |
         docker build ./api -f api/geo.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
         docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
@@ -126,6 +128,7 @@ jobs:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
+
       - run: |
           docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
           docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/sampleapp:${{ github.sha }}
