@@ -7,7 +7,6 @@ services:
       dockerfile: api.Dockerfile
     container_name: marxan-test-unit-api
     command: test-unit
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
@@ -24,7 +23,6 @@ services:
       dockerfile: geo.Dockerfile
     container_name: marxan-test-unit-geoprocessing
     command: test-unit
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs

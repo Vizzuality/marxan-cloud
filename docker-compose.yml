@@ -8,7 +8,6 @@ services:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-api
     command: develop
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
@@ -58,7 +57,6 @@ services:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-geoprocessing
     command: develop
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
