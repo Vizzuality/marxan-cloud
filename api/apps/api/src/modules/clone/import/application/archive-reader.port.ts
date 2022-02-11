@@ -1,7 +1,7 @@
 import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Either } from 'fp-ts/Either';
 import { Import } from '../domain';
-import { notFound } from '@marxan/files-repository/file.repository';
+import { fileNotFound } from '@marxan/files-repository/file.repository';
 
 export const archiveCorrupted = Symbol(`archive couldn't be extracted`);
 export const invalidFiles = Symbol(`archive files structure is not recognized`);
@@ -9,7 +9,7 @@ export const invalidFiles = Symbol(`archive files structure is not recognized`);
 export type Failure =
   | typeof archiveCorrupted
   | typeof invalidFiles
-  | typeof notFound;
+  | typeof fileNotFound;
 export type Success = Import;
 
 export abstract class ArchiveReader {

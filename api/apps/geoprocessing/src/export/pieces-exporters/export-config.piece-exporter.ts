@@ -1,11 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import {
-  ExportConfigRelativePath,
-  ProjectExportConfigContent,
-  ScenarioExportConfigContent,
-} from '@marxan/cloning/infraestructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -16,6 +11,11 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import {
+  ExportConfigRelativePath,
+  ProjectExportConfigContent,
+  ScenarioExportConfigContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 
 @Injectable()
 @PieceExportProvider()

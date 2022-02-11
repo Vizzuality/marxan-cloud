@@ -7,9 +7,9 @@ import {
 import {
   ExportConfigContent,
   ExportConfigRelativePath,
-} from '@marxan/cloning/infraestructure/clone-piece-data/export-config';
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
-import { notFound } from '@marxan/files-repository/file.repository';
+import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { Injectable } from '@nestjs/common';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
@@ -18,12 +18,9 @@ import {
   ArchiveReader,
   Failure,
   invalidFiles,
+  archiveCorrupted,
 } from '../application/archive-reader.port';
 import { Import, ImportComponent } from '../domain';
-
-export const exportConfigFileParsingFailed = Symbol(
-  'export config file parsing failed',
-);
 
 @Injectable()
 export class ArchiveReaderAdapter implements ArchiveReader {
@@ -31,27 +28,25 @@ export class ArchiveReaderAdapter implements ArchiveReader {
 
   private parseExportConfigFile(
     readable: Readable,
-  ): Promise<
-    Either<typeof exportConfigFileParsingFailed, ExportConfigContent>
-  > {
-    return new Promise<
-      Either<typeof exportConfigFileParsingFailed, ExportConfigContent>
-    >((resolve) => {
-      readable
-        .pipe(unzipper.ParseOne(new RegExp(ExportConfigRelativePath)))
-        .on('entry', async (entry: unzipper.Entry) => {
-          const buffer = await entry.buffer();
-          resolve(right(JSON.parse(buffer.toString())));
-        })
-        .on('error', () => {
-          resolve(left(exportConfigFileParsingFailed));
-        });
-    });
+  ): Promise<Either<typeof archiveCorrupted, ExportConfigContent>> {
+    return new Promise<Either<typeof archiveCorrupted, ExportConfigContent>>(
+      (resolve) => {
+        readable
+          .pipe(unzipper.ParseOne(new RegExp(ExportConfigRelativePath)))
+          .on('entry', async (entry: unzipper.Entry) => {
+            const buffer = await entry.buffer();
+            resolve(right(JSON.parse(buffer.toString())));
+          })
+          .on('error', () => {
+            resolve(left(archiveCorrupted));
+          });
+      },
+    );
   }
 
   async get(archive: ArchiveLocation): Promise<Either<Failure, Import>> {
     const readableOrError = await this.fileRepository.get(archive.value);
-    if (isLeft(readableOrError)) return left(notFound);
+    if (isLeft(readableOrError)) return left(fileNotFound);
 
     const exportConfigOrError = await this.parseExportConfigFile(
       readableOrError.right,
