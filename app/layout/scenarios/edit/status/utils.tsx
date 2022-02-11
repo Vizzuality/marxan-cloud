@@ -13,7 +13,7 @@ const getStatus = (arr) => {
 export const useScenarioJobs = (jobs) => {
   return useMemo(() => {
     const groups = groupBy(jobs, (j) => {
-      if (['featuresWithPuIntersection', 'specification', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStrat'].includes(j.kind)) {
+      if (['specification', 'featuresWithPuIntersection', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStratification'].includes(j.kind)) {
         return 'features';
       }
 

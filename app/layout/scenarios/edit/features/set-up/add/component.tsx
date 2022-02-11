@@ -115,8 +115,8 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
         <motion.div
           key="features"
           className="flex flex-col min-h-0 overflow-hidden"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
         >
 
           <header className="flex items-start justify-between flex-shrink-0">
