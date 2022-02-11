@@ -1,10 +1,8 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import {
-  PlanningAreaGadmContent,
-  PlanningAreaGadmRelativePath,
-} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository } from '@marxan/files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
@@ -90,7 +88,8 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: PlanningAreaGadmRelativePath,
+          relativePath:
+            ClonePieceRelativePaths[ClonePiece.PlanningAreaGAdm].paGadm,
         },
       ],
     };

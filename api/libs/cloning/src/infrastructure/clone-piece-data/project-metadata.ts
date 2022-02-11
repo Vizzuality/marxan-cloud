@@ -3,4 +3,10 @@ export interface ProjectMetadataContent {
   description?: string;
 }
 
-export const ProjectMetadataRelativePath = `project-metadata.json`;
+export interface ProjectMetadataRelativePathsType {
+  projectMetadata: string;
+}
+
+export const ProjectMetadataRelativePaths: ProjectMetadataRelativePathsType = {
+  projectMetadata: `project-metadata.json`,
+};

@@ -16,6 +16,7 @@ import {
   ProjectExportConfigContent,
   ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 
 @Injectable()
 @PieceExportProvider()
@@ -75,7 +76,7 @@ export class ExportConfigPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: ExportConfigRelativePath,
+          relativePath: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
         },
       ],
     };
@@ -125,7 +126,7 @@ export class ExportConfigPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: ExportConfigRelativePath,
+          relativePath: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
         },
       ],
     };

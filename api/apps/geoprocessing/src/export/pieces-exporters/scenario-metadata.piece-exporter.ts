@@ -1,9 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import {
-  getScenarioMetadataRelativePath,
-  ScenarioMetadataContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -11,8 +9,8 @@ import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import {
-  PieceExportProvider,
   ExportPieceProcessor,
+  PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
 @Injectable()
@@ -68,7 +66,9 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: getScenarioMetadataRelativePath(
+          relativePath: ClonePieceRelativePaths[
+            ClonePiece.ScenarioMetadata
+          ].getScenarioMetadataRelativePath(
             input.resourceKind,
             input.resourceId,
           ),

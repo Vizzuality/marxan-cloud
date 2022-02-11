@@ -5,11 +5,19 @@ export interface ScenarioMetadataContent {
   description?: string;
 }
 
-export function getScenarioMetadataRelativePath(
-  exportResourceKind: ResourceKind,
-  exportResourceId: string,
-): string {
-  return exportResourceKind === ResourceKind.Scenario
-    ? `scenario-metadata.json`
-    : `scenarios/${exportResourceId}/scenario-metadata.json`;
+export interface ScenarioMetadataRelativePathsType {
+  getScenarioMetadataRelativePath: (
+    exportResourceKind: ResourceKind,
+    exportResourceId: string,
+  ) => string;
 }
+
+export const ScenarioMetadataRelativePaths: ScenarioMetadataRelativePathsType = {
+  getScenarioMetadataRelativePath: (
+    exportResourceKind: ResourceKind,
+    exportResourceId: string,
+  ) =>
+    exportResourceKind === ResourceKind.Scenario
+      ? `scenario-metadata.json`
+      : `scenarios/${exportResourceId}/scenario-metadata.json`,
+};

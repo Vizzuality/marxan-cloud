@@ -1,13 +1,10 @@
 import {
   ArchiveLocation,
   ClonePiece,
-  ComponentLocation,
   ResourceId,
 } from '@marxan/cloning/domain';
-import {
-  ExportConfigContent,
-  ExportConfigRelativePath,
-} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { Injectable } from '@nestjs/common';
@@ -15,12 +12,12 @@ import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import * as unzipper from 'unzipper';
 import {
+  archiveCorrupted,
   ArchiveReader,
   Failure,
   invalidFiles,
-  archiveCorrupted,
 } from '../application/archive-reader.port';
-import { Import, ImportComponent } from '../domain';
+import { Import } from '../domain';
 
 @Injectable()
 export class ArchiveReaderAdapter implements ArchiveReader {
@@ -32,7 +29,13 @@ export class ArchiveReaderAdapter implements ArchiveReader {
     return new Promise<Either<typeof archiveCorrupted, ExportConfigContent>>(
       (resolve) => {
         readable
-          .pipe(unzipper.ParseOne(new RegExp(ExportConfigRelativePath)))
+          .pipe(
+            unzipper.ParseOne(
+              new RegExp(
+                ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
+              ),
+            ),
+          )
           .on('entry', async (entry: unzipper.Entry) => {
             const buffer = await entry.buffer();
             resolve(right(JSON.parse(buffer.toString())));
@@ -44,8 +47,8 @@ export class ArchiveReaderAdapter implements ArchiveReader {
     );
   }
 
-  async get(archive: ArchiveLocation): Promise<Either<Failure, Import>> {
-    const readableOrError = await this.fileRepository.get(archive.value);
+  async get(location: ArchiveLocation): Promise<Either<Failure, Import>> {
+    const readableOrError = await this.fileRepository.get(location.value);
     if (isLeft(readableOrError)) return left(fileNotFound);
 
     const exportConfigOrError = await this.parseExportConfigFile(
@@ -58,13 +61,6 @@ export class ArchiveReaderAdapter implements ArchiveReader {
     const resourceId = new ResourceId(exportConfig.resourceId);
     const resourceKind = exportConfig.resourceKind;
 
-    // TODO We should generate proper import pieces
-    return right(
-      Import.newOne(resourceId, resourceKind, archive, [
-        ImportComponent.newOne(resourceId, ClonePiece.ProjectMetadata, 0, [
-          new ComponentLocation(archive.value, `project-metadata.json`),
-        ]),
-      ]),
-    );
+    return right(Import.newOne(resourceId, resourceKind, location, []));
   }
 }

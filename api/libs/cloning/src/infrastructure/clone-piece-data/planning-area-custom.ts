@@ -1,3 +1,9 @@
-export const PlanningAreaCustomRelativePath = 'planning-area.json';
-export const CustomProjectAreaGeoJsonRelativePath =
-  'planning-area/project-pa.geojson';
+export interface PlanningAreaCustomRelativePathsType {
+  planningArea: string;
+  customPaGeoJson: string;
+}
+
+export const PlanningAreaCustomRelativePaths: PlanningAreaCustomRelativePathsType = {
+  planningArea: 'planning-area.json',
+  customPaGeoJson: 'planning-area/project-pa.geojson',
+};

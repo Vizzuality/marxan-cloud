@@ -1,9 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import {
-  ProjectMetadataContent,
-  ProjectMetadataRelativePath,
-} from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -64,7 +62,8 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: ProjectMetadataRelativePath,
+          relativePath:
+            ClonePieceRelativePaths[ClonePiece.ProjectMetadata].projectMetadata,
         },
       ],
     };

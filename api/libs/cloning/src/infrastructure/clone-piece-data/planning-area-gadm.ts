@@ -9,4 +9,10 @@ export interface PlanningAreaGadmContent {
   bbox: number[];
 }
 
-export const PlanningAreaGadmRelativePath = 'planning-area.json';
+export interface PlanningAreaGadmRelativePathsType {
+  paGadm: string;
+}
+
+export const PlanningAreaGadmRelativePaths: PlanningAreaGadmRelativePathsType = {
+  paGadm: 'planning-area.json',
+};

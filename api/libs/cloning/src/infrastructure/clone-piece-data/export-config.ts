@@ -22,4 +22,10 @@ export type ExportConfigContent =
   | ProjectExportConfigContent
   | ScenarioExportConfigContent;
 
-export const ExportConfigRelativePath = 'config.json';
+export interface ExportConfigRelativePathsType {
+  config: string;
+}
+
+export const ExportConfigRelativePaths: ExportConfigRelativePathsType = {
+  config: 'config.json',
+};
