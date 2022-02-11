@@ -13,6 +13,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
+import PostGapAnalysis from 'layout/scenarios/edit/solutions/gap-analysis';
 import SolutionsDetails from 'layout/scenarios/edit/solutions/overview';
 import ScheduleScenario from 'layout/scenarios/edit/solutions/schedule';
 import Sections from 'layout/sections';
@@ -30,6 +31,11 @@ export const SECTIONS = [
     name: 'Schedule scenario',
     description: 'Comming feature...',
   },
+  {
+    id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
+    name: 'Gap Analysis',
+    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network(the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
+  },
 ];
 
 export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = () => {
@@ -40,6 +46,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
   const { setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
@@ -52,7 +59,6 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
 
   // EFFECTS
   useEffect(() => {
-    // Check that the subtab is a valid planning unit subtab
     if (!SECTIONS.find((s) => s.id === subtab)) {
       dispatch(setSubTab(null));
     }
@@ -133,6 +139,13 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                   onChangeSection={onChangeSection}
                   onScheduleScenario={() => console.info('Schedule scenario - solutions')}
                   numberOfSchedules={2}
+                />
+              )}
+
+              {subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS && (
+                <PostGapAnalysis
+                  key="post-gap-analysis"
+                  onChangeSection={onChangeSection}
                 />
               )}
             </Pill>

@@ -21,4 +21,5 @@ export enum ScenarioSidebarSubTabs {
 
   SOLUTIONS_OVERVIEW = 'so-solutions-overview',
   SCHEDULE_SCENARIO = 'so-schedule-scenario',
+  POST_GAP_ANALYSIS = 'so-post-gap-analysis',
 }
