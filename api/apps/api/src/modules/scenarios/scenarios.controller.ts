@@ -63,11 +63,7 @@ import {
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
 import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
-import {
-  projectDoesntExist,
-  projectNotReady,
-  ScenariosService,
-} from './scenarios.service';
+import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
 import { ScenarioFeatureResultDto } from './dto/scenario-feature-result.dto';
@@ -91,7 +87,6 @@ import {
 } from '@marxan-api/dto/async-job.dto';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
-import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 import {
   GeometryFileInterceptor,
   GeometryKind,
@@ -103,37 +98,15 @@ import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dt
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
-import {
-  marxanFailed,
-  metadataNotFound,
-  outputZipNotYetAvailable,
-} from './output-files/output-files.service';
-import {
-  inputZipNotYetAvailable,
-  metadataNotFound as inputMetadataNotFound,
-} from './input-files';
-import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
-import { invalidProtectedAreaId } from './protected-area/selection/selection-update.service';
+
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { BlmRangeDto } from '@marxan-api/modules/scenarios/dto/blm-range.dto';
-import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
-import { invalidRange } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
-import {
-  scenarioNotFound,
-  unknownError as scenarioUnknownError,
-} from '@marxan-api/modules/blm/values/blm-repos';
-import {
-  noLockInPlace,
-  lockedByAnotherUser,
-  lockedScenario,
-  unknownError as lockUnknownError,
-} from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import {
   ScenarioLockResultPlural,
   ScenarioLockResultSingular,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -280,17 +253,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case scenarioNotFound:
-          throw new NotFoundException(`Scenario ${id} could not be found`);
-        case scenarioUnknownError:
-          throw new InternalServerErrorException();
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      return aclErrorHandler(result.left, {
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return await this.scenarioSerializer.serialize(result.right);
@@ -308,23 +274,10 @@ export class ScenariosController {
       authenticatedUser: req.user,
     });
     if (isLeft(result)) {
-      switch (result.left) {
-        case projectNotReady:
-          throw new ConflictException();
-        case projectDoesntExist:
-          throw new NotFoundException(`Project doesn't exist`);
-        case forbiddenError:
-          throw new ForbiddenException(
-            `User with ID: ${req.user.id} is not allowed to create scenarios`,
-          );
-        case blmCreationFailure:
-          throw new InternalServerErrorException(
-            `Could not create initial BLM for scenario`,
-          );
-
-        default:
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return await this.scenarioSerializer.serialize(
       result.right,
@@ -344,15 +297,11 @@ export class ScenariosController {
     const result = await this.service.createSpecification(id, req.user.id, dto);
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case internalError:
-          throw new InternalServerErrorException(result.left.description);
-        case forbiddenError:
-          throw new ForbiddenException();
-        default:
-          const _check: never = result.left;
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return await this.geoFeatureSetSerializer.serialize(
@@ -380,8 +329,8 @@ export class ScenariosController {
         case forbiddenError:
           throw new ForbiddenException();
         default:
-          const _check: never = result.left;
-          throw new InternalServerErrorException();
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
       }
     }
     return await this.geoFeatureSetSerializer.serialize(result.right);
@@ -403,7 +352,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
@@ -416,7 +369,11 @@ export class ScenariosController {
   ): Promise<CostRangeDto> {
     const result = await this.service.getCostRange(scenarioId, req.user.id);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
   }
@@ -436,7 +393,11 @@ export class ScenariosController {
       file,
     );
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return result.right;
   }
@@ -453,19 +414,11 @@ export class ScenariosController {
     const result = await this.service.update(id, req.user.id, dto);
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case lockedByAnotherUser:
-          throw new BadRequestException(
-            `Scenario ${id} is already being edited.`,
-          );
-        case noLockInPlace:
-          throw new NotFoundException(`Scenario ${id} has no locks in place.`);
-        default:
-          const _check: never = result.left;
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return await this.scenarioSerializer.serialize(
@@ -485,7 +438,11 @@ export class ScenariosController {
     const result = await this.service.remove(id, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
   }
 
@@ -499,7 +456,11 @@ export class ScenariosController {
   ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.service.changeLockStatus(id, req.user.id, input);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
@@ -513,7 +474,11 @@ export class ScenariosController {
     const result = await this.service.resetLockStatus(id, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
   }
 
@@ -526,7 +491,11 @@ export class ScenariosController {
     const result = await this.service.getPlanningUnits(id, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return this.planningUnitsSerializer.serialize(result.right);
@@ -543,7 +512,11 @@ export class ScenariosController {
   ): Promise<Partial<ScenarioFeaturesData>[]> {
     const result = await this.service.getFeatures(id, req.user.id);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return this.scenarioFeatureSerializer.serialize(
       result.right.data,
@@ -577,7 +550,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return this.scenarioFeaturesGapData.serialize(
       result.right.data,
@@ -596,7 +573,11 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getInputParameterFile(id, req.user.id);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return result.right;
   }
@@ -612,7 +593,11 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getSpecDatCsv(id, req.user.id);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return result.right;
   }
@@ -628,7 +613,11 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getPuvsprDatCsv(id, req.user.id);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return result.right;
   }
@@ -644,7 +633,11 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getBoundDatCsv(id, req.user.id);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return result.right;
   }
@@ -667,23 +660,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case marxanFailed:
-          throw new InternalServerErrorException('Marxan failed');
-        case outputZipNotYetAvailable:
-          throw new InternalServerErrorException(
-            'Marxan output file - output file not available, possible error',
-          );
-        case metadataNotFound:
-          throw new InternalServerErrorException(
-            'Marxan was not yet executed.',
-          );
-        default:
-          const _check: never = result.left;
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     response.send(this.zipFilesSerializer.serialize(result));
@@ -707,21 +688,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case inputZipNotYetAvailable:
-          throw new InternalServerErrorException(
-            'marxan input file - input file not available, possible error',
-          );
-        case inputMetadataNotFound:
-          throw new InternalServerErrorException(
-            'marxan input file - metadata not found',
-          );
-        default:
-          const _check: never = result.left;
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     response.send(this.zipFilesSerializer.serialize(result));
   }
@@ -753,7 +724,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return this.scenarioSolutionSerializer.serialize(
@@ -783,7 +758,11 @@ export class ScenariosController {
   ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.service.run(id, req.user.id, blm);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
@@ -804,7 +783,11 @@ export class ScenariosController {
     const result = await this.service.cancelMarxanRun(id, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
   }
 
@@ -826,7 +809,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return this.scenarioSolutionSerializer.serialize(result.right[0]);
@@ -850,7 +837,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return this.scenarioSolutionSerializer.serialize(result.right[0]);
@@ -890,7 +881,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return this.scenarioFeaturesOutputGapData.serialize(
@@ -918,7 +913,11 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return this.scenarioSolutionSerializer.serialize(result.right);
@@ -943,7 +942,11 @@ export class ScenariosController {
     const result = await this.service.getCostSurfaceCsv(id, req.user.id, res);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
   }
 
@@ -961,17 +964,11 @@ export class ScenariosController {
     });
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case scenarioNotFound:
-          throw new NotFoundException('Scenario not found');
-        case protectedAreaProjectNotFound:
-          throw new NotFoundException('Project not found');
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return result.right;
@@ -992,19 +989,11 @@ export class ScenariosController {
     });
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case scenarioNotFound:
-          throw new NotFoundException('Scenario not found');
-        case protectedAreaProjectNotFound:
-          throw new NotFoundException('Project not found');
-        case invalidProtectedAreaId:
-          throw new BadRequestException('Invalid protected area id');
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return await this.getProtectedAreasForScenario(scenarioId, req);
   }
@@ -1030,14 +1019,11 @@ export class ScenariosController {
       dto,
     );
     if (isLeft(outcome)) {
-      switch (outcome.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case submissionFailed:
-          throw new InternalServerErrorException();
-        default:
-          throw new NotFoundException();
-      }
+      return aclErrorHandler(outcome.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
   }
@@ -1064,22 +1050,12 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException(
-            `User with ID: ${req.user.id} is not allowed to start a calibration for scenario with ID: ${id}`,
-          );
-        case scenarioNotFound:
-          throw new NotFoundException(
-            `Could not found scenario with ID: ${id}`,
-          );
-        case invalidRange:
-          throw new BadRequestException(
-            `Received range is invalid: [${range}]`,
-          );
-        default:
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+        range,
+      });
     }
 
     return AsyncJobDto.forScenario().asJsonApiMetadata();
@@ -1100,10 +1076,13 @@ export class ScenariosController {
   ): Promise<BlmCalibrationRunResultDto[]> {
     const result = await this.service.getBlmCalibrationResults(id, req.user.id);
 
-    if (isLeft(result))
-      throw new ForbiddenException(
-        `User with ID: ${req.user.id} cannot view scenario with ID: ${id}`,
-      );
+    if (isLeft(result)) {
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
+    }
 
     return result.right;
   }
@@ -1124,18 +1103,11 @@ export class ScenariosController {
     const result = await this.service.getBlmRange(id, req.user.id);
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException(
-            `User with ID: ${req.user.id} cannot retrieve BLM range for scenario with ID: ${id}`,
-          );
-        case scenarioNotFound:
-          throw new NotFoundException(
-            `Could not found project for scenario with ID: ${id}`,
-          );
-        default:
-          throw new InternalServerErrorException();
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return BlmRangeDto.fromBlmValues(result.right);
@@ -1153,7 +1125,11 @@ export class ScenariosController {
     const result = await this.service.cancelBlmCalibration(id, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
   }
 
@@ -1162,6 +1138,7 @@ export class ScenariosController {
     summary: `Creates a Lock entity with related scenario
      and user data to prevent other users from editing at the same time.`,
   })
+  @ApiOkResponse({ type: ScenarioLockResultSingular })
   @Post(`:id/lock`)
   async startScenarioEditingSession(
     @Param('id', ParseUUIDPipe) id: string,
@@ -1170,19 +1147,11 @@ export class ScenariosController {
     const result = await this.scenarioAclService.acquireLock(req.user.id, id);
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case lockedScenario:
-          throw new BadRequestException(
-            `Scenario ${id} is already being edited.`,
-          );
-        case lockUnknownError:
-          throw new InternalServerErrorException();
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
     return { data: result.right };
   }
@@ -1205,23 +1174,11 @@ export class ScenariosController {
     const result = await this.service.releaseLock(id, req.user.id);
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case lockedByAnotherUser:
-          throw new BadRequestException(
-            'Scenario lock belongs to a different user.',
-          );
-        case noLockInPlace:
-          throw new NotFoundException(`Scenario ${id} has no locks in place.`);
-        case scenarioNotFound:
-          throw new NotFoundException(`Scenario ${id} could not be found`);
-        case scenarioUnknownError:
-          throw new InternalServerErrorException();
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
   }
 
@@ -1229,6 +1186,7 @@ export class ScenariosController {
   @ApiOperation({
     summary: 'Get lock for scenario if it exists. Otherwise, it returns null',
   })
+  @ApiOkResponse({ type: ScenarioLockResultPlural })
   async findLocksForScenariosWithinParentProject(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
@@ -1236,19 +1194,11 @@ export class ScenariosController {
     const result = await this.service.findLock(scenarioId, req.user.id);
 
     if (isLeft(result)) {
-      switch (result.left) {
-        case forbiddenError:
-          throw new ForbiddenException();
-        case scenarioNotFound:
-          throw new NotFoundException(
-            `Scenario ${scenarioId} could not be found`,
-          );
-        case scenarioUnknownError:
-          throw new InternalServerErrorException();
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      return aclErrorHandler(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: 'scenarios',
+      });
     }
 
     return result.right;
