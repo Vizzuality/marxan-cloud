@@ -205,6 +205,7 @@ export class ScenariosService {
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
+      true,
     );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;

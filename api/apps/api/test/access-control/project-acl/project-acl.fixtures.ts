@@ -341,13 +341,13 @@ export const getFixtures = async () => {
     ThenQueryFailedIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(`Error while adding record to the database`);
+      expect(error.title).toEqual(`Error while adding record to the database.`);
     },
 
     ThenTransactionFailedIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(500);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(`Transaction failed`);
+      expect(error.title).toEqual(`Transaction failed.`);
     },
 
     ThenNoContentIsReturned: (response: request.Response) => {

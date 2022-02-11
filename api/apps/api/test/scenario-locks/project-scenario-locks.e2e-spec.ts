@@ -225,7 +225,7 @@ test(`getting all locks of scenarios as scenario viewer`, async () => {
   );
 });
 
-test.only(`getting the lock of a scenario if there is no lock in place`, async () => {
+test(`getting the lock of a scenario if there is no lock in place`, async () => {
   const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
   const scenarioIdObj = await fixtures.GivenTwoScenariosWereCreated();
 
