@@ -232,15 +232,11 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
                 modifiers={['flip']}
                 tooltipPlacement="right"
               >
-                <div className="flex flex-col flex-grow flex-shrink-0 pt-5 space-y-6 overflow-hidden w-80">
-                  <div className="relative flex flex-col flex-grow overflow-hidden">
-                    <div className="absolute left-0 z-10 w-full h-6 pointer-events-none -top-1" />
-                    <div className="overflow-x-hidden overflow-y-auto">
-                      <div className="space-y-10">
-                        {FIELDS.map((f) => <RunField key={f.id} {...f} />)}
-                      </div>
+                <div className="flex flex-col flex-grow flex-shrink-0 pt-5 space-y-6 overflow-hidden">
+                  <div className="relative flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
+                    <div className="mr-12 space-y-10">
+                      {FIELDS.map((f) => <RunField key={f.id} {...f} />)}
                     </div>
-                    <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none" />
                   </div>
 
                   <div className="flex-shrink-0 px-10">

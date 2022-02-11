@@ -35,7 +35,7 @@ export const ScenariosRunField: React.FC<ScenariosRunFieldProps> = ({
       {(fprops) => (
         <div className="">
           <div className="flex items-center">
-            <Label theme="light" className="mr-2 text-lg font-heading">{label}</Label>
+            <Label theme="dark" className="mr-2 text-xs text-white uppercase font-heading">{label}</Label>
             <InfoButton>
               <span>{description}</span>
             </InfoButton>
