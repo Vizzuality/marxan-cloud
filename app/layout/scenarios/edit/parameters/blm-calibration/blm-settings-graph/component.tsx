@@ -9,8 +9,8 @@ import { format } from 'd3';
 
 import { useScenarioCalibrationResults } from 'hooks/scenarios';
 
-import BLMChart from 'layout/scenarios/edit/analysis/blm-calibration/blm-chart';
-import BlmImageModal from 'layout/scenarios/edit/analysis/blm-calibration/blm-image-modal';
+import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/blm-chart';
+import BlmImageModal from 'layout/scenarios/edit/parameters/blm-calibration/blm-image-modal';
 
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';

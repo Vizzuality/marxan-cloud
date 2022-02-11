@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { useSaveScenarioCalibrationRange, useScenarioCalibrationRange } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import BlmSettingsGraph from 'layout/scenarios/edit/analysis/blm-calibration/blm-settings-graph';
+import BlmSettingsGraph from 'layout/scenarios/edit/parameters/blm-calibration/blm-settings-graph';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';

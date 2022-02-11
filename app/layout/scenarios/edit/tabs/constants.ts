@@ -13,7 +13,7 @@ export const TABS = [
   },
   {
     id: ScenarioSidebarTabs.PARAMETERS,
-    subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
+    subtab: null,
     name: 'Parameters',
   },
   {
