@@ -53,8 +53,8 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./api -f api/api.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }}
+          docker build ./api -f api/api.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api
 
   push_geoprocessing_to_registry:
     name: Push Geoprocessing Docker image to Azure Container Registry
@@ -92,9 +92,8 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./api -f api/geo.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }}
-          docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:latest
+          docker build ./api -f api/geo.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing
 
   push_client_to_registry:
     name: Push Client Docker image to Azure Container Registry
@@ -132,6 +131,5 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./app -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }}
-          docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }}
-          docker tag ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:latest
+          docker build ./app -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client
