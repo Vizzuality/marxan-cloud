@@ -12,7 +12,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
+import { Either, isLeft, isRight, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { assertDefined } from '@marxan/utils';
 import {
@@ -235,8 +235,16 @@ export class ScenarioAclService implements ScenarioAccessControl {
       boolean
     >
   > {
-    const scenarioIsLocked = await this.lockService.isLocked(scenarioId);
+    const scenarioIsAlreadyLocked = await this.lockService.isLocked(scenarioId);
     const canEditScenario = await this.canEditScenario(userId, scenarioId);
+    // LOFU (lock on first use): if scenario is not locked (maybe it's new and it
+    // was never locked, or any previous locks have expired or have been
+    // explicitly released), the current user can attempt to acquire a lock
+    // transparently.
+    const scenarioIsLocked =
+      canEditScenario && !scenarioIsAlreadyLocked
+        ? isRight(await this.acquireLock(userId, scenarioId))
+        : scenarioIsAlreadyLocked;
     const scenarioIsLockedByCurrentUser = await this.lockService.isLockedByUser(
       scenarioId,
       userId,
