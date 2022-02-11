@@ -14,6 +14,7 @@ import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
+import AdvancedSettings from 'layout/scenarios/edit/parameters/advanced-settings';
 import BLMCalibration from 'layout/scenarios/edit/parameters/blm-calibration';
 import Run from 'layout/scenarios/edit/run';
 import Sections from 'layout/sections';
@@ -38,7 +39,6 @@ export interface ScenariosSidebarEditAnalysisProps {
 }
 
 export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysisProps> = () => {
-  const [section, setSection] = useState(null);
   const [runOpen, setRunOpen] = useState(false);
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -50,24 +50,20 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const { setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
-  // EFFECTS
   useEffect(() => {
-    return () => {
-      if (tab !== ScenarioSidebarTabs.PARAMETERS) {
-        setSection(null);
-      }
-    };
-  }, [tab]);
+    if (!SECTIONS.find((s) => s.id === subtab)) {
+      dispatch(setSubTab(null));
+    }
+  }, []); // eslint-disable-line
 
-  // CALLBACKS
   const onChangeSection = useCallback((s) => {
-    setSection(s);
-    const subt = s ? `analysis-${s}` : ScenarioSidebarSubTabs.ANALYSIS_PREVIEW;
-    dispatch(setSubTab(subt));
+    const sub = s || null;
+    dispatch(setSubTab(sub));
   }, [dispatch, setSubTab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.PARAMETERS) return null;
@@ -142,16 +138,16 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
                 />
               )}
 
-              {/* {subtab === ScenarioSidebarSubTabs.ADVANCED_SETTINGS && (
+              {subtab === ScenarioSidebarSubTabs.ADVANCED_SETTINGS && (
                 <AdvancedSettings
                   key="advanced-settings"
                   onChangeSection={onChangeSection}
                 />
-              )} */}
+              )}
 
             </Pill>
 
-            {!section && (
+            {!subtab && (
               <motion.div
                 key="run-scenario-button"
                 className="flex justify-center flex-shrink-0 mt-4"

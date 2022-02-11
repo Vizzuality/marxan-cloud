@@ -20,7 +20,7 @@ export enum ScenarioSidebarSubTabs {
   ANALYSIS_ADJUST_PLANNING_UNITS = 'analysis-adjust-planning-units',
 
   BLM_CALIBRATION = 'pa-blm-calibration',
-  AVANCED_SETTINGS = 'pa-advanced-settings',
+  ADVANCED_SETTINGS = 'pa-advanced-settings',
 
   SOLUTIONS_PREVIEW = 'solutions-preview',
   SOLUTIONS_DETAILS = 'solutions-details',
