@@ -15,6 +15,10 @@ import {
 } from '../pieces/export-piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { GeoJSON } from 'geojson';
+import {
+  CustomGridGeoJsonRelativePath,
+  PlanningAreaCustomGridRelativePath,
+} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
 
 @Injectable()
 @PieceExportProvider()
@@ -35,13 +39,11 @@ export class PlanningAreaCustomGridPieceExporter
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const customProjectAreaFile = 'project-grid/custom-grid.geojson';
-
     const metadata = JSON.stringify({
       shape: 'square',
       areaKm2: 4000,
       bbox: [],
-      file: customProjectAreaFile,
+      file: CustomGridGeoJsonRelativePath,
     });
 
     const geoJson: GeoJSON = {
@@ -76,11 +78,11 @@ export class PlanningAreaCustomGridPieceExporter
       uris: [
         {
           uri: outputFile.right,
-          relativePath: `project-grid.json`,
+          relativePath: PlanningAreaCustomGridRelativePath,
         },
         {
           uri: planningAreaGeoJson.right,
-          relativePath: customProjectAreaFile,
+          relativePath: CustomGridGeoJsonRelativePath,
         },
       ],
     };

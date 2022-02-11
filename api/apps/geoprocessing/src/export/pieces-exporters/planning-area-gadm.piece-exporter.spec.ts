@@ -1,5 +1,6 @@
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
+import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import {
   FileRepository,
   GetFileError,
@@ -15,10 +16,7 @@ import { Either, left, Right, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
 import { geoprocessingConnections } from '../../ormconfig';
-import {
-  Gadm,
-  PlanningAreaGadmPieceExporter,
-} from './planning-area-gadm.piece-exporter';
+import { PlanningAreaGadmPieceExporter } from './planning-area-gadm.piece-exporter';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -138,18 +136,16 @@ const getFixtures = async () => {
 };
 
 class FakeEntityManager {
-  public data: Gadm[] = [
+  public data: PlanningAreaGadmContent[] = [
     {
       bbox: [],
       country: 'AGO',
-      l1: null,
-      l2: null,
       planningUnitAreakm2: 1000,
       puGridShape: PlanningUnitGridShape.hexagon,
     },
   ];
 
-  async query(): Promise<Gadm[]> {
+  async query(): Promise<PlanningAreaGadmContent[]> {
     return this.data;
   }
 }

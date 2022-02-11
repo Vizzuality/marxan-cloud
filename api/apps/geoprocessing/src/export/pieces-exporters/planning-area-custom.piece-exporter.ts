@@ -15,6 +15,10 @@ import {
 } from '../pieces/export-piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { GeoJSON } from 'geojson';
+import {
+  CustomProjectAreaGeoJsonRelativePath,
+  PlanningAreaCustomRelativePath,
+} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 
 @Injectable()
 @PieceExportProvider()
@@ -34,7 +38,6 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
     // TODO check files on fs - something broke the archive
-    const customProjectAreaFile = 'planning-area/project-pa.geojson';
 
     await delay();
 
@@ -42,7 +45,7 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       version: `0.1.0`,
       planningAreaGeometry: {
         uuid: `uuid`,
-        file: customProjectAreaFile,
+        file: CustomProjectAreaGeoJsonRelativePath,
       },
     });
 
@@ -79,11 +82,11 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: `planning-area.json`,
+          relativePath: PlanningAreaCustomRelativePath,
         },
         {
           uri: planningAreaGeoJson.right,
-          relativePath: customProjectAreaFile,
+          relativePath: CustomProjectAreaGeoJsonRelativePath,
         },
       ],
     };
