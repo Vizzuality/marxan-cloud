@@ -30,6 +30,7 @@ export const SECTIONS = [
     id: ScenarioSidebarSubTabs.SCHEDULE_SCENARIO,
     name: 'Schedule scenario',
     description: 'Comming feature...',
+    disabled: true,
   },
   {
     id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,

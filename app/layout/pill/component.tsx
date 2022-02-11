@@ -7,7 +7,7 @@ export interface PillProps {
   children: ReactNode
 }
 
-export const Pill: React.FC<PillProps> = ({ children, selected }:PillProps) => {
+export const Pill: React.FC<PillProps> = ({ children, selected }: PillProps) => {
   return (
     <div
       className={cx({
