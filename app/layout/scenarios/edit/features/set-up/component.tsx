@@ -63,11 +63,7 @@ export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () =>
         )}
 
         {(subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) && (
-          <ScenariosSidebarSetupFeaturesTarget
-            onBack={() => {
-              dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
-            }}
-          />
+          <ScenariosSidebarSetupFeaturesTarget />
         )}
       </motion.div>
     </div>

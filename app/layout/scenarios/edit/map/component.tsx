@@ -183,8 +183,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         'pugrid',
       ];
     }
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features', 'pugrid'];
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features', 'pugrid'];
     if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return ['cost', 'pugrid'];
     if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features', 'pugrid'];

@@ -16,8 +16,8 @@ import {
 } from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
-import List from 'layout/scenarios/edit/features/set-up/add-btn/list';
-import Toolbar from 'layout/scenarios/edit/features/set-up/add-btn/toolbar';
+import List from 'layout/scenarios/edit/features/set-up/add/add-modal/list';
+import Toolbar from 'layout/scenarios/edit/features/set-up/add/add-modal/toolbar';
 
 import Button from 'components/button';
 import Icon from 'components/icon';

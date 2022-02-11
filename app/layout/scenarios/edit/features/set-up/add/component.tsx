@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -8,19 +8,16 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSelectedFeatures } from 'hooks/features';
-import { useScenario, useSaveScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
-import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add-btn';
-import ListFeatures from 'layout/scenarios/edit/features/set-up/list';
-import TargetFeatures from 'layout/scenarios/edit/features/set-up/targets';
+import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
+import ListFeatures from 'layout/scenarios/edit/features/set-up/add/list';
 
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Steps from 'components/steps';
 
 import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
 import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
@@ -39,41 +36,20 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
-  const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
 
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const saveScenarioStatusOnBack = useCallback(async () => {
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        metadata: mergeScenarioStatusMetaData(metadata, {
-          tab: ScenarioSidebarTabs.FEATURES,
-          subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
-        }),
-      },
-    });
-  }, [saveScenarioMutation, sid, metadata]);
 
   useEffect(() => {
     // setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_TARGET ? 1 : 0);
   }, []);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
-
-  const step = ScenarioSidebarSubTabs.FEATURES_ADD && ScenarioSidebarSubTabs.FEATURES_ADD ? 0 : 1;
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
@@ -123,7 +99,6 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
             <div>
               <div className="flex items-baseline space-x-4">
                 <h2 className="text-lg font-medium font-heading">Features</h2>
-                <Steps step={step + 1} length={2} />
                 <InfoButton>
                   <div>
                     <h4 className="font-heading text-lg mb-2.5">What are features?</h4>
@@ -150,97 +125,24 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
               </div>
 
               <div className="flex items-center mt-2 space-x-2">
-
-                {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && (
-                  <>
-                    <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
-                    <div className="text-xs uppercase font-heading">
-                      Features added:
-                      {' '}
-                      {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
-                    </div>
-                  </>
-                )}
-
-                {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
-                  <div className="text-xs uppercase font-heading">
-                    Set the target and FPF for your features.
-
-                  </div>
-                )}
-
-                {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
-                  <>
-                    <InfoButton>
-                      <div>
-                        <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            This value represents how much you want to conserve of a particular
-                            feature. In an ideal conservation, land or sea use plan,
-                            all your features meet their targets.
-                          </p>
-                          <p>
-                            You can set a default
-                            value for all of your features
-                            or you can set individual the targets separately for each feature.
-                            You can set your targets to 100% if you want the whole extent of
-                            your feature to be included in the solution.
-                          </p>
-                        </div>
-                        <h4 className="font-heading text-lg mt-5 mb-2.5">What is the FPF?</h4>
-                        <div className="space-y-2">
-                          <p>
-                            FPF stands for
-                            {' '}
-                            <b>Feature Penalty Factor</b>
-                            .
-                            A higher FPF value forces the Marxan algorithm
-                            to choose the planning units where this feature
-                            is present by applying a penalty if the target
-                            is missed, thereby increasing
-                            the cost of the solution. It comes into play when
-                            some of your targets fail to be met.
-                          </p>
-                          <p>
-                            In a typical
-                            workflow you start out with all FPF values set at
-                            1 and after checking the results, increase the FPF
-                            values for the particular features where targets have
-                            been missed.
-                          </p>
-                        </div>
-                      </div>
-                    </InfoButton>
-                  </>
-                )}
-
+                <Icon icon={FEATURES_SVG} className="w-4 h-4 text-gray-400" />
+                <div className="text-xs uppercase font-heading">
+                  Features added:
+                  {' '}
+                  {selectedFeaturesData && <span className="ml-1 text-gray-400">{selectedFeaturesData.length}</span>}
+                </div>
               </div>
             </div>
 
-            {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && (
-              <AddFeaturesModal />
-            )}
+            <AddFeaturesModal />
 
           </header>
 
-          {subtab === ScenarioSidebarSubTabs.FEATURES_ADD && (
-            <ListFeatures
-              onSuccess={() => {
-                dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-              }}
-            />
-          )}
-
-          {subtab === ScenarioSidebarSubTabs.FEATURES_TARGET && (
-            <TargetFeatures
-              onBack={() => {
-                dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_ADD));
-                saveScenarioStatusOnBack();
-              }}
-            />
-          )}
-
+          <ListFeatures
+            onSuccess={() => {
+              dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+            }}
+          />
         </motion.div>
       </HelpBeacon>
     </div>

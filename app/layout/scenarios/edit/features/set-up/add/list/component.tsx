@@ -18,7 +18,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
-import IntersectFeatures from 'layout/scenarios/edit/features/set-up/intersect';
+import IntersectFeatures from 'layout/scenarios/edit/features/set-up/add/intersect';
 
 import Button from 'components/button';
 import Item from 'components/features/selected-item';
@@ -218,7 +218,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     const { features } = values;
     const data = getFeaturesRecipe(features);
     setSubmitting(true);
-    dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
 
     // Save current features
     selectedFeaturesMutation.mutate({
@@ -226,6 +225,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       data,
     }, {
       onSuccess: () => {
+        dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
         onSuccess();
       },
       onError: () => {
