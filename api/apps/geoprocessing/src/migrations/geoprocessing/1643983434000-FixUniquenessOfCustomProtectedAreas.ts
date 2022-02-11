@@ -21,7 +21,7 @@ alter table wdpa add constraint unique_custom_protected_area_geometries_per_proj
 
   async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-drop index unique_custom_protected_area_geometries_per_project;
+alter table wdpa drop constraint unique_custom_protected_area_geometries_per_project;
 drop index unique_wdpa_areas;
 create unique index wpdpa_project_geometries_project_check on wdpa(coalesce(wdpaid, -1), hash, coalesce(project_id, '00000000-0000-0000-0000-000000000000'));
     `);
