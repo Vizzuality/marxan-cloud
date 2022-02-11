@@ -84,7 +84,34 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                         size="base"
                         theme="primary"
                       >
-                        <h4 className="font-heading text-lg mb-2.5">What is BLM?</h4>
+                        <div className="space-y-2">
+                          <h4 className="font-heading text-lg mb-2.5">Boundary Length Modifier (BLM)</h4>
+                          <p>
+                            The BLM should be either ‘0’ or a positive number.
+                          </p>
+                          <p>
+                            It is permissible for the BLM to include decimal
+                            points (e.g. 0.1). Setting the BLM to ‘0’ will
+                            remove boundary length from consideration altogether.
+                          </p>
+                          <p>
+                            There is no universally good value for the BLM,
+                            as it works in relation to the costs and
+                            geometry of the study region/planning units.
+                          </p>
+                          <p>
+                            With a small BLM, Marxan will concentrate on
+                            minimizing overall reserve cost and will only
+                            aim for compactness when little extra cost will
+                            be incurred.
+                          </p>
+                          <p>
+                            Alternatively, a large BLM will
+                            place a high emphasis on minimizing the
+                            boundary length, even if it means a more
+                            costly solution.
+                          </p>
+                        </div>
                       </InfoButton>
                     </div>
                     <div className="flex items-end w-full space-x-5">
