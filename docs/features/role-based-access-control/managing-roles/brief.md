@@ -58,3 +58,14 @@ desirable, in a future revision of the feature.
   new project on their dashboard with a little "new" or similar visual hint, and
   likewise for scenarios (current or that may be created in the future) within
   projects they have access to.
+
+## Possible future workflow: scenario-specific roles
+
+As access control checks for operations on scenarios (reading, editing,
+deleting, running Marxan, etc.) are performed at scenario-level, the workflow
+above can be extended in future project phases to cover granting users specific
+roles on scenarios; at that stage, users with a role on a project can be granted
+a different role on one or more scenarios, or outright denied access to a
+scenario (for example, a project viewer could be granted scenario owner role on
+a specific scenario, or a project contributor could be denied access from a
+specific scenario within the project).
