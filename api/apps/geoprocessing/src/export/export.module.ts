@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
+import { WorkerModule } from '../modules/worker';
 
 import { ExportPiecesModule } from './pieces/export-pieces.module';
 import { ExportWorker } from './export.worker';
