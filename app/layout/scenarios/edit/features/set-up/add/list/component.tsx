@@ -224,6 +224,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     }, {
       onSuccess: () => {
         dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+        saveScenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData(metadata, {
+              tab: ScenarioSidebarTabs.FEATURES,
+              subtab: ScenarioSidebarSubTabs.FEATURES_TARGET,
+            }),
+          },
+        });
       },
       onError: () => {
         setSubmitting(false);
@@ -235,6 +244,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     getFeaturesRecipe,
     dispatch,
     setSubTab,
+    metadata,
+    saveScenarioMutation,
   ]);
 
   // Render
