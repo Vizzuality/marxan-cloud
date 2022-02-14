@@ -64,14 +64,10 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
   async failed(eventData: EventData<JobInput, true>): Promise<void> {
     const jobInput = await eventData.data;
 
-    if (this.isInitialCostJobInput(jobInput)) {
+    const isInitialCostJobInput =
+      (jobInput as InitialCostJobInput).puGridShape !== undefined;
+    if (isInitialCostJobInput) {
       await this.commandBus.execute(new DeleteScenario(jobInput.scenarioId));
     }
-  }
-
-  private isInitialCostJobInput(
-    jobInput: JobInput,
-  ): jobInput is InitialCostJobInput {
-    return (jobInput as InitialCostJobInput).puGridShape !== undefined;
   }
 }
