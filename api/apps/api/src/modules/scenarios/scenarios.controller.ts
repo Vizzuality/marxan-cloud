@@ -1194,7 +1194,7 @@ export class ScenariosController {
   })
   @ApiNoContentResponse({
     status: 204,
-    description: 'Lock was deleted correctly',
+    description: 'Lock was released correctly',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(`:id/lock`)
@@ -1232,7 +1232,7 @@ export class ScenariosController {
   async findLocksForScenariosWithinParentProject(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<null | ScenarioLockResultSingular> {
+  ): Promise<ScenarioLockResultSingular> {
     const result = await this.service.findLock(scenarioId, req.user.id);
 
     if (isLeft(result)) {

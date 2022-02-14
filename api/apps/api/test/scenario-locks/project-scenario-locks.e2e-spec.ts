@@ -225,6 +225,22 @@ test(`getting all locks of scenarios as scenario viewer`, async () => {
   );
 });
 
+test.only(`getting the lock of a scenario if there is no lock in place`, async () => {
+  const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
+  const scenarioIdObj = await fixtures.GivenTwoScenariosWereCreated();
+
+  const firstScenarioResponse = await fixtures.WhenGettingLockFromScenario(
+    scenarioIdObj.firstScenarioId,
+    ownerToken,
+  );
+  fixtures.ThenNoScenarioLockIsReturned(firstScenarioResponse);
+  const secondScenarioResponse = await fixtures.WhenGettingLockFromScenario(
+    scenarioIdObj.secondScenarioId,
+    ownerToken,
+  );
+  fixtures.ThenNoScenarioLockIsReturned(secondScenarioResponse);
+});
+
 test('Viewer fails to acquire lock for a scenario', async () => {
   await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenViewerWasAddedToScenario();

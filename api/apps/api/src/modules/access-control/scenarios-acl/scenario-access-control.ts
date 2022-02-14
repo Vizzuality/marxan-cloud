@@ -45,5 +45,5 @@ export abstract class ScenarioAccessControl {
   abstract findLock(
     userId: string,
     scenarioId: string,
-  ): Promise<Either<typeof forbiddenError, null | ScenarioLockResultSingular>>;
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultSingular>>;
 }

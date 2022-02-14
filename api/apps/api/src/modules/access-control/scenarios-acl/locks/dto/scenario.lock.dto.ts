@@ -17,7 +17,7 @@ export class ScenarioLockDto {
 
 export class ScenarioLockResultSingular {
   @ApiProperty()
-  data!: ScenarioLockDto;
+  data!: ScenarioLockDto | null;
 }
 export class ScenarioLockResultPlural {
   @ApiProperty()
