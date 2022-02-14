@@ -11,6 +11,7 @@ import Banner from 'layout/home/banner';
 import Features from 'layout/home/features';
 import Intro from 'layout/home/intro';
 import PartnersList from 'layout/home/partners';
+import Support from 'layout/home/support';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
@@ -36,8 +37,9 @@ const Home: React.FC = () => {
       <main className="overflow-x-hidden overflow-y-auto">
         <Header className="absolute" size="lg" theme="transparent" />
         <Intro />
-        <Features />
+        <Support />
         <Banner />
+        <Features />
         <PartnersList />
         <Footer />
       </main>

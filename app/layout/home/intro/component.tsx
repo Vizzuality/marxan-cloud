@@ -19,12 +19,12 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
 
   return (
     <div
-      className="relative text-white w-full md:h-screen min-h-screen flex items-center pt-24 md:pt-0"
+      className="relative flex items-center w-full min-h-screen pt-24 text-white md:h-screen md:pt-0"
       style={{ backgroundColor }}
     >
       <HeroAnimation />
       <Wrapper>
-        <div className="relative flex flex-col justify-between max-w-5xl z-10 w-full h-full m-auto py-8 md:py-0 md:mt-64 md:mb-48">
+        <div className="relative z-10 flex flex-col justify-between w-full h-full max-w-5xl py-8 m-auto md:py-0 md:mt-64 md:mb-48">
           <div className="lg:pr-80">
             <h1
               className="pb-8 text-5xl font-semibold leading-tight"
@@ -38,7 +38,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
               ocean systems.
             </p>
 
-            <div className="space-y-4 xs:flex xs:space-x-4 xs:space-y-0 mt-10 md:mt-18 md:mb-18">
+            <div className="mt-10 space-y-4 xs:flex xs:space-x-4 xs:space-y-0 md:mt-18 md:mb-18">
               <Button
                 className="w-full md:w-40"
                 theme="primary"
@@ -49,16 +49,17 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
               </Button>
 
               <Button
-                className="w-full md:w-40"
+                className="w-full md:w-64"
                 theme="secondary"
                 size="lg"
+                href="/community"
               >
-                How to
+                Explore the community
               </Button>
             </div>
           </div>
 
-          <div className="relative md:absolute bottom-0 mt-10 md:mt-0 text-center md:text-left">
+          <div className="relative bottom-0 mt-10 text-center md:absolute md:mt-0 md:text-left">
             <Link href="#features">
               <a className="mt-8" href="#features">
                 Discover more
