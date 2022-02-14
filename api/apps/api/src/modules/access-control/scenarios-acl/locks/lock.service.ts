@@ -65,13 +65,11 @@ export class LockService {
     return { data: allLocksByProject };
   }
 
-  async getLock(
-    scenarioId: string,
-  ): Promise<null | ScenarioLockResultSingular> {
+  async getLock(scenarioId: string): Promise<ScenarioLockResultSingular> {
     const result = await this.locksRepo.findOne({ scenarioId });
 
     if (!result) {
-      return null;
+      return { data: null };
     }
 
     return { data: result };

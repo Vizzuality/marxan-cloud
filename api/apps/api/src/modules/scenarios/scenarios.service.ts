@@ -991,7 +991,7 @@ export class ScenariosService {
   ): Promise<
     Either<
       typeof forbiddenError | GetScenarioFailure,
-      null | ScenarioLockResultSingular
+      ScenarioLockResultSingular
     >
   > {
     return await this.scenarioAclService.findLock(userId, scenarioId);

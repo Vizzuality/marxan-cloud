@@ -310,5 +310,9 @@ export async function getFixtures() {
       expect(response.body.data.scenarioId).toEqual(scenarioId);
       expect(response.body.data.userId).toEqual(userId);
     },
+    ThenNoScenarioLockIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toEqual(null);
+    },
   };
 }
