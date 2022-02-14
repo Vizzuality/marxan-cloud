@@ -4,7 +4,7 @@ import React, {
 
 import { useDebouncedCallback } from 'use-debounce';
 
-import Filters from 'layout/scenarios/edit/features/add/filters';
+import Filters from 'layout/scenarios/edit/features/set-up/add/add-modal/filters';
 
 import Icon from 'components/icon';
 import Modal from 'components/modal';
