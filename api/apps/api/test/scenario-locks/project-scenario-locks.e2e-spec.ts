@@ -20,7 +20,7 @@ test(`getting all locks of scenarios from projects as project owner`, async () =
     scenarioIdObj.firstScenarioId,
     token,
   );
-  await fixtures.ThenScenarioLockInfoIsReturned(
+  await fixtures.ThenScenarioLockInfoAfterCreationIsReturned(
     firstLock,
     scenarioIdObj.firstScenarioId,
   );
@@ -28,7 +28,7 @@ test(`getting all locks of scenarios from projects as project owner`, async () =
     scenarioIdObj.secondScenarioId,
     token,
   );
-  await fixtures.ThenScenarioLockInfoIsReturned(
+  await fixtures.ThenScenarioLockInfoAfterCreationIsReturned(
     secondLock,
     scenarioIdObj.secondScenarioId,
   );
@@ -117,24 +117,22 @@ test(`getting all locks of scenarios as scenario owner`, async () => {
     token,
   );
 
-  const firstScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
+  const firstScenarioResponse = await fixtures.WhenGettingLockFromScenario(
     scenarioIdObj.firstScenarioId,
     token,
   );
-  fixtures.ThenAllLocksAreReturned(
+  fixtures.ThenScenarioLockInfoIsReturned(
     firstScenarioResponse,
     userId,
     scenarioIdObj.firstScenarioId,
-    scenarioIdObj.secondScenarioId,
   );
-  const secondScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
+  const secondScenarioResponse = await fixtures.WhenGettingLockFromScenario(
     scenarioIdObj.secondScenarioId,
     token,
   );
-  fixtures.ThenAllLocksAreReturned(
+  fixtures.ThenScenarioLockInfoIsReturned(
     secondScenarioResponse,
     userId,
-    scenarioIdObj.firstScenarioId,
     scenarioIdObj.secondScenarioId,
   );
 });
@@ -163,24 +161,22 @@ test(`getting all locks of scenarios as scenario contributor`, async () => {
     ownerToken,
   );
 
-  const firstScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
+  const firstScenarioResponse = await fixtures.WhenGettingLockFromScenario(
     scenarioIdObj.firstScenarioId,
     contributorToken,
   );
-  fixtures.ThenAllLocksAreReturned(
+  fixtures.ThenScenarioLockInfoIsReturned(
     firstScenarioResponse,
     ownerUserId,
     scenarioIdObj.firstScenarioId,
-    scenarioIdObj.secondScenarioId,
   );
-  const secondScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
+  const secondScenarioResponse = await fixtures.WhenGettingLockFromScenario(
     scenarioIdObj.secondScenarioId,
     contributorToken,
   );
-  fixtures.ThenAllLocksAreReturned(
+  fixtures.ThenScenarioLockInfoIsReturned(
     secondScenarioResponse,
     ownerUserId,
-    scenarioIdObj.firstScenarioId,
     scenarioIdObj.secondScenarioId,
   );
 });
@@ -209,24 +205,22 @@ test(`getting all locks of scenarios as scenario viewer`, async () => {
     ownerToken,
   );
 
-  const firstScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
+  const firstScenarioResponse = await fixtures.WhenGettingLockFromScenario(
     scenarioIdObj.firstScenarioId,
     viewerToken,
   );
-  fixtures.ThenAllLocksAreReturned(
+  fixtures.ThenScenarioLockInfoIsReturned(
     firstScenarioResponse,
     ownerUserId,
     scenarioIdObj.firstScenarioId,
-    scenarioIdObj.secondScenarioId,
   );
-  const secondScenarioResponse = await fixtures.WhenGettingAllLocksFromScenarioId(
+  const secondScenarioResponse = await fixtures.WhenGettingLockFromScenario(
     scenarioIdObj.secondScenarioId,
     viewerToken,
   );
-  fixtures.ThenAllLocksAreReturned(
+  fixtures.ThenScenarioLockInfoIsReturned(
     secondScenarioResponse,
     ownerUserId,
-    scenarioIdObj.firstScenarioId,
     scenarioIdObj.secondScenarioId,
   );
 });

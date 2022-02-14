@@ -3,7 +3,7 @@ import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '..';
 import {
   ScenarioLockDto,
-  ScenarioLockResultPlural,
+  ScenarioLockResultSingular,
 } from './locks/dto/scenario.lock.dto';
 import {
   AcquireFailure,
@@ -42,9 +42,8 @@ export abstract class ScenarioAccessControl {
       boolean
     >
   >;
-  abstract findAllLocks(
+  abstract findLock(
     userId: string,
     scenarioId: string,
-    projectId: string,
-  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>>;
+  ): Promise<Either<typeof forbiddenError, null | ScenarioLockResultSingular>>;
 }

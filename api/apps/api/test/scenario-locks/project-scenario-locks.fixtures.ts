@@ -209,7 +209,7 @@ export async function getFixtures() {
         .set('Authorization', `Bearer ${contributorToken}`),
     WhenReleasingLockForScenario: async (token: string) =>
       await request(app.getHttpServer())
-        .patch(`/api/v1/scenarios/${scenarioId}/release-lock`)
+        .delete(`/api/v1/scenarios/${scenarioId}/lock`)
         .set('Authorization', `Bearer ${token}`),
     WhenGettingAllLocksFromProjectId: async (
       projectId: string,
@@ -218,10 +218,7 @@ export async function getFixtures() {
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/editing-locks`)
         .set('Authorization', `Bearer ${token}`),
-    WhenGettingAllLocksFromScenarioId: async (
-      scenarioId: string,
-      token: string,
-    ) =>
+    WhenGettingLockFromScenario: async (scenarioId: string, token: string) =>
       await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/editing-locks`)
         .set('Authorization', `Bearer ${token}`),
@@ -296,13 +293,22 @@ export async function getFixtures() {
       expect(firstScenario.userId).toEqual(userId);
       expect(secondScenario.userId).toEqual(userId);
     },
-    ThenScenarioLockInfoIsReturned: (
+    ThenScenarioLockInfoAfterCreationIsReturned: (
       response: request.Response,
       scenarioId: string,
     ) => {
       expect(response.status).toEqual(201);
       expect(response.body.data.scenarioId).toEqual(scenarioId);
       expect(response.body.data.userId).toEqual(ownerUserId);
+    },
+    ThenScenarioLockInfoIsReturned: (
+      response: request.Response,
+      userId: string,
+      scenarioId: string,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data.scenarioId).toEqual(scenarioId);
+      expect(response.body.data.userId).toEqual(userId);
     },
   };
 }

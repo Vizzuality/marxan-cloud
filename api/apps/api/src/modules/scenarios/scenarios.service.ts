@@ -101,7 +101,7 @@ import {
   LockService,
   noLockInPlace,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
-import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -985,23 +985,15 @@ export class ScenariosService {
     );
   }
 
-  async findAllLocks(
+  async findLock(
     scenarioId: string,
     userId: string,
   ): Promise<
-    Either<typeof forbiddenError | GetScenarioFailure, ScenarioLockResultPlural>
+    Either<
+      typeof forbiddenError | GetScenarioFailure,
+      null | ScenarioLockResultSingular
+    >
   > {
-    const scenario = await this.getById(scenarioId, {
-      authenticatedUser: { id: userId },
-    });
-    if (isLeft(scenario)) {
-      return scenario;
-    }
-    const projectId = scenario.right.projectId;
-    return await this.scenarioAclService.findAllLocks(
-      userId,
-      scenarioId,
-      projectId,
-    );
+    return await this.scenarioAclService.findLock(userId, scenarioId);
   }
 }
