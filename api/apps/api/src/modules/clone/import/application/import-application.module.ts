@@ -3,7 +3,6 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportEntity } from '../../export/adapters/entities/exports.api.entity';
 import { ImportAdaptersModule } from '../adapters/import-adapters.module';
-import { FooController } from './foo.controller';
 import { ImportArchive } from './import-archive';
 
 @Module({
@@ -13,7 +12,7 @@ import { ImportArchive } from './import-archive';
     ImportAdaptersModule,
   ],
   providers: [ImportArchive],
-  controllers: [FooController],
+  controllers: [],
   exports: [],
 })
 export class ImportApplicationModule {}
