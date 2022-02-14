@@ -26,12 +26,10 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 
 export interface ScenariosFeaturesListProps {
-  onSuccess: () => void
+
 }
 
-export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
-  onSuccess,
-}: ScenariosFeaturesListProps) => {
+export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const [intersecting, setIntersecting] = useState(null);
   const { query } = useRouter();
@@ -226,7 +224,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
     }, {
       onSuccess: () => {
         dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-        onSuccess();
       },
       onError: () => {
         setSubmitting(false);
@@ -235,7 +232,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   }, [
     sid,
     selectedFeaturesMutation,
-    onSuccess,
     getFeaturesRecipe,
     dispatch,
     setSubTab,
