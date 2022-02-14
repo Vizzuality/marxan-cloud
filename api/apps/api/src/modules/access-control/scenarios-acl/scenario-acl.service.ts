@@ -32,6 +32,7 @@ import {
 import {
   ScenarioLockDto,
   ScenarioLockResultPlural,
+  ScenarioLockResultSingular,
 } from './locks/dto/scenario.lock.dto';
 
 @Injectable()
@@ -255,15 +256,14 @@ export class ScenarioAclService implements ScenarioAccessControl {
     );
   }
 
-  async findAllLocks(
+  async findLock(
     userId: string,
     scenarioId: string,
-    projectId: string,
-  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+  ): Promise<Either<typeof forbiddenError, null | ScenarioLockResultSingular>> {
     if (!(await this.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    return right(await this.lockService.getAllLocksByProject(projectId));
+    return right(await this.lockService.getLock(scenarioId));
   }
 
   async findUsersInScenario(

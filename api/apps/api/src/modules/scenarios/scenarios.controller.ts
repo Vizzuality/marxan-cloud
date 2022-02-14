@@ -1189,15 +1189,15 @@ export class ScenariosController {
 
   @ApiOperation({
     description: `End Scenario Editing session.`,
-    summary: `Releases the lock created on a scenario so other
+    summary: `Deletes the lock created on a scenario so other
     users can start editing the scenario.`,
   })
   @ApiNoContentResponse({
     status: 204,
-    description: 'Lock was released correctly',
+    description: 'Lock was deleted correctly',
   })
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Patch(`:id/release-lock`)
+  @Delete(`:id/lock`)
   async endScenarioEditingSession(
     @Param('id', ParseUUIDPipe) id: string,
     @Req() req: RequestWithAuthenticatedUser,
@@ -1227,13 +1227,13 @@ export class ScenariosController {
 
   @Get(':scenarioId/editing-locks')
   @ApiOperation({
-    summary: "Get all locks for scenarios of this scenario's parent project",
+    summary: 'Get lock for scenario if it exists. Otherwise, it returns null',
   })
   async findLocksForScenariosWithinParentProject(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<ScenarioLockResultPlural> {
-    const result = await this.service.findAllLocks(scenarioId, req.user.id);
+  ): Promise<null | ScenarioLockResultSingular> {
+    const result = await this.service.findLock(scenarioId, req.user.id);
 
     if (isLeft(result)) {
       switch (result.left) {

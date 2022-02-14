@@ -7,6 +7,7 @@ import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios
 import {
   ScenarioLockDto,
   ScenarioLockResultPlural,
+  ScenarioLockResultSingular,
 } from './dto/scenario.lock.dto';
 
 export const unknownError = Symbol(`unknown error`);
@@ -62,6 +63,18 @@ export class LockService {
     const allLocksByProject = await query.getMany();
 
     return { data: allLocksByProject };
+  }
+
+  async getLock(
+    scenarioId: string,
+  ): Promise<null | ScenarioLockResultSingular> {
+    const result = await this.locksRepo.findOne({ scenarioId });
+
+    if (!result) {
+      return null;
+    }
+
+    return { data: result };
   }
 
   async releaseLock(scenarioId: string): Promise<void> {
