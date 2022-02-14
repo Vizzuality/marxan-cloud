@@ -2,24 +2,40 @@ import React from 'react';
 
 import Wrapper from 'layout/wrapper';
 
+import { PLANNING_PROBLEMS } from './constants';
+
 export interface HomeSupportProps {
 
 }
 
 export const HomeSupport: React.FC<HomeSupportProps> = () => {
   return (
-    <div className="bg-gray-800 ">
+    <div className="bg-gray-700">
       <Wrapper>
-        <div className="w-full max-w-5xl py-10 mx-auto md:py-32">
+        <div className="relative w-full max-w-5xl py-10 mx-auto md:py-44">
 
           <h3 className="text-4xl text-white font-heading">
             Types of planning problems that
             {' '}
             <span className="text-primary-500">Marxan can support:</span>
           </h3>
-          <div className="grid max-w-5xl grid-cols-2 gap-10 mx-auto" />
+
+          <div className="grid max-w-5xl grid-cols-2 pt-24 mx-auto gap-y-10 gap-x-44">
+            {PLANNING_PROBLEMS.map((P) => {
+              const { id, text, image } = P;
+
+              return (
+                <div key={`${id}`} className="flex items-center space-x-6">
+                  <img alt={text} src={image} />
+                  <p className="text-lg text-white">{text}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="absolute bottom-0 w-full h-px opacity-20" style={{ background: 'linear-gradient(to right, transparent, #ffffff, transparent)' }} />
         </div>
       </Wrapper>
+
     </div>
   );
 };

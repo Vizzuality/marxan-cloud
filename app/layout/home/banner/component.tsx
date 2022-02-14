@@ -15,7 +15,7 @@ const claimLines = [{ id: '0', text: 'free and open' }, { id: '1', text: 'flexib
 
 export const HomeBanner: React.FC<HomeBannerProps> = () => {
   return (
-    <div className="py-10 bg-gray-500 md:py-32" style={{ background: 'radial-gradient(circle at 50% 60%, rgba(54,55,62,1) 0%, rgba(17,17,17,1) 51%)' }}>
+    <div className="py-10 md:py-32" style={{ background: 'radial-gradient(circle at 50% 70%, rgba(54,55,62,1) 0%, rgba(21,21,21,1) 51%)' }}>
 
       <Wrapper>
         <div className="flex flex-col items-center -space-y-20 md:space-y-20">

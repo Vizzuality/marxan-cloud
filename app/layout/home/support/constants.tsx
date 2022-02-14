@@ -1,7 +1,7 @@
 import CONSERVATION_PNG from 'images/home/support/conservation.png';
 import DESIGNING_PNG from 'images/home/support/designing.png';
 import DEVELOPMENT_PNG from 'images/home/support/development.png';
-import ENHANCING_PNG from 'images/home/support/enhacing.png';
+import ENHANCING_PNG from 'images/home/support/enhancing.png';
 import FRESHWATER_PNG from 'images/home/support/freshwater.png';
 import NATURAL_PNG from 'images/home/support/natural.png';
 
