@@ -132,10 +132,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return 'cost';
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return 'lock-status,protection';
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_PREVIEW) return 'protection,features';
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return 'features';
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return 'cost';
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return 'lock-status,protection';
+    if (tab === ScenarioSidebarTabs.PARAMETERS) return 'protection,features';
 
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return 'results';
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return 'results,features';
@@ -151,10 +148,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
     if (tab === ScenarioSidebarTabs.FEATURES) return ['wdpa-percentage'];
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_PREVIEW) return ['wdpa-percentage', 'features'];
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features'];
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return ['cost'];
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out'];
+    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
 
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return ['solutions'];
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return ['features'];
@@ -183,14 +177,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         'pugrid',
       ];
     }
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features', 'pugrid'];
 
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_COST_SURFACE) return ['cost', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PARAMETERS && subtab === ScenarioSidebarSubTabs.ANALYSIS_ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
 
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['frequency', 'solution', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.ANALYSIS_GAP_ANALYSIS) return ['features'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return ['frequency', 'solution', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.SOLUTIONS_GAP_ANALYSIS) return ['features'];
 
     return ['pugrid'];
   }, [tab, subtab, wdpaCategories?.wdpaIucnCategories, scenarioData?.wdpaIucnCategories]);
