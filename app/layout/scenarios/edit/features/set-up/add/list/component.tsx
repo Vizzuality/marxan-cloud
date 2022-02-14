@@ -18,7 +18,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
-import IntersectFeatures from 'layout/scenarios/edit/features/intersect';
+import IntersectFeatures from 'layout/scenarios/edit/features/set-up/add/intersect';
 
 import Button from 'components/button';
 import Item from 'components/features/selected-item';
@@ -38,7 +38,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatures, setFeatureHoverId } = scenarioSlice.actions;
+  const { setFeatures, setFeatureHoverId, setSubTab } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
@@ -225,34 +225,20 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
       data,
     }, {
       onSuccess: () => {
-        saveScenarioMutation.mutate({
-          id: `${sid}`,
-          data: {
-            metadata: mergeScenarioStatusMetaData(metadata, {
-              tab: ScenarioSidebarTabs.FEATURES,
-              subtab: ScenarioSidebarSubTabs.FEATURES_TARGET,
-            }),
-          },
-        }, {
-          onSuccess: () => {
-            onSuccess();
-            setSubmitting(false);
-          },
-          onError: () => {
-            setSubmitting(false);
-          },
-        });
+        dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+        onSuccess();
       },
       onError: () => {
         setSubmitting(false);
       },
     });
-  }, [sid,
-    metadata,
+  }, [
+    sid,
     selectedFeaturesMutation,
-    saveScenarioMutation,
     onSuccess,
     getFeaturesRecipe,
+    dispatch,
+    setSubTab,
   ]);
 
   // Render

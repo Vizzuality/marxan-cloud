@@ -13,6 +13,7 @@ export enum ScenarioSidebarSubTabs {
 
   FEATURES_ADD = 'fe-features-add',
   FEATURES_TARGET = 'fe-features-target',
+  PRE_GAP_ANALYSIS = 'fe-pre-gap-analysis',
 
   BLM_CALIBRATION = 'pa-blm-calibration',
   ADVANCED_SETTINGS = 'pa-advanced-settings',

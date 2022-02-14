@@ -35,7 +35,7 @@ Default.args = {
     },
     {
       id: 3,
-      name: 'Prameters',
+      name: 'Parameters',
       warning: false,
     },
     {

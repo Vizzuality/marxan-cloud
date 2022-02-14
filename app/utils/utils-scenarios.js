@@ -27,6 +27,7 @@ export const STATUS_VALUES = {
 
 export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
   const { scenarioEditingMetadata = {} } = obj;
+
   const metadata = {
     ...obj,
     scenarioEditingMetadata: {

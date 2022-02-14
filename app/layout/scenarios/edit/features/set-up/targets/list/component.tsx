@@ -17,15 +17,13 @@ import Button from 'components/button';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
 
-export interface ScenariosFeaturesListProps {
+export interface ScenariosFeaturesTargetsProps {
   onBack: () => void;
-  onSuccess: () => void;
 }
 
-export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
+export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> = ({
   onBack,
-  onSuccess,
-}: ScenariosFeaturesListProps) => {
+}: ScenariosFeaturesTargetsProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
@@ -178,7 +176,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
           },
         }, {
           onSuccess: () => {
-            onSuccess();
             setSubmitting(false);
           },
           onError: () => {
@@ -190,14 +187,12 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
         setSubmitting(false);
       },
     });
-
-    // onSuccess();
-  }, [sid,
+  }, [
+    sid,
     metadata,
     selectedFeaturesData,
     selectedFeaturesMutation,
     saveScenarioMutation,
-    onSuccess,
   ]);
 
   // Render
@@ -291,7 +286,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
                 size="lg"
                 onClick={onBack}
               >
-                Back
+                Set features
               </Button>
 
               <Button
@@ -311,4 +306,4 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = ({
   );
 };
 
-export default ScenariosFeaturesList;
+export default ScenariosFeaturesTargets;
