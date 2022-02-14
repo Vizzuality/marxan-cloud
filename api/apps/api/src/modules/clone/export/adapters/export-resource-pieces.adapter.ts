@@ -12,8 +12,8 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     ResourceKind,
     (id: ResourceId, kind: ResourceKind) => Promise<ExportComponent[]>
   > = {
-    project: this.resolveForProject,
-    scenario: this.resolveForScenario,
+    project: this.resolveForProject.bind(this),
+    scenario: this.resolveForScenario.bind(this),
   };
 
   constructor(
