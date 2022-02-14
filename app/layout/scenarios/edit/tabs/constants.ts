@@ -1,4 +1,4 @@
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 export const TABS = [
   {
@@ -8,12 +8,12 @@ export const TABS = [
   },
   {
     id: ScenarioSidebarTabs.FEATURES,
-    subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
+    subtab: null,
     name: 'Features',
   },
   {
     id: ScenarioSidebarTabs.PARAMETERS,
-    subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
+    subtab: null,
     name: 'Parameters',
   },
   {

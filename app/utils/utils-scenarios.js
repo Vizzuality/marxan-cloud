@@ -4,7 +4,7 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
   status: {
     'planning-unit': 'draft', // Possible values: empty, draft and outdated
     features: 'draft',
-    analysis: 'empty',
+    parameters: 'empty',
     solutions: 'empty',
   },
   tab: ScenarioSidebarTabs.PLANNING_UNIT,
@@ -17,16 +17,17 @@ export const STATUS_VALUES = {
     solutions: 'empty',
   },
   features: {
-    analysis: 'empty',
+    parameters: 'empty',
     solutions: 'empty',
   },
-  analysis: {
+  parameters: {
     solutions: 'empty',
   },
 };
 
 export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
   const { scenarioEditingMetadata = {} } = obj;
+
   const metadata = {
     ...obj,
     scenarioEditingMetadata: {
@@ -47,17 +48,5 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
     },
   };
 
-  return metadata;
-};
-
-export const mergeScenarioStatusEditingMetaData = (obj = {}, newObj = {}) => {
-  const { scenarioEditingMetadata = {} } = obj;
-  const metadata = {
-    ...obj,
-    scenarioEditingMetadata: {
-      ...scenarioEditingMetadata,
-      ...newObj,
-    },
-  };
   return metadata;
 };

@@ -2,7 +2,11 @@ import React, {
   useCallback, useEffect, useRef,
 } from 'react';
 
+import { useDispatch } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
@@ -32,6 +36,10 @@ export interface ScenarioStatusProps {
 export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const dispatch = useDispatch();
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { data: scenarioData } = useScenario(sid);
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
@@ -75,6 +83,13 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
       // If
     }
   }, [ACTIONS_DONE, JOB_DONE]);
+
+  useEffect(() => {
+    if (scenarioData) {
+      dispatch(setTab(scenarioData?.metadata?.scenarioEditingMetadata?.tab));
+      dispatch(setSubTab(scenarioData?.metadata?.scenarioEditingMetadata?.subtab));
+    }
+  }, [scenarioData]); //eslint-disable-line
 
   const onTryAgain = useCallback(() => {
     ACTIONS_FAILURE[JOB_FAILURE.kind]();
