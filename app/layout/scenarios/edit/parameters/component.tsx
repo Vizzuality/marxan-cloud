@@ -61,7 +61,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata, marxanInputParameterFile: runSettings } = metadata || {};
+  const { marxanInputParameterFile: runSettings } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -87,19 +87,8 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
       numberOfRuns: runSettings.NUMREPS,
       boundaryLengthModifier: runSettings.BLM,
       metadata: {
+        ...metadata,
         marxanInputParameterFile: runSettings,
-        scenarioEditingMetadata: {
-          ...scenarioEditingMetadata,
-          lastJobCheck: new Date().getTime(),
-          tab: ScenarioSidebarTabs.SOLUTIONS,
-          subtab: null,
-          status: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'draft',
-            solutions: 'draft',
-          },
-        },
       },
     };
 
@@ -115,7 +104,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
             ), {
               level: 'success',
             });
-            console.info('Scenario name saved succesfully', s);
+            console.info('Scenario runned succesfully', s);
 
             plausible('Run scenario', {
               props: {
@@ -132,7 +121,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
             addToast('error-run-start', (
               <>
                 <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">Scenario name not saved</p>
+                <p className="text-sm">Scenario run failed</p>
               </>
             ), {
               level: 'error',
@@ -140,16 +129,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
           },
         });
       },
-      onError: () => {
-        addToast('error-scenario-name', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario name not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
+      onError: () => { },
     });
   }, [
     pid,
@@ -157,13 +137,13 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
     saveScenarioMutation,
     runScenarioMutation,
     addToast,
-    scenarioEditingMetadata,
     plausible,
     projectData?.name,
     user?.email,
     user?.id,
     scenarioData?.name,
     runSettings,
+    metadata,
   ]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.PARAMETERS) return null;
@@ -265,15 +245,6 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
               </motion.div>
             )}
           </AnimatePresence>
-
-          {/* <Modal
-            title="Run scenario"
-            open={runOpen}
-            size="narrow"
-            onDismiss={() => setRunOpen(false)}
-          >
-            <Run />
-          </Modal> */}
         </motion.div>
       </HelpBeacon>
     </div>
