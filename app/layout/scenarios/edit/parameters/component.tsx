@@ -61,7 +61,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { marxanInputParameterFile: runSettings } = metadata || {};
+  const { marxanInputParameterFile: runSettings, scenarioEditingMetadata } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -87,7 +87,12 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
       numberOfRuns: runSettings.NUMREPS,
       boundaryLengthModifier: runSettings.BLM,
       metadata: {
-        ...metadata,
+        scenarioEditingMetadata: {
+          ...scenarioEditingMetadata,
+          lastJobCheck: new Date().getTime(),
+          tab: ScenarioSidebarTabs.PARAMETERS,
+          subtab: null,
+        },
         marxanInputParameterFile: runSettings,
       },
     };
@@ -143,7 +148,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
     user?.id,
     scenarioData?.name,
     runSettings,
-    metadata,
+    scenarioEditingMetadata,
   ]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.PARAMETERS) return null;
