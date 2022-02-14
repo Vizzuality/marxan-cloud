@@ -7,11 +7,11 @@ import { ExportPiecesProvider } from './pieces/export-pieces.provider';
 export class ExportProcessor {
   constructor(private readonly piecesExporters: ExportPiecesProvider) {}
 
-  async run(input: ExportJobInput): Promise<ExportJobOutput> {
+  run(input: ExportJobInput): Promise<ExportJobOutput> {
     const provider = this.piecesExporters.getPieceProvider(input.piece);
     if (!provider) {
       throw new Error(`${input.piece} is not yet supported.`);
     }
-    return await provider.run(input);
+    return provider.run(input);
   }
 }

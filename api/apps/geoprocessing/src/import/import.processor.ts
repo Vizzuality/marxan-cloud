@@ -6,11 +6,11 @@ import { ImportPiecesProvider } from './pieces/import-pieces.provider';
 export class ImportProcessor {
   constructor(private readonly piecesImporters: ImportPiecesProvider) {}
 
-  async run(input: ImportJobInput): Promise<ImportJobOutput> {
+  run(input: ImportJobInput): Promise<ImportJobOutput> {
     const provider = this.piecesImporters.getPieceProvider(input.piece);
     if (!provider) {
       throw new Error(`${input.piece} is not yet supported.`);
     }
-    return await provider.run(input);
+    return provider.run(input);
   }
 }
