@@ -7,3 +7,10 @@ export interface ExportJobOutput {
   readonly piece: ClonePiece;
   readonly uris: Array<{ uri: string; relativePath: string }>;
 }
+
+export interface ImportJobOutput {
+  readonly importId: string;
+  readonly componentId: string;
+  readonly resourceId: string;
+  readonly piece: ClonePiece;
+}
