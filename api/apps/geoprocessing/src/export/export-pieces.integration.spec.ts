@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 import { Injectable } from '@nestjs/common';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 
 import { PiecesModule } from './pieces/pieces.module';
@@ -72,7 +72,7 @@ class FakeProjectMetadataExporter extends PieceProcessor {
     return piece === ClonePiece.ProjectMetadata;
   }
 
-  async run(input: JobInput): Promise<JobOutput> {
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
     return {
       ...input,
       uris: [

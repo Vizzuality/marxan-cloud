@@ -1,4 +1,4 @@
-import { JobInput } from '@marxan/cloning/job-input';
+import { ExportJobInput } from '@marxan/cloning';
 import { Inject } from '@nestjs/common';
 import {
   CommandBus,
@@ -16,7 +16,7 @@ export class CancelExportPendingJobsHandler
   implements IInferredCommandHandler<CancelExportPendingJobs> {
   constructor(
     @Inject(exportPieceQueueToken)
-    private readonly queue: Queue<JobInput>,
+    private readonly queue: Queue<ExportJobInput>,
     private readonly commandBus: CommandBus,
   ) {}
 
@@ -25,7 +25,7 @@ export class CancelExportPendingJobsHandler
     resourceKind,
     resourceId,
   }: CancelExportPendingJobs): Promise<void> {
-    const pendingJobs: Job<JobInput>[] = await this.queue.getJobs([
+    const pendingJobs: Job<ExportJobInput>[] = await this.queue.getJobs([
       'waiting',
       'delayed',
     ]);

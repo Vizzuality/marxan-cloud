@@ -1,5 +1,5 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
@@ -24,7 +24,7 @@ export class ScenarioMetadata extends PieceProcessor {
     return piece === ClonePiece.ScenarioMetadata;
   }
 
-  async run(input: JobInput): Promise<JobOutput> {
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const scenarioData: Array<{
       name: string;
     }> = await this.entityManager.query(

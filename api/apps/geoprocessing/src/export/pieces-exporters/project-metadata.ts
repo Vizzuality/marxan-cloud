@@ -4,7 +4,7 @@ import { EntityManager } from 'typeorm';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
 
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { FileRepository } from '@marxan/files-repository';
 
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
@@ -26,7 +26,7 @@ export class ProjectMetadata extends PieceProcessor {
     return piece === ClonePiece.ProjectMetadata;
   }
 
-  async run(input: JobInput): Promise<JobOutput> {
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const projectData: Array<{
       name: string;
       description: string;

@@ -1,6 +1,6 @@
 import { ClonePiece, ResourceKind } from './domain';
 
-export interface JobInput {
+export interface ExportJobInput {
   readonly exportId: string;
   readonly componentId: string;
   readonly resourceId: string;

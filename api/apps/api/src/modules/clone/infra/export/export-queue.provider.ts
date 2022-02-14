@@ -1,6 +1,6 @@
 import { FactoryProvider } from '@nestjs/common';
 import { Queue, QueueEvents } from 'bullmq';
-import { JobInput, exportPieceQueueName } from '@marxan/cloning';
+import { ExportJobInput, exportPieceQueueName } from '@marxan/cloning';
 import { QueueBuilder, QueueEventsBuilder } from '@marxan-api/modules/queue';
 import {
   CreateWithEventFactory,
@@ -14,9 +14,11 @@ export const exportPieceEventsFactoryToken = Symbol(
   'export piece queue' + ' factory token',
 );
 
-export const exportPieceQueueProvider: FactoryProvider<Queue<JobInput>> = {
+export const exportPieceQueueProvider: FactoryProvider<
+  Queue<ExportJobInput>
+> = {
   provide: exportPieceQueueToken,
-  useFactory: (queueBuilder: QueueBuilder<JobInput>) => {
+  useFactory: (queueBuilder: QueueBuilder<ExportJobInput>) => {
     return queueBuilder.buildQueue(exportPieceQueueName);
   },
   inject: [QueueBuilder],

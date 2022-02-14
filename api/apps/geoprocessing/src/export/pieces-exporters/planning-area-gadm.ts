@@ -4,7 +4,7 @@ import { EntityManager } from 'typeorm';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
 
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { FileRepository } from '@marxan/files-repository';
 
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
@@ -37,7 +37,7 @@ export class PlanningAreaGadm extends PieceProcessor {
     return piece === ClonePiece.PlanningAreaGAdm;
   }
 
-  async run(input: JobInput): Promise<JobOutput> {
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
     if (input.resourceKind === ResourceKind.Scenario) {
       throw new Error(`Exporting scenario is not yet supported.`);
     }

@@ -1,4 +1,4 @@
-import { ClonePiece, JobInput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import {
   FileRepository,
@@ -84,7 +84,7 @@ const getFixtures = async () => {
     geoprocessingEntityManagerToken,
   ) as FakeEntityManager;
 
-  let exportJob: JobInput;
+  let exportJob: ExportJobInput;
   let fileUri: string;
 
   return {
