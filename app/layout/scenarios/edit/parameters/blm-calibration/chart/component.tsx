@@ -12,6 +12,7 @@ import classnames from 'classnames';
 import {
   scaleLinear, line, area,
 } from 'd3';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -118,6 +119,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   }, [containerRef, setDimensions]);
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata, marxanInputParameterFile } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -128,8 +131,14 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   const onSaveBlm = useCallback((value) => {
     const scenarioMetaData = {
       metadata: {
-        ...scenarioData.metadata,
+        scenarioEditingMetadata: {
+          ...scenarioEditingMetadata,
+          lastJobCheck: new Date().getTime(),
+          tab: ScenarioSidebarTabs.PARAMETERS,
+          subtab: null,
+        },
         marxanInputParameterFile: {
+          ...marxanInputParameterFile,
           BLM: value,
         },
       },
@@ -159,7 +168,13 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
         });
       },
     });
-  }, [sid, saveScenarioMutation, addToast, scenarioData.metadata]);
+  }, [
+    sid,
+    saveScenarioMutation,
+    addToast,
+    marxanInputParameterFile,
+    scenarioEditingMetadata,
+  ]);
 
   /**
    * When containerRef changes, we update the dimensions of the SVG

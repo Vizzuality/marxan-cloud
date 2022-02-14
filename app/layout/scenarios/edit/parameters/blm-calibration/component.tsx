@@ -124,62 +124,58 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                 noValidate
                 onSubmit={handleSubmit}
               >
-                <div className="flex space-x-7">
+                <div className="flex space-x-6 justify-between">
                   <div className="flex items-center">
                     <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
-                    <div className="w-22">
-                      <FieldRFF
-                        name="blmCalibrationFrom"
-                        validate={composeValidators([{ presence: true }])}
-                      >
-                        {(fprops) => (
-                          <Field id="blmCalibrationFrom" {...fprops}>
-                            <Input
-                              mode="dashed"
-                              className="text-2xl"
-                              type="number"
-                              min={minBlmValue}
-                              max={maxBlmValue}
-                              onChange={(e) => {
-                                if (!e.target.value) {
-                                  return fprops.input.onChange(null);
-                                }
-                                return fprops.input.onChange(+e.target.value);
-                              }}
-                            />
-                          </Field>
-                        )}
-                      </FieldRFF>
-                    </div>
+                    <FieldRFF
+                      name="blmCalibrationFrom"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
+                        <Field id="blmCalibrationFrom" {...fprops}>
+                          <Input
+                            mode="dashed"
+                            className="text-2xl"
+                            type="number"
+                            min={minBlmValue}
+                            max={maxBlmValue}
+                            onChange={(e) => {
+                              if (!e.target.value) {
+                                return fprops.input.onChange(null);
+                              }
+                              return fprops.input.onChange(+e.target.value);
+                            }}
+                          />
+                        </Field>
+                      )}
+                    </FieldRFF>
                     <p className="ml-5 text-sm text-white opacity-60 whitespace-nowrap">{`min ${format(',d')(minBlmValue)}`}</p>
                   </div>
 
                   <div className="flex items-center">
                     <Label theme="dark" className="mr-3 text-xs uppercase">To</Label>
-                    <div className="w-22">
-                      <FieldRFF
-                        name="blmCalibrationTo"
-                        validate={composeValidators([{ presence: true }])}
-                      >
-                        {(fprops) => (
-                          <Field id="blmCalibrationTo" {...fprops}>
-                            <Input
-                              mode="dashed"
-                              className="text-2xl"
-                              type="number"
-                              min={minBlmValue}
-                              max={maxBlmValue}
-                              onChange={(e) => {
-                                if (!e.target.value) {
-                                  return fprops.input.onChange(null);
-                                }
-                                return fprops.input.onChange(+e.target.value);
-                              }}
-                            />
-                          </Field>
-                        )}
-                      </FieldRFF>
-                    </div>
+                    <FieldRFF
+                      name="blmCalibrationTo"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
+                        <Field className="w-44" id="blmCalibrationTo" {...fprops}>
+                          <Input
+                            mode="dashed"
+                            className="text-2xl"
+                            type="number"
+                            min={minBlmValue}
+                            max={maxBlmValue}
+                            onChange={(e) => {
+                              if (!e.target.value) {
+                                return fprops.input.onChange(null);
+                              }
+                              return fprops.input.onChange(+e.target.value);
+                            }}
+                          />
+                        </Field>
+                      )}
+                    </FieldRFF>
                     <p className="ml-5 text-sm text-white opacity-60 whitespace-nowrap">{`max ${format(',d')(maxBlmValue)}`}</p>
                   </div>
                 </div>
