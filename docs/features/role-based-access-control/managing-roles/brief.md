@@ -14,18 +14,18 @@ These possible features would improve the ergonomics of the workflow for adding
 users to projects or scenarios, but they also imply substantive additional
 complexity which should be avoided for a first, functional implementation.
 
-## Adding users to a project or a scenario - workflow
+## Adding users to a project - workflow
 
-- Project/scenario owners can click on a `+` (or similar) button next to the
+- Project owners can click on a `+` (or similar) button next to the
   collaborators picture as per designs.
 
 - By clicking that `+` button, a modal panel appears with a search box.
 
-- Project/scenario owner searches for the user they want to add.
+- Project owner searches for the user they want to add.
 
-Project/scenario owners can search for *any* user within the instance, as long
-as their account is active (that is, their email address was verified after
-account creation, and their account is not marked as deleted).
+Project owners can search for *any* user within the instance, as long as their
+account is active (that is, their email address was verified after account
+creation, and their account is not marked as deleted).
 
 Users can only be found by typing their full email address as used for their
 Marxan Cloud account (case insensitive).
@@ -38,13 +38,14 @@ reasonable debouncing timing could also help to slow down automated guesses, if
 desirable, in a future revision of the feature.
 
 - Once the desired user is found, a visual confirmation is given (that is, the
-  project/scenario owner needs to see that the email address they have typed is
-  that of an active user)
+  project owner needs to see that the email address they have typed is that of
+  an active user)
 
-- Project/scenario owner selects the user account just found, then:
+- Project owner selects the user account just found, then:
 
   - they are presented with a dropdown to select the desired role of the new
-    user within the relevant project/scenario
+    user within the relevant project (project owner, project contributor,
+    project viewer or solution viewer)
 
   - this operation can be repeated to compile a list of users + roles as part of
     a batch assignment of user roles
@@ -53,7 +54,7 @@ desirable, in a future revision of the feature.
    
    - users are granted their new roles instantly
 
-- Then, each new user who has been granted a role on the project/scenario will
-  see the new project on their dashboard with a little "new" or similar
-  visual hint, and likewise for new scenarios they are given access to, within
-  projects they already have access to.
+- Then, each new user who has been granted a role on the project will see the
+  new project on their dashboard with a little "new" or similar visual hint, and
+  likewise for scenarios (current or that may be created in the future) within
+  projects they have access to.
