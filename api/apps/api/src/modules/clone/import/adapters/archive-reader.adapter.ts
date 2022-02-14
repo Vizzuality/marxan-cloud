@@ -2,6 +2,7 @@ import {
   ArchiveLocation,
   ClonePiece,
   ResourceId,
+  ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { FileRepository } from '@marxan/files-repository';
@@ -10,6 +11,7 @@ import { extractFile } from '@marxan/utils';
 import { Injectable } from '@nestjs/common';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import {
+  archiveCorrupted,
   ArchiveReader,
   Failure,
   invalidFiles,
@@ -32,12 +34,16 @@ export class ArchiveReaderAdapter implements ArchiveReader {
       readableOrError.right,
       new RegExp(ClonePieceRelativePaths[ClonePiece.ExportConfig].config),
     );
-    if (isLeft(exportConfigOrError)) return left(invalidFiles);
+    if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
     const exportConfig = JSON.parse(exportConfigOrError.right);
 
-    // TODO We should validate resourceId and resourceKind
     const resourceId = new ResourceId(exportConfig.resourceId);
     const resourceKind = exportConfig.resourceKind;
+
+    const validResourceKind = Object.values(ResourceKind).includes(
+      resourceKind,
+    );
+    if (!validResourceKind) return left(invalidFiles);
 
     const pieces = await this.importResourcePieces.resolveFor(
       resourceId,
