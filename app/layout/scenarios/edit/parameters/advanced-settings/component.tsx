@@ -6,13 +6,11 @@ import { useRouter } from 'next/router';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useMe } from 'hooks/me';
 import { useProjectRole } from 'hooks/project-users';
-import { useProject } from 'hooks/projects';
-import { useRunScenario, useSaveScenario, useScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -21,7 +19,6 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-import RUN_SVG from 'svgs/ui/run.svg?sprite';
 
 import { FIELDS } from './constants';
 import RunField from './field';
@@ -35,29 +32,21 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
 }: ScenariosAdvancedSettingsProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { addToast } = useToasts();
-  const plausible = usePlausible();
 
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { user } = useMe();
-
   const { data: projectRole } = useProjectRole(pid);
   const VIEWER = projectRole === 'project_viewer';
 
-  const { data: projectData } = useProject(pid);
-
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
     },
   });
-
-  const runScenarioMutation = useRunScenario({});
 
   const INITIAL_VALUES = useMemo(() => {
     return FIELDS.reduce((acc, f) => {
@@ -76,63 +65,27 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
     const data = {
       numberOfRuns: values.NUMREPS,
       boundaryLengthModifier: values.BLM,
-      metadata: {
+      metadata: mergeScenarioStatusMetaData({
+        ...metadata,
         marxanInputParameterFile: values,
-        scenarioEditingMetadata: {
-          ...scenarioEditingMetadata,
-          lastJobCheck: new Date().getTime(),
-          tab: ScenarioSidebarTabs.SOLUTIONS,
-          subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
-          status: {
-            'protected-areas': 'draft',
-            features: 'draft',
-            analysis: 'draft',
-            solutions: 'draft',
-          },
-        },
-      },
+      }, {
+        tab: ScenarioSidebarTabs.PARAMETERS,
+        subtab: null,
+      }),
     };
 
     saveScenarioMutation.mutate({ id: `${sid}`, data }, {
       onSuccess: () => {
-        runScenarioMutation.mutate({ id: `${sid}` }, {
-          onSuccess: ({ data: { data: s } }) => {
-            setSubmitting(false);
-
-            addToast('run-start', (
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Run started</p>
-              </>
-            ), {
-              level: 'success',
-            });
-            console.info('Scenario name saved succesfully', s);
-
-            plausible('Run scenario', {
-              props: {
-                userId: `${user.id}`,
-                userEmail: `${user.email}`,
-                projectId: `${pid}`,
-                projectName: `${projectData.name}`,
-                scenarioId: `${sid}`,
-                scenarioName: `${scenarioData?.name}`,
-              },
-            });
-          },
-          onError: () => {
-            setSubmitting(false);
-
-            addToast('error-run-start', (
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <p className="text-sm">Scenario name not saved</p>
-              </>
-            ), {
-              level: 'error',
-            });
-          },
+        setSubmitting(false);
+        addToast('success-advanced-setting', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Advanced settings saved</p>
+          </>
+        ), {
+          level: 'success',
         });
+        console.info('Advanced settings saved succesfully');
       },
       onError: () => {
         setSubmitting(false);
@@ -148,17 +101,10 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
       },
     });
   }, [
-    pid,
     sid,
+    metadata,
     saveScenarioMutation,
-    runScenarioMutation,
     addToast,
-    scenarioEditingMetadata,
-    plausible,
-    projectData?.name,
-    user?.email,
-    user?.id,
-    scenarioData?.name,
   ]);
 
   return (
@@ -249,10 +195,8 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
                     >
                       <div className="flex items-center space-x-5">
                         <div className="text-left">
-                          <div className="text-lg">Run scenario</div>
+                          <div className="text-lg">Save</div>
                         </div>
-
-                        <Icon icon={RUN_SVG} className="flex-shrink-0 w-7 h-7" />
                       </div>
                     </Button>
                   </div>
