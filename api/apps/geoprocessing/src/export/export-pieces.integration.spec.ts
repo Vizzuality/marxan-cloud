@@ -48,7 +48,7 @@ test(`exporting unsupported piece`, async () => {
     resourceKind: ResourceKind.Scenario,
     allPieces: [ClonePiece.ProjectMetadata],
   };
-  await expect(fixtures.sut.run(input)).rejects.toEqual(
+  expect(async () => await fixtures.sut.run(input)).rejects.toEqual(
     new Error(`some piece is not yet supported.`),
   );
 });
