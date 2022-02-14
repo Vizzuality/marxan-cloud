@@ -12,7 +12,7 @@ import classnames from 'classnames';
 import {
   scaleLinear, line, area,
 } from 'd3';
-import { ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -135,7 +135,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           ...scenarioEditingMetadata,
           lastJobCheck: new Date().getTime(),
           tab: ScenarioSidebarTabs.PARAMETERS,
-          subtab: null,
+          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
         },
         marxanInputParameterFile: {
           ...marxanInputParameterFile,

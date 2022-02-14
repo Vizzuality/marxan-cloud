@@ -46,7 +46,7 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      blmCalibration: blm?.toFixed(2),
+      blmCalibration: blm < 10 ? blm?.toFixed(2) : blm.toFixed(),
     };
   }, [blm]);
 
@@ -120,7 +120,7 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
                         validate={composeValidators([{ presence: true }])}
                       >
                         {(fprops) => (
-                          <Field id="blmCalibration" {...fprops}>
+                          <Field className="w-44" id="blmCalibration" {...fprops}>
                             <Input
                               mode="dashed"
                               theme="dark"
