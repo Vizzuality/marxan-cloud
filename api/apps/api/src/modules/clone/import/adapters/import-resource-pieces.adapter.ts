@@ -6,7 +6,7 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
-import { ClonePieceRelativePaths } from '../../../../../../../libs/cloning/src/infrastructure/clone-piece-data';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ImportResourcePieces } from '../application/import-resource-pieces.port';
 import { ImportComponent } from '../domain';
 
@@ -20,8 +20,8 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
       location: ArchiveLocation,
     ) => Promise<ImportComponent[]>
   > = {
-    project: this.resolveForProject,
-    scenario: this.resolveForScenario,
+    project: this.resolveForProject.bind(this),
+    scenario: this.resolveForScenario.bind(this),
   };
 
   resolveFor(
