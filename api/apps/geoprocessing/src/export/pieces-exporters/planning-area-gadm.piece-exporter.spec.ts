@@ -1,4 +1,4 @@
-import { ClonePiece, JobInput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import {
   FileRepository,
@@ -15,7 +15,10 @@ import { Either, left, Right, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
 import { geoprocessingConnections } from '../../ormconfig';
-import { Gadm, PlanningAreaGadm } from './planning-area-gadm';
+import {
+  Gadm,
+  PlanningAreaGadmPieceExporter,
+} from './planning-area-gadm.piece-exporter';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -65,7 +68,7 @@ const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [],
     providers: [
-      PlanningAreaGadm,
+      PlanningAreaGadmPieceExporter,
       {
         provide: FileRepository,
         useClass: FakeFileRepository,
@@ -78,13 +81,13 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
-  const sut = sandbox.get(PlanningAreaGadm);
+  const sut = sandbox.get(PlanningAreaGadmPieceExporter);
   const fakeFileRepo = sandbox.get(FileRepository) as FakeFileRepository;
   const fakeEntityManager = sandbox.get(
     geoprocessingEntityManagerToken,
   ) as FakeEntityManager;
 
-  let exportJob: JobInput;
+  let exportJob: ExportJobInput;
   let fileUri: string;
 
   return {

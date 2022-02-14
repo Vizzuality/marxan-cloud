@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus, EventBus } from '@nestjs/cqrs';
 
-import { JobInput, JobOutput } from '@marxan/cloning';
+import { ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
 import { API_EVENT_KINDS } from '@marxan/api-events';
@@ -27,8 +27,8 @@ import { ResourceKind } from '@marxan/cloning/domain';
 
 @Injectable()
 export class ExportPieceEventsHandler
-  implements EventFactory<JobInput, JobOutput> {
-  private queueEvents: QueueEventsAdapter<JobInput, JobOutput>;
+  implements EventFactory<ExportJobInput, ExportJobOutput> {
+  private queueEvents: QueueEventsAdapter<ExportJobInput, ExportJobOutput>;
 
   private failEventsMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__piece__failed__v1__alpha,
@@ -42,7 +42,7 @@ export class ExportPieceEventsHandler
 
   constructor(
     @Inject(exportPieceEventsFactoryToken)
-    queueEventsFactory: CreateWithEventFactory<JobInput, JobOutput>,
+    queueEventsFactory: CreateWithEventFactory<ExportJobInput, ExportJobOutput>,
     private readonly commandBus: CommandBus,
     private readonly eventBus: EventBus,
   ) {
@@ -52,7 +52,7 @@ export class ExportPieceEventsHandler
   }
 
   async createCompletedEvent(
-    eventData: EventData<JobInput, JobOutput>,
+    eventData: EventData<ExportJobInput, ExportJobOutput>,
   ): Promise<CreateApiEventDTO> {
     const data = await eventData.data;
     const output = await eventData.result;
@@ -70,7 +70,7 @@ export class ExportPieceEventsHandler
   }
 
   async createFailedEvent(
-    eventData: EventData<JobInput, JobOutput>,
+    eventData: EventData<ExportJobInput, ExportJobOutput>,
   ): Promise<CreateApiEventDTO> {
     const {
       resourceId,
@@ -93,7 +93,7 @@ export class ExportPieceEventsHandler
     };
   }
 
-  private async completed(event: EventData<JobInput, JobOutput>) {
+  private async completed(event: EventData<ExportJobInput, ExportJobOutput>) {
     const result = await event.result;
     assertDefined(result);
     await this.commandBus.execute(
@@ -107,7 +107,7 @@ export class ExportPieceEventsHandler
     );
   }
 
-  private async failed(event: EventData<JobInput, unknown>) {
+  private async failed(event: EventData<ExportJobInput, unknown>) {
     const {
       exportId,
       componentId,

@@ -1,4 +1,4 @@
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import {
   CommandBus,
@@ -53,7 +53,9 @@ const getFixtures = async () => {
       ExportPieceEventsHandler,
       {
         provide: exportPieceEventsFactoryToken,
-        useValue: (eventFactory: EventFactory<JobInput, JobOutput>) => {
+        useValue: (
+          eventFactory: EventFactory<ExportJobInput, ExportJobOutput>,
+        ) => {
           fakeQueueEvents = new FakeQueueEvents(eventFactory);
           return fakeQueueEvents;
         },
@@ -74,8 +76,8 @@ const getFixtures = async () => {
   });
   let results: unknown[] = [];
   const getEventDataFromInput = (
-    input: JobInput,
-  ): EventData<JobInput, JobOutput> => ({
+    input: ExportJobInput,
+  ): EventData<ExportJobInput, ExportJobOutput> => ({
     eventId: v4(),
     jobId: v4(),
     data: Promise.resolve(input),
@@ -86,7 +88,7 @@ const getFixtures = async () => {
   });
 
   return {
-    GivenExportPieceJob: (): JobInput => {
+    GivenExportPieceJob: (): ExportJobInput => {
       return {
         allPieces: [ClonePiece.ProjectMetadata, ClonePiece.ExportConfig],
         componentId: v4(),
@@ -96,14 +98,14 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    WhenJobFinishes: async (input: JobInput) => {
+    WhenJobFinishes: async (input: ExportJobInput) => {
       const data = getEventDataFromInput(input);
 
       results = await Promise.all(
         fakeQueueEvents.triggerJobEvent('completed', data),
       );
     },
-    WhenJobFails: async (input: JobInput) => {
+    WhenJobFails: async (input: ExportJobInput) => {
       const data = getEventDataFromInput(input);
 
       results = await Promise.all(
@@ -140,7 +142,7 @@ const getFixtures = async () => {
 type JobEvent = 'completed' | 'failed';
 
 type JobEventListener = (
-  eventData: EventData<JobInput, JobOutput>,
+  eventData: EventData<ExportJobInput, ExportJobOutput>,
 ) => Promise<unknown>;
 
 export class FakeQueueEvents {
@@ -149,7 +151,9 @@ export class FakeQueueEvents {
     failed: [],
   };
 
-  public constructor(private eventFactory: EventFactory<JobInput, JobOutput>) {
+  public constructor(
+    private eventFactory: EventFactory<ExportJobInput, ExportJobOutput>,
+  ) {
     this.on('completed', eventFactory.createCompletedEvent);
     this.on('failed', eventFactory.createFailedEvent);
   }
@@ -160,7 +164,7 @@ export class FakeQueueEvents {
 
   triggerJobEvent(
     type: JobEvent,
-    eventData: EventData<JobInput, JobOutput>,
+    eventData: EventData<ExportJobInput, ExportJobOutput>,
   ): Promise<unknown>[] {
     return this.#listeners[type].map((listener) => listener(eventData));
   }

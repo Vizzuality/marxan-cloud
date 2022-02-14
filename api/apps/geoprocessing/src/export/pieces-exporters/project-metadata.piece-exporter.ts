@@ -4,29 +4,30 @@ import { EntityManager } from 'typeorm';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
 
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { FileRepository } from '@marxan/files-repository';
 
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
-import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
+import {
+  PieceExportProvider,
+  ExportPieceProcessor,
+} from '../pieces/export-piece-processor';
 
 @Injectable()
 @PieceExportProvider()
-export class ProjectMetadata extends PieceProcessor {
+export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {
-    super();
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ProjectMetadata;
   }
 
-  async run(input: JobInput): Promise<JobOutput> {
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const projectData: Array<{
       name: string;
       description: string;
@@ -39,7 +40,7 @@ export class ProjectMetadata extends PieceProcessor {
 
     if (projectData.length !== 1) {
       throw new Error(
-        `${ProjectMetadata.name} - Project ${input.resourceId} does not exist.`,
+        `${ProjectMetadataPieceExporter.name} - Project ${input.resourceId} does not exist.`,
       );
     }
 
@@ -55,7 +56,7 @@ export class ProjectMetadata extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ProjectMetadata.name} - Project - couldn't save file - ${outputFile.left.description}`,
+        `${ProjectMetadataPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`,
       );
     }
 

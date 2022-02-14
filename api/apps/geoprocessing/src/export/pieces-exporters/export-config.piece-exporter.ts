@@ -4,28 +4,31 @@ import { EntityManager } from 'typeorm';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
 
-import { ClonePiece, JobInput, JobOutput } from '@marxan/cloning';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { FileRepository } from '@marxan/files-repository';
 
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
-import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
+import {
+  PieceExportProvider,
+  ExportPieceProcessor,
+} from '../pieces/export-piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
 
 @Injectable()
 @PieceExportProvider()
-export class ExportConfig extends PieceProcessor {
+export class ExportConfigPieceExporter implements ExportPieceProcessor {
   private readonly relativePath = 'config.json';
 
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {
-    super();
-  }
+  ) {}
 
-  private async projectExportConfig(input: JobInput): Promise<JobOutput> {
+  private async projectExportConfig(
+    input: ExportJobInput,
+  ): Promise<ExportJobOutput> {
     const scenarios: { name: string }[] = await this.entityManager.query(
       `
        SELECT name FROM scenarios where project_id = $1
@@ -47,7 +50,7 @@ export class ExportConfig extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ExportConfig.name} - Project - couldn't save file - ${outputFile.left.description}`,
+        `${ExportConfigPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`,
       );
     }
 
@@ -62,7 +65,9 @@ export class ExportConfig extends PieceProcessor {
     };
   }
 
-  private async scenarioExportConfig(input: JobInput): Promise<JobOutput> {
+  private async scenarioExportConfig(
+    input: ExportJobInput,
+  ): Promise<ExportJobOutput> {
     const [scenario]: {
       name: string;
       project_id: string;
@@ -94,7 +99,7 @@ export class ExportConfig extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ExportConfig.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
+        `${ExportConfigPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
       );
     }
 
@@ -113,7 +118,7 @@ export class ExportConfig extends PieceProcessor {
     return piece === ClonePiece.ExportConfig;
   }
 
-  async run(input: JobInput): Promise<JobOutput> {
+  async run(input: ExportJobInput): Promise<ExportJobOutput> {
     if (input.resourceKind === ResourceKind.Scenario) {
       return this.scenarioExportConfig(input);
     }

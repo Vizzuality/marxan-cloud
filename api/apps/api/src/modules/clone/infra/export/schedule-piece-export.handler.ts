@@ -4,7 +4,7 @@ import {
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { Inject, Logger } from '@nestjs/common';
-import { JobInput } from '@marxan/cloning';
+import { ExportJobInput } from '@marxan/cloning';
 import { Queue } from 'bullmq';
 
 import { ApiEventsService } from '@marxan-api/modules/api-events';
@@ -25,7 +25,8 @@ export class SchedulePieceExportHandler
 
   constructor(
     private readonly apiEvents: ApiEventsService,
-    @Inject(exportPieceQueueToken) private readonly queue: Queue<JobInput>,
+    @Inject(exportPieceQueueToken)
+    private readonly queue: Queue<ExportJobInput>,
     private readonly eventBus: EventBus,
     private logger: Logger,
   ) {
