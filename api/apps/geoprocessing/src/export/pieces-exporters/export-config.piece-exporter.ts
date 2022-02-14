@@ -9,21 +9,22 @@ import { FileRepository } from '@marxan/files-repository';
 
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
-import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
+import {
+  PieceExportProvider,
+  ExportPieceProcessor,
+} from '../pieces/export-piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
 
 @Injectable()
 @PieceExportProvider()
-export class ExportConfig extends PieceProcessor {
+export class ExportConfigPieceExporter implements ExportPieceProcessor {
   private readonly relativePath = 'config.json';
 
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {
-    super();
-  }
+  ) {}
 
   private async projectExportConfig(
     input: ExportJobInput,
@@ -49,7 +50,7 @@ export class ExportConfig extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ExportConfig.name} - Project - couldn't save file - ${outputFile.left.description}`,
+        `${ExportConfigPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`,
       );
     }
 
@@ -98,7 +99,7 @@ export class ExportConfig extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ExportConfig.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
+        `${ExportConfigPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
       );
     }
 

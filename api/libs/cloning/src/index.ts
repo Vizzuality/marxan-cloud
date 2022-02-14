@@ -3,3 +3,4 @@ export { importPieceQueueName } from './import-piece-queue-name';
 export { ExportJobInput, ImportJobInput } from './job-input';
 export { ExportJobOutput, ImportJobOutput } from './job-output';
 export { ClonePiece } from './domain';
+export { PieceProcessor } from './piece-processor.port';

@@ -21,12 +21,8 @@ export class ExportWorker {
     this.#worker = wrapper.build<ExportJobInput, ExportJobOutput>(
       exportPieceQueueName,
       {
-        process: async (job) => {
-          try {
-            return await this.exportProcessor.run(job.data);
-          } catch (error) {
-            throw new Error(JSON.stringify(error));
-          }
+        process: (job) => {
+          return this.exportProcessor.run(job.data);
         },
       },
     );

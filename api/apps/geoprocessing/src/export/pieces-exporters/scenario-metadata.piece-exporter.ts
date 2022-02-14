@@ -7,18 +7,19 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
-import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
+import {
+  PieceExportProvider,
+  ExportPieceProcessor,
+} from '../pieces/export-piece-processor';
 
 @Injectable()
 @PieceExportProvider()
-export class ScenarioMetadata extends PieceProcessor {
+export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {
-    super();
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioMetadata;
@@ -36,7 +37,7 @@ export class ScenarioMetadata extends PieceProcessor {
 
     if (scenarioData.length !== 1) {
       throw new Error(
-        `${ScenarioMetadata.name} - Scenario ${input.resourceId} does not exist.`,
+        `${ScenarioMetadataPieceExporter.name} - Scenario ${input.resourceId} does not exist.`,
       );
     }
 
@@ -51,7 +52,7 @@ export class ScenarioMetadata extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ScenarioMetadata.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
+        `${ScenarioMetadataPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
       );
     }
 

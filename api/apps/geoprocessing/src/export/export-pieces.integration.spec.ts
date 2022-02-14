@@ -5,9 +5,12 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 
-import { PiecesModule } from './pieces/pieces.module';
+import { ExportPiecesModule } from './pieces/export-pieces.module';
 import { ExportProcessor } from './export.processor';
-import { PieceExportProvider, PieceProcessor } from './pieces/piece-processor';
+import {
+  PieceExportProvider,
+  ExportPieceProcessor,
+} from './pieces/export-piece-processor';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -52,7 +55,7 @@ test(`exporting unsupported piece`, async () => {
 
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
-    imports: [PiecesModule],
+    imports: [ExportPiecesModule],
     providers: [ExportProcessor, FakeProjectMetadataExporter],
   }).compile();
 
@@ -67,7 +70,7 @@ const getFixtures = async () => {
 
 @Injectable()
 @PieceExportProvider()
-class FakeProjectMetadataExporter extends PieceProcessor {
+class FakeProjectMetadataExporter implements ExportPieceProcessor {
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ProjectMetadata;
   }

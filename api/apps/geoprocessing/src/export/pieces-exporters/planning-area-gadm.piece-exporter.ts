@@ -9,7 +9,10 @@ import { FileRepository } from '@marxan/files-repository';
 
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
-import { PieceExportProvider, PieceProcessor } from '../pieces/piece-processor';
+import {
+  PieceExportProvider,
+  ExportPieceProcessor,
+} from '../pieces/export-piece-processor';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
@@ -24,14 +27,12 @@ export interface Gadm {
 
 @Injectable()
 @PieceExportProvider()
-export class PlanningAreaGadm extends PieceProcessor {
+export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {
-    super();
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.PlanningAreaGAdm;
@@ -76,7 +77,7 @@ export class PlanningAreaGadm extends PieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${PlanningAreaGadm.name} - Project GADM - couldn't save file - ${outputFile.left.description}`,
+        `${PlanningAreaGadmPieceExporter.name} - Project GADM - couldn't save file - ${outputFile.left.description}`,
       );
     }
 

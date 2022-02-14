@@ -1,30 +1,32 @@
-import { Module, OnModuleInit } from '@nestjs/common';
 import { DiscoveryModule, DiscoveryService } from '@golevelup/nestjs-discovery';
-
-import { PieceProcessor, PieceProcessorProvider } from './piece-processor';
-import { PiecesProvider } from './pieces.provider';
+import { Module, OnModuleInit } from '@nestjs/common';
+import {
+  ExportPieceProcessor,
+  ExportPieceProcessorProvider,
+} from './export-piece-processor';
+import { ExportPiecesProvider } from './export-pieces.provider';
 
 @Module({
   imports: [DiscoveryModule],
-  providers: [PiecesProvider],
-  exports: [PiecesProvider],
+  providers: [ExportPiecesProvider],
+  exports: [ExportPiecesProvider],
 })
-export class PiecesModule implements OnModuleInit {
+export class ExportPiecesModule implements OnModuleInit {
   constructor(
     private readonly discovery: DiscoveryService,
-    private readonly providers: PiecesProvider,
+    private readonly providers: ExportPiecesProvider,
   ) {}
 
   async onModuleInit() {
     const pieceExportersProviders = await this.discovery.providersWithMetaAtKey<symbol>(
-      PieceProcessorProvider,
+      ExportPieceProcessorProvider,
     );
 
     // TODO: should ensure this is a class instance that implements PieceProcessor
     // shouldn't happen tho if decorator is used as intended.
     pieceExportersProviders.forEach((provider) =>
       this.providers.registerProvider(
-        provider.discoveredClass.instance as PieceProcessor,
+        provider.discoveredClass.instance as ExportPieceProcessor,
       ),
     );
   }
