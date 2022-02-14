@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { useSaveScenarioCalibrationRange, useScenarioCalibrationRange } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import BlmSettingsGraph from 'layout/scenarios/edit/parameters/blm-calibration/blm-settings-graph';
+import BlmSettingsChart from 'layout/scenarios/edit/parameters/blm-calibration/settings-chart';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -198,7 +198,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
               </form>
             )}
           </FormRFF>
-          <BlmSettingsGraph
+          <BlmSettingsChart
             maxBlmValue={maxBlmValue}
             minBlmValue={minBlmValue}
           />
