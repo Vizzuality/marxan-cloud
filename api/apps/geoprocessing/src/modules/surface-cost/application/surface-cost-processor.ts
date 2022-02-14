@@ -55,7 +55,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
 
       await this.repo.save(
         scenarioId,
-        puIds.map((id) => ({ puid: id, cost: 1 })),
+        puIds.map((id) => ({ puUuid: id, cost: 1 })),
       );
       return true;
     }
@@ -71,7 +71,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     await this.repo.save(
       scenarioId,
       pusWithArea.map(({ id, area }) => ({
-        puid: id,
+        puUuid: id,
         cost: Math.round((area * 100) / referenceArea) / 100,
       })),
     );

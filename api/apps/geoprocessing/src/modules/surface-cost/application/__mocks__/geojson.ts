@@ -54,7 +54,7 @@ export const getGeoJsonWithNegativeCost = (): FeatureCollection<
       type: 'Feature',
       properties: {
         cost: 200,
-        puid: 'uuid-1',
+        puUuid: 'uuid-1',
       },
       geometry: {
         type: 'MultiPolygon',
@@ -64,7 +64,7 @@ export const getGeoJsonWithNegativeCost = (): FeatureCollection<
     {
       properties: {
         cost: -100,
-        puid: 'uuid-2',
+        puUuid: 'uuid-2',
       },
       type: 'Feature',
       geometry: {
