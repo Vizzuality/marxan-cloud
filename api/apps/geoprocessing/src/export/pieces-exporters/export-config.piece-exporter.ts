@@ -12,7 +12,6 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 import {
-  ExportConfigRelativePath,
   ProjectExportConfigContent,
   ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
