@@ -84,7 +84,10 @@ export class Import extends AggregateRoot {
     const isThisTheLastBatch = false;
     const isThisBatchCompleted = false;
 
-    if (isThisTheLastBatch) this.apply(new AllPiecesImported());
+    if (isThisTheLastBatch)
+      this.apply(
+        new AllPiecesImported(this.id, this.resourceId, this.resourceKind),
+      );
     if (isThisTheLastBatch || !isThisBatchCompleted) return right(true);
 
     const nextBatch = this.pieces.filter(
@@ -119,7 +122,9 @@ export class Import extends AggregateRoot {
 
   private requestFirstBatch() {
     if (this.pieces.length === 0) {
-      this.apply(new AllPiecesImported());
+      this.apply(
+        new AllPiecesImported(this.id, this.resourceId, this.resourceKind),
+      );
       return;
     }
     const firstBatchOrder = Math.min(
