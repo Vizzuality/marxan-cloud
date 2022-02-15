@@ -96,14 +96,6 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
         tab: ScenarioSidebarTabs.PARAMETERS,
         subtab: null,
       }),
-      // scenarioEditingMetadata: {
-      //   ...scenarioEditingMetadata,
-      //   lastJobCheck: new Date().getTime(),
-      //   tab: ScenarioSidebarTabs.PARAMETERS,
-      //   subtab: null,
-      // },
-      // marxanInputParameterFile: runSettings,
-
     };
 
     saveScenarioMutation.mutate({ id: `${sid}`, data }, {
