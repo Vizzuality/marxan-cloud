@@ -11,12 +11,13 @@ import {
   ComponentId,
   ComponentLocation,
   ResourceKind,
+  ResourceId,
 } from '@marxan/cloning/domain';
 import { assertDefined } from '@marxan/utils';
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus, EventBus } from '@nestjs/cqrs';
 import { ApiEventsService } from '../../../api-events';
-import { ExportId, ResourceId } from '../../export';
+import { ExportId } from '../../export';
 import { CompleteExportPiece } from '../../export/application/complete-export-piece.command';
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
 import { exportPieceEventsFactoryToken } from './export-queue.provider';

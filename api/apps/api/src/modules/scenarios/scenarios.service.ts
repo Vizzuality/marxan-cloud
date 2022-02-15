@@ -88,7 +88,7 @@ import {
   GetScenarioFailure,
   scenarioNotFound,
 } from '@marxan-api/modules/blm/values/blm-repos';
-import { ResourceId } from '../clone';
+
 import { ExportScenario } from '../clone/export/application/export-scenario.command';
 import {
   SetInitialCostSurface,
@@ -102,6 +102,7 @@ import {
   noLockInPlace,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { ResourceId } from '@marxan/cloning/domain';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
