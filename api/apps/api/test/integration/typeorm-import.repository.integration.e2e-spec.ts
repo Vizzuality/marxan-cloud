@@ -107,7 +107,7 @@ const getFixtures = async () => {
           }),
         ],
       );
-      importId = importInstance.id;
+      importId = importInstance.importId;
       await repo.save(importInstance);
     },
     GivenImportWithMultipleComponentsWasRequested: async () => {
@@ -134,7 +134,7 @@ const getFixtures = async () => {
         archiveLocation,
         components,
       );
-      importId = importInstance.id;
+      importId = importInstance.importId;
       await repo.transaction(async (repository) => {
         await repository.save(importInstance);
       });
