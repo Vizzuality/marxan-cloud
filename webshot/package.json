@@ -1,0 +1,33 @@
+{
+  "name": "@marxan-cloud/webshot",
+  "version": "1.2.15.0",
+  "description": "Webshot service",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "nodemon --exec 'ts-node --files --project tsconfig.json -r tsconfig-paths/register src/main.ts' -L | bunyan",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "~16.14"
+  },
+  "author": "Vizzuality",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "cors": "2.8.5",
+    "dotenv": "16.0.0",
+    "express": "4.17.2",
+    "helmet": "5.0.2",
+    "puppeteer": "13.3.2",
+    "typescript": "4.5.5"
+  },
+  "devDependencies": {
+    "@types/cors": "2.8.12",
+    "@types/express": "4.17.13",
+    "bunyan": "1.8.15",
+    "nodemon": "2.0.15",
+    "ts-node": "10.5.0",
+    "tsconfig-paths": "3.12.0"
+  }
+}

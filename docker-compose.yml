@@ -83,6 +83,13 @@ services:
       - api
       - redis
 
+  webshot:
+    build:
+      context: ./webshot
+      dockerfile: Dockerfile
+    container_name: marxan-webshot
+    command: start
+
   postgresql-api:
     build:
       context: ./postgresql
