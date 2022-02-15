@@ -7,6 +7,8 @@ import {
   importPiecenQueueEventsProvider,
   importPieceQueueProvider,
 } from './import-queue.provider';
+import { ImportRequestedSaga } from './import-requested-saga';
+import { MarkImportAsSubmittedHandler } from './mark-import-as-submitted.handler';
 import { PieceImportRequestedSaga } from './piece-import-requested.saga';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
 
@@ -15,6 +17,8 @@ import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
   providers: [
     PieceImportRequestedSaga,
     SchedulePieceImportHandler,
+    ImportRequestedSaga,
+    MarkImportAsSubmittedHandler,
     importPieceQueueProvider,
     importPiecenQueueEventsProvider,
     importPieceEventsFactoryProvider,
