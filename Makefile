@@ -1,21 +1,25 @@
 .PHONY: start
 
 # Read values as needed from .env
+#
+# Optionally pass 'environment=<something>' to load env vars from '.env.something' instead
+# Useful to separate i.e. dev from testing databases
+#
 # If using the same variables in recipes that need to use a dotenv file other
 # than .env, remember to check that no values from .env are being used
 # inadvertently.
-ENVFILE := $(if $(environment), .env-test-e2e, .env)
+ENVFILE := $(if $(environment),.env.$(environment),.env)
 ifneq (,$(wildcard $(ENVFILE)))
     include $(ENVFILE)
+    DOCKER_COMPOSE_FILE := --env-file $(ENVFILE)
     export
 endif
 
-CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
-API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
-GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
-REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
+API_DB_INSTANCE := $(if $(filter $(IS_DOCKER_E2E_TESTS_RUNTIME), true), test-e2e-postgresql-api, postgresql-api)
+GEO_DB_INSTANCE := $(if $(filter $(IS_DOCKER_E2E_TESTS_RUNTIME), true), test-e2e-postgresql-geo-api, postgresql-geo-api)
+REDIS_INSTANCE := $(if $(filter $(IS_DOCKER_E2E_TESTS_RUNTIME), true), test-e2e-redis, redis)
 
-DOCKER_COMPOSE_FILE := $(if $(environment), -f docker-compose-test-e2e.yml $(CIENV), -f docker-compose.yml )
+DOCKER_COMPOSE_FILE := $(DOCKER_COMPOSE_FILE) $(if $(filter $(IS_DOCKER_E2E_TESTS_RUNTIME), true), -f docker-compose-test-e2e.yml, -f docker-compose.yml )
 DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data && \
@@ -29,7 +33,6 @@ NC :=\033[0m # No Color
 test-commands:
 	@echo $(ENVFILE)
 	@echo $(DOCKER_COMPOSE_FILE)
-	@echo $(CIENV)
 	@echo $(API_POSTGRES_DB)
 	@echo $(GEO_POSTGRES_USER)
 
@@ -103,7 +106,7 @@ seed-geoapi-init-data:
 		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
 		done;
 
-# need notebook service to execute a expecific notebook. this requires a full geodb
+# need notebook service to execute a specific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml exec marxan-science-notebooks papermill --progress-bar --log-output work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
 	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/apps/api/test/fixtures/test-wdpa-data.sql
@@ -124,8 +127,7 @@ test-start-services: clean-slate
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh run-migrations-for-e2e-tests && \
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh run-migrations-for-e2e-tests
 
-seed-dbs-e2e: test-start-services
-	$(MAKE) seed-api-with-test-data
+seed-dbs-e2e: test-start-services seed-api-with-test-data
 
 test-e2e-api: seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh test-e2e
@@ -134,13 +136,7 @@ test-e2e-geoprocessing: seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
 
 test-e2e-backend: test-e2e-api test-e2e-geoprocessing
-	$(MAKE) test-clean-slate
-
-run-test-e2e-local:
-	$(MAKE) --keep-going test-e2e-backend environment=local
-
-run-test-e2e-ci:
-	$(MAKE) --keep-going test-e2e-backend environment=ci
+	$(MAKE) test-clean-slate $(ARGS)
 
 setup-test-unit-backend:
 	# build API and geoprocessing containers
@@ -157,7 +153,7 @@ test-unit-geo:
 test-unit-backend: setup-test-unit-backend test-unit-api test-unit-geo
 
 run-test-unit:
-	$(MAKE) --keep-going test-unit-backend
+	$(MAKE) --keep-going test-unit-backend $(ARGS)
 
 dump-geodb-data:
 	docker-compose exec -T postgresql-geo-api pg_dump -T migrations -a -U "${GEO_POSTGRES_USER}" -F t ${GEO_POSTGRES_DB} | gzip > data/data/processed/db_dumps/geo_db-$$(date +%Y-%m-%d).tar.gz
@@ -236,4 +232,5 @@ native-seed-geoapi-init-data:
 		done;
 
 native-seed-api-with-test-data: native-db-migrate native-seed-api-init-data | native-seed-geoapi-init-data
+	@echo "seeding db with testing project and scenarios"
 	psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}" ${API_POSTGRES_DB} < api/apps/api/test/fixtures/test-data.sql

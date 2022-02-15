@@ -17,7 +17,6 @@
     "concurrency": 50
   },
   "postgresApi": {
-    "url": null,
     "port": 5432,
     "host": null,
     "username": null,
@@ -27,7 +26,6 @@
     "logging": "error"
   },
   "postgresGeoApi": {
-    "url": null,
     "port": 5432,
     "host": null,
     "username": null,
