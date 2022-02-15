@@ -9,8 +9,8 @@ import { format } from 'd3';
 
 import { useScenarioCalibrationResults } from 'hooks/scenarios';
 
-import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/blm-chart';
-import BlmImageModal from 'layout/scenarios/edit/parameters/blm-calibration/blm-image-modal';
+import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
+import BlmImageModal from 'layout/scenarios/edit/parameters/blm-calibration/image-modal';
 
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
@@ -22,15 +22,15 @@ import Loading from 'components/loading';
 
 import ZOOM_SVG from 'svgs/ui/zoom.svg?sprite';
 
-export interface ScenariosBlmSettingsGraphProps {
+export interface ScenariosBlmSettingsChartProps {
   maxBlmValue: number,
   minBlmValue: number,
 }
 
-export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps> = ({
+export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps> = ({
   maxBlmValue,
   minBlmValue,
-}: ScenariosBlmSettingsGraphProps) => {
+}: ScenariosBlmSettingsChartProps) => {
   const [zoomImage, setZoomImage] = useState(false);
 
   const { query } = useRouter();
@@ -46,7 +46,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      blmCalibration: blm?.toFixed(2),
+      blmCalibration: blm < 10 ? blm?.toFixed(2) : blm.toFixed(),
     };
   }, [blm]);
 
@@ -120,7 +120,7 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
                         validate={composeValidators([{ presence: true }])}
                       >
                         {(fprops) => (
-                          <Field id="blmCalibration" {...fprops}>
+                          <Field className="w-44" id="blmCalibration" {...fprops}>
                             <Input
                               mode="dashed"
                               theme="dark"
@@ -175,4 +175,4 @@ export const ScenariosBlmSettingsGraph: React.FC<ScenariosBlmSettingsGraphProps>
   );
 };
 
-export default ScenariosBlmSettingsGraph;
+export default ScenariosBlmSettingsChart;

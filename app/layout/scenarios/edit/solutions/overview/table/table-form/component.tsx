@@ -23,7 +23,7 @@ import LoadingMore from 'components/loading-more/component';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
-import SolutionsTable from '../table';
+import SolutionsTable from '..';
 
 import { SolutionsTableFormProps } from './types';
 

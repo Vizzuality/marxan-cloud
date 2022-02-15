@@ -1,4 +1,4 @@
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 export const TABS = [
   {
@@ -18,7 +18,7 @@ export const TABS = [
   },
   {
     id: ScenarioSidebarTabs.SOLUTIONS,
-    subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
+    subtab: null,
     name: 'Solutions',
   },
 ];

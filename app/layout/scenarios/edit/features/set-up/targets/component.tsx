@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -30,6 +30,7 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   const { setSubTab } = scenarioSlice.actions;
 
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
@@ -37,10 +38,6 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
-
-  useEffect(() => {
-    // setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_TARGET ? 1 : 0);
-  }, []);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
 

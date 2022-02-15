@@ -293,6 +293,8 @@ export const useScenarioActionsDone = () => {
           scenarioEditingMetadata: {
             ...scenarioData?.metadata?.scenarioEditingMetadata,
             lastJobCheck: new Date().getTime(),
+            tab: ScenarioSidebarTabs.SOLUTIONS,
+            subtab: null,
             status: {
               'protected-areas': 'draft',
               features: 'draft',

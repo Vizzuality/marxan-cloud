@@ -18,7 +18,7 @@ export enum ScenarioSidebarSubTabs {
   BLM_CALIBRATION = 'pa-blm-calibration',
   ADVANCED_SETTINGS = 'pa-advanced-settings',
 
-  SOLUTIONS_PREVIEW = 'solutions-preview',
-  SOLUTIONS_DETAILS = 'solutions-details',
-  SOLUTIONS_GAP_ANALYSIS = 'solutions-gap-analysis',
+  SOLUTIONS_OVERVIEW = 'so-solutions-overview',
+  SCHEDULE_SCENARIO = 'so-schedule-scenario',
+  POST_GAP_ANALYSIS = 'so-post-gap-analysis',
 }
