@@ -1,19 +1,20 @@
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import {
+  ClonePiece,
+  ComponentId,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
-import { v4 } from 'uuid';
-import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { ApiEventsService } from '../../../api-events';
-import {
-  ComponentId,
-  ExportId,
-} from '../../export/application/complete-piece.command';
+import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
+import { ExportId } from '../../export/domain';
 import { exportPieceQueueToken } from './export-queue.provider';
 import { SchedulePieceExport } from './schedule-piece-export.command';
 import { SchedulePieceExportHandler } from './schedule-piece-export.handler';
-import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
-import { API_EVENT_KINDS } from '@marxan/api-events';
-import { Logger } from '@nestjs/common';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

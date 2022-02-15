@@ -1,19 +1,19 @@
-import {
-  ClonePiece,
-  ComponentId,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Connection } from 'typeorm';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
-import { ComponentLocation } from '@marxan-api/modules/clone/export/application/complete-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import {
   Export,
   ExportComponent,
   ExportId,
 } from '@marxan-api/modules/clone/export/domain';
+import {
+  ClonePiece,
+  ComponentId,
+  ComponentLocation,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { Connection } from 'typeorm';
 import { bootstrapApplication } from '../utils/api-application';
 
 describe('Typeorm export repository', () => {

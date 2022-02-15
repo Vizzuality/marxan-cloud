@@ -1,3 +1,4 @@
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 import {
   ClonePiece,
   ComponentId,
@@ -9,7 +10,6 @@ import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
 import {
   Export,
@@ -17,8 +17,8 @@ import {
   ExportComponentFinished,
   ExportId,
 } from '../domain';
-import { CompletePiece } from './complete-piece.command';
-import { CompletePieceHandler } from './complete-piece.handler';
+import { CompleteExportPiece } from './complete-export-piece.command';
+import { CompleteExportPieceHandler } from './complete-export-piece.handler';
 import { ExportPieceFailed } from './export-piece-failed.event';
 import { ExportRepository } from './export-repository.port';
 
@@ -86,14 +86,14 @@ const getFixtures = async () => {
         provide: Logger,
         useClass: FakeLogger,
       },
-      CompletePieceHandler,
+      CompleteExportPieceHandler,
     ],
   }).compile();
   await sandbox.init();
 
   const events: IEvent[] = [];
 
-  const sut = sandbox.get(CompletePieceHandler);
+  const sut = sandbox.get(CompleteExportPieceHandler);
   const repo: InMemoryExportRepo = sandbox.get(ExportRepository);
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
@@ -141,7 +141,9 @@ const getFixtures = async () => {
         new ComponentLocation(`${v4()}.json`, 'relative-path.json'),
       ];
 
-      await sut.execute(new CompletePiece(exportId, componentId, location));
+      await sut.execute(
+        new CompleteExportPiece(exportId, componentId, location),
+      );
     },
     WhenTryingToCompleteAnUnexistingPiece: async (exportId: ExportId) => {
       const exportInstance = await repo.find(exportId);
@@ -153,10 +155,12 @@ const getFixtures = async () => {
         .exportPieces.find((piece) => piece.id === componentId.value);
       expect(piece).toBeUndefined();
 
-      await sut.execute(new CompletePiece(exportId, componentId, []));
+      await sut.execute(new CompleteExportPiece(exportId, componentId, []));
     },
     WhenAPieceOfAnUnexistingExportIsCompleted: async (exportId: ExportId) => {
-      await sut.execute(new CompletePiece(exportId, ComponentId.create(), []));
+      await sut.execute(
+        new CompleteExportPiece(exportId, ComponentId.create(), []),
+      );
     },
     ThenComponentIsFinished: async (
       exportId: ExportId,

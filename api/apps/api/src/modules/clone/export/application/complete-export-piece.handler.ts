@@ -1,41 +1,40 @@
+import { ExportPieceFailed } from '@marxan-api/modules/clone/export/application/export-piece-failed.event';
+import { Logger } from '@nestjs/common';
 import {
   CommandHandler,
   EventBus,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { Logger } from '@nestjs/common';
-
-import { CompletePiece } from './complete-piece.command';
-import { ExportRepository } from './export-repository.port';
 import { isLeft } from 'fp-ts/Either';
-import { ExportPieceFailed } from '@marxan-api/modules/clone/export/application/export-piece-failed.event';
 import { Export } from '../domain';
+import { CompleteExportPiece } from './complete-export-piece.command';
+import { ExportRepository } from './export-repository.port';
 
-@CommandHandler(CompletePiece)
-export class CompletePieceHandler
-  implements IInferredCommandHandler<CompletePiece> {
+@CommandHandler(CompleteExportPiece)
+export class CompleteExportPieceHandler
+  implements IInferredCommandHandler<CompleteExportPiece> {
   constructor(
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly eventBus: EventBus,
     private readonly logger: Logger,
   ) {
-    this.logger.setContext(CompletePieceHandler.name);
+    this.logger.setContext(CompleteExportPieceHandler.name);
   }
 
   async execute({
     exportId,
     componentLocation,
     componentId,
-  }: CompletePiece): Promise<void> {
+  }: CompleteExportPiece): Promise<void> {
     let exportInstance: Export | undefined;
     await this.exportRepository
       .transaction(async (repo) => {
         exportInstance = await repo.find(exportId);
 
         if (!exportInstance) {
-          const errorMessage = `${CompletePieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`;
+          const errorMessage = `${CompleteExportPieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`;
           this.logger.error(errorMessage);
           throw new Error(errorMessage);
         }
