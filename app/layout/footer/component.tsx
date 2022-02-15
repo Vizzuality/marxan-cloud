@@ -39,14 +39,12 @@ export const Footer: React.FC<FooterProps> = () => {
 
       <div className="py-24 bg-gray-700">
         <Wrapper>
-
           <div className="flex justify-between w-full max-w-5xl pb-16 mx-auto space-x-36">
             <div className="space-y-12">
               <h3 className="text-2xl font-heading">
                 Reach out with comments
                 or suggestions.
               </h3>
-
               <Button
                 href="mailto:marxancloud@gmail.com"
                 size="lg"
@@ -57,7 +55,6 @@ export const Footer: React.FC<FooterProps> = () => {
               >
                 Contact Us
               </Button>
-
             </div>
 
             <div className="space-y-12">
@@ -74,6 +71,7 @@ export const Footer: React.FC<FooterProps> = () => {
               </Button>
             </div>
           </div>
+
           <div className="w-full h-px max-w-5xl mx-auto opacity-20" style={{ background: 'linear-gradient(to right, transparent, #ffffff, transparent)' }} />
 
           <div className="flex justify-between w-full max-w-5xl pt-12 mx-auto">

@@ -4,14 +4,14 @@ import Flicking, { ERROR_CODE, FlickingError } from '@egjs/react-flicking';
 import cx from 'classnames';
 
 export interface CarouselProps {
-  images: {
+  slides: {
     id: string | number;
     alt: string;
     src: string
   }[];
 }
 
-export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => {
+export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => {
   const slider = useRef(null);
   const timer = useRef(null);
   const [slide, setSlide] = useState(0);
@@ -76,7 +76,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
             setSlide(index);
           }}
         >
-          {images.map((img) => {
+          {slides.map((img) => {
             return (
               <div
                 key={img.id}
@@ -102,7 +102,7 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
       </div>
 
       <div className="flex flex-row items-center justify-center space-x-1 mt-14">
-        {images.map((img, i) => {
+        {slides.map((img, i) => {
           return (
             <button
               key={img.id}
@@ -113,8 +113,8 @@ export const Carousel: React.FC<CarouselProps> = ({ images }: CarouselProps) => 
               }}
               className={cx({
                 'relative w-20': true,
-                'bg-blue-500 h-0.5': slide === i,
-                'bg-gray-300 h-px': slide !== i,
+                'bg-blue-500 h-1': slide === i,
+                'bg-gray-300 h-0.5': slide !== i,
               })}
             >
               <div

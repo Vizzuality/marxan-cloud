@@ -18,7 +18,7 @@ const Template: Story<CarouselProps> = ({ ...args }: CarouselProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  images: [
+  slides: [
     {
       id: 1,
       alt: 'carousel',
