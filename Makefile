@@ -38,7 +38,7 @@ test-commands:
 # Useful when developing on API components only, to avoid spinning up services
 # which may not be needed.
 start-api:
-	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
+	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing webshot
 
 # Start all the services.
 start:
