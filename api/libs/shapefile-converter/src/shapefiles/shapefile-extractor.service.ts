@@ -93,7 +93,7 @@ export class ShapefileExtractorService {
     shapeFile: UnpackedShapefile,
   ): Promise<boolean> {
     const filesInPath = await readdir(shapeFile.path);
-    const extensions = filesInPath.map((file) => path.extname(file));
+    const extensions = filesInPath.map((file) => path.extname(file)).map(ext => ext.toLowerCase());
     return this.minRequiredFiles.every((ext: string) =>
       extensions.includes(ext),
     );

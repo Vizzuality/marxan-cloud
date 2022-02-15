@@ -47,7 +47,7 @@ export class ShapefileService {
 
   async areRequiredShapefileFilesInFolder(filePath: string): Promise<boolean> {
     const filesInPath = await readdir(filePath);
-    const extensions = filesInPath.map((file) => path.extname(file));
+    const extensions = filesInPath.map((file) => path.extname(file)).map(ext => ext.toLocaleLowerCase());
     return this.minRequiredFiles.every((ext: string) =>
       extensions.includes(ext),
     );
