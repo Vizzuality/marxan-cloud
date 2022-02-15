@@ -71,6 +71,9 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
+  const resourceId = ResourceId.create();
+  const projectId = ResourceId.create();
+
   const events: IEvent[] = [];
   sandbox.get(EventBus).subscribe((event) => events.push(event));
 
@@ -88,13 +91,13 @@ const getFixtures = async () => {
           Import.fromSnapshot({
             id: ImportId.create().value,
             archiveLocation: 'whatever',
-            resourceId: `resource-id`,
+            resourceId: resourceId.value,
             resourceKind: ResourceKind.Project,
             importPieces: [
               {
                 finished: false,
                 order: 0,
-                resourceId: `project-id`,
+                resourceId: projectId.value,
                 id: `import component unique id`,
                 piece: ClonePiece.ProjectMetadata,
                 uris: [
@@ -107,7 +110,7 @@ const getFixtures = async () => {
               {
                 finished: false,
                 order: 1,
-                resourceId: `project-id`,
+                resourceId: projectId.value,
                 id: `some other piece`,
                 piece: ClonePiece.PlanningAreaGAdm,
                 uris: [
@@ -128,13 +131,13 @@ const getFixtures = async () => {
           Import.fromSnapshot({
             id: ImportId.create().value,
             archiveLocation: 'whatever',
-            resourceId: `resource-id`,
+            resourceId: resourceId.value,
             resourceKind: ResourceKind.Project,
             importPieces: [
               {
                 finished: false,
                 order: 2,
-                resourceId: `project-id`,
+                resourceId: projectId.value,
                 id: `import component unique id`,
                 piece: ClonePiece.ProjectMetadata,
                 uris: [
@@ -147,7 +150,7 @@ const getFixtures = async () => {
               {
                 finished: false,
                 order: 2,
-                resourceId: `project-id`,
+                resourceId: projectId.value,
                 id: `some other piece`,
                 piece: ClonePiece.PlanningAreaGAdm,
                 uris: [
@@ -183,7 +186,7 @@ const getFixtures = async () => {
       ).toEqual([
         {
           id: expect.any(ImportId),
-          resourceId: new ResourceId(`resource-id`),
+          resourceId,
           resourceKind: `project`,
         },
       ]);
@@ -194,7 +197,7 @@ const getFixtures = async () => {
       ).toMatchObject([
         {
           id: new ComponentId(`import component unique id`),
-          resourceId: new ResourceId(`project-id`),
+          resourceId: projectId,
           piece: `project-metadata`,
           uris: [
             {
@@ -211,7 +214,7 @@ const getFixtures = async () => {
       ).toMatchObject([
         {
           id: new ComponentId(`import component unique id`),
-          resourceId: new ResourceId(`project-id`),
+          resourceId: projectId,
           piece: `project-metadata`,
           uris: [
             {
@@ -222,7 +225,7 @@ const getFixtures = async () => {
         },
         {
           id: new ComponentId(`some other piece`),
-          resourceId: new ResourceId(`project-id`),
+          resourceId: projectId,
           piece: `planning-area-gadm`,
           uris: [
             {

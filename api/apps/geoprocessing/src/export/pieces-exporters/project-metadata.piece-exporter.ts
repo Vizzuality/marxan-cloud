@@ -1,17 +1,16 @@
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
-
-import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { FileRepository } from '@marxan/files-repository';
-
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-
+import { Readable } from 'stream';
+import { EntityManager } from 'typeorm';
 import {
-  PieceExportProvider,
   ExportPieceProcessor,
+  PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
 @Injectable()
@@ -28,29 +27,27 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const projectData: Array<{
+    const [projectData]: {
       name: string;
       description: string;
-    }> = await this.entityManager.query(
-      `
-    SELECT projects.name, projects.description FROM projects WHERE projects.id = $1
-    `,
+    }[] = await this.entityManager.query(
+      `SELECT projects.name, projects.description FROM projects WHERE projects.id = $1`,
       [input.resourceId],
     );
 
-    if (projectData.length !== 1) {
+    if (!projectData) {
       throw new Error(
         `${ProjectMetadataPieceExporter.name} - Project ${input.resourceId} does not exist.`,
       );
     }
 
-    const metadata = JSON.stringify({
-      name: projectData[0].name,
-      description: projectData[0].description ?? null,
-    });
+    const fileContent: ProjectMetadataContent = {
+      name: projectData.name,
+      description: projectData.description,
+    };
 
     const outputFile = await this.fileRepository.save(
-      Readable.from(metadata),
+      Readable.from(JSON.stringify(fileContent)),
       `json`,
     );
 
@@ -65,7 +62,8 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: `project-metadata.json`,
+          relativePath:
+            ClonePieceRelativePaths[ClonePiece.ProjectMetadata].projectMetadata,
         },
       ],
     };

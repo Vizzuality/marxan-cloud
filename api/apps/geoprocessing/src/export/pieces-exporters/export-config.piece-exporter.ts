@@ -1,25 +1,25 @@
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
+import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
-
-import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { FileRepository } from '@marxan/files-repository';
-
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-
+import { Readable } from 'stream';
+import { EntityManager } from 'typeorm';
 import {
-  PieceExportProvider,
   ExportPieceProcessor,
+  PieceExportProvider,
 } from '../pieces/export-piece-processor';
-import { ResourceKind } from '@marxan/cloning/domain';
+import {
+  ProjectExportConfigContent,
+  ScenarioExportConfigContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 
 @Injectable()
 @PieceExportProvider()
 export class ExportConfigPieceExporter implements ExportPieceProcessor {
-  private readonly relativePath = 'config.json';
-
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
@@ -29,22 +29,38 @@ export class ExportConfigPieceExporter implements ExportPieceProcessor {
   private async projectExportConfig(
     input: ExportJobInput,
   ): Promise<ExportJobOutput> {
-    const scenarios: { name: string }[] = await this.entityManager.query(
-      `
-       SELECT name FROM scenarios where project_id = $1
-    `,
+    const [project]: {
+      name: string;
+      description: string;
+    }[] = await this.entityManager.query(
+      `SELECT name, description FROM projects where id = $1`,
       [input.resourceId],
     );
 
-    const metadata = JSON.stringify({
+    if (!project) {
+      throw new Error(`Project with ID ${input.resourceId} not found`);
+    }
+
+    const scenarios: {
+      name: string;
+      id: string;
+    }[] = await this.entityManager.query(
+      `SELECT id, name FROM scenarios where project_id = $1`,
+      [input.resourceId],
+    );
+
+    const fileContent: ProjectExportConfigContent = {
       version: `0.1.0`,
-      scenarios: scenarios.map(({ name }) => name),
-      kind: input.resourceKind,
+      scenarios,
+      name: project.name,
+      description: project.description,
+      resourceKind: input.resourceKind,
+      resourceId: input.resourceId,
       pieces: input.allPieces,
-    });
+    };
 
     const outputFile = await this.fileRepository.save(
-      Readable.from(metadata),
+      Readable.from(JSON.stringify(fileContent)),
       `json`,
     );
 
@@ -59,7 +75,7 @@ export class ExportConfigPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: this.relativePath,
+          relativePath: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
         },
       ],
     };
@@ -83,17 +99,18 @@ export class ExportConfigPieceExporter implements ExportPieceProcessor {
       throw new Error(`Scenario with ID ${input.resourceId} not found`);
     }
 
-    const metadata = JSON.stringify({
+    const fileContent: ScenarioExportConfigContent = {
       version: `0.1.0`,
       name: scenario.name,
       description: scenario.description,
       projectId: scenario.project_id,
-      kind: input.resourceKind,
+      resourceKind: input.resourceKind,
+      resourceId: input.resourceId,
       pieces: input.allPieces,
-    });
+    };
 
     const outputFile = await this.fileRepository.save(
-      Readable.from(metadata),
+      Readable.from(JSON.stringify(fileContent)),
       `json`,
     );
 
@@ -108,7 +125,7 @@ export class ExportConfigPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath: this.relativePath,
+          relativePath: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
         },
       ],
     };

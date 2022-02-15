@@ -14,7 +14,7 @@ import {
 } from '../domain';
 
 import { ExportProjectHandler } from './export-project.handler';
-import { ResourcePieces } from './resource-pieces.port';
+import { ExportResourcePieces } from './export-resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
 import { ExportProject } from './export-project.command';
 import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
@@ -38,7 +38,7 @@ const getFixtures = async () => {
     imports: [CqrsModule],
     providers: [
       {
-        provide: ResourcePieces,
+        provide: ExportResourcePieces,
         useClass: FakePiecesProvider,
       },
       {
@@ -54,7 +54,7 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ExportProjectHandler);
   const repo: InMemoryExportRepo = sandbox.get(ExportRepository);
-  const piecesResolver: FakePiecesProvider = sandbox.get(ResourcePieces);
+  const piecesResolver: FakePiecesProvider = sandbox.get(ExportResourcePieces);
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
   });
@@ -136,8 +136,10 @@ const getFixtures = async () => {
 };
 
 @Injectable()
-class FakePiecesProvider implements ResourcePieces {
-  resolveMock: jest.MockedFunction<ResourcePieces['resolveFor']> = jest.fn();
+class FakePiecesProvider implements ExportResourcePieces {
+  resolveMock: jest.MockedFunction<
+    ExportResourcePieces['resolveFor']
+  > = jest.fn();
 
   async resolveFor(
     id: ResourceId,

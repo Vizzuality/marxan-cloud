@@ -1,20 +1,18 @@
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
-import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/Either';
-
-import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { FileRepository } from '@marxan/files-repository';
-
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-
-import {
-  PieceExportProvider,
-  ExportPieceProcessor,
-} from '../pieces/export-piece-processor';
-import { ResourceKind } from '@marxan/cloning/domain';
 import { GeoJSON } from 'geojson';
+import { Readable } from 'stream';
+import { EntityManager } from 'typeorm';
+import {
+  ExportPieceProcessor,
+  PieceExportProvider,
+} from '../pieces/export-piece-processor';
 
 @Injectable()
 @PieceExportProvider()
@@ -35,13 +33,14 @@ export class PlanningAreaCustomGridPieceExporter
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const customProjectAreaFile = 'project-grid/custom-grid.geojson';
+    const relativePaths =
+      ClonePieceRelativePaths[ClonePiece.PlanningAreaGridCustom];
 
     const metadata = JSON.stringify({
       shape: 'square',
       areaKm2: 4000,
       bbox: [],
-      file: customProjectAreaFile,
+      file: relativePaths.customGridGeoJson,
     });
 
     const geoJson: GeoJSON = {
@@ -76,11 +75,11 @@ export class PlanningAreaCustomGridPieceExporter
       uris: [
         {
           uri: outputFile.right,
-          relativePath: `project-grid.json`,
+          relativePath: relativePaths.projectGrid,
         },
         {
           uri: planningAreaGeoJson.right,
-          relativePath: customProjectAreaFile,
+          relativePath: relativePaths.customGridGeoJson,
         },
       ],
     };

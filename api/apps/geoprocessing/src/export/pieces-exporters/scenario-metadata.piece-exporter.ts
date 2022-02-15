@@ -1,6 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -8,8 +9,8 @@ import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import {
-  PieceExportProvider,
   ExportPieceProcessor,
+  PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
 @Injectable()
@@ -26,27 +27,31 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const scenarioData: Array<{
-      name: string;
-    }> = await this.entityManager.query(
+    const [scenario]: [
+      {
+        name: string;
+        description?: string;
+      },
+    ] = await this.entityManager.query(
       `
-        SELECT scenarios.name FROM scenarios WHERE scenarios.id = $1
+        SELECT name, description FROM scenarios WHERE scenarios.id = $1
       `,
       [input.resourceId],
     );
 
-    if (scenarioData.length !== 1) {
+    if (!scenario) {
       throw new Error(
         `${ScenarioMetadataPieceExporter.name} - Scenario ${input.resourceId} does not exist.`,
       );
     }
 
-    const metadata = JSON.stringify({
-      name: scenarioData[0].name,
-    });
+    const fileContent: ScenarioMetadataContent = {
+      description: scenario.description,
+      name: scenario.name,
+    };
 
     const outputFile = await this.fileRepository.save(
-      Readable.from(metadata),
+      Readable.from(JSON.stringify(fileContent)),
       `json`,
     );
 
@@ -61,10 +66,12 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       uris: [
         {
           uri: outputFile.right,
-          relativePath:
-            input.resourceKind === ResourceKind.Scenario
-              ? `scenario-metadata.json`
-              : `scenarios/${input.resourceId}/scenario-metadata.json`,
+          relativePath: ClonePieceRelativePaths[
+            ClonePiece.ScenarioMetadata
+          ].getScenarioMetadataRelativePath(
+            input.resourceKind,
+            input.resourceId,
+          ),
         },
       ],
     };
