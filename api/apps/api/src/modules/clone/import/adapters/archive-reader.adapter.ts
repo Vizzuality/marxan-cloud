@@ -17,11 +17,15 @@ import {
   Failure,
   invalidFiles,
 } from '../application/archive-reader.port';
+import { ImportResourcePieces } from '../application/import-resource-pieces.port';
 import { Import } from '../domain';
 
 @Injectable()
 export class ArchiveReaderAdapter implements ArchiveReader {
-  constructor(private readonly fileRepository: FileRepository) {}
+  constructor(
+    private readonly fileRepository: FileRepository,
+    private readonly importResourcePieces: ImportResourcePieces,
+  ) {}
 
   private parseExportConfigFile(
     readable: Readable,
@@ -61,6 +65,12 @@ export class ArchiveReaderAdapter implements ArchiveReader {
     const resourceId = new ResourceId(exportConfig.resourceId);
     const resourceKind = exportConfig.resourceKind;
 
-    return right(Import.newOne(resourceId, resourceKind, location, []));
+    const pieces = await this.importResourcePieces.resolveFor(
+      resourceId,
+      resourceKind,
+      location,
+    );
+
+    return right(Import.newOne(resourceId, resourceKind, location, pieces));
   }
 }

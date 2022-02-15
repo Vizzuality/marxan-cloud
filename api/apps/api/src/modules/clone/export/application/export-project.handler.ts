@@ -8,14 +8,14 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { Export, ExportId } from '../domain';
 
 import { ExportProject } from './export-project.command';
-import { ResourcePieces } from './resource-pieces.port';
+import { ExportResourcePieces } from './export-resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
 
 @CommandHandler(ExportProject)
 export class ExportProjectHandler
   implements IInferredCommandHandler<ExportProject> {
   constructor(
-    private readonly resourcePieces: ResourcePieces,
+    private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
   ) {}

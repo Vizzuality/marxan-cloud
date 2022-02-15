@@ -1,31 +1,39 @@
-import { Controller, Post } from '@nestjs/common';
-import { EventBus } from '@nestjs/cqrs';
 import {
-  ComponentId,
-  ClonePiece,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+  BadRequestException,
+  Controller,
+  InternalServerErrorException,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Repository } from 'typeorm';
+import { ArchiveLocation } from '../../../../../../../libs/cloning/src/domain';
 import { apiGlobalPrefixes } from '../../../../api.config';
-import { ImportId, PieceImportRequested } from '../domain';
+import { ExportEntity } from '../../export/adapters/entities/exports.api.entity';
+import { ImportArchive } from './import-archive';
 
-const basePath = `${apiGlobalPrefixes.v1}/foo`;
-
-@Controller(basePath)
+@Controller(`${apiGlobalPrefixes.v1}/foo`)
 export class FooController {
-  constructor(private eventBus: EventBus) {}
+  constructor(
+    private importArchive: ImportArchive,
+    @InjectRepository(ExportEntity)
+    private exportRepo: Repository<ExportEntity>,
+  ) {}
 
-  @Post()
-  async create(): Promise<void> {
-    this.eventBus.publish(
-      new PieceImportRequested(
-        ImportId.create(),
-        ComponentId.create(),
-        ClonePiece.ProjectMetadata,
-        ResourceId.create(),
-        ResourceKind.Project,
-        [],
-      ),
+  @Post('import/:exportId')
+  async startImport(
+    @Param('exportId', ParseUUIDPipe) exportId: string,
+  ): Promise<void> {
+    const exportInstance = await this.exportRepo.findOneOrFail(exportId);
+
+    if (!exportInstance.archiveLocation) throw new BadRequestException();
+
+    const result = await this.importArchive.import(
+      new ArchiveLocation(exportInstance.archiveLocation),
     );
+
+    if (isLeft(result)) throw new InternalServerErrorException();
   }
 }
