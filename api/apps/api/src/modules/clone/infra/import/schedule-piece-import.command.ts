@@ -1,3 +1,4 @@
+import { Command } from '@nestjs-architects/typed-cqrs';
 import {
   ClonePiece,
   ComponentId,
@@ -5,16 +6,17 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { IEvent } from '@nestjs/cqrs';
-import { ImportId } from '../import/import.id';
+import { ImportId } from '@marxan-api/modules/clone/import/domain';
 
-export class PieceImportRequested implements IEvent {
+export class SchedulePieceImport extends Command<void> {
   constructor(
     public readonly importId: ImportId,
-    public readonly id: ComponentId,
-    public readonly piece: ClonePiece,
+    public readonly componentId: ComponentId,
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,
+    public readonly piece: ClonePiece,
     public readonly uris: ComponentLocation[],
-  ) {}
+  ) {
+    super();
+  }
 }

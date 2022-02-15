@@ -91,13 +91,15 @@ export class Import extends AggregateRoot {
       (piece) => piece.order === pieceToComplete.order + 1,
     );
 
-    for (const nextPiece of nextBatch) {
+    for (const component of nextBatch) {
       this.apply(
         new PieceImportRequested(
-          nextPiece.id,
-          nextPiece.piece,
-          nextPiece.resourceId,
-          nextPiece.uris,
+          this.id,
+          component.id,
+          component.piece,
+          component.resourceId,
+          this.resourceKind,
+          component.uris,
         ),
       );
     }
@@ -129,9 +131,11 @@ export class Import extends AggregateRoot {
     )) {
       this.apply(
         new PieceImportRequested(
+          this.id,
           component.id,
           component.piece,
           component.resourceId,
+          this.resourceKind,
           component.uris,
         ),
       );
