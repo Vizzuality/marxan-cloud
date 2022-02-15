@@ -19,14 +19,6 @@ import { importPieceQueueToken } from './import-queue.provider';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
 
-function getDifferentComponentId(previous: ComponentId): ComponentId {
-  let newId = ComponentId.create();
-  while (previous.value === newId.value) {
-    newId = ComponentId.create();
-  }
-  return newId;
-}
-
 let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
@@ -58,10 +50,9 @@ it('should emit an ImportPieceFailed event if the import instance cannot be retr
 });
 
 it('should emit an ImportPieceFailed event if the import component is not found in import pieces', async () => {
-  const [importId, componentId] = await fixtures.GivenImportIsCreated();
-  const anotherComponentId = getDifferentComponentId(componentId);
+  const [importId] = await fixtures.GivenImportIsCreated();
 
-  fixtures.GivenSchedulePieceImportCommand(importId, anotherComponentId);
+  fixtures.GivenSchedulePieceImportCommand(importId, ComponentId.create());
 
   await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
     addMockResolvedValue: 'job',
