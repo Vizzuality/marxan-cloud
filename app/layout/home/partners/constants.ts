@@ -44,11 +44,8 @@ export const PARTNER_LOGOS = [
         src: UNIVERSITY_QUEENSLAND_LOGO,
       },
     ],
-  }, {
-    // SEPARATOR
-    id: 'separator',
-    separator: true,
-  }, {
+  },
+  {
     // INITIATIVE LOGOS
     id: 'initiative',
     title: 'Supported by an initiative of the:',

@@ -1,10 +1,8 @@
 import React from 'react';
 
-import Wrapper from 'layout/wrapper';
-
 import Carousel from 'components/carousel';
 
-// import { PARTNER_LOGOS } from './constants';
+import { PARTNER_LOGOS } from './constants';
 
 export interface PartnersListProps {
 
@@ -12,31 +10,36 @@ export interface PartnersListProps {
 
 export const PartnersList: React.FC<PartnersListProps> = () => {
   return (
-    <div className="pt-24 pb-6 bg-white">
+    <div className="pt-24 pb-6 bg-primary-50">
 
       <div className="max-w-5xl mx-auto">
-        <Wrapper>
-          <Carousel
-            slides={[
-              {
-                id: 1,
-                content: 'https://dummyimage.com/866x565/000/fff.png&text=01',
-              },
-              {
-                id: 2,
-                content: 'https://dummyimage.com/866x565/000/fff.png&text=02',
-              },
-              {
-                id: 3,
-                content: 'https://dummyimage.com/866x565/000/fff.png&text=03',
-              },
-              {
-                id: 4,
-                content: 'https://dummyimage.com/866x565/000/fff.png&text=04',
-              },
-            ]}
-          />
-        </Wrapper>
+        <Carousel
+          slides={PARTNER_LOGOS.map((pl) => {
+            const { id, title, logos } = pl;
+            return {
+              id,
+              content: (
+                <>
+                  <p className="text-2xl text-black font-heading">
+                    {title}
+                  </p>
+                  <div className="grid w-full grid-cols-4 py-14 gap-x-20">
+                    {logos.map((logo) => {
+                      const {
+                        id: logoId, alt, hyperlink, src,
+                      } = logo;
+                      return (
+                        <a href={hyperlink} key={logoId} rel="noreferrer" target="_blank" className="place-self-center">
+                          <img className="max-h-12" alt={alt} src={src} height="auto" width="auto" />
+                        </a>
+                      );
+                    })}
+                  </div>
+                </>
+              ),
+            };
+          })}
+        />
       </div>
 
     </div>

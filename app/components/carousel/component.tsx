@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {
+  ReactElement, useEffect, useRef, useState,
+} from 'react';
 
 import Flicking, { ERROR_CODE, FlickingError } from '@egjs/react-flicking';
 import cx from 'classnames';
@@ -6,7 +8,7 @@ import cx from 'classnames';
 export interface CarouselProps {
   slides: {
     id: string | number;
-    content: string
+    content?: ReactElement;
   }[];
 }
 
@@ -47,10 +49,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
     >
       <div
         role="presentation"
-        className="overflow-hidden bg-black rounded-3xl"
-        style={{
-          boxShadow: '0px 50px 50px rgba(0, 0, 0, 0.5)',
-        }}
+        className="overflow-hidden"
         onMouseOver={() => {
           if (timer.current) clearInterval(timer.current);
           setPause(true);
