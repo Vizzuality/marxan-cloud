@@ -1,5 +1,5 @@
 export enum PlanningUnitGridShape {
   square = 'square',
   hexagon = 'hexagon',
-  fromShapefile = 'irregular',
+  fromShapefile = 'from_shapefile',
 }
