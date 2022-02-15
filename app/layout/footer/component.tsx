@@ -19,12 +19,15 @@ export const Footer: React.FC<FooterProps> = () => {
       <div className="bg-primary-500">
         <Wrapper>
           <div className="flex flex-col w-full max-w-5xl py-24 mx-auto space-y-18 font-heading">
-            <h2 className="text-6xl text-black" style={{ lineHeight: '90px' }}>
-              Want to know more
-              <br />
-              about Marxan?
-            </h2>
-            <div className="flex items-center space-x-8 text-2xl">
+            <div className="text-3xl text-black md:text-6xl">
+              <p>
+                Want to know more
+              </p>
+              <p>
+                about Marxan?
+              </p>
+            </div>
+            <div className="flex flex-col space-y-6 text-2xl md:space-y-0 md:space-x-8 md:items-center md:flex-row">
               <p className="text-black">Explore more:</p>
               <Link href="/community">
                 <a href="/community" className="text-gray-400 hover:text-black">Community</a>
@@ -39,7 +42,7 @@ export const Footer: React.FC<FooterProps> = () => {
 
       <div className="py-24 bg-gray-700">
         <Wrapper>
-          <div className="flex justify-between w-full max-w-5xl pb-16 mx-auto space-x-36">
+          <div className="justify-between w-full max-w-5xl pb-16 mx-auto space-y-24 md:flex md:space-y-0 md:space-x-36">
             <div className="space-y-12">
               <h3 className="text-2xl font-heading">
                 Reach out with comments
@@ -74,7 +77,7 @@ export const Footer: React.FC<FooterProps> = () => {
 
           <div className="w-full h-px max-w-5xl mx-auto opacity-20" style={{ background: 'linear-gradient(to right, transparent, #ffffff, transparent)' }} />
 
-          <div className="flex justify-between w-full max-w-5xl pt-12 mx-auto">
+          <div className="justify-between w-full max-w-5xl pt-12 mx-auto space-y-10 md:flex md:space-y-0">
             <div>
               <p className="text-base">Follow us on twitter and join in the conversation.</p>
               <div className="flex items-center">
@@ -91,7 +94,7 @@ export const Footer: React.FC<FooterProps> = () => {
                 </a>
               </div>
             </div>
-            <div className="flex items-center justify-center space-x-8 md:justify-start">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-8">
               <Link href="/terms-of-use">
                 <a href="/terms-of-use" className="text-white hover:underline">Terms of use</a>
               </Link>

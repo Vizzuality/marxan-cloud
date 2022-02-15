@@ -19,7 +19,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
 
   return (
     <div
-      className="relative flex items-center w-full min-h-screen pt-24 text-white md:h-screen md:pt-0"
+      className="relative flex items-center w-full min-h-screen text-white pt-44 md:h-screen md:pt-0"
       style={{ backgroundColor }}
     >
       <HeroAnimation />
