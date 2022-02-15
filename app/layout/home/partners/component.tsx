@@ -19,24 +19,20 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
           <Carousel
             slides={[
               {
-                alt: 'carousel',
                 id: 1,
-                src: 'https://dummyimage.com/866x565/000/fff.png&text=01',
+                content: 'https://dummyimage.com/866x565/000/fff.png&text=01',
               },
               {
-                alt: 'carousel',
                 id: 2,
-                src: 'https://dummyimage.com/866x565/000/fff.png&text=02',
+                content: 'https://dummyimage.com/866x565/000/fff.png&text=02',
               },
               {
-                alt: 'carousel',
                 id: 3,
-                src: 'https://dummyimage.com/866x565/000/fff.png&text=03',
+                content: 'https://dummyimage.com/866x565/000/fff.png&text=03',
               },
               {
-                alt: 'carousel',
                 id: 4,
-                src: 'https://dummyimage.com/866x565/000/fff.png&text=04',
+                content: 'https://dummyimage.com/866x565/000/fff.png&text=04',
               },
             ]}
           />

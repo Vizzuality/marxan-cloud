@@ -21,23 +21,75 @@ Default.args = {
   slides: [
     {
       id: 1,
-      alt: 'carousel',
-      src: 'https://dummyimage.com/866x565/000/fff.png&text=01',
+      content: (
+        <div
+          className="relative w-full"
+          style={{
+            paddingBottom: '56.25%',
+          }}
+        >
+          <div
+            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            style={{
+              backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=01)',
+            }}
+          />
+        </div>
+      ),
     },
     {
       id: 2,
-      alt: 'carousel',
-      src: 'https://dummyimage.com/866x565/000/fff.png&text=02',
+      content: (
+        <div
+          className="relative w-full"
+          style={{
+            paddingBottom: '56.25%',
+          }}
+        >
+          <div
+            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            style={{
+              backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=02)',
+            }}
+          />
+        </div>
+      ),
     },
     {
       id: 3,
-      alt: 'carousel',
-      src: 'https://dummyimage.com/866x565/000/fff.png&text=03',
+      content: (
+        <div
+          className="relative w-full"
+          style={{
+            paddingBottom: '56.25%',
+          }}
+        >
+          <div
+            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            style={{
+              backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=03)',
+            }}
+          />
+        </div>
+      ),
     },
     {
       id: 4,
-      alt: 'carousel',
-      src: 'https://dummyimage.com/866x565/000/fff.png&text=04',
+      content: (
+        <div
+          className="relative w-full"
+          style={{
+            paddingBottom: '56.25%',
+          }}
+        >
+          <div
+            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            style={{
+              backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=04)',
+            }}
+          />
+        </div>
+      ),
     },
   ],
 };

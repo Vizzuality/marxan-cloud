@@ -6,8 +6,7 @@ import cx from 'classnames';
 export interface CarouselProps {
   slides: {
     id: string | number;
-    alt: string;
-    src: string
+    content: string
   }[];
 }
 
@@ -76,25 +75,13 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
             setSlide(index);
           }}
         >
-          {slides.map((img) => {
+          {slides.map((sl) => {
             return (
               <div
-                key={img.id}
+                key={sl.id}
                 className="w-full"
               >
-                <div
-                  className="relative w-full"
-                  style={{
-                    paddingBottom: '56.25%',
-                  }}
-                >
-                  <div
-                    className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
-                    style={{
-                      backgroundImage: `url(${img.src})`,
-                    }}
-                  />
-                </div>
+                {sl.content}
               </div>
             );
           })}
@@ -102,10 +89,10 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
       </div>
 
       <div className="flex flex-row items-center justify-center space-x-1 mt-14">
-        {slides.map((img, i) => {
+        {slides.map((sl, i) => {
           return (
             <button
-              key={img.id}
+              key={sl.id}
               type="button"
               aria-label="dot-element"
               onClick={() => {
