@@ -9,6 +9,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
 import { useProjectRole } from 'hooks/project-users';
@@ -83,18 +84,26 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   }, [dispatch, setSubTab]);
 
   const onRunScenario = useCallback(() => {
+    const meta = {
+      scenarioEditingMetadata,
+      marxanInputParameterFile: runSettings,
+    };
+
     const data = {
       numberOfRuns: runSettings.NUMREPS,
       boundaryLengthModifier: runSettings.BLM,
-      metadata: {
-        scenarioEditingMetadata: {
-          ...scenarioEditingMetadata,
-          lastJobCheck: new Date().getTime(),
-          tab: ScenarioSidebarTabs.PARAMETERS,
-          subtab: null,
-        },
-        marxanInputParameterFile: runSettings,
-      },
+      metadata: mergeScenarioStatusMetaData(meta, {
+        tab: ScenarioSidebarTabs.PARAMETERS,
+        subtab: null,
+      }),
+      // scenarioEditingMetadata: {
+      //   ...scenarioEditingMetadata,
+      //   lastJobCheck: new Date().getTime(),
+      //   tab: ScenarioSidebarTabs.PARAMETERS,
+      //   subtab: null,
+      // },
+      // marxanInputParameterFile: runSettings,
+
     };
 
     saveScenarioMutation.mutate({ id: `${sid}`, data }, {
