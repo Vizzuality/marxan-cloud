@@ -8,6 +8,7 @@ import { ExportId } from '@marxan-api/modules/clone';
 import { IEvent } from '@nestjs/cqrs';
 
 export class ExportPieceFailed implements IEvent {
+  // TODO Check if all parameters are needed
   constructor(
     public readonly exportId: ExportId,
     public readonly componentId: ComponentId,

@@ -37,6 +37,6 @@ export class ImportArchive {
 
     importRequest.commit();
 
-    return right(importRequest.id.value);
+    return right(importRequest.importId.value);
   }
 }

@@ -1,8 +1,8 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import {
+  ArchiveLocation,
   ClonePiece,
   ComponentId,
-  ComponentLocation,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
@@ -11,11 +11,21 @@ import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
+import { MemoryImportRepository } from '../../import/adapters/memory-import.repository.adapter';
 import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
-import { ImportId } from '../../import/domain';
+import { ImportRepository } from '../../import/application/import.repository.port';
+import { Import, ImportComponent, ImportId } from '../../import/domain';
 import { importPieceQueueToken } from './import-queue.provider';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
+
+function getDifferentComponentId(previous: ComponentId): ComponentId {
+  let newId = ComponentId.create();
+  while (previous.value === newId.value) {
+    newId = ComponentId.create();
+  }
+  return newId;
+}
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -24,17 +34,49 @@ beforeEach(async () => {
 });
 
 it('should add a import-piece job to the queue and create a import piece submitted api event', async () => {
-  fixtures.GivenSchedulePieceImportCommand();
+  const [importId, componentId] = await fixtures.GivenImportIsCreated();
+  fixtures.GivenSchedulePieceImportCommand(importId, componentId);
 
-  await fixtures.WhenJobIsAddedToQueue();
+  await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
+    addMockResolvedValue: 'job',
+  });
 
   fixtures.ThenImportPieceSubmittedApiEventIsCreated();
 });
 
-it('should emit an ImportPieceFailed event if the job cannot be added to the queue', async () => {
-  fixtures.GivenSchedulePieceImportCommand();
+it('should emit an ImportPieceFailed event if the import instance cannot be retrieved', async () => {
+  fixtures.GivenSchedulePieceImportCommand(
+    ImportId.create(),
+    ComponentId.create(),
+  );
 
-  await fixtures.WhenAddingJobToQueueFails();
+  await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
+    addMockResolvedValue: 'job',
+  });
+
+  fixtures.ThenImportPieceFailedEventIsPublished();
+});
+
+it('should emit an ImportPieceFailed event if the import component is not found in import pieces', async () => {
+  const [importId, componentId] = await fixtures.GivenImportIsCreated();
+  const anotherComponentId = getDifferentComponentId(componentId);
+
+  fixtures.GivenSchedulePieceImportCommand(importId, anotherComponentId);
+
+  await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
+    addMockResolvedValue: 'job',
+  });
+
+  fixtures.ThenImportPieceFailedEventIsPublished();
+});
+
+it('should emit an ImportPieceFailed event if the job cannot be added to the queue', async () => {
+  const [importId, componentId] = await fixtures.GivenImportIsCreated();
+  fixtures.GivenSchedulePieceImportCommand(importId, componentId);
+
+  await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
+    addMockResolvedValue: undefined,
+  });
 
   fixtures.ThenImportPieceFailedEventIsPublished();
 });
@@ -65,6 +107,10 @@ const getFixtures = async () => {
           error: () => {},
         },
       },
+      {
+        provide: ImportRepository,
+        useClass: MemoryImportRepository,
+      },
       SchedulePieceImportHandler,
     ],
   }).compile();
@@ -77,30 +123,41 @@ const getFixtures = async () => {
   let command: SchedulePieceImport;
 
   const sut = sandbox.get(SchedulePieceImportHandler);
-
-  const uri = 'zip.location';
-  const relativePath = './project.metadata.json';
+  const importRepo = sandbox.get(ImportRepository);
 
   return {
-    GivenSchedulePieceImportCommand: (): SchedulePieceImport => {
-      command = new SchedulePieceImport(
-        ImportId.create(),
-        ComponentId.create(),
-        ResourceId.create(),
-        ResourceKind.Project,
+    GivenImportIsCreated: async (): Promise<[ImportId, ComponentId]> => {
+      const resourceId = ResourceId.create();
+      const importComponent = ImportComponent.newOne(
+        resourceId,
         ClonePiece.ProjectMetadata,
-        [new ComponentLocation(uri, relativePath)],
+        0,
+        [],
       );
+      const importInstance = Import.newOne(
+        resourceId,
+        ResourceKind.Project,
+        new ArchiveLocation('/tmp/foo.zip'),
+        [importComponent],
+      );
+      await importRepo.save(importInstance);
+
+      return [importInstance.importId, importComponent.id];
+    },
+    GivenSchedulePieceImportCommand: (
+      importId: ImportId,
+      componentId: ComponentId,
+    ): SchedulePieceImport => {
+      command = new SchedulePieceImport(importId, componentId);
 
       return command;
     },
-    WhenJobIsAddedToQueue: async () => {
-      addMock.mockResolvedValueOnce('job added successfully');
-
-      await sut.execute(command);
-    },
-    WhenAddingJobToQueueFails: async () => {
-      addMock.mockResolvedValueOnce(undefined);
+    WhenSchedulePieceImportHandlerIsInvoked: async ({
+      addMockResolvedValue,
+    }: {
+      addMockResolvedValue?: string;
+    }) => {
+      addMock.mockResolvedValueOnce(addMockResolvedValue);
 
       await sut.execute(command);
     },

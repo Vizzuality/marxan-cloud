@@ -11,13 +11,6 @@ export class ImportRequestedSaga {
   emitApiEvents = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(ImportRequested),
-      map(
-        (event) =>
-          new MarkImportAsSubmitted(
-            event.id,
-            event.resourceId,
-            event.resourceKind,
-          ),
-      ),
+      map((event) => new MarkImportAsSubmitted(event.importId)),
     );
 }

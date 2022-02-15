@@ -2,7 +2,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ImportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import {
   CommandHandler,
   EventBus,
@@ -10,6 +10,7 @@ import {
 } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
+import { ImportRepository } from '../../import/application/import.repository.port';
 import { importPieceQueueToken } from './import-queue.provider';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 
@@ -26,29 +27,50 @@ export class SchedulePieceImportHandler
     @Inject(importPieceQueueToken)
     private readonly queue: Queue<ImportJobInput>,
     private readonly eventBus: EventBus,
-  ) {}
+    private readonly importRepository: ImportRepository,
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(SchedulePieceImportHandler.name);
+  }
 
-  async execute({
-    piece,
-    importId,
-    componentId,
-    resourceId,
-    resourceKind,
-    uris,
-  }: SchedulePieceImport): Promise<void> {
+  async execute({ importId, componentId }: SchedulePieceImport): Promise<void> {
+    const importInstance = await this.importRepository.find(importId);
+
+    if (!importInstance) {
+      this.logger.error(`Import with ID ${importId.value} not found`);
+      this.eventBus.publish(new ImportPieceFailed(importId, componentId));
+      return;
+    }
+    const {
+      resourceKind,
+      resourceId,
+      importPieces,
+    } = importInstance.toSnapshot();
+
+    const component = importPieces.find(
+      (piece) => piece.id === componentId.value,
+    );
+    if (!component) {
+      this.logger.error(
+        `Import component with ID ${componentId.value} not found`,
+      );
+      this.eventBus.publish(new ImportPieceFailed(importId, componentId));
+      return;
+    }
+    const { piece, uris } = component;
+
     const job = await this.queue.add(`import-piece`, {
       piece,
       importId: importId.value,
       componentId: componentId.value,
-      resourceId: resourceId.value,
+      resourceId: resourceId,
       resourceKind,
       uris,
     });
 
     if (!job) {
-      this.eventBus.publish(
-        new ImportPieceFailed(importId, componentId, resourceId, resourceKind),
-      );
+      this.logger.error(`import-piece job couldn't be added to queue`);
+      this.eventBus.publish(new ImportPieceFailed(importId, componentId));
       return;
     }
 
@@ -61,7 +83,7 @@ export class SchedulePieceImportHandler
         piece,
         importId: importId.value,
         componentId: componentId.value,
-        resourceId: resourceId.value,
+        resourceId: resourceId,
       },
     });
   }

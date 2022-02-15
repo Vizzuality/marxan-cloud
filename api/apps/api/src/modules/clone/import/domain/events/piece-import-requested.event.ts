@@ -11,7 +11,7 @@ import { ImportId } from '../import/import.id';
 export class PieceImportRequested implements IEvent {
   constructor(
     public readonly importId: ImportId,
-    public readonly id: ComponentId,
+    public readonly componentId: ComponentId,
     public readonly piece: ClonePiece,
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,

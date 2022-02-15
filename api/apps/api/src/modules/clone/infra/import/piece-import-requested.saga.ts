@@ -13,15 +13,7 @@ export class PieceImportRequestedSaga {
     events$.pipe(
       ofType(PieceImportRequested),
       map(
-        (event) =>
-          new SchedulePieceImport(
-            event.importId,
-            event.id,
-            event.resourceId,
-            event.resourceKind,
-            event.piece,
-            event.uris,
-          ),
+        (event) => new SchedulePieceImport(event.importId, event.componentId),
       ),
     );
 }

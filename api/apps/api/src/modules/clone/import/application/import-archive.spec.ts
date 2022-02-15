@@ -185,7 +185,7 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof ImportRequested),
       ).toEqual([
         {
-          id: expect.any(ImportId),
+          importId: expect.any(ImportId),
           resourceId,
           resourceKind: `project`,
         },
@@ -196,7 +196,7 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof PieceImportRequested),
       ).toMatchObject([
         {
-          id: new ComponentId(`import component unique id`),
+          componentId: new ComponentId(`import component unique id`),
           resourceId: projectId,
           piece: `project-metadata`,
           uris: [
@@ -213,7 +213,7 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof PieceImportRequested),
       ).toMatchObject([
         {
-          id: new ComponentId(`import component unique id`),
+          componentId: new ComponentId(`import component unique id`),
           resourceId: projectId,
           piece: `project-metadata`,
           uris: [
@@ -224,7 +224,7 @@ const getFixtures = async () => {
           ],
         },
         {
-          id: new ComponentId(`some other piece`),
+          componentId: new ComponentId(`some other piece`),
           resourceId: projectId,
           piece: `planning-area-gadm`,
           uris: [

@@ -11,13 +11,6 @@ export class AllPiecesImportedSaga {
   finalizeArchive = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(AllPiecesImported),
-      map(
-        (event) =>
-          new MarkImportAsFinished(
-            event.importId,
-            event.resourceId,
-            event.resourceKind,
-          ),
-      ),
+      map((event) => new MarkImportAsFinished(event.importId)),
     );
 }

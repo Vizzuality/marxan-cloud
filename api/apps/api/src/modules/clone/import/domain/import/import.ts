@@ -24,7 +24,7 @@ export type CompletePieceErrors =
 
 export class Import extends AggregateRoot {
   private constructor(
-    readonly id: ImportId,
+    readonly importId: ImportId,
     private readonly resourceId: ResourceId,
     private readonly resourceKind: ResourceKind,
     private readonly archiveLocation: ArchiveLocation,
@@ -57,7 +57,7 @@ export class Import extends AggregateRoot {
 
   run(): void {
     this.apply(
-      new ImportRequested(this.id, this.resourceId, this.resourceKind),
+      new ImportRequested(this.importId, this.resourceId, this.resourceKind),
     );
     this.requestFirstBatch();
   }
@@ -84,10 +84,7 @@ export class Import extends AggregateRoot {
     const isThisTheLastBatch = false;
     const isThisBatchCompleted = false;
 
-    if (isThisTheLastBatch)
-      this.apply(
-        new AllPiecesImported(this.id, this.resourceId, this.resourceKind),
-      );
+    if (isThisTheLastBatch) this.apply(new AllPiecesImported(this.importId));
     if (isThisTheLastBatch || !isThisBatchCompleted) return right(true);
 
     const nextBatch = this.pieces.filter(
@@ -97,7 +94,7 @@ export class Import extends AggregateRoot {
     for (const component of nextBatch) {
       this.apply(
         new PieceImportRequested(
-          this.id,
+          this.importId,
           component.id,
           component.piece,
           component.resourceId,
@@ -112,7 +109,7 @@ export class Import extends AggregateRoot {
 
   toSnapshot(): ImportSnapshot {
     return {
-      id: this.id.value,
+      id: this.importId.value,
       resourceId: this.resourceId.value,
       resourceKind: this.resourceKind,
       importPieces: this.pieces.map((piece) => piece.toSnapshot()),
@@ -121,12 +118,6 @@ export class Import extends AggregateRoot {
   }
 
   private requestFirstBatch() {
-    if (this.pieces.length === 0) {
-      this.apply(
-        new AllPiecesImported(this.id, this.resourceId, this.resourceKind),
-      );
-      return;
-    }
     const firstBatchOrder = Math.min(
       ...this.pieces.map((piece) => piece.order),
     );
@@ -136,7 +127,7 @@ export class Import extends AggregateRoot {
     )) {
       this.apply(
         new PieceImportRequested(
-          this.id,
+          this.importId,
           component.id,
           component.piece,
           component.resourceId,
