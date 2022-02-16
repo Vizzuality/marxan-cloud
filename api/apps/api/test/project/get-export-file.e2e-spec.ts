@@ -1,11 +1,7 @@
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
-import {
-  CompletePiece,
-  ComponentId,
-  ComponentLocation,
-} from '@marxan-api/modules/clone/export/application/complete-piece.command';
+import { CompleteExportPiece } from '@marxan-api/modules/clone/export/application/complete-export-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import {
   ArchiveReady,
@@ -13,6 +9,7 @@ import {
   ExportId,
 } from '@marxan-api/modules/clone/export/domain';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ComponentId, ComponentLocation } from '@marxan/cloning/domain';
 import { FileRepository } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
@@ -190,7 +187,7 @@ export const getFixtures = async () => {
 
       exportInstance!.toSnapshot().exportPieces.forEach((piece) => {
         commandBus.execute(
-          new CompletePiece(exportId, new ComponentId(piece.id), [
+          new CompleteExportPiece(exportId, new ComponentId(piece.id), [
             new ComponentLocation(
               piecesUris[piece.id],
               `${piece.id}-${piece.piece}.txt`,

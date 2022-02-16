@@ -1,4 +1,4 @@
-import { ClonePiece, ResourceKind } from './domain';
+import { ClonePiece, ComponentLocationSnapshot, ResourceKind } from './domain';
 
 export interface ExportJobInput {
   readonly exportId: string;
@@ -15,5 +15,5 @@ export interface ImportJobInput {
   readonly resourceId: string;
   readonly resourceKind: ResourceKind;
   readonly piece: ClonePiece;
-  readonly archiveLocation: string;
+  readonly uris: ComponentLocationSnapshot[];
 }

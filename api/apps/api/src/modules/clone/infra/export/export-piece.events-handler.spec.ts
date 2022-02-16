@@ -1,4 +1,6 @@
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import {
   CommandBus,
@@ -10,15 +12,13 @@ import {
 } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
-import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ResourceKind } from '@marxan/cloning/domain';
 import { CreateApiEventDTO } from '../../../api-events/dto/create.api-event.dto';
 import { QueueModule } from '../../../queue';
 import { EventData, EventFactory } from '../../../queue-api-events';
+import { CompleteExportPiece } from '../../export/application/complete-export-piece.command';
+import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
 import { ExportPieceEventsHandler } from './export-piece.events-handler';
 import { exportPieceEventsFactoryToken } from './export-queue.provider';
-import { CompletePiece } from '../../export/application/complete-piece.command';
-import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -129,7 +129,7 @@ const getFixtures = async () => {
     ThenACompletePieceCommandShouldBeSent: () => {
       expect(commands).toHaveLength(1);
       const [completePieceCommand] = commands;
-      expect(completePieceCommand).toBeInstanceOf(CompletePiece);
+      expect(completePieceCommand).toBeInstanceOf(CompleteExportPiece);
     },
     ThenAExportPieceFailedEventShouldBePublished: () => {
       expect(events).toHaveLength(1);
@@ -170,7 +170,7 @@ export class FakeQueueEvents {
   }
 }
 
-@CommandHandler(CompletePiece)
+@CommandHandler(CompleteExportPiece)
 export class FakeCompletePieceHandler {
   async execute(): Promise<void> {}
 }

@@ -1,29 +1,26 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { CommandBus, EventBus } from '@nestjs/cqrs';
-
-import { ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-
 import { CreateApiEventDTO } from '@marxan-api/modules/api-events/dto/create.api-event.dto';
-import { API_EVENT_KINDS } from '@marxan/api-events';
-import { assertDefined } from '@marxan/utils';
 import {
   CreateWithEventFactory,
   EventData,
   EventFactory,
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
-
-import { exportPieceEventsFactoryToken } from './export-queue.provider';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import {
-  CompletePiece,
   ComponentId,
   ComponentLocation,
-  ExportId,
-} from '../../export/application/complete-piece.command';
-import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
-import { ResourceId } from '../../export';
+  ResourceKind,
+  ResourceId,
+} from '@marxan/cloning/domain';
+import { assertDefined } from '@marxan/utils';
+import { Inject, Injectable } from '@nestjs/common';
+import { CommandBus, EventBus } from '@nestjs/cqrs';
 import { ApiEventsService } from '../../../api-events';
-import { ResourceKind } from '@marxan/cloning/domain';
+import { ExportId } from '../../export';
+import { CompleteExportPiece } from '../../export/application/complete-export-piece.command';
+import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
+import { exportPieceEventsFactoryToken } from './export-queue.provider';
 
 @Injectable()
 export class ExportPieceEventsHandler
@@ -97,7 +94,7 @@ export class ExportPieceEventsHandler
     const result = await event.result;
     assertDefined(result);
     await this.commandBus.execute(
-      new CompletePiece(
+      new CompleteExportPiece(
         new ExportId(result.exportId),
         new ComponentId(result.componentId),
         result.uris.map(

@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from '../../../projects/project.api.entity';
@@ -14,6 +14,14 @@ import { UpdateCostSurfaceHandler } from './update-cost-surface.handler';
     CqrsModule,
     TypeOrmModule.forFeature([Project]),
   ],
-  providers: [Logger, SetInitialCostSurfaceHandler, UpdateCostSurfaceHandler],
+  providers: [
+    {
+      provide: Logger,
+      useClass: Logger,
+      scope: Scope.TRANSIENT,
+    },
+    SetInitialCostSurfaceHandler,
+    UpdateCostSurfaceHandler,
+  ],
 })
 export class CostSurfaceApplicationModule {}

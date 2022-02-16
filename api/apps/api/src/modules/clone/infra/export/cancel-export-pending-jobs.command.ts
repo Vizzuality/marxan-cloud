@@ -1,6 +1,6 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
-import { ExportId, ResourceId } from '@marxan-api/modules/clone';
-import { ResourceKind } from '@marxan/cloning/domain';
+import { ExportId } from '@marxan-api/modules/clone';
+import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
 
 export class CancelExportPendingJobs extends Command<void> {
   constructor(

@@ -1,12 +1,11 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { ResourceId } from '@marxan-api/modules/clone';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ExportPieceFailed } from '@marxan-api/modules/clone/export/application/export-piece-failed.event';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import { ExportId } from '@marxan-api/modules/clone/export/domain';
 import { exportPieceQueueToken } from '@marxan-api/modules/clone/infra/export/export-queue.provider';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ComponentId } from '@marxan/cloning/domain';
+import { ComponentId, ResourceId } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { EventBus } from '@nestjs/cqrs';
 import * as request from 'supertest';

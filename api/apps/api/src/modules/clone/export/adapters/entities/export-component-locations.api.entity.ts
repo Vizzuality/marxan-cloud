@@ -1,7 +1,9 @@
+import {
+  ComponentLocation,
+  ComponentLocationSnapshot,
+} from '@marxan/cloning/domain';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { ComponentLocation } from '../../application/complete-piece.command';
 import { ExportComponentEntity } from './export-components.api.entity';
-import { ComponentLocationSnapshot } from '@marxan/cloning/domain/component-location.snapshot';
 
 @Entity('export_component_locations')
 export class ExportComponentLocationEntity {

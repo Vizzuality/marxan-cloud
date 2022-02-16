@@ -64,6 +64,18 @@ export enum API_EVENT_KINDS {
   scenario__export__piece__submitted__v1__alpha = 'scenario.export.piece.submitted/v1/alpha',
   scenario__export__piece__finished__v1__alpha = 'scenario.export.piece.finished/v1/alpha',
   scenario__export__piece__failed__v1__alpha = 'scenario.export.piece.failed/v1/alpha',
+  project__import__submitted__v1__alpha = 'project.import.submitted/v1/alpha',
+  project__import__finished__v1__alpha = 'project.import.finished/v1/alpha',
+  project__import__failed__v1__alpha = 'project.import.failed/v1/alpha',
+  project__import__piece__submitted__v1__alpha = 'project.import.piece.submitted/v1/alpha',
+  project__import__piece__finished__v1__alpha = 'project.import.piece.finished/v1/alpha',
+  project__import__piece__failed__v1__alpha = 'project.import.piece.failed/v1/alpha',
+  scenario__import__submitted__v1__alpha = 'scenario.import.submitted/v1/alpha',
+  scenario__import__finished__v1__alpha = 'scenario.import.finished/v1/alpha',
+  scenario__import__failed__v1__alpha = 'scenario.import.failed/v1/alpha',
+  scenario__import__piece__submitted__v1__alpha = 'scenario.import.piece.submitted/v1/alpha',
+  scenario__import__piece__finished__v1__alpha = 'scenario.import.piece.finished/v1/alpha',
+  scenario__import__piece__failed__v1__alpha = 'scenario.import.piece.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<
