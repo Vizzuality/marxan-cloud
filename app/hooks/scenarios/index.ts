@@ -42,9 +42,17 @@ import {
   CancelRunScenarioProps,
   UseSaveScenarioCalibrationRangeProps,
   SaveScenarioCalibrationRangeProps,
+  UseSaveScenarioLockProps,
+  SaveScenarioLockProps,
+  UseDeleteScenarioLockProps,
+  DeleteScenarioLockProps,
 } from './types';
 
-// SCENARIO STATUS
+/**
+****************************************
+  SCENARIO STATUS
+****************************************
+*/
 export function useScenariosStatus(pId) {
   const [session] = useSession();
 
@@ -111,6 +119,111 @@ export function useScenarioStatus(pId, sId) {
   }, [query, data?.data, sId]);
 }
 
+/**
+****************************************
+  SCENARIO LOCKS
+****************************************
+*/
+export function useScenarioLock(sid) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenario-lock', sid], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/editing-locks`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!sid,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
+export function useSaveScenarioLock({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveScenarioLockProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveScenarioLock = ({ sid }: SaveScenarioLockProps) => {
+    return SCENARIOS.request({
+      url: `/${sid}/lock`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+      transformResponse: (data) => JSON.parse(data),
+    });
+  };
+
+  return useMutation(saveScenarioLock, {
+    onSuccess: (data: any, variables, context) => {
+      const { scenarioId } = data?.data;
+      // const { isoDate, started } = data?.data?.meta;
+      queryClient.invalidateQueries(['project-locks']);
+      queryClient.setQueryData(['scenario-lock', scenarioId], data?.data);
+
+      console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteScenarioLock({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteScenarioLockProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const deleteScenarioLock = ({ sid }: DeleteScenarioLockProps) => {
+    return SCENARIOS.request({
+      url: `/${sid}/lock`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(deleteScenarioLock, {
+    onSuccess: (data: any, variables, context) => {
+      const { scenarioId } = data?.data;
+      // const { isoDate, started } = data?.data?.meta;
+      queryClient.invalidateQueries(['project-locks']);
+      queryClient.invalidateQueries(['scenario-lock', scenarioId]);
+
+      console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+/**
+****************************************
+  SCENARIOS
+****************************************
+*/
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const [session] = useSession();
   const { push } = useRouter();

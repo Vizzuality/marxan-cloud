@@ -27,7 +27,7 @@ import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 
-import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
+import ScenariosDrawingManager from 'layout/scenarios/map/drawing-manager';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
