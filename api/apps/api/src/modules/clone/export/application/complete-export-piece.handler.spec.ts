@@ -11,12 +11,7 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
 import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
-import {
-  Export,
-  AllPiecesExported,
-  ExportComponentFinished,
-  ExportId,
-} from '../domain';
+import { Export, AllPiecesExported, PieceExported, ExportId } from '../domain';
 import { CompleteExportPiece } from './complete-export-piece.command';
 import { CompleteExportPieceHandler } from './complete-export-piece.handler';
 import { ExportPieceFailed } from './export-piece-failed.event';
@@ -28,20 +23,17 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it('should mark a component as finished and emit ExportComponentFinished event', async () => {
+it('should mark a component as finished and emit PieceExported event', async () => {
   const exportInstance = await fixtures.GivenExportWasRequested();
   const [firstPiece] = exportInstance.toSnapshot().exportPieces;
   const componentId = new ComponentId(firstPiece.id);
 
   await fixtures.WhenAPieceIsCompleted(exportInstance.id, componentId);
   await fixtures.ThenComponentIsFinished(exportInstance.id, componentId);
-  fixtures.ThenExportComponentFinishedEventIsEmitted(
-    exportInstance.id,
-    componentId,
-  );
+  fixtures.ThenPieceExportedEventIsEmitted(exportInstance.id, componentId);
 });
 
-it('should emit a ExportAllComponentsFinished event if all components are finished', async () => {
+it('should emit a AllPiecesExported event if all components are finished', async () => {
   const exportInstance = await fixtures.GivenExportWasRequested();
   const [firstPiece, secondPiece] = exportInstance.toSnapshot().exportPieces;
   const firstPieceComponentId = new ComponentId(firstPiece.id);
@@ -56,7 +48,7 @@ it('should emit a ExportAllComponentsFinished event if all components are finish
     secondPieceComponentId,
   );
 
-  fixtures.ThenExportAllComponentsFinishedEventIsEmitted(exportInstance.id);
+  fixtures.ThenAllPiecesExportedEventIsEmitted(exportInstance.id);
 });
 
 it('should not publish any event if export instance is not found', async () => {
@@ -177,7 +169,7 @@ const getFixtures = async () => {
       expect(component).toBeDefined();
       expect(component?.finished).toEqual(true);
     },
-    ThenExportComponentFinishedEventIsEmitted: (
+    ThenPieceExportedEventIsEmitted: (
       exportId: ExportId,
       componentId: ComponentId,
     ) => {
@@ -188,9 +180,9 @@ const getFixtures = async () => {
         exportId,
         location: expect.any(Array),
       });
-      expect(componentFinishedEvent).toBeInstanceOf(ExportComponentFinished);
+      expect(componentFinishedEvent).toBeInstanceOf(PieceExported);
     },
-    ThenExportAllComponentsFinishedEventIsEmitted: (exportId: ExportId) => {
+    ThenAllPiecesExportedEventIsEmitted: (exportId: ExportId) => {
       const allComponentsFinishedEvent = events[2];
       expect(allComponentsFinishedEvent).toMatchObject({
         exportId,

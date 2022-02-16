@@ -1,6 +1,4 @@
-import { AggregateRoot } from '@nestjs/cqrs';
-import { Either, left, right } from 'fp-ts/Either';
-
+import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 import {
   ArchiveLocation,
   ComponentId,
@@ -8,16 +6,15 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ExportId } from './export.id';
-
-import { ExportComponentRequested } from '../events/export-component-requested.event';
-import { ExportComponentFinished } from '../events/export-component-finished.event';
-import { ArchiveReady } from '../events/archive-ready.event';
-
-import { ExportComponent } from './export-component/export-component';
-import { ExportSnapshot } from './export.snapshot';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { Either, left, right } from 'fp-ts/Either';
 import { AllPiecesExported } from '../events/all-pieces-exported.event';
-import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
+import { ArchiveReady } from '../events/archive-ready.event';
+import { PieceExported } from '../events/piece-exported.event';
+import { ExportComponentRequested } from '../events/export-component-requested.event';
+import { ExportComponent } from './export-component/export-component';
+import { ExportId } from './export.id';
+import { ExportSnapshot } from './export.snapshot';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');
@@ -74,7 +71,7 @@ export class Export extends AggregateRoot {
       return left(pieceNotFound);
     }
     piece.finish(pieceLocation);
-    this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
+    this.apply(new PieceExported(this.id, id, pieceLocation));
 
     if (this.#allPiecesReady()) {
       this.apply(new AllPiecesExported(this.id));
