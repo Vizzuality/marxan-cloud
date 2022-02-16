@@ -71,20 +71,15 @@ export class Import extends AggregateRoot {
     if (!pieceToComplete) return left(componentNotFound);
     if (pieceToComplete.isReady()) return left(componentAlreadyCompleted);
 
-    this.apply(
-      new PieceImported(
-        pieceToComplete.id,
-        pieceToComplete.piece,
-        pieceToComplete.resourceId,
-      ),
-    );
+    this.apply(new PieceImported(this.importId, pieceId));
 
     pieceToComplete.complete();
 
-    const isThisTheLastBatch = false;
-    const isThisBatchCompleted = false;
+    const isThisTheLastBatch = this.isLastBatch(pieceToComplete.order);
+    const isThisBatchCompleted = this.isBatchReady(pieceToComplete.order);
 
-    if (isThisTheLastBatch) this.apply(new AllPiecesImported(this.importId));
+    if (isThisTheLastBatch && isThisBatchCompleted)
+      this.apply(new AllPiecesImported(this.importId));
     if (isThisTheLastBatch || !isThisBatchCompleted) return right(true);
 
     const nextBatch = this.pieces.filter(
@@ -136,5 +131,15 @@ export class Import extends AggregateRoot {
         ),
       );
     }
+  }
+
+  private isBatchReady(order: number) {
+    return this.pieces
+      .filter((piece) => piece.order === order)
+      .every((piece) => piece.isReady());
+  }
+
+  private isLastBatch(order: number) {
+    return order === Math.max(...this.pieces.map((piece) => piece.order));
   }
 }
