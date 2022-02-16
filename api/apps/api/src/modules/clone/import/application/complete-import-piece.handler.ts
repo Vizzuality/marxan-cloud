@@ -33,8 +33,9 @@ export class CompleteImportPieceHandler
         const importInstance = await repo.find(importId);
 
         if (!importInstance) {
-          const errorMessage = `${CompleteImportPieceHandler.name} could not find import ${importId.value} to complete piece: ${componentId.value}`;
-          throw new Error(errorMessage);
+          throw new Error(
+            `${CompleteImportPieceHandler.name} could not find import ${importId.value} to complete piece: ${componentId.value}`,
+          );
         }
 
         const importAggregate = this.eventPublisher.mergeObjectContext(
@@ -46,8 +47,9 @@ export class CompleteImportPieceHandler
         if (isLeft(result)) {
           switch (result.left) {
             case componentNotFound:
-              const errorMessage = `Could not find piece with ID: ${componentId} for import with ID: ${importId}`;
-              throw new Error(errorMessage);
+              throw new Error(
+                `Could not find piece with ID: ${componentId} for import with ID: ${importId}`,
+              );
             case componentAlreadyCompleted:
               this.logger.error(
                 `Component with ${componentId} was already completed`,
