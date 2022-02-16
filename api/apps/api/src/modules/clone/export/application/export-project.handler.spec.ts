@@ -8,7 +8,7 @@ import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 
 import {
   ExportComponent,
-  ExportComponentRequested,
+  PieceExportRequested,
   ExportId,
   ExportRequested,
 } from '../domain';
@@ -81,7 +81,7 @@ const getFixtures = async () => {
       const projectPlanningAreaCustomExport = events[1];
       const exportConfigExport = events[2];
 
-      expect(projectMetadataExport).toBeInstanceOf(ExportComponentRequested);
+      expect(projectMetadataExport).toBeInstanceOf(PieceExportRequested);
       expect(projectMetadataExport).toMatchObject({
         componentId: {
           value: expect.any(String),
@@ -96,7 +96,7 @@ const getFixtures = async () => {
       });
 
       expect(projectPlanningAreaCustomExport).toBeInstanceOf(
-        ExportComponentRequested,
+        PieceExportRequested,
       );
       expect(projectPlanningAreaCustomExport).toMatchObject({
         componentId: {
@@ -111,7 +111,7 @@ const getFixtures = async () => {
         },
       });
 
-      expect(exportConfigExport).toBeInstanceOf(ExportComponentRequested);
+      expect(exportConfigExport).toBeInstanceOf(PieceExportRequested);
       expect(exportConfigExport).toMatchObject({
         componentId: {
           value: expect.any(String),

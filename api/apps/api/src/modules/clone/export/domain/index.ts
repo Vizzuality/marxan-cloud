@@ -1,6 +1,6 @@
 export { ArchiveReady } from './events/archive-ready.event';
 export { PieceExported } from './events/piece-exported.event';
-export { ExportComponentRequested } from './events/export-component-requested.event';
+export { PieceExportRequested } from './events/piece-export-requested.event';
 export { AllPiecesExported } from './events/all-pieces-exported.event';
 export { ExportRequested } from './events/export-requested.event';
 

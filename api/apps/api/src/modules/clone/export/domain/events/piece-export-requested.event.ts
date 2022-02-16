@@ -8,7 +8,7 @@ import {
 } from '@marxan/cloning/domain';
 import { ExportId } from '../export/export.id';
 
-export class ExportComponentRequested implements IEvent {
+export class PieceExportRequested implements IEvent {
   constructor(
     public readonly exportId: ExportId,
     public readonly componentId: ComponentId,

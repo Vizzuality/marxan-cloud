@@ -11,7 +11,7 @@ import { Either, left, right } from 'fp-ts/Either';
 import { AllPiecesExported } from '../events/all-pieces-exported.event';
 import { ArchiveReady } from '../events/archive-ready.event';
 import { PieceExported } from '../events/piece-exported.event';
-import { ExportComponentRequested } from '../events/export-component-requested.event';
+import { PieceExportRequested } from '../events/piece-export-requested.event';
 import { ExportComponent } from './export-component/export-component';
 import { ExportId } from './export.id';
 import { ExportSnapshot } from './export.snapshot';
@@ -41,7 +41,7 @@ export class Export extends AggregateRoot {
       .filter((part) => !part.isReady())
       .map(
         (part) =>
-          new ExportComponentRequested(
+          new PieceExportRequested(
             exportRequest.id,
             part.id,
             part.resourceId,
