@@ -43,7 +43,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   const dispatch = useDispatch();
 
   const {
-
     cache,
 
     // Adjust planning units
@@ -193,6 +192,11 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     <>
       <div className="relative w-full h-full overflow-hidden">
         <Map
+          scrollZoom={false}
+          touchZoom={false}
+          dragPan={false}
+          dragRotate={false}
+          touchRotate={false}
           bounds={bounds}
           width="100%"
           height="100%"
