@@ -23,7 +23,8 @@ import {
   invalidFiles,
   Success as ArchiveSuccess,
 } from './archive-reader.port';
-import { ImportArchive } from './import-archive';
+import { ImportArchive } from './import-archive.command';
+import { ImportArchiveHandler } from './import-archive.handler';
 import { ImportRepository } from './import.repository.port';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -41,8 +42,10 @@ test(`importing invalid archive`, async () => {
 test(`importing archive with sequential components`, async () => {
   fixtures.GivenExtractingArchiveHasSequentialComponents();
   const result = await fixtures.WhenRequestingImport();
+
   fixtures.ThenRequestImportIsSaved(result);
   fixtures.ThenImportRequestedIsEmitted();
+  //TODO check if PieceImportRequested could be simplified
   fixtures.ThenLowestOrderComponentIsRequested();
 });
 
@@ -66,7 +69,7 @@ const getFixtures = async () => {
         provide: ImportRepository,
         useClass: MemoryImportRepository,
       },
-      ImportArchive,
+      ImportArchiveHandler,
     ],
   }).compile();
   await sandbox.init();
@@ -77,7 +80,7 @@ const getFixtures = async () => {
   const events: IEvent[] = [];
   sandbox.get(EventBus).subscribe((event) => events.push(event));
 
-  const sut = sandbox.get(ImportArchive);
+  const sut = sandbox.get(ImportArchiveHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
   const archiveReader: FakeArchiveReader = sandbox.get(ArchiveReader);
 
@@ -166,9 +169,9 @@ const getFixtures = async () => {
       );
     },
     WhenRequestingImport: async () =>
-      sut.import(new ArchiveLocation(`whatever`)),
+      sut.execute(new ImportArchive(new ArchiveLocation(`whatever`))),
     ThenRequestImportIsSaved: (
-      importResult: PromiseType<ReturnType<ImportArchive['import']>>,
+      importResult: PromiseType<ReturnType<ImportArchiveHandler['execute']>>,
     ) => {
       expect(isRight(importResult)).toBeTruthy();
       expect(
@@ -176,7 +179,7 @@ const getFixtures = async () => {
       ).toBeDefined();
     },
     ThenImportFails: (
-      importResult: PromiseType<ReturnType<ImportArchive['import']>>,
+      importResult: PromiseType<ReturnType<ImportArchiveHandler['execute']>>,
     ) => {
       expect(isLeft(importResult)).toBeTruthy();
     },
