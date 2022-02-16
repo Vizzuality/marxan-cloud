@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -7,20 +7,23 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
+import { useMe } from 'hooks/me';
 import { useProjectRole } from 'hooks/project-users';
-import { useScenario } from 'hooks/scenarios';
+import { useProject } from 'hooks/projects';
+import { useScenario, useSaveScenario, useRunScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AdvancedSettings from 'layout/scenarios/edit/parameters/advanced-settings';
 import BLMCalibration from 'layout/scenarios/edit/parameters/blm-calibration';
-import Run from 'layout/scenarios/edit/run';
 import Sections from 'layout/sections';
 
 import Button from 'components/button';
-import Modal from 'components/modal';
 
 const SECTIONS = [
   {
@@ -39,10 +42,14 @@ export interface ScenariosSidebarEditAnalysisProps {
 }
 
 export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysisProps> = () => {
-  const [runOpen, setRunOpen] = useState(false);
+  const { addToast } = useToasts();
+  const plausible = usePlausible();
   const { query } = useRouter();
   const { pid, sid } = query;
 
+  const { user } = useMe();
+
+  const { data: projectData } = useProject(pid);
   const { data: projectRole } = useProjectRole(pid);
   const VIEWER = projectRole === 'project_viewer';
 
@@ -54,6 +61,16 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { marxanInputParameterFile: runSettings, scenarioEditingMetadata } = metadata || {};
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const runScenarioMutation = useRunScenario({});
 
   useEffect(() => {
     if (!SECTIONS.find((s) => s.id === subtab)) {
@@ -65,6 +82,75 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
     const sub = s || null;
     dispatch(setSubTab(sub));
   }, [dispatch, setSubTab]);
+
+  const onRunScenario = useCallback(() => {
+    const meta = {
+      scenarioEditingMetadata,
+      marxanInputParameterFile: runSettings,
+    };
+
+    const data = {
+      numberOfRuns: runSettings.NUMREPS,
+      boundaryLengthModifier: runSettings.BLM,
+      metadata: mergeScenarioStatusMetaData(meta, {
+        tab: ScenarioSidebarTabs.PARAMETERS,
+        subtab: null,
+      }),
+    };
+
+    saveScenarioMutation.mutate({ id: `${sid}`, data }, {
+      onSuccess: () => {
+        runScenarioMutation.mutate({ id: `${sid}` }, {
+          onSuccess: ({ data: { data: s } }) => {
+            addToast('run-start', (
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Run started</p>
+              </>
+            ), {
+              level: 'success',
+            });
+            console.info('Scenario runned succesfully', s);
+
+            plausible('Run scenario', {
+              props: {
+                userId: `${user.id}`,
+                userEmail: `${user.email}`,
+                projectId: `${pid}`,
+                projectName: `${projectData.name}`,
+                scenarioId: `${sid}`,
+                scenarioName: `${scenarioData?.name}`,
+              },
+            });
+          },
+          onError: () => {
+            addToast('error-run-start', (
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario run failed</p>
+              </>
+            ), {
+              level: 'error',
+            });
+          },
+        });
+      },
+      onError: () => { },
+    });
+  }, [
+    pid,
+    sid,
+    saveScenarioMutation,
+    runScenarioMutation,
+    addToast,
+    plausible,
+    projectData?.name,
+    user?.email,
+    user?.id,
+    scenarioData?.name,
+    runSettings,
+    scenarioEditingMetadata,
+  ]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.PARAMETERS) return null;
 
@@ -158,22 +244,13 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
                   theme="spacial"
                   size="lg"
                   disabled={VIEWER}
-                  onClick={() => setRunOpen(true)}
+                  onClick={onRunScenario}
                 >
                   Run scenario
                 </Button>
               </motion.div>
             )}
           </AnimatePresence>
-
-          <Modal
-            title="Run scenario"
-            open={runOpen}
-            size="narrow"
-            onDismiss={() => setRunOpen(false)}
-          >
-            <Run />
-          </Modal>
         </motion.div>
       </HelpBeacon>
     </div>

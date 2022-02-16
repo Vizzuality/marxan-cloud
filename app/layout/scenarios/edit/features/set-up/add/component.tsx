@@ -1,13 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import { motion } from 'framer-motion';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
@@ -32,22 +30,13 @@ export interface ScenariosSidebarEditFeaturesProps {
 export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setSubTab } = scenarioSlice.actions;
-
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-  const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
 
   const {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
-
-  useEffect(() => {
-    // setStep(metaSubtab === ScenarioSidebarSubTabs.FEATURES_TARGET ? 1 : 0);
-  }, []);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
 
@@ -138,11 +127,8 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
 
           </header>
 
-          <ListFeatures
-            onSuccess={() => {
-              dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
-            }}
-          />
+          <ListFeatures />
+
         </motion.div>
       </HelpBeacon>
     </div>

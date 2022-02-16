@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import BestCell from 'layout/scenarios/edit/solutions/table/cells/best';
+import BestCell from 'layout/scenarios/edit/solutions/overview/table/cells/best';
 
 import { Button } from 'components/button/component';
 import Table from 'components/table';
