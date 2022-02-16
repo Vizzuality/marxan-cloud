@@ -1,22 +1,25 @@
-import express, { Application, json, Request, Response } from 'express';
-import puppeteer from 'puppeteer';
-import cors from 'cors';
-import helmet from 'helmet';
+import express, { Application, json, Request, Response } from "express";
+import puppeteer from "puppeteer";
+import cors from "cors";
+import helmet from "helmet";
 
 const app: Application = express();
 const daemonListenPort = process.env.WEBSHOT_DAEMON_LISTEN_PORT ?? 3000;
 
 const takeScreenshot = async (req: Request, res: Response) => {
   const {
-    body: { url },
+    body: {
+      url,
+      viewport: { width, height },
+    },
   } = req;
   const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
-  await page.setViewport({ width: 1080, height: 850 });
-  await page.setExtraHTTPHeaders({ 'X-Placeholder': "placeholder" });
-  console.log('webshot destination: ' + url);
+  await page.setViewport({ width, height });
+  await page.setExtraHTTPHeaders({ "X-Placeholder": "placeholder" });
+  console.log("webshot destination: " + url);
   await page.goto(url);
   await page.waitForNetworkIdle();
 
@@ -25,18 +28,20 @@ const takeScreenshot = async (req: Request, res: Response) => {
   await page.close();
   await browser.close();
 
-  res.type('application/pdf');
+  res.type("application/pdf");
   res.end(pageAsPdf);
 };
 
 app.use(helmet());
 app.use(json());
-app.use(cors({
-  allowedHeaders: 'Content-Type,Authorization,Content-Disposition',
-  exposedHeaders: 'Authorization',
-}));
+app.use(
+  cors({
+    allowedHeaders: "Content-Type,Authorization,Content-Disposition",
+    exposedHeaders: "Authorization",
+  })
+);
 
-app.post('/webshot', takeScreenshot);
+app.post("/webshot", takeScreenshot);
 
 app.listen(daemonListenPort, () => {
   console.info(`webshot service initialized on port ${daemonListenPort}`);
