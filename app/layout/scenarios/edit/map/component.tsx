@@ -160,7 +160,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       || scenarioData?.wdpaIucnCategories
       || [];
 
-    // PLANNING UNIT
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return ['cost', 'pugrid'];
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];

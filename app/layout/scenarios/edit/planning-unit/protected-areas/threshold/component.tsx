@@ -154,7 +154,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         addToast('save-scenario-wdpa', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario Protected Areas threshold saved</p>
+            <p className="text-sm">Scenario protected areas threshold saved</p>
           </>
         ), {
           level: 'success',
@@ -166,7 +166,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
         addToast('error-scenario-wdpa', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario Protected Areas threshold not saved</p>
+            <p className="text-sm">Scenario protected areas threshold not saved</p>
           </>
         ), {
           level: 'error',
