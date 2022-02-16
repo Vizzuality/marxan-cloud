@@ -28,14 +28,12 @@ export class CompleteImportPieceHandler
   }
 
   async execute({ importId, componentId }: CompleteImportPiece): Promise<void> {
-    let importInstance: Import | undefined;
     await this.importRepository
       .transaction(async (repo) => {
-        importInstance = await repo.find(importId);
+        const importInstance = await repo.find(importId);
 
         if (!importInstance) {
           const errorMessage = `${CompleteImportPieceHandler.name} could not find import ${importId.value} to complete piece: ${componentId.value}`;
-          this.logger.error(errorMessage);
           throw new Error(errorMessage);
         }
 
@@ -49,7 +47,6 @@ export class CompleteImportPieceHandler
           switch (result.left) {
             case componentNotFound:
               const errorMessage = `Could not find piece with ID: ${componentId} for import with ID: ${importId}`;
-              this.logger.error(errorMessage);
               throw new Error(errorMessage);
             case componentAlreadyCompleted:
               this.logger.error(
@@ -63,10 +60,9 @@ export class CompleteImportPieceHandler
 
         importAggregate.commit();
       })
-      .catch(() => {
-        if (importInstance) {
-          this.eventBus.publish(new ImportPieceFailed(importId, componentId));
-        }
+      .catch((err) => {
+        this.logger.error(err);
+        this.eventBus.publish(new ImportPieceFailed(importId, componentId));
       });
   }
 }

@@ -62,7 +62,7 @@ it('should advance to next batch and emit PieceImportRequested events when previ
   );
 });
 
-it('should emit a ImportAllComponentsFinished event if all components are finished', async () => {
+it('should emit a AllPiecesImported event if all components are finished', async () => {
   const importInstance = await fixtures.GivenImportWasRequested();
   const firstBatchOrder = 0;
   const lastBatchOrder = 1;
@@ -73,11 +73,11 @@ it('should emit a ImportAllComponentsFinished event if all components are finish
   fixtures.ThenAllPiecesImportedEventIsEmitted(importInstance.importId);
 });
 
-it('should not publish any event if import instance is not found', async () => {
+it('should emit a ImportPieceFailed event if import instance is not found', async () => {
   const importId = new ImportId(v4());
   await fixtures.GivenNoneImportWasRequested(importId);
   await fixtures.WhenAPieceOfAnUnexistingImportIsCompleted(importId);
-  fixtures.ThenNoEventIsEmitted();
+  fixtures.ThenImportPieceFailedEventIsEmitted(importId);
 });
 
 it('should not publish any event if import piece component is already completed', async () => {
