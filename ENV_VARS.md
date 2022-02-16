@@ -124,3 +124,7 @@ applications.
   on which the Express daemon of the Geoprocessing service will listen.
   If running the API on the same host as the Geoprocessing application, you 
   need to modify at least one 
+* `WEBSHOT_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on
+  which the Express daemon of the Webshot service will listen. If running the
+  Webshot service on the same host as other Marxan backend applications, you
+  need to modify at least one.
