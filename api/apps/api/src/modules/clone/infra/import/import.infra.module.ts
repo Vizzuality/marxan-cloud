@@ -4,6 +4,7 @@ import { ApiEventsModule } from '../../../api-events';
 import { QueueApiEventsModule } from '../../../queue-api-events';
 import { ImportAdaptersModule } from '../../import/adapters/import-adapters.module';
 import { AllPiecesImportedSaga } from './all-pieces-imported.saga';
+import { ImportPieceEventsHandler } from './import-piece.events-handler';
 import {
   importPieceEventsFactoryProvider,
   importPiecenQueueEventsProvider,
@@ -29,6 +30,7 @@ import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
     ImportRequestedSaga,
     MarkImportAsSubmittedHandler,
     MarkImportAsFinishedHandler,
+    ImportPieceEventsHandler,
     {
       provide: Logger,
       useClass: Logger,

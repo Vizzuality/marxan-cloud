@@ -1,5 +1,5 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import {
@@ -15,10 +15,10 @@ import { v4 } from 'uuid';
 import { CreateApiEventDTO } from '../../../api-events/dto/create.api-event.dto';
 import { QueueModule } from '../../../queue';
 import { EventData, EventFactory } from '../../../queue-api-events';
-import { CompleteExportPiece } from '../../export/application/complete-export-piece.command';
-import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
-import { ExportPieceEventsHandler } from './export-piece.events-handler';
-import { exportPieceEventsFactoryToken } from './export-queue.provider';
+import { CompleteImportPiece } from '../../import/application/complete-import-piece.command';
+import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
+import { ImportPieceEventsHandler } from './import-piece.events-handler';
+import { importPieceEventsFactoryToken } from './import-queue.provider';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -26,22 +26,22 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it('should create a completed api event and send a CompleteExportPiece command when a job finishes successfully', async () => {
-  const jobInput = fixtures.GivenExportPieceJob();
+it('should create a completed api event and send a CompleteImportPiece command when a job finishes successfully', async () => {
+  const jobInput = fixtures.GivenImportPieceJob();
 
   await fixtures.WhenJobFinishes(jobInput);
 
-  fixtures.ThenAExportPieceFinishedApiEventShouldBeCreated();
-  fixtures.ThenACompleteExportPieceCommandShouldBeSent();
+  fixtures.ThenAImportPieceFinishedApiEventShouldBeCreated();
+  fixtures.ThenACompleteImportPieceCommandShouldBeSent();
 });
 
-it('should create a failed api event and publish a ExportPieceFailed event when a job fails', async () => {
-  const jobInput = fixtures.GivenExportPieceJob();
+it('should create a failed api event and publish a ImportPieceFailed event when a job fails', async () => {
+  const jobInput = fixtures.GivenImportPieceJob();
 
   await fixtures.WhenJobFails(jobInput);
 
-  fixtures.ThenAExportPieceFailedApiEventShouldBeCreated();
-  fixtures.ThenAExportPieceFailedEventShouldBePublished();
+  fixtures.ThenAImportPieceFailedApiEventShouldBeCreated();
+  fixtures.ThenAImportPieceFailedEventShouldBePublished();
 });
 
 const getFixtures = async () => {
@@ -50,17 +50,17 @@ const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule, QueueModule],
     providers: [
-      ExportPieceEventsHandler,
+      ImportPieceEventsHandler,
       {
-        provide: exportPieceEventsFactoryToken,
+        provide: importPieceEventsFactoryToken,
         useValue: (
-          eventFactory: EventFactory<ExportJobInput, ExportJobOutput>,
+          eventFactory: EventFactory<ImportJobInput, ImportJobOutput>,
         ) => {
           fakeQueueEvents = new FakeQueueEvents(eventFactory);
           return fakeQueueEvents;
         },
       },
-      FakeCompleteExportPieceHandler,
+      FakeCompleteImportPieceHandler,
     ],
   }).compile();
   await sandbox.init();
@@ -76,8 +76,8 @@ const getFixtures = async () => {
   });
   let results: unknown[] = [];
   const getEventDataFromInput = (
-    input: ExportJobInput,
-  ): EventData<ExportJobInput, ExportJobOutput> => ({
+    input: ImportJobInput,
+  ): EventData<ImportJobInput, ImportJobOutput> => ({
     eventId: v4(),
     jobId: v4(),
     data: Promise.resolve(input),
@@ -88,53 +88,53 @@ const getFixtures = async () => {
   });
 
   return {
-    GivenExportPieceJob: (): ExportJobInput => {
+    GivenImportPieceJob: (): ImportJobInput => {
       return {
-        allPieces: [ClonePiece.ProjectMetadata, ClonePiece.ExportConfig],
         componentId: v4(),
-        exportId: v4(),
+        importId: v4(),
         piece: ClonePiece.ProjectMetadata,
         resourceId: v4(),
         resourceKind: ResourceKind.Project,
+        uris: [],
       };
     },
-    WhenJobFinishes: async (input: ExportJobInput) => {
+    WhenJobFinishes: async (input: ImportJobInput) => {
       const data = getEventDataFromInput(input);
 
       results = await Promise.all(
         fakeQueueEvents.triggerJobEvent('completed', data),
       );
     },
-    WhenJobFails: async (input: ExportJobInput) => {
+    WhenJobFails: async (input: ImportJobInput) => {
       const data = getEventDataFromInput(input);
 
       results = await Promise.all(
         fakeQueueEvents.triggerJobEvent('failed', data),
       );
     },
-    ThenAExportPieceFinishedApiEventShouldBeCreated: () => {
+    ThenAImportPieceFinishedApiEventShouldBeCreated: () => {
       const [finishedApiEvent] = results as [CreateApiEventDTO];
 
       expect(finishedApiEvent.kind).toEqual(
-        API_EVENT_KINDS.project__export__piece__finished__v1__alpha,
+        API_EVENT_KINDS.project__import__piece__finished__v1__alpha,
       );
     },
-    ThenAExportPieceFailedApiEventShouldBeCreated: () => {
+    ThenAImportPieceFailedApiEventShouldBeCreated: () => {
       const [failedApiEvent] = results as [CreateApiEventDTO];
 
       expect(failedApiEvent.kind).toEqual(
-        API_EVENT_KINDS.project__export__piece__failed__v1__alpha,
+        API_EVENT_KINDS.project__import__piece__failed__v1__alpha,
       );
     },
-    ThenACompleteExportPieceCommandShouldBeSent: () => {
+    ThenACompleteImportPieceCommandShouldBeSent: () => {
       expect(commands).toHaveLength(1);
       const [completePieceCommand] = commands;
-      expect(completePieceCommand).toBeInstanceOf(CompleteExportPiece);
+      expect(completePieceCommand).toBeInstanceOf(CompleteImportPiece);
     },
-    ThenAExportPieceFailedEventShouldBePublished: () => {
+    ThenAImportPieceFailedEventShouldBePublished: () => {
       expect(events).toHaveLength(1);
-      const [exportPieceFailedEvent] = events;
-      expect(exportPieceFailedEvent).toBeInstanceOf(ExportPieceFailed);
+      const [importPieceFailedEvent] = events;
+      expect(importPieceFailedEvent).toBeInstanceOf(ImportPieceFailed);
     },
   };
 };
@@ -142,7 +142,7 @@ const getFixtures = async () => {
 type JobEvent = 'completed' | 'failed';
 
 type JobEventListener = (
-  eventData: EventData<ExportJobInput, ExportJobOutput>,
+  eventData: EventData<ImportJobInput, ImportJobOutput>,
 ) => Promise<unknown>;
 
 class FakeQueueEvents {
@@ -152,7 +152,7 @@ class FakeQueueEvents {
   };
 
   public constructor(
-    private eventFactory: EventFactory<ExportJobInput, ExportJobOutput>,
+    private eventFactory: EventFactory<ImportJobInput, ImportJobOutput>,
   ) {
     this.on('completed', eventFactory.createCompletedEvent);
     this.on('failed', eventFactory.createFailedEvent);
@@ -164,13 +164,13 @@ class FakeQueueEvents {
 
   triggerJobEvent(
     type: JobEvent,
-    eventData: EventData<ExportJobInput, ExportJobOutput>,
+    eventData: EventData<ImportJobInput, ImportJobOutput>,
   ): Promise<unknown>[] {
     return this.#listeners[type].map((listener) => listener(eventData));
   }
 }
 
-@CommandHandler(CompleteExportPiece)
-class FakeCompleteExportPieceHandler {
+@CommandHandler(CompleteImportPiece)
+class FakeCompleteImportPieceHandler {
   async execute(): Promise<void> {}
 }
