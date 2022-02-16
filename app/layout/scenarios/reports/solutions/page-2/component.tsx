@@ -18,8 +18,8 @@ export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
         </div>
 
         <div className="text-sm border-t border-gray-400">
-          <p> Solutions:</p>
-          <p> Selection Frequency</p>
+          <p>Solutions:</p>
+          <p>Selection Frequency</p>
         </div>
 
       </section>
