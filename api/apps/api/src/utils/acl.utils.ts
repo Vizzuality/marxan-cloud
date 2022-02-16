@@ -109,7 +109,7 @@ export const aclErrorHandler = (
       throw new InternalServerErrorException();
     case lockedByAnotherUser:
       throw new BadRequestException(
-        `Scenario ${options?.scenarioId} is already being edited.`,
+        `Scenario lock belongs to a different user.`,
       );
     case lockedScenario:
       throw new BadRequestException(

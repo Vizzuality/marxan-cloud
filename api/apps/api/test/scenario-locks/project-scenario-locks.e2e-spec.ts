@@ -280,7 +280,7 @@ test('Fails to update scenario as there was a lock in place by a different user'
   fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
   response = await fixtures.WhenUpdatingScenarioAsContributor();
-  fixtures.ThenScenarioIsLockedIsReturned(response);
+  fixtures.ThenScenarioIsLockedByAnotherUserIsReturned(response);
 });
 
 test('Updates scenario correctly as lock is in place by same user', async () => {
