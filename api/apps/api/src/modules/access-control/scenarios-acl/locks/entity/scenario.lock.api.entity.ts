@@ -1,3 +1,4 @@
+import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import {
@@ -22,6 +23,12 @@ export class ScenarioLockEntity {
     name: `scenario_id`,
   })
   scenarioId!: string;
+
+  @PrimaryColumn({
+    type: `uuid`,
+    name: `token_id`,
+  })
+  tokenId!: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -50,4 +57,14 @@ export class ScenarioLockEntity {
     referencedColumnName: `id`,
   })
   user?: User;
+
+  @ManyToOne(() => IssuedAuthnToken, {
+    onDelete: 'CASCADE',
+    primary: true,
+  })
+  @JoinColumn({
+    name: `token_id`,
+    referencedColumnName: `id`,
+  })
+  token?: IssuedAuthnToken;
 }

@@ -9,6 +9,7 @@ import { forbiddenError } from '@marxan-api/modules/access-control';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { ScenarioAccessControlMock } from './__mocks__/scenario-access-control.mock';
 import { ScenarioLockDto } from './dto/scenario.lock.dto';
+import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 interface LockInterface {
@@ -64,6 +65,10 @@ it(`isLocked should return false if lock no lock exists`, async () => {
 async function getFixtures() {
   const USER_ID = 'user-id';
   const SCENARIO_ID = 'scenario-id';
+  const TOKEN_ID = 'token-id';
+  const createdAt = new Date();
+  const exp = new Date(createdAt);
+  exp.setHours(createdAt.getHours() + 2);
 
   const mockEntityManager = {
     save: jest.fn(() => {
@@ -92,6 +97,26 @@ async function getFixtures() {
       {
         provide: ScenarioAccessControl,
         useClass: ScenarioAccessControlMock,
+      },
+      {
+        provide: getRepositoryToken(IssuedAuthnToken),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+          createQueryBuilder: jest.fn(() => ({
+            leftJoinAndSelect: jest.fn().mockReturnThis(),
+            where: jest.fn().mockReturnThis(),
+            orderBy: jest.fn().mockReturnThis(),
+            getOne: jest.fn(() => {
+              return {
+                id: TOKEN_ID,
+                userId: USER_ID,
+                createdAt,
+                exp,
+              };
+            }),
+          })),
+        },
       },
     ],
   })
@@ -130,6 +155,7 @@ async function getFixtures() {
         scenarioId: SCENARIO_ID,
         userId: USER_ID,
         createdAt: expect.any(Date),
+        tokenId: TOKEN_ID,
       });
     },
     ThenALockedScenarioErrorIsReturned: async (
