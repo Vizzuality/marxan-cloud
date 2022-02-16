@@ -13,7 +13,7 @@ import { v4 } from 'uuid';
 import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
 import {
   Export,
-  ExportAllComponentsFinished,
+  AllPiecesExported,
   ExportComponentFinished,
   ExportId,
 } from '../domain';
@@ -195,9 +195,7 @@ const getFixtures = async () => {
       expect(allComponentsFinishedEvent).toMatchObject({
         exportId,
       });
-      expect(allComponentsFinishedEvent).toBeInstanceOf(
-        ExportAllComponentsFinished,
-      );
+      expect(allComponentsFinishedEvent).toBeInstanceOf(AllPiecesExported);
     },
     ThenNoEventIsEmitted: () => {
       expect(events).toHaveLength(0);

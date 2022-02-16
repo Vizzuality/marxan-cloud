@@ -16,7 +16,7 @@ import { ArchiveReady } from '../events/archive-ready.event';
 
 import { ExportComponent } from './export-component/export-component';
 import { ExportSnapshot } from './export.snapshot';
-import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
+import { AllPiecesExported } from '../events/all-pieces-exported.event';
 import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 
 export const pieceNotFound = Symbol('export piece not found');
@@ -77,7 +77,7 @@ export class Export extends AggregateRoot {
     this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
 
     if (this.#allPiecesReady()) {
-      this.apply(new ExportAllComponentsFinished(this.id));
+      this.apply(new AllPiecesExported(this.id));
     }
 
     return right(true);
