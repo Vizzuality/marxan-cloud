@@ -3,9 +3,8 @@ import puppeteer from 'puppeteer';
 import cors from 'cors';
 import helmet from 'helmet';
 
-require('dotenv').config();
-
 const app: Application = express();
+const daemonListenPort = process.env.WEBSHOT_DAEMON_LISTEN_PORT ?? 3000;
 
 const takeScreenshot = async (req: Request, res: Response) => {
   const {
@@ -39,6 +38,6 @@ app.use(cors({
 
 app.post('/webshot', takeScreenshot);
 
-app.listen(3001, () => {
-  console.info(`webshot service initialized on port 3001`);
+app.listen(daemonListenPort, () => {
+  console.info(`webshot service initialized on port ${daemonListenPort}`);
 });
