@@ -26,10 +26,8 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
         All projects
       </Breadcrumb>
 
-      <div className="flex justify-between mt-5">
-        <div className="flex-col w-2/4">
-          <Title />
-        </div>
+      <div className="flex items-end justify-between mt-5 space-x-10">
+        <Title />
 
         <div className="flex flex-col items-end flex-shrink-0 space-y-6">
           <Contributors />
