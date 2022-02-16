@@ -138,14 +138,16 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
       },
     };
 
-    const mergeData = {
-      metadata: mergeScenarioStatusMetaData(meta, {
-        tab: ScenarioSidebarTabs.PARAMETERS,
-        subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
-      }),
-    };
-
-    saveScenarioMutation.mutate({ id: `${sid}`, data: mergeData }, {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data:
+      {
+        metadata: mergeScenarioStatusMetaData(meta, {
+          tab: ScenarioSidebarTabs.PARAMETERS,
+          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
+        }),
+      },
+    }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-save-blm-value', (
           <>
