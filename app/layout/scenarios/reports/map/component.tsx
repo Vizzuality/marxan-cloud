@@ -10,18 +10,14 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useAccessToken } from 'hooks/auth';
-import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   usePUGridLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
+import { useScenario } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
-
-import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
@@ -47,17 +43,8 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   const dispatch = useDispatch();
 
   const {
-    tab,
-    subtab,
+
     cache,
-
-    // WDPA
-    wdpaCategories,
-    wdpaThreshold,
-
-    // Features
-    preHighlightFeatures,
-    postHighlightFeatures,
 
     // Adjust planning units
     clicking,
@@ -82,16 +69,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   } = useScenario(sid);
 
   const {
-    data: costSurfaceRangeData,
-  } = useCostSurfaceRange(sid);
-
-  const {
-    data: allGapAnalysisData,
-  } = useAllGapAnalysis(sid, {
-    enabled: !!sid,
-  });
-
-  const {
     data: bestSolutionData,
   } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
@@ -104,46 +81,12 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   const [bounds, setBounds] = useState(null);
 
   const include = useMemo(() => {
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return 'lock-status,protection';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW) return 'protection';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return 'cost';
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return 'lock-status,protection';
-
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return 'protection,features';
-
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return 'results';
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return 'results,features';
-
-    return 'protection';
-  }, [tab, subtab]);
+    return 'results';
+  }, []);
 
   const sublayers = useMemo(() => {
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD) return ['wdpa-percentage'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return ['cost'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out'];
-
-    if (tab === ScenarioSidebarTabs.FEATURES) return ['wdpa-percentage'];
-
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
-
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['solutions'];
-
-    return [];
-  }, [tab, subtab]);
-
-  const featuresIds = useMemo(() => {
-    if (allGapAnalysisData) {
-      return allGapAnalysisData.map((g) => g.featureId);
-    }
-    return [];
-  }, [allGapAnalysisData]);
-
-  const postHighlightedFeaturesIds = useMemo(() => {
-    return postHighlightFeatures.map((h) => {
-      return h.replace(`_run${selectedSolution?.runId || bestSolution?.runId}`, '');
-    });
-  }, [postHighlightFeatures, selectedSolution, bestSolution]);
+    return ['solutions'];
+  }, []);
 
   const PUGridLayer = usePUGridLayer({
     cache,
@@ -152,18 +95,10 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     include,
     sublayers,
     options: {
-      wdpaIucnCategories: tab === ScenarioSidebarTabs.PLANNING_UNIT
-        ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
-      wdpaThreshold: tab === ScenarioSidebarTabs.PLANNING_UNIT
-        && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
-        ? wdpaThreshold * 100 : scenarioData?.wdpaThreshold,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
-      features: featuresIds,
-      preHighlightFeatures,
-      postHighlightFeatures: postHighlightedFeaturesIds,
-      cost: costSurfaceRangeData,
+
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
@@ -256,7 +191,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
 
   return (
     <>
-      <div className="relative w-full h-full overflow-hidden rounded-4xl">
+      <div className="relative w-full h-full overflow-hidden">
         <Map
           bounds={bounds}
           width="100%"
@@ -273,16 +208,11 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
         >
           {(map) => {
             return (
-              <>
-                <LayerManager map={map} plugin={PluginMapboxGl}>
-                  {LAYERS.map((l) => (
-                    <Layer key={l.id} {...l} />
-                  ))}
-                </LayerManager>
-
-                {/* Drawing editor */}
-                <ScenariosDrawingManager />
-              </>
+              <LayerManager map={map} plugin={PluginMapboxGl}>
+                {LAYERS.map((l) => (
+                  <Layer key={l.id} {...l} />
+                ))}
+              </LayerManager>
             );
           }}
         </Map>

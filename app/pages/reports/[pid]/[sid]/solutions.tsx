@@ -109,9 +109,9 @@ const SolutionsReport: React.FC = () => {
               </div>
             </header>
 
-            <div className="flex pt-2">
+            <div className="flex">
 
-              <section className="w-1/3 space-y-8 text-xs">
+              <section className="w-1/3 pt-6 space-y-8 text-xs">
                 <div>
                   <p className="font-semibold">Contributors</p>
                   <p>{contributors.join(', ')}</p>
