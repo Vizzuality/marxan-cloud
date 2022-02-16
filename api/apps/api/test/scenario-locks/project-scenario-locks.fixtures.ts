@@ -15,6 +15,7 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ScenarioLockDto } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
 
 export async function getFixtures() {
   const app = await bootstrapApplication();
@@ -42,6 +43,9 @@ export async function getFixtures() {
     getRepositoryToken(UsersProjectsApiEntity),
   );
   const usersRepo: Repository<User> = app.get(getRepositoryToken(User));
+  const tokenRepo: Repository<IssuedAuthnToken> = app.get(
+    getRepositoryToken(IssuedAuthnToken),
+  );
 
   const cleanups: (() => Promise<void>)[] = [];
 
@@ -179,6 +183,9 @@ export async function getFixtures() {
         await usersRepo.delete({ id: randomUserInfo.user.id });
         return;
       });
+    },
+    GivenUserTokenHasExpired: async (userId: string) => {
+      await tokenRepo.delete({ userId });
     },
 
     WhenAcquiringLockForScenario: async (scenarioId: string, token: string) =>

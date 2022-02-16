@@ -341,3 +341,16 @@ test('Fails to release scenario lock as it is not owned by the same user and thi
   response = await fixtures.WhenReleasingLockForScenario(randomUserToken);
   fixtures.ThenScenarioIsLockedByAnotherUserIsReturned(response);
 });
+
+test('A lock is deleted after user token has expired', async () => {
+  const ownerUserId = await fixtures.GivenOwnerExists();
+  const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
+  fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
+
+  await fixtures.GivenUserTokenHasExpired(ownerUserId);
+
+  response = await fixtures.WhenGettingLockFromScenario(scenarioId, ownerToken);
+  fixtures.ThenNoScenarioLockIsReturned(response);
+});
