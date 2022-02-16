@@ -13,15 +13,9 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useAccessToken } from 'hooks/auth';
-import { useSelectedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
-  // usePUGridPreviewLayer,
-  // useAdminPreviewLayer,
-  useWDPAPreviewLayer,
   usePUGridLayer,
-  useFeaturePreviewLayers,
-  useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
@@ -31,22 +25,11 @@ import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
-// Controls
-import Controls from 'components/map/controls';
-import FitBoundsControl from 'components/map/controls/fit-bounds';
-import ZoomControl from 'components/map/controls/zoom';
-import Legend from 'components/map/legend';
-import LegendItem from 'components/map/legend/item';
-import LegendTypeBasic from 'components/map/legend/types/basic';
-import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
-import LegendTypeGradient from 'components/map/legend/types/gradient';
-import LegendTypeMatrix from 'components/map/legend/types/matrix';
 
-export interface ScenariosEditMapProps {
+export interface ScenariosReportMapProps {
 }
 
-export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
-  const [open, setOpen] = useState(true);
+export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   const [mapInteractive, setMapInteractive] = useState(false);
 
   const accessToken = useAccessToken();
@@ -59,7 +42,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     setTmpPuIncludedValue,
     setTmpPuExcludedValue,
-    setLayerSettings,
   } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
@@ -74,8 +56,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     wdpaThreshold,
 
     // Features
-    features: featuresRecipe,
-    featureHoverId,
     preHighlightFeatures,
     postHighlightFeatures,
 
@@ -100,10 +80,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const {
     data: scenarioData,
   } = useScenario(sid);
-
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
 
   const {
     data: costSurfaceRangeData,
@@ -156,36 +132,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return [];
   }, [tab, subtab]);
 
-  const layers = useMemo(() => {
-    const protectedCategories = wdpaCategories?.wdpaIucnCategories
-      || scenarioData?.wdpaIucnCategories
-      || [];
-
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return ['cost', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
-
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW && !!protectedCategories.length) return ['wdpa-preview', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD && !!protectedCategories.length) return ['wdpa-percentage', 'pugrid'];
-
-    if (tab === ScenarioSidebarTabs.FEATURES) {
-      return [
-        ...protectedCategories.length ? ['wdpa-percentage'] : [],
-        'bioregional',
-        'species',
-        'pugrid',
-      ];
-    }
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features', 'pugrid'];
-
-    if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
-
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['frequency', 'solution', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['features'];
-
-    return ['pugrid'];
-  }, [tab, subtab, wdpaCategories?.wdpaIucnCategories, scenarioData?.wdpaIucnCategories]);
-
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {
       return allGapAnalysisData.map((g) => g.featureId);
@@ -198,33 +144,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       return h.replace(`_run${selectedSolution?.runId || bestSolution?.runId}`, '');
     });
   }, [postHighlightFeatures, selectedSolution, bestSolution]);
-
-  const WDPApreviewLayer = useWDPAPreviewLayer({
-    ...wdpaCategories,
-    pid: `${pid}`,
-    cache,
-    active: tab === ScenarioSidebarTabs.PLANNING_UNIT
-      && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
-    bbox,
-    options: {
-      ...layerSettings['wdpa-preview'],
-    },
-  });
-
-  const FeaturePreviewLayers = useFeaturePreviewLayers({
-    features: selectedFeaturesData,
-    cache,
-    active: tab === ScenarioSidebarTabs.FEATURES,
-    bbox,
-    options: {
-      featuresRecipe,
-      featureHoverId,
-      settings: {
-        bioregional: layerSettings.bioregional,
-        species: layerSettings.species,
-      },
-    },
-  });
 
   const PUGridLayer = usePUGridLayer({
     cache,
@@ -260,30 +179,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   });
 
   const LAYERS = [
-    // PUGridPreviewLayer,
-    // AdminPreviewLayer,
     PUGridLayer,
-    WDPApreviewLayer,
-    ...FeaturePreviewLayers,
   ].filter((l) => !!l);
-
-  const LEGEND = useLegend({
-    layers,
-    options: {
-      wdpaIucnCategories: tab === ScenarioSidebarTabs.PLANNING_UNIT
-        && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
-        ? wdpaCategories.wdpaIucnCategories : scenarioData?.wdpaIucnCategories,
-      wdpaThreshold: tab === ScenarioSidebarTabs.PLANNING_UNIT
-        && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
-        ? wdpaThreshold : scenarioData?.wdpaThreshold,
-      cost: costSurfaceRangeData,
-      puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
-      runId: selectedSolution?.runId || bestSolution?.runId,
-      layerSettings,
-    },
-  });
 
   useEffect(() => {
     setBounds({
@@ -295,21 +192,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
-  }, []);
-
-  const handleZoomChange = useCallback(
-    (zoom) => {
-      setViewport({
-        ...viewport,
-        zoom,
-        transitionDuration: 500,
-      });
-    },
-    [viewport],
-  );
-
-  const handleFitBoundsChange = useCallback((b) => {
-    setBounds(b);
   }, []);
 
   const handleClick = useCallback((e) => {
@@ -372,21 +254,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     return null;
   };
 
-  const onChangeOpacity = useCallback((opacity, id) => {
-    dispatch(setLayerSettings({
-      id,
-      settings: { opacity },
-    }));
-  }, [setLayerSettings, dispatch]);
-
-  const onChangeVisibility = useCallback((id) => {
-    const { visibility = true } = layerSettings[id] || {};
-    dispatch(setLayerSettings({
-      id,
-      settings: { visibility: !visibility },
-    }));
-  }, [setLayerSettings, dispatch, layerSettings]);
-
   return (
     <>
       <div className="relative w-full h-full overflow-hidden rounded-4xl">
@@ -419,60 +286,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
             );
           }}
         </Map>
-
-        {/* Controls */}
-        <Controls>
-          <ZoomControl
-            viewport={{
-              ...viewport,
-              minZoom,
-              maxZoom,
-            }}
-            onZoomChange={handleZoomChange}
-          />
-
-          <FitBoundsControl
-            bounds={{
-              ...bounds,
-              viewportOptions: {
-                transitionDuration: 1500,
-              },
-            }}
-            onFitBoundsChange={handleFitBoundsChange}
-          />
-        </Controls>
-
-        {/* Legend */}
-        <div className="absolute w-full max-w-xs bottom-14 right-5">
-          <Legend
-            open={open}
-            className="w-full"
-            maxHeight={325}
-            onChangeOpen={() => setOpen(!open)}
-          >
-            {LEGEND.map((i) => {
-              const {
-                type, items, intersections, id,
-              } = i;
-
-              return (
-                <LegendItem
-                  sortable={false}
-                  key={i.id}
-                  settingsManager={i.settingsManager}
-                  onChangeOpacity={(opacity) => onChangeOpacity(opacity, id)}
-                  onChangeVisibility={() => onChangeVisibility(id)}
-                  {...i}
-                >
-                  {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
-                  {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
-                  {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
-                  {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
-                </LegendItem>
-              );
-            })}
-          </Legend>
-        </div>
       </div>
       <Loading
         visible={!mapInteractive}
@@ -483,4 +296,4 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   );
 };
 
-export default ScenariosEditMap;
+export default ScenariosReportMap;
