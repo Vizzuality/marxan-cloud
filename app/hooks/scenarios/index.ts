@@ -11,6 +11,8 @@ import { useRouter } from 'next/router';
 import { formatDistanceToNow } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
+import { useMe } from 'hooks/me';
+
 import { ItemProps } from 'components/scenarios/item/component';
 
 import DOWNLOADS from 'services/downloads';
@@ -124,6 +126,32 @@ export function useScenarioStatus(pId, sId) {
   SCENARIO LOCKS
 ****************************************
 */
+
+export function useProjectScenariosLocks(pid) {
+  const [session] = useSession();
+
+  const query = useQuery(['project-locks', pid], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pid}/editing-locks`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pid,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
 export function useScenarioLock(sid) {
   const [session] = useSession();
 
@@ -150,6 +178,17 @@ export function useScenarioLock(sid) {
   }, [query, data?.data]);
 }
 
+export function useScenarioLockMe(sid) {
+  const {
+    data: scenarioLockData,
+  } = useScenarioLock(sid);
+  const { user } = useMe();
+
+  return useMemo(() => {
+    return (user.id === scenarioLockData?.userId);
+  }, [user, scenarioLockData]);
+}
+
 export function useSaveScenarioLock({
   requestConfig = {
     method: 'POST',
@@ -170,13 +209,10 @@ export function useSaveScenarioLock({
   };
 
   return useMutation(saveScenarioLock, {
-    onSuccess: (data: any, variables, context) => {
-      const { scenarioId } = data?.data;
-      // const { isoDate, started } = data?.data?.meta;
-      queryClient.invalidateQueries(['project-locks']);
-      queryClient.setQueryData(['scenario-lock', scenarioId], data?.data);
-
-      console.info('Success', data, variables, context);
+    onSuccess: (data: any, variables) => {
+      const { sid } = variables;
+      queryClient.invalidateQueries('project-locks');
+      queryClient.invalidateQueries(['scenario-lock', sid]);
     },
     onError: (error, variables, context) => {
       // An error happened!
@@ -204,13 +240,10 @@ export function useDeleteScenarioLock({
   };
 
   return useMutation(deleteScenarioLock, {
-    onSuccess: (data: any, variables, context) => {
-      const { scenarioId } = data?.data;
-      // const { isoDate, started } = data?.data?.meta;
-      queryClient.invalidateQueries(['project-locks']);
-      queryClient.invalidateQueries(['scenario-lock', scenarioId]);
-
-      console.info('Success', data, variables, context);
+    onSuccess: (data: any, variables) => {
+      const { sid } = variables;
+      queryClient.invalidateQueries('project-locks');
+      queryClient.invalidateQueries(['scenario-lock', sid]);
     },
     onError: (error, variables, context) => {
       // An error happened!
