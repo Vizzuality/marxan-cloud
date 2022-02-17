@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useSelectedFeatures } from 'hooks/features';
 import { useScenario } from 'hooks/scenarios';
 
 import { SCENARIO_PARAMETERS, Types } from './constants';
@@ -13,6 +14,11 @@ export interface ScenariosReportPage4Props {
 export const ScenariosReportPage4: React.FC<ScenariosReportPage4Props> = () => {
   const { query } = useRouter();
   const { sid } = query;
+
+  const {
+    data: featuresData,
+    isFetched: featuresDataIsFetched,
+  } = useSelectedFeatures(sid, {});
 
   const {
     data: scenarioData,
@@ -49,12 +55,18 @@ export const ScenariosReportPage4: React.FC<ScenariosReportPage4Props> = () => {
   };
 
   return (
-    scenarioDataIsFetched && (
-      <div className="flex space-x-4">
+    scenarioDataIsFetched && featuresDataIsFetched && (
+      <div className="flex space-x-4 font-heading">
 
         <section className="w-1/2 space-y-6 text-xs">
           <div>
             <p className="font-semibold">Feature name, target, spf:</p>
+            {featuresData.map((f) => {
+              const { featureId, name, marxanSettings: { fpf: spf, prop: target } } = f;
+              return (
+                <p key={featureId}>{`${name}, ${target}, ${spf}`}</p>
+              );
+            })}
           </div>
         </section>
 
@@ -63,7 +75,7 @@ export const ScenariosReportPage4: React.FC<ScenariosReportPage4Props> = () => {
           {SCENARIO_PARAMETERS.map((p) => {
             const { description, value } = p;
             return (
-              <div key={p.value} className="flex font-heading">
+              <div key={p.value} className="flex">
                 <p className="">{`${description} : ${PARAMETERS[value]}`}</p>
               </div>
             );
