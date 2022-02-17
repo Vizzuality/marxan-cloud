@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -10,6 +10,7 @@ export interface ScenarioLockProps {
 }
 
 export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
+  const [mutatting, setMutatting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
 
@@ -22,10 +23,13 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
 
   // Create a lock if it doesn't exist when you start editing
   useEffect(() => {
-    if (!scenarioLockData) {
-      saveScenarioLockMutation.mutate({ sid: `${sid}` });
+    if (!mutatting && !scenarioLockData) {
+      setMutatting(true);
+      saveScenarioLockMutation.mutate({ sid: `${sid}` }, {
+        onSettled: () => { setMutatting(false); },
+      });
     }
-  }, []); // eslint-disable-line
+  }, [scenarioLockData]); // eslint-disable-line
 
   // Delete a lock when you finish editing
   useLayoutEffect(() => {

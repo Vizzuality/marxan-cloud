@@ -7,6 +7,31 @@ import SCENARIOS from 'services/scenarios';
 
 import { mergeDehydratedState } from './utils';
 
+const fetchScenario = (session, queryClient, { sid }) => {
+  return queryClient.prefetchQuery(['scenarios', sid], () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }));
+};
+
+const fetchScenarioLock = (session, queryClient, { sid }) => {
+  return queryClient.prefetchQuery(['scenario-lock', sid], () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/editing-locks`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }));
+};
+
 export function withScenario(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
@@ -33,15 +58,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
 
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery(['scenarios', sid], () => SCENARIOS.request({
-      method: 'GET',
-      url: `/${sid}`,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    }).then((response) => {
-      return response.data;
-    }));
+    await fetchScenario(session, queryClient, { sid });
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};
@@ -96,16 +113,22 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
 
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery(['scenario-lock', sid], () => SCENARIOS.request({
-      method: 'GET',
-      url: `/${sid}/editing-locks`,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-      transformResponse: (data) => JSON.parse(data),
-    }).then((response) => {
-      return response.data;
-    }));
+    await fetchScenarioLock(session, queryClient, { sid });
+
+    const { data: scenarioLockData } = queryClient.getQueryData<any>(['scenario-lock', sid]);
+
+    if (!scenarioLockData) {
+      await SCENARIOS.request({
+        method: 'POST',
+        url: `/${sid}/lock`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      });
+    }
+
+    await fetchScenarioLock(session, queryClient, { sid });
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};

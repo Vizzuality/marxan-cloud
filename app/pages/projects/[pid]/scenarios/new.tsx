@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { withProtection, withUser } from 'hoc/auth';
+import { withProject } from 'hoc/projects';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
@@ -12,7 +13,7 @@ import ScenariosSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser());
+export const getServerSideProps = withProtection(withUser(withProject()));
 
 const NewScenarioPage: React.FC = () => {
   return (
