@@ -19,13 +19,13 @@ export const ScenariosReportPage3: React.FC<ScenariosReportPage3Props> = () => {
 
   return (
     featuresDataIsFetched && (
-      <section className="w-full text-xs">
+      <section className="w-full pt-4 text-xs">
         <div>
           <p className="pb-2 font-medium">Feature name, target, spf:</p>
           {featuresData.map((f) => {
             const { featureId, name, marxanSettings: { fpf: spf, prop: target } } = f;
             return (
-              <p key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>
+              <p className="leading-5" key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>
             );
           })}
         </div>

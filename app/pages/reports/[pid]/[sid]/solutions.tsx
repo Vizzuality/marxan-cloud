@@ -14,8 +14,8 @@ export const getServerSideProps = withProtection(withUser());
 
 const styles = {
   page: {
-    minHeight: '210mm',
-    margin: '10mm auto',
+    minHeight: '200mm',
+    margin: 'auto',
     padding: '33px 51px',
     width: '297mm',
   },
