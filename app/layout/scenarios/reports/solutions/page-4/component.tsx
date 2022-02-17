@@ -58,14 +58,13 @@ export const ScenariosReportPage4: React.FC<ScenariosReportPage4Props> = () => {
           </div>
         </section>
 
-        <section className="w-1/2 space-y-6 text-xs">
+        <section className="w-1/2 text-xs leading-8">
 
           {SCENARIO_PARAMETERS.map((p) => {
             const { description, value } = p;
             return (
-              <div key={p.value} className="flex space-x-2">
-                <p className="font-semibold">{`${description} :`}</p>
-                <p>{PARAMETERS[value]}</p>
+              <div key={p.value} className="flex font-heading">
+                <p className="">{`${description} : ${PARAMETERS[value]}`}</p>
               </div>
             );
           })}
