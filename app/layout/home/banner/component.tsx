@@ -2,10 +2,10 @@ import React from 'react';
 
 import Wrapper from 'layout/wrapper';
 
-import BANNER_1_IMG from 'images/home-banner/banner-1.png';
-import BANNER_2_IMG from 'images/home-banner/banner-2.png';
-import BANNER_3_IMG from 'images/home-banner/banner-3.png';
-import BANNER_BACKGROUND from 'images/home-banner/banner-background.png';
+import BANNER_1_IMG from 'images/home/banner/banner-1.png';
+import BANNER_2_IMG from 'images/home/banner/banner-2.png';
+import BANNER_3_IMG from 'images/home/banner/banner-3.png';
+import BANNER_BACKGROUND from 'images/home/banner/banner-background.png';
 
 export interface HomeBannerProps {
 
@@ -15,7 +15,7 @@ const claimLines = [{ id: '0', text: 'free and open' }, { id: '1', text: 'flexib
 
 export const HomeBanner: React.FC<HomeBannerProps> = () => {
   return (
-    <div className="py-10 bg-gray-500 md:py-32" style={{ background: 'radial-gradient(circle at 50% 60%, rgba(54,55,62,1) 0%, rgba(17,17,17,1) 51%)' }}>
+    <div className="py-10 md:py-32" style={{ background: 'radial-gradient(circle at 50% 70%, rgba(54,55,62,1) 0%, rgba(21,21,21,1) 51%)' }}>
 
       <Wrapper>
         <div className="flex flex-col items-center -space-y-20 md:space-y-20">

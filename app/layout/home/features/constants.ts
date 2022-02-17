@@ -1,5 +1,5 @@
-import EXAMPLE_PLACEHOLDER_PNG from 'images/home-features/example-placeholder.png';
-import EXAMPLE_PROJECT_PNG from 'images/home-features/example-project.png';
+import EXAMPLE_PLACEHOLDER_PNG from 'images/home/features/example-placeholder.png';
+import EXAMPLE_PROJECT_PNG from 'images/home/features/example-project.png';
 
 import ANALYZE_AND_REPORT_SVG from 'svgs/home/analyze-report.svg?sprite';
 import CLOUD_STORAGE_SVG from 'svgs/home/cloud-storage.svg?sprite';
