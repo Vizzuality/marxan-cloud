@@ -46,6 +46,8 @@ import {
   ChangeProjectBlmRange,
   ChangeProjectRangeErrors,
 } from '@marxan-api/modules/projects/blm';
+import { UploadExportFile } from '../clone/infra/import/upload-export-file.command';
+import { unknownError } from '@marxan/files-repository';
 
 export { validationFailed } from '../planning-areas';
 
@@ -304,5 +306,20 @@ export class ProjectsService {
     userId: string,
   ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
     return await this.projectAclService.findAllLocks(userId, projectId);
+  }
+
+  async importProject(
+    exportFile: Express.Multer.File,
+  ): Promise<Either<typeof unknownError, string>> {
+    const archiveLocationOrError = await this.commandBus.execute(
+      new UploadExportFile(exportFile),
+    );
+
+    if (isLeft(archiveLocationOrError)) {
+      return archiveLocationOrError;
+    }
+
+    // TODO Return actual import id
+    return right(archiveLocationOrError.right.value);
   }
 }
