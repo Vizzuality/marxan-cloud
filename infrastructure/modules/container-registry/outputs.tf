@@ -2,6 +2,10 @@ output "azurerm_container_registry_login_server" {
   value = azurerm_container_registry.acr.login_server
 }
 
+output "azurerm_container_registry_id" {
+  value = azurerm_container_registry.acr.id
+}
+
 output "azuread_application" {
   value = azuread_application.github-actions-access
 }
