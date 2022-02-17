@@ -102,7 +102,7 @@ import {
   ScenarioLockResultPlural,
   ScenarioLockResultSingular,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
-import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -249,9 +249,9 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -270,9 +270,9 @@ export class ScenariosController {
       authenticatedUser: req.user,
     });
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return await this.scenarioSerializer.serialize(
@@ -293,10 +293,10 @@ export class ScenariosController {
     const result = await this.service.createSpecification(id, req.user.id, dto);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -348,10 +348,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
@@ -365,10 +365,10 @@ export class ScenariosController {
   ): Promise<CostRangeDto> {
     const result = await this.service.getCostRange(scenarioId, req.user.id);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return plainToClass<CostRangeDto, CostRangeDto>(CostRangeDto, result.right);
@@ -389,10 +389,10 @@ export class ScenariosController {
       file,
     );
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return result.right;
@@ -410,10 +410,10 @@ export class ScenariosController {
     const result = await this.service.update(id, req.user.id, dto);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -434,10 +434,10 @@ export class ScenariosController {
     const result = await this.service.remove(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
   }
@@ -452,10 +452,10 @@ export class ScenariosController {
   ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.service.changeLockStatus(id, req.user.id, input);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
@@ -470,10 +470,10 @@ export class ScenariosController {
     const result = await this.service.resetLockStatus(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
   }
@@ -487,10 +487,10 @@ export class ScenariosController {
     const result = await this.service.getPlanningUnits(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -508,10 +508,10 @@ export class ScenariosController {
   ): Promise<Partial<ScenarioFeaturesData>[]> {
     const result = await this.service.getFeatures(id, req.user.id);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return this.scenarioFeatureSerializer.serialize(
@@ -546,10 +546,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return this.scenarioFeaturesGapData.serialize(
@@ -569,10 +569,10 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getInputParameterFile(id, req.user.id);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return result.right;
@@ -589,10 +589,10 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getSpecDatCsv(id, req.user.id);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return result.right;
@@ -609,10 +609,10 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getPuvsprDatCsv(id, req.user.id);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return result.right;
@@ -629,10 +629,10 @@ export class ScenariosController {
   ): Promise<string> {
     const result = await this.service.getBoundDatCsv(id, req.user.id);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return result.right;
@@ -656,10 +656,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -684,10 +684,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     response.send(this.zipFilesSerializer.serialize(result));
@@ -720,10 +720,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -754,10 +754,10 @@ export class ScenariosController {
   ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.service.run(id, req.user.id, blm);
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
@@ -779,10 +779,10 @@ export class ScenariosController {
     const result = await this.service.cancelMarxanRun(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
   }
@@ -805,10 +805,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -833,10 +833,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -877,10 +877,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -909,10 +909,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -938,10 +938,10 @@ export class ScenariosController {
     const result = await this.service.getCostSurfaceCsv(id, req.user.id, res);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
   }
@@ -960,10 +960,10 @@ export class ScenariosController {
     });
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -985,10 +985,10 @@ export class ScenariosController {
     });
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return await this.getProtectedAreasForScenario(scenarioId, req);
@@ -1015,10 +1015,10 @@ export class ScenariosController {
       dto,
     );
     if (isLeft(outcome)) {
-      return aclErrorHandler(outcome.left, {
+      throw mapAclDomainToHttpError(outcome.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return AsyncJobDto.forScenario().asJsonApiMetadata();
@@ -1046,10 +1046,10 @@ export class ScenariosController {
     );
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
         range,
       });
     }
@@ -1073,10 +1073,10 @@ export class ScenariosController {
     const result = await this.service.getBlmCalibrationResults(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -1099,10 +1099,10 @@ export class ScenariosController {
     const result = await this.service.getBlmRange(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 
@@ -1121,10 +1121,10 @@ export class ScenariosController {
     const result = await this.service.cancelBlmCalibration(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
   }
@@ -1143,10 +1143,10 @@ export class ScenariosController {
     const result = await this.scenarioAclService.acquireLock(req.user.id, id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
     return { data: result.right };
@@ -1170,10 +1170,10 @@ export class ScenariosController {
     const result = await this.service.releaseLock(id, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
   }
@@ -1190,10 +1190,10 @@ export class ScenariosController {
     const result = await this.service.findLock(scenarioId, req.user.id);
 
     if (isLeft(result)) {
-      return aclErrorHandler(result.left, {
+      throw mapAclDomainToHttpError(result.left, {
         scenarioId,
         userId: req.user.id,
-        resourceType: 'scenarios',
+        resourceType: scenarioResource.name.plural,
       });
     }
 

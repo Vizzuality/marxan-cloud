@@ -59,7 +59,7 @@ interface ErrorHandlerOptions {
   userId?: string;
 }
 
-export const aclErrorHandler = (
+export const mapAclDomainToHttpError = (
   errorToCheck:
     | typeof forbiddenError
     | typeof lastOwner
@@ -94,89 +94,89 @@ export const aclErrorHandler = (
 ) => {
   switch (errorToCheck) {
     case forbiddenError:
-      throw new ForbiddenException(
+      return new ForbiddenException(
         `User with ID: ${options?.userId} is not allowed to perform this action on ${options?.resourceType}.`,
       );
     case lastOwner:
-      throw new ForbiddenException(`There must be at least one owner.`);
+      return new ForbiddenException(`There must be at least one owner.`);
     case queryFailed:
-      throw new BadRequestException(
+      return new BadRequestException(
         `Error while adding record to the database.`,
       );
     case transactionFailed:
-      throw new InternalServerErrorException(`Transaction failed.`);
+      return new InternalServerErrorException(`Transaction failed.`);
     case lockUnknownError:
-      throw new InternalServerErrorException();
+      return new InternalServerErrorException();
     case lockedByAnotherUser:
-      throw new BadRequestException(
+      return new BadRequestException(
         `Scenario lock belongs to a different user.`,
       );
     case lockedScenario:
-      throw new BadRequestException(
+      return new BadRequestException(
         `Scenario ${options?.scenarioId} is already being edited.`,
       );
     case noLockInPlace:
-      throw new NotFoundException(
+      return new NotFoundException(
         `Scenario ${options?.scenarioId} has no locks in place.`,
       );
     case internalError:
-      throw new InternalServerErrorException(errorToCheck.description);
+      return new InternalServerErrorException(errorToCheck.description);
     case marxanRunNotFound:
-      throw new NotFoundException(`Entity not found.`);
+      return new NotFoundException(`Entity not found.`);
     case blmUnknownError:
-      throw new InternalServerErrorException();
+      return new InternalServerErrorException();
     case scenarioNotFound:
-      throw new NotFoundException(
+      return new NotFoundException(
         `Scenario ${options?.scenarioId} could not be found.`,
       );
     case marxanFailed:
-      throw new InternalServerErrorException('Marxan failed.');
+      return new InternalServerErrorException('Marxan failed.');
     case outputZipNotYetAvailable:
-      throw new InternalServerErrorException(
+      return new InternalServerErrorException(
         'Marxan output file - output file not available, possible error.',
       );
     case metadataNotFound:
-      throw new InternalServerErrorException('Marxan was not yet executed.');
+      return new InternalServerErrorException('Marxan was not yet executed.');
     case inputZipNotYetAvailable:
-      throw new InternalServerErrorException(
+      return new InternalServerErrorException(
         'Marxan input file - input file not available, possible error.',
       );
     case inputMetadataNotFound:
-      throw new InternalServerErrorException(
+      return new InternalServerErrorException(
         'Marxan input file - metadata not found.',
       );
     case projectNotReady:
-      throw new ConflictException('Project is not ready.');
+      return new ConflictException('Project is not ready.');
     case projectDoesntExist:
-      throw new NotFoundException(`Project doesn't exist.`);
+      return new NotFoundException(`Project doesn't exist.`);
     case protectedAreaProjectNotFound:
-      throw new NotFoundException('Project not found.');
+      return new NotFoundException('Project not found.');
     case invalidProtectedAreaId:
-      throw new BadRequestException('Invalid protected area id.');
+      return new BadRequestException('Invalid protected area id.');
     case rangeUnknownError:
-      throw new InternalServerErrorException();
+      return new InternalServerErrorException();
     case updateFailure:
-      throw new InternalServerErrorException();
+      return new InternalServerErrorException();
     case invalidRange:
-      throw new BadRequestException(
+      return new BadRequestException(
         `Received range is invalid: [${options?.range}]`,
       );
     case blmCreationFailure:
-      throw new InternalServerErrorException(
+      return new InternalServerErrorException(
         `Could not create initial BLM for scenario.`,
       );
     case jobSubmissionFailed:
-      throw new InternalServerErrorException('Job submission failed.');
+      return new InternalServerErrorException('Job submission failed.');
     case submissionFailed:
-      throw new InternalServerErrorException(
+      return new InternalServerErrorException(
         'System could not submit the async job.',
       );
     case nullPlanningUnitGridShape:
-      throw new BadRequestException('Invalid planing unit grid shape.');
+      return new BadRequestException('Invalid planing unit grid shape.');
     case initialCostProjectNotFound:
-      throw new NotFoundException('Project not found.');
+      return new NotFoundException('Project not found.');
     default:
       const _exhaustiveCheck: never = errorToCheck;
-      throw _exhaustiveCheck;
+      return _exhaustiveCheck;
   }
 };
