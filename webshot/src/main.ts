@@ -6,24 +6,33 @@ import helmet from "helmet";
 const app: Application = express();
 const daemonListenPort = process.env.WEBSHOT_DAEMON_LISTEN_PORT ?? 3000;
 
-const takeScreenshot = async (req: Request, res: Response) => {
+const generateSummaryReportForProject = async (req: Request, res: Response) => {
+  /**
+   * @todo `pageUrl` is currently allowed (and required) in the request body
+   * only for testing purposes for the initial proof-of-concept implementation.
+   * This will be removed once
+   */
   const {
-    body: {
-      url,
-      viewport: { width, height },
-    },
+    body: { pageUrl, viewport: { width = 1080, height = 960 } = {} },
   } = req;
+
+  if (!pageUrl) {
+    res.status(400).json({ error: "No url was provided" });
+    return;
+  }
+
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
+
   await page.setViewport({ width, height });
   await page.setExtraHTTPHeaders({ "X-Placeholder": "placeholder" });
-  console.log("webshot destination: " + url);
-  await page.goto(url);
+  console.info(`Rendering ${pageUrl} as PDF`);
+  await page.goto(pageUrl);
   await page.waitForNetworkIdle();
 
-  const pageAsPdf = await page.pdf({ timeout: 0 });
+  const pageAsPdf = await page.pdf({ timeout: 3e4 });
 
   await page.close();
   await browser.close();
@@ -41,7 +50,10 @@ app.use(
   })
 );
 
-app.post("/webshot", takeScreenshot);
+app.post(
+  "/projects/:projectId/summary-report",
+  generateSummaryReportForProject
+);
 
 app.listen(daemonListenPort, () => {
   console.info(`webshot service initialized on port ${daemonListenPort}`);
