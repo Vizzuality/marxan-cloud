@@ -7,6 +7,7 @@ import { PlanningAreaController } from './planning-area.controller';
 import { gcConfigProvider } from './garbage-collector-config';
 import { PlanningAreaSerializer } from './planning-area.serializer';
 import { PlanningUnitsGridProcessor } from './planning-units-grid/planning-units-grid.processor';
+import { PlanningAreaTilesService } from './planning-area-tiles/planning-area-tiles.service';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlanningUnitsGridProcessor } from './planning-units-grid/planning-units
     gcConfigProvider,
     PlanningAreaSerializer,
     PlanningUnitsGridProcessor,
+    PlanningAreaTilesService,
   ],
   controllers: [PlanningAreaController],
 })
