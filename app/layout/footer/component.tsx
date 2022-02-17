@@ -30,10 +30,10 @@ export const Footer: React.FC<FooterProps> = () => {
             <div className="flex flex-col space-y-6 text-2xl md:space-y-0 md:space-x-8 md:items-center md:flex-row">
               <p className="text-black">Explore more:</p>
               <Link href="/community">
-                <a href="/community" className="text-gray-400 hover:text-black">Community</a>
+                <a href="/community" className="text-black opacity-50 hover:underline hover:opacity-100">Community</a>
               </Link>
               <Link href="/about">
-                <a href="/about" className="text-gray-400 hover:text-black">About</a>
+                <a href="/about" className="text-black opacity-50 hover:underline hover:opacity-100">About</a>
               </Link>
             </div>
           </div>
@@ -78,12 +78,12 @@ export const Footer: React.FC<FooterProps> = () => {
           <div className="w-full h-px max-w-5xl mx-auto opacity-20" style={{ background: 'linear-gradient(to right, transparent, #ffffff, transparent)' }} />
 
           <div className="justify-between w-full max-w-5xl pt-12 mx-auto space-y-10 md:flex md:space-y-0">
-            <div>
+            <div className="space-y-2">
               <p className="text-base">Follow us on twitter and join in the conversation.</p>
-              <div className="flex items-center">
-                <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 mr-2.5 text-primary-500" />
+              <div className="flex items-center space-x-3">
+                <Icon icon={TWITTER_FILLED_SVG} className="w-5 h-5 text-primary-500" />
                 <a
-                  className="text-primary-500 hover:underline"
+                  className="font-semibold text-primary-500 hover:underline"
                   type="button"
                   role="button"
                   href="https://twitter.com/marxan_planning?"

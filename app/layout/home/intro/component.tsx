@@ -1,6 +1,4 @@
-import React from 'react';
-
-import Link from 'next/link';
+import React, { useCallback } from 'react';
 
 import Wrapper from 'layout/wrapper';
 
@@ -16,6 +14,16 @@ export interface HomeIntroProps {
 
 export const HomeIntro: React.FC<HomeIntroProps> = () => {
   const { backgroundColor } = BACKGROUND_IMAGES[0];
+
+  const onDiscover = useCallback(() => {
+    const $scrollToElement = document.getElementById('home-support-section');
+
+    window.scrollTo({
+      top: $scrollToElement.offsetTop,
+      left: 0,
+      behavior: 'smooth',
+    });
+  }, []);
 
   return (
     <div
@@ -60,12 +68,14 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
           </div>
 
           <div className="relative bottom-0 mt-10 text-center md:absolute md:mt-0 md:text-left">
-            <Link href="#features">
-              <a className="mt-8" href="#features">
-                Discover more
-                <ARROW_DOWN_SVG className="inline w-3 ml-3" fill="white" />
-              </a>
-            </Link>
+            <button
+              className="mt-8 text-sm focus:outline-none"
+              type="button"
+              onClick={onDiscover}
+            >
+              Discover more
+              <ARROW_DOWN_SVG className="inline w-3 ml-3 animate-bounce" fill="white" />
+            </button>
           </div>
         </div>
       </Wrapper>

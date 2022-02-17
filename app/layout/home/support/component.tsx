@@ -10,7 +10,7 @@ export interface HomeSupportProps {
 
 export const HomeSupport: React.FC<HomeSupportProps> = () => {
   return (
-    <div className="bg-gray-700">
+    <div id="home-support-section" className="bg-gray-700">
       <Wrapper>
         <div className="relative w-full max-w-5xl py-24 mx-auto md:py-44">
 

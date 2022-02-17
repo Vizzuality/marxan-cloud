@@ -23,7 +23,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
       originX: 1,
       originY: 1,
       transition: {
-        duration: 0.5,
+        duration: 0.25,
         ease: 'easeInOut',
       },
     }),
@@ -34,14 +34,14 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
       originX: 1,
       originY: 1,
       transition: {
-        duration: 0.5,
+        duration: 0.25,
         ease: 'easeInOut',
       },
     }),
   };
 
   return (
-    <div id="features" className="bg-primary-50">
+    <div className="bg-primary-50">
       <Wrapper>
         <div className="w-full py-10 md:py-32">
           <div className="grid max-w-5xl grid-cols-1 gap-10 mx-auto md:gap-20 sm:grid-cols-2 lg:grid-cols-3">
@@ -70,7 +70,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                   Explore planning examples from around the world and learn
                 </p>
               </Link>
-              <div className="w-full overflow-hidden mt-10">
+              <div className="w-full mt-10 overflow-hidden">
                 {EXAMPLE_PROJECTS.map(({
                   id, image, alt,
                 }, index) => (

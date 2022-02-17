@@ -41,7 +41,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
             }
           });
       }
-    }, 4000);
+    }, 3000);
 
     return () => {
       if (timer.current) clearInterval(timer.current);
@@ -55,7 +55,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
         type="button"
         aria-label="dot-element"
         onClick={() => slider.current.prev()}
-        className="absolute flex items-center justify-center invisible w-16 h-16 border border-gray-500 rounded-full md:visible -left-36 top-12 opacity-30 hover:opacity-90"
+        className="absolute flex items-center justify-center w-16 h-16 border border-gray-500 rounded-full -left-36 top-12 opacity-30 hover:opacity-90"
       >
         <Icon className="w-3 h-3 text-black" icon={ARROW_LEFT_SVG} />
       </button>
@@ -83,6 +83,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
 
         <Flicking
           ref={slider}
+          duration={0}
           circular
           onWillChange={({ index }) => {
             setSlide(index);
@@ -129,7 +130,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }: CarouselProps) => 
         type="button"
         aria-label="dot-element"
         onClick={() => slider.current.next()}
-        className="absolute flex items-center justify-center invisible w-16 h-16 border border-gray-500 rounded-full md:visible top-12 -right-36 opacity-30 hover:opacity-90"
+        className="absolute flex items-center justify-center w-16 h-16 border border-gray-500 rounded-full top-12 -right-36 opacity-30 hover:opacity-90"
       >
         <Icon className="w-3 h-3 text-black" icon={ARROW_RIGHT_SVG} />
       </button>
