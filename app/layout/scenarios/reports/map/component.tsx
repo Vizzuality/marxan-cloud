@@ -2,9 +2,11 @@ import React, {
   useCallback, useEffect, useState, useMemo,
 } from 'react';
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -32,8 +34,22 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
 
   const { pid, sid } = query;
 
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const {
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
+  } = scenarioSlice.actions;
+
+  const dispatch = useDispatch();
+
   const {
     cache,
+
+    // Adjust planning units
+    clicking,
+    puAction,
+    puTmpIncludedValue,
+    puTmpExcludedValue,
 
     // Solutions
     selectedSolution,
@@ -78,6 +94,9 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     include,
     sublayers,
     options: {
+      puAction,
+      puIncludedValue: puTmpIncludedValue,
+      puExcludedValue: puTmpExcludedValue,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
@@ -108,6 +127,54 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     setViewport(vw);
   }, []);
 
+  const handleClick = useCallback((e) => {
+    if (e && e.features) {
+      console.info(e.features);
+    }
+
+    if (clicking) {
+      const { features = [] } = e;
+
+      const pUGridLayer = features.find((f) => f.source === `pu-grid-layer-${cache}`);
+
+      if (pUGridLayer) {
+        const { properties } = pUGridLayer;
+        const { scenarioPuId } = properties;
+
+        const newClickingValue = puAction === 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
+        const newAction = puAction === 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
+
+        const newOpositeClickingValue = puAction !== 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
+        const newOpositeAction = puAction !== 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
+
+        const index = newClickingValue.findIndex((s) => s === scenarioPuId);
+        const indexOposite = newOpositeClickingValue.findIndex((s) => s === scenarioPuId);
+
+        if (index > -1) {
+          newClickingValue.splice(index, 1);
+        } else {
+          newClickingValue.push(scenarioPuId);
+        }
+
+        if (indexOposite > -1) {
+          newOpositeClickingValue.splice(indexOposite, 1);
+          dispatch(newOpositeAction(newOpositeClickingValue));
+        }
+
+        dispatch(newAction(newClickingValue));
+      }
+    }
+  }, [
+    clicking,
+    puAction,
+    puTmpIncludedValue,
+    puTmpExcludedValue,
+    dispatch,
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
+    cache,
+  ]);
+
   const handleTransformRequest = (url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
@@ -135,6 +202,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           minZoom={minZoom}
           maxZoom={maxZoom}
           viewport={viewport}
+          onClick={handleClick}
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
