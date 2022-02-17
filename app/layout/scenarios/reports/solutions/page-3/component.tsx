@@ -1,28 +1,36 @@
 import React from 'react';
 
+import { useRouter } from 'next/router';
+
+import { useSelectedFeatures } from 'hooks/features';
+
 export interface ScenariosReportPage3Props {
 
 }
 
 export const ScenariosReportPage3: React.FC<ScenariosReportPage3Props> = () => {
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const {
+    data: featuresData,
+    isFetched: featuresDataIsFetched,
+  } = useSelectedFeatures(sid, {});
+
   return (
-
-    <div className="flex space-x-4">
-
-      <section className="w-full space-y-8 text-xs">
-
-        <div className="border-t-4 border-gray-700">
-          <p className="font-semibold uppercase"> Legend:</p>
+    featuresDataIsFetched && (
+      <section className="w-full text-xs">
+        <div>
+          <p className="pb-2 font-medium">Feature name, target, spf:</p>
+          {featuresData.map((f) => {
+            const { featureId, name, marxanSettings: { fpf: spf, prop: target } } = f;
+            return (
+              <p key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>
+            );
+          })}
         </div>
-
-        <div className="text-sm border-t border-gray-400">
-          <p>Solutions:</p>
-          <p>Selection Frequency</p>
-        </div>
-
       </section>
-
-    </div>
+    )
   );
 };
 

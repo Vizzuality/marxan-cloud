@@ -24,7 +24,7 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
 
   const {
     data: projectUsers,
-    isFetched: projectUsersAreFetched,
+    isFetched: projectUsersDataIsFetched,
   } = useProjectUsers(pid);
 
   const contributors = projectUsers?.map((u) => u.user.displayName);
@@ -36,7 +36,7 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
 
   const {
     data: protectedAreasData,
-    isFetched: protectedAreasAreFetched,
+    isFetched: protectedAreasDataIsFetched,
   } = useWDPACategories({
     adminAreaId: projectData?.adminAreaLevel2Id
       || projectData?.adminAreaLevel1I
@@ -47,15 +47,15 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
     scenarioId: sid,
   });
 
+  const protectedAreas = protectedAreasData?.filter((a) => a.selected).map((a) => a.name);
+
   const {
     data: PUData,
     isFetched: PUDataIsFetched,
   } = useScenarioPU(sid);
 
-  const protectedAreas = protectedAreasData?.filter((a) => a.selected).map((a) => a.name);
-
-  const reportDataIsFetched = projectDataIsFetched && projectUsersAreFetched
-    && scenarioDataIsFetched && protectedAreasAreFetched && PUDataIsFetched;
+  const reportDataIsFetched = projectDataIsFetched && projectUsersDataIsFetched
+    && scenarioDataIsFetched && protectedAreasDataIsFetched && PUDataIsFetched;
 
   return (
     reportDataIsFetched && (

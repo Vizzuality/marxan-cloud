@@ -42,7 +42,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
 
   return (
     reportDataIsFetched && (
-      <header className="w-full mb-12">
+      <header className="w-full pb-6">
 
         <div className="flex justify-between">
           <div className="flex space-x-1 text-xs">
@@ -57,7 +57,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
           </p>
         </div>
 
-        <h1 className="pb-6 text-2xl text-gray-500 font-heading">
+        <h1 className="pb-4 text-2xl text-gray-500 font-heading">
           {`${projectData.name}-${scenarioData.name}`}
         </h1>
 
