@@ -55,6 +55,9 @@
   "geoprocessing": {
     "url": "http://geoprocessing:3000"
   },
+  "webshot": {
+    "url": "http://webshot:3000"
+  },
   "storage": {
     "sharedFileStorage": {
       "localPath": "/tmp/storage"
