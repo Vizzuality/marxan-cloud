@@ -2,6 +2,11 @@ output "client_certificate" {
   value = module.kubernetes.client_certificate
 }
 
+output "aks_cluster_name" {
+  value       = module.kubernetes.cluster_name
+  description = "AKS cluster name"
+}
+
 output "kube_config" {
   value = module.kubernetes.kube_config
 
@@ -26,4 +31,8 @@ output "azure_tenant_id" {
 
 output "azure_subscription_id" {
   value = data.azurerm_subscription.subscription.subscription_id
+}
+
+output "bastion_public_ip" {
+  value = module.bastion.bastion_public_ip
 }

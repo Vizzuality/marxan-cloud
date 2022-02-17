@@ -7,3 +7,7 @@ output "kube_config" {
 
   sensitive = true
 }
+
+output "cluster_name" {
+  value = azurerm_kubernetes_cluster.k8s_cluster.name
+}

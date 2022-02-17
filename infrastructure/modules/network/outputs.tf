@@ -1,35 +1,31 @@
-# IDs of subnets provisioned.
-output "network_subnet_ids" {
-  description = "IDs of subnets provisioned."
-  value       = "${concat(azurerm_subnet.private_subnet.*.id, azurerm_subnet.public_subnet.*.id)}"
+output "aks_vnet_id" {
+  value = azurerm_virtual_network.aks_vnet.id
 }
 
-# Prefixes of virtual networks provisioned.
-output "network_subnet_prefixes" {
-  description = "Prefixes of virtual networks provisioned."
-  value       = "${concat(azurerm_subnet.public_subnet.*.address_prefix, azurerm_subnet.private_subnet.*.address_prefix)}"
+output "aks_vnet_name" {
+  value = azurerm_virtual_network.aks_vnet.name
 }
 
-# IDs of network security groups provisioned.
-output "network_security_group_ids" {
-  description = "IDs of network security groups provisioned."
-  value       = "${concat(azurerm_network_security_group.public_nsg.*.id, azurerm_network_security_group.private_nsg.*.id)}"
+output "aks_subnet_id" {
+  value = azurerm_subnet.aks_subnet.id
 }
 
-# IDs of public IP addresses provisioned.
-output "public_ip_ids" {
-  description = "IDs of public IP addresses provisioned."
-  value       = "${azurerm_public_ip.public_ip.*.id}"
+output "aks_subnet_name" {
+  value = azurerm_subnet.aks_subnet.name
 }
 
-# IP addresses of public IP addresses provisioned.
-output "public_ip_addresses" {
-  description = "IP addresses of public IP addresses provisioned."
-  value       = "${azurerm_public_ip.public_ip.*.ip_address}"
+output "core_vnet_id" {
+  value = azurerm_virtual_network.core_vnet.id
 }
 
-# FQDNs of public IP addresses provisioned.
-output "public_ip_dns_names" {
-  description = "FQDNs of public IP addresses provisioned."
-  value       = "${azurerm_public_ip.public_ip.*.fqdn}"
+output "core_vnet_name" {
+  value = azurerm_virtual_network.core_vnet.name
+}
+
+output "bastion_subnet_id" {
+  value = azurerm_subnet.bastion_subnet.id
+}
+
+output "firewall_subnet_id" {
+  value = azurerm_subnet.firewall_subnet.id
 }
