@@ -225,7 +225,7 @@ test(`getting all locks of scenarios as scenario viewer`, async () => {
   );
 });
 
-test.only(`getting the lock of a scenario if there is no lock in place`, async () => {
+test(`getting the lock of a scenario if there is no lock in place`, async () => {
   const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');
   const scenarioIdObj = await fixtures.GivenTwoScenariosWereCreated();
 
@@ -280,7 +280,7 @@ test('Fails to update scenario as there was a lock in place by a different user'
   fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
 
   response = await fixtures.WhenUpdatingScenarioAsContributor();
-  fixtures.ThenScenarioIsLockedIsReturned(response);
+  fixtures.ThenScenarioIsLockedByAnotherUserIsReturned(response);
 });
 
 test('Updates scenario correctly as lock is in place by same user', async () => {

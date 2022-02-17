@@ -137,7 +137,6 @@ describe('ScenariosModule (e2e)', () => {
 async function getFixtures() {
   const app = await bootstrapApplication();
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
-  const ownerUserId = await GivenUserExists(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerToken = await GivenUserIsLoggedIn(app, 'cc');

@@ -36,6 +36,7 @@ export abstract class ScenarioAccessControl {
   abstract canEditScenarioAndOwnsLock(
     userId: string,
     scenarioId: string,
+    isDeletion?: boolean,
   ): Promise<
     Either<
       typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,

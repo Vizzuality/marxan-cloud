@@ -196,12 +196,20 @@ export class ScenariosService {
   async remove(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      void
+    >
+  > {
     await this.assertScenario(scenarioId);
-    if (
-      !(await this.scenarioAclService.canDeleteScenario(userId, scenarioId))
-    ) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+      true,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     return right(await this.crudService.remove(scenarioId));
   }
@@ -215,8 +223,7 @@ export class ScenariosService {
       | typeof blmCreationFailure
       | ProjectNotReady
       | ProjectDoesntExist
-      | SetInitialCostSurfaceError
-      | typeof forbiddenError,
+      | SetInitialCostSurfaceError,
       Scenario
     >
   > {
@@ -344,10 +351,19 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     input: UpdateScenarioPlanningUnitLockStatusDto,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      void
+    >
+  > {
     await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     await this.updatePlanningUnits.update(scenarioId, {
       include: {
@@ -366,9 +382,18 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     file: Express.Multer.File,
-  ): Promise<Either<typeof forbiddenError, void>> {
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      void
+    >
+  > {
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
 
     await this.commandBus.execute(new UpdateCostSurface(scenarioId, file));
@@ -379,10 +404,19 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     file: Express.Multer.File,
-  ): Promise<Either<typeof forbiddenError, any>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      any
+    >
+  > {
     await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     /**
      * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
@@ -448,10 +482,19 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     blm?: number,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      void
+    >
+  > {
     const scenario = await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     await this.runService.run(
       pick(scenario, 'id', 'boundaryLengthModifier'),
@@ -486,7 +529,10 @@ export class ScenariosService {
     rangeToUpdate?: [number, number],
   ): Promise<
     Either<
-      ChangeScenarioRangeErrors | GetScenarioFailure | typeof forbiddenError,
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | ChangeScenarioRangeErrors,
       true
     >
   > {
@@ -494,13 +540,12 @@ export class ScenariosService {
     assertDefined(userInfo.authenticatedUser);
     if (isLeft(scenario)) return left(forbiddenError);
 
-    if (
-      !(await this.scenarioAclService.canEditScenario(
-        userInfo.authenticatedUser?.id,
-        id,
-      ))
-    ) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userInfo.authenticatedUser.id,
+      id,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     const projectId = scenario.right.projectId;
     await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
@@ -540,10 +585,19 @@ export class ScenariosService {
   async cancelBlmCalibration(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      void
+    >
+  > {
     await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     await this.commandBus.execute(new CancelBlmCalibration(scenarioId));
     return right(void 0);
@@ -552,10 +606,19 @@ export class ScenariosService {
   async cancelMarxanRun(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      void
+    >
+  > {
     await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     const result = await this.runService.cancel(scenarioId);
     if (isLeft(result)) {
@@ -787,11 +850,24 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     dto: CreateGeoFeatureSetDTO,
-  ): Promise<Either<typeof forbiddenError | typeof internalError, any>> {
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | typeof internalError
+      | typeof lockedByAnotherUser
+      | typeof noLockInPlace,
+      any
+    >
+  > {
     const scenario = await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
+
     return await this.specificationService.submit(
       scenarioId,
       scenario.projectId,
@@ -831,10 +907,19 @@ export class ScenariosService {
   async resetLockStatus(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      void
+    >
+  > {
     await this.assertScenario(scenarioId);
-    if (!(await this.scenarioAclService.canEditScenario(userId, scenarioId))) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     await this.planningUnitsService.resetLockStatus(scenarioId);
     return right(void 0);
@@ -845,17 +930,24 @@ export class ScenariosService {
     file: Express.Multer.File,
     info: AppInfoDTO,
     dto: UploadShapefileDto,
-  ): Promise<Either<SubmitProtectedAreaError | typeof forbiddenError, true>> {
+  ): Promise<
+    Either<
+      | SubmitProtectedAreaError
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser,
+      true
+    >
+  > {
     try {
       const scenario = await this.assertScenario(scenarioId);
       assertDefined(info.authenticatedUser);
-      if (
-        !(await this.scenarioAclService.canEditScenario(
-          info.authenticatedUser.id,
-          scenarioId,
-        ))
-      ) {
-        return left(forbiddenError);
+      const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        info.authenticatedUser.id,
+        scenarioId,
+      );
+      if (isLeft(userCanEditScenario)) {
+        return userCanEditScenario;
       }
       const projectResponse = await this.queryBus.execute(
         new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
@@ -926,16 +1018,23 @@ export class ScenariosService {
     scenarioId: string,
     dto: ProtectedAreasChangeDto,
     info: AppInfoDTO,
-  ): Promise<Either<UpdateProtectedAreasError | typeof forbiddenError, true>> {
+  ): Promise<
+    Either<
+      | UpdateProtectedAreasError
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser,
+      true
+    >
+  > {
     const scenario = await this.assertScenario(scenarioId);
     assertDefined(info.authenticatedUser);
-    if (
-      !(await this.scenarioAclService.canEditScenario(
-        info.authenticatedUser?.id,
-        scenarioId,
-      ))
-    ) {
-      return left(forbiddenError);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      info.authenticatedUser?.id,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
     const projectResponse = await this.queryBus.execute(
       new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),

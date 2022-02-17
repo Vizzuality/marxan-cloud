@@ -29,7 +29,7 @@ import {
   UserRoleInProjectDto,
   UsersInProjectResult,
 } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import { aclErrorHandler } from '@marxan-api/utils/acl.utils';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
 @ImplementsAcl()
@@ -84,7 +84,7 @@ export class ProjectAclController {
     );
 
     if (isLeft(result)) {
-      aclErrorHandler(result.left);
+      throw mapAclDomainToHttpError(result.left);
     }
   }
 
@@ -107,7 +107,7 @@ export class ProjectAclController {
     );
 
     if (isLeft(result)) {
-      aclErrorHandler(result.left);
+      throw mapAclDomainToHttpError(result.left);
     }
   }
 }

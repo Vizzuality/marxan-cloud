@@ -51,7 +51,7 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
   async releaseLock(
     userId: string,
     scenarioId: string,
-    projectId: string,
+    _projectId: string,
   ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
     if (this.mock(userId, scenarioId)) {
       return left(forbiddenError);
@@ -75,6 +75,7 @@ export class ScenarioAccessControlMock implements ScenarioAccessControl {
   async findLock(
     userId: string,
     scenarioId: string,
+    _isDeletion?: boolean,
   ): Promise<Either<typeof forbiddenError, ScenarioLockResultSingular>> {
     if (this.mock(userId, scenarioId)) {
       return left(forbiddenError);
