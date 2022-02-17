@@ -74,7 +74,7 @@ export function useScenariosStatus(pId) {
         scenarios: [],
       },
     },
-    refetchInterval: 5000,
+    refetchInterval: 2500,
   });
 
   const { data } = query;
@@ -141,6 +141,7 @@ export function useProjectScenariosLocks(pid) {
     return response.data;
   }), {
     enabled: !!pid,
+    refetchInterval: 2500,
   });
 
   const { data } = query;
@@ -310,8 +311,12 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     },
   });
 
+  const { user } = useMe();
+
   const { data: statusData = { scenarios: [] } } = useScenariosStatus(pId);
   const { scenarios: statusScenarios = [] } = statusData;
+
+  const { data: scenariosLocksData = [] } = useProjectScenariosLocks(pId);
 
   const { data } = query;
   const { pages } = data || {};
@@ -328,6 +333,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
         const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
+        const lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user.id);
+
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
             new Date(lastModifiedAt),
@@ -343,6 +350,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           warnings: false,
           runStatus,
           jobs,
+          lock,
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
           },
@@ -364,7 +372,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       ...query,
       data: filteredData,
     };
-  }, [query, pages, filters, push, statusScenarios]);
+  }, [query, pages, filters, push, user.id, statusScenarios, scenariosLocksData]);
 }
 
 export function useScenario(id) {

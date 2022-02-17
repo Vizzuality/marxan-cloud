@@ -72,6 +72,7 @@ export interface ItemProps {
   lastUpdate: string;
   jobs?: Record<string, any>[];
   runStatus: 'created' | 'running' | 'done' | 'failure',
+  lock?: Record<string, any>;
   lastUpdateDistance: string;
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;

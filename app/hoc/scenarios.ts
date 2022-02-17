@@ -126,9 +126,9 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
         },
         transformResponse: (data) => JSON.parse(data),
       });
-    }
 
-    await fetchScenarioLock(session, queryClient, { sid });
+      await fetchScenarioLock(session, queryClient, { sid });
+    }
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};
