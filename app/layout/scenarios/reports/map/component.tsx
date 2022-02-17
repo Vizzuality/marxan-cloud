@@ -191,6 +191,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     <>
       <div className="relative w-full h-full overflow-hidden">
         <Map
+          className="map-report"
           scrollZoom={false}
           touchZoom={false}
           dragPan={false}

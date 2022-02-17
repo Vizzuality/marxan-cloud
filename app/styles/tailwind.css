@@ -421,6 +421,11 @@ a.mapboxgl-ctrl-logo.mapboxgl-compact {
   background-color: hsla(0, 0%, 100%, 0.5);
   margin: 0 24px 24px 0;
 }
+
+.map-report .mapboxgl-ctrl.mapboxgl-ctrl-attrib {
+  display: none;
+}
+
 @media screen {
   .mapboxgl-ctrl-attrib.mapboxgl-compact {
     min-height: 24px;
