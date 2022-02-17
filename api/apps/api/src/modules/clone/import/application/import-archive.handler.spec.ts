@@ -45,7 +45,6 @@ test(`importing archive with sequential components`, async () => {
 
   fixtures.ThenRequestImportIsSaved(result);
   fixtures.ThenImportRequestedIsEmitted();
-  //TODO check if PieceImportRequested could be simplified
   fixtures.ThenLowestOrderComponentIsRequested();
 });
 
