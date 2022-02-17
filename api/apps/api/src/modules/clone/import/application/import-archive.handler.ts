@@ -1,14 +1,12 @@
-import { JSONObject } from '@marxan-api/utils/json.type';
 import { ResourceId } from '@marxan/cloning/domain';
-import { checkIsResourceKind } from '@marxan/cloning/domain/resource.kind';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { ExportConfigReader } from './export-config-reader';
 import { Import } from '../domain/import/import';
-import { ArchiveReader, invalidFiles } from './archive-reader.port';
 import { ImportArchive, ImportError } from './import-archive.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
@@ -17,7 +15,7 @@ import { ImportRepository } from './import.repository.port';
 export class ImportArchiveHandler
   implements IInferredCommandHandler<ImportArchive> {
   constructor(
-    private readonly archiveReader: ArchiveReader,
+    private readonly exportConfigReader: ExportConfigReader,
     private readonly importRepo: ImportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly importResourcePieces: ImportResourcePieces,
@@ -26,16 +24,15 @@ export class ImportArchiveHandler
   async execute({
     archiveLocation,
   }: ImportArchive): Promise<Either<ImportError, string>> {
-    const exportConfigOrError = await this.archiveReader.get(archiveLocation);
+    const exportConfigOrError = await this.exportConfigReader.read(
+      archiveLocation,
+    );
 
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
-    const exportConfig = exportConfigOrError.right;
+    const { resourceKind } = exportConfigOrError.right;
 
     const resourceId = ResourceId.create();
-    const resourceKind = (exportConfig as JSONObject).resourceKind;
-
-    if (!checkIsResourceKind(resourceKind)) return left(invalidFiles);
 
     const pieces = await this.importResourcePieces.resolveFor(
       resourceId,

@@ -1,4 +1,3 @@
-import { JSONValue } from '@marxan-api/utils/json.type';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -6,11 +5,13 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
+import { ExportConfigReader } from './export-config-reader';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
   ImportComponent,
@@ -19,10 +20,9 @@ import {
   PieceImportRequested,
 } from '../domain';
 import {
-  ArchiveReader,
   Failure as ArchiveFailure,
   invalidFiles,
-} from './archive-reader.port';
+} from '@marxan/cloning/infrastructure/archive-reader.port';
 import { ImportArchive } from './import-archive.command';
 import { ImportArchiveHandler } from './import-archive.handler';
 import { ImportResourcePieces } from './import-resource-pieces.port';
@@ -62,8 +62,8 @@ const getFixtures = async () => {
     imports: [CqrsModule],
     providers: [
       {
-        provide: ArchiveReader,
-        useClass: FakeArchiveReader,
+        provide: ExportConfigReader,
+        useClass: FakeExportConfigReader,
       },
       {
         provide: ImportRepository,
@@ -82,14 +82,18 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ImportArchiveHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
-  const archiveReader: FakeArchiveReader = sandbox.get(ArchiveReader);
+  const exportConfigReader: FakeExportConfigReader = sandbox.get(
+    ExportConfigReader,
+  );
   const importResourcePieces: FakeImportResourcePieces = sandbox.get(
     ImportResourcePieces,
   );
 
   return {
     GivenExtractingArchiveFails: () => {
-      archiveReader.mock.mockImplementation(async () => left(invalidFiles));
+      exportConfigReader.mock.mockImplementation(async () =>
+        left(invalidFiles),
+      );
     },
     GivenExtractingArchiveHasSequentialComponents: () => {
       importResourcePieces.mockSequentialPieces();
@@ -103,7 +107,7 @@ const getFixtures = async () => {
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
-          repo.entities[(importResult as Right<string>).right].resourceId,
+          repo.entities[importResult.right].resourceId,
         );
       return importResult;
     },
@@ -182,14 +186,18 @@ const getFixtures = async () => {
   };
 };
 
-class FakeArchiveReader extends ArchiveReader {
-  mock: jest.MockedFunction<ArchiveReader['get']> = jest
+class FakeExportConfigReader {
+  mock: jest.MockedFunction<
+    ExportConfigReader['read']
+  > = jest
     .fn()
-    .mockResolvedValue(right({ resourceKind: ResourceKind.Project }));
+    .mockResolvedValue(
+      right({ resourceKind: ResourceKind.Project } as ExportConfigContent),
+    );
 
-  async get(
+  async read(
     archive: ArchiveLocation,
-  ): Promise<Either<ArchiveFailure, JSONValue>> {
+  ): Promise<Either<ArchiveFailure, ExportConfigContent>> {
     return this.mock(archive);
   }
 }
