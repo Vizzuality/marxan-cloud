@@ -36,7 +36,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, resourceId } = input;
+    const { uris, resourceId, piece } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -49,7 +49,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       projectMetadataLocation.uri,
     );
     if (isLeft(readableOrError)) {
-      const errorMessage = `Zip file not found: ${projectMetadataLocation.uri}`;
+      const errorMessage = `File with piece data for ${piece}/${resourceId} is not available at ${projectMetadataLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -64,7 +64,11 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    // TODO OrganizationId should be specified when creating the Import
+    // TODO As we don't handle organizations for the time being,
+    // the imported/cloned project is homed arbitrarily within an
+    // existing organization. Once proper handling of organizations
+    // is added, users may be able to specify within which organization
+    // an imported/cloned project should be created.
     const organizationId = await this.getRandomOrganizationId();
     const projectMetadata: ProjectMetadataContent = JSON.parse(
       stringProjectMetadataOrError.right,
