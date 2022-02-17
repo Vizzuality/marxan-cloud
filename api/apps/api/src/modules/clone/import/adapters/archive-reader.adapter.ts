@@ -32,12 +32,12 @@ export class ArchiveReaderAdapter implements ArchiveReader {
 
     const exportConfigOrError = await extractFile(
       readableOrError.right,
-      new RegExp(ClonePieceRelativePaths[ClonePiece.ExportConfig].config),
+      ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
     );
     if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
     const exportConfig = JSON.parse(exportConfigOrError.right);
 
-    const resourceId = new ResourceId(exportConfig.resourceId);
+    const resourceId = ResourceId.create();
     const resourceKind = exportConfig.resourceKind;
 
     const validResourceKind = Object.values(ResourceKind).includes(
