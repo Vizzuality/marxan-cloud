@@ -1,9 +1,5 @@
-import {
-  ArchiveLocation,
-  ClonePiece,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { JSONValue } from '@marxan-api/utils/json.type';
+import { ArchiveLocation, ClonePiece } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { FileRepository } from '@marxan/files-repository';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
@@ -14,19 +10,13 @@ import {
   archiveCorrupted,
   ArchiveReader,
   Failure,
-  invalidFiles,
 } from '../application/archive-reader.port';
-import { ImportResourcePieces } from '../application/import-resource-pieces.port';
-import { Import } from '../domain';
 
 @Injectable()
 export class ArchiveReaderAdapter implements ArchiveReader {
-  constructor(
-    private readonly fileRepository: FileRepository,
-    private readonly importResourcePieces: ImportResourcePieces,
-  ) {}
+  constructor(private readonly fileRepository: FileRepository) {}
 
-  async get(location: ArchiveLocation): Promise<Either<Failure, Import>> {
+  async get(location: ArchiveLocation): Promise<Either<Failure, JSONValue>> {
     const readableOrError = await this.fileRepository.get(location.value);
     if (isLeft(readableOrError)) return left(fileNotFound);
 
@@ -35,22 +25,6 @@ export class ArchiveReaderAdapter implements ArchiveReader {
       ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
     );
     if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
-    const exportConfig = JSON.parse(exportConfigOrError.right);
-
-    const resourceId = ResourceId.create();
-    const resourceKind = exportConfig.resourceKind;
-
-    const validResourceKind = Object.values(ResourceKind).includes(
-      resourceKind,
-    );
-    if (!validResourceKind) return left(invalidFiles);
-
-    const pieces = await this.importResourcePieces.resolveFor(
-      resourceId,
-      resourceKind,
-      location,
-    );
-
-    return right(Import.newOne(resourceId, resourceKind, location, pieces));
+    return JSON.parse(exportConfigOrError.right);
   }
 }

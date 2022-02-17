@@ -34,6 +34,6 @@ import { TypeormImportRepository } from './typeorm-import.repository.adapter';
       useClass: ImportResourcePiecesAdapter,
     },
   ],
-  exports: [ArchiveReader, ImportRepository],
+  exports: [ArchiveReader, ImportRepository, ImportResourcePieces],
 })
 export class ImportAdaptersModule {}
