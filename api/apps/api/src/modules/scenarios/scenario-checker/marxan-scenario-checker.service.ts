@@ -22,7 +22,26 @@ export class MarxanScenarioChecker implements ScenarioChecker {
   async hasPendingImport(
     scenarioId: string,
   ): Promise<Either<ScenarioDoesntExist, boolean>> {
-    throw new Error('Method not implemented.');
+    const scenarioExist = await this.checkScenarioExists(scenarioId);
+
+    if (!scenarioExist) return left(scenarioDoesntExist);
+
+    const importEvent = await this.apiEvents
+      .getLatestEventForTopic({
+        topic: scenarioId,
+        kind: In([
+          API_EVENT_KINDS.scenario__import__finished__v1__alpha,
+          API_EVENT_KINDS.scenario__import__failed__v1__alpha,
+          API_EVENT_KINDS.scenario__import__submitted__v1__alpha,
+        ]),
+      })
+      .catch(this.createNotFoundHandler());
+
+    const pendingImport =
+      importEvent?.kind ===
+      API_EVENT_KINDS.scenario__import__submitted__v1__alpha;
+
+    return right(pendingImport);
   }
 
   async hasPendingExport(

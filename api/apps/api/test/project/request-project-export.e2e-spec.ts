@@ -1,22 +1,22 @@
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { Connection, Repository } from 'typeorm';
+import { ProjectChecker } from '../../src/modules/projects/project-checker/project-checker.service';
+import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
 import { GivenProjectExists } from '../steps/given-project';
+import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
-import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
-import { ProjectChecker } from '../../src/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
-import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { ScenarioCheckerFake } from '../utils/scenario-checker.service-fake';
-import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { FakeQueue } from '../utils/queues';
 import { exportPieceQueueToken } from '../../src/modules/clone/infra/export/export-queue.provider';
 
@@ -24,7 +24,7 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-}, 10_000);
+}, 12_000);
 
 afterEach(async () => {
   await fixtures?.cleanup();
@@ -56,11 +56,23 @@ test('rejects a request to export a project if this has a scenario with a pendin
   fixtures.ThenBadRequestIsReturned(response);
 });
 
-test.todo('rejects a request to export a project if this has a pending import');
+test('rejects a request to export a project if this has a pending import', async () => {
+  await fixtures.GivenProjectWasCreated();
+  fixtures.GivenProjectHasAPendingImport();
 
-test.todo(
-  'rejects a request to export a project if this has a scenario with a pending import',
-);
+  const response = await fixtures.WhenOwnerUserRequestAnExport();
+
+  fixtures.ThenBadRequestIsReturned(response);
+});
+
+test('rejects a request to export a project if this has a scenario with a pending import', async () => {
+  await fixtures.GivenProjectWasCreated();
+  fixtures.GivenProjectHasAScenarioWithAPendingImport();
+
+  const response = await fixtures.WhenOwnerUserRequestAnExport();
+
+  fixtures.ThenBadRequestIsReturned(response);
+});
 
 test('rejects a request to export a project if this has a scenario with a pending blm calibration', async () => {
   await fixtures.GivenProjectWasCreated();
@@ -168,8 +180,14 @@ export const getFixtures = async () => {
     GivenProjectHasAPendingExport: () => {
       fakeProjectChecker.addPendingExportForProject(projectId);
     },
+    GivenProjectHasAPendingImport: () => {
+      fakeProjectChecker.addPendingImportForProject(projectId);
+    },
     GivenProjectHasAScenarioWithAPendingExport: () => {
       fakeScenarioChecker.addPendingExportForScenario(scenarioId);
+    },
+    GivenProjectHasAScenarioWithAPendingImport: () => {
+      fakeScenarioChecker.addPendingImportForScenario(scenarioId);
     },
     GivenProjectHasAScenarioWithAPendingBLMCalibration: () => {
       fakeScenarioChecker.addPendingBlmCalibrationForScenario(scenarioId);

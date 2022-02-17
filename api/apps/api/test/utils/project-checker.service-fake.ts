@@ -140,7 +140,7 @@ export class ProjectCheckerFake implements ProjectChecker {
     this.projectsWithPendingExports.push(projectId);
   }
 
-  addPendingImportsForProject(projectId: string) {
+  addPendingImportForProject(projectId: string) {
     this.projectsWithPendingImports.push(projectId);
   }
 

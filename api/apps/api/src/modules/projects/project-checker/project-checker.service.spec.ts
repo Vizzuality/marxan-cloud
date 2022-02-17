@@ -1,19 +1,19 @@
-import { FindConditions, In, Repository } from 'typeorm';
-import { Test } from '@nestjs/testing';
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { isEqual } from 'lodash';
-import { NotFoundException } from '@nestjs/common';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
 import {
   doesntExist,
   ProjectChecker,
 } from '@marxan-api/modules/projects/project-checker/project-checker.service';
-import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { NotFoundException } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { isEqual } from 'lodash';
+import { FindConditions, In, Repository } from 'typeorm';
 import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -217,21 +217,73 @@ it(`hasPendingExports() should return doesntExist if the project does not exist`
   });
 });
 
-it.todo(
-  `hasPendingImports() should return false for a project without pending imports`,
-);
+it(`hasPendingImports() should return false for a project without pending imports`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  const hasPendingImports = await service.hasPendingImports(`projectId`);
+  // then
+  expect(hasPendingImports).toEqual({
+    _tag: 'Right',
+    right: false,
+  });
+});
 
-it.todo(
-  `hasPendingImports() should return true for a project with pending imports`,
-);
+it(`hasPendingImports() should return true for a project with pending imports`, async () => {
+  const projectId = 'projectId';
 
-it.todo(
-  `hasPendingImports() should return true for a project with a scenario with a pending import`,
-);
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  fixtures.GivenImportJob(
+    API_EVENT_KINDS.project__import__submitted__v1__alpha,
+  );
+  // and
+  const hasPendingImports = await service.hasPendingImports(projectId);
+  // then
+  expect(hasPendingImports).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
 
-it.todo(
-  `hasPendingImports() should return doesntExist if the project does not exist`,
-);
+it(`hasPendingImports() should return true for a project with a scenario with a pending import`, async () => {
+  const projectId = 'projectId';
+
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectExists(projectId, [
+    { id: 'scenario-1' },
+    { id: 'scenario-2' },
+  ]);
+  fixtures.GivenScenarioIsBeingImported('scenario-2');
+  // and
+  const hasPendingImports = await service.hasPendingImports(projectId);
+  // then
+  expect(hasPendingImports).toEqual({
+    _tag: 'Right',
+    right: true,
+  });
+});
+
+it(`hasPendingImports() should return doesntExist if the project does not exist`, async () => {
+  // given
+  const service = fixtures.getService();
+  // and
+  fixtures.GivenProjectDoesntExist();
+  // and
+  const hasPendingImports = await service.hasPendingImports(`projectId`);
+  // then
+  expect(hasPendingImports).toEqual({
+    _tag: 'Left',
+    left: doesntExist,
+  });
+});
 
 it(`hasPendingBlmCalibration() should return false for a project without scenarios running blm calibration`, async () => {
   const projectId = 'projectId';
@@ -422,6 +474,9 @@ async function getFixtures() {
     exportKinds: Object.values(API_EVENT_KINDS)
       .filter((kind) => kind.startsWith(`project.export.`))
       .sort(),
+    importKinds: Object.values(API_EVENT_KINDS)
+      .filter((kind) => kind.startsWith(`project.import.`))
+      .sort(),
     ThenShouldAskAllPlanningUnitsStatuses() {
       expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledTimes(2);
       expect(fakeApiEventsService.getLatestEventForTopic).toBeCalledWith({
@@ -459,6 +514,20 @@ async function getFixtures() {
       fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
         async (_args) => {
           if (fixtures.exportKinds.includes(kind)) {
+            return {
+              kind,
+              timestamp: new Date(),
+              topic: `projectId`,
+            };
+          }
+          throw new NotFoundException();
+        },
+      );
+    },
+    GivenImportJob(kind: API_EVENT_KINDS) {
+      fixtures.fakeApiEventsService.getLatestEventForTopic.mockImplementation(
+        async (_args) => {
+          if (fixtures.importKinds.includes(kind)) {
             return {
               kind,
               timestamp: new Date(),
@@ -514,6 +583,9 @@ async function getFixtures() {
     },
     GivenScenarioIsBeingExported(scenarioId: string) {
       fakeScenarioChecker.addPendingExportForScenario(scenarioId);
+    },
+    GivenScenarioIsBeingImported(scenarioId: string) {
+      fakeScenarioChecker.addPendingImportForScenario(scenarioId);
     },
     GivenScenarioIsRunningBlmCalibration(scenarioId: string) {
       fakeScenarioChecker.addPendingBlmCalibrationForScenario(scenarioId);

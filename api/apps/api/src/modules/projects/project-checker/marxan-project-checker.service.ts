@@ -28,7 +28,43 @@ export class MarxanProjectChecker implements ProjectChecker {
   async hasPendingImports(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    throw new Error('Method not implemented.');
+    const project = await this.repository.findOne(projectId, {
+      relations: ['scenarios'],
+    });
+
+    if (!project) {
+      return left(doesntExist);
+    }
+
+    const importEvent = await this.apiEvents
+      .getLatestEventForTopic({
+        topic: projectId,
+        kind: In([
+          API_EVENT_KINDS.project__import__finished__v1__alpha,
+          API_EVENT_KINDS.project__import__failed__v1__alpha,
+          API_EVENT_KINDS.project__import__submitted__v1__alpha,
+        ]),
+      })
+      .catch(this.createNotFoundHandler());
+
+    const projectPendingImport =
+      importEvent?.kind ===
+      API_EVENT_KINDS.project__import__submitted__v1__alpha;
+
+    if (!project.scenarios || projectPendingImport)
+      return right(projectPendingImport);
+
+    const results = await Promise.all(
+      project.scenarios.map(async (scenario) => {
+        const result = await this.scenarioChecker.hasPendingImport(scenario.id);
+        return isRight(result) ? result.right : false;
+      }),
+    );
+
+    return right(
+      projectPendingImport ||
+        results.some((scenarioPendingExport) => scenarioPendingExport),
+    );
   }
 
   async hasPendingExports(

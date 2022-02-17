@@ -66,7 +66,7 @@ export class ScenarioCheckerFake implements ScenarioChecker {
     this.scenarioWithPendingExports.push(scenarioId);
   }
 
-  addPendingImportsForScenario(scenarioId: string) {
+  addPendingImportForScenario(scenarioId: string) {
     this.scenarioWithPendingImports.push(scenarioId);
   }
 
