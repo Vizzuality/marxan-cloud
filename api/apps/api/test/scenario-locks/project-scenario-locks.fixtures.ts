@@ -16,6 +16,7 @@ import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ScenarioLockDto } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
+import { assertDefined } from '@marxan/utils';
 
 export async function getFixtures() {
   const app = await bootstrapApplication();
@@ -27,6 +28,8 @@ export async function getFixtures() {
   const viewerUserId = await GivenUserExists(app, 'cc');
 
   const randomUserInfo = await GivenUserIsCreated(app);
+  assertDefined(randomUserInfo.user.id);
+  const randomUserId = randomUserInfo.user.id;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
 
@@ -183,6 +186,7 @@ export async function getFixtures() {
         await usersRepo.delete({ id: randomUserInfo.user.id });
         return;
       });
+      return randomUserId;
     },
     GivenUserTokenHasExpired: async (userId: string) => {
       await tokenRepo.delete({ userId });

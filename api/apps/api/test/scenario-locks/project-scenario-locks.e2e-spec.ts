@@ -294,22 +294,27 @@ test('Updates scenario correctly as lock is in place by same user', async () => 
   fixtures.ThenScenarioIsUpdated(response);
 });
 
-// test('A lock is deleted after user token has expired', async () => {
-//   const ownerUserId = await fixtures.GivenOwnerExists();
-//   const scenarioId = await fixtures.GivenScenarioWasCreated();
-//   await fixtures.GivenContributorWasAddedToScenario();
-//   let response = await fixtures.WhenAcquiringLockForScenarioAsOwner();
-//   fixtures.ThenScenarioLockInfoForOwnerIsReturned(response);
+test('A lock is deleted after user token has expired', async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  const ownerOfLockUserId = await fixtures.GivenUserWasAddedToScenario();
 
-//   await fixtures.GivenUserTokenHasExpired(ownerUserId);
+  const ownerOfLockUserToken = await fixtures.GivenUserIsLoggedIn('random');
+  
+  const GivenUserAcquiredLockForScenario = await fixtures.WhenAcquiringLockForScenario(
+    scenarioId,
+    ownerOfLockUserToken,
+  );
+  await fixtures.GivenUserTokenHasExpired(ownerOfLockUserId);
 
-//   const differentUserToken = await fixtures.GivenUserIsLoggedIn('contributor');
-//   response = await fixtures.WhenGettingLockFromScenario(
-//     scenarioId,
-//     differentUserToken,
-//   );
-//   fixtures.ThenNoScenarioLockIsReturned(response);
-// });
+  const ownerOfScenarioButNotLockToken = await fixtures.GivenUserIsLoggedIn(
+    'owner',
+  );
+  const response = await fixtures.WhenGettingLockFromScenario(
+    scenarioId,
+    ownerOfScenarioButNotLockToken,
+  );
+  fixtures.ThenNoScenarioLockIsReturned(response);
+});
 
 test('Releases scenario lock correctly', async () => {
   await fixtures.GivenScenarioWasCreated();
