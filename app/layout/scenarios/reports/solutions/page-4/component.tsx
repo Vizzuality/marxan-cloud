@@ -92,7 +92,7 @@ export const ScenariosReportPage4: React.FC<ScenariosReportPage4Props> = () => {
 
   return (
     reportDataIsFetched && (
-      <div className="flex pt-4 space-x-4">
+      <div className="flex pt-6 space-x-4">
 
         <section className="w-1/2 space-y-8 text-xs">
           <div>
