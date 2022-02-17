@@ -33,9 +33,9 @@ export class CompleteExportPieceHandler
         const exportInstance = await repo.find(exportId);
 
         if (!exportInstance) {
-          const errorMessage = `${CompleteExportPieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`;
-          this.logger.error(errorMessage);
-          throw new Error(errorMessage);
+          throw new Error(
+            `${CompleteExportPieceHandler.name} could not find export ${exportId.value} to complete piece: ${componentId.value}`,
+          );
         }
 
         const exportAggregate = this.eventPublisher.mergeObjectContext(
@@ -53,11 +53,10 @@ export class CompleteExportPieceHandler
                 `Could not find piece with ID: ${componentId} for export with ID: ${exportId}`,
               );
             case pieceAlreadyExported:
-              return;
-            default:
-              throw new Error(
-                `Unknown error while trying to complete piece with iD ${componentId} for export with ID: ${exportId}`,
+              this.logger.error(
+                `Component with id ${componentId} was already completed`,
               );
+              return;
           }
         }
 
@@ -65,7 +64,8 @@ export class CompleteExportPieceHandler
 
         exportAggregate.commit();
       })
-      .catch(() => {
+      .catch((err) => {
+        this.logger.error(err);
         this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       });
   }
