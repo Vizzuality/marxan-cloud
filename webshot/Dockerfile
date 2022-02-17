@@ -1,8 +1,12 @@
 FROM node:16.14.0-alpine3.15
 LABEL maintainer="hello@vizzuality.com"
 
-ENV NAME mgis-webshot
-ENV USER mgis
+
+ENV NAME marxan-webshot
+ENV USER $NAME
+ENV APP_HOME /opt/$NAME
+
+RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 
 RUN apk add --update \
     bash \
@@ -19,11 +23,21 @@ RUN apk add --update \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-WORKDIR /opt/$NAME
-COPY . .
+WORKDIR $APP_HOME
+RUN chown $USER:$USER $APP_HOME
+
+COPY --chown=$USER:$USER package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
-# RUN yarn build
+
+COPY --chown=$USER:$USER entrypoint.sh ./
+COPY --chown=$USER:$USER src ./src
+COPY --chown=$USER:$USER tsconfig.json tsconfig.build.json ./
+
+RUN yarn prestart:prod
+
+COPY --chown=$USER:$USER dist ./dist
 
 EXPOSE 3000
+USER $USER
 
 ENTRYPOINT ["sh", "./entrypoint.sh"]

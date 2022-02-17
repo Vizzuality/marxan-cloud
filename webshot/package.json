@@ -2,9 +2,10 @@
   "name": "@marxan-cloud/webshot",
   "version": "1.2.15.0",
   "description": "Webshot service",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node dist/main.js",
+    "prestart:prod": "rimraf dist && tsc",
     "start:dev": "nodemon --exec 'ts-node --files --project tsconfig.json -r tsconfig-paths/register src/main.ts' -L | bunyan",
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,6 +30,7 @@
     "bunyan": "1.8.15",
     "nodemon": "2.0.15",
     "prettier": "2.5.1",
+    "rimraf": "3.0.2",
     "ts-node": "10.5.0",
     "tsconfig-paths": "3.12.0"
   }
