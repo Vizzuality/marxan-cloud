@@ -17,6 +17,8 @@ import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
 import { ScenarioCheckerFake } from '../utils/scenario-checker.service-fake';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
+import { FakeQueue } from '../utils/queues';
+import { exportPieceQueueToken } from '../../src/modules/clone/infra/export/export-queue.provider';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -121,6 +123,8 @@ export const getFixtures = async () => {
   );
   const fakeProjectChecker = app.get(ProjectChecker) as ProjectCheckerFake;
   const fakeScenarioChecker = app.get(ScenarioChecker) as ScenarioCheckerFake;
+  const exportPieceQueue = app.get<FakeQueue>(exportPieceQueueToken);
+  exportPieceQueue.getJobs.mockResolvedValue([]);
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken = await GivenUserIsLoggedIn(app, 'bb');

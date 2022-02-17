@@ -107,11 +107,7 @@ const getFixtures = async () => {
 
       expect(exportInstance).toBeDefined();
 
-      const {
-        exportPieces,
-        resourceKind,
-        resourceId,
-      } = exportInstance!.toSnapshot();
+      const { exportPieces } = exportInstance!.toSnapshot();
 
       const [failedPiece, ...rest] = exportPieces;
 
@@ -126,13 +122,7 @@ const getFixtures = async () => {
       exportPieceQueue.getJobs.mockResolvedValueOnce(fakePendingJobs);
 
       eventBus.publish(
-        new ExportPieceFailed(
-          exportId,
-          new ComponentId(failedPiece.id),
-          new ResourceId(resourceId),
-          resourceKind,
-          [],
-        ),
+        new ExportPieceFailed(exportId, new ComponentId(failedPiece.id)),
       );
 
       await delay(3000);
