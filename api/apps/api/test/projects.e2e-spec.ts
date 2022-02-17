@@ -140,7 +140,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
-      expect(jsonAPIResponse.data).toHaveLength(5);
+      expect(jsonAPIResponse.data).toHaveLength(4);
 
       const projectNames: string[] = jsonAPIResponse.data.map(
         (p) => p.attributes.name,
@@ -203,7 +203,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultPlural = response.body;
 
       expect(jsonAPIResponse.data[0].type).toBe('projects');
-      expect(jsonAPIResponse.data).toHaveLength(5);
+      expect(jsonAPIResponse.data).toHaveLength(4);
 
       const projectNames: string[] = jsonAPIResponse.data.map(
         (p) => p.attributes.name,
