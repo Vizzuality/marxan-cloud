@@ -18,6 +18,7 @@ import { ExportSnapshot } from './export.snapshot';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');
+export const pieceAlreadyExported = Symbol(`piece already exported`);
 
 export class Export extends AggregateRoot {
   private constructor(
@@ -36,20 +37,9 @@ export class Export extends AggregateRoot {
     parts: ExportComponent[],
   ): Export {
     const exportRequest = new Export(ExportId.create(), id, kind, parts);
-    const allPieces = parts.map((part) => part.piece);
     parts
       .filter((part) => !part.isReady())
-      .map(
-        (part) =>
-          new PieceExportRequested(
-            exportRequest.id,
-            part.id,
-            part.resourceId,
-            kind,
-            part.piece,
-            allPieces,
-          ),
-      )
+      .map((part) => new PieceExportRequested(exportRequest.id, part.id))
       .forEach((event) => exportRequest.apply(event));
 
     exportRequest.apply(
@@ -65,11 +55,10 @@ export class Export extends AggregateRoot {
   completeComponent(
     id: ComponentId,
     pieceLocation: ComponentLocation[],
-  ): Either<typeof pieceNotFound, true> {
+  ): Either<typeof pieceNotFound | typeof pieceAlreadyExported, true> {
     const piece = this.pieces.find((piece) => piece.id.equals(id));
-    if (!piece) {
-      return left(pieceNotFound);
-    }
+    if (!piece) return left(pieceNotFound);
+    if (piece.isReady()) return left(pieceAlreadyExported);
     piece.finish(pieceLocation);
     this.apply(new PieceExported(this.id, id, pieceLocation));
 

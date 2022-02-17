@@ -38,7 +38,7 @@ export class MarkExportAsFinishedHandler
       topic: resourceId,
       data: {
         exportId: exportId.value,
-        resourceId: resourceId,
+        resourceId,
         resourceKind,
       },
     });

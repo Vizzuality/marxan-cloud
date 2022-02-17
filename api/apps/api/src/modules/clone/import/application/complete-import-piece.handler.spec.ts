@@ -132,7 +132,6 @@ const getFixtures = async () => {
 
   return {
     GivenImportWasRequested: async () => {
-      const importId = v4();
       const resourceId = ResourceId.create();
       const pieces = [
         ImportComponent.newOne(resourceId, ClonePiece.ProjectMetadata, 0, []),

@@ -11,7 +11,6 @@ import {
   ComponentId,
   ComponentLocation,
   ResourceKind,
-  ResourceId,
 } from '@marxan/cloning/domain';
 import { assertDefined } from '@marxan/utils';
 import { Inject, Injectable } from '@nestjs/common';
@@ -105,18 +104,11 @@ export class ExportPieceEventsHandler
   }
 
   private async failed(event: EventData<ExportJobInput, unknown>) {
-    const {
-      exportId,
-      componentId,
-      resourceId,
-      resourceKind,
-    } = await event.data;
+    const { exportId, componentId } = await event.data;
     this.eventBus.publish(
       new ExportPieceFailed(
         new ExportId(exportId),
         new ComponentId(componentId),
-        new ResourceId(resourceId),
-        resourceKind,
       ),
     );
   }

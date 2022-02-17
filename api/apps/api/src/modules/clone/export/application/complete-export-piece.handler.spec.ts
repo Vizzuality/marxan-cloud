@@ -3,6 +3,7 @@ import {
   ClonePiece,
   ComponentId,
   ComponentLocation,
+  ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -10,8 +11,16 @@ import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
-import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
-import { Export, AllPiecesExported, PieceExported, ExportId } from '../domain';
+import { MemoryExportRepo } from '../adapters/memory-export.repository';
+import {
+  AllPiecesExported,
+  Export,
+  ExportComponent,
+  ExportId,
+  ExportRequested,
+  PieceExported,
+  PieceExportRequested,
+} from '../domain';
 import { CompleteExportPiece } from './complete-export-piece.command';
 import { CompleteExportPieceHandler } from './complete-export-piece.handler';
 import { ExportPieceFailed } from './export-piece-failed.event';
@@ -36,25 +45,33 @@ it('should mark a component as finished and emit PieceExported event', async () 
 it('should emit a AllPiecesExported event if all components are finished', async () => {
   const exportInstance = await fixtures.GivenExportWasRequested();
   const [firstPiece, secondPiece] = exportInstance.toSnapshot().exportPieces;
-  const firstPieceComponentId = new ComponentId(firstPiece.id);
-  const secondPieceComponentId = new ComponentId(secondPiece.id);
+  const firstComponentId = new ComponentId(firstPiece.id);
+  const secondComponentId = new ComponentId(secondPiece.id);
 
-  await fixtures.WhenAPieceIsCompleted(
-    exportInstance.id,
-    firstPieceComponentId,
-  );
-  await fixtures.WhenAPieceIsCompleted(
-    exportInstance.id,
-    secondPieceComponentId,
-  );
+  await fixtures.WhenAPieceIsCompleted(exportInstance.id, firstComponentId);
+  await fixtures.WhenAPieceIsCompleted(exportInstance.id, secondComponentId);
 
   fixtures.ThenAllPiecesExportedEventIsEmitted(exportInstance.id);
 });
 
-it('should not publish any event if export instance is not found', async () => {
+it('should emit a ExportPieceFailed event if export instance is not found', async () => {
   const exportId = new ExportId(v4());
   await fixtures.GivenNoneExportWasRequested(exportId);
   await fixtures.WhenAPieceOfAnUnexistingExportIsCompleted(exportId);
+  fixtures.ThenExportPieceFailedEventIsEmitted(exportId);
+});
+
+it('should not publish any event if export piece is already exported', async () => {
+  const exportInstance = await fixtures.GivenExportWasRequested();
+  const [firstPiece] = exportInstance.toSnapshot().exportPieces;
+  const componentId = new ComponentId(firstPiece.id);
+
+  await fixtures.WhenAPieceIsCompleted(exportInstance.id, componentId);
+  await fixtures.ThenComponentIsFinished(exportInstance.id, componentId);
+  fixtures.ThenPieceExportedEventIsEmitted(exportInstance.id, componentId);
+
+  fixtures.WhenCleaningEventBus();
+  await fixtures.WhenAPieceIsCompleted(exportInstance.id, componentId);
   fixtures.ThenNoEventIsEmitted();
 });
 
@@ -72,7 +89,7 @@ const getFixtures = async () => {
     providers: [
       {
         provide: ExportRepository,
-        useClass: InMemoryExportRepo,
+        useClass: MemoryExportRepo,
       },
       {
         provide: Logger,
@@ -86,36 +103,23 @@ const getFixtures = async () => {
   const events: IEvent[] = [];
 
   const sut = sandbox.get(CompleteExportPieceHandler);
-  const repo: InMemoryExportRepo = sandbox.get(ExportRepository);
+  const repo = sandbox.get(ExportRepository);
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
   });
 
   return {
     GivenExportWasRequested: async () => {
-      const exportId = v4();
-      const resourceId = v4();
-      const exportInstance = Export.fromSnapshot({
-        id: exportId,
-        exportPieces: [
-          {
-            finished: false,
-            id: v4(),
-            piece: ClonePiece.ProjectMetadata,
-            resourceId,
-            uris: [],
-          },
-          {
-            finished: false,
-            id: v4(),
-            piece: ClonePiece.ExportConfig,
-            resourceId,
-            uris: [],
-          },
-        ],
+      const resourceId = ResourceId.create();
+      const pieces = [
+        ExportComponent.newOne(resourceId, ClonePiece.ProjectMetadata),
+        ExportComponent.newOne(resourceId, ClonePiece.ExportConfig),
+      ];
+      const exportInstance = Export.newOne(
         resourceId,
-        resourceKind: ResourceKind.Project,
-      });
+        ResourceKind.Project,
+        pieces,
+      );
 
       await repo.save(exportInstance);
 
@@ -129,12 +133,10 @@ const getFixtures = async () => {
       exportId: ExportId,
       componentId: ComponentId,
     ) => {
-      const location = [
-        new ComponentLocation(`${v4()}.json`, 'relative-path.json'),
-      ];
-
       await sut.execute(
-        new CompleteExportPiece(exportId, componentId, location),
+        new CompleteExportPiece(exportId, componentId, [
+          new ComponentLocation('/tmp/foo.json', 'foo.json'),
+        ]),
       );
     },
     WhenTryingToCompleteAnUnexistingPiece: async (exportId: ExportId) => {
@@ -173,17 +175,20 @@ const getFixtures = async () => {
       exportId: ExportId,
       componentId: ComponentId,
     ) => {
-      const componentFinishedEvent = events[0];
+      const pieceExportedEvent = events.find(
+        (event) => event instanceof PieceExported,
+      ) as PieceExported;
 
-      expect(componentFinishedEvent).toMatchObject({
+      expect(pieceExportedEvent).toBeDefined;
+      expect(pieceExportedEvent).toBeInstanceOf(PieceExported);
+      expect(pieceExportedEvent).toMatchObject({
         componentId,
         exportId,
-        location: expect.any(Array),
       });
-      expect(componentFinishedEvent).toBeInstanceOf(PieceExported);
     },
     ThenAllPiecesExportedEventIsEmitted: (exportId: ExportId) => {
-      const allComponentsFinishedEvent = events[2];
+      const lastEventPosition = events.length - 1;
+      const allComponentsFinishedEvent = events[lastEventPosition];
       expect(allComponentsFinishedEvent).toMatchObject({
         exportId,
       });
@@ -193,12 +198,18 @@ const getFixtures = async () => {
       expect(events).toHaveLength(0);
     },
     ThenExportPieceFailedEventIsEmitted: (exportId: ExportId) => {
-      const exportPieceFailedEvent = events[0];
+      const exportPieceFailedEvent = events.find(
+        (event) => event instanceof ExportPieceFailed,
+      ) as ExportPieceFailed;
 
+      expect(exportPieceFailedEvent).toBeDefined();
       expect(exportPieceFailedEvent).toBeInstanceOf(ExportPieceFailed);
       expect((exportPieceFailedEvent as ExportPieceFailed).exportId).toEqual(
         exportId,
       );
+    },
+    WhenCleaningEventBus: () => {
+      events.splice(0, events.length);
     },
   };
 };

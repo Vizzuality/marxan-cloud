@@ -1,19 +1,18 @@
+import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ExportJobInput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
+import { Inject, Logger } from '@nestjs/common';
 import {
   CommandHandler,
   EventBus,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { Inject, Logger } from '@nestjs/common';
-import { ExportJobInput } from '@marxan/cloning';
 import { Queue } from 'bullmq';
-
-import { ApiEventsService } from '@marxan-api/modules/api-events';
-
-import { SchedulePieceExport } from './schedule-piece-export.command';
-import { exportPieceQueueToken } from './export-queue.provider';
-import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
-import { ResourceKind } from '@marxan/cloning/domain';
+import { ExportRepository } from '../../export/application/export-repository.port';
+import { exportPieceQueueToken } from './export-queue.provider';
+import { SchedulePieceExport } from './schedule-piece-export.command';
 
 @CommandHandler(SchedulePieceExport)
 export class SchedulePieceExportHandler
@@ -28,24 +27,45 @@ export class SchedulePieceExportHandler
     @Inject(exportPieceQueueToken)
     private readonly queue: Queue<ExportJobInput>,
     private readonly eventBus: EventBus,
-    private logger: Logger,
+    private readonly exportRepository: ExportRepository,
+    private readonly logger: Logger,
   ) {
     this.logger.setContext(SchedulePieceExportHandler.name);
   }
 
-  async execute({
-    piece,
-    exportId,
-    componentId,
-    resourceId,
-    resourceKind,
-    allPieces,
-  }: SchedulePieceExport): Promise<void> {
+  async execute({ exportId, componentId }: SchedulePieceExport): Promise<void> {
+    const exportInstance = await this.exportRepository.find(exportId);
+
+    if (!exportInstance) {
+      this.logger.error(`Export with ID ${exportId.value} not found`);
+      this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
+      return;
+    }
+    const {
+      resourceKind,
+      resourceId,
+      exportPieces,
+    } = exportInstance.toSnapshot();
+
+    const component = exportPieces.find(
+      (piece) => piece.id === componentId.value,
+    );
+    if (!component) {
+      this.logger.error(
+        `Export component with ID ${componentId.value} not found`,
+      );
+      this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
+      return;
+    }
+
+    const { piece } = component;
+    const allPieces = exportPieces.map(({ piece }) => piece);
+
     const job = await this.queue.add(`export-piece`, {
       piece,
       exportId: exportId.value,
       componentId: componentId.value,
-      resourceId: resourceId.value,
+      resourceId,
       resourceKind,
       allPieces,
     });
@@ -54,9 +74,7 @@ export class SchedulePieceExportHandler
       this.logger.error(
         `[SchedulePieceExportHandler] Unable to start job - exportId=${exportId.value}`,
       );
-      this.eventBus.publish(
-        new ExportPieceFailed(exportId, componentId, resourceId, resourceKind),
-      );
+      this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       return;
     }
 
@@ -69,7 +87,7 @@ export class SchedulePieceExportHandler
         piece,
         exportId: exportId.value,
         componentId: componentId.value,
-        resourceId: resourceId.value,
+        resourceId,
       },
     });
   }
