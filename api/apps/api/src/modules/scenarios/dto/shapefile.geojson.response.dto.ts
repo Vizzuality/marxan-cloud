@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import GeoJSON from 'geojson';
+import GeoJSON, { FeatureCollection } from 'geojson';
 
-export class ShapefileGeoJSONResponseDTO {
+export class GeoJsonDataDTO {
   @ApiProperty()
   data!: GeoJSON.GeoJSON;
 }

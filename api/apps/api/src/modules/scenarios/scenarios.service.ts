@@ -103,8 +103,8 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { ResourceId } from '@marxan/cloning/domain';
-import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
-import { FeatureCollection, GeoJsonProperties } from 'geojson';
+import { GeoJsonDataDTO } from './dto/shapefile.geojson.response.dto';
+import { FeatureCollection } from 'geojson';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -409,7 +409,7 @@ export class ScenariosService {
   ): Promise<
     Either<
       typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
-      ShapefileGeoJSONResponseDTO
+      GeoJsonDataDTO
     >
   > {
     await this.assertScenario(scenarioId);
@@ -445,7 +445,7 @@ export class ScenariosService {
             properties: {},
           })),
         },
-      }) as ShapefileGeoJSONResponseDTO);
+      }) as GeoJsonDataDTO);
     return right(geoJson);
   }
 

@@ -57,7 +57,7 @@ import {
   ScenarioFeaturesOutputGapData,
 } from '@marxan/features';
 import { UpdateScenarioPlanningUnitLockStatusDto } from './dto/update-scenario-planning-unit-lock-status.dto';
-import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
+import { GeoJsonDataDTO } from './dto/shapefile.geojson.response.dto';
 import { ApiConsumesShapefile } from '@marxan-api/decorators/shapefile.decorator';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
@@ -382,7 +382,7 @@ export class ScenariosController {
     @Param('id', ParseUUIDPipe) scenarioId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ShapefileGeoJSONResponseDTO> {
+  ): Promise<GeoJsonDataDTO> {
     const result = await this.service.uploadLockInShapeFile(
       scenarioId,
       req.user.id,
