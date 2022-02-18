@@ -4,7 +4,7 @@ This document represents the initial needs for map tiles needed at project and s
 
 ## User requirements
 
-User needs to be able to:
+All users need to be able to:
 
 * At project creation visualize their custom uploaded planning area in the map.
 * At project creation visualize their custom uploaded planning area grid in the map.
