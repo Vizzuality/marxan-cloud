@@ -4,13 +4,13 @@ import Clicking from './clicking';
 import Drawing from './drawing';
 import Uploading from './uploading';
 
-export interface AnalysisAdjustButtonsProps {
+export interface PlanningUnitButtonsProps {
   type: string;
 }
 
-export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
+export const PlanningUnitButtons: React.FC<PlanningUnitButtonsProps> = ({
   type,
-}: AnalysisAdjustButtonsProps) => {
+}: PlanningUnitButtonsProps) => {
   const [selected, setSelected] = useState(null);
 
   const BUTTONS = [
@@ -47,4 +47,4 @@ export const AnalysisAdjustButtons: React.FC<AnalysisAdjustButtonsProps> = ({
   );
 };
 
-export default AnalysisAdjustButtons;
+export default PlanningUnitButtons;

@@ -13,6 +13,7 @@ import {
   scaleLinear, line, area,
 } from 'd3';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -129,22 +130,26 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   });
 
   const onSaveBlm = useCallback((value) => {
-    const scenarioMetaData = {
-      metadata: {
-        scenarioEditingMetadata: {
-          ...scenarioEditingMetadata,
-          lastJobCheck: new Date().getTime(),
-          tab: ScenarioSidebarTabs.PARAMETERS,
-          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
-        },
-        marxanInputParameterFile: {
-          ...marxanInputParameterFile,
-          BLM: value,
-        },
+    const BLM = +value.toFixed(0);
+    const meta = {
+      scenarioEditingMetadata,
+      marxanInputParameterFile: {
+        ...marxanInputParameterFile,
+        BLM,
       },
     };
 
-    saveScenarioMutation.mutate({ id: `${sid}`, data: scenarioMetaData }, {
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data:
+      {
+        boundaryLengthModifier: BLM,
+        metadata: mergeScenarioStatusMetaData(meta, {
+          tab: ScenarioSidebarTabs.PARAMETERS,
+          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
+        }),
+      },
+    }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-save-blm-value', (
           <>

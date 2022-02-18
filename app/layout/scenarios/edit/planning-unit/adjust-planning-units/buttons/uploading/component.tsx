@@ -25,17 +25,17 @@ import Loading from 'components/loading';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
-export interface AnalysisAdjustUploadingProps {
+export interface PlanningUnitUploadingProps {
   type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }
 
-export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = ({
+export const PlanningUnitUploading: React.FC<PlanningUnitUploadingProps> = ({
   type,
   selected,
   onSelected,
-}: AnalysisAdjustUploadingProps) => {
+}: PlanningUnitUploadingProps) => {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
@@ -441,4 +441,4 @@ export const AnalysisAdjustUploading: React.FC<AnalysisAdjustUploadingProps> = (
   );
 };
 
-export default AnalysisAdjustUploading;
+export default PlanningUnitUploading;

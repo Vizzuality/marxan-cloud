@@ -8,9 +8,10 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useProjectRole } from 'hooks/project-users';
-import { useScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Pill from 'layout/pill';
 import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
@@ -57,6 +58,11 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const scenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   // EFFECTS
   useEffect(() => {
@@ -73,9 +79,28 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   }, [dispatch, setSubTab]);
 
   const onContinue = useCallback(() => {
-    dispatch(setTab(ScenarioSidebarTabs.FEATURES));
-    dispatch(setSubTab(null));
-  }, [dispatch, setTab, setSubTab]);
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.FEATURES,
+            subtab: null,
+          },
+          {
+            saveTab: true,
+            saveStatus: false,
+          },
+        ),
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setTab(ScenarioSidebarTabs.FEATURES));
+        dispatch(setSubTab(null));
+      },
+    });
+  }, [sid, scenarioData?.metadata, dispatch, setTab, setSubTab, scenarioMutation]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
 

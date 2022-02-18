@@ -20,17 +20,17 @@ import Loading from 'components/loading';
 
 import DRAW_SHAPE_SVG from 'svgs/ui/draw.svg?sprite';
 
-export interface AnalysisAdjustDrawingProps {
+export interface PlanningUnitDrawingProps {
   type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }
 
-export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
+export const PlanningUnitDrawing: React.FC<PlanningUnitDrawingProps> = ({
   type,
   selected,
   onSelected,
-}: AnalysisAdjustDrawingProps) => {
+}: PlanningUnitDrawingProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
@@ -234,4 +234,4 @@ export const AnalysisAdjustDrawing: React.FC<AnalysisAdjustDrawingProps> = ({
   );
 };
 
-export default AnalysisAdjustDrawing;
+export default PlanningUnitDrawing;
