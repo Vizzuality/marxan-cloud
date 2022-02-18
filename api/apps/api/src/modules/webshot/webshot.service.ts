@@ -1,7 +1,7 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
-
+import { Readable } from 'stream';
 export class WebshotViewport {
   @IsNumber()
   @Min(64)
@@ -36,15 +36,23 @@ export class WebshotService {
     projectId: string,
     config: WebshotSummaryReportConfig,
   ) {
-    return await this.httpService
+    const pdfBuffer = await this.httpService
       .post(
         `${this.webshotServiceUrl}/projects/${projectId}/summary-report`,
         config,
+        { responseType: 'arraybuffer' },
       )
       .toPromise()
       .then((response) => response.data)
       .catch((error) => {
         throw new Error(error);
       });
+
+    const stream = new Readable();
+
+    stream.push(pdfBuffer);
+    stream.push(null);
+
+    return stream;
   }
 }

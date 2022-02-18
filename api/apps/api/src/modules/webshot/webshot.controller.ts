@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -18,6 +19,7 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { WebshotService, WebshotSummaryReportConfig } from './webshot.service';
+import { Response } from 'express';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -34,7 +36,15 @@ export class WebshotController {
   async getSummaryReportForProject(
     @Body() config: WebshotSummaryReportConfig,
     @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Res() res: Response,
   ): Promise<any> {
-    return await this.service.getSummaryReportForProject(projectId, config);
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
+    const pdfStream = await this.service.getSummaryReportForProject(
+      projectId,
+      config,
+    );
+    pdfStream.pipe(res);
   }
 }
