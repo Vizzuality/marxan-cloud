@@ -288,21 +288,10 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-            tab: ScenarioSidebarTabs.SOLUTIONS,
-            subtab: null,
-            status: {
-              'protected-areas': 'draft',
-              features: 'draft',
-              analysis: 'draft',
-              solutions: 'draft',
-            },
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.SOLUTIONS,
+          subtab: null,
+        }),
       },
     }, {
       onSuccess: () => {

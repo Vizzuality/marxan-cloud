@@ -37,7 +37,6 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
 
   const { data: calibrationRange } = useScenarioCalibrationRange(sid);
-
   const minBlmValue = 0;
   const maxBlmValue = 10000000;
 
@@ -124,7 +123,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                 noValidate
                 onSubmit={handleSubmit}
               >
-                <div className="flex space-x-6 justify-between">
+                <div className="flex justify-between space-x-6">
                   <div className="flex items-center">
                     <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
                     <FieldRFF

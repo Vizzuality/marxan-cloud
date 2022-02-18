@@ -99,7 +99,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         addToast('save-scenario-wdpa', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario Protected Areas saved</p>
+            <p className="text-sm">Scenario protected areas saved</p>
           </>
         ), {
           level: 'success',
@@ -111,7 +111,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         addToast('error-scenario-wdpa', (
           <>
             <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario Protected Areas not saved</p>
+            <p className="text-sm">Scenario protected areas not saved</p>
           </>
         ), {
           level: 'error',

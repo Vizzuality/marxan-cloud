@@ -23,6 +23,8 @@ export const STATUS_VALUES = {
   parameters: {
     solutions: 'empty',
   },
+  solutions: {
+  },
 };
 
 export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
