@@ -1,5 +1,15 @@
 import { ScenarioSidebarTabs } from './tabs';
 
+interface MergeMetadataProps {
+  scenarioEditingMetadata?: Record<string, any>;
+  marxanInputParameterFile?: Record<string, any>;
+}
+
+interface MergeOptionsProps {
+  saveTab?: boolean;
+  saveStatus?: boolean;
+}
+
 export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
   status: {
     'planning-unit': 'draft', // Possible values: empty, draft and outdated
@@ -28,27 +38,29 @@ export const STATUS_VALUES = {
 };
 
 export const mergeScenarioStatusMetaData = (
-  obj = {},
+  obj: MergeMetadataProps = {},
   { tab, subtab },
-  options = { saveTab: true },
+  options: MergeOptionsProps = { saveTab: true, saveStatus: true },
 ) => {
   const { scenarioEditingMetadata = {}, marxanInputParameterFile = {} } = obj;
 
-  const { saveTab } = options;
+  const { saveTab, saveStatus } = options;
 
   const metadata = {
     ...obj,
     scenarioEditingMetadata: {
       ...scenarioEditingMetadata,
-      status: {
-        ...scenarioEditingMetadata.status,
-        [tab]: 'draft',
-        ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
-          return {
-            ...acc,
-            [v]: (scenarioEditingMetadata.status[v] !== 'empty') ? 'outdated' : 'empty',
-          };
-        }, {}),
+      ...saveStatus && {
+        status: {
+          ...scenarioEditingMetadata.status,
+          [tab]: 'draft',
+          ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
+            return {
+              ...acc,
+              [v]: (scenarioEditingMetadata.status[v] !== 'empty') ? 'outdated' : 'empty',
+            };
+          }, {}),
+        },
       },
       ...saveTab && {
         tab,
