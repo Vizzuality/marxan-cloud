@@ -98,7 +98,6 @@ import { UpdateCostSurface } from './cost-surface/application/update-cost-surfac
 import { DeleteScenario } from './cost-surface/infra/delete-scenario.command';
 import {
   lockedByAnotherUser,
-  LockService,
   noLockInPlace,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
@@ -160,7 +159,6 @@ export class ScenariosService {
     private readonly blmValuesRepository: ScenarioBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
     private readonly scenarioAclService: ScenarioAccessControl,
-    private readonly lockService: LockService,
   ) {}
 
   async findAllPaginated(
