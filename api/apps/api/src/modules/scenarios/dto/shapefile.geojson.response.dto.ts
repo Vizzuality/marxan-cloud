@@ -3,5 +3,5 @@ import GeoJSON from 'geojson';
 
 export class ShapefileGeoJSONResponseDTO {
   @ApiProperty()
-  data!: typeof GeoJSON;
+  data!: GeoJSON.GeoJSON;
 }

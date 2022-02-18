@@ -103,6 +103,8 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { ResourceId } from '@marxan/cloning/domain';
+import { ShapefileGeoJSONResponseDTO } from './dto/shapefile.geojson.response.dto';
+import { FeatureCollection, GeoJsonProperties } from 'geojson';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -407,7 +409,7 @@ export class ScenariosService {
   ): Promise<
     Either<
       typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
-      any
+      ShapefileGeoJSONResponseDTO
     >
   > {
     await this.assertScenario(scenarioId);
@@ -422,7 +424,7 @@ export class ScenariosService {
      * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
      * in case a shapefile is not validated and a status 4xx is sent back.
      */
-    const { data: geoJson } = await this.httpService
+    const geoJson = await this.httpService
       .post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
         file,
@@ -431,8 +433,20 @@ export class ScenariosService {
           validateStatus: (status) => status <= 499,
         },
       )
-      .toPromise();
-    return geoJson;
+      .toPromise()
+      .then((response) => response.data.data as FeatureCollection)
+      .then((geoJson) => ({
+        data: {
+          type: geoJson.type,
+          features: geoJson.features.map((feature) => ({
+            ...feature,
+            // remove any shapefile attributes that may be still around at this
+            // stage, as they are not needed.
+            properties: {},
+          })),
+        },
+      }) as ShapefileGeoJSONResponseDTO);
+    return right(geoJson);
   }
 
   async findScenarioResults(
