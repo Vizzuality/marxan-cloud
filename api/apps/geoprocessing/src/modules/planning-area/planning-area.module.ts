@@ -9,14 +9,17 @@ import { gcConfigProvider } from './garbage-collector-config';
 import { PlanningAreaSerializer } from './planning-area.serializer';
 import { PlanningUnitsGridProcessor } from './planning-units-grid/planning-units-grid.processor';
 import { PlanningAreaTilesService } from './planning-area-tiles/planning-area-tiles.service';
+import { PlanningAreaGridTilesService } from './planning-units-grid/planning-area-grid-tiles.service';
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 @Module({
   imports: [
     PlanningAreaRepositoryModule.for(geoprocessingConnections.default.name),
     TypeOrmModule.forFeature([PlanningArea]),
+    TypeOrmModule.forFeature([PlanningUnitsGeom]),
     ShapefilesModule,
     TileModule,
   ],
@@ -26,6 +29,7 @@ import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo
     PlanningAreaSerializer,
     PlanningUnitsGridProcessor,
     PlanningAreaTilesService,
+    PlanningAreaGridTilesService,
   ],
   controllers: [PlanningAreaController],
 })

@@ -110,12 +110,17 @@
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                `http://localhost:3040/api/v1/projects/planning-area/697f2adf-4977-4d95-97bc-187be99333e2/preview/tiles/{z}/{x}/{y}.mvt`,
+                `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/preview/tiles/{z}/{x}/{y}.mvt`,
               ],
             },
-
-
-
+            'postgis-previewPlanningAreaGrid': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/grid/preview/tiles/{z}/{x}/{y}.mvt`,
+              ],
+            },
             BASEMAP: {
               type: 'raster',
               tiles: [
@@ -197,6 +202,17 @@
                 'fill-outline-color': 'yellow',
                 'fill-color': 'red',
                 'fill-opacity': 0.1,
+              },
+            },
+            {
+              id: 'postgis-tiles-layer-customPlanningAreaGrid',
+              type: 'line',
+              source: 'postgis-previewPlanningAreaGrid',
+              'source-layer': 'layer0',
+
+              paint: {
+                'line-color': 'yellow',
+                'line-opacity': 1,
               },
             },
             // {
