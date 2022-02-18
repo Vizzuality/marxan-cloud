@@ -37,9 +37,14 @@ export class WebshotService {
     config: WebshotSummaryReportConfig,
   ) {
     return await this.httpService
-      .post(`${this.webshotServiceUrl}/projects/${projectId}/summary-report`, config)
+      .post(
+        `${this.webshotServiceUrl}/projects/${projectId}/summary-report`,
+        config,
+      )
       .toPromise()
-      .then(response => response.data)
-      .catch(error => { throw new Error(error); });
+      .then((response) => response.data)
+      .catch((error) => {
+        throw new Error(error);
+      });
   }
 }
