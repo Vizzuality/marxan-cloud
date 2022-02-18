@@ -28,22 +28,19 @@ export const FIELDS = [
       id: 'general-parameters',
       label: 'General parameters',
     },
-    default: 10,
+    default: 1,
     required: true,
     advanced: false,
     input: {
       className: 'text-2xl',
-      min: 1,
-      max: 10000,
+      min: 0,
       type: 'number',
     },
     validations: [
       {
         presence: true,
         numericality: {
-          onlyInteger: true,
-          greaterThanOrEqualTo: 1,
-          lessThanOrEqualTo: 10000,
+          greaterThanOrEqualTo: 0,
         },
       },
     ],
