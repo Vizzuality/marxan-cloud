@@ -17,9 +17,7 @@ export interface HomeFeaturesProps {
 }
 
 export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
-  const { ref, inView } = useInView({
-    threshold: 0,
-  });
+  const { ref, inView } = useInView({});
 
   const exampleProjectsVariants = {
     initial: (i: number) => ({
