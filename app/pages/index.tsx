@@ -19,6 +19,7 @@ export const getServerSideProps = withUser();
 
 const Home: React.FC = () => {
   const { asPath } = useRouter();
+
   return (
     <>
       <Head title="Home" />
