@@ -34,6 +34,7 @@ import { AccessControlModule } from '../access-control';
 import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
 import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
     JobStatusService,
     JobStatusSerializer,
     GetProjectHandler,
+    ProxyService,
   ],
   controllers: [
     ProjectsListingController,

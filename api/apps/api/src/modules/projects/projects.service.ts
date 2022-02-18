@@ -2,7 +2,7 @@ import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { Either, isLeft, left, right, isRight } from 'fp-ts/Either';
 
 import {
   FindResult,
@@ -168,6 +168,21 @@ export class ProjectsService {
       return left(false);
     }
     return right(await this.projectsCrud.update(projectId, input));
+  }
+
+  async checkPlanningAreaBelongsToProject(
+    planningAreaId: string,
+    userId: string
+  ): Promise<Either<typeof forbiddenError, void>> {
+
+    const projectIsFound = await this.assertProject(planningAreaId, {id: userId});
+
+    if (isRight(projectIsFound)) {
+        if (!(await this.projectAclService.canViewProject(userId, planningAreaId))) {
+        return left(forbiddenError);
+      }
+    }
+    return right(void 0);
   }
 
   async updateBlmValues(
