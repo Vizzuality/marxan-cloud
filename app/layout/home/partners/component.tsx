@@ -1,5 +1,9 @@
 import React, { useMemo } from 'react';
 
+import { useInView } from 'react-intersection-observer';
+
+import { AnimatePresence, motion } from 'framer-motion';
+
 import { Media } from 'layout/media';
 import Wrapper from 'layout/wrapper';
 
@@ -12,6 +16,9 @@ export interface PartnersListProps {
 }
 
 export const PartnersList: React.FC<PartnersListProps> = () => {
+  const { ref: desktopRef, inView: desktopInView } = useInView({});
+  const { ref: mobileRef, inView: mobileInView } = useInView({});
+
   const renderLogoSections = useMemo(() => {
     return PARTNER_LOGOS.map((pl) => {
       const { id, title, logos } = pl;
@@ -39,23 +46,46 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
       };
     });
   }, []);
+
   return (
-    <div className="relative border-t border-white bg-primary-50">
+    <div className="relative border border-t border-white bg-primary-50">
       <Wrapper>
 
         <div className="top-0 w-full h-px max-w-5xl mx-auto opacity-20" style={{ background: 'linear-gradient(to right, transparent, #000000, transparent)' }} />
 
         <Media greaterThanOrEqual="md">
-          <div className="max-w-5xl pt-24 pb-6 mx-auto">
-            <Carousel
-              slides={renderLogoSections}
-            />
+          <div ref={desktopRef}>
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: desktopInView ? 1 : 0 }}
+                transition={{ delay: 0.4 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="max-w-5xl pt-24 pb-6 mx-auto">
+                  <Carousel
+                    slides={renderLogoSections}
+                  />
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </Media>
 
         <Media lessThan="md">
-          <div className="max-w-5xl py-10 mx-auto space-y-16">
-            {renderLogoSections.map((ls) => ls.content)}
+          <div ref={mobileRef}>
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: mobileInView ? 1 : 0 }}
+                transition={{ delay: 0.35 }}
+                exit={{ opacity: 0 }}
+              >
+                <div className="max-w-5xl py-10 mx-auto space-y-16">
+                  {renderLogoSections.map((ls) => ls.content)}
+                </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </Media>
       </Wrapper>

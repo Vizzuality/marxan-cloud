@@ -28,7 +28,7 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: inView ? 1 : 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.35 }}
               exit={{ opacity: 0 }}
             >
               <div className="flex flex-col items-center -space-y-20 md:space-y-20">
