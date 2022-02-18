@@ -21,6 +21,9 @@ export class WebshotSummaryReportConfig {
 
   @IsOptional()
   viewport?: WebshotViewport;
+
+  @IsOptional()
+  cookie?: string;
 }
 
 @Injectable()
