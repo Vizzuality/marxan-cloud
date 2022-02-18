@@ -8,4 +8,4 @@ User needs to be able to:
 
 * At project creation visualize their custom uploaded planning area in the map.
 * At project creation visualize their custom uploaded planning area grid in the map.
-* At scenario creation visualize their planning area in the map and visualize their panning unit grid.
+* At scenario creation visualize their planning area in the map and visualize their planning unit grid.
