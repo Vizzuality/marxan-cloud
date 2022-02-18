@@ -1,3 +1,4 @@
+import { FileRepositoryModule } from '@marxan/files-repository';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../../../api-events';
@@ -15,6 +16,7 @@ import { MarkImportAsFinishedHandler } from './mark-import-as-finished.handler';
 import { MarkImportAsSubmittedHandler } from './mark-import-as-submitted.handler';
 import { PieceImportRequestedSaga } from './piece-import-requested.saga';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
+import { UploadExportFileHandler } from './upload-export-file.handler';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
     QueueApiEventsModule,
     CqrsModule,
     ImportAdaptersModule,
+    FileRepositoryModule,
   ],
   providers: [
     PieceImportRequestedSaga,
@@ -31,6 +34,7 @@ import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
     MarkImportAsSubmittedHandler,
     MarkImportAsFinishedHandler,
     ImportPieceEventsHandler,
+    UploadExportFileHandler,
     {
       provide: Logger,
       useClass: Logger,

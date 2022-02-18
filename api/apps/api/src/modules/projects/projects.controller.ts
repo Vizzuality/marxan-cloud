@@ -26,6 +26,8 @@ import {
 } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -61,7 +63,7 @@ import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
-import { isLeft } from 'fp-ts/Either';
+import { isLeft, right } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
@@ -82,7 +84,10 @@ import {
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { projectNotFound as blmProjectNotFound, unknownError } from '../blm';
+import {
+  projectNotFound as blmProjectNotFound,
+  unknownError as blmUnknownError,
+} from '../blm';
 import { Response } from 'express';
 import {
   ImplementsAcl,
@@ -91,6 +96,13 @@ import {
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
+import { unknownError as fileRepositoryUnknownError } from '@marxan/files-repository';
+import {
+  archiveCorrupted,
+  invalidFiles,
+} from '@marxan/cloning/infrastructure/archive-reader.port';
+import { fileNotFound } from '@marxan/files-repository/file.repository';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -400,7 +412,7 @@ export class ProjectsController {
           );
         case forbiddenError:
           throw new ForbiddenException();
-        case unknownError:
+        case blmUnknownError:
           throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;
@@ -540,5 +552,44 @@ export class ProjectsController {
     }
 
     return result.right;
+  }
+
+  @IsMissingAclImplementation()
+  @Post('import')
+  @ApiOkResponse({ type: RequestProjectImportResponseDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          description: 'Export zip file',
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async importProject(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<RequestProjectImportResponseDto> {
+    const importIdOrError = await this.projectsService.importProject(file);
+
+    if (isLeft(importIdOrError)) {
+      switch (importIdOrError.left) {
+        case archiveCorrupted:
+          throw new BadRequestException('Missing export config file');
+        case invalidFiles:
+          throw new BadRequestException('Invalid export config file');
+        case fileRepositoryUnknownError:
+        case fileNotFound:
+          throw new InternalServerErrorException('Error while saving file');
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { importId: importIdOrError.right };
   }
 }
