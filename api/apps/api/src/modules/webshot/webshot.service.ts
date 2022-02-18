@@ -16,7 +16,7 @@ export class WebshotViewport {
 
 export class WebshotSummaryReportConfig {
   @IsString()
-  pageUrl!: string;
+  baseUrl!: string;
 
   @IsOptional()
   viewport?: WebshotViewport;
@@ -32,13 +32,14 @@ export class WebshotService {
 
   constructor(private httpService: HttpService) {}
 
-  async getSummaryReportForProject(
+  async getSummaryReportForScenario(
     projectId: string,
+    scenarioId: string,
     config: WebshotSummaryReportConfig,
   ) {
     const pdfBuffer = await this.httpService
       .post(
-        `${this.webshotServiceUrl}/projects/${projectId}/summary-report`,
+        `${this.webshotServiceUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
         config,
         { responseType: 'arraybuffer' },
       )
