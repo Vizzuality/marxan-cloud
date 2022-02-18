@@ -221,6 +221,24 @@ describe('ProxyVectorTilesModule (e2e)', () => {
           .expect(HttpStatus.BAD_REQUEST);
       });
     });
+    describe('Custom Planning Area grid layer previews', () => {
+      test('Should give back a valid request for a regular hexagon PUs vector tile preview', async () => {
+        await request(app.getHttpServer())
+          .get(
+            `api/v1/project/planning-area/${id}/preview/tiles/6/30/25.mvt`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.OK);
+      });
+      test('Should give back a error if the planning area does not exist', async () => {
+        await request(app.getHttpServer())
+          .get(
+            `api/v1/project/planning-area/qweqwe21/preview/tiles/6/30/25.mvt`,
+          )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(HttpStatus.BAD_REQUEST);
+      });
+    });
     describe('Scenario PUs layers', () => {
       test('Should give back a valid request for a scenario PUs', async () => {
         await request(app.getHttpServer())
