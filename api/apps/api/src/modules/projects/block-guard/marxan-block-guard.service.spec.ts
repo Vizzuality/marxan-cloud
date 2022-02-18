@@ -52,11 +52,25 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
       .ThenAPendingExportErrorIsThrown();
   });
 
-  it.todo(`throws an exception if the given project has an ongoing import`);
+  it(`throws an exception if the given project has an ongoing import`, async () => {
+    const [projectId] = fixtures.GivenProjectWasCreated();
 
-  it.todo(
-    `throws an exception if the given project has a scenario with an ongoing import`,
-  );
+    fixtures.WhenProjectHasAnOngoingImport(projectId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingImportErrorIsThrown();
+  });
+
+  it(`throws an exception if the given project has a scenario with an ongoing import`, async () => {
+    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAScenarioWithAnOngoingImport(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingImportErrorIsThrown();
+  });
 
   it(`throws an exception if the given project has a scenario with an ongoing blm calibration`, async () => {
     const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
@@ -126,11 +140,25 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
       .ThenAPendingProjectExportErrorIsThrown();
   });
 
-  it.todo(`throws an exception if the given scenario has an ongoing import`);
+  it(`throws an exception if the given scenario has an ongoing import`, async () => {
+    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
 
-  it.todo(
-    `throws an exception if the given scenario's parent project has an ongoing import`,
-  );
+    fixtures.WhenProjectHasAScenarioWithAnOngoingImport(scenarioId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingImportErrorIsThrown();
+  });
+
+  it(`throws an exception if the given scenario's parent project has an ongoing import`, async () => {
+    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAnOngoingImport(projectId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingProjectImportErrorIsThrown();
+  });
 
   it(`throws an exception if the given scenario has an ongoing blm calibration`, async () => {
     const [_, scenarioId] = fixtures.GivenProjectWasCreated();
@@ -223,6 +251,9 @@ const getFixtures = async () => {
     WhenProjectHasAScenarioWithAnOngoingExport: (scenarioId: string) => {
       scenarioChecker.addPendingExportForScenario(scenarioId);
     },
+    WhenProjectHasAScenarioWithAnOngoingImport: (scenarioId: string) => {
+      scenarioChecker.addPendingImportForScenario(scenarioId);
+    },
     WhenProjectHasAScenarioWithAnOngoingBlmCalibration: (
       scenarioId: string,
     ) => {
@@ -234,12 +265,20 @@ const getFixtures = async () => {
     WhenProjectHasAnOngoingExport: (projectId: string) => {
       projectChecker.addPendingExportForProject(projectId);
     },
+    WhenProjectHasAnOngoingImport: (projectId: string) => {
+      projectChecker.addPendingImportForProject(projectId);
+    },
     WhenCheckingWhetherTheProjectCanBeEdited: (projectId: string) => {
       return {
         ThenAPendingExportErrorIsThrown: async () => {
           await expect(
             blockGuard.ensureThatProjectIsNotBlocked(projectId),
           ).rejects.toThrow(/project.+pending export/gi);
+        },
+        ThenAPendingImportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
+          ).rejects.toThrow(/project.+pending import/gi);
         },
         ThenAPendingBlmCalibrationErrorIsThrown: async () => {
           await expect(
@@ -280,10 +319,20 @@ const getFixtures = async () => {
             blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
           ).rejects.toThrow(/scenario.+pending export/gi);
         },
+        ThenAPendingImportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+pending import/gi);
+        },
         ThenAPendingProjectExportErrorIsThrown: async () => {
           await expect(
             blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
           ).rejects.toThrow(/scenario.+project pending export/gi);
+        },
+        ThenAPendingProjectImportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+project pending import/gi);
         },
         ThenAPendingBlmCalibrationErrorIsThrown: async () => {
           await expect(

@@ -48,17 +48,30 @@ it(`hasPendingExport() should return true if given scenario has an ongoing expor
   fixtures.ThenTrueIsReturned(result);
 });
 
-it.todo(
-  `hasPendingImport() should return scenarioDoesntExist if the scenario does not exist`,
-);
+it(`hasPendingImport() should return scenarioDoesntExist if the scenario does not exist`, async () => {
+  fixtures.GivenScenarioDoesntExist();
 
-it.todo(
-  `hasPendingImport() should return false if given scenario does not have an ongoing import`,
-);
+  const result = await fixtures.WhenHasPendingImportMethodIsCalled(v4());
 
-it.todo(
-  `hasPendingImport() should return true if given scenario has an ongoing import`,
-);
+  fixtures.ThenScenarioDoesntExistIsReturned(result);
+});
+
+it(`hasPendingImport() should return false if given scenario does not have an ongoing import`, async () => {
+  const id = fixtures.GivenScenarioExist();
+
+  const result = await fixtures.WhenHasPendingImportMethodIsCalled(id);
+
+  fixtures.ThenFalseIsReturned(result);
+});
+
+it(`hasPendingImport() should return true if given scenario has an ongoing import`, async () => {
+  const id = fixtures.GivenScenarioExist();
+  fixtures.GivenScenarioHasAnOngoingImport();
+
+  const result = await fixtures.WhenHasPendingImportMethodIsCalled(id);
+
+  fixtures.ThenTrueIsReturned(result);
+});
 
 it(`hasPendingBlmCalibration() should return scenarioDoesntExist if the scenario does not exist`, async () => {
   fixtures.GivenScenarioDoesntExist();
@@ -164,6 +177,11 @@ async function getFixtures() {
         kind: API_EVENT_KINDS.scenario__export__submitted__v1__alpha,
       } as ApiEventByTopicAndKind);
     },
+    GivenScenarioHasAnOngoingImport: () => {
+      fakeApiEventsService.getLatestEventForTopic.mockResolvedValueOnce({
+        kind: API_EVENT_KINDS.scenario__import__submitted__v1__alpha,
+      } as ApiEventByTopicAndKind);
+    },
     GivenScenarioHasAnOngoingBlmCalibration: () => {
       fakeApiEventsService.getLatestEventForTopic.mockResolvedValueOnce({
         kind: API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1,
@@ -176,6 +194,9 @@ async function getFixtures() {
     },
     WhenHasPendingExportMethodIsCalled: (scenarioId: string) => {
       return sut.hasPendingExport(scenarioId);
+    },
+    WhenHasPendingImportMethodIsCalled: (scenarioId: string) => {
+      return sut.hasPendingImport(scenarioId);
     },
     WhenHasPendingBlmCalibrationMethodIsCalled: (scenarioId: string) => {
       return sut.hasPendingBlmCalibration(scenarioId);

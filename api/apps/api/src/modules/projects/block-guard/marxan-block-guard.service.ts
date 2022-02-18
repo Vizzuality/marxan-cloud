@@ -8,7 +8,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isLeft } from 'fp-ts/Either';
 import { isRight } from 'fp-ts/lib/These';
 import { Repository } from 'typeorm';
 import { Project } from '../project.api.entity';
@@ -35,18 +34,24 @@ export class MarxanBlockGuard implements BlockGuard {
 
     const [
       hasPendingExports,
+      hasPendingImports,
       hasPendingBlmCalibration,
       hasPendingMarxanRun,
     ] = await Promise.all([
       this.projectChecker.hasPendingExports(projectId),
+      this.projectChecker.hasPendingImports(projectId),
       this.projectChecker.hasPendingBlmCalibration(projectId),
       this.projectChecker.hasPendingMarxanRun(projectId),
-      //TODO this.projectChecker.hasPendingImports(projectId)
     ]);
 
     if (isRight(hasPendingExports) && hasPendingExports.right)
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending export`,
+      );
+
+    if (isRight(hasPendingImports) && hasPendingImports.right)
+      throw new BadRequestException(
+        `Project ${projectId} editing is blocked because of pending import`,
       );
 
     if (isRight(hasPendingBlmCalibration) && hasPendingBlmCalibration.right)
@@ -58,8 +63,6 @@ export class MarxanBlockGuard implements BlockGuard {
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending marxan run`,
       );
-
-    //TODO check if project has pending imports
   }
 
   async ensureThatScenarioIsNotBlocked(scenarioId: string): Promise<void> {
@@ -75,19 +78,26 @@ export class MarxanBlockGuard implements BlockGuard {
       hasPendingBlmCalibration,
       hasPendingMarxanRun,
       hasPendingExports,
+      hasPendingImports,
       projectHasPendingExports,
+      projectHasPendingImports,
     ] = await Promise.all([
       this.scenarioChecker.hasPendingBlmCalibration(scenarioId),
       this.scenarioChecker.hasPendingMarxanRun(scenarioId),
       this.scenarioChecker.hasPendingExport(scenarioId),
+      this.scenarioChecker.hasPendingImport(scenarioId),
       this.projectChecker.hasPendingExports(scenario.projectId),
-      //TODO this.scenarioChecker.hasPendingImport(scenarioId),
-      //TODO this.projectChecker.hasPendingImports(projectId)
+      this.projectChecker.hasPendingImports(scenario.projectId),
     ]);
 
     if (isRight(hasPendingExports) && hasPendingExports.right)
       throw new BadRequestException(
         `Scenario ${scenarioId} editing is blocked because of pending export`,
+      );
+
+    if (isRight(hasPendingImports) && hasPendingImports.right)
+      throw new BadRequestException(
+        `Scenario ${scenarioId} editing is blocked because of pending import`,
       );
 
     if (isRight(hasPendingBlmCalibration) && hasPendingBlmCalibration.right)
@@ -104,7 +114,10 @@ export class MarxanBlockGuard implements BlockGuard {
       throw new BadRequestException(
         `Scenario ${scenarioId} editing is blocked because of project pending export`,
       );
-    //TODO check if project has pending imports
-    //TODO check if scenario has pending imports
+
+    if (isRight(projectHasPendingImports) && projectHasPendingImports.right)
+      throw new BadRequestException(
+        `Scenario ${scenarioId} editing is blocked because of project pending import`,
+      );
   }
 }
