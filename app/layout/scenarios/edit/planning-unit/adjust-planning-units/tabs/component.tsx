@@ -2,15 +2,15 @@ import React from 'react';
 
 import cx from 'classnames';
 
-export interface AnalysisAdjustTabsProps {
+export interface PlanningUnitTabsProps {
   type: string;
   onChange: (s: string) => void;
 }
 
-export const AnalysisAdjustTabs: React.FC<AnalysisAdjustTabsProps> = ({
+export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
   type,
   onChange,
-}: AnalysisAdjustTabsProps) => {
+}: PlanningUnitTabsProps) => {
   return (
     <div className="flex w-full space-x-8">
       <button
@@ -52,4 +52,4 @@ export const AnalysisAdjustTabs: React.FC<AnalysisAdjustTabsProps> = ({
   );
 };
 
-export default AnalysisAdjustTabs;
+export default PlanningUnitTabs;

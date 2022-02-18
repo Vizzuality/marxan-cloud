@@ -20,17 +20,17 @@ import Loading from 'components/loading';
 
 import SELECT_PLANNING_UNITS_SVG from 'svgs/ui/planning-units.svg?sprite';
 
-export interface AnalysisAdjustClickingProps {
+export interface PlanningUnitClickingProps {
   type: string;
   selected: boolean;
   onSelected: (s: string) => void;
 }
 
-export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
+export const PlanningUnitClicking: React.FC<PlanningUnitClickingProps> = ({
   type,
   selected,
   onSelected,
-}: AnalysisAdjustClickingProps) => {
+}: PlanningUnitClickingProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
@@ -225,4 +225,4 @@ export const AnalysisAdjustClicking: React.FC<AnalysisAdjustClickingProps> = ({
   );
 };
 
-export default AnalysisAdjustClicking;
+export default PlanningUnitClicking;

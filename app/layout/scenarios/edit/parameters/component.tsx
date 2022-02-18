@@ -158,7 +158,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
         id="scenarios-analysis"
-        title="Analysis"
+        title="Parameters"
         subtitle="Fine tune your Marxan plan"
         content={(
           <div className="space-y-2">
@@ -194,7 +194,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
       >
 
         <motion.div
-          key="analysis"
+          key="parameters"
           className="flex flex-col min-h-0 overflow-hidden"
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -204,7 +204,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
               <header className="flex justify-between flex-shrink-0">
                 <div>
                   <div className="flex items-baseline space-x-4">
-                    <h2 className="text-lg font-medium font-heading">Analysis</h2>
+                    <h2 className="text-lg font-medium font-heading">Parameters</h2>
                   </div>
                 </div>
               </header>

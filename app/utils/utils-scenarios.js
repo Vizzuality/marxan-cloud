@@ -13,7 +13,7 @@ export const SCENARIO_EDITING_META_DATA_DEFAULT_VALUES = {
 
 export const STATUS_VALUES = {
   'planning-unit': {
-    analysis: 'empty',
+    parameters: 'empty',
     solutions: 'empty',
   },
   features: {
