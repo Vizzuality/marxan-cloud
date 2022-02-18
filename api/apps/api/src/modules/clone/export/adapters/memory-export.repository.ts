@@ -6,7 +6,7 @@ import {
 } from '../application/export-repository.port';
 import { Export, ExportId } from '../domain';
 
-export class InMemoryExportRepo implements ExportRepository {
+export class MemoryExportRepo implements ExportRepository {
   #memory: Record<string, Export> = {};
 
   async find(exportId: ExportId): Promise<Export | undefined> {

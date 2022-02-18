@@ -38,7 +38,7 @@ export class MarkImportAsSubmittedHandler
       topic: resourceId,
       data: {
         importId: importId.value,
-        resourceId: resourceId,
+        resourceId,
         resourceKind,
       },
     });

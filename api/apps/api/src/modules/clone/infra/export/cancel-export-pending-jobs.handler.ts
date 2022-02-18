@@ -1,4 +1,6 @@
+import { MarkExportPiecesAsFailed } from '@marxan-api/modules/clone/infra/export/mark-export-pieces-as-failed.command';
 import { ExportJobInput } from '@marxan/cloning';
+import { ComponentId } from '@marxan/cloning/domain';
 import { Inject } from '@nestjs/common';
 import {
   CommandBus,
@@ -8,8 +10,6 @@ import {
 import { Job, Queue } from 'bullmq';
 import { CancelExportPendingJobs } from './cancel-export-pending-jobs.command';
 import { exportPieceQueueToken } from './export-queue.provider';
-import { ComponentId } from '@marxan/cloning/domain';
-import { MarkExportPiecesAsFailed } from '@marxan-api/modules/clone/infra/export/mark-export-pieces-as-failed.command';
 
 @CommandHandler(CancelExportPendingJobs)
 export class CancelExportPendingJobsHandler
@@ -20,11 +20,7 @@ export class CancelExportPendingJobsHandler
     private readonly commandBus: CommandBus,
   ) {}
 
-  async execute({
-    exportId,
-    resourceKind,
-    resourceId,
-  }: CancelExportPendingJobs): Promise<void> {
+  async execute({ exportId }: CancelExportPendingJobs): Promise<void> {
     const pendingJobs: Job<ExportJobInput>[] = await this.queue.getJobs([
       'waiting',
       'delayed',
@@ -49,8 +45,6 @@ export class CancelExportPendingJobsHandler
     await this.commandBus.execute(
       new MarkExportPiecesAsFailed(
         exportId,
-        resourceId,
-        resourceKind,
         exportJobs.map((job) => new ComponentId(job.data.componentId)),
       ),
     );

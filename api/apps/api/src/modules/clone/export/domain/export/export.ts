@@ -1,6 +1,4 @@
-import { AggregateRoot } from '@nestjs/cqrs';
-import { Either, left, right } from 'fp-ts/Either';
-
+import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 import {
   ArchiveLocation,
   ComponentId,
@@ -8,19 +6,19 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ExportId } from './export.id';
-
-import { ExportComponentRequested } from '../events/export-component-requested.event';
-import { ExportComponentFinished } from '../events/export-component-finished.event';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { Either, left, right } from 'fp-ts/Either';
+import { AllPiecesExported } from '../events/all-pieces-exported.event';
 import { ArchiveReady } from '../events/archive-ready.event';
-
+import { PieceExportRequested } from '../events/piece-export-requested.event';
+import { PieceExported } from '../events/piece-exported.event';
 import { ExportComponent } from './export-component/export-component';
+import { ExportId } from './export.id';
 import { ExportSnapshot } from './export.snapshot';
-import { ExportAllComponentsFinished } from '../events/export-all-components-finished.event';
-import { ExportRequested } from '@marxan-api/modules/clone/export/domain';
 
 export const pieceNotFound = Symbol('export piece not found');
 export const notReady = Symbol('some pieces of export are not yet ready');
+export const pieceAlreadyExported = Symbol(`piece already exported`);
 
 export class Export extends AggregateRoot {
   private constructor(
@@ -39,20 +37,9 @@ export class Export extends AggregateRoot {
     parts: ExportComponent[],
   ): Export {
     const exportRequest = new Export(ExportId.create(), id, kind, parts);
-    const allPieces = parts.map((part) => part.piece);
     parts
       .filter((part) => !part.isReady())
-      .map(
-        (part) =>
-          new ExportComponentRequested(
-            exportRequest.id,
-            part.id,
-            part.resourceId,
-            kind,
-            part.piece,
-            allPieces,
-          ),
-      )
+      .map((part) => new PieceExportRequested(exportRequest.id, part.id))
       .forEach((event) => exportRequest.apply(event));
 
     exportRequest.apply(
@@ -68,16 +55,15 @@ export class Export extends AggregateRoot {
   completeComponent(
     id: ComponentId,
     pieceLocation: ComponentLocation[],
-  ): Either<typeof pieceNotFound, true> {
+  ): Either<typeof pieceNotFound | typeof pieceAlreadyExported, true> {
     const piece = this.pieces.find((piece) => piece.id.equals(id));
-    if (!piece) {
-      return left(pieceNotFound);
-    }
+    if (!piece) return left(pieceNotFound);
+    if (piece.isReady()) return left(pieceAlreadyExported);
     piece.finish(pieceLocation);
-    this.apply(new ExportComponentFinished(this.id, id, pieceLocation));
+    this.apply(new PieceExported(this.id, id, pieceLocation));
 
     if (this.#allPiecesReady()) {
-      this.apply(new ExportAllComponentsFinished(this.id));
+      this.apply(new AllPiecesExported(this.id));
     }
 
     return right(true);
@@ -88,14 +74,7 @@ export class Export extends AggregateRoot {
       return left(notReady);
     }
     this.archiveLocation = archiveLocation;
-    this.apply(
-      new ArchiveReady(
-        this.id,
-        this.resourceId,
-        this.resourceKind,
-        this.archiveLocation,
-      ),
-    );
+    this.apply(new ArchiveReady(this.id, this.archiveLocation));
     return right(true);
   }
 

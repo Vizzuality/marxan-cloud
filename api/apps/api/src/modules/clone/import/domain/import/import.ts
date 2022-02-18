@@ -87,16 +87,7 @@ export class Import extends AggregateRoot {
     );
 
     for (const component of nextBatch) {
-      this.apply(
-        new PieceImportRequested(
-          this.importId,
-          component.id,
-          component.piece,
-          component.resourceId,
-          this.resourceKind,
-          component.uris,
-        ),
-      );
+      this.apply(new PieceImportRequested(this.importId, component.id));
     }
 
     return right(true);
@@ -120,16 +111,7 @@ export class Import extends AggregateRoot {
     for (const component of this.pieces.filter(
       (pc) => pc.order === firstBatchOrder,
     )) {
-      this.apply(
-        new PieceImportRequested(
-          this.importId,
-          component.id,
-          component.piece,
-          component.resourceId,
-          this.resourceKind,
-          component.uris,
-        ),
-      );
+      this.apply(new PieceImportRequested(this.importId, component.id));
     }
   }
 

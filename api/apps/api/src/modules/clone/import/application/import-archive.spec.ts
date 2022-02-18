@@ -196,15 +196,8 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof PieceImportRequested),
       ).toMatchObject([
         {
+          importId: expect.any(ImportId),
           componentId: new ComponentId(`import component unique id`),
-          resourceId: projectId,
-          piece: `project-metadata`,
-          uris: [
-            {
-              relativePath: `project-metadata.json`,
-              uri: `/tmp/project-metadata-random-uuid.json`,
-            },
-          ],
         },
       ]);
     },
@@ -213,26 +206,12 @@ const getFixtures = async () => {
         events.filter((event) => event instanceof PieceImportRequested),
       ).toMatchObject([
         {
+          importId: expect.any(ImportId),
           componentId: new ComponentId(`import component unique id`),
-          resourceId: projectId,
-          piece: `project-metadata`,
-          uris: [
-            {
-              relativePath: `project-metadata.json`,
-              uri: `/tmp/project-metadata-random-uuid.json`,
-            },
-          ],
         },
         {
+          importId: expect.any(ImportId),
           componentId: new ComponentId(`some other piece`),
-          resourceId: projectId,
-          piece: `planning-area-gadm`,
-          uris: [
-            {
-              relativePath: `planning-area/config.json`,
-              uri: `/tmp/project-planning-area-random-uuid.json`,
-            },
-          ],
         },
       ]);
     },

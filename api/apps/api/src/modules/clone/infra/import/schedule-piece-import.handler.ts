@@ -63,7 +63,7 @@ export class SchedulePieceImportHandler
       piece,
       importId: importId.value,
       componentId: componentId.value,
-      resourceId: resourceId,
+      resourceId,
       resourceKind,
       uris,
     });
@@ -83,7 +83,7 @@ export class SchedulePieceImportHandler
         piece,
         importId: importId.value,
         componentId: componentId.value,
-        resourceId: resourceId,
+        resourceId,
       },
     });
   }

@@ -1,5 +1,6 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import {
+  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ResourceId,
@@ -10,8 +11,11 @@ import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
+import { MemoryExportRepo } from '../../export/adapters/memory-export.repository';
 import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
-import { ExportId } from '../../export/domain';
+import { ExportRepository } from '../../export/application/export-repository.port';
+import { Export, ExportComponent } from '../../export/domain';
+import { ExportId } from '../../export/domain/export/export.id';
 import { exportPieceQueueToken } from './export-queue.provider';
 import { SchedulePieceExport } from './schedule-piece-export.command';
 import { SchedulePieceExportHandler } from './schedule-piece-export.handler';
@@ -23,17 +27,48 @@ beforeEach(async () => {
 });
 
 it('should add a export-piece job to the queue and create a export piece submitted api event', async () => {
-  fixtures.GivenSchedulePieceExportCommand();
+  const [exportId, componentId] = await fixtures.GivenExportIsCreated();
+  fixtures.GivenSchedulePieceExportCommand(exportId, componentId);
 
-  await fixtures.WhenJobIsAddedToQueue();
+  await fixtures.WhenSchedulePieceExportHandlerIsInvoked({
+    addMockResolvedValue: 'job',
+  });
 
   fixtures.ThenExportPieceSubmittedApiEventIsCreated();
 });
 
-it('should emit an ExportPieceFailed event if the job cannot be added to the queue', async () => {
-  fixtures.GivenSchedulePieceExportCommand();
+it('should emit an ExportPieceFailed event if the export instance cannot be retrieved', async () => {
+  fixtures.GivenSchedulePieceExportCommand(
+    ExportId.create(),
+    ComponentId.create(),
+  );
 
-  await fixtures.WhenAddingJobToQueueFails();
+  await fixtures.WhenSchedulePieceExportHandlerIsInvoked({
+    addMockResolvedValue: 'job',
+  });
+
+  fixtures.ThenExportPieceFailedEventIsPublished();
+});
+
+it('should emit an ExportPieceFailed event if the export component is not found in export pieces', async () => {
+  const [exportId] = await fixtures.GivenExportIsCreated();
+
+  fixtures.GivenSchedulePieceExportCommand(exportId, ComponentId.create());
+
+  await fixtures.WhenSchedulePieceExportHandlerIsInvoked({
+    addMockResolvedValue: 'job',
+  });
+
+  fixtures.ThenExportPieceFailedEventIsPublished();
+});
+
+it('should emit an ExportPieceFailed event if the job cannot be added to the queue', async () => {
+  const [exportId, componentId] = await fixtures.GivenExportIsCreated();
+  fixtures.GivenSchedulePieceExportCommand(exportId, componentId);
+
+  await fixtures.WhenSchedulePieceExportHandlerIsInvoked({
+    addMockResolvedValue: undefined,
+  });
 
   fixtures.ThenExportPieceFailedEventIsPublished();
 });
@@ -64,6 +99,10 @@ const getFixtures = async () => {
           error: () => {},
         },
       },
+      {
+        provide: ExportRepository,
+        useClass: MemoryExportRepo,
+      },
       SchedulePieceExportHandler,
     ],
   }).compile();
@@ -76,27 +115,36 @@ const getFixtures = async () => {
   let command: SchedulePieceExport;
 
   const sut = sandbox.get(SchedulePieceExportHandler);
+  const exportRepo = sandbox.get(ExportRepository);
 
   return {
-    GivenSchedulePieceExportCommand: (): SchedulePieceExport => {
-      command = new SchedulePieceExport(
-        ExportId.create(),
-        ComponentId.create(),
-        ResourceId.create(),
-        ResourceKind.Project,
+    GivenExportIsCreated: async (): Promise<[ExportId, ComponentId]> => {
+      const resourceId = ResourceId.create();
+      const exportComponent = ExportComponent.newOne(
+        resourceId,
         ClonePiece.ProjectMetadata,
-        [ClonePiece.ProjectMetadata, ClonePiece.ExportConfig],
       );
+      const exportInstance = Export.newOne(resourceId, ResourceKind.Project, [
+        exportComponent,
+      ]);
+      await exportRepo.save(exportInstance);
+
+      return [exportInstance.id, exportComponent.id];
+    },
+    GivenSchedulePieceExportCommand: (
+      exportId: ExportId,
+      componentId: ComponentId,
+    ): SchedulePieceExport => {
+      command = new SchedulePieceExport(exportId, componentId);
 
       return command;
     },
-    WhenJobIsAddedToQueue: async () => {
-      addMock.mockResolvedValueOnce('job added successfully');
-
-      await sut.execute(command);
-    },
-    WhenAddingJobToQueueFails: async () => {
-      addMock.mockResolvedValueOnce(undefined);
+    WhenSchedulePieceExportHandlerIsInvoked: async ({
+      addMockResolvedValue,
+    }: {
+      addMockResolvedValue?: string;
+    }) => {
+      addMock.mockResolvedValueOnce(addMockResolvedValue);
 
       await sut.execute(command);
     },

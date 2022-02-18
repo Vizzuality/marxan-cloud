@@ -52,7 +52,7 @@ export class CompleteImportPieceHandler
               );
             case componentAlreadyCompleted:
               this.logger.error(
-                `Component with ${componentId} was already completed`,
+                `Component with id ${componentId} was already completed`,
               );
               return;
           }

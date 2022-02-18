@@ -1,23 +1,24 @@
-import { Test } from '@nestjs/testing';
+import {
+  ClonePiece,
+  ComponentId,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Injectable } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
-
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-
-import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
-
+import { Test } from '@nestjs/testing';
+import { MemoryExportRepo } from '../adapters/memory-export.repository';
 import {
   ExportComponent,
-  ExportComponentRequested,
   ExportId,
   ExportRequested,
+  PieceExportRequested,
 } from '../domain';
-
-import { ExportProjectHandler } from './export-project.handler';
-import { ExportResourcePieces } from './export-resource-pieces.port';
-import { ExportRepository } from './export-repository.port';
 import { ExportProject } from './export-project.command';
-import { InMemoryExportRepo } from '../adapters/in-memory-export.repository';
+import { ExportProjectHandler } from './export-project.handler';
+import { ExportRepository } from './export-repository.port';
+import { ExportResourcePieces } from './export-resource-pieces.port';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -43,7 +44,7 @@ const getFixtures = async () => {
       },
       {
         provide: ExportRepository,
-        useClass: InMemoryExportRepo,
+        useClass: MemoryExportRepo,
       },
       ExportProjectHandler,
     ],
@@ -53,7 +54,7 @@ const getFixtures = async () => {
   const events: IEvent[] = [];
 
   const sut = sandbox.get(ExportProjectHandler);
-  const repo: InMemoryExportRepo = sandbox.get(ExportRepository);
+  const repo: MemoryExportRepo = sandbox.get(ExportRepository);
   const piecesResolver: FakePiecesProvider = sandbox.get(ExportResourcePieces);
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
@@ -81,48 +82,24 @@ const getFixtures = async () => {
       const projectPlanningAreaCustomExport = events[1];
       const exportConfigExport = events[2];
 
-      expect(projectMetadataExport).toBeInstanceOf(ExportComponentRequested);
+      expect(projectMetadataExport).toBeInstanceOf(PieceExportRequested);
       expect(projectMetadataExport).toMatchObject({
-        componentId: {
-          value: expect.any(String),
-        },
-        exportId: {
-          value: expect.any(String),
-        },
-        piece: 'project-metadata',
-        resourceId: {
-          value: projectId.value,
-        },
+        componentId: expect.any(ComponentId),
+        exportId: expect.any(ExportId),
       });
 
       expect(projectPlanningAreaCustomExport).toBeInstanceOf(
-        ExportComponentRequested,
+        PieceExportRequested,
       );
       expect(projectPlanningAreaCustomExport).toMatchObject({
-        componentId: {
-          value: expect.any(String),
-        },
-        exportId: {
-          value: expect.any(String),
-        },
-        piece: 'planning-area-shapefile',
-        resourceId: {
-          value: projectId.value,
-        },
+        componentId: expect.any(ComponentId),
+        exportId: expect.any(ExportId),
       });
 
-      expect(exportConfigExport).toBeInstanceOf(ExportComponentRequested);
+      expect(exportConfigExport).toBeInstanceOf(PieceExportRequested);
       expect(exportConfigExport).toMatchObject({
-        componentId: {
-          value: expect.any(String),
-        },
-        exportId: {
-          value: expect.any(String),
-        },
-        piece: 'export-config',
-        resourceId: {
-          value: projectId.value,
-        },
+        componentId: expect.any(ComponentId),
+        exportId: expect.any(ExportId),
       });
     },
     ThenExportRequestsEventIsPresent(exportId: ExportId) {
