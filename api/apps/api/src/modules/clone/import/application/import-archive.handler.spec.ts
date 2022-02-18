@@ -141,15 +141,7 @@ const getFixtures = async () => {
       ).toMatchObject([
         {
           importId: expect.any(ImportId),
-          componentId: new ComponentId(`import component unique id`),
-          resourceId,
-          piece: `project-metadata`,
-          uris: [
-            {
-              relativePath: `project-metadata.json`,
-              uri: `/tmp/project-metadata-random-uuid.json`,
-            },
-          ],
+          componentId: expect.any(ComponentId),
         },
       ]);
     },
@@ -159,27 +151,11 @@ const getFixtures = async () => {
       ).toMatchObject([
         {
           importId: expect.any(ImportId),
-          componentId: new ComponentId(`import component unique id`),
-          resourceId,
-          piece: `project-metadata`,
-          uris: [
-            {
-              relativePath: `project-metadata.json`,
-              uri: `/tmp/project-metadata-random-uuid.json`,
-            },
-          ],
+          componentId: expect.any(ComponentId),
         },
         {
           importId: expect.any(ImportId),
-          componentId: new ComponentId(`some other piece`),
-          resourceId,
-          piece: `planning-area-gadm`,
-          uris: [
-            {
-              relativePath: `planning-area/config.json`,
-              uri: `/tmp/project-planning-area-random-uuid.json`,
-            },
-          ],
+          componentId: expect.any(ComponentId),
         },
       ]);
     },
