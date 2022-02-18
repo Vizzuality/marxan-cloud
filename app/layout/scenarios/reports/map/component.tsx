@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useState, useMemo,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
@@ -38,16 +36,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
 
   const {
     cache,
-
-    // Adjust planning units
-    puAction,
-    puTmpIncludedValue,
-    puTmpExcludedValue,
-
-    // Solutions
     selectedSolution,
-
-    // Settings
     layerSettings,
   } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -72,41 +61,21 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
-  const include = useMemo(() => {
-    return 'results';
-  }, []);
-
-  const sublayers = useMemo(() => {
-    return ['solutions'];
-  }, []);
-
   const PUGridLayer = usePUGridLayer({
     cache,
     active: true,
     sid: sid ? `${sid}` : null,
-    include,
-    sublayers,
+    include: 'results',
+    sublayers: ['solutions'],
     options: {
-      puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
       runId: selectedSolution?.runId || bestSolution?.runId,
       settings: {
         pugrid: layerSettings.pugrid,
-        'wdpa-percentage': layerSettings['wdpa-percentage'],
-        features: layerSettings.features,
-        cost: layerSettings.cost,
-        'lock-in': layerSettings['lock-in'],
-        'lock-out': layerSettings['lock-out'],
         frequency: layerSettings.frequency,
         solution: layerSettings.solution,
       },
     },
   });
-
-  const LAYERS = [
-    PUGridLayer,
-  ].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
@@ -148,7 +117,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           minZoom={minZoom}
           maxZoom={maxZoom}
           viewport={viewport}
-          // onClick={handleClick}
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
@@ -158,9 +126,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           {(map) => {
             return (
               <LayerManager map={map} plugin={PluginMapboxGl}>
-                {LAYERS.map((l) => (
-                  <Layer key={l.id} {...l} />
-                ))}
+                <Layer key={PUGridLayer.id} {...PUGridLayer} />
               </LayerManager>
             );
           }}
