@@ -27,8 +27,14 @@ export const STATUS_VALUES = {
   },
 };
 
-export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
+export const mergeScenarioStatusMetaData = (
+  obj = {},
+  { tab, subtab },
+  options = { saveTab: true },
+) => {
   const { scenarioEditingMetadata = {}, marxanInputParameterFile = {} } = obj;
+
+  const { saveTab } = options;
 
   const metadata = {
     ...obj,
@@ -44,8 +50,10 @@ export const mergeScenarioStatusMetaData = (obj = {}, { tab, subtab }) => {
           };
         }, {}),
       },
-      tab,
-      subtab,
+      ...saveTab && {
+        tab,
+        subtab,
+      },
       lastJobCheck: new Date().getTime(),
     },
     marxanInputParameterFile,
