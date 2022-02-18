@@ -89,6 +89,9 @@ services:
       dockerfile: Dockerfile
     container_name: marxan-webshot
     command: develop
+    volumes:
+      - ./webshot/src:/opt/marxan-webshot/src
+
 
   postgresql-api:
     build:
