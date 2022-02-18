@@ -13,7 +13,7 @@ const generateSummaryReportForProject = async (req: Request, res: Response) => {
    * This will be removed once
    */
   const {
-    body: { pageUrl, viewport: { width = 1080, height = 960 } = {} },
+    body: { pageUrl, cookie, viewport: { width = 1080, height = 960 } = {} },
   } = req;
 
   if (!pageUrl) {
@@ -28,6 +28,11 @@ const generateSummaryReportForProject = async (req: Request, res: Response) => {
 
   await page.setViewport({ width, height });
   await page.setExtraHTTPHeaders({ "X-Placeholder": "placeholder" });
+
+  // @todo Remove this. It's only demoware, to be able to easily take snapshots
+  // as an authenticated user while we test the report workflow.
+  if (cookie) await page.setExtraHTTPHeaders({ cookie });
+
   console.info(`Rendering ${pageUrl} as PDF`);
   await page.goto(pageUrl);
   await page.waitForNetworkIdle();
