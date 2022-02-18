@@ -1,6 +1,6 @@
 # Role base access control - High-level design
 
-This document aims at providing an overview of the architecture of the tiles to fullfil the [requirements document](./requirements.md) for the Marxan platform.
+This document aims at providing an overview of the architecture of the tiles to fulfill the [requirements document](./requirements.md) for the Marxan platform.
 
 ## Preview custom planning area tiler
 
