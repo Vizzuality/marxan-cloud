@@ -433,17 +433,20 @@ export class ScenariosService {
       )
       .toPromise()
       .then((response) => response.data.data as FeatureCollection)
-      .then((geoJson) => ({
-        data: {
-          type: geoJson.type,
-          features: geoJson.features.map((feature) => ({
-            ...feature,
-            // remove any shapefile attributes that may be still around at this
-            // stage, as they are not needed.
-            properties: {},
-          })),
-        },
-      }) as GeoJsonDataDTO);
+      .then(
+        (geoJson) =>
+          ({
+            data: {
+              type: geoJson.type,
+              features: geoJson.features.map((feature) => ({
+                ...feature,
+                // remove any shapefile attributes that may be still around at this
+                // stage, as they are not needed.
+                properties: {},
+              })),
+            },
+          } as GeoJsonDataDTO),
+      );
     return right(geoJson);
   }
 
