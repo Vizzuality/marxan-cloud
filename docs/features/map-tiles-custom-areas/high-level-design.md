@@ -1,4 +1,4 @@
-# Role base access control - High-level design
+# Map tiles for custom planning areas and custom grids - High-level design
 
 This document aims at providing an overview of the architecture of the tiles to fulfill the [requirements document](./requirements.md) for the Marxan platform.
 
