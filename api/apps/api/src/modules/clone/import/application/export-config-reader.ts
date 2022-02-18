@@ -25,7 +25,7 @@ export class ExportConfigReader {
 
     const exportConfigOrError = await extractFile(
       readableOrError.right,
-      new RegExp(ClonePieceRelativePaths[ClonePiece.ExportConfig].config),
+      ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
     );
     if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
 
