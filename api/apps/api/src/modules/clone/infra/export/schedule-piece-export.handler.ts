@@ -41,11 +41,7 @@ export class SchedulePieceExportHandler
       this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       return;
     }
-    const {
-      resourceKind,
-      resourceId,
-      exportPieces,
-    } = exportInstance.toSnapshot();
+    const { resourceKind, exportPieces } = exportInstance.toSnapshot();
 
     const component = exportPieces.find(
       (piece) => piece.id === componentId.value,
@@ -58,7 +54,7 @@ export class SchedulePieceExportHandler
       return;
     }
 
-    const { piece } = component;
+    const { piece, resourceId } = component;
     const allPieces = exportPieces.map(({ piece }) => piece);
 
     const job = await this.queue.add(`export-piece`, {

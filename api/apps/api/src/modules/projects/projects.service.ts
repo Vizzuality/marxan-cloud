@@ -48,6 +48,10 @@ import {
 } from '@marxan-api/modules/projects/blm';
 import { UploadExportFile } from '../clone/infra/import/upload-export-file.command';
 import { unknownError } from '@marxan/files-repository';
+import {
+  ImportArchive,
+  ImportError,
+} from '../clone/import/application/import-archive.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -310,7 +314,7 @@ export class ProjectsService {
 
   async importProject(
     exportFile: Express.Multer.File,
-  ): Promise<Either<typeof unknownError, string>> {
+  ): Promise<Either<typeof unknownError | ImportError, string>> {
     const archiveLocationOrError = await this.commandBus.execute(
       new UploadExportFile(exportFile),
     );
@@ -319,7 +323,14 @@ export class ProjectsService {
       return archiveLocationOrError;
     }
 
-    // TODO Return actual import id
-    return right(archiveLocationOrError.right.value);
+    const importIdOrError = await this.commandBus.execute(
+      new ImportArchive(archiveLocationOrError.right),
+    );
+
+    if (isLeft(importIdOrError)) {
+      return importIdOrError;
+    }
+
+    return right(importIdOrError.right);
   }
 }
