@@ -1,7 +1,6 @@
 import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
-import { inspect } from 'util';
 
 export class WebshotViewport {
   @IsNumber()
@@ -40,6 +39,7 @@ export class WebshotService {
     return await this.httpService
       .post(`${this.webshotServiceUrl}/projects/${projectId}/summary-report`, config)
       .toPromise()
-      .then(response => response.data);
+      .then(response => response.data)
+      .catch(error => { throw new Error(error); });
   }
 }
