@@ -1,4 +1,4 @@
-import { Body, Controller, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Header, Param, ParseUUIDPipe, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -20,7 +20,8 @@ export class WebshotController {
   constructor(public readonly service: WebshotService) {}
 
   @ApiOperation({ description: 'Get PDF summary report for scenario' })
-  @ApiOkResponse({ type: 'application/pdf' })
+  @ApiOkResponse()
+  @Header('content-type', 'application/pdf')
   @Post('/projects/:projectId/summary-report')
   async getSummaryReportForProject(
     @Body() config: WebshotSummaryReportConfig,
