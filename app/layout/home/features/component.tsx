@@ -6,9 +6,8 @@ import Link from 'next/link';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import Item from 'layout/home/features/item';
 import Wrapper from 'layout/wrapper';
-
-import Icon from 'components/icon';
 
 import { FEATURES, EXAMPLE_PROJECTS } from './constants';
 
@@ -69,11 +68,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                     } = F;
 
                     return (
-                      <div key={`${id}`}>
-                        <Icon icon={icon} className="w-16 h-16" />
-                        <h2 className="mt-2.5 mb-2.5 md:mt-6 md:mb-10 text-2xl font-medium text-gray-800 font-heading">{name}</h2>
-                        <p className="text-gray-400">{description}</p>
-                      </div>
+                      <Item key={`${id}`} id={id} name={name} description={description} icon={icon} />
                     );
                   })}
                   <motion.div
