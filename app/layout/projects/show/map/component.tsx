@@ -384,14 +384,13 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               </div>
             </div>
           )}
+          <Loading
+            visible={!mapInteractive}
+            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+            iconClassName="w-10 h-10 text-primary-500"
+          />
         </motion.div>
       )}
-
-      <Loading
-        visible={!mapInteractive}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-        iconClassName="w-10 h-10 text-primary-500"
-      />
 
     </AnimatePresence>
   );
