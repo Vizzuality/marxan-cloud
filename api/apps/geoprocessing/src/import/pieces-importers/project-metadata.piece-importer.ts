@@ -36,7 +36,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, resourceId, piece } = input;
+    const { uris, importResourceId, piece } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -49,7 +49,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       projectMetadataLocation.uri,
     );
     if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${resourceId} is not available at ${projectMetadataLocation.uri}`;
+      const errorMessage = `File with piece data for ${piece}/${importResourceId} is not available at ${projectMetadataLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -80,7 +80,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       VALUES ($1, $2, $3, $4)
     `,
       [
-        resourceId,
+        importResourceId,
         projectMetadata.name,
         projectMetadata.description,
         organizationId,
@@ -90,7 +90,8 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     return {
       importId: input.importId,
       componentId: input.componentId,
-      resourceId: input.resourceId,
+      importResourceId,
+      componentResourceId: input.componentResourceId,
       piece: input.piece,
     };
   }

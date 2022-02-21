@@ -11,6 +11,7 @@ export interface ExportJobOutput {
 export interface ImportJobOutput {
   readonly importId: string;
   readonly componentId: string;
-  readonly resourceId: string;
+  readonly importResourceId: string;
+  readonly componentResourceId: string;
   readonly piece: ClonePiece;
 }
