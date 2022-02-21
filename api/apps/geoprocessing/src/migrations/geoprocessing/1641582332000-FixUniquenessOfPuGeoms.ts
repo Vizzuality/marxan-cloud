@@ -58,10 +58,10 @@ export class FixUniquenessOfPuGeoms1641582332000 implements MigrationInterface {
       await queryRunner.query(`
           DROP EXTENSION IF EXISTS pgcrypto;
         `);
-      } else {
-        Logger.warn(
-          'The PostgreSQL extension `pgcrypto` is not needed anymore for the Marxan Geoprocessing service, but it was not possible to drop it. Please drop it manually (see setup documentation).',
-        );
+    } else {
+      Logger.warn(
+        'The PostgreSQL extension `pgcrypto` is not needed anymore for the Marxan Geoprocessing service, but it was not possible to drop it. Please drop it manually (see setup documentation).',
+      );
     }
   }
 }
