@@ -20,6 +20,10 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
     threshold: 0.4,
     triggerOnce: true,
   });
+  const { ref: exploreRef, inView: exploreInView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
 
   const exampleProjectsVariants = {
     initial: (i: number) => ({
@@ -71,34 +75,46 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                       <Item key={`${id}`} id={id} name={name} description={description} icon={icon} />
                     );
                   })}
-                  <motion.div
-                    className="relative w-full pb-24 overflow-hidden pt-11 place-self-center rounded-3xl"
-                    style={{ background: 'linear-gradient(to right bottom, #4B48F5, #00BFFF)' }}
-                    initial="initial"
-                    whileHover="hover"
-                    animate="initial"
-                  >
-                    <Link href="/community/projects">
-                      <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
-                        Explore planning examples from around the world and learn
-                      </p>
-                    </Link>
-                    <div className="w-full mt-10 overflow-hidden">
-                      {EXAMPLE_PROJECTS.map(({
-                        id, image, alt,
-                      }, index) => (
-                        <div key={id} className="absolute bottom-0 w-full transform px-9 left-1/2 -translate-x-2/4">
-                          <motion.img
-                            className="w-full cursor-pointer max-h-32 lg:max-h-full"
-                            alt={alt}
-                            src={image}
-                            custom={EXAMPLE_PROJECTS.length - index - 1}
-                            variants={exampleProjectsVariants}
-                          />
+                  <div ref={exploreRef}>
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: exploreInView ? 1 : 0 }}
+                      transition={{
+                        duration: 0.35,
+                        ease: 'easeInOut',
+                      }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <motion.div
+                        className="relative w-full pb-24 overflow-hidden pt-11 place-self-center rounded-3xl"
+                        style={{ background: 'linear-gradient(to right bottom, #4B48F5, #00BFFF)' }}
+                        initial="initial"
+                        whileHover="hover"
+                        animate="initial"
+                      >
+                        <Link href="/community/projects">
+                          <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
+                            Explore planning examples from around the world and learn
+                          </p>
+                        </Link>
+                        <div className="w-full mt-10 overflow-hidden">
+                          {EXAMPLE_PROJECTS.map(({
+                            id, image, alt,
+                          }, index) => (
+                            <div key={id} className="absolute bottom-0 w-full transform px-9 left-1/2 -translate-x-2/4">
+                              <motion.img
+                                className="w-full cursor-pointer max-h-32 lg:max-h-full"
+                                alt={alt}
+                                src={image}
+                                custom={EXAMPLE_PROJECTS.length - index - 1}
+                                variants={exampleProjectsVariants}
+                              />
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </motion.div>
+                      </motion.div>
+                    </motion.div>
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
