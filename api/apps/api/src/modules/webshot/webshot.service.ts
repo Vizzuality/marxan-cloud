@@ -2,6 +2,15 @@ import { HttpService, Injectable, Logger } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Readable } from 'stream';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { assertDefined } from '@marxan/utils';
+import { User } from '../users/user.api.entity';
+import { Either, left, right } from 'fp-ts/lib/Either';
+
+export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
+
 export class WebshotViewport {
   @IsNumber()
   @Min(64)
@@ -30,30 +39,50 @@ export class WebshotService {
   private webshotServiceUrl: string = AppConfig.get('webshot.url') as string;
   private readonly logger = new Logger(WebshotService.name);
 
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly scenarioAclService: ScenarioAccessControl,
+  ) {}
 
   async getSummaryReportForScenario(
     projectId: string,
     scenarioId: string,
+    authenticatedUser: Pick<User, 'id'>,
     config: WebshotSummaryReportConfig,
-  ) {
-    const pdfBuffer = await this.httpService
-      .post(
-        `${this.webshotServiceUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
-        config,
-        { responseType: 'arraybuffer' },
-      )
-      .toPromise()
-      .then((response) => response.data)
-      .catch((error) => {
-        throw new Error(error);
-      });
+  ): Promise<
+    Either<typeof unknownPdfWebshotError | typeof forbiddenError, Readable>
+  > {
+    try {
+      assertDefined(authenticatedUser);
+      if (
+        !(await this.scenarioAclService.canViewScenario(
+          authenticatedUser.id,
+          scenarioId,
+        ))
+      ) {
+        return left(forbiddenError);
+      }
 
-    const stream = new Readable();
+      const pdfBuffer = await this.httpService
+        .post(
+          `${this.webshotServiceUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
+          config,
+          { responseType: 'arraybuffer' },
+        )
+        .toPromise()
+        .then((response) => response.data)
+        .catch((error) => {
+          throw new Error(error);
+        });
 
-    stream.push(pdfBuffer);
-    stream.push(null);
+      const stream = new Readable();
 
-    return stream;
+      stream.push(pdfBuffer);
+      stream.push(null);
+
+      return right(stream);
+    } catch (error) {
+      return left(unknownPdfWebshotError);
+    }
   }
 }

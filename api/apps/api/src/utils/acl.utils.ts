@@ -50,6 +50,7 @@ import {
   updateFailure,
   unknownError as rangeUnknownError,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
+import { unknownPdfWebshotError } from '@marxan-api/modules/webshot/webshot.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -89,7 +90,8 @@ export const mapAclDomainToHttpError = (
     | typeof jobSubmissionFailed
     | typeof submissionFailed
     | typeof nullPlanningUnitGridShape
-    | typeof initialCostProjectNotFound,
+    | typeof initialCostProjectNotFound
+    | typeof unknownPdfWebshotError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -175,6 +177,10 @@ export const mapAclDomainToHttpError = (
       return new BadRequestException('Invalid planing unit grid shape.');
     case initialCostProjectNotFound:
       return new NotFoundException('Project not found.');
+    case unknownPdfWebshotError:
+      return new InternalServerErrorException(
+        'Unexpected error while preparing scenario solutions report.',
+      );
     default:
       const _exhaustiveCheck: never = errorToCheck;
       return _exhaustiveCheck;
