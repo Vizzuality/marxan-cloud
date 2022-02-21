@@ -5,38 +5,27 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { Injectable } from '@nestjs/common';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { Injectable } from '@nestjs/common';
 import { ImportResourcePieces } from '../application/import-resource-pieces.port';
 import { ImportComponent } from '../domain';
 
 @Injectable()
 export class ImportResourcePiecesAdapter implements ImportResourcePieces {
-  private resolverMapping: Record<
-    ResourceKind,
-    (
-      id: ResourceId,
-      kind: ResourceKind,
-      location: ArchiveLocation,
-    ) => Promise<ImportComponent[]>
-  > = {
-    project: this.resolveForProject.bind(this),
-    scenario: this.resolveForScenario.bind(this),
-  };
-
-  resolveFor(
+  resolveForProject(
     id: ResourceId,
-    kind: ResourceKind,
     location: ArchiveLocation,
-  ): Promise<ImportComponent[]> {
-    return this.resolverMapping[kind](id, kind, location);
-  }
+    scenarios: ProjectExportConfigContent['scenarios'],
+  ): ImportComponent[] {
+    const scenarioPieces = scenarios.flatMap((scenario) =>
+      this.resolveForScenario(
+        new ResourceId(scenario.id),
+        ResourceKind.Project,
+        location,
+      ),
+    );
 
-  private async resolveForProject(
-    id: ResourceId,
-    kind: ResourceKind,
-    location: ArchiveLocation,
-  ): Promise<ImportComponent[]> {
     return [
       ImportComponent.newOne(id, ClonePiece.ProjectMetadata, 0, [
         new ComponentLocation(
@@ -44,14 +33,28 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
           ClonePieceRelativePaths[ClonePiece.ProjectMetadata].projectMetadata,
         ),
       ]),
+      ...scenarioPieces,
     ];
   }
 
-  private async resolveForScenario(
+  resolveForScenario(
     id: ResourceId,
     kind: ResourceKind,
     location: ArchiveLocation,
-  ): Promise<ImportComponent[]> {
-    return [];
+  ): ImportComponent[] {
+    const oldScenarioId = id.value;
+    const newScenarioId = ResourceId.create();
+    const resourceId = kind === ResourceKind.Project ? newScenarioId : id;
+
+    return [
+      ImportComponent.newOne(resourceId, ClonePiece.ScenarioMetadata, 1, [
+        new ComponentLocation(
+          location.value,
+          ClonePieceRelativePaths[
+            ClonePiece.ScenarioMetadata
+          ].getScenarioMetadataRelativePath(kind, oldScenarioId),
+        ),
+      ]),
+    ];
   }
 }

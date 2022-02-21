@@ -4,12 +4,12 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ImportAdaptersModule } from '../adapters/import-adapters.module';
 import { CompleteImportPieceHandler } from './complete-import-piece.handler';
 import { ExportConfigReader } from './export-config-reader';
-import { ImportArchiveHandler } from './import-archive.handler';
+import { ImportProjectHandler } from './import-project.handler';
 
 @Module({
   imports: [CqrsModule, ImportAdaptersModule, ArchiveReaderModule],
   providers: [
-    ImportArchiveHandler,
+    ImportProjectHandler,
     CompleteImportPieceHandler,
     ExportConfigReader,
     Logger,

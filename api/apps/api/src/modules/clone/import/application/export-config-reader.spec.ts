@@ -186,7 +186,7 @@ const getFixtures = async () => {
       result: Either<Failure, ExportConfigContent>,
     ) => {
       expect(isRight(result)).toBeTruthy();
-      expect((result as Right<ExportConfigContent>).right).toStrictEqual(
+      expect((result as Right<ExportConfigContent>).right).toEqual(
         expectedExportConfig,
       );
     },
