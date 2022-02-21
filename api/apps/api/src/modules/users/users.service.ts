@@ -24,7 +24,10 @@ import { compare, hash } from 'bcrypt';
 import { AuthenticationService } from '@marxan-api/modules/authentication/authentication.service';
 import { v4 } from 'uuid';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
+import { Either, left, right } from 'fp-ts/lib/Either';
 
+export const forbiddenError = Symbol(`unauthorized access`);
 @Injectable()
 export class UsersService extends AppBaseService<
   User,
@@ -35,6 +38,8 @@ export class UsersService extends AppBaseService<
   constructor(
     @InjectRepository(User)
     protected readonly repository: Repository<User>,
+    @InjectRepository(PlatformAdminEntity)
+    private readonly adminRepo: Repository<PlatformAdminEntity>,
     @Inject(forwardRef(() => AuthenticationService))
     private readonly authenticationService: AuthenticationService,
   ) {
@@ -215,5 +220,48 @@ export class UsersService extends AppBaseService<
 
   private hash(password: string) {
     return hash(password, 10);
+  }
+
+  private async isPlatformAdmin(userId: string): Promise<boolean> {
+    return (await this.adminRepo.count({ where: { userId } })) > 0;
+  }
+
+  async getPlatformAdmins(
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, PlatformAdminEntity[]>> {
+    if (!(await this.isPlatformAdmin(userId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.adminRepo.find());
+  }
+
+  async addAdmin(
+    loggedUserId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
+    return this.adminRepo.manager.transaction(async (entityManager) => {
+      if (!(await this.isPlatformAdmin(loggedUserId))) {
+        return left(forbiddenError);
+      }
+
+      const admin = new PlatformAdminEntity();
+      admin.userId = userId;
+
+      await entityManager.save(admin);
+
+      return right(void 0);
+    });
+  }
+
+  async deleteAdmin(
+    loggedUserId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, void>> {
+    if (!(await this.isPlatformAdmin(loggedUserId))) {
+      return left(forbiddenError);
+    }
+
+    await this.adminRepo.delete({ userId });
+    return right(void 0);
   }
 }
