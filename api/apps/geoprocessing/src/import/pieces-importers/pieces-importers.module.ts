@@ -2,7 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { FileRepositoryModule } from '@marxan/files-repository';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProjectMetadataProjectPieceImporter } from './project-metadata.project-piece-importer';
+import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer';
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
 
 @Module({
@@ -11,7 +11,7 @@ import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importe
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
   ],
   providers: [
-    ProjectMetadataProjectPieceImporter,
+    ProjectMetadataPieceImporter,
     ScenarioMetadataPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
