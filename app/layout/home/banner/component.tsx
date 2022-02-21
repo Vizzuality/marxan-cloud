@@ -18,7 +18,10 @@ export interface HomeBannerProps {
 const claimLines = [{ id: '0', text: 'free and open' }, { id: '1', text: 'flexible' }, { id: '2', text: 'efficient & repitable' }];
 
 export const HomeBanner: React.FC<HomeBannerProps> = () => {
-  const { ref, inView } = useInView({});
+  const { ref, inView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
 
   return (
     <div className="py-10 md:py-32" style={{ background: 'radial-gradient(circle at 50% 70%, rgba(54,55,62,1) 0%, rgba(21,21,21,1) 51%)' }}>
@@ -28,7 +31,10 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: inView ? 1 : 0 }}
-              transition={{ delay: 0.35 }}
+              transition={{
+                duration: 0.35,
+                ease: 'easeInOut',
+              }}
               exit={{ opacity: 0 }}
             >
               <div className="flex flex-col items-center -space-y-20 md:space-y-20">

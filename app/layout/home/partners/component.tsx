@@ -16,8 +16,14 @@ export interface PartnersListProps {
 }
 
 export const PartnersList: React.FC<PartnersListProps> = () => {
-  const { ref: desktopRef, inView: desktopInView } = useInView({});
-  const { ref: mobileRef, inView: mobileInView } = useInView({});
+  const { ref: desktopRef, inView: desktopInView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
+  const { ref: mobileRef, inView: mobileInView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
 
   const renderLogoSections = useMemo(() => {
     return PARTNER_LOGOS.map((pl) => {
@@ -59,7 +65,10 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: desktopInView ? 1 : 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{
+                  duration: 0.35,
+                  ease: 'easeInOut',
+                }}
                 exit={{ opacity: 0 }}
               >
                 <div className="max-w-5xl pt-24 pb-6 mx-auto">
@@ -78,7 +87,10 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: mobileInView ? 1 : 0 }}
-                transition={{ delay: 0.35 }}
+                transition={{
+                  duration: 0.35,
+                  ease: 'easeInOut',
+                }}
                 exit={{ opacity: 0 }}
               >
                 <div className="max-w-5xl py-10 mx-auto space-y-16">

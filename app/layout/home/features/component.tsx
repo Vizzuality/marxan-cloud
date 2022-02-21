@@ -17,7 +17,10 @@ export interface HomeFeaturesProps {
 }
 
 export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
-  const { ref, inView } = useInView({});
+  const { ref, inView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
 
   const exampleProjectsVariants = {
     initial: (i: number) => ({
@@ -53,7 +56,10 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: inView ? 1 : 0 }}
-                transition={{ delay: 0.35 }}
+                transition={{
+                  duration: 0.35,
+                  ease: 'easeInOut',
+                }}
                 exit={{ opacity: 0 }}
               >
                 <div className="grid max-w-5xl grid-cols-1 gap-10 mx-auto md:gap-20 sm:grid-cols-2 lg:grid-cols-3">

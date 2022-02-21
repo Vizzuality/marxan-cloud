@@ -13,7 +13,10 @@ export interface HomeSupportProps {
 }
 
 export const HomeSupport: React.FC<HomeSupportProps> = () => {
-  const { ref, inView } = useInView({});
+  const { ref, inView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
 
   return (
     <div
@@ -27,7 +30,10 @@ export const HomeSupport: React.FC<HomeSupportProps> = () => {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: inView ? 1 : 0 }}
-                transition={{ delay: 0.35 }}
+                transition={{
+                  duration: 0.35,
+                  ease: 'easeInOut',
+                }}
                 exit={{ opacity: 0 }}
               >
                 <h3 className="text-2xl text-white md:text-4xl font-heading">
