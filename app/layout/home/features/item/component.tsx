@@ -35,7 +35,7 @@ export const HomeFeaturesItem: React.FC<HomeFeaturesItemProps> = ({
       }}
       transition={{
         duration: 0.35,
-        delay: index * 0.1,
+        delay: ((index % 3) * 0.1),
         ease: 'easeInOut',
       }}
     >

@@ -84,7 +84,6 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
               duration: 1,
               ease: 'easeInOut',
             }}
-            exit={{ opacity: 0 }}
           >
             <div className="max-w-5xl pt-24 pb-6 mx-auto">
               <Carousel
@@ -103,7 +102,6 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
               duration: 1,
               ease: 'easeInOut',
             }}
-            exit={{ opacity: 0 }}
           >
             <div className="max-w-5xl py-10 mx-auto space-y-16">
               {renderLogoSections.map((ls) => ls.content)}

@@ -69,7 +69,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               }}
               transition={{
                 duration: 0.35,
-                delay: 0.1 * FEATURES.length,
+                delay: 0.1 * (FEATURES.length % 3),
                 ease: 'easeInOut',
               }}
             >
