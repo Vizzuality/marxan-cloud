@@ -24,7 +24,10 @@ import { MediaContextProvider } from 'layout/media';
 import 'styles/tailwind.css';
 
 const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
-  const [routeLoading, setRouteLoading] = useState(false);
+  const [routeLoading, setRouteLoading] = useState({
+    loading: false,
+    key: 0,
+  });
   const queryClientRef = useRef(null);
   if (!queryClientRef.current) {
     queryClientRef.current = new QueryClient();
@@ -33,28 +36,31 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
 
   const onRouteChangeStart = useCallback(() => {
-    setRouteLoading(true);
+    setRouteLoading((prevState) => ({
+      ...prevState,
+      loading: true,
+      key: prevState.key + 1,
+    }));
   }, []);
 
-  const onRouteChangeComplete = useCallback(() => {
-    setRouteLoading(false);
-  }, []);
-
-  const onRouteChangeError = useCallback(() => {
-    setRouteLoading(false);
+  const onRouteChangeEnd = useCallback(() => {
+    setRouteLoading((prevState) => ({
+      ...prevState,
+      loading: false,
+    }));
   }, []);
 
   useEffect(() => {
     router.events.on('routeChangeStart', onRouteChangeStart);
-    router.events.on('routeChangeComplete', onRouteChangeComplete);
-    router.events.on('routeChangeError', onRouteChangeError);
+    router.events.on('routeChangeComplete', onRouteChangeEnd);
+    router.events.on('routeChangeError', onRouteChangeEnd);
 
     // If the component is unmounted, unsubscribe
     // from the event with the `off` method:
     return () => {
       router.events.off('routeChangeStart', onRouteChangeStart);
-      router.events.off('routeChangeComplete', onRouteChangeComplete);
-      router.events.off('routeChangeError', onRouteChangeError);
+      router.events.off('routeChangeComplete', onRouteChangeEnd);
+      router.events.off('routeChangeError', onRouteChangeEnd);
     };
   }, []); // eslint-disable-line
 
@@ -79,7 +85,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
                   >
                     <HelpProvider>
                       <PlausibleProvider domain="marxan.vercel.app">
-                        <Loading loading={routeLoading} />
+                        <Loading {...routeLoading} />
                         <div className="bg-black">
                           <Component {...pageProps} />
                         </div>

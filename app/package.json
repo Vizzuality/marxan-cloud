@@ -41,6 +41,7 @@
     "@reduxjs/toolkit": "^1.5.0",
     "@storybook/react": "^6.2.9",
     "@tailwindcss/custom-forms": "^0.2.1",
+    "@tanem/react-nprogress": "^4.0.8",
     "@tippyjs/react": "^4.2.0",
     "@turf/area": "^6.3.0",
     "@vizzuality/layer-manager-plugin-mapboxgl": "^1.0.0-alpha.3",
