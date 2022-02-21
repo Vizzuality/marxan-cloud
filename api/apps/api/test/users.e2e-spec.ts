@@ -1,8 +1,6 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as faker from 'faker';
 import * as request from 'supertest';
-import { AppModule } from '@marxan-api/app.module';
 import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
 import { SignUpDto } from '@marxan-api/modules/authentication/dto/sign-up.dto';
@@ -17,6 +15,11 @@ import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { bootstrapApplication } from './utils/api-application';
+import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
+import { GivenUserExists } from './steps/given-user-exists';
+import { GivenUserIsCreated } from './steps/given-user-is-created';
+import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 
 nock.disableNetConnect();
 nock.enableNetConnect(process.env.HOST_IP);
@@ -344,6 +347,89 @@ describe('UsersModule (e2e)', () => {
         .post('/auth/sign-in')
         .send(loginDto)
         .expect(HttpStatus.CREATED);
+    });
+  });
+
+  describe('Users - Platform admins', () => {
+    let adminToken: string;
+    let adminUserId: string;
+    const cleanups: (() => Promise<void>)[] = [];
+    const usersRepo: Repository<User> = app.get(getRepositoryToken(User));
+
+    beforeAll(async () => {
+      adminToken = await GivenUserIsLoggedIn(app, 'dd');
+      adminUserId = await GivenUserExists(app, 'dd');
+    });
+
+    afterAll(async () => {
+      for (const cleanup of cleanups.reverse()) {
+        await cleanup();
+      }
+    });
+
+    test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
+      const whenGettingAdminListResponse = await request(app.getHttpServer())
+        .get('/api/v1/users/admins')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(whenGettingAdminListResponse.status).toEqual(200);
+      expect(whenGettingAdminListResponse.body).toHaveLength(1);
+      expect(whenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
+    });
+
+    test('A platform admin should be able to add a new admin', async () => {
+      const { accessToken: newAdminToken, user } = await GivenUserIsCreated(
+        app,
+      );
+
+      cleanups.push(async () => {
+        await usersRepo.delete({ id: user.id });
+        return;
+      });
+
+      const WhenAddingNewAdminResponse = await request(app.getHttpServer())
+        .post(`/api/v1/users/admins/${user.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenAddingNewAdminResponse.status).toEqual(201);
+
+      const WhenGettingAdminListByNewUserResponse = await request(
+        app.getHttpServer(),
+      )
+        .get('/api/v1/users/admins')
+        .set('Authorization', `Bearer ${newAdminToken}`);
+      const resources = WhenGettingAdminListByNewUserResponse.body;
+      expect(resources.status).toEqual(200);
+      expect(resources.body).toHaveLength(2);
+
+      const userIds = [user.id, adminUserId];
+
+      const adminUserIds: string[] = resources.map((s: any) => s.userId);
+      expect(adminUserIds.sort()).toEqual(userIds.sort());
+    });
+
+    test('A platform admin should be able to remove an existing admin', async () => {
+      const { user } = await GivenUserIsCreated(app);
+
+      cleanups.push(async () => {
+        await usersRepo.delete({ id: user.id });
+        return;
+      });
+
+      const WhenAddingNewAdminResponse = await request(app.getHttpServer())
+        .post(`/api/v1/users/admins/${user.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenAddingNewAdminResponse.status).toEqual(201);
+
+      const WhenRemovingExistingAdmin = await request(app.getHttpServer())
+        .post(`/api/v1/users/admins/${user.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenRemovingExistingAdmin.status).toEqual(200);
+
+      const whenGettingAdminListResponse = await request(app.getHttpServer())
+        .get('/api/v1/users/admins')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(whenGettingAdminListResponse.status).toEqual(200);
+      expect(whenGettingAdminListResponse.body).toHaveLength(1);
+      expect(whenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
     });
   });
 });

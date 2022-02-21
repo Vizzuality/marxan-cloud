@@ -45,3 +45,8 @@ VALUES
 ((SELECT id FROM users WHERE lower(email) = 'aa@example.com'), (SELECT id FROM scenarios WHERE name = 'Example scenario 2 Project 2 Org 2'), 'scenario_owner'),
 ((SELECT id FROM users WHERE lower(email) = 'bb@example.com'), (SELECT id FROM scenarios WHERE name = 'Example scenario 2 Project 2 Org 2'), 'scenario_contributor'),
 ((SELECT id FROM users WHERE lower(email) = 'cc@example.com'), (SELECT id FROM scenarios WHERE name = 'Example scenario 2 Project 2 Org 2'), 'scenario_viewer');
+
+INSERT INTO platform_admins
+(user_id)
+VALUES
+((SELECT id FROM users WHERE lower(email) = 'dd@example.com'));
