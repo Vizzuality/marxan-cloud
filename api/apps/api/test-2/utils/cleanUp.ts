@@ -11,8 +11,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-  console.log('BEFORE EACH');
-  await clearTables(apiConnection);
+  await clearTables(apiConnection, ['roles', 'api_event_kinds']);
+  await clearTables(geoConnection);
 });
 
 afterEach(async () => {
@@ -24,12 +24,13 @@ afterAll(async () => {
   await geoConnection.close();
 });
 
-const clearTables = async (connection: Connection) => {
-  const tablesNotToDelete = ['roles', 'api_event_kinds'];
+const clearTables = async (
+  connection: Connection,
+  tablesToSkip: string[] = [],
+) => {
   const tables = connection.entityMetadatas.filter(
     (entity) =>
-      entity.tableType !== 'view' &&
-      !tablesNotToDelete.includes(entity.tableName),
+      entity.tableType !== 'view' && !tablesToSkip.includes(entity.tableName),
   );
 
   for (const table of tables) {

@@ -1,6 +1,7 @@
 import { Server } from 'http';
 import {
   FactoryProvider,
+  HttpStatus,
   INestApplication,
   ValidationPipe,
   ValueProvider,
@@ -25,6 +26,14 @@ import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { CommandBus } from '@nestjs/cqrs';
 import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
+import {
+  FakeMailer,
+  Mailer,
+} from '@marxan-api/modules/authentication/password-recovery/mailer';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from '@marxan-api/modules/users/user.api.entity';
+import { Repository } from 'typeorm';
+import { ProjectResultSingular } from '@marxan-api/modules/projects/project.api.entity';
 
 type Overrides = {
   classes: ClassProvider[];
@@ -53,10 +62,8 @@ export class TestClientApi {
     const testingModuleBuilder = Test.createTestingModule({
       imports: [AppModule],
     });
-
     this.overrideProviders(testingModuleBuilder, overrides);
     this.moduleRef = await testingModuleBuilder.compile();
-
     const nestApplication: INestApplication = this.moduleRef.createNestApplication();
     nestApplication.useGlobalPipes(
       new ValidationPipe({
@@ -65,8 +72,8 @@ export class TestClientApi {
         forbidNonWhitelisted: true,
       }),
     );
-    await nestApplication.init();
 
+    await nestApplication.init();
     TestClientApi.addAppInstance(nestApplication);
 
     this.app = nestApplication.getHttpServer();
@@ -83,6 +90,7 @@ export class TestClientApi {
         { provide: ProjectChecker, useClass: ProjectCheckerFake },
         { provide: ScenarioChecker, useClass: ScenarioCheckerFake },
         { provide: FileRepository, useClass: TempStorageRepository },
+        { provide: Mailer, useClass: FakeMailer },
         {
           provide: ScenarioCalibrationRepo,
           useClass: FakeScenarioCalibrationRepo,
@@ -108,20 +116,38 @@ export class TestClientApi {
         .useFactory({ factory: (args) => useFactory(...args) }),
     );
   }
+
   //----------------------//
   // API Endpoint helpers //
   //----------------------//
 
   // Users
-  public registerUser(
-    { username, password } = {
-      username: 'user@email.com',
-      password: 'password',
-    },
-  ) {
+  public registerUser({
+    email = 'user@email.com',
+    password = 'password',
+    displayName = undefined as string | undefined,
+  } = {}) {
+    return request(this.app).post('/auth/sign-up').send({
+      email,
+      password,
+      displayName,
+    });
+  }
+
+  public login({ username = 'user@email.com', password = 'password' } = {}) {
     return request(this.app).post('/auth/sign-in').send({
       username,
       password,
+    });
+  }
+
+  public validateUser({
+    validationToken = 'token',
+    sub = 'user@email.com',
+  } = {}) {
+    return request(this.app).post('/auth/validate').send({
+      sub,
+      validationToken,
     });
   }
 
@@ -147,6 +173,22 @@ export class TestClientApi {
       .send(data);
   }
 
+  public listProjects(
+    jwt: string,
+    query: { include: Array<'users' | 'scenarios'> } = { include: [] },
+  ) {
+    return request(this.app)
+      .get('/api/v1/projects')
+      .query(query)
+      .auth(jwt, { type: 'bearer' });
+  }
+
+  public deleteProject(jwt: string, projectId: string) {
+    return request(this.app)
+      .delete(`/api/v1/projects/${projectId}`)
+      .auth(jwt, { type: 'bearer' });
+  }
+
   // Scenarios
   public createScenario(
     jwt: string,
@@ -158,11 +200,86 @@ export class TestClientApi {
       .send(data);
   }
 
-  // Utils
-  public async generateProjectBlmValues(projectId: string) {
-    const commandBus = this.moduleRef.get(CommandBus);
-    await commandBus.execute(new SetProjectBlm(projectId));
-  }
+  //--------//
+  // Utils //
+  //-------//
+
+  public readonly utils = {
+    // Projects
+    generateProjectBlmValues: async (projectId: string) => {
+      const commandBus = this.moduleRef.get(CommandBus);
+      await commandBus.execute(new SetProjectBlm(projectId));
+    },
+    createWorkingProject: async (
+      jwt: string,
+      data = E2E_CONFIG.projects.valid.minimal(),
+    ): Promise<ProjectResultSingular> => {
+      const { body: organizationResponse } = await this.createOrganization(
+        jwt,
+        E2E_CONFIG.organizations.valid.minimal(),
+      ).expect(HttpStatus.CREATED);
+
+      const { body: projectResponse } = await this.createProject(jwt, {
+        ...data,
+        organizationId: organizationResponse.data.id,
+      }).expect(HttpStatus.CREATED);
+      await this.utils.generateProjectBlmValues(projectResponse.data.id);
+
+      return projectResponse;
+    },
+
+    createWorkingProjectWithScenario: async (
+      jwt: string,
+      projectData = E2E_CONFIG.projects.valid.minimal(),
+      scenarioData = E2E_CONFIG.scenarios.valid.minimal(),
+    ) => {
+      const { body: organizationResponse } = await this.createOrganization(
+        jwt,
+        E2E_CONFIG.organizations.valid.minimal(),
+      ).expect(HttpStatus.CREATED);
+
+      const { body: projectResponse } = await this.createProject(jwt, {
+        ...projectData,
+        organizationId: organizationResponse.data.id,
+      }).expect(HttpStatus.CREATED);
+      await this.utils.generateProjectBlmValues(projectResponse.data.id);
+      await this.createScenario(jwt, {
+        ...scenarioData,
+        projectId: projectResponse.data.id,
+      });
+
+      return projectResponse;
+    },
+
+    // Users
+    validateUserWithEmail: async (email: string) => {
+      const mailer = this.moduleRef.get(Mailer) as FakeMailer;
+      const userRepository: Repository<User> = this.moduleRef.get(
+        getRepositoryToken(User),
+      );
+      const user = await userRepository.findOneOrFail({ email });
+      const validationToken = mailer.confirmationTokens[user.id];
+
+      await this.validateUser({ validationToken, sub: user.id }).expect(
+        HttpStatus.CREATED,
+      );
+    },
+    createWorkingUser: async ({
+      email = 'user@email.com',
+      password = 'password',
+      displayName = undefined as string | undefined,
+    } = {}) => {
+      await this.registerUser({ email, password, displayName }).expect(
+        HttpStatus.CREATED,
+      );
+      await this.utils.validateUserWithEmail(email);
+      const { body } = await this.login({ username: email, password }).expect(
+        HttpStatus.CREATED,
+      );
+
+      return body.accessToken;
+    },
+  };
 }
 
 export async function createClient(
