@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -17,11 +18,15 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { WebshotService, WebshotSummaryReportConfig } from './webshot.service';
 import { Response } from 'express';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { isLeft } from 'fp-ts/lib/Either';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { scenarioResource } from '../scenarios/scenario.api.entity';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
-@IsMissingAclImplementation()
+@ImplementsAcl()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Webshot')
@@ -38,6 +43,7 @@ export class WebshotController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<any> {
     // @debt Refactor to use @nestjs/common's StreamableFile
     // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
@@ -45,8 +51,16 @@ export class WebshotController {
     const pdfStream = await this.service.getSummaryReportForScenario(
       projectId,
       scenarioId,
+      req.user,
       config,
     );
-    pdfStream.pipe(res);
+    if (isLeft(pdfStream)) {
+      throw mapAclDomainToHttpError(pdfStream.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    pdfStream.right.pipe(res);
   }
 }
