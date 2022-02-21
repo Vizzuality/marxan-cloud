@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useInView } from 'react-intersection-observer';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import Wrapper from 'layout/wrapper';
 
@@ -19,11 +19,11 @@ const claimLines = [{ id: '0', text: 'free and open' }, { id: '1', text: 'flexib
 
 export const HomeBanner: React.FC<HomeBannerProps> = () => {
   const { ref, inView } = useInView({
-    threshold: 0.4,
+    threshold: 0,
     triggerOnce: true,
   });
   const { ref: imagesRef, inView: imagesInView } = useInView({
-    threshold: 0.4,
+    threshold: 0,
     triggerOnce: true,
   });
 
@@ -32,58 +32,50 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
       <Wrapper>
         <div className="flex flex-col items-center -space-y-20 md:space-y-20">
           <div ref={ref}>
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: inView ? 1 : 0 }}
-                transition={{
-                  duration: 0.35,
-                  ease: 'easeInOut',
-                }}
-                exit={{ opacity: 0 }}
-              >
-                <div>
-                  <h5 className="text-5xl text-center md:text-left md:text-6xl leading-14 md:leading-10 font-heading">Marxan software is</h5>
-                  <div
-                    className="relative h-52 md:h-40"
-                    style={{ clipPath: 'polygon(0 5%, 100% 5%, 100% 45%, 0 45%)' }}
-                  >
-                    <div className="absolute flex flex-col items-center w-full max-w-4xl mt-5 animate-banner text-primary-500">
-                      {!!claimLines.length && claimLines.map((cl) => (
-                        <p className="text-4xl text-center md:text-left mb-18 md:mb-16 md:text-5xl" key={cl.id}>{cl.text}</p>
-                      ))}
-                    </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: inView ? 1 : 0 }}
+              transition={{
+                duration: 1,
+              }}
+            >
+              <div>
+                <h5 className="text-5xl text-center md:text-left md:text-6xl leading-14 md:leading-10 font-heading">Marxan software is</h5>
+                <div
+                  className="relative h-52 md:h-40"
+                  style={{ clipPath: 'polygon(0 5%, 100% 5%, 100% 45%, 0 45%)' }}
+                >
+                  <div className="absolute flex flex-col items-center w-full max-w-4xl mt-5 animate-banner text-primary-500">
+                    {!!claimLines.length && claimLines.map((cl) => (
+                      <p className="text-4xl text-center md:text-left mb-18 md:mb-16 md:text-5xl" key={cl.id}>{cl.text}</p>
+                    ))}
                   </div>
                 </div>
-              </motion.div>
-            </AnimatePresence>
+              </div>
+            </motion.div>
           </div>
 
           <div ref={imagesRef}>
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: imagesInView ? 1 : 0 }}
-                transition={{
-                  duration: 0.35,
-                  ease: 'easeInOut',
-                }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="relative grid justify-between w-full grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-y-0 md:gap-x-6">
-                  <div
-                    className="absolute hidden w-full h-full bg-no-repeat opacity-50 -top-10 md:-top-20 -left-10 md:-left-18 bg-gradient-to-b from-current to-transparent lg:block"
-                    style={{
-                      backgroundImage: `url(${BANNER_BACKGROUND})`,
-                      backgroundSize: '34%',
-                    }}
-                  />
-                  <img alt="Scenario features example" src={BANNER_1_IMG} />
-                  <img alt="Scenario map layers example" src={BANNER_2_IMG} />
-                  <img alt="Scenarios tags examples" src={BANNER_3_IMG} className="md:pt-12" />
-                </div>
-              </motion.div>
-            </AnimatePresence>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: imagesInView ? 1 : 0 }}
+              transition={{
+                duration: 1,
+              }}
+            >
+              <div className="relative grid justify-between w-full grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-y-0 md:gap-x-6">
+                <div
+                  className="absolute hidden w-full h-full bg-no-repeat opacity-50 -top-10 md:-top-20 -left-10 md:-left-18 bg-gradient-to-b from-current to-transparent lg:block"
+                  style={{
+                    backgroundImage: `url(${BANNER_BACKGROUND})`,
+                    backgroundSize: '34%',
+                  }}
+                />
+                <img alt="Scenario features example" src={BANNER_1_IMG} />
+                <img alt="Scenario map layers example" src={BANNER_2_IMG} />
+                <img alt="Scenarios tags examples" src={BANNER_3_IMG} className="md:pt-12" />
+              </div>
+            </motion.div>
           </div>
         </div>
 

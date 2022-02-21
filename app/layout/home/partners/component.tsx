@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 
 import { useInView } from 'react-intersection-observer';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 import { Media } from 'layout/media';
 import Wrapper from 'layout/wrapper';
@@ -17,11 +17,15 @@ export interface PartnersListProps {
 
 export const PartnersList: React.FC<PartnersListProps> = () => {
   const { ref: desktopRef, inView: desktopInView } = useInView({
-    threshold: 0.4,
+    threshold: 0.5,
     triggerOnce: true,
   });
   const { ref: mobileRef, inView: mobileInView } = useInView({
-    threshold: 0.4,
+    threshold: 0.5,
+    triggerOnce: true,
+  });
+  const { ref: barRef, inView: barInView } = useInView({
+    threshold: 1,
     triggerOnce: true,
   });
 
@@ -31,7 +35,7 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
       return {
         id,
         content: (
-          <div className="flex flex-col md:space-y-0">
+          <div key={id} className="flex flex-col md:space-y-0">
             <p className="text-lg text-center text-black md:text-left md:text-2xl font-heading">
               {title}
             </p>
@@ -57,48 +61,54 @@ export const PartnersList: React.FC<PartnersListProps> = () => {
     <div className="relative border border-t border-white bg-primary-50">
       <Wrapper>
 
-        <div className="top-0 w-full h-px max-w-5xl mx-auto opacity-20" style={{ background: 'linear-gradient(to right, transparent, #000000, transparent)' }} />
+        <motion.div
+          ref={barRef}
+          initial={{ width: 0 }}
+          animate={{
+            width: barInView ? '100%' : 0,
+          }}
+          transition={{
+            duration: 0.75,
+            ease: 'easeInOut',
+          }}
+          className="absolute top-0 w-full h-px max-w-5xl mx-auto transform -translate-x-1/2 opacity-20 left-1/2"
+          style={{ background: 'linear-gradient(to right, transparent, #000000, transparent)' }}
+        />
 
         <Media greaterThanOrEqual="md">
-          <div ref={desktopRef}>
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: desktopInView ? 1 : 0 }}
-                transition={{
-                  duration: 0.35,
-                  ease: 'easeInOut',
-                }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="max-w-5xl pt-24 pb-6 mx-auto">
-                  <Carousel
-                    slides={renderLogoSections}
-                  />
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <motion.div
+            ref={desktopRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: desktopInView ? 1 : 0 }}
+            transition={{
+              duration: 1,
+              ease: 'easeInOut',
+            }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="max-w-5xl pt-24 pb-6 mx-auto">
+              <Carousel
+                slides={renderLogoSections}
+              />
+            </div>
+          </motion.div>
         </Media>
 
         <Media lessThan="md">
-          <div ref={mobileRef}>
-            <AnimatePresence>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: mobileInView ? 1 : 0 }}
-                transition={{
-                  duration: 0.35,
-                  ease: 'easeInOut',
-                }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="max-w-5xl py-10 mx-auto space-y-16">
-                  {renderLogoSections.map((ls) => ls.content)}
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <motion.div
+            ref={mobileRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: mobileInView ? 1 : 0 }}
+            transition={{
+              duration: 1,
+              ease: 'easeInOut',
+            }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="max-w-5xl py-10 mx-auto space-y-16">
+              {renderLogoSections.map((ls) => ls.content)}
+            </div>
+          </motion.div>
         </Media>
       </Wrapper>
 
