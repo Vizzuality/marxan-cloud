@@ -1,6 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class SyncPuShapeEnumFromGeoprocessingToApi1645449750000 implements MigrationInterface {
+export class SyncPuShapeEnumFromGeoprocessingToApi1645449750000
+  implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       ALTER TYPE planning_unit_grid_shape ADD VALUE 'irregular';
