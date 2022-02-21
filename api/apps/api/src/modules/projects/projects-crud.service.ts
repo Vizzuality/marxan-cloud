@@ -146,7 +146,7 @@ export class ProjectsCrudService extends AppBaseService<
     const project = await super.setDataCreate(create, info);
     project.createdBy = info.authenticatedUser?.id;
 
-    if (project.planningUnitGridShape === PlanningUnitGridShape.fromShapefile) {
+    if (project.planningUnitGridShape === PlanningUnitGridShape.FromShapefile) {
       // isProjectUsingCustomPlanningUnitGrid requires planningUnitAreakm2
       // to be empty
       project.planningUnitAreakm2 = undefined;
@@ -182,7 +182,7 @@ export class ProjectsCrudService extends AppBaseService<
   ): Promise<void> {
     if (
       createModel?.planningUnitGridShape ===
-        PlanningUnitGridShape.fromShapefile &&
+        PlanningUnitGridShape.FromShapefile &&
       createModel.planningAreaId
     ) {
       await this.commandBus.execute(
@@ -228,7 +228,7 @@ export class ProjectsCrudService extends AppBaseService<
   ): Promise<void> {
     if (
       createModel?.planningUnitGridShape ===
-        PlanningUnitGridShape.fromShapefile &&
+        PlanningUnitGridShape.FromShapefile &&
       createModel.planningAreaId
     ) {
       await this.commandBus.execute(

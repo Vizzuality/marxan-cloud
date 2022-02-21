@@ -157,7 +157,7 @@ describe('when processing initial cost job input', () => {
     it('should persist cost one for all planning units', async () => {
       expect(
         await sut.process(
-          getInitialCostJob(scenarioId, PlanningUnitGridShape.square),
+          getInitialCostJob(scenarioId, PlanningUnitGridShape.Square),
         ),
       ).toEqual(true);
       expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costOne);
@@ -168,7 +168,7 @@ describe('when processing initial cost job input', () => {
     it('should persist cost one for all planning units', async () => {
       expect(
         await sut.process(
-          getInitialCostJob(scenarioId, PlanningUnitGridShape.hexagon),
+          getInitialCostJob(scenarioId, PlanningUnitGridShape.Hexagon),
         ),
       ).toEqual(true);
       expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costOne);
@@ -187,7 +187,7 @@ describe('when processing initial cost job input', () => {
     it('should persist cost based on area for all planning units', async () => {
       expect(
         await sut.process(
-          getInitialCostJob(scenarioId, PlanningUnitGridShape.fromShapefile),
+          getInitialCostJob(scenarioId, PlanningUnitGridShape.FromShapefile),
         ),
       ).toEqual(true);
       expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costByArea);

@@ -106,7 +106,7 @@ const getFixtures = async () => {
     GivenInitialCostJob: (): InitialCostJobInput => {
       return {
         scenarioId: v4(),
-        puGridShape: PlanningUnitGridShape.square,
+        puGridShape: PlanningUnitGridShape.Square,
       };
     },
     GivenFromShapeFileJob: (): FromShapefileJobInput => {
