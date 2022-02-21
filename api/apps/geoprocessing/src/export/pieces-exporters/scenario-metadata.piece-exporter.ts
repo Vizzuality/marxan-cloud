@@ -1,5 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FileRepository } from '@marxan/files-repository';
@@ -61,17 +62,19 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       );
     }
 
+    const isProjectImport = input.resourceKind === ResourceKind.Project;
+    const relativePath = isProjectImport
+      ? ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].projectImport(
+          input.resourceId,
+        )
+      : ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].scenarioImport;
+
     return {
       ...input,
       uris: [
         {
           uri: outputFile.right,
-          relativePath: ClonePieceRelativePaths[
-            ClonePiece.ScenarioMetadata
-          ].getScenarioMetadataRelativePath(
-            input.resourceKind,
-            input.resourceId,
-          ),
+          relativePath,
         },
       ],
     };

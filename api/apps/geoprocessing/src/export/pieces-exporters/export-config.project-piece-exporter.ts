@@ -2,7 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ScenarioExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -16,7 +16,7 @@ import {
 
 @Injectable()
 @PieceExportProvider()
-export class ScenarioExportConfigPieceExporter implements ExportPieceProcessor {
+export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
@@ -24,30 +24,35 @@ export class ScenarioExportConfigPieceExporter implements ExportPieceProcessor {
   ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
-    return piece === ClonePiece.ExportConfig && kind === ResourceKind.Scenario;
+    return piece === ClonePiece.ExportConfig && kind === ResourceKind.Project;
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [scenario]: {
+    const [project]: {
       name: string;
-      project_id: string;
       description: string;
     }[] = await this.entityManager.query(
-      `
-       SELECT name, project_id, description FROM scenarios where id = $1
-    `,
+      `SELECT name, description FROM projects where id = $1`,
       [input.resourceId],
     );
 
-    if (!scenario) {
-      throw new Error(`Scenario with ID ${input.resourceId} not found`);
+    if (!project) {
+      throw new Error(`Project with ID ${input.resourceId} not found`);
     }
 
-    const fileContent: ScenarioExportConfigContent = {
+    const scenarios: {
+      name: string;
+      id: string;
+    }[] = await this.entityManager.query(
+      `SELECT id, name FROM scenarios where project_id = $1`,
+      [input.resourceId],
+    );
+
+    const fileContent: ProjectExportConfigContent = {
       version: `0.1.0`,
-      name: scenario.name,
-      description: scenario.description,
-      projectId: scenario.project_id,
+      scenarios,
+      name: project.name,
+      description: project.description,
       resourceKind: input.resourceKind,
       resourceId: input.resourceId,
       pieces: input.allPieces,
@@ -60,7 +65,7 @@ export class ScenarioExportConfigPieceExporter implements ExportPieceProcessor {
 
     if (isLeft(outputFile)) {
       throw new Error(
-        `${ScenarioExportConfigPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
+        `${ExportConfigProjectPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`,
       );
     }
 

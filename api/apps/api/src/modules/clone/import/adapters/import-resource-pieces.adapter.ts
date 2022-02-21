@@ -3,7 +3,6 @@ import {
   ClonePiece,
   ComponentLocation,
   ResourceId,
-  ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
@@ -19,9 +18,9 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
     scenarios: ProjectExportConfigContent['scenarios'],
   ): ImportComponent[] {
     const scenarioPieces = scenarios.flatMap((scenario) =>
-      this.resolveForScenario(
-        new ResourceId(scenario.id),
-        ResourceKind.Project,
+      this.resolveForScenarioWithinProjectImport(
+        ResourceId.create(),
+        scenario.id,
         location,
       ),
     );
@@ -37,22 +36,32 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
     ];
   }
 
-  resolveForScenario(
-    id: ResourceId,
-    kind: ResourceKind,
+  private resolveForScenarioWithinProjectImport(
+    scenarioId: ResourceId,
+    oldScenarioId: string,
     location: ArchiveLocation,
   ): ImportComponent[] {
-    const oldScenarioId = id.value;
-    const newScenarioId = ResourceId.create();
-    const resourceId = kind === ResourceKind.Project ? newScenarioId : id;
-
     return [
-      ImportComponent.newOne(resourceId, ClonePiece.ScenarioMetadata, 1, [
+      ImportComponent.newOne(scenarioId, ClonePiece.ScenarioMetadata, 1, [
         new ComponentLocation(
           location.value,
-          ClonePieceRelativePaths[
-            ClonePiece.ScenarioMetadata
-          ].getScenarioMetadataRelativePath(kind, oldScenarioId),
+          ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].projectImport(
+            oldScenarioId,
+          ),
+        ),
+      ]),
+    ];
+  }
+
+  resolveForScenario(
+    scenarioId: ResourceId,
+    location: ArchiveLocation,
+  ): ImportComponent[] {
+    return [
+      ImportComponent.newOne(scenarioId, ClonePiece.ScenarioMetadata, 1, [
+        new ComponentLocation(
+          location.value,
+          ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].scenarioImport,
         ),
       ]),
     ];
