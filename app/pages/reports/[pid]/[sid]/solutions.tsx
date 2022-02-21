@@ -16,7 +16,7 @@ const styles = {
   page: {
     minHeight: '200mm',
     margin: 'auto',
-    padding: '33px 51px',
+    padding: '8.73mm 13.49mm',
     width: '297mm',
   },
 };

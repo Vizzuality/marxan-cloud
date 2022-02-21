@@ -92,11 +92,8 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
           </div>
         </section>
 
-        <section className="w-2/3" style={{ height: '552px' }}>
+        <ScenarioReportsMap />
 
-          <ScenarioReportsMap />
-
-        </section>
       </div>
     )
   );
