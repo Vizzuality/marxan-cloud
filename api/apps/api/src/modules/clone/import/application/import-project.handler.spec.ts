@@ -196,7 +196,6 @@ class FakeImportResourcePieces extends ImportResourcePieces {
 
   resolveForScenario(
     id: ResourceId,
-    kind: ResourceKind,
     archiveLocation: ArchiveLocation,
   ): ImportComponent[] {
     return [];
