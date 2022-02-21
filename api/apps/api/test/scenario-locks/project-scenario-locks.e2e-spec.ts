@@ -299,7 +299,7 @@ test('A lock is deleted after user token has expired', async () => {
   const ownerOfLockUserId = await fixtures.GivenUserWasAddedToScenario();
 
   const ownerOfLockUserToken = await fixtures.GivenUserIsLoggedIn('random');
-  
+
   const GivenUserAcquiredLockForScenario = await fixtures.WhenAcquiringLockForScenario(
     scenarioId,
     ownerOfLockUserToken,
