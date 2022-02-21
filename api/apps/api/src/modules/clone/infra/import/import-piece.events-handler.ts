@@ -70,6 +70,7 @@ export class ImportPieceEventsHandler
       resourceKind,
       importId,
       componentId,
+      piece,
     } = await eventData.data;
     const kind = this.failEventsMapper[resourceKind];
 
@@ -83,6 +84,7 @@ export class ImportPieceEventsHandler
         componentResourceId,
         resourceKind,
         componentId,
+        piece,
       },
     };
   }

@@ -649,7 +649,10 @@ export class ScenariosService {
     }
 
     const result = await this.commandBus.execute(
-      new ExportScenario(new ResourceId(scenarioId)),
+      new ExportScenario(
+        new ResourceId(scenario.projectId),
+        new ResourceId(scenarioId),
+      ),
     );
 
     return right(result.value);

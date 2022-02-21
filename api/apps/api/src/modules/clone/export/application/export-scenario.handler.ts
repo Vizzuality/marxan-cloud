@@ -20,11 +20,11 @@ export class ExportScenarioHandler
     private readonly eventPublisher: EventPublisher,
   ) {}
 
-  async execute({ id }: ExportScenario): Promise<ExportId> {
+  async execute({ scenarioId, projectId }: ExportScenario): Promise<ExportId> {
     const kind = ResourceKind.Scenario;
-    const pieces = await this.resourcePieces.resolveFor(id, kind);
+    const pieces = await this.resourcePieces.resolveFor(scenarioId, kind);
     const exportRequest = this.eventPublisher.mergeObjectContext(
-      Export.newOne(id, kind, pieces),
+      Export.newOne(projectId, kind, pieces),
     );
     await this.exportRepository.save(exportRequest);
 
