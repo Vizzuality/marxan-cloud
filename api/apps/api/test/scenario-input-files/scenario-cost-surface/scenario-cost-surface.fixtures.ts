@@ -5,15 +5,13 @@ import { In, Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import {
   LockStatus,
+  PlanningUnitGridShape,
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuCostDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { Polygon } from 'geojson';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import {
-  PlanningUnitsGeom,
-  ShapeType,
-} from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 import { GivenProjectExists } from '../../steps/given-project';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
@@ -103,7 +101,7 @@ export const getFixtures = async () => {
           polygons.map((poly) => ({
             theGeom: () =>
               `st_multi(ST_GeomFromGeoJSON('${JSON.stringify(poly)}'))`,
-            type: ShapeType.Square,
+            type: PlanningUnitGridShape.Square,
           })),
         )
       ).identifiers;

@@ -2,11 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { ShapeType } from '@marxan-jobs/planning-unit-geometry';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { BBox, GeoJSON } from 'geojson';
 import { v4 } from 'uuid';
 import { SaveGeoJsonResult } from '@marxan/planning-area-repository';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class PlanningUnitsGridProcessor {
@@ -46,7 +46,7 @@ export class PlanningUnitsGridProcessor {
             ON CONFLICT (the_geom_hash, type, COALESCE(project_id, '00000000-0000-0000-0000-000000000000')) DO UPDATE SET type = 'from_shapefile'::shape_type
             RETURNING "id", "project_id"
           `,
-          [geoJson, ShapeType.FromShapefile, fakeProjectId],
+          [geoJson, PlanningUnitGridShape.FromShapefile, fakeProjectId],
         );
 
         const planningArea: {
