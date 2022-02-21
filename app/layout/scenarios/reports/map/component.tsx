@@ -1,10 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { useSelector } from 'react-redux';
-
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -32,14 +28,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
 
   const { pid, sid } = query;
 
-  getScenarioEditSlice(sid);
-
-  const {
-    cache,
-    selectedSolution,
-    layerSettings,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
   const {
     data = {},
   } = useProject(pid);
@@ -62,18 +50,13 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   const [bounds, setBounds] = useState(null);
 
   const PUGridLayer = usePUGridLayer({
-    cache,
+    cache: Date.now(),
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
     sublayers: ['solutions'],
     options: {
-      runId: selectedSolution?.runId || bestSolution?.runId,
-      settings: {
-        pugrid: layerSettings.pugrid,
-        frequency: layerSettings.frequency,
-        solution: layerSettings.solution,
-      },
+      runId: bestSolution?.runId,
     },
   });
 
