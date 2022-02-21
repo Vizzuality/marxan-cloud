@@ -2,8 +2,12 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
+  Param,
+  ParseUUIDPipe,
   Patch,
+  Post,
   Request,
   UseGuards,
   ValidationPipe,
@@ -30,6 +34,8 @@ import {
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
+import { isLeft } from 'fp-ts/lib/Either';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -124,5 +130,56 @@ export class UsersController {
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
     return this.service.markAsDeleted(req.user.id);
+  }
+
+  @ApiOperation({
+    description: 'Get list of admins in platform.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('admins')
+  async getAdmins(
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<PlatformAdminEntity[]> {
+    const result = await this.service.getPlatformAdmins(req.user.id);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return result.right;
+  }
+
+  @ApiOperation({
+    description: 'Add user as admin.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Post('admins/:id')
+  async addAdmin(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Param('id', ParseUUIDPipe) userIdToAdd: string,
+  ): Promise<void> {
+    const result = await this.service.addAdmin(req.user.id, userIdToAdd);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+  }
+
+  @ApiOperation({
+    description: 'Revoke admin permissions from user.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Delete('admins/:id')
+  async deleteAdmin(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Param('id', ParseUUIDPipe) userIdToDelete: string,
+  ): Promise<void> {
+    const result = await this.service.addAdmin(req.user.id, userIdToDelete);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
   }
 }

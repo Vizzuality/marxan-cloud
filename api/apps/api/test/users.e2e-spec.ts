@@ -45,6 +45,7 @@ describe('UsersModule (e2e)', () => {
   let app: INestApplication;
   let apiEventsService: ApiEventsService;
   let usersService: UsersService;
+  let usersRepo: Repository<User>;
 
   const aNewPassword = faker.random.uuid();
 
@@ -81,6 +82,7 @@ describe('UsersModule (e2e)', () => {
 
   beforeAll(async () => {
     app = await bootstrapApplication();
+    usersRepo = app.get(getRepositoryToken(User));
 
     apiEventsService = app.get<ApiEventsService>(ApiEventsService);
     usersService = app.get<UsersService>(UsersService);
@@ -354,26 +356,25 @@ describe('UsersModule (e2e)', () => {
     let adminToken: string;
     let adminUserId: string;
     const cleanups: (() => Promise<void>)[] = [];
-    const usersRepo: Repository<User> = app.get(getRepositoryToken(User));
 
     beforeAll(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       for (const cleanup of cleanups.reverse()) {
         await cleanup();
       }
     });
 
     test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
-      const whenGettingAdminListResponse = await request(app.getHttpServer())
+      const WhenGettingAdminListResponse = await request(app.getHttpServer())
         .get('/api/v1/users/admins')
         .set('Authorization', `Bearer ${adminToken}`);
-      expect(whenGettingAdminListResponse.status).toEqual(200);
-      expect(whenGettingAdminListResponse.body).toHaveLength(1);
-      expect(whenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
+      expect(WhenGettingAdminListResponse.status).toEqual(200);
+      expect(WhenGettingAdminListResponse.body).toHaveLength(1);
+      expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
     });
 
     test('A platform admin should be able to add a new admin', async () => {
@@ -396,9 +397,10 @@ describe('UsersModule (e2e)', () => {
       )
         .get('/api/v1/users/admins')
         .set('Authorization', `Bearer ${newAdminToken}`);
+      expect(WhenGettingAdminListByNewUserResponse.status).toEqual(200);
+
       const resources = WhenGettingAdminListByNewUserResponse.body;
-      expect(resources.status).toEqual(200);
-      expect(resources.body).toHaveLength(2);
+      expect(resources).toHaveLength(2);
 
       const userIds = [user.id, adminUserId];
 
@@ -420,16 +422,16 @@ describe('UsersModule (e2e)', () => {
       expect(WhenAddingNewAdminResponse.status).toEqual(201);
 
       const WhenRemovingExistingAdmin = await request(app.getHttpServer())
-        .post(`/api/v1/users/admins/${user.id}`)
+        .delete(`/api/v1/users/admins/${user.id}`)
         .set('Authorization', `Bearer ${adminToken}`);
       expect(WhenRemovingExistingAdmin.status).toEqual(200);
 
-      const whenGettingAdminListResponse = await request(app.getHttpServer())
+      const WhenGettingAdminListResponse = await request(app.getHttpServer())
         .get('/api/v1/users/admins')
         .set('Authorization', `Bearer ${adminToken}`);
-      expect(whenGettingAdminListResponse.status).toEqual(200);
-      expect(whenGettingAdminListResponse.body).toHaveLength(1);
-      expect(whenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
+      expect(WhenGettingAdminListResponse.status).toEqual(200);
+      expect(WhenGettingAdminListResponse.body).toHaveLength(1);
+      expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
     });
   });
 });
