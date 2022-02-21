@@ -73,7 +73,6 @@ export const WebShootStatus: React.FC<WebShootStatusProps> = () => {
         globalThis.MARXAN = {
           webshoot_ready: true,
         };
-        console.log('---->', globalThis.MARXAN);
       }, 3000);
     } else if (!reportDataIsFetched) {
       globalThis.MARXAN = {
@@ -83,9 +82,8 @@ export const WebShootStatus: React.FC<WebShootStatusProps> = () => {
   }, [reportDataIsFetched]);
 
   return (
-    <div>
-      { }
-    </div>
+    <>
+    </>
   );
 };
 
