@@ -12,7 +12,7 @@ export interface GuideRequestProps {
   onDismiss?: () => void,
 }
 
-export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }:GuideRequestProps) => {
+export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRequestProps) => {
   const { user } = useMe();
 
   const { onActive } = useHelp();
