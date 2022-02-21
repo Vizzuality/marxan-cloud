@@ -4,6 +4,7 @@ import { useInView } from 'react-intersection-observer';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
+import Item from 'layout/home/support/item';
 import Wrapper from 'layout/wrapper';
 
 import { PLANNING_PROBLEMS } from './constants';
@@ -46,10 +47,7 @@ export const HomeSupport: React.FC<HomeSupportProps> = () => {
                     const { id, text, image } = P;
 
                     return (
-                      <div key={`${id}`} className="flex items-center space-x-6">
-                        <img alt={text} src={image} />
-                        <p className="text-lg text-white">{text}</p>
-                      </div>
+                      <Item key={id} id={id} text={text} image={image} />
                     );
                   })}
                 </div>
