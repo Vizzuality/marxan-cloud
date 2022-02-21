@@ -10,8 +10,8 @@ import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileRequest } from '@marxan/tiles';
 
 enum RegularPlanningUnitGridShape {
-  hexagon = PlanningUnitGridShape.hexagon,
-  square = PlanningUnitGridShape.square,
+  hexagon = PlanningUnitGridShape.Hexagon,
+  square = PlanningUnitGridShape.Square,
 }
 
 export class tileSpecification extends TileRequest {

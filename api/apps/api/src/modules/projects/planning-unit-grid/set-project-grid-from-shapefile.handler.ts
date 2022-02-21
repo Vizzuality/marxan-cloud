@@ -65,7 +65,7 @@ export class SetProjectGridFromShapefileHandler
         id: projectId,
       },
       {
-        planningUnitGridShape: ProjectGridShape.fromShapefile,
+        planningUnitGridShape: ProjectGridShape.FromShapefile,
         planningAreaGeometryId: planningAreaId,
         bbox,
       },

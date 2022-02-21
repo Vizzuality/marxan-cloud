@@ -111,7 +111,7 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
-        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
       }),
       minimalInGivenAdminArea: (options?: {
@@ -125,7 +125,7 @@ export const E2E_CONFIG: {
         countryId: options?.countryCode,
         adminAreaLevel1Id: options?.adminAreaLevel1Id,
         adminAreaLevel2Id: options?.adminAreaLevel2Id,
-        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
       }),
       complete: (options: CountryCodeInput): CreateProjectDTO => ({
@@ -135,7 +135,7 @@ export const E2E_CONFIG: {
         countryId: options.countryCode,
         adminAreaLevel1Id: options.adminLevel1,
         adminAreaLevel2Id: options.adminLevel2,
-        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
         metadata: {
           [faker.random.word()]: faker.random.words(3),
@@ -149,7 +149,7 @@ export const E2E_CONFIG: {
         countryId: options.countryCode,
         adminAreaLevel1Id: faker.random.alphaNumeric(7),
         adminAreaLevel2Id: faker.random.alphaNumeric(12),
-        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
         metadata: {
           [faker.random.word()]: faker.random.words(3),
@@ -163,7 +163,7 @@ export const E2E_CONFIG: {
         countryId: options.countryCode,
         adminAreaLevel1Id: faker.random.alphaNumeric(7),
         adminAreaLevel2Id: faker.random.alphaNumeric(12),
-        planningUnitGridShape: PlanningUnitGridShape.hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
         metadata: {
           [faker.random.word()]: faker.random.words(3),

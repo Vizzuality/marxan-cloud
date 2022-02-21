@@ -47,8 +47,8 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   private async initialCostProcessor({
     data: { scenarioId, puGridShape },
   }: Job<InitialCostJobInput, true>): Promise<true> {
-    const hexagonPuShape = puGridShape === PlanningUnitGridShape.hexagon;
-    const squarePuShape = puGridShape === PlanningUnitGridShape.square;
+    const hexagonPuShape = puGridShape === PlanningUnitGridShape.Hexagon;
+    const squarePuShape = puGridShape === PlanningUnitGridShape.Square;
 
     if (hexagonPuShape || squarePuShape) {
       const { ids: puIds } = await this.availablePlanningUnits.get(scenarioId);
