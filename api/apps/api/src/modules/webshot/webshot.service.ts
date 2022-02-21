@@ -12,11 +12,13 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
 
 export class WebshotViewport {
+  @ApiPropertyOptional()
   @IsNumber()
   @Min(64)
   @Max(1920)
   width!: number;
 
+  @ApiPropertyOptional()
   @IsNumber()
   @Min(64)
   @Max(1080)
@@ -24,12 +26,15 @@ export class WebshotViewport {
 }
 
 export class WebshotSummaryReportConfig {
+  @ApiProperty()
   @IsString()
   baseUrl!: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   viewport?: WebshotViewport;
 
+  @ApiPropertyOptional()
   @IsOptional()
   cookie?: string;
 }
