@@ -15,6 +15,7 @@ import { ScenarioAclController } from './scenarios-acl/scenario-acl.controller';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ScenarioLockEntity } from './scenarios-acl/locks/entity/scenario.lock.api.entity';
 import { LockService } from './scenarios-acl/locks/lock.service';
+import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { LockService } from './scenarios-acl/locks/lock.service';
       UsersScenariosApiEntity,
       PublishedProject,
       ScenarioLockEntity,
+      IssuedAuthnToken,
     ]),
     ProjectAclModule,
     ScenarioAclModule,

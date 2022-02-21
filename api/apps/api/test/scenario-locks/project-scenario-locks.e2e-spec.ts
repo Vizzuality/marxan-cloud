@@ -294,6 +294,28 @@ test('Updates scenario correctly as lock is in place by same user', async () => 
   fixtures.ThenScenarioIsUpdated(response);
 });
 
+test('A lock is deleted after user token has expired', async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  const ownerOfLockUserId = await fixtures.GivenUserWasAddedToScenario();
+
+  const ownerOfLockUserToken = await fixtures.GivenUserIsLoggedIn('random');
+  
+  const GivenUserAcquiredLockForScenario = await fixtures.WhenAcquiringLockForScenario(
+    scenarioId,
+    ownerOfLockUserToken,
+  );
+  await fixtures.GivenUserTokenHasExpired(ownerOfLockUserId);
+
+  const ownerOfScenarioButNotLockToken = await fixtures.GivenUserIsLoggedIn(
+    'owner',
+  );
+  const response = await fixtures.WhenGettingLockFromScenario(
+    scenarioId,
+    ownerOfScenarioButNotLockToken,
+  );
+  fixtures.ThenNoScenarioLockIsReturned(response);
+});
+
 test('Releases scenario lock correctly', async () => {
   await fixtures.GivenScenarioWasCreated();
   const ownerToken = await fixtures.GivenUserIsLoggedIn('owner');

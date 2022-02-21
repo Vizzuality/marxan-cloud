@@ -52,6 +52,7 @@ import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scen
 import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
 import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
 import { LockService } from '../access-control/scenarios-acl/locks/lock.service';
+import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 
 @Module({
   imports: [
@@ -65,6 +66,7 @@ import { LockService } from '../access-control/scenarios-acl/locks/lock.service'
       ScenariosOutputResultsApiEntity,
       UsersScenariosApiEntity,
       ScenarioLockEntity,
+      IssuedAuthnToken,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],

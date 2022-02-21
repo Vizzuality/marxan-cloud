@@ -9,6 +9,8 @@ import {
   ScenarioLockResultPlural,
   ScenarioLockResultSingular,
 } from './dto/scenario.lock.dto';
+import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
+import { assertDefined } from '@marxan/utils';
 
 export const unknownError = Symbol(`unknown error`);
 export const lockedScenario = Symbol(`scenario is already locked`);
@@ -24,6 +26,8 @@ export class LockService {
   constructor(
     @InjectRepository(ScenarioLockEntity)
     private readonly locksRepo: Repository<ScenarioLockEntity>,
+    @InjectRepository(IssuedAuthnToken)
+    private readonly tokenRepo: Repository<IssuedAuthnToken>,
   ) {}
 
   async acquireLock(
@@ -35,10 +39,18 @@ export class LockService {
         return left(lockedScenario);
       }
 
+      const query = this.tokenRepo
+        .createQueryBuilder('issued_authn_tokens')
+        .where({ userId })
+        .orderBy('exp', 'DESC');
+      const userToken = await query.getOne();
+      assertDefined(userToken);
+
       const lock = new ScenarioLockEntity();
       lock.scenarioId = scenarioId;
       lock.userId = userId;
       lock.createdAt = new Date();
+      lock.tokenId = userToken?.id;
 
       const result = await entityManager.save(lock);
 
