@@ -22,22 +22,26 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
     threshold: 0.4,
     triggerOnce: true,
   });
+  const { ref: imagesRef, inView: imagesInView } = useInView({
+    threshold: 0.4,
+    triggerOnce: true,
+  });
 
   return (
     <div className="py-10 md:py-32" style={{ background: 'radial-gradient(circle at 50% 70%, rgba(54,55,62,1) 0%, rgba(21,21,21,1) 51%)' }}>
       <Wrapper>
-        <div ref={ref}>
-          <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: inView ? 1 : 0 }}
-              transition={{
-                duration: 0.35,
-                ease: 'easeInOut',
-              }}
-              exit={{ opacity: 0 }}
-            >
-              <div className="flex flex-col items-center -space-y-20 md:space-y-20">
+        <div className="flex flex-col items-center -space-y-20 md:space-y-20">
+          <div ref={ref}>
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: inView ? 1 : 0 }}
+                transition={{
+                  duration: 0.35,
+                  ease: 'easeInOut',
+                }}
+                exit={{ opacity: 0 }}
+              >
                 <div>
                   <h5 className="text-5xl text-center md:text-left md:text-6xl leading-14 md:leading-10 font-heading">Marxan software is</h5>
                   <div
@@ -51,7 +55,21 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
                     </div>
                   </div>
                 </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
+          <div ref={imagesRef}>
+            <AnimatePresence>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: imagesInView ? 1 : 0 }}
+                transition={{
+                  duration: 0.35,
+                  ease: 'easeInOut',
+                }}
+                exit={{ opacity: 0 }}
+              >
                 <div className="relative grid justify-between w-full grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-y-0 md:gap-x-6">
                   <div
                     className="absolute hidden w-full h-full bg-no-repeat opacity-50 -top-10 md:-top-20 -left-10 md:-left-18 bg-gradient-to-b from-current to-transparent lg:block"
@@ -60,15 +78,13 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
                       backgroundSize: '34%',
                     }}
                   />
-
                   <img alt="Scenario features example" src={BANNER_1_IMG} />
                   <img alt="Scenario map layers example" src={BANNER_2_IMG} />
                   <img alt="Scenarios tags examples" src={BANNER_3_IMG} className="md:pt-12" />
-
                 </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
 
       </Wrapper>
