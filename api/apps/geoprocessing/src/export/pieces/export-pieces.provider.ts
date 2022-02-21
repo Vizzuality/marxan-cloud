@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ClonePiece } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { ExportPieceProcessor } from './export-piece-processor';
 
 @Injectable()
@@ -10,9 +11,12 @@ export class ExportPiecesProvider {
     this.providers.push(provider);
   }
 
-  getPieceProvider(piece: ClonePiece): ExportPieceProcessor | undefined {
+  getPieceProvider(
+    piece: ClonePiece,
+    kind: ResourceKind,
+  ): ExportPieceProcessor | undefined {
     for (const provider of this.providers) {
-      if (provider.isSupported(piece)) {
+      if (provider.isSupported(piece, kind)) {
         return provider;
       }
     }

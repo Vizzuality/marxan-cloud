@@ -7,6 +7,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
+import { ResourceKind } from '@marxan/cloning/domain';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
@@ -24,8 +25,10 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     this.logger.setContext(ProjectMetadataPieceImporter.name);
   }
 
-  isSupported(piece: ClonePiece): boolean {
-    return piece === ClonePiece.ProjectMetadata;
+  isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
+    return (
+      piece === ClonePiece.ProjectMetadata && kind === ResourceKind.Project
+    );
   }
 
   private async getRandomOrganizationId(): Promise<string> {

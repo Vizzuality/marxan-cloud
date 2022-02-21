@@ -4,11 +4,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
-import { ExportConfigPieceExporter } from './export-config.piece-exporter';
+import { ProjectExportConfigPieceExporter } from './project-export-config.piece-exporter';
 import { PlanningAreaGadmPieceExporter } from './planning-area-gadm.piece-exporter';
 import { PlanningAreaCustomGridPieceExporter } from './planning-area-custom-grid.piece-exporter';
 import { PlanningAreaCustomPieceExporter } from './planning-area-custom.piece-exporter';
 import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
+import { ScenarioExportConfigPieceExporter } from './scenario-export-config.piece-exporter';
 
 @Module({
   imports: [
@@ -17,10 +18,11 @@ import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporte
   ],
   providers: [
     ProjectMetadataPieceExporter,
-    ExportConfigPieceExporter,
+    ProjectExportConfigPieceExporter,
     PlanningAreaGadmPieceExporter,
     PlanningAreaCustomPieceExporter,
     PlanningAreaCustomGridPieceExporter,
+    ScenarioExportConfigPieceExporter,
     ScenarioMetadataPieceExporter,
   ],
 })

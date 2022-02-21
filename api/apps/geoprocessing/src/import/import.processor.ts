@@ -7,7 +7,10 @@ export class ImportProcessor {
   constructor(private readonly piecesImporters: ImportPiecesProvider) {}
 
   run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const provider = this.piecesImporters.getPieceProvider(input.piece);
+    const provider = this.piecesImporters.getPieceProvider(
+      input.piece,
+      input.resourceKind,
+    );
     if (!provider) {
       throw new Error(`${input.piece} is not yet supported.`);
     }

@@ -25,6 +25,7 @@ export class PlanningAreaCustomGridPieceExporter
   ) {}
 
   isSupported(piece: ClonePiece): boolean {
+    // TODO resource kind filtering
     return piece === ClonePiece.PlanningAreaGridCustom;
   }
 
