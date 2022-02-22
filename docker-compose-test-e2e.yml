@@ -36,7 +36,7 @@ services:
     container_name: marxan-test-e2e-redis
     command: [ "redis-server" ]
     ports:
-      - "${REDIS_API_SERVICE_PORT}:6379"
+      - "3489:6379"
     restart: on-failure
 
 volumes:
