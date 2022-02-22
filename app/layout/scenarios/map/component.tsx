@@ -52,6 +52,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
+
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -368,7 +369,6 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         },
       };
     }
-
     return null;
   };
 
