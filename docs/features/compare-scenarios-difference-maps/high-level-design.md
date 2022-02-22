@@ -13,7 +13,7 @@ We need to ensure first that both scenarios are under the same project.
 
 In order to compare solutions across any two given scenarios we will make use of the data already [configured for selection in scenario results](https://github.com/Vizzuality/marxan-cloud/blob/56d97aedd8dabe4cd22a7a9f1c84ff4f7bcb6b57/api/apps/geoprocessing/src/modules/scenarios/scenarios.service.ts#L45-L52): `frequencyValue`  in the table `output_scenarios_pu_data` for each scenario, which is calculated as `round((output.included_count/array_length(output.value, 1)::numeric)*100)::int as "frequencyValue"`
 
-The vector tile properties that needs to be outputted are:
+The properties that need to be present in the generated tiles are:
 
 ```json
 {
