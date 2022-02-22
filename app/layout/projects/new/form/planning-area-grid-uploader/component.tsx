@@ -58,6 +58,8 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     const data = new FormData();
     data.append('file', f);
 
+    setLoading(true);
+
     uploadProjectPAGridMutation.mutate({ data }, {
       onSuccess: ({ data: { data: g, id: PAid } }) => {
         setLoading(false);
