@@ -36,3 +36,7 @@ output "azure_subscription_id" {
 output "bastion_public_ip" {
   value = module.bastion.bastion_public_ip
 }
+
+output "redis_url" {
+  value = module.redis.redis_url
+}

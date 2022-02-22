@@ -34,3 +34,7 @@ variable "project_name" {
   type        = string
   description = "A project name to use when naming resources."
 }
+
+variable "redis_host" {
+  description = "The redis server hostname"
+}

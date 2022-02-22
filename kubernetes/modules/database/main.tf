@@ -17,7 +17,7 @@ resource "azurerm_key_vault_secret" "postgresql" {
 }
 
 resource "helm_release" "postgres" {
-  name       = "postgres"
+  name       = "${var.name}-postgres"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "postgresql"
   version    = "9.4.1"
@@ -40,13 +40,13 @@ resource "helm_release" "postgres" {
 
   set {
     name  = "existingSecret"
-    value = "postgres-secret"
+    value = "${var.name}-postgres-secret"
   }
 }
 
 resource "kubernetes_secret" "postgres-secret" {
   metadata {
-    name      = "postgres-secret"
+    name      = "${var.name}-postgres-secret"
     namespace = var.namespace
   }
 
@@ -59,6 +59,6 @@ resource "kubernetes_secret" "postgres-secret" {
 data "kubernetes_service" "postgresql" {
   metadata {
     namespace = var.namespace
-    name      = "postgres-postgresql"
+    name      = "${var.name}-postgresql"
   }
 }
