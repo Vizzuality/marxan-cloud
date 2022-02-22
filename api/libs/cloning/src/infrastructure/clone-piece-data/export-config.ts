@@ -64,19 +64,3 @@ export interface ExportConfigRelativePathsType {
 export const ExportConfigRelativePaths: ExportConfigRelativePathsType = {
   config: 'config.json',
 };
-
-export function isProjectExportConfig(
-  exportConfig: ExportConfigContent,
-): exportConfig is ProjectExportConfigContent {
-  return exportConfig.resourceKind === ResourceKind.Project;
-}
-
-export function isScenarioExportConfig(
-  exportConfig: ExportConfigContent,
-): exportConfig is ScenarioExportConfigContent {
-  return exportConfig.resourceKind === ResourceKind.Scenario;
-}
-
-export function isScenarioMetadataArray(value: any): boolean {
-  return Array.isArray(value) && value.every((el) => el.name && el.id);
-}
