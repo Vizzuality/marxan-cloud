@@ -302,9 +302,7 @@ export class ScenariosService {
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
-    await this.blockGuard.ensureThatProjectIsNotBlocked(
-      scenario.right.projectId,
-    );
+    await this.blockGuard.ensureThatScenarioIsNotBlocked(scenario.right.id);
     const validatedMetadata = this.getPayloadWithValidatedMetadata(input);
     return right(await this.crudService.update(scenarioId, validatedMetadata));
   }
@@ -562,8 +560,7 @@ export class ScenariosService {
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
-    const projectId = scenario.right.projectId;
-    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
+    await this.blockGuard.ensureThatScenarioIsNotBlocked(scenario.right.id);
 
     if (rangeToUpdate) {
       const result = await this.commandBus.execute(
