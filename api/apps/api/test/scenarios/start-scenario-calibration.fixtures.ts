@@ -9,15 +9,31 @@ import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity'
 import { GivenProjectExists } from '../steps/given-project';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { GivenUserExists } from '../steps/given-user-exists';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
-  const token = await GivenUserIsLoggedIn(app);
   const projectChecker = (await app.get(ProjectChecker)) as ProjectCheckerFake;
+
+  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
+  const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
+  const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
+  const contributorUserId = await GivenUserExists(app, 'bb');
+  const viewerUserId = await GivenUserExists(app, 'cc');
+  const scenarioViewerRole = ScenarioRoles.scenario_viewer;
+  const scenarioContributorRole = ScenarioRoles.scenario_contributor;
+  const projectViewerRole = ProjectRoles.project_viewer;
+  const projectContributorRole = ProjectRoles.project_contributor;
 
   const { projectId, organizationId } = await GivenProjectExists(
     app,
-    token,
+    ownerToken,
     {
       countryCode: 'AGO',
       name: `Project name ${Date.now()}`,
@@ -27,93 +43,226 @@ export const getFixtures = async () => {
     },
   );
 
+  const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
+    getRepositoryToken(UsersProjectsApiEntity),
+  );
+
+  await userProjectsRepo.save({
+    projectId,
+    roleName: projectContributorRole,
+    userId: contributorUserId,
+  });
+  await userProjectsRepo.save({
+    projectId,
+    roleName: projectViewerRole,
+    userId: viewerUserId,
+  });
+
   await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
   const updatedRange = [1, 50];
+  const defaultRange = [0.001, 100];
+
+  const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
+    getRepositoryToken(UsersScenariosApiEntity),
+  );
 
   return {
     cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, token, projectId);
-      await ScenariosTestUtils.deleteScenario(app, token, scenarioId);
+      projectChecker.clear();
+      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
+      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await OrganizationsTestUtils.deleteOrganization(
         app,
-        token,
+        ownerToken,
         organizationId,
       );
       await app.close();
     },
     GivenScenarioWasCreated: async () => {
-      const result = await ScenariosTestUtils.createScenario(app, token, {
+      const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,
         type: ScenarioType.marxan,
         projectId,
       });
       scenarioId = result.data.id;
     },
-    WhenScenarioCalibrationIsLaunchedItShouldNotFail: () => ({
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
+        roleName: scenarioContributorRole,
+        userId: contributorUserId,
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId: scenarioId,
+        roleName: scenarioViewerRole,
+        userId: viewerUserId,
+      }),
+    WhenScenarioCalibrationIsLaunchedAsOwner: () => ({
       WithRange: async () =>
         await request(app.getHttpServer())
           .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-          .set('Authorization', `Bearer ${token}`)
+          .set('Authorization', `Bearer ${ownerToken}`)
           .send({
             range: updatedRange,
-          })
-          .expect(HttpStatus.CREATED),
+          }),
       WithoutRange: async () =>
         await request(app.getHttpServer())
           .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-          .set('Authorization', `Bearer ${token}`)
-          .expect(HttpStatus.CREATED),
+          .set('Authorization', `Bearer ${ownerToken}`),
     }),
-    ThenWhenReadingProjectCalibrationItHasTheNewRange: async () => {
-      const projectData = await request(app.getHttpServer())
+    WhenScenarioCalibrationIsLaunchedAsContributor: () => ({
+      WithRange: async () =>
+        await request(app.getHttpServer())
+          .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+          .set('Authorization', `Bearer ${contributorToken}`)
+          .send({
+            range: updatedRange,
+          }),
+      WithoutRange: async () =>
+        await request(app.getHttpServer())
+          .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+          .set('Authorization', `Bearer ${contributorToken}`),
+    }),
+    WhenScenarioCalibrationIsLaunchedAsViewer: () => ({
+      WithRange: async () =>
+        await request(app.getHttpServer())
+          .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+          .set('Authorization', `Bearer ${viewerToken}`)
+          .send({
+            range: updatedRange,
+          }),
+      WithoutRange: async () =>
+        await request(app.getHttpServer())
+          .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+          .set('Authorization', `Bearer ${viewerToken}`),
+    }),
+    WhenReadingProjectCalibrationAsOwner: async () =>
+      await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/calibration`)
-        .set('Authorization', `Bearer ${token}`);
-
-      expect(projectData.body.range).toEqual(updatedRange);
-    },
-    ThenShouldFailWhenStartingAScenarioCalibrationWithA: () => {
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenReadingProjectCalibrationAsContributor: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/calibration`)
+        .set('Authorization', `Bearer ${contributorToken}`),
+    WhenReadingProjectCalibrationAsViewer: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/calibration`)
+        .set('Authorization', `Bearer ${viewerToken}`),
+    WhenStartingAnScenarioCalibrationAsOwnerWithA: () => {
       return {
-        RangeWithNegativeNumbers: async () => {
-          const response = await request(app.getHttpServer())
+        RangeWithNegativeNumbers: async () =>
+          await request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [-1, -50],
-            });
-          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-        },
-        RangeWithAMinGreaterThanMax: async () => {
-          const response = await request(app.getHttpServer())
+            }),
+        RangeWithAMinGreaterThanMax: async () =>
+          await request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [50, 1],
-            });
-          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-        },
-        RangeWithValuesThatAreNotNumbers: async () => {
-          const response = await request(app.getHttpServer())
+            }),
+        RangeWithValuesThatAreNotNumbers: async () =>
+          await request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [1, '50'],
-            });
-
-          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-        },
+            }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
-          const response = await request(app.getHttpServer())
+          return request(app.getHttpServer())
             .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [1, 50],
             });
-
-          expect(response.status).toBe(HttpStatus.BAD_REQUEST);
         },
       };
+    },
+    WhenStartingAnScenarioCalibrationAsContributorWithA: () => {
+      return {
+        RangeWithNegativeNumbers: async () =>
+          await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${contributorToken}`)
+            .send({
+              range: [-1, -50],
+            }),
+        RangeWithAMinGreaterThanMax: async () =>
+          await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${contributorToken}`)
+            .send({
+              range: [50, 1],
+            }),
+        RangeWithValuesThatAreNotNumbers: async () =>
+          await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${contributorToken}`)
+            .send({
+              range: [1, '50'],
+            }),
+        RunningExport: async () => {
+          projectChecker.addPendingExportForProject(projectId);
+          return request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${contributorToken}`)
+            .send({
+              range: [1, 50],
+            });
+        },
+      };
+    },
+    WhenStartingAnScenarioCalibrationAsViewerWithA: () => {
+      return {
+        RangeWithNegativeNumbers: async () =>
+          await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${viewerToken}`)
+            .send({
+              range: [-1, -50],
+            }),
+        RangeWithAMinGreaterThanMax: async () =>
+          await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${viewerToken}`)
+            .send({
+              range: [50, 1],
+            }),
+        RangeWithValuesThatAreNotNumbers: async () =>
+          await request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${viewerToken}`)
+            .send({
+              range: [1, '50'],
+            }),
+        RunningExport: async () => {
+          projectChecker.addPendingExportForProject(projectId);
+          return request(app.getHttpServer())
+            .post(`/api/v1/scenarios/${scenarioId}/calibration`)
+            .set('Authorization', `Bearer ${viewerToken}`)
+            .send({
+              range: [1, 50],
+            });
+        },
+      };
+    },
+    ThenScenarioCalibrationIsCreated: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.CREATED);
+    },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.FORBIDDEN);
+    },
+    ThenBadRequestIsReturned: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    },
+    ThenItHasNoUpdatedRange: (response: request.Response) => {
+      expect(response.body.range).toEqual(defaultRange);
     },
   };
 };

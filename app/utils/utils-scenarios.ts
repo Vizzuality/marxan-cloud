@@ -50,10 +50,10 @@ export const mergeScenarioStatusMetaData = (
     ...obj,
     scenarioEditingMetadata: {
       ...scenarioEditingMetadata,
-      ...saveStatus && {
-        status: {
-          ...scenarioEditingMetadata.status,
-          [tab]: 'draft',
+      status: {
+        ...scenarioEditingMetadata.status,
+        [tab]: scenarioEditingMetadata.status[tab] === 'empty' ? 'draft' : scenarioEditingMetadata.status[tab],
+        ...saveStatus && {
           ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
             return {
               ...acc,

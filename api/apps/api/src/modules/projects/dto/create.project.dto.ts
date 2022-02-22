@@ -10,7 +10,7 @@ import {
   IsUUID,
   Length,
 } from 'class-validator';
-import { PlanningUnitGridShape } from '../project.api.entity';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 /**
  * @todo We have this dto partially duplicated in the geoprocessing service

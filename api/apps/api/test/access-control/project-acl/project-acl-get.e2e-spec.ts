@@ -57,3 +57,14 @@ test(`getting project users as owner with a wrong search query`, async () => {
   );
   fixtures.ThenNoUserInformationIsReturned(response);
 });
+
+test(`getting project users should only show those who are not deleted`, async () => {
+  const projectId = await fixtures.GivenProjectWasCreated();
+  await fixtures.GivenContributorWasAddedToProject(projectId);
+  await fixtures.GivenUserWasAddedToProject(projectId);
+  let response = await fixtures.WhenGettingProjectUsersAsOwner(projectId);
+  fixtures.ThenAllUsersBeforeDeletingAnyFromAppAreReturned(response);
+  await fixtures.GivenUserIsDeleted();
+  response = await fixtures.WhenGettingProjectUsersAsOwner(projectId);
+  fixtures.ThenAllUsersExceptDeletedAreReturned(response);
+});

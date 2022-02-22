@@ -292,7 +292,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             </div>
           </div>
 
-          {!hasScenarios && !search && !hasFilters && !scenariosLoading && (
+          {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (
             <motion.div
               key="project-scenarios-empty"
               initial={{ y: -10, opacity: 0 }}

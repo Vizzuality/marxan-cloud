@@ -57,3 +57,14 @@ test(`getting scenario users as owner with a wrong search query`, async () => {
   );
   fixtures.ThenNoUserInformationIsReturned(response);
 });
+
+test(`getting scenario users should only show those who are not deleted`, async () => {
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+  await fixtures.GivenContributorWasAddedToScenario(scenarioId);
+  await fixtures.GivenUserWasAddedToScenario(scenarioId);
+  let response = await fixtures.WhenGettingScenarioUsersAsOwner(scenarioId);
+  fixtures.ThenAllUsersBeforeDeletingAnyFromAppAreReturned(response);
+  await fixtures.GivenUserIsDeleted();
+  response = await fixtures.WhenGettingScenarioUsersAsOwner(scenarioId);
+  fixtures.ThenAllUsersExceptDeletedAreReturned(response);
+});

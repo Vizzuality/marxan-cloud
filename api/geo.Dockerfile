@@ -1,14 +1,11 @@
-FROM node:14.15.5-alpine3.13
+FROM node:14.18-alpine3.15
 LABEL maintainer="hello@vizzuality.com"
-
-ARG UID
-ARG GID
 
 ENV NAME marxan-geoprocessing
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
 
-RUN addgroup -g $GID $USER && adduser -u $UID -D -G $USER $USER
+RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 
 WORKDIR $APP_HOME
 RUN chown $USER:$USER $APP_HOME
@@ -25,10 +22,8 @@ COPY --chown=$USER:$USER libs ./libs
 
 RUN mkdir -p ./test/integration/protected-areas/steps/new-shape-name
 RUN chown $USER ./test/integration/protected-areas/steps/new-shape-name
-RUN chown $UID ./test/integration/protected-areas/steps/new-shape-name
 
 RUN chown -R $USER:$USER ./test/integration
-RUN chown -R $UID:$UID ./test/integration
 
 RUN mkdir -p ./test/integration/protected-areas/steps/test_multiple_features_v2
 

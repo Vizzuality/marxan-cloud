@@ -12,21 +12,35 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { Either, isRight, left, right } from 'fp-ts/lib/Either';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { assertDefined } from '@marxan/utils';
 import {
   forbiddenError,
-  transactionFailed,
   lastOwner,
   queryFailed,
+  transactionFailed,
 } from '@marxan-api/modules/access-control';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
+import {
+  AcquireFailure,
+  lockedByAnotherUser,
+  LockService,
+  noLockInPlace,
+} from './locks/lock.service';
+import {
+  ScenarioLockDto,
+  ScenarioLockResultSingular,
+} from './locks/dto/scenario.lock.dto';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
   private readonly canCreateScenarioRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
+  private readonly canReleaseLockRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
   ];
@@ -40,12 +54,16 @@ export class ScenarioAclService implements ScenarioAccessControl {
     ScenarioRoles.scenario_owner,
   ];
   private readonly canDeleteScenarioRoles = [ScenarioRoles.scenario_owner];
+  private readonly canCloneScenarioRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
 
   private async getRolesWithinScenarioForUser(
     userId: string,
     scenarioId: string,
   ): Promise<Array<ScenarioRoles>> {
-    const rolesToCheck = (
+    return (
       await this.roles.find({
         where: {
           scenarioId,
@@ -54,14 +72,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
         select: ['roleName'],
       })
     ).flatMap((role) => role.roleName);
-    return rolesToCheck;
   }
 
   private async getRolesWithinProjectForUser(
     userId: string,
     projectId: string,
   ): Promise<Array<ProjectRoles>> {
-    const rolesToCheck = (
+    return (
       await this.projectRoles.find({
         where: {
           projectId,
@@ -70,7 +87,6 @@ export class ScenarioAclService implements ScenarioAccessControl {
         select: ['roleName'],
       })
     ).flatMap((role) => role.roleName);
-    return rolesToCheck;
   }
 
   private async doesUserHaveRole(
@@ -92,6 +108,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     private readonly roles: Repository<UsersScenariosApiEntity>,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly projectRoles: Repository<UsersProjectsApiEntity>,
+    private readonly lockService: LockService,
   ) {}
 
   async canCreateScenario(userId: string, projectId: string): Promise<Permit> {
@@ -122,6 +139,20 @@ export class ScenarioAclService implements ScenarioAccessControl {
     );
   }
 
+  async canCloneScenario(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRoleInProject(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canCloneScenarioRoles,
+    );
+  }
+
+  async canReleaseLock(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRoleInProject(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canReleaseLockRoles,
+    );
+  }
+
   async isOwner(userId: string, scenarioId: string): Promise<Permit> {
     const userIsScenarioOwner = await this.roles.findOne({
       where: {
@@ -137,14 +168,115 @@ export class ScenarioAclService implements ScenarioAccessControl {
   }
 
   async hasOtherOwner(userId: string, scenarioId: string): Promise<Permit> {
-    const otherOwnersInScenario = await this.roles.count({
-      where: {
+    const query = this.roles
+      .createQueryBuilder('users_scenarios')
+      .leftJoin('users_scenarios.user', 'userId')
+      .where({
         scenarioId,
         roleName: ScenarioRoles.scenario_owner,
         userId: Not(userId),
-      },
-    });
+      })
+      .andWhere('userId.isDeleted is false');
+
+    const otherOwnersInScenario = await query.getCount();
+
     return otherOwnersInScenario >= 1;
+  }
+
+  async acquireLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<Either<typeof forbiddenError | AcquireFailure, ScenarioLockDto>> {
+    if (!(await this.canEditScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return await this.lockService.acquireLock(scenarioId, userId);
+  }
+
+  async releaseLock(
+    userId: string,
+    scenarioId: string,
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError | typeof lockedByAnotherUser, void>> {
+    /*
+     * Using named variables instead of direct usage of functions
+     * for clarity when understanding the steps to release a lock
+     */
+    const canReleaseLockFromProjectLevel = await this.canReleaseLock(
+      userId,
+      projectId,
+    );
+    const canEditScenario = await this.canEditScenario(userId, scenarioId);
+    const scenarioIsLockedByCurrentUser = await this.lockService.isLockedByUser(
+      scenarioId,
+      userId,
+    );
+    if (!canEditScenario && !canReleaseLockFromProjectLevel) {
+      return left(forbiddenError);
+    }
+    if (
+      !canReleaseLockFromProjectLevel &&
+      canEditScenario &&
+      !scenarioIsLockedByCurrentUser
+    ) {
+      return left(lockedByAnotherUser);
+    }
+    await this.lockService.releaseLock(scenarioId);
+
+    return right(void 0);
+  }
+
+  async canEditScenarioAndOwnsLock(
+    userId: string,
+    scenarioId: string,
+    isDeletion?: boolean,
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      boolean
+    >
+  > {
+    const scenarioIsAlreadyLocked = await this.lockService.isLocked(scenarioId);
+    const canProcessActionInScenario = isDeletion
+      ? await this.canDeleteScenario(userId, scenarioId)
+      : await this.canEditScenario(userId, scenarioId);
+    // LOFU (lock on first use): if scenario is not locked (maybe it's new and it
+    // was never locked, or any previous locks have expired or have been
+    // explicitly released), the current user can attempt to acquire a lock
+    // transparently.
+    const scenarioIsLocked =
+      canProcessActionInScenario && !scenarioIsAlreadyLocked
+        ? isRight(await this.acquireLock(userId, scenarioId))
+        : scenarioIsAlreadyLocked;
+
+    const scenarioIsLockedByCurrentUser = await this.lockService.isLockedByUser(
+      scenarioId,
+      userId,
+    );
+    if (!canProcessActionInScenario) {
+      return left(forbiddenError);
+    }
+    if (!scenarioIsLocked) {
+      return left(noLockInPlace);
+    }
+    if (!scenarioIsLockedByCurrentUser) {
+      return left(lockedByAnotherUser);
+    }
+    return right(
+      scenarioIsLocked &&
+        canProcessActionInScenario &&
+        scenarioIsLockedByCurrentUser,
+    );
+  }
+
+  async findLock(
+    userId: string,
+    scenarioId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultSingular>> {
+    if (!(await this.canViewScenario(userId, scenarioId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.lockService.getLock(scenarioId));
   }
 
   async findUsersInScenario(
@@ -162,6 +294,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
       .where({
         scenarioId,
       })
+      .andWhere('userId.isDeleted is false')
       .select([
         'users_scenarios.roleName',
         'userId.displayName',
@@ -210,16 +343,25 @@ export class ScenarioAclService implements ScenarioAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInScenario = await apiQueryRunner.manager.findOne(
-        UsersScenariosApiEntity,
-        undefined,
-        {
-          where: {
-            scenarioId,
-            userId,
-          },
-        },
-      );
+      const existingUserInScenario = await apiQueryRunner.manager
+        .createQueryBuilder(UsersScenariosApiEntity, 'users_scenarios')
+        .where({
+          scenarioId,
+          userId,
+        })
+        .leftJoinAndSelect('users_scenarios.user', 'userId')
+        .select(['users_scenarios.roleName', 'userId.isDeleted'])
+        .getOne();
+
+      /**
+       * If a role was already granted to the user, but the user is marked
+       * as deleted, we don't want to touch their existing role: we consider it,
+       * for the time being, as an archived fact, kept untouched.
+       */
+
+      if (existingUserInScenario?.user?.isDeleted) {
+        return left(transactionFailed);
+      }
 
       if (!existingUserInScenario) {
         const userRoleToSave = new UsersScenariosApiEntity();

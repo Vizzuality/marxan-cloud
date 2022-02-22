@@ -3,6 +3,8 @@ import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../../steps/given-project';
 import { GivenUserExists } from '../../steps/given-user-exists';
+import { GivenUserIsCreated } from '../../steps/given-user-is-created';
+import { GivenUserIsDeleted } from '../../steps/given-user-is-deleted';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -30,6 +32,8 @@ export const getFixtures = async () => {
   );
   const nonExistentUserId = v4();
   const cleanups: (() => Promise<void>)[] = [];
+
+  const randomUserInfo = await GivenUserIsCreated(app);
 
   return {
     cleanup: async () => {
@@ -98,6 +102,17 @@ export const getFixtures = async () => {
         userId: otherOwnerUserId,
       });
       return userCreated;
+    },
+
+    GivenUserWasAddedToProject: async (projectId: string) => {
+      await userProjectsRepo.save({
+        projectId,
+        userId: randomUserInfo.user.id,
+        roleName: projectOwnerRole,
+      });
+    },
+    GivenUserIsDeleted: async () => {
+      await GivenUserIsDeleted(app, randomUserInfo.accessToken);
     },
 
     WhenGettingProjectUsersAsNotInProject: async (projectId: string) =>
@@ -221,6 +236,15 @@ export const getFixtures = async () => {
           userId: viewerUserId,
           roleName: projectContributorRole,
         }),
+    WhenChangingUserRoleForDeletedUser: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerUserToken}`)
+        .send({
+          projectId,
+          userId: randomUserInfo.user.id,
+          roleName: projectContributorRole,
+        }),
     WhenAddingIncorrectUserRole: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
@@ -314,10 +338,16 @@ export const getFixtures = async () => {
       expect(error?.message[0]).toEqual('roleName must be a valid enum value');
     },
 
-    ThenQueryFailedReturned: (response: request.Response) => {
+    ThenQueryFailedIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(`Error while adding record to the database`);
+      expect(error.title).toEqual(`Error while adding record to the database.`);
+    },
+
+    ThenTransactionFailedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(500);
+      const error: any = response.body.errors[0];
+      expect(error.title).toEqual(`Transaction failed.`);
     },
 
     ThenNoContentIsReturned: (response: request.Response) => {
@@ -341,7 +371,7 @@ export const getFixtures = async () => {
       expect(response.body.data).toHaveLength(0);
     },
 
-    ThenAllUsersinProjectAfterAddingAnOwnerAreReturned: (
+    ThenAllUsersInProjectAfterAddingAnOwnerAreReturned: (
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
@@ -382,7 +412,7 @@ export const getFixtures = async () => {
       ]);
     },
 
-    ThenAllUsersinProjectAfterEveryTypeOfUserHasBeenAddedAreReturned: (
+    ThenAllUsersInProjectAfterEveryTypeOfUserHasBeenAddedAreReturned: (
       response: request.Response,
     ) => {
       expect(response.status).toEqual(200);
@@ -437,6 +467,36 @@ export const getFixtures = async () => {
       );
       expect(firstUser.roleName).toEqual(projectOwnerRole);
       expect(secondUser.roleName).toEqual(projectOwnerRole);
+    },
+    ThenAllUsersBeforeDeletingAnyFromAppAreReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(3);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === randomUserInfo.user.id,
+      );
+      const thirdUser = response.body.data.find(
+        (user: any) => user.user.id === contributorUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectOwnerRole);
+      expect(secondUser.roleName).toEqual(projectOwnerRole);
+      expect(thirdUser.roleName).toEqual(projectContributorRole);
+    },
+    ThenAllUsersExceptDeletedAreReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const firstUser = response.body.data.find(
+        (user: any) => user.user.id === ownerUserId,
+      );
+      const secondUser = response.body.data.find(
+        (user: any) => user.user.id === contributorUserId,
+      );
+      expect(firstUser.roleName).toEqual(projectOwnerRole);
+      expect(secondUser.roleName).toEqual(projectContributorRole);
     },
   };
 };

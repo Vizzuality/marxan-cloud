@@ -3,12 +3,12 @@ import { FileRepositoryModule } from '@marxan/files-repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
-import { ProjectMetadata } from './project-metadata';
-import { ProjectConfig } from './project-config';
-import { PlanningAreaGadm } from './planning-area-gadm';
-import { PlanningAreaCustomGrid } from './planning-area-custom-grid';
-import { PlanningAreaCustom } from './planning-area-custom';
-import { ScenarioMetadata } from './scenario-metadata';
+import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
+import { ExportConfigPieceExporter } from './export-config.piece-exporter';
+import { PlanningAreaGadmPieceExporter } from './planning-area-gadm.piece-exporter';
+import { PlanningAreaCustomGridPieceExporter } from './planning-area-custom-grid.piece-exporter';
+import { PlanningAreaCustomPieceExporter } from './planning-area-custom.piece-exporter';
+import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
 
 @Module({
   imports: [
@@ -16,12 +16,12 @@ import { ScenarioMetadata } from './scenario-metadata';
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
   ],
   providers: [
-    ProjectMetadata,
-    ProjectConfig,
-    PlanningAreaGadm,
-    PlanningAreaCustom,
-    PlanningAreaCustomGrid,
-    ScenarioMetadata,
+    ProjectMetadataPieceExporter,
+    ExportConfigPieceExporter,
+    PlanningAreaGadmPieceExporter,
+    PlanningAreaCustomPieceExporter,
+    PlanningAreaCustomGridPieceExporter,
+    ScenarioMetadataPieceExporter,
   ],
 })
 export class PiecesExportersModule {}

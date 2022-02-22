@@ -12,11 +12,29 @@ describe('get-scenario-blm-calibration-results', () => {
     await fixtures?.cleanup();
   });
 
-  it(`retrieves blm calibration results via API`, async () => {
+  it(`retrieves blm calibration results via API as owner`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
-    await fixtures.WhenBlmCalibrationIsLaunched();
+    await fixtures.WhenBlmCalibrationIsLaunchedAsOwner();
 
     await fixtures.ThenCalibrationResultsShouldBeAvailable();
   }, 100000);
+
+  it(`retrieves blm calibration results as contributor`, async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario();
+
+    await fixtures.WhenContributorLaunchesCalibration();
+
+    await fixtures.ThenCalibrationResultsShouldBeAvailable();
+  }, 100000);
+
+  it(`retrieves blm calibration results as viewer`, async () => {
+    await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenViewerWasAddedToScenario();
+
+    const response = await fixtures.WhenViewerLaunchesCalibration();
+
+    await fixtures.ThenForbiddenIsReturned(response);
+  });
 });

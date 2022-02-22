@@ -14,6 +14,9 @@
     "storybook:dev": "yarn storybook:styles:dev && start-storybook -p 6006 -s ./public -c .storybook",
     "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook"
   },
+  "engines": {
+    "node": "~14.18"
+  },
   "dependencies": {
     "@artsy/fresnel": "^1.9.0",
     "@dnd-kit/core": "^3.0.3",
@@ -41,6 +44,7 @@
     "@reduxjs/toolkit": "^1.5.0",
     "@storybook/react": "^6.2.9",
     "@tailwindcss/custom-forms": "^0.2.1",
+    "@tanem/react-nprogress": "^4.0.8",
     "@tippyjs/react": "^4.2.0",
     "@turf/area": "^6.3.0",
     "@vizzuality/layer-manager-plugin-mapboxgl": "^1.0.0-alpha.3",
@@ -68,6 +72,7 @@
     "next-connect": "^0.9.1",
     "next-optimized-images": "^2.6.2",
     "next-plausible": "^2.0.0",
+    "nprogress": "^0.2.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "popmotion": "9.3.1",

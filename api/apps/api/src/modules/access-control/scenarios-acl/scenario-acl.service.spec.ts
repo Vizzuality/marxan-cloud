@@ -1,6 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
@@ -10,6 +9,9 @@ import { ScenarioAclService } from '@marxan-api/modules/access-control/scenarios
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '../projects-acl/dto/user-role-project.dto';
+import { LockService } from './locks/lock.service';
+import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
+import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -59,9 +61,6 @@ test(`project viewer role assigned`, async () => {
 });
 
 const getFixtures = async () => {
-  let userScenariosRepoMock: jest.Mocked<Repository<UsersScenariosApiEntity>>;
-  let userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>>;
-
   const userScenariosToken = getRepositoryToken(UsersScenariosApiEntity);
   const userProjectsToken = getRepositoryToken(UsersProjectsApiEntity);
 
@@ -87,13 +86,28 @@ const getFixtures = async () => {
           findOne: jest.fn(),
         },
       },
+      {
+        provide: getRepositoryToken(ScenarioLockEntity),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+        },
+      },
+      {
+        provide: getRepositoryToken(IssuedAuthnToken),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+        },
+      },
+      LockService,
     ],
   }).compile();
 
   const sut = sandbox.get(ScenarioAclService);
 
-  userScenariosRepoMock = sandbox.get(userScenariosToken);
-  userProjectsRepoMock = sandbox.get(userProjectsToken);
+  const userScenariosRepoMock = sandbox.get(userScenariosToken);
+  const userProjectsRepoMock = sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>

@@ -3,7 +3,7 @@ import { assertDefined, isDefined } from '@marxan/utils';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommandBus } from '@nestjs/cqrs';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { PlanningUnitGridShape, Project } from './project.api.entity';
+import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
 import { UsersService } from '@marxan-api/modules/users/users.service';
@@ -31,6 +31,7 @@ import { ProjectsRequest } from './project-requests-info';
 import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 const projectFilterKeyNames = [
   'name',
@@ -145,7 +146,7 @@ export class ProjectsCrudService extends AppBaseService<
     const project = await super.setDataCreate(create, info);
     project.createdBy = info.authenticatedUser?.id;
 
-    if (project.planningUnitGridShape === PlanningUnitGridShape.fromShapefile) {
+    if (project.planningUnitGridShape === PlanningUnitGridShape.FromShapefile) {
       // isProjectUsingCustomPlanningUnitGrid requires planningUnitAreakm2
       // to be empty
       project.planningUnitAreakm2 = undefined;
@@ -181,7 +182,7 @@ export class ProjectsCrudService extends AppBaseService<
   ): Promise<void> {
     if (
       createModel?.planningUnitGridShape ===
-        PlanningUnitGridShape.fromShapefile &&
+        PlanningUnitGridShape.FromShapefile &&
       createModel.planningAreaId
     ) {
       await this.commandBus.execute(
@@ -227,7 +228,7 @@ export class ProjectsCrudService extends AppBaseService<
   ): Promise<void> {
     if (
       createModel?.planningUnitGridShape ===
-        PlanningUnitGridShape.fromShapefile &&
+        PlanningUnitGridShape.FromShapefile &&
       createModel.planningAreaId
     ) {
       await this.commandBus.execute(

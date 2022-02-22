@@ -179,7 +179,7 @@ module.exports = {
       spin: 'spin 1s linear infinite',
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      bounce: 'bounce 1s infinite',
+      bounce: 'bounce 0.75s infinite',
       banner: 'banner 6s cubic-bezier(0, 0, 0.2, 1) infinite',
     },
     backgroundColor: (theme) => theme('colors'),
@@ -887,6 +887,8 @@ module.exports = {
       30: '30',
       40: '40',
       50: '50',
+      60: '60',
+      70: '70',
     },
     lineClamp: {
       1: 1,

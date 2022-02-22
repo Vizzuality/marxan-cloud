@@ -1,6 +1,6 @@
 import { IEvent } from '@nestjs/cqrs';
+import { ImportId } from '../import/import.id';
 
-/**
- * emitted as an end-step by aggregate once all pieces were imported
- */
-export class AllPiecesImported implements IEvent {}
+export class AllPiecesImported implements IEvent {
+  constructor(public readonly importId: ImportId) {}
+}

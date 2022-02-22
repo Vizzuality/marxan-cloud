@@ -70,6 +70,10 @@ describe('ProxyVectorTilesModule (e2e)', () => {
         organizationId: anOrganization.id,
       },
     ).then(async (response) => await Deserializer.deserialize(response));
+    await ProjectsTestUtils.generateBlmValues(
+      app,
+      aProjectWithCountryAsPlanningArea.id,
+    );
 
     aFeature = await FeaturesTestUtils.getFeature(
       app,

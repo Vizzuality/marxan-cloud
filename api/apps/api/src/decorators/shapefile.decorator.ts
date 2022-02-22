@@ -8,7 +8,7 @@ import {
   ApiResponseMetadata,
 } from '@nestjs/swagger';
 
-import { ShapefileGeoJSONResponseDTO } from '@marxan-api/modules/scenarios/dto/shapefile.geojson.response.dto';
+import { GeoJsonDataDTO } from '@marxan-api/modules/scenarios/dto/shapefile.geojson.response.dto';
 
 export function ApiConsumesShapefile(
   options: {
@@ -19,7 +19,7 @@ export function ApiConsumesShapefile(
 ) {
   options = Object.assign({}, options, {
     withGeoJsonResponse: true,
-    type: ShapefileGeoJSONResponseDTO,
+    type: GeoJsonDataDTO,
     description: 'Upload Zip file containing .shp, .dbj, .prj and .shx files',
   });
   return applyDecorators(

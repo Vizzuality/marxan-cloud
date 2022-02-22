@@ -1,4 +1,4 @@
-import { ClonePiece, ComponentId } from '@marxan/cloning/domain';
+import { ClonePiece } from '@marxan/cloning/domain';
 import {
   Column,
   Entity,
@@ -8,7 +8,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { ExportComponentSnapshot } from '../../domain';
-import { ComponentLocationEntity } from './component-locations.api.entity';
+import { ExportComponentLocationEntity } from './export-component-locations.api.entity';
 import { ExportEntity } from './exports.api.entity';
 
 @Entity('export_components')
@@ -42,21 +42,21 @@ export class ExportComponentEntity {
   @ManyToOne(() => ExportEntity, (exportInstance) => exportInstance.components)
   export!: ExportEntity;
 
-  @OneToMany(() => ComponentLocationEntity, (uri) => uri.component, {
+  @OneToMany(() => ExportComponentLocationEntity, (uri) => uri.component, {
     cascade: true,
   })
-  uris!: ComponentLocationEntity[];
+  uris!: ExportComponentLocationEntity[];
 
   static fromSnapshot(
     componentSnapshot: ExportComponentSnapshot,
   ): ExportComponentEntity {
     const exportComponentEntity = new ExportComponentEntity();
-    exportComponentEntity.id = componentSnapshot.id.value;
+    exportComponentEntity.id = componentSnapshot.id;
     exportComponentEntity.piece = componentSnapshot.piece;
     exportComponentEntity.resourceId = componentSnapshot.resourceId;
     exportComponentEntity.finished = componentSnapshot.finished;
     exportComponentEntity.uris = componentSnapshot.uris.map(
-      ComponentLocationEntity.fromSnapshot,
+      ExportComponentLocationEntity.fromSnapshot,
     );
 
     return exportComponentEntity;
@@ -64,7 +64,7 @@ export class ExportComponentEntity {
 
   toSnapshot(): ExportComponentSnapshot {
     return {
-      id: new ComponentId(this.id),
+      id: this.id,
       finished: this.finished,
       piece: this.piece,
       resourceId: this.resourceId,

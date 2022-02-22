@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := seed-data
 
 
-seed-data: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion
+seed-data: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion seed-ecosystems
 seed-gadm:
 	@echo "Starting seeding gadm data... "
 	@time $(MAKE) -C ./gadm_3.6 import

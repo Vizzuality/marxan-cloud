@@ -5,15 +5,10 @@ services:
     build:
       context: ./api
       dockerfile: api.Dockerfile
-      args:
-        UID: 5000
-        GID: 5000
-        UPLOADS_TEMP_DIR: "/tmp/storage"
     ports:
       - "${API_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-api
     command: develop
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
@@ -42,14 +37,10 @@ services:
     build:
       context: ./api
       dockerfile: geo.Dockerfile
-      args:
-        UID: 5000
-        GID: 5000
     ports:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
     container_name: marxan-test-e2e-geoprocessing
     command: develop
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs

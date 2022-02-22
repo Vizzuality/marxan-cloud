@@ -155,7 +155,7 @@
         "libs/files-repository/src"
       ],
       "@marxan/files-repository/*": [
-        "libs/files-repositoryd/src/*"
+        "libs/files-repository/src/*"
       ],
       "@marxan/cloning": [
         "libs/cloning/src"

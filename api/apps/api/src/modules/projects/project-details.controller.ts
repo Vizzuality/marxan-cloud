@@ -22,7 +22,7 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 
 import { projectResource, ProjectResultSingular } from './project.api.entity';
-import { notFound, ProjectsService } from './projects.service';
+import { projectNotFound, ProjectsService } from './projects.service';
 import { ProjectSerializer } from './dto/project.serializer';
 import { isLeft } from 'fp-ts/lib/Either';
 import { forbiddenError } from '../access-control';
@@ -53,7 +53,7 @@ export class ProjectDetailsController {
       switch (result.left) {
         case forbiddenError:
           throw new ForbiddenException();
-        case notFound:
+        case projectNotFound:
           throw new NotFoundException(`Project ${id} could not be found`);
         default:
           const _exhaustiveCheck: never = result.left;
