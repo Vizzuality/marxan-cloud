@@ -16,6 +16,7 @@ export enum FeatureTags {
 
 export interface GeoFeatureMetadata {
   name: string;
+  fileName: string;
   type: FeatureTags;
   description?: string;
   intersectWith?: string;

@@ -1,10 +1,16 @@
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
-import { DeleteResult, Repository } from 'typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { isNil } from 'lodash';
+import { DeleteResult, Repository } from 'typeorm';
 import { FindOperator } from 'typeorm/find-options/FindOperator';
-
+import { AppInfoDTO } from '../../dto/info.dto';
+import {
+  AppBaseService,
+  JSONAPISerializerConfig,
+} from '../../utils/app-base.service';
+import { AppConfig } from '../../utils/config.utils';
 import {
   ApiEvent,
   apiEventResource,
@@ -14,16 +20,8 @@ import {
   ApiEventByTopicAndKind,
   LatestApiEventByTopicAndKind,
 } from './api-event.topic+kind.api.entity';
-
-import { isNil } from 'lodash';
-import {
-  AppBaseService,
-  JSONAPISerializerConfig,
-} from '../../utils/app-base.service';
 import { CreateApiEventDTO } from './dto/create.api-event.dto';
 import { UpdateApiEventDTO } from './dto/update.api-event.dto';
-import { AppInfoDTO } from '../../dto/info.dto';
-import { AppConfig } from '../../utils/config.utils';
 
 export interface QualifiedEventTopicSearch
   extends Omit<QualifiedEventTopic, 'kind'> {
@@ -57,6 +55,10 @@ export class ApiEventsService extends AppBaseService<
       attributes: ['timestamp', 'topic', 'kind', 'data'],
       keyForAttribute: 'camelCase',
     };
+  }
+
+  static composeExternalId(id: string, kind: API_EVENT_KINDS): string {
+    return `${id}/${kind}`;
   }
 
   /**

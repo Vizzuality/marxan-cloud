@@ -1,10 +1,16 @@
-import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common';
+import {
+  DynamicModule,
+  Logger,
+  Module,
+  ModuleMetadata,
+  Scope,
+} from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-
-import { ExportProjectHandler } from './export-project.handler';
-import { CompletePieceHandler } from './complete-piece.handler';
-import { FinalizeArchiveHandler } from './finalize-archive.handler';
 import { AllPiecesReadySaga } from './all-pieces-ready.saga';
+import { CompleteExportPieceHandler } from './complete-export-piece.handler';
+import { ExportProjectHandler } from './export-project.handler';
+import { ExportScenarioHandler } from './export-scenario.handler';
+import { FinalizeArchiveHandler } from './finalize-archive.handler';
 import { GetArchiveHandler } from './get-archive.handler';
 
 @Module({})
@@ -18,9 +24,15 @@ export class ExportApplicationModule {
         AllPiecesReadySaga,
         // use cases
         ExportProjectHandler,
-        CompletePieceHandler,
+        ExportScenarioHandler,
+        CompleteExportPieceHandler,
         FinalizeArchiveHandler,
         GetArchiveHandler,
+        {
+          provide: Logger,
+          useClass: Logger,
+          scope: Scope.TRANSIENT,
+        },
       ],
       exports: [],
     };

@@ -25,6 +25,8 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
+      projectChecker.clear();
+
       await ProjectsTestUtils.deleteProject(app, token, projectId);
       await OrganizationsTestUtils.deleteOrganization(
         app,

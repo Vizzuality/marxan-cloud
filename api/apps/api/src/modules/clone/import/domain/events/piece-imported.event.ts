@@ -1,10 +1,10 @@
 import { IEvent } from '@nestjs/cqrs';
-import { ComponentId, ClonePiece, ResourceId } from '@marxan/cloning/domain';
+import { ComponentId } from '@marxan/cloning/domain';
+import { ImportId } from '../import/import.id';
 
 export class PieceImported implements IEvent {
   constructor(
-    public readonly id: ComponentId,
-    public readonly piece: ClonePiece,
-    public readonly resourceId: ResourceId,
+    public readonly importId: ImportId,
+    public readonly componentId: ComponentId,
   ) {}
 }

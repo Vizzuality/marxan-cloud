@@ -2,8 +2,9 @@ import { PlanningUnitCost } from '../../ports/planning-unit-cost';
 
 export const getCostByPlanningUnit = (
   planningUnitsIds: string[],
+  expectedCost?: number,
 ): PlanningUnitCost[] =>
   planningUnitsIds.map((pu) => ({
-    cost: 200,
+    cost: expectedCost ?? 200,
     puid: pu,
   }));

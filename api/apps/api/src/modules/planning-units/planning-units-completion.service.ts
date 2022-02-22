@@ -74,6 +74,6 @@ export class PlanningUnitsCompletionService
 
   private async completed(event: EventData<PlanningUnitsJob>) {
     const jobData = await event.data;
-    await this.eventBus.publish(new PlanningUnitSet(jobData.projectId));
+    this.eventBus.publish(new PlanningUnitSet(jobData.projectId));
   }
 }

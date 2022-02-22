@@ -2,17 +2,21 @@ import * as request from 'supertest';
 import { readFileSync } from 'fs';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { CommandBus, ICommand } from '@nestjs/cqrs';
 
 import { ProtectedArea } from '@marxan/protected-areas';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { IUCNCategory } from '@marxan/iucn';
+import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { CommandBus, ICommand } from '@nestjs/cqrs';
-import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
+import { GivenUserExists } from '../steps/given-user-exists';
+import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -28,8 +32,21 @@ export const getFixtures = async () => {
   const adminAreaLevel1Id = `NAM.4_1`;
   const customAreaName = `custom protected area`;
 
-  const token = await GivenUserIsLoggedIn(app);
-  const { cleanup, projectId } = await GivenProjectExists(app, token, {
+  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
+  const contributorToken = await GivenUserIsLoggedIn(app, 'bb');
+  const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
+  const userWithNoRoleToken = await GivenUserIsLoggedIn(app, 'dd');
+  const contributorUserId = await GivenUserExists(app, 'bb');
+  const viewerUserId = await GivenUserExists(app, 'cc');
+  const scenarioViewerRole = ScenarioRoles.scenario_viewer;
+  const scenarioContributorRole = ScenarioRoles.scenario_contributor;
+  let scenarioId: string;
+
+  const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
+    getRepositoryToken(UsersScenariosApiEntity),
+  );
+
+  const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
     name: `scenario-pa-${new Date().getTime()}`,
     countryCode,
     adminAreaLevel1Id,
@@ -54,15 +71,42 @@ export const getFixtures = async () => {
       await app.close();
     },
     GivenScenarioInsideNAM41WasCreated: async () => {
-      const { id } = await GivenScenarioExists(app, projectId, token);
+      const { id } = await GivenScenarioExists(app, projectId, ownerToken);
+      scenarioId = id;
       return id;
     },
-    WhenGettingProtectedAreas: async (scenarioId: string) =>
+    GivenContributorWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId,
+        roleName: scenarioContributorRole,
+        userId: contributorUserId,
+      }),
+    GivenViewerWasAddedToScenario: async () =>
+      await userScenariosRepo.save({
+        scenarioId,
+        roleName: scenarioViewerRole,
+        userId: viewerUserId,
+      }),
+    WhenGettingProtectedAreasAsOwner: async (scenarioId: string) =>
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
         .then((response) => response.body),
-    ThenInContainsRelevantWdpa: async (response: unknown) => {
+    WhenGettingProtectedAreasAsContributor: async (scenarioId: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
+        .set('Authorization', `Bearer ${contributorToken}`)
+        .then((response) => response.body),
+    WhenGettingProtectedAreasAsViewer: async (scenarioId: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
+        .set('Authorization', `Bearer ${viewerToken}`)
+        .then((response) => response.body),
+    WhenGettingProtectedAreasAsUserNotInScenario: async (scenarioId: string) =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
+        .set('Authorization', `Bearer ${userWithNoRoleToken}`),
+    ThenItContainsRelevantWdpa: async (response: unknown) => {
       expect(response).toEqual([
         {
           id: 'II',
@@ -114,7 +158,7 @@ export const getFixtures = async () => {
       return ids[0].id;
     },
     ThenItContainsSelectedCustomArea: async (
-      response: any[],
+      response: ProtectedAreaDto[],
       areaId: string,
     ) => {
       expect(response.find((e) => e.id === areaId)).toEqual({
@@ -124,7 +168,20 @@ export const getFixtures = async () => {
         selected: true,
       });
     },
-    ThenItContainsNonSelectedCustomArea: async (response: any[]) => {
+    ThenItDoesNotContainsSelectedCustomArea: async (
+      response: ProtectedAreaDto[],
+      areaId: string,
+    ) => {
+      expect(response.find((e) => e.id === areaId)).toEqual({
+        id: areaId,
+        kind: `project`,
+        name: customAreaName,
+        selected: false,
+      });
+    },
+    ThenItContainsNonSelectedCustomArea: async (
+      response: ProtectedAreaDto[],
+    ) => {
       expect(response.find((e) => e.kind === `project`)).toEqual({
         id: expect.any(String),
         kind: `project`,
@@ -132,14 +189,14 @@ export const getFixtures = async () => {
         selected: false,
       });
     },
-    GivenAreasWereSelected: async (
+    GivenAreasWereSelectedAsOwner: async (
       scenarioId: string,
       category: IUCNCategory,
       customPaId: string,
     ) =>
       request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/protected-areas`)
-        .set('Authorization', `Bearer ${token}`)
+        .set('Authorization', `Bearer ${ownerToken}`)
         .send({
           areas: [
             {
@@ -154,8 +211,51 @@ export const getFixtures = async () => {
           threshold: 50,
         })
         .then((response) => response.body),
+    GivenAreasWereSelectedAsContributor: async (
+      scenarioId: string,
+      category: IUCNCategory,
+      customPaId: string,
+    ) =>
+      request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/protected-areas`)
+        .set('Authorization', `Bearer ${contributorToken}`)
+        .send({
+          areas: [
+            {
+              id: category,
+              selected: true,
+            },
+            {
+              id: customPaId,
+              selected: true,
+            },
+          ],
+          threshold: 50,
+        })
+        .then((response) => response.body),
+    GivenAreasWereSelectedAsViewer: async (
+      scenarioId: string,
+      category: IUCNCategory,
+      customPaId: string,
+    ) =>
+      request(app.getHttpServer())
+        .post(`/api/v1/scenarios/${scenarioId}/protected-areas`)
+        .set('Authorization', `Bearer ${viewerToken}`)
+        .send({
+          areas: [
+            {
+              id: category,
+              selected: true,
+            },
+            {
+              id: customPaId,
+              selected: true,
+            },
+          ],
+          threshold: 50,
+        }),
     ThenItContainsSelectedGlobalArea: async (
-      response: any[],
+      response: ProtectedAreaDto[],
       category: IUCNCategory,
     ) => {
       expect(response.find((e) => e.id === category)).toEqual({
@@ -163,6 +263,17 @@ export const getFixtures = async () => {
         kind: `global`,
         name: category,
         selected: true,
+      });
+    },
+    ThenItDoesNotContainsSelectedGlobalArea: async (
+      response: ProtectedAreaDto[],
+      category: IUCNCategory,
+    ) => {
+      expect(response.find((e) => e.id === category)).toEqual({
+        id: category,
+        kind: `global`,
+        name: category,
+        selected: false,
       });
     },
     ThenCalculationsOfProtectionLevelWereTriggered: async (
@@ -173,6 +284,16 @@ export const getFixtures = async () => {
           (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
         ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
       ).toEqual(scenario);
+    },
+    ThenCalculationsOfProtectionLevelWereNotTriggered: async () => {
+      expect(
+        (commands.find(
+          (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
+        ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
+      ).toEqual(undefined);
+    },
+    ThenForbiddenIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(403);
     },
   };
 };

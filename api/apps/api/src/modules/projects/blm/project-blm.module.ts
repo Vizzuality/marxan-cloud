@@ -6,7 +6,7 @@ import { BlmModule } from '@marxan-api/modules/blm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 import { SetProjectBlmHandler } from './set-project-blm-handler';
-import { ChangeBlmRangeHandler } from './change-blm-range.handler';
+import { ChangeProjectBlmRangeHandler } from './change-project-blm-range.handler';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-values-policy-factory';
 import { ProjectBlmSaga } from './project-blm.saga';
@@ -20,7 +20,7 @@ import { ProjectBlmSaga } from './project-blm.saga';
   ],
   providers: [
     SetProjectBlmHandler,
-    ChangeBlmRangeHandler,
+    ChangeProjectBlmRangeHandler,
     ProjectBlmSaga,
     BlmValuesPolicyFactory,
   ],

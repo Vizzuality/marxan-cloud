@@ -68,21 +68,21 @@ export class FakeQueue implements Partial<Queue> {
     this.jobs = {};
   }
 
-  async add(
-    name: string,
-    data: any,
-    opts: JobsOptions | undefined,
-  ): Promise<Job> {
-    const job: Job = new Job(this.queueBase, name, data, opts, opts?.jobId);
-    if (!job.id) {
-      job.id = v4();
-    }
-    this.jobs[name] = job;
-    return job;
-  }
+  add = jest.fn(
+    async (name: string, data: any, opts: JobsOptions | undefined) => {
+      const job: Job = new Job(this.queueBase, name, data, opts, opts?.jobId);
+      if (!job.id) {
+        job.id = v4();
+      }
+      this.jobs[name] = job;
+      return job;
+    },
+  );
 
   close = jest.fn();
   disconnect = jest.fn();
+  getJobs = jest.fn();
+  remove = jest.fn();
 
   private keepThisInstance() {
     const newKey = new Key();

@@ -6,4 +6,5 @@ export class FakeLogger implements LoggerService {
   log = jest.fn();
   verbose = jest.fn();
   warn = jest.fn();
+  setContext = jest.fn();
 }

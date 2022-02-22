@@ -1,6 +1,7 @@
 import React from 'react';
-import { ToastContainerProps } from 'hooks/toast/types';
+
 import { PLACEMENTS } from 'hooks/toast/constants';
+import { ToastContainerProps } from 'hooks/toast/types';
 
 export const ToastContainer = ({
   placement,

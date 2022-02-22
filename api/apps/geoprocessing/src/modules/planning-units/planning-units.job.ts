@@ -5,10 +5,8 @@ import { validate } from 'class-validator';
 import { InjectConnection } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 
-import {
-  PlanningUnitsJob,
-  PlanningUnitGridShape,
-} from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry';
 
 const logger = new Logger('planning-units-job-processor');
 

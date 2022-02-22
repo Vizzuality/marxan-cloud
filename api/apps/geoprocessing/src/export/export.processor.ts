@@ -1,17 +1,17 @@
-import { JobInput, JobOutput } from '@marxan/cloning';
+import { ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { Injectable } from '@nestjs/common';
 
-import { PiecesProvider } from './pieces/pieces.provider';
+import { ExportPiecesProvider } from './pieces/export-pieces.provider';
 
 @Injectable()
 export class ExportProcessor {
-  constructor(private readonly piecesExporters: PiecesProvider) {}
+  constructor(private readonly piecesExporters: ExportPiecesProvider) {}
 
-  async run(input: JobInput): Promise<JobOutput> {
+  run(input: ExportJobInput): Promise<ExportJobOutput> {
     const provider = this.piecesExporters.getPieceProvider(input.piece);
     if (!provider) {
       throw new Error(`${input.piece} is not yet supported.`);
     }
-    return await provider.run(input);
+    return provider.run(input);
   }
 }

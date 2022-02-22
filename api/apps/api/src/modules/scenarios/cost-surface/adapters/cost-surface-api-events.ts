@@ -3,7 +3,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import {
   CostSurfaceEventsPort,
   CostSurfaceState,
-} from '../cost-surface-events.port';
+} from '../ports/cost-surface-events.port';
 import { ApiEventsService } from '../../../api-events/api-events.service';
 
 @Injectable()

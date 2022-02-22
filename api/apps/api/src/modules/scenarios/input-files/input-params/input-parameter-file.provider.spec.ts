@@ -215,6 +215,12 @@ async function getFixtures() {
         lastModifiedAt: new Date(),
         name: 'Scenario Name',
         projectId: '',
+        scenarioBlm: {
+          id: 'anId',
+          values: [],
+          defaults: [],
+          range: [0.001, 100],
+        },
         project: {
           name: 'Project Name',
           id: '',

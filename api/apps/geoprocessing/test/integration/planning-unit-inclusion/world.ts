@@ -6,16 +6,14 @@ import { Feature, MultiPolygon, Polygon } from 'geojson';
 
 import {
   LockStatus,
+  PlanningUnitGridShape,
   ScenariosPlanningUnitGeoEntity,
 } from '@marxan/scenarios-planning-unit';
 import {
   AreaUnitSampleGeometry,
   AreaUnitSampleGeometryProps,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
-import {
-  PlanningUnitsGeom,
-  ShapeType,
-} from '@marxan-jobs/planning-unit-geometry';
+import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 export type ForCase = 'singleFeature' | 'multipleFeatures';
 
@@ -195,7 +193,7 @@ const insertPuGeometryFromGeoJson = async (
       features.map((feature) => ({
         theGeom: () =>
           `st_multi(ST_GeomFromGeoJSON('${JSON.stringify(feature.geometry)}'))`,
-        type: ShapeType.Square,
+        type: PlanningUnitGridShape.Square,
       })),
     )
   ).identifiers;

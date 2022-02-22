@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
+  PaginationMeta,
 } from '../../utils/app-base.service';
 
 import { ScenarioFeaturesOutputGapData } from '@marxan/features';
@@ -12,7 +13,11 @@ import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { isInt, isPositive } from 'class-validator';
-import { FiltersSpecification } from 'nestjs-base-service';
+import { FetchSpecification, FiltersSpecification } from 'nestjs-base-service';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import { assertDefined } from '@marxan/utils';
+import { Either, left, right } from 'fp-ts/lib/Either';
+import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 
 const scenarioFeaturesOutputGapDataFilterKeyNames = ['runId'] as const;
 type ScenarioFeaturesOutputGapDataFilterKeys = keyof Pick<
@@ -39,10 +44,36 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
       DbConnections.geoprocessingDB,
     )
     private readonly gapData: Repository<ScenarioFeaturesOutputGapData>,
+    private readonly scenarioAclService: ScenarioAccessControl,
   ) {
     super(gapData, 'scenario_features', 'scenario_feature', {
       logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
     });
+  }
+
+  async findAllPaginatedAcl(
+    fetchSpecification?: FetchSpecification,
+    info?: UserSearchCriteria,
+  ): Promise<
+    Either<
+      typeof forbiddenError,
+      {
+        data: (Partial<ScenarioFeaturesOutputGapData> | undefined)[];
+        metadata: PaginationMeta | undefined;
+      }
+    >
+  > {
+    assertDefined(info?.authenticatedUser);
+    assertDefined(info.params?.scenarioId);
+    if (
+      !(await this.scenarioAclService.canViewScenario(
+        info.authenticatedUser.id,
+        info.params?.scenarioId,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
+    return right(await super.findAllPaginated(fetchSpecification, info));
   }
 
   setFilters(

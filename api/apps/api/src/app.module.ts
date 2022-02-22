@@ -35,6 +35,7 @@ import { PublishedProjectModule } from '@marxan-api/modules/published-project/pu
 import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloneModule } from './modules/clone';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { FileRepositoryModule } from '@marxan/files-repository';
     BlmValuesModule,
     AccessControlModule,
     FileRepositoryModule,
+    CloneModule,
   ],
   controllers: [AppController, PingController],
   providers: [

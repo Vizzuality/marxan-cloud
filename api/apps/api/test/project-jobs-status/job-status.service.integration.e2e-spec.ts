@@ -14,6 +14,7 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -77,7 +78,7 @@ async function getFixtures() {
 
   const eventsRepository = application.get(ApiEventsService);
   const addedOrganizations: string[] = [];
-
+  const addedProjects: string[] = [];
   const addedEvents: ApiEvent[] = [];
 
   const statusRepository: Repository<ScenarioJobStatus> = application.get(
@@ -132,6 +133,7 @@ async function getFixtures() {
         const event = await eventsRepository.create(eventDto);
         addedEvents.push(event);
       }
+      addedProjects.push(projectId);
       addedOrganizations.push(organizationId);
       return {
         projectId,
@@ -150,10 +152,16 @@ async function getFixtures() {
         topic: projectId,
       });
       addedOrganizations.push(organizationId);
+      addedProjects.push(projectId);
       addedEvents.push(event);
     },
     async cleanup() {
       await eventsRepository.repo.remove(addedEvents);
+      await Promise.all(
+        addedProjects.map((projectId) =>
+          ProjectsTestUtils.deleteProject(application, token, projectId),
+        ),
+      );
       await Promise.all(
         addedOrganizations.map((organizationId) =>
           OrganizationsTestUtils.deleteOrganization(

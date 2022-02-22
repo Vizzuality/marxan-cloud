@@ -4,7 +4,7 @@ import { Either, left } from 'fp-ts/Either';
 
 export const unknownError = Symbol(`unknown error`);
 export const storageNotReachable = Symbol(`storage not reachable`);
-export const notFound = Symbol(`not found`);
+export const fileNotFound = Symbol(`file not found`);
 export const hackerFound = Symbol(`please hands off`);
 
 export type SaveFileError =
@@ -14,7 +14,7 @@ export type SaveFileError =
 
 export type GetFileError =
   | typeof storageNotReachable
-  | typeof notFound
+  | typeof fileNotFound
   | typeof hackerFound;
 
 @Injectable()

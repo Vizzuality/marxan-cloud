@@ -1,6 +1,6 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ExportId, ResourceId } from '../../export';
+import { ResourceKind, ResourceId } from '@marxan/cloning/domain';
+import { ExportId } from '../../export';
 
 export class MarkExportAsSubmitted extends Command<void> {
   constructor(

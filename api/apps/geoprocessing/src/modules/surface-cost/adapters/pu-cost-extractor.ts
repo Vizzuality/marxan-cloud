@@ -23,6 +23,12 @@ export class PuCostExtractor implements PuExtractorPort {
       );
     }
 
+    const validPUCosts = puCosts.every(this.hasACostEqualOrGreaterThanZero);
+
+    if (!validPUCosts) {
+      throw new Error(`Some of the Features has invalid cost values`);
+    }
+
     return puCosts.map((puCost) => ({
       puid: puCost.puid,
       cost: puCost.cost,
@@ -39,5 +45,9 @@ export class PuCostExtractor implements PuExtractorPort {
       isDefined(properties.cost) &&
       isDefined(properties.puid)
     );
+  }
+
+  private hasACostEqualOrGreaterThanZero(puCost: PlanningUnitCost): boolean {
+    return puCost.cost >= 0;
   }
 }

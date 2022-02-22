@@ -2,7 +2,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { IsEnum } from 'class-validator';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, PrimaryColumn, ViewEntity } from 'typeorm';
 
 export class ApiEventByTopicAndKind {
   @Column('timestamp without time zone', {
@@ -24,8 +24,8 @@ export class ApiEventByTopicAndKind {
   data?: Record<string, unknown>;
 }
 
-@Entity('latest_api_event_by_topic_and_kind')
+@ViewEntity('latest_api_event_by_topic_and_kind')
 export class LatestApiEventByTopicAndKind extends ApiEventByTopicAndKind {}
 
-@Entity('first_api_event_by_topic_and_kind')
+@ViewEntity('first_api_event_by_topic_and_kind')
 export class FirstApiEventByTopicAndKind extends ApiEventByTopicAndKind {}

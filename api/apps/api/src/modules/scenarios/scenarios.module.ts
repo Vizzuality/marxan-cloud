@@ -49,7 +49,10 @@ import { BlmCalibrationModule } from './blm-calibration/blm-calibration.module';
 import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
-import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-guard.module';
+import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
+import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
+import { LockService } from '../access-control/scenarios-acl/locks/lock.service';
+import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 
 @Module({
   imports: [
@@ -62,12 +65,14 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
       Scenario,
       ScenariosOutputResultsApiEntity,
       UsersScenariosApiEntity,
+      ScenarioLockEntity,
+      IssuedAuthnToken,
     ]),
     TypeOrmModule.forFeature(
       [ScenariosPuOutputGeoEntity, ScenariosPlanningUnitGeoEntity],
       DbConnections.geoprocessingDB,
     ),
-    EditGuardModule,
+    BlockGuardModule,
     ProjectCheckerModule,
     PlanningAreasModule,
     UsersModule,
@@ -104,6 +109,7 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
     ZipFilesSerializer,
     ScenarioPlanningUnitSerializer,
     CostRangeService,
+    LockService,
   ],
   controllers: [ScenariosController],
   exports: [ScenariosCrudService, ScenariosService],

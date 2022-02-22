@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import {
   PlanningUnitGridShape,
-  Project,
-} from '@marxan-api/modules/projects/project.api.entity';
+  ScenariosPlanningUnitGeoEntity,
+} from '@marxan/scenarios-planning-unit';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '../scenario.api.entity';
 import { isNil } from 'lodash';
 import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
@@ -38,7 +38,7 @@ export class ScenarioPlanningUnitsLinkerService {
   ): boolean {
     return (
       !isNil(shape) &&
-      [PlanningUnitGridShape.hexagon, PlanningUnitGridShape.square].includes(
+      [PlanningUnitGridShape.Hexagon, PlanningUnitGridShape.Square].includes(
         shape,
       )
     );
@@ -73,7 +73,7 @@ export class ScenarioPlanningUnitsLinkerService {
 
   private isProjectUsingCustomPlanningUnitGrid(project: Project): boolean {
     return (
-      project.planningUnitGridShape === PlanningUnitGridShape.fromShapefile &&
+      project.planningUnitGridShape === PlanningUnitGridShape.FromShapefile &&
       isNil(project.planningUnitAreakm2)
     );
   }
@@ -90,7 +90,7 @@ export class ScenarioPlanningUnitsLinkerService {
       this.isProjectUsingCustomPlanningArea(project)
     ) {
       return {
-        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
+        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.FromShapefile}' and project_id = '${project.id}'`,
         planningUnitIntersectionQueryPart: `(select the_geom from planning_areas where project_id = '${project.id}')`,
       };
     }
@@ -110,7 +110,7 @@ export class ScenarioPlanningUnitsLinkerService {
       this.isProjectUsingGadmPlanningArea(project)
     ) {
       return {
-        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.fromShapefile}' and project_id = '${project.id}'`,
+        planningUnitSelectionQueryPart: `type = '${PlanningUnitGridShape.FromShapefile}' and project_id = '${project.id}'`,
         planningUnitIntersectionQueryPart: `(select the_geom from admin_regions where ${this.getQueryPartForAdminAreaSelectionByLevel(
           project,
         )})`,
