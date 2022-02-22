@@ -23,3 +23,8 @@ variable "virtual_networks_to_link" {
   type        = map(any)
   default     = {}
 }
+
+variable "acr_id" {
+  description = "Id of the ACR so pull images from"
+  type        = string
+}

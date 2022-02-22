@@ -36,6 +36,12 @@ resource "azurerm_role_assignment" "key_vault_reader" {
   skip_service_principal_aad_check = true
 }
 
+resource "azurerm_role_assignment" "attach_acr" {
+  scope                = var.acr_id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_kubernetes_cluster.k8s_cluster.kubelet_identity[0].object_id
+}
+
 resource "azurerm_private_dns_zone" "private_dns_zone" {
   name                = "${var.project_name}.privatelink.westeurope.azmk8s.io"
   resource_group_name = var.resource_group.name
