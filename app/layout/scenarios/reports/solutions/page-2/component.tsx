@@ -29,6 +29,7 @@ export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
         <div className="pt-4 space-y-4 border-t border-black border-opacity-30">
           <p className="text-sm font-heading">Solutions:</p>
           <p className="text-xs font-heading">Selection Frequency</p>
+
           <div className="w-full pr-14">
             <LegendTypeGradient
               className={{
