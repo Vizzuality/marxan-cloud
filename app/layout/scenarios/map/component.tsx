@@ -237,7 +237,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
-    active: tab === ScenarioSidebarTabs.FEATURES,
+    active: tab === ScenarioSidebarTabs.FEATURES
+      && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
     bbox,
     options: {
       featuresRecipe,
