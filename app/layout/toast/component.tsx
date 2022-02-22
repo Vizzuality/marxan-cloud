@@ -8,7 +8,7 @@ export const ToastContainer = ({
   ...props
 }: ToastContainerProps) => (
   <div
-    className="fixed z-50 w-full max-w-full max-h-full p-5 pointer-events-none"
+    className="fixed w-full max-w-full max-h-full p-5 pointer-events-none z-60"
     style={{
       ...PLACEMENTS[placement],
       maxWidth: 400,
