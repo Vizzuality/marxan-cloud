@@ -106,6 +106,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
+  const isSpecies = useMemo(() => selectedFeaturesData.filter((f) => f.type === 'species'), [selectedFeaturesData]);
+  const isBioregional = useMemo(() => selectedFeaturesData.filter((f) => f.type === 'bioregional'), [selectedFeaturesData]);
+
   const {
     data: costSurfaceRangeData,
   } = useCostSurfaceRange(sid);
@@ -166,7 +169,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return ['cost'];
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out'];
 
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['wdpa-percentage'];
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['wdpa-percentage', 'features'];
     if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features'];
 
     if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
@@ -191,8 +194,8 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) {
       return [
         ...protectedCategories.length ? ['wdpa-percentage'] : [],
-        'bioregional',
-        'species',
+        !!isBioregional.length && 'bioregional',
+        !!isSpecies.length && 'species',
         'pugrid',
       ];
     }
@@ -204,7 +207,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['features'];
 
     return ['pugrid'];
-  }, [tab, subtab, protectedAreas]);
+  }, [tab, subtab, protectedAreas, isSpecies, isBioregional]);
 
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {
