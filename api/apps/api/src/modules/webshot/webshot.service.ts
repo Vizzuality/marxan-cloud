@@ -1,13 +1,20 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpService,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Readable } from 'stream';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { assertDefined } from '@marxan/utils';
-import { User } from '../users/user.api.entity';
-import { Either, left, right } from 'fp-ts/lib/Either';
+import { User } from '@marxan-api/modules/users/user.api.entity';
+import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 
 export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
 
@@ -46,31 +53,34 @@ export class WebshotService {
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly scenarioAclService: ScenarioAccessControl,
+    @Inject(forwardRef(() => ScenariosService))
+    private readonly scenariosService: ScenariosService,
   ) {}
 
   async getSummaryReportForScenario(
-    projectId: string,
     scenarioId: string,
     authenticatedUser: Pick<User, 'id'>,
     config: WebshotSummaryReportConfig,
   ): Promise<
-    Either<typeof unknownPdfWebshotError | typeof forbiddenError, Readable>
+    Either<
+      | typeof unknownPdfWebshotError
+      | GetScenarioFailure
+      | typeof forbiddenError,
+      Readable
+    >
   > {
     try {
       assertDefined(authenticatedUser);
-      if (
-        !(await this.scenarioAclService.canViewScenario(
-          authenticatedUser.id,
-          scenarioId,
-        ))
-      ) {
-        return left(forbiddenError);
+      const scenario = await this.scenariosService.getById(scenarioId, {
+        authenticatedUser,
+      });
+      if (isLeft(scenario)) {
+        return scenario;
       }
 
       const pdfBuffer = await this.httpService
         .post(
-          `${this.webshotServiceUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
+          `${this.webshotServiceUrl}/projects/${scenario.right.projectId}/scenarios/${scenarioId}/solutions/report`,
           config,
           { responseType: 'arraybuffer' },
         )
