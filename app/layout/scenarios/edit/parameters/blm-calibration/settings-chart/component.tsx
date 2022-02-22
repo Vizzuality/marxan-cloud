@@ -46,7 +46,7 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
     isFetched: calibrationResultsAreFetched,
   } = useScenarioCalibrationResults(sid);
 
-  const BLM = scenarioData?.boundaryLengthModifier;
+  const BLM = scenarioData?.boundaryLengthModifier || 1;
 
   const INITIAL_VALUES = useMemo(() => {
     return {
