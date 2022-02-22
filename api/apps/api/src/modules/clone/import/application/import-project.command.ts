@@ -4,9 +4,9 @@ import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
 import { SaveError } from './import.repository.port';
 
-export type ImportError = SaveError | ArchiveReadError;
+export type ImportProjectError = SaveError | ArchiveReadError;
 
-export class ImportArchive extends Command<Either<ImportError, string>> {
+export class ImportProject extends Command<Either<ImportProjectError, string>> {
   constructor(public readonly archiveLocation: ArchiveLocation) {
     super();
   }

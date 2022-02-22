@@ -8,7 +8,10 @@ export class ExportProcessor {
   constructor(private readonly piecesExporters: ExportPiecesProvider) {}
 
   run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const provider = this.piecesExporters.getPieceProvider(input.piece);
+    const provider = this.piecesExporters.getPieceProvider(
+      input.piece,
+      input.resourceKind,
+    );
     if (!provider) {
       throw new Error(`${input.piece} is not yet supported.`);
     }

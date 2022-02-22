@@ -24,6 +24,7 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
   ) {}
 
   isSupported(piece: ClonePiece): boolean {
+    // TODO resource kind filtering
     return piece === ClonePiece.PlanningAreaCustom;
   }
 

@@ -49,9 +49,9 @@ import {
 import { UploadExportFile } from '../clone/infra/import/upload-export-file.command';
 import { unknownError } from '@marxan/files-repository';
 import {
-  ImportArchive,
-  ImportError,
-} from '../clone/import/application/import-archive.command';
+  ImportProject,
+  ImportProjectError,
+} from '../clone/import/application/import-project.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -314,7 +314,7 @@ export class ProjectsService {
 
   async importProject(
     exportFile: Express.Multer.File,
-  ): Promise<Either<typeof unknownError | ImportError, string>> {
+  ): Promise<Either<typeof unknownError | ImportProjectError, string>> {
     const archiveLocationOrError = await this.commandBus.execute(
       new UploadExportFile(exportFile),
     );
@@ -324,7 +324,7 @@ export class ProjectsService {
     }
 
     const importIdOrError = await this.commandBus.execute(
-      new ImportArchive(archiveLocationOrError.right),
+      new ImportProject(archiveLocationOrError.right),
     );
 
     if (isLeft(importIdOrError)) {

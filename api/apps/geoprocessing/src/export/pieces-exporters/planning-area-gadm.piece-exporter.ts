@@ -33,8 +33,10 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
     private readonly entityManager: EntityManager,
   ) {}
 
-  isSupported(piece: ClonePiece): boolean {
-    return piece === ClonePiece.PlanningAreaGAdm;
+  isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
+    return (
+      piece === ClonePiece.PlanningAreaGAdm && kind === ResourceKind.Project
+    );
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {

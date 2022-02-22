@@ -1,19 +1,20 @@
-import { ResourceId } from '@marxan/cloning/domain';
+import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
-import { ExportConfigReader } from './export-config-reader';
+import { Either, isLeft, right } from 'fp-ts/Either';
 import { Import } from '../domain/import/import';
-import { ImportArchive, ImportError } from './import-archive.command';
+import { ExportConfigReader } from './export-config-reader';
+import { ImportProject, ImportProjectError } from './import-project.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
 
-@CommandHandler(ImportArchive)
-export class ImportArchiveHandler
-  implements IInferredCommandHandler<ImportArchive> {
+@CommandHandler(ImportProject)
+export class ImportProjectHandler
+  implements IInferredCommandHandler<ImportProject> {
   constructor(
     private readonly exportConfigReader: ExportConfigReader,
     private readonly importRepo: ImportRepository,
@@ -23,25 +24,23 @@ export class ImportArchiveHandler
 
   async execute({
     archiveLocation,
-  }: ImportArchive): Promise<Either<ImportError, string>> {
+  }: ImportProject): Promise<Either<ImportProjectError, string>> {
     const exportConfigOrError = await this.exportConfigReader.read(
       archiveLocation,
     );
-
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
-    const { resourceKind } = exportConfigOrError.right;
-
+    const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
     const resourceId = ResourceId.create();
 
-    const pieces = await this.importResourcePieces.resolveFor(
+    const pieces = this.importResourcePieces.resolveForProject(
       resourceId,
-      resourceKind,
       archiveLocation,
+      exportConfig.scenarios,
     );
 
     const importRequest = this.eventPublisher.mergeObjectContext(
-      Import.newOne(resourceId, resourceKind, archiveLocation, pieces),
+      Import.newOne(resourceId, ResourceKind.Project, archiveLocation, pieces),
     );
 
     importRequest.run();

@@ -5,7 +5,10 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  ExportConfigContent,
+  ProjectExportConfigContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
@@ -23,10 +26,10 @@ import {
   Failure as ArchiveFailure,
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
-import { ImportArchive } from './import-archive.command';
-import { ImportArchiveHandler } from './import-archive.handler';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
+import { ImportProjectHandler } from './import-project.handler';
+import { ImportProject } from './import-project.command';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -70,7 +73,7 @@ const getFixtures = async () => {
         useClass: MemoryImportRepository,
       },
       { provide: ImportResourcePieces, useClass: FakeImportResourcePieces },
-      ImportArchiveHandler,
+      ImportProjectHandler,
     ],
   }).compile();
   await sandbox.init();
@@ -80,7 +83,7 @@ const getFixtures = async () => {
   const events: IEvent[] = [];
   sandbox.get(EventBus).subscribe((event) => events.push(event));
 
-  const sut = sandbox.get(ImportArchiveHandler);
+  const sut = sandbox.get(ImportProjectHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
   const exportConfigReader: FakeExportConfigReader = sandbox.get(
     ExportConfigReader,
@@ -103,7 +106,7 @@ const getFixtures = async () => {
     },
     WhenRequestingImport: async () => {
       const importResult = await sut.execute(
-        new ImportArchive(new ArchiveLocation(`whatever`)),
+        new ImportProject(new ArchiveLocation(`whatever`)),
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
@@ -112,7 +115,7 @@ const getFixtures = async () => {
       return importResult;
     },
     ThenRequestImportIsSaved: (
-      importResult: PromiseType<ReturnType<ImportArchiveHandler['execute']>>,
+      importResult: PromiseType<ReturnType<ImportProjectHandler['execute']>>,
     ) => {
       expect(isRight(importResult)).toBeTruthy();
       expect(
@@ -120,7 +123,7 @@ const getFixtures = async () => {
       ).toBeDefined();
     },
     ThenImportFails: (
-      importResult: PromiseType<ReturnType<ImportArchiveHandler['execute']>>,
+      importResult: PromiseType<ReturnType<ImportProjectHandler['execute']>>,
     ) => {
       expect(isLeft(importResult)).toBeTruthy();
     },
@@ -179,85 +182,84 @@ class FakeExportConfigReader {
 }
 
 class FakeImportResourcePieces extends ImportResourcePieces {
-  mock: jest.MockedFunction<ImportResourcePieces['resolveFor']> = jest.fn();
+  mock: jest.MockedFunction<
+    ImportResourcePieces['resolveForProject']
+  > = jest.fn();
 
-  resolveFor(
+  resolveForProject(
     id: ResourceId,
-    kind: ResourceKind,
     archiveLocation: ArchiveLocation,
-  ): Promise<ImportComponent[]> {
-    return this.mock(id, kind, archiveLocation);
+    scenarios: ProjectExportConfigContent['scenarios'],
+  ): ImportComponent[] {
+    return this.mock(id, archiveLocation, scenarios);
   }
+
+  resolveForScenario(
+    id: ResourceId,
+    archiveLocation: ArchiveLocation,
+  ): ImportComponent[] {
+    return [];
+  }
+
   mockSequentialPieces() {
-    this.mock.mockImplementation(
-      async (
-        resourceId: ResourceId,
-        kind: ResourceKind,
-        archiveLocation: ArchiveLocation,
-      ) => [
-        ImportComponent.fromSnapshot({
-          finished: false,
-          order: 0,
-          resourceId: resourceId.value,
-          id: `import component unique id`,
-          piece: ClonePiece.ProjectMetadata,
-          uris: [
-            {
-              uri: `/tmp/project-metadata-random-uuid.json`,
-              relativePath: `project-metadata.json`,
-            },
-          ],
-        }),
-        ImportComponent.fromSnapshot({
-          finished: false,
-          order: 1,
-          resourceId: resourceId.value,
-          id: `some other piece`,
-          piece: ClonePiece.PlanningAreaGAdm,
-          uris: [
-            {
-              uri: `/tmp/project-planning-area-random-uuid.json`,
-              relativePath: `planning-area/config.json`,
-            },
-          ],
-        }),
-      ],
-    );
+    this.mock.mockImplementation((resourceId: ResourceId) => [
+      ImportComponent.fromSnapshot({
+        finished: false,
+        order: 0,
+        resourceId: resourceId.value,
+        id: `import component unique id`,
+        piece: ClonePiece.ProjectMetadata,
+        uris: [
+          {
+            uri: `/tmp/project-metadata-random-uuid.json`,
+            relativePath: `project-metadata.json`,
+          },
+        ],
+      }),
+      ImportComponent.fromSnapshot({
+        finished: false,
+        order: 1,
+        resourceId: resourceId.value,
+        id: `some other piece`,
+        piece: ClonePiece.PlanningAreaGAdm,
+        uris: [
+          {
+            uri: `/tmp/project-planning-area-random-uuid.json`,
+            relativePath: `planning-area/config.json`,
+          },
+        ],
+      }),
+    ]);
   }
+
   mockEqualPieces() {
-    this.mock.mockImplementation(
-      async (
-        resourceId: ResourceId,
-        kind: ResourceKind,
-        archiveLocation: ArchiveLocation,
-      ) => [
-        ImportComponent.fromSnapshot({
-          finished: false,
-          order: 2,
-          resourceId: resourceId.value,
-          id: `import component unique id`,
-          piece: ClonePiece.ProjectMetadata,
-          uris: [
-            {
-              uri: `/tmp/project-metadata-random-uuid.json`,
-              relativePath: `project-metadata.json`,
-            },
-          ],
-        }),
-        ImportComponent.fromSnapshot({
-          finished: false,
-          order: 2,
-          resourceId: resourceId.value,
-          id: `some other piece`,
-          piece: ClonePiece.PlanningAreaGAdm,
-          uris: [
-            {
-              uri: `/tmp/project-planning-area-random-uuid.json`,
-              relativePath: `planning-area/config.json`,
-            },
-          ],
-        }),
-      ],
-    );
+    this.mock.mockImplementation((resourceId: ResourceId) => [
+      ImportComponent.fromSnapshot({
+        finished: false,
+        order: 2,
+        resourceId: resourceId.value,
+        id: `import component unique id`,
+        piece: ClonePiece.ProjectMetadata,
+        uris: [
+          {
+            uri: `/tmp/project-metadata-random-uuid.json`,
+            relativePath: `project-metadata.json`,
+          },
+        ],
+      }),
+      ImportComponent.fromSnapshot({
+        finished: false,
+        order: 2,
+        resourceId: resourceId.value,
+        id: `some other piece`,
+        piece: ClonePiece.PlanningAreaGAdm,
+        uris: [
+          {
+            uri: `/tmp/project-planning-area-random-uuid.json`,
+            relativePath: `planning-area/config.json`,
+          },
+        ],
+      }),
+    ]);
   }
 }

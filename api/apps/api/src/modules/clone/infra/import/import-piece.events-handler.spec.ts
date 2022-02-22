@@ -93,7 +93,8 @@ const getFixtures = async () => {
         componentId: v4(),
         importId: v4(),
         piece: ClonePiece.ProjectMetadata,
-        resourceId: v4(),
+        componentResourceId: v4(),
+        importResourceId: v4(),
         resourceKind: ResourceKind.Project,
         uris: [],
       };

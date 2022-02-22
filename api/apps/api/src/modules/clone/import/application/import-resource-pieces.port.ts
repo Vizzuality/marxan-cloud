@@ -1,14 +1,16 @@
-import {
-  ArchiveLocation,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
+import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { ImportComponent } from '../domain';
 
 export abstract class ImportResourcePieces {
-  abstract resolveFor(
+  abstract resolveForProject(
     id: ResourceId,
-    kind: ResourceKind,
     archiveLocation: ArchiveLocation,
-  ): Promise<ImportComponent[]>;
+    scenarios: ProjectExportConfigContent['scenarios'],
+  ): ImportComponent[];
+
+  abstract resolveForScenario(
+    id: ResourceId,
+    archiveLocation: ArchiveLocation,
+  ): ImportComponent[];
 }
