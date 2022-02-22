@@ -15,6 +15,10 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
   dismissible = true,
   icon,
   danger = false,
+  options = {
+    acceptText: 'Yes',
+    refuseText: 'No',
+  },
   onDismiss,
   onAccept,
   onRefuse,
@@ -27,7 +31,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
     onDismiss={onDismiss}
   >
     <div className="px-8 py-4">
-      <div className="pr-20">
+      <header>
         <div className="mt-8 text-xl font-medium text-gray-800 leading-1 sm:mt-0 sm:pr-32 font-heading">
           {title}
         </div>
@@ -39,7 +43,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
         >
           {description}
         </p>
-      </div>
+      </header>
       <div
         className={classnames({
           'flex justify-start items-end': true,
@@ -54,22 +58,27 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
           'flex-row-reverse': !!danger,
         })}
         >
-          <Button
-            theme="secondary"
-            size="lg"
-            className="flex-shrink-0 w-32 mr-5"
-            onClick={onRefuse}
-          >
-            No
-          </Button>
-          <Button
-            theme={danger ? 'danger' : 'primary'}
-            size="lg"
-            className="flex-shrink-0 w-32 sm:mr-5"
-            onClick={onAccept}
-          >
-            Yes
-          </Button>
+          {!!onRefuse && (
+            <Button
+              theme="secondary"
+              size="lg"
+              className="flex-shrink-0 w-32 mr-5"
+              onClick={onRefuse}
+            >
+              {options.refuseText}
+            </Button>
+          )}
+
+          {!!onAccept && (
+            <Button
+              theme={danger ? 'danger' : 'primary'}
+              size="lg"
+              className="flex-shrink-0 w-32 sm:mr-5"
+              onClick={onAccept}
+            >
+              {options.acceptText}
+            </Button>
+          )}
         </div>
         {icon && (
           <Icon icon={icon} className="hidden ml-auto sm:block flex-shrink-1 flex-grow-1 w-36" />
