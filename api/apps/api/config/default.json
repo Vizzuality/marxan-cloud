@@ -13,10 +13,7 @@
     "connection": {
       "host": "marxan-redis",
       "port": 6379,
-      "password": null,
-      "tls": {
-        "host": null
-      }
+      "password": null
     },
     "concurrency": 50
   },

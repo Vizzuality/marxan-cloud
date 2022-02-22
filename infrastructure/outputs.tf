@@ -43,4 +43,5 @@ output "redis_url" {
 
 output "redis_password" {
   value = module.redis.redis_password
+  sensitive = true
 }
