@@ -27,7 +27,7 @@ The properties that need to be present in the generated tiles are:
 
 Rules are based on the [this document](https://docs.google.com/document/d/1r9Excv4juGThjPSdPZYx9yWke_LBh-LqGDFw6UTKa08/edit#heading=h.lce9j8b1epbp)
 
-3 bivariate rules are defined:
+3 bivariate rules are defined (all values below are to be interpreted as percentages):
 
 * 3x3 bivariate categories based on design
 * Never and always values based on (0,0) and (>90,>90)
