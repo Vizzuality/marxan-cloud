@@ -10,6 +10,8 @@ import { GivenProjectExists } from '../steps/given-project';
 import { HttpStatus } from '@nestjs/common';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
+import { ScenarioCheckerFake } from '../utils/scenario-checker.service-fake';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -23,25 +25,48 @@ describe('update scenario', () => {
   });
 
   it(`should update an scenario with new data`, async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
 
     await fixtures
-      .WhenUpdatingNameAndDescriptionOfAScenario()
+      .WhenUpdatingNameAndDescriptionOfAScenario(scenarioId)
       .ThatDoesNotHaveAnOngoingExport();
 
-    await fixtures.ThenScenarioWasUpdatedSuccessfully();
+    await fixtures.ThenScenarioWasUpdatedSuccessfully(scenarioId);
+  });
+
+  it(`should update an scenario if another scenario has a pending marxan run`, async () => {
+    const firstScenarioId = await fixtures.GivenScenarioWasCreated();
+    const secondScenarioId = await fixtures.GivenScenarioWasCreated();
+
+    await fixtures.WhenAScenarioHasAPendingMarxanRun(firstScenarioId);
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(secondScenarioId);
+
+    await fixtures.WhenUpdatingAnScenario(secondScenarioId);
+
+    await fixtures.ThenScenarioWasUpdatedSuccessfully(secondScenarioId);
   });
 
   it(`should not update an scenario if an export is running`, async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.WhenAcquiringLockForScenarioAsOwner();
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
 
     await fixtures
-      .WhenUpdatingNameAndDescriptionOfAScenario()
+      .WhenUpdatingNameAndDescriptionOfAScenario(scenarioId)
       .ThatHasAnOngoingExport();
 
-    await fixtures.ThenScenarioIsUnchanged();
+    await fixtures.ThenScenarioIsUnchanged(scenarioId);
+  });
+
+  it(`should not update an scenario if a project export is running`, async () => {
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.WhenAcquiringLockForScenarioAsOwner(scenarioId);
+
+    await fixtures
+      .WhenUpdatingNameAndDescriptionOfAScenario(scenarioId)
+      .OfAProjectWithAnOngoingExport();
+
+    await fixtures.ThenScenarioIsUnchanged(scenarioId);
   });
 });
 
@@ -50,7 +75,9 @@ async function getFixtures() {
   const ownerToken: string = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken: string = await GivenUserIsLoggedIn(app, 'bb');
   const viewerToken: string = await GivenUserIsLoggedIn(app, 'cc');
-  const projectChecker = (await app.get(ProjectChecker)) as ProjectCheckerFake;
+  const projectChecker = app.get(ProjectChecker) as ProjectCheckerFake;
+  const scenarioChecker = app.get(ScenarioChecker) as ScenarioCheckerFake;
+
   const { projectId, organizationId } = await GivenProjectExists(
     app,
     ownerToken,
@@ -63,7 +90,7 @@ async function getFixtures() {
     },
   );
 
-  let scenarioId: string;
+  const scenarios: string[] = [];
   const updatedName = 'Updated name';
   const updatedDescription = 'Updated description';
   const originalName = 'Test scenario';
@@ -71,8 +98,14 @@ async function getFixtures() {
   return {
     cleanup: async () => {
       projectChecker.clear();
+      scenarioChecker.clear();
+
+      await Promise.all(
+        scenarios.map((id) =>
+          ScenariosTestUtils.deleteScenario(app, ownerToken, id),
+        ),
+      );
       await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await OrganizationsTestUtils.deleteOrganization(
         app,
         ownerToken,
@@ -86,17 +119,28 @@ async function getFixtures() {
         type: ScenarioType.marxan,
         projectId,
       });
-      scenarioId = result.data.id;
+      scenarios.push(result.data.id);
+      return result.data.id;
     },
-    WhenAcquiringLockForScenarioAsOwner: async () =>
+    WhenAcquiringLockForScenarioAsOwner: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/lock`)
         .set('Authorization', `Bearer ${ownerToken}`),
-    WhenAcquiringLockForScenarioAsContributor: async () =>
+    WhenAScenarioHasAPendingMarxanRun: async (scenarioId: string) => {
+      scenarioChecker.addPendingMarxanRunForScenario(scenarioId);
+    },
+    WhenAcquiringLockForScenarioAsContributor: async (scenarioId: string) =>
       await request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/lock`)
         .set('Authorization', `Bearer ${contributorToken}`),
-    WhenUpdatingNameAndDescriptionOfAScenario: () => {
+    WhenUpdatingAnScenario: async (scenarioId: string) => {
+      await request(app.getHttpServer())
+        .patch(`/api/v1/scenarios/${scenarioId}`)
+        .send({ name: updatedName, description: updatedDescription })
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .expect(HttpStatus.OK);
+    },
+    WhenUpdatingNameAndDescriptionOfAScenario: (scenarioId: string) => {
       return {
         ThatDoesNotHaveAnOngoingExport: async () => {
           await request(app.getHttpServer())
@@ -106,6 +150,14 @@ async function getFixtures() {
             .expect(HttpStatus.OK);
         },
         ThatHasAnOngoingExport: async () => {
+          scenarioChecker.addPendingExportForScenario(scenarioId);
+          await request(app.getHttpServer())
+            .patch(`/api/v1/scenarios/${scenarioId}`)
+            .send({ name: updatedName, description: updatedDescription })
+            .set('Authorization', `Bearer ${ownerToken}`)
+            .expect(HttpStatus.BAD_REQUEST);
+        },
+        OfAProjectWithAnOngoingExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
           await request(app.getHttpServer())
             .patch(`/api/v1/scenarios/${scenarioId}`)
@@ -115,7 +167,7 @@ async function getFixtures() {
         },
       };
     },
-    ThenScenarioWasUpdatedSuccessfully: async () => {
+    ThenScenarioWasUpdatedSuccessfully: async (scenarioId: string) => {
       const scenarioData = await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}`)
         .set('Authorization', `Bearer ${ownerToken}`);
@@ -124,7 +176,7 @@ async function getFixtures() {
         updatedDescription,
       );
     },
-    ThenScenarioIsUnchanged: async () => {
+    ThenScenarioIsUnchanged: async (scenarioId: string) => {
       const scenarioData = await request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}`)
         .set('Authorization', `Bearer ${ownerToken}`);
