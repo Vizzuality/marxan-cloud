@@ -67,6 +67,8 @@ resource "kubernetes_secret" "api_secret" {
     GEO_POSTGRES_DB       = sensitive(local.geoprocessing_postgres_secret_json.database)
 
     REDIS_HOST = var.redis_host
+    REDIS_PASSWORD = var.redis_password
+    REDIS_TLS_PASSWORD = var.redis_host
   }
 }
 
@@ -90,6 +92,8 @@ resource "kubernetes_secret" "geoprocessing_secret" {
     GEO_POSTGRES_DB       = sensitive(local.geoprocessing_postgres_secret_json.database)
 
     REDIS_HOST = var.redis_host
+    REDIS_PASSWORD = var.redis_password
+    REDIS_TLS_PASSWORD = var.redis_host
   }
 }
 
