@@ -1,10 +1,10 @@
 import { HttpModule, Module } from '@nestjs/common';
-import { AccessControlModule } from '../access-control';
+import { ScenariosModule } from '@marxan-api/modules/scenarios/scenarios.module';
 import { WebshotController } from './webshot.controller';
 import { WebshotService } from './webshot.service';
 
 @Module({
-  imports: [HttpModule, AccessControlModule],
+  imports: [HttpModule, ScenariosModule],
   providers: [WebshotService],
   controllers: [WebshotController],
   exports: [WebshotService],

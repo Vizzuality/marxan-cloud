@@ -37,10 +37,9 @@ export class WebshotController {
   @ApiOperation({ description: 'Get PDF summary report for scenario' })
   @ApiOkResponse()
   @Header('content-type', 'application/pdf')
-  @Post('/projects/:projectId/scenarios/:scenarioId/solutions/report')
+  @Post('/scenarios/:scenarioId/solutions/report')
   async getSummaryReportForProject(
     @Body() config: WebshotSummaryReportConfig,
-    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
@@ -49,7 +48,6 @@ export class WebshotController {
     // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
     // after upgrading NestJS to v8.
     const pdfStream = await this.service.getSummaryReportForScenario(
-      projectId,
       scenarioId,
       req.user,
       config,
