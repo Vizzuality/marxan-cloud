@@ -21,6 +21,8 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import LoadingMore from 'components/loading-more/component';
 
+import FIVE_DIFF_SOLUTIONS_IMG from 'images/info-buttons/img_5_different_solutions.png';
+
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 import SolutionsTable from '..';
@@ -184,24 +186,17 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
               <InfoButton theme="secondary">
                 <div>
-                  <h4 className="font-heading text-lg mb-2.5">5 most different solutions</h4>
+                  <h4 className="font-heading text-lg mb-2.5">Five different solutions</h4>
                   <div className="space-y-2">
-                    <p>
-                      Marxan calculates a range of possible good solutions,
-                      instead of a unique solution.
+                    <p className="mb-6">
+                      One of Marxan’s advantages is that it creates a range of good solutions
+                      that can be presented to decision-makers. With this feature you can
+                      automatically call the 5 most different solutions that meet your
+                      objectives. These are identified through a 5 group cluster analysis
+                      and the solution with the lowest score is used as the representative
+                      solution of the group.
                     </p>
-                    <p>
-                      It is useful to see
-                      how much the solutions differ by assessing
-                      the 5 most extreme cases. These are obtained by
-                      creating a distance matrix of all solutions by
-                      applying the Jaccard similarity index and
-                      then by grouping the results in 5 clusters.
-                      The solutions that are more similar to each
-                      other will fall in the same cluster. Finally,
-                      for each cluster, the solution with the lowest
-                      score is used as the representative solution of the group.
-                    </p>
+                    <img src={FIVE_DIFF_SOLUTIONS_IMG} alt="Five different solutions" />
                   </div>
                 </div>
               </InfoButton>

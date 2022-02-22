@@ -41,7 +41,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
                   will also have an SF = 100.
                 </p>
 
-                <img src={FREQUENCY_MAP_IMG} alt="Stratification_1" />
+                <img src={FREQUENCY_MAP_IMG} alt="Selection frequency" />
 
               </div>
 
