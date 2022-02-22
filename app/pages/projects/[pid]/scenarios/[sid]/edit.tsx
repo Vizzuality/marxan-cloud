@@ -5,7 +5,8 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
-import { withScenario } from 'hoc/scenarios';
+import { withProject } from 'hoc/projects';
+import { withScenario, withScenarioLock } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
@@ -18,16 +19,19 @@ import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 import SidebarEditFeatures from 'layout/scenarios/edit/features';
-import ScenarioEditsMap from 'layout/scenarios/edit/map';
+import ScenarioLock from 'layout/scenarios/edit/lock';
 import SidebarEditAnalysis from 'layout/scenarios/edit/parameters';
 import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
-import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
 import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
+import ScenarioEditsMap from 'layout/scenarios/map';
+import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser(withScenario()));
+export const getServerSideProps = withProtection(withUser(
+  withProject(withScenario(withScenarioLock())),
+));
 
 const EditScenarioPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -110,6 +114,7 @@ const EditScenarioPage: React.FC = () => {
           </Wrapper>
         </div>
         <ScenarioStatus />
+        <ScenarioLock />
       </main>
     </Protected>
   );

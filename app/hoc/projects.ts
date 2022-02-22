@@ -7,6 +7,73 @@ import PROJECTS from 'services/projects';
 
 import { mergeDehydratedState } from './utils';
 
+const fetchProject = (session, queryClient, { pid }) => {
+  return queryClient.prefetchQuery(['projects', pid], () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pid}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }));
+};
+
+export function withProject(getServerSidePropsFunc?: Function) {
+  return async (context: any) => {
+    const session = await getSession(context);
+
+    if (!session) {
+      if (getServerSidePropsFunc) {
+        const SSPF = await getServerSidePropsFunc(context) || {};
+
+        return {
+          props: {
+            ...SSPF.props,
+          },
+        };
+      }
+
+      return {
+        props: {},
+      };
+    }
+
+    const { params } = context;
+
+    const { pid } = params;
+
+    const queryClient = new QueryClient();
+
+    await fetchProject(session, queryClient, { pid });
+
+    if (getServerSidePropsFunc) {
+      const SSPF = await getServerSidePropsFunc(context) || {};
+
+      const { dehydratedState: prevDehydratedState } = SSPF.props;
+      const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+
+      const newDehydratedState = mergeDehydratedState(prevDehydratedState, currentDehydratedState);
+
+      return {
+        ...SSPF,
+        props: {
+          session,
+          ...SSPF.props,
+          dehydratedState: newDehydratedState,
+        },
+      };
+    }
+
+    return {
+      props: {
+        session,
+        dehydratedState: JSON.parse(JSON.stringify(dehydrate(queryClient))),
+      },
+    };
+  };
+}
+
 export function withPublishedProject(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);

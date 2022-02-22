@@ -12,7 +12,10 @@ import { flatten } from 'lodash';
 import { useProjectRole } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import {
-  useDeleteScenario, useScenarios, useDuplicateScenario, useCancelRunScenario,
+  useDeleteScenario,
+  useScenarios,
+  useDuplicateScenario,
+  useCancelRunScenario,
 } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import { useToasts } from 'hooks/toast';
