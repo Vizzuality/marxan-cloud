@@ -38,3 +38,7 @@ variable "project_name" {
 variable "redis_host" {
   description = "The redis server hostname"
 }
+
+variable "redis_password" {
+  description = "The redis server password"
+}

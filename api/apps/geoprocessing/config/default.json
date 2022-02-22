@@ -1,12 +1,13 @@
 {
-  "postgresApi": {
-    "runMigrationsOnStartup": false
-  },
   "redisApi": {
     "concurrency": 50,
     "connection": {
       "host": "marxan-redis",
-      "port": "6379"
+      "port": 6379,
+      "password": null,
+      "tls": {
+        "host": null
+      }
     }
   },
   "postgresApi": {

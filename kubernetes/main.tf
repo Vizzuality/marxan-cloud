@@ -100,4 +100,5 @@ module "api_production_secret" {
   name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
   redis_host                 = data.terraform_remote_state.core.outputs.redis_url
+  redis_password             = data.terraform_remote_state.core.outputs.redis_password
 }

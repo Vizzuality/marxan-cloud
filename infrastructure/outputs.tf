@@ -40,3 +40,7 @@ output "bastion_public_ip" {
 output "redis_url" {
   value = module.redis.redis_url
 }
+
+output "redis_password" {
+  value = module.redis.redis_password
+}
