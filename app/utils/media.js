@@ -1,4 +1,5 @@
 module.exports = {
+  xxs: 0,
   xs: 420,
   sm: 640,
   md: 768,

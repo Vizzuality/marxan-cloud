@@ -31,7 +31,9 @@ import { GetProjectHandler } from './get-project.handler';
 import { ProjectBlmModule } from './blm';
 import { CloneModule } from '@marxan-api/modules/clone';
 import { AccessControlModule } from '../access-control';
-import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-guard.module';
+import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block-guard.module';
+import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 
 @Module({
   imports: [
@@ -45,6 +47,7 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
       Project,
       ScenarioJobStatus,
       ProjectJobStatus,
+      PublishedProject,
       UsersProjectsApiEntity,
     ]),
     TypeOrmModule.forFeature(
@@ -59,7 +62,8 @@ import { EditGuardModule } from '@marxan-api/modules/projects/edit-guard/edit-gu
     ProjectBlmModule,
     CloneModule,
     AccessControlModule,
-    EditGuardModule,
+    BlockGuardModule,
+    ProjectCheckerModule,
   ],
   providers: [
     ProjectsCrudService,

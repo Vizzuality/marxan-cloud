@@ -1,9 +1,12 @@
-import React, { useRef } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import type { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
 
 import { OverlayProvider } from '@react-aria/overlays';
 import { Provider as AuthenticationProvider } from 'next-auth/client';
@@ -15,15 +18,51 @@ import { HelpProvider } from 'hooks/help';
 import { MultipleModalProvider } from 'hooks/modal';
 import { ToastProvider } from 'hooks/toast';
 
+import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
 
 import 'styles/tailwind.css';
 
 const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
+  const [routeLoading, setRouteLoading] = useState({
+    loading: false,
+    key: 0,
+  });
   const queryClientRef = useRef(null);
   if (!queryClientRef.current) {
     queryClientRef.current = new QueryClient();
   }
+
+  const router = useRouter();
+
+  const onRouteChangeStart = useCallback(() => {
+    setRouteLoading((prevState) => ({
+      ...prevState,
+      loading: true,
+      key: prevState.key + 1,
+    }));
+  }, []);
+
+  const onRouteChangeEnd = useCallback(() => {
+    setRouteLoading((prevState) => ({
+      ...prevState,
+      loading: false,
+    }));
+  }, []);
+
+  useEffect(() => {
+    router.events.on('routeChangeStart', onRouteChangeStart);
+    router.events.on('routeChangeComplete', onRouteChangeEnd);
+    router.events.on('routeChangeError', onRouteChangeEnd);
+
+    // If the component is unmounted, unsubscribe
+    // from the event with the `off` method:
+    return () => {
+      router.events.off('routeChangeStart', onRouteChangeStart);
+      router.events.off('routeChangeComplete', onRouteChangeEnd);
+      router.events.off('routeChangeError', onRouteChangeEnd);
+    };
+  }, []); // eslint-disable-line
 
   return (
     <ReduxProvider store={store}>
@@ -46,6 +85,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
                   >
                     <HelpProvider>
                       <PlausibleProvider domain="marxan.vercel.app">
+                        <Loading {...routeLoading} />
                         <div className="bg-black">
                           <Component {...pageProps} />
                         </div>

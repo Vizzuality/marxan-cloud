@@ -12,7 +12,10 @@ import { flatten } from 'lodash';
 import { useProjectRole } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import {
-  useDeleteScenario, useScenarios, useDuplicateScenario, useCancelRunScenario,
+  useDeleteScenario,
+  useScenarios,
+  useDuplicateScenario,
+  useCancelRunScenario,
 } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import { useToasts } from 'hooks/toast';
@@ -289,7 +292,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
             </div>
           </div>
 
-          {!hasScenarios && !search && !hasFilters && !scenariosLoading && (
+          {!hasScenarios && !search && !hasFilters && scenariosIsFetched && (
             <motion.div
               key="project-scenarios-empty"
               initial={{ y: -10, opacity: 0 }}

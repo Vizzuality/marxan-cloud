@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { withProtection, withUser } from 'hoc/auth';
+import { withProject } from 'hoc/projects';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
@@ -13,7 +14,7 @@ import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
 import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser());
+export const getServerSideProps = withProtection(withUser(withProject()));
 
 const ShowProjectsPage: React.FC = () => {
   return (

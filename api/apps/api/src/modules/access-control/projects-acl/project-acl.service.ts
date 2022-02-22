@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Repository, Not, QueryFailedError } from 'typeorm';
+import { getConnection, Not, QueryFailedError, Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
@@ -20,9 +20,12 @@ import { assertDefined } from '@marxan/utils';
 import {
   forbiddenError,
   lastOwner,
-  transactionFailed,
   queryFailed,
+  transactionFailed,
 } from '@marxan-api/modules/access-control';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -41,6 +44,24 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_owner,
   ];
   private readonly canDeleteProjectRoles = [ProjectRoles.project_owner];
+  private readonly canExportProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_viewer,
+  ];
+  private readonly canDownloadExportProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_viewer,
+  ];
+
+  constructor(
+    @InjectRepository(UsersProjectsApiEntity)
+    private readonly roles: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(PublishedProject)
+    private readonly publishedProjectRepo: Repository<PublishedProject>,
+    private readonly lockService: LockService,
+  ) {}
 
   private async getRolesWithinProjectForUser(
     userId: string,
@@ -55,6 +76,7 @@ export class ProjectAclService implements ProjectAccessControl {
         select: ['roleName'],
       })
     ).flatMap((role) => role.roleName);
+
     return rolesToCheck;
   }
 
@@ -64,11 +86,6 @@ export class ProjectAclService implements ProjectAccessControl {
   ): Promise<Permit> {
     return intersection(roles, rolesToCheck).length > 0;
   }
-
-  constructor(
-    @InjectRepository(UsersProjectsApiEntity)
-    private readonly roles: Repository<UsersProjectsApiEntity>,
-  ) {}
 
   // TODO: this will be changed in the following release of user requirements.
   // For now, anyone should be able to create projects, regardless of having
@@ -94,10 +111,13 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   async canViewProject(userId: string, projectId: string): Promise<Permit> {
-    return this.doesUserHaveRole(
+    const isPublic = await this.isProjectPublic(projectId);
+    const userHasPermit = await this.doesUserHaveRole(
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canViewProjectRoles,
     );
+
+    return userHasPermit || isPublic;
   }
 
   async canPublishProject(userId: string, projectId: string): Promise<Permit> {
@@ -105,6 +125,30 @@ export class ProjectAclService implements ProjectAccessControl {
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canPublishProjectRoles,
     );
+  }
+
+  async canExportProject(userId: string, projectId: string): Promise<Permit> {
+    const isPublic = await this.isProjectPublic(projectId);
+    const userHasPermit = await this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canExportProjectRoles,
+    );
+
+    return userHasPermit || isPublic;
+  }
+
+  async canDownloadProjectExport(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    const isPublic = await this.isProjectPublic(projectId);
+
+    const userHasPermit = await this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canDownloadExportProjectRoles,
+    );
+
+    return userHasPermit || isPublic;
   }
 
   async isOwner(userId: string, projectId: string): Promise<Permit> {
@@ -115,22 +159,36 @@ export class ProjectAclService implements ProjectAccessControl {
         roleName: ProjectRoles.project_owner,
       },
     });
-    if (!userIsProjectOwner) {
-      return false;
-    }
-    return true;
+
+    return Boolean(userIsProjectOwner);
   }
 
   async hasOtherOwner(userId: string, projectId: string): Promise<Permit> {
-    const otherOwnersInProject = await this.roles.count({
-      where: {
+    const query = this.roles
+      .createQueryBuilder('users_projects')
+      .leftJoin('users_projects.user', 'userId')
+      .where({
         projectId,
         roleName: ProjectRoles.project_owner,
         userId: Not(userId),
-      },
-    });
+      })
+      .andWhere('userId.isDeleted is false');
+
+    const otherOwnersInProject = await query.getCount();
+
     return otherOwnersInProject >= 1;
   }
+
+  async findAllLocks(
+    userId: string,
+    projectId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+    if (!(await this.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+    return right(await this.lockService.getAllLocksByProject(projectId));
+  }
+
   /**
    * @debt This module should not involve user details and it should deal with
    * it using a standalone module that will access the data just to read it. We
@@ -152,6 +210,7 @@ export class ProjectAclService implements ProjectAccessControl {
       .where({
         projectId,
       })
+      .andWhere('userId.isDeleted is false')
       .select([
         'users_projects.roleName',
         'userId.displayName',
@@ -198,16 +257,23 @@ export class ProjectAclService implements ProjectAccessControl {
     await apiQueryRunner.startTransaction();
 
     try {
-      const existingUserInProject = await apiQueryRunner.manager.findOne(
-        UsersProjectsApiEntity,
-        undefined,
-        {
-          where: {
-            projectId,
-            userId,
-          },
-        },
-      );
+      const existingUserInProject = await apiQueryRunner.manager
+        .createQueryBuilder(UsersProjectsApiEntity, 'users_projects')
+        .where({
+          projectId,
+          userId,
+        })
+        .leftJoinAndSelect('users_projects.user', 'userId')
+        .select(['users_projects.roleName', 'userId.isDeleted'])
+        .getOne();
+      /**
+       * If a role was already granted to the user, but the user is marked
+       * as deleted, we don't want to touch their existing role: we consider it,
+       * for the time being, as an archived fact, kept untouched.
+       */
+      if (existingUserInProject?.user?.isDeleted) {
+        return left(transactionFailed);
+      }
 
       if (!existingUserInProject) {
         const userRoleToSave = new UsersProjectsApiEntity();
@@ -252,5 +318,9 @@ export class ProjectAclService implements ProjectAccessControl {
 
     await this.roles.delete({ projectId, userId });
     return right(void 0);
+  }
+
+  private async isProjectPublic(projectId: string): Promise<boolean> {
+    return Boolean(await this.publishedProjectRepo.findOne(projectId));
   }
 }

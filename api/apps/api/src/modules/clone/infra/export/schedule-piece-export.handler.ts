@@ -1,37 +1,67 @@
-import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { Inject, Logger } from '@nestjs/common';
-import { JobInput } from '@marxan/cloning';
-import { Queue } from 'bullmq';
-
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-
-import { SchedulePieceExport } from './schedule-piece-export.command';
-import { exportPieceQueueToken } from './export-queue.provider';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ExportJobInput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
+import { Inject, Logger } from '@nestjs/common';
+import {
+  CommandHandler,
+  EventBus,
+  IInferredCommandHandler,
+} from '@nestjs/cqrs';
+import { Queue } from 'bullmq';
+import { ExportPieceFailed } from '../../export/application/export-piece-failed.event';
+import { ExportRepository } from '../../export/application/export-repository.port';
+import { exportPieceQueueToken } from './export-queue.provider';
+import { SchedulePieceExport } from './schedule-piece-export.command';
 
 @CommandHandler(SchedulePieceExport)
 export class SchedulePieceExportHandler
   implements IInferredCommandHandler<SchedulePieceExport> {
-  private readonly logger = new Logger(SchedulePieceExportHandler.name);
+  private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__export__piece__submitted__v1__alpha,
+  };
 
   constructor(
     private readonly apiEvents: ApiEventsService,
-    @Inject(exportPieceQueueToken) private readonly queue: Queue<JobInput>,
-  ) {}
+    @Inject(exportPieceQueueToken)
+    private readonly queue: Queue<ExportJobInput>,
+    private readonly eventBus: EventBus,
+    private readonly exportRepository: ExportRepository,
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(SchedulePieceExportHandler.name);
+  }
 
-  async execute({
-    piece,
-    exportId,
-    componentId,
-    resourceId,
-    resourceKind,
-    allPieces,
-  }: SchedulePieceExport): Promise<void> {
+  async execute({ exportId, componentId }: SchedulePieceExport): Promise<void> {
+    const exportInstance = await this.exportRepository.find(exportId);
+
+    if (!exportInstance) {
+      this.logger.error(`Export with ID ${exportId.value} not found`);
+      this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
+      return;
+    }
+    const { resourceKind, exportPieces } = exportInstance.toSnapshot();
+
+    const component = exportPieces.find(
+      (piece) => piece.id === componentId.value,
+    );
+    if (!component) {
+      this.logger.error(
+        `Export component with ID ${componentId.value} not found`,
+      );
+      this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
+      return;
+    }
+
+    const { piece, resourceId } = component;
+    const allPieces = exportPieces.map(({ piece }) => piece);
+
     const job = await this.queue.add(`export-piece`, {
       piece,
       exportId: exportId.value,
       componentId: componentId.value,
-      resourceId: resourceId.value,
+      resourceId,
       resourceKind,
       allPieces,
     });
@@ -40,16 +70,19 @@ export class SchedulePieceExportHandler
       this.logger.error(
         `[SchedulePieceExportHandler] Unable to start job - exportId=${exportId.value}`,
       );
+      this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       return;
     }
 
+    const kind = this.eventMapper[resourceKind];
+
     await this.apiEvents.createIfNotExists({
-      kind: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
-      topic: resourceId.value,
+      kind,
+      topic: componentId.value,
       data: {
         piece,
-        exportId,
-        componentId,
+        exportId: exportId.value,
+        componentId: componentId.value,
         resourceId,
       },
     });

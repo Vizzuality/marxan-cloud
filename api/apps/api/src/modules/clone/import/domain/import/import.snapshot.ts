@@ -1,18 +1,10 @@
-import {
-  ArchiveLocation,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
-import { ImportComponentSnapshot } from './import.component.snapshot';
-
-export type ImportComponents = Array<
-  ImportComponentSnapshot & { order: number }
->;
+import { ResourceKind } from '@marxan/cloning/domain';
+import { ImportComponentSnapshot } from './import-component.snapshot';
 
 export interface ImportSnapshot {
   id: string;
-  resourceId: ResourceId;
+  resourceId: string;
   resourceKind: ResourceKind;
-  archiveLocation: ArchiveLocation;
-  importPieces: ImportComponents;
+  archiveLocation: string;
+  importPieces: ImportComponentSnapshot[];
 }

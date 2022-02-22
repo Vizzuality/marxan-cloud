@@ -2,11 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { ShapeType } from '@marxan-jobs/planning-unit-geometry';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { BBox, GeoJSON } from 'geojson';
 import { v4 } from 'uuid';
 import { SaveGeoJsonResult } from '@marxan/planning-area-repository';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class PlanningUnitsGridProcessor {
@@ -38,15 +38,15 @@ export class PlanningUnitsGridProcessor {
             SELECT ST_SetSRID(
                      ST_GeomFromGeoJSON(features ->> 'geometry'),
                      4326)::geometry,
-                   $2::shape_type,
+                   $2::planning_unit_grid_shape,
                    $3
             FROM (
                    SELECT json_array_elements($1::json -> 'features') AS features
                  ) AS f
-            ON CONFLICT (the_geom_hash, type, COALESCE(project_id, '00000000-0000-0000-0000-000000000000')) DO UPDATE SET type = 'from_shapefile'::shape_type
+            ON CONFLICT (the_geom_hash, type, COALESCE(project_id, '00000000-0000-0000-0000-000000000000')) DO UPDATE SET type = 'from_shapefile'::planning_unit_grid_shape
             RETURNING "id", "project_id"
           `,
-          [geoJson, ShapeType.FromShapefile, fakeProjectId],
+          [geoJson, PlanningUnitGridShape.FromShapefile, fakeProjectId],
         );
 
         const planningArea: {

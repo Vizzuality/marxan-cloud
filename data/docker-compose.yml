@@ -12,7 +12,7 @@ services:
       env_file:
         - '../.env'
       ports:
-        - 8888:8888
+        - 8887:8888
       container_name: marxan-science_jupyter_notebook
       command: "start-notebook.sh \
         --NotebookApp.token=''"

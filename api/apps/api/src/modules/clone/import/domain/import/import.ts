@@ -1,21 +1,18 @@
-import { AggregateRoot } from '@nestjs/cqrs';
-import { ImportSnapshot } from './import.snapshot';
-import { ImportComponentSnapshot } from './import.component.snapshot';
-import { Either, left, right } from 'fp-ts/Either';
-import { v4 } from 'uuid';
 import {
-  ResourceKind,
   ArchiveLocation,
+  ComponentId,
   ResourceId,
+  ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  AllPiecesImported,
-  ImportRequested,
-  PieceImported,
-  PieceImportRequested,
-} from '../events';
-
-type ImportComponent = ImportComponentSnapshot;
+import { AggregateRoot } from '@nestjs/cqrs';
+import { Either, left, right } from 'fp-ts/Either';
+import { AllPiecesImported } from '../events/all-pieces-imported.event';
+import { ImportRequested } from '../events/import-requested.event';
+import { PieceImportRequested } from '../events/piece-import-requested.event';
+import { PieceImported } from '../events/piece-imported.event';
+import { ImportComponent } from './import-component';
+import { ImportId } from './import.id';
+import { ImportSnapshot } from './import.snapshot';
 
 export const componentNotFound = Symbol(`component not found`);
 export const componentAlreadyCompleted = Symbol(`component already completed`);
@@ -27,7 +24,7 @@ export type CompletePieceErrors =
 
 export class Import extends AggregateRoot {
   private constructor(
-    private readonly id: string,
+    readonly importId: ImportId,
     private readonly resourceId: ResourceId,
     private readonly resourceKind: ResourceKind,
     private readonly archiveLocation: ArchiveLocation,
@@ -36,68 +33,61 @@ export class Import extends AggregateRoot {
     super();
   }
 
-  static from(snapshot: ImportSnapshot): Import {
+  static fromSnapshot(snapshot: ImportSnapshot): Import {
     return new Import(
-      snapshot.id,
-      snapshot.resourceId,
+      new ImportId(snapshot.id),
+      new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
-      snapshot.archiveLocation,
-      snapshot.importPieces.sort(this.orderSorter),
+      new ArchiveLocation(snapshot.archiveLocation),
+      snapshot.importPieces.map(ImportComponent.fromSnapshot),
     );
   }
 
-  static new(data: Omit<ImportSnapshot, 'id'>): Import {
-    const id = v4();
-    const instance = new Import(
-      id,
-      data.resourceId,
-      data.resourceKind,
-      data.archiveLocation,
-      data.importPieces.sort(this.orderSorter),
-    );
-    instance.apply(new ImportRequested(id, data.resourceId, data.resourceKind));
-    instance.requestFirstBatch();
+  static newOne(
+    resourceId: ResourceId,
+    kind: ResourceKind,
+    archiveLocation: ArchiveLocation,
+    pieces: ImportComponent[],
+  ): Import {
+    const id = ImportId.create();
+    const instance = new Import(id, resourceId, kind, archiveLocation, pieces);
+
     return instance;
   }
 
+  run(): void {
+    this.apply(
+      new ImportRequested(this.importId, this.resourceId, this.resourceKind),
+    );
+    this.requestFirstBatch();
+  }
+
   completePiece(
-    piece: ImportComponentSnapshot &
-      Required<Pick<ImportComponentSnapshot, 'uri'>>,
+    pieceId: ComponentId,
   ): Either<CompletePieceErrors, CompletePieceSuccess> {
     const pieceToComplete = this.pieces.find(
-      (pc) => pc.id.value === piece.id.value,
+      (pc) => pc.id.value === pieceId.value,
     );
-    if (!pieceToComplete) {
-      return left(componentNotFound);
-    }
+    if (!pieceToComplete) return left(componentNotFound);
+    if (pieceToComplete.isReady()) return left(componentAlreadyCompleted);
 
-    if (pieceToComplete.uri) {
-      return left(componentAlreadyCompleted);
-    }
+    this.apply(new PieceImported(this.importId, pieceId));
 
-    this.apply(
-      new PieceImported(
-        pieceToComplete.id,
-        pieceToComplete.piece,
-        pieceToComplete.resourceId,
-      ),
+    pieceToComplete.complete();
+
+    const isThisTheLastBatch = this.isLastBatch(pieceToComplete.order);
+    const isThisBatchCompleted = this.isBatchReady(pieceToComplete.order);
+
+    if (isThisTheLastBatch && isThisBatchCompleted)
+      this.apply(new AllPiecesImported(this.importId));
+    if (isThisTheLastBatch || !isThisBatchCompleted) return right(true);
+
+    const nextBatch = this.pieces.filter(
+      (piece) => piece.order === pieceToComplete.order + 1,
     );
 
-    const nextBatch = this.getNextComponents(pieceToComplete);
-
-    if (nextBatch.finished) {
-      this.apply(new AllPiecesImported());
-    } else {
-      for (const nextPiece of nextBatch.components) {
-        this.apply(
-          new PieceImportRequested(
-            nextPiece.id,
-            nextPiece.piece,
-            nextPiece.resourceId,
-            nextPiece.uri,
-          ),
-        );
-      }
+    for (const component of nextBatch) {
+      this.apply(new PieceImportRequested(this.importId, component.id));
     }
 
     return right(true);
@@ -105,66 +95,33 @@ export class Import extends AggregateRoot {
 
   toSnapshot(): ImportSnapshot {
     return {
-      id: this.id,
-      resourceId: this.resourceId,
+      id: this.importId.value,
+      resourceId: this.resourceId.value,
       resourceKind: this.resourceKind,
-      importPieces: this.pieces,
-      archiveLocation: this.archiveLocation,
+      importPieces: this.pieces.map((piece) => piece.toSnapshot()),
+      archiveLocation: this.archiveLocation.value,
     };
   }
 
   private requestFirstBatch() {
-    if (this.pieces.length === 0) {
-      this.apply(new AllPiecesImported());
-    } else {
-      // we kindly assume that first batch is not done already
-      for (const component of this.pieces.filter(
-        (pc) => pc.order === this.pieces[0].order,
-      )) {
-        this.apply(
-          new PieceImportRequested(
-            component.id,
-            component.piece,
-            component.resourceId,
-            component.uri,
-          ),
-        );
-      }
+    const firstBatchOrder = Math.min(
+      ...this.pieces.map((piece) => piece.order),
+    );
+
+    for (const component of this.pieces.filter(
+      (pc) => pc.order === firstBatchOrder,
+    )) {
+      this.apply(new PieceImportRequested(this.importId, component.id));
     }
   }
 
-  private getNextComponents(
-    lastPiece: ImportComponent,
-  ): { components: ImportComponent[]; finished: boolean } {
-    const elements = this.pieces.filter((pc) => pc.order === lastPiece.order);
-    const hasIncompletePiecesForBatch = elements.some((pc) => !Boolean(pc.uri));
-
-    if (hasIncompletePiecesForBatch) {
-      return {
-        components: [],
-        finished: false,
-      };
-    }
-
-    const location = this.pieces.indexOf(lastPiece);
-    const nextComponentLocation = location + 1;
-    const nextComponent = this.pieces[nextComponentLocation];
-
-    if (nextComponent) {
-      return {
-        components: this.pieces.filter(
-          (pc) => pc.order === nextComponent.order,
-        ),
-        finished: false,
-      };
-    }
-
-    return {
-      components: [],
-      finished: true,
-    };
+  private isBatchReady(order: number) {
+    return this.pieces
+      .filter((piece) => piece.order === order)
+      .every((piece) => piece.isReady());
   }
 
-  private static orderSorter = (a: { order: number }, b: { order: number }) =>
-    a.order - b.order;
+  private isLastBatch(order: number) {
+    return order === Math.max(...this.pieces.map((piece) => piece.order));
+  }
 }

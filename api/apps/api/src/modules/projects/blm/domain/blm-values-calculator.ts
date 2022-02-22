@@ -13,9 +13,7 @@ export class BlmValuesCalculator {
     const formulaResults = initialArray.map(
       (i) => min + ((max - min) / (this.cardinality - 1)) * i,
     );
-    const blmValues = [min, ...formulaResults];
-
-    return blmValues;
+    return [min, ...formulaResults];
   }
 
   with(range: [number, number]) {

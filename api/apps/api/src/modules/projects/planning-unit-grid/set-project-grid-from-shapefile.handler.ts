@@ -7,14 +7,12 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
-import {
-  PlanningUnitGridShape as ProjectGridShape,
-  Project,
-} from '@marxan-api/modules/projects/project.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { PlanningUnitSet } from '@marxan/planning-units-grid';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { PlanningUnitGridShape as ProjectGridShape } from '@marxan/scenarios-planning-unit';
 
 import { SetProjectGridFromShapefile } from './set-project-grid-from-shapefile.command';
 
@@ -67,7 +65,7 @@ export class SetProjectGridFromShapefileHandler
         id: projectId,
       },
       {
-        planningUnitGridShape: ProjectGridShape.fromShapefile,
+        planningUnitGridShape: ProjectGridShape.FromShapefile,
         planningAreaGeometryId: planningAreaId,
         bbox,
       },
@@ -79,6 +77,6 @@ export class SetProjectGridFromShapefileHandler
       externalId: v4(),
     });
 
-    await this.eventBus.publish(new PlanningUnitSet(projectId));
+    this.eventBus.publish(new PlanningUnitSet(projectId));
   }
 }

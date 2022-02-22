@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 
-import { useScenarioCalibrationResults } from 'hooks/scenarios';
+import { useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
 
 import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
 import BlmImageModal from 'layout/scenarios/edit/parameters/blm-calibration/image-modal';
@@ -36,7 +36,9 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
   const { query } = useRouter();
   const { sid } = query;
 
-  const { blm, blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+
+  const { data: scenarioData } = useScenario(sid);
 
   const {
     data: calibrationResultsData,
@@ -44,11 +46,13 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
     isFetched: calibrationResultsAreFetched,
   } = useScenarioCalibrationResults(sid);
 
+  const BLM = scenarioData?.boundaryLengthModifier || 1;
+
   const INITIAL_VALUES = useMemo(() => {
     return {
-      blmCalibration: blm < 10 ? blm?.toFixed(2) : blm.toFixed(),
+      blmCalibration: BLM < 10 ? BLM.toFixed(2) : BLM.toFixed(),
     };
-  }, [blm]);
+  }, [BLM]);
 
   return (
     <>

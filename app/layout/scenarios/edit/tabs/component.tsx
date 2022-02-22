@@ -81,7 +81,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
               First you will
               decide if you want to
               include existing conservation areas in
-              <b> Protected areas</b>
+              <b> Planning unit</b>
               .
             </li>
             <li>
@@ -101,7 +101,7 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
               you would like to exclude or
               include in
               {' '}
-              <b> Analysis</b>
+              <b> Parameters</b>
               .
             </li>
             <li>

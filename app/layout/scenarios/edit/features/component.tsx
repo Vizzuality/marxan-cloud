@@ -8,9 +8,10 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useProjectRole } from 'hooks/project-users';
-import { useScenario } from 'hooks/scenarios';
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Pill from 'layout/pill';
 import GapAnalysis from 'layout/scenarios/edit/features/gap-analysis';
@@ -51,6 +52,11 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
+  const scenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   // EFFECTS
   useEffect(() => {
@@ -67,9 +73,28 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
   }, [dispatch, setSubTab]);
 
   const onContinue = useCallback(() => {
-    dispatch(setTab(ScenarioSidebarTabs.PARAMETERS));
-    dispatch(setSubTab(null));
-  }, [dispatch, setTab, setSubTab]);
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PARAMETERS,
+            subtab: null,
+          },
+          {
+            saveTab: true,
+            saveStatus: false,
+          },
+        ),
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setTab(ScenarioSidebarTabs.PARAMETERS));
+        dispatch(setSubTab(null));
+      },
+    });
+  }, [sid, scenarioData?.metadata, dispatch, setTab, setSubTab, scenarioMutation]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.FEATURES) return null;
 

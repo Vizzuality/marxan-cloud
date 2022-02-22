@@ -7,11 +7,11 @@ import { ProjectBlm } from './project-blm.api.entity';
 import {
   alreadyCreated,
   CreateFailure,
-  GetFailure,
+  GetProjectFailure,
   ProjectBlmRepo,
   projectNotFound,
   SaveFailure,
-} from '../../project-blm-repo';
+} from '../../blm-repos';
 
 @Injectable()
 export class TypeormProjectBlmRepository extends ProjectBlmRepo {
@@ -21,7 +21,7 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
   ) {
     super();
   }
-  async get(projectId: string): Promise<Either<GetFailure, ProjectBlm>> {
+  async get(projectId: string): Promise<Either<GetProjectFailure, ProjectBlm>> {
     const projectBlm = await this.repository.findOne(projectId);
 
     return projectBlm ? right(projectBlm) : left(projectNotFound);

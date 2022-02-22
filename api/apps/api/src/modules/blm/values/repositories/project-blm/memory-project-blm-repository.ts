@@ -3,22 +3,20 @@ import { Either, left, right } from 'fp-ts/Either';
 
 import {
   alreadyCreated,
+  Blm,
   CreateFailure,
-  GetFailure,
-  ProjectBlm,
+  GetProjectFailure,
   ProjectBlmRepo,
   projectNotFound,
   SaveFailure,
-} from '../../project-blm-repo';
+} from '../../blm-repos';
 
 @Injectable()
 export class MemoryProjectBlmRepository extends ProjectBlmRepo {
-  constructor(
-    private readonly memory: Record<string, ProjectBlm | undefined> = {},
-  ) {
+  constructor(private readonly memory: Record<string, Blm | undefined> = {}) {
     super();
   }
-  async get(projectId: string): Promise<Either<GetFailure, ProjectBlm>> {
+  async get(projectId: string): Promise<Either<GetProjectFailure, Blm>> {
     const blm = this.memory[projectId];
     if (!blm) return left(projectNotFound);
 
@@ -27,7 +25,7 @@ export class MemoryProjectBlmRepository extends ProjectBlmRepo {
 
   async create(
     projectId: string,
-    defaults: ProjectBlm['defaults'],
+    defaults: Blm['defaults'],
   ): Promise<Either<CreateFailure, true>> {
     if (this.memory[projectId]) return left(alreadyCreated);
 
@@ -43,8 +41,8 @@ export class MemoryProjectBlmRepository extends ProjectBlmRepo {
 
   async update(
     projectId: string,
-    range: ProjectBlm['range'],
-    values: ProjectBlm['values'],
+    range: Blm['range'],
+    values: Blm['values'],
   ): Promise<Either<SaveFailure, true>> {
     const blm = this.memory[projectId];
     if (!blm) return left(projectNotFound);

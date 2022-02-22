@@ -10,7 +10,8 @@ Cloud platform. Each microservice lives in a top-level folder.
 
 Services are packaged as Docker images.
 
-Microservices are set up to be run via Docker Compose for local development.
+Microservices are set up to be run with or without Docker Compose for local 
+development - see the sections below for more details.
 
 In CI, testing, staging and production environments, microservices are
 orchestrated via Kubernetes (forthcoming).
@@ -22,151 +23,27 @@ details.
 
 ![Backend architecture](./docs/ARCHITECTURE_infrastructure/marxan-contexts.png)
 
-### Dependencies
+## Dependencies
 
-- Nodejs v14
-- PostgreSQL v14
-- Postgis v3
-- Redis v6
+- [Nodejs](https://nodejs.org/en/) v14.18
+- [Yarn](https://yarnpkg.com/)
+- [PostgreSQL](https://www.postgresql.org/) v14
+- [Postgis](https://postgis.net/) v3
+- [Redis](https://redis.io/) v6
 
-### Prerequisites
+## Running API and Geoprocessing services using Docker
 
 1. Install Docker (19.03+):
 	* [MacOS](https://docs.docker.com/docker-for-mac/)
 	* [GNU/Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 2. Install [Docker Compose](https://docs.docker.com/compose/install/)
 3. Create an `.env` at the root of the repository, defining all the required
-   environment variables listed below. In most cases, for variables other
-   than secrets, the defaults in `env.default` may just work - YMMV.
-
-	* `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
-	  signing of API JWT tokens; can be generated via a command such as `dd
-	  if=/dev/urandom bs=1024 count=1 | base64 -w0`
-	* `API_AUTH_X_API_KEY` (string, required): a secret used as API key for
-	  requests from the Geoprocessing service to the API; can be generated
-	  similarly to `API_AUTH_JWT_SECRET`
-	* `API_SERVICE_PORT` (number, required): the port exposed by Docker for the
-	  API service; when running an instance under Docker Compose, NestJS will
-	  always be listening on port 3000 internally, and this is mapped to
-	  `API_SERVICE_PORT` when exposed outside of the container
-	* `API_SERVICE_URL` (URL, optional, default is http://api:3000): the internal
-	  (docker-compose or k8s cluster) where the API service can be reached by
-	  other services running in the cluster
-	* `API_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default is
-	  `true`): set this to `false` if migrations for the API service should not
-	  run automatically on startup
-	* `API_LOGGING_MUTE_ALL` (boolean, optional, default is `false`): can be used
-	  to mute all logging (for example, in CI pipelines) irrespective of Node
-	  environment and other settings that would normally affect the logging
-	  verbosity of the API
-	* `API_SHARED_FILE_STORAGE_LOCAL_PATH` (string, optional, default is
-	  `/tmp/storage`): set this to a filesystem path if needing to override the
-	  default temporary storage location where shared volumes for files shared
-	  from the API to the Geoprocessing service are mounted; configuration of
-	  mount point for shared storage (via Docker volumes in development
-	  environments and via Persistent Volumes in Kubernetes environments) should
-	  be set accordingly
-	* `APP_SERVICE_PORT` (number, required): the port on which the App service
-	  should listen on the local machine
-	* `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
-	  Docker PostgreSQL service should listen on the local machine
-	* API PostgreSQL configuration variables:
-        * `API_POSTGRES_HOST` (string, required): host of the database server to be
-          used for the PostgreSQL connection (API)
-        * `API_POSTGRES_PORT` (number, required): port of the database server to be
-          used for the PostgreSQL connection (API)
-        * `API_POSTGRES_USER` (string, required): username to be used for the
-          PostgreSQL connection (API)
-        * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
-          PostgreSQL connection (API)
-        * `API_POSTGRES_DB` (string, required): name of the database to be used for
-          the PostgreSQL connection (API)
-        * `API_POSTGRES_LOGGING` (string, required): comma separated list of logging
-          options to pass to typeorm. [More info](https://typeorm.io/#/logging/logging-options)
-	* `GEOPROCESSING_SERVICE_PORT` (number, required): the port exposed by Docker
-	  for the Geoprocessing service; when running an instance under Docker
-	  Compose, NestJS will always be listening on port 3000 internally, and this
-	  is mapped to `GEOPROCESSING_SERVICE_PORT` when exposed outside of the
-	  container
-	* `POSTGRES_GEO_SERVICE_PORT` (number, required): the port on which the
-	  geoprocessing Docker PostgreSQL service should listen on the local machine
-	* `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default
-	  is `true`): set this to `false` if migrations for the Geoprocessing service
-	  should not run automatically on startup
-	* Geoprocessing PostgreSQL configuration variables:
-        * `GEO_POSTGRES_HOST` (string, required): host of the database server to be
-          used for the geoprocessing PostgreSQL connection (API)
-        * `GEO_POSTGRES_PORT` (number, required): port of the database server to be
-          used for the geoprocessing PostgreSQL connection (API)
-        * `GEO_POSTGRES_USER` (string, required): username to be used for the
-          geoprocessing PostgreSQL connection (API)
-        * `GEO_POSTGRES_PASSWORD` (string, required): password to be used for the
-          geoprocessing PostgreSQL connection (API)
-        * `GEO_POSTGRES_DB` (string, required): name of the database to be used for
-          the geoprocessing PostgreSQL connection (API)
-        * `GEO_POSTGRES_LOGGING` (string, required): comma separated list of logging
-		  options to pass to typeorm. [More info](https://typeorm.io/#/logging/logging-options)
-	* `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
-	  PostgreSQL for Airflow service should listen on the local machine
-	* `AIRFLOW_PORT` (number, required): the port on which the
-	  Airflow service should listen on the local machine
-	* `REDIS_API_SERVICE_PORT` (number, required): the port on which the
-	  Redis service should listen on the local machine
-	* `REDIS_COMMANDER_PORT` (number, required): the port on which the
-	  Redis Commander service should listen on the local machine
-	* `SPARKPOST_APIKEY` (string, required): an API key to be used for Sparkpost,
-	  an email service
-	* `SPARKPOST_ORIGIN` (string, required): the URL of a SparkPost API service:
-	  this would normally be either `https://api.sparkpost.com` or
-	  `https://api.eu.sparkpost.com` (note: **no trailing `/` character** or the
-	  SparkPost API [client library](https://github.com/SparkPost/node-sparkpost)
-	  will not work correctly); please check [SparkPost's
-	  documentation](https://developers.sparkpost.com/api/#header-sparkpost-eu)
-	  and the client library's own documentation for details
-	* `APPLICATION_BASE_URL` (string, required): the public URL of the
-	  **frontend** application on the running instance (without trailing slash).
-	  This URL will be used to compose links sent via email for some flows of the
-	  platform, such as password recovery or sign-up confirmation (see also
-	  `PASSWORD_RESET_TOKEN_PREFIX` and `SIGNUP_CONFIRMATION_TOKEN_PREFIX`)
-	* `PASSWORD_RESET_TOKEN_PREFIX` (string, required): the path that should be
-	  appended after the application base URL (`APPLICATION_BASE_URL`),
-	  corresponding to the **frontend** route where users are redirected from
-	  password reset emails to complete the process of resetting their
-	  password; the reset token is appended at the end of this URL to compose
-	  the actual link that is included in password reset emails
-	* `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
-	  milliseconds: 30 minutes): a time (in milliseconds) that a token for a
-	  password reset is valid for
-	* `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the path that should be
-	  appended after the application base URL (`APPLICATION_BASE_URL`),
-	  corresponding to the **frontend** route where users are redirected from
-	  sign-up confirmation emails to complete the process validating their account;
-	  the validation token is appended at the end of this URL to compose the actual
-	  link that is included in sign-up confirmation emails
+   [environment variables](./ENV_VARS.md). In most cases, for variables other
+   than secrets, the defaults in `env.default` may just work - your mileage may vary.
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
 via a Docker volume.
-
-#### Running API and Geoprocessing services natively
-
-When running the API and Geoprocessing services without relying on Docker
-Compose for container orchestration, the following two environment variables can
-be used to set on which port the NestJS/Express daemon should be listening,
-instead of the hardcoded port `3000` which is used in Docker setups.
-
-* `API_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on which
-  the Express daemon of the API service will listen
-* `GEOPROCESSING_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port
-  on which the Express daemon of the Geoprocessing service will listen
-
-Make sure you are running the necessary [dependencies](#Dependencies) locally.
-You may need to tweak some env variables to point to the right URLs and ports -
-see the list above for details on which configuration options are available.
-
-The included Makefile has some useful build targets (commands) specifically
-targeted at native execution (prefixed with `native-`) that you'll find helpful.
-Refer to the Makefile inline documentation for more details.
 
 ### Running the Marxan Cloud platform
 
@@ -180,34 +57,37 @@ Run `make notebooks` to start the jupyterlab service.
 
 ### Seed data
 
-To seed the geodb database after a clean state, you need to follow the next instructions:
+To seed the geodb database after a clean state, please follow the steps below:
 
 ``` bash
 make seed-geodb-data
 ```
-This will populate the metadata DB and will trigger the geo-pipelines to seed the geoDB.  
-Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in order to fulfill
-some of these tasks (GADM and WDPA data import pipelines). Also the number of
-CPU cores will impact the time needed to seed a new instance with the complete
-GADM and WDPA datasets.
-___
 
-or if you only wants to populate the newly fresh instance with a small subset of test data:
+This will populate the metadata DB and will trigger the geo-pipelines to seed
+the geoDB.
+
+Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in
+order to carry out some of these tasks (GADM and WDPA data import pipelines).
+Also, the number of CPU cores will impact the time needed to seed a new instance
+with the complete GADM and WDPA datasets.
+
+To populate a new instance with a small subset of test data, instead:
 
 ``` bash
 make seed-dbs
 ```
 
-
-
-We also provide a way to freshly clean the dbs instances(we recommend do it regularly):
+We also provide a way to reset db instances from scratch. This can be useful to
+do regularly, to avoid keeping obsolete data in the local development instance.
 
 ``` bash
 make clean-slate
 ```
 
-And finally we provided a set of commands to create a new dbs dumps, upload them to an azure instance and restore both dbs
-that is faster that triggering the geodb pipes.
+And finally, we provide a set of commands to create new dbs dumps from upstream
+data sources, upload these dunps to an Azure storage bucket, and populate both
+dbs from these dumps. This will typically be faster than triggering the full
+geodb ETL pipelines.
 
 ``` bash
 make generate-content-dumps && make upload-dump-data
@@ -216,6 +96,79 @@ make generate-content-dumps && make upload-dump-data
 ``` bash
 make restore-dumps
 ```
+
+## Running API and Geoprocessing services natively
+
+Make sure you have installed and configured all the [dependencies](#Dependencies) 
+locally. PostgreSQL (with PostGIS) and Redis need to be up and running.
+
+When running the API and Geoprocessing services without relying on Docker
+Compose for container orchestration, be sure to review and set the correct
+[environment variables](./ENV_VARS.md) before executing the application. 
+The `env.default` file and the `docker-compose` configuration files may give
+you some example values that work for docker-based executions, and that may
+be useful when implementing your native execution configuration.
+
+The included Makefile has some useful build targets (commands) specifically
+targeted at native execution (prefixed with `native-`) that you'll find helpful.
+Refer to the Makefile inline documentation for more details.
+
+### Setting up test seed data
+
+``` bash
+make native-seed-api-with-test-data
+```
+
+### Running the API/Geoprocessing
+
+You can find the source code for the API/Geoprocessing applications inside the
+`api` folder.
+
+Be sure to install the necessary `nodejs` dependencies using `yarn` prior to
+running the applications
+
+To start the API, run:
+
+``` bash
+yarn start
+```
+
+To start the Geoprocessing application, run:
+
+``` bash
+yarn start geoprocessing
+```
+
+### Running tests
+
+Running the whole test suite requires running 3 commands, each focused on a
+specific type of test:
+
+To run the unit tests for both the API and the Geoprocessing app:
+``` bash
+yarn run test
+```
+
+To run the E2E tests for the API:
+``` bash
+yarn run api:test:e2e
+```
+
+To run the E2E tests for the Geoprocessing app:
+
+``` bash
+yarn run geoprocessing:test:e2e
+```
+
+Note that E2E tests may trigger cross-application requests, so:
+- When running E2E tests for the API, you must have the Geoprocessing
+  application running in the background.
+- When running E2E tests for the Geoprocessing application, you must have the
+  API running in the background.
+
+Running tests require previously loading the [test seed
+data](#setting-up-test-seed-data), and may modify data in the database - do not
+run tests using a database whose data you don't want to lose.
 
 ## Development workflow (TBD)
 
@@ -234,6 +187,48 @@ As feature types:
 * `bugfix` (regular bug fix)
 * `hotfix` (urgent bug fixes fast-tracked to `main`)
 
+## Devops
+
+### CI/CD
+
+[CI/CD](https://www.redhat.com/en/topics/devops/what-is-ci-cd) is handled with 
+[GitHub Actions](https://github.com/features/actions). More details can be found 
+by reviewing the actual content of the `.github/workflows` folder but, in a nutshell, 
+GitHub Action will automatically run tests on code pushed as part of a Pull Request.
+
+For code merged to key branches (currently `main` and `develop`), once tests run
+successfully, [Docker](https://www.docker.com/) images are built and pushed to a 
+private [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/).
+
+The GitHub Actions workflows currently configured requires a few [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+to be set on GitHub in order to work properly:
+
+- `AZURE_CLIENT_ID`: Obtain from Terraform's `azure_client_id` output
+- `AZURE_TENANT_ID`: Obtain from Terraform's `azure_tenant_id` output
+- `AZURE_SUBSCRIPTION_ID`: Obtain from Terraform's `azure_subscription_id` output
+- `REGISTRY_LOGIN_SERVER`: Obtain from Terraform's `azurerm_container_registry_login_server` output
+- `REGISTRY_USERNAME`: Obtain from Terraform's `azure_client_id` output
+- `REGISTRY_PASSWORD`: Obtain from Terraform's `azuread_application_password` output
+
+Some of these values are obtained from Terraform output values, which will be documented
+in more detail in the [Infrastructure](#infrastructure) docs.
+
+
+### Infrastructure
+
+While the application can be deployed in any server configuration that supports the above-mentioned
+[dependencies](#dependencies), this project includes a [Terraform](https://www.terraform.io/) project
+in the `infrastructure` folder, that you can use to easily and quickly deploy it using 
+[Microsoft Azure](https://azure.microsoft.com/en-us/). 
+
+Deploying the included Terraform project is done in two steps:
+- First, use Terraform to apply the `infrastructure/remote-state` folder, which will set up base
+Azure resources, like a [Resource Group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/overview)
+or a [Storage Account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
+to store the "main" Terraform remote state
+- Apply the "main" `infrastructure` folder, which contains all the Azure 
+resources necessary to host a functioning Marxan application. 
+
 ## Bugs
 
 Please use the [Marxan Cloud issue
@@ -241,7 +236,7 @@ tracker](https://github.com/Vizzuality/marxan-cloud/issues) to report bugs.
 
 ## License
 
-(C) Copyright 2020-2021 Vizzuality.
+(C) Copyright 2020-2022 Vizzuality.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the [MIT License](LICENSE) as included in this repository.

@@ -168,13 +168,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
+            subtab: null,
           },
-        },
+          {
+            saveTab: false,
+          },
+        ),
       },
     }, {
       onSuccess: () => {
@@ -209,13 +212,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
+            subtab: null,
           },
-        },
+          {
+            saveTab: false,
+          },
+        ),
       },
     }, {
       onSuccess: () => {
@@ -248,13 +254,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PARAMETERS,
+            subtab: null,
           },
-        },
+          {
+            saveTab: false,
+          },
+        ),
       },
     }, {
       onSuccess: () => {

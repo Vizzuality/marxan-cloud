@@ -3,10 +3,11 @@ export {
   projectNotFound,
   unknownError,
   alreadyCreated,
-  ProjectBlm,
+  Blm,
   ProjectBlmRepo,
+  ScenarioBlmRepo,
   CreateFailure,
-  GetFailure,
+  GetProjectFailure,
   SaveFailure,
   BlmValuesModule,
 } from './values';

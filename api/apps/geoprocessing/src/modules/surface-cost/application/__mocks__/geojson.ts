@@ -43,6 +43,37 @@ export const getGeoJsonWithMissingCost = (): FeatureCollection<
   ],
 });
 
+export const getGeoJsonWithNegativeCost = (): FeatureCollection<
+  MultiPolygon | Polygon,
+  PlanningUnitCost | Record<string, undefined>
+> => ({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        cost: 200,
+        puid: 'uuid-1',
+      },
+      geometry: {
+        type: 'MultiPolygon',
+        coordinates: [],
+      },
+    },
+    {
+      properties: {
+        cost: -100,
+        puid: 'uuid-2',
+      },
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [],
+      },
+    },
+  ],
+});
+
 export const getGeometryMultiPolygon = (): MultiPolygon => ({
   type: 'MultiPolygon',
   coordinates: [],

@@ -3,8 +3,8 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
   ForbiddenException,
+  Get,
   Header,
   InternalServerErrorException,
   NotFoundException,
@@ -26,6 +26,8 @@ import {
 } from './project.api.entity';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -49,16 +51,22 @@ import {
 } from 'nestjs-base-service';
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
-import { ProjectsService, validationFailed } from './projects.service';
+import {
+  exportNotFound,
+  notAllowed,
+  projectNotFound,
+  ProjectsService,
+  validationFailed,
+} from './projects.service';
 import { GeoFeatureSerializer } from './dto/geo-feature.serializer';
 import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
-import { isLeft } from 'fp-ts/Either';
+import { isLeft, right } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
-import { GeoFeaturesService } from '../geo-features/geo-features.service';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
@@ -69,19 +77,32 @@ import { invalidRange } from '@marxan-api/modules/projects/blm';
 import {
   planningUnitAreaNotFound,
   updateFailure,
-} from '@marxan-api/modules/projects/blm/change-blm-range.command';
+} from '@marxan-api/modules/projects/blm/change-project-blm-range.command';
 import { ProjectBlmValuesResponseDto } from '@marxan-api/modules/projects/dto/project-blm-values-response.dto';
 import {
   GeometryFileInterceptor,
   GeometryKind,
 } from '@marxan-api/decorators/file-interceptors.decorator';
-import { forbiddenError } from '../access-control/access-control.types';
-import { projectNotFound, unknownError } from '../blm';
+import { forbiddenError } from '@marxan-api/modules/access-control';
+import {
+  projectNotFound as blmProjectNotFound,
+  unknownError as blmUnknownError,
+} from '../blm';
 import { Response } from 'express';
 import {
   ImplementsAcl,
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
+import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
+import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
+import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
+import { unknownError as fileRepositoryUnknownError } from '@marxan/files-repository';
+import {
+  archiveCorrupted,
+  invalidFiles,
+} from '@marxan/cloning/infrastructure/archive-reader.port';
+import { fileNotFound } from '@marxan/files-repository/file.repository';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -339,8 +360,8 @@ export class ProjectsController {
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<ProjectBlmValuesResponseDto> {
     const result = await this.projectsService.updateBlmValues(
-      req.user.id,
       id,
+      req.user.id,
       range,
     );
 
@@ -385,13 +406,13 @@ export class ProjectsController {
 
     if (isLeft(result))
       switch (result.left) {
-        case projectNotFound:
+        case blmProjectNotFound:
           throw new NotFoundException(
             `Could not find project BLM values for project with ID: ${id}`,
           );
         case forbiddenError:
           throw new ForbiddenException();
-        case unknownError:
+        case blmUnknownError:
           throw new InternalServerErrorException();
         default:
           const _exhaustiveCheck: never = result.left;
@@ -400,29 +421,175 @@ export class ProjectsController {
     return result.right;
   }
 
-  @IsMissingAclImplementation()
-  @Post(`:id/export`)
-  async requestProjectExport(@Param('id') id: string) {
+  @ImplementsAcl()
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: RequestProjectExportResponseDto })
+  @Post(`:projectId/export`)
+  async requestProjectExport(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const result = await this.projectsService.requestExport(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
     return {
-      id: await this.projectsService.requestExport(id),
+      id: result.right,
     };
   }
 
-  @IsMissingAclImplementation()
-  @Get(`:id/export/:exportId`)
+  @ImplementsAcl()
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiParam({
+    name: 'exportId',
+    description: 'ID of the Export',
+  })
+  @Get(`:projectId/export/:exportId`)
   @Header(`Content-Type`, `application/zip`)
   @Header('Content-Disposition', 'attachment; filename="export.zip"')
   async getProjectExportArchive(
-    @Param('id') id: string,
+    @Param('projectId') projectId: string,
     @Param('exportId') exportId: string,
     @Res() response: Response,
+    @Req() req: RequestWithAuthenticatedUser,
   ) {
-    const stream = await this.projectsService.getExportedArchive(id, exportId);
+    const result = await this.projectsService.getExportedArchive(
+      projectId,
+      req.user.id,
+      exportId,
+    );
 
-    if (stream) {
-      stream.pipe(response);
-    } else {
-      response.send(null);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case locationNotFound:
+          throw new NotFoundException(
+            `Could not find export .zip location for export with ID: ${exportId} for project with ID: ${projectId}`,
+          );
+        case notAllowed:
+          throw new ForbiddenException(
+            `Your role cannot retrieve export .zip files for project with ID: ${projectId}`,
+          );
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
     }
+
+    result.right.pipe(response);
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Returns the latest exportId of a given project',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: RequestProjectExportResponseDto })
+  @Get(`:projectId/export`)
+  async getLatestExportId(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ) {
+    const exportIdOrError = await this.projectsService.getLatestExportForProject(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(exportIdOrError)) {
+      switch (exportIdOrError.left) {
+        case exportNotFound:
+          throw new NotFoundException(
+            `Export for project with id ${projectId} not found`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+    return { id: exportIdOrError.right };
+  }
+
+  @ImplementsAcl()
+  @Get(':projectId/editing-locks')
+  @ApiOperation({ summary: 'Get all locks by project' })
+  async findLocksForProject(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<ScenarioLockResultPlural> {
+    const result = await this.projectsService.findAllLocks(
+      projectId,
+      req.user.id,
+    );
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+
+    return result.right;
+  }
+
+  @IsMissingAclImplementation()
+  @Post('import')
+  @ApiOkResponse({ type: RequestProjectImportResponseDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          description: 'Export zip file',
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('file'))
+  async importProject(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<RequestProjectImportResponseDto> {
+    const importIdOrError = await this.projectsService.importProject(file);
+
+    if (isLeft(importIdOrError)) {
+      switch (importIdOrError.left) {
+        case archiveCorrupted:
+          throw new BadRequestException('Missing export config file');
+        case invalidFiles:
+          throw new BadRequestException('Invalid export config file');
+        case fileRepositoryUnknownError:
+        case fileNotFound:
+          throw new InternalServerErrorException('Error while saving file');
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { importId: importIdOrError.right };
   }
 }

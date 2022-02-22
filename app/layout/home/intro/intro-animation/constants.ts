@@ -1,10 +1,10 @@
-import Bg01Img from 'images/home-intro/bg-01.png';
-import Bg02Img from 'images/home-intro/bg-02.png';
-import Bg03Img from 'images/home-intro/bg-03.png';
-import Bg04Img from 'images/home-intro/bg-04.png';
-import ToucanImg from 'images/home-intro/image-01.jpg';
-import FarmerImg from 'images/home-intro/image-02.jpg';
-import BoatImg from 'images/home-intro/image-03.jpg';
+import Bg01Img from 'images/home/intro/bg-01.png';
+import Bg02Img from 'images/home/intro/bg-02.png';
+import Bg03Img from 'images/home/intro/bg-03.png';
+import Bg04Img from 'images/home/intro/bg-04.png';
+import ToucanImg from 'images/home/intro/image-01.jpg';
+import FarmerImg from 'images/home/intro/image-02.jpg';
+import BoatImg from 'images/home/intro/image-03.jpg';
 
 export const BACKGROUND_IMAGES = [{
   backgroundColor: '#10223a',

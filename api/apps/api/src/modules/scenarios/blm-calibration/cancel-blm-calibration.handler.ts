@@ -1,6 +1,6 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
-import { Job, Queue } from 'bullmq';
+import { Queue } from 'bullmq';
 
 import { calibrationQueueToken } from './blm-calibration-queue.providers';
 import { JobData } from '@marxan/blm-calibration';

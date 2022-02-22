@@ -5,13 +5,8 @@ services:
     build:
       context: ./api
       dockerfile: api.Dockerfile
-      args:
-        UID: 5000
-        GID: 5000
-        UPLOADS_TEMP_DIR: "/tmp/storage"
     container_name: marxan-test-unit-api
     command: test-unit
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
@@ -26,12 +21,8 @@ services:
     build:
       context: ./api
       dockerfile: geo.Dockerfile
-      args:
-        UID: 5000
-        GID: 5000
     container_name: marxan-test-unit-geoprocessing
     command: test-unit
-    user: "5000:5000"
     volumes:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs

@@ -1,3 +1,4 @@
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -23,30 +24,42 @@ import {
 } from './project-requests-info';
 import { GetProjectErrors, GetProjectQuery } from '@marxan/projects';
 import {
-  ChangeBlmRange,
-  ChangeRangeErrors,
-} from '@marxan-api/modules/projects/blm';
-import {
-  GetFailure,
-  ProjectBlm,
+  Blm,
+  GetProjectFailure as GetBlmFailure,
   ProjectBlmRepo,
 } from '@marxan-api/modules/blm';
-import { ProjectAccessControl } from '../access-control';
-import { forbiddenError } from '@marxan-api/modules/access-control';
-import { Permit } from '../access-control/access-control.types';
-
 import {
   ExportId,
   ExportProject,
   GetExportArchive,
 } from '@marxan-api/modules/clone';
+import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
+import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
-import { createReadStream } from 'fs';
-import { EditGuard } from '@marxan-api/modules/projects/edit-guard/edit-guard.service';
+import { Readable } from 'stream';
+import { ProjectAccessControl } from '@marxan-api/modules/access-control';
+import { Permit } from '@marxan-api/modules/access-control/access-control.types';
+import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
+import { ApiEventsService } from '../api-events';
+import {
+  ChangeProjectBlmRange,
+  ChangeProjectRangeErrors,
+} from '@marxan-api/modules/projects/blm';
+import { UploadExportFile } from '../clone/infra/import/upload-export-file.command';
+import { unknownError } from '@marxan/files-repository';
+import {
+  ImportArchive,
+  ImportError,
+} from '../clone/import/application/import-archive.command';
 
 export { validationFailed } from '../planning-areas';
 
+export const projectNotFound = Symbol(`project not found`);
+export const notAllowed = Symbol(`not allowed to that action`);
 export const notFound = Symbol(`project not found`);
+export const exportNotFound = Symbol(`project export not found`);
+export const apiEventDataNotFound = Symbol(`missing data in api event`);
 
 @Injectable()
 export class ProjectsService {
@@ -59,7 +72,8 @@ export class ProjectsService {
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
-    private readonly editGuard: EditGuard,
+    private readonly blockGuard: BlockGuard,
+    private readonly apiEventsService: ApiEventsService,
   ) {}
 
   async findAllGeoFeatures(
@@ -93,7 +107,7 @@ export class ProjectsService {
   async findOne(
     id: string,
     info: ProjectsServiceRequest,
-  ): Promise<Either<typeof notFound | typeof forbiddenError, Project>> {
+  ): Promise<Either<typeof projectNotFound | typeof forbiddenError, Project>> {
     try {
       const project = await this.projectsCrud.getById(id, undefined, info);
       if (
@@ -107,14 +121,14 @@ export class ProjectsService {
       return right(project);
     } catch (error) {
       // library-sourced errors are no longer instances of HttpException
-      return left(notFound);
+      return left(projectNotFound);
     }
   }
 
   async findProjectBlm(
     projectId: string,
     userId: string,
-  ): Promise<Either<GetFailure | typeof forbiddenError, ProjectBlm>> {
+  ): Promise<Either<GetBlmFailure | typeof forbiddenError, Blm>> {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -148,7 +162,7 @@ export class ProjectsService {
     input: UpdateProjectDTO,
     userId: string,
   ): Promise<Either<Permit, Project>> {
-    await this.editGuard.ensureEditingIsAllowedFor(projectId);
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(false);
@@ -157,30 +171,45 @@ export class ProjectsService {
   }
 
   async updateBlmValues(
-    userId: string,
     projectId: string,
+    userId: string,
     range: [number, number],
-  ): Promise<Either<ChangeRangeErrors | typeof forbiddenError, ProjectBlm>> {
+  ): Promise<Either<ChangeProjectRangeErrors | typeof forbiddenError, Blm>> {
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
+
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(forbiddenError);
     }
-    return await this.commandBus.execute(new ChangeBlmRange(projectId, range));
+    return await this.commandBus.execute(
+      new ChangeProjectBlmRange(projectId, range),
+    );
   }
 
-  async requestExport(projectId: string): Promise<string> {
-    // ACL slot
+  async requestExport(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError | typeof projectNotFound, string>> {
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
-    return (
-      await this.commandBus.execute(
-        new ExportProject(new ResourceId(projectId)),
-      )
-    ).value;
+    const canExportProject = await this.projectAclService.canExportProject(
+      userId,
+      projectId,
+    );
+
+    if (!canExportProject) return left(forbiddenError);
+
+    const exportId = await this.commandBus.execute(
+      new ExportProject(new ResourceId(projectId)),
+    );
+    return right(exportId.value);
   }
 
   async remove(
     projectId: string,
     userId: string,
   ): Promise<Either<Permit, void>> {
+    await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
+
     if (!(await this.projectAclService.canDeleteProject(userId, projectId))) {
       return left(false);
     }
@@ -199,6 +228,7 @@ export class ProjectsService {
     return right(new Project());
   }
 
+  // TODO add ensureThatProjectIsNotBlocked guard
   savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
     this.planningAreaService,
   );
@@ -212,12 +242,95 @@ export class ProjectsService {
     );
   }
 
-  async getExportedArchive(projectId: string, exportId: string) {
-    // ACL
-    const location = await this.queryBus.execute(
-      new GetExportArchive(new ExportId(exportId)),
+  async getExportedArchive(
+    projectId: string,
+    userId: string,
+    exportId: string,
+  ): Promise<
+    Either<
+      GetArchiveLocationFailure | typeof notAllowed | typeof projectNotFound,
+      Readable
+    >
+  > {
+    const response = await this.assertProject(projectId, { id: userId });
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
+      userId,
+      projectId,
     );
-    // MARXAN-1129
-    return location ? createReadStream(location.value) : null;
+
+    if (!canDownloadExport) return left(notAllowed);
+
+    return this.queryBus.execute(new GetExportArchive(new ExportId(exportId)));
+  }
+
+  async getLatestExportForProject(
+    projectId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      | typeof exportNotFound
+      | typeof forbiddenError
+      | typeof apiEventDataNotFound
+      | typeof projectNotFound,
+      string
+    >
+  > {
+    const response = await this.assertProject(projectId, { id: userId });
+
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
+      userId,
+      projectId,
+    );
+
+    if (!canDownloadExport) return left(forbiddenError);
+
+    try {
+      const latestExportFinishedApiEvent = await this.apiEventsService.getLatestEventForTopic(
+        {
+          kind: API_EVENT_KINDS.project__export__finished__v1__alpha,
+          topic: projectId,
+        },
+      );
+      const exportId = latestExportFinishedApiEvent.data?.exportId as
+        | string
+        | undefined;
+      if (!exportId) return left(apiEventDataNotFound);
+      return right(exportId);
+    } catch (err) {
+      return left(exportNotFound);
+    }
+  }
+
+  async findAllLocks(
+    projectId: string,
+    userId: string,
+  ): Promise<Either<typeof forbiddenError, ScenarioLockResultPlural>> {
+    return await this.projectAclService.findAllLocks(userId, projectId);
+  }
+
+  async importProject(
+    exportFile: Express.Multer.File,
+  ): Promise<Either<typeof unknownError | ImportError, string>> {
+    const archiveLocationOrError = await this.commandBus.execute(
+      new UploadExportFile(exportFile),
+    );
+
+    if (isLeft(archiveLocationOrError)) {
+      return archiveLocationOrError;
+    }
+
+    const importIdOrError = await this.commandBus.execute(
+      new ImportArchive(archiveLocationOrError.right),
+    );
+
+    if (isLeft(importIdOrError)) {
+      return importIdOrError;
+    }
+
+    return right(importIdOrError.right);
   }
 }

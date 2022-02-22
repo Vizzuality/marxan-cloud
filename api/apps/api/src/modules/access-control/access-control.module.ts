@@ -12,12 +12,21 @@ import { ScenarioAclModule } from './scenarios-acl/scenario-acl.module';
 import { ScenarioAccessControl } from './scenarios-acl/scenario-access-control';
 import { ScenarioAclService } from './scenarios-acl/scenario-acl.service';
 import { ScenarioAclController } from './scenarios-acl/scenario-acl.controller';
+import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { ScenarioLockEntity } from './scenarios-acl/locks/entity/scenario.lock.api.entity';
+import { LockService } from './scenarios-acl/locks/lock.service';
+import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([UsersProjectsApiEntity]),
+    TypeOrmModule.forFeature([
+      UsersProjectsApiEntity,
+      UsersScenariosApiEntity,
+      PublishedProject,
+      ScenarioLockEntity,
+      IssuedAuthnToken,
+    ]),
     ProjectAclModule,
-    TypeOrmModule.forFeature([UsersScenariosApiEntity]),
     ScenarioAclModule,
   ],
   providers: [
@@ -29,6 +38,7 @@ import { ScenarioAclController } from './scenarios-acl/scenario-acl.controller';
       provide: ScenarioAccessControl,
       useClass: ScenarioAclService,
     },
+    LockService,
   ],
   controllers: [ProjectAclController, ScenarioAclController],
   exports: [ProjectAccessControl, ScenarioAccessControl],

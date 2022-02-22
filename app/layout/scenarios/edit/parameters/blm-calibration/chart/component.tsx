@@ -130,11 +130,12 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   });
 
   const onSaveBlm = useCallback((value) => {
+    const BLM = +value.toFixed(0);
     const meta = {
       scenarioEditingMetadata,
       marxanInputParameterFile: {
         ...marxanInputParameterFile,
-        BLM: value,
+        BLM,
       },
     };
 
@@ -142,6 +143,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
       id: `${sid}`,
       data:
       {
+        boundaryLengthModifier: BLM,
         metadata: mergeScenarioStatusMetaData(meta, {
           tab: ScenarioSidebarTabs.PARAMETERS,
           subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
