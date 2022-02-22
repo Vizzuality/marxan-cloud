@@ -78,7 +78,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
             <p>
               Under
               {' '}
-              <b>Details</b>
+              <b>Solution Overview</b>
               {' '}
               you will find the information
               for each of the

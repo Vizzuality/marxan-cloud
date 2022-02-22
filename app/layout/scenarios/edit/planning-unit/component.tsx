@@ -13,6 +13,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import { useProjectRole } from 'hooks/project-users';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
+import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import AdjustPanningUnits from 'layout/scenarios/edit/planning-unit/adjust-planning-units';
 import CostSurface from 'layout/scenarios/edit/planning-unit/cost-surface';
@@ -106,74 +107,122 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
-      <motion.div
-        key="planning-unit"
-        className="flex flex-col min-h-0 overflow-hidden"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+      <HelpBeacon
+        id="scenarios-analysis"
+        title="Planning Unit"
+        subtitle="Fine tune your Marxan plan"
+        content={(
+          <div className="space-y-2">
+            <p>
+              This section helps you refine your
+              plan by allowing you to:
+            </p>
+            <ol className="pl-6 space-y-2 list-disc">
+              <li>
+                <p>
+                  Add any existing
+                  {' '}
+                  <b> PROTECTED AREAS</b>
+                  {' '}
+                  you would
+                  like to include in the plan. They will be
+                  included as locked-in areas (meaning they will be
+                  included in all the solutions of this scenario).
+                </p>
+                <p>
+                  You can select current
+                  protected areas listed in World Database of
+                  Protected Areas (WCMC-UNEP)
+                  or upload your own protected area geometry.
+                </p>
+              </li>
+              <li>
+                Exclude or force include
+                some planning units in the analysis in
+                <b>
+                  {' '}
+                  ADJUST
+                  PLANNING UNITS
+                </b>
+              </li>
+              <li>
+                Add a cost surface in
+                <b> COST SURFACE</b>
+              </li>
+            </ol>
+          </div>
+        )}
+        modifiers={['flip']}
+        tooltipPlacement="left"
       >
-        <AnimatePresence>
-          <Pill selected>
-            <header className="flex justify-between flex-shrink-0">
-              <div>
-                <div className="flex items-baseline space-x-4">
-                  <h2 className="text-lg font-medium font-heading">Planning Unit</h2>
+        <motion.div
+          key="planning-unit"
+          className="flex flex-col min-h-0 overflow-hidden"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <AnimatePresence>
+            <Pill selected>
+              <header className="flex justify-between flex-shrink-0">
+                <div>
+                  <div className="flex items-baseline space-x-4">
+                    <h2 className="text-lg font-medium font-heading">Planning Unit</h2>
+                  </div>
                 </div>
-              </div>
-            </header>
+              </header>
 
-            {!subtab && (
-              <Sections
-                key="sections"
-                sections={SECTIONS}
-                onChangeSection={onChangeSection}
-              />
-            )}
-
-            {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
-              || subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD)
-              && (
-                <ProtectedAreas
-                  key="protected-areas"
+              {!subtab && (
+                <Sections
+                  key="sections"
+                  sections={SECTIONS}
+                  onChangeSection={onChangeSection}
                 />
               )}
 
-            {subtab === ScenarioSidebarSubTabs.COST_SURFACE && (
-              <CostSurface
-                key="cost-surface"
-                onChangeSection={onChangeSection}
-              />
-            )}
+              {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+                || subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD)
+                && (
+                  <ProtectedAreas
+                    key="protected-areas"
+                  />
+                )}
 
-            {subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS && (
-              <AdjustPanningUnits
-                key="adjust-planning-units"
-                onChangeSection={onChangeSection}
-              />
-            )}
-          </Pill>
+              {subtab === ScenarioSidebarSubTabs.COST_SURFACE && (
+                <CostSurface
+                  key="cost-surface"
+                  onChangeSection={onChangeSection}
+                />
+              )}
 
-          {!subtab && (
-            <motion.div
-              key="continue-scenario-button"
-              className="flex justify-center flex-shrink-0 mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <Button
-                theme="primary"
-                size="lg"
-                disabled={VIEWER}
-                onClick={onContinue}
+              {subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS && (
+                <AdjustPanningUnits
+                  key="adjust-planning-units"
+                  onChangeSection={onChangeSection}
+                />
+              )}
+            </Pill>
+
+            {!subtab && (
+              <motion.div
+                key="continue-scenario-button"
+                className="flex justify-center flex-shrink-0 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                Continue
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+                <Button
+                  theme="primary"
+                  size="lg"
+                  disabled={VIEWER}
+                  onClick={onContinue}
+                >
+                  Continue
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </HelpBeacon>
     </div>
-
   );
 };
 
