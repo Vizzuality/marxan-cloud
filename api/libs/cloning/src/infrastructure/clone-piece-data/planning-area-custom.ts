@@ -1,3 +1,7 @@
+export interface PlanningAreaCustomContent {
+  planningAreaGeom: number[];
+}
+
 export interface PlanningAreaCustomRelativePathsType {
   planningArea: string;
   customPaGeoJson: string;
