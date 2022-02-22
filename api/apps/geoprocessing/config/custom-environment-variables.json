@@ -34,10 +34,7 @@
     "connection": {
       "host": "REDIS_HOST",
       "port": "REDIS_PORT",
-      "password": "REDIS_PASSWORD",
-      "tls": {
-        "host": "REDIS_TLS_HOST"
-      }
+      "password": "REDIS_PASSWORD"
     }
   },
   "api": {

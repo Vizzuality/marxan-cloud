@@ -4,4 +4,5 @@ output "redis_url" {
 
 output "redis_password" {
   value = azurerm_redis_cache.marxan.primary_access_key
+  sensitive = true
 }
