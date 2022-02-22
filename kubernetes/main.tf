@@ -52,7 +52,7 @@ module "key_vault_production" {
   project_name   = var.project_name
 }
 
-module "k8s_database" {
+module "k8s_api_database" {
   source                     = "./modules/database"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -61,19 +61,33 @@ module "k8s_database" {
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "production"
+  name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
 }
 
-#module "api_production" {
-#  source                     = "./modules/api"
-#  k8s_host                   = local.k8s_host
-#  k8s_client_certificate     = local.k8s_client_certificate
-#  k8s_client_key             = local.k8s_client_key
-#  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-#  namespace                  = "production"
-#  image                      = "marxan.azurecr.io/marxan-api:production"
-#  deployment_name            = "api"
-#}
+module "k8s_geoprocessing_database" {
+  source                     = "./modules/database"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "production"
+  name                       = "geoprocessing"
+  key_vault_id               = module.key_vault_production.key_vault_id
+}
+
+module "api_production" {
+  source                     = "./modules/api"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "production"
+  image                      = "marxan.azurecr.io/marxan-api:production"
+  deployment_name            = "api"
+}
 
 module "api_production_secret" {
   source                     = "./modules/secrets"
@@ -85,4 +99,5 @@ module "api_production_secret" {
   namespace                  = "production"
   name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
+  redis_host                 = data.terraform_remote_state.core.outputs.redis_url
 }

@@ -52,6 +52,7 @@ module "data_node_pool" {
   aks_cluster_id = module.kubernetes.cluster_id
   resource_group = data.azurerm_resource_group.resource_group
   project_name = var.project_name
+  subnet_id = module.network.aks_subnet_id
   node_labels = {
     type : "data"
   }
@@ -63,6 +64,7 @@ module "app_node_pool" {
   aks_cluster_id = module.kubernetes.cluster_id
   resource_group = data.azurerm_resource_group.resource_group
   project_name = var.project_name
+  subnet_id = module.network.aks_subnet_id
   node_labels = {
     type : "app"
   }

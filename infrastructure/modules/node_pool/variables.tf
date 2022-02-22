@@ -53,3 +53,6 @@ variable "node_labels" {
   description = "A map of Kubernetes labels which should be applied to nodes in this Node Pool"
 }
 
+variable "subnet_id" {
+  type = string
+}

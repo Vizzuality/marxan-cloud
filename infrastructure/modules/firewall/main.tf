@@ -43,7 +43,7 @@ resource "azurerm_firewall" "firewall" {
   lifecycle {
     ignore_changes = [
       tags,
-      
+
     ]
   }
 }
@@ -121,7 +121,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "policy" {
         type = "Https"
       }
     }
-    
+
     rule {
       name             = "AllowImagesFqdns"
       source_addresses = ["*"]
@@ -237,6 +237,7 @@ resource "azurerm_monitor_diagnostic_setting" "settings" {
   name                       = "DiagnosticsSettings"
   target_resource_id         = azurerm_firewall.firewall.id
   log_analytics_workspace_id = var.log_analytics_workspace_id
+  log_analytics_destination_type = "AzureDiagnostics"
 
   log {
     category = "AzureFirewallApplicationRule"
