@@ -1,4 +1,4 @@
-# Difference map - High-level design
+# Difference maps - High-level design
 
 This document aims at providing an overview of the architecture of the difference maps for
 the Marxan platform.
