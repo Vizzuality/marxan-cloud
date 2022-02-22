@@ -157,40 +157,38 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
       <HelpBeacon
-        id="scenarios-analysis"
+        id="run-settings"
         title="Parameters"
-        subtitle="Fine tune your Marxan plan"
+        subtitle="Marxan settings"
         content={(
           <div className="space-y-2">
             <p>
-              This section helps you refine your
-              plan by allowing you to:
+              Before you run Marxan, you can adjust some
+              parameters.
             </p>
-            <ol className="pl-6 space-y-2 list-disc">
-              <li>
-                Evaluate your set targets by viewing the
-                current conservation status of your
-                features in the
-                <b> GAP ANALYSIS</b>
-              </li>
-              <li>
-                Add a cost surface in
-                <b> COST SURFACE</b>
-              </li>
-              <li>
-                Exclude or force include
-                some planning units in the analysis in
-                <b>
-                  {' '}
-                  ADJUST
-                  PLANNING UNITS
-                </b>
-              </li>
-            </ol>
+            <p>
+              Everything is pre-set to the default values recommended
+              by the Marxan manual, but you can choose other allowed values.
+            </p>
+            <p>
+              Some of these parameters have more implications that others.
+              Particularly important is to decide the
+              {' '}
+              <b>Number of Runs</b>
+              ,
+              the
+              {' '}
+              <b>Clumping</b>
+              {' '}
+              and the
+              {' '}
+              <b>Conservation Feature missing proportion</b>
+            </p>
           </div>
         )}
+        beaconClassName="z-50"
         modifiers={['flip']}
-        tooltipPlacement="left"
+        tooltipPlacement="right"
       >
 
         <motion.div
