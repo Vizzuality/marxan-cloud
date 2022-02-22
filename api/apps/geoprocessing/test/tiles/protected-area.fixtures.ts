@@ -33,6 +33,9 @@ export const getFixtures = async () => {
           FROM (
                  SELECT json_array_elements($1::json -> 'features') AS features
                ) AS f
+          ON CONFLICT ON CONSTRAINT unique_custom_protected_area_geometries_per_project
+          DO UPDATE
+            SET full_name = EXCLUDED.full_name
         `,
         [geoJson, projectId, `area-name`],
       );

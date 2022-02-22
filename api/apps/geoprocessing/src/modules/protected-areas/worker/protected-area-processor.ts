@@ -44,7 +44,10 @@ export class ProtectedAreaProcessor
           FROM (
                  SELECT json_array_elements($1::json -> 'features') AS features
                ) AS f
-          RETURNING "id"
+          ON CONFLICT ON CONSTRAINT unique_custom_protected_area_geometries_per_project
+          DO UPDATE
+            SET full_name = EXCLUDED.full_name
+          RETURNING "id";
         `,
         [geo, job.data.projectId, job.data.name || job.data.shapefile.filename],
       );

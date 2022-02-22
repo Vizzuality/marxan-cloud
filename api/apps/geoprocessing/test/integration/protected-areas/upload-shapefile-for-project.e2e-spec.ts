@@ -1,5 +1,6 @@
 import { createWorld } from './steps/shapefile-for-wdpa-world';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { v4 } from 'uuid';
 
 let world: FixtureType<typeof createWorld>;
 
@@ -24,16 +25,12 @@ test(`uses provided name as protected area's "fullName"`, async () => {
   expect(await world.ThenProtectedAreaIsAvailable(name)).toEqual(true);
 });
 
-test(`adding the same shape twice`, async () => {
+test(`adding the same shape twice succeeds and results in the latest protected area name to be set`, async () => {
   expect.assertions(1);
+  const updatedProtectedAreaName = v4();
   await world.WhenNewShapefileIsSubmitted(`custom name`);
-  try {
-    await world.WhenNewShapefileIsSubmitted(`custom name`);
-  } catch (error) {
-    expect(
-      error.toString().match(`wpdpa_project_geometries_project_check`),
-    ).toBeTruthy();
-  }
+  await world.WhenNewShapefileIsSubmitted(updatedProtectedAreaName);
+  await world.ThenProtectedAreaNameIsUpdated(updatedProtectedAreaName);
 });
 
 afterAll(async () => {

@@ -65,5 +65,13 @@ export const createWorld = async () => {
         })
         // note that the_geom has select: false in entity definition
         .then((results) => results.length > 0),
+    ThenProtectedAreaNameIsUpdated: async (newShapeName: string) => {
+      const countOfCustomProtectedAreasWithGivenName = await repo.count({
+        where: {
+          fullName: newShapeName,
+        },
+      });
+      expect(countOfCustomProtectedAreasWithGivenName).toBe(1);
+    },
   };
 };
