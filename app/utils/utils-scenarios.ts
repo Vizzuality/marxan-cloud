@@ -52,7 +52,7 @@ export const mergeScenarioStatusMetaData = (
       ...scenarioEditingMetadata,
       status: {
         ...scenarioEditingMetadata.status,
-        [tab]: scenarioEditingMetadata.status[tab] === 'empty' ? 'draft' : scenarioEditingMetadata.status[tab],
+        [tab]: (scenarioEditingMetadata.status[tab] === 'empty' || saveStatus) ? 'draft' : scenarioEditingMetadata.status[tab],
         ...saveStatus && {
           ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
             return {

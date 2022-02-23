@@ -9,6 +9,7 @@ import Icon from 'components/icon';
 import ProgressBar from 'components/progress-bar';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
+import LOCK_SVG from 'svgs/ui/lock.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
 import Settings from './settings';
@@ -90,6 +91,7 @@ export const Item: React.FC<ItemProps> = ({
   className,
   jobs,
   runStatus,
+  lock,
   onEdit,
   onCancelRun,
   onDelete,
@@ -182,33 +184,40 @@ export const Item: React.FC<ItemProps> = ({
                     </div>
                   )}
 
-                  <div className="leading-none">
-                    <h2
-                      className="text-sm font-medium font-heading clamp-1"
-                      title={name}
-                    >
-                      {name}
-                    </h2>
+                  <div className="flex items-center space-x-4 leading-none">
+                    {lock && (
+                      <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-gray-500 rounded-full">
+                        <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
+                      </div>
+                    )}
+                    <div>
+                      <h2
+                        className="text-sm font-medium font-heading clamp-1"
+                        title={name}
+                      >
+                        {name}
+                      </h2>
 
-                    <div className="clamp-1">
-                      <span
-                        className={cx({
-                          'm-0 text-xs inline-block': true,
-                          [SCENARIO_STATES[status].styles]:
-                            status !== SCENARIO_STATES[status].text,
-                        })}
-                      >
-                        {`${SCENARIO_STATES[status].text} `}
-                      </span>
-                      <span
-                        className={cx({
-                          'ml-1 text-xs inline-block': true,
-                          [SCENARIO_STATES[status].styles]:
-                            status !== SCENARIO_STATES[status].text,
-                        })}
-                      >
-                        {lastUpdateDistance}
-                      </span>
+                      <div className="clamp-1">
+                        <span
+                          className={cx({
+                            'm-0 text-xs inline-block': true,
+                            [SCENARIO_STATES[status].styles]:
+                              status !== SCENARIO_STATES[status].text,
+                          })}
+                        >
+                          {`${SCENARIO_STATES[status].text} `}
+                        </span>
+                        <span
+                          className={cx({
+                            'ml-1 text-xs inline-block': true,
+                            [SCENARIO_STATES[status].styles]:
+                              status !== SCENARIO_STATES[status].text,
+                          })}
+                        >
+                          {lastUpdateDistance}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
