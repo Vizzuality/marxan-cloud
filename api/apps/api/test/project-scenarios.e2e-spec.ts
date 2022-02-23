@@ -30,21 +30,9 @@ afterEach(async () => {
 });
 
 describe('ScenariosModule (e2e)', () => {
-  // beforeEach(async () => {
-  //   const response = await request(app.getHttpServer())
-  //     .get('/api/v1/projects')
-  //     .set('Authorization', `Bearer ${ownerToken}`)
-  //     .expect(200);
-  //   projects = response.body.data;
-  // });
-
   afterEach(async () => {
     await fixtures.cleanup();
   });
-
-  // it('Gets projects', async () => {
-  //   expect(projects[0].type).toBe('projects');
-  // });
 
   it('Creating a scenario with incomplete data should fail', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithIncompleteData();

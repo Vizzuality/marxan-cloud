@@ -177,7 +177,7 @@ export class UsersController {
     @Request() req: RequestWithAuthenticatedUser,
     @Param('id', ParseUUIDPipe) userIdToDelete: string,
   ): Promise<void> {
-    const result = await this.service.addAdmin(req.user.id, userIdToDelete);
+    const result = await this.service.deleteAdmin(req.user.id, userIdToDelete);
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
