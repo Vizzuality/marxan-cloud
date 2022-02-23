@@ -81,12 +81,3 @@ resource "azuread_application_federated_identity_credential" "github-actions-acc
   issuer                = "https://token.actions.githubusercontent.com"
   subject               = "repo:Vizzuality/marxan-cloud:ref:refs/heads/main"
 }
-
-resource "azuread_application_federated_identity_credential" "github-actions-access-temp" {
-  application_object_id = azuread_application.github-actions-access.object_id
-  display_name          = "github-actions-access-temp"
-  description           = "Deployments from github actions"
-  audiences             = ["api://AzureADTokenExchange"]
-  issuer                = "https://token.actions.githubusercontent.com"
-  subject               = "repo:Vizzuality/marxan-cloud:ref:refs/heads/infrastructure/data-layer"
-}
