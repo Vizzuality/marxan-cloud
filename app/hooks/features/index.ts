@@ -553,7 +553,8 @@ export function useUploadFeaturesShapefile({
 
   return useMutation(uploadFeatureShapefile, {
     onSuccess: (data: any, variables, context) => {
-      queryClient.invalidateQueries(['all-features']);
+      const { id: projectId } = variables;
+      queryClient.invalidateQueries(['all-features', projectId]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
