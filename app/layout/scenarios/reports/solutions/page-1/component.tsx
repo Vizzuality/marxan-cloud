@@ -61,7 +61,7 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
     reportDataIsFetched && (
       <div className="flex space-x-4">
 
-        <section className="w-1/3 pt-6 space-y-8 text-xs">
+        <section className="w-1/3 space-y-8 text-xs leading-5">
           <div>
             <p className="font-semibold">Contributors</p>
             <p>{contributors.join(', ')}</p>

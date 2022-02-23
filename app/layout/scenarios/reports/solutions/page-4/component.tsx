@@ -131,7 +131,7 @@ export const ScenariosReportPage4: React.FC<ScenariosReportPage4Props> = () => {
           </div>
         </section>
 
-        <section className="w-1/2 text-xs leading-7">
+        <section className="w-1/2 text-xs leading-6">
           {SCENARIO_PARAMETERS.map((p) => {
             const { description, value } = p;
             return (

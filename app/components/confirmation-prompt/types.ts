@@ -23,17 +23,24 @@ export interface ConfirmationPromptProps {
    */
   icon?: IconProps['icon'],
   /**
-   * Callback executed when the user accepts the action
+   * Optional boolean to set dangeroust prompts.
    */
   danger?: boolean,
   /**
-   * Optional boolean to set dangeroust prompts.
+   * Optional button texts
+   */
+  options?: {
+    acceptText?: string;
+    refuseText?: string;
+  },
+  /**
+   * Callback executed when the user accepts the action
    */
   onAccept: () => void,
   /**
    * Callback executed when the user refuses the action
    */
-  onRefuse: () => void,
+  onRefuse?: () => void,
   /**
    * Callback executed when the user dismisses the prompt. Only relevant if `dismissible` is true or
    * unset.
