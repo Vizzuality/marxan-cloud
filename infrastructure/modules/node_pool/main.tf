@@ -9,4 +9,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "node_pool" {
   vnet_subnet_id        = var.subnet_id
 
   node_labels = var.node_labels
+
+  lifecycle {
+    ignore_changes = [node_count]
+  }
 }

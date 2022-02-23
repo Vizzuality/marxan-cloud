@@ -29,3 +29,7 @@ output "bastion_subnet_id" {
 output "firewall_subnet_id" {
   value = azurerm_subnet.firewall_subnet.id
 }
+
+output "app_gateway_subnet_id" {
+  value = azurerm_subnet.app_gateway_subnet.id
+}

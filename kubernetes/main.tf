@@ -45,6 +45,9 @@ module "k8s_namespaces" {
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
 }
 
+####
+# Production
+####
 module "key_vault_production" {
   source         = "./modules/key_vault"
   namespace      = "production"
@@ -52,7 +55,7 @@ module "key_vault_production" {
   project_name   = var.project_name
 }
 
-module "k8s_api_database" {
+module "k8s_api_database_production" {
   source                     = "./modules/database"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -65,7 +68,7 @@ module "k8s_api_database" {
   key_vault_id               = module.key_vault_production.key_vault_id
 }
 
-module "k8s_geoprocessing_database" {
+module "k8s_geoprocessing_database_production" {
   source                     = "./modules/database"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -89,7 +92,18 @@ module "api_production" {
   deployment_name            = "api"
 }
 
-module "api_production_secret" {
+module "geoprocessing_production" {
+  source                     = "./modules/geoprocessing"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "production"
+  image                      = "marxan.azurecr.io/marxan-geoprocessing:production"
+  deployment_name            = "geoprocessing"
+}
+
+module "production_secrets" {
   source                     = "./modules/secrets"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -99,6 +113,90 @@ module "api_production_secret" {
   namespace                  = "production"
   name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
+  redis_host                 = data.terraform_remote_state.core.outputs.redis_url
+  redis_password             = data.terraform_remote_state.core.outputs.redis_password
+}
+
+module "ingress_production" {
+  source                     = "./modules/ingress"
+  namespace                  = "production"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+}
+
+
+####
+# Staging
+####
+module "key_vault_staging" {
+  source         = "./modules/key_vault"
+  namespace      = "staging"
+  resource_group = data.azurerm_resource_group.resource_group
+  project_name   = var.project_name
+}
+
+module "k8s_api_database_staging" {
+  source                     = "./modules/database"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "staging"
+  name                       = "api"
+  key_vault_id               = module.key_vault_staging.key_vault_id
+}
+
+module "k8s_geoprocessing_database_staging" {
+  source                     = "./modules/database"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "staging"
+  name                       = "geoprocessing"
+  key_vault_id               = module.key_vault_staging.key_vault_id
+}
+
+module "api_staging" {
+  source                     = "./modules/api"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "staging"
+  image                      = "marxan.azurecr.io/marxan-api:staging"
+  deployment_name            = "api"
+}
+
+module "geoprocessing_staging" {
+  source                     = "./modules/geoprocessing"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "staging"
+  image                      = "marxan.azurecr.io/marxan-geoprocessing:staging"
+  deployment_name            = "geoprocessing"
+}
+
+module "staging_secrets" {
+  source                     = "./modules/secrets"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  project_name               = var.project_name
+  namespace                  = "staging"
+  name                       = "api"
+  key_vault_id               = module.key_vault_staging.key_vault_id
   redis_host                 = data.terraform_remote_state.core.outputs.redis_url
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
 }

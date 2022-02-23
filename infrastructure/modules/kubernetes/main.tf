@@ -66,6 +66,17 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
 
   private_dns_zone_id = azurerm_private_dns_zone.private_dns_zone.id
 
+  addon_profile {
+    ingress_application_gateway {
+      enabled                    = true
+      gateway_name = "${var.project_name}KubernetesIngress"
+      subnet_id                  = var.gateway_subnet_id
+    }
+    http_application_routing {
+      enabled = true
+    }
+  }
+
   network_profile {
     network_plugin     = "azure"
     network_policy     = "azure"
