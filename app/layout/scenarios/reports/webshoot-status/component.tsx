@@ -71,12 +71,15 @@ export const WebShootStatus: React.FC<WebShootStatusProps> = () => {
     if (reportDataIsFetched) {
       setTimeout(() => {
         globalThis.MARXAN = {
-          webshoot_ready: true,
+          webshot_ready: true,
+          options: {
+            landscape: true,
+          },
         };
       }, 3000);
     } else if (!reportDataIsFetched) {
       globalThis.MARXAN = {
-        webshoot_ready: false,
+        webshot_ready: false,
       };
     }
   }, [reportDataIsFetched]);
