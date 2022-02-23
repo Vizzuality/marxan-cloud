@@ -32,7 +32,7 @@ export const HomeSupportItem: React.FC<HomeSupportItemProps> = ({
         }}
       >
         <div key={`${id}`} className="flex items-center space-x-6">
-          <img alt={text} src={image} />
+          <img alt={text} className="w-26" src={image} />
           <p className="text-lg text-white">{text}</p>
         </div>
       </motion.div>

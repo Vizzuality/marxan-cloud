@@ -45,7 +45,7 @@ export const HomeSupport: React.FC<HomeSupportProps> = () => {
           >
             <h3 className="text-2xl text-white md:text-4xl font-heading">
               Types of planning problems that
-              {' '}
+              <br />
               <span className="text-primary-500">Marxan can support:</span>
             </h3>
           </motion.div>

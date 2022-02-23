@@ -101,12 +101,12 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
 
           >
             <button
-              className="mt-8 text-sm focus:outline-none"
+              className="mt-8 focus:outline-none"
               type="button"
               onClick={onDiscover}
             >
               Discover more
-              <ARROW_DOWN_SVG className="inline w-3 ml-3 animate-bounce" fill="white" />
+              <ARROW_DOWN_SVG className="inline w-3.5 ml-3.5 animate-bounce" fill="white" />
             </button>
           </motion.div>
         </div>
