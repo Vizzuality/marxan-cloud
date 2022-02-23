@@ -9,14 +9,21 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface SelectResult {
+interface PlanningAreaSelectResult {
   geojson: string;
   ewkb: Buffer;
+}
+
+interface ProjectSelectResult {
+  planning_unit_grid_shape: PlanningUnitGridShape;
+  bbox: number[];
+  planning_unit_area_km2: number;
 }
 
 @Injectable()
@@ -25,7 +32,9 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.default)
-    private readonly entityManager: EntityManager,
+    private readonly geoprocessingEntityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
   ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
@@ -38,7 +47,22 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     const relativePaths =
       ClonePieceRelativePaths[ClonePiece.PlanningAreaCustom];
 
-    const [result]: [SelectResult] = await this.entityManager.query(
+    const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
+      `
+        SELECT planning_unit_grid_shape, planning_unit_area_km2, bbox
+        FROM projects
+        WHERE id = $1
+      `,
+      [input.resourceId],
+    );
+
+    if (!project) {
+      throw new Error(`Project with ID ${input.resourceId} not found`);
+    }
+
+    const [planningArea]: [
+      PlanningAreaSelectResult,
+    ] = await this.geoprocessingEntityManager.query(
       `
         SELECT ST_AsEWKB(the_geom) as ewkb, ST_AsGeoJSON(the_geom) as geojson
         FROM planning_areas
@@ -47,19 +71,22 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       [input.resourceId],
     );
 
-    if (!result) {
+    if (!planningArea) {
       throw new Error(
         `Custom planning area not found for project with ID: ${input.resourceId}`,
       );
     }
 
     const planningAreaGeoJson = await this.fileRepository.save(
-      Readable.from(result.geojson),
+      Readable.from(planningArea.geojson),
       `json`,
     );
 
     const content: PlanningAreaCustomContent = {
-      planningAreaGeom: result.ewkb.toJSON().data,
+      planningAreaBbox: project.bbox,
+      puAreaKm2: project.planning_unit_area_km2,
+      puGridShape: project.planning_unit_grid_shape,
+      planningAreaGeom: planningArea.ewkb.toJSON().data,
     };
 
     const outputFile = await this.fileRepository.save(

@@ -1,5 +1,10 @@
+import { PlanningUnitGridShape } from '../../../../scenarios-planning-unit/src';
+
 export interface PlanningAreaCustomContent {
   planningAreaGeom: number[];
+  puGridShape: PlanningUnitGridShape;
+  puAreaKm2: number;
+  planningAreaBbox: number[];
 }
 
 export interface PlanningAreaCustomRelativePathsType {
