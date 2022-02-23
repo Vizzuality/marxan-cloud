@@ -106,7 +106,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     data.append('type', type);
 
     uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, {
-      onSuccess: ({ data: { data: g, id: shapefileId } }) => {
+      onSuccess: () => {
         setLoading(false);
         setSuccessFile({ ...successFile });
         onClose();
@@ -119,7 +119,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
           level: 'success',
         });
 
-        console.info('Shapefile uploaded', g, 'shapefileId', shapefileId);
+        console.info('Feature shapefile uploaded');
       },
       onError: ({ response }) => {
         const { errors } = response.data;
