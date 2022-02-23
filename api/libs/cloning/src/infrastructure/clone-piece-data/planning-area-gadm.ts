@@ -1,7 +1,7 @@
 import { PlanningUnitGridShape } from '../../../../scenarios-planning-unit/src';
 
 export interface PlanningAreaGadmContent {
-  country: string;
+  country?: string;
   l1?: string;
   l2?: string;
   puGridShape: PlanningUnitGridShape;
