@@ -28,6 +28,7 @@ import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
 export const forbiddenError = Symbol(`unauthorized access`);
+export const userNotFoundError = Symbol(`user not found in database`);
 @Injectable()
 export class UsersService extends AppBaseService<
   User,
@@ -238,19 +239,16 @@ export class UsersService extends AppBaseService<
   async addAdmin(
     loggedUserId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
-    return this.adminRepo.manager.transaction(async (entityManager) => {
-      if (!(await this.isPlatformAdmin(loggedUserId))) {
-        return left(forbiddenError);
-      }
+  ): Promise<Either<typeof forbiddenError | typeof userNotFoundError, void>> {
+    if (!(await this.isPlatformAdmin(loggedUserId))) {
+      return left(forbiddenError);
+    }
+    if (!(await this.getById(userId))) {
+      return left(userNotFoundError);
+    }
 
-      const admin = new PlatformAdminEntity();
-      admin.userId = userId;
-
-      await entityManager.save(admin);
-
-      return right(void 0);
-    });
+    await this.adminRepo.save({ userId });
+    return right(void 0);
   }
 
   async deleteAdmin(

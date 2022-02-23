@@ -4,6 +4,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -13,7 +14,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { User, userResource, UserResult } from './user.api.entity';
-import { UsersService } from './users.service';
+import {
+  forbiddenError,
+  userNotFoundError,
+  UsersService,
+} from './users.service';
 
 import {
   ApiBearerAuth,
@@ -133,7 +138,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    description: 'Get list of admins in platform.',
+    description: 'Get list of users with plaform admin role.',
   })
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
@@ -150,7 +155,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    description: 'Add user as admin.',
+    description: 'Grant platform admin role to user.',
   })
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
@@ -161,8 +166,19 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) userIdToAdd: string,
   ): Promise<void> {
     const result = await this.service.addAdmin(req.user.id, userIdToAdd);
+
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case userNotFoundError:
+          throw new NotFoundException('User not found.');
+        case forbiddenError:
+          throw new ForbiddenException(
+            `Unauthorized access: user ${req.user.id} is not a platform admin`,
+          );
+        default:
+          const _exhaustiveCheck: never = result.left;
+          return _exhaustiveCheck;
+      }
     }
   }
 
