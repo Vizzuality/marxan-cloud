@@ -65,7 +65,9 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
             </span>
           </InfoButton>
         </div>
-        <p className="text-sm opacity-50">{`Going below ${+parseInt(minPuAreaSize, 10)} km2 or above ${+parseInt(maxPuAreaSize, 10)} km2 could cause performance issues`}</p>
+        {minPuAreaSize && maxPuAreaSize && (
+          <p className="text-sm opacity-50">{`Going below ${+parseInt(minPuAreaSize, 10)} km2 or above ${+parseInt(maxPuAreaSize, 10)} km2 could cause performance issues`}</p>
+        )}
       </div>
 
       <div className="flex items-baseline mt-4">
