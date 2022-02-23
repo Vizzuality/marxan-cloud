@@ -15,6 +15,7 @@ import { ExportConfigScenarioPieceExporter } from './export-config.scenario-piec
   imports: [
     FileRepositoryModule,
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
+    TypeOrmModule.forFeature([], geoprocessingConnections.default),
   ],
   providers: [
     ProjectMetadataPieceExporter,

@@ -39,12 +39,14 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ),
     );
 
+    // TODO We should check project configuration before returning PlanningAreaCustom,
+    // PlanningAreaGAdm or PlanningAreaGridCustom pieces
     return [
       ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
       ExportComponent.newOne(id, ClonePiece.ExportConfig),
-      ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom),
-      ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
-      ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
+      // ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom),
+      // ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
+      // ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
       ...scenarioPieces.flat(),
     ];
   }
