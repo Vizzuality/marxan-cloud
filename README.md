@@ -227,7 +227,10 @@ Azure resources, like a [Resource Group](https://docs.microsoft.com/en-us/azure/
 or a [Storage Account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
 to store the "main" Terraform remote state
 - Apply the "main" `infrastructure` folder, which contains all the Azure 
-resources necessary to host a functioning Marxan application. 
+resources necessary to host a functioning [Azure AKS cluster](https://azure.microsoft.com/en-us/services/kubernetes-service/). 
+- Apply the "main" `kubernetes` folder, which contains all the 
+resources necessary to host a functioning Marxan application within the AKS 
+cluster provisioned above. 
 
 ## Bugs
 

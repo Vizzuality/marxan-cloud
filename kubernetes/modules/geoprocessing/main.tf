@@ -1,11 +1,11 @@
-resource "kubernetes_service" "api_service" {
+resource "kubernetes_service" "geoprocessing_service" {
   metadata {
-    name      = kubernetes_deployment.api_deployment.metadata[0].name
+    name      = kubernetes_deployment.geoprocessing_deployment.metadata[0].name
     namespace = var.namespace
   }
   spec {
     selector = {
-      name = kubernetes_deployment.api_deployment.metadata[0].name
+      name = kubernetes_deployment.geoprocessing_deployment.metadata[0].name
     }
     port {
       port = 3000
@@ -15,7 +15,7 @@ resource "kubernetes_service" "api_service" {
   }
 }
 
-resource "kubernetes_deployment" "api_deployment" {
+resource "kubernetes_deployment" "geoprocessing_deployment" {
   metadata {
     name      = var.deployment_name
     namespace = var.namespace
@@ -50,7 +50,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "API_POSTGRES_HOST"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "API_POSTGRES_HOST"
               }
             }
@@ -60,7 +60,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "API_POSTGRES_USER"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "API_POSTGRES_USER"
               }
             }
@@ -70,7 +70,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "API_POSTGRES_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "API_POSTGRES_PASSWORD"
               }
             }
@@ -80,7 +80,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "API_POSTGRES_DB"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "API_POSTGRES_DB"
               }
             }
@@ -90,7 +90,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "GEO_POSTGRES_HOST"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "GEO_POSTGRES_HOST"
               }
             }
@@ -100,7 +100,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "GEO_POSTGRES_USER"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "GEO_POSTGRES_USER"
               }
             }
@@ -110,7 +110,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "GEO_POSTGRES_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "GEO_POSTGRES_PASSWORD"
               }
             }
@@ -120,7 +120,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "GEO_POSTGRES_DB"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "GEO_POSTGRES_DB"
               }
             }
@@ -130,7 +130,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "API_AUTH_JWT_SECRET"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "API_AUTH_JWT_SECRET"
               }
             }
@@ -140,7 +140,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "API_AUTH_X_API_KEY"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "API_AUTH_X_API_KEY"
               }
             }
@@ -150,7 +150,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "REDIS_HOST"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "REDIS_HOST"
               }
             }
@@ -160,7 +160,7 @@ resource "kubernetes_deployment" "api_deployment" {
             name = "REDIS_PASSWORD"
             value_from {
               secret_key_ref {
-                name = "api"
+                name = "geoprocessing"
                 key  = "REDIS_PASSWORD"
               }
             }
@@ -178,7 +178,7 @@ resource "kubernetes_deployment" "api_deployment" {
 
           env {
             name  = "NODE_CONFIG_DIR"
-            value = "apps/api/config"
+            value = "apps/geoprocessing/config"
           }
 
           resources {

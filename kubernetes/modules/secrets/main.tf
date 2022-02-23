@@ -11,7 +11,7 @@ locals {
   }
 
   api_auth_jwt_secret = random_password.jwt_secret.result
-  x_auth_api_key = random_password.x_auth_api_key.result
+  x_auth_api_key      = random_password.x_auth_api_key.result
 }
 
 resource "random_password" "postgresql_api_user_generator" {
@@ -54,7 +54,7 @@ resource "kubernetes_secret" "api_secret" {
 
   data = {
     API_AUTH_JWT_SECRET = sensitive(local.api_auth_jwt_secret)
-    API_AUTH_X_API_KEY = sensitive(local.x_auth_api_key)
+    API_AUTH_X_API_KEY  = sensitive(local.x_auth_api_key)
 
     API_POSTGRES_HOST     = "api-postgres-postgresql.${var.namespace}.svc.cluster.local"
     API_POSTGRES_USER     = sensitive(local.api_postgres_secret_json.username)
@@ -66,9 +66,8 @@ resource "kubernetes_secret" "api_secret" {
     GEO_POSTGRES_PASSWORD = sensitive(local.geoprocessing_postgres_secret_json.password)
     GEO_POSTGRES_DB       = sensitive(local.geoprocessing_postgres_secret_json.database)
 
-    REDIS_HOST = var.redis_host
+    REDIS_HOST     = var.redis_host
     REDIS_PASSWORD = var.redis_password
-    REDIS_TLS_PASSWORD = var.redis_host
   }
 }
 
@@ -80,20 +79,20 @@ resource "kubernetes_secret" "geoprocessing_secret" {
 
   data = {
     API_AUTH_JWT_SECRET = sensitive(local.api_auth_jwt_secret)
+    API_AUTH_X_API_KEY  = sensitive(local.x_auth_api_key)
 
-    API_POSTGRES_HOST     = "api-postgresql.${var.namespace}.svc.cluster.local"
+    API_POSTGRES_HOST     = "api-postgres-postgresql.${var.namespace}.svc.cluster.local"
     API_POSTGRES_USER     = sensitive(local.api_postgres_secret_json.username)
     API_POSTGRES_PASSWORD = sensitive(local.api_postgres_secret_json.password)
     API_POSTGRES_DB       = sensitive(local.api_postgres_secret_json.database)
 
-    GEO_POSTGRES_HOST     = "geoprocessing-postgresql.${var.namespace}.svc.cluster.local"
+    GEO_POSTGRES_HOST     = "geoprocessing-postgres-postgresql.${var.namespace}.svc.cluster.local"
     GEO_POSTGRES_USER     = sensitive(local.geoprocessing_postgres_secret_json.username)
     GEO_POSTGRES_PASSWORD = sensitive(local.geoprocessing_postgres_secret_json.password)
     GEO_POSTGRES_DB       = sensitive(local.geoprocessing_postgres_secret_json.database)
 
-    REDIS_HOST = var.redis_host
+    REDIS_HOST     = var.redis_host
     REDIS_PASSWORD = var.redis_password
-    REDIS_TLS_PASSWORD = var.redis_host
   }
 }
 

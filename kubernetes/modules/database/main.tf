@@ -11,7 +11,7 @@ resource "random_password" "postgresql_admin_generator" {
 }
 
 resource "azurerm_key_vault_secret" "postgresql" {
-  name         = "${title(var.project_name)}${title(var.namespace)}PostgresAdminPassword"
+  name         = "Postgres${title(var.name)}AdminPassword"
   value        = jsonencode(local.postgres_secret_json)
   key_vault_id = var.key_vault_id
 }

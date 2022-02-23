@@ -34,6 +34,20 @@ resource "azurerm_subnet" "bastion_subnet" {
   enforce_private_link_service_network_policies = false
 }
 
+
+###
+# Application Gateway subnet
+###
+resource "azurerm_subnet" "app_gateway_subnet" {
+  name                      = "AzureAppGatewaySubnet"
+  resource_group_name       = var.resource_group.name
+  virtual_network_name      = azurerm_virtual_network.core_vnet.name
+  address_prefixes          = ["10.1.2.0/24"]
+
+  enforce_private_link_endpoint_network_policies = true
+  enforce_private_link_service_network_policies = false
+}
+
 # Create network security group and SSH rule for bastion subnet.
 resource "azurerm_network_security_group" "bastion_nsg" {
   name                = "${var.project_name}-bastion-nsg"

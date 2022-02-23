@@ -44,6 +44,11 @@ module "kubernetes" {
     (module.network.aks_vnet_name) = module.network.aks_vnet_id
   }
   acr_id = module.container_registry.azurerm_container_registry_id
+
+  aks_vnet_id = module.network.aks_vnet_id
+  aks_vnet_name = module.network.aks_vnet_name
+
+  gateway_subnet_id = module.network.app_gateway_subnet_id
 }
 
 module "data_node_pool" {
