@@ -5,6 +5,7 @@ import {
 } from './calculate-planning-units-protection-level.command';
 import { QueueService } from '../queue/queue.service';
 import { ApiEventsService } from '../api-events/api-events.service';
+import { Logger } from '@nestjs/common';
 
 @CommandHandler(CalculatePlanningUnitsProtectionLevel)
 export class CalculatePlanningUnitsProtectionLevelHandler
@@ -29,6 +30,6 @@ export class CalculatePlanningUnitsProtectionLevelHandler
   }
 
   onCompleted({ jobId }: { jobId: string }) {
-    console.log(`--- job ${jobId} completed`);
+    Logger.log(`--- job ${jobId} completed`);
   }
 }
