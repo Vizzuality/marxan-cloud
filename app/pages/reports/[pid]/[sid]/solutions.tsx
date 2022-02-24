@@ -9,7 +9,7 @@ import Page1 from 'layout/scenarios/reports/solutions/page-1';
 import Page2 from 'layout/scenarios/reports/solutions/page-2';
 import Page3 from 'layout/scenarios/reports/solutions/page-3';
 import Page4 from 'layout/scenarios/reports/solutions/page-4';
-import WebShootStatus from 'layout/scenarios/reports/webshoot-status';
+import WebShootStatus from 'layout/scenarios/reports/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
 

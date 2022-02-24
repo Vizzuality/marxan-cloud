@@ -13,8 +13,6 @@ import { useProjectRole } from 'hooks/project-users';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import HelpBeacon from 'layout/help/beacon';
-
 import Button from 'components/button';
 import Icon from 'components/icon';
 
@@ -144,64 +142,29 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
           >
 
             <div className="flex w-full overflow-hidden" style={{ height: 475 }}>
-              <HelpBeacon
-                id="run-settings"
-                title="RUN OPTIONS"
-                subtitle="Marxan settings"
-                content={(
-                  <div className="space-y-2">
-                    <p>
-                      Before you run Marxan, you can adjust some
-                      parameters.
-                    </p>
-                    <p>
-                      Everything is pre-set to the default values recommended
-                      by the Marxan manual, but you can choose other allowed values.
-                    </p>
-                    <p>
-                      Some of these parameters have more implications that others.
-                      Particularly important is to decide the
-                      {' '}
-                      <b>Number of Runs</b>
-                      ,
-                      the
-                      {' '}
-                      <b>Clumping</b>
-                      {' '}
-                      and the
-                      {' '}
-                      <b>Conservation Feature missing proportion</b>
-                    </p>
-                  </div>
-                )}
-                beaconClassName="z-50"
-                modifiers={['flip']}
-                tooltipPlacement="right"
-              >
-                <div className="flex flex-col flex-grow flex-shrink-0 pt-5 space-y-6 overflow-hidden">
-                  <div className="relative flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
-                    <div className="mr-12 space-y-10">
-                      {FIELDS.map((f) => <RunField key={f.id} {...f} />)}
-                    </div>
-                  </div>
-
-                  <div className="flex-shrink-0 px-10">
-                    <Button
-                      type="submit"
-                      theme="primary"
-                      size="base"
-                      className="w-full"
-                      disabled={submitting || VIEWER}
-                    >
-                      <div className="flex items-center space-x-5">
-                        <div className="text-left">
-                          <div className="text-lg">Save</div>
-                        </div>
-                      </div>
-                    </Button>
+              <div className="flex flex-col flex-grow flex-shrink-0 pt-5 space-y-6 overflow-hidden">
+                <div className="relative flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
+                  <div className="mr-12 space-y-10">
+                    {FIELDS.map((f) => <RunField key={f.id} {...f} />)}
                   </div>
                 </div>
-              </HelpBeacon>
+
+                <div className="flex-shrink-0 px-10">
+                  <Button
+                    type="submit"
+                    theme="primary"
+                    size="base"
+                    className="w-full"
+                    disabled={submitting || VIEWER}
+                  >
+                    <div className="flex items-center space-x-5">
+                      <div className="text-left">
+                        <div className="text-lg">Save</div>
+                      </div>
+                    </div>
+                  </Button>
+                </div>
+              </div>
             </div>
           </form>
 

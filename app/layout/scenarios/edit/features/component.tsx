@@ -13,6 +13,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import { useProjectRole } from 'hooks/project-users';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
+import HelpBeacon from 'layout/help/beacon';
 import Pill from 'layout/pill';
 import GapAnalysis from 'layout/scenarios/edit/features/gap-analysis';
 import SetUpFeatures from 'layout/scenarios/edit/features/set-up';
@@ -29,7 +30,7 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
     name: 'Gap Analysis',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
   },
 ];
 export interface ScenariosSidebarFeaturesProps {
@@ -100,69 +101,104 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
 
   return (
     <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
-      <motion.div
-        key="planning-unit"
-        className="flex flex-col min-h-0 overflow-hidden"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+      <HelpBeacon
+        id="scenarios-features"
+        title="Features"
+        subtitle="Manage features"
+        content={(
+          <div className="space-y-2">
+            <p>
+              Features are everything you want to include in
+              your conservation or land/sea use plan such as
+              species ranges, habitats or ecoregions.
+            </p>
+            <p>
+              The first step requires adding features.
+              There are public features available for use that
+              you can access directly
+              or you can upload your private features as a shapefile.
+            </p>
+            <p>
+              The second step of this section requires setting a
+              conservation target and feature penalty factor for
+              each feature.
+            </p>
+            <p>
+              <i>
+                Note on privacy: The features you upload will only
+                be accessible inside your project to you and your
+                contributors. They will not be shared with other users.
+              </i>
+            </p>
+
+          </div>
+        )}
+        modifiers={['flip']}
+        tooltipPlacement="left"
       >
-        <AnimatePresence>
-          <Pill selected>
+        <motion.div
+          key="planning-unit"
+          className="flex flex-col min-h-0 overflow-hidden"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <AnimatePresence>
+            <Pill selected>
 
-            {!subtab && (
-              <>
-                <header className="flex justify-between flex-shrink-0">
-                  <div>
-                    <div className="flex items-baseline space-x-4">
-                      <h2 className="text-lg font-medium font-heading">Sorting out the features</h2>
+              {!subtab && (
+                <>
+                  <header className="flex justify-between flex-shrink-0">
+                    <div>
+                      <div className="flex items-baseline space-x-4">
+                        <h2 className="text-lg font-medium font-heading">Sorting out the features</h2>
+                      </div>
                     </div>
-                  </div>
-                </header>
-                <Sections
-                  key="sections"
-                  sections={SECTIONS}
-                  onChangeSection={onChangeSection}
-                />
-              </>
-            )}
-
-            {(subtab === ScenarioSidebarSubTabs.FEATURES_ADD
-              || subtab === ScenarioSidebarSubTabs.FEATURES_TARGET)
-              && (
-                <SetUpFeatures
-                  key="set-up-features"
-                />
+                  </header>
+                  <Sections
+                    key="sections"
+                    sections={SECTIONS}
+                    onChangeSection={onChangeSection}
+                  />
+                </>
               )}
 
-            {subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && (
-              <GapAnalysis
-                key="gap-analysis"
-                onChangeSection={onChangeSection}
-              />
-            )}
-          </Pill>
+              {(subtab === ScenarioSidebarSubTabs.FEATURES_ADD
+                || subtab === ScenarioSidebarSubTabs.FEATURES_TARGET)
+                && (
+                  <SetUpFeatures
+                    key="set-up-features"
+                  />
+                )}
 
-          {!subtab && (
-            <motion.div
-              key="continue-scenario-button"
-              className="flex justify-center flex-shrink-0 mt-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <Button
-                theme="primary"
-                size="lg"
-                disabled={VIEWER}
-                onClick={onContinue}
+              {subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && (
+                <GapAnalysis
+                  key="gap-analysis"
+                  onChangeSection={onChangeSection}
+                />
+              )}
+            </Pill>
+
+            {!subtab && (
+              <motion.div
+                key="continue-scenario-button"
+                className="flex justify-center flex-shrink-0 mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                Continue
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+                <Button
+                  theme="primary"
+                  size="lg"
+                  disabled={VIEWER}
+                  onClick={onContinue}
+                >
+                  Continue
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </HelpBeacon>
     </div>
-
   );
 };
 

@@ -35,7 +35,7 @@ export const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
     name: 'Gap Analysis',
-    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network(the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
+    description: 'This gap analysis shows the amount of each feature that would be included if the new conservation plan your are working on is implemented.',
   },
 ];
 
@@ -78,7 +78,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
             <p>
               Under
               {' '}
-              <b>Details</b>
+              <b>Solution Overview</b>
               {' '}
               you will find the information
               for each of the

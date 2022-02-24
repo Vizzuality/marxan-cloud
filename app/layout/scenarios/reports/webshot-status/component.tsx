@@ -8,11 +8,11 @@ import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-export interface WebShootStatusProps {
+export interface WebShotStatusProps {
 
 }
 
-export const WebShootStatus: React.FC<WebShootStatusProps> = () => {
+export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -71,12 +71,15 @@ export const WebShootStatus: React.FC<WebShootStatusProps> = () => {
     if (reportDataIsFetched) {
       setTimeout(() => {
         globalThis.MARXAN = {
-          webshoot_ready: true,
+          webshot_ready: true,
+          options: {
+            landscape: true,
+          },
         };
       }, 3000);
     } else if (!reportDataIsFetched) {
       globalThis.MARXAN = {
-        webshoot_ready: false,
+        webshot_ready: false,
       };
     }
   }, [reportDataIsFetched]);
@@ -87,4 +90,4 @@ export const WebShootStatus: React.FC<WebShootStatusProps> = () => {
   );
 };
 
-export default WebShootStatus;
+export default WebShotStatus;
