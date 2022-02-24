@@ -2,7 +2,7 @@ import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Scenario } from '../../../scenarios/scenario.api.entity';
+import { Project } from '../../../projects/project.api.entity';
 import { ExportResourcePieces } from '../application/export-resource-pieces.port';
 import { ExportComponent } from '../domain';
 
@@ -17,8 +17,8 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
   };
 
   constructor(
-    @InjectRepository(Scenario)
-    private readonly scenarioRepository: Repository<Scenario>,
+    @InjectRepository(Project)
+    private readonly projectRepository: Repository<Project>,
   ) {}
 
   resolveFor(id: ResourceId, kind: ResourceKind): Promise<ExportComponent[]> {
@@ -29,23 +29,31 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     id: ResourceId,
     kind: ResourceKind,
   ): Promise<ExportComponent[]> {
-    const scenarios = await this.scenarioRepository.find({
-      where: { projectId: id.value },
+    const project = await this.projectRepository.findOneOrFail(id.value, {
+      relations: ['scenarios'],
     });
+    const { scenarios } = project;
 
-    const scenarioPieces = await Promise.all(
-      scenarios.map((scenario) =>
-        this.resolveForScenario(new ResourceId(scenario.id), kind),
-      ),
-    );
+    const scenarioPieces: ExportComponent[][] = [];
 
-    // TODO We should check project configuration before returning PlanningAreaCustom,
-    // PlanningAreaGAdm or PlanningAreaGridCustom pieces
+    if (scenarios) {
+      scenarioPieces.push(
+        ...(await Promise.all(
+          scenarios.map((scenario) =>
+            this.resolveForScenario(new ResourceId(scenario.id), kind),
+          ),
+        )),
+      );
+    }
+
+    const customPlanningArea = Boolean(project.planningAreaGeometryId);
+
     return [
       ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
       ExportComponent.newOne(id, ClonePiece.ExportConfig),
-      // ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom),
-      // ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
+      customPlanningArea
+        ? ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom)
+        : ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
       // ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
       ...scenarioPieces.flat(),
     ];
