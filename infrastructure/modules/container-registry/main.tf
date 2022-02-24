@@ -17,7 +17,7 @@ resource "azurerm_container_registry" "acr" {
 }
 
 resource "azuread_application" "github-actions-access" {
-  display_name     = "github-actions-access"
+  display_name = "github-actions-access"
 
   api {
     mapped_claims_enabled          = false

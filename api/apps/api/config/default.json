@@ -9,13 +9,12 @@
       ]
     }
   },
-  "redisApi": {
-    "connection": {
-      "host": "marxan-redis",
-      "port": 6379,
-      "password": null
-    },
-    "concurrency": 50
+  "redis": {
+    "host": "marxan-redis",
+    "port": 6379,
+    "password": null,
+    "useTLS": false,
+    "concurrency" : 50
   },
   "postgresApi": {
     "url": null,

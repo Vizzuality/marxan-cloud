@@ -9,7 +9,7 @@ variable "location" {
 }
 
 variable "bastion_ssh_public_keys" {
-  type = list
+  type        = list(any)
   description = "Public SSH keys to add to the bastion host"
 }
 
@@ -27,8 +27,8 @@ variable "log_analytics_retention_days" {
 
 variable "solution_plan_map" {
   description = "Specifies solutions to deploy to log analytics workspace"
-  default     = {
-    ContainerInsights= {
+  default = {
+    ContainerInsights = {
       product   = "OMSGallery/ContainerInsights"
       publisher = "Microsoft"
     }

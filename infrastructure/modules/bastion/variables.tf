@@ -8,13 +8,13 @@ variable "resource_group" {
 }
 
 variable "bastion_ssh_public_keys" {
-  type = list
+  type        = list(any)
   description = "Public SSH keys to add to the bastion host"
 }
 
 variable "bastion_host_size" {
   description = "VM type for the bastion host"
-  default = "Standard_B1ls"
+  default     = "Standard_B1ls"
 }
 
 variable "bastion_subnet_id" {

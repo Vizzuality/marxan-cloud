@@ -1,8 +1,6 @@
 {
-  "redisApi": {
-    "connection": {
-      "host": "test-e2e-redis",
-      "port": "6379"
-    }
+  "redis": {
+    "host": "test-e2e-redis",
+    "port": "6379"
   }
 }

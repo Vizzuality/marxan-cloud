@@ -7,6 +7,7 @@ import {
   WorkerModule,
   WorkerProcessor,
 } from '../../src/modules/worker';
+import { getRedisConfig } from '@marxan-geoprocessing/utils/redisConfig.utils';
 
 let app: TestingModule;
 let queue: Queue;
@@ -27,9 +28,7 @@ beforeAll(async () => {
   app = await sandbox.init();
   processor = app.get(ExampleProcessingService);
 
-  queue = new Queue(queueName, {
-    ...config.get('redisApi'),
-  });
+  queue = new Queue(queueName, getRedisConfig());
 });
 
 afterAll(async () => {

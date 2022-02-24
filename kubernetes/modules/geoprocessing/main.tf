@@ -167,6 +167,21 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
 
           env {
+            name = "REDIS_PORT"
+            value_from {
+              secret_key_ref {
+                name = "api"
+                key  = "REDIS_PORT"
+              }
+            }
+          }
+
+          env {
+            name = "REDIS_USE_TLS"
+            value = "true"
+          }
+
+          env {
             name  = "API_SERVICE_PORT"
             value = 3000
           }

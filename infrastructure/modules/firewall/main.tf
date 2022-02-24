@@ -204,15 +204,15 @@ resource "azurerm_firewall_policy_rule_collection_group" "policy" {
     }
 
     rule {
-      name                  = "ServiceTags"
-      source_addresses      = ["*"]
-      destination_ports     = ["*"]
+      name              = "ServiceTags"
+      source_addresses  = ["*"]
+      destination_ports = ["*"]
       destination_addresses = [
         "AzureContainerRegistry",
         "MicrosoftContainerRegistry",
         "AzureActiveDirectory"
       ]
-      protocols             = ["Any"]
+      protocols = ["Any"]
     }
 
     rule {
@@ -230,96 +230,5 @@ resource "azurerm_firewall_policy_rule_collection_group" "policy" {
       network_rule_collection,
       nat_rule_collection
     ]
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "settings" {
-  name                       = "DiagnosticsSettings"
-  target_resource_id         = azurerm_firewall.firewall.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-  log_analytics_destination_type = "AzureDiagnostics"
-
-  log {
-    category = "AzureFirewallApplicationRule"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "AzureFirewallNetworkRule"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "AzureFirewallDnsProxy"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-}
-
-resource "azurerm_monitor_diagnostic_setting" "pip_settings" {
-  name                       = "DiagnosticsSettings"
-  target_resource_id         = azurerm_public_ip.pip.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-
-  log {
-    category = "DDoSProtectionNotifications"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "DDoSMitigationFlowLogs"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  log {
-    category = "DDoSMitigationReports"
-    enabled  = true
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-
-    retention_policy {
-      enabled = true
-      days    = var.log_analytics_retention_days
-    }
   }
 }

@@ -42,3 +42,7 @@ variable "redis_host" {
 variable "redis_password" {
   description = "The redis server password"
 }
+
+variable "redis_port" {
+  description = "The redis server port"
+}

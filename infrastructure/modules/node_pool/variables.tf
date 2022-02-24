@@ -8,48 +8,48 @@ variable "resource_group" {
 }
 
 variable "aks_cluster_id" {
-  type = string
+  type        = string
   description = "The Azure AKS cluster id"
 }
 
 variable "name" {
-  type = string
+  type        = string
   description = "The node pool name"
 }
 
 variable "vm_size" {
-  type = string
-  default = "Standard_D2_v2"
+  type        = string
+  default     = "Standard_D2_v2"
   description = "The node pool machine type"
 }
 
 variable "node_count" {
-  type = number
-  default = 1
+  type        = number
+  default     = 1
   description = "The number of machines in this pool"
 }
 
 variable "min_node_count" {
-  type = number
-  default = 1
+  type        = number
+  default     = 1
   description = "The minimum number of machines in this pool"
 }
 
 variable "max_node_count" {
-  type = number
-  default = 2
+  type        = number
+  default     = 2
   description = "The maximum number of machines in this pool"
 }
 
 variable "enable_auto_scaling" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "If this pool will auto-scale"
 }
 
 variable "node_labels" {
-  type = map
-  default = {  }
+  type        = map(any)
+  default     = {}
   description = "A map of Kubernetes labels which should be applied to nodes in this Node Pool"
 }
 
