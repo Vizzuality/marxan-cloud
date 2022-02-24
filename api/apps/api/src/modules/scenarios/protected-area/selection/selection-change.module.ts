@@ -13,6 +13,7 @@ import { SelectionGetterModule } from '../getter/selection-getter.module';
 import { SelectionUpdateService } from './selection-update.service';
 import { SelectionChangedSaga } from './selection-changed.saga';
 import { UpdatePlanningUnitsHandler } from './update-planning-units.handler';
+import { ApiEventsModule } from '@marxan-api/modules/api-events';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UpdatePlanningUnitsHandler } from './update-planning-units.handler';
     ProtectionStatusModule.for(DbConnections.geoprocessingDB),
     PlanningAreasModule,
     SelectionGetterModule,
+    ApiEventsModule,
   ],
   providers: [
     SelectionUpdateService,
