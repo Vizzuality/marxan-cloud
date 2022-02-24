@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
 import { Field as FieldRFF } from 'react-final-form';
-import { useSelector } from 'react-redux';
 
 import PlanningUnitAreaSize from 'layout/projects/new/form/planning-area-selector/planning-unit-area-size';
 import PlanningUnitGrid from 'layout/projects/new/form/planning-area-selector/planning-unit-grid';
@@ -23,11 +22,6 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
 
   const ref = useRef(null);
 
-  const {
-    minPuAreaSize,
-    maxPuAreaSize,
-  } = useSelector((state) => state['/projects/new']);
-
   // On initial render, make sure component is visible on screen.
   useEffect(() => {
     ref?.current?.scrollIntoView({ block: 'end', behavior: 'smooth' });
@@ -35,7 +29,7 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
 
   return (
     <div ref={ref}>
-      <div className="flex items-center mt-6 space-x-2">
+      <div className="flex items-center mt-10 space-x-2">
         <h2 className="text-lg font-medium font-heading">Add a planning unit grid</h2>
         <InfoButton>
           <span>
@@ -88,8 +82,6 @@ export const PlanningAreaSelector: React.FC<PlanningAreaSelectorProps> = ({
               presence: true,
               numericality: {
                 onlyInteger: true,
-                greaterThanOrEqualTo: +parseInt(minPuAreaSize, 10),
-                lessThanOrEqualTo: +parseInt(maxPuAreaSize, 10),
               },
             }])}
           >
