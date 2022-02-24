@@ -1,10 +1,11 @@
 import express, { Application, json } from "express";
 import cors from "cors";
+import * as config from "config";
 import helmet from "helmet";
 import { generateSummaryReportForScenario } from "./domain/solutions-report/solutions-report";
 
 const app: Application = express();
-const daemonListenPort = process.env.WEBSHOT_DAEMON_LISTEN_PORT ?? 3000;
+const daemonListenPort = config.get("port");
 
 app.use(helmet());
 app.use(json());
