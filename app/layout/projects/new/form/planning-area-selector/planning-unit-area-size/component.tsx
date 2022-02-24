@@ -71,12 +71,9 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
             </span>
           </InfoButton>
         </div>
-        {minPuAreaSize && maxPuAreaSize && (
-          <p className="text-sm opacity-50">{`Going below ${format(minPuAreaSize)} km2 or above ${format(maxPuAreaSize)} km2 could cause performance issues`}</p>
-        )}
       </div>
 
-      <div className="flex items-baseline mt-4">
+      <div className="flex items-baseline">
         <div className="w-full">
           <Input
             {...input}
@@ -88,6 +85,10 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
         </div>
         <span>KM2</span>
       </div>
+
+      {minPuAreaSize && maxPuAreaSize && (
+        <p className="mt-2 text-xs opacity-50">{`Going below ${format(minPuAreaSize)} km2 could cause performance issues`}</p>
+      )}
     </div>
   );
 };
