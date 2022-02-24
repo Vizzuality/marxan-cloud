@@ -68,6 +68,7 @@ resource "kubernetes_secret" "api_secret" {
 
     REDIS_HOST     = var.redis_host
     REDIS_PASSWORD = var.redis_password
+    REDIS_PORT     = var.redis_port
   }
 }
 
@@ -93,6 +94,7 @@ resource "kubernetes_secret" "geoprocessing_secret" {
 
     REDIS_HOST     = var.redis_host
     REDIS_PASSWORD = var.redis_password
+    REDIS_PORT     = var.redis_port
   }
 }
 

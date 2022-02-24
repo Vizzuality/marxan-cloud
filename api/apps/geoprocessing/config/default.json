@@ -1,11 +1,10 @@
 {
-  "redisApi": {
-    "concurrency": 50,
-    "connection": {
-      "host": "marxan-redis",
-      "port": 6379,
-      "password": null
-    }
+  "redis": {
+    "useTLS": false,
+    "host": "marxan-redis",
+    "port": 6379,
+    "password": null,
+    "concurrency" : 50
   },
   "postgresApi": {
     "url": null,

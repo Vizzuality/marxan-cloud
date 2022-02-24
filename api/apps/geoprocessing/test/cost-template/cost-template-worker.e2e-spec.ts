@@ -20,6 +20,7 @@ import {
   ScenarioCostSurfaceRepository,
 } from '@marxan/scenario-cost-surface';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
+import { getRedisConfig } from '@marxan-geoprocessing/utils/redisConfig.utils';
 
 jest.setTimeout(35000);
 
@@ -110,7 +111,7 @@ async function getFixtures() {
   const fileRepository = application.get(ScenarioCostSurfaceRepository);
 
   const queue = new Queue(`cost-surface-template-creation`, {
-    ...config.get('redisApi'),
+    ...getRedisConfig(),
   });
 
   let processedScenario: string | undefined;

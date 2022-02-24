@@ -30,12 +30,11 @@
       "secret": "API_AUTH_X_API_KEY"
     }
   },
-  "redisApi": {
-    "connection": {
-      "host": "REDIS_HOST",
-      "port": "REDIS_PORT",
-      "password": "REDIS_PASSWORD"
-    }
+  "redis": {
+    "host": "REDIS_HOST",
+    "port": "REDIS_PORT",
+    "password": "REDIS_PASSWORD",
+    "useTLS": "REDIS_USE_TLS"
   },
   "api": {
     "url": "API_SERVICE_URL"

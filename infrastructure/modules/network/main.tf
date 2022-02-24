@@ -12,26 +12,26 @@ resource "azurerm_virtual_network" "core_vnet" {
 # Firewall subnet
 ###
 resource "azurerm_subnet" "firewall_subnet" {
-  name                      = "AzureFirewallSubnet"
-  resource_group_name       = var.resource_group.name
-  virtual_network_name      = azurerm_virtual_network.core_vnet.name
-  address_prefixes          = ["10.1.0.0/24"]
+  name                 = "AzureFirewallSubnet"
+  resource_group_name  = var.resource_group.name
+  virtual_network_name = azurerm_virtual_network.core_vnet.name
+  address_prefixes     = ["10.1.0.0/24"]
 
   enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies = false
+  enforce_private_link_service_network_policies  = false
 }
 
 ###
 # Bastion subnet
 ###
 resource "azurerm_subnet" "bastion_subnet" {
-  name                      = "${var.project_name}-bastion-subnet"
-  resource_group_name       = var.resource_group.name
-  virtual_network_name      = azurerm_virtual_network.core_vnet.name
-  address_prefixes          = ["10.1.1.0/24"]
+  name                 = "${var.project_name}-bastion-subnet"
+  resource_group_name  = var.resource_group.name
+  virtual_network_name = azurerm_virtual_network.core_vnet.name
+  address_prefixes     = ["10.1.1.0/24"]
 
   enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies = false
+  enforce_private_link_service_network_policies  = false
 }
 
 
@@ -39,13 +39,13 @@ resource "azurerm_subnet" "bastion_subnet" {
 # Application Gateway subnet
 ###
 resource "azurerm_subnet" "app_gateway_subnet" {
-  name                      = "AzureAppGatewaySubnet"
-  resource_group_name       = var.resource_group.name
-  virtual_network_name      = azurerm_virtual_network.core_vnet.name
-  address_prefixes          = ["10.1.2.0/24"]
+  name                 = "AzureAppGatewaySubnet"
+  resource_group_name  = var.resource_group.name
+  virtual_network_name = azurerm_virtual_network.core_vnet.name
+  address_prefixes     = ["10.1.2.0/24"]
 
   enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies = false
+  enforce_private_link_service_network_policies  = false
 }
 
 # Create network security group and SSH rule for bastion subnet.
@@ -89,15 +89,15 @@ resource "azurerm_virtual_network" "aks_vnet" {
 # AKS subnet
 ###
 resource "azurerm_subnet" "aks_subnet" {
-  name                      = "${var.project_name}-aks-subnet"
-  resource_group_name       = var.resource_group.name
-  virtual_network_name      = azurerm_virtual_network.aks_vnet.name
-  address_prefixes          = ["10.0.8.0/21"]
+  name                 = "${var.project_name}-aks-subnet"
+  resource_group_name  = var.resource_group.name
+  virtual_network_name = azurerm_virtual_network.aks_vnet.name
+  address_prefixes     = ["10.0.8.0/21"]
 
   enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies = false
+  enforce_private_link_service_network_policies  = false
 
-  service_endpoints         = [
+  service_endpoints = [
     "Microsoft.ServiceBus",
     "Microsoft.ContainerRegistry"
   ]
@@ -134,19 +134,19 @@ resource "azurerm_subnet_network_security_group_association" "private_subnet_ass
 # Peering
 ##
 resource "azurerm_virtual_network_peering" "peering" {
-  name                      = "core-to-aks"
-  resource_group_name       = var.resource_group.name
-  virtual_network_name      = azurerm_virtual_network.core_vnet.name
-  remote_virtual_network_id = azurerm_virtual_network.aks_vnet.id
+  name                         = "core-to-aks"
+  resource_group_name          = var.resource_group.name
+  virtual_network_name         = azurerm_virtual_network.core_vnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.aks_vnet.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }
 
 resource "azurerm_virtual_network_peering" "peering-back" {
-  name                      = "aks-to-core"
-  resource_group_name       = var.resource_group.name
-  virtual_network_name      = azurerm_virtual_network.aks_vnet.name
-  remote_virtual_network_id = azurerm_virtual_network.core_vnet.id
+  name                         = "aks-to-core"
+  resource_group_name          = var.resource_group.name
+  virtual_network_name         = azurerm_virtual_network.aks_vnet.name
+  remote_virtual_network_id    = azurerm_virtual_network.core_vnet.id
   allow_virtual_network_access = true
   allow_forwarded_traffic      = true
 }

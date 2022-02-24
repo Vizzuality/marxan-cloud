@@ -10,6 +10,7 @@ import { Queue, Worker } from 'bullmq';
 import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
 import { QueueModule } from '@marxan-api/modules/queue/queue.module';
+import { getRedisConfig } from '@marxan-api/utils/redisConfig.utils';
 
 const queueName = baseQueueName + '_test_' + Date.now();
 
@@ -124,7 +125,10 @@ const getFixtures = async () => {
         async () => {
           /**/
         },
-        config.get('redisApi'),
+        {
+          ...getRedisConfig(),
+          concurrency: config.get('redis.concurrency'),
+        },
       );
       workers.push(worker);
     },

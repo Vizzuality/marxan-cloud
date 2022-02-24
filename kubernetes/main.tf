@@ -115,6 +115,7 @@ module "production_secrets" {
   key_vault_id               = module.key_vault_production.key_vault_id
   redis_host                 = data.terraform_remote_state.core.outputs.redis_url
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                 = data.terraform_remote_state.core.outputs.redis_port
 }
 
 module "ingress_production" {
@@ -199,4 +200,5 @@ module "staging_secrets" {
   key_vault_id               = module.key_vault_staging.key_vault_id
   redis_host                 = data.terraform_remote_state.core.outputs.redis_url
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                 = data.terraform_remote_state.core.outputs.redis_port
 }

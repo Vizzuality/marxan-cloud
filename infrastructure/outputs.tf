@@ -42,6 +42,10 @@ output "redis_url" {
 }
 
 output "redis_password" {
-  value = module.redis.redis_password
+  value     = module.redis.redis_password
   sensitive = true
+}
+
+output "redis_port" {
+  value     = module.redis.redis_port
 }

@@ -25,7 +25,7 @@ variable "threat_intel_mode" {
   type        = string
 
   validation {
-    condition = contains(["Off", "Alert", "Deny"], var.threat_intel_mode)
+    condition     = contains(["Off", "Alert", "Deny"], var.threat_intel_mode)
     error_message = "The threat intel mode is invalid."
   }
 }

@@ -12,6 +12,7 @@ import {
   runWorkerQueueNameToken,
   sandboxRunnerToken,
 } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
+import { getRedisConfig } from '@marxan-geoprocessing/utils/redisConfig.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -100,9 +101,10 @@ async function getFixtures() {
   }).compile();
   await testingModule.enableShutdownHooks().init();
 
-  const queue = new Queue(testingModule.get(runWorkerQueueNameToken), {
-    ...config.get('redisApi'),
-  });
+  const queue = new Queue(
+    testingModule.get(runWorkerQueueNameToken),
+    getRedisConfig(),
+  );
   const fakeMarxanRunner = testingModule.get(FakeMarxanRunner);
 
   return {
