@@ -22,7 +22,6 @@ interface PlanningAreaSelectResult {
 
 interface ProjectSelectResult {
   planning_unit_grid_shape: PlanningUnitGridShape;
-  bbox: number[];
   planning_unit_area_km2: number;
 }
 
@@ -49,7 +48,7 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
 
     const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
       `
-        SELECT planning_unit_grid_shape, planning_unit_area_km2, bbox
+        SELECT planning_unit_grid_shape, planning_unit_area_km2
         FROM projects
         WHERE id = $1
       `,
@@ -83,7 +82,6 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     );
 
     const content: PlanningAreaCustomContent = {
-      planningAreaBbox: project.bbox,
       puAreaKm2: project.planning_unit_area_km2,
       puGridShape: project.planning_unit_grid_shape,
       planningAreaGeom: planningArea.ewkb.toJSON().data,

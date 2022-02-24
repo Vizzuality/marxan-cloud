@@ -3,6 +3,7 @@ import { FileRepositoryModule } from '@marxan/files-repository';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlanningAreaGadmPieceImporter } from './planning-area-gadm.piece-importer';
+import { PlanningAreaCustomPieceImporter } from './planning-area-custom.piece-importer';
 import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer';
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
 
@@ -15,6 +16,7 @@ import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importe
     ProjectMetadataPieceImporter,
     ScenarioMetadataPieceImporter,
     PlanningAreaGadmPieceImporter,
+    PlanningAreaCustomPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })

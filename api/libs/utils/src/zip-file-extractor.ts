@@ -1,6 +1,6 @@
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import * as unzipper from 'unzipper';
+import { Parse, Entry } from 'unzipper';
 
 export const extractFileFailed = Symbol('Extract file failed');
 
@@ -10,8 +10,13 @@ export async function extractFile(
 ): Promise<Either<typeof extractFileFailed, string>> {
   return new Promise<Either<typeof extractFileFailed, string>>((resolve) => {
     readable
-      .pipe(unzipper.ParseOne(new RegExp(fileRelativePath)))
-      .on('entry', async (entry: unzipper.Entry) => {
+      .pipe(Parse())
+      .on('entry', async (entry: Entry) => {
+        if (entry.path !== fileRelativePath) {
+          entry.autodrain();
+          return;
+        }
+
         const buffer = await entry.buffer();
         resolve(right(buffer.toString()));
       })
