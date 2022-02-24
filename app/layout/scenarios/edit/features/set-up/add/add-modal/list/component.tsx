@@ -1,6 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
-
-import { useSelector } from 'react-redux';
+import React, { useCallback } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -28,9 +26,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
-
-  const { cache } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { pid } = query;
 
   const {
     data: allFeaturesData,
@@ -39,7 +35,6 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
-    refetch: allFeaturesDataRefetch,
   } = useAllFeatures(pid, {
     search,
     filters,
@@ -51,12 +46,6 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
       if (hasNextPage) allFeaturesfetchNextPage();
     },
   );
-
-  useEffect(() => {
-    return () => {
-      allFeaturesDataRefetch();
-    };
-  }, [cache, allFeaturesDataRefetch]);
 
   // Callbacks
   const handleToggleSelected = useCallback((id) => {
