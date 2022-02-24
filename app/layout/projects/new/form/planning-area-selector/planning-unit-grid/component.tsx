@@ -39,7 +39,7 @@ export const PlanningUnitGrid: React.FC<PlanningUnitGridProps> = ({
         </InfoButton>
       </div>
 
-      <div className="flex mt-4">
+      <div className="flex mt-3">
         <PlanningUnitButton
           unit={PlanningUnit.SQUARE}
           selected={unitSelected === PlanningUnit.SQUARE}
