@@ -29,6 +29,7 @@ import { SelectionGetService } from '../getter/selection-get.service';
 import { SelectionUpdateService } from './selection-update.service';
 import { UpdatePlanningUnitsHandler } from './update-planning-units.handler';
 import { SelectionChangedSaga } from './selection-changed.saga';
+import { ApiEventsService } from '@marxan-api/modules/api-events';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -76,6 +77,12 @@ const getFixtures = async () => {
         provide: scenarioRepoToken,
         useClass: ScenarioRepo,
       },
+      {
+        provide: ApiEventsService,
+        useValue: {
+          create: jest.fn()
+        }
+      }
     ],
   }).compile();
 
