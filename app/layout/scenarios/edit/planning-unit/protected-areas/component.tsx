@@ -34,25 +34,6 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   const dispatch = useDispatch();
 
   const { data: scenarioData } = useScenario(sid);
-  // const { metadata } = scenarioData || {};
-  // const { scenarioEditingMetadata } = metadata || {};
-
-  // const {
-  //   subtab: metaSubtab,
-  // } = scenarioEditingMetadata || {};
-
-  // useEffect(() => {
-  //   setStep(metaSubtab === 'planning-unit-protected-areas' ? 1 : 0);
-  // }, [metaSubtab]);
-
-  // EFFECTS
-  // useEffect(() => {
-  //   return () => {
-  //     if (tab !== ScenarioSidebarTabs.PLANNING_UNIT) {
-  //       setStep(0);
-  //     }
-  //   };
-  // }, [tab]);
 
   if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
 

@@ -26,7 +26,7 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
     name: 'Protected Areas',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    description: 'You can select current protected areas listed in World Database of Protected Areas (WCMC-UNEP) or upload your own protected area geometry.',
   },
   {
     id: ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS,
