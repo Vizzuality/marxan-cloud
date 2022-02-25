@@ -1,0 +1,102 @@
+name: Deploy images to k8s
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+    paths:
+      - 'app/**'
+      - 'api/**'
+      - 'webshot/**'
+      - '.github/**'
+  workflow_dispatch:
+
+jobs:
+  deploy_images_to_kubernetes:
+    name: Deploy updated Docker image to Kubernetes
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Wait for API image to be pushed to Docker Hub
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          checkName: Push API Docker image to Azure Container Registry
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Wait for Geoprocessing image to be pushed to Docker Hub
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          checkName: Push Geoprocessing Docker image to Azure Container Registry
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Wait for Client image to be pushed to Docker Hub
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          checkName: Push Client Docker image to Docker Hub
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Wait for Webshot image to be pushed to Docker Hub
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          checkName: Push Webshot Docker image to Azure Container Registry
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Configure SSH access to the bastion host
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY" > ~/.ssh/bastion.key
+          chmod 600 ~/.ssh/bastion.key
+        env:
+          SSH_KEY: ${{ secrets.BASTION_SSH_PRIVATE_KEY }}
+
+      - name: Add custom host data
+        run: |
+          sudo sh -c 'echo "127.0.0.1 ${{ secrets.EKS_HOST }}" >> /etc/hosts'
+
+      - name: Install kubectl
+        run: |
+          sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+          echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+          sudo apt-get update
+          sudo apt-get install -y kubectl
+
+      - name: Config kubectl
+        run: |
+          mkdir ~/.kube
+          az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
+          sed -i 's/marxan.privatelink.westeurope.azmk8s.io/marxan.privatelink.westeurope.azmk8s.io:4433/g' ~/.kube/config
+
+      - name: Creating SSH tunnel
+        run: |
+          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ secrets.EKS_HOST }}:443 ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} -T &
+
+      - name: Redeploy production pods
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          kubectl rollout restart deployment api -n production
+          kubectl rollout restart deployment client -n production
+          kubectl rollout restart deployment geoprocessing -n production
+          kubectl rollout restart deployment webshot -n production
+
+      - name: Redeploy staging pods
+        if: ${{ github.ref == 'refs/heads/staging' }}
+        run: |
+          kubectl rollout restart deployment api -n staging
+          kubectl rollout restart deployment client -n staging
+          kubectl rollout restart deployment client -n staging
+          kubectl rollout restart deployment geoprocessing -n staging
+          kubectl rollout restart deployment webshot -n staging
