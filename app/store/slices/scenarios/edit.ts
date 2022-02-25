@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { injectReducer } from 'store';
+import { Solution } from 'types/project-model';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 interface ScenarioEditStateProps {
   tab: string,
@@ -12,7 +14,8 @@ interface ScenarioEditStateProps {
   // FEATURES
   features: Record<string, any>;
   featureHoverId: string;
-  highlightFeatures: string[];
+  preHighlightFeatures: string[];
+  postHighlightFeatures: string[];
 
   // ADJUST PLANNING UNITS
   cache: number;
@@ -30,6 +33,9 @@ interface ScenarioEditStateProps {
   uploading: boolean;
   uploadingValue: Record<string, object>
 
+  // SOLUTIONS
+  selectedSolution: Solution,
+
   // SETTINGS
   layerSettings: Record<string, Record<string, unknown>>
 
@@ -43,8 +49,8 @@ interface ScenarioEditStateProps {
 }
 
 const initialState = {
-  tab: 'protected-areas',
-  subtab: 'protected-areas-preview',
+  tab: ScenarioSidebarTabs.PLANNING_UNIT,
+  subtab: null,
 
   // WDPA
   wdpaCategories: {},
@@ -53,7 +59,8 @@ const initialState = {
   // FEATURES
   features: [],
   featureHoverId: null,
-  highlightFeatures: [],
+  preHighlightFeatures: [],
+  postHighlightFeatures: [],
 
   // ADJUST PLANNING UNITS
   cache: Date.now(),
@@ -67,6 +74,9 @@ const initialState = {
   drawingValue: null,
   uploading: false,
   uploadingValue: null,
+
+  // SOLUTIONS
+  selectedSolution: null,
 
   // SETTINGS
   layerSettings: {},
@@ -107,8 +117,11 @@ export function getScenarioEditSlice(id) {
       setFeatureHoverId: (state, action: PayloadAction<string>) => {
         state.featureHoverId = action.payload;
       },
-      setHighlightFeatures: (state, action: PayloadAction<string[]>) => {
-        state.highlightFeatures = action.payload;
+      setPreHighlightFeatures: (state, action: PayloadAction<string[]>) => {
+        state.preHighlightFeatures = action.payload;
+      },
+      setPostHighlightFeatures: (state, action: PayloadAction<string[]>) => {
+        state.postHighlightFeatures = action.payload;
       },
 
       // ADJUST PLANNING UNITS
@@ -144,6 +157,11 @@ export function getScenarioEditSlice(id) {
       },
       setUploadingValue: (state, action: PayloadAction<Record<string, object>>) => {
         state.uploadingValue = action.payload;
+      },
+
+      // SOLUTIONS
+      setSelectedSolution: (state, action: PayloadAction<Solution>) => {
+        state.selectedSolution = action.payload;
       },
 
       // SETTINGS

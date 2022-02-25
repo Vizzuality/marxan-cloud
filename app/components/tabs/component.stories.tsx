@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
 
 import Tabs, { TabsProps } from './component';
@@ -34,7 +35,7 @@ Default.args = {
     },
     {
       id: 3,
-      name: 'Analysis',
+      name: 'Parameters',
       warning: false,
     },
     {

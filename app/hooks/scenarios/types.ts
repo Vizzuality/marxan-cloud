@@ -23,6 +23,22 @@ export interface DeleteScenarioProps {
   id: string
 }
 
+export interface UseSaveScenarioLockProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SaveScenarioLockProps {
+  sid?: string
+}
+
+export interface UseDeleteScenarioLockProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DeleteScenarioLockProps {
+  sid?: string,
+}
+
 export interface UseUploadScenarioPUProps {
   requestConfig?: AxiosRequestConfig
 }

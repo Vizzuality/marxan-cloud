@@ -3,11 +3,14 @@ import React, {
 } from 'react';
 
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -21,11 +24,11 @@ export const useScenarioActionsDone = () => {
   const {
     setJob,
     setCache,
+    setTab,
+    setSubTab,
   } = scenarioSlice.actions;
 
-  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { wdpaIucnCategories } = wdpaCategories;
+  const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: scenarioData } = useScenario(sid);
 
@@ -41,21 +44,24 @@ export const useScenarioActionsDone = () => {
 
   // PLANNING AREA calculation
   const onPlanningAreaProtectedCalculationDone = useCallback((JOB_REF) => {
+    const subt = subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW
+      ? ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD : null;
+
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PLANNING_UNIT,
+          subtab: subt,
+        }),
       },
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));
+        dispatch(setSubTab(subt));
+        queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
       },
       onError: () => {
@@ -75,27 +81,23 @@ export const useScenarioActionsDone = () => {
     dispatch,
     setJob,
     setCache,
+    setTab,
+    setSubTab,
+    subtab,
     addToast,
+    queryClient,
   ]);
+
   // Protected Areas
   const onProtectedAreasDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: wdpaIucnCategories.length > 0 ? 'features' : 'protected-areas',
-            subtab: wdpaIucnCategories.length > 0 ? 'features-preview' : 'protected-areas-preview',
-            status: {
-              'protected-areas': 'draft',
-              features: 'empty',
-              analysis: 'empty',
-            },
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PLANNING_UNIT,
+          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
+        }),
+
       },
     }, {
       onSuccess: () => {
@@ -121,25 +123,23 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
-    wdpaIucnCategories?.length,
+
   ]);
 
   const onFeaturesDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.FEATURES,
+          subtab: null,
+        }),
       },
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        dispatch(setSubTab(null));
         JOB_REF.current = null;
       },
       onError: () => {
@@ -160,6 +160,7 @@ export const useScenarioActionsDone = () => {
     setJob,
     setCache,
     addToast,
+    setSubTab,
   ]);
 
   // Cost surface
@@ -167,13 +168,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
+            subtab: null,
           },
-        },
+          {
+            saveTab: false,
+          },
+        ),
       },
     }, {
       onSuccess: () => {
@@ -208,13 +212,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PLANNING_UNIT,
+            subtab: null,
           },
-        },
+          {
+            saveTab: false,
+          },
+        ),
       },
     }, {
       onSuccess: () => {
@@ -247,13 +254,16 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          {
+            tab: ScenarioSidebarTabs.PARAMETERS,
+            subtab: null,
           },
-        },
+          {
+            saveTab: false,
+          },
+        ),
       },
     }, {
       onSuccess: () => {
@@ -287,17 +297,15 @@ export const useScenarioActionsDone = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.SOLUTIONS,
+          subtab: null,
+        }),
       },
     }, {
       onSuccess: () => {
         dispatch(setJob(null));
+        dispatch(setCache(Date.now()));
         JOB_REF.current = null;
       },
       onError: () => {
@@ -316,6 +324,7 @@ export const useScenarioActionsDone = () => {
     scenarioData?.metadata,
     dispatch,
     setJob,
+    setCache,
     addToast,
   ]);
 

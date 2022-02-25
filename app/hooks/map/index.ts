@@ -344,14 +344,15 @@ export function usePUGridLayer({
       puIncludedValue,
       puExcludedValue,
       features = [],
-      highlightFeatures = [],
+      preHighlightFeatures = [],
+      postHighlightFeatures = [],
       runId,
       settings = {},
     } = options;
     const {
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
-      features: PreGapAnalysisSettings = {},
+      features: FeaturesSettings = {},
       cost: CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
@@ -368,9 +369,9 @@ export function usePUGridLayer({
       visibility: WdpaPercentageVisibility = true,
     } = WdpaPercentageSettings;
     const {
-      opacity: PreGapAnalysisOpacity = 1,
-      visibility: PreGapAnalysisVisibility = true,
-    } = PreGapAnalysisSettings;
+      opacity: FeaturesOpacity = 1,
+      visibility: FeaturesVisibility = true,
+    } = FeaturesSettings;
     const {
       opacity: CostOpacity = 1,
       visibility: CostVisibility = true,
@@ -463,7 +464,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               layout: {
-                visibility: getLayerVisibility(PreGapAnalysisVisibility),
+                visibility: getLayerVisibility(FeaturesVisibility),
               },
               // ...runId && {
               //   filter: [
@@ -480,7 +481,7 @@ export function usePUGridLayer({
                       return ['in', id, ['get', 'featureList']];
                     })),
                   ],
-                  0.5 * PreGapAnalysisOpacity,
+                  0.5 * FeaturesOpacity,
                   0,
                 ],
               },
@@ -489,22 +490,43 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               layout: {
-                visibility: getLayerVisibility(PreGapAnalysisVisibility),
+                visibility: getLayerVisibility(FeaturesVisibility),
               },
               paint: {
                 'fill-color': COLORS.highlightFeatures,
                 'fill-opacity': [
                   'case',
                   ['any',
-                    ...(highlightFeatures.map((id) => {
+                    ...(preHighlightFeatures.map((id) => {
                       return ['in', id, ['get', 'featureList']];
                     })),
                   ],
-                  0.5 * PreGapAnalysisOpacity,
+                  0.5 * FeaturesOpacity,
                   0,
                 ],
               },
             },
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(FeaturesVisibility),
+              },
+              paint: {
+                'fill-color': COLORS.highlightFeatures,
+                'fill-opacity': [
+                  'case',
+                  ['any',
+                    ...(postHighlightFeatures.map((id) => {
+                      return ['in', id, ['get', 'featureList']];
+                    })),
+                  ],
+                  0.5 * FeaturesOpacity,
+                  0,
+                ],
+              },
+            },
+
           ] : [],
 
           // ANALYSIS - COST SURFACE

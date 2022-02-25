@@ -8,6 +8,9 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -36,14 +39,10 @@ export const useScenarioActionsFailure = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'protected-areas-preview',
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PLANNING_UNIT,
+          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
+        }),
       },
     }, {
       onSuccess: () => {
@@ -66,14 +65,10 @@ export const useScenarioActionsFailure = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            subtab: 'protected-areas-preview',
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PLANNING_UNIT,
+          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
+        }),
       },
     }, {
       onSuccess: () => {
@@ -96,20 +91,10 @@ export const useScenarioActionsFailure = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            tab: 'features',
-            subtab: 'features-preview',
-            status: {
-              'protected-areas': 'draft',
-              features: 'draft',
-              analysis: 'empty',
-            },
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.FEATURES,
+          subtab: ScenarioSidebarSubTabs.FEATURES_ADD,
+        }),
       },
     }, {
       onSuccess: () => {
@@ -226,13 +211,10 @@ export const useScenarioActionsFailure = () => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
-        metadata: {
-          ...scenarioData?.metadata,
-          scenarioEditingMetadata: {
-            ...scenarioData?.metadata?.scenarioEditingMetadata,
-            lastJobCheck: new Date().getTime(),
-          },
-        },
+        metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
+          tab: ScenarioSidebarTabs.PARAMETERS,
+          subtab: null,
+        }),
       },
     }, {
       onSuccess: () => {

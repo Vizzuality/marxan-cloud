@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { injectReducer } from 'store';
 import { Solution } from 'types/project-model';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 interface ScenarioShowStateProps {
   tab: string,
@@ -13,7 +14,7 @@ interface ScenarioShowStateProps {
 }
 
 const initialState = {
-  tab: 'solutions',
+  tab: ScenarioSidebarTabs.SOLUTIONS,
   subtab: null,
   selectedSolution: null,
   // FEATURES

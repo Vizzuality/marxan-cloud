@@ -254,7 +254,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                       </div>
 
                       {/* PLANNING AREA */}
-                      <div className="flex flex-col justify-between mt-6">
+                      <div className="flex flex-col justify-between mt-10">
                         <div className="flex items-center mb-5 space-x-3">
                           <h2 className="text-lg font-medium font-heading">Do you have a planning region or planning unit shapefile?</h2>
                           <InfoButton>

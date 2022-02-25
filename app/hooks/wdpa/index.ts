@@ -21,7 +21,7 @@ export function useWDPACategories({
   const [session] = useSession();
 
   const query = useQuery(
-    ['scenarios', adminAreaId, customAreaId],
+    ['protected-areas', adminAreaId, customAreaId],
     async () => WDPA.request({
       method: 'GET',
       url: `/${scenarioId}/protected-areas`,

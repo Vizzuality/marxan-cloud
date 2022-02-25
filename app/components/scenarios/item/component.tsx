@@ -9,6 +9,7 @@ import Icon from 'components/icon';
 import ProgressBar from 'components/progress-bar';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
+import LOCK_SVG from 'svgs/ui/lock.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
 import Settings from './settings';
@@ -72,10 +73,10 @@ export interface ItemProps {
   lastUpdate: string;
   jobs?: Record<string, any>[];
   runStatus: 'created' | 'running' | 'done' | 'failure',
+  lock?: Record<string, any>;
   lastUpdateDistance: string;
   className?: string;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  onView: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDuplicate?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -90,8 +91,8 @@ export const Item: React.FC<ItemProps> = ({
   className,
   jobs,
   runStatus,
+  lock,
   onEdit,
-  onView,
   onCancelRun,
   onDelete,
   onDuplicate,
@@ -183,33 +184,40 @@ export const Item: React.FC<ItemProps> = ({
                     </div>
                   )}
 
-                  <div className="leading-none">
-                    <h2
-                      className="text-sm font-medium font-heading clamp-1"
-                      title={name}
-                    >
-                      {name}
-                    </h2>
+                  <div className="flex items-center space-x-4 leading-none">
+                    {lock && (
+                      <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-gray-500 rounded-full">
+                        <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
+                      </div>
+                    )}
+                    <div>
+                      <h2
+                        className="text-sm font-medium font-heading clamp-1"
+                        title={name}
+                      >
+                        {name}
+                      </h2>
 
-                    <div className="clamp-1">
-                      <span
-                        className={cx({
-                          'm-0 text-xs inline-block': true,
-                          [SCENARIO_STATES[status].styles]:
-                            status !== SCENARIO_STATES[status].text,
-                        })}
-                      >
-                        {`${SCENARIO_STATES[status].text} `}
-                      </span>
-                      <span
-                        className={cx({
-                          'ml-1 text-xs inline-block': true,
-                          [SCENARIO_STATES[status].styles]:
-                            status !== SCENARIO_STATES[status].text,
-                        })}
-                      >
-                        {lastUpdateDistance}
-                      </span>
+                      <div className="clamp-1">
+                        <span
+                          className={cx({
+                            'm-0 text-xs inline-block': true,
+                            [SCENARIO_STATES[status].styles]:
+                              status !== SCENARIO_STATES[status].text,
+                          })}
+                        >
+                          {`${SCENARIO_STATES[status].text} `}
+                        </span>
+                        <span
+                          className={cx({
+                            'ml-1 text-xs inline-block': true,
+                            [SCENARIO_STATES[status].styles]:
+                              status !== SCENARIO_STATES[status].text,
+                          })}
+                        >
+                          {lastUpdateDistance}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -225,15 +233,6 @@ export const Item: React.FC<ItemProps> = ({
                   >
                     {settings && 'Close'}
                     {!settings && 'Settings'}
-                  </Button>
-
-                  <Button
-                    className="flex-shrink-0"
-                    size="s"
-                    theme="primary"
-                    onClick={onEdit}
-                  >
-                    Edit
                   </Button>
                 </>
               )}
@@ -255,13 +254,12 @@ export const Item: React.FC<ItemProps> = ({
 
         <button
           type="button"
-          onClick={onView}
+          onClick={onEdit}
           disabled={status.includes('running')}
           className={cx({
             'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl': true,
+            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': true,
             'rounded-br-none': settings,
-            'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': status === 'run-done',
-            'text-gray-400 pointer-events-none': status !== 'run-done',
           })}
         >
           <span className="mr-2 text-sm">View</span>

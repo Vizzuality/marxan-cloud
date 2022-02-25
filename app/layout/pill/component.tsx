@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+
 import cx from 'classnames';
 
 export interface PillProps {
@@ -6,7 +7,7 @@ export interface PillProps {
   children: ReactNode
 }
 
-export const Pill: React.FC<PillProps> = ({ children, selected }:PillProps) => {
+export const Pill: React.FC<PillProps> = ({ children, selected }: PillProps) => {
   return (
     <div
       className={cx({

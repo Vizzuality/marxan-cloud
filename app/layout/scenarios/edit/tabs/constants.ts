@@ -1,24 +1,30 @@
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'layout/scenarios/show/sidebar/types';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 export const TABS = [
   {
-    id: ScenarioSidebarTabs.PROTECTED_AREAS,
-    subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
-    name: 'Protected areas',
+    id: ScenarioSidebarTabs.PLANNING_UNIT,
+    subtab: null,
+    name: 'Planning unit',
   },
   {
     id: ScenarioSidebarTabs.FEATURES,
-    subtab: ScenarioSidebarSubTabs.FEATURES_PREVIEW,
+    subtab: null,
     name: 'Features',
   },
   {
-    id: ScenarioSidebarTabs.ANALYSIS,
-    subtab: ScenarioSidebarSubTabs.ANALYSIS_PREVIEW,
-    name: 'Analysis',
+    id: ScenarioSidebarTabs.PARAMETERS,
+    subtab: null,
+    name: 'Parameters',
   },
   {
     id: ScenarioSidebarTabs.SOLUTIONS,
-    subtab: ScenarioSidebarSubTabs.SOLUTIONS_PREVIEW,
-    name: null,
+    subtab: null,
+    name: 'Solutions',
   },
 ];
+
+export const STATUS = {
+  empty: 'disabled',
+  outdated: 'outdated',
+  draft: 'active',
+};

@@ -18,11 +18,9 @@ import {
 import Tooltip from 'components/tooltip';
 
 export interface TitleProps {
-  editable?: boolean;
-  header?: boolean;
 }
 
-export const Title: React.FC<TitleProps> = ({ header = false, editable = false }: TitleProps) => {
+export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
@@ -162,9 +160,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                   onSubmit={fprops.handleSubmit}
                   autoComplete="off"
                   className={cx({
-                    'relative px-2': true,
-                    'max-w-xs': header,
-                    'h-16 max-w-max': !header,
+                    'relative px-2 h-6 max-w-max': true,
                   })}
                 >
                   <FieldRFF
@@ -179,7 +175,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                       <Tooltip
                         arrow
                         placement="bottom"
-                        disabled={meta.active || editable || !header || VIEWER}
+                        disabled={meta.active || VIEWER}
                         content={(
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
@@ -188,19 +184,16 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                       >
                         <div
                           className={cx({
-                            relative: true,
-                            'h-6': header,
-                            'h-16': !header,
+                            'relative h-6': true,
                           })}
                         >
 
                           <input
                             {...input}
                             className={cx({
-                              'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer': true,
-                              'text-4xl': !header,
+                              'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer px-1.5': true,
                             })}
-                            disabled={(!editable && !header) || VIEWER}
+                            disabled={VIEWER}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
@@ -212,7 +205,7 @@ export const Title: React.FC<TitleProps> = ({ header = false, editable = false }
                           />
 
                           <h1 className={cx({
-                            'invisible h-full px-1.5 text-4xl font-heading font-normal overflow-ellipsis': true,
+                            'invisible h-full px-1.5 font-heading font-normal overflow-ellipsis': true,
                           })}
                           >
                             {input.value}

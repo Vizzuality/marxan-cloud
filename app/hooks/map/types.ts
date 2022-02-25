@@ -87,7 +87,8 @@ export interface UsePUGridLayer {
     puExcludedValue?: string[];
     runId?: string;
     features?: string[];
-    highlightFeatures?: Array<string>;
+    preHighlightFeatures?: Array<string>;
+    postHighlightFeatures?: Array<string>;
     cost?: {
       min: number;
       max: number,

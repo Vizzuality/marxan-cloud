@@ -5,9 +5,12 @@ import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
-import { withScenario } from 'hoc/scenarios';
+import { withProject } from 'hoc/projects';
+import { withScenario, withScenarioLock } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
@@ -15,17 +18,20 @@ import Header from 'layout/header';
 import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import SidebarEditAnalysis from 'layout/scenarios/edit/analysis';
 import SidebarEditFeatures from 'layout/scenarios/edit/features';
-import ScenarioEditsMap from 'layout/scenarios/edit/map';
-import ScenariosEditSidebar from 'layout/scenarios/edit/sidebar';
-import { ScenarioSidebarTabs } from 'layout/scenarios/edit/sidebar/types';
+import ScenarioLock from 'layout/scenarios/edit/lock';
+import SidebarEditAnalysis from 'layout/scenarios/edit/parameters';
+import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
+import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
-import SidebarEditWDPA from 'layout/scenarios/edit/wdpa';
+import ScenarioEditsMap from 'layout/scenarios/map';
+import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
 
-export const getServerSideProps = withProtection(withUser(withScenario()));
+export const getServerSideProps = withProtection(withUser(
+  withProject(withScenario(withScenarioLock())),
+));
 
 const EditScenarioPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -98,15 +104,17 @@ const EditScenarioPage: React.FC = () => {
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosEditSidebar>
-                <SidebarEditWDPA key={ScenarioSidebarTabs.PROTECTED_AREAS} />
+                <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
                 <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
-                <SidebarEditAnalysis key={ScenarioSidebarTabs.ANALYSIS} />
+                <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
+                <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosEditSidebar>
               <ScenarioEditsMap />
             </div>
           </Wrapper>
         </div>
         <ScenarioStatus />
+        <ScenarioLock />
       </main>
     </Protected>
   );

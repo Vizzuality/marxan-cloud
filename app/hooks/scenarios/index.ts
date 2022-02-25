@@ -11,6 +11,8 @@ import { useRouter } from 'next/router';
 import { formatDistanceToNow } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
+import { useMe } from 'hooks/me';
+
 import { ItemProps } from 'components/scenarios/item/component';
 
 import DOWNLOADS from 'services/downloads';
@@ -42,9 +44,17 @@ import {
   CancelRunScenarioProps,
   UseSaveScenarioCalibrationRangeProps,
   SaveScenarioCalibrationRangeProps,
+  UseSaveScenarioLockProps,
+  SaveScenarioLockProps,
+  UseDeleteScenarioLockProps,
+  DeleteScenarioLockProps,
 } from './types';
 
-// SCENARIO STATUS
+/**
+****************************************
+  SCENARIO STATUS
+****************************************
+*/
 export function useScenariosStatus(pId) {
   const [session] = useSession();
 
@@ -64,7 +74,7 @@ export function useScenariosStatus(pId) {
         scenarios: [],
       },
     },
-    refetchInterval: 5000,
+    refetchInterval: 2500,
   });
 
   const { data } = query;
@@ -111,6 +121,143 @@ export function useScenarioStatus(pId, sId) {
   }, [query, data?.data, sId]);
 }
 
+/**
+****************************************
+  SCENARIO LOCKS
+****************************************
+*/
+
+export function useProjectScenariosLocks(pid) {
+  const [session] = useSession();
+
+  const query = useQuery(['project-locks', pid], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pid}/editing-locks`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pid,
+    refetchInterval: 2500,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+export function useScenarioLock(sid) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenario-lock', sid], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/editing-locks`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!sid,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
+export function useScenarioLockMe(sid) {
+  const {
+    data: scenarioLockData,
+  } = useScenarioLock(sid);
+  const { user } = useMe();
+
+  return useMemo(() => {
+    return (user.id === scenarioLockData?.userId);
+  }, [user, scenarioLockData]);
+}
+
+export function useSaveScenarioLock({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveScenarioLockProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveScenarioLock = ({ sid }: SaveScenarioLockProps) => {
+    return SCENARIOS.request({
+      url: `/${sid}/lock`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+      transformResponse: (data) => JSON.parse(data),
+    });
+  };
+
+  return useMutation(saveScenarioLock, {
+    onSuccess: (data: any, variables) => {
+      const { sid } = variables;
+      queryClient.invalidateQueries('project-locks');
+      queryClient.invalidateQueries(['scenario-lock', sid]);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteScenarioLock({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteScenarioLockProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const deleteScenarioLock = ({ sid }: DeleteScenarioLockProps) => {
+    return SCENARIOS.request({
+      url: `/${sid}/lock`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(deleteScenarioLock, {
+    onSuccess: (data: any, variables) => {
+      const { sid } = variables;
+      queryClient.invalidateQueries('project-locks');
+      queryClient.invalidateQueries(['scenario-lock', sid]);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+/**
+****************************************
+  SCENARIOS
+****************************************
+*/
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const [session] = useSession();
   const { push } = useRouter();
@@ -164,8 +311,12 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     },
   });
 
+  const { user } = useMe();
+
   const { data: statusData = { scenarios: [] } } = useScenariosStatus(pId);
   const { scenarios: statusScenarios = [] } = statusData;
+
+  const { data: scenariosLocksData = [] } = useProjectScenariosLocks(pId);
 
   const { data } = query;
   const { pages } = data || {};
@@ -182,6 +333,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
         const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
+        const lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user.id);
+
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
             new Date(lastModifiedAt),
@@ -197,11 +350,9 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           warnings: false,
           runStatus,
           jobs,
+          lock,
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
-          },
-          onView: () => {
-            push(`/projects/${projectId}/scenarios/${id}`);
           },
         };
       });
@@ -221,7 +372,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       ...query,
       data: filteredData,
     };
-  }, [query, pages, filters, push, statusScenarios]);
+  }, [query, pages, filters, push, user.id, statusScenarios, scenariosLocksData]);
 }
 
 export function useScenario(id) {
@@ -654,6 +805,8 @@ export function useCancelRunScenario({
     },
   });
 }
+
+// BLM
 export function useScenarioCalibrationResults(scenarioId) {
   const [session] = useSession();
 
@@ -669,7 +822,8 @@ export function useScenarioCalibrationResults(scenarioId) {
   const { data } = query;
 
   return useMemo(() => {
-    const parsedData = Array.isArray(data?.data) ? data?.data : [];
+    const parsedData = Array.isArray(data?.data)
+      ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)) : [];
 
     return {
       ...query,
@@ -678,7 +832,28 @@ export function useScenarioCalibrationResults(scenarioId) {
   }, [query, data?.data]);
 }
 
-// BLM
+export function useScenarioCalibrationRange(scenarioId) {
+  const [session] = useSession();
+
+  const query = useQuery(['scenario-calibration-range', scenarioId], async () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${scenarioId}/blm/range`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }));
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data?.range,
+    };
+  }, [query, data?.data]);
+}
+
 export function useSaveScenarioCalibrationRange({
   requestConfig = {
     method: 'POST',
@@ -703,6 +878,7 @@ export function useSaveScenarioCalibrationRange({
       console.info('Succcess', data, variables, context);
       const { id: scenarioId } = variables;
       queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
+      queryClient.invalidateQueries(['scenario-calibration-range', scenarioId]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
