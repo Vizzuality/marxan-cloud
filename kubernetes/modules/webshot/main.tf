@@ -1,11 +1,11 @@
-resource "kubernetes_service" "client_service" {
+resource "kubernetes_service" "webshot_service" {
   metadata {
-    name      = kubernetes_deployment.client_deployment.metadata[0].name
+    name      = kubernetes_deployment.webshot_deployment.metadata[0].name
     namespace = var.namespace
   }
   spec {
     selector = {
-      name = kubernetes_deployment.client_deployment.metadata[0].name
+      name = kubernetes_deployment.webshot_deployment.metadata[0].name
     }
     port {
       port = 3000
@@ -15,7 +15,7 @@ resource "kubernetes_service" "client_service" {
   }
 }
 
-resource "kubernetes_deployment" "client_deployment" {
+resource "kubernetes_deployment" "webshot_deployment" {
   metadata {
     name      = var.deployment_name
     namespace = var.namespace
@@ -38,40 +38,22 @@ resource "kubernetes_deployment" "client_deployment" {
       }
 
       spec {
-        affinity {
-          node_affinity {
-            required_during_scheduling_ignored_during_execution {
-              node_selector_term {
-                match_expressions {
-                  key      = "type"
-                  values   = ["app"]
-                  operator = "In"
-                }
-              }
-            }
-          }
-        }
         container {
           image             = var.image
           image_pull_policy = "Always"
           name              = var.deployment_name
 
-          args = ["start:prod"]
+          args = ["start"]
 
           resources {
             limits = {
               cpu    = "1"
-              memory = "1Gi"
+              memory = "2Gi"
             }
             requests = {
               cpu    = "500m"
-              memory = "512Mi"
+              memory = "2Gi"
             }
-          }
-
-          env {
-            name  = "NEXTAUTH_URL"
-            value = var.site_url
           }
 
           liveness_probe {
