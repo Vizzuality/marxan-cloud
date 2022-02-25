@@ -2,6 +2,7 @@ import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { DeepPartial } from 'utility-types';
 import { v4 } from 'uuid';
 import { Project } from '../../../projects/project.api.entity';
 import { ExportComponent } from '../domain';
@@ -168,14 +169,7 @@ const getFixtures = async () => {
   };
 };
 
-type ScenariosArray = { id: string }[];
-
-interface ProjectMock {
-  id: string;
-  scenarios?: ScenariosArray;
-  planningAreaGeometryId?: string;
-}
-
+type ProjectMock = DeepPartial<Project>;
 type MockProjectOptions = Omit<ProjectMock, 'id'>;
 
 class FakeProjectRepo {
