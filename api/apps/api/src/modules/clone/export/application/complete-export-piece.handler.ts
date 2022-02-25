@@ -28,7 +28,7 @@ export class CompleteExportPieceHandler
     componentLocation,
     componentId,
   }: CompleteExportPiece): Promise<void> {
-    await this.exportRepository
+    const aggregate = await this.exportRepository
       .transaction(async (repo) => {
         const exportInstance = await repo.find(exportId);
 
@@ -62,11 +62,13 @@ export class CompleteExportPieceHandler
 
         await repo.save(exportAggregate);
 
-        exportAggregate.commit();
+        return exportAggregate;
       })
       .catch((err) => {
         this.logger.error(err);
         this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       });
+
+    if (aggregate) aggregate.commit();
   }
 }

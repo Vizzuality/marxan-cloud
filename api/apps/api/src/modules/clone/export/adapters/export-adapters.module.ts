@@ -1,7 +1,7 @@
 import { FileRepositoryModule } from '@marxan/files-repository';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Scenario } from '../../../scenarios/scenario.api.entity';
+import { Project } from '../../../projects/project.api.entity';
 import { ArchiveCreator } from '../application/archive-creator.port';
 import { ExportRepository } from '../application/export-repository.port';
 import { ExportResourcePieces } from '../application/export-resource-pieces.port';
@@ -16,7 +16,7 @@ import { TypeormExportRepository } from './typeorm-export.repository';
   imports: [
     FileRepositoryModule,
     TypeOrmModule.forFeature([
-      Scenario,
+      Project,
       ExportEntity,
       ExportComponentEntity,
       ExportComponentLocationEntity,
