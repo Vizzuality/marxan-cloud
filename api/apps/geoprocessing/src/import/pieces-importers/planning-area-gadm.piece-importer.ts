@@ -55,7 +55,7 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
       planningAreaGadmLocation.relativePath,
     );
     if (isLeft(stringPlanningAreaGadmOrError)) {
-      const errorMessage = `Project metadata file extraction failed: ${planningAreaGadmLocation.relativePath}`;
+      const errorMessage = `Planning area gadm file extraction failed: ${planningAreaGadmLocation.relativePath}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
