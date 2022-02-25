@@ -171,11 +171,16 @@ export class ScenarioPlanningUnitsLinkerService {
     // upstream yet, and since the frontend app will (should) always send all
     // that is needed, this should be fine for a first pass.
     if (queryPartsForLinker) {
-      const query = `insert into scenarios_pu_data (pu_geom_id, scenario_id, puid)
+      const query = `
+                     with pug as (
+                       select * from planning_units_geom
+                       order by id
+                     )
+                     insert into scenarios_pu_data (pu_geom_id, scenario_id, puid)
                      select id                   as pu_geom_id,
                             '${scenario.id}'     as scenario_id,
                             row_number() over () as puid
-                     from planning_units_geom pug
+                     from pug
                      where ${queryPartsForLinker.planningUnitSelectionQueryPart}
                        and st_intersects(the_geom, ${queryPartsForLinker.planningUnitIntersectionQueryPart});`;
       await this.puRepo.query(query);
