@@ -177,7 +177,7 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
 
           env {
-            name = "REDIS_USE_TLS"
+            name  = "REDIS_USE_TLS"
             value = "true"
           }
 

@@ -20,3 +20,7 @@ variable "bastion_host_size" {
 variable "bastion_subnet_id" {
   description = "The id of the subnet where the bastion host will be placed"
 }
+
+variable "dns_zone" {
+  description = "The Azure DNS zone where the bastion A record will be added"
+}
