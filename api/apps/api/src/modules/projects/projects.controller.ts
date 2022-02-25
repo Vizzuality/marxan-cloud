@@ -7,8 +7,10 @@ import {
   Get,
   Header,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -19,6 +21,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+
 import {
   Project,
   projectResource,
@@ -96,7 +99,6 @@ import {
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
-<<<<<<< HEAD
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
 import { unknownError as fileRepositoryUnknownError } from '@marxan/files-repository';
 import {
@@ -104,9 +106,8 @@ import {
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
-=======
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
->>>>>>> api level planning area tiles endpoints finish with ACL
+import { string } from 'fp-ts';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -419,13 +420,147 @@ export class ProjectsController {
     @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
-  ) {
+  ): Promise<void> {
     const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(planningAreaId, req.user.id);
     if (isLeft(checkPlanningAreaBelongsToProject)) {
-      throw new ForbiddenException();
+     throw new ForbiddenException();
     }
+
     return await this.proxyService.proxyTileRequest(req, response);
   }
+
+  @IsMissingAclImplementation()
+  @ApiOperation({
+    description: 'Get planning area grid tiles for uploaded planning area grid.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    description: 'Binary protobuffer mvt tile',
+    type: String,
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+    example: 6,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+    example: 35,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+    example: 35,
+  })
+  @Get(':id/planning-area/tiles/:z/:x/:y.mvt')
+  async proxyProjectPlanningAreaTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) projectId: string,
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
+  )  {
+
+    const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(projectId, req.user.id);
+    if (isLeft(checkPlanningAreaBelongsToProject)) {
+     throw new ForbiddenException();
+    }
+
+    const result = await this.projectsService.getProjectPlanningAreaTiles(projectId, req.user.id, z, x, y);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    req.url = req.url.replace(result.right.from, result.right.to);
+
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @IsMissingAclImplementation()
+  @ApiOperation({
+    description: 'Get planning area grid tiles for uploaded planning area grid.',
+  })
+  /**
+   *@todo Change ApiOkResponse mvt type
+   */
+  @ApiOkResponse({
+    description: 'Binary protobuffer mvt tile',
+    type: String,
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiParam({
+    name: 'z',
+    description: 'The zoom level ranging from 0 - 20',
+    type: Number,
+    required: true,
+    example: 6,
+  })
+  @ApiParam({
+    name: 'x',
+    description: 'The tile x offset on Mercator Projection',
+    type: Number,
+    required: true,
+    example: 35,
+  })
+  @ApiParam({
+    name: 'y',
+    description: 'The tile y offset on Mercator Projection',
+    type: Number,
+    required: true,
+    example: 35,
+  })
+  @Get(':id/grid/tiles/:z/:x/:y.mvt')
+  async proxyProjectPlanningUnitsTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) projectId: string,
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
+  )  {
+
+    const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(projectId, req.user.id);
+    if (isLeft(checkPlanningAreaBelongsToProject)) {
+     throw new ForbiddenException();
+    }
+
+    const result = await this.projectsService.getProjectPlanningUnitsTiles(projectId, req.user.id, z, x, y);
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    req.url = req.url.replace(result.right.from, result.right.to);
+
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
 
   @IsMissingAclImplementation()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })

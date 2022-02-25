@@ -1,9 +1,9 @@
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, isLeft, left, right, isRight } from 'fp-ts/Either';
-
+import { validate as isValidUUID } from 'uuid';
 import {
   FindResult,
   GeoFeaturesService,
@@ -15,7 +15,7 @@ import { JobStatusService } from './job-status';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
+import { PlanningAreasService, PlanningGids } from '@marxan-api/modules/planning-areas';
 import { assertDefined } from '@marxan/utils';
 
 import {
@@ -52,6 +52,8 @@ import {
   ImportProject,
   ImportProjectError,
 } from '../clone/import/application/import-project.command';
+import { Gids } from '../planning-areas/gids';
+import { getgid } from 'process';
 
 export { validationFailed } from '../planning-areas';
 
@@ -63,6 +65,7 @@ export const apiEventDataNotFound = Symbol(`missing data in api event`);
 
 @Injectable()
 export class ProjectsService {
+
   constructor(
     private readonly geoCrud: GeoFeaturesService,
     private readonly projectsCrud: ProjectsCrudService,
@@ -123,6 +126,88 @@ export class ProjectsService {
       // library-sourced errors are no longer instances of HttpException
       return left(projectNotFound);
     }
+  }
+
+  async getProjectPlanningAreaTiles(
+    projectId: string,
+    userId: string,
+    z: number,
+    x: number,
+    y: number,
+  ): Promise<Either<GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
+  {from: string, to: string} >> {
+
+
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    const project = await this.projectsCrud.getById(projectId);
+
+    if (!project.planningAreaId) {
+      return left(projectNotFound);
+    }
+
+    const planningAreaId = isValidUUID(project.planningAreaId) ?
+      {planningAreaGeometryId: project.planningAreaId} : this.idToGid(project.planningAreaId);
+
+    const planningAreaEntity = await this.planningAreaService.locatePlanningAreaEntity(planningAreaId)
+
+    if (!planningAreaEntity) {
+      return left(projectNotFound);
+    }
+    /*
+    we are redirecting to the planning area service to get the tiles
+    **/
+
+    const level = Object.keys(planningAreaId).length - 1;
+    const endpointRedirect: {[k: string]: {from: string, to: string}} = {
+      'planning_areas': {from:`/projects/${projectId}/planning-area/tiles`,
+                        to: `/projects/planning-area/${projectId}/preview/tiles`},
+      'admin_regions': {from:`/projects/${projectId}/planning-area/tiles/${z}/${x}/${y}.mvt`,
+                        to: `/administrative-areas/${level}/preview/tiles/${z}/${x}/${y}.mvt?guid=${project.planningAreaId}`},
+    }
+    if (!endpointRedirect[planningAreaEntity.tableName]) {
+      return left(forbiddenError);
+    }
+
+    return right(endpointRedirect[planningAreaEntity.tableName]);
+  }
+
+  async getProjectPlanningUnitsTiles(
+    projectId: string,
+    userId: string,
+    z: number,
+    x: number,
+    y: number,
+  ): Promise<Either<GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
+  {from: string, to: string} >> {
+
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    const project = await this.projectsCrud.getById(projectId);
+
+
+    if (!project.planningUnitGridShape) {
+      return left(projectNotFound);
+    }
+    project.bbox[0]
+    /*
+    we are redirecting to the planning area service to get the tiles
+    **/
+   if (project.planningUnitGridShape === 'from_shapefile'){
+    return right({from:`/projects/${projectId}/grid/tiles`,
+                  to: `/projects/planning-area/${projectId}/preview/tiles`});
+
+   }
+   else {
+    return right({
+      from:`/projects/${projectId}/grid/tiles/${z}/${x}/${y}.mvt`,
+      to: `/planning-units/preview/regular/${project.planningUnitGridShape}/${project.planningUnitAreakm2}/tiles/${z}/${x}/${y}.mvt?bbox=${project.bbox.join(',')}`
+    });
+   }
   }
 
   async findProjectBlm(
@@ -347,5 +432,13 @@ export class ProjectsService {
     }
 
     return right(importIdOrError.right);
+  }
+
+  private idToGid(gid: string): PlanningGids {
+    const myArray = gid.split(".");
+    return myArray.reduce((acc : {}, curr: string, idx: number) => {
+      const key = idx === 0 ? "countryId" : `adminAreaLevel${idx}Id`;
+      return {...acc, [key]: curr};
+    } , {} );
   }
 }
