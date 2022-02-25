@@ -1,6 +1,6 @@
-import express, { Application, json } from "express";
+import express, { Application, json, Request, Response } from "express";
 import cors from "cors";
-import * as config from "config";
+import config from "config";
 import helmet from "helmet";
 import { generateSummaryReportForScenario } from "./domain/solutions-report/solutions-report";
 
@@ -20,6 +20,10 @@ app.post(
   "/projects/:projectId/scenarios/:scenarioId/solutions/report",
   generateSummaryReportForScenario
 );
+
+app.get("/api/ping", async (req: Request, res: Response) => {
+  res.status(200).json({ ping: "pong" });
+});
 
 app.listen(daemonListenPort, () => {
   console.info(`webshot service initialized on port ${daemonListenPort}`);
