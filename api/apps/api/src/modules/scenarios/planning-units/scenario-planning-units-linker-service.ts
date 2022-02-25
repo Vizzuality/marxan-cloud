@@ -171,6 +171,37 @@ export class ScenarioPlanningUnitsLinkerService {
     // upstream yet, and since the frontend app will (should) always send all
     // that is needed, this should be fine for a first pass.
     if (queryPartsForLinker) {
+      /**
+       * @debt Ordering `planning_units_geom` by uuid will ensure that every
+       * time a scenario is created from the same project, its planning units
+       * will be selected in the same order, therefore making the `puid`
+       * attribute of each planning unit stable across all the scenarios of the
+       * same project.
+       *
+       * This could be done more robustly by linking planning units _to
+       * projects_, so that puids can be assigned at that moment, and then
+       * propagated to individual scenarios. However, this is an intrusive
+       * change that will affect many parts of the API which should be avoided
+       * at this stage.
+       *
+       * Without this ordering (the initial implementation did not enforce an
+       * order), planning units would be selected in database order, and so
+       * their `puid` attribute _may_ be stable in most cases, except when any
+       * query updates relevant rows of `planning_units_geom`, which may result
+       * in the database order to be changed.
+       *
+       * Even with ordering, this setup relies on some assumptions that should
+       * be ignored in practice for the time being, such as that no updates to
+       * the `admin_regions` table are performed between the creation of
+       * different scenarios. Small adjustments (amending mistakes, or
+       * incorporating hopefully peaceful changes to admin boundaries) may
+       * result in generated grids to differ slightly, leading to different
+       * `planning_unit_geom` rows to be selected for scenarios created after a
+       * GADM geometries update. As ingesting GADM data is an ETL operation that
+       * is currently supposed to be done only once at the time a Marxan Cloud
+       * instance is set up, the logic below should still be sound, but it would
+       * need to be revisited if assumptions we rely on change.
+       */
       const query = `
                      with pug as (
                        select * from planning_units_geom
