@@ -6,7 +6,7 @@ import {
 } from '@marxan/cloning/domain';
 import {
   ClonePieceImportOrder,
-  ClonePieceUris,
+  ClonePieceUrisResolver,
 } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ProjectExportConfigContent,
@@ -19,7 +19,7 @@ import { ImportComponent } from '../domain';
 @Injectable()
 export class ImportResourcePiecesAdapter implements ImportResourcePieces {
   resolveForProject(
-    id: ResourceId,
+    projectId: ResourceId,
     location: ArchiveLocation,
     pieces: ProjectExportConfigContent['pieces'],
   ): ImportComponent[] {
@@ -27,21 +27,21 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
       .filter((piece) => piece !== ClonePiece.ExportConfig)
       .map((piece) =>
         ImportComponent.newOne(
-          id,
+          projectId,
           piece,
           ClonePieceImportOrder[piece],
-          ClonePieceUris[piece](location.value),
+          ClonePieceUrisResolver.resolveFor(piece, location.value),
         ),
       );
 
-    const scenarios = Object.keys(pieces.scenarios);
-    const scenarioComponents = scenarios.flatMap((id) =>
+    const scenarioIds = Object.keys(pieces.scenarios);
+    const scenarioComponents = scenarioIds.flatMap((scenarioId) =>
       this.resolveForScenario(
         ResourceId.create(),
         location,
-        pieces.scenarios[id],
+        pieces.scenarios[scenarioId],
         ResourceKind.Project,
-        id,
+        scenarioId,
       ),
     );
 
@@ -62,7 +62,7 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
           scenarioId,
           piece,
           ClonePieceImportOrder[piece],
-          ClonePieceUris[piece](location.value, {
+          ClonePieceUrisResolver.resolveFor(piece, location.value, {
             kind,
             scenarioId: oldScenarioId,
           }),

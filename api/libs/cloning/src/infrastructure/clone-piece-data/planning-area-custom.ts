@@ -6,6 +6,6 @@ export interface PlanningAreaCustomContent {
   puAreaKm2: number;
 }
 
-export const PlanningAreaCustomRelativePath = 'planning-area.json';
-export const PlanningAreaCustomGeoJSONRelativePath =
+export const planningAreaCustomRelativePath = 'planning-area.json';
+export const planningAreaCustomGeoJSONRelativePath =
   'planning-area/project-pa.geojson';

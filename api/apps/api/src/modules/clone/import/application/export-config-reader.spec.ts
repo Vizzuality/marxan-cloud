@@ -9,10 +9,9 @@ import {
   Failure,
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
-import { ClonePieceUris } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ExportConfigContent,
-  ExportConfigRelativePath,
   exportVersion,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
@@ -190,7 +189,8 @@ const getFixtures = async () => {
         zlib: { level: 9 },
       });
 
-      const [{ relativePath }] = ClonePieceUris[ClonePiece.ExportConfig](
+      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ExportConfig,
         'export-config uri',
       );
 
@@ -221,8 +221,14 @@ const getFixtures = async () => {
       });
       const invalidExportConfig = expectedExportConfig;
       invalidExportConfig.version = '';
+
+      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ExportConfig,
+        'export-config uri',
+      );
+
       archive.append(JSON.stringify(invalidExportConfig), {
-        name: ExportConfigRelativePath,
+        name: relativePath,
       });
 
       return new Promise((resolve, reject) => {
@@ -246,7 +252,8 @@ const getFixtures = async () => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
-      const [{ relativePath }] = ClonePieceUris[ClonePiece.ExportConfig](
+      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ExportConfig,
         'export-config uri',
       );
 

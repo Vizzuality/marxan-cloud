@@ -1,8 +1,8 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUris } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { PlanningAreaCustomGridGeoJSONRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
+import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { planningAreaCustomGridGeoJSONRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -39,7 +39,7 @@ export class PlanningAreaCustomGridPieceExporter
       shape: 'square',
       areaKm2: 4000,
       bbox: [],
-      file: PlanningAreaCustomGridGeoJSONRelativePath,
+      file: planningAreaCustomGridGeoJSONRelativePath,
     });
 
     const geoJson: GeoJSON = {
@@ -72,10 +72,13 @@ export class PlanningAreaCustomGridPieceExporter
     return {
       ...input,
       uris: [
-        ...ClonePieceUris[ClonePiece.PlanningAreaGridCustom](outputFile.right),
+        ...ClonePieceUrisResolver.resolveFor(
+          ClonePiece.PlanningAreaGridCustom,
+          outputFile.right,
+        ),
         {
           uri: planningAreaGeoJson.right,
-          relativePath: PlanningAreaCustomGridGeoJSONRelativePath,
+          relativePath: planningAreaCustomGridGeoJSONRelativePath,
         },
       ],
     };

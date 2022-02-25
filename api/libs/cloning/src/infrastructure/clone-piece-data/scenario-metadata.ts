@@ -3,7 +3,7 @@ export interface ScenarioMetadataContent {
   description?: string;
 }
 
-export const ScenarioMetadataRelativePath = {
+export const scenarioMetadataRelativePath = {
   scenarioImport: `scenario-metadata.json`,
   projectImport: (oldScenarioId: string) =>
     `scenarios/${oldScenarioId}/scenario-metadata.json`,

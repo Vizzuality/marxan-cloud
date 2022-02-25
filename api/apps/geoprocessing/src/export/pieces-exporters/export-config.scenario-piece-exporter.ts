@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUris } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   exportVersion,
   ScenarioExportConfigContent,
@@ -74,7 +74,10 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: ClonePieceUris[ClonePiece.ExportConfig](outputFile.right),
+      uris: ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ExportConfig,
+        outputFile.right,
+      ),
     };
   }
 }

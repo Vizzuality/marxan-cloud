@@ -75,4 +75,4 @@ export type ExportConfigContent =
   | ProjectExportConfigContent
   | ScenarioExportConfigContent;
 
-export const ExportConfigRelativePath = 'config.json';
+export const exportConfigRelativePath = 'config.json';
