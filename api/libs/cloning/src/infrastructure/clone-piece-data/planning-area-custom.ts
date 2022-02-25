@@ -6,12 +6,6 @@ export interface PlanningAreaCustomContent {
   puAreaKm2: number;
 }
 
-export interface PlanningAreaCustomRelativePathsType {
-  planningArea: string;
-  customPaGeoJson: string;
-}
-
-export const PlanningAreaCustomRelativePaths: PlanningAreaCustomRelativePathsType = {
-  planningArea: 'planning-area.json',
-  customPaGeoJson: 'planning-area/project-pa.geojson',
-};
+export const PlanningAreaCustomRelativePath = 'planning-area.json';
+export const PlanningAreaCustomGeoJSONRelativePath =
+  'planning-area/project-pa.geojson';

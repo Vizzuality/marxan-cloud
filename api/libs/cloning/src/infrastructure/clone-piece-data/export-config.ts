@@ -75,10 +75,4 @@ export type ExportConfigContent =
   | ProjectExportConfigContent
   | ScenarioExportConfigContent;
 
-export interface ExportConfigRelativePathsType {
-  config: string;
-}
-
-export const ExportConfigRelativePaths: ExportConfigRelativePathsType = {
-  config: 'config.json',
-};
+export const ExportConfigRelativePath = 'config.json';

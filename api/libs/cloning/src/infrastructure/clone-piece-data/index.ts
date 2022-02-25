@@ -1,47 +1,56 @@
+import { ComponentLocation, ResourceKind } from '../../domain';
 import { ClonePiece } from '../../domain/clone-piece';
-import {
-  ExportConfigRelativePaths,
-  ExportConfigRelativePathsType,
-} from './export-config';
-import {
-  PlanningAreaCustomRelativePaths,
-  PlanningAreaCustomRelativePathsType,
-} from './planning-area-custom';
-import {
-  PlanningAreaGadmRelativePaths,
-  PlanningAreaGadmRelativePathsType,
-} from './planning-area-gadm';
-import {
-  PlanningAreaCustomGridRelativePaths,
-  PlanningAreaCustomGridRelativePathsType,
-} from './planning-area-grid-custom';
-import {
-  ProjectMetadataRelativePaths,
-  ProjectMetadataRelativePathsType,
-} from './project-metadata';
-import {
-  ScenarioMetadataRelativePaths,
-  ScenarioMetadataRelativePathsType,
-} from './scenario-metadata';
+import { ExportConfigRelativePath } from './export-config';
+import { PlanningAreaCustomRelativePath } from './planning-area-custom';
+import { PlanningAreaGadmRelativePath } from './planning-area-gadm';
+import { PlanningAreaCustomGridRelativePath } from './planning-area-grid-custom';
+import { ProjectMetadataRelativePath } from './project-metadata';
+import { ScenarioMetadataRelativePath } from './scenario-metadata';
 
-interface ClonePieceRelativePathsType {
-  [ClonePiece.ExportConfig]: ExportConfigRelativePathsType;
-  [ClonePiece.PlanningAreaGAdm]: PlanningAreaGadmRelativePathsType;
-  [ClonePiece.PlanningAreaCustom]: PlanningAreaCustomRelativePathsType;
-  [ClonePiece.PlanningAreaGridCustom]: PlanningAreaCustomGridRelativePathsType;
-  [ClonePiece.ProjectMetadata]: ProjectMetadataRelativePathsType;
-  [ClonePiece.ScenarioMetadata]: ScenarioMetadataRelativePathsType;
-}
-
-type ClonePieceRelativePaths = {
-  [property in ClonePiece]: ClonePieceRelativePathsType[property];
+export const ClonePieceImportOrder: Record<ClonePiece, number> = {
+  [ClonePiece.ExportConfig]: -1,
+  [ClonePiece.ProjectMetadata]: 0,
+  [ClonePiece.ScenarioMetadata]: 1,
+  [ClonePiece.PlanningAreaGAdm]: 1,
+  [ClonePiece.PlanningAreaCustom]: 1,
+  [ClonePiece.PlanningAreaGridCustom]: 2,
 };
 
-export const ClonePieceRelativePaths: ClonePieceRelativePaths = {
-  [ClonePiece.ExportConfig]: ExportConfigRelativePaths,
-  [ClonePiece.PlanningAreaGAdm]: PlanningAreaGadmRelativePaths,
-  [ClonePiece.PlanningAreaCustom]: PlanningAreaCustomRelativePaths,
-  [ClonePiece.PlanningAreaGridCustom]: PlanningAreaCustomGridRelativePaths,
-  [ClonePiece.ProjectMetadata]: ProjectMetadataRelativePaths,
-  [ClonePiece.ScenarioMetadata]: ScenarioMetadataRelativePaths,
+export const ClonePieceUris: Record<
+  ClonePiece,
+  (
+    location: string,
+    scenarioPiecesExtraData?: { kind: ResourceKind; scenarioId: string },
+  ) => ComponentLocation[]
+> = {
+  [ClonePiece.ExportConfig]: (location) => [
+    new ComponentLocation(location, ExportConfigRelativePath),
+  ],
+  [ClonePiece.PlanningAreaGAdm]: (location) => [
+    new ComponentLocation(location, PlanningAreaGadmRelativePath),
+  ],
+  [ClonePiece.PlanningAreaCustom]: (location) => [
+    new ComponentLocation(location, PlanningAreaCustomRelativePath),
+  ],
+  [ClonePiece.PlanningAreaGridCustom]: (location) => [
+    new ComponentLocation(location, PlanningAreaCustomGridRelativePath),
+  ],
+  [ClonePiece.ProjectMetadata]: (location) => [
+    new ComponentLocation(location, ProjectMetadataRelativePath),
+  ],
+  [ClonePiece.ScenarioMetadata]: (location, extraData) => {
+    if (!extraData)
+      throw new Error(
+        'It is not possible generate scenario pieces uris without export kind or old scenario id',
+      );
+
+    return [
+      new ComponentLocation(
+        location,
+        extraData.kind === ResourceKind.Project
+          ? ScenarioMetadataRelativePath.projectImport(extraData.scenarioId)
+          : ScenarioMetadataRelativePath.scenarioImport,
+      ),
+    ];
+  },
 };

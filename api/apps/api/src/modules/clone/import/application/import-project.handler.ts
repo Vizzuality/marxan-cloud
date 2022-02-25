@@ -36,7 +36,7 @@ export class ImportProjectHandler
     const pieces = this.importResourcePieces.resolveForProject(
       resourceId,
       archiveLocation,
-      exportConfig.scenarios,
+      exportConfig.pieces,
     );
 
     const importRequest = this.eventPublisher.mergeObjectContext(

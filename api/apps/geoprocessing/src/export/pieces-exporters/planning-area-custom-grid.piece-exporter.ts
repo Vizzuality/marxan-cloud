@@ -1,7 +1,8 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceUris } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { PlanningAreaCustomGridGeoJSONRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -34,14 +35,11 @@ export class PlanningAreaCustomGridPieceExporter
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const relativePaths =
-      ClonePieceRelativePaths[ClonePiece.PlanningAreaGridCustom];
-
     const metadata = JSON.stringify({
       shape: 'square',
       areaKm2: 4000,
       bbox: [],
-      file: relativePaths.customGridGeoJson,
+      file: PlanningAreaCustomGridGeoJSONRelativePath,
     });
 
     const geoJson: GeoJSON = {
@@ -74,13 +72,10 @@ export class PlanningAreaCustomGridPieceExporter
     return {
       ...input,
       uris: [
-        {
-          uri: outputFile.right,
-          relativePath: relativePaths.projectGrid,
-        },
+        ...ClonePieceUris[ClonePiece.PlanningAreaGridCustom](outputFile.right),
         {
           uri: planningAreaGeoJson.right,
-          relativePath: relativePaths.customGridGeoJson,
+          relativePath: PlanningAreaCustomGridGeoJSONRelativePath,
         },
       ],
     };

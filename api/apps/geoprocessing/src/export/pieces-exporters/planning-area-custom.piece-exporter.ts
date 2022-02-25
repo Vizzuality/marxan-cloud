@@ -1,15 +1,18 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
+import { ClonePieceUris } from '@marxan/cloning/infrastructure/clone-piece-data';
+import {
+  PlanningAreaCustomContent,
+  PlanningAreaCustomGeoJSONRelativePath,
+} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable, Logger } from '@nestjs/common';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import {
   ExportPieceProcessor,
   PieceExportProvider,
@@ -46,9 +49,6 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const relativePaths =
-      ClonePieceRelativePaths[ClonePiece.PlanningAreaCustom];
-
     const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
       `
         SELECT planning_unit_grid_shape, planning_unit_area_km2
@@ -112,13 +112,10 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     return {
       ...input,
       uris: [
-        {
-          uri: outputFile.right,
-          relativePath: relativePaths.planningArea,
-        },
+        ...ClonePieceUris[ClonePiece.PlanningAreaCustom](outputFile.right),
         {
           uri: planningAreaGeoJson.right,
-          relativePath: relativePaths.customPaGeoJson,
+          relativePath: PlanningAreaCustomGeoJSONRelativePath,
         },
       ],
     };
