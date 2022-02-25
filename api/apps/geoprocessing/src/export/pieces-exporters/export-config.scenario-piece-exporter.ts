@@ -58,7 +58,7 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
       projectId: scenario.project_id,
       resourceKind: input.resourceKind,
       resourceId: input.resourceId,
-      pieces: input.allPieces,
+      pieces: input.allPieces.map((elem) => elem.piece),
     };
 
     const outputFile = await this.fileRepository.save(

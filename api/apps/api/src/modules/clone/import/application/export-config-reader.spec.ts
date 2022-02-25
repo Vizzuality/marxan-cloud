@@ -38,27 +38,84 @@ describe('ExportConfigReader', () => {
     fixtures = await getFixtures();
   });
 
-  test('should fail when cant find archive', async () => {
+  it('should fail when cant find archive', async () => {
     const archiveLocation = fixtures.GivenNoArchive();
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenNotFoundErrorShouldBeReturned(result);
   });
-  test('should fail when export config file is missing', async () => {
+
+  it('should fail when export config file is missing', async () => {
     const archiveLocation = await fixtures.GivenArchiveMissingExportConfig();
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenArchiveCorruptedErrorShouldBeReturned(result);
   });
-  test('should fail when resource kind property of export config file has an invalid value', async () => {
-    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig();
+
+  it('should fail when resource kind property of export config file has an invalid value', async () => {
+    const invalidExportConfig: ExportConfigContent = {
+      resourceKind: 'invalid resource kind' as ResourceKind,
+      name: 'name',
+      pieces: [ClonePiece.ExportConfig],
+      projectId: v4(),
+      resourceId: v4(),
+      scenarios: [],
+      version: '1.0.0',
+      description: 'description',
+    };
+    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
+      invalidExportConfig,
+    );
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
   });
-  test('should fail when versionproperty of export config file has an invalid value', async () => {
+
+  it('should fail when pieces property of project export config file has an invalid value', async () => {
+    const invalidExportConfig: ExportConfigContent = {
+      resourceKind: ResourceKind.Project,
+      name: 'name',
+      pieces: {
+        project: [ClonePiece.ExportConfig, ClonePiece.ProjectMetadata],
+        scenarios: {
+          'non-uuid-key': [ClonePiece.ScenarioMetadata],
+        },
+      },
+      projectId: v4(),
+      resourceId: v4(),
+      scenarios: [],
+      version: '1.0.0',
+      description: 'description',
+    };
+    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
+      invalidExportConfig,
+    );
+    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
+    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+  });
+
+  it('should fail when pieces property of scenario export config file has an invalid value', async () => {
+    const invalidExportConfig: ExportConfigContent = {
+      resourceKind: ResourceKind.Scenario,
+      name: 'name',
+      pieces: ['invalid-piece' as ClonePiece],
+      projectId: v4(),
+      resourceId: v4(),
+      scenarios: [],
+      version: '1.0.0',
+      description: 'description',
+    };
+    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
+      invalidExportConfig,
+    );
+    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
+    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+  });
+
+  it('should fail when version property of export config file has an invalid value', async () => {
     const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfigVersion();
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
   });
-  test('should retrieve export config content', async () => {
+
+  it('should retrieve export config content', async () => {
     const archiveLocation = await fixtures.GivenValidArchive();
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenExportConfigShouldBeReturned(result);
@@ -76,10 +133,16 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
+  const scenarioId = v4();
   const expectedExportConfig: ExportConfigContent = {
     description: 'random description',
     name: 'random name',
-    pieces: [ClonePiece.ExportConfig, ClonePiece.ExportConfig],
+    pieces: {
+      project: [ClonePiece.ExportConfig, ClonePiece.ScenarioMetadata],
+      scenarios: {
+        [scenarioId]: [ClonePiece.ScenarioMetadata],
+      },
+    },
     projectId: v4(),
     resourceId: v4(),
     resourceKind: ResourceKind.Project,
@@ -119,11 +182,12 @@ const getFixtures = async () => {
         archive.finalize();
       });
     },
-    GivenArchiveWithInvalidExportConfig: (): Promise<ArchiveLocation> => {
+    GivenArchiveWithInvalidExportConfig: (
+      invalidExportConfig: ExportConfigContent,
+    ): Promise<ArchiveLocation> => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
-      const invalidExportConfig = { resourceKind: 'invalid resource kind' };
       archive.append(JSON.stringify(invalidExportConfig), {
         name: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
       });

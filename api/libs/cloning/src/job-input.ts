@@ -6,7 +6,7 @@ export interface ExportJobInput {
   readonly resourceId: string;
   readonly resourceKind: ResourceKind;
   readonly piece: ClonePiece;
-  readonly allPieces: ClonePiece[];
+  readonly allPieces: { piece: ClonePiece; resourceId: string }[];
 }
 
 export interface ImportJobInput {

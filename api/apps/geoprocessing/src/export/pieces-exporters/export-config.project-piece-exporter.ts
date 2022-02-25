@@ -56,6 +56,20 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
       [input.resourceId],
     );
 
+    const projectPieces = input.allPieces
+      .filter(({ resourceId }) => resourceId === input.resourceId)
+      .map(({ piece }) => piece);
+
+    const scenarioPieces: Record<string, ClonePiece[]> = {};
+    scenarios.forEach(({ id }) => {
+      scenarioPieces[id] = [];
+    });
+    input.allPieces
+      .filter(({ resourceId }) => resourceId !== input.resourceId)
+      .forEach(({ piece, resourceId }) => {
+        scenarioPieces[resourceId].push(piece);
+      });
+
     const fileContent: ProjectExportConfigContent = {
       version: exportVersion,
       scenarios,
@@ -63,7 +77,10 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
       description: project.description,
       resourceKind: input.resourceKind,
       resourceId: input.resourceId,
-      pieces: input.allPieces,
+      pieces: {
+        project: projectPieces,
+        scenarios: scenarioPieces,
+      },
     };
 
     const outputFile = await this.fileRepository.save(
