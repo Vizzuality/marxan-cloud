@@ -209,7 +209,7 @@ resource "kubernetes_deployment" "api_deployment" {
 
           liveness_probe {
             http_get {
-              path   = "/ping"
+              path   = "/api/ping"
               port   = 3000
               scheme = "HTTP"
             }
@@ -222,7 +222,7 @@ resource "kubernetes_deployment" "api_deployment" {
 
           readiness_probe {
             http_get {
-              path   = "/ping"
+              path   = "/api/ping"
               port   = 3000
               scheme = "HTTP"
             }

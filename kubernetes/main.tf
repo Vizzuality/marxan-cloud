@@ -129,6 +129,17 @@ module "client_production" {
   site_url                   = "http://${module.ingress_production.client_ip}"
 }
 
+module "webshot_production" {
+  source                     = "./modules/webshot"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "production"
+  image                      = "marxan.azurecr.io/marxan-webshot:production"
+  deployment_name            = "webshot"
+}
+
 module "production_secrets" {
   source                     = "./modules/secrets"
   k8s_host                   = local.k8s_host
@@ -226,6 +237,17 @@ module "client_staging" {
   image                      = "marxan.azurecr.io/marxan-client:staging"
   deployment_name            = "client"
   site_url                   = "http://${module.ingress_production.client_ip}"
+}
+
+module "webshot_staging" {
+  source                     = "./modules/webshot"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "staging"
+  image                      = "marxan.azurecr.io/marxan-webshot:staging"
+  deployment_name            = "webshot"
 }
 
 module "staging_secrets" {
