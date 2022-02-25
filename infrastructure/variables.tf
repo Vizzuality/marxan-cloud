@@ -35,3 +35,8 @@ variable "solution_plan_map" {
   }
   type = map(any)
 }
+
+variable "domain" {
+  type = string
+  description = "The domain name"
+}

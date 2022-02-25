@@ -25,7 +25,12 @@ data "terraform_remote_state" "core" {
 }
 
 data "azurerm_kubernetes_cluster" "k8s_cluster" {
-  name                = data.terraform_remote_state.core.outputs.aks_cluster_name
+  name                = data.terraform_remote_state.core.outputs.k8s_cluster_name
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+data "azurerm_dns_zone" "dns_zone" {
+  name                = data.terraform_remote_state.core.outputs.dns_zone_name
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
 
@@ -43,6 +48,15 @@ module "k8s_namespaces" {
   k8s_client_certificate     = local.k8s_client_certificate
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+}
+
+module "cert_manager" {
+  source                     = "./modules/cert_manager"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  email                      = var.cert_email
 }
 
 ####
@@ -103,6 +117,18 @@ module "geoprocessing_production" {
   deployment_name            = "geoprocessing"
 }
 
+module "client_production" {
+  source                     = "./modules/client"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "production"
+  image                      = "marxan.azurecr.io/marxan-client:production"
+  deployment_name            = "client"
+  site_url                   = "http://${module.ingress_production.client_ip}"
+}
+
 module "production_secrets" {
   source                     = "./modules/secrets"
   k8s_host                   = local.k8s_host
@@ -113,7 +139,7 @@ module "production_secrets" {
   namespace                  = "production"
   name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
-  redis_host                 = data.terraform_remote_state.core.outputs.redis_url
+  redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
   redis_port                 = data.terraform_remote_state.core.outputs.redis_port
 }
@@ -127,6 +153,8 @@ module "ingress_production" {
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
+  dns_zone                   = data.azurerm_dns_zone.dns_zone
+  domain                     = var.domain
 }
 
 
@@ -188,6 +216,18 @@ module "geoprocessing_staging" {
   deployment_name            = "geoprocessing"
 }
 
+module "client_staging" {
+  source                     = "./modules/client"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  namespace                  = "staging"
+  image                      = "marxan.azurecr.io/marxan-client:staging"
+  deployment_name            = "client"
+  site_url                   = "http://${module.ingress_production.client_ip}"
+}
+
 module "staging_secrets" {
   source                     = "./modules/secrets"
   k8s_host                   = local.k8s_host
@@ -198,7 +238,21 @@ module "staging_secrets" {
   namespace                  = "staging"
   name                       = "api"
   key_vault_id               = module.key_vault_staging.key_vault_id
-  redis_host                 = data.terraform_remote_state.core.outputs.redis_url
+  redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
   redis_port                 = data.terraform_remote_state.core.outputs.redis_port
+}
+
+module "ingress_staging" {
+  source                     = "./modules/ingress"
+  namespace                  = "staging"
+  k8s_host                   = local.k8s_host
+  k8s_client_certificate     = local.k8s_client_certificate
+  k8s_client_key             = local.k8s_client_key
+  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  dns_zone                   = data.azurerm_dns_zone.dns_zone
+  domain                     = var.domain
+  domain_prefix = "staging"
 }

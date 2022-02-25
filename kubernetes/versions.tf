@@ -18,6 +18,11 @@ terraform {
     template = {
       source = "hashicorp/template"
     }
+
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
+    }
   }
   required_version = "1.1.3"
 }
@@ -45,4 +50,12 @@ provider "kubernetes" {
   client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_certificate)
   client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
   cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
+}
+
+provider "kubectl" {
+  host                   = data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.host
+  client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_certificate)
+  client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
+  cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
+  load_config_file       = false
 }

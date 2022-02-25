@@ -59,3 +59,11 @@ resource "azurerm_linux_virtual_machine" "bastion" {
     version   = "latest"
   }
 }
+
+resource "azurerm_dns_a_record" "bastion_dns_record" {
+  name                = "bastion"
+  zone_name           = var.dns_zone.name
+  resource_group_name = var.resource_group.name
+  ttl                 = 300
+  records             = [azurerm_linux_virtual_machine.bastion.public_ip_address]
+}

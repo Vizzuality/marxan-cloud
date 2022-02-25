@@ -30,3 +30,18 @@ variable "resource_group" {
 variable "namespace" {
   description = "The k8s namespace in which to deploy resources"
 }
+
+variable "dns_zone" {
+  description = "The Azure DNS zone where the bastion A record will be added"
+}
+
+variable "domain" {
+  type        = string
+  description = "The base domain"
+}
+
+variable "domain_prefix" {
+  type        = string
+  default = null
+  description = "The prefix added to the base domain"
+}
