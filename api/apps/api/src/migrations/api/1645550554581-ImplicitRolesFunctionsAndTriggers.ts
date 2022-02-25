@@ -3,32 +3,64 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class ImplicitRolesFunctionsAndTriggers1645550554581
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(``);
+    // remove legacy column - we never used this
     await queryRunner.query(`
-      CREATE OR REPLACE FUNCTION compute_implicit_scenario_roles_for_user(_scenario_id uuid)
-      RETURNS table(grant_on uuid[]) AS $$
+      ALTER TABLE users_scenarios
+        DROP COLUMN is_editing;
+    `);
+    await queryRunner.query(`
+      ALTER TABLE users_scenarios
+        ADD COLUMN is_implicit boolean NOT NULL DEFAULT false;
+    `);
+    await queryRunner.query(`
+      CREATE OR REPLACE FUNCTION compute_implicit_scenario_roles_for_user(_user_id uuid)
+      RETURNS table(grant_on uuid[], revoke_on uuid[]) AS $$
         WITH
-          O AS (
-            SELECT id FROM users WHERE id IN (SELECT user_id FROM users_projects project_user WHERE project_id IN (SELECT project_id FROM scenarios WHERE scenarios.id = $1))
+          P AS (
+            SELECT id FROM scenarios WHERE project_id IN (SELECT project_id FROM users_projects up WHERE up.user_id = $1)
+          ),
+          E as (
+            SELECT scenario_id FROM users_scenarios us WHERE us.user_id = $1 AND is_implicit IS false
+          ),
+          I as (
+            SELECT * FROM P EXCEPT SELECT * FROM E
+          ),
+          C as (
+            SELECT scenario_id FROM users_scenarios us WHERE us.user_id = $1 AND is_implicit IS true
+          ),
+          -- @todo: this will need to be joined with the user role on each of the scenarios' parent project
+          G as (
+            SELECT * FROM I EXCEPT SELECT * FROM C
+          ),
+          R as (
+            SELECT * FROM C EXCEPT SELECT * FROM I
           )
-        SELECT array((SELECT * FROM O)) AS grant_on;
+        SELECT array((SELECT * FROM G)) AS grant_on, array((SELECT * FROM R)) AS revoke_on;
         $$ LANGUAGE 'sql';
     `);
 
     await queryRunner.query(`
-      CREATE OR REPLACE FUNCTION apply_scenarios_acl_for_user(_scenario_id uuid, grant_on uuid[], role_name varchar) RETURNS void as $$
+      CREATE OR REPLACE FUNCTION apply_scenario_acl_diff_for_user(_user_id uuid, grant_on (uuid, varchar)[], revoke_on (uuid[] ) RETURNS void as $$
       DECLARE
-        grant_on_user_id uuid;
+        grant_on_scenario_id uuid;
+        revoke_on_scenario_id uuid;
       BEGIN
-        FOREACH grant_on_user_id IN array grant_on
+        FOREACH grant_on_scenario IN array grant_on
         LOOP
-          RAISE NOTICE 'Granting implicit % role on scenario % to user %', role_name, _scenario_id, grant_on_user_id;
+          RAISE NOTICE 'Granting implicit % role on scenario % to user %', grant_on_scenario.role_id, grant_on_scenario.scenario_id, _user_id;
 
           INSERT INTO users_scenarios
-            (user_id, scenario_id, role_id)
+            (user_id, scenario_id, role_id, is_implicit)
             VALUES
-            (grant_on_user_id, _scenario_id, , (SELECT name from roles WHERE name = role_name), true);
+            (_user_id, grant_on_scenario.scenario_id, grant_on_scenario.role_id, true);
+        END LOOP;
 
+        FOREACH revoke_on_scenario_id IN array revoke_on
+        LOOP
+          RAISE NOTICE 'Revoking implicit role on scenario % from user %', revoke_on_scenario_id, _user_id;
+
+          DELETE FROM users_scenarios us
+            WHERE us.user_id = _user_id AND scenario_id = revoke_on_scenario_id;
         END LOOP;
       END;
       $$ LANGUAGE 'plpgsql';
@@ -49,7 +81,7 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
           user_id := NEW.user_id;
         END IF;
 
-        PERFORM apply_scenario_acl_diff_for_user(scenario_id, (select grant_on from compute_implicit_scenario_roles_for_user(scenario_id)), role_name);
+        PERFORM apply_scenario_acl_diff_for_user(user_id, (select grant_on from compute_implicit_scenario_roles_for_user(user_id)), role_name);
 
         IF TG_OP = 'INSERT' THEN
           RETURN NEW;
