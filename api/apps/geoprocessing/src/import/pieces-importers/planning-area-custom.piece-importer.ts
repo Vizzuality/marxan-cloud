@@ -57,7 +57,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
       planningAreaCustomLocation.relativePath,
     );
     if (isLeft(stringPlanningAreaCustomOrError)) {
-      const errorMessage = `Project metadata file extraction failed: ${planningAreaCustomLocation.relativePath}`;
+      const errorMessage = `Custom planning area file extraction failed: ${planningAreaCustomLocation.relativePath}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
