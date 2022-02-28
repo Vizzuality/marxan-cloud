@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -15,6 +17,9 @@ import HelpBeacon from 'layout/help/beacon';
 import ComingSoon from 'layout/help/coming-soon';
 
 import Button from 'components/button';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
@@ -87,10 +92,8 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
             <div className="flex space-x-4">
               <Button
                 className="text-white"
-                // disabled={isPublic || !OWNER}
                 theme="primary-alt"
                 size="base"
-                // onClick={onPublish}
                 onClick={() => setModal(true)}
               >
                 <span className="mr-2.5">Publish to Community</span>
@@ -170,22 +173,61 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
         title="Publisj to community"
         onDismiss={() => setModal(false)}
       >
-
-        <h1 className="mb-5 text-xl font-medium text-black">
-          Publish project to community
-        </h1>
-        <Button
-          className="text-white"
-          disabled={!OWNER}
-          theme="primary"
-          size="base"
-          onClick={onPublish}
-
+        <FormRFF
+          onSubmit={onPublish}
+          initialValues={{
+            name: projectData?.name || '',
+          }}
         >
-          <span className="mr-2.5">{isPublic ? 'Edit published project' : 'Publish'}</span>
+          {({ form, handleSubmit }) => (
+            <form
+              onSubmit={handleSubmit}
+              autoComplete="off"
+              className="flex flex-col justify-between flex-grow w-full overflow-hidden"
+            >
+              <h1 className="mb-5 text-xl font-medium text-black">
+                Publish project to the community
+              </h1>
 
-        </Button>
+              {/* NAME */}
+              <div className="mt-8">
+                <FieldRFF
+                  name="name"
+                >
+                  {(fprops) => (
+                    <Field id="name" {...fprops}>
+                      <div className="flex items-center mb-3 space-x-2">
+                        <Label theme="light" className="uppercase" id="name">
+                          Project Name
+                        </Label>
+                      </div>
+                      <Input theme="light" type="text" placeholder="Write project name..." />
+                    </Field>
+                  )}
+                </FieldRFF>
+              </div>
 
+              <div className="flex justify-between mx-auto space-x-4">
+                <Button
+                  theme="secondary"
+                  size="base"
+                  onClick={() => setModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  disabled={isPublic || !OWNER}
+                  theme="primary"
+                  size="base"
+                  type="submit"
+                  onClick={onPublish}
+                >
+                  Publish
+                </Button>
+              </div>
+            </form>
+          )}
+        </FormRFF>
       </Modal>
     </>
   );
