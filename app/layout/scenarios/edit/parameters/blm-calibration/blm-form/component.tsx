@@ -65,7 +65,7 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
             {({ handleSubmit }) => {
               return (
                 <form
-                  className="relative flex flex-col flex-grow pt-5 overflow-hidden text-white border-t border-gray-500"
+                  className="relative flex flex-col flex-grow pt-10 overflow-hidden text-white border-t border-gray-500"
                   autoComplete="off"
                   noValidate
                   onSubmit={handleSubmit}

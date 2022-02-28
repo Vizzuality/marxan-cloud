@@ -71,8 +71,8 @@ export const ScenariosBLMCalibrationForm: React.FC<ScenariosBLMCalibrationFormPr
   };
 
   return (
-    <div className="relative flex flex-col flex-grow w-full pb-5">
-      <div className="flex items-center mt-2.5 space-x-3">
+    <div className="relative flex flex-col flex-grow w-full pt-5 pb-10">
+      <div className="flex items-center space-x-3">
         <p className="text-xs text-white uppercase font-heading">Select the BLM range and calibrate</p>
         <InfoButton>
           <div>
@@ -81,14 +81,14 @@ export const ScenariosBLMCalibrationForm: React.FC<ScenariosBLMCalibrationFormPr
           </div>
         </InfoButton>
       </div>
-      <div className="flex flex-col w-full min-h-0 space-y-10 text-sm">
+      <div className="flex flex-col w-full min-h-0 text-sm">
         <FormRFF
           initialValues={INITIAL_VALUES}
           onSubmit={onSaveBlmRange}
         >
           {({ handleSubmit }) => (
             <form
-              className="flex flex-col w-full mt-5 text-gray-500"
+              className="flex flex-col w-full mt-2.5 text-gray-500"
               autoComplete="off"
               noValidate
               onSubmit={handleSubmit}
@@ -159,7 +159,6 @@ export const ScenariosBLMCalibrationForm: React.FC<ScenariosBLMCalibrationFormPr
                   Calibrate BLM
                 </Button>
               </div>
-
             </form>
           )}
         </FormRFF>
