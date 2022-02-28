@@ -7,7 +7,7 @@ import Header from 'layout/header';
 import Help from 'layout/help/button';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
-import ScenariosEditMap from 'layout/scenarios/map';
+import ScenarioNewMap from 'layout/scenarios/new/map';
 import SidebarName from 'layout/scenarios/new/name';
 import ScenariosSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
@@ -31,7 +31,7 @@ const NewScenarioPage: React.FC = () => {
               <ScenariosSidebar>
                 <SidebarName />
               </ScenariosSidebar>
-              <ScenariosEditMap />
+              <ScenarioNewMap />
             </div>
           </Wrapper>
         </div>

@@ -20,11 +20,11 @@ import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioLock from 'layout/scenarios/edit/lock';
+import ScenarioEditMap from 'layout/scenarios/edit/map';
 import SidebarEditAnalysis from 'layout/scenarios/edit/parameters';
 import SidebarEditPlanningUnit from 'layout/scenarios/edit/planning-unit';
 import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
-import ScenarioEditsMap from 'layout/scenarios/map';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
@@ -109,7 +109,7 @@ const EditScenarioPage: React.FC = () => {
                 <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
                 <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
               </ScenariosEditSidebar>
-              <ScenarioEditsMap />
+              <ScenarioEditMap />
             </div>
           </Wrapper>
         </div>

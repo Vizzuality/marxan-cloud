@@ -255,7 +255,6 @@ export const Item: React.FC<ItemProps> = ({
         <button
           type="button"
           onClick={onEdit}
-          disabled={status.includes('running')}
           className={cx({
             'flex items-center h-full px-8 bg-gray-700 flex-column rounded-r-3xl': true,
             'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:outline-none focus:bg-primary-300 focus:text-black': true,
