@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import puppeteer from "puppeteer";
+import { waitForReportReady } from "./wait-function";
 
 const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions";
 
@@ -53,7 +54,7 @@ export const generateSummaryReportForScenario = async (
 
   console.info(`Rendering ${pageUrl} as PDF`);
   await page.goto(pageUrl);
-  await page.waitForNetworkIdle();
+  await page.waitForFunction(waitForReportReady);
 
   const pageAsPdf = await page.pdf({ timeout: 3e4 });
 
