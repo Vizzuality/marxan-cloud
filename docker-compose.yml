@@ -40,7 +40,7 @@ services:
     ports:
       - "${APP_SERVICE_PORT}:3000"
     container_name: marxan-app
-    command: start
+    command: develop
     volumes:
       - ./app/src:/opt/marxan-app/src
       - ./app/test:/opt/marxan-app/test
