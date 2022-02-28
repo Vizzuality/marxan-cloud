@@ -104,11 +104,27 @@ export const Item: React.FC<ItemProps> = ({
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
       >
-        <header className="flex-1 pr-5">
-          <div className="flex items-center justify-between">
-            <div className="px-4 bg-red-500 rounded-3xl">{ROLES[projectRole]}</div>
+        <div className="flex-1">
+          <div className="flex items-center justify-between pb-7">
+
+            <div className={cx({
+              'px-4 text-sm rounded-3xl': true,
+              'bg-primary-500 bg-opacity-20': OWNER,
+              'border border-gray-500': !OWNER,
+            })}
+            >
+              <p className={cx({
+                'leading-7': true,
+                'text-primary-500': OWNER,
+                'text-white': !OWNER,
+              })}
+              >
+                {ROLES[projectRole]}
+              </p>
+            </div>
+
             <div className="inline-flex">
-              <div className="flex items-center mt-4 text-sm">
+              <div className="flex items-center text-sm">
                 <ul className="flex">
                   {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
                     const { user: { displayName, id: userId, avatarDataUrl } } = u;
@@ -211,7 +227,7 @@ export const Item: React.FC<ItemProps> = ({
             </span>
           </div>
           <div className="text-sm opacity-50 clamp-2">{description}</div>
-        </header>
+        </div>
 
         <footer className="mt-7">
           <div className="flex">
