@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -16,6 +16,7 @@ import ComingSoon from 'layout/help/coming-soon';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import Modal from 'components/modal';
 
 import COMMUNITY_SVG from 'svgs/project/community.svg?sprite';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
@@ -25,6 +26,8 @@ export interface ToolbarProps {
 }
 
 export const Toolbar: React.FC<ToolbarProps> = () => {
+  const [modal, setModal] = useState(false);
+
   const { query } = useRouter();
   const { pid } = query;
   const plausible = usePlausible();
@@ -72,91 +75,118 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   const isPublic = !!publishedProjectsData?.find((p) => p?.id === projectData?.id);
 
   return (
-    <AnimatePresence>
-      {projectData?.name && (
-        <motion.div
-          key="project-toolbar"
-          initial={{ y: -10, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -10, opacity: 0 }}
+    <>
+      <AnimatePresence>
+        {projectData?.name && (
+          <motion.div
+            key="project-toolbar"
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -10, opacity: 0 }}
+          >
+            <div className="flex space-x-4">
+              <Button
+                className="text-white"
+                // disabled={isPublic || !OWNER}
+                theme="primary-alt"
+                size="base"
+                // onClick={onPublish}
+                onClick={() => setModal(true)}
+              >
+                <span className="mr-2.5">Publish to Community</span>
+                <Icon icon={COMMUNITY_SVG} />
+              </Button>
+              <HelpBeacon
+                id="scenarios-upload"
+                title="Upload scenario"
+                subtitle=""
+                content={(
+                  <div>
+                    You can upload the files of a marxan scenario directly.
+                    You will need to compress your input files
+                    as a zipfile. Make sure that your planning region and grid match the one used
+                    for all the scenarios is this project.
+                  </div>
+                )}
+              >
+                <div>
+                  <ComingSoon>
+                    <Button
+                      theme="secondary"
+                      size="base"
+                    >
+                      <span className="mr-2.5">Upload new Scenario</span>
+                      <Icon icon={UPLOAD_SVG} />
+                    </Button>
+                  </ComingSoon>
+                </div>
+              </HelpBeacon>
+
+              <HelpBeacon
+                id="project-download"
+                title="Download scenario"
+                subtitle=""
+                content={(
+                  <div>
+                    You can download all the files from your project in the standard Marxan
+                    format. This will allow you to edit your project outside of the Marxan
+                    Cloud platform.
+                    After doing so you can continue working inside Marxan Cloud by
+                    re-uploading your files back into the platform.
+
+                  </div>
+                )}
+              >
+                <div>
+                  <ComingSoon>
+                    <Button
+                      theme="secondary"
+                      size="base"
+                      onClick={() => plausible('Download project', {
+                        props: {
+                          userId: `${user.id}`,
+                          userEmail: `${user.email}`,
+                          projectId: `${pid}`,
+                          projectName: `${projectData.name}`,
+                        },
+                      })}
+                    >
+                      <span className="mr-2.5">Download project</span>
+                      <Icon icon={DOWNLOAD_SVG} />
+                    </Button>
+                  </ComingSoon>
+                </div>
+              </HelpBeacon>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <Modal
+        dismissable
+        open={modal}
+        size="default"
+        title="Publisj to community"
+        onDismiss={() => setModal(false)}
+      >
+
+        <h1 className="mb-5 text-xl font-medium text-black">
+          Publish project to community
+        </h1>
+        <Button
+          className="text-white"
+          disabled={!OWNER}
+          theme="primary"
+          size="base"
+          onClick={onPublish}
+
         >
-          <div className="flex space-x-4">
-            <Button
-              className="text-white"
-              disabled={isPublic || !OWNER}
-              theme="primary-alt"
-              size="base"
-              onClick={onPublish}
-            >
-              <span className="mr-2.5">Publish to Community</span>
-              <Icon icon={COMMUNITY_SVG} />
-            </Button>
-            <HelpBeacon
-              id="scenarios-upload"
-              title="Upload scenario"
-              subtitle=""
-              content={(
-                <div>
-                  You can upload the files of a marxan scenario directly.
-                  You will need to compress your input files
-                  as a zipfile. Make sure that your planning region and grid match the one used
-                  for all the scenarios is this project.
-                </div>
-              )}
-            >
-              <div>
-                <ComingSoon>
-                  <Button
-                    theme="secondary"
-                    size="base"
-                  >
-                    <span className="mr-2.5">Upload new Scenario</span>
-                    <Icon icon={UPLOAD_SVG} />
-                  </Button>
-                </ComingSoon>
-              </div>
-            </HelpBeacon>
+          <span className="mr-2.5">{isPublic ? 'Edit published project' : 'Publish'}</span>
 
-            <HelpBeacon
-              id="project-download"
-              title="Download scenario"
-              subtitle=""
-              content={(
-                <div>
-                  You can download all the files from your project in the standard Marxan
-                  format. This will allow you to edit your project outside of the Marxan
-                  Cloud platform.
-                  After doing so you can continue working inside Marxan Cloud by
-                  re-uploading your files back into the platform.
+        </Button>
 
-                </div>
-              )}
-            >
-              <div>
-                <ComingSoon>
-                  <Button
-                    theme="secondary"
-                    size="base"
-                    onClick={() => plausible('Download project', {
-                      props: {
-                        userId: `${user.id}`,
-                        userEmail: `${user.email}`,
-                        projectId: `${pid}`,
-                        projectName: `${projectData.name}`,
-                      },
-                    })}
-                  >
-                    <span className="mr-2.5">Download project</span>
-                    <Icon icon={DOWNLOAD_SVG} />
-                  </Button>
-                </ComingSoon>
-              </div>
-            </HelpBeacon>
-
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      </Modal>
+    </>
   );
 };
 
