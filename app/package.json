@@ -15,7 +15,7 @@
     "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook"
   },
   "engines": {
-    "node": "~14.18"
+    "node": "~14.19"
   },
   "dependencies": {
     "@artsy/fresnel": "^1.9.0",
