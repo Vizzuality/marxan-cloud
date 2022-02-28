@@ -56,7 +56,7 @@ export const generateSummaryReportForScenario = async (
   await page.goto(pageUrl);
   await page.waitForFunction(waitForReportReady);
 
-  const pageAsPdf = await page.pdf({ timeout: 3e4 });
+  const pageAsPdf = await page.pdf({ timeout: 3e4, landscape: true });
 
   await page.close();
   await browser.close();
