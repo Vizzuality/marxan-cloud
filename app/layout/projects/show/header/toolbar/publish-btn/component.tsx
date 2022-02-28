@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { Form as FormRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
@@ -10,10 +10,10 @@ import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
-import Field from 'components/forms/field';
-import Input from 'components/forms/input';
-import Label from 'components/forms/label';
-import Textarea from 'components/forms/textarea';
+// import Field from 'components/forms/field';
+// import Input from 'components/forms/input';
+// import Label from 'components/forms/label';
+// import Textarea from 'components/forms/textarea';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
@@ -105,8 +105,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                 Publish project to the community
               </h1>
 
-              {/* NAME */}
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <FieldRFF
                   name="name"
                 >
@@ -123,7 +122,6 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                 </FieldRFF>
               </div>
 
-              {/* DESCRIPTION */}
               <div className="mt-8">
                 <FieldRFF
                   name="description"
@@ -131,11 +129,16 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                   {(fprops) => (
                     <Field id="description" {...fprops}>
                       <Label theme="light" className="mb-3 uppercase">Description</Label>
-                      <Textarea className="text-sm" theme="light" rows={4} placeholder="Write your project description..." />
+                      <Textarea
+                        className="text-sm"
+                        theme="light"
+                        rows={4}
+                        placeholder="Write your project description..."
+                      />
                     </Field>
                   )}
                 </FieldRFF>
-              </div>
+              </div> */}
 
               <div className="flex justify-between mx-auto mt-4 space-x-4">
                 <Button
