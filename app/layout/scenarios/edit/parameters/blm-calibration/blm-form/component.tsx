@@ -9,8 +9,8 @@ import { format } from 'd3';
 
 import { useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
 
-import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
-import BlmImageModal from 'layout/scenarios/edit/parameters/blm-calibration/image-modal';
+import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/blm-form/chart';
+import BlmImageModal from 'layout/scenarios/edit/parameters/blm-calibration/blm-form/image-modal';
 
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
@@ -65,7 +65,7 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
             {({ handleSubmit }) => {
               return (
                 <form
-                  className="relative flex flex-col flex-grow pt-10 overflow-hidden text-white border-t border-gray-500"
+                  className="relative flex flex-col flex-grow pt-5 overflow-hidden text-white border-t border-gray-500"
                   autoComplete="off"
                   noValidate
                   onSubmit={handleSubmit}
