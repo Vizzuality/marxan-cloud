@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import isEmpty from 'lodash/isEmpty';
+
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
@@ -107,13 +109,19 @@ export const Item: React.FC<ItemProps> = ({
         onClick={handleClick}
       >
         <div className="flex-1">
-          <div className="flex items-center justify-between pb-7">
-
-            <div className={cx({
-              'px-4 text-sm rounded-3xl': true,
-              'bg-primary-500 bg-opacity-20': OWNER,
-              'border border-gray-500': !OWNER,
-            })}
+          <div
+            className="flex items-center justify-between"
+            style={{
+              minHeight: 40,
+            }}
+          >
+            <div
+              className={cx({
+                'px-4 text-sm rounded-3xl opacity-0 transition-opacity': true,
+                'opacity-100': !!ROLES[projectRole],
+                'bg-primary-500 bg-opacity-20': OWNER,
+                'border border-gray-500': !OWNER,
+              })}
             >
               <p className={cx({
                 'leading-7': true,
@@ -125,7 +133,12 @@ export const Item: React.FC<ItemProps> = ({
               </p>
             </div>
 
-            <div className="inline-flex">
+            <div
+              className={cx({
+                'inline-flex opacity-0 transition-opacity': true,
+                'opacity-100': !isEmpty(userColors),
+              })}
+            >
               <div className="flex items-center text-sm">
                 <ul className="flex">
                   {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
@@ -162,7 +175,7 @@ export const Item: React.FC<ItemProps> = ({
             </div>
           </div>
 
-          <h3 className="text-xs font-medium tracking-widest uppercase font-heading">
+          <h3 className="text-xs font-medium tracking-widest uppercase font-heading pt-7">
             {area}
           </h3>
 

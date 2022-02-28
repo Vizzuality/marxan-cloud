@@ -56,22 +56,29 @@ export function useProjectsUsers(options) {
       })
       .flat(),
     (u) => u?.user?.id,
-  )
-    .map((u) => u?.user?.id)
-    .filter((u) => !!u);
+  );
+
+  const USERS = useMemo(() => {
+    if (users.every((u) => u?.user)) {
+      return users
+        .map((u) => u?.user?.id)
+        .filter((u) => !!u);
+    }
+    return [];
+  }, [users]);
 
   const COLORS = chroma.scale(['#674BFD', '#3787FF', '#03E7D1']).colors(users.length);
 
   return useMemo(() => {
     return {
-      data: users.reduce((acc, u, i) => {
+      data: USERS.reduce((acc, u, i) => {
         return {
           ...acc,
           [u]: COLORS[i],
         };
       }, {}),
     };
-  }, [users, COLORS]);
+  }, [USERS, COLORS]);
 }
 
 export function useProjectUsers(projectId) {
@@ -86,7 +93,17 @@ export function useProjectUsers(projectId) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.data.sort((a, b) => {
+        const ROLES_SORT = {
+          project_owner: 1,
+          project_contributor: 2,
+          project_viewer: 3,
+        };
+        if (ROLES_SORT[a.roleName] < ROLES_SORT[b.roleName]) return -1;
+        if (ROLES_SORT[a.roleName] > ROLES_SORT[b.roleName]) return 1;
+        return 0;
+      })
+      ,
     };
   }, [query, data?.data]);
 }
