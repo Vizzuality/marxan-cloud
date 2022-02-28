@@ -28,7 +28,7 @@ import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ScenariosDrawingManager from 'layout/scenarios/map/drawing-manager';
+import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
 import Loading from 'components/loading';
 import Map from 'components/map';

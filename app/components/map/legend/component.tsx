@@ -1,4 +1,6 @@
-import React, { useCallback } from 'react';
+import React, {
+  useMemo, useCallback, Children, isValidElement,
+} from 'react';
 
 import cx from 'classnames';
 
@@ -32,6 +34,10 @@ export const Legend: React.FC<LegendProps> = ({
   onChangeOpen,
   onChangeOrder,
 }: LegendProps) => {
+  const isChildren = useMemo(() => {
+    return !!Children.count(Children.toArray(children).filter((c) => isValidElement(c)));
+  }, [children]);
+
   const onToggleOpen = useCallback(() => {
     onChangeOpen(!open);
   }, [open, onChangeOpen]);
@@ -61,7 +67,7 @@ export const Legend: React.FC<LegendProps> = ({
         />
       </button>
 
-      {open && (
+      {open && isChildren && (
         <div
           className="relative flex flex-col flex-grow"
           style={{
