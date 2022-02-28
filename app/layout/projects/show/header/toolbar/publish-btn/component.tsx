@@ -13,6 +13,7 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
+import Textarea from 'components/forms/textarea';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
@@ -83,7 +84,6 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
       <Modal
         dismissable
         open={modal}
-        className="p-6"
         size="default"
         title="Publish to community"
         onDismiss={() => setModal(false)}
@@ -92,13 +92,14 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
           onSubmit={onPublish}
           initialValues={{
             name: projectData?.name || '',
+            description: projectData?.description || '',
           }}
         >
           {({ form, handleSubmit }) => (
             <form
               onSubmit={handleSubmit}
               autoComplete="off"
-              className="flex flex-col justify-between flex-grow w-full overflow-hidden"
+              className="flex flex-col justify-between flex-grow w-full px-6 overflow-hidden"
             >
               <h1 className="mb-5 text-xl font-medium text-black">
                 Publish project to the community
@@ -122,7 +123,21 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                 </FieldRFF>
               </div>
 
-              <div className="flex justify-between mx-auto space-x-4">
+              {/* DESCRIPTION */}
+              <div className="mt-8">
+                <FieldRFF
+                  name="description"
+                >
+                  {(fprops) => (
+                    <Field id="description" {...fprops}>
+                      <Label theme="light" className="mb-3 uppercase">Description</Label>
+                      <Textarea className="text-sm" theme="light" rows={4} placeholder="Write your project description..." />
+                    </Field>
+                  )}
+                </FieldRFF>
+              </div>
+
+              <div className="flex justify-between mx-auto mt-4 space-x-4">
                 <Button
                   theme="secondary"
                   size="base"
