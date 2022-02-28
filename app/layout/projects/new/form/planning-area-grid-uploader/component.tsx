@@ -242,7 +242,13 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                                 to upload
                               </p>
 
-                              <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_GRID_UPLOADER_MAX_SIZE)} MB`}</p>
+                              <p className="mt-2 leading-4 text-center text-gray-400 text-xxs">
+                                {`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_GRID_UPLOADER_MAX_SIZE)} MB`}
+                                <br />
+                                Include only the geometry.
+                                <br />
+                                The grid included should work as a continuous surface.
+                              </p>
 
                               <Loading
                                 visible={loading}
