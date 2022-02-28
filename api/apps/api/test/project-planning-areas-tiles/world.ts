@@ -12,17 +12,22 @@ import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { decodeMvt } from '@marxan/utils/geo/decode-mvt';
 import { PlanningAreaResponseDto } from '@marxan-api/modules/projects/dto/planning-area-response.dto';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 export const createWorld = async (app: INestApplication) => {
   const projectsRepo: Repository<Project> = app.get(
     getRepositoryToken(Project),
   );
   const jwtToken = await GivenUserIsLoggedIn(app);
+
   const organization = await OrganizationsTestUtils.createOrganization(
     app,
     jwtToken,
     E2E_CONFIG.organizations.valid.minimal(),
   );
+
+
+
 
   return {
     jwtToken,
@@ -55,32 +60,29 @@ export const createWorld = async (app: INestApplication) => {
         .responseType('blob')
         .buffer()
     ).body,
-    WhenCreatingProjectWithAdminAreas: async () => request(app.getHttpServer())
-          .post('/api/v1/projects')
-          .set('Authorization', `Bearer ${jwtToken}`)
-          .send({
-            ...E2E_CONFIG.projects.valid.complete({
-              countryCode: 'NAM',
-              adminLevel1: 'NAM.8_1',
-              adminLevel2: 'NAM.8.6_1',
-            }),
-            organizationId: organization.data.id,
-          }).then((response) => response.body),
-      WhenCreatingProjectWithCustomAreas: async (
+    GivenProjectWithAdminAreas: async () => (
+      await ProjectsTestUtils.createProject(app, jwtToken, {
+        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+          countryCode: 'NAM',
+          adminAreaLevel1Id: 'NAM.8_1',
+          adminAreaLevel2Id: 'NAM.8.6_1',
+        }),
+        organizationId: organization.data.id,
+      })
+    ).data.id,
+      GivenProjectWithCustomAreas: async (
         planningAreaId?: string,
         planningUnitGridShape?: PlanningUnitGridShape,
-        planningUnitAreakm2?: number ) => request(app.getHttpServer())
-        .post('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send({
+        planningUnitAreakm2?: number ) => (
+          await ProjectsTestUtils.createProject(app, jwtToken, {
           ...E2E_CONFIG.projects.valid.customArea({
             planningAreaId: planningAreaId,
             planningUnitGridShape: planningUnitGridShape,
             planningUnitAreakm2: planningUnitAreakm2,
           }),
           organizationId: organization.data.id,
-
-        }).then((response) => response.body),
+         })
+        ).data.id,
       WhenRequestingTileForProjectPlanningArea: async (projectId: string) =>
       (
         await request(app.getHttpServer())

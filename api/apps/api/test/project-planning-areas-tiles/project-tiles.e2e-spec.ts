@@ -30,9 +30,9 @@ describe('PlanningUnitsTilesModule (e2e)', () => {
     test('When creating a project with custom planning Area we should have tiles', async () => {
       const PlanningAreaResponse = await world.WhenCreatingCustomPlanningArea();
       const planningAreaId: string = await world.GivenPlanningAreaIsCreated(PlanningAreaResponse);
-      const project = await world.WhenCreatingProjectWithCustomAreas(planningAreaId);
-      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(project.data.id);
-      world.ThenItContainsPlaningAreaTile(tile, {projectId: project.data.id});
+      const projectId = await world.GivenProjectWithCustomAreas(planningAreaId);
+      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(projectId);
+      world.ThenItContainsPlaningAreaTile(tile, {projectId: projectId});
     });
 
     test('When creating a user upload planning Area grid we should have tiles', async () => {
@@ -45,22 +45,22 @@ describe('PlanningUnitsTilesModule (e2e)', () => {
     test('When creating a project with custom grid we should have tiles', async () => {
       const PlanningAreaResponse = await world.WhenCreatingCustomPlanningArea();
       const planningAreaGridId: string = await world.GivenPlanningAreaIsCreated(PlanningAreaResponse);
-      const project = await world.WhenCreatingProjectWithCustomAreas(planningAreaGridId, PlanningUnitGridShape.FromShapefile);
-      const tile: Buffer = await  world.WhenRequestingTileForProjectPlanningGrid(project.data.id);
+      const projectId = await world.GivenProjectWithCustomAreas(planningAreaGridId, PlanningUnitGridShape.FromShapefile);
+      const tile: Buffer = await  world.WhenRequestingTileForProjectPlanningGrid(projectId);
 
-      world.ThenItContainsGridTile(tile, {projectId: project.data.id});
+      world.ThenItContainsGridTile(tile, {projectId: projectId});
     });
 
     test('When creating a regular project whe should be able to access to its planning area', async () => {
-      const project = await world.WhenCreatingProjectWithAdminAreas();
-      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(project.data.id);
-      world.ThenItContainsPlaningAreaTile(tile, {projectId: project.data.id});
+      const projectId = await world.GivenProjectWithAdminAreas();
+      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(projectId);
+      world.ThenItContainsPlaningAreaTile(tile, {projectId: projectId});
     });
 
     test('When creating a user upload planning Area grid we should see the tiles', async () => {
-      const project = await world.WhenCreatingProjectWithAdminAreas();
-      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(project.data.id);
-      world.ThenItContainsPlaningAreaTile(tile, {projectId: project.data.id});
+      const projectId = await world.GivenProjectWithAdminAreas();
+      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(projectId);
+      world.ThenItContainsPlaningAreaTile(tile, {projectId: projectId});
     });
 
 });
