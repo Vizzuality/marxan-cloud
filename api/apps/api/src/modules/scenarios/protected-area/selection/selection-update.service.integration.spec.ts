@@ -80,9 +80,9 @@ const getFixtures = async () => {
       {
         provide: ApiEventsService,
         useValue: {
-          create: jest.fn()
-        }
-      }
+          create: jest.fn(),
+        },
+      },
     ],
   }).compile();
 

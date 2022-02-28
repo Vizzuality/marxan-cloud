@@ -1,10 +1,4 @@
-import {
-  forwardRef,
-  HttpService,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { forwardRef, HttpService, Inject, Injectable } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Readable } from 'stream';
@@ -49,7 +43,6 @@ export class WebshotSummaryReportConfig {
 @Injectable()
 export class WebshotService {
   private webshotServiceUrl: string = AppConfig.get('webshot.url') as string;
-  private readonly logger = new Logger(WebshotService.name);
 
   constructor(
     private readonly httpService: HttpService,
