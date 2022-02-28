@@ -52,8 +52,6 @@ import {
   ImportProject,
   ImportProjectError,
 } from '../clone/import/application/import-project.command';
-import { Gids } from '../planning-areas/gids';
-import { getgid } from 'process';
 
 export { validationFailed } from '../planning-areas';
 
