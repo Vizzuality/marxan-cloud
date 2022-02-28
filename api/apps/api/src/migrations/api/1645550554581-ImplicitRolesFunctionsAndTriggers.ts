@@ -46,9 +46,9 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
     `);
 
     await queryRunner.query(`
-      CREATE OR REPLACE FUNCTION apply_scenario_acl_diff_for_user(_user_id uuid, grant_on roles_to_grant_in_scenario[], revoke_on (uuid[] ) RETURNS void as $$
+      CREATE OR REPLACE FUNCTION apply_scenario_acl_diff_for_user(_user_id uuid, grant_on role_on_entity[], revoke_on (uuid[] ) RETURNS void as $$
       DECLARE
-        grant_on_scenario_id roles_to_grant_in_scenario;
+        grant_on_scenario_id role_on_entity;
         revoke_on_scenario_id uuid;
       BEGIN
         FOREACH grant_on_scenario IN array grant_on
@@ -78,19 +78,35 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
       $$
       DECLARE
         scenario_id uuid;
+        is_implicit boolean;
         role_name varchar;
       BEGIN
         -- define constants
-        role_name := 'scenario_viewer';
+        -- set is_implicit to false as default
+        is_implicit := false;
 
+        -- set user_id and is_implicit from row being created or deleted,
+        -- as applicable
         IF TG_OP = 'INSERT' THEN
           user_id := NEW.user_id;
+          IF TG_TABLE_NAME = 'users_projects' THEN
+            is_implicit := NEW.is_implicit;
+          END IF;
+        ELSIF TG_OP = 'DELETE' THEN
+            user_id := OLD.user_id;
+            IF TG_TABLE_NAME = 'users_projects' THEN
+              is_implicit := OLD.is_implicit;
+            END IF;
         END IF;
 
-        PERFORM apply_scenario_acl_diff_for_user(user_id, (select grant_on from compute_implicit_scenario_roles_for_user(user_id)), role_name);
+        PERFORM apply_scenario_acl_diff_for_user(user_id, (select grant_on from compute_implicit_scenario_roles_for_user(user_id)));
 
         IF TG_OP = 'INSERT' THEN
           RETURN NEW;
+        END IF;
+
+        IF TG_OP = 'DELETE' THEN
+          RETURN OLD;
         END IF;
       END;
       $$ language 'plpgsql';
@@ -100,10 +116,14 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
       CREATE OR REPLACE FUNCTION change_implicit_scenario_role_to_explicit()
         RETURNS trigger AS
       $$
+      -- If we are handling an INSERT for a new explicit role that should
+        -- replace an existing implicit role, we simply flip the is_implicit
+        -- column to false
       BEGIN
         IF EXISTS (SELECT 1 FROM users_scenarios WHERE user_id = NEW.user_id AND scenario_id = NEW.scenario_id) THEN
-          IF TG_OP = 'INSERT' AND TG_TABLE_NAME = 'users_scenarios' THEN
+          IF TG_OP = 'INSERT' AND TG_TABLE_NAME = 'users_scenarios' AND NEW.is_implicit IS FALSE THEN
             UPDATE users_scenarios SET
+              is_implicit = FALSE
               role_id = NEW.role_id
               WHERE user_id = NEW.user_id AND scenario_id = NEW.scenario_id;
             RETURN NULL;
@@ -117,12 +137,17 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
     await queryRunner.query(`
       -- triggers for implicit scenario roles
       CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_projects
+      AFTER INSERT OR DELETE ON users_projects
+      FOR EACH ROW
+      EXECUTE PROCEDURE manage_implicit_scenario_roles();
+
+      CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_scenarios
       AFTER DELETE ON users_scenarios
       FOR EACH ROW
       EXECUTE PROCEDURE manage_implicit_scenario_roles();
 
       CREATE OR REPLACE TRIGGER change_implicit_scenario_role_to_explicit
-      AFTER INSERT ON users_scenarios
+      BEFORE INSERT ON users_scenarios
       FOR EACH ROW
       EXECUTE PROCEDURE change_implicit_scenario_role_to_explicit();
     `);
