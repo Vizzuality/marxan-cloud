@@ -24,6 +24,7 @@ export interface ItemProps extends Project {
   style?: Record<string, unknown>;
   lastUpdate: string;
   lastUpdateDistance: string;
+  userColors?: Record<string, string>;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -38,6 +39,7 @@ export const Item: React.FC<ItemProps> = ({
   description,
   lastUpdateDistance,
   style,
+  userColors,
   onClick,
   onDownload,
   onDuplicate,
@@ -137,7 +139,8 @@ export const Item: React.FC<ItemProps> = ({
                         })}
                       >
                         <Avatar
-                          className="text-sm text-white uppercase bg-primary-700"
+                          className="text-sm text-white uppercase"
+                          bgColor={userColors[userId]}
                           bgImage={avatarDataUrl}
                           name={displayName}
                         >

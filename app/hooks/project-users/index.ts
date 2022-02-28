@@ -1,43 +1,83 @@
 import { useMemo } from 'react';
 
 import {
-  useMutation, useQuery, useQueryClient,
+  useMutation, useQueries, useQuery, useQueryClient,
 } from 'react-query';
 
+import chroma from 'chroma-js';
+import { uniqBy } from 'lodash';
 import { useSession } from 'next-auth/client';
 
 import { useMe } from 'hooks/me';
+import { useProjects } from 'hooks/projects';
 
 import ROLES from 'services/roles';
 
 import {
-  UseProjectUsersOptionsProps,
   DeleteProjectUserProps,
   UseDeleteProjectUserProps,
   UseSaveProjectUserRoleProps,
   SaveProjectUserRoleProps,
 } from './types';
 
-export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps = {}) {
-  const [session] = useSession();
-
-  const { search } = options;
-
-  const query = useQuery(['roles', projectId], async () => ROLES.request({
+function fetchProjectUsers(pId, session) {
+  return ROLES.request({
     method: 'GET',
-    url: `/${projectId}/users`,
+    url: `/${pId}/users`,
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-    params: {
-      ...search && {
-        q: search,
-      },
-    },
+    params: {},
     transformResponse: (data) => JSON.parse(data),
   }).then((response) => {
-    return response;
-  }), {
+    return response.data;
+  });
+}
+
+export function useProjectsUsers(options) {
+  const [session] = useSession();
+
+  const { data: projectsData } = useProjects(options);
+
+  const userQueries = useQueries(
+    projectsData.map((p) => {
+      return {
+        queryKey: ['roles', p.id],
+        queryFn: () => fetchProjectUsers(p.id, session),
+      };
+    }),
+  );
+
+  const users = uniqBy(
+    userQueries
+      .map((u:any) => {
+        const { data } = u;
+        return data?.data;
+      })
+      .flat(),
+    (u) => u?.user?.id,
+  )
+    .map((u) => u?.user?.id)
+    .filter((u) => !!u);
+
+  const COLORS = chroma.scale(['#674BFD', '#3787FF', '#03E7D1']).colors(users.length);
+
+  return useMemo(() => {
+    return {
+      data: users.reduce((acc, u, i) => {
+        return {
+          ...acc,
+          [u]: COLORS[i],
+        };
+      }, {}),
+    };
+  }, [users, COLORS]);
+}
+
+export function useProjectUsers(projectId) {
+  const [session] = useSession();
+
+  const query = useQuery(['roles', projectId], () => fetchProjectUsers(projectId, session), {
     enabled: !!projectId,
   });
 
@@ -46,9 +86,9 @@ export function useProjectUsers(projectId, options: UseProjectUsersOptionsProps 
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data?.data,
+      data: data?.data,
     };
-  }, [query, data?.data?.data]);
+  }, [query, data?.data]);
 }
 
 export function useProjectRole(projectId) {

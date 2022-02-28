@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
 
+import { useProjectsUsers } from 'hooks/project-users';
 import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -23,6 +24,7 @@ export interface ProjectsListProps {
 export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const { search } = useSelector((state) => state['/projects']);
   const { data, isFetching, isFetched } = useProjects({ search });
+  const { data: projectsUsersData } = useProjectsUsers({ search });
 
   const [deleteProject, setDelete] = useState(null);
   const deleteMutation = useDeleteProject({});
@@ -140,6 +142,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                   <Item
                     key={`${d.id}`}
                     {...d}
+                    userColors={projectsUsersData}
                     onDelete={() => {
                       setDelete(d);
                     }}

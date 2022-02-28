@@ -31,7 +31,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const {
     data: projectUsers,
     refetch: refetchProjectUsers,
-  } = useProjectUsers(pid, { search });
+  } = useProjectUsers(pid);
 
   const projectUsersVisibleSize = 3;
   const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
