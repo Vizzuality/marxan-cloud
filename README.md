@@ -216,21 +216,7 @@ in more detail in the [Infrastructure](#infrastructure) docs.
 
 ### Infrastructure
 
-While the application can be deployed in any server configuration that supports the above-mentioned
-[dependencies](#dependencies), this project includes a [Terraform](https://www.terraform.io/) project
-in the `infrastructure` folder, that you can use to easily and quickly deploy it using 
-[Microsoft Azure](https://azure.microsoft.com/en-us/). 
-
-Deploying the included Terraform project is done in two steps:
-- First, use Terraform to apply the `infrastructure/remote-state` folder, which will set up base
-Azure resources, like a [Resource Group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/overview)
-or a [Storage Account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-overview)
-to store the "main" Terraform remote state
-- Apply the "main" `infrastructure` folder, which contains all the Azure 
-resources necessary to host a functioning [Azure AKS cluster](https://azure.microsoft.com/en-us/services/kubernetes-service/). 
-- Apply the "main" `kubernetes` folder, which contains all the 
-resources necessary to host a functioning Marxan application within the AKS 
-cluster provisioned above. 
+Infrastructure code and documentation can be found under `/infrastructure`
 
 ## Bugs
 

@@ -43,7 +43,7 @@ resource "azurerm_linux_virtual_machine" "bastion" {
     for_each = var.bastion_ssh_public_keys
     content {
       username   = local.admin_user
-      public_key = admin_ssh_key.value.key
+      public_key = admin_ssh_key.value
     }
   }
 

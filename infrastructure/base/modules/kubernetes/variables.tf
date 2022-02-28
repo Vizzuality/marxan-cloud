@@ -10,7 +10,7 @@ variable "resource_group" {
 variable "kubernetes_version" {
   type        = string
   description = "Version of kubernetes to deploy"
-  default     = "1.22.4"
+  default     = "1.22.6"
 }
 
 variable "gateway_subnet_id" {
@@ -39,4 +39,22 @@ variable "virtual_networks_to_link" {
 variable "acr_id" {
   description = "Id of the ACR so pull images from"
   type        = string
+}
+
+variable "min_node_count" {
+  type        = number
+  default     = 1
+  description = "The minimum number of machines in the default node pool"
+}
+
+variable "max_node_count" {
+  type        = number
+  default     = 4
+  description = "The maximum number of machines in the default node pool"
+}
+
+variable "enable_auto_scaling" {
+  type        = bool
+  default     = true
+  description = "If the default node pool will auto-scale"
 }

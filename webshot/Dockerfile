@@ -31,6 +31,7 @@ RUN yarn install --frozen-lockfile
 
 COPY --chown=$USER:$USER entrypoint.sh ./
 COPY --chown=$USER:$USER src ./src
+COPY --chown=$USER:$USER config ./config
 COPY --chown=$USER:$USER tsconfig.json tsconfig.build.json nodemon.json ./
 
 RUN yarn prestart:prod

@@ -23,12 +23,6 @@ variable "vm_size" {
   description = "The node pool machine type"
 }
 
-variable "node_count" {
-  type        = number
-  default     = 1
-  description = "The number of machines in this pool"
-}
-
 variable "min_node_count" {
   type        = number
   default     = 1
@@ -39,12 +33,6 @@ variable "max_node_count" {
   type        = number
   default     = 4
   description = "The maximum number of machines in this pool"
-}
-
-variable "enable_auto_scaling" {
-  type        = bool
-  default     = true
-  description = "If this pool will auto-scale"
 }
 
 variable "node_labels" {

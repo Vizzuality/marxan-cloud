@@ -18,6 +18,11 @@ output "azure_client_id" {
   value = azuread_service_principal.github-actions-access.application_id
 }
 
+output "azuread_application_username" {
+  value = nonsensitive(azuread_application_password.github-actions-access.value)
+}
+
+
 output "azuread_application_password" {
   value = nonsensitive(azuread_application_password.github-actions-access.value)
 }
