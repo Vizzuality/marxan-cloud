@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useNumberFormatter } from '@react-aria/i18n';
+
 import Icon from 'components/icon';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
@@ -28,6 +30,10 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
     runId, scoreValue, costValue, missingValues, planningUnits,
   } = values;
   const { visibility = true } = settings || {};
+
+  const { format } = useNumberFormatter({
+    style: 'decimal',
+  });
 
   return (
     <div className="w-full">
@@ -60,19 +66,19 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
       <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Score:</p>
-          <p className="w-20 font-semibold text-left">{scoreValue}</p>
+          <p className="w-20 font-semibold text-left">{format(scoreValue)}</p>
         </div>
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Cost:</p>
-          <p className="w-20 font-semibold text-left">{costValue}</p>
+          <p className="w-20 font-semibold text-left">{format(costValue)}</p>
         </div>
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Missing:</p>
-          <p className="w-20 font-semibold text-left">{missingValues}</p>
+          <p className="w-20 font-semibold text-left">{format(missingValues)}</p>
         </div>
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Planning:</p>
-          <p className="w-20 font-semibold text-left">{planningUnits}</p>
+          <p className="w-20 font-semibold text-left">{format(planningUnits)}</p>
         </div>
       </div>
     </div>
