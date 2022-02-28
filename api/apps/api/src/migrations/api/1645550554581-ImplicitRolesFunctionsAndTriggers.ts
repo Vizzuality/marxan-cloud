@@ -13,8 +13,11 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
         ADD COLUMN is_implicit boolean NOT NULL DEFAULT false;
     `);
     await queryRunner.query(`
+    CREATE TYPE role_on_entity AS ( entity_id uuid, role_id varchar);
+    `);
+    await queryRunner.query(`
       CREATE OR REPLACE FUNCTION compute_implicit_scenario_roles_for_user(_user_id uuid)
-      RETURNS table(grant_on uuid[], revoke_on uuid[]) AS $$
+      RETURNS table(grant_on role_on_entity[], revoke_on uuid[]) AS $$
         WITH
           P AS (
             SELECT id FROM scenarios WHERE project_id IN (SELECT project_id FROM users_projects up WHERE up.user_id = $1)
@@ -32,17 +35,20 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
           G as (
             SELECT * FROM I EXCEPT SELECT * FROM C
           ),
+		      J as (
+			      SELECT s.id, up.role_id as role_id FROM G * LEFT OUTER JOIN scenarios s ON G.id = s.id JOIN projects pro ON s.id = pro.id JOIN users_projects up ON up.project_id = pro.id AND up.user_id = $1
+          ),
           R as (
             SELECT * FROM C EXCEPT SELECT * FROM I
           )
-        SELECT array((SELECT * FROM G)) AS grant_on, array((SELECT * FROM R)) AS revoke_on;
+        SELECT array((SELECT (id, role_id)::role_on_entity FROM J)) AS grant_on, array((SELECT * FROM R)) AS revoke_on;
         $$ LANGUAGE 'sql';
     `);
 
     await queryRunner.query(`
-      CREATE OR REPLACE FUNCTION apply_scenario_acl_diff_for_user(_user_id uuid, grant_on (uuid, varchar)[], revoke_on (uuid[] ) RETURNS void as $$
+      CREATE OR REPLACE FUNCTION apply_scenario_acl_diff_for_user(_user_id uuid, grant_on roles_to_grant_in_scenario[], revoke_on (uuid[] ) RETURNS void as $$
       DECLARE
-        grant_on_scenario_id uuid;
+        grant_on_scenario_id roles_to_grant_in_scenario;
         revoke_on_scenario_id uuid;
       BEGIN
         FOREACH grant_on_scenario IN array grant_on
