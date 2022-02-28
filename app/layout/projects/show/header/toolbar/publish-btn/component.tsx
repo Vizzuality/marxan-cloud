@@ -54,6 +54,8 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
         ), {
           level: 'success',
         });
+
+        setModal(false);
       },
       onError: () => {
         addToast('error-publish-project', (
