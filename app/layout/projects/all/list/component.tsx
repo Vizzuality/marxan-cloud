@@ -8,11 +8,11 @@ import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projec
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
+import Item from 'layout/projects/all/list/item';
 import Wrapper from 'layout/wrapper';
 
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Loading from 'components/loading';
-import Item from 'components/projects/item';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
