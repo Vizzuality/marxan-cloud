@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
 import type { Project } from 'types/project-model';
+import { ROLES } from 'utils/constants-roles';
 
 import { useMe } from 'hooks/me';
 import { useProjectRole, useProjectUsers } from 'hooks/project-users';
@@ -96,7 +97,7 @@ export const Item: React.FC<ItemProps> = ({
         role="presentation"
         style={style}
         className={cx({
-          'relative flex flex-col rounded-4xl bg-gray-800 px-8 py-10 text-white cursor-pointer text-left': true,
+          'relative flex flex-col rounded-4xl bg-gray-800 px-7 py-8 text-white cursor-pointer text-left': true,
           [className]: !!className,
         })}
         onMouseEnter={handleMouseEnter}
@@ -104,6 +105,44 @@ export const Item: React.FC<ItemProps> = ({
         onClick={handleClick}
       >
         <header className="flex-1 pr-5">
+          <div className="flex items-center justify-between">
+            <div className="px-4 bg-red-500 rounded-3xl">{ROLES[projectRole]}</div>
+            <div className="inline-flex">
+              <div className="flex items-center mt-4 text-sm">
+                <ul className="flex">
+                  {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
+                    const { user: { displayName, id: userId, avatarDataUrl } } = u;
+
+                    return (
+                      <li
+                        key={userId}
+                        className={cx({
+                          '-ml-3': i !== 0,
+                        })}
+                      >
+                        <Avatar
+                          className="text-sm text-white uppercase bg-primary-700"
+                          bgImage={avatarDataUrl}
+                          name={displayName}
+                        >
+                          {!avatarDataUrl && displayName.slice(0, 2)}
+                        </Avatar>
+                      </li>
+                    );
+                  })}
+
+                  {projectUsers?.length > projectUsersVisibleSize && (
+                    <Avatar
+                      className="-ml-3 text-sm text-white uppercase bg-primary-700"
+                    >
+                      {`+${projectUsers.length - projectUsersVisibleSize}`}
+                    </Avatar>
+                  )}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <h3 className="text-xs font-medium tracking-widest uppercase font-heading">
             {area}
           </h3>
@@ -173,56 +212,6 @@ export const Item: React.FC<ItemProps> = ({
           </div>
           <div className="text-sm opacity-50 clamp-2">{description}</div>
         </header>
-
-        {/* CONTRIBUTORS */}
-        <div className="inline-flex">
-          <div className="flex items-center mt-4 text-sm">
-            <p>Contributors:</p>
-            <ul className="flex ml-2">
-              {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
-                const { user: { displayName, id: userId, avatarDataUrl } } = u;
-
-                return (
-                  <li
-                    key={userId}
-                    className={cx({
-                      '-ml-3': i !== 0,
-                    })}
-                  >
-                    <Avatar
-                      className="text-sm text-white uppercase bg-primary-700"
-                      bgImage={avatarDataUrl}
-                      name={displayName}
-                    >
-                      {!avatarDataUrl && displayName.slice(0, 2)}
-                    </Avatar>
-                  </li>
-                );
-              })}
-
-              {projectUsers?.length > projectUsersVisibleSize && (
-                <Avatar
-                  className="-ml-3 text-sm text-white uppercase bg-primary-700"
-                >
-                  {`+${projectUsers.length - projectUsersVisibleSize}`}
-                </Avatar>
-              )}
-
-              {/* <ComingSoon>
-                <li
-                  key="add-contributor"
-                  className={cx({
-                    'ml-2': true,
-                  })}
-                >
-                  <Avatar className="text-sm text-white uppercase bg-gray-500">
-                    <Icon icon={ADD_USER_SVG} className="w-4 h-4" />
-                  </Avatar>
-                </li>
-              </ComingSoon> */}
-            </ul>
-          </div>
-        </div>
 
         <footer className="mt-7">
           <div className="flex">
