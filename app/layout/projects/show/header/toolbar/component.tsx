@@ -165,6 +165,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
       <Modal
         dismissable
         open={modal}
+        className="p-6"
         size="default"
         title="Publisj to community"
         onDismiss={() => setModal(false)}

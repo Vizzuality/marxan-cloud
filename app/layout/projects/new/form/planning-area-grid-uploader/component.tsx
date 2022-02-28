@@ -242,14 +242,6 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                                 to upload
                               </p>
 
-                              <p className="mt-2 leading-4 text-center text-gray-400 text-xxs">
-                                {`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_GRID_UPLOADER_MAX_SIZE)} MB`}
-                                <br />
-                                Include only the geometry.
-                                <br />
-                                The grid included should work as a continuous surface.
-                              </p>
-
                               <Loading
                                 visible={loading}
                                 className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
@@ -291,6 +283,18 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                         </div>
                       </motion.div>
                     )}
+
+                    <ul className="flex flex-col items-start mt-3 ml-3 leading-5 text-center text-gray-400 list-disc text-xxs">
+                      <li>
+                        {`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_GRID_UPLOADER_MAX_SIZE)} MB`}
+                      </li>
+                      <li>
+                        Include only the geometry.
+                      </li>
+                      <li>
+                        The grid included should work as a continuous surface.
+                      </li>
+                    </ul>
 
                     <div className="flex justify-center mt-16 space-x-6">
                       <Button
