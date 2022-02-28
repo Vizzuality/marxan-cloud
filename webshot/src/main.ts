@@ -1,4 +1,10 @@
-import express, { Application, json, Request, Response } from "express";
+import express, {
+  Application,
+  json,
+  NextFunction,
+  Request,
+  Response,
+} from "express";
 import cors from "cors";
 import config from "config";
 import helmet from "helmet";
@@ -18,7 +24,12 @@ app.use(
 
 app.post(
   "/projects/:projectId/scenarios/:scenarioId/solutions/report",
-  generateSummaryReportForScenario
+  async (req: Request, res: Response, next: NextFunction) => {
+    await generateSummaryReportForScenario(req, res).catch((error) => {
+      console.error(error);
+      next(error);
+    });
+  }
 );
 
 app.get("/api/ping", async (req: Request, res: Response) => {
