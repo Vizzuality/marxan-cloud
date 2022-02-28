@@ -38,6 +38,20 @@ resource "kubernetes_deployment" "webshot_deployment" {
       }
 
       spec {
+        affinity {
+          node_affinity {
+            required_during_scheduling_ignored_during_execution {
+              node_selector_term {
+                match_expressions {
+                  key      = "type"
+                  values   = ["app"]
+                  operator = "In"
+                }
+              }
+            }
+          }
+        }
+
         container {
           image             = var.image
           image_pull_policy = "Always"

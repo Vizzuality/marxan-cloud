@@ -77,6 +77,7 @@ module "app_node_pool" {
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
+  vm_size        = "Standard_F4s_v2"
   node_labels = {
     type : "app"
   }

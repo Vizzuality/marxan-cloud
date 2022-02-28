@@ -65,7 +65,7 @@ jobs:
 
       - name: Add custom host data
         run: |
-          sudo sh -c 'echo "127.0.0.1 ${{ secrets.EKS_HOST }}" >> /etc/hosts'
+          sudo sh -c 'echo "127.0.0.1 ${{ secrets.AKS_HOST }}" >> /etc/hosts'
 
       - name: Install kubectl
         run: |
@@ -82,7 +82,7 @@ jobs:
 
       - name: Creating SSH tunnel
         run: |
-          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ secrets.EKS_HOST }}:443 ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} -T &
+          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ secrets.AKS_HOST }}:443 ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} -T &
 
       - name: Redeploy production pods
         if: ${{ github.ref == 'refs/heads/main' }}

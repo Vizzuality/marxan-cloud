@@ -126,7 +126,7 @@ module "client_production" {
   namespace                  = "production"
   image                      = "marxan.azurecr.io/marxan-client:production"
   deployment_name            = "client"
-  site_url                   = "http://${module.ingress_production.client_ip}"
+  site_url                   = "http://${data.terraform_remote_state.core.outputs.dns_zone_name}"
 }
 
 module "webshot_production" {
@@ -236,7 +236,7 @@ module "client_staging" {
   namespace                  = "staging"
   image                      = "marxan.azurecr.io/marxan-client:staging"
   deployment_name            = "client"
-  site_url                   = "http://${module.ingress_production.client_ip}"
+  site_url                   = "http://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
 }
 
 module "webshot_staging" {
