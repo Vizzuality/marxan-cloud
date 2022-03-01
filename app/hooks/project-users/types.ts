@@ -1,10 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
 
-// useProjectUsers
-export interface UseProjectUsersOptionsProps {
-  search?: string;
-}
-
 // UseSaveProjectUserRole
 export interface SaveProjectUserRoleProps {
   projectId: string,

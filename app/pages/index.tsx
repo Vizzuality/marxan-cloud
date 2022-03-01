@@ -30,7 +30,7 @@ const Home: React.FC = () => {
         name="Marxan conservation Solutions"
         title="Spatial conservation planning in the cloud"
         description="This platform supports decision-making for biodiversity and people on land, freshwater and ocean systems."
-        url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
+        url={`${process.env.NEXT_PUBLIC_VERCEL_URL || process.env.NEXT_PUBLIC_URL}${asPath}`}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"

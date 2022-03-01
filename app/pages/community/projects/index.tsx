@@ -30,7 +30,7 @@ const CommunityProjects: React.FC = () => {
         name="Marxan conservation Solutions"
         title={TITLE_TEXT}
         description={DESCRIPTION_TEXT}
-        url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
+        url={`${process.env.NEXT_PUBLIC_VERCEL_URL || process.env.NEXT_PUBLIC_URL}${asPath}`}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"

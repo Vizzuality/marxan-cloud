@@ -4,7 +4,7 @@ import Jsona from 'jsona';
 const dataFormatter = new Jsona();
 
 const ADMINISTRATIVE_AREAS = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL || process.env.STORYBOOK_API_URL}/api/v1/administrative-areas`,
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/administrative-areas`,
   headers: { 'Content-Type': 'application/json' },
   transformResponse: (data) => {
     try {

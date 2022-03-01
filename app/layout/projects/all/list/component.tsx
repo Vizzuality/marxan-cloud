@@ -4,15 +4,16 @@ import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
 
+import { useProjectsUsers } from 'hooks/project-users';
 import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
+import Item from 'layout/projects/all/list/item';
 import Wrapper from 'layout/wrapper';
 
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Loading from 'components/loading';
-import Item from 'components/projects/item';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
@@ -23,6 +24,7 @@ export interface ProjectsListProps {
 export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const { search } = useSelector((state) => state['/projects']);
   const { data, isFetching, isFetched } = useProjects({ search });
+  const { data: projectsUsersData } = useProjectsUsers(data.map((p) => p.id));
 
   const [deleteProject, setDelete] = useState(null);
   const deleteMutation = useDeleteProject({});
@@ -140,6 +142,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                   <Item
                     key={`${d.id}`}
                     {...d}
+                    userColors={projectsUsersData}
                     onDelete={() => {
                       setDelete(d);
                     }}

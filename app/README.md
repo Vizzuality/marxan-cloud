@@ -1,5 +1,16 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Env variables
+
+`NEXT_PUBLIC_URL`: Canonical url of the app. Will be used for meta tags and social media shares. Not needed in Vercel deploys
+
+`NEXT_PUBLIC_API_URL`: url of the API. Depending on the environment we will use different urls. For now, https://marxan49.westeurope.cloudapp.azure.com is the one we use as PROD in frontend
+
+`NEXTAUTH_URL`: Needed by next-auth library for handling auth requests and callbacks. Set the environment variable to the canonical URL of your site. Not needed in Vercel deploys. https://next-auth.js.org/configuration/options#nextauth_url
+
+`NEXT_PUBLIC_MAPBOX_API_TOKEN`: Mapbox token. It MUST be TNC mapbox token
+
+
 ## Getting Started
 
 First, run the development server:

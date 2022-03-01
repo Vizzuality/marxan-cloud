@@ -25,7 +25,7 @@ const SignInPage: React.FC = () => {
         name="Marxan conservation Solutions"
         title="Sign in"
         description="Start planning!"
-        url={`${process.env.NEXT_PUBLIC_VERCEL_URL}${asPath}`}
+        url={`${process.env.NEXT_PUBLIC_VERCEL_URL || process.env.NEXT_PUBLIC_URL}${asPath}`}
         type="article"
         twitterCard="summary"
         twitterSite="@Marxan_Planning"

@@ -8,11 +8,11 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import { usePublishedProjects } from 'hooks/published-projects';
 
+import PublishedItem from 'layout/community/published-projects/item';
 import Wrapper from 'layout/wrapper';
 
 import Icon from 'components/icon';
 import Loading from 'components/loading';
-import PublishedItem from 'components/projects/published-item';
 import Search from 'components/search';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-right-2.svg?sprite';

@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { formatDistance } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
-import { ItemProps } from 'components/projects/item/component';
+import { ItemProps } from 'layout/projects/all/list/item/component';
 
 import PROJECTS from 'services/projects';
 import UPLOADS from 'services/uploads';
