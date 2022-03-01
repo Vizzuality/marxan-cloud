@@ -9,7 +9,6 @@ import { uniqBy } from 'lodash';
 import { useSession } from 'next-auth/client';
 
 import { useMe } from 'hooks/me';
-import { useProjects } from 'hooks/projects';
 
 import ROLES from 'services/roles';
 
@@ -34,40 +33,37 @@ function fetchProjectUsers(pId, session) {
   });
 }
 
-export function useProjectsUsers(options) {
+export function useProjectsUsers(projectsIds) {
   const [session] = useSession();
 
-  const { data: projectsData } = useProjects(options);
-
   const userQueries = useQueries(
-    projectsData.map((p) => {
+    projectsIds.map((p) => {
       return {
-        queryKey: ['roles', p.id],
-        queryFn: () => fetchProjectUsers(p.id, session),
+        queryKey: ['roles', p],
+        queryFn: () => fetchProjectUsers(p, session),
       };
     }),
   );
 
-  const users = uniqBy(
-    userQueries
-      .map((u:any) => {
-        const { data } = u;
-        return data?.data;
-      })
-      .flat(),
-    (u) => u?.user?.id,
-  );
-
   const USERS = useMemo(() => {
-    if (users.every((u) => u?.user)) {
-      return users
+    if (userQueries.every((u) => u?.isFetched)) {
+      const uniqUsers = uniqBy(
+        userQueries
+          .map((u:any) => {
+            const { data } = u;
+            return data?.data;
+          })
+          .flat(),
+        (u) => u?.user?.id,
+      );
+      return uniqUsers
         .map((u) => u?.user?.id)
         .filter((u) => !!u);
     }
     return [];
-  }, [users]);
+  }, [userQueries]);
 
-  const COLORS = chroma.scale(['#674BFD', '#3787FF', '#03E7D1']).colors(users.length);
+  const COLORS = chroma.scale(['ef946c', 'c4a77d', '70877f', '454372', '2f2963']).colors(USERS.length);
 
   return useMemo(() => {
     return {

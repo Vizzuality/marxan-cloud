@@ -24,7 +24,7 @@ export interface ProjectsListProps {
 export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const { search } = useSelector((state) => state['/projects']);
   const { data, isFetching, isFetched } = useProjects({ search });
-  const { data: projectsUsersData } = useProjectsUsers({ search });
+  const { data: projectsUsersData } = useProjectsUsers(data.map((p) => p.id));
 
   const [deleteProject, setDelete] = useState(null);
   const deleteMutation = useDeleteProject({});

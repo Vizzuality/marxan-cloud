@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useProjectUsers } from 'hooks/project-users';
+import { useProjectsUsers, useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 
 import EditDropdown from 'layout/projects/show/header/contributors/edit-dropdown';
@@ -27,6 +27,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const [search, setSearch] = useState(null);
 
   const { data = {} } = useProject(pid);
+  const { data: projectsUsersData } = useProjectsUsers([pid]);
 
   const {
     data: projectUsers,
@@ -89,6 +90,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                     <Avatar
                       className="text-sm text-white uppercase bg-primary-700"
                       bgImage={avatarDataUrl}
+                      bgColor={projectsUsersData[id]}
                       name={displayName}
                     >
                       {!avatarDataUrl && displayName.slice(0, 2)}
