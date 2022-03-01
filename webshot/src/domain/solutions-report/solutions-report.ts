@@ -47,8 +47,13 @@ export const generateSummaryReportForScenario = async (
   });
   const page = await browser.newPage();
 
-  // @todo Remove this. It's only demoware, to be able to easily take snapshots
-  // as an authenticated user while we test the report workflow.
+  /**
+   * The webshot service authenticates to the upstream frontend instance by
+   * passing through the cookie that it receives from the API. In practice, all
+   * that is needed is the `__Secure-next-auth.session-token` cookie (or
+   * `next-auth.session-token` in development environments where the frontend
+   * may not be running behind an HTTPS reverse proxy).
+   */
   if (cookie) await page.setExtraHTTPHeaders({ cookie });
 
   console.info(`Rendering ${pageUrl} as PDF`);
