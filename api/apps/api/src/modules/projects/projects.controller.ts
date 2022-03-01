@@ -321,7 +321,7 @@ export class ProjectsController {
     return result.right;
   }
 
-  @IsMissingAclImplementation()
+  @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
     description: 'Get planning area grid tiles for uploaded planning area grid.',
@@ -346,7 +346,7 @@ export class ProjectsController {
     return await this.proxyService.proxyTileRequest(req, response);
   }
 
-  @IsMissingAclImplementation()
+  @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
     description: 'Get planning area grid tiles for uploaded planning area grid.',
@@ -372,19 +372,11 @@ export class ProjectsController {
     return await this.proxyService.proxyTileRequest(req, response);
   }
 
-  @IsMissingAclImplementation()
+  @ImplementsAcl()
+  @TilesOpenApi()
   @ApiOperation({
     description: 'Get planning area grid tiles for uploaded planning area grid.',
   })
-  /**
-   *@todo Change ApiOkResponse mvt type
-   */
-  @ApiOkResponse({
-    description: 'Binary protobuffer mvt tile',
-    type: String,
-  })
-  @ApiUnauthorizedResponse()
-  @ApiForbiddenResponse()
   @ApiParam({
     name: 'id',
     description: 'Scenario id',
@@ -392,27 +384,7 @@ export class ProjectsController {
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
-    type: Number,
-    required: true,
-    example: 6,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-    example: 35,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
-    example: 35,
-  })
+
   @Get(':id/planning-area/tiles/:z/:x/:y.mvt')
   async proxyProjectPlanningAreaTile(
     @Req() req: RequestWithAuthenticatedUser,
@@ -438,46 +410,17 @@ export class ProjectsController {
     return await this.proxyService.proxyTileRequest(req, response);
   }
 
-  @IsMissingAclImplementation()
+  @ImplementsAcl()
+  @TilesOpenApi()
   @ApiOperation({
     description: 'Get planning area grid tiles for uploaded planning area grid.',
   })
-  /**
-   *@todo Change ApiOkResponse mvt type
-   */
-  @ApiOkResponse({
-    description: 'Binary protobuffer mvt tile',
-    type: String,
-  })
-  @ApiUnauthorizedResponse()
-  @ApiForbiddenResponse()
   @ApiParam({
     name: 'id',
     description: 'Scenario id',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
-    type: Number,
-    required: true,
-    example: 6,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-    example: 35,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
-    example: 35,
   })
   @Get(':id/grid/tiles/:z/:x/:y.mvt')
   async proxyProjectPlanningUnitsTile(
