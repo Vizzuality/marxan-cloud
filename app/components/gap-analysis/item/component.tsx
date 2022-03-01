@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from 'react';
 
-import { useNumberFormatter } from '@react-aria/i18n';
 import classnames from 'classnames';
+import { format } from 'd3';
 
 import Icon from 'components/icon';
 
@@ -32,8 +32,6 @@ export interface ItemProps {
 export const Item: React.FC<ItemProps> = ({
   name, current, target, className, highlighted, muted, onMouseEnter, onMouseLeave, onHighlight,
 }: ItemProps) => {
-  const percentFormatter = useNumberFormatter({ style: 'percent' });
-
   return (
     <div
       className={classnames({
@@ -63,7 +61,7 @@ export const Item: React.FC<ItemProps> = ({
           <span className="text-sm">
             Current:
             {' '}
-            {percentFormatter.format(current.percent)}
+            {format('.2~%')(current.percent)}
             {' '}
             (
             {current.value}
@@ -77,7 +75,7 @@ export const Item: React.FC<ItemProps> = ({
           <span className="text-sm">
             Target:
             {' '}
-            {percentFormatter.format(target.percent)}
+            {format('.2~%')(target.percent)}
             {' '}
             (
             {target.value}
