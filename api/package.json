@@ -121,6 +121,7 @@
     "@types/passport-local": "^1.0.33",
     "@types/pbf": "^3.0.2",
     "@types/pg-large-object": "2.0.4",
+    "@types/puppeteer": "^5.4.5",
     "@types/sparkpost": "^2.1.5",
     "@types/supertest": "^2.0.10",
     "@types/unzipper": "^0.10.3",
