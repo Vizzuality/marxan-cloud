@@ -37,7 +37,7 @@ Project planning grid tiler needs to access to the grid independently if it has 
 
 ## Implementation details
 
-GET `api/v1/project/planning-area/{id}/preview/tiles/{z}/{x}/{y}.mvt`
-GET `api/v1/project/planning-area/{id}/grid/preview/tiles/{z}/{x}/{y}.mvt`
-GET `api/v1/project/{id}/planning-area/tiles/{z}/{x}/{y}.mvt`
-GET `api/v1/project/{id}/grid/tiles/{z}/{x}/{y}.mvt`
+GET `api/v1/project/planning-area/{id}/preview/tiles/{z}/{x}/{y}.mvt`  
+GET `api/v1/project/planning-area/{id}/grid/preview/tiles/{z}/{x}/{y}.mvt`  
+GET `api/v1/project/{id}/planning-area/tiles/{z}/{x}/{y}.mvt`  
+GET `api/v1/project/{id}/grid/tiles/{z}/{x}/{y}.mvt`  
