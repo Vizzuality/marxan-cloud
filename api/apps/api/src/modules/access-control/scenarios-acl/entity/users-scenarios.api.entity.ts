@@ -25,6 +25,14 @@ export class UsersScenariosApiEntity {
   })
   roleName!: ScenarioRoles;
 
+  @PrimaryColumn({
+    type: 'boolean',
+    name: 'is_implicit',
+    default: false,
+  })
+  isImplicit!: boolean;
+
+
   @ManyToOne(() => Scenario, {
     onDelete: 'CASCADE',
     primary: true,

@@ -147,6 +147,7 @@ export class ScenariosCrudService extends AppBaseService<
         scenarioId,
         userId,
         roleName: ScenarioRoles.scenario_owner,
+        isImplicit: false,
       }),
     );
   }

@@ -86,7 +86,7 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
         -- set user_id from row being created or deleted,
         -- as applicable
         IF TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN
-          user_id := NEW.user_id;
+            user_id := NEW.user_id;
         ELSIF TG_OP = 'DELETE' THEN
             user_id := OLD.user_id;
         END IF;
@@ -109,9 +109,44 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
     `);
 
     await queryRunner.query(`
+    CREATE OR REPLACE FUNCTION apply_project_acl_to_scenario(_user_id uuid, grant_on role_on_entity[], revoke_on uuid[]) RETURNS void as $$
+    DECLARE
+      grant_on_scenario role_on_entity;
+      revoke_on_scenario uuid;
+    BEGIN
+      FOREACH grant_on_scenario IN array grant_on
+      LOOP
+        RAISE NOTICE 'Granting implicit % role on scenario % to user %', grant_on_scenario.role_id, grant_on_scenario.entity_id, _user_id;
+
+        -- first delete, then redo - this is so that we can easily reflect a
+        -- change on user role on the parent project
+        DELETE FROM users_scenarios WHERE user_id = _user_id AND scenario_id = grant_on_scenario.entity_id AND is_implicit IS true;
+        INSERT INTO users_scenarios
+          (user_id, scenario_id, role_id, is_implicit)
+          VALUES
+          (_user_id, grant_on_scenario.entity_id, grant_on_scenario.role_id, true);
+      END LOOP;
+
+      FOREACH revoke_on_scenario IN array revoke_on
+      LOOP
+        RAISE NOTICE 'Revoking implicit role on scenario % from user %', revoke_on_scenario, _user_id;
+
+        DELETE FROM users_scenarios us
+          WHERE us.user_id = _user_id AND scenario_id = revoke_on_scenario;
+      END LOOP;
+    END;
+    $$ LANGUAGE 'plpgsql';
+    `);
+
+    await queryRunner.query(`
       -- triggers for implicit scenario roles
       CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_projects
       AFTER INSERT OR UPDATE OR DELETE ON users_projects
+      FOR EACH ROW
+      EXECUTE PROCEDURE manage_implicit_scenario_roles();
+
+      CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_scenarios
+      AFTER INSERT ON scenarios
       FOR EACH ROW
       EXECUTE PROCEDURE manage_implicit_scenario_roles();
     `);
