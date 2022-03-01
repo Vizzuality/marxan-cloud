@@ -74,6 +74,11 @@ resource "kubernetes_deployment" "client_deployment" {
             value = var.site_url
           }
 
+          env {
+            name  = "NEXT_PUBLIC_API_URL"
+            value = var.api_url
+          }
+
           liveness_probe {
             http_get {
               path   = "/api/ping"

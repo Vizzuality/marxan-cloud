@@ -1,5 +1,5 @@
 output "client_certificate" {
-  value = module.kubernetes.client_certificate
+  value     = module.kubernetes.client_certificate
   sensitive = true
 }
 
@@ -14,7 +14,7 @@ output "k8s_cluster_hostname" {
 }
 
 output "kube_config" {
-  value = module.kubernetes.kube_config
+  value     = module.kubernetes.kube_config
   sensitive = true
 }
 
@@ -23,7 +23,7 @@ output "container_registry_hostname" {
 }
 
 output "container_registry_password" {
-  value = module.container_registry.azuread_application_password
+  value     = module.container_registry.azuread_application_password
   sensitive = true
 }
 
@@ -52,7 +52,7 @@ output "redis_hostname" {
 }
 
 output "redis_port" {
-  value     = module.redis.redis_port
+  value = module.redis.redis_port
 }
 
 output "redis_password" {
@@ -61,5 +61,5 @@ output "redis_password" {
 }
 
 output "dns_zone_name" {
-  value     = module.dns.dns_zone.name
+  value = module.dns.dns_zone.name
 }

@@ -126,7 +126,8 @@ module "client_production" {
   namespace                  = "production"
   image                      = "marxan.azurecr.io/marxan-client:production"
   deployment_name            = "client"
-  site_url                   = "http://${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  site_url                   = "https://${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  api_url                    = "https://api.${data.terraform_remote_state.core.outputs.dns_zone_name}"
 }
 
 module "webshot_production" {
@@ -153,6 +154,8 @@ module "production_secrets" {
   redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
   redis_port                 = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key          = var.sparkpost_api_key
+  api_url                    = "api.${var.domain}"
 }
 
 module "ingress_production" {
@@ -236,7 +239,8 @@ module "client_staging" {
   namespace                  = "staging"
   image                      = "marxan.azurecr.io/marxan-client:staging"
   deployment_name            = "client"
-  site_url                   = "http://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  site_url                   = "https://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  api_url                    = "https://api.staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
 }
 
 module "webshot_staging" {
@@ -263,6 +267,8 @@ module "staging_secrets" {
   redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
   redis_password             = data.terraform_remote_state.core.outputs.redis_password
   redis_port                 = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key          = var.sparkpost_api_key
+  api_url                    = "api.staging.${var.domain}"
 }
 
 module "ingress_staging" {
@@ -276,5 +282,5 @@ module "ingress_staging" {
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
-  domain_prefix = "staging"
+  domain_prefix              = "staging"
 }

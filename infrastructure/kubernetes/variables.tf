@@ -1,6 +1,6 @@
 variable "project_name" {
   type        = string
-  description = "An environment namespace for the infrastructure."
+  description = "The name of the project. Used in naming most of the resources in the infrastructure."
 }
 
 variable "location" {
@@ -23,4 +23,9 @@ variable "cert_email" {
 variable "domain" {
   type        = string
   description = "The domain name"
+}
+
+variable "sparkpost_api_key" {
+  type        = string
+  description = "The API key for Sparkpost"
 }

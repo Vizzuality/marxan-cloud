@@ -161,6 +161,16 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name = "SPARKPOST_APIKEY"
+            value_from {
+              secret_key_ref {
+                name = "api"
+                key  = "SPARKPOST_APIKEY"
+              }
+            }
+          }
+
+          env {
             name = "REDIS_HOST"
             value_from {
               secret_key_ref {

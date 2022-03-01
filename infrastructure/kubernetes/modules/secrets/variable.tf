@@ -46,3 +46,13 @@ variable "redis_password" {
 variable "redis_port" {
   description = "The redis server port"
 }
+
+variable "sparkpost_api_key" {
+  type        = string
+  description = "The API key for Sparkpost"
+}
+
+variable "api_url" {
+  type        = string
+  description = "The URL for the Marxan API server"
+}
