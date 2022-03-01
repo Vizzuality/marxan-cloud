@@ -109,53 +109,31 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
     `);
 
     await queryRunner.query(`
-      CREATE OR REPLACE FUNCTION change_implicit_scenario_role_to_explicit()
-        RETURNS trigger AS
-      $$
-      -- If we are handling an INSERT for a new explicit role that should
-        -- replace an existing implicit role, we simply flip the is_implicit
-        -- column to false
-      BEGIN
-        IF EXISTS (SELECT 1 FROM users_scenarios WHERE user_id = NEW.user_id AND scenario_id = NEW.scenario_id) THEN
-          IF TG_OP = 'INSERT' AND TG_TABLE_NAME = 'users_scenarios' AND NEW.is_implicit IS FALSE THEN
-            UPDATE users_scenarios SET
-              is_implicit = FALSE
-              role_id = NEW.role_id
-              WHERE user_id = NEW.user_id AND scenario_id = NEW.scenario_id;
-            RETURN NULL;
-          END IF;
-        END IF;
-
-        RETURN NEW;
-      END;
-      $$ language 'plpgsql';
-    `);
-    await queryRunner.query(`
       -- triggers for implicit scenario roles
       CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_projects
       AFTER INSERT OR UPDATE OR DELETE ON users_projects
       FOR EACH ROW
       EXECUTE PROCEDURE manage_implicit_scenario_roles();
-
-      CREATE OR REPLACE TRIGGER change_implicit_scenario_role_to_explicit
-      BEFORE INSERT ON users_scenarios
-      FOR EACH ROW
-      EXECUTE PROCEDURE change_implicit_scenario_role_to_explicit();
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         DROP TRIGGER IF EXISTS compute_implicit_scenario_roles_for_projects ON users_scenarios;
-        DROP TRIGGER IF EXISTS change_implicit_scenario_role_to_explicit ON users_scenarios;
-
-        DROP FUNCTION IF EXISTS change_implicit_scenario_role_to_explicit();
 
         DROP FUNCTION IF EXISTS manage_implicit_scenario_roles();
 
-        DROP FUNCTION IF EXISTS apply_scenarios_acl_for_user(uuid, uuid[], varchar);
+        DROP FUNCTION IF EXISTS apply_scenarios_acl_for_user(uuid, role_on_entity[], varchar);
 
         DROP FUNCTION IF EXISTS compute_implicit_scenario_roles_for_user(uuid);
+
+        DROP TYPE IF EXISTS role_on_entity;
+
+        ALTER TABLE users_scenarios
+        DROP COLUMN is_implicit;
+
+        ALTER TABLE users_scenarios
+        ADD COLUMN is_editing boolean NOT NULL DEFAULT false;
   `);
   }
 }
