@@ -37,5 +37,7 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./webshot -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker build ./webshot \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.sha }} \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
           docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-webshot
