@@ -26,8 +26,13 @@ variable "sku" {
 
 variable "solution_plan_map" {
   description = "(Optional) Specifies the map structure containing the list of solutions to be enabled."
-  type        = map(any)
-  default     = {}
+  default = {
+    ContainerInsights = {
+      product   = "OMSGallery/ContainerInsights"
+      publisher = "Microsoft"
+    }
+  }
+  type = map(any)
 }
 
 variable "tags" {

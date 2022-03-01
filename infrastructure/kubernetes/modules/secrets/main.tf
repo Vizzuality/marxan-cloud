@@ -69,6 +69,9 @@ resource "kubernetes_secret" "api_secret" {
     REDIS_HOST     = var.redis_host
     REDIS_PASSWORD = var.redis_password
     REDIS_PORT     = var.redis_port
+
+    SPARKPOST_APIKEY = var.sparkpost_api_key
+    API_SERVICE_URL  = var.api_url
   }
 }
 

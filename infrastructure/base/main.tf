@@ -21,9 +21,9 @@ module "network" {
 }
 
 module "dns" {
-  source                  = "./modules/dns"
-  resource_group          = data.azurerm_resource_group.resource_group
-  domain                  = var.domain
+  source         = "./modules/dns"
+  resource_group = data.azurerm_resource_group.resource_group
+  domain         = var.domain
 }
 
 module "bastion" {
@@ -32,7 +32,7 @@ module "bastion" {
   project_name            = var.project_name
   bastion_ssh_public_keys = var.bastion_ssh_public_keys
   bastion_subnet_id       = module.network.bastion_subnet_id
-  dns_zone = module.dns.dns_zone
+  dns_zone                = module.dns.dns_zone
 }
 
 module "container_registry" {
@@ -84,19 +84,18 @@ module "app_node_pool" {
 }
 
 module "redis" {
-  source         = "./modules/redis"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  subnet_id      = module.network.aks_subnet_id
+  source                         = "./modules/redis"
+  resource_group                 = data.azurerm_resource_group.resource_group
+  project_name                   = var.project_name
+  subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.kubernetes.cluster_id
 }
 
 module "log_analytics_workspace" {
   source              = "./modules/log_analytics"
-  name                = var.log_analytics_workspace_name
+  name                = var.project_name
   location            = var.location
   resource_group_name = data.azurerm_resource_group.resource_group.name
-  solution_plan_map   = var.solution_plan_map
 }
 
 module "firewall" {
@@ -130,16 +129,16 @@ module "routetable" {
 }
 
 module "redis_private_dns_zone" {
-  source                       = "./modules/private_dns_zone"
-  name                         = "redis.cache.windows.net"
-  resource_group               = data.azurerm_resource_group.resource_group
-  virtual_networks_to_link     = {
+  source         = "./modules/private_dns_zone"
+  name           = "redis.cache.windows.net"
+  resource_group = data.azurerm_resource_group.resource_group
+  virtual_networks_to_link = {
     (module.network.core_vnet_name) = {
-      subscription_id = data.azurerm_subscription.subscription.subscription_id
+      subscription_id     = data.azurerm_subscription.subscription.subscription_id
       resource_group_name = data.azurerm_resource_group.resource_group.name
     }
     (module.network.aks_vnet_name) = {
-      subscription_id = data.azurerm_subscription.subscription.subscription_id
+      subscription_id     = data.azurerm_subscription.subscription.subscription_id
       resource_group_name = data.azurerm_resource_group.resource_group.name
     }
   }

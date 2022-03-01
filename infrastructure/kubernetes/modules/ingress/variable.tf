@@ -42,6 +42,6 @@ variable "domain" {
 
 variable "domain_prefix" {
   type        = string
-  default = null
+  default     = null
   description = "The prefix added to the base domain"
 }

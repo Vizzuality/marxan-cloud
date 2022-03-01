@@ -8,7 +8,7 @@ output "redis_password" {
 }
 
 output "redis_port" {
-  value     = azurerm_redis_cache.marxan.ssl_port
+  value = azurerm_redis_cache.marxan.ssl_port
 }
 
 output "id" {
