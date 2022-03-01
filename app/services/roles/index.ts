@@ -5,7 +5,7 @@ import { signOut } from 'next-auth/client';
 const dataFormatter = new Jsona();
 
 const ROLES = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_API_URL || process.env.STORYBOOK_API_URL}/api/v1/roles/projects`,
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/roles/projects`,
   headers: { 'Content-Type': 'application/json' },
   transformResponse: (data) => {
     try {
