@@ -55,7 +55,7 @@ export class PlanningAreaCustomGridPieceExporter
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
     const gridStream = await qb
       .select(
-        'ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid, ST_AsGeoJSON(the_geom) as geojson',
+        'ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid, ST_AsGeoJSON(the_geom) as geojson , size',
       )
       .from('planning_units_geom', 'pug')
       .where('project_id = :projectId', { projectId: project.id })

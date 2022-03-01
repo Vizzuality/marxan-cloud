@@ -4,6 +4,7 @@ import { Transform, TransformCallback } from 'stream';
 export interface PlanningAreaCustomGridContentElement {
   puid: number;
   geom: number[];
+  size: number;
 }
 
 export interface PlanningAreaCustomGridContent {
@@ -25,13 +26,14 @@ export class PlanningAreaGridCustomTransform extends Transform {
   }
 
   _transform(
-    chunk: { ewkb: Buffer; puid: string },
+    chunk: { ewkb: Buffer; puid: string; size: number },
     encoding: BufferEncoding,
     callback: TransformCallback,
   ): void {
     const record: PlanningAreaCustomGridContentElement = {
       geom: chunk.ewkb.toJSON().data,
       puid: parseInt(chunk.puid),
+      size: chunk.size,
     };
     let transformedChunk =
       (this.firstChunk ? '' : ',\n') + JSON.stringify(record);
