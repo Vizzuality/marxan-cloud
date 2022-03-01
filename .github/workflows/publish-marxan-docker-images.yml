@@ -26,6 +26,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: API Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          intervalSeconds: 20
 
       - name: Wait for Client tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
@@ -33,6 +34,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Client Tests
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          intervalSeconds: 20
 
   push_api_to_registry:
     name: Push API Docker image to Azure Container Registry
