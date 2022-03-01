@@ -130,5 +130,11 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./app -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker build ./app \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }} \
+            --build-arg NEXT_PUBLIC_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_URL_STAGING || secrets.NEXT_PUBLIC_URL_PRODUCTION }}
+            --build-arg NEXT_PUBLIC_API_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_API_URL_STAGING || secrets.NEXT_PUBLIC_API_URL_PRODUCTION }}
+            --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXTAUTH_URL_STAGING || secrets.NEXTAUTH_URL_PRODUCTION }}
+            --build-arg NEXTAUTH_URL=${{ secrets.NEXT_PUBLIC_MAPBOX_API_TOKEN }}
           docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client
