@@ -17,20 +17,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy_images_to_kubernetes:
-    name: Deploy updated Docker image to Kubernetes
+  wait_for_tests:
+    name: Wait for tests to finish running
     runs-on: ubuntu-20.04
     steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-
-      - name: 'Login via Azure CLI'
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
       - name: Wait for API image to be pushed to Docker Hub
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
@@ -58,6 +48,20 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Webshot Docker image to Azure Container Registry
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+  deploy_images_to_kubernetes:
+    name: Deploy updated Docker image to Kubernetes
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: 'Login via Azure CLI'
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Configure SSH access to the bastion host
         run: |
