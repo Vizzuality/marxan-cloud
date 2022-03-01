@@ -2,7 +2,10 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  exportVersion,
+  ProjectExportConfigContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -49,7 +52,7 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
     );
 
     const fileContent: ProjectExportConfigContent = {
-      version: `0.1.0`,
+      version: exportVersion,
       scenarios,
       name: project.name,
       description: project.description,
