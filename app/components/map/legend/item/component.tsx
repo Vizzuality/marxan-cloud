@@ -3,8 +3,8 @@ import React, {
   useState,
 } from 'react';
 
-import { useNumberFormatter } from '@react-aria/i18n';
 import cx from 'classnames';
+import { dotFormat } from 'utils/units';
 
 import Slider from 'components/forms/slider';
 import Icon from 'components/icon';
@@ -62,10 +62,6 @@ export const LegendItem: React.FC<LegendItemProps> = ({
 
   const { opacity = 1, visibility = true } = settings || {};
 
-  const { format } = useNumberFormatter({
-    style: 'percent',
-  });
-
   return (
     <div
       key={id}
@@ -115,7 +111,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
                   className="p-2 text-gray-500 bg-white rounded"
                 >
                   Opacity (
-                  {format(opacity)}
+                  {dotFormat(opacity)}
                   )
                 </div>
               )}

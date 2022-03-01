@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
-import { useNumberFormatter } from '@react-aria/i18n';
 import cx from 'classnames';
+import { dotFormat } from 'utils/units';
 
 import Icon from 'components/icon';
 
@@ -54,10 +54,6 @@ export const Table: React.FC<TableProps> = ({
   useEffect(() => {
     setSortedBody(body);
   }, [body]);
-
-  const { format } = useNumberFormatter({
-    style: 'decimal',
-  });
 
   return (
     <table
@@ -134,7 +130,7 @@ export const Table: React.FC<TableProps> = ({
                       {/* Cell is a function */}
                       {CellIsFunction && Cell(value, rowData)}
 
-                      {!Cell && format(value)}
+                      {!Cell && dotFormat(value)}
                     </td>
                   );
                 })

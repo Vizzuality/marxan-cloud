@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNumberFormatter } from '@react-aria/i18n';
+import { dotFormat } from 'utils/units';
 
 import Icon from 'components/icon';
 
@@ -30,10 +30,6 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
     runId, scoreValue, costValue, missingValues, planningUnits,
   } = values;
   const { visibility = true } = settings || {};
-
-  const { format } = useNumberFormatter({
-    style: 'decimal',
-  });
 
   return (
     <div className="w-full">
@@ -66,19 +62,19 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
       <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Score:</p>
-          <p className="w-20 font-semibold text-left">{format(scoreValue)}</p>
+          <p className="w-20 font-semibold text-left">{dotFormat(scoreValue)}</p>
         </div>
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Cost:</p>
-          <p className="w-20 font-semibold text-left">{format(costValue)}</p>
+          <p className="w-20 font-semibold text-left">{dotFormat(costValue)}</p>
         </div>
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Missing:</p>
-          <p className="w-20 font-semibold text-left">{format(missingValues)}</p>
+          <p className="w-20 font-semibold text-left">{dotFormat(missingValues)}</p>
         </div>
         <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
           <p>Planning:</p>
-          <p className="w-20 font-semibold text-left">{format(planningUnits)}</p>
+          <p className="w-20 font-semibold text-left">{dotFormat(planningUnits)}</p>
         </div>
       </div>
     </div>

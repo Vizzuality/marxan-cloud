@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 import { useSelector } from 'react-redux';
 
-import { useNumberFormatter } from '@react-aria/i18n';
+import { dotFormat } from 'utils/units';
 
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
@@ -28,10 +28,6 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [minPuAreaSize]);
-
-  const { format } = useNumberFormatter({
-    style: 'decimal',
-  });
 
   return (
     <div>
@@ -87,7 +83,7 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
       </div>
 
       {minPuAreaSize && maxPuAreaSize && (
-        <p className="mt-2 text-xs opacity-50">{`Going below ${format(minPuAreaSize)} km2 could cause performance issues`}</p>
+        <p className="mt-2 text-xs opacity-50">{`Going below ${dotFormat(minPuAreaSize)} km2 could cause performance issues`}</p>
       )}
     </div>
   );
