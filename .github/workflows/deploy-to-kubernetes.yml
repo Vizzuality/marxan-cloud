@@ -3,7 +3,7 @@ name: Deploy images to k8s
 permissions:
   id-token: write
   contents: read
-  
+
 on:
   push:
     branches:
@@ -34,28 +34,28 @@ jobs:
       - name: Wait for API image to be pushed to Docker Hub
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push API Docker image to Azure Container Registry
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Wait for Geoprocessing image to be pushed to Docker Hub
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Geoprocessing Docker image to Azure Container Registry
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Wait for Client image to be pushed to Docker Hub
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Client Docker image to Docker Hub
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Wait for Webshot image to be pushed to Docker Hub
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Webshot Docker image to Azure Container Registry
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
