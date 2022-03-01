@@ -1,23 +1,26 @@
 import { Repository } from 'typeorm';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 
 import { E2E_CONFIG } from '../e2e.config';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import {gunzip} from 'zlib';
 
 
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { decodeMvt } from '@marxan/utils/geo/decode-mvt';
-import { PlanningAreaResponseDto } from '@marxan-api/modules/projects/dto/planning-area-response.dto';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 
 export const createWorld = async (app: INestApplication) => {
   const projectsRepo: Repository<Project> = app.get(
     getRepositoryToken(Project),
   );
+
+
   const jwtToken = await GivenUserIsLoggedIn(app);
 
   const organization = await OrganizationsTestUtils.createOrganization(
@@ -26,123 +29,146 @@ export const createWorld = async (app: INestApplication) => {
     E2E_CONFIG.organizations.valid.minimal(),
   );
 
+  const regularProject = await ProjectsTestUtils.createProject(app, jwtToken, {
+    ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
+      countryCode: 'NAM',
+      adminAreaLevel1Id: 'NAM.8_1',
+      adminAreaLevel2Id: 'NAM.8.6_1',
+    }),
+    organizationId: organization.data.id,
+  })
 
+  const customPlanningAreaId = await request(app.getHttpServer())
+    .post(`/api/v1/projects/planning-area/shapefile`)
+    .set('Authorization', `Bearer ${jwtToken}`)
+    .attach(`file`, __dirname + `/test-planning-area.zip`)
+    .then((response) => response.body.id)
+    .catch((error) => {
+      Logger.error(error);
+      throw new Error(`[step] Could not upload planning area`);
+    });
+
+  const customPlanningAreaGridId = await request(app.getHttpServer())
+  .post(`/api/v1/projects/planning-area/shapefile-grid`)
+  .set('Authorization', `Bearer ${jwtToken}`)
+  .attach(`file`, __dirname + `/test-grid-planning.zip`)
+  .then((response) => response.body.id)
+  .catch((error) => {
+    Logger.error(error);
+    throw new Error(`[step] Could not upload grid`);
+  });
+
+  const customProjectPlanningAreaGridId = await request(app.getHttpServer())
+  .post(`/api/v1/projects/planning-area/shapefile-grid`)
+  .set('Authorization', `Bearer ${jwtToken}`)
+  .attach(`file`, __dirname + `/test-grid-planning.zip`)
+  .then((response) => response.body.id)
+  .catch((error) => {
+    Logger.error(error);
+    throw new Error(`[step] Could not upload grid`);
+  });
+  const customProjectId = await ProjectsTestUtils.createProject(app, jwtToken, {
+    ...E2E_CONFIG.projects.valid.customArea({
+      planningAreaId: customProjectPlanningAreaGridId,
+      planningUnitGridShape: PlanningUnitGridShape.FromShapefile
+    }),
+    organizationId: organization.data.id,
+   })
+  .then((response) => response.data.id)
+  .catch((error) => {
+  Logger.error(error);
+  throw new Error(`[step] Could not Create Custom area Project`);
+});
 
 
   return {
     jwtToken,
     organizationId: organization.data.id,
-    WhenCreatingCustomPlanningArea: async () => request(app.getHttpServer())
-        .post(`/api/v1/projects/planning-area/shapefile`)
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .attach(`file`, __dirname + `/planning-area.zip`)
-        .then((response) => response.body),
-    WhenCreatingPlanningGridArea: async () => request(app.getHttpServer())
-        .post(`/api/v1/projects/planning-area/shapefile-grid`)
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .attach(`file`, __dirname + `/planning-area-grid.zip`)
-        .then((response) => response.body),
+    regularProjectId: regularProject.data.id,
+    customPlanningAreaId,
+    customPlanningAreaGridId,
+    customProjectId,
+
     WhenRequestingTileForCustomArea: async (planningAreaId: string) =>
-    (
-      await request(app.getHttpServer())
+    request(app.getHttpServer())
         .get(
-          `/api/v1/project/planning-area/${planningAreaId}/preview/tiles/6/35/35.mvt`,
+          `/api/v1/project/planning-area/${planningAreaId}/preview/tiles/9/189/291.mvt`,
         )
         .responseType('blob')
         .buffer()
-    ).body,
+        .then((response) => response.body)
+        .catch((error) => {
+          Logger.error(error);
+          throw new Error(`[step] Could not Access tile preview grid tile`);
+    }),
     WhenRequestingTileForCustomPlanningGrid: async (planningAreaId: string) =>
-    (
-      await request(app.getHttpServer())
+    request(app.getHttpServer())
         .get(
-          `/api/v1/project/planning-area/${planningAreaId}/grid/preview/tiles/6/35/35.mvt`,
+          `/api/v1/project/planning-area/${planningAreaId}/grid/preview/tiles/9/189/291.mvt`,
         )
         .responseType('blob')
         .buffer()
-    ).body,
-    GivenProjectWithAdminAreas: async () => (
-      await ProjectsTestUtils.createProject(app, jwtToken, {
-        ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: 'NAM',
-          adminAreaLevel1Id: 'NAM.8_1',
-          adminAreaLevel2Id: 'NAM.8.6_1',
-        }),
-        organizationId: organization.data.id,
-      })
-    ).data.id,
-      GivenProjectWithCustomAreas: async (
-        planningAreaId?: string,
-        planningUnitGridShape?: PlanningUnitGridShape,
-        planningUnitAreakm2?: number ) => (
-          await ProjectsTestUtils.createProject(app, jwtToken, {
-          ...E2E_CONFIG.projects.valid.customArea({
-            planningAreaId: planningAreaId,
-            planningUnitGridShape: planningUnitGridShape,
-            planningUnitAreakm2: planningUnitAreakm2,
-          }),
-          organizationId: organization.data.id,
-         })
-        ).data.id,
+        .then((response) => response.body)
+        .catch((error) => {
+          Logger.error(error);
+          throw new Error(`[step] Could not Access tile preview grid tile`);
+    }),
       WhenRequestingTileForProjectPlanningArea: async (projectId: string) =>
-      (
-        await request(app.getHttpServer())
+      request(app.getHttpServer())
           .get(
-            `/api/v1/project/${projectId}/planning-area/tiles/6/35/35.mvt`,
+            `/api/v1/project/${projectId}/planning-area/tiles/9/189/291.mvt`,
           )
           .responseType('blob')
           .buffer()
-      ).body,
+        .then((response) => response.body)
+        .catch((error) => {
+        Logger.error(error);
+        throw new Error(`[step] Could not access project planning area tiles`);
+      }),
     WhenRequestingTileForProjectPlanningGrid: async (projectId: string) =>
-      (
-        await request(app.getHttpServer())
+      request(app.getHttpServer())
           .get(
-            `/api/v1/project/${projectId}/grid/tiles/6/35/35.mvt`,
+            `/api/v1/project/${projectId}/grid/tiles/9/189/291.mvt`,
           )
           .responseType('blob')
           .buffer()
-      ).body,
-    GivenPlanningAreaIsCreated: async (
-        response: PlanningAreaResponseDto[]
-      ) => response[0].id,
+          .then((response) => response.body)
+          .catch((error) => {
+          Logger.error(error);
+          throw new Error(`[step] Could not access project grid tiles`);
+        }),
 
     ThenItContainsPlaningAreaTile: async (
-      mvt: Buffer,
-      customPlanningArea: { projectId: string },
+      mvt: Buffer
     ) => {
-      const tile = decodeMvt(mvt);
-      const features = tile.layers['layer0']._features.map((_, index) =>
-        tile.layers['layer0'].feature(index),
-      );
-      const customFeature = features.filter(
-        (feature) => feature.properties.projectId === customPlanningArea.projectId,
-      );
-
-      expect(customFeature.length).toEqual(1);
-      expect(features.length).toEqual(1);
+      gunzip(mvt, (err, buffer) => {
+        expect(err).toBeNull();
+        const tile = decodeMvt(buffer)
+        Logger.debug(tile)
+        expect(tile.layers).toBeDefined();
+      });
 
     },
     ThenItContainsGridTile: async (
-      mvt: Buffer,
-      customPlanningArea: { projectId: string },
+      mvt: Buffer
     ) => {
-      const tile = decodeMvt(mvt);
-      const features = tile.layers['layer0']._features.map((_, index) =>
-        tile.layers['layer0'].feature(index),
-      );
-      const customFeature = features.filter(
-        (feature) => feature.properties.projectId === customPlanningArea.projectId,
-      );
-
-      expect(customFeature.length).toEqual(1);
-      expect(features.length).toEqual(20);
+      gunzip(mvt, (err, buffer) => {
+        expect(err).toBeNull();
+        const tile = decodeMvt(buffer)
+        Logger.debug(tile)
+        expect(tile.layers).toBeDefined();
+      });
 
     },
     cleanup: async () => {
+
       await projectsRepo.delete({
         organization: {
           id: organization.data.id,
         },
       });
+
+
       await OrganizationsTestUtils.deleteOrganization(
         app,
         jwtToken,

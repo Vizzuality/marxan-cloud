@@ -20,6 +20,7 @@ import { PlanningUnitsGridProcessor } from './planning-units-grid/planning-units
 import { PlanningAreaTilesService, TileSpecification } from './planning-area-tiles/planning-area-tiles.service';
 import { PlanningAreaGridTilesService } from './planning-units-grid/planning-area-grid-tiles.service';
 import { Response } from 'express';
+import { TilesOpenApi } from '@marxan/tiles';
 
 @Controller(`${apiGlobalPrefixes.v1}/projects/planning-area`)
 export class PlanningAreaController {
@@ -68,26 +69,9 @@ export class PlanningAreaController {
     }
   }
 
+  @TilesOpenApi()
   @ApiOperation({
     description: 'Get preview tile for selected custom planning area',
-  })
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 12',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
   })
   @ApiParam({
     name: 'planningAreaId',
@@ -97,41 +81,20 @@ export class PlanningAreaController {
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @Get('/:planningAreaId/preview/tiles/:z/:x/:y.mvt')
-  @ApiBadRequestResponse()
-  @Header('Content-Type', 'application/x-protobuf')
-  @Header('Content-Disposition', 'attachment')
-  @Header('Access-Control-Allow-Origin', '*')
-  @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileSpecification: TileSpecification,
     @Res() response: Response,
   ): Promise<Response> {
+
     const tile: Buffer = await this.planningAreaTilesService.findTile(
       tileSpecification,
     );
     return response.send(tile);
   }
 
+  @TilesOpenApi()
   @ApiOperation({
     description: 'Get preview tile for selected custom planning area grid',
-  })
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 12',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
   })
   @ApiParam({
     name: 'planningAreaId',
