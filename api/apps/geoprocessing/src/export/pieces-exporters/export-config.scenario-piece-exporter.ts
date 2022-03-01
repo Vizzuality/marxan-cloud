@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -21,7 +21,10 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(ExportConfigScenarioPieceExporter.name);
+  }
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return piece === ClonePiece.ExportConfig && kind === ResourceKind.Scenario;
@@ -40,7 +43,9 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
     );
 
     if (!scenario) {
-      throw new Error(`Scenario with ID ${input.resourceId} not found`);
+      const errorMessage = `Scenario with ID ${input.resourceId} not found`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const fileContent: ScenarioExportConfigContent = {
@@ -59,9 +64,9 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
     );
 
     if (isLeft(outputFile)) {
-      throw new Error(
-        `${ExportConfigScenarioPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
-      );
+      const errorMessage = `${ExportConfigScenarioPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     return {

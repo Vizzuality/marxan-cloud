@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -21,7 +21,10 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(ScenarioMetadataPieceExporter.name);
+  }
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioMetadata;
@@ -41,9 +44,9 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
     );
 
     if (!scenario) {
-      throw new Error(
-        `${ScenarioMetadataPieceExporter.name} - Scenario ${input.resourceId} does not exist.`,
-      );
+      const errorMessage = `${ScenarioMetadataPieceExporter.name} - Scenario ${input.resourceId} does not exist.`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const fileContent: ScenarioMetadataContent = {
@@ -57,9 +60,9 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
     );
 
     if (isLeft(outputFile)) {
-      throw new Error(
-        `${ScenarioMetadataPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`,
-      );
+      const errorMessage = `${ScenarioMetadataPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const isProjectImport = input.resourceKind === ResourceKind.Project;

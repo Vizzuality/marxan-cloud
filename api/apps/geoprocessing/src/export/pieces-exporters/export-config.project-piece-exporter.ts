@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -21,7 +21,10 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(ExportConfigProjectPieceExporter.name);
+  }
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return piece === ClonePiece.ExportConfig && kind === ResourceKind.Project;
@@ -37,7 +40,9 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
     );
 
     if (!project) {
-      throw new Error(`Project with ID ${input.resourceId} not found`);
+      const errorMessage = `Project with ID ${input.resourceId} not found`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const scenarios: {
@@ -64,9 +69,9 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
     );
 
     if (isLeft(outputFile)) {
-      throw new Error(
-        `${ExportConfigProjectPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`,
-      );
+      const errorMessage = `${ExportConfigProjectPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     return {

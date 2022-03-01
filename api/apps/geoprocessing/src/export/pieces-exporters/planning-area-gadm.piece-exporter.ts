@@ -5,7 +5,7 @@ import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-pi
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository } from '@marxan/files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -31,7 +31,10 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(PlanningAreaGadmPieceExporter.name);
+  }
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -60,9 +63,9 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
     );
 
     if (!gadm) {
-      throw new Error(
-        `Gadm data not found for project with ID: ${input.resourceId}`,
-      );
+      const errorMessage = `Gadm data not found for project with ID: ${input.resourceId}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const fileContent: PlanningAreaGadmContent = {
@@ -80,9 +83,9 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
     );
 
     if (isLeft(outputFile)) {
-      throw new Error(
-        `${PlanningAreaGadmPieceExporter.name} - Project GADM - couldn't save file - ${outputFile.left.description}`,
-      );
+      const errorMessage = `${PlanningAreaGadmPieceExporter.name} - Project GADM - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     return {

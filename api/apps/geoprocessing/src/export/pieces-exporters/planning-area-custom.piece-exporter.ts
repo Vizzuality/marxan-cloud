@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -34,7 +34,10 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(PlanningAreaCustomPieceExporter.name);
+  }
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -56,7 +59,9 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     );
 
     if (!project) {
-      throw new Error(`Project with ID ${input.resourceId} not found`);
+      const errorMessage = `Project with ID ${input.resourceId} not found`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const [planningArea]: [
@@ -71,9 +76,9 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     );
 
     if (!planningArea) {
-      throw new Error(
-        `Custom planning area not found for project with ID: ${input.resourceId}`,
-      );
+      const errorMessage = `Custom planning area not found for project with ID: ${input.resourceId}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const planningAreaGeoJson = await this.fileRepository.save(
@@ -93,15 +98,15 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
     );
 
     if (isLeft(outputFile)) {
-      throw new Error(
-        `${PlanningAreaCustomPieceExporter.name} - Project Custom PA - couldn't save file - ${outputFile.left.description}`,
-      );
+      const errorMessage = `${PlanningAreaCustomPieceExporter.name} - Project Custom PA - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     if (isLeft(planningAreaGeoJson)) {
-      throw new Error(
-        `${PlanningAreaCustomPieceExporter.name} - Project Custom PA - couldn't save file - ${planningAreaGeoJson.left.description}`,
-      );
+      const errorMessage = `${PlanningAreaCustomPieceExporter.name} - Project Custom PA - couldn't save file - ${planningAreaGeoJson.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     return {
