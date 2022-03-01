@@ -150,14 +150,14 @@ export const createWorld = async (app: INestApplication) => {
       mvt: Buffer
     ) => {
       const tile = decodeMvt(mvt)
-      expect(tile.layers?.layer0).toBeDefined();
+      expect(tile.layers).toBeDefined();
 
     },
     ThenItContainsGridTile: async (
       mvt: Buffer
     ) => {
       const tile = decodeMvt(mvt)
-      expect(tile.layers?.layer0).toBeDefined();
+      expect(tile.layers).toBeDefined();
 
     },
     cleanup: async () => {
