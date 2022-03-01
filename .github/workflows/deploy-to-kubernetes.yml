@@ -17,8 +17,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  wait_for_tests:
-    name: Wait for tests to finish running
+  wait_for_docker_images:
+    name: Wait for docker images to be deployed
     runs-on: ubuntu-20.04
     steps:
       - name: Wait for API image to be pushed to Docker Hub
@@ -51,6 +51,7 @@ jobs:
 
   deploy_images_to_kubernetes:
     name: Deploy updated Docker image to Kubernetes
+    needs: wait_for_docker_images
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the repo
