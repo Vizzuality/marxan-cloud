@@ -4,7 +4,7 @@ import { Form as FormRFF/* , Field as FieldRFF */ } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useProjectRole/* , useProjectUsers */ } from 'hooks/project-users';
 import { useProject, usePublishProject } from 'hooks/projects';
 import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';
@@ -34,6 +34,10 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
 
   const { data: projectRole } = useProjectRole(pid);
   const OWNER = projectRole === 'project_owner';
+
+  // const {
+  //   data: projectUsers,
+  // } = useProjectUsers(pid);
 
   const { data: publishedProjectsData } = usePublishedProjects({});
 
@@ -71,6 +75,8 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
   }, [pid, publishProjectMutation, addToast]);
 
   const isPublic = !!publishedProjectsData?.find((p) => p?.id === projectData?.id);
+
+  // const contributors = projectUsers.map((u) => u.user);
 
   return (
     <>
@@ -136,6 +142,35 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                         theme="light"
                         rows={4}
                         placeholder="Write your project description..."
+                      />
+                    </Field>
+                  )}
+                </FieldRFF>
+              </div>
+
+              <div className="mt-8">
+                <FieldRFF
+                  name="contributors"
+                >
+                  {(fprops) => (
+                    <Field id="contributors" {...fprops}>
+                      <div className="flex items-center mb-3 space-x-2">
+                        <Label theme="light" className="uppercase" id="name">
+                          Contributors
+                        </Label>
+                      </div>
+
+                      <div className="mb-4">
+                        {contributors.map((c) => (
+                          <p key={c.id} className="text-sm leading-6 text-black">{c.displayName}</p>
+                        ))}
+                      </div>
+
+                      <Input
+                        theme="light"
+                        type="text"
+                        className="text-sm"
+                        placeholder="Add up to 10 aditional creators."
                       />
                     </Field>
                   )}
