@@ -88,7 +88,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                     {timesDuplicated && (
                       <p className="ml-5 text-sm">
                         Duplicated
-                        {format('.3s')(timesDuplicated)}
+                        {format('~s')(timesDuplicated)}
                         {' '}
                         times
                       </p>

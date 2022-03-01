@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { useNumberFormatter } from '@react-aria/i18n';
 import cx from 'classnames';
+import { dotFormat } from 'utils/units';
 
 export interface LegendTypeGradientProps {
   className?: {
@@ -19,10 +19,6 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
   className,
   items,
 }: LegendTypeGradientProps) => {
-  const { format } = useNumberFormatter({
-    style: 'decimal',
-  });
-
   return (
     <div
       className={cx({
@@ -50,7 +46,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
                 [className.labels]: className.labels,
               })}
             >
-              {format(+parseInt(value, 10))}
+              {dotFormat(value)}
             </li>
           ))}
       </ul>
