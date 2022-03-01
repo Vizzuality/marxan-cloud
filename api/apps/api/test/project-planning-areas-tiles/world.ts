@@ -92,8 +92,10 @@ export const createWorld = async (app: INestApplication) => {
     WhenRequestingTileForCustomArea: async (planningAreaId: string) =>
     request(app.getHttpServer())
         .get(
-          `/api/v1/project/planning-area/${planningAreaId}/preview/tiles/9/189/291.mvt`,
+          `/api/v1/projects/planning-area/${planningAreaId}/preview/tiles/9/189/291.mvt`,
         )
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200)
         .responseType('blob')
         .buffer()
         .then((response) => response.body)
@@ -104,8 +106,10 @@ export const createWorld = async (app: INestApplication) => {
     WhenRequestingTileForCustomPlanningGrid: async (planningAreaId: string) =>
     request(app.getHttpServer())
         .get(
-          `/api/v1/project/planning-area/${planningAreaId}/grid/preview/tiles/9/189/291.mvt`,
+          `/api/v1/projects/planning-area/${planningAreaId}/grid/preview/tiles/9/189/291.mvt`,
         )
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(200)
         .responseType('blob')
         .buffer()
         .then((response) => response.body)
@@ -116,8 +120,10 @@ export const createWorld = async (app: INestApplication) => {
       WhenRequestingTileForProjectPlanningArea: async (projectId: string) =>
       request(app.getHttpServer())
           .get(
-            `/api/v1/project/${projectId}/planning-area/tiles/9/189/291.mvt`,
+            `/api/v1/projects/${projectId}/planning-area/tiles/9/189/291.mvt`,
           )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(200)
           .responseType('blob')
           .buffer()
         .then((response) => response.body)
@@ -128,8 +134,10 @@ export const createWorld = async (app: INestApplication) => {
     WhenRequestingTileForProjectPlanningGrid: async (projectId: string) =>
       request(app.getHttpServer())
           .get(
-            `/api/v1/project/${projectId}/grid/tiles/9/189/291.mvt`,
+            `/api/v1/projects/${projectId}/grid/tiles/9/189/291.mvt`,
           )
+          .set('Authorization', `Bearer ${jwtToken}`)
+          .expect(200)
           .responseType('blob')
           .buffer()
           .then((response) => response.body)
@@ -141,23 +149,15 @@ export const createWorld = async (app: INestApplication) => {
     ThenItContainsPlaningAreaTile: async (
       mvt: Buffer
     ) => {
-      gunzip(mvt, (err, buffer) => {
-        expect(err).toBeNull();
-        const tile = decodeMvt(buffer)
-        Logger.debug(tile)
-        expect(tile.layers).toBeDefined();
-      });
+      const tile = decodeMvt(mvt)
+      expect(tile.layers?.layer0).toBeDefined();
 
     },
     ThenItContainsGridTile: async (
       mvt: Buffer
     ) => {
-      gunzip(mvt, (err, buffer) => {
-        expect(err).toBeNull();
-        const tile = decodeMvt(buffer)
-        Logger.debug(tile)
-        expect(tile.layers).toBeDefined();
-      });
+      const tile = decodeMvt(mvt)
+      expect(tile.layers?.layer0).toBeDefined();
 
     },
     cleanup: async () => {
