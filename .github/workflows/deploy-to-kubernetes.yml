@@ -1,5 +1,9 @@
 name: Deploy images to k8s
 
+permissions:
+  id-token: write
+  contents: read
+  
 on:
   push:
     branches:
@@ -20,7 +24,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: Login via Azure CLI
+      - name: 'Login via Azure CLI'
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
