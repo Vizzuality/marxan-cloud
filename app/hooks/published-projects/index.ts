@@ -6,7 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 
-import { PublishedItemProps } from 'components/projects/published-item/component';
+import { PublishedItemProps } from 'layout/community/published-projects/item/component';
 
 import PUBLISHED_PROJECTS from 'services/published-projects';
 

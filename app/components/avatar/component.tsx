@@ -12,6 +12,7 @@ export interface AvatarProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children?: React.ReactNode;
   className?: string;
   bgImage?: string;
+  bgColor?: string;
   size?: 's' | 'base' | 'lg';
 }
 
@@ -19,6 +20,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   children,
   className,
   bgImage,
+  bgColor,
   size = 'base',
 }: AvatarProps) => (
   <div
@@ -29,6 +31,7 @@ export const Avatar: React.FC<AvatarProps> = ({
     })}
     style={{
       ...bgImage && { backgroundImage: `url(${bgImage})` },
+      ...bgColor && { backgroundColor: bgColor },
     }}
   >
     {children}

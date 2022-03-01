@@ -5,6 +5,7 @@ import React, {
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
 import { useSaveProjectUserRole, useDeleteProjectUser, useProjectRole } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
@@ -15,8 +16,6 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Select from 'components/forms/select';
 
 import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?sprite';
-
-import { ROLES, ROLE_OPTIONS } from './constants';
 
 export interface UserCardProps {
   id: string,
