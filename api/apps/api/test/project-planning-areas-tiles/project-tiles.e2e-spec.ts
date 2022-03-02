@@ -22,7 +22,7 @@ describe('PlanningUnitsTilesModule (e2e)', () => {
     const tile: Buffer = await world.WhenRequestingTileForProjectPlanningArea(
       world.regularProjectId,
     );
-    world.ThenItContainsPlaningAreaTile(tile);
+    world.ThenItContainsPlanningAreaTile(tile);
   });
 
   test('When creating a regular project whe should be able to access to its grid tiles', async () => {
@@ -52,7 +52,7 @@ describe('PlanningUnitsTilesModule (e2e)', () => {
       world.customProjectId,
     );
 
-    world.ThenItContainsPlaningAreaTile(tile);
+    world.ThenItContainsPlanningAreaTile(tile);
   });
 
   test('When creating a project with custom grid we should have tiles', async () => {
