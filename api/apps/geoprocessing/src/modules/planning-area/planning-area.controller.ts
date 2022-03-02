@@ -10,14 +10,23 @@ import {
   Query,
   Res,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ApiConsumesShapefile } from '@marxan-geoprocessing/decoratos/shapefile.decorator';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import { PlanningAreaDto } from './planning-area.dto';
 import { PlanningAreaService } from './planning-area.service';
 import { PlanningAreaSerializer } from './planning-area.serializer';
 import { PlanningUnitsGridProcessor } from './planning-units-grid/planning-units-grid.processor';
-import { PlanningAreaTilesService, TileSpecification } from './planning-area-tiles/planning-area-tiles.service';
+import {
+  PlanningAreaTilesService,
+  TileSpecification,
+} from './planning-area-tiles/planning-area-tiles.service';
 import { PlanningAreaGridTilesService } from './planning-units-grid/planning-area-grid-tiles.service';
 import { Response } from 'express';
 import { TilesOpenApi } from '@marxan/tiles';
@@ -85,7 +94,6 @@ export class PlanningAreaController {
     @Param() tileSpecification: TileSpecification,
     @Res() response: Response,
   ): Promise<Response> {
-
     const tile: Buffer = await this.planningAreaTilesService.findTile(
       tileSpecification,
     );

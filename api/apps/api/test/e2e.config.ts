@@ -20,7 +20,6 @@ interface CustomPlanningAreaInput {
   planningAreaId?: string;
   planningUnitGridShape?: PlanningUnitGridShape;
   planningUnitAreakm2?: number;
-
 }
 
 export const E2E_CONFIG: {
@@ -50,7 +49,9 @@ export const E2E_CONFIG: {
         name?: string;
       }) => Partial<CreateProjectDTO>;
       complete: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
-      customArea: (options: CustomPlanningAreaInput) => Partial<CreateProjectDTO>;
+      customArea: (
+        options: CustomPlanningAreaInput,
+      ) => Partial<CreateProjectDTO>;
       adminRegion: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
     };
     invalid: {

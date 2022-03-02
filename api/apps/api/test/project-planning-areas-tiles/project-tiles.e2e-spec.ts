@@ -18,44 +18,48 @@ afterAll(async () => {
 });
 
 describe('PlanningUnitsTilesModule (e2e)', () => {
-
   test('When creating a regular project whe should be able to access to its planning area tiles', async () => {
-
-    const tile: Buffer = await  world.WhenRequestingTileForProjectPlanningArea(world.regularProjectId);
+    const tile: Buffer = await world.WhenRequestingTileForProjectPlanningArea(
+      world.regularProjectId,
+    );
     world.ThenItContainsPlaningAreaTile(tile);
   });
 
   test('When creating a regular project whe should be able to access to its grid tiles', async () => {
-
-    const tile: Buffer = await  world.WhenRequestingTileForProjectPlanningGrid(world.regularProjectId);
+    const tile: Buffer = await world.WhenRequestingTileForProjectPlanningGrid(
+      world.regularProjectId,
+    );
     world.ThenItContainsGridTile(tile);
   });
 
-    test('When creating a user upload planning Area we should have tiles', async () => {
+  test('When creating a user upload planning Area we should have tiles', async () => {
+    const tile: Buffer = await world.WhenRequestingTileForCustomArea(
+      world.customPlanningAreaId,
+    );
+    world.ThenItContainsPlaningAreaTile(tile);
+  });
 
-      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(world.customPlanningAreaId);
-      world.ThenItContainsPlaningAreaTile(tile);
-    });
+  test('When creating a user upload planning Area grid we should have tiles', async () => {
+    const tile: Buffer = await world.WhenRequestingTileForCustomPlanningGrid(
+      world.customPlanningAreaGridId,
+    );
 
-    test('When creating a user upload planning Area grid we should have tiles', async () => {
+    world.ThenItContainsGridTile(tile);
+  });
 
-      const tile: Buffer = await  world.WhenRequestingTileForCustomPlanningGrid(world.customPlanningAreaGridId);
+  test('When creating a project with custom planning Area we should have tiles', async () => {
+    const tile: Buffer = await world.WhenRequestingTileForCustomArea(
+      world.customProjectId,
+    );
 
-      world.ThenItContainsGridTile(tile);
-    });
+    world.ThenItContainsPlaningAreaTile(tile);
+  });
 
-    test('When creating a project with custom planning Area we should have tiles', async () => {
+  test('When creating a project with custom grid we should have tiles', async () => {
+    const tile: Buffer = await world.WhenRequestingTileForProjectPlanningGrid(
+      world.customProjectId,
+    );
 
-      const tile: Buffer = await  world.WhenRequestingTileForCustomArea(world.customProjectId);
-
-      world.ThenItContainsPlaningAreaTile(tile);
-    });
-
-    test('When creating a project with custom grid we should have tiles', async () => {
-
-      const tile: Buffer = await  world.WhenRequestingTileForProjectPlanningGrid(world.customProjectId);
-
-      world.ThenItContainsGridTile(tile);
-    });
-
+    world.ThenItContainsGridTile(tile);
+  });
 });

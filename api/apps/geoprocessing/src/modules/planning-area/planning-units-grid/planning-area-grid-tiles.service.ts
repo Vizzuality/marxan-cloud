@@ -28,9 +28,7 @@ export class PlanningAreaGridTilesService {
   /**
    * @todo get attributes from Entity, based on user selection
    */
-  public findTile(
-    tileSpecification: TileSpecification
-  ): Promise<Buffer> {
+  public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
     const { z, x, y, planningAreaId } = tileSpecification;
     const attributes = 'project_id as planningAreaId';
     const table = this.repository.metadata.tableName;

@@ -7,7 +7,6 @@ import {
   Get,
   Header,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -66,7 +65,7 @@ import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
-import { isLeft, right } from 'fp-ts/Either';
+import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
@@ -107,7 +106,6 @@ import {
 } from '@marxan/cloning/infrastructure/archive-reader.port';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
-import { string } from 'fp-ts';
 import { TilesOpenApi } from '@marxan/tiles';
 
 @UseGuards(JwtAuthGuard)
@@ -324,7 +322,8 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description: 'Get planning area grid tiles for uploaded planning area grid.',
+    description:
+      'Get planning area grid tiles for user uploaded grid.',
   })
   @ApiParam({
     name: 'id',
@@ -339,7 +338,10 @@ export class ProjectsController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(planningAreaId, req.user.id);
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      planningAreaId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -349,7 +351,8 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description: 'Get planning area grid tiles for uploaded planning area grid.',
+    description:
+      'Get planning area tiles for uploaded planning area.',
   })
   @ApiParam({
     name: 'id',
@@ -364,9 +367,12 @@ export class ProjectsController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ): Promise<void> {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(planningAreaId, req.user.id);
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      planningAreaId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
-     throw new ForbiddenException();
+      throw new ForbiddenException();
     }
 
     return await this.proxyService.proxyTileRequest(req, response);
@@ -375,32 +381,40 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description: 'Get planning area grid tiles for uploaded planning area grid.',
+    description:
+      'Get planning area tiles for project planning area.',
   })
   @ApiParam({
-    name: 'id',
+    name: 'projectId',
     description: 'Scenario id',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
-
-  @Get(':id/planning-area/tiles/:z/:x/:y.mvt')
+  @Get(':projectId/planning-area/tiles/:z/:x/:y.mvt')
   async proxyProjectPlanningAreaTile(
     @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
-    @Param('id', ParseUUIDPipe) projectId: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('z', ParseIntPipe) z: number,
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
-  )  {
-
-    const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(projectId, req.user.id);
+  ) {
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      projectId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
-     throw new ForbiddenException();
+      throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getProjectPlanningAreaTiles(projectId, req.user.id, z, x, y);
+    const result = await this.projectsService.getProjectPlanningAreaTiles(
+      projectId,
+      req.user.id,
+      z,
+      x,
+      y,
+    );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
@@ -413,31 +427,40 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description: 'Get planning area grid tiles for uploaded planning area grid.',
+    description:
+      'Get planning area grid tiles for project grid.',
   })
   @ApiParam({
-    name: 'id',
+    name: 'projectId',
     description: 'Scenario id',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
-  @Get(':id/grid/tiles/:z/:x/:y.mvt')
+  @Get(':projectId/grid/tiles/:z/:x/:y.mvt')
   async proxyProjectPlanningUnitsTile(
     @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
-    @Param('id', ParseUUIDPipe) projectId: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @Param('z', ParseIntPipe) z: number,
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
-  )  {
-
-    const checkPlanningAreaBelongsToProject = await this.projectsService.checkPlanningAreaBelongsToProject(projectId, req.user.id);
+  ) {
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      projectId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
-     throw new ForbiddenException();
+      throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getProjectPlanningUnitsTiles(projectId, req.user.id, z, x, y);
+    const result = await this.projectsService.getProjectPlanningUnitsTiles(
+      projectId,
+      req.user.id,
+      z,
+      x,
+      y,
+    );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
@@ -446,7 +469,6 @@ export class ProjectsController {
 
     return await this.proxyService.proxyTileRequest(req, response);
   }
-
 
   @IsMissingAclImplementation()
   @ApiConsumesShapefile({ withGeoJsonResponse: false })

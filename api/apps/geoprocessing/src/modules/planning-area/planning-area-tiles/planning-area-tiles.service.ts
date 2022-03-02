@@ -1,8 +1,6 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsUUID,
-} from 'class-validator';
+import { IsUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
@@ -37,9 +35,7 @@ export class PlanningAreaTilesService {
   /**
    * @todo get attributes from Entity, based on user selection
    */
-  public findTile(
-    tileSpecification: TileSpecification
-  ): Promise<Buffer> {
+  public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
     const { z, x, y, planningAreaId } = tileSpecification;
     const attributes = 'project_id as planningAreaId';
     const table = this.repository.metadata.tableName;
