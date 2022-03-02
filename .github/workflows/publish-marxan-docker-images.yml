@@ -72,7 +72,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: 'Login via Azure CLI'
+      - name: Login via Azure CLI
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
