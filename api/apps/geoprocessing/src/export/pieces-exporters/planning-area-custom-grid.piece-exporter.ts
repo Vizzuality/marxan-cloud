@@ -54,25 +54,14 @@ export class PlanningAreaCustomGridPieceExporter
 
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
     const gridStream = await qb
-      .select(
-        'ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid, ST_AsGeoJSON(the_geom) as geojson , size',
-      )
+      .select('ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid, size')
       .from('planning_units_geom', 'pug')
       .where('project_id = :projectId', { projectId: project.id })
       .stream();
 
     const gridFileTransform = new PlanningAreaGridCustomTransform();
-    const geojsonFileTransform = new PlanningAreaGridCustomGeoJsonTransform(
-      project.bbox,
-    );
 
     gridStream.pipe(gridFileTransform);
-    gridStream.pipe(geojsonFileTransform);
-
-    const gridGeoJson = await this.fileRepository.save(
-      geojsonFileTransform,
-      'json',
-    );
 
     const gridFile = await this.fileRepository.save(gridFileTransform, 'json');
     if (isLeft(gridFile)) {
@@ -80,6 +69,23 @@ export class PlanningAreaCustomGridPieceExporter
         `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridFile.left.description}`,
       );
     }
+
+    const geoJsonQb = this.geoprocessingEntityManager.createQueryBuilder();
+    const geoJsonStream = await geoJsonQb
+      .select('ST_AsGeoJSON(the_geom) as geojson')
+      .from('planning_units_geom', 'pug')
+      .where('project_id = :projectId', { projectId: project.id })
+      .stream();
+
+    const geojsonFileTransform = new PlanningAreaGridCustomGeoJsonTransform(
+      project.bbox,
+    );
+    geoJsonStream.pipe(geojsonFileTransform);
+
+    const gridGeoJson = await this.fileRepository.save(
+      geojsonFileTransform,
+      'json',
+    );
 
     if (isLeft(gridGeoJson)) {
       throw new Error(
