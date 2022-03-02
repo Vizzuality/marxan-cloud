@@ -10,7 +10,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { useAccessToken } from 'hooks/auth';
 import {
   // usePUGridPreviewLayer,
-  // useAdminPreviewLayer,
+  usePlanningAreaLayer,
   useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
@@ -53,9 +53,12 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
+  const PlanningAreaLayer = usePlanningAreaLayer({
+    active: true,
+    pId: `${pid}`,
+  });
   const LAYERS = [
-    // PUGridPreviewLayer,
-    // AdminPreviewLayer,
+    PlanningAreaLayer,
   ].filter((l) => !!l);
 
   const LEGEND = useLegend({

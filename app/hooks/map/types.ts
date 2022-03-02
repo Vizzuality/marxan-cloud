@@ -16,6 +16,11 @@ export interface UseAdminPreviewLayer {
   subregion?: string;
   search?: string;
 }
+export interface UsePlanningAreaLayer {
+  cache?: number;
+  active?: boolean;
+  pId: string;
+}
 
 export interface UsePUGridPreviewLayer {
   cache?: number;
