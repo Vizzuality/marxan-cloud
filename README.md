@@ -32,8 +32,6 @@ they may need some adaptation to run on Windows systems.
 See [ARCHITECTURE_infrastructure.md](./docs/ARCHITECTURE_infrastructure.md) for
 details.
 
-![Backend architecture](./docs/ARCHITECTURE_infrastructure/marxan-contexts.png)
-
 ## Dependencies
 
 - [NodeJS](https://nodejs.org/en/) v14.18
