@@ -32,6 +32,7 @@ import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { PublishedProject } from '../published-project/entities/published-project.api.entity';
 
 const projectFilterKeyNames = [
   'name',
@@ -70,6 +71,8 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly userProjects: Repository<UsersProjectsApiEntity>,
     @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
     private readonly protectedAreas: Repository<ProtectedArea>,
+    @InjectRepository(PublishedProject)
+    private readonly publishedProjects: Repository<PublishedProject>,
     private readonly commandBus: CommandBus,
   ) {
     super(repository, 'project', 'projects', {
@@ -94,8 +97,14 @@ export class ProjectsCrudService extends AppBaseService<
         'planningAreaName',
         'bbox',
         'customProtectedAreas',
+        'isPublic',
+        'publicMetadata',
       ],
       keyForAttribute: 'camelCase',
+      publicMetadata: {
+        ref: 'id',
+        attributes: ['name', 'description'],
+      },
       scenarios: {
         ref: 'id',
         attributes: [
