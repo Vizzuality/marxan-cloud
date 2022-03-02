@@ -322,8 +322,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area grid tiles for user uploaded grid.',
+    description: 'Get planning area grid tiles for user uploaded grid.',
   })
   @ApiParam({
     name: 'id',
@@ -351,8 +350,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area tiles for uploaded planning area.',
+    description: 'Get planning area tiles for uploaded planning area.',
   })
   @ApiParam({
     name: 'id',
@@ -381,8 +379,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area tiles for project planning area.',
+    description: 'Get planning area tiles for project planning area.',
   })
   @ApiParam({
     name: 'projectId',
@@ -427,8 +424,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area grid tiles for project grid.',
+    description: 'Get planning area grid tiles for project grid.',
   })
   @ApiParam({
     name: 'projectId',
