@@ -17,45 +17,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  wait_for_docker_images:
-    name: Wait for docker images to be deployed
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Wait for API image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Push API Docker image to Azure Container Registry
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          intervalSeconds: 30
-
-      - name: Wait for Geoprocessing image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Push Geoprocessing Docker image to Azure Container Registry
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          intervalSeconds: 30
-
-      - name: Wait for Client image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Push Client Docker image to Docker Hub
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          intervalSeconds: 30
-
-      - name: Wait for Webshot image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Push Webshot Docker image to Azure Container Registry
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          intervalSeconds: 30
+#  wait_for_docker_images:
+#    name: Wait for docker images to be deployed
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - name: Wait for API image to be pushed to Docker Hub
+#        uses: fountainhead/action-wait-for-check@v1.0.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          checkName: Push API Docker image to Azure Container Registry
+#          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+#          intervalSeconds: 30
+#
+#      - name: Wait for Geoprocessing image to be pushed to Docker Hub
+#        uses: fountainhead/action-wait-for-check@v1.0.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          checkName: Push Geoprocessing Docker image to Azure Container Registry
+#          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+#          intervalSeconds: 30
+#
+#      - name: Wait for Client image to be pushed to Docker Hub
+#        uses: fountainhead/action-wait-for-check@v1.0.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          checkName: Push Client Docker image to Docker Hub
+#          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+#          intervalSeconds: 30
+#
+#      - name: Wait for Webshot image to be pushed to Docker Hub
+#        uses: fountainhead/action-wait-for-check@v1.0.0
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          checkName: Push Webshot Docker image to Azure Container Registry
+#          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+#          intervalSeconds: 30
 
   deploy_images_to_kubernetes:
     name: Deploy updated Docker image to Kubernetes
-    needs: wait_for_docker_images
+#    needs: wait_for_docker_images
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the repo
