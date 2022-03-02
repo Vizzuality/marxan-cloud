@@ -1,11 +1,17 @@
 import {
   ArchiveLocation,
   ClonePiece,
-  ComponentLocation,
   ResourceId,
+  ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  ClonePieceImportOrder,
+  ClonePieceUrisResolver,
+} from '@marxan/cloning/infrastructure/clone-piece-data';
+import {
+  ProjectExportConfigContent,
+  ScenarioExportConfigContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { Injectable } from '@nestjs/common';
 import { ImportResourcePieces } from '../application/import-resource-pieces.port';
 import { ImportComponent } from '../domain';
@@ -13,57 +19,54 @@ import { ImportComponent } from '../domain';
 @Injectable()
 export class ImportResourcePiecesAdapter implements ImportResourcePieces {
   resolveForProject(
-    id: ResourceId,
+    projectId: ResourceId,
     location: ArchiveLocation,
-    scenarios: ProjectExportConfigContent['scenarios'],
+    pieces: ProjectExportConfigContent['pieces'],
   ): ImportComponent[] {
-    const scenarioPieces = scenarios.flatMap((scenario) =>
-      this.resolveForScenarioWithinProjectImport(
+    const projectComponents = pieces.project
+      .filter((piece) => piece !== ClonePiece.ExportConfig)
+      .map((piece) =>
+        ImportComponent.newOne(
+          projectId,
+          piece,
+          ClonePieceImportOrder[piece],
+          ClonePieceUrisResolver.resolveFor(piece, location.value),
+        ),
+      );
+
+    const scenarioIds = Object.keys(pieces.scenarios);
+    const scenarioComponents = scenarioIds.flatMap((scenarioId) =>
+      this.resolveForScenario(
         ResourceId.create(),
-        scenario.id,
         location,
+        pieces.scenarios[scenarioId],
+        ResourceKind.Project,
+        scenarioId,
       ),
     );
 
-    return [
-      ImportComponent.newOne(id, ClonePiece.ProjectMetadata, 0, [
-        new ComponentLocation(
-          location.value,
-          ClonePieceRelativePaths[ClonePiece.ProjectMetadata].projectMetadata,
-        ),
-      ]),
-      ...scenarioPieces,
-    ];
-  }
-
-  private resolveForScenarioWithinProjectImport(
-    scenarioId: ResourceId,
-    oldScenarioId: string,
-    location: ArchiveLocation,
-  ): ImportComponent[] {
-    return [
-      ImportComponent.newOne(scenarioId, ClonePiece.ScenarioMetadata, 1, [
-        new ComponentLocation(
-          location.value,
-          ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].projectImport(
-            oldScenarioId,
-          ),
-        ),
-      ]),
-    ];
+    return [...projectComponents, ...scenarioComponents];
   }
 
   resolveForScenario(
     scenarioId: ResourceId,
     location: ArchiveLocation,
+    pieces: ScenarioExportConfigContent['pieces'],
+    kind: ResourceKind,
+    oldScenarioId: string,
   ): ImportComponent[] {
-    return [
-      ImportComponent.newOne(scenarioId, ClonePiece.ScenarioMetadata, 1, [
-        new ComponentLocation(
-          location.value,
-          ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].scenarioImport,
+    return pieces
+      .filter((piece) => piece !== ClonePiece.ExportConfig)
+      .map((piece) =>
+        ImportComponent.newOne(
+          scenarioId,
+          piece,
+          ClonePieceImportOrder[piece],
+          ClonePieceUrisResolver.resolveFor(piece, location.value, {
+            kind,
+            scenarioId: oldScenarioId,
+          }),
         ),
-      ]),
-    ];
+      );
   }
 }

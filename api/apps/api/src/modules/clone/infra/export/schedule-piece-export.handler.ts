@@ -55,7 +55,10 @@ export class SchedulePieceExportHandler
     }
 
     const { piece, resourceId } = component;
-    const allPieces = exportPieces.map(({ piece }) => piece);
+    const allPieces = exportPieces.map(({ piece, resourceId }) => ({
+      piece,
+      resourceId,
+    }));
 
     const job = await this.queue.add(`export-piece`, {
       piece,

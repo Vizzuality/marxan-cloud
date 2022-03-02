@@ -1,7 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable, Logger } from '@nestjs/common';
@@ -65,21 +64,16 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const isProjectImport = input.resourceKind === ResourceKind.Project;
-    const relativePath = isProjectImport
-      ? ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].projectImport(
-          input.resourceId,
-        )
-      : ClonePieceRelativePaths[ClonePiece.ScenarioMetadata].scenarioImport;
-
     return {
       ...input,
-      uris: [
+      uris: ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ScenarioMetadata,
+        outputFile.right,
         {
-          uri: outputFile.right,
-          relativePath,
+          kind: input.resourceKind,
+          scenarioId: input.resourceId,
         },
-      ],
+      ),
     };
   }
 }

@@ -89,12 +89,16 @@ const getFixtures = async () => {
 
   return {
     GivenExportPieceJob: (): ExportJobInput => {
+      const projectId = v4();
       return {
-        allPieces: [ClonePiece.ProjectMetadata, ClonePiece.ExportConfig],
+        allPieces: [
+          { piece: ClonePiece.ProjectMetadata, resourceId: projectId },
+          { piece: ClonePiece.ExportConfig, resourceId: projectId },
+        ],
         componentId: v4(),
         exportId: v4(),
         piece: ClonePiece.ProjectMetadata,
-        resourceId: v4(),
+        resourceId: projectId,
         resourceKind: ResourceKind.Project,
       };
     },

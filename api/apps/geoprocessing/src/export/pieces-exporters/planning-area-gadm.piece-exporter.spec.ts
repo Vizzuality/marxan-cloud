@@ -92,22 +92,28 @@ const getFixtures = async () => {
 
   return {
     GivenAPlanningAreaGadmProjectExportJob: () => {
+      const projectId = v4();
       exportJob = {
-        allPieces: [ClonePiece.PlanningAreaGAdm],
+        allPieces: [
+          { resourceId: projectId, piece: ClonePiece.PlanningAreaGAdm },
+        ],
         componentId: v4(),
         exportId: v4(),
         piece: ClonePiece.PlanningAreaGAdm,
-        resourceId: v4(),
+        resourceId: projectId,
         resourceKind: ResourceKind.Project,
       };
     },
     GivenAPlanningAreaGadmScenarioExportJob: () => {
+      const scenarioId = v4();
       exportJob = {
-        allPieces: [ClonePiece.PlanningAreaGAdm],
+        allPieces: [
+          { resourceId: scenarioId, piece: ClonePiece.PlanningAreaGAdm },
+        ],
         componentId: v4(),
         exportId: v4(),
         piece: ClonePiece.PlanningAreaGAdm,
-        resourceId: v4(),
+        resourceId: scenarioId,
         resourceKind: ResourceKind.Scenario,
       };
     },
