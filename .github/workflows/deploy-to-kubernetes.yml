@@ -79,7 +79,6 @@ jobs:
       - name: Add custom host data
         run: |
           sudo sh -c 'echo "127.0.0.1 ${{ secrets.AZURE_AKS_HOST }}" >> /etc/hosts'
-          sudo sh -c 'cat /etc/hosts'
 
       - name: Install kubectl
         run: |
@@ -92,8 +91,7 @@ jobs:
         run: |
           mkdir ~/.kube
           az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
-          sed -i 's/marxan.privatelink.westeurope.azmk8s.io/marxan.privatelink.westeurope.azmk8s.io:4433/g' ~/.kube/config
-          cat ~/.kube/config
+          sed -i 's/marxan.privatelink.westeurope.azmk8s.io:443/marxan.privatelink.westeurope.azmk8s.io:4433/g' ~/.kube/config
 
       - name: Creating SSH tunnel
         run: |
