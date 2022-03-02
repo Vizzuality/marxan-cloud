@@ -2,18 +2,26 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { planningAreaCustomGridGeoJSONRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
+import {
+  planningAreaCustomGridGeoJSONRelativePath,
+  PlanningAreaGridCustomGeoJsonTransform,
+  PlanningAreaGridCustomTransform,
+} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
-import { GeoJSON } from 'geojson';
-import { Readable } from 'stream';
+import { BBox } from 'geojson';
 import { EntityManager } from 'typeorm';
 import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+
+interface ProjectSelectResult {
+  id: string;
+  bbox: BBox;
+}
 
 @Injectable()
 @PieceExportProvider()
@@ -22,50 +30,67 @@ export class PlanningAreaCustomGridPieceExporter
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
-    private readonly entityManager: EntityManager,
+    private readonly apiEntityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.default)
+    private readonly geoprocessingEntityManager: EntityManager,
   ) {}
 
-  isSupported(piece: ClonePiece): boolean {
-    // TODO resource kind filtering
-    return piece === ClonePiece.PlanningAreaGridCustom;
+  isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
+    return (
+      piece === ClonePiece.PlanningAreaGridCustom &&
+      kind === ResourceKind.Project
+    );
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    if (input.resourceKind === ResourceKind.Scenario) {
-      throw new Error(`Exporting scenario is not yet supported.`);
-    }
-
-    const metadata = JSON.stringify({
-      shape: 'square',
-      areaKm2: 4000,
-      bbox: [],
-      file: planningAreaCustomGridGeoJSONRelativePath,
-    });
-
-    const geoJson: GeoJSON = {
-      bbox: [0, 0, 0, 0, 0, 0],
-      coordinates: [],
-      type: 'MultiPolygon',
-    };
-
-    const planningAreaGeoJson = await this.fileRepository.save(
-      Readable.from(JSON.stringify(geoJson)),
+    const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
+      `
+        SELECT id, bbox
+        FROM projects
+        WHERE id = $1
+      `,
+      [input.resourceId],
     );
 
-    const outputFile = await this.fileRepository.save(
-      Readable.from(metadata),
-      `json`,
-    );
+    const qb = this.geoprocessingEntityManager.createQueryBuilder();
+    const gridStream = await qb
+      // TODO puid should be obtained in a proper way
+      .select('ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid')
+      .from('planning_units_geom', 'pug')
+      .where('project_id = :projectId', { projectId: project.id })
+      .stream();
 
-    if (isLeft(outputFile)) {
+    const gridFileTransform = new PlanningAreaGridCustomTransform();
+
+    gridStream.pipe(gridFileTransform);
+
+    const gridFile = await this.fileRepository.save(gridFileTransform);
+    if (isLeft(gridFile)) {
       throw new Error(
-        `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${outputFile.left.description}`,
+        `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridFile.left.description}`,
       );
     }
 
-    if (isLeft(planningAreaGeoJson)) {
+    const geoJsonQb = this.geoprocessingEntityManager.createQueryBuilder();
+    const geoJsonStream = await geoJsonQb
+      .select('ST_AsGeoJSON(the_geom) as geojson')
+      .from('planning_units_geom', 'pug')
+      .where('project_id = :projectId', { projectId: project.id })
+      .stream();
+
+    const geojsonFileTransform = new PlanningAreaGridCustomGeoJsonTransform(
+      project.bbox,
+    );
+    geoJsonStream.pipe(geojsonFileTransform);
+
+    const gridGeoJson = await this.fileRepository.save(
+      geojsonFileTransform,
+      'json',
+    );
+
+    if (isLeft(gridGeoJson)) {
       throw new Error(
-        `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${planningAreaGeoJson.left.description}`,
+        `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridGeoJson.left.description}`,
       );
     }
 
@@ -74,10 +99,10 @@ export class PlanningAreaCustomGridPieceExporter
       uris: [
         ...ClonePieceUrisResolver.resolveFor(
           ClonePiece.PlanningAreaGridCustom,
-          outputFile.right,
+          gridFile.right,
         ),
         {
-          uri: planningAreaGeoJson.right,
+          uri: gridGeoJson.right,
           relativePath: planningAreaCustomGridGeoJSONRelativePath,
         },
       ],
