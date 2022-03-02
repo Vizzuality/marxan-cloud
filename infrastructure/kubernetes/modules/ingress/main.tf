@@ -1,6 +1,6 @@
 locals {
   client_fqdn = (var.domain_prefix == null ? var.domain : "${var.domain_prefix}.${var.domain}")
-  api_fqdn = (var.domain_prefix == null ? "api.${var.domain}" : "api.${var.domain_prefix}.${var.domain}")
+  api_fqdn    = (var.domain_prefix == null ? "api.${var.domain}" : "api.${var.domain_prefix}.${var.domain}")
 }
 
 
