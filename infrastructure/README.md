@@ -23,6 +23,7 @@ will skip over the basics, and assume you are conformable using all of them.
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Github Actions](https://github.com/features/actions)
+- [Bastion host](https://en.wikipedia.org/wiki/Bastion_host) pattern.
 - An SSH client capable of establishing [SSH Tunnels](https://www.ssh.com/academy/ssh/tunneling/example)
 - DNS management 
 - A purchased domain
