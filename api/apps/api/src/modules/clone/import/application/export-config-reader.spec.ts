@@ -10,7 +10,10 @@ import {
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  ExportConfigContent,
+  exportVersion,
+} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
@@ -50,6 +53,11 @@ describe('ExportConfigReader', () => {
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
   });
+  test('should fail when versionproperty of export config file has an invalid value', async () => {
+    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfigVersion();
+    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
+    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+  });
   test('should retrieve export config content', async () => {
     const archiveLocation = await fixtures.GivenValidArchive();
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
@@ -76,7 +84,7 @@ const getFixtures = async () => {
     resourceId: v4(),
     resourceKind: ResourceKind.Project,
     scenarios: [{ id: v4(), name: 'random scenario' }],
-    version: '',
+    version: exportVersion,
   };
 
   const sut = sandbox.get(ExportConfigReader);
@@ -116,6 +124,33 @@ const getFixtures = async () => {
         zlib: { level: 9 },
       });
       const invalidExportConfig = { resourceKind: 'invalid resource kind' };
+      archive.append(JSON.stringify(invalidExportConfig), {
+        name: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
+      });
+
+      return new Promise((resolve, reject) => {
+        const buffers: Buffer[] = [];
+        archive.on('data', (chunk) => {
+          buffers.push(chunk);
+        });
+        archive.on('finish', () => {
+          archiveReaderGetMock.mockResolvedValue(
+            right(Readable.from(Buffer.concat(buffers))),
+          );
+          resolve(new ArchiveLocation('invalid export config property'));
+        });
+        archive.on('error', function (err) {
+          reject(err);
+        });
+        archive.finalize();
+      });
+    },
+    GivenArchiveWithInvalidExportConfigVersion: (): Promise<ArchiveLocation> => {
+      const archive = archiver(`zip`, {
+        zlib: { level: 9 },
+      });
+      const invalidExportConfig = expectedExportConfig;
+      invalidExportConfig.version = '';
       archive.append(JSON.stringify(invalidExportConfig), {
         name: ClonePieceRelativePaths[ClonePiece.ExportConfig].config,
       });
