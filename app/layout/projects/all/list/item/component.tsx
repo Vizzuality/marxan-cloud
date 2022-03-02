@@ -115,22 +115,38 @@ export const Item: React.FC<ItemProps> = ({
               minHeight: 40,
             }}
           >
-            <div
-              className={cx({
-                'px-4 text-sm rounded-3xl opacity-0 transition-opacity': true,
-                'opacity-100': !!ROLES[projectRole],
-                'bg-primary-500 bg-opacity-20': OWNER,
-                'border border-gray-500': !OWNER,
-              })}
-            >
-              <p className={cx({
-                'leading-7': true,
-                'text-primary-500': OWNER,
-                'text-white': !OWNER,
-              })}
+            <div className="flex space-x-2">
+              <div
+                className={cx({
+                  'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
+                  'opacity-100': !!ROLES[projectRole],
+                  'bg-yellow-500 bg-opacity-20': OWNER,
+                  'border border-gray-500': !OWNER,
+                })}
               >
-                {ROLES[projectRole]}
-              </p>
+                <p className={cx({
+                  'text-yellow-500': OWNER,
+                  'text-white': !OWNER,
+                })}
+                >
+                  {ROLES[projectRole]}
+                </p>
+              </div>
+
+              {/* <div
+                className={cx({
+                  'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
+                  'opacity-100 bg-primary-500 bg-opacity-20': !!ROLES[projectRole],
+                })}
+              >
+                <p className={cx({
+                  'text-primary-500': ROLES[projectRole],
+                })}
+                >
+                  Public
+                </p>
+              </div> */}
+
             </div>
 
             <div
