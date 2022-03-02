@@ -141,7 +141,7 @@ export const createWorld = async (app: INestApplication) => {
           throw new Error(`[step] Could not access project grid tiles`);
         }),
 
-    ThenItContainsPlaningAreaTile: async (mvt: Buffer) => {
+    ThenItContainsPlanningAreaTile: async (mvt: Buffer) => {
       const tile = decodeMvt(mvt);
       expect(tile.layers).toBeDefined();
     },

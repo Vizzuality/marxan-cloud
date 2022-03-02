@@ -36,7 +36,7 @@ describe('PlanningUnitsTilesModule (e2e)', () => {
     const tile: Buffer = await world.WhenRequestingTileForCustomArea(
       world.customPlanningAreaId,
     );
-    world.ThenItContainsPlaningAreaTile(tile);
+    world.ThenItContainsPlanningAreaTile(tile);
   });
 
   test('When creating a user upload planning Area grid we should have tiles', async () => {
