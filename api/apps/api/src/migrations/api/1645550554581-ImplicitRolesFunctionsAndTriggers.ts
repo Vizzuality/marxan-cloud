@@ -108,31 +108,32 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
       $$ language 'plpgsql';
     `);
 
-    // await queryRunner.query(`
-    // CREATE OR REPLACE FUNCTION manage_existing_project_roles_for_scenario()
-    // RETURNS trigger as $$
-    // DECLARE
-    //   users_to_grant role_on_entity[];
-    //   project_id uuid;
-    //   scenario_id uuid;
-    //   user_to_grant role_on_entity;
-    // BEGIN
-    //   project_id := NEW.project_id;
-    //   scenario_id := NEW.id;
-    //   users_to_grant := (SELECT user_id, role_id FROM users_projects up WHERE up.project_id = project_id);
-      
-    //   FOREACH user_to_grant IN array users_to_grant
-    //   LOOP
-    //     RAISE NOTICE 'Granting implicit % role on scenario % to user %', regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), scenario_id, user_to_grant.entity_id;
+    await queryRunner.query(`
+      CREATE OR REPLACE FUNCTION manage_existing_project_roles_for_scenario()
+      RETURNS trigger as $$
+      DECLARE
+        users_to_grant role_on_entity[];
+        upper_project_id uuid;
+        scenario_id uuid;
+        user_to_grant role_on_entity;
+      BEGIN
+        upper_project_id := NEW.project_id;
+        scenario_id := NEW.id;
+        users_to_grant := ARRAY(SELECT ROW(user_id, role_id) FROM users_projects up WHERE up.project_id = upper_project_id);
+          
+        FOREACH user_to_grant IN array users_to_grant
+        LOOP
+          RAISE NOTICE 'Granting implicit % role on scenario % to user %', regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), scenario_id, user_to_grant.entity_id;
 
-    //     INSERT INTO users_scenarios
-    //       (user_id, scenario_id, role_id, is_implicit)
-    //       VALUES
-    //       (user_to_grant.entity_id, scenario_id, regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), true);
-    //   END LOOP;
-    // END;
-    // $$ LANGUAGE 'plpgsql';
-    // `);
+          INSERT INTO users_scenarios
+            (user_id, scenario_id, role_id, is_implicit)
+            VALUES
+            (user_to_grant.entity_id, scenario_id, regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), true);
+        END LOOP;
+	      RETURN NULL;
+      END;
+      $$ LANGUAGE 'plpgsql';
+    `);
 
     await queryRunner.query(`
       -- triggers for implicit scenario roles
@@ -141,11 +142,11 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
       FOR EACH ROW
       EXECUTE PROCEDURE manage_implicit_scenario_roles();
 
+      CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_scenarios
+      AFTER INSERT ON scenarios
+      FOR EACH ROW
+      EXECUTE PROCEDURE manage_existing_project_roles_for_scenario();
       `);
-      // CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_scenarios
-      // AFTER INSERT ON scenarios
-      // FOR EACH ROW
-      // EXECUTE PROCEDURE manage_existing_project_roles_for_scenario();
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
