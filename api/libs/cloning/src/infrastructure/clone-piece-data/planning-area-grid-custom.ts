@@ -1,17 +1,7 @@
 import { Polygon } from 'geojson';
 import { Transform, TransformCallback } from 'stream';
 
-export interface PlanningAreaCustomGridContentElement {
-  puid: number;
-  geom: number[];
-  size: number;
-}
-
-export interface PlanningAreaCustomGridContent {
-  planningUnits: PlanningAreaCustomGridContentElement[];
-}
-
-export const planningAreaCustomGridRelativePath = 'project-grid.json';
+export const planningAreaCustomGridRelativePath = 'project-grid';
 export const planningAreaCustomGridGeoJSONRelativePath =
   'project-grid/custom-grid.geojson';
 
@@ -22,32 +12,25 @@ export class PlanningAreaGridCustomTransform extends Transform {
     super({
       objectMode: true,
     });
-    this.push('{ "planningUnits": [\n');
   }
 
   _transform(
-    chunk: { ewkb: Buffer; puid: string; size: number },
+    chunk: { ewkb: Buffer; puid: string },
     encoding: BufferEncoding,
     callback: TransformCallback,
   ): void {
-    const record: PlanningAreaCustomGridContentElement = {
+    const record = {
       geom: chunk.ewkb.toJSON().data,
       puid: parseInt(chunk.puid),
-      size: chunk.size,
     };
-    let transformedChunk =
-      (this.firstChunk ? '' : ',\n') + JSON.stringify(record);
+    const content = `${record.puid},${JSON.stringify(record.geom)}`;
+    const data = (this.firstChunk ? '' : '\n') + content;
 
-    callback(null, transformedChunk);
+    callback(null, data);
 
     if (this.firstChunk) {
       this.firstChunk = false;
     }
-  }
-
-  _flush(callback: TransformCallback): void {
-    this.push(']}');
-    callback();
   }
 }
 
@@ -69,10 +52,10 @@ export class PlanningAreaGridCustomGeoJsonTransform extends Transform {
     callback: TransformCallback,
   ): void {
     const polygon: Polygon = JSON.parse(chunk.geojson);
-    const transformedChunk =
+    const data =
       (this.firstChunk ? '' : ',\n') + JSON.stringify(polygon.coordinates);
 
-    callback(null, transformedChunk);
+    callback(null, data);
 
     if (this.firstChunk) {
       this.firstChunk = false;

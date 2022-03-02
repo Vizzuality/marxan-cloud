@@ -54,7 +54,8 @@ export class PlanningAreaCustomGridPieceExporter
 
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
     const gridStream = await qb
-      .select('ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid, size')
+      // TODO puid should be obtained in a proper way
+      .select('ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid')
       .from('planning_units_geom', 'pug')
       .where('project_id = :projectId', { projectId: project.id })
       .stream();
@@ -63,7 +64,7 @@ export class PlanningAreaCustomGridPieceExporter
 
     gridStream.pipe(gridFileTransform);
 
-    const gridFile = await this.fileRepository.save(gridFileTransform, 'json');
+    const gridFile = await this.fileRepository.save(gridFileTransform);
     if (isLeft(gridFile)) {
       throw new Error(
         `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridFile.left.description}`,
