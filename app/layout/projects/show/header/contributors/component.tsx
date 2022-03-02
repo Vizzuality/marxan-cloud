@@ -88,7 +88,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                     })}
                   >
                     <Avatar
-                      className="text-sm text-white uppercase bg-primary-700"
+                      className="text-sm uppercase bg-primary-700"
                       bgImage={avatarDataUrl}
                       bgColor={projectsUsersData[id]}
                       name={displayName}

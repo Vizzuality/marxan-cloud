@@ -19,6 +19,9 @@ import {
   SaveProjectUserRoleProps,
 } from './types';
 
+const COLOR_ME = '#1b72f5';
+const COLORS = ['#03E7D1', '#A8FFED', '#5ED3FF', '#46A0FF', '#674BFD', '#9713DD', '#D383FE', '#F65884', '#FF7470', '#FE8B5C', '#FEC95A', '#FFF1A0'];
+
 function fetchProjectUsers(pId, session) {
   return ROLES.request({
     method: 'GET',
@@ -35,6 +38,7 @@ function fetchProjectUsers(pId, session) {
 
 export function useProjectsUsers(projectsIds) {
   const [session] = useSession();
+  const { user } = useMe();
 
   const userQueries = useQueries(
     projectsIds.map((p) => {
@@ -63,22 +67,26 @@ export function useProjectsUsers(projectsIds) {
     return [];
   }, [userQueries]);
 
-  const COLORS = chroma.scale(['ef946c', 'c4a77d', '70877f', '454372', '2f2963']).colors(USERS.length);
+  const COLORS_SCALE = chroma.scale(COLORS).colors(USERS.length);
 
   return useMemo(() => {
     return {
       data: USERS.reduce((acc, u, i) => {
         return {
           ...acc,
-          [u]: COLORS[i],
+          [u]: (USERS.length > 10) ? COLORS_SCALE[i] : COLORS[i],
+          ...user.id === u && {
+            [u]: COLOR_ME,
+          },
         };
       }, {}),
     };
-  }, [USERS, COLORS]);
+  }, [user, USERS, COLORS_SCALE]);
 }
 
 export function useProjectUsers(projectId) {
   const [session] = useSession();
+  const { user } = useMe();
 
   const query = useQuery(['roles', projectId], () => fetchProjectUsers(projectId, session), {
     enabled: !!projectId,
@@ -95,13 +103,16 @@ export function useProjectUsers(projectId) {
           project_contributor: 2,
           project_viewer: 3,
         };
+
+        if (a.user.id === user.id) return -1;
+        if (b.user.id === user.id) return 1;
         if (ROLES_SORT[a.roleName] < ROLES_SORT[b.roleName]) return -1;
         if (ROLES_SORT[a.roleName] > ROLES_SORT[b.roleName]) return 1;
         return 0;
       })
       ,
     };
-  }, [query, data?.data]);
+  }, [query, data?.data, user]);
 }
 
 export function useProjectRole(projectId) {

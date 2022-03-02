@@ -152,7 +152,7 @@ export const Item: React.FC<ItemProps> = ({
                         })}
                       >
                         <Avatar
-                          className="text-sm text-white uppercase"
+                          className="text-sm uppercase"
                           bgColor={userColors[userId]}
                           bgImage={avatarDataUrl}
                           name={displayName}
