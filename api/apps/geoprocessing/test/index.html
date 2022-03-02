@@ -56,13 +56,13 @@
                 'http://localhost:3040/api/v1/administrative-areas/1/preview/tiles/{z}/{x}/{y}.mvt?guid=BWA',
               ],
             },
-            'postgis-tiles2': {
-              type: 'vector',
-              maxzoom: 12,
-              tiles: [
-                'http://localhost:3040/api/v1/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt?guid=BWA.12_1&bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
-              ],
-            },
+            // 'postgis-tiles2': {
+            //   type: 'vector',
+            //   maxzoom: 12,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/administrative-areas/2/preview/tiles/{z}/{x}/{y}.mvt?guid=BWA.12_1&bbox=[21.14044189453125,-19.202241064923044,22.980651855468746,-18.22935133838667]',
+            //   ],
+            // },
             'postgis-tileswdpa': {
               type: 'vector',
               minzoom: 1,
@@ -72,22 +72,22 @@
               ],
             },
 
-            'postgis-tilesPU': {
-              type: 'vector',
-              minzoom: 1,
-              maxzoom: 20,
-              tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/50/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
-              ],
-            },
-            'postgis-tilesPU2': {
-              type: 'vector',
-              minzoom: 1,
-              maxzoom: 20,
-              tiles: [
-                'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/120/tiles/{z}/{x}/{y}.mvt',
-              ],
-            },
+            // 'postgis-tilesPU': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 20,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/50/tiles/{z}/{x}/{y}.mvt?bbox=[21.14044189453125,22.980651855468746,-18.22935133838667,-19.202241064923044]',
+            //   ],
+            // },
+            // 'postgis-tilesPU2': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 20,
+            //   tiles: [
+            //     'http://localhost:3040/api/v1/planning-units/preview/regular/hexagon/120/tiles/{z}/{x}/{y}.mvt',
+            //   ],
+            // },
             // 'postgis-tilesFeatures': {
             //   type: 'vector',
             //   minzoom: 1,
@@ -97,16 +97,30 @@
             //   ],
             // },
 
-            'postgis-tilesScenarioPu': {
+            // 'postgis-tilesScenarioPu': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 20,
+            //   tiles: [
+            //     `http://localhost:3040/api/v1/scenarios/a9cabc9a-7747-44f1-9905-f3b7b5401036/planning-units/tiles/{z}/{x}/{y}.mvt?include=protection,features`,
+            //   ],
+            // },
+            'postgis-previewPlanningArea': {
               type: 'vector',
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                `http://localhost:3040/api/v1/scenarios/a9cabc9a-7747-44f1-9905-f3b7b5401036/planning-units/tiles/{z}/{x}/{y}.mvt?include=protection,features`,
+                `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/preview/tiles/{z}/{x}/{y}.mvt`,
               ],
             },
-
-
+            'postgis-previewPlanningAreaGrid': {
+              type: 'vector',
+              minzoom: 1,
+              maxzoom: 20,
+              tiles: [
+                `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/grid/preview/tiles/{z}/{x}/{y}.mvt`,
+              ],
+            },
             BASEMAP: {
               type: 'raster',
               tiles: [
@@ -122,51 +136,51 @@
               minzoom: 1,
               maxzoom: 22,
             },
-            {
-              id: 'postgis-tiles-layer-ScenarioPU',
-              type: 'fill',
-              source: 'postgis-tilesScenarioPu',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-outline-color': 'yellow',
-                'fill-color': 'red',
-                'fill-opacity': 0.1,
-              },
-            },
+            // {
+            //   id: 'postgis-tiles-layer-ScenarioPU',
+            //   type: 'fill',
+            //   source: 'postgis-tilesScenarioPu',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'fill-outline-color': 'yellow',
+            //     'fill-color': 'red',
+            //     'fill-opacity': 0.1,
+            //   },
+            // },
 
-            {
-              id: 'postgis-tiles-layer',
-              type: 'fill',
-              source: 'postgis-tiles2',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-outline-color': 'purple',
-                'fill-color': 'purple',
-                'fill-opacity': 0.1,
-              },
-            },
-            {
-                'id': 'postgis-tiles-layer1',
-                'type': 'fill',
-                'source': 'postgis-tiles1',
-                'source-layer': 'layer0',
-                'paint': {
-                    'fill-outline-color': 'green',
-                    'fill-color': 'green',
-                    'fill-opacity': 0.1
-                }
-            },
-            {
-                'id': 'postgis-tiles-layer2',
-                'type': 'fill',
-                'source': 'postgis-tiles0',
-                'source-layer': 'layer0',
-                'paint': {
-                    'fill-outline-color': 'red',
-                    'fill-color': 'red',
-                    'fill-opacity': 0.1
-                }
-            },
+            // {
+            //   id: 'postgis-tiles-layer',
+            //   type: 'fill',
+            //   source: 'postgis-tiles2',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'fill-outline-color': 'purple',
+            //     'fill-color': 'purple',
+            //     'fill-opacity': 0.1,
+            //   },
+            // },
+            // {
+            //     'id': 'postgis-tiles-layer1',
+            //     'type': 'fill',
+            //     'source': 'postgis-tiles1',
+            //     'source-layer': 'layer0',
+            //     'paint': {
+            //         'fill-outline-color': 'green',
+            //         'fill-color': 'green',
+            //         'fill-opacity': 0.1
+            //     }
+            // },
+            // {
+            //     'id': 'postgis-tiles-layer2',
+            //     'type': 'fill',
+            //     'source': 'postgis-tiles0',
+            //     'source-layer': 'layer0',
+            //     'paint': {
+            //         'fill-outline-color': 'red',
+            //         'fill-color': 'red',
+            //         'fill-opacity': 0.1
+            //     }
+            // },
             {
               id: 'postgis-tiles-layer-wdpa',
               type: 'fill',
@@ -176,6 +190,29 @@
                 'fill-outline-color': 'blue',
                 'fill-color': 'blue',
                 'fill-opacity': 0.3,
+              },
+            },
+            {
+              id: 'postgis-tiles-layer-customPlanningArea',
+              type: 'fill',
+              source: 'postgis-previewPlanningArea',
+              'source-layer': 'layer0',
+
+              paint: {
+                'fill-outline-color': 'yellow',
+                'fill-color': 'red',
+                'fill-opacity': 0.1,
+              },
+            },
+            {
+              id: 'postgis-tiles-layer-customPlanningAreaGrid',
+              type: 'line',
+              source: 'postgis-previewPlanningAreaGrid',
+              'source-layer': 'layer0',
+
+              paint: {
+                'line-color': 'yellow',
+                'line-opacity': 1,
               },
             },
             // {
@@ -189,54 +226,54 @@
             //     'fill-opacity': 0.3,
             //   },
             // },
-            {
-              id: 'postgis-tiles-layer-PU',
-              type: 'fill',
-              source: 'postgis-tilesPU',
-              'source-layer': 'layer0',
+            // {
+            //   id: 'postgis-tiles-layer-PU',
+            //   type: 'fill',
+            //   source: 'postgis-tilesPU',
+            //   'source-layer': 'layer0',
 
-              paint: {
-                'fill-outline-color': 'yellow',
-                'fill-color': 'red',
-                'fill-opacity': 0.1,
-              },
-            },
-            {
-              id: 'postgis-tiles-layer-PU-points',
-              type: 'circle',
-              source: 'postgis-tilesPU2',
-              'source-layer': 'layer0',
-              paint: {
-                'circle-color': 'blue',
-                'circle-opacity':[
-                        'interpolate',
-                        // Set the exponential rate of change to 0.5
-                        ['exponential', 0.5],
-                        ['zoom'],
-                        // When zoom is 15, buildings will be beige.
-                        5,
-                        1,
-                        // When zoom is 18 or higher, buildings will be yellow.
-                        12,
-                        0
-                        ],
-                        'circle-stroke-opacity':[
-                        'interpolate',
-                        // Set the exponential rate of change to 0.5
-                        ['exponential', 0.5],
-                        ['zoom'],
-                        // When zoom is 15, buildings will be beige.
-                        2,
-                        1,
-                        // When zoom is 18 or higher, buildings will be yellow.
-                        7,
-                        0
-                        ],
-                'circle-radius': 1,
-                'circle-stroke-width': 1,
-                'circle-stroke-color': 'blue'
-              },
-            },
+            //   paint: {
+            //     'fill-outline-color': 'yellow',
+            //     'fill-color': 'red',
+            //     'fill-opacity': 0.1,
+            //   },
+            // },
+            // {
+            //   id: 'postgis-tiles-layer-PU-points',
+            //   type: 'circle',
+            //   source: 'postgis-tilesPU2',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'circle-color': 'blue',
+            //     'circle-opacity':[
+            //             'interpolate',
+            //             // Set the exponential rate of change to 0.5
+            //             ['exponential', 0.5],
+            //             ['zoom'],
+            //             // When zoom is 15, buildings will be beige.
+            //             5,
+            //             1,
+            //             // When zoom is 18 or higher, buildings will be yellow.
+            //             12,
+            //             0
+            //             ],
+            //             'circle-stroke-opacity':[
+            //             'interpolate',
+            //             // Set the exponential rate of change to 0.5
+            //             ['exponential', 0.5],
+            //             ['zoom'],
+            //             // When zoom is 15, buildings will be beige.
+            //             2,
+            //             1,
+            //             // When zoom is 18 or higher, buildings will be yellow.
+            //             7,
+            //             0
+            //             ],
+            //     'circle-radius': 1,
+            //     'circle-stroke-width': 1,
+            //     'circle-stroke-color': 'blue'
+            //   },
+            // },
           ],
         },
       });
@@ -250,9 +287,9 @@
         // map.on('click', 'postgis-tiles-layer2', function (e) {
         // console.log(e.features[0].properties)
         // });
-        map.on('click', 'postgis-tiles-layer-ScenarioPU', function (e) {
-        console.log(e.features[0].properties)
-        });
+        // map.on('click', 'postgis-tiles-layer-ScenarioPU', function (e) {
+        // console.log(e.features[0].properties)
+        // });
         // Change the cursor to a pointer when the mouse is over the places layer.
         map.on('mouseenter', 'postgis-tiles-layer-ScenarioPU', function () {
         map.getCanvas().style.cursor = 'pointer';

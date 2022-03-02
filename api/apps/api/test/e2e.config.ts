@@ -16,6 +16,11 @@ interface CountryCodeInput {
   adminLevel1?: string;
   adminLevel2?: string;
 }
+interface CustomPlanningAreaInput {
+  planningAreaId?: string;
+  planningUnitGridShape?: PlanningUnitGridShape;
+  planningUnitAreakm2?: number;
+}
 
 export const E2E_CONFIG: {
   users: {
@@ -44,7 +49,9 @@ export const E2E_CONFIG: {
         name?: string;
       }) => Partial<CreateProjectDTO>;
       complete: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
-      customArea: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
+      customArea: (
+        options: CustomPlanningAreaInput,
+      ) => Partial<CreateProjectDTO>;
       adminRegion: (options: CountryCodeInput) => Partial<CreateProjectDTO>;
     };
     invalid: {
@@ -142,15 +149,13 @@ export const E2E_CONFIG: {
           [faker.random.word()]: faker.random.uuid(),
         },
       }),
-      customArea: (options: CountryCodeInput): CreateProjectDTO => ({
+      customArea: (options: CustomPlanningAreaInput): CreateProjectDTO => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
         description: faker.lorem.paragraphs(2),
-        countryId: options.countryCode,
-        adminAreaLevel1Id: faker.random.alphaNumeric(7),
-        adminAreaLevel2Id: faker.random.alphaNumeric(12),
-        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
-        planningUnitAreakm2: 10,
+        planningAreaId: options.planningAreaId,
+        planningUnitGridShape: options.planningUnitGridShape,
+        planningUnitAreakm2: options.planningUnitAreakm2,
         metadata: {
           [faker.random.word()]: faker.random.words(3),
           [faker.random.word()]: faker.random.uuid(),

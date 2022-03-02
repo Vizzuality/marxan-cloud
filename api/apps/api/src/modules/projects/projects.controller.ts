@@ -9,6 +9,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -19,6 +20,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+
 import {
   Project,
   projectResource,
@@ -63,7 +65,7 @@ import { ProjectSerializer } from './dto/project.serializer';
 import { ProjectJobsStatusDto } from './dto/project-jobs-status.dto';
 import { JobStatusSerializer } from './dto/job-status.serializer';
 import { PlanningAreaResponseDto } from './dto/planning-area-response.dto';
-import { isLeft, right } from 'fp-ts/Either';
+import { isLeft } from 'fp-ts/Either';
 import { ShapefileUploadResponse } from './dto/project-upload-shapefile.dto';
 import { UploadShapefileDTO } from './dto/upload-shapefile.dto';
 import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
@@ -103,6 +105,8 @@ import {
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
 import { fileNotFound } from '@marxan/files-repository/file.repository';
+import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { TilesOpenApi } from '@marxan/tiles';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -116,6 +120,7 @@ export class ProjectsController {
     private readonly projectSerializer: ProjectSerializer,
     private readonly jobsStatusSerializer: JobStatusSerializer,
     private readonly shapefileService: ShapefileService,
+    private readonly proxyService: ProxyService,
   ) {}
 
   @IsMissingAclImplementation()
@@ -312,6 +317,157 @@ export class ProjectsController {
     }
 
     return result.right;
+  }
+
+  @ImplementsAcl()
+  @TilesOpenApi()
+  @ApiOperation({
+    description:
+      'Get planning area grid tiles for user uploaded grid.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'planning area id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get('planning-area/:id/grid/preview/tiles/:z/:x/:y.mvt')
+  async proxyPlanningAreaGridTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) planningAreaId: string,
+  ) {
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      planningAreaId,
+      req.user.id,
+    );
+    if (isLeft(checkPlanningAreaBelongsToProject)) {
+      throw new ForbiddenException();
+    }
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @ImplementsAcl()
+  @TilesOpenApi()
+  @ApiOperation({
+    description:
+      'Get planning area tiles for uploaded planning area.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get('planning-area/:id/preview/tiles/:z/:x/:y.mvt')
+  async proxyPlanningAreaTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) planningAreaId: string,
+  ): Promise<void> {
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      planningAreaId,
+      req.user.id,
+    );
+    if (isLeft(checkPlanningAreaBelongsToProject)) {
+      throw new ForbiddenException();
+    }
+
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @ImplementsAcl()
+  @TilesOpenApi()
+  @ApiOperation({
+    description:
+      'Get planning area tiles for project planning area.',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get(':projectId/planning-area/tiles/:z/:x/:y.mvt')
+  async proxyProjectPlanningAreaTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
+  ) {
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      projectId,
+      req.user.id,
+    );
+    if (isLeft(checkPlanningAreaBelongsToProject)) {
+      throw new ForbiddenException();
+    }
+
+    const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
+      projectId,
+      req.user.id,
+      z,
+      x,
+      y,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    req.url = req.url.replace(result.right.from, result.right.to);
+
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @ImplementsAcl()
+  @TilesOpenApi()
+  @ApiOperation({
+    description:
+      'Get planning area grid tiles for project grid.',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get(':projectId/grid/tiles/:z/:x/:y.mvt')
+  async proxyProjectPlanningUnitsTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('z', ParseIntPipe) z: number,
+    @Param('x', ParseIntPipe) x: number,
+    @Param('y', ParseIntPipe) y: number,
+  ) {
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      projectId,
+      req.user.id,
+    );
+    if (isLeft(checkPlanningAreaBelongsToProject)) {
+      throw new ForbiddenException();
+    }
+
+    const result = await this.projectsService.getActualUrlForProjectPlanningGridTiles(
+      projectId,
+      req.user.id,
+      z,
+      x,
+      y,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    req.url = req.url.replace(result.right.from, result.right.to);
+
+    return await this.proxyService.proxyTileRequest(req, response);
   }
 
   @IsMissingAclImplementation()
