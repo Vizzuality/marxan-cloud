@@ -10,6 +10,7 @@ import {
   UseFeaturePreviewLayers,
   UseGeoJSONLayer,
   UseLegend,
+  UsePlanningAreaLayer,
   UsePUCompareLayer,
   UsePUGridLayer,
   UsePUGridPreviewLayer,
@@ -85,6 +86,35 @@ export function useAdminPreviewLayer({
       },
     };
   }, [active, level, guid, cache]);
+}
+
+export function usePlanningAreaLayer({
+  active, pId, cache = 0,
+}: UsePlanningAreaLayer) {
+  return useMemo(() => {
+    if (!active || !pId) return null;
+
+    return {
+      id: `planning-area-preview-layer-${pId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/planning-area/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#FFF',
+              'line-width': 3,
+            },
+          },
+        ],
+      },
+    };
+  }, [active, pId, cache]);
 }
 
 // WDPApreview
