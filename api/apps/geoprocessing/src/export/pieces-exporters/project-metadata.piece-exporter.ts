@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -21,7 +21,10 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-  ) {}
+    private readonly logger: Logger,
+  ) {
+    this.logger.setContext(ProjectMetadataPieceExporter.name);
+  }
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
@@ -39,9 +42,9 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
     );
 
     if (!projectData) {
-      throw new Error(
-        `${ProjectMetadataPieceExporter.name} - Project ${input.resourceId} does not exist.`,
-      );
+      const errorMessage = `${ProjectMetadataPieceExporter.name} - Project ${input.resourceId} does not exist.`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     const fileContent: ProjectMetadataContent = {
@@ -55,9 +58,9 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
     );
 
     if (isLeft(outputFile)) {
-      throw new Error(
-        `${ProjectMetadataPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`,
-      );
+      const errorMessage = `${ProjectMetadataPieceExporter.name} - Project - couldn't save file - ${outputFile.left.description}`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
     }
 
     return {

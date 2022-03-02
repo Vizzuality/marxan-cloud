@@ -10,6 +10,7 @@ import {
 } from '@marxan/files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken } from '@nestjs/typeorm';
 import { Either, left, Right, right } from 'fp-ts/lib/Either';
@@ -75,6 +76,7 @@ const getFixtures = async () => {
         provide: geoprocessingEntityManagerToken,
         useClass: FakeEntityManager,
       },
+      Logger,
     ],
   }).compile();
   await sandbox.init();
