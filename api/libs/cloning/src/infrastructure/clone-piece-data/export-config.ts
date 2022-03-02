@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { Type } from 'class-transformer';
 import {
+  Equals,
   IsArray,
   IsEnum,
   IsOptional,
@@ -11,8 +12,11 @@ import {
 import { ClonePiece } from '../../domain/clone-piece';
 import { ResourceKind } from '../../domain/resource.kind';
 
+export const exportVersion = '0.1.0';
+
 class CommonFields {
   @IsString()
+  @Equals(exportVersion)
   version!: string;
 
   @IsEnum(ResourceKind)

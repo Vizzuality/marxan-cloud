@@ -1,10 +1,4 @@
-import {
-  forwardRef,
-  HttpService,
-  Inject,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { forwardRef, HttpService, Inject, Injectable } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Readable } from 'stream';
@@ -15,22 +9,9 @@ import { User } from '@marxan-api/modules/users/user.api.entity';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
+import { PDFOptions } from 'puppeteer';
 
 export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
-
-export class WebshotViewport {
-  @ApiPropertyOptional()
-  @IsNumber()
-  @Min(64)
-  @Max(1920)
-  width!: number;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @Min(64)
-  @Max(1080)
-  height!: number;
-}
 
 export class WebshotSummaryReportConfig {
   @ApiProperty()
@@ -39,17 +20,16 @@ export class WebshotSummaryReportConfig {
 
   @ApiPropertyOptional()
   @IsOptional()
-  viewport?: WebshotViewport;
+  cookie?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  cookie?: string;
+  pdfOptions?: PDFOptions;
 }
 
 @Injectable()
 export class WebshotService {
   private webshotServiceUrl: string = AppConfig.get('webshot.url') as string;
-  private readonly logger = new Logger(WebshotService.name);
 
   constructor(
     private readonly httpService: HttpService,

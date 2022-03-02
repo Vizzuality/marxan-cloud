@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import puppeteer from "puppeteer";
+import puppeteer, { PDFOptions } from "puppeteer";
+import { waitForReportReady } from "./wait-function";
 
 const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions";
 
@@ -8,8 +9,9 @@ export const generateSummaryReportForScenario = async (
   res: Response
 ) => {
   const {
-    body: { baseUrl, cookie, viewport: { width = 1080, height = 960 } = {} },
-  } = req;
+    body: { baseUrl, cookie, pdfOptions },
+  }: { body: { baseUrl: string; cookie: string; pdfOptions: PDFOptions } } =
+    req;
 
   const {
     params: { projectId, scenarioId },
@@ -45,17 +47,19 @@ export const generateSummaryReportForScenario = async (
   });
   const page = await browser.newPage();
 
-  await page.setViewport({ width, height });
-
-  // @todo Remove this. It's only demoware, to be able to easily take snapshots
-  // as an authenticated user while we test the report workflow.
+  /**
+   * The webshot service authenticates to the upstream frontend instance by
+   * passing through the cookie that it receives from the API. In practice, all
+   * that is needed is the `__Secure-next-auth.session-token` cookie (or
+   * `next-auth.session-token` in development environments where the frontend
+   * may not be running behind an HTTPS reverse proxy).
+   */
   if (cookie) await page.setExtraHTTPHeaders({ cookie });
 
   console.info(`Rendering ${pageUrl} as PDF`);
   await page.goto(pageUrl);
-  await page.waitForNetworkIdle();
-
-  const pageAsPdf = await page.pdf({ timeout: 3e4 });
+  await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
+  const pageAsPdf = await page.pdf({ ...pdfOptions, timeout: 30e3 });
 
   await page.close();
   await browser.close();

@@ -16,8 +16,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  wait_for_tests:
+    name: Wait for tests to finish running
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Wait for API tests to run
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: API Tests
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          intervalSeconds: 20
+
+      - name: Wait for Client tests to run
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Client Tests
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          intervalSeconds: 20
+
   push_api_to_registry:
     name: Push API Docker image to Azure Container Registry
+    needs: wait_for_tests
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the repo
@@ -30,20 +51,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Wait for API tests to run
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: API Tests
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Wait for Client tests to run
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Client Tests
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
       - name: Build and push image
         uses: azure/docker-login@v1
         with:
@@ -52,50 +59,14 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./api -f api/api.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker build ./api -f api/api.Dockerfile \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.sha }} \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
           docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-api
 
   push_geoprocessing_to_registry:
     name: Push Geoprocessing Docker image to Azure Container Registry
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-
-      - name: 'Login via Azure CLI'
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Wait for API tests to run
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: API Tests
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Wait for Client tests to run
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Client Tests
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-
-      - name: Build and push image
-        uses: azure/docker-login@v1
-        with:
-          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-
-      - run: |
-          docker build ./api -f api/geo.Dockerfile -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
-          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing
-
-  push_client_to_registry:
-    name: Push Client Docker image to Azure Container Registry
+    needs: wait_for_tests
     runs-on: ubuntu-20.04
     steps:
       - name: Check out the repo
@@ -108,19 +79,33 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Wait for API tests to run
-        uses: fountainhead/action-wait-for-check@v1.0.0
+      - name: Build and push image
+        uses: azure/docker-login@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: API Tests
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Wait for Client tests to run
-        uses: fountainhead/action-wait-for-check@v1.0.0
+      - run: |
+          docker build ./api -f api/geo.Dockerfile \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.sha }} \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-geoprocessing
+
+  push_client_to_registry:
+    name: Push Client Docker image to Azure Container Registry
+    needs: wait_for_tests
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Login via Azure CLI
+        uses: azure/login@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Client Tests
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Build and push image
         uses: azure/docker-login@v1
@@ -130,5 +115,11 @@ jobs:
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       - run: |
-          docker build ./app -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }}
+          docker build ./app \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.sha }} \
+            -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client:${{ github.ref != 'refs/heads/main' && 'staging' || 'production' }} \
+            --build-arg NEXT_PUBLIC_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_URL_STAGING || secrets.NEXT_PUBLIC_URL_PRODUCTION }} \
+            --build-arg NEXT_PUBLIC_API_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_API_URL_STAGING || secrets.NEXT_PUBLIC_API_URL_PRODUCTION }} \
+            --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXTAUTH_URL_STAGING || secrets.NEXTAUTH_URL_PRODUCTION }} \
+            --build-arg NEXTAUTH_URL=${{ secrets.NEXT_PUBLIC_MAPBOX_API_TOKEN }}
           docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client
