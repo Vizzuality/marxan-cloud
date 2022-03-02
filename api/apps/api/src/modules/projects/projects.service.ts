@@ -128,7 +128,7 @@ export class ProjectsService {
     }
   }
 
-  async getProjectPlanningAreaTiles(
+  async getActualUrlForProjectPlanningAreaTiles(
     projectId: string,
     userId: string,
     z: number,
@@ -166,6 +166,9 @@ export class ProjectsService {
     **/
 
     const level = Object.keys(planningAreaId).length - 1;
+    /**
+     * @todo: In the future we should decouple this.
+     */
     const endpointRedirect: { [k: string]: { from: string; to: string } } = {
       planning_areas: {
         from: `/projects/${projectId}/planning-area/tiles`,
@@ -183,7 +186,7 @@ export class ProjectsService {
     return right(endpointRedirect[planningAreaEntity.tableName]);
   }
 
-  async getProjectPlanningUnitsTiles(
+  async getActualUrlForProjectPlanningGridTiles(
     projectId: string,
     userId: string,
     z: number,
@@ -206,7 +209,10 @@ export class ProjectsService {
     }
     project.bbox[0];
     /*
-    we are redirecting to the planning area service to get the tiles
+    we are redirecting to the planning area service to get the tiles.
+
+    @todo: In the future we should decouple this text url stuff.
+
     **/
     if (project.planningUnitGridShape === 'from_shapefile') {
       return right({
@@ -449,7 +455,11 @@ export class ProjectsService {
 
     return right(importIdOrError.right);
   }
-
+  /**
+   * @todo: this is a good candidate for a new static method in class
+   * Gids (static planningGidsFromAreaId()
+   *
+   **/
   private idToGid(gid: string): PlanningGids {
     const myArray = gid.split('.');
     return myArray.reduce((acc: {}, curr: string, idx: number) => {

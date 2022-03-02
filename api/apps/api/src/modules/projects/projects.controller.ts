@@ -408,7 +408,7 @@ export class ProjectsController {
       throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getProjectPlanningAreaTiles(
+    const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
       projectId,
       req.user.id,
       z,
@@ -454,7 +454,7 @@ export class ProjectsController {
       throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getProjectPlanningUnitsTiles(
+    const result = await this.projectsService.getActualUrlForProjectPlanningGridTiles(
       projectId,
       req.user.id,
       z,
