@@ -130,7 +130,6 @@ async function getFixtures() {
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
   const viewerUserId = await GivenUserExists(app, 'cc');
-  const noScenariosUserToken = await GivenUserIsLoggedIn(app, 'dd');
 
   const randomUserInfo = await GivenUserIsCreated(app);
   const queue = FakeQueue.getByName(queueName);
@@ -299,7 +298,7 @@ async function getFixtures() {
     WhenGettingScenariosAsUserWithNoScenarios: async () =>
       await request(app.getHttpServer())
         .get('/api/v1/scenarios')
-        .set('Authorization', `Bearer ${noScenariosUserToken}`),
+        .set('Authorization', `Bearer ${randomUserInfo.accessToken}`),
 
     WhenGettingPaginatedScenariosAsOwner: async () =>
       await request(app.getHttpServer())

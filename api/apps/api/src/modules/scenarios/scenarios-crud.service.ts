@@ -142,14 +142,12 @@ export class ScenariosCrudService extends AppBaseService<
   }
 
   async assignCreatorRole(scenarioId: string, userId: string): Promise<void> {
-    await this.userScenarios.save(
-      this.userScenarios.create({
-        scenarioId,
-        userId,
-        roleName: ScenarioRoles.scenario_owner,
-        isImplicit: false,
-      }),
-    );
+    await this.userScenarios.save({
+      scenarioId,
+      userId,
+      roleName: ScenarioRoles.scenario_owner,
+      isImplicit: false,
+    });
   }
 
   async setDataUpdate(
