@@ -343,9 +343,11 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                               );
                             }}
                           </FieldRFF>
-                          <PlanningAreaSelector
-                            values={values}
-                          />
+                          {values.planningAreaId && (
+                            <PlanningAreaSelector
+                              values={values}
+                            />
+                          )}
                         </div>
                       )}
 
