@@ -16,6 +16,9 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
     CREATE TYPE role_on_entity AS ( entity_id uuid, role_id varchar);
     `);
     await queryRunner.query(`
+    CREATE TYPE user_and_role AS ( user_id uuid, role_id varchar);
+    `);
+    await queryRunner.query(`
       CREATE OR REPLACE FUNCTION compute_implicit_scenario_roles_for_user(_user_id uuid)
       RETURNS table(grant_on role_on_entity[], revoke_on uuid[]) AS $$
         WITH
@@ -112,23 +115,24 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
       CREATE OR REPLACE FUNCTION manage_existing_project_roles_for_scenario()
       RETURNS trigger as $$
       DECLARE
-        users_to_grant role_on_entity[];
-        upper_project_id uuid;
-        scenario_id uuid;
-        user_to_grant role_on_entity;
+        users_to_grant user_and_role[];
+        parent_project_id uuid;
+        new_scenario_id uuid;
+        user_to_grant user_and_role;
       BEGIN
-        upper_project_id := NEW.project_id;
-        scenario_id := NEW.id;
-        users_to_grant := ARRAY(SELECT ROW(user_id, role_id) FROM users_projects up WHERE up.project_id = upper_project_id);
+        parent_project_id := NEW.project_id;
+        new_scenario_id := NEW.id;
+        users_to_grant := ARRAY(SELECT ROW(user_id, role_id) FROM users_projects up WHERE up.project_id = parent_project_id);
           
         FOREACH user_to_grant IN array users_to_grant
         LOOP
-          RAISE NOTICE 'Granting implicit % role on scenario % to user %', regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), scenario_id, user_to_grant.entity_id;
+          RAISE NOTICE 'Granting implicit % role on scenario % to user %', regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), new_scenario_id, user_to_grant.user_id;
 
+          DELETE FROM users_scenarios WHERE user_id = user_to_grant.user_id AND scenario_id = new_scenario_id;
           INSERT INTO users_scenarios
             (user_id, scenario_id, role_id, is_implicit)
             VALUES
-            (user_to_grant.entity_id, scenario_id, regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), true);
+            (user_to_grant.user_id, new_scenario_id, regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), true);
         END LOOP;
 	      RETURN NULL;
       END;
