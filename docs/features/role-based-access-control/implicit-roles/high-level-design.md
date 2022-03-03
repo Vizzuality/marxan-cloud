@@ -1,25 +1,5 @@
 # Implicit roles - high level design
 
-Users with any role on a project are granted an implicit role on all the
-scenarios that belong to each projects they have a role on.
-
-If users are explicitly granted a role on the scenario (currently, this will
-happen only for the user who creates the scenario, who is granted
-`scenario_owner` right after the scenario has been created), their role will be
-updated as required by the explicit grant, and marked as explicitly granted.
-
-The role they are implicitly granted on a scenario will match the role they have
-on the project (so, owner => owner, and so on).
-
-This is implemented via a SQL function that computes implicit roles, and a
-second one that actually grants them and revokes them.
-
-Database triggers are used to run the computation (and to perform any
-grants/revokes, as applicable) when any roles are added/changed/revoked on any
-entity (project or scenario) is created or deleted.
-
-## Implementation details
-
 A user who is added with *any* role to a project should *implicitly* be granted
 a matching role on all the scenarios within the project, *except* when they
 already have any explicit role on a scenario.
@@ -28,10 +8,10 @@ With *implicit* here we mean that:
 
 * the role is identified as such in the `users_scenarios` table (this is done
   via the `is_implicit` boolean field)
-* the role must be revoked as soon as *all* the conditions through which it had
-  been granted become void; for example, if a user became implicitly viewer of
-  scenario X part of project Y when they became viewers of project Y, as soon as
-  their viewer role on project Y is revoked, their implicit viewer role on
+* the role must be revoked as soon as *any* of the conditions through which it
+  had been granted become void; for example, if a user became implicitly viewer
+  of scenario X part of project Y when they became viewers of project Y, as soon
+  as their viewer role on project Y is revoked, their implicit viewer role on
   scenario X must be revoked *by materially deleting the relevant row* of the
   `users_scenarios` table (ideally these two operations should happen
   atomically);
@@ -61,29 +41,79 @@ We compute grant and revoke sets for implicit scenario roles.
 * Get the list of scenario the user has any *explicit* roles on, as set `Es`
   (Explicit scenario roles).
 
-* Compute the set difference between `Ps` and `Es` as set `Is` (Implicit
-  scenario roles): `Ip = Ps - Es`. This is the set of scenarios the user should
-  have an implicit role on.
-
 * Get the list of scenarios the user *already has an implicit role on*, as
   set `Cs` (Current implicit scenario roles).
 
-* Calculate the following two sets:
+* Calculate the following sets:
 
-  * `Gs` (grant) as `Gs = Is - Cs`, joining the role that the user has on the
-    parent project of each scenario
+  * `Gs`: scenarios on which to grant a role, for a given user, as `Gs = Ps -
+    Cs`
 
-  * `Rs` (revoke) as `Rs = Cs - Is`.
+  * `GRs`: as above, but including *which* role they should be given on each
+    scenario, by joining the role that the user has on the parent project of
+    each scenario
 
-* And finally, grant the roles in `Gs` and revoke the roles in `Rs`.
+  * `Rs`: scenarios from which to revoke roles, for a given user, as `Rs = Cs - Gs`.
+
+* And finally, grant the roles in `GRs` and revoke the roles in `Rs`.
 
 Some further details:
 
 * the role the user is granted will match the one they have on the parent
   project
 * as a corollary, the database triggers that calculate and apply implicit roles
-  need to run `BEFORE INSERT OR UPDATE` or `AFTER DELETE` of roles on projects
-  or scenarios
+  need to run `BEFORE INSERT OR UPDATE` and `AFTER DELETE` for roles on projects
+* likewise, these triggers should also run `BEFORE INSERT OR UPDATE` for roles
+  on scearios: this is so that if a user already has an implicit project on a
+  scenario and is being granted an explicit role, this operation can be
+  transparently result in an update of the user's role to an explicit one
+* these triggers should also run `AFTER DELETE` for roles on scenarios: this is
+  so that if a user is being revoked an explicit role, this can be replaced by
+  the relevant implicit role
 * when the user's role on parent projects is granted/changed/revoked, we always
   re-compute which scenarios they should have implicit access to, and calculate
   what needs changing (a sort of virtual ACL diffing).
+
+## Testing implicit role management
+
+Tests should cover the common situations that can lead to implicit roles being
+granted or revoked:
+
+```
+given userA and userB are created,
+given a new project P is created by userA,
+given that userB is granted role R on P
+when userA creates a new scenario S in P
+then userB should be granted role R on the new scenario
+```
+
+(repeating this for each of project owner, contributor, viewer roles as R for
+userB)
+
+```
+given userA and userB are created,
+given a new project P is created by userA,
+given that userB is granted role R on P
+given that userA creates a new scenario S in P
+when userB's role on the parent project is revoked
+then userB should have no role on scenario S
+```
+
+```
+given userA and userB are created,
+given a new project P is created by userA,
+given that userB is granted role R on P
+given that userA creates a new scenario S in P
+when userB's role on the parent project is changed from R to R'
+  (for example owner to viewer)
+then userB's role on scenario S is updated to be R'
+```
+
+```
+given userA and userB are created,
+given a new project P is created by userA,
+given that userA creates a new scenario S in P
+given that userB is granted role R on P
+given that userA creates a new scenario T in P
+then userB should be granted role R on scenario T
+```
