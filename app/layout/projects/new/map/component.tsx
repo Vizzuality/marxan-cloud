@@ -7,7 +7,9 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 // Map
 import { useAccessToken } from 'hooks/auth';
-import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
+import {
+  useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer, usePlanningAreaPreviewLayer,
+} from 'hooks/map';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
@@ -28,13 +30,15 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 }: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
-  const { bbox, uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
+  const { bbox, uploadingPlanningArea, uploadingPlanningAreaId } = useSelector((state) => state['/projects/new']);
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
 
   const accessToken = useAccessToken();
+
+  console.log(uploadingPlanningArea);
 
   const LAYERS = [
     useGeoJsonLayer({
@@ -44,6 +48,10 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       options: {
         customPAshapefileGrid: paOptionSelected === 'customPAshapefileGrid',
       },
+    }),
+    usePlanningAreaPreviewLayer({
+      active: !!uploadingPlanningAreaId,
+      planningAreaId: uploadingPlanningAreaId,
     }),
     useAdminPreviewLayer({
       active: true,

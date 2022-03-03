@@ -6,7 +6,7 @@ import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
+  setBbox, setUploadingPlanningArea, setUploadingPlanningAreaId, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
 import cx from 'classnames';
@@ -123,6 +123,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   const onUploadSubmit = useCallback(() => {
     input.onChange(successFile.id);
     dispatch(setUploadingPlanningArea(successFile.geom));
+    dispatch(setUploadingPlanningAreaId(successFile.id));
     dispatch(setBbox(successFile.geom.bbox));
     dispatch(setMinPuAreaSize(successFile.geom.marxanMetadata.minPuAreaSize));
     dispatch(setMaxPuAreaSize(successFile.geom.marxanMetadata.maxPuAreaSize));
