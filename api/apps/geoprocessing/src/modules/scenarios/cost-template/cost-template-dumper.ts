@@ -36,12 +36,13 @@ export class CostTemplateDumper {
                       (
                         SELECT
                           spd.id AS puid,
-                          1 AS cost
+                          coalesce(spcd.cost, 1)::numeric(24,12) AS cost
                       ) properties_attributes
                   ) AS "properties"
                 FROM
                   scenarios_pu_data spd
                     INNER JOIN planning_units_geom pug ON pug.id = spd.pu_geom_id
+                    LEFT JOIN scenarios_pu_cost_data spcd ON spcd.scenarios_pu_data_id = spd.id
                 WHERE
                   spd.scenario_id = $1`,
             [scenarioId],
