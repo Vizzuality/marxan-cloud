@@ -310,6 +310,20 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
+  extendGetByIdQuery(query: SelectQueryBuilder<Project>, fetchSpecification?: FetchSpecification, info?: ProjectsRequest): SelectQueryBuilder<Project> {
+    /**
+     * Bring in publicMetadata (if the project has been made public). This is
+     * used in the `@AfterLoad()` event listener to set the `isPublic` property
+     * to true for public projects.
+     */
+    query.leftJoinAndSelect(
+      'project.publicMetadata',
+      'publicMetadata'
+    );
+
+    return query;
+  }
+
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification: FetchSpecification,
@@ -325,6 +339,9 @@ export class ProjectsCrudService extends AppBaseService<
       `${this.alias}.id = acl.project_id`,
     );
 
+    /**
+     * @see extendGetByIdQuery()
+     */
     query.leftJoinAndSelect(
       'project.publicMetadata',
       'publicMetadata'
