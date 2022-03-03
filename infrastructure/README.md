@@ -99,7 +99,7 @@ Secrets with the corresponding values:
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
-- `SSH_KEY`: The ssh public key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
+- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 
 ## How to deploy
 

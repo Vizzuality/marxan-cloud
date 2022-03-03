@@ -19,13 +19,14 @@ beforeEach(async () => {
 });
 
 test(`exporting supported piece`, async () => {
+  const resourceId = '3';
   const input = {
     piece: ClonePiece.ProjectMetadata,
     componentId: '1',
     exportId: '2',
-    resourceId: '3',
+    resourceId,
     resourceKind: ResourceKind.Project,
-    allPieces: [ClonePiece.ProjectMetadata],
+    allPieces: [{ resourceId, piece: ClonePiece.ProjectMetadata }],
   };
   const result = await fixtures.sut.run(input);
   expect(result).toEqual({
@@ -40,13 +41,14 @@ test(`exporting supported piece`, async () => {
 });
 
 test(`exporting unsupported piece`, async () => {
+  const resourceId = '3';
   const input = {
     piece: `some piece` as ClonePiece,
     componentId: '1',
     exportId: '2',
-    resourceId: '3',
+    resourceId,
     resourceKind: ResourceKind.Scenario,
-    allPieces: [ClonePiece.ProjectMetadata],
+    allPieces: [{ resourceId, piece: ClonePiece.ProjectMetadata }],
   };
   expect(async () => await fixtures.sut.run(input)).rejects.toEqual(
     new Error(`some piece is not yet supported.`),

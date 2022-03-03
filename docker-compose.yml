@@ -150,55 +150,11 @@ services:
     depends_on:
       - redis
 
-  postgresql-airflow:
-    image: postgres
-    container_name: marxan-postgresql-airflow
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-
-  airflow-scheduler:
-    container_name: marxan-airflow-scheduler
-    image: apache/airflow:2.0.0
-    command: scheduler
-    depends_on:
-        - postgresql-airflow
-    restart: on-failure
-    environment:
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgresql-airflow/airflow
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - marxan-airflow-logs:/opt/airflow/logs
-
-  airflow-webserver:
-    container_name: marxan-airflow-webserver
-    image: apache/airflow:2.0.0
-    restart: on-failure
-    entrypoint: ['sh','./scripts/entrypoint.sh']
-    env_file:
-      - .env
-    environment:
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgresql-airflow/airflow
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/scripts:/opt/airflow/scripts
-      - marxan-airflow-logs:/opt/airflow/logs
-    ports:
-      - "${AIRFLOW_PORT}:8080"
-    depends_on:
-      - postgresql-airflow
-      - airflow-scheduler
-
 volumes:
   marxan-cloud-postgresql-api-data:
 
   marxan-cloud-postgresql-geo-data:
 
   marxan-cloud-redis-api-data:
-
-  marxan-airflow-logs:
 
   marxan-cloud-backend-temp-storage:

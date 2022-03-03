@@ -13,23 +13,41 @@ Services are packaged as Docker images.
 Microservices are set up to be run with or without Docker Compose for local 
 development - see the sections below for more details.
 
+The recommended setup for new developers is to run all the backend services (api
+and geoprocessing services, alongside their PostgreSQL and Redis databases) via
+Docker Compose, and the frontend app natively.
+
 In CI, testing, staging and production environments, microservices are
-orchestrated via Kubernetes (forthcoming).
+orchestrated via Kubernetes (see [the relevant
+documentation](./infrastructure/README.md)).
+
+Most of the commands listed in this README and referenced elsewhere in the
+repository are targeted at a GNU/Linux OS environment such as a recent Ubuntu,
+Arch or Debian system, whether running natively or in a VM or under Windows
+Subsystem for Linux 2 (WSL 2). They should also work identically on MacOS, while
+they may need some adaptation to run on Windows systems.
 
 ## Platform architecture
 
 See [ARCHITECTURE_infrastructure.md](./docs/ARCHITECTURE_infrastructure.md) for
 details.
 
-![Backend architecture](./docs/ARCHITECTURE_infrastructure/marxan-contexts.png)
-
 ## Dependencies
 
-- [Nodejs](https://nodejs.org/en/) v14.18
-- [Yarn](https://yarnpkg.com/)
+- [NodeJS](https://nodejs.org/en/) v14.18
+- [Yarn](https://classic.yarnpkg.com/) v1
 - [PostgreSQL](https://www.postgresql.org/) v14
 - [Postgis](https://postgis.net/) v3
 - [Redis](https://redis.io/) v6
+- A [Sparkpost](https://www.sparkpost.com/) account
+
+For development environments, a separate Sparkpost account than what is used for
+staging/production should be used. Unless the transactional email components of
+the platform are being actively worked on (email verification on signup, email
+confirmation for password changes, email flow for resetting forgotten passwords,
+etc.), there will be no need to set up email templates within the Sparkpost
+account, and only a Sparkpost API key will be needed (see documentation on
+[environment variables](./ENV_VARS.md) for details on this).
 
 ## Running API and Geoprocessing services using Docker
 
@@ -47,54 +65,60 @@ via a Docker volume.
 
 ### Running the Marxan Cloud platform
 
-Run `make start` to start all the services.
+Run `make start-api` to start all the backend services and all the required
+database services.
 
-Run `make start-api` to start api services.
+To run the frontend app, populate the `app/.env` file according to the [app
+documentation](./app/README.md), then:
 
-### Running the notebooks
 
-Run `make notebooks` to start the jupyterlab service.
+```
+npm install -g yarn
+cd app
+nvm use ## or fnm use, etc. according to the preferred node version manager
+yarn install
+yarn dev
+```
 
-### Seed data
+The frontend app will then be available on http://localhost:3000 (or at the URL
+shown when the app starts, if a different port has been configured).
 
-To seed the geodb database after a clean state, please follow the steps below:
+### Seeding a new instance with initial data
+
+Once all the backend services have started for the first time, initial seed data
+must be imported into the new instance. Likewise, after resetting an instance
+via `make clean-slate`, this step must be repeated after having started the
+backend services.
+
+Please make sure to wait for all of the backend services (api, geoprocessing and
+webshot) to fully start as database migrations will be run while the services
+are started: attempting to import seed data before migrations have run fully
+will result in errors.
+
+Importing initial seed data can be done in two distinct ways:
+
+1. Full data (recommended in most cases)
 
 ``` bash
 make seed-geodb-data
 ```
 
-This will populate the metadata DB and will trigger the geo-pipelines to seed
-the geoDB.
+This will populate the metadata DB and will trigger the geoprocessing ETL
+pipelines to seed the geoDB with the full data that would normally be used in
+staging and production instances.
 
-Note: Full db set up will require at least 16GB of RAM and 40GB of disk space in
-order to carry out some of these tasks (GADM and WDPA data import pipelines).
-Also, the number of CPU cores will impact the time needed to seed a new instance
-with the complete GADM and WDPA datasets.
+Please note that this full db set up will require at least 16GB of RAM and 40GB
+of disk space in order to carry out some of these tasks (GADM and WDPA data
+import pipelines). Also, the number of CPU cores will impact the time needed to
+seed a new instance with the complete GADM and WDPA datasets.
 
-To populate a new instance with a small subset of test data, instead:
+2. Small subset of test data
+
+To populate a new instance with a small subset of test data, instead, the
+following command can be used:
 
 ``` bash
 make seed-dbs
-```
-
-We also provide a way to reset db instances from scratch. This can be useful to
-do regularly, to avoid keeping obsolete data in the local development instance.
-
-``` bash
-make clean-slate
-```
-
-And finally, we provide a set of commands to create new dbs dumps from upstream
-data sources, upload these dunps to an Azure storage bucket, and populate both
-dbs from these dumps. This will typically be faster than triggering the full
-geodb ETL pipelines.
-
-``` bash
-make generate-content-dumps && make upload-dump-data
-```
-
-``` bash
-make restore-dumps
 ```
 
 ## Running API and Geoprocessing services natively
@@ -169,6 +193,45 @@ Note that E2E tests may trigger cross-application requests, so:
 Running tests require previously loading the [test seed
 data](#setting-up-test-seed-data), and may modify data in the database - do not
 run tests using a database whose data you don't want to lose.
+
+## Maintenance
+
+### Resetting data to a clean slate status
+
+The main `Makefile` provides a way to reset db instances from scratch. This can
+be useful to do regularly, to avoid keeping obsolete data in the local
+development instance.
+
+``` bash
+make clean-slate
+```
+
+### Update seed data (GADM, WDPA) from newer upstream releases
+
+The main `Makefile` provides a set of commands to create new dbs dumps from
+upstream data sources, upload these dumps to an Azure storage bucket, and
+populating both dbs from these dumps. Populating clean dbs this way will
+typically be faster than triggering the full geodb ETL pipelines.
+
+To run the geoprocessing ETL pipelines (such as when using the *Seed data,
+option 1* above) and upload the processed data to an Azure bucket:
+
+``` bash
+make generate-content-dumps && make upload-dump-data
+```
+
+Other developers can then benefit from the pre-prepared data seeds when
+populating new development instances after their initial setup:
+
+``` bash
+make restore-dumps
+```
+
+### Running the notebooks
+
+This step is only needed when developing Python notebooks for Marxan.
+
+Run `make notebooks` to start the jupyterlab service.
 
 ## Development workflow (TBD)
 

@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceRelativePaths } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository } from '@marxan/files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
@@ -90,13 +90,10 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: [
-        {
-          uri: outputFile.right,
-          relativePath:
-            ClonePieceRelativePaths[ClonePiece.PlanningAreaGAdm].paGadm,
-        },
-      ],
+      uris: ClonePieceUrisResolver.resolveFor(
+        ClonePiece.PlanningAreaGAdm,
+        outputFile.right,
+      ),
     };
   }
 }

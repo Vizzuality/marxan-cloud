@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Type } from 'class-transformer';
 import {
   Equals,
@@ -9,8 +8,10 @@ import {
   IsUUID,
   ValidateNested,
 } from 'class-validator';
+import 'reflect-metadata';
 import { ClonePiece } from '../../domain/clone-piece';
 import { ResourceKind } from '../../domain/resource.kind';
+import { IsExportConfigPieces } from '../../is-export-config-pieces.decorator';
 
 export const exportVersion = '0.1.0';
 
@@ -24,10 +25,6 @@ class CommonFields {
 
   @IsUUID(4)
   resourceId!: string;
-
-  @IsArray()
-  @IsEnum(ClonePiece, { each: true })
-  pieces!: ClonePiece[];
 
   @IsString()
   name!: string;
@@ -45,26 +42,37 @@ class ScenarioMetadata {
   name!: string;
 }
 
+class ProjectExportConfigPieces {
+  @IsArray()
+  @IsEnum(ClonePiece, { each: true })
+  project!: ClonePiece[];
+
+  @IsExportConfigPieces()
+  scenarios!: Record<string, ClonePiece[]>;
+}
+
 export class ProjectExportConfigContent extends CommonFields {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ScenarioMetadata)
   scenarios!: ScenarioMetadata[];
+
+  @ValidateNested()
+  @Type(() => ProjectExportConfigPieces)
+  pieces!: ProjectExportConfigPieces;
 }
 
 export class ScenarioExportConfigContent extends CommonFields {
   @IsUUID(4)
   projectId!: string;
+
+  @IsArray()
+  @IsEnum(ClonePiece, { each: true })
+  pieces!: ClonePiece[];
 }
 
 export type ExportConfigContent =
   | ProjectExportConfigContent
   | ScenarioExportConfigContent;
 
-export interface ExportConfigRelativePathsType {
-  config: string;
-}
-
-export const ExportConfigRelativePaths: ExportConfigRelativePathsType = {
-  config: 'config.json',
-};
+export const exportConfigRelativePath = 'config.json';

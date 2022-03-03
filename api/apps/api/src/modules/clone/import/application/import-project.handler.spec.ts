@@ -189,9 +189,9 @@ class FakeImportResourcePieces extends ImportResourcePieces {
   resolveForProject(
     id: ResourceId,
     archiveLocation: ArchiveLocation,
-    scenarios: ProjectExportConfigContent['scenarios'],
+    pieces: ProjectExportConfigContent['pieces'],
   ): ImportComponent[] {
-    return this.mock(id, archiveLocation, scenarios);
+    return this.mock(id, archiveLocation, pieces);
   }
 
   resolveForScenario(

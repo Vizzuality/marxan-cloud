@@ -61,7 +61,7 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v2
 
-      - name: 'Login via Azure CLI'
+      - name: Login via Azure CLI
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -78,7 +78,7 @@ jobs:
 
       - name: Add custom host data
         run: |
-          sudo sh -c 'echo "127.0.0.1 ${{ secrets.AKS_HOST }}" >> /etc/hosts'
+          sudo sh -c 'echo "127.0.0.1 ${{ secrets.AZURE_AKS_HOST }}" >> /etc/hosts'
 
       - name: Install kubectl
         run: |
@@ -91,11 +91,11 @@ jobs:
         run: |
           mkdir ~/.kube
           az aks get-credentials --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ secrets.AZURE_AKS_CLUSTER_NAME }}
-          sed -i 's/marxan.privatelink.westeurope.azmk8s.io/marxan.privatelink.westeurope.azmk8s.io:4433/g' ~/.kube/config
+          sed -i 's/marxan.privatelink.westeurope.azmk8s.io:443/marxan.privatelink.westeurope.azmk8s.io:4433/g' ~/.kube/config
 
       - name: Creating SSH tunnel
         run: |
-          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ secrets.AKS_HOST }}:443 ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} -T &
+          ssh -i ~/.ssh/bastion.key -o StrictHostKeyChecking=no -N -L 4433:${{ secrets.AZURE_AKS_HOST }}:443 ${{ secrets.BASTION_USER }}@${{ secrets.BASTION_HOST }} -T &
 
       - name: Redeploy production pods
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -106,7 +106,7 @@ jobs:
           kubectl rollout restart deployment webshot -n production
 
       - name: Redeploy staging pods
-        if: ${{ github.ref == 'refs/heads/staging' }}
+        if: ${{ github.ref == 'refs/heads/develop' }}
         run: |
           kubectl rollout restart deployment api -n staging
           kubectl rollout restart deployment client -n staging

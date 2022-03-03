@@ -1,4 +1,5 @@
 import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -47,16 +48,25 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     }
 
     const customPlanningArea = Boolean(project.planningAreaGeometryId);
+    const customGrid =
+      customPlanningArea &&
+      project.planningUnitGridShape === PlanningUnitGridShape.FromShapefile;
 
-    return [
+    const components: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
       ExportComponent.newOne(id, ClonePiece.ExportConfig),
       customPlanningArea
         ? ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom)
         : ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
-      // ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
       ...scenarioPieces.flat(),
     ];
+
+    if (customGrid)
+      components.push(
+        ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
+      );
+
+    return components;
   }
 
   private async resolveForScenario(
