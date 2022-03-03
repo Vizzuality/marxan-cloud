@@ -98,13 +98,8 @@ export class ProjectsCrudService extends AppBaseService<
         'bbox',
         'customProtectedAreas',
         'isPublic',
-        'publicMetadata',
       ],
       keyForAttribute: 'camelCase',
-      publicMetadata: {
-        ref: 'id',
-        attributes: ['name', 'description'],
-      },
       scenarios: {
         ref: 'id',
         attributes: [
@@ -328,6 +323,11 @@ export class ProjectsCrudService extends AppBaseService<
       UsersProjectsApiEntity,
       `acl`,
       `${this.alias}.id = acl.project_id`,
+    );
+
+    query.leftJoinAndSelect(
+      'project.publicMetadata',
+      'publicMetadata'
     );
 
     if (namesSearch) {
