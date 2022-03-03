@@ -39,7 +39,6 @@ export class PlanningAreaCustomGridPieceImporter
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, importResourceId, piece } = input;
-
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
       this.logger.error(errorMessage);
@@ -55,6 +54,7 @@ export class PlanningAreaCustomGridPieceImporter
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
+
     await this.processGridFile(
       readableOrError.right,
       planningAreaCustomGridLocation,
@@ -86,7 +86,7 @@ export class PlanningAreaCustomGridPieceImporter
     planningAreaCustomGridLocation: ComponentLocationSnapshot,
     projectId: string,
   ) {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve, reject) => {
       let lastChunkIncompletedData = '';
 
       zipStream
@@ -94,9 +94,8 @@ export class PlanningAreaCustomGridPieceImporter
         .pipe(
           new Transform({
             writableObjectMode: true,
-            transform: (chunk, encoding, callback) => {
+            transform: async (chunk, encoding, callback) => {
               const data = lastChunkIncompletedData + chunk.toString();
-
               const lastNewLineIndex = data.lastIndexOf('\n');
               if (lastNewLineIndex === -1) {
                 lastChunkIncompletedData = data;
@@ -105,28 +104,39 @@ export class PlanningAreaCustomGridPieceImporter
               }
               const processableData = data.substring(0, lastNewLineIndex);
               lastChunkIncompletedData = data.substring(lastNewLineIndex + 1);
+              try {
+                const geomPUs = processableData
+                  .split('\n')
+                  .map(this.parseGridFileLine);
 
-              const geomPUs = processableData
-                .split('\n')
-                .map(this.parseGridFileLine);
+                const values = geomPUs
+                  .map((pu, index) => `($1,$2,ST_GeomFromEWKB($${index + 3}))`)
+                  .join(',');
 
-              const values = geomPUs
-                .map((pu, index) => `($1,$2,ST_GeomFromEWKB($${index + 3}))`)
-                .join(',');
+                const buffers = geomPUs.map((pu) => Buffer.from(pu.geom));
+                await this.geoprocessingEntityManager.query(
+                  `
+                  INSERT INTO planning_units_geom (type,project_id,the_geom)
+                  VALUES ${values}
+                  `,
+                  [PlanningUnitGridShape.FromShapefile, projectId, ...buffers],
+                );
 
-              const buffers = geomPUs.map((pu) => Buffer.from(pu.geom));
-              this.geoprocessingEntityManager.query(
-                `
-              INSERT INTO planning_units_geom (type,project_id,the_geom)
-              VALUES ${values}
-              `,
-                [PlanningUnitGridShape.FromShapefile, projectId, ...buffers],
-              );
-              callback();
+                callback();
+              } catch (err) {
+                callback(err as Error);
+              }
             },
           }),
         )
-        .on('finish', resolve);
+        .on('finish', () => {
+          !lastChunkIncompletedData
+            ? resolve()
+            : reject('couldnt parse grid file');
+        })
+        .on('error', (err) => {
+          reject(err);
+        });
     });
   }
 }
