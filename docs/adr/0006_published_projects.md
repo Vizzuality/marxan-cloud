@@ -5,7 +5,7 @@
 * Deciders: Alicia Arenzana, Kamil Gajowy, Alex Larrañaga, Dominik Ostrowski, Andrea Rota, Maciej Sikorski
 
 ## Context and problem statement
-We need to decide how to implement published projects described [here](../hld/projects/publish/high-level-design.md)
+We need to decide how to implement published projects described [here](../features/project-publishing/high-level-design.md)
 
 ## Decision drivers
 
@@ -50,4 +50,5 @@ We will have to prepare a simple migration, but then we have to maintain the str
 If something already depends on is_public fields it has to be changed.
 
 ## References
-[HLD](../hld/projects/publish)
+
+[High-level design](../features/project-publishing/high-level-design.md)
