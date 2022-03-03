@@ -28,7 +28,7 @@ export const projectResource: BaseServiceResource = {
     singular: 'project',
     plural: 'projects',
   },
-  entitiesAllowedAsIncludes: ['scenarios', 'users', 'publicMetadata'],
+  entitiesAllowedAsIncludes: ['scenarios', 'users'],
 };
 
 @Entity('projects')
@@ -187,12 +187,12 @@ export class Project extends TimeUserEntityMetadata {
     /**
      * This event listener relies on the `publicMetadata` relation to have been
      * loaded, which - when using QueryBuilder via BaseService - may mean that
-     * this will only happen if FetchSpecification's includes `publicMetadata`
-     * as a relation to include. Therefore, if we have no publicMetadata here,
-     * we cannot definitely say that the project is not public, but only that we
-     * don't know, as the project may well not be public, or it may be but
-     * publicMetadata has not been loaded -- hence the undefined here rather
-     * than an outright false.
+     * this will only happen if the relation has been explicitly loaded via
+     * `leftJoinAndSelect()` (or similar, as applicable). Therefore, if we have
+     * no publicMetadata here, we cannot definitely say that the project is not
+     * public, but only that we don't know, as the project may well not be
+     * public, or it may be but publicMetadata has not been loaded -- hence the
+     * undefined here rather than an outright false.
      */
     this.isPublic = this.publicMetadata ? true : undefined;
   }
