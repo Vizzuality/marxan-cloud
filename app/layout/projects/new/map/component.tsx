@@ -38,8 +38,6 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 
   const accessToken = useAccessToken();
 
-  console.log(uploadingPlanningArea);
-
   const LAYERS = [
     useGeoJsonLayer({
       id: 'uploaded-geojson',
