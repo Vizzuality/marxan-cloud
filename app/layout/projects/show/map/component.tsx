@@ -15,11 +15,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useAccessToken } from 'hooks/auth';
 import {
-  /* useAdminPreviewLayer, */
   useLegend,
   usePUCompareLayer,
   usePUGridLayer,
-  /* usePUGridPreviewLayer, */
+  useProyectPlanningAreaLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -91,6 +90,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
   }, [sid1, rawScenariosData, rawScenariosIsFetched]);
 
+  const PlanningAreaLayer = useProyectPlanningAreaLayer({
+    active: rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length,
+    pId: `${pid}`,
+  });
+
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
@@ -121,37 +125,17 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
-  // const AdminPreviewLayer = useAdminPreviewLayer({
-  //   active: (
-  //     rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length
-  //     && (countryId || adminAreaLevel1Id || adminAreaLevel2Id)),
-  //   country: countryId,
-  //   region: adminAreaLevel1Id,
-  //   subregion: adminAreaLevel2Id,
-  // });
-
-  // const PUGridPreviewLayer = usePUGridPreviewLayer({
-  //   active: !sid,
-  //   bbox,
-  //   planningUnitGridShape,
-  //   planningUnitAreakm2: planningUnitAreakm2 || 10,
-  //   options: {
-  //     settings: layerSettings.pugrid,
-  //   },
-  // });
-
   const LAYERS = [
     PUCompareLayer,
     PUGridLayer,
-    // AdminPreviewLayer,
-    // PUGridPreviewLayer,
+    PlanningAreaLayer,
   ].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [
       ...!!sid1 && !sid2 ? ['frequency'] : [],
       ...!!sid1 && !!sid2 ? ['compare'] : [],
-      'pugrid',
+      ...rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? ['pugrid'] : [],
     ],
     options: {
       layerSettings,

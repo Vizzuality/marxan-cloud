@@ -10,7 +10,8 @@ import {
   UseFeaturePreviewLayers,
   UseGeoJSONLayer,
   UseLegend,
-  UsePlanningAreaLayer,
+  UseProyectPlanningAreaLayer,
+  UseProyectGridLayer,
   UsePUCompareLayer,
   UsePUGridLayer,
   UsePUGridPreviewLayer,
@@ -88,14 +89,14 @@ export function useAdminPreviewLayer({
   }, [active, level, guid, cache]);
 }
 
-export function usePlanningAreaLayer({
+export function useProyectPlanningAreaLayer({
   active, pId, cache = 0,
-}: UsePlanningAreaLayer) {
+}: UseProyectPlanningAreaLayer) {
   return useMemo(() => {
     if (!active || !pId) return null;
 
     return {
-      id: `planning-area-preview-layer-${pId}-${cache}`,
+      id: `proyect-planning-area-layer-${pId}-${cache}`,
       type: 'vector',
       source: {
         type: 'vector',
@@ -110,6 +111,36 @@ export function usePlanningAreaLayer({
               'line-color': '#FFF',
               'line-width': 3,
             },
+          },
+        ],
+      },
+    };
+  }, [active, pId, cache]);
+}
+
+export function useProyectGridLayer({
+  active, pId, cache = 0,
+}: UseProyectGridLayer) {
+  return useMemo(() => {
+    if (!active || !pId) return null;
+
+    return {
+      id: `proyect-grid-layer-${pId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/grid/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': COLORS.primary,
+              'line-opacity': 0.5,
+            },
+
           },
         ],
       },
