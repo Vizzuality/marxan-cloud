@@ -13,15 +13,15 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 
-import Loading from 'components/loading';
 import Map from 'components/map';
 
 export interface ScenariosReportMapProps {
+  id: string;
 }
 
-export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
-  const [mapInteractive, setMapInteractive] = useState(false);
-
+export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
+  id,
+}: ScenariosReportMapProps) => {
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
@@ -84,6 +84,26 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     return null;
   };
 
+  useEffect(() => {
+    globalThis.MARXAN = {
+      ...globalThis.MARXAN,
+      maps: {
+        ...globalThis.MARXAN.maps,
+        [id]: false,
+      },
+    };
+  }, []); // eslint-disable-line
+
+  const handleMapLoad = () => {
+    globalThis.MARXAN = {
+      ...globalThis.MARXAN,
+      maps: {
+        ...globalThis.MARXAN.maps,
+        [id]: true,
+      },
+    };
+  };
+
   return (
     <>
       <div
@@ -106,7 +126,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
-          onMapLoad={() => setMapInteractive(true)}
+          onMapLoad={handleMapLoad}
           transformRequest={handleTransformRequest}
         >
           {(map) => {
@@ -118,11 +138,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           }}
         </Map>
       </div>
-      <Loading
-        visible={!mapInteractive}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-        iconClassName="w-10 h-10 text-primary-500"
-      />
     </>
   );
 };

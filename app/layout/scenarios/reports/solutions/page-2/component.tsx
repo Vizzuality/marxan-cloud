@@ -43,8 +43,7 @@ export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
 
       </section>
 
-      <ScenarioReportsMap />
-
+      <ScenarioReportsMap id="report-map-2" />
     </div>
   );
 };

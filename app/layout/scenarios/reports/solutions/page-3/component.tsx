@@ -23,10 +23,19 @@ export const ScenariosReportPage3: React.FC<ScenariosReportPage3Props> = () => {
         <div>
           <p className="pb-2 font-medium">Feature name, target, spf:</p>
           {featuresData.map((f) => {
-            const { featureId, name, marxanSettings: { fpf: spf, prop: target } } = f;
-            return (
-              <p className="leading-5" key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>
-            );
+            const { featureId, name, kind } = f;
+            if (kind === 'plain') {
+              const { marxanSettings: { fpf: spf, prop: target } } = f;
+              return (
+                <p key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>
+              );
+            }
+
+            if (kind === 'withGeoprocessing') {
+              // console.log('hello');
+            }
+
+            return null;
           })}
         </div>
       </section>

@@ -92,7 +92,7 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
           </div>
         </section>
 
-        <ScenarioReportsMap />
+        <ScenarioReportsMap id="report-map-1" />
 
       </div>
     )

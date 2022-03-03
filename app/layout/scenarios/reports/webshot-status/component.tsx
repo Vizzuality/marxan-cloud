@@ -12,6 +12,14 @@ export interface WebShotStatusProps {
 
 }
 
+globalThis.MARXAN = {
+  webshot_ready: false,
+  maps: {
+    'report-map-1': false,
+    'report-map-2': false,
+  },
+};
+
 export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
@@ -65,29 +73,25 @@ export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
     && protectedAreasData && protectedAreasDataIsFetched
     && PUData && PUDataIsFetched
     && featuresData && featuresDataIsFetched
-    && costSurfaceRangeData && costSurfaceRangeDataIsFetched;
+    && costSurfaceRangeData && costSurfaceRangeDataIsFetched
+    && globalThis.MARXAN.maps['report-map-1']
+    && globalThis.MARXAN.maps['report-map-2'];
+
+  console.log({ reportDataIsFetched });
 
   useEffect(() => {
     if (reportDataIsFetched) {
       setTimeout(() => {
+        console.log('WEBSHOT!');
         globalThis.MARXAN = {
+          ...globalThis.MARXAN,
           webshot_ready: true,
-          options: {
-            landscape: true,
-          },
         };
-      }, 3000);
-    } else if (!reportDataIsFetched) {
-      globalThis.MARXAN = {
-        webshot_ready: false,
-      };
+      }, 5000);
     }
   }, [reportDataIsFetched]);
 
-  return (
-    <>
-    </>
-  );
+  return null;
 };
 
 export default WebShotStatus;
