@@ -80,6 +80,8 @@ Tests should cover the common situations that can lead to implicit roles being
 granted or revoked:
 
 ```
+All users roles in project must be replicated in a newly created scenario:
+
 given userA and userB are created,
 given a new project P is created by userA,
 given that userB is granted role R on P
@@ -91,6 +93,8 @@ then userB should be granted role R on the new scenario
 userB)
 
 ```
+All implicit users roles in a scenario should be revoked when revoked in the parent project:
+
 given userA and userB are created,
 given a new project P is created by userA,
 given that userB is granted role R on P
@@ -100,6 +104,8 @@ then userB should have no role on scenario S
 ```
 
 ```
+All changes in roles at project level should also result in updating implict scenario roles:
+
 given userA and userB are created,
 given a new project P is created by userA,
 given that userB is granted role R on P
@@ -110,6 +116,8 @@ then userB's role on scenario S is updated to be R'
 ```
 
 ```
+When a new scenario is created, implicit roles on it should be granted to users with role on the parent project:
+
 given userA and userB are created,
 given a new project P is created by userA,
 given that userA creates a new scenario S in P
