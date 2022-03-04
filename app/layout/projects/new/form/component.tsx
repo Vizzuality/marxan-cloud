@@ -9,7 +9,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import {
-  setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
+  setBbox,
+  setMaxPuAreaSize,
+  setMinPuAreaSize,
+  setUploadingPlanningArea,
+  setUploadingPlanningAreaId,
+  setUploadingGridId,
 } from 'store/slices/projects/new';
 
 import { usePlausible } from 'next-plausible';
@@ -66,6 +71,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       dispatch(setMinPuAreaSize(null));
       dispatch(setMaxPuAreaSize(null));
       dispatch(setUploadingPlanningArea(null));
+      dispatch(setUploadingGridId(null));
     };
   }, [dispatch]);
 
@@ -124,6 +130,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
   const resetPlanningArea = (form) => {
     dispatch(setUploadingPlanningArea(null));
+    dispatch(setUploadingPlanningAreaId(null));
     dispatch(setBbox(null));
 
     const registeredFields = form.getRegisteredFields();
@@ -136,7 +143,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   };
 
   const resetPlanningAreaGrid = (form) => {
-    dispatch(setUploadingPlanningArea(null));
+    dispatch(setUploadingGridId(null));
     dispatch(setBbox(null));
 
     const registeredFields = form.getRegisteredFields();
@@ -303,6 +310,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                                 onChange={(value: string) => {
                                   setPAOptionSelected(value);
                                   resetPlanningArea(form);
+                                  resetPlanningAreaGrid(form);
                                 }}
                               />
                             </Field>

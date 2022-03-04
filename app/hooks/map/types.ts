@@ -23,6 +23,12 @@ export interface UsePlanningAreaPreviewLayer {
   planningAreaId: string;
 }
 
+export interface UseGridPreviewLayer {
+  cache?: number;
+  active?: boolean;
+  gridId: string;
+}
+
 export interface UseProyectPlanningAreaLayer {
   cache?: number;
   active?: boolean;
