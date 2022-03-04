@@ -18,7 +18,7 @@ import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/
 export async function getFixtures() {
   const app = await bootstrapApplication();
   const creatorToken = await GivenUserIsLoggedIn(app, 'aa');
-  const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
+  const ownerToken = await GivenUserIsLoggedIn(app, 'dd');
   const creatorUserId = await GivenUserExists(app, 'aa');
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerUserId = await GivenUserExists(app, 'cc');
@@ -122,11 +122,7 @@ export async function getFixtures() {
       await userProjectsRepo.delete({ userId: ownerUserId, projectId });
     },
 
-    WhenChangingAllUsersRole: async () => {
-      await request(app.getHttpServer())
-        .patch(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${creatorToken}`)
-        .send({ projectId, userId: viewerUserId, roleName: projectOwnerRole });
+    WhenChangingAllUsersExceptCreatorRole: async () => {
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
         .set('Authorization', `Bearer ${creatorToken}`)
@@ -145,7 +141,18 @@ export async function getFixtures() {
         });
       await request(app.getHttpServer())
         .patch(`/api/v1/roles/projects/${projectId}/users`)
-        .set('Authorization', `Bearer ${viewerToken}`)
+        .set('Authorization', `Bearer ${creatorToken}`)
+        .send({
+          projectId,
+          userId: viewerUserId,
+          roleName: projectOwnerRole,
+        });
+    },
+
+    WhenChangingCreatorRoleInProject: async () => {
+      await request(app.getHttpServer())
+        .patch(`/api/v1/roles/projects/${projectId}/users`)
+        .set('Authorization', `Bearer ${ownerToken}`)
         .send({
           projectId,
           userId: creatorUserId,
@@ -188,6 +195,18 @@ export async function getFixtures() {
       );
       expect(creatorUser.roleName).toEqual(scenarioOwnerRole);
     },
+    ThenBothOwnersShouldBeReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data).toHaveLength(2);
+      const creatorUser = response.body.data.find(
+        (user: any) => user.user.id === creatorUserId,
+      );
+      expect(creatorUser.roleName).toEqual(scenarioOwnerRole);
+      const ownerUser = response.body.data.find(
+        (user: any) => user.user.id === creatorUserId,
+      );
+      expect(ownerUser.roleName).toEqual(scenarioOwnerRole);
+    },
     ThenUsersWithChangedRolesShouldBeReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
       expect(response.body.data).toHaveLength(4);
@@ -202,7 +221,7 @@ export async function getFixtures() {
       const viewerUser = response.body.data.find(
         (user: any) => user.user.id === viewerUserId,
       );
-      expect(viewerUser.roleName).toEqual(scenarioContributorRole);
+      expect(viewerUser.roleName).toEqual(scenarioOwnerRole);
       const ownerUser = response.body.data.find(
         (user: any) => user.user.id === ownerUserId,
       );

@@ -56,6 +56,22 @@ test(`All users roles in scenario should be revoked when revoked in project`, as
   fixtures.ThenOnlyCreatorIsReturned(response);
 });
 
+test(`It fails to change the scenario owner role of the creator of the scenario as it is a explicit role`, async () => {
+  await fixtures.GivenProjectWasCreated();
+  const creatorToken = await fixtures.GivenUserIsLoggedIn('owner');
+
+  await fixtures.GivenOwnerWasAddedToProject();
+
+  const scenarioId = await fixtures.GivenScenarioWasCreated();
+
+  await fixtures.WhenChangingCreatorRoleInProject();
+  const response = await fixtures.WhenGettingScenarioUsers(
+    scenarioId,
+    creatorToken,
+  );
+  fixtures.ThenBothOwnersShouldBeReturned(response);
+});
+
 test(`All changes in roles at project level should also be done at scenario level`, async () => {
   await fixtures.GivenProjectWasCreated();
   const creatorToken = await fixtures.GivenUserIsLoggedIn('owner');
@@ -66,7 +82,7 @@ test(`All changes in roles at project level should also be done at scenario leve
 
   const scenarioId = await fixtures.GivenScenarioWasCreated();
 
-  await fixtures.WhenChangingAllUsersRole();
+  await fixtures.WhenChangingAllUsersExceptCreatorRole();
   const response = await fixtures.WhenGettingScenarioUsers(
     scenarioId,
     creatorToken,
