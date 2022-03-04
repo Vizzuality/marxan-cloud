@@ -45,6 +45,7 @@ export class CostTemplateGenerator {
       await runCommandsXL(
         [
           `'${path.join(transformationDirectory, resultFilePrefix + `.json`)}'`,
+          `'field-types=puid:string,cost:double'`,
           '-o',
           `'${path.join(shapefileDirectory, resultFilePrefix + `.shp`)}'`,
         ].join(' '),
