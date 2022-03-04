@@ -1,5 +1,5 @@
 import { Role } from '@marxan-api/modules/access-control/role.api.entity';
-import { Check, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Check, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
@@ -19,11 +19,19 @@ export class UsersScenariosApiEntity {
   scenarioId!: string;
 
   @Check(`role_id`, `LIKE 'scenario_%'`)
-  @PrimaryColumn({
+  @Column({
     type: `varchar`,
     name: `role_id`,
   })
   roleName!: ScenarioRoles;
+
+  @Column({
+    type: 'boolean',
+    name: 'is_implicit',
+    default: false,
+  })
+  isImplicit!: boolean;
+
 
   @ManyToOne(() => Scenario, {
     onDelete: 'CASCADE',

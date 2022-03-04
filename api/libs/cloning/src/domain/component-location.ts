@@ -15,4 +15,8 @@ export class ComponentLocation extends TinyType {
   ) {
     super();
   }
+
+  toSnapshot(): ComponentLocationSnapshot {
+    return { uri: this.uri, relativePath: this.relativePath };
+  }
 }
