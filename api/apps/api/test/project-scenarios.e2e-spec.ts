@@ -51,6 +51,7 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Creating a scenario will fail because the user is a project viewer', async () => {
+    await fixtures.GivenViewerWasAddedToProject();
     const response = await fixtures.WhenCreatingAScenarioAsAProjectViewer();
     fixtures.ThenForbiddenIsReturned(response);
   });
@@ -129,7 +130,6 @@ async function getFixtures() {
   const contributorUserId = await GivenUserExists(app, 'bb');
   const viewerToken = await GivenUserIsLoggedIn(app, 'cc');
   const viewerUserId = await GivenUserExists(app, 'cc');
-  const noScenariosUserToken = await GivenUserIsLoggedIn(app, 'dd');
 
   const randomUserInfo = await GivenUserIsCreated(app);
   const queue = FakeQueue.getByName(queueName);
@@ -137,6 +137,7 @@ async function getFixtures() {
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
 
   const projectContributorRole = ProjectRoles.project_contributor;
+  const projectViewerRole = ProjectRoles.project_viewer;
 
   const { projectId } = await GivenProjectExists(app, ownerToken);
 
@@ -152,6 +153,8 @@ async function getFixtures() {
 
   let scenarioId: string;
   const seedScenarioNames = [
+    'Example scenario 1 Project 1 Org 1',
+    'Example scenario 2 Project 1 Org 1',
     'Example scenario 1 Project 2 Org 2',
     'Example scenario 2 Project 2 Org 2',
   ];
@@ -196,6 +199,13 @@ async function getFixtures() {
         projectId,
         roleName: projectContributorRole,
         userId: contributorUserId,
+      }),
+
+    GivenViewerWasAddedToProject: async () =>
+      await userProjectsRepo.save({
+        projectId,
+        roleName: projectViewerRole,
+        userId: viewerUserId,
       }),
 
     GivenContributorWasAddedToScenario: async () =>
@@ -288,7 +298,7 @@ async function getFixtures() {
     WhenGettingScenariosAsUserWithNoScenarios: async () =>
       await request(app.getHttpServer())
         .get('/api/v1/scenarios')
-        .set('Authorization', `Bearer ${noScenariosUserToken}`),
+        .set('Authorization', `Bearer ${randomUserInfo.accessToken}`),
 
     WhenGettingPaginatedScenariosAsOwner: async () =>
       await request(app.getHttpServer())
