@@ -434,4 +434,44 @@ describe('UsersModule (e2e)', () => {
       expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
     });
   });
+
+  describe('Users - Find by email', () => {
+    let adminToken: string;
+    let adminUserId: string;
+    const cleanups: (() => Promise<void>)[] = [];
+
+    beforeAll(async () => {
+      adminToken = await GivenUserIsLoggedIn(app, 'dd');
+      adminUserId = await GivenUserExists(app, 'dd');
+    });
+
+    afterEach(async () => {
+      for (const cleanup of cleanups.reverse()) {
+        await cleanup();
+      }
+    });
+
+    test('A user can be found by full email', async () => {
+      const userId = await GivenUserExists(app, 'aa');
+      const WhenSearchingUserByFullMail = await request(app.getHttpServer())
+        .get('/api/v1/users/by-email')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ email: 'aa@example.com' });
+      expect(WhenSearchingUserByFullMail.status).toEqual(200);
+      expect(WhenSearchingUserByFullMail.body.data).toBeDefined();
+      expect(WhenSearchingUserByFullMail.body.data.id).toEqual(userId);
+      expect(
+        WhenSearchingUserByFullMail.body.data.attributes.displayName,
+      ).toEqual('User A A');
+    });
+
+    test('Partial email searches return undefined', async () => {
+      const WhenSearchingUserByFullMail = await request(app.getHttpServer())
+        .get('/api/v1/users/by-email')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ email: 'aa@example' });
+      expect(WhenSearchingUserByFullMail.status).toEqual(200);
+      expect(WhenSearchingUserByFullMail.body.data).toBeUndefined();
+    });
+  });
 });

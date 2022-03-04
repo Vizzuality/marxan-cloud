@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { User, userResource } from './user.api.entity';
+import { User, userResource, UserResult } from './user.api.entity';
 
 import { omit } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';

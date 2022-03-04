@@ -41,6 +41,7 @@ import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { isLeft } from 'fp-ts/lib/Either';
+import { assertDefined } from '@marxan/utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -196,6 +197,23 @@ export class UsersController {
     const result = await this.service.deleteAdmin(req.user.id, userIdToDelete);
     if (isLeft(result)) {
       throw new ForbiddenException();
+    }
+  }
+
+  @ApiOperation({
+    description: 'Find users by full email address.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('by-email')
+  async findByEmail(
+    @Body() dto: UpdateUserDTO,
+  ): Promise<UserResult | undefined> {
+    assertDefined(dto.email);
+    const result = await this.service.findByEmail(dto.email);
+    if (result) {
+      return await this.service.serialize(result);
     }
   }
 }
