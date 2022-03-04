@@ -53,6 +53,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
   const onDropAccepted = async (acceptedFiles) => {
+    setLoading(true);
     const f = acceptedFiles[0];
 
     const data = new FormData();
@@ -248,7 +249,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
                               <Loading
                                 visible={loading}
-                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
                                 iconClassName="w-5 h-5 text-primary-500"
                               />
 

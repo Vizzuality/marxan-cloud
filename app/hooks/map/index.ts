@@ -21,6 +21,7 @@ import {
   UsePUCompareLayer,
 
   UseLegend,
+  UseGridPreviewLayer,
 } from './types';
 
 /**
@@ -132,6 +133,37 @@ export function usePlanningAreaPreviewLayer({
       },
     };
   }, [active, planningAreaId, cache]);
+}
+
+export function useGridPreviewLayer({
+  active, gridId, cache = 0,
+}: UseGridPreviewLayer) {
+  return useMemo(() => {
+    if (!active || !gridId) return null;
+
+    return {
+      id: `grid-preview-layer-${gridId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${gridId}/grid/preview/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-width': 1,
+              'line-color': COLORS.primary,
+              'line-opacity': 0.5,
+            },
+
+          },
+        ],
+      },
+    };
+  }, [active, gridId, cache]);
 }
 
 // WDPA preview layer
