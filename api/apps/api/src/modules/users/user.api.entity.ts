@@ -73,6 +73,13 @@ export class User {
   isActive!: boolean;
 
   /**
+   * Whether this user is blocked by a platform admin.
+   */
+  @ApiProperty()
+  @Column('boolean', { name: 'is_blocked' })
+  isBlocked!: boolean;
+
+  /**
    * Whether the user should be considered as deleted. This is used to implement
    * a grace period before full deletion.
    */
