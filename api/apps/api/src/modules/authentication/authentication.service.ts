@@ -96,7 +96,8 @@ export class AuthenticationService {
     password: string;
   }): Promise<User | null> {
     const user = await this.usersService.findByEmail(email);
-    const isUserActive = user && user.isActive && !user.isDeleted;
+    const isUserActive =
+      user && user.isActive && !user.isDeleted && !user.isBlocked;
 
     if (user && isUserActive && (await compare(password, user.passwordHash))) {
       return user;

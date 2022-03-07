@@ -58,6 +58,7 @@ export class UsersService extends AppBaseService<
         'displayName',
         'avatarDataUrl',
         'isActive',
+        'isBlocked',
         'isDeleted',
         'metadata',
         'projects',
@@ -129,8 +130,8 @@ export class UsersService extends AppBaseService<
    */
   static getSanitizedUserMetadata(
     user: User,
-  ): Omit<User, 'passwordHash' | 'isActive' | 'isDeleted'> {
-    return omit(user, ['passwordHash', 'isActive', 'isDeleted']);
+  ): Omit<User, 'passwordHash' | 'isActive' | 'isBlocked' | 'isDeleted'> {
+    return omit(user, ['passwordHash', 'isActive', 'isBlocked', 'isDeleted']);
   }
 
   /**
@@ -227,6 +228,16 @@ export class UsersService extends AppBaseService<
     return (await this.adminRepo.count({ where: { userId } })) > 0;
   }
 
+  private async markAsBlocked(userId: string): Promise<void> {
+    await this.repository.update(
+      { id: userId },
+      {
+        isBlocked: true,
+      },
+    );
+    this.authenticationService.invalidateAllTokensOfUser(userId);
+  }
+
   async getPlatformAdmins(
     userId: string,
   ): Promise<Either<typeof forbiddenError, PlatformAdminEntity[]>> {
@@ -260,6 +271,22 @@ export class UsersService extends AppBaseService<
     }
 
     await this.adminRepo.delete({ userId });
+    return right(void 0);
+  }
+
+  async blockUsers(
+    loggedUserId: string,
+    usersId: string[],
+  ): Promise<Either<typeof forbiddenError, void>> {
+    if (!(await this.isPlatformAdmin(loggedUserId))) {
+      return left(forbiddenError);
+    }
+
+    await Promise.all(
+      usersId.map(async (userId) => {
+        await this.markAsBlocked(userId);
+      }),
+    );
     return right(void 0);
   }
 }

@@ -36,7 +36,7 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { UpdateUserDTO } from './dto/update.user.dto';
+import { BlockUsersBatchDTO, UpdateUserDTO } from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
@@ -194,6 +194,23 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) userIdToDelete: string,
   ): Promise<void> {
     const result = await this.service.deleteAdmin(req.user.id, userIdToDelete);
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+  }
+
+  @ApiOperation({
+    description: 'Block users in a batch.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Patch('admins/block-users')
+  async blockUsers(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Body() dto: BlockUsersBatchDTO,
+  ): Promise<void> {
+    const result = await this.service.blockUsers(req.user.id, dto.userIds);
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
