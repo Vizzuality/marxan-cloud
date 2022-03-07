@@ -86,10 +86,14 @@ INSERT INTO "planning_areas"("the_geom","project_id","id")
   ): Promise<{
     affected?: number | null;
   }> {
-    return await this.planningAreas.delete({
-      projectId: null,
-      createdAt: LessThan(new Date(+now - maxAgeInMs)),
-    });
+    return this.planningAreas
+      .createQueryBuilder()
+      .where('id = project_id')
+      .andWhere('created_at < :unsassignedPlanningAreaDate', {
+        unsassignedPlanningAreaDate: new Date(+now - maxAgeInMs),
+      })
+      .delete()
+      .execute();
   }
 
   private transaction<T>(
