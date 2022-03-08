@@ -434,6 +434,13 @@ describe('UsersModule (e2e)', () => {
       expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
     });
 
+    test('A platform admin should not be able to remove oneself', async () => {
+      const WhenRemovingOneself = await request(app.getHttpServer())
+        .delete(`/api/v1/users/admins/${adminUserId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenRemovingOneself.status).toEqual(400);
+    });
+
     test('A platform admin should be able to block existing users', async () => {
       const username = `${v4()}@example.com`;
       const password = v4();
@@ -457,6 +464,14 @@ describe('UsersModule (e2e)', () => {
           password,
         });
       expect(WhenLoginAsBlockedUser.status).toEqual(401);
+    });
+
+    test('A platform admin should not be able to block oneself', async () => {
+      const WhenBlockingOneself = await request(app.getHttpServer())
+        .patch(`/api/v1/users/admins/block-users`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userIds: [adminUserId] });
+      expect(WhenBlockingOneself.status).toEqual(400);
     });
   });
 });

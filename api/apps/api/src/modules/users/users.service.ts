@@ -28,6 +28,7 @@ import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
 export const forbiddenError = Symbol(`unauthorized access`);
+export const badRequestError = Symbol(`operation not allowed`);
 export const userNotFoundError = Symbol(`user not found in database`);
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -265,7 +266,10 @@ export class UsersService extends AppBaseService<
   async deleteAdmin(
     loggedUserId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<Either<typeof forbiddenError | typeof badRequestError, void>> {
+    if (loggedUserId === userId) {
+      return left(badRequestError);
+    }
     if (!(await this.isPlatformAdmin(loggedUserId))) {
       return left(forbiddenError);
     }
@@ -276,14 +280,17 @@ export class UsersService extends AppBaseService<
 
   async blockUsers(
     loggedUserId: string,
-    usersId: string[],
-  ): Promise<Either<typeof forbiddenError, void>> {
+    userIds: string[],
+  ): Promise<Either<typeof forbiddenError | typeof badRequestError, void>> {
     if (!(await this.isPlatformAdmin(loggedUserId))) {
       return left(forbiddenError);
     }
 
     await Promise.all(
-      usersId.map(async (userId) => {
+      userIds.map(async (userId) => {
+        if (loggedUserId === userId) {
+          return left(badRequestError);
+        }
         await this.markAsBlocked(userId);
       }),
     );
