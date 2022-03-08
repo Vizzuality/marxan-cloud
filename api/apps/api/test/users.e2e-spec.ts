@@ -454,9 +454,8 @@ describe('UsersModule (e2e)', () => {
     test('A user can be found by full email', async () => {
       const userId = await GivenUserExists(app, 'aa');
       const WhenSearchingUserByFullMail = await request(app.getHttpServer())
-        .get('/api/v1/users/by-email')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ email: 'aa@example.com' });
+        .get('/api/v1/users/by-email/aa@example.com')
+        .set('Authorization', `Bearer ${adminToken}`);
       expect(WhenSearchingUserByFullMail.status).toEqual(200);
       expect(WhenSearchingUserByFullMail.body.data).toBeDefined();
       expect(WhenSearchingUserByFullMail.body.data.id).toEqual(userId);
@@ -465,13 +464,11 @@ describe('UsersModule (e2e)', () => {
       ).toEqual('User A A');
     });
 
-    test('Partial email searches return undefined', async () => {
+    test('Partial email searches return bad request because of validation', async () => {
       const WhenSearchingUserByFullMail = await request(app.getHttpServer())
-        .get('/api/v1/users/by-email')
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ email: 'aa@example' });
-      expect(WhenSearchingUserByFullMail.status).toEqual(200);
-      expect(WhenSearchingUserByFullMail.body.data).toBeUndefined();
+        .get('/api/v1/users/by-email/aa@example')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenSearchingUserByFullMail.status).toEqual(400);
     });
   });
 });
