@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { User, userResource, UserResult } from './user.api.entity';
+import { User, userResource } from './user.api.entity';
 
 import { omit } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
@@ -119,6 +119,13 @@ export class UsersService extends AppBaseService<
    */
   async findByEmail(email: string): Promise<User | undefined> {
     return this.repository.findOne({ email: ILike(email.toLowerCase()) });
+  }
+
+  async findByExactEmail(email: string): Promise<User | undefined> {
+    return this.repository
+      .createQueryBuilder('users')
+      .where('LOWER(email) = :email', { email: email.toLowerCase() })
+      .getOne();
   }
 
   /**

@@ -36,7 +36,7 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { UpdateUserDTO } from './dto/update.user.dto';
+import { ExactEmailParamsDTO, UpdateUserDTO } from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
@@ -206,12 +206,11 @@ export class UsersController {
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
-  @Get('by-email')
+  @Get('by-email/:email')
   async findByEmail(
-    @Body() dto: UpdateUserDTO,
+    @Param() params: ExactEmailParamsDTO,
   ): Promise<UserResult | undefined> {
-    assertDefined(dto.email);
-    const result = await this.service.findByEmail(dto.email);
+    const result = await this.service.findByExactEmail(params.email);
     if (result) {
       return await this.service.serialize(result);
     }
