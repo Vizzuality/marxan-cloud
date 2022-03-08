@@ -12,7 +12,6 @@ export class AppConfig {
    * property does not exist.
    */
   static get<T>(property: string, defaultValue?: T): T {
-    // console.dir(config, { depth: Infinity });
     if (config.has(property)) {
       return config.get(property);
     }

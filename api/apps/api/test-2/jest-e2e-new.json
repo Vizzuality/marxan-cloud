@@ -10,7 +10,7 @@
   },
   "setupFilesAfterEnv": [
     "<rootDir>/utils/setEnvVars.ts",
-    "<rootDir>/utils/cleanUp.ts"
+    "<rootDir>/utils/handleDatabase.ts"
   ],
   "moduleNameMapper": {
     "@marxan-api/(.*)": "<rootDir>/../src/$1",

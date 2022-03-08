@@ -1,6 +1,5 @@
-import { Connection, createConnection } from 'typeorm';
+import { Connection, createConnection, MigrationExecutor } from 'typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
-import { TestClientApi } from '../test-client-api';
 
 let apiConnection: Connection;
 let geoConnection: Connection;
@@ -8,6 +7,10 @@ let geoConnection: Connection;
 beforeAll(async () => {
   apiConnection = await createConnection(apiConnections.default);
   geoConnection = await createConnection(apiConnections.geoprocessingDB);
+
+  // We could also run the pending migrations from the code. Would this be useful/correct?
+  await ensureThereAreNotPendingMigrations(apiConnection, 'API');
+  await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
 });
 
 beforeEach(async () => {
@@ -16,7 +19,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await TestClientApi.teardownApps();
+  //await TestClientApi.teardownApps();
 });
 
 afterAll(async () => {
@@ -39,4 +42,24 @@ const clearTables = async (
       `TRUNCATE ${table.tableName} RESTART IDENTITY CASCADE;`,
     );
   }
+};
+
+const ensureThereAreNotPendingMigrations = async (
+  connection: Connection,
+  connectionName: string,
+) => {
+  const pendingMigrations = await new MigrationExecutor(
+    connection,
+    connection.createQueryRunner('master'),
+  ).getPendingMigrations();
+
+  if (pendingMigrations.length)
+    throw new Error(
+      `There are ${
+        pendingMigrations.length
+      } pending migrations for ${connectionName} database: ${pendingMigrations.reduce(
+        (prev, current) => prev + '\n' + current.name,
+        '',
+      )}`,
+    );
 };

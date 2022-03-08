@@ -11,34 +11,34 @@
   },
   "redisApi": {
     "connection": {
-      "host": "marxan-redis",
-      "port": 6379
+      "host": "localhost",
+      "port": 3489
     },
     "concurrency": 50
   },
   "postgresApi": {
     "url": null,
-    "port": 5432,
-    "host": null,
-    "username": null,
-    "password": null,
-    "database": null,
+    "port": 3432,
+    "host": "localhost",
+    "username": "marxan-api",
+    "password": "marxan-api",
+    "database": "marxan-api",
     "runMigrationsOnStartup": false,
     "logging": "error"
   },
   "postgresGeoApi": {
     "url": null,
-    "port": 5432,
-    "host": null,
-    "username": null,
-    "password": null,
-    "database": null,
+    "port": 3433,
+    "host": "localhost",
+    "username": "marxan-geo",
+    "password": "marxan-geo",
+    "database": "marxan-geo",
     "runMigrationsOnStartup": false,
     "logging": "error"
   },
   "api": {
-    "url": "http://api:3000",
-    "daemonListenPort": 3000
+    "url": "http://localhost:3130",
+    "daemonListenPort": 3130
   },
   "jobOptions": {
     "removeOnComplete": 100,
@@ -48,11 +48,15 @@
   },
   "auth": {
     "jwt": {
-      "expiresIn": "2h"
+      "expiresIn": "2h",
+      "secret": "secret"
+    },
+    "xApiKey": {
+      "secret": "xapikey"
     }
   },
   "geoprocessing": {
-    "url": "http://geoprocessing:3000"
+    "url": "http://localhost:3000"
   },
   "storage": {
     "sharedFileStorage": {
@@ -82,7 +86,7 @@
     "origin": "https://api.eu.sparkpost.com:443"
   },
   "application": {
-    "baseUrl": "http://localhost:3000"
+    "baseUrl": "http://localhost:3130"
   },
   "passwordReset": {
     "tokenPrefix": "/auth/reset-password?token=",

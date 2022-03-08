@@ -1,7 +1,7 @@
 # GH Actions runners on Ubuntu 18.04 require an older (<= 3.6) Compose file version
 version: "3.6"
 services:
-  api-postgresql:
+  test-e2e-api-postgresql:
     build:
       context: ./postgresql
       dockerfile: Dockerfile
@@ -9,20 +9,20 @@ services:
     volumes:
       - "./api/test/fixtures:/opt"
     ports:
-      - "3542:5432"
+      - "3432:5432"
     environment:
       - POSTGRES_PASSWORD=marxan-api
       - POSTGRES_USER=marxan-api
       - POSTGRES_DB=marxan-api
     restart: on-failure
 
-  test-e2e-postgresql-geo-api:
+  test-e2e-geo-postgresql:
     build:
       context: ./postgresql
       dockerfile: Dockerfile
     container_name: marxan-test-e2e-postgresql-geo-api
     ports:
-      - "3541:5432"
+      - "3433:5432"
     environment:
       - POSTGRES_PASSWORD=marxan-geo
       - POSTGRES_USER=marxan-geo

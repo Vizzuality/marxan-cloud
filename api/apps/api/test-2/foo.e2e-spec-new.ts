@@ -1,11 +1,9 @@
-import { createClient } from './test-client-api';
+import { TestClientApi } from './test-client-api';
 
 describe('Foo', () => {
   it('works', async () => {
-    const client = await createClient();
-    const foo = await client.utils.createWorkingUser();
+    const api = await TestClientApi.initialize();
 
-    console.log(foo);
     expect(1).toBe(1);
   });
 });

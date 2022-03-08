@@ -40,3 +40,18 @@ export class ImportArchive {
     return right(importRequest.importId.value);
   }
 }
+function say(str: string) {
+  console.log(str);
+}
+type Car = {
+  id: number;
+  model: string;
+};
+
+export const main = (cars: Car[]) => {
+  for (const car of cars) {
+    if (car.model === 'Focus') {
+      say(`I found a Ford Focus with id: ${car.id}`);
+    }
+  }
+};

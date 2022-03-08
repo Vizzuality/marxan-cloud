@@ -1,10 +1,5 @@
-import {
-  ClonePiece,
-  ComponentId,
-  ComponentLocation,
-  ResourceId,
-} from '@marxan/cloning/domain';
-import { ImportComponentSnapshot } from '../import/import-component.snapshot';
+import {ClonePiece, ComponentId, ComponentLocation, ResourceId,} from '@marxan/cloning/domain';
+import {ImportComponentSnapshot} from '../import/import-component.snapshot';
 
 export class ImportComponent {
   private constructor(
@@ -26,6 +21,7 @@ export class ImportComponent {
       snapshot.finished,
     );
   }
+
 
   static newOne(
     resourceId: ResourceId,
@@ -61,3 +57,5 @@ export class ImportComponent {
     };
   }
 }
+
+type Foo = <Omit<ClonePiece, ClonePiece.ExportConfig>>
