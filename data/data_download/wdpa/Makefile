@@ -12,7 +12,7 @@ GEO_FOLDER := data/wdpa/geojson
 
 # @debt
 # need to add as the main admin user through auth and calling for it.
-MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" -c "select id from users limit 1")
+MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" -c "select id from users limit 1")
 
 import: simp
 	for i in $(SIMP_FOLDER)/*.json; do \
@@ -20,8 +20,8 @@ import: simp
 		-nln wdpa -nlt PROMOTE_TO_MULTI \
 		-geomfield the_geom \
 		-t_srs EPSG:4326 -a_srs EPSG:4326 \
-		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
-		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
+		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host=$$GEO_POSTGRES_HOST \
+		port=$$GEO_POSTGRES_PORT user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
 		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .json "$$i")\""; \
 	done;
 	rm -rf $(SIMP_FOLDER)

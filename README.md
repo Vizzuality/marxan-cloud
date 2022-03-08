@@ -29,12 +29,21 @@ they may need some adaptation to run on Windows systems.
 
 ## Platform architecture
 
+In a nutshell, the Marxan solution is composed by the following components:
+- A frontend application accessible through the browser - the `app`
+- A public, backend API - the `api`
+- A geoprocessing-focused service used by the `api` - the `geoprocessing api/application`
+- An HTML-to-PDF service - the `webshot` service
+
+Besides these 4, there are other components that may be used in one-off situations,
+like seeding source data (see `/data`), testing (`/e2e-product-testing`) and others.
+
 See [ARCHITECTURE_infrastructure.md](./docs/ARCHITECTURE_infrastructure.md) for
 details.
 
 ## Dependencies
 
-- [NodeJS](https://nodejs.org/en/) v14.18
+- [NodeJS](https://nodejs.org/en/) v14.18 and v16.14
 - [Yarn](https://classic.yarnpkg.com/) v1
 - [PostgreSQL](https://www.postgresql.org/) v14
 - [Postgis](https://postgis.net/) v3
@@ -49,13 +58,13 @@ etc.), there will be no need to set up email templates within the Sparkpost
 account, and only a Sparkpost API key will be needed (see documentation on
 [environment variables](./ENV_VARS.md) for details on this).
 
-## Running API and Geoprocessing services using Docker
+## Running Marxan using Docker
 
-1. Install Docker (19.03+):
-	* [MacOS](https://docs.docker.com/docker-for-mac/)
-	* [GNU/Linux](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
-2. Install [Docker Compose](https://docs.docker.com/compose/install/)
-3. Create an `.env` at the root of the repository, defining all the required
+Before attempting to use the following steps, be sure to:
+
+- Install Docker (19.03+):
+- Install [Docker Compose](https://docs.docker.com/compose/install/)
+- Create an `.env` at the root of the repository, defining all the required
    [environment variables](./ENV_VARS.md). In most cases, for variables other
    than secrets, the defaults in `env.default` may just work - your mileage may vary.
 
@@ -65,66 +74,20 @@ via a Docker volume.
 
 ### Running the Marxan Cloud platform
 
-Run `make start-api` to start all the backend services and all the required
-database services.
+Run `make start` to start all the 4 services needed to run Marxan, as well as
+the required database services.
 
-To run the frontend app, populate the `app/.env` file according to the [app
-documentation](./app/README.md), then:
+The docker build process may take a few minutes, depending on your hardware,
+software and internet connection. Once completed, the applications will start,
+and you should be able to access the Marxan site on `localhost`, on the port 
+specified as `APP_SERVICE_PORT`.
 
-
-```
-npm install -g yarn
-cd app
-nvm use ## or fnm use, etc. according to the preferred node version manager
-yarn install
-yarn dev
-```
-
-The frontend app will then be available on http://localhost:3000 (or at the URL
-shown when the app starts, if a different port has been configured).
-
-### Seeding a new instance with initial data
-
-Once all the backend services have started for the first time, initial seed data
-must be imported into the new instance. Likewise, after resetting an instance
-via `make clean-slate`, this step must be repeated after having started the
-backend services.
-
-Please make sure to wait for all of the backend services (api, geoprocessing and
-webshot) to fully start as database migrations will be run while the services
-are started: attempting to import seed data before migrations have run fully
-will result in errors.
-
-Importing initial seed data can be done in two distinct ways:
-
-1. Full data (recommended in most cases)
-
-``` bash
-make seed-geodb-data
-```
-
-This will populate the metadata DB and will trigger the geoprocessing ETL
-pipelines to seed the geoDB with the full data that would normally be used in
-staging and production instances.
-
-Please note that this full db set up will require at least 16GB of RAM and 40GB
-of disk space in order to carry out some of these tasks (GADM and WDPA data
-import pipelines). Also, the number of CPU cores will impact the time needed to
-seed a new instance with the complete GADM and WDPA datasets.
-
-2. Small subset of test data
-
-To populate a new instance with a small subset of test data, instead, the
-following command can be used:
-
-``` bash
-make seed-dbs
-```
-
-## Running API and Geoprocessing services natively
+## Running Marxan natively
 
 Make sure you have installed and configured all the [dependencies](#Dependencies) 
 locally. PostgreSQL (with PostGIS) and Redis need to be up and running.
+
+### Running API and Geoprocessing services
 
 When running the API and Geoprocessing services without relying on Docker
 Compose for container orchestration, be sure to review and set the correct
@@ -137,30 +100,45 @@ The included Makefile has some useful build targets (commands) specifically
 targeted at native execution (prefixed with `native-`) that you'll find helpful.
 Refer to the Makefile inline documentation for more details.
 
+If you'd like to run the application directly using Yarn, you can find a 
+`package.json` inside the `/app` folder with dependencies and commands for both
+applications. After installing the nodejs dependencies, this is how you can 
+start either application:
+
+```bash
+// Run the API
+yarn start
+
+// Run the geoprocessing service
+yarn start geoprocessing
+```
+
+### Running the Frontend application
+
+The Frontend application can be found in `/app`. Be sure to populate the
+`.env` file according to the [app documentation](./app/README.md), as well as
+install the necessary nodejs packages. To start the application, run:
+
+```bash
+yarn dev
+```
+
+The frontend app will then be available on http://localhost:3000 (or at the URL
+shown when the app starts, if a different port has been configured).
+
+### Running the webshot service
+
+The webshot service can be found in the `/webshot` folder. After installing
+the necessary nodejs packages, you can start it by running:
+
+```bash
+yarn start:dev
+```
+
 ### Setting up test seed data
 
 ``` bash
 make native-seed-api-with-test-data
-```
-
-### Running the API/Geoprocessing
-
-You can find the source code for the API/Geoprocessing applications inside the
-`api` folder.
-
-Be sure to install the necessary `nodejs` dependencies using `yarn` prior to
-running the applications
-
-To start the API, run:
-
-``` bash
-yarn start
-```
-
-To start the Geoprocessing application, run:
-
-``` bash
-yarn start geoprocessing
 ```
 
 ### Running tests
@@ -194,9 +172,127 @@ Running tests require previously loading the [test seed
 data](#setting-up-test-seed-data), and may modify data in the database - do not
 run tests using a database whose data you don't want to lose.
 
+## Seed data
+
+All fresh installations of Marxan (be it locally for development or in a cloud 
+provider for production) start off with empty databases, that need to be populated
+with seed data before the Marxan platform is fully functional. The seed data you'll
+want to import will depend on the goal of the installation you are currently setting 
+up.
+
+Please make sure to wait for all of the backend services (api, geoprocessing and
+webshot) to fully start as database migrations will be run while the services
+are started: attempting to import seed data before migrations have run fully
+will result in errors.
+
+There are types of seed data available with the application:
+
+- User data: user accounts
+- Geographic data: complex geographic data, like GADM or WDPA
+- Test data: intended only for environments where development or e2e/unit tests
+ execution takes place, and must not be imported in production-grade environments.
+
+Please review the following sections carefully to determine which best fits your needs
+for each deployment
+
+### User data
+
+User data is necessary for all types of Marxan installations, but different user data
+import processes will best fit different use cases. 
+
+There are two ways to create user accounts:
+
+**Using the nodejs CLI**
+
+```bash
+cd api
+yarn run console create:user EMAIL_ADDRESS PASSWORD [-f, --firstname <first name>] [-l, --lastname <last name>] [-d, --displayname <display name>]
+```
+
+**Using Make**
+
+```bash
+// For Marxan running on Docker
+make seed-api-init-data
+// For Marxan running natively
+make native-seed-api-init-data
+```
+
+The first option will allow you to create a custom user, and is targeted at
+environments where user accounts are meaningful - for example, production. To 
+execute this on a cloud hosted version of Marxan, you should run the command
+above on the VM instance/docker container running the `api` application.
+
+In contract, the second approach will batch-create several users with insecure 
+passwords and generic details, and it's only suited for development, testing
+or otherwise ephemeral environments.
+
+### Geographic data
+
+Importing the initial geographic data executes a long-running data ETL pipeline
+that imports large amounts of data from publicly available datasets onto Marxan's
+PostgreSQL server - using both `api` and `geoprocessing` databases. 
+
+**Note**: The geographic data import process assumes the 
+presence of at least a user in the database. If none exists, the process will fail
+with non-descriptive error, so be sure to import [User data](#user-data) first.
+
+The easiest way to execute this data import process is using
+the following make task, which runs a dockerized version of the tool:
+
+``` bash
+make seed-geodb-data
+```
+
+*Note* this process can complete successfully and exit with code 0, 
+but have errors in the output logs. This is expected, and said log errors can be 
+ignored.
+
+The actual implementation can be found in the `/data` folder
+
+This will populate the metadata DB and will trigger the geoprocessing ETL
+pipelines to seed the geoprocessing DB with the full data that is needed for
+production-grade instances of Marxan.
+
+Please note that this full DB set up will require at least 16GB of RAM and 40GB
+of disk space in order to carry out some of these tasks (GADM and WDPA data
+import pipelines). Also, the number of CPU cores will impact the time needed to
+seed a new instance with the complete GADM and WDPA datasets, which will be 1h+ 
+on ideal hardware.
+
+To execute this on a cloud hosted version of Marxan, you have a couple of options:
+- Run the import process locally, while having it connect directly to the remote
+`api` and `geoprocessing` databases
+- Run the import process locally on local running PostgreSQL servers, then export 
+the resulting `.sql` locally and import it remotely.
+
+While geographic data is technically necessary on all Marxan environments,
+there is a faster alternative to import equivalent data on development/test 
+environments, which is discussed in the next section.
+
+#### Test data
+
+Test data includes both user and geographical data described above, as well as
+extra data necessary to run certain types of automated tests. This data is meant
+for development/testing environments only, and should not be imported in production
+environments.
+
+```bash
+// For Marxan running on Docker
+make seed-dbs
+// For Marxan running natively
+make native-seed-api-init-data
+```
+
+These commands will:
+- Import generic user data (equivalent to `seed-api-init-data`/`native-seed-api-init-data` 
+described above)
+- Import a precomputed, subset of the geographical data
+- Create sample/test Marxan resources, like organizations, scenarios, etc.
+
 ## Maintenance
 
-### Resetting data to a clean slate status
+### Resetting data to a clean slate status (docker only)
 
 The main `Makefile` provides a way to reset db instances from scratch. This can
 be useful to do regularly, to avoid keeping obsolete data in the local
@@ -252,6 +348,10 @@ As feature types:
 
 ## Devops
 
+### Infrastructure
+
+Infrastructure code and documentation can be found under `/infrastructure`
+
 ### CI/CD
 
 [CI/CD](https://www.redhat.com/en/topics/devops/what-is-ci-cd) is handled with 
@@ -276,10 +376,6 @@ to be set on GitHub in order to work properly:
 Some of these values are obtained from Terraform output values, which will be documented
 in more detail in the [Infrastructure](#infrastructure) docs.
 
-
-### Infrastructure
-
-Infrastructure code and documentation can be found under `/infrastructure`
 
 ## Bugs
 

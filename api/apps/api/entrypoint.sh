@@ -2,6 +2,10 @@
 set -e
 
 case "$1" in
+    console)
+        echo "Running CLI command"
+        exec yarn run "$@"
+        ;;
     develop)
         echo "Running Development Server"
         exec yarn api:start:dev

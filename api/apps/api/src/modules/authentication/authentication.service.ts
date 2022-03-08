@@ -115,6 +115,8 @@ export class AuthenticationService {
     user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
     user.email = signupDto.email;
+    user.fname = signupDto.fname;
+    user.lname = signupDto.lname;
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
@@ -148,6 +150,30 @@ export class AuthenticationService {
       );
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
+    return newUser;
+  }
+
+  /**
+   * Create a new user from the signup data provided via the CLI. Skips account confirmation
+   */
+  async createCLIUser(signupDto: SignUpDto): Promise<Partial<User>> {
+    const user = new User();
+    user.displayName = signupDto.displayName;
+    user.fname = signupDto.fname;
+    user.lname = signupDto.lname;
+    user.passwordHash = await hash(signupDto.password, 10);
+    user.email = signupDto.email;
+    user.isActive = true;
+    const newUser = UsersService.getSanitizedUserMetadata(
+      await this.usersRepository.save(user),
+    );
+    if (!newUser) {
+      throw new InternalServerErrorException('Error while creating a new user');
+    }
+    await this.apiEventsService.create({
+      topic: newUser.id,
+      kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
+    });
     return newUser;
   }
 
