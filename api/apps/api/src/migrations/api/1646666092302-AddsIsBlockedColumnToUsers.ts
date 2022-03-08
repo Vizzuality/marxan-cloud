@@ -14,7 +14,7 @@ export class AddsIsBlockedColumnToUsers1646666092302
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `
-        ALTER TABLE users_scenarios
+        ALTER TABLE users
             DROP COLUMN is_blocked;
           `,
     );

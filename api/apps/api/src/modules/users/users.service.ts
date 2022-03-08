@@ -282,15 +282,15 @@ export class UsersService extends AppBaseService<
     loggedUserId: string,
     userIds: string[],
   ): Promise<Either<typeof forbiddenError | typeof badRequestError, void>> {
+    if (userIds.includes(loggedUserId)) {
+      return left(badRequestError);
+    }
     if (!(await this.isPlatformAdmin(loggedUserId))) {
       return left(forbiddenError);
     }
 
     await Promise.all(
       userIds.map(async (userId) => {
-        if (loggedUserId === userId) {
-          return left(badRequestError);
-        }
         await this.markAsBlocked(userId);
       }),
     );
