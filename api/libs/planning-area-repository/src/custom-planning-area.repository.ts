@@ -89,7 +89,7 @@ INSERT INTO "planning_areas"("the_geom","project_id","id")
     return this.planningAreas
       .createQueryBuilder()
       .where('id = project_id')
-      .andWhere('created_at < :unsassignedPlanningAreaDate', {
+      .andWhere('created_at < :unassignedPlanningAreaDate', {
         unsassignedPlanningAreaDate: new Date(+now - maxAgeInMs),
       })
       .delete()
