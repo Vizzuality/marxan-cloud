@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddsIsBlockedColumnToUsers1646666092302
+export class AddsUnpublishedColumnPublicProjects1646761240039
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(

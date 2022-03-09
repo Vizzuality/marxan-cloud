@@ -13,7 +13,6 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
 import { FetchSpecification } from 'nestjs-base-service';
 import { UsersService } from '../users/users.service';
-import { assertDefined } from '@marxan/utils';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -50,10 +49,8 @@ export class PublishedProjectCrudService extends AppBaseService<
     info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<PublishedProject>> {
     let showUnpublishedProjects = false;
-    assertDefined(info?.authenticatedUser);
-    if (
-      !(await this.usersService.isPlatformAdmin(info?.authenticatedUser.id))
-    ) {
+    const id = info?.authenticatedUser?.id;
+    if (id && !(await this.usersService.isPlatformAdmin(id))) {
       showUnpublishedProjects = true;
     }
 

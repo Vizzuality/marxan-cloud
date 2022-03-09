@@ -10,6 +10,7 @@ export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const randomUserToken = await GivenUserIsLoggedIn(app);
   const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
+  const adminUserToken = await GivenUserIsLoggedIn(app, 'dd');
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
   );
@@ -25,8 +26,16 @@ export const getFixtures = async () => {
       await request(app.getHttpServer()).get(
         `/api/v1/published-projects/${projectId}`,
       ),
+    WhenGettingPublicProjectAsAdmin: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/published-projects/${projectId}`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
     WhenGettingPublicProjects: async () =>
       await request(app.getHttpServer()).get(`/api/v1/published-projects`),
+    WhenGettingPublicProjectsAsAdmin: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/published-projects`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
     ThenNoProjectIsAvailable: (response: request.Response) => {
       expect(response.body).toEqual({
         data: [],
@@ -72,6 +81,17 @@ export const getFixtures = async () => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].id).toEqual(publicProjectId);
     },
+    ThenPublicProjectWithUnpublishedStatusIsAvailable: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body.data.length).toEqual(1);
+      expect(response.body.data[0].id).toEqual(publicProjectId);
+      expect(response.body.data[0].isUnpublished).toEqual(true);
+    },
+    ThenNoContentIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(204);
+    },
     ThenNotFoundIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(404);
     },
@@ -116,6 +136,23 @@ export const getFixtures = async () => {
         meta: {},
       });
     },
+    ThenPublicProjectDetailsWhileUnpublishedArePresent: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body).toEqual({
+        data: {
+          attributes: {
+            description: null,
+            name: expect.any(String),
+            isUnpublished: true,
+          },
+          id: publicProjectId,
+          type: 'published_projects',
+        },
+        meta: {},
+      });
+    },
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
     },
@@ -127,5 +164,18 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
         .set('Authorization', `Bearer ${notIncludedUserToken}`),
+
+    WhenPublishingAProject: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/publish`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenUnpublishingAProjectAsAdmin: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/unpublish`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
+    WhenUnpublishingAProjectNotAsAdmin: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/unpublish`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
   };
 };
