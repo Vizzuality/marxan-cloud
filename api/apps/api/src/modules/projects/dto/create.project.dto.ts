@@ -11,6 +11,7 @@ import {
   Length,
 } from 'class-validator';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { ProjectHasPlanningAreaIdOrGadmIdIfGridIsGenerated } from '../validators/grid-shape.validator';
 
 /**
  * @todo We have this dto partially duplicated in the geoprocessing service
@@ -57,6 +58,7 @@ export class CreateProjectDTO {
   @ApiPropertyOptional()
   @IsOptional()
   @IsEnum(Object.values(PlanningUnitGridShape))
+  @ProjectHasPlanningAreaIdOrGadmIdIfGridIsGenerated()
   planningUnitGridShape?: PlanningUnitGridShape;
 
   @ApiPropertyOptional()
