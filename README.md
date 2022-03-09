@@ -185,7 +185,7 @@ webshot) to fully start as database migrations will be run while the services
 are started: attempting to import seed data before migrations have run fully
 will result in errors.
 
-There are types of seed data available with the application:
+There are three types of seed data available with the application:
 
 - User data: user accounts
 - Geographic data: complex geographic data, like GADM or WDPA
