@@ -223,7 +223,7 @@ environments where user accounts are meaningful - for example, production. To
 execute this on a cloud hosted version of Marxan, you should run the command
 above on the VM instance/docker container running the `api` application.
 
-In contract, the second approach will batch-create several users with insecure 
+In contrast, the second approach will batch-create several users with insecure 
 passwords and generic details, and it's only suited for development, testing
 or otherwise ephemeral environments.
 
