@@ -112,6 +112,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
                   .join(',');
 
                 const buffers = geomPUs.map((pu) => Buffer.from(pu.geom));
+                // FIXME planning_units_geom does not have project_id column
                 await this.geoprocessingEntityManager.query(
                   `
                   INSERT INTO planning_units_geom (type,project_id,the_geom)

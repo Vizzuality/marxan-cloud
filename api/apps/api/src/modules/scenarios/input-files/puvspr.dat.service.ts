@@ -31,9 +31,11 @@ export class PuvsprDatService {
         group by fd.feature_id
     ) species,
     (
-        select the_geom, spd.puid, spd.scenario_id
+        select the_geom, ppu.puid, spd.scenario_id
         from planning_units_geom pug
-        inner join scenarios_pu_data spd on pug.id = spd.pu_geom_id where spd.scenario_id = '${scenarioId}' order by puid asc
+        inner join projects_pu ppu on pug.id = ppu.geom_id
+        inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
+        where spd.scenario_id = '${scenarioId}' order by ppu.puid asc
     ) pu
     where pu.scenario_id = '${scenarioId}' and species.the_geom && pu.the_geom
     order by puid, feature_id asc;

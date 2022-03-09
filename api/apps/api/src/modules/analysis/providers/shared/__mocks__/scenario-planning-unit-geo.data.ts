@@ -10,10 +10,9 @@ export const validDataWithGivenPuIds = (
 ): ScenariosPlanningUnitGeoEntity[] =>
   puids.map((id, index) => ({
     lockStatus: LockStatus.Unstated,
-    planningUnitMarxanId: index++,
     protectedByDefault: false,
     scenarioId,
-    puGeometryId: v4(),
+    projectPuId: v4(),
     id: id,
     featureList: [],
   }));

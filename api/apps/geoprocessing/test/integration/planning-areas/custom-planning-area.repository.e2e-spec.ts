@@ -9,13 +9,16 @@ import {
   SaveGeoJsonResult,
 } from '@marxan/planning-area-repository';
 import { bootstrapApplication } from '../../utils';
+import { PlanningAreaGarbageCollector } from '../../../src/modules/planning-area/planning-area-garbage-collector.service';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let repository: CustomPlanningAreaRepository;
+let paGarbageCollector: PlanningAreaGarbageCollector;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
   repository = fixtures.getRepository();
+  paGarbageCollector = fixtures.getPlanningAreaGarbageCollector();
 });
 
 afterEach(async () => {
@@ -126,7 +129,7 @@ describe(`when there is an entity created in 2021-03-03T12:00:00Z and gc time is
 
   it(`should garbage collect entity when now is 2021-03-03T12:00:06Z`, async () => {
     // when
-    await repository.deleteUnassignedOldEntries(
+    await paGarbageCollector.collectGarbage(
       gcAge,
       new Date('2021-03-03T12:00:06Z'),
     );
@@ -137,7 +140,7 @@ describe(`when there is an entity created in 2021-03-03T12:00:00Z and gc time is
 
   it(`should not garbage collect entity when now is 2021-03-03T12:00:04Z`, async () => {
     // when
-    await repository.deleteUnassignedOldEntries(
+    await paGarbageCollector.collectGarbage(
       gcAge,
       new Date('2021-03-03T12:00:04Z'),
     );
@@ -151,7 +154,7 @@ describe(`when there is an entity created in 2021-03-03T12:00:00Z and gc time is
     await repository.assignProject(id, '32ce1a52-51cb-4f50-ab41-92c4c5a71f31');
 
     // when
-    await repository.deleteUnassignedOldEntries(
+    await paGarbageCollector.collectGarbage(
       gcAge,
       new Date('2021-03-03T12:00:06Z'),
     );
@@ -188,6 +191,9 @@ async function getFixtures() {
     },
     getRepository() {
       return app.get(CustomPlanningAreaRepository);
+    },
+    getPlanningAreaGarbageCollector() {
+      return app.get(PlanningAreaGarbageCollector);
     },
     getTypeormRepository() {
       return app.get<Repository<PlanningArea>>(

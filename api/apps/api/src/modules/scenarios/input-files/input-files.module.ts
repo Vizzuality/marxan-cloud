@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
-import { ScenarioPuvsprGeoEntity } from '@marxan/scenario-puvspr';
 import { ScenarioFeaturesData } from '@marxan/features';
 import {
   ScenariosPlanningUnitGeoEntity,
@@ -27,7 +26,6 @@ import { InputFilesArchiverService } from './input-files-archiver.service';
     TypeOrmModule.forFeature(
       [
         PlanningUnitsGeom,
-        ScenarioPuvsprGeoEntity,
         ScenarioFeaturesData,
         ScenariosPlanningUnitGeoEntity,
         ScenariosPuCostDataGeo,

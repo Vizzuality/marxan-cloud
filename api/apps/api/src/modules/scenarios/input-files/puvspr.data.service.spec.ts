@@ -1,13 +1,19 @@
 import { Repository } from 'typeorm';
-import { ScenarioPuvsprGeoEntity } from '@marxan/scenario-puvspr';
 import { getConnectionToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 import { PuvsprDatService } from './puvspr.dat.service';
 
+interface Record {
+  scenarioId: string;
+  puId: string;
+  featureId: string;
+  amount: number;
+}
+
 let sut: PuvsprDatService;
-let dataRepo: jest.Mocked<Repository<ScenarioPuvsprGeoEntity>>;
+let dataRepo: jest.Mocked<Repository<Record>>;
 
 beforeEach(async () => {
   const token = getConnectionToken(DbConnections.geoprocessingDB);

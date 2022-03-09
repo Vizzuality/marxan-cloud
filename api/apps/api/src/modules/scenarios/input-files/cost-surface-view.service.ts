@@ -23,9 +23,10 @@ export class CostSurfaceViewService {
   ): Promise<void> {
     responseStream.write([`id`, `cost`, `status`].join(this.#separator));
 
-    const query = await this.spuDataRepo
+    const query = this.spuDataRepo
       .createQueryBuilder('spu')
-      .select(['spu.puid', 'spu.lockin_status', 'spucd.cost'])
+      .select(['ppu.puid', 'spu.lockin_status', 'spucd.cost'])
+      .leftJoin('projects_pu', 'ppu', 'ppu.id = spu.project_pu_id')
       .leftJoin(
         `scenarios_pu_cost_data`,
         `spucd`,
@@ -38,12 +39,12 @@ export class CostSurfaceViewService {
     queryStream.on(
       'data',
       (data: {
-        puid: number;
+        ppu_puid: number;
         lockin_status: number | null;
         spucd_cost: number | null;
       }) => {
         const tsvRow = [
-          data.puid,
+          data.ppu_puid,
           data.spucd_cost ?? 0,
           this.#fixMarxanIssue(data.lockin_status) ?? 0,
         ].join(this.#separator);
