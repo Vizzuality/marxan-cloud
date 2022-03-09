@@ -7,6 +7,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -90,7 +91,7 @@ export class PublishProjectController {
     return;
   }
 
-  @Post(':id/unpublish')
+  @Patch(':id/unpublish')
   @ApiNoContentResponse()
   @ApiNotFoundResponse()
   @ApiForbiddenResponse()

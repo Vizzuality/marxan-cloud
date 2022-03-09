@@ -83,7 +83,13 @@ export const getFixtures = async () => {
     ) => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].id).toEqual(publicProjectId);
-      expect(response.body.data[0].isUnpublished).toEqual(true);
+      expect(response.body.data[0].attributes.isUnpublished).toEqual(true);
+    },
+    ThenOkIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+    },
+    ThenCreatedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(201);
     },
     ThenNoContentIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(204);
@@ -125,6 +131,7 @@ export const getFixtures = async () => {
           attributes: {
             description: null,
             name: expect.any(String),
+            isUnpublished: false,
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -167,11 +174,11 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenUnpublishingAProjectAsAdmin: async (projectId: string) =>
       await request(app.getHttpServer())
-        .post(`/api/v1/projects/${projectId}/unpublish`)
+        .patch(`/api/v1/projects/${projectId}/unpublish`)
         .set('Authorization', `Bearer ${adminUserToken}`),
     WhenUnpublishingAProjectNotAsAdmin: async (projectId: string) =>
       await request(app.getHttpServer())
-        .post(`/api/v1/projects/${projectId}/unpublish`)
+        .patch(`/api/v1/projects/${projectId}/unpublish`)
         .set('Authorization', `Bearer ${randomUserToken}`),
   };
 };
