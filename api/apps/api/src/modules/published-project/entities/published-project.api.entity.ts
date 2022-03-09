@@ -12,6 +12,9 @@ export class PublishedProject {
   @Column('character varying')
   description?: string;
 
+  @Column('boolean', { name: 'is_unpublished', default: false })
+  isUnpublished?: boolean;
+
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })
   originalProject?: Project;
