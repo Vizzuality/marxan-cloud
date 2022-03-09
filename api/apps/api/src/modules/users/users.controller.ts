@@ -36,11 +36,12 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { UpdateUserDTO } from './dto/update.user.dto';
+import { ExactEmailParamsDTO, UpdateUserDTO } from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { isLeft } from 'fp-ts/lib/Either';
+import { assertDefined } from '@marxan/utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -196,6 +197,22 @@ export class UsersController {
     const result = await this.service.deleteAdmin(req.user.id, userIdToDelete);
     if (isLeft(result)) {
       throw new ForbiddenException();
+    }
+  }
+
+  @ApiOperation({
+    description: 'Find users by full email address.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('by-email/:email')
+  async findByEmail(
+    @Param() params: ExactEmailParamsDTO,
+  ): Promise<UserResult | undefined> {
+    const result = await this.service.findByExactEmail(params.email);
+    if (result) {
+      return await this.service.serialize(result);
     }
   }
 }

@@ -121,6 +121,13 @@ export class UsersService extends AppBaseService<
     return this.repository.findOne({ email: ILike(email.toLowerCase()) });
   }
 
+  async findByExactEmail(email: string): Promise<User | undefined> {
+    return this.repository
+      .createQueryBuilder('users')
+      .where('LOWER(email) = :email', { email: email.toLowerCase() })
+      .getOne();
+  }
+
   /**
    * Assemble a sanitized user object from whitelisted properties of the User
    * entity.
