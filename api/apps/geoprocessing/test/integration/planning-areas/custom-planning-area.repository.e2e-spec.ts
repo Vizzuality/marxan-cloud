@@ -46,10 +46,20 @@ describe(`when entity created`, () => {
         38.20365531807149,
         29.22889003019423,
       ],
-      id: expect.any(String),
+      id: result.id,
       maxPuAreaSize: 940152,
       minPuAreaSize: 103,
     });
+  });
+
+  it('should have equal id and project_id', async () => {
+    const [planning_area] = await fixtures
+      .getTypeormRepository()
+      .find({ id: result.id });
+
+    expect(planning_area).toBeDefined();
+
+    expect(planning_area.id).toEqual(planning_area.projectId);
   });
 
   it(`should find a bbox of entity`, async () => {
