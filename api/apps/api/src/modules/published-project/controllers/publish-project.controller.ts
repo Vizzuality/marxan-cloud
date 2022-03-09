@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -10,6 +12,7 @@ import {
 } from '@nestjs/common';
 import {
   accessDenied,
+  alreadyUnpublished,
   internalError,
   notFound,
   PublishedProjectService,
@@ -60,6 +63,39 @@ export class PublishProjectController {
         case internalError:
         default:
           throw new InternalServerErrorException();
+      }
+    }
+
+    return;
+  }
+
+  @Post(':id/unpublish')
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  async unpublish(
+    @Param('id') id: string,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.publishedProjectService.unpublish(
+      id,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case accessDenied:
+          throw new ForbiddenException();
+        case notFound:
+          throw new NotFoundException();
+        case internalError:
+          throw new InternalServerErrorException();
+        case alreadyUnpublished:
+          throw new BadRequestException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
       }
     }
 

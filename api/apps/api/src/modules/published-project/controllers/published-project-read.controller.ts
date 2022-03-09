@@ -1,5 +1,19 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { PublishedProjectService } from '../published-project.service';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Query,
+  Req,
+} from '@nestjs/common';
+import {
+  accessDenied,
+  PublishedProjectService,
+  notFound,
+  internalError,
+} from '../published-project.service';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -20,6 +34,8 @@ import {
   PublishedProjectResultPlural,
   PublishedProjectResultSingular,
 } from '@marxan-api/modules/published-project/dto/read-result.dtos';
+import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
+import { isLeft } from 'fp-ts/lib/Either';
 
 @ApiBearerAuth()
 @ApiTags(publishedProjectResource.className)
@@ -53,6 +69,7 @@ export class PublishedProjectReadController {
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Req() req: RequestWithAuthenticatedUser,
     @Query('q') namesSearch?: string,
   ): Promise<PublishedProjectResultPlural> {
     const results = await this.publishedProjectService.findAll(
@@ -61,6 +78,7 @@ export class PublishedProjectReadController {
         params: {
           namesSearch,
         },
+        authenticatedUser: req.user,
       },
     );
     return this.serializer.serializeAll(results.data, results.metadata);
@@ -71,10 +89,27 @@ export class PublishedProjectReadController {
   @ApiOkResponse({ type: PublishedProjectResultSingular })
   @Get(':id')
   async getPublishedOne(
+    @Req() req: RequestWithAuthenticatedUser,
     @Param('id') id: string,
   ): Promise<PublishedProjectResultSingular> {
-    return await this.serializer.serialize(
-      await this.publishedProjectService.findOne(id),
-    );
+    const result = await this.publishedProjectService.findOne(id, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case accessDenied:
+          throw new ForbiddenException();
+        case notFound:
+          throw new NotFoundException();
+        case internalError:
+          throw new InternalServerErrorException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return await this.serializer.serialize(result.right);
   }
 }
