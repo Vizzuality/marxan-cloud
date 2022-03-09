@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -15,6 +16,7 @@ import {
 } from '@nestjs/common';
 import { User, userResource, UserResult } from './user.api.entity';
 import {
+  badRequestError,
   forbiddenError,
   userNotFoundError,
   UsersService,
@@ -36,7 +38,7 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { ExactEmailParamsDTO, UpdateUserDTO } from './dto/update.user.dto';
+import { BlockUsersBatchDTO, ExactEmailParamsDTO, UpdateUserDTO } from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
@@ -196,7 +198,40 @@ export class UsersController {
   ): Promise<void> {
     const result = await this.service.deleteAdmin(req.user.id, userIdToDelete);
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case badRequestError:
+          throw new BadRequestException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+  }
+
+  @ApiOperation({
+    description: 'Block users in a batch.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Patch('admins/block-users')
+  async blockUsers(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Body() dto: BlockUsersBatchDTO,
+  ): Promise<void> {
+    const result = await this.service.blockUsers(req.user.id, dto.userIds);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case badRequestError:
+          throw new BadRequestException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
     }
   }
 

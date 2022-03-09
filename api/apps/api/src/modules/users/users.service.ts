@@ -28,6 +28,7 @@ import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
 
 export const forbiddenError = Symbol(`unauthorized access`);
+export const badRequestError = Symbol(`operation not allowed`);
 export const userNotFoundError = Symbol(`user not found in database`);
 @Injectable()
 export class UsersService extends AppBaseService<
@@ -58,6 +59,7 @@ export class UsersService extends AppBaseService<
         'displayName',
         'avatarDataUrl',
         'isActive',
+        'isBlocked',
         'isDeleted',
         'metadata',
         'projects',
@@ -136,8 +138,8 @@ export class UsersService extends AppBaseService<
    */
   static getSanitizedUserMetadata(
     user: User,
-  ): Omit<User, 'passwordHash' | 'isActive' | 'isDeleted'> {
-    return omit(user, ['passwordHash', 'isActive', 'isDeleted']);
+  ): Omit<User, 'passwordHash' | 'isActive' | 'isBlocked' | 'isDeleted'> {
+    return omit(user, ['passwordHash', 'isActive', 'isBlocked', 'isDeleted']);
   }
 
   /**
@@ -234,6 +236,16 @@ export class UsersService extends AppBaseService<
     return (await this.adminRepo.count({ where: { userId } })) > 0;
   }
 
+  private async markAsBlocked(userId: string): Promise<void> {
+    await this.repository.update(
+      { id: userId },
+      {
+        isBlocked: true,
+      },
+    );
+    this.authenticationService.invalidateAllTokensOfUser(userId);
+  }
+
   async getPlatformAdmins(
     userId: string,
   ): Promise<Either<typeof forbiddenError, PlatformAdminEntity[]>> {
@@ -261,12 +273,34 @@ export class UsersService extends AppBaseService<
   async deleteAdmin(
     loggedUserId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, void>> {
+  ): Promise<Either<typeof forbiddenError | typeof badRequestError, void>> {
+    if (loggedUserId === userId) {
+      return left(badRequestError);
+    }
     if (!(await this.isPlatformAdmin(loggedUserId))) {
       return left(forbiddenError);
     }
 
     await this.adminRepo.delete({ userId });
+    return right(void 0);
+  }
+
+  async blockUsers(
+    loggedUserId: string,
+    userIds: string[],
+  ): Promise<Either<typeof forbiddenError | typeof badRequestError, void>> {
+    if (userIds.includes(loggedUserId)) {
+      return left(badRequestError);
+    }
+    if (!(await this.isPlatformAdmin(loggedUserId))) {
+      return left(forbiddenError);
+    }
+
+    await Promise.all(
+      userIds.map(async (userId) => {
+        await this.markAsBlocked(userId);
+      }),
+    );
     return right(void 0);
   }
 }
