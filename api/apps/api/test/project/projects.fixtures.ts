@@ -26,15 +26,11 @@ export const getFixtures = async () => {
       await request(app.getHttpServer()).get(
         `/api/v1/published-projects/${projectId}`,
       ),
-    WhenGettingPublicProjectAsAdmin: async (projectId: string) =>
-      await request(app.getHttpServer())
-        .get(`/api/v1/published-projects/${projectId}`)
-        .set('Authorization', `Bearer ${adminUserToken}`),
     WhenGettingPublicProjects: async () =>
       await request(app.getHttpServer()).get(`/api/v1/published-projects`),
     WhenGettingPublicProjectsAsAdmin: async () =>
       await request(app.getHttpServer())
-        .get(`/api/v1/published-projects`)
+        .get(`/api/v1/projects/published-projects/by-admin`)
         .set('Authorization', `Bearer ${adminUserToken}`),
     ThenNoProjectIsAvailable: (response: request.Response) => {
       expect(response.body).toEqual({

@@ -13,11 +13,12 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '../users/users.service';
 import { assertDefined } from '@marxan/utils';
-import { isLeft } from 'fp-ts/lib/These';
+import { string } from 'fp-ts';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
 export const alreadyUnpublished = Symbol(`this project is not public`);
+export const alreadyPublished = Symbol(`this project is public`);
 export const internalError = Symbol(`internal error`);
 
 export type errors =
@@ -34,23 +35,12 @@ export class PublishedProjectService {
     private readonly usersService: UsersService,
   ) {}
 
-  async getById(
-    id: string,
-  ): Promise<Either<typeof notFound, PublishedProject>> {
-    const result = await this.crudService.getById(id, undefined, undefined);
-
-    if (!result) {
-      return left(notFound);
-    }
-
-    return right(result);
-  }
-
   async publish(
     id: string,
     requestingUserId: string,
-  ): Promise<Either<errors, true>> {
+  ): Promise<Either<errors | typeof alreadyPublished, true>> {
     const project = await this.projectRepository.findOne(id);
+
     if (!project) {
       return left(notFound);
     }
@@ -59,18 +49,19 @@ export class PublishedProjectService {
       return left(accessDenied);
     }
 
-    const existingPublicProject = await this.getById(id);
-
-    if (isLeft(existingPublicProject)) {
-      return existingPublicProject;
-    }
-
     const userIsAdmin = await this.usersService.isPlatformAdmin(
       requestingUserId,
     );
 
-    if (existingPublicProject.right.isUnpublished && !userIsAdmin) {
-      return left(accessDenied);
+    if (userIsAdmin) {
+      const existingPublicProject = await this.crudService.getById(
+        id,
+        undefined,
+        undefined,
+      );
+      if (!existingPublicProject.isUnpublished) {
+        return left(alreadyPublished);
+      }
     }
 
     await this.crudService.create({
@@ -113,25 +104,13 @@ export class PublishedProjectService {
 
   async findOne(
     id: string,
-    info?: ProjectsServiceRequest,
-  ): Promise<Either<errors, PublishedProject | undefined>> {
-    // /ACL slot/
-    assertDefined(info?.authenticatedUser);
-    const { authenticatedUser } = info;
-    const existingPublicProject = await this.crudService.getById(
-      id,
-      undefined,
-      info,
-    );
-
-    const userIsAdmin = await this.usersService.isPlatformAdmin(
-      authenticatedUser.id,
-    );
-
-    if (existingPublicProject.isUnpublished && !userIsAdmin) {
-      return left(accessDenied);
+    info?: ProjectsRequest,
+  ): Promise<PublishedProject | undefined> {
+    try {
+      return await this.crudService.getById(id, undefined, info);
+    } catch (error) {
+      // library-sourced errors are no longer instances of HttpException
+      return undefined;
     }
-
-    return right(existingPublicProject);
   }
 }

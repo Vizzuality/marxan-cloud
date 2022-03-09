@@ -47,14 +47,8 @@ test(`when unpublishing a project as a platform admin`, async () => {
     response,
   );
 
-  // Test that findOne only shows project for admin
   response = await fixtures.WhenGettingPublicProject(projectId);
-  fixtures.ThenForbiddenIsReturned(response);
-  response = await fixtures.WhenGettingPublicProjectAsAdmin(projectId);
-  fixtures.ThenPublicProjectDetailsWhileUnpublishedArePresent(
-    projectId,
-    response,
-  );
+  fixtures.ThenNotFoundIsReturned(response);
 });
 
 test(`when unpublishing a project as not a platform admin`, async () => {

@@ -50,7 +50,7 @@ export class PublishedProjectCrudService extends AppBaseService<
   ): Promise<SelectQueryBuilder<PublishedProject>> {
     let showUnpublishedProjects = false;
     const id = info?.authenticatedUser?.id;
-    if (id && !(await this.usersService.isPlatformAdmin(id))) {
+    if (id && (await this.usersService.isPlatformAdmin(id))) {
       showUnpublishedProjects = true;
     }
 
