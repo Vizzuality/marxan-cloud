@@ -12,6 +12,7 @@ import {
 } from 'class-validator';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { ProjectHasPlanningAreaIdOrGadmIdIfGridIsGenerated } from '../validators/grid-shape.validator';
+import { HasCountryId, HasLevel1AreaId } from '../validators/gadm-id.validator';
 
 /**
  * @todo We have this dto partially duplicated in the geoprocessing service
@@ -47,11 +48,13 @@ export class CreateProjectDTO {
 
   @ApiPropertyOptional()
   @IsString()
+  @HasCountryId()
   @IsOptional()
   adminAreaLevel1Id?: string;
 
   @ApiPropertyOptional()
   @IsString()
+  @HasLevel1AreaId()
   @IsOptional()
   adminAreaLevel2Id?: string;
 

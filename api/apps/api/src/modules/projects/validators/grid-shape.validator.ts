@@ -33,7 +33,7 @@ export function ProjectHasPlanningAreaIdOrGadmIdIfGridIsGenerated() {
           return true;
         },
         defaultMessage(_args: ValidationArguments) {
-          return 'When a regular planning grid is requested (hexagon or square) either a custom planning area or a GADM area gid must be provided.';
+          return 'When a regular planning grid is requested (hexagon or square) either a custom planning area id or a GADM area gid must be provided (including upper levels, if relevant).';
         },
       },
     });
