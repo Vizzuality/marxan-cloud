@@ -132,8 +132,10 @@ export const E2E_CONFIG: {
         countryId: options?.countryCode,
         adminAreaLevel1Id: options?.adminAreaLevel1Id,
         adminAreaLevel2Id: options?.adminAreaLevel2Id,
-        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
-        planningUnitAreakm2: 10,
+        planningUnitGridShape: options?.countryCode
+          ? PlanningUnitGridShape.Hexagon
+          : undefined,
+        planningUnitAreakm2: options?.countryCode ? 10 : undefined,
       }),
       complete: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
