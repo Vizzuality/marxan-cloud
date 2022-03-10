@@ -1,4 +1,5 @@
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { Logger } from '@nestjs/common';
 import { registerDecorator, ValidationArguments } from 'class-validator';
 import { CreateProjectDTO } from '../dto/create.project.dto';
 
@@ -23,12 +24,16 @@ export function ProjectHasPlanningAreaIdOrGadmIdIfGridIsGenerated() {
               PlanningUnitGridShape.Square,
             ].includes(value)
           ) {
-            return Boolean(
+            const validationResult = Boolean(
               planningAreaId ||
                 countryId ||
                 (countryId && adminAreaLevel1Id) ||
                 (countryId && adminAreaLevel1Id && adminAreaLevel2Id),
             );
+            Logger.debug(`grid shape: ${value}`);
+            Logger.debug(`gids: ${planningAreaId} - ${countryId} - ${adminAreaLevel1Id} - ${adminAreaLevel2Id}`);
+            Logger.debug(`validationResult: ${validationResult}`);
+            return validationResult;
           }
           return true;
         },
