@@ -118,11 +118,12 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
+        countryId: 'BWA',
         planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
       }),
       minimalInGivenAdminArea: (options?: {
-        countryCode?: string;
+        countryCode: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
         name?: string;

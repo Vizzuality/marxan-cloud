@@ -50,6 +50,9 @@ export const getFixtures = async () => {
       const { projectId, cleanup } = await GivenProjectExists(
         app,
         randomUserToken,
+        {
+          countryCode: 'BWA',
+        },
       );
       await publishedProjectsRepo.save({
         id: projectId,
@@ -85,7 +88,7 @@ export const getFixtures = async () => {
             adminAreaLevel1Id: null,
             adminAreaLevel2Id: null,
             bbox: null,
-            countryId: null,
+            countryId: expect.any(String),
             description: null,
             createdAt: expect.any(String),
             customProtectedAreas: [],

@@ -36,7 +36,9 @@ export async function getFixtures() {
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
 
-  const { projectId } = await GivenProjectExists(app, creatorToken);
+  const { projectId } = await GivenProjectExists(app, creatorToken, {
+    countryCode: 'BWA',
+  });
 
   let scenarioId: string;
 
