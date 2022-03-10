@@ -43,7 +43,7 @@ export const Item: React.FC<ItemProps> = ({
   lastUpdateDistance,
   style,
   userColors,
-  isPublic,
+  // isPublic,
   onClick,
   onDownload,
   onDuplicate,
@@ -135,23 +135,6 @@ export const Item: React.FC<ItemProps> = ({
                 </p>
               </div>
 
-<<<<<<< HEAD
-              {isPublic && (
-                <div
-                  className={cx({
-                    'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
-                    'opacity-100 bg-primary-500 bg-opacity-20': !!ROLES[projectRole],
-                  })}
-                >
-                  <p className={cx({
-                    'text-primary-500': ROLES[projectRole],
-                  })}
-                  >
-                    Public
-                  </p>
-                </div>
-              )}
-=======
               {/* <div
                 className={cx({
                   'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
@@ -165,7 +148,6 @@ export const Item: React.FC<ItemProps> = ({
                   Public
                 </p>
               </div> */}
->>>>>>> Projects: owner and public styles
 
             </div>
 
