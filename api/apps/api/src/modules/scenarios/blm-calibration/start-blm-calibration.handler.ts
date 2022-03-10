@@ -46,6 +46,8 @@ export class StartBlmCalibrationHandler
     await this.apiEvents.create({
       kind,
       topic: scenarioId,
+      // @todo: remove dependency on job.id - may lead to FK constraint
+      // violations as job ids are not guaranteed to be forever monotonic
       externalId: job.id + kind,
       data: {
         blmValues,

@@ -35,6 +35,8 @@ export class IntersectWithPuHandler
       kind:
         API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1,
       topic: scenarioId,
+      // @todo: remove dependency on job.id - may lead to FK constraint
+      // violations as job ids are not guaranteed to be forever monotonic
       externalId: id,
       data: {},
     });
