@@ -37,9 +37,7 @@ import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
 import Textarea from 'components/forms/textarea';
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 
 import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';

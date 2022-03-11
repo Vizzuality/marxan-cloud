@@ -2,7 +2,12 @@
 
 This document covers the different [environment
 variables](https://en.wikipedia.org/wiki/Environment_variable) supported by
-Marxan Cloud and how these affect the behavior of the platform. These variables
+Marxan Cloud and how these affect the behavior of the platform. 
+
+
+## API and Geoprocessing env vars
+
+These variables
 are imported using [node-config](https://www.npmjs.com/package/config) through
 [this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/api/config/custom-environment-variables.json)
 for the API app, and
@@ -123,8 +128,16 @@ applications.
 * `GEO_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port
   on which the Express daemon of the Geoprocessing service will listen.
   If running the API on the same host as the Geoprocessing application, you 
-  need to modify at least one 
-* `WEBSHOT_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on
+  need to modify at least one.
+
+## Webshot application env vars
+
+* `WEBSHOT_PORT` (number, optional, default is 3000): port on
   which the Express daemon of the Webshot service will listen. If running the
   Webshot service on the same host as other Marxan backend applications, you
   need to modify at least one.
+
+## Frontend application env vars
+
+The frontend application has its own set of env vars, which are documented
+[here](/app/README.md#env-variables).

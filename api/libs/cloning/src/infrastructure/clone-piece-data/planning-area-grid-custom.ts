@@ -6,8 +6,6 @@ export const planningAreaCustomGridGeoJSONRelativePath =
   'project-grid/custom-grid.geojson';
 
 export class PlanningAreaGridCustomTransform extends Transform {
-  firstChunk = true;
-
   constructor() {
     super({
       objectMode: true,
@@ -23,14 +21,8 @@ export class PlanningAreaGridCustomTransform extends Transform {
       geom: chunk.ewkb.toJSON().data,
       puid: parseInt(chunk.puid),
     };
-    const content = `${record.puid},${JSON.stringify(record.geom)}`;
-    const data = (this.firstChunk ? '' : '\n') + content;
-
-    callback(null, data);
-
-    if (this.firstChunk) {
-      this.firstChunk = false;
-    }
+    const content = `${record.puid},${JSON.stringify(record.geom)}\n`;
+    callback(null, content);
   }
 }
 

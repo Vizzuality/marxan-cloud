@@ -27,6 +27,7 @@ export interface ItemProps extends Project {
   lastUpdate: string;
   lastUpdateDistance: string;
   userColors?: Record<string, string>;
+  isPublic: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -42,6 +43,7 @@ export const Item: React.FC<ItemProps> = ({
   lastUpdateDistance,
   style,
   userColors,
+  // isPublic,
   onClick,
   onDownload,
   onDuplicate,

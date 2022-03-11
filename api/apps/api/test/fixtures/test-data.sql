@@ -1,3 +1,8 @@
+INSERT INTO organizations (name, created_by)
+VALUES
+  ('Example Org 1', (SELECT id FROM users WHERE email = 'aa@example.com')),
+  ('Example Org 2', (SELECT id FROM users WHERE email = 'aa@example.com'));
+
 INSERT INTO projects
 (name, organization_id, created_by, description, bbox)
 VALUES

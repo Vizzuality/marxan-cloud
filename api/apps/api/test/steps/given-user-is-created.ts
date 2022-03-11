@@ -9,9 +9,11 @@ import { Repository } from 'typeorm';
 
 export const GivenUserIsCreated = async (
   app: INestApplication,
+  emailUsername?: string,
+  pass?: string,
 ): Promise<AccessToken> => {
-  const email = faker.internet.email();
-  const password = faker.internet.password();
+  const email = emailUsername || faker.internet.email();
+  const password = pass || faker.internet.password();
   const displayName = faker.name.firstName();
 
   const user = new User();
