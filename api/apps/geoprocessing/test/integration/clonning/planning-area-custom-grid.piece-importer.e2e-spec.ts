@@ -1,6 +1,9 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
-import { ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { ImportJobInput } from '@marxan/cloning';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -14,7 +17,7 @@ import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/Either';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { PlanningUnitsGridPieceImporter } from '../../../src/import/pieces-importers/planning-units-grid.piece-importer';
 
@@ -26,7 +29,7 @@ describe(PlanningUnitsGridPieceImporter, () => {
   }, 10_000);
 
   afterEach(async () => {
-    fixtures?.cleanUp();
+    await fixtures?.cleanUp();
   });
 
   it('should fail when planning area grid file is missing in uris array ', async () => {
@@ -77,7 +80,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      TypeOrmModule.forFeature([PlanningUnitsGeom]),
+      TypeOrmModule.forFeature([PlanningUnitsGeom, ProjectsPuEntity]),
       FileRepositoryModule,
     ],
     providers: [
@@ -93,9 +96,16 @@ const getFixtures = async () => {
   const puGeomRepo = sandbox.get<Repository<PlanningUnitsGeom>>(
     getRepositoryToken(PlanningUnitsGeom),
   );
+  const projectsPuRepo = sandbox.get<Repository<ProjectsPuEntity>>(
+    getRepositoryToken(ProjectsPuEntity),
+  );
   return {
     cleanUp: async () => {
-      await puGeomRepo.delete({ projectId });
+      const pus = await projectsPuRepo.find({ projectId });
+      await projectsPuRepo.delete({ projectId });
+      await puGeomRepo.delete({
+        id: In(pus.map((pu) => pu.geomId)),
+      });
     },
     GivenNoGridFileIsAvailable: () => {
       return new ArchiveLocation('not found');
@@ -212,10 +222,14 @@ const getFixtures = async () => {
         },
         ThenPlanningUnitsGeometriesShouldBeInserted: async () => {
           const result = await sut.run(input);
-          const geoms = await puGeomRepo.find({
-            projectId: result.importResourceId,
+          const pus = await projectsPuRepo.find({
+            relations: ['puGeom'],
+            where: {
+              projectId: result.importResourceId,
+            },
           });
-          expect(geoms).toHaveLength(4);
+          expect(pus).toHaveLength(4);
+          expect(pus.every((pu) => pu.puGeom !== undefined)).toBe(true);
         },
       };
     },
