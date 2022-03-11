@@ -1,18 +1,19 @@
-import { Repository } from 'typeorm';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
-import { assertDefined } from '@marxan/utils';
-import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import {
-  PlanningUnitGridShape,
-  ScenariosPuCostDataGeo,
-  ScenariosPuPaDataGeo,
-} from '@marxan/scenarios-planning-unit';
-
 import { CostRangeService } from '@marxan-api/modules/scenarios/cost-range-service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
+import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import {
+  getEntityManagerToken,
+  getRepositoryToken,
+  TypeOrmModule,
+} from '@nestjs/typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
+import { v4 } from 'uuid';
+import { GivenScenarioPuData } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { bootstrapApplication } from '../utils/api-application';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -27,12 +28,11 @@ afterEach(async () => {
 
 it(`should return defaults when no data`, async () => {
   // given
+  const scenarioId = fixtures.getScenarioId();
   const rangeService = fixtures.getRangeService();
   // and no data
   // when
-  const range = await rangeService.getRange(
-    '00000000-0000-0000-0000-000000000001',
-  );
+  const range = await rangeService.getRange(scenarioId);
   // then
   expect(range).toStrictEqual({
     min: 1,
@@ -42,13 +42,12 @@ it(`should return defaults when no data`, async () => {
 
 it(`should return valid min/max while data available`, async () => {
   // given
+  const scenarioId = fixtures.getScenarioId();
   const rangeService = fixtures.getRangeService();
   // and
   await fixtures.GivenCostDataInDbForMultipleScenarios();
   // when
-  const range = await rangeService.getRange(
-    '00000000-0000-0000-0000-000000000001',
-  );
+  const range = await rangeService.getRange(scenarioId);
   // then
   expect(range).toStrictEqual({
     min: -1,
@@ -57,98 +56,80 @@ it(`should return valid min/max while data available`, async () => {
 });
 
 async function getFixtures() {
+  const projectId = v4();
+  const anotherProjectId = v4();
+  const scenarioId = v4();
+  const anotherScenarioId = v4();
   const app = await bootstrapApplication([
     TypeOrmModule.forFeature(
-      [ScenariosPuPaDataGeo],
+      [PlanningUnitsGeom, ProjectsPuEntity, ScenariosPuCostDataGeo],
       DbConnections.geoprocessingDB,
     ),
   ]);
-  const cleanups: (() => Promise<unknown>)[] = [() => app.close()];
-  const planningUnitsGeoms: Repository<PlanningUnitsGeom> = app.get(
+  const entityManager = app.get<EntityManager>(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
+  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> = app.get(
+    getRepositoryToken(ProjectsPuEntity, DbConnections.geoprocessingDB),
+  );
+  const geomsRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
-  const scenariosPuDatas: Repository<ScenariosPuPaDataGeo> = app.get(
-    getRepositoryToken(ScenariosPuPaDataGeo, DbConnections.geoprocessingDB),
-  );
-  const scenarioPuCostDatas: Repository<ScenariosPuCostDataGeo> = app.get(
+  const scenarioPuCostRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
   );
+
   return {
     async GivenCostDataInDbForMultipleScenarios() {
-      const pu = await planningUnitsGeoms.save(
-        planningUnitsGeoms.create({
-          theGeom: {
-            type: 'Point',
-            coordinates: [20.545450150966644, 52.08397788419048],
-          },
-          type: PlanningUnitGridShape.Square,
-          size: 100,
-        }),
+      const { rows: firstScenarioPuData } = await GivenScenarioPuData(
+        entityManager,
+        projectId,
+        scenarioId,
+        3,
       );
-      assertDefined(pu);
-      cleanups.push(async () => {
-        await planningUnitsGeoms.remove(pu);
-      });
-      let planningUnitMarxanId = 0;
-      const puDatas = await scenariosPuDatas.save(
-        [
-          '00000000-0000-0000-0000-000000000001',
-          '00000000-0000-0000-0000-000000000002',
-          '00000000-0000-0000-0000-000000000001',
-          '00000000-0000-0000-0000-000000000002',
-          '00000000-0000-0000-0000-000000000001',
-          '00000000-0000-0000-0000-000000000002',
-        ].map((scenarioId) => ({
-          puGeometryId: pu.id,
-          planningUnitMarxanId: planningUnitMarxanId++,
-          scenarioId,
-          protectedByDefault: true,
-        })),
+      const { rows: secondScenarioPuData } = await GivenScenarioPuData(
+        entityManager,
+        anotherProjectId,
+        anotherScenarioId,
+        3,
       );
-      cleanups.push(async () => {
-        for (const puData of puDatas) {
-          await scenariosPuDatas.remove(puData);
-        }
-      });
-      const puCosts = await scenarioPuCostDatas.save([
-        scenarioPuCostDatas.create({
-          scenariosPuDataId: puDatas[0].id,
+
+      await scenarioPuCostRepo.save([
+        scenarioPuCostRepo.create({
+          scenariosPuDataId: firstScenarioPuData[0].id,
           cost: -1,
         }),
-        scenarioPuCostDatas.create({
-          scenariosPuDataId: puDatas[1].id,
+        scenarioPuCostRepo.create({
+          scenariosPuDataId: secondScenarioPuData[0].id,
           cost: 5,
         }),
-        scenarioPuCostDatas.create({
-          scenariosPuDataId: puDatas[2].id,
+        scenarioPuCostRepo.create({
+          scenariosPuDataId: firstScenarioPuData[1].id,
           cost: 634,
         }),
-        scenarioPuCostDatas.create({
-          scenariosPuDataId: puDatas[3].id,
+        scenarioPuCostRepo.create({
+          scenariosPuDataId: secondScenarioPuData[1].id,
           cost: -5323,
         }),
-        scenarioPuCostDatas.create({
-          scenariosPuDataId: puDatas[4].id,
+        scenarioPuCostRepo.create({
+          scenariosPuDataId: firstScenarioPuData[2].id,
           cost: 4,
         }),
-        scenarioPuCostDatas.create({
-          scenariosPuDataId: puDatas[5].id,
+        scenarioPuCostRepo.create({
+          scenariosPuDataId: secondScenarioPuData[2].id,
           cost: 6,
         }),
       ]);
-      cleanups.push(async () => {
-        for (const puCost of puCosts) {
-          await scenarioPuCostDatas.delete(puCost);
-        }
-      });
     },
     async cleanup() {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
+      const projectPus = await projectsPuRepo.find({ projectId });
+      await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
     },
     getRangeService(): CostRangeService {
       return app.get(CostRangeService);
+    },
+    getScenarioId(): string {
+      return scenarioId;
     },
   };
 }

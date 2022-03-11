@@ -169,13 +169,3 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     });
   }
 }
-
-// WITH foo AS (
-// 	SELECT ST_GeomFromEwkb((obj ->> 'geom')::bytea) as geom, obj ->> 'puid' as puid
-// 	FROM json_array_elements('[
-// 						 	{"puid":4, "geom": "\\x0103000020e610000001000000070000005d5ce4e8cb1c3140c09a48c050792dc04a9dcce8d51f314062d1011d3c702dc0aa3e81325b1c3140bc56378c27672dc047d2587ed6153140bc56378c27672dc07d099355cc12314062d1011d3c702dc0f2cfcb0947163140c09a48c050792dc05d5ce4e8cb1c3140c09a48c050792dc0"}
-// 						 ]') as obj
-// )
-// SELECT pug.id, foo.puid
-// FROM planning_units_geom pug, foo
-// WHERE ST_Equals(pug.the_geom, foo.geom)

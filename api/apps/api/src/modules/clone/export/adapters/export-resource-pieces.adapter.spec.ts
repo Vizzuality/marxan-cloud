@@ -83,6 +83,8 @@ const getFixtures = async () => {
     projectWithCustomPlanningArea
       ? ClonePiece.PlanningAreaCustom
       : ClonePiece.PlanningAreaGAdm,
+    ClonePiece.PlanningUnitsGrid,
+    ClonePiece.PlanningUnitsGridGeojson,
     ClonePiece.ProjectCustomProtectedAreas,
   ];
 

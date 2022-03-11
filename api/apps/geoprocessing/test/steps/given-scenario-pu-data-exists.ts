@@ -4,17 +4,28 @@ import {
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
+import { boolean } from 'fp-ts';
 import { DeepPartial, EntityManager } from 'typeorm';
 import {
   GivenProjectsPu,
   GivenProjectsPuExists,
 } from './given-projects-pu-exists';
 
-// TODO monorepo - copy of api-step
+export interface GivenScenarioPuDataExistsOpts {
+  protectedByDefault: boolean;
+}
+
+const defaultGivenScenarioPuDataExistsOpts: GivenScenarioPuDataExistsOpts = {
+  protectedByDefault: false,
+};
+
 export const GivenScenarioPuDataExists = async (
   entityManager: EntityManager,
   projectId: string,
   scenarioId: string,
+  {
+    protectedByDefault,
+  }: GivenScenarioPuDataExistsOpts = defaultGivenScenarioPuDataExistsOpts,
 ): Promise<ScenariosPlanningUnitGeoEntity[]> => {
   const [first, second, third] = await GivenProjectsPuExists(
     entityManager,
@@ -26,16 +37,19 @@ export const GivenScenarioPuDataExists = async (
       scenarioId,
       lockStatus: LockStatus.Unstated,
       projectPuId: first.id,
+      protectedByDefault,
     },
     {
       scenarioId,
       lockStatus: LockStatus.LockedOut,
       projectPuId: second.id,
+      protectedByDefault,
     },
     {
       scenarioId,
       lockStatus: LockStatus.LockedIn,
       projectPuId: third.id,
+      protectedByDefault,
     },
   ]);
   return rows as ScenariosPlanningUnitGeoEntity[];
