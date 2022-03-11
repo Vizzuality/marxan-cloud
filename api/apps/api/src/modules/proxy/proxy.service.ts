@@ -16,7 +16,6 @@ export class ProxyService {
       this.geoprocessingServiceUrl +
       req.path +
       new URL(req.originalUrl, this.geoprocessingServiceUrl).search;
-    console.log(url);
     get(url, { headers: req.headers }, (response) => {
       // As we're proxying, set status code/message and headers from upstream
       res.statusCode = response.statusCode!;
