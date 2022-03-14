@@ -5,6 +5,7 @@ import {
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
+
 import { useSession } from 'next-auth/client';
 
 import ORGANIZATIONS from 'services/organizations';
