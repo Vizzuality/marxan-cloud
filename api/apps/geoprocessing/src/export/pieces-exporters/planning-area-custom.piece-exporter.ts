@@ -16,7 +16,6 @@ import {
 } from '../pieces/export-piece-processor';
 
 interface PlanningAreaSelectResult {
-  geojson: string;
   ewkb: Buffer;
 }
 

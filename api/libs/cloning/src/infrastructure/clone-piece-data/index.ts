@@ -42,7 +42,7 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ScenarioProtectedAreas]: 2,
   [ClonePiece.ScenarioPlanningUnitsData]: 2,
   [ClonePiece.ScenarioRunResults]: 2,
-  //
+  // Temporal import order
   [ClonePiece.UserUploadedFeatures]: 4,
   [ClonePiece.FeaturesSpecification]: 4,
 };

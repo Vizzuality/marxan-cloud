@@ -14,14 +14,8 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface PlanningAreaSelectResult {
+interface PlanningAreaGeojsonSelectResult {
   geojson: string;
-  ewkb: Buffer;
-}
-
-interface ProjectSelectResult {
-  planning_unit_grid_shape: PlanningUnitGridShape;
-  planning_unit_area_km2: number;
 }
 
 @Injectable()
@@ -47,23 +41,8 @@ export class PlanningAreaCustomGeojsonPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
-      `
-        SELECT planning_unit_grid_shape, planning_unit_area_km2
-        FROM projects
-        WHERE id = $1
-      `,
-      [input.resourceId],
-    );
-
-    if (!project) {
-      const errorMessage = `Project with ID ${input.resourceId} not found`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
     const [planningArea]: [
-      PlanningAreaSelectResult,
+      PlanningAreaGeojsonSelectResult,
     ] = await this.geoprocessingEntityManager.query(
       `
         SELECT ST_AsGeoJSON(the_geom) as geojson
