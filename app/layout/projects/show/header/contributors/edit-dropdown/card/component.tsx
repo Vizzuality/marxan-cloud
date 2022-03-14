@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
-import { useCanEditProject } from 'hooks/permissions';
+import { useOwnsProject } from 'hooks/permissions';
 import { useSaveProjectUserRole, useDeleteProjectUser } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
@@ -34,8 +34,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   const [open, setOpen] = useState(false);
   const [userRole, setUserRole] = useState(ROLES[roleName]);
 
-  const { data: projectRole } = useCanEditProject(pid);
-  const OWNER = projectRole === 'project_owner';
+  const { data: isOwner } = useOwnsProject(pid);
 
   const editProjectUserRoleMutation = useSaveProjectUserRole({
     requestConfig: {
@@ -124,7 +123,7 @@ export const UserCard: React.FC<UserCardProps> = ({
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
         <p className="w-40 text-sm text-black clamp-1">{name}</p>
         <div className="w-40 pr-4">
-          {OWNER && (
+          {isOwner && (
             <Select
               initialSelected={ROLES[roleName]}
               maxHeight={300}
@@ -139,18 +138,18 @@ export const UserCard: React.FC<UserCardProps> = ({
               }}
             />
           )}
-          {!OWNER && (<p className="text-sm text-black">{ROLES[roleName]}</p>)}
+          {!isOwner && (<p className="text-sm text-black">{ROLES[roleName]}</p>)}
         </div>
       </div>
 
       <Button
         className={cx({
           'flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group': true,
-          invisible: !OWNER,
+          invisible: !isOwner,
         })}
         theme="secondary-alt"
         size="xs"
-        disabled={!OWNER}
+        disabled={!isOwner}
         onClick={() => setOpen(true)}
       >
         <span className="text-white group-hover:text-gray-600">Remove</span>
