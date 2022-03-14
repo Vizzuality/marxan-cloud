@@ -82,6 +82,7 @@ export class TestClientApi {
     for await (const app of this.apps) {
       app.close();
     }
+    this.apps = [];
   }
   public static async initialize(overrides = TestClientApi.emptyOverrides) {
     const testingModuleBuilder = Test.createTestingModule({
