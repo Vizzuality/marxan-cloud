@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useCanEditProject } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -32,10 +31,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
   const { addToast } = useToasts();
 
   const { query } = useRouter();
-  const { pid, sid } = query;
-
-  const { data: projectRole } = useCanEditProject(pid);
-  const VIEWER = projectRole === 'project_viewer';
+  const { sid } = query;
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
@@ -155,7 +151,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
                     theme="primary"
                     size="base"
                     className="w-full"
-                    disabled={submitting || VIEWER}
+                    disabled={submitting}
                   >
                     <div className="flex items-center space-x-5">
                       <div className="text-left">

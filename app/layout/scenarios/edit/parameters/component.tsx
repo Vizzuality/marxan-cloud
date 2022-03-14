@@ -12,7 +12,6 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
-import { useCanEditProject } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario, useRunScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -50,8 +49,6 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const { user } = useMe();
 
   const { data: projectData } = useProject(pid);
-  const { data: projectRole } = useCanEditProject(pid);
-  const VIEWER = projectRole === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
@@ -241,7 +238,6 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
                 <Button
                   theme="spacial"
                   size="lg"
-                  disabled={VIEWER}
                   onClick={onRunScenario}
                 >
                   Run scenario
