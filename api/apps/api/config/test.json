@@ -16,6 +16,13 @@
     },
     "concurrency": 50
   },
+  "redis": {
+    "host": "localhost",
+    "port": 3379,
+    "password": null,
+    "useTLS": false,
+    "concurrency" : 50
+  },
   "postgresApi": {
     "url": null,
     "port": 3542,
