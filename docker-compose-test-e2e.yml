@@ -73,10 +73,11 @@ services:
     volumes:
       - "./api/test/fixtures:/opt"
     ports:
-      - "${POSTGRES_API_SERVICE_PORT}:5432"
+      - "3542:5432"
     environment:
-      - POSTGRES_PASSWORD=${API_POSTGRES_PASSWORD}
-      - POSTGRES_USER=${API_POSTGRES_USER}
+      - POSTGRES_PASSWORD=marxan-api
+      - POSTGRES_USER=marxan-api
+      - POSTGRES_DB=marxan-api
     restart: on-failure
 
   test-e2e-postgresql-geo-api:
@@ -85,10 +86,11 @@ services:
       dockerfile: geodb.Dockerfile
     container_name: marxan-test-e2e-postgresql-geo-api
     ports:
-      - "${POSTGRES_GEO_SERVICE_PORT}:5432"
+      - "3541:5432"
     environment:
-      - POSTGRES_PASSWORD=${GEO_POSTGRES_PASSWORD}
-      - POSTGRES_USER=${GEO_POSTGRES_USER}
+      - POSTGRES_PASSWORD=marxan-geo
+      - POSTGRES_USER=marxan-geo
+      - POSTGRES_DB=marxan-geo
     restart: on-failure
 
   test-e2e-redis:
