@@ -412,7 +412,7 @@ export function usePUGridPreviewLayer({
  * PROYECT LAYERS
  *******************************************************************
  */
-export function useProyectPlanningAreaLayer({
+export function useProjectPlanningAreaLayer({
   active, pId, cache = 0,
 }: UseProyectPlanningAreaLayer) {
   return useMemo(() => {
@@ -441,7 +441,7 @@ export function useProyectPlanningAreaLayer({
   }, [active, pId, cache]);
 }
 
-export function useProyectGridLayer({
+export function useProjectGridLayer({
   active, pId, cache = 0,
 }: UseProyectGridLayer) {
   return useMemo(() => {

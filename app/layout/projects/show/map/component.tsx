@@ -18,7 +18,8 @@ import {
   useLegend,
   usePUCompareLayer,
   usePUGridLayer,
-  useProyectPlanningAreaLayer,
+  useProjectPlanningAreaLayer,
+  useProjectGridLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -60,11 +61,6 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const {
     id,
     bbox,
-    // countryId,
-    // adminAreaLevel1Id,
-    // adminAreaLevel2Id,
-    // planningUnitGridShape,
-    // planningUnitAreakm2,
   } = data;
 
   const {
@@ -90,7 +86,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
   }, [sid1, rawScenariosData, rawScenariosIsFetched]);
 
-  const PlanningAreaLayer = useProyectPlanningAreaLayer({
+  const ProjectPlanningAreaLayer = useProjectPlanningAreaLayer({
+    active: rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length,
+    pId: `${pid}`,
+  });
+
+  const ProjectGridLayer = useProjectGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length,
     pId: `${pid}`,
   });
@@ -128,7 +129,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const LAYERS = [
     PUCompareLayer,
     PUGridLayer,
-    PlanningAreaLayer,
+    ProjectPlanningAreaLayer,
+    ProjectGridLayer,
   ].filter((l) => !!l);
 
   const LEGEND = useLegend({
