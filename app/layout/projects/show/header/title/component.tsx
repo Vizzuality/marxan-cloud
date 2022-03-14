@@ -37,8 +37,7 @@ export const Title: React.FC<TitleProps> = () => {
 
   const { data: projectData } = useProject(pid);
 
-  const { data: projectRole } = useCanEditProject(pid);
-  const OWNER = projectRole === 'project_owner';
+  const { data: editable } = useCanEditProject(pid);
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({
@@ -48,7 +47,7 @@ export const Title: React.FC<TitleProps> = () => {
   });
 
   const handleEdition = () => {
-    if (!editting) {
+    if (!editting && !editable) {
       const $input = document.getElementById('form-title-show-project-input');
       setTimeout(() => {
         if ($input instanceof HTMLElement) {
@@ -183,7 +182,7 @@ export const Title: React.FC<TitleProps> = () => {
 
                     {/* BUTTONS */}
                     <div className="relative top-2.5 right-0 flex space-x-2">
-                      {OWNER && !editting && (
+                      {editable && !editting && (
                         <motion.button
                           key="edit-button"
                           type="button"
@@ -207,7 +206,7 @@ export const Title: React.FC<TitleProps> = () => {
                           />
                         </motion.button>
                       )}
-                      {OWNER && editting && (
+                      {editable && editting && (
                         <motion.button
                           key="save-button"
                           type="submit"
@@ -228,7 +227,7 @@ export const Title: React.FC<TitleProps> = () => {
                         </motion.button>
                       )}
 
-                      {OWNER && editting && (
+                      {editable && editting && (
                         <motion.button
                           key="cancel-button"
                           type="button"

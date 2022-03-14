@@ -39,7 +39,11 @@ export function useCanEditProject(projectId) {
 
   const meId = me?.data?.id;
 
-  const editable = projectUsers?.find((r) => r.user.id === meId)?.roleName === ('project_owner' || 'project_contributor');
+  const editorRoles = ['project_owner', 'project_contributor'];
+
+  const roleMe = projectUsers?.find((r) => r.user.id === meId)?.roleName;
+
+  const editable = editorRoles.includes(roleMe);
 
   return useMemo(() => {
     return {
