@@ -39,13 +39,13 @@ export function useCanEditProject(projectId) {
 
   const meId = me?.data?.id;
 
-  const canEdit = projectUsers?.find((r) => r.user.id === meId)?.roleName === ('project_owner' || 'project_contributor');
+  const editable = projectUsers?.find((r) => r.user.id === meId)?.roleName === ('project_owner' || 'project_contributor');
 
   return useMemo(() => {
     return {
-      data: canEdit,
+      data: editable,
     };
-  }, [canEdit]);
+  }, [editable]);
 }
 
 export function useOwnsScenario(projectId) {
@@ -69,11 +69,11 @@ export function useCanEditScenario(projectId) {
 
   const meId = me?.data?.id;
 
-  const canEdit = projectUsers?.find((r) => r.user.id === meId)?.roleName !== ('project_viewer');
+  const editable = projectUsers?.find((r) => r.user.id === meId)?.roleName !== ('project_viewer');
 
   return useMemo(() => {
     return {
-      data: canEdit,
+      data: editable,
     };
-  }, [canEdit]);
+  }, [editable]);
 }

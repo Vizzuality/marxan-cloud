@@ -21,8 +21,8 @@ export const Item: React.FC<ItemSettingsProps> = ({
 }: ItemSettingsProps) => {
   const { query } = useRouter();
   const { pid } = query;
-  const { data: projectRole } = useCanEditProject(pid);
-  const VIEWER = projectRole === 'project_viewer';
+
+  const { data: editable } = useCanEditProject(pid);
 
   return (
     <div className="w-full px-8 pt-6 pb-4 bg-gray-700 rounded-b-3xl">
@@ -34,7 +34,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
             className="flex-shrink-0"
             size="s"
             theme="secondary"
-            disabled={VIEWER}
+            disabled={!editable}
             onClick={onDuplicate}
           >
             Duplicate
@@ -45,7 +45,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
           className="flex-shrink-0"
           size="s"
           theme="secondary"
-          disabled={VIEWER}
+          disabled={!editable}
           onClick={onDelete}
         >
           Delete
