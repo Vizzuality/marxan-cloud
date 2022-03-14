@@ -34,7 +34,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   const [open, setOpen] = useState(false);
   const [userRole, setUserRole] = useState(ROLES[roleName]);
 
-  const { data: isOwner } = useOwnsProject(pid);
+  const isOwner = useOwnsProject(pid);
 
   const editProjectUserRoleMutation = useSaveProjectUserRole({
     requestConfig: {

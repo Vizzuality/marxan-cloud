@@ -12,6 +12,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -48,6 +49,9 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: projectData } = useProject(pid);
+
+  const { data: editable } = useCanEditScenario(pid, sid);
+  console.log({ editable });
 
   const {
     data: scenarioData,

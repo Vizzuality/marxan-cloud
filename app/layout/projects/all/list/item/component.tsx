@@ -56,7 +56,7 @@ export const Item: React.FC<ItemProps> = ({
 
   const { data: projectRole } = useProjectRole(id);
 
-  const { data: isOwner } = useOwnsProject(id);
+  const isOwner = useOwnsProject(id);
 
   const { data: projectUsers } = useProjectUsers(id);
 

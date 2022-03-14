@@ -32,7 +32,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
 
   const { data: projectData } = useProject(pid);
 
-  const { data: isOwner } = useOwnsProject(pid);
+  const isOwner = useOwnsProject(pid);
 
   // const {
   //   data: projectUsers,

@@ -28,7 +28,7 @@ export function useOwnsProject(projectId) {
 
   return useMemo(() => {
     return {
-      data: isOwner,
+      isOwner,
     };
   }, [isOwner]);
 }
@@ -67,13 +67,19 @@ export function useOwnsScenario(projectId) {
   }, [isOwner]);
 }
 
-export function useCanEditScenario(projectId) {
+export function useCanEditScenario(projectId, scenarioId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
 
+  console.log({ scenarioId });
+
   const meId = me?.data?.id;
 
-  const editable = projectUsers?.find((r) => r.user.id === meId)?.roleName !== ('project_viewer');
+  const editorRoles = ['project_owner', 'project_contributor'];
+
+  const roleMe = projectUsers?.find((r) => r.user.id === meId)?.roleName;
+
+  const editable = editorRoles.includes(roleMe);
 
   return useMemo(() => {
     return {
