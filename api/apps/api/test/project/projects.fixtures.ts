@@ -77,13 +77,13 @@ export const getFixtures = async () => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].id).toEqual(publicProjectId);
     },
-    ThenPublicProjectWithUnpublishedStatusIsAvailable: (
+    ThenPublicProjectWithUnderModerationStatusIsAvailable: (
       publicProjectId: string,
       response: request.Response,
     ) => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].id).toEqual(publicProjectId);
-      expect(response.body.data[0].attributes.isUnpublished).toEqual(true);
+      expect(response.body.data[0].attributes.underModeration).toEqual(true);
     },
     ThenOkIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(200);
@@ -131,7 +131,7 @@ export const getFixtures = async () => {
           attributes: {
             description: null,
             name: expect.any(String),
-            isUnpublished: false,
+            underModeration: false,
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -139,7 +139,7 @@ export const getFixtures = async () => {
         meta: {},
       });
     },
-    ThenPublicProjectDetailsWhileUnpublishedArePresent: (
+    ThenPublicProjectDetailsWhileUnderModerationArePresent: (
       publicProjectId: string,
       response: request.Response,
     ) => {
@@ -148,7 +148,7 @@ export const getFixtures = async () => {
           attributes: {
             description: null,
             name: expect.any(String),
-            isUnpublished: true,
+            underModeration: true,
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -172,11 +172,11 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/publish`)
         .set('Authorization', `Bearer ${randomUserToken}`),
-    WhenUnpublishingAProjectAsAdmin: async (projectId: string) =>
+    WhenPlacingUnderModerationAProjectAsAdmin: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/unpublish`)
         .set('Authorization', `Bearer ${adminUserToken}`),
-    WhenUnpublishingAProjectNotAsAdmin: async (projectId: string) =>
+    WhenPlacingUnderModerationAProjectNotAsAdmin: async (projectId: string) =>
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/unpublish`)
         .set('Authorization', `Bearer ${randomUserToken}`),

@@ -1,12 +1,12 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddsUnpublishedColumnPublicProjects1646761240039
+export class AddsUnderModerationColumnPublicProjects1646761240039
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `
         ALTER TABLE published_projects
-            ADD COLUMN is_unpublished boolean NOT NULL DEFAULT false;
+            ADD COLUMN under_moderation boolean NOT NULL DEFAULT false;
     `,
     );
   }
@@ -15,7 +15,7 @@ export class AddsUnpublishedColumnPublicProjects1646761240039
     await queryRunner.query(
       `
         ALTER TABLE published_projects
-            DROP COLUMN is_unpublished; 
+            DROP COLUMN under_moderation; 
           `,
     );
   }

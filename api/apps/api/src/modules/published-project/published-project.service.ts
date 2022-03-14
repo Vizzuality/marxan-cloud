@@ -5,19 +5,14 @@ import { Repository } from 'typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FetchSpecification } from 'nestjs-base-service';
-import {
-  ProjectsRequest,
-  ProjectsServiceRequest,
-} from '@marxan-api/modules/projects/project-requests-info';
+import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-info';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '../users/users.service';
-import { assertDefined } from '@marxan/utils';
-import { string } from 'fp-ts';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
-export const alreadyUnpublished = Symbol(`this project is not public`);
+export const alreadyUnderModeration = Symbol(`this project is not public`);
 export const alreadyPublished = Symbol(`this project is public`);
 export const internalError = Symbol(`internal error`);
 
@@ -59,7 +54,7 @@ export class PublishedProjectService {
         undefined,
         undefined,
       );
-      if (!existingPublicProject.isUnpublished) {
+      if (!existingPublicProject.underModeration) {
         return left(alreadyPublished);
       }
     }
@@ -75,7 +70,7 @@ export class PublishedProjectService {
   async unpublish(
     id: string,
     requestingUserId: string,
-  ): Promise<Either<errors | typeof alreadyUnpublished, true>> {
+  ): Promise<Either<errors | typeof alreadyUnderModeration, true>> {
     const existingPublicProject = await this.crudService.getById(
       id,
       undefined,
@@ -88,12 +83,12 @@ export class PublishedProjectService {
     if (!(await this.usersService.isPlatformAdmin(requestingUserId))) {
       return left(accessDenied);
     }
-    if (existingPublicProject.isUnpublished) {
-      return left(alreadyUnpublished);
+    if (existingPublicProject.underModeration) {
+      return left(alreadyUnderModeration);
     }
 
     await this.crudService.update(id, {
-      isUnpublished: true,
+      underModeration: true,
     });
     return right(true);
   }

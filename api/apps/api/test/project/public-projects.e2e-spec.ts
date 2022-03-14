@@ -35,14 +35,16 @@ test(`when unpublishing a project as a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
   let response = await fixtures.WhenPublishingAProject(projectId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenUnpublishingAProjectAsAdmin(projectId);
+  response = await fixtures.WhenPlacingUnderModerationAProjectAsAdmin(
+    projectId,
+  );
   fixtures.ThenOkIsReturned(response);
 
   // Test that findAll only shows project for admin
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
   response = await fixtures.WhenGettingPublicProjectsAsAdmin();
-  fixtures.ThenPublicProjectWithUnpublishedStatusIsAvailable(
+  fixtures.ThenPublicProjectWithUnderModerationStatusIsAvailable(
     projectId,
     response,
   );
@@ -55,7 +57,9 @@ test(`when unpublishing a project as not a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
   let response = await fixtures.WhenPublishingAProject(projectId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenUnpublishingAProjectNotAsAdmin(projectId);
+  response = await fixtures.WhenPlacingUnderModerationAProjectNotAsAdmin(
+    projectId,
+  );
   fixtures.ThenForbiddenIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenPublicProjectIsAvailable(projectId, response);

@@ -76,7 +76,7 @@ export class PublishedProjectReadController {
     const result = await this.publishedProjectService.findOne(id);
 
     return await this.serializer.serialize(
-      result?.isUnpublished ? undefined : result,
+      result?.underModeration ? undefined : result,
     );
   }
 }

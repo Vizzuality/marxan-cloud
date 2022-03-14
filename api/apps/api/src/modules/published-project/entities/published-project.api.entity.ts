@@ -12,8 +12,8 @@ export class PublishedProject {
   @Column('character varying')
   description?: string;
 
-  @Column('boolean', { name: 'is_unpublished', default: false })
-  isUnpublished?: boolean;
+  @Column('boolean', { name: 'under_moderation', default: false })
+  underModeration?: boolean;
 
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })

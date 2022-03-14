@@ -38,7 +38,7 @@ export class PublishedProjectCrudService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<PublishedProject> {
     return {
-      attributes: ['name', 'description', 'isUnpublished'],
+      attributes: ['name', 'description', 'underModeration'],
       keyForAttribute: 'camelCase',
     };
   }
@@ -48,14 +48,14 @@ export class PublishedProjectCrudService extends AppBaseService<
     fetchSpecification: FetchSpecification,
     info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<PublishedProject>> {
-    let showUnpublishedProjects = false;
+    let showUnderModerationPublishedProjects = false;
     const id = info?.authenticatedUser?.id;
     if (id && (await this.usersService.isPlatformAdmin(id))) {
-      showUnpublishedProjects = true;
+      showUnderModerationPublishedProjects = true;
     }
 
-    query.andWhere('published_project.isUnpublished = :isUnpublished', {
-      isUnpublished: showUnpublishedProjects,
+    query.andWhere('published_project.underModeration = :underModeration', {
+      underModeration: showUnderModerationPublishedProjects,
     });
 
     return query;

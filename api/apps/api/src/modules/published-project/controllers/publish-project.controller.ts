@@ -17,7 +17,7 @@ import {
 import {
   accessDenied,
   alreadyPublished,
-  alreadyUnpublished,
+  alreadyUnderModeration,
   internalError,
   notFound,
   PublishedProjectService,
@@ -113,7 +113,7 @@ export class PublishProjectController {
           throw new NotFoundException();
         case internalError:
           throw new InternalServerErrorException();
-        case alreadyUnpublished:
+        case alreadyUnderModeration:
           throw new BadRequestException();
         default:
           const _exhaustiveCheck: never = result.left;
