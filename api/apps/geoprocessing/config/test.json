@@ -1,6 +1,98 @@
 {
-  "redis": {
-    "host": "test-e2e-redis",
-    "port": "6379"
+  "logging": {
+    "muteAll": "API_LOGGING_MUTE_ALL"
+  },
+  "network": {
+    "cors": {
+      "origins": [
+        "http://localhost:3010"
+      ]
+    }
+  },
+  "redisApi": {
+    "connection": {
+      "host": "localhost",
+      "port": 3379
+    },
+    "concurrency": 50
+  },
+  "postgresApi": {
+    "url": null,
+    "port": 3542,
+    "host": "localhost",
+    "username": "marxan-api",
+    "password": "marxan-api",
+    "database": "marxan-api",
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "postgresGeoApi": {
+    "url": null,
+    "port": 3541,
+    "host": "localhost",
+    "username": "marxan-geo",
+    "password": "marxan-geo",
+    "database": "marxan-geo",
+    "runMigrationsOnStartup": false,
+    "logging": "error"
+  },
+  "api": {
+    "url": "http://localhost:3000",
+    "daemonListenPort": 3000
+  },
+  "jobOptions": {
+    "removeOnComplete": 100,
+    "removeOnFail": 1000,
+    "attempts": 3,
+    "timeout": 60000
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h",
+      "secret": "jwtSecret"
+    },
+    "xApiKey": {
+      "secret": "xApiKeySecret"
+    }
+  },
+  "geoprocessing": {
+    "url": "http://localhosts:3001"
+  },
+  "storage": {
+    "sharedFileStorage": {
+      "localPath": "/tmp/storage"
+    }
+  },
+  "marxan": {
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "input",
+          "PUNAME": "pu.dat",
+          "SPECNAME": "spec.dat",
+          "PUVSPRNAME": "puvspr.dat",
+          "BOUNDNAME": "bound.dat",
+          "OUTPUTDIR": "output"
+        }
+      }
+    }
+  },
+  "fileUploads": {
+    "limits": {
+    }
+  },
+  "sparkpost": {
+    "apikey": "invalidSparkpostApikey",
+    "origin": "https://api.eu.sparkpost.com:443"
+  },
+  "application": {
+    "baseUrl": "http://localhost:3000"
+  },
+  "passwordReset": {
+    "tokenPrefix": "/auth/reset-password?token=",
+    "expiration": 1800000
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "/auth/sign-up-confirmation?token="
   }
 }
