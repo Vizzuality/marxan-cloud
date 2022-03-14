@@ -18,21 +18,6 @@ export function useProjectRole(projectId) {
   }, [projectRole]);
 }
 
-export function useCanEditProject(projectId) {
-  const { data: me } = useMe();
-  const { data: projectUsers } = useProjectUsers(projectId);
-
-  const meId = me?.data?.id;
-
-  const projectRole = projectUsers?.find((r) => r.user.id === meId)?.roleName;
-
-  return useMemo(() => {
-    return {
-      data: projectRole,
-    };
-  }, [projectRole]);
-}
-
 export function useOwnsProject(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
@@ -48,6 +33,21 @@ export function useOwnsProject(projectId) {
   }, [isOwner]);
 }
 
+export function useCanEditProject(projectId) {
+  const { data: me } = useMe();
+  const { data: projectUsers } = useProjectUsers(projectId);
+
+  const meId = me?.data?.id;
+
+  const canEdit = projectUsers?.find((r) => r.user.id === meId)?.roleName === ('project_owner' || 'project_contributor');
+
+  return useMemo(() => {
+    return {
+      data: canEdit,
+    };
+  }, [canEdit]);
+}
+
 export function useOwnsScenario(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
@@ -61,4 +61,19 @@ export function useOwnsScenario(projectId) {
       data: isOwner,
     };
   }, [isOwner]);
+}
+
+export function useCanEditScenario(projectId) {
+  const { data: me } = useMe();
+  const { data: projectUsers } = useProjectUsers(projectId);
+
+  const meId = me?.data?.id;
+
+  const canEdit = projectUsers?.find((r) => r.user.id === meId)?.roleName !== ('project_viewer');
+
+  return useMemo(() => {
+    return {
+      data: canEdit,
+    };
+  }, [canEdit]);
 }

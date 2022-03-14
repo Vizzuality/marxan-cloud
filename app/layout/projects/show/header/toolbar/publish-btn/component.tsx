@@ -4,7 +4,7 @@ import { Form as FormRFF/* , Field as FieldRFF */ } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useCanEditProject } from 'hooks/permissions';
+import { useOwnsProject } from 'hooks/permissions';
 import { useProject, usePublishProject } from 'hooks/projects';
 import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';
@@ -32,8 +32,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
 
   const { data: projectData } = useProject(pid);
 
-  const { data: projectRole } = useCanEditProject(pid);
-  const OWNER = projectRole === 'project_owner';
+  const { data: isOwner } = useOwnsProject(pid);
 
   // const {
   //   data: projectUsers,
@@ -84,6 +83,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
         className="text-white"
         theme="primary-alt"
         size="base"
+        disabled={!isOwner}
         onClick={() => setModal(true)}
       >
         <span className="mr-2.5">Publish to Community</span>
@@ -186,7 +186,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                   Cancel
                 </Button>
                 <Button
-                  disabled={isPublic || !OWNER}
+                  disabled={isPublic || !isOwner}
                   theme="primary"
                   size="base"
                   type="submit"
