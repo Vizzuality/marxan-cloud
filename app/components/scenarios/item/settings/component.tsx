@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 
 import ComingSoon from 'layout/help/coming-soon';
 

@@ -7,7 +7,8 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
-import { useSaveProjectUserRole, useDeleteProjectUser, useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
+import { useSaveProjectUserRole, useDeleteProjectUser } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';

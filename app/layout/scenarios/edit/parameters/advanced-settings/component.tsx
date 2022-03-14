@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 

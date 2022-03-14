@@ -4,7 +4,7 @@ import { Form as FormRFF/* , Field as FieldRFF */ } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useCanEditProject/* , useProjectUsers */ } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useProject, usePublishProject } from 'hooks/projects';
 import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';

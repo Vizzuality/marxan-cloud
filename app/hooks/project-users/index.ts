@@ -115,21 +115,6 @@ export function useProjectUsers(projectId) {
   }, [query, data?.data, user]);
 }
 
-export function useCanEditProject(projectId) {
-  const { data: me } = useMe();
-  const { data: projectUsers } = useProjectUsers(projectId);
-
-  const meId = me?.data?.id;
-
-  const projectRole = projectUsers?.find((r) => r.user.id === meId)?.roleName;
-
-  return useMemo(() => {
-    return {
-      data: projectRole,
-    };
-  }, [projectRole]);
-}
-
 export function useSaveProjectUserRole({
   requestConfig = {
     method: 'PATCH',

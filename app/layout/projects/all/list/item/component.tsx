@@ -9,7 +9,8 @@ import type { Project } from 'types/project-model';
 import { ROLES } from 'utils/constants-roles';
 
 import { useMe } from 'hooks/me';
-import { useCanEditProject, useProjectUsers } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
+import { useProjectUsers } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 

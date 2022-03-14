@@ -12,7 +12,7 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
-import { useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario, useRunScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';

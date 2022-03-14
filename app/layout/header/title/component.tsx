@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';

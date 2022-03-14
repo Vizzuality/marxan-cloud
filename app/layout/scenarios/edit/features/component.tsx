@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';

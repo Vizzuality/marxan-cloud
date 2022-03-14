@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { flatten } from 'lodash';
 
-import { useCanEditProject } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import {
   useDeleteScenario,
