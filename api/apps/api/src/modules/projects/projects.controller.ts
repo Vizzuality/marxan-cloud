@@ -417,6 +417,7 @@ export class ProjectsController {
       throw new ForbiddenException();
     }
     req.url = req.url.replace(result.right.from, result.right.to);
+    req.originalUrl = req.originalUrl.replace(result.right.from, result.right.to);
 
     return await this.proxyService.proxyTileRequest(req, response);
   }
@@ -461,7 +462,13 @@ export class ProjectsController {
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
+
+
+
     req.url = req.url.replace(result.right.from, result.right.to);
+    req.originalUrl = req.originalUrl.replace(result.right.from, result.right.to);
+
+    req.query = result.right.query;
 
     return await this.proxyService.proxyTileRequest(req, response);
   }

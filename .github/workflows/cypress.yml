@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           working-directory: app
-          node-version: '12.13.x'
+          node-version: '14.19.x'
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path

@@ -46,6 +46,7 @@ export const Legend: React.FC<LegendProps> = ({
     <div
       className={cx({
         'bg-black rounded-3xl flex flex-col flex-grow overflow-hidden w-full': true,
+        hidden: !isChildren,
         [className]: !!className,
       })}
     >

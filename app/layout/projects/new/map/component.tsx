@@ -7,7 +7,13 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 // Map
 import { useAccessToken } from 'hooks/auth';
-import { useAdminPreviewLayer, usePUGridPreviewLayer, useGeoJsonLayer } from 'hooks/map';
+import {
+  useGeoJsonLayer,
+  useAdminPreviewLayer,
+  usePUGridPreviewLayer,
+  usePlanningAreaPreviewLayer,
+  useGridPreviewLayer,
+} from 'hooks/map';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
@@ -28,7 +34,9 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 }: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
-  const { bbox, uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
+  const {
+    bbox, uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId,
+  } = useSelector((state) => state['/projects/new']);
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
@@ -44,6 +52,14 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       options: {
         customPAshapefileGrid: paOptionSelected === 'customPAshapefileGrid',
       },
+    }),
+    usePlanningAreaPreviewLayer({
+      active: !!uploadingPlanningAreaId,
+      planningAreaId: uploadingPlanningAreaId,
+    }),
+    useGridPreviewLayer({
+      active: !!uploadingGridId,
+      gridId: uploadingGridId,
     }),
     useAdminPreviewLayer({
       active: true,

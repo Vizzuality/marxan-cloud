@@ -1,4 +1,6 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, {
+  useCallback, useEffect, useLayoutEffect, useState,
+} from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -26,6 +28,18 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   const saveScenarioLockMutation = useSaveScenarioLock({});
   const deleteScenarioLockMutation = useDeleteScenarioLock({});
 
+  const removeScenarioLock = useCallback(() => {
+    deleteScenarioLockMutation.mutate({ sid: `${sid}` });
+  }, [sid, deleteScenarioLockMutation]);
+
+  useEffect(() => {
+    globalThis.addEventListener('beforeunload', removeScenarioLock);
+
+    return () => {
+      globalThis.removeEventListener('beforeunload', removeScenarioLock);
+    };
+  }, []); // eslint-disable-line
+
   // Create a lock if it doesn't exist when you start editing
   useEffect(() => {
     if (!mutatting && !scenarioLockData) {
@@ -42,7 +56,7 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
 
     return () => {
       if (isLockMe) {
-        deleteScenarioLockMutation.mutate({ sid: `${sid}` });
+        removeScenarioLock();
       }
     };
   }, [isLockMe]); // eslint-disable-line
