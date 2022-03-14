@@ -135,3 +135,22 @@ export class ConsoleMailer implements Mailer {
     );
   }
 }
+
+export class FakeMailer implements Mailer {
+  public readonly confirmationTokens: Record<string, string> = {};
+
+  async sendPasswordChangedConfirmation(userId: string): Promise<void> {
+    await Promise.resolve(userId);
+  }
+
+  async sendRecoveryEmail(userId: string, token: string): Promise<void> {
+    await Promise.resolve([userId, token]);
+  }
+
+  async sendSignUpConfirmationEmail(
+    userId: string,
+    token: string,
+  ): Promise<void> {
+    this.confirmationTokens[userId] = token;
+  }
+}

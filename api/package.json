@@ -22,10 +22,14 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "api:test:e2e": "NODE_OPTIONS=\"--max_old_space_size=3072\" jest --config ./apps/api/test/jest-e2e.json",
+    "api:test:e2e:new": "jest --config ./apps/api/test/jest-e2e-new.json",
     "geoprocessing:test:e2e": "jest --config ./apps/geoprocessing/test/jest-e2e.json",
     "ts-coverage": "typescript-coverage-report",
     "api:typeorm": "NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/ormconfig.ts",
-    "geoprocessing:typeorm": "NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts"
+    "api:test:typeorm": "NODE_ENV=test, NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/ormconfig.ts",
+    "geoprocessing:typeorm": "NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts",
+    "geoprocessing:test:typeorm": "NODE_ENV=test, NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts",
+    "test:prepare:db": "yarn api:test:typeorm migration:run -t each && yarn geoprocessing:test:typeorm migration:run -t each"
   },
   "husky": {
     "hooks": {
