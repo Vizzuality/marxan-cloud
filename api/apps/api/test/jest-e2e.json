@@ -1,13 +1,17 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
   "moduleDirectories": ["node_modules", "src"],
-  "testTimeout": 10000,
+  "testTimeout": 6000,
   "rootDir": ".",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
   },
+  "setupFilesAfterEnv": [
+    "<rootDir>/utils/set-env-vars.ts",
+    "<rootDir>/utils/handle-database.ts"
+  ],
   "moduleNameMapper": {
     "@marxan-api/(.*)": "<rootDir>/../src/$1",
     "^@marxan/utils": ["<rootDir>/../../../libs/utils/src"],
