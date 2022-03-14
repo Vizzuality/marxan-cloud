@@ -51,7 +51,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const { data: projectData } = useProject(pid);
 
   const editable = useCanEditScenario(pid, sid);
-  console.log('----> EDITABLE', editable);
 
   const {
     data: scenarioData,
@@ -292,6 +291,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                               size="base"
                               placeholder="Select..."
                               clearSelectionActive
+                              disabled={!editable}
                               selected={values.wdpaIucnCategories.length
                                 ? values.wdpaIucnCategories[0]
                                 : null}
@@ -316,6 +316,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                               clearSelectionLabel="Clear selection"
                               batchSelectionActive
                               batchSelectionLabel="All protected areas"
+                              disabled={!editable}
                               selected={values.wdpaIucnCategories}
                               options={ORDERED_WDPA_CATEGORIES_OPTIONS}
                               onChange={fprops.input.onChange}

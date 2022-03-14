@@ -17,6 +17,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useUploadPA } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -40,7 +41,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
   const formRef = useRef(null);
 
   const [opened, setOpened] = useState(false);
@@ -56,6 +57,8 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   const {
     setCache,
   } = scenarioSlice.actions;
+
+  const editable = useCanEditScenario(pid, sid);
 
   const uploadPAMutation = useUploadPA({
     requestConfig: {
@@ -166,6 +169,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     <Uploader
       caption="Upload your protected area network"
       open={opened}
+      disabled={!editable}
       onOpen={() => {
         setOpened(true);
         setSuccessFile(null);
