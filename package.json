@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@swc/jest": "^0.2.20"
+  }
+}

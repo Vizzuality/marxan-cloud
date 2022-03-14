@@ -39,11 +39,11 @@
   "geoprocessing": {
     "url": "GEOPROCESSING_URL"
   },
-  "redis": {
-    "host": "REDIS_HOST",
-    "port": "REDIS_PORT",
-    "password": "REDIS_PASSWORD",
-    "useTLS": "REDIS_USE_TLS"
+  "redisApi": {
+    "connection": {
+      "host": "REDIS_HOST",
+      "port": "REDIS_API_SERVICE_PORT"
+    }
   },
   "api": {
     "url": "API_SERVICE_URL",
@@ -70,9 +70,9 @@
   },
   "fileUploads": {
     "limits": {
-      "singleGeometry": "API_UPLOAD_SINGLE_MAX_SIZE_MEBIBYTES",
-      "complexGeometryWithoutProperties": "API_UPLOAD_COMPLEX_MAX_SIZE_MEBIBYTES",
-      "complexGeometryWithProperties": "API_UPLOAD_COMPLEX_PROPERTIES_MAX_SIZE_MEBIBYTES"
+      "singleGeometry": "API_UPLOAD_SINGLE_MAX_SIZE",
+      "complexGeometryWithoutProperties": "API_UPLOAD_COMPLEX_MAX_SIZE",
+      "complexGeometryWithProperties": "API_UPLOAD_COMPLEX_PROPERTIES_MAX_SIZE"
     }
   },
   "sparkpost": {
