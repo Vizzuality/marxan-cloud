@@ -2,29 +2,49 @@ import { ComponentLocation, ResourceKind } from '../../domain';
 import { ClonePiece } from '../../domain/clone-piece';
 import { exportConfigRelativePath } from './export-config';
 import { featuresSpecificationRelativePath } from './features-specification';
-import { planningAreaGridGeoJSONRelativePath } from './planning-are-grid-geojson';
+import { planningUnitsGridGeoJSONRelativePath } from './planning-units-grid-geojson';
 import { planningAreaCustomRelativePath } from './planning-area-custom';
 import { planningAreaCustomGeoJSONRelativePath } from './planning-area-custom-geojson';
 import { planningAreaGadmRelativePath } from './planning-area-gadm';
-import { planningAreaCustomGridRelativePath } from './planning-area-grid';
+import { planningUnitsGridRelativePath } from './planning-units-grid';
 import { projectCustomProtectedAreasRelativePath } from './project-custom-protected-areas';
 import { projectMetadataRelativePath } from './project-metadata';
 import { scenarioMetadataRelativePath } from './scenario-metadata';
 import { scenarioProtectedAreasRelativePath } from './scenario-protected-areas';
-import { scenarioPuDataRelativePath } from './scenario-pu-data';
+import { scenarioPlanningUnitsDataRelativePath } from './scenario-planning-units-data';
 import { scenarioRunResultsRelativePath } from './scenario-run-results';
 import { userUploadedFeaturesRelativePath } from './user-uploaded-features';
 
-export const ClonePieceImportOrder: Record<ClonePiece, number> = {
-  // Export config pieces should never be imported. When a import
+export const exportOnlyClonePieces: ClonePiece[] = [
+  ClonePiece.ExportConfig,
+  ClonePiece.PlanningUnitsGridGeojson,
+  ClonePiece.PlanningAreaCustomGeojson,
+];
+
+export const clonePieceImportOrder: Record<ClonePiece, number> = {
+  // ExportConfig pieces should never be imported. When a import
   // request arrives, export config piece is "processed" in ExportConfigReader
   // we keep ClonePiece.ExportConfig key for typing reasons
+  //
+  // PlanningAreaGridGeojson and PlanningAreaCustomGeojson should never be imported
   [ClonePiece.ExportConfig]: -1,
+  [ClonePiece.PlanningUnitsGridGeojson]: -1,
+  [ClonePiece.PlanningAreaCustomGeojson]: -1,
+  //
   [ClonePiece.ProjectMetadata]: 0,
+  //
   [ClonePiece.ScenarioMetadata]: 1,
   [ClonePiece.PlanningAreaGAdm]: 1,
   [ClonePiece.PlanningAreaCustom]: 1,
-  [ClonePiece.PlanningAreaGrid]: 2,
+  [ClonePiece.PlanningUnitsGrid]: 1,
+  [ClonePiece.ProjectCustomProtectedAreas]: 1,
+  //
+  [ClonePiece.ScenarioProtectedAreas]: 2,
+  [ClonePiece.ScenarioPlanningUnitsData]: 2,
+  [ClonePiece.ScenarioRunResults]: 2,
+  //
+  [ClonePiece.UserUploadedFeatures]: 4,
+  [ClonePiece.FeaturesSpecification]: 4,
 };
 
 export class ClonePieceUrisResolver {
@@ -47,11 +67,11 @@ export class ClonePieceUrisResolver {
     [ClonePiece.PlanningAreaCustomGeojson]: (location) => [
       new ComponentLocation(location, planningAreaCustomGeoJSONRelativePath),
     ],
-    [ClonePiece.PlanningAreaGrid]: (location) => [
-      new ComponentLocation(location, planningAreaCustomGridRelativePath),
+    [ClonePiece.PlanningUnitsGrid]: (location) => [
+      new ComponentLocation(location, planningUnitsGridRelativePath),
     ],
-    [ClonePiece.PlanningAreaGridGeojson]: (location) => [
-      new ComponentLocation(location, planningAreaGridGeoJSONRelativePath),
+    [ClonePiece.PlanningUnitsGridGeojson]: (location) => [
+      new ComponentLocation(location, planningUnitsGridGeoJSONRelativePath),
     ],
     [ClonePiece.ProjectMetadata]: (location) => [
       new ComponentLocation(location, projectMetadataRelativePath),
@@ -80,7 +100,7 @@ export class ClonePieceUrisResolver {
         ),
       ];
     },
-    [ClonePiece.ScenarioPuData]: (location, extraData) => {
+    [ClonePiece.ScenarioPlanningUnitsData]: (location, extraData) => {
       if (!extraData)
         throw new Error(
           'It is not possible generate scenario pieces uris without export kind or old scenario id',
@@ -90,8 +110,10 @@ export class ClonePieceUrisResolver {
         new ComponentLocation(
           location,
           extraData.kind === ResourceKind.Project
-            ? scenarioPuDataRelativePath.projectImport(extraData.scenarioId)
-            : scenarioPuDataRelativePath.scenarioImport,
+            ? scenarioPlanningUnitsDataRelativePath.projectImport(
+                extraData.scenarioId,
+              )
+            : scenarioPlanningUnitsDataRelativePath.scenarioImport,
         ),
       ];
     },

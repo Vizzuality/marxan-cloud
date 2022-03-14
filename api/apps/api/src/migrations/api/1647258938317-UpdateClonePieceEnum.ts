@@ -6,17 +6,17 @@ export class UpdateClonePieceEnum1647258938317 implements MigrationInterface {
       `ALTER TYPE clone_piece_enum RENAME VALUE 'planning-area-shapefile' TO 'planning-area-custom';`,
     );
     await queryRunner.query(
-      `ALTER TYPE clone_piece_enum RENAME VALUE 'planning-area-grid-shapefile' TO 'planning-area-grid';`,
+      `ALTER TYPE clone_piece_enum RENAME VALUE 'planning-area-grid-shapefile' TO 'planning-units-grid';`,
     );
 
     await queryRunner.query(
       `ALTER TYPE clone_piece_enum ADD VALUE 'planning-area-custom-geojson'`,
     );
     await queryRunner.query(
-      `ALTER TYPE clone_piece_enum ADD VALUE 'planning-area-grid-geojson'`,
+      `ALTER TYPE clone_piece_enum ADD VALUE 'planning-units-grid-geojson'`,
     );
     await queryRunner.query(
-      `ALTER TYPE clone_piece_enum ADD VALUE 'scenario-pu-data'`,
+      `ALTER TYPE clone_piece_enum ADD VALUE 'scenario-planning-units-data'`,
     );
     await queryRunner.query(
       `ALTER TYPE clone_piece_enum ADD VALUE 'scenario-run-results'`,
