@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
-import { useSaveProjectUserRole, useDeleteProjectUser, useProjectRole } from 'hooks/project-users';
+import { useSaveProjectUserRole, useDeleteProjectUser, useCanEditProject } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
@@ -33,7 +33,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   const [open, setOpen] = useState(false);
   const [userRole, setUserRole] = useState(ROLES[roleName]);
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const OWNER = projectRole === 'project_owner';
 
   const editProjectUserRoleMutation = useSaveProjectUserRole({

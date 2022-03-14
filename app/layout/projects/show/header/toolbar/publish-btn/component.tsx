@@ -4,7 +4,7 @@ import { Form as FormRFF/* , Field as FieldRFF */ } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useProjectRole/* , useProjectUsers */ } from 'hooks/project-users';
+import { useCanEditProject/* , useProjectUsers */ } from 'hooks/project-users';
 import { useProject, usePublishProject } from 'hooks/projects';
 import { usePublishedProjects } from 'hooks/published-projects';
 import { useToasts } from 'hooks/toast';
@@ -32,7 +32,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
 
   const { data: projectData } = useProject(pid);
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const OWNER = projectRole === 'project_owner';
 
   // const {

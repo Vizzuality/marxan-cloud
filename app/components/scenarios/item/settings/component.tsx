@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -21,7 +21,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
 }: ItemSettingsProps) => {
   const { query } = useRouter();
   const { pid } = query;
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const VIEWER = projectRole === 'project_viewer';
 
   return (

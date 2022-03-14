@@ -115,7 +115,7 @@ export function useProjectUsers(projectId) {
   }, [query, data?.data, user]);
 }
 
-export function useProjectRole(projectId) {
+export function useCanEditProject(projectId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
 

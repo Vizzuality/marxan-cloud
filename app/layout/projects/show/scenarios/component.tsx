@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { flatten } from 'lodash';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import {
   useDeleteScenario,
@@ -53,7 +53,8 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
+
   const VIEWER = projectRole === 'project_viewer';
 
   const {

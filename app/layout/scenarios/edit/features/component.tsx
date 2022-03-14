@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -43,7 +43,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const VIEWER = projectRole === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);

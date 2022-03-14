@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -34,7 +34,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const VIEWER = projectRole === 'project_viewer';
 
   const { data: scenarioData } = useScenario(sid);

@@ -12,7 +12,7 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario, useRunScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -50,7 +50,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const { user } = useMe();
 
   const { data: projectData } = useProject(pid);
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const VIEWER = projectRole === 'project_viewer';
 
   const scenarioSlice = getScenarioEditSlice(sid);

@@ -9,7 +9,7 @@ import type { Project } from 'types/project-model';
 import { ROLES } from 'utils/constants-roles';
 
 import { useMe } from 'hooks/me';
-import { useProjectRole, useProjectUsers } from 'hooks/project-users';
+import { useCanEditProject, useProjectUsers } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -53,7 +53,7 @@ export const Item: React.FC<ItemProps> = ({
   const plausible = usePlausible();
   const { user } = useMe();
 
-  const { data: projectRole } = useProjectRole(id);
+  const { data: projectRole } = useCanEditProject(id);
   const OWNER = projectRole === 'project_owner';
 
   const { data: projectUsers } = useProjectUsers(id);

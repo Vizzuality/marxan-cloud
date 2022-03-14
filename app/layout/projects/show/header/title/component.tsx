@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
@@ -37,7 +37,7 @@ export const Title: React.FC<TitleProps> = () => {
 
   const { data: projectData } = useProject(pid);
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const OWNER = projectRole === 'project_owner';
 
   // Project mutation and submit

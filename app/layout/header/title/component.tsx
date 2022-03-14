@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/project-users';
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -25,7 +25,7 @@ export const Title: React.FC<TitleProps> = () => {
   const { addToast } = useToasts();
   const { pid, sid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
+  const { data: projectRole } = useCanEditProject(pid);
   const VIEWER = projectRole === 'project_viewer';
 
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
