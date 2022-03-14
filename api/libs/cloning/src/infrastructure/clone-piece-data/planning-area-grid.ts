@@ -2,8 +2,6 @@ import { Polygon } from 'geojson';
 import { Transform, TransformCallback } from 'stream';
 
 export const planningAreaCustomGridRelativePath = 'project-grid';
-export const planningAreaCustomGridGeoJSONRelativePath =
-  'project-grid/custom-grid.geojson';
 
 export class PlanningAreaGridCustomTransform extends Transform {
   constructor() {

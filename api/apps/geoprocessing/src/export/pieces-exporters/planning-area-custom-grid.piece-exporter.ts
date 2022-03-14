@@ -6,7 +6,7 @@ import {
   planningAreaCustomGridGeoJSONRelativePath,
   PlanningAreaGridCustomGeoJsonTransform,
   PlanningAreaGridCustomTransform,
-} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
+} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -37,8 +37,7 @@ export class PlanningAreaCustomGridPieceExporter
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.PlanningAreaGridCustom &&
-      kind === ResourceKind.Project
+      piece === ClonePiece.PlanningAreaGrid && kind === ResourceKind.Project
     );
   }
 
@@ -98,7 +97,7 @@ export class PlanningAreaCustomGridPieceExporter
       ...input,
       uris: [
         ...ClonePieceUrisResolver.resolveFor(
-          ClonePiece.PlanningAreaGridCustom,
+          ClonePiece.PlanningAreaGrid,
           gridFile.right,
         ),
         {
