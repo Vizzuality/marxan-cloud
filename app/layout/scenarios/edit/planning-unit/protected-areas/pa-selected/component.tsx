@@ -43,11 +43,9 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
               className="flex mb-2.5 mr-5"
             >
               <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                {
-                  wdpa.label.length > 25
-                    ? (`${(wdpa.label).substring(0, 25 - 3)}...`)
-                    : wdpa.label
-                }
+                {wdpa.label.length > 25
+                  ? (`${(wdpa.label).substring(0, 25 - 3)}...`)
+                  : wdpa.label}
               </span>
 
               {(!isView && editable) && (

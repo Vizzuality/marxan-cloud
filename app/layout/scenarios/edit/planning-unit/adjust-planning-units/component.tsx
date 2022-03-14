@@ -9,6 +9,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { motion } from 'framer-motion';
 import { xor } from 'lodash';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -36,7 +37,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
 
@@ -60,6 +61,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
 
   const { addToast } = useToasts();
 
+  const editable = useCanEditScenario(pid, sid);
   const { data: PUData, isFetched: PUisFetched } = useScenarioPU(sid);
   const scenarioPUMutation = useSaveScenarioPU({});
 
@@ -233,7 +235,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           onChange={onChangeTab}
         />
 
-        {PUData && (!!PUData.included.length || !!PUData.excluded.length) && (
+        {PUData && (!!PUData.included.length || !!PUData.excluded.length) && editable && (
           <Button
             className="relative"
             theme="secondary"
@@ -260,9 +262,25 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         <div className="absolute top-0 left-0 z-10 w-full h-3 bg-gradient-to-b from-gray-700 via-gray-700" />
         <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
           <div className="py-3">
-            <Buttons
-              type={puAction}
-            />
+            {editable && (
+              <Buttons
+                type={puAction}
+              />
+            )}
+            {!editable && (
+              <div>
+                <p>
+                  Included:
+                  {' '}
+                  {PUData.included.length}
+                </p>
+                <p>
+                  Excluded:
+                  {' '}
+                  {PUData.excluded.length}
+                </p>
+              </div>
+            )}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 z-10 w-full h-3 bg-gradient-to-t from-gray-700 via-gray-700" />
