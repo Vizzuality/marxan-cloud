@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
+import { useScenarioLockMe } from 'hooks/scenarios';
 
 export function useProjectRole(projectId) {
   const { data: me } = useMe();
@@ -64,7 +65,7 @@ export function useOwnsScenario(projectId) {
 export function useCanEditScenario(projectId, scenarioId) {
   const { data: me } = useMe();
   const { data: projectUsers } = useProjectUsers(projectId);
-  console.log(scenarioId);
+  const isLockMe = useScenarioLockMe(scenarioId);
 
   const meId = me?.data?.id;
 
@@ -72,7 +73,7 @@ export function useCanEditScenario(projectId, scenarioId) {
 
   const roleMe = projectUsers?.find((r) => r.user.id === meId)?.roleName;
 
-  const editable = editorRoles.includes(roleMe);
+  const editable = editorRoles.includes(roleMe) && isLockMe;
 
   return useMemo(() => {
     return editable;
