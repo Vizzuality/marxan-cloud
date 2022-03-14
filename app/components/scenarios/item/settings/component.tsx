@@ -22,7 +22,7 @@ export const Item: React.FC<ItemSettingsProps> = ({
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: editable } = useCanEditProject(pid);
+  const editable = useCanEditProject(pid);
 
   return (
     <div className="w-full px-8 pt-6 pb-4 bg-gray-700 rounded-b-3xl">

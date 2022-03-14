@@ -37,7 +37,7 @@ export const Title: React.FC<TitleProps> = () => {
 
   const { data: projectData } = useProject(pid);
 
-  const { data: editable } = useCanEditProject(pid);
+  const editable = useCanEditProject(pid);
 
   // Project mutation and submit
   const saveProjectMutation = useSaveProject({

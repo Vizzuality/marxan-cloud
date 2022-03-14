@@ -53,7 +53,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: editable } = useCanEditProject(pid);
+  const editable = useCanEditProject(pid);
 
   const {
     isFetching: projectIsFetching,
