@@ -12,6 +12,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
 import { useMe } from 'hooks/me';
+import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
 
@@ -317,6 +318,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const { scenarios: statusScenarios = [] } = statusData;
 
   const { data: scenariosLocksData = [] } = useProjectScenariosLocks(pId);
+  const { data: projectUsersData = [] } = useProjectUsers(pId);
 
   const { data } = query;
   const { pages } = data || {};
@@ -333,7 +335,16 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
         const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
-        const lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user.id);
+        let lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user.id);
+        if (lock) {
+          const userLock = projectUsersData.find((pu) => pu?.user?.id === lock.userId);
+
+          lock = {
+            ...lock,
+            ...userLock?.user,
+            roleName: userLock?.roleName,
+          };
+        }
 
         const lastUpdateDistance = () => {
           return formatDistanceToNow(
@@ -372,7 +383,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       ...query,
       data: filteredData,
     };
-  }, [query, pages, filters, push, user.id, statusScenarios, scenariosLocksData]);
+  }, [query, pages, filters, push, user.id, statusScenarios, scenariosLocksData, projectUsersData]);
 }
 
 export function useScenario(id) {
