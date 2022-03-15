@@ -58,6 +58,7 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       customPlanningArea
         ? ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom)
         : ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
+      ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
       ...scenarioPieces.flat(),
     ];
 
