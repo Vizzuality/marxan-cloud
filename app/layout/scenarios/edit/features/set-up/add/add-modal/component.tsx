@@ -14,6 +14,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import {
   useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures,
 } from 'hooks/features';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import List from 'layout/scenarios/edit/features/set-up/add/add-modal/list';
@@ -46,6 +47,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
 
   const { setFeatures } = scenarioSlice.actions;
 
+  const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -166,14 +168,16 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
 
   return (
     <>
-      <Button
-        theme="primary"
-        size="base"
-        onClick={() => setOpen(true)}
-      >
-        <span className="mr-3">Add features</span>
-        <Icon icon={PLUS_SVG} className="w-4 h-4" />
-      </Button>
+      {editable && (
+        <Button
+          theme="primary"
+          size="base"
+          onClick={() => setOpen(true)}
+        >
+          <span className="mr-3">Add features</span>
+          <Icon icon={PLUS_SVG} className="w-4 h-4" />
+        </Button>
+      )}
 
       <Modal
         id="all-feaures"

@@ -16,6 +16,7 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import IntersectFeatures from 'layout/scenarios/edit/features/set-up/add/intersect';
@@ -42,6 +43,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
 
   const queryClient = useQueryClient();
 
+  const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -300,6 +302,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                           >
                             <Item
                               {...item}
+                              editable={editable}
                               onSplitSelected={(s) => {
                                 onSplitSelected(item.id, s, input);
                               }}
