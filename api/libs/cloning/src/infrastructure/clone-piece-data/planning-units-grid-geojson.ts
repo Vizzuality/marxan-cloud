@@ -1,32 +1,10 @@
 import { Polygon } from 'geojson';
 import { Transform, TransformCallback } from 'stream';
 
-export const planningAreaCustomGridRelativePath = 'project-grid';
-export const planningAreaCustomGridGeoJSONRelativePath =
-  'project-grid/custom-grid.geojson';
+export const planningUnitsGridGeoJSONRelativePath =
+  'planning-units-grid.geojson';
 
-export class PlanningAreaGridCustomTransform extends Transform {
-  constructor() {
-    super({
-      objectMode: true,
-    });
-  }
-
-  _transform(
-    chunk: { ewkb: Buffer; puid: string },
-    encoding: BufferEncoding,
-    callback: TransformCallback,
-  ): void {
-    const record = {
-      geom: chunk.ewkb.toJSON().data,
-      puid: parseInt(chunk.puid),
-    };
-    const content = `${record.puid},${JSON.stringify(record.geom)}\n`;
-    callback(null, content);
-  }
-}
-
-export class PlanningAreaGridCustomGeoJsonTransform extends Transform {
+export class PlanningUnitsGridGeoJsonTransform extends Transform {
   firstChunk = true;
 
   constructor(bbox: number[]) {

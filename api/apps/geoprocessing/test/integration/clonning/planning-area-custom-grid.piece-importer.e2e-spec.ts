@@ -16,11 +16,11 @@ import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { PlanningAreaCustomGridPieceImporter } from '../../../src/import/pieces-importers/planning-area-custom-grid.piece-importer';
+import { PlanningUnitsGridPieceImporter } from '../../../src/import/pieces-importers/planning-units-grid.piece-importer';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaCustomGridPieceImporter, () => {
+describe(PlanningUnitsGridPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -81,14 +81,14 @@ const getFixtures = async () => {
       FileRepositoryModule,
     ],
     providers: [
-      PlanningAreaCustomGridPieceImporter,
+      PlanningUnitsGridPieceImporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
   const projectId = v4();
-  const sut = sandbox.get(PlanningAreaCustomGridPieceImporter);
+  const sut = sandbox.get(PlanningUnitsGridPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
   const puGeomRepo = sandbox.get<Repository<PlanningUnitsGeom>>(
     getRepositoryToken(PlanningUnitsGeom),
@@ -106,7 +106,7 @@ const getFixtures = async () => {
       });
 
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         'planning area custom grid relative path',
       );
 
@@ -130,7 +130,7 @@ const getFixtures = async () => {
         zlib: { level: 9 },
       });
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         'planning area custom grid relative path',
       );
       archive.append(validGridFile, {
@@ -150,7 +150,7 @@ const getFixtures = async () => {
       });
 
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         'planning area custom grid relative path',
       );
 
@@ -168,7 +168,7 @@ const getFixtures = async () => {
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const [uri] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         archiveLocation.value,
       );
       return {
@@ -176,7 +176,7 @@ const getFixtures = async () => {
         componentResourceId: v4(),
         importId: v4(),
         importResourceId: projectId,
-        piece: ClonePiece.PlanningAreaGridCustom,
+        piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
       };
@@ -187,7 +187,7 @@ const getFixtures = async () => {
         componentResourceId: v4(),
         importId: v4(),
         importResourceId: projectId,
-        piece: ClonePiece.PlanningAreaGridCustom,
+        piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [],
       };

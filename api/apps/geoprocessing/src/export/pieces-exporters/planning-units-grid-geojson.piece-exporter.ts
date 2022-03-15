@@ -2,11 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import {
-  planningAreaCustomGridGeoJSONRelativePath,
-  PlanningAreaGridCustomGeoJsonTransform,
-  PlanningAreaGridCustomTransform,
-} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-grid-custom';
+import { PlanningUnitsGridGeoJsonTransform } from '@marxan/cloning/infrastructure/clone-piece-data/planning-units-grid-geojson';
 import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -25,7 +21,7 @@ interface ProjectSelectResult {
 
 @Injectable()
 @PieceExportProvider()
-export class PlanningAreaCustomGridPieceExporter
+export class PlanningUnitsGridGeojsonPieceExporter
   implements ExportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
@@ -37,7 +33,7 @@ export class PlanningAreaCustomGridPieceExporter
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.PlanningAreaGridCustom &&
+      piece === ClonePiece.PlanningUnitsGridGeojson &&
       kind === ResourceKind.Project
     );
   }
@@ -53,32 +49,13 @@ export class PlanningAreaCustomGridPieceExporter
     );
 
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
-    const gridStream = await qb
-      // TODO puid should be obtained in a proper way
-      .select('ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid')
-      .from('planning_units_geom', 'pug')
-      .where('project_id = :projectId', { projectId: project.id })
-      .stream();
-
-    const gridFileTransform = new PlanningAreaGridCustomTransform();
-
-    gridStream.pipe(gridFileTransform);
-
-    const gridFile = await this.fileRepository.save(gridFileTransform);
-    if (isLeft(gridFile)) {
-      throw new Error(
-        `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridFile.left.description}`,
-      );
-    }
-
-    const geoJsonQb = this.geoprocessingEntityManager.createQueryBuilder();
-    const geoJsonStream = await geoJsonQb
+    const geoJsonStream = await qb
       .select('ST_AsGeoJSON(the_geom) as geojson')
       .from('planning_units_geom', 'pug')
       .where('project_id = :projectId', { projectId: project.id })
       .stream();
 
-    const geojsonFileTransform = new PlanningAreaGridCustomGeoJsonTransform(
+    const geojsonFileTransform = new PlanningUnitsGridGeoJsonTransform(
       project.bbox,
     );
     geoJsonStream.pipe(geojsonFileTransform);
@@ -90,22 +67,16 @@ export class PlanningAreaCustomGridPieceExporter
 
     if (isLeft(gridGeoJson)) {
       throw new Error(
-        `${PlanningAreaCustomGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridGeoJson.left.description}`,
+        `${PlanningUnitsGridGeojsonPieceExporter.name} - Project Custom PA - couldn't save file - ${gridGeoJson.left.description}`,
       );
     }
 
     return {
       ...input,
-      uris: [
-        ...ClonePieceUrisResolver.resolveFor(
-          ClonePiece.PlanningAreaGridCustom,
-          gridFile.right,
-        ),
-        {
-          uri: gridGeoJson.right,
-          relativePath: planningAreaCustomGridGeoJSONRelativePath,
-        },
-      ],
+      uris: ClonePieceUrisResolver.resolveFor(
+        ClonePiece.PlanningUnitsGridGeojson,
+        gridGeoJson.right,
+      ),
     };
   }
 }

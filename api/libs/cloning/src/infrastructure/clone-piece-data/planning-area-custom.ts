@@ -7,5 +7,3 @@ export interface PlanningAreaCustomContent {
 }
 
 export const planningAreaCustomRelativePath = 'planning-area.json';
-export const planningAreaCustomGeoJSONRelativePath =
-  'planning-area/project-pa.geojson';

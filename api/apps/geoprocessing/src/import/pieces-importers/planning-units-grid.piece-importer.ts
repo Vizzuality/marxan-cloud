@@ -19,21 +19,19 @@ import {
 
 @Injectable()
 @PieceImportProvider()
-export class PlanningAreaCustomGridPieceImporter
-  implements ImportPieceProcessor {
+export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     private readonly logger: Logger,
   ) {
-    this.logger.setContext(PlanningAreaCustomGridPieceImporter.name);
+    this.logger.setContext(PlanningUnitsGridPieceImporter.name);
   }
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (
-      piece === ClonePiece.PlanningAreaGridCustom &&
-      kind === ResourceKind.Project
+      piece === ClonePiece.PlanningUnitsGrid && kind === ResourceKind.Project
     );
   }
 

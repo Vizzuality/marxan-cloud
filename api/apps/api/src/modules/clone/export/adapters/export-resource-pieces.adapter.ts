@@ -61,11 +61,6 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ...scenarioPieces.flat(),
     ];
 
-    if (customGrid)
-      components.push(
-        ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
-      );
-
     return components;
   }
 

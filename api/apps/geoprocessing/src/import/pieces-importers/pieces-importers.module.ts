@@ -6,7 +6,7 @@ import { PlanningAreaGadmPieceImporter } from './planning-area-gadm.piece-import
 import { PlanningAreaCustomPieceImporter } from './planning-area-custom.piece-importer';
 import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer';
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
-import { PlanningAreaCustomGridPieceImporter } from './planning-area-custom-grid.piece-importer';
+import { PlanningUnitsGridPieceImporter } from './planning-units-grid.piece-importer';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { PlanningAreaCustomGridPieceImporter } from './planning-area-custom-grid
     ScenarioMetadataPieceImporter,
     PlanningAreaGadmPieceImporter,
     PlanningAreaCustomPieceImporter,
-    PlanningAreaCustomGridPieceImporter,
+    PlanningUnitsGridPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
