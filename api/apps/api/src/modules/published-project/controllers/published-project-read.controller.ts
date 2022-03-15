@@ -2,7 +2,6 @@ import {
   Controller,
   ForbiddenException,
   Get,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   Query,

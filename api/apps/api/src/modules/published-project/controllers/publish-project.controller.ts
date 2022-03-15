@@ -38,7 +38,10 @@ import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { isLeft } from 'fp-ts/Either';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
-import { PublishedProjectResultPlural } from '../dto/read-result.dtos';
+import {
+  PublishedProjectResultPlural,
+  PublishedProjectResultSingular,
+} from '../dto/read-result.dtos';
 import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { publishedProjectResource } from '../published-project.resource';
 import {
@@ -181,7 +184,7 @@ export class PublishProjectController {
     description: `A free search over names`,
   })
   @Get('published-projects/by-admin')
-  async findAll(
+  async findOneByAdmin(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') namesSearch?: string,
@@ -196,5 +199,32 @@ export class PublishProjectController {
       },
     );
     return this.serializer.serializeAll(results.data, results.metadata);
+  }
+
+  @ApiNotFoundResponse()
+  @ApiOperation({ description: 'Find public project by id for admins.' })
+  @ApiOkResponse({ type: PublishedProjectResultSingular })
+  @Get('published-projects/:id/by-admin')
+  async findAll(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Param('id') id: string,
+  ): Promise<PublishedProjectResultSingular> {
+    const result = await this.publishedProjectService.findOne(id, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case notFound:
+          throw new NotFoundException();
+        case accessDenied:
+          throw new ForbiddenException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return await this.serializer.serialize(result.right);
   }
 }

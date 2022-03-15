@@ -112,6 +112,5 @@ export class PublishedProjectService {
       return left(accessDenied);
     }
     return right(result);
-    // library-sourced errors are no longer instances of HttpException
   }
 }
