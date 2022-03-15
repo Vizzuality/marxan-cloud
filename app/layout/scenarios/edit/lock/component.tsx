@@ -52,8 +52,7 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
 
   // Delete a lock when you finish editing
   useLayoutEffect(() => {
-    setModal(!isLockMe);
-
+    setModal(scenarioLockData && !isLockMe);
     return () => {
       if (isLockMe) {
         removeScenarioLock();
