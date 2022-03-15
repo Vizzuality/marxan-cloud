@@ -41,6 +41,7 @@
     "node": "~14.18"
   },
   "dependencies": {
+    "@faker-js/faker": "^6.0.0",
     "@golevelup/nestjs-discovery": "3.0.0",
     "@greenelab/hclust": "0.0.1",
     "@nestjs-architects/typed-cqrs": "1.0.0",
@@ -67,7 +68,6 @@
     "commander": "9.0.0",
     "config": "^3.3.7",
     "express": "^4.17.3",
-    "faker": "^6.6.6",
     "fp-ts": "2.11.9",
     "geojson": "0.5.0",
     "helmet": "^5.0.2",
