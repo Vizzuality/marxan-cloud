@@ -7,13 +7,8 @@ import { Organization } from '@marxan-api/modules/organizations/organization.api
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { tearDown } from './utils/tear-down';
 import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
-
-afterAll(async () => {
-  await tearDown();
-});
 
 describe('JSON API Specs (e2e)', () => {
   let app: INestApplication;
@@ -25,7 +20,7 @@ describe('JSON API Specs (e2e)', () => {
     keyForAttribute: 'camelCase',
   });
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
     jwtToken = await GivenUserIsLoggedIn(app);
 
@@ -49,11 +44,7 @@ describe('JSON API Specs (e2e)', () => {
     }).then(async (response) => await Deserializer.deserialize(response));
   });
 
-  afterAll(async () => {
-    await Promise.all([app.close()]);
-  });
-
-  it('should return a response shaped as JSON:API Error spec, including raw error data', async () => {
+  it.only('should return a response shaped as JSON:API Error spec, including raw error data', async () => {
     const jsonApiErrorResponse = {
       id: null,
       links: null,

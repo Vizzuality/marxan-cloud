@@ -17,6 +17,14 @@ export const bootstrapApplication = async (
     email: E2E_CONFIG.users.basic.aa.username,
     password: E2E_CONFIG.users.basic.aa.password,
   });
+  await api.utils.createWorkingUser({
+    email: E2E_CONFIG.users.basic.bb.username,
+    password: E2E_CONFIG.users.basic.bb.password,
+  });
+  await api.utils.createWorkingUser({
+    email: E2E_CONFIG.users.basic.cc.username,
+    password: E2E_CONFIG.users.basic.cc.password,
+  });
   await api.utils.createWorkingProjectWithScenario(jwt);
 
   return api.getNestInstance();

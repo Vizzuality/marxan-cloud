@@ -17,23 +17,15 @@ import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/
 import { GivenProjectExists } from './steps/given-project';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import { ProjectsTestUtils } from './utils/projects.test.utils';
-import { User } from '@marxan-api/modules/users/user.api.entity';
 
+// TODO: This test file is highly coupled, some tests relies on other tests, some expectations are not clear. This one should be a priority to refactor
 let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
 }, 12_000);
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 describe('ScenariosModule (e2e)', () => {
-  afterEach(async () => {
-    await fixtures.cleanup();
-  });
-
   it('Creating a scenario with incomplete data should fail', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithIncompleteData();
     fixtures.ThenBadRequestIsReturned(response);
@@ -67,11 +59,17 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Gets scenarios as a scenario contributor', async () => {
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario(scenarioId);
+
     const response = await fixtures.WhenGettingScenariosAsContributor();
+
     fixtures.ThenAllScenariosFromContributorAreReturned(response);
   });
 
   it('Gets scenarios as a scenario viewer', async () => {
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenViewerWasAddedToScenario(scenarioId);
     const response = await fixtures.WhenGettingScenariosAsViewer();
     fixtures.ThenAllScenariosFromViewerAreReturned(response);
   });
@@ -92,27 +90,36 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it(`Gets scenarios with a free search`, async () => {
-    const response = await fixtures.WhenGettingScenariosWithFreeSearchAsOwner();
-    fixtures.ThenCorrectScenariosAreReturned(response);
+    const name = 'Find me!';
+    const partialName = 'Fin';
+    const scenarioId = await fixtures.GivenScenarioWasCreated(name);
+
+    const response = await fixtures.WhenGettingScenariosWithFreeSearchAsOwner(
+      partialName,
+    );
+
+    fixtures.ThenCorrectScenariosAreReturned(response, { scenarioId, name });
   });
 
   it('Contributor fails to delete scenario', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenContributorWasAddedToScenario();
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenContributorWasAddedToScenario(scenarioId);
+
     const response = await fixtures.WhenDeletingScenarioAsContributor();
+
     fixtures.ThenForbiddenIsReturned(response);
   });
 
   it('Viewer fails to delete scenario', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenViewerWasAddedToScenario();
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenViewerWasAddedToScenario(scenarioId);
     const response = await fixtures.WhenDeletingScenarioAsViewer();
     fixtures.ThenForbiddenIsReturned(response);
   });
 
   it('Owner successfully deletes the newly created scenario', async () => {
-    await fixtures.GivenScenarioWasCreated();
-    await fixtures.GivenViewerWasAddedToScenario();
+    const scenarioId = await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenViewerWasAddedToScenario(scenarioId);
     const response = await fixtures.WhenDeletingScenarioAsOwner();
     fixtures.ThenOkIsReturned(response);
   });
@@ -152,40 +159,26 @@ async function getFixtures() {
   };
 
   let scenarioId: string;
-  const seedScenarioNames = [
-    'Example scenario 1 Project 1 Org 1',
-    'Example scenario 2 Project 1 Org 1',
-    'Example scenario 1 Project 2 Org 2',
-    'Example scenario 2 Project 2 Org 2',
-  ];
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
   );
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
-  const usersRepo: Repository<User> = app.get(getRepositoryToken(User));
-
-  const cleanups: (() => Promise<void>)[] = [];
 
   return {
-    cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await app.close();
-    },
-
     GivenUserIsLoggedIn: async (user: string) => {
       if (user === 'random') {
         return randomUserInfo.accessToken;
       }
       const userToken = userObj[user as keyof typeof userObj];
+
       return await GivenUserIsLoggedIn(app, userToken);
     },
 
-    GivenScenarioWasCreated: async () => {
+    GivenScenarioWasCreated: async (name = 'Test scenario') => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
-        name: `Test scenario`,
+        name,
         type: ScenarioType.marxan,
         projectId,
       });
@@ -208,14 +201,14 @@ async function getFixtures() {
         userId: viewerUserId,
       }),
 
-    GivenContributorWasAddedToScenario: async () =>
+    GivenContributorWasAddedToScenario: async (scenarioId: string) =>
       await userScenariosRepo.save({
         scenarioId,
         roleName: scenarioContributorRole,
         userId: contributorUserId,
       }),
 
-    GivenViewerWasAddedToScenario: async () =>
+    GivenViewerWasAddedToScenario: async (scenarioId: string) =>
       await userScenariosRepo.save({
         scenarioId,
         roleName: scenarioViewerRole,
@@ -227,10 +220,6 @@ async function getFixtures() {
         scenarioId,
         userId: randomUserInfo.user.id,
         roleName: scenarioContributorRole,
-      });
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: randomUserInfo.user.id });
-        return;
       });
     },
 
@@ -276,8 +265,8 @@ async function getFixtures() {
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
         .send(completeCreateScenarioDTO);
-
       scenarioId = response.body.data.id;
+
       return response;
     },
 
@@ -310,9 +299,9 @@ async function getFixtures() {
         .get('/api/v1/scenarios?page[size]=5&page[number]=1')
         .set('Authorization', `Bearer ${ownerToken}`),
 
-    WhenGettingScenariosWithFreeSearchAsOwner: async () =>
+    WhenGettingScenariosWithFreeSearchAsOwner: async (searchWord: string) =>
       await request(app.getHttpServer())
-        .get(`/api/v1/scenarios?q=oRG%202`)
+        .get(`/api/v1/scenarios?q=${searchWord}`)
         .set(`Authorization`, `Bearer ${ownerToken}`),
 
     WhenDeletingScenarioAsContributor: async () =>
@@ -402,7 +391,7 @@ async function getFixtures() {
       const scenarioNames: string[] = resources.map(
         (s: any) => s.attributes.name,
       );
-      expect(scenarioNames.sort()).toEqual(seedScenarioNames.sort());
+      expect(scenarioNames).toHaveLength(1);
       expect(response.body.meta).toEqual({
         page: expect.any(Number),
         size: expect.any(Number),
@@ -420,7 +409,7 @@ async function getFixtures() {
       const scenarioNames: string[] = resources.map(
         (s: any) => s.attributes.name,
       );
-      expect(scenarioNames.sort()).toEqual(seedScenarioNames.sort());
+      expect(scenarioNames).toHaveLength(1);
       expect(response.body.meta).toEqual({
         page: expect.any(Number),
         size: expect.any(Number),
@@ -436,7 +425,7 @@ async function getFixtures() {
       const scenarioNames: string[] = resources.map(
         (s: any) => s.attributes.name,
       );
-      expect(scenarioNames.sort()).toEqual(seedScenarioNames.sort());
+      expect(scenarioNames).toHaveLength(1);
       expect(response.body.meta).toEqual({
         page: expect.any(Number),
         size: expect.any(Number),
@@ -454,20 +443,18 @@ async function getFixtures() {
       expect(resources.length).toBeLessThanOrEqual(5);
       expect(resources.length).toBeGreaterThanOrEqual(1);
     },
-    ThenCorrectScenariosAreReturned: (response: request.Response) => {
+    ThenCorrectScenariosAreReturned: (
+      response: request.Response,
+      data: { scenarioId: string; name: string },
+    ) => {
       const resources = response.body.data;
       expect(resources).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             type: 'scenarios',
             attributes: expect.objectContaining({
-              name: 'Example scenario 1 Project 2 Org 2',
-            }),
-          }),
-          expect.objectContaining({
-            type: 'scenarios',
-            attributes: expect.objectContaining({
-              name: 'Example scenario 2 Project 2 Org 2',
+              id: data.scenarioId,
+              name: data.name,
             }),
           }),
         ]),
