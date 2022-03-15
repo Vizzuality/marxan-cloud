@@ -83,6 +83,7 @@ const getFixtures = async () => {
     projectWithCustomPlanningArea
       ? ClonePiece.PlanningAreaCustom
       : ClonePiece.PlanningAreaGAdm,
+    ClonePiece.ProjectCustomProtectedAreas,
   ];
 
   const expectedScenarioPieces = (projectExport: boolean) => {
