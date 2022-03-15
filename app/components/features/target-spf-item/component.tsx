@@ -19,6 +19,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   target,
   fpf,
   id,
+  editable,
   onRemove,
   onChangeTarget,
   onChangeFPF,
@@ -60,8 +61,14 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         })}
       />
       <div className="flex items-start justify-between pb-2 pr-2">
-        <span className="pr-5 text-sm font-medium font-heading">{isAllTargets ? 'Set target and SPF in all features' : name}</span>
-        {!isAllTargets && (
+        <span className={cx({
+          'pr-5 text-sm font-medium font-heading': true,
+          'w-4/5': !editable,
+        })}
+        >
+          {isAllTargets ? 'Set target and SPF in all features' : name}
+        </span>
+        {!isAllTargets && editable && (
           <Button
             className="flex-shrink-0 text-xs"
             theme="secondary"
@@ -74,15 +81,18 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       </div>
       <div className="flex">
         <div className="relative flex-col w-full pr-4">
+
           <Label ref={sliderLabelRef} className="mb-1 uppercase">
             <span>{isAllTargets ? 'ALL TARGETS' : 'TARGET'}</span>
           </Label>
+
           <Slider
             labelRef={sliderLabelRef}
             minValue={0}
             maxValue={1}
             value={targetValue}
             step={0.01}
+            disabled={!editable}
             onChange={(sliderValue) => {
               setTargetValue(sliderValue);
               if (onChangeTarget) onChangeTarget(+(sliderValue * 100).toFixed(0));
@@ -102,6 +112,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               mode="dashed"
               type="number"
               value={inputFPFValue}
+              disabled={!editable}
               onChange={({ target: { value: inputValue } }) => {
                 setInputFPFValue(inputValue);
               }}

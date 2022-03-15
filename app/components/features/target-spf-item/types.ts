@@ -14,6 +14,7 @@ export interface TargetSPFItemProps {
   type?: Type;
   surface?: string;
   name?: string;
+  editable?: boolean;
   onChangeTarget?: (value) => void;
   onChangeFPF?: (value) => void;
   onRemove?: (value) => void
