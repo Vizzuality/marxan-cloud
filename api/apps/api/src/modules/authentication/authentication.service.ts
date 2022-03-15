@@ -12,12 +12,11 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { hash, compare } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 
 import { LessThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IssuedAuthnToken } from './issued-authn-token.api.entity';
-import ms = require('ms');
 import { SignUpDto } from './dto/sign-up.dto';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { v4 } from 'uuid';
@@ -28,6 +27,7 @@ import { EventBus } from '@nestjs/cqrs';
 import { UserLoggedIn } from './user-logged-in.event';
 import { isStringEntropyHigherThan } from '@marxan-api/utils/passwordValidation.utils';
 import { isLeft } from 'fp-ts/lib/Either';
+import ms = require('ms');
 
 /**
  * Access token for the app: key user data and access token
@@ -170,6 +170,7 @@ export class AuthenticationService {
       );
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
+
     return newUser;
   }
 
