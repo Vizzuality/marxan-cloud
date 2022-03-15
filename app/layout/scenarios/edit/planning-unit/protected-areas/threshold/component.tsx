@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -44,12 +45,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const { data: projectData } = useProject(pid);
-
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
+  const { data: projectData } = useProject(pid);
+  const editable = useCanEditScenario(pid, sid);
   const {
     data: scenarioData,
     isFetching: scenarioIsFetching,
@@ -265,6 +266,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                           maxValue={1}
                           minValue={0.01}
                           step={0.01}
+                          disabled={!editable}
                           onChange={(s) => {
                             flprops.input.onChange(s);
                             dispatch(setWDPAThreshold(s));
@@ -307,18 +309,20 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
               disabled={submitting}
               onClick={handleBack}
             >
-              <span>Set areas</span>
+              <span>{editable ? 'Set areas' : 'Back to areas'}</span>
             </Button>
 
-            <Button
-              theme="primary"
-              size="lg"
-              type="submit"
-              className="relative px-20 md:px-9 lg:px-16 xl:px-20"
-              disabled={submitting}
-            >
-              <span>Save</span>
-            </Button>
+            {editable && (
+              <Button
+                theme="primary"
+                size="lg"
+                type="submit"
+                className="relative px-20 md:px-9 lg:px-16 xl:px-20"
+                disabled={submitting}
+              >
+                <span>Save</span>
+              </Button>
+            )}
           </div>
         </form>
       )}
