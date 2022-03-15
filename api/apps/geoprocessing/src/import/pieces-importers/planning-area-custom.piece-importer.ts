@@ -66,7 +66,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
       stringPlanningAreaCustomOrError.right,
     );
 
-    this.geoprocessingEntityManager.transaction(async (em) => {
+    await this.geoprocessingEntityManager.transaction(async (em) => {
       await em.query(
         `
         INSERT INTO planning_areas(project_id, the_geom)
