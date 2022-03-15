@@ -110,7 +110,8 @@ describe('ExportConfigReader', () => {
   });
 
   it('should fail when version property of export config file has an invalid value', async () => {
-    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfigVersion();
+    const archiveLocation =
+      await fixtures.GivenArchiveWithInvalidExportConfigVersion();
     const result = await fixtures.WhenReadingExportConfig(archiveLocation);
     fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
   });
@@ -215,39 +216,40 @@ const getFixtures = async () => {
         archive.finalize();
       });
     },
-    GivenArchiveWithInvalidExportConfigVersion: (): Promise<ArchiveLocation> => {
-      const archive = archiver(`zip`, {
-        zlib: { level: 9 },
-      });
-      const invalidExportConfig = expectedExportConfig;
-      invalidExportConfig.version = '';
-
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ExportConfig,
-        'export-config uri',
-      );
-
-      archive.append(JSON.stringify(invalidExportConfig), {
-        name: relativePath,
-      });
-
-      return new Promise((resolve, reject) => {
-        const buffers: Buffer[] = [];
-        archive.on('data', (chunk) => {
-          buffers.push(chunk);
+    GivenArchiveWithInvalidExportConfigVersion:
+      (): Promise<ArchiveLocation> => {
+        const archive = archiver(`zip`, {
+          zlib: { level: 9 },
         });
-        archive.on('finish', () => {
-          archiveReaderGetMock.mockResolvedValue(
-            right(Readable.from(Buffer.concat(buffers))),
-          );
-          resolve(new ArchiveLocation('invalid export config property'));
+        const invalidExportConfig = expectedExportConfig;
+        invalidExportConfig.version = '';
+
+        const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+          ClonePiece.ExportConfig,
+          'export-config uri',
+        );
+
+        archive.append(JSON.stringify(invalidExportConfig), {
+          name: relativePath,
         });
-        archive.on('error', function (err) {
-          reject(err);
+
+        return new Promise((resolve, reject) => {
+          const buffers: Buffer[] = [];
+          archive.on('data', (chunk) => {
+            buffers.push(chunk);
+          });
+          archive.on('finish', () => {
+            archiveReaderGetMock.mockResolvedValue(
+              right(Readable.from(Buffer.concat(buffers))),
+            );
+            resolve(new ArchiveLocation('invalid export config property'));
+          });
+          archive.on('error', function (err) {
+            reject(err);
+          });
+          archive.finalize();
         });
-        archive.finalize();
-      });
-    },
+      },
     GivenValidArchive: (): Promise<ArchiveLocation> => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },

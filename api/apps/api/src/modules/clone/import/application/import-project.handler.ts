@@ -14,7 +14,8 @@ import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(ImportProject)
 export class ImportProjectHandler
-  implements IInferredCommandHandler<ImportProject> {
+  implements IInferredCommandHandler<ImportProject>
+{
   constructor(
     private readonly exportConfigReader: ExportConfigReader,
     private readonly importRepo: ImportRepository,
@@ -30,7 +31,8 @@ export class ImportProjectHandler
     );
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
-    const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
+    const exportConfig =
+      exportConfigOrError.right as ProjectExportConfigContent;
     const resourceId = ResourceId.create();
 
     const pieces = this.importResourcePieces.resolveForProject(

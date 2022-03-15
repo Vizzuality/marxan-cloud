@@ -203,11 +203,12 @@ export class ScenariosService {
     >
   > {
     await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-      true,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+        true,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -295,10 +296,11 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return left(forbiddenError);
     }
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -356,10 +358,11 @@ export class ScenariosService {
     >
   > {
     await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -386,10 +389,11 @@ export class ScenariosService {
       void
     >
   > {
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -409,10 +413,11 @@ export class ScenariosService {
     >
   > {
     await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -502,10 +507,11 @@ export class ScenariosService {
     >
   > {
     const scenario = await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -553,10 +559,11 @@ export class ScenariosService {
     assertDefined(userInfo.authenticatedUser);
     if (isLeft(scenario)) return left(forbiddenError);
 
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userInfo.authenticatedUser.id,
-      id,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userInfo.authenticatedUser.id,
+        id,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -604,10 +611,11 @@ export class ScenariosService {
     >
   > {
     await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -625,10 +633,11 @@ export class ScenariosService {
     >
   > {
     await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -766,7 +775,7 @@ export class ScenariosService {
    * @private
    */
   private getPayloadWithValidatedMetadata<
-    T extends CreateScenarioDTO | UpdateScenarioDTO
+    T extends CreateScenarioDTO | UpdateScenarioDTO,
   >(input: T): T {
     let marxanInput: MarxanParameters | undefined;
     if (input.metadata?.marxanInputParameterFile) {
@@ -782,7 +791,8 @@ export class ScenariosService {
       marxanInput = this.marxanInputValidator.from({});
     }
     const withValidatedMetadata: T = classToClass<T>(input);
-    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile = marxanInput;
+    (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile =
+      marxanInput;
     return withValidatedMetadata;
   }
 
@@ -875,10 +885,11 @@ export class ScenariosService {
     >
   > {
     const scenario = await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -929,10 +940,11 @@ export class ScenariosService {
     >
   > {
     await this.assertScenario(scenarioId);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      userId,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        userId,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
@@ -957,10 +969,11 @@ export class ScenariosService {
     try {
       const scenario = await this.assertScenario(scenarioId);
       assertDefined(info.authenticatedUser);
-      const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-        info.authenticatedUser.id,
-        scenarioId,
-      );
+      const userCanEditScenario =
+        await this.scenarioAclService.canEditScenarioAndOwnsLock(
+          info.authenticatedUser.id,
+          scenarioId,
+        );
       if (isLeft(userCanEditScenario)) {
         return userCanEditScenario;
       }
@@ -1044,10 +1057,11 @@ export class ScenariosService {
   > {
     const scenario = await this.assertScenario(scenarioId);
     assertDefined(info.authenticatedUser);
-    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-      info.authenticatedUser?.id,
-      scenarioId,
-    );
+    const userCanEditScenario =
+      await this.scenarioAclService.canEditScenarioAndOwnsLock(
+        info.authenticatedUser?.id,
+        scenarioId,
+      );
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }

@@ -85,12 +85,10 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ImportProjectHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
-  const exportConfigReader: FakeExportConfigReader = sandbox.get(
-    ExportConfigReader,
-  );
-  const importResourcePieces: FakeImportResourcePieces = sandbox.get(
-    ImportResourcePieces,
-  );
+  const exportConfigReader: FakeExportConfigReader =
+    sandbox.get(ExportConfigReader);
+  const importResourcePieces: FakeImportResourcePieces =
+    sandbox.get(ImportResourcePieces);
 
   return {
     GivenExtractingArchiveFails: () => {
@@ -166,9 +164,7 @@ const getFixtures = async () => {
 };
 
 class FakeExportConfigReader {
-  mock: jest.MockedFunction<
-    ExportConfigReader['read']
-  > = jest
+  mock: jest.MockedFunction<ExportConfigReader['read']> = jest
     .fn()
     .mockResolvedValue(
       right({ resourceKind: ResourceKind.Project } as ExportConfigContent),
@@ -182,9 +178,8 @@ class FakeExportConfigReader {
 }
 
 class FakeImportResourcePieces extends ImportResourcePieces {
-  mock: jest.MockedFunction<
-    ImportResourcePieces['resolveForProject']
-  > = jest.fn();
+  mock: jest.MockedFunction<ImportResourcePieces['resolveForProject']> =
+    jest.fn();
 
   resolveForProject(
     id: ResourceId,

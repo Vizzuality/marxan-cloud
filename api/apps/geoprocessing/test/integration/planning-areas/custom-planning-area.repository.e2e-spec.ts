@@ -44,9 +44,7 @@ describe(`when entity created`, () => {
   it(`should return id, bbox, max and min pu size in insert`, async () => {
     expect(result).toStrictEqual({
       bbox: [
-        -30.146484374999996,
-        -40.341796875,
-        38.20365531807149,
+        -30.146484374999996, -40.341796875, 38.20365531807149,
         29.22889003019423,
       ],
       id: result.id,
@@ -71,10 +69,7 @@ describe(`when entity created`, () => {
 
     // then
     expect(bbox).toStrictEqual([
-      -30.146484374999996,
-      -40.341796875,
-      38.20365531807149,
-      29.22889003019423,
+      -30.146484374999996, -40.341796875, 38.20365531807149, 29.22889003019423,
     ]);
   });
 });

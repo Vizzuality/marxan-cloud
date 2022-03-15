@@ -88,9 +88,8 @@ export class SolutionResultCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: AppInfoDTO,
   ): Promise<[ScenariosOutputResultsApiEntity[], number]> {
-    const extendedEntities: Promise<ScenariosOutputResultsApiEntity>[] = entitiesAndCount[0].map(
-      (entity) => this.extendGetByIdResult(entity),
-    );
+    const extendedEntities: Promise<ScenariosOutputResultsApiEntity>[] =
+      entitiesAndCount[0].map((entity) => this.extendGetByIdResult(entity));
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 

@@ -3,9 +3,7 @@ export interface PUWithArea {
   area: number;
 }
 export abstract class GetAvailablePlanningUnits {
-  abstract get(
-    scenarioId: string,
-  ): Promise<{
+  abstract get(scenarioId: string): Promise<{
     ids: string[];
   }>;
 

@@ -409,7 +409,8 @@ export class ProjectsCrudService extends AppBaseService<
     return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 
-  locatePlanningAreaEntity = this.planningAreasService.locatePlanningAreaEntity.bind(
-    this.planningAreasService,
-  );
+  locatePlanningAreaEntity =
+    this.planningAreasService.locatePlanningAreaEntity.bind(
+      this.planningAreasService,
+    );
 }

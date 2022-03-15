@@ -32,9 +32,8 @@ export const createWorld = async (app: INestApplication) => {
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom),
   );
-  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(ScenariosPlanningUnitGeoEntity),
-  );
+  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> =
+    app.get(getRepositoryToken(ScenariosPlanningUnitGeoEntity));
 
   const geometriesByCase: {
     [k in ForCase]: {

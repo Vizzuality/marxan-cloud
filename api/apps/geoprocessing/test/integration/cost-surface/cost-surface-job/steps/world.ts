@@ -28,13 +28,13 @@ export const createWorld = async (app: INestApplication) => {
     },
     GivenPuCostDataExists: fixtures.GivenPuCostDataExists,
     getShapefileWithCost: () =>
-      (({
+      ({
         data: {
           scenarioId: fixtures.scenarioId,
           shapefile,
         },
         id: 'test-job',
-      } as unknown) as Job<FromShapefileJobInput>),
+      } as unknown as Job<FromShapefileJobInput>),
     ThenCostIsUpdated: async () => {
       const newCost = await fixtures.GetPuCostsData(fixtures.scenarioId);
       expect(newCost).toEqual(

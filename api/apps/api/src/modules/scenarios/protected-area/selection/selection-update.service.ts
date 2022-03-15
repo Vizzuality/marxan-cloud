@@ -121,8 +121,7 @@ export class SelectionUpdateService {
        */
       try {
         await this.apiEvents.create({
-          kind:
-            API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1,
+          kind: API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1,
           topic: scenario.id,
         });
       } catch (error: unknown) {

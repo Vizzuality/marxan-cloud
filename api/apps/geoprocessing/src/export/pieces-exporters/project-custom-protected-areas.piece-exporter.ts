@@ -23,7 +23,8 @@ interface ProjectCustomProtectedAreasSelectResult {
 @Injectable()
 @PieceExportProvider()
 export class ProjectCustomProtectedAreasPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.default)
@@ -41,22 +42,24 @@ export class ProjectCustomProtectedAreasPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const customProtectedAreas: ProjectCustomProtectedAreasSelectResult[] = await this.geoprocessingEntityManager
-      .createQueryBuilder()
-      .select('ST_AsEWKB(wdpa.the_geom)', 'ewkb')
-      .addSelect('full_name', 'fullName')
-      .from(ProtectedArea, 'wdpa')
-      .where('project_id = :projectId', { projectId: input.resourceId })
-      .execute();
+    const customProtectedAreas: ProjectCustomProtectedAreasSelectResult[] =
+      await this.geoprocessingEntityManager
+        .createQueryBuilder()
+        .select('ST_AsEWKB(wdpa.the_geom)', 'ewkb')
+        .addSelect('full_name', 'fullName')
+        .from(ProtectedArea, 'wdpa')
+        .where('project_id = :projectId', { projectId: input.resourceId })
+        .execute();
 
-    const content = customProtectedAreas.map<ProjectCustomProtectedAreasContent>(
-      (protectedArea) => {
-        return {
-          fullName: protectedArea.fullName,
-          ewkb: protectedArea.ewkb.toJSON().data,
-        };
-      },
-    );
+    const content =
+      customProtectedAreas.map<ProjectCustomProtectedAreasContent>(
+        (protectedArea) => {
+          return {
+            fullName: protectedArea.fullName,
+            ewkb: protectedArea.ewkb.toJSON().data,
+          };
+        },
+      );
 
     const outputFile = await this.fileRepository.save(
       Readable.from(JSON.stringify(content)),

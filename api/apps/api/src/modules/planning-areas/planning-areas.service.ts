@@ -9,17 +9,18 @@ export class PlanningAreasService {
     private readonly allPlanningAreaService: AllPlanningAreasService,
   ) {}
 
-  savePlanningAreaFromShapefile = this.uploader.savePlanningAreaFromShapefile.bind(
-    this.uploader,
-  );
+  savePlanningAreaFromShapefile =
+    this.uploader.savePlanningAreaFromShapefile.bind(this.uploader);
 
-  locatePlanningAreaEntity = this.allPlanningAreaService.locatePlanningAreaEntity.bind(
-    this.allPlanningAreaService,
-  );
+  locatePlanningAreaEntity =
+    this.allPlanningAreaService.locatePlanningAreaEntity.bind(
+      this.allPlanningAreaService,
+    );
 
-  getPlanningAreaIdAndName = this.allPlanningAreaService.getPlanningAreaIdAndName.bind(
-    this.allPlanningAreaService,
-  );
+  getPlanningAreaIdAndName =
+    this.allPlanningAreaService.getPlanningAreaIdAndName.bind(
+      this.allPlanningAreaService,
+    );
 
   getPlanningAreaBBox = this.allPlanningAreaService.getPlanningAreaBBox.bind(
     this.allPlanningAreaService,

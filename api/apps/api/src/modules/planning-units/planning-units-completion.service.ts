@@ -21,7 +21,8 @@ import { PlanningUnitSet } from '@marxan/planning-units-grid';
 
 @Injectable()
 export class PlanningUnitsCompletionService
-  implements EventFactory<PlanningUnitsJob> {
+  implements EventFactory<PlanningUnitsJob>
+{
   private queueEvents: QueueEventsAdapter<PlanningUnitsJob>;
 
   constructor(

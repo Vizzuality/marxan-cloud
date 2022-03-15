@@ -10,7 +10,6 @@ import { tryGeoJSON } from 'pure-geojson-validation';
 export const IsFeatureCollectionOfPolygons = (
   validationOptions: ValidationOptions,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/ban-types
   return (object: object, propertyName: string) => {
     registerDecorator({
       name: 'IsFeatureCollectionOfPolygons',

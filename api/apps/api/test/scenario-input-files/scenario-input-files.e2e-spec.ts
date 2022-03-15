@@ -18,7 +18,8 @@ describe(`when getting input.zip`, () => {
   });
   it(`as contributor, should contain required input files`, async () => {
     await fixtures.GivenContributorWasAddedToScenario();
-    const archiveResponse = await fixtures.WhenGettingArchivedInputAsContributor();
+    const archiveResponse =
+      await fixtures.WhenGettingArchivedInputAsContributor();
     await fixtures.ThenArchiveContainsRequiredFiles(archiveResponse);
   });
   it(`as viewer, should contain required input files`, async () => {
@@ -27,7 +28,8 @@ describe(`when getting input.zip`, () => {
     await fixtures.ThenArchiveContainsRequiredFiles(archiveResponse);
   });
   it(`as user not in scenario, should contain required input files`, async () => {
-    const archiveResponse = await fixtures.WhenGettingArchivedInputAsUserNotInScenario();
+    const archiveResponse =
+      await fixtures.WhenGettingArchivedInputAsUserNotInScenario();
     fixtures.ThenForbiddenIsReturned(archiveResponse);
   });
 });

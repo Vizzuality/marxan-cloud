@@ -14,7 +14,8 @@ import { BlmValuesPolicyFactory } from './blm-values-policy-factory';
 
 @CommandHandler(ChangeProjectBlmRange)
 export class ChangeProjectBlmRangeHandler
-  implements IInferredCommandHandler<ChangeProjectBlmRange> {
+  implements IInferredCommandHandler<ChangeProjectBlmRange>
+{
   private readonly logger: Logger = new Logger(ChangeProjectBlmRange.name);
 
   constructor(

@@ -9,7 +9,8 @@ import { ScenarioJobService } from '../scenario-job/scenario-job.service';
 
 @CommandHandler(CancelBlmCalibration)
 export class CancelBlmCalibrationHandler
-  implements IInferredCommandHandler<CancelBlmCalibration> {
+  implements IInferredCommandHandler<CancelBlmCalibration>
+{
   constructor(
     @Inject(calibrationQueueToken)
     private readonly queue: Queue<JobData>,

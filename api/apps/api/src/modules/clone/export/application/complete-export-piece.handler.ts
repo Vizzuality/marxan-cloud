@@ -13,7 +13,8 @@ import { ExportRepository } from './export-repository.port';
 
 @CommandHandler(CompleteExportPiece)
 export class CompleteExportPieceHandler
-  implements IInferredCommandHandler<CompleteExportPiece> {
+  implements IInferredCommandHandler<CompleteExportPiece>
+{
   constructor(
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
@@ -38,9 +39,8 @@ export class CompleteExportPieceHandler
           );
         }
 
-        const exportAggregate = this.eventPublisher.mergeObjectContext(
-          exportInstance,
-        );
+        const exportAggregate =
+          this.eventPublisher.mergeObjectContext(exportInstance);
 
         const result = exportAggregate.completeComponent(
           componentId,

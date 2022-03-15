@@ -13,7 +13,8 @@ export const queueName = 'cost-surface-template-creation';
 
 @Injectable()
 export class CostTemplateWorkerProcessor
-  implements WorkerProcessor<void, void> {
+  implements WorkerProcessor<void, void>
+{
   private readonly worker: Worker;
   private readonly logger = new Logger(this.constructor.name);
 

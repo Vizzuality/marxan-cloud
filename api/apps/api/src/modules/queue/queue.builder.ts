@@ -6,7 +6,8 @@ import { queueOptionsToken } from './queue-options.provider';
   scope: Scope.TRANSIENT,
 })
 export class QueueBuilder<Input = any, Output = any>
-  implements OnModuleDestroy {
+  implements OnModuleDestroy
+{
   private queue?: Queue;
 
   constructor(

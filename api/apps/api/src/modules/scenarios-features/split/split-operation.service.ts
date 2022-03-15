@@ -28,14 +28,11 @@ export class SplitOperation {
       kind: API_EVENT_KINDS.scenario__geofeatureSplit__submitted__v1__alpha1,
     });
     try {
-      const {
-        project,
-        protectedAreaFilterByIds,
-        planningAreaLocation,
-      } = await this.splitDataProvider.prepareData({
-        scenarioId: data.scenarioId,
-        input: data.input,
-      });
+      const { project, protectedAreaFilterByIds, planningAreaLocation } =
+        await this.splitDataProvider.prepareData({
+          scenarioId: data.scenarioId,
+          input: data.input,
+        });
 
       const { parameters, query } = this.splitQuery.prepareQuery(
         data.input,

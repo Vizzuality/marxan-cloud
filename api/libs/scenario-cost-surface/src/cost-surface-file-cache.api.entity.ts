@@ -49,4 +49,5 @@ export const createCostSurfaceFileCacheFields = [
 ] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const typecheckFields: readonly (keyof CostSurfaceFileCache)[] = createCostSurfaceFileCacheFields;
+const typecheckFields: readonly (keyof CostSurfaceFileCache)[] =
+  createCostSurfaceFileCacheFields;

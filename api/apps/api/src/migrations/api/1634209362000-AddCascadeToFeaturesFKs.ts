@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddCascadeToFeaturesFKs1634209362000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
     ALTER TABLE public.features DROP CONSTRAINT features_project_id_fkey;

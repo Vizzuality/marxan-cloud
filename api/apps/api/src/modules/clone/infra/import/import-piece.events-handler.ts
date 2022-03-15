@@ -19,7 +19,8 @@ import { importPieceEventsFactoryToken } from './import-queue.provider';
 
 @Injectable()
 export class ImportPieceEventsHandler
-  implements EventFactory<ImportJobInput, ImportJobOutput> {
+  implements EventFactory<ImportJobInput, ImportJobOutput>
+{
   private queueEvents: QueueEventsAdapter<ImportJobInput, ImportJobOutput>;
 
   private failEventsMapper: Record<ResourceKind, API_EVENT_KINDS> = {

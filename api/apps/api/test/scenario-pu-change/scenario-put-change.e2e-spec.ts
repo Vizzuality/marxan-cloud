@@ -46,7 +46,8 @@ describe(`when requesting to change inclusive options`, () => {
 
   describe(`when desired PU ids are available`, () => {
     it(`triggers the job`, async () => {
-      const result = await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
+      const result =
+        await world.WhenChangingPlanningUnitInclusivityWithExistingPu();
       const job = Object.values(queue.jobs)[0];
       expect(result.meta.started).toBeTruthy();
       HasExpectedJobDetails(job);

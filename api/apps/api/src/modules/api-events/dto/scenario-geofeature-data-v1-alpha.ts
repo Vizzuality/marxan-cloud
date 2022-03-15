@@ -27,7 +27,8 @@ const geofeatureEventKinds: ScenarioGeofeatureEvents = {
 };
 const allKindsValues = Object.values(geofeatureEventKinds);
 export class ScenarioGeofeatureDataV1AlphaDTO
-  implements ScenarioGeofeatureDataV1Alpha {
+  implements ScenarioGeofeatureDataV1Alpha
+{
   @ApiProperty()
   @IsUUID()
   featureId!: string;

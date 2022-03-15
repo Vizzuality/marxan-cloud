@@ -8,7 +8,8 @@ import {
 } from 'class-validator';
 
 export class ScenarioFeatureRunData
-  implements Omit<OutputScenariosFeaturesDataGeoEntity, `id`> {
+  implements Omit<OutputScenariosFeaturesDataGeoEntity, `id`>
+{
   @IsOptional()
   @IsNumber()
   amount?: number;

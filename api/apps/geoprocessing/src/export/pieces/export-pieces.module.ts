@@ -18,9 +18,10 @@ export class ExportPiecesModule implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const pieceExportersProviders = await this.discovery.providersWithMetaAtKey<symbol>(
-      ExportPieceProcessorProvider,
-    );
+    const pieceExportersProviders =
+      await this.discovery.providersWithMetaAtKey<symbol>(
+        ExportPieceProcessorProvider,
+      );
 
     // TODO: should ensure this is a class instance that implements PieceProcessor
     // shouldn't happen tho if decorator is used as intended.

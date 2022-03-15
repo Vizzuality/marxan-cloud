@@ -34,9 +34,8 @@ export class ProjectCheckerFake implements ProjectChecker {
     });
     if (!project) return left(doesntExist);
 
-    const projectPendingImport = this.projectsWithPendingImports.includes(
-      projectId,
-    );
+    const projectPendingImport =
+      this.projectsWithPendingImports.includes(projectId);
 
     if (!project.scenarios || projectPendingImport)
       return right(projectPendingImport);
@@ -62,9 +61,8 @@ export class ProjectCheckerFake implements ProjectChecker {
     });
     if (!project) return left(doesntExist);
 
-    const projectPendingExport = this.projectsWithPendingExports.includes(
-      projectId,
-    );
+    const projectPendingExport =
+      this.projectsWithPendingExports.includes(projectId);
 
     if (!project.scenarios || projectPendingExport)
       return right(projectPendingExport);

@@ -14,9 +14,7 @@ export class CopyDataProvider {
     private readonly projects: ProjectsCrudService,
   ) {}
 
-  async prepareData(data: {
-    scenarioId: string;
-  }): Promise<{
+  async prepareData(data: { scenarioId: string }): Promise<{
     protectedAreaFilterByIds: string[];
     planningAreaLocation: { id: string; tableName: string } | undefined;
     project: Project;

@@ -337,10 +337,11 @@ export class ProjectsController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      planningAreaId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        planningAreaId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -365,10 +366,11 @@ export class ProjectsController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ): Promise<void> {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      planningAreaId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        planningAreaId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -397,27 +399,32 @@ export class ProjectsController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      projectId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        projectId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
-      projectId,
-      req.user.id,
-      z,
-      x,
-      y,
-    );
+    const result =
+      await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
+        projectId,
+        req.user.id,
+        z,
+        x,
+        y,
+      );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
     req.url = req.url.replace(result.right.from, result.right.to);
-    req.originalUrl = req.originalUrl.replace(result.right.from, result.right.to);
+    req.originalUrl = req.originalUrl.replace(
+      result.right.from,
+      result.right.to,
+    );
 
     return await this.proxyService.proxyTileRequest(req, response);
   }
@@ -443,30 +450,33 @@ export class ProjectsController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
-    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-      projectId,
-      req.user.id,
-    );
+    const checkPlanningAreaBelongsToProject =
+      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+        projectId,
+        req.user.id,
+      );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
 
-    const result = await this.projectsService.getActualUrlForProjectPlanningGridTiles(
-      projectId,
-      req.user.id,
-      z,
-      x,
-      y,
-    );
+    const result =
+      await this.projectsService.getActualUrlForProjectPlanningGridTiles(
+        projectId,
+        req.user.id,
+        z,
+        x,
+        y,
+      );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
 
-
-
     req.url = req.url.replace(result.right.from, result.right.to);
-    req.originalUrl = req.originalUrl.replace(result.right.from, result.right.to);
+    req.originalUrl = req.originalUrl.replace(
+      result.right.from,
+      result.right.to,
+    );
 
     req.query = result.right.query;
 
@@ -675,10 +685,11 @@ export class ProjectsController {
     @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ) {
-    const exportIdOrError = await this.projectsService.getLatestExportForProject(
-      projectId,
-      req.user.id,
-    );
+    const exportIdOrError =
+      await this.projectsService.getLatestExportForProject(
+        projectId,
+        req.user.id,
+      );
 
     if (isLeft(exportIdOrError)) {
       switch (exportIdOrError.left) {

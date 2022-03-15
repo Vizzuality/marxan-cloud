@@ -10,7 +10,8 @@ import { ProjectsCrudService } from './projects-crud.service';
 
 @QueryHandler(GetProjectQuery)
 export class GetProjectHandler
-  implements IInferredQueryHandler<GetProjectQuery> {
+  implements IInferredQueryHandler<GetProjectQuery>
+{
   constructor(private readonly projectsCrud: ProjectsCrudService) {}
 
   async execute({

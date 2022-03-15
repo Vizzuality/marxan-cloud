@@ -55,12 +55,13 @@ export const getFixtures = async () => {
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
-  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      DbConnections.geoprocessingDB,
-    ),
-  );
+  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> =
+    app.get(
+      getRepositoryToken(
+        ScenariosPlanningUnitGeoEntity,
+        DbConnections.geoprocessingDB,
+      ),
+    );
   const scenarioPuDataCostRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
   );

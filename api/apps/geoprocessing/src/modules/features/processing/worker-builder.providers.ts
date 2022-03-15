@@ -60,11 +60,12 @@ export const stratificationQueueNameProvider: ValueProvider<string> = {
 export const stratificationWorkerBuilderToken = Symbol(
   'stratification worker builder token',
 );
-export const stratificationWorkerBuilderProvider: FactoryProvider<WorkerBuilder> = {
-  provide: stratificationWorkerBuilderToken,
-  useFactory: (builder: WorkerBuilder) => builder,
-  inject: [WorkerBuilder],
-};
+export const stratificationWorkerBuilderProvider: FactoryProvider<WorkerBuilder> =
+  {
+    provide: stratificationWorkerBuilderToken,
+    useFactory: (builder: WorkerBuilder) => builder,
+    inject: [WorkerBuilder],
+  };
 
 export const stratificationQueueEventsToken = Symbol(
   'stratification queue events token',

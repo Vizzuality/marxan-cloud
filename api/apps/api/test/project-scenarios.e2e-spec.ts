@@ -40,13 +40,15 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Creating a scenario with minimum required data should succeed', async () => {
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     fixtures.ThenScenarioIsCreatedAndNoJobHasBeenSubmitted(response);
   });
 
   it('Creating a scenario will succeed because the user is a project contributor', async () => {
     await fixtures.GivenContributorWasAddedToProject();
-    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsContributor();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsContributor();
     fixtures.ThenScenarioIsCreated(response);
   });
 
@@ -57,7 +59,8 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Creating a scenario with complete data should succeed', async () => {
-    const response = await fixtures.WhenCreatingAScenarioWithCompleteDataAsOwner();
+    const response =
+      await fixtures.WhenCreatingAScenarioWithCompleteDataAsOwner();
     fixtures.ThenScenarioAndJobAreCreated(response);
   });
 
@@ -87,7 +90,8 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('Gets scenarios (paginated; pages of up to 5 items, first page)', async () => {
-    const response = await fixtures.WhenGettingPaginatedScenariosWithPageNumberAsOwner();
+    const response =
+      await fixtures.WhenGettingPaginatedScenariosWithPageNumberAsOwner();
     fixtures.ThenProperLengthIsReturned(response);
   });
 
@@ -118,7 +122,8 @@ describe('ScenariosModule (e2e)', () => {
   });
 
   it('should not allow to create scenario with invalid marxan properties', async () => {
-    const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
+    const response =
+      await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
   });
 });

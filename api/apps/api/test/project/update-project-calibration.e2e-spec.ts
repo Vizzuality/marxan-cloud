@@ -36,10 +36,11 @@ test(`updating a project calibration with incorrect ranges should throw an excep
 test(`updating a project calibration range should not work if user is not in project`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
   const userToken = await fixtures.GivenUserIsNotInProject();
-  const request = await fixtures.WhenProjectCalibrationIsUpdatedAsNotIncludedUser(
-    projectId,
-    userToken,
-  );
+  const request =
+    await fixtures.WhenProjectCalibrationIsUpdatedAsNotIncludedUser(
+      projectId,
+      userToken,
+    );
 
   await fixtures.ThenForbiddenIsReturned(request);
 });

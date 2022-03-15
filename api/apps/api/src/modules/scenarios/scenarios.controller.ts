@@ -534,16 +534,17 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesGapData>[]> {
-    const result = await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
-      fetchSpecification,
-      {
-        params: {
-          scenarioId: id,
-          searchPhrase: featureClassAndAliasFilter,
+    const result =
+      await this.scenarioFeaturesGapDataService.findAllPaginatedAcl(
+        fetchSpecification,
+        {
+          params: {
+            scenarioId: id,
+            searchPhrase: featureClassAndAliasFilter,
+          },
+          authenticatedUser: req.user,
         },
-        authenticatedUser: req.user,
-      },
-    );
+      );
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
@@ -865,16 +866,17 @@ export class ScenariosController {
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Query('q') featureClassAndAliasFilter?: string,
   ): Promise<Partial<ScenarioFeaturesOutputGapData>[]> {
-    const result = await this.scenarioFeaturesOutputGapDataService.findAllPaginatedAcl(
-      fetchSpecification,
-      {
-        params: {
-          scenarioId: id,
-          searchPhrase: featureClassAndAliasFilter,
+    const result =
+      await this.scenarioFeaturesOutputGapDataService.findAllPaginatedAcl(
+        fetchSpecification,
+        {
+          params: {
+            scenarioId: id,
+            searchPhrase: featureClassAndAliasFilter,
+          },
+          authenticatedUser: req.user,
         },
-        authenticatedUser: req.user,
-      },
-    );
+      );
 
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {

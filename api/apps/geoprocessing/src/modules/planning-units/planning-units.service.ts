@@ -52,13 +52,8 @@ export class PlanningUnitsService {
     tileSpecification: tileSpecification,
     filters?: PlanningUnitsFilters,
   ): Promise<Buffer> {
-    const {
-      z,
-      x,
-      y,
-      planningUnitGridShape,
-      planningUnitAreakm2,
-    } = tileSpecification;
+    const { z, x, y, planningUnitGridShape, planningUnitAreakm2 } =
+      tileSpecification;
 
     const inputProjection = 3857;
 

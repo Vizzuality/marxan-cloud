@@ -170,27 +170,28 @@ export class GeoFeaturesService extends AppBaseService<
      *
      */
     if (projectId && info?.params?.bbox) {
-      const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
-        .createQueryBuilder('geoFeatureGeometries')
-        .select('"geoFeatureGeometries"."feature_id"', 'featureId')
-        .distinctOn(['"geoFeatureGeometries"."feature_id"'])
-        .where(
-          `st_intersects(
+      const geoFeaturesWithinProjectBbox =
+        await this.geoFeaturesGeometriesRepository
+          .createQueryBuilder('geoFeatureGeometries')
+          .select('"geoFeatureGeometries"."feature_id"', 'featureId')
+          .distinctOn(['"geoFeatureGeometries"."feature_id"'])
+          .where(
+            `st_intersects(
         st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
         "geoFeatureGeometries".the_geom
       )`,
-          {
-            xmin: info.params.bbox[1],
-            ymin: info.params.bbox[3],
-            xmax: info.params.bbox[0],
-            ymax: info.params.bbox[2],
-          },
-        )
-        .getRawMany()
-        .then((result) => result.map((i) => i.featureId))
-        .catch((error) => {
-          throw new Error(error);
-        });
+            {
+              xmin: info.params.bbox[1],
+              ymin: info.params.bbox[3],
+              xmax: info.params.bbox[0],
+              ymax: info.params.bbox[2],
+            },
+          )
+          .getRawMany()
+          .then((result) => result.map((i) => i.featureId))
+          .catch((error) => {
+            throw new Error(error);
+          });
 
       // Only apply narrowing by intersection with project bbox if there are
       // features falling within said bbox; otherwise return an empty set

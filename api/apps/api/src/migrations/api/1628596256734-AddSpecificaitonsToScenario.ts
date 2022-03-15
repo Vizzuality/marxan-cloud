@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddSpecificaitonsToScenario1628596256734
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'AddSpecificaitonsToScenario1628596256734';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

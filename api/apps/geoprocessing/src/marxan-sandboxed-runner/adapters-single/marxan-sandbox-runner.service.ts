@@ -14,7 +14,8 @@ import { SandboxRunnerOutputHandler } from '../ports/sandbox-runner-output-handl
 
 @Injectable()
 export class MarxanSandboxRunnerService
-  implements SandboxRunner<JobData, ExecutionResult> {
+  implements SandboxRunner<JobData, ExecutionResult>
+{
   readonly #controllers: Record<string, AbortController> = {};
   readonly #logger = new Logger(this.constructor.name);
 
@@ -126,9 +127,8 @@ export class MarxanSandboxRunnerService
     scenarioId: string,
     cancellables: Cancellable[],
   ) {
-    const controller = (this.#controllers[
-      scenarioId
-    ] ??= new AbortController());
+    const controller = (this.#controllers[scenarioId] ??=
+      new AbortController());
 
     controller.signal.addEventListener('abort', () => {
       cancellables.forEach((killMe) => killMe.cancel());

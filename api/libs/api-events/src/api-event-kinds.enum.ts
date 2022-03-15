@@ -96,4 +96,5 @@ export type ScenarioGeofeatureEvents = Pick<
   typeof API_EVENT_KINDS,
   ScenarioGeoFeatureEventKeys
 >;
-export type ScenarioGeofeatureEventValues = ValuesType<ScenarioGeofeatureEvents>;
+export type ScenarioGeofeatureEventValues =
+  ValuesType<ScenarioGeofeatureEvents>;

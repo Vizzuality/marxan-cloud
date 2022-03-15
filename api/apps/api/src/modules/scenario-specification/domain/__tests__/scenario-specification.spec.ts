@@ -17,7 +17,8 @@ test(`activate empty candidate`, () => {
 });
 
 test(`activate candidate with different id`, () => {
-  const scenarioSpecification = fixtures.GivenScenarioSpecificationWithCandidate();
+  const scenarioSpecification =
+    fixtures.GivenScenarioSpecificationWithCandidate();
   const result = fixtures.WhenCandidateSpecificationIsActivated(
     scenarioSpecification,
     new SpecificationId(v4()),
@@ -26,7 +27,8 @@ test(`activate candidate with different id`, () => {
 });
 
 test(`activate current candidate`, () => {
-  const scenarioSpecification = fixtures.GivenScenarioSpecificationWithCandidate();
+  const scenarioSpecification =
+    fixtures.GivenScenarioSpecificationWithCandidate();
   const result = fixtures.WhenCandidateSpecificationIsActivated(
     scenarioSpecification,
     scenarioSpecification.currentCandidateSpecification,
@@ -36,7 +38,8 @@ test(`activate current candidate`, () => {
 });
 
 test(`assign candidate`, () => {
-  const scenarioSpecification = fixtures.GivenScenarioSpecificationWithCandidate();
+  const scenarioSpecification =
+    fixtures.GivenScenarioSpecificationWithCandidate();
   const specification = fixtures.WhenCandidateSpecificationIsAssigned(
     scenarioSpecification,
   );

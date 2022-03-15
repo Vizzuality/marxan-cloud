@@ -8,7 +8,8 @@ import { MarkImportAsFinished } from './mark-import-as-finished.command';
 
 @CommandHandler(MarkImportAsFinished)
 export class MarkImportAsFinishedHandler
-  implements IInferredCommandHandler<MarkImportAsFinished> {
+  implements IInferredCommandHandler<MarkImportAsFinished>
+{
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__finished__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__finished__v1__alpha,

@@ -194,11 +194,10 @@ const getFixtures = async () => {
     findOne: jest.fn(),
   };
 
-  const fakeScenariosRepo: jest.Mocked<
-    Pick<Repository<Scenario>, 'findOne'>
-  > = {
-    findOne: jest.fn(),
-  };
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Scenario>, 'findOne'>> =
+    {
+      findOne: jest.fn(),
+    };
 
   const sandbox = await Test.createTestingModule({
     providers: [

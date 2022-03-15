@@ -12,18 +12,15 @@ afterEach(async () => {
 
 test(`add every type of user to a scenario as scenario owner`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
-  const viewerResponse = await fixtures.WhenAddingANewViewerToTheScenarioAsOwner(
-    scenarioId,
-  );
-  const contributorResponse = await fixtures.WhenAddingANewContributorToTheScenarioAsOwner(
-    scenarioId,
-  );
+  const viewerResponse =
+    await fixtures.WhenAddingANewViewerToTheScenarioAsOwner(scenarioId);
+  const contributorResponse =
+    await fixtures.WhenAddingANewContributorToTheScenarioAsOwner(scenarioId);
   const ownerResponse = await fixtures.WhenAddingANewOwnerToTheScenarioAsOwner(
     scenarioId,
   );
-  const allUsersInScenarioResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
-    scenarioId,
-  );
+  const allUsersInScenarioResponse =
+    await fixtures.WhenGettingScenarioUsersAsOwner(scenarioId);
   fixtures.ThenNoContentIsReturned(viewerResponse);
   fixtures.ThenNoContentIsReturned(contributorResponse);
   fixtures.ThenNoContentIsReturned(ownerResponse);
@@ -35,15 +32,14 @@ test(`add every type of user to a scenario as scenario owner`, async () => {
 test(`add every type of user to a scenario as scenario contributor`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenContributorWasAddedToScenario(scenarioId);
-  const viewerResponse = await fixtures.WhenAddingANewViewerToTheScenarioAsContributor(
-    scenarioId,
-  );
-  const contributorResponse = await fixtures.WhenAddingANewContributorToTheScenarioAsContributor(
-    scenarioId,
-  );
-  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheScenarioAsContributor(
-    scenarioId,
-  );
+  const viewerResponse =
+    await fixtures.WhenAddingANewViewerToTheScenarioAsContributor(scenarioId);
+  const contributorResponse =
+    await fixtures.WhenAddingANewContributorToTheScenarioAsContributor(
+      scenarioId,
+    );
+  const ownerResponse =
+    await fixtures.WhenAddingANewOwnerToTheScenarioAsContributor(scenarioId);
   fixtures.ThenForbiddenIsReturned(viewerResponse);
   fixtures.ThenForbiddenIsReturned(contributorResponse);
   fixtures.ThenForbiddenIsReturned(ownerResponse);
@@ -52,15 +48,14 @@ test(`add every type of user to a scenario as scenario contributor`, async () =>
 test(`add every type of user to a scenario as scenario viewer`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenViewerWasAddedToScenario(scenarioId);
-  const viewerResponse = await fixtures.WhenAddingANewViewerToTheScenarioAsContributor(
-    scenarioId,
-  );
-  const contributorResponse = await fixtures.WhenAddingANewContributorToTheScenarioAsContributor(
-    scenarioId,
-  );
-  const ownerResponse = await fixtures.WhenAddingANewOwnerToTheScenarioAsContributor(
-    scenarioId,
-  );
+  const viewerResponse =
+    await fixtures.WhenAddingANewViewerToTheScenarioAsContributor(scenarioId);
+  const contributorResponse =
+    await fixtures.WhenAddingANewContributorToTheScenarioAsContributor(
+      scenarioId,
+    );
+  const ownerResponse =
+    await fixtures.WhenAddingANewOwnerToTheScenarioAsContributor(scenarioId);
   fixtures.ThenForbiddenIsReturned(viewerResponse);
   fixtures.ThenForbiddenIsReturned(contributorResponse);
   fixtures.ThenForbiddenIsReturned(ownerResponse);
@@ -71,9 +66,8 @@ test(`change user role`, async () => {
   await fixtures.GivenViewerWasAddedToScenario(scenarioId);
   const changeRoleResponse = await fixtures.WhenChangingUserRole(scenarioId);
   fixtures.ThenNoContentIsReturned(changeRoleResponse);
-  const allUsersInScenarioResponse = await fixtures.WhenGettingScenarioUsersAsOwner(
-    scenarioId,
-  );
+  const allUsersInScenarioResponse =
+    await fixtures.WhenGettingScenarioUsersAsOwner(scenarioId);
   fixtures.ThenUsersWithChangedRoleIsOnScenario(allUsersInScenarioResponse);
 });
 
@@ -120,12 +114,10 @@ test(`adds and deletes users alternately`, async () => {
   const scenarioId = await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenViewerWasAddedToScenario(scenarioId);
 
-  const viewerResponse = await fixtures.WhenAddingANewViewerToTheScenarioAsOwner(
-    scenarioId,
-  );
-  const contributorResponse = await fixtures.WhenAddingANewContributorToTheScenarioAsOwner(
-    scenarioId,
-  );
+  const viewerResponse =
+    await fixtures.WhenAddingANewViewerToTheScenarioAsOwner(scenarioId);
+  const contributorResponse =
+    await fixtures.WhenAddingANewContributorToTheScenarioAsOwner(scenarioId);
   fixtures.ThenNoContentIsReturned(viewerResponse);
   fixtures.ThenNoContentIsReturned(contributorResponse);
 

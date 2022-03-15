@@ -8,7 +8,8 @@ import { MarkExportAsFinished } from './mark-export-as-finished.command';
 
 @CommandHandler(MarkExportAsFinished)
 export class MarkExportAsFinishedHandler
-  implements IInferredCommandHandler<MarkExportAsFinished> {
+  implements IInferredCommandHandler<MarkExportAsFinished>
+{
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__finished__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__finished__v1__alpha,

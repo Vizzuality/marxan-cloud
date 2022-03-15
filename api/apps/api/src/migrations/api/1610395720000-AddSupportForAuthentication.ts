@@ -3,7 +3,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 import { PostgreSQLUtils } from '@marxan-api/utils/postgresql.utils';
 
 export class AddSupportForAuthentication1610395720000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   async up(queryRunner: QueryRunner): Promise<any> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
     if (await PostgreSQLUtils.version13Plus()) {

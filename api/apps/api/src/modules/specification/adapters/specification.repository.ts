@@ -40,22 +40,23 @@ export class DbSpecificationRepository implements SpecificationRepository {
         draft: snapshot.draft,
         raw: snapshot.raw,
         scenarioId: snapshot.scenarioId,
-        specificationFeaturesConfiguration: this.specificationFeatureConfigRepo.create(
-          snapshot.config.map((configuration) => ({
-            id: configuration.id,
-            againstFeatureId: configuration.againstFeatureId,
-            baseFeatureId: configuration.baseFeatureId,
-            operation: configuration.operation,
-            splitByProperty: configuration.splitByProperty,
-            selectSubSets: configuration.selectSubSets,
-            features: configuration.resultFeatures.map((feature) => ({
-              calculated: feature.calculated,
-              featureId: feature.featureId,
+        specificationFeaturesConfiguration:
+          this.specificationFeatureConfigRepo.create(
+            snapshot.config.map((configuration) => ({
+              id: configuration.id,
+              againstFeatureId: configuration.againstFeatureId,
+              baseFeatureId: configuration.baseFeatureId,
+              operation: configuration.operation,
+              splitByProperty: configuration.splitByProperty,
+              selectSubSets: configuration.selectSubSets,
+              features: configuration.resultFeatures.map((feature) => ({
+                calculated: feature.calculated,
+                featureId: feature.featureId,
+              })),
+              featuresDetermined: configuration.featuresDetermined,
+              specificationId: snapshot.id,
             })),
-            featuresDetermined: configuration.featuresDetermined,
-            specificationId: snapshot.id,
-          })),
-        ),
+          ),
       }),
       {
         chunk: 10000,

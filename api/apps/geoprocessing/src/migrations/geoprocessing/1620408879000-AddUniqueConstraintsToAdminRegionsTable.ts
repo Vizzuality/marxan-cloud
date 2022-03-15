@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddUniqueConstraintsToAdminRegionsTable1620408879000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 CREATE UNIQUE INDEX unique_l0_regions ON admin_regions (gid_0, level) where level = 'country';

@@ -8,7 +8,8 @@ import { UploadExportFile } from './upload-export-file.command';
 
 @CommandHandler(UploadExportFile)
 export class UploadExportFileHandler
-  implements IInferredCommandHandler<UploadExportFile> {
+  implements IInferredCommandHandler<UploadExportFile>
+{
   constructor(
     private readonly fileRepository: FileRepository,
     private readonly logger: Logger,

@@ -22,7 +22,8 @@ interface ProjectSelectResult {
 @Injectable()
 @PieceExportProvider()
 export class PlanningUnitsGridGeojsonPieceExporter
-  implements ExportPieceProcessor {
+  implements ExportPieceProcessor
+{
   constructor(
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)

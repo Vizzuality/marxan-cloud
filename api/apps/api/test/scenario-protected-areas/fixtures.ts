@@ -283,16 +283,20 @@ export const getFixtures = async () => {
       scenario: string,
     ) => {
       expect(
-        (commands.find(
-          (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
-        ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
+        (
+          commands.find(
+            (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
+          ) as CalculatePlanningUnitsProtectionLevel | undefined
+        )?.scenarioId,
       ).toEqual(scenario);
     },
     ThenCalculationsOfProtectionLevelWereNotTriggered: async () => {
       expect(
-        (commands.find(
-          (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
-        ) as CalculatePlanningUnitsProtectionLevel | undefined)?.scenarioId,
+        (
+          commands.find(
+            (cmd) => cmd instanceof CalculatePlanningUnitsProtectionLevel,
+          ) as CalculatePlanningUnitsProtectionLevel | undefined
+        )?.scenarioId,
       ).toEqual(undefined);
     },
     ThenForbiddenIsReturned: (response: request.Response) => {

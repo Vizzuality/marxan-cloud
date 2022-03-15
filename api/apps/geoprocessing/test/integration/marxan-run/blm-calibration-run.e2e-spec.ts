@@ -124,9 +124,8 @@ const getFixtures = async () => {
   const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
     getRepositoryToken(MarxanExecutionMetadataGeoEntity),
   );
-  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
-    getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
-  );
+  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> =
+    app.get(getRepositoryToken(OutputScenariosFeaturesDataGeoEntity));
   const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = app.get(
     getRepositoryToken(BlmFinalResultEntity),
   );
@@ -136,9 +135,8 @@ const getFixtures = async () => {
   // note that SandboxRunner may be both single and blm-calibration one
   const runModuleContext = app.select(BlmRunAdapterModule);
 
-  const sut: MarxanSandboxBlmRunnerService = runModuleContext.get(
-    blmSandboxRunner,
-  );
+  const sut: MarxanSandboxBlmRunnerService =
+    runModuleContext.get(blmSandboxRunner);
 
   const nockScope = nock(host, {
     reqheaders: {

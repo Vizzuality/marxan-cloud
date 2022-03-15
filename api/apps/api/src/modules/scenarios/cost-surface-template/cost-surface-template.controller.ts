@@ -46,10 +46,11 @@ export class CostSurfaceTemplateController {
     @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
-    const shapefileStatus = await this.scenarioCostSurfaceTemplateService.getTemplateShapefile(
-      id,
-      res,
-    );
+    const shapefileStatus =
+      await this.scenarioCostSurfaceTemplateService.getTemplateShapefile(
+        id,
+        res,
+      );
 
     if (shapefileStatus === FileNotReady) {
       res.status(HttpStatus.GATEWAY_TIMEOUT).send();

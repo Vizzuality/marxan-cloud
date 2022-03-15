@@ -16,7 +16,8 @@ import { Either, isLeft, left, right } from 'fp-ts/Either';
 
 @CommandHandler(CreateInitialScenarioBlm)
 export class CreateInitialScenarioBlmHandler
-  implements IInferredCommandHandler<CreateInitialScenarioBlm> {
+  implements IInferredCommandHandler<CreateInitialScenarioBlm>
+{
   constructor(
     @Inject(calibrationQueueToken)
     private readonly queue: Queue<JobData>,

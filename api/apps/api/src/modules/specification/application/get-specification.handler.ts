@@ -10,7 +10,8 @@ import { SpecificationRepository } from './specification.repository';
 
 @QueryHandler(GetLastUpdatedSpecification)
 export class GetSpecificationHandler
-  implements IInferredQueryHandler<GetLastUpdatedSpecification> {
+  implements IInferredQueryHandler<GetLastUpdatedSpecification>
+{
   constructor(private readonly specificationsRepo: SpecificationRepository) {}
 
   async execute({

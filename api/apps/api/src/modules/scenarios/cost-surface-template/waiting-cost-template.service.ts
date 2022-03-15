@@ -10,7 +10,8 @@ import {
 
 @Injectable()
 export class WaitingCostTemplateService
-  implements ScenarioCostSurfaceTemplateService {
+  implements ScenarioCostSurfaceTemplateService
+{
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(private readonly templateService: QueuedCostTemplateService) {}

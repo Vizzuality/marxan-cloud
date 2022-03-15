@@ -15,15 +15,12 @@ test(`delete every type of user from the project as owner`, async () => {
   await fixtures.GivenViewerWasAddedToProject(projectId);
   await fixtures.GivenContributorWasAddedToProject(projectId);
   await fixtures.GivenOwnerWasAddedToProject(projectId);
-  const viewerRevokeResponse = await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(
-    projectId,
-  );
-  const contributorRevokeResponse = await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(
-    projectId,
-  );
-  const ownerRevokeResponse = await fixtures.WhenRevokingAccessToOwnerFromProjectAsOwner(
-    projectId,
-  );
+  const viewerRevokeResponse =
+    await fixtures.WhenRevokingAccessToViewerFromProjectAsOwner(projectId);
+  const contributorRevokeResponse =
+    await fixtures.WhenRevokingAccessToContributorFromProjectAsOwner(projectId);
+  const ownerRevokeResponse =
+    await fixtures.WhenRevokingAccessToOwnerFromProjectAsOwner(projectId);
   const singleUserResponse = await fixtures.WhenGettingProjectUsersAsOwner(
     projectId,
   );
@@ -35,8 +32,7 @@ test(`delete every type of user from the project as owner`, async () => {
 
 test(`delete last owner as the only owner`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
-  const revokeResponse = await fixtures.WhenRevokingAccessToLastOwnerFromProjectAsOwner(
-    projectId,
-  );
+  const revokeResponse =
+    await fixtures.WhenRevokingAccessToLastOwnerFromProjectAsOwner(projectId);
   fixtures.ThenForbiddenIsReturned(revokeResponse);
 });

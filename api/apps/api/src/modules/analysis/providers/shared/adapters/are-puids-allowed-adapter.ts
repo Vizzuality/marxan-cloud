@@ -8,7 +8,8 @@ import { ScenariosPlanningUnitService } from '../../../../scenarios-planning-uni
 @Injectable()
 export class ArePuidsAllowedAdapter
   extends ScenariosPlanningUnitService
-  implements ArePuidsAllowedPort {
+  implements ArePuidsAllowedPort
+{
   async validate(
     scenarioId: string,
     puIds: string[],

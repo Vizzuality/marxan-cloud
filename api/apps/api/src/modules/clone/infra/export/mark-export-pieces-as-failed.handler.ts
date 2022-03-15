@@ -8,7 +8,8 @@ import { Logger } from '@nestjs/common';
 
 @CommandHandler(MarkExportPiecesAsFailed)
 export class MarkExportPiecesAsFailedHandler
-  implements IInferredCommandHandler<MarkExportPiecesAsFailed> {
+  implements IInferredCommandHandler<MarkExportPiecesAsFailed>
+{
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__piece__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__piece__failed__v1__alpha,

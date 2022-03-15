@@ -2,7 +2,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 import { v4 } from 'uuid';
 
 export class DropNotNullsOnTimeUserMetadataColumns1619711501000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   private tablesToAlter = ['organizations', 'projects', 'scenarios'];
 
   public async up(queryRunner: QueryRunner): Promise<void> {

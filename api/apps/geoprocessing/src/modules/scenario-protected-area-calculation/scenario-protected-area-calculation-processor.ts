@@ -9,7 +9,8 @@ import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit'
 
 @Injectable()
 export class ScenarioProtectedAreaCalculationProcessor
-  implements WorkerProcessor<JobInput, true> {
+  implements WorkerProcessor<JobInput, true>
+{
   private readonly logger: Logger = new Logger(
     ScenarioProtectedAreaCalculationProcessor.name,
   );

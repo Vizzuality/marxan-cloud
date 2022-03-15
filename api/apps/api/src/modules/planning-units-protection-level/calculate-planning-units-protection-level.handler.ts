@@ -9,7 +9,8 @@ import { Logger } from '@nestjs/common';
 
 @CommandHandler(CalculatePlanningUnitsProtectionLevel)
 export class CalculatePlanningUnitsProtectionLevelHandler
-  implements ICommandHandler<CalculatePlanningUnitsProtectionLevel> {
+  implements ICommandHandler<CalculatePlanningUnitsProtectionLevel>
+{
   constructor(
     private readonly queueService: QueueService<CalculatePlanningUnitsProtectionLevel>,
     private readonly events: ApiEventsService,

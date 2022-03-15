@@ -72,9 +72,8 @@ const getFixtures = async () => {
       fakeShapefileService.templatesInProgress.push(scenarioId);
     },
     templateAvailable(scenarioId: string, fileContent: string) {
-      fakeShapefileService.availableTemplatesForScenarios[
-        scenarioId
-      ] = fileContent;
+      fakeShapefileService.availableTemplatesForScenarios[scenarioId] =
+        fileContent;
     },
   };
 

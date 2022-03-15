@@ -3,7 +3,8 @@ import { ShapefileService } from '@marxan/shapefile-converter';
 
 @Injectable()
 export class FakeShapefileService
-  implements Pick<ShapefileService, 'transformToGeoJson'> {
+  implements Pick<ShapefileService, 'transformToGeoJson'>
+{
   transformToGeoJsonMock = jest.fn();
 
   async transformToGeoJson(

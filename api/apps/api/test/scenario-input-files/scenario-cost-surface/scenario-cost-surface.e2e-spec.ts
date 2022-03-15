@@ -126,7 +126,8 @@ describe(`As user not in scenario, when scenario has PUs with cost and lock stat
   });
 
   it(`returns forbidden when getting planning-units`, async () => {
-    const response = await fixtures.WhenGettingPuInclusionStateAsUserNotInScenario();
+    const response =
+      await fixtures.WhenGettingPuInclusionStateAsUserNotInScenario();
     await fixtures.ThenForbiddenIsReturned(response);
   });
 });

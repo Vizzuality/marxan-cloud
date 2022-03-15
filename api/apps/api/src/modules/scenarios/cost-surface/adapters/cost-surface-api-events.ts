@@ -9,7 +9,8 @@ import { ApiEventsService } from '../../../api-events/api-events.service';
 @Injectable()
 export class CostSurfaceApiEvents
   extends ApiEventsService
-  implements CostSurfaceEventsPort {
+  implements CostSurfaceEventsPort
+{
   private readonly eventsMap: Record<CostSurfaceState, API_EVENT_KINDS> = {
     [CostSurfaceState.Submitted]:
       API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1,

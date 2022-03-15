@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddScenariosCostSurfaceFileCache1622202936552
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TYPE "cost_surface_file_cache_artifactType_enum" AS ENUM('CostTemplate');

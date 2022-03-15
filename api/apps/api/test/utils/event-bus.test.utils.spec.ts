@@ -33,7 +33,8 @@ it('should await until an event of a specific class is published', async () => {
 it('should await until an event which mets a specific condition is published', async () => {
   fixtures.GivenEventInspectionHasStarted();
 
-  const event = await fixtures.WhenAnEventOfFirstEventTypeWithFooAsIdIsPublished();
+  const event =
+    await fixtures.WhenAnEventOfFirstEventTypeWithFooAsIdIsPublished();
 
   fixtures.ThenObtainedEventIsAnInstanceOfFirstEventTypeAndItsIdIsFoo(event);
 });

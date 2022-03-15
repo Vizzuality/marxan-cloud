@@ -110,14 +110,16 @@ export class GeoFeaturePropertySetService {
       id: In(idsOfFeaturesInSpecification),
     });
     Logger.debug(inspect(featuresInSpecification));
-    const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(
-      idsOfFeaturesInSpecification,
-      project?.bbox,
-    );
-    const featuresInSpecificationWithPropertiesMetadata = this.extendGeoFeaturesWithPropertiesFromPropertySets(
-      featuresInSpecification,
-      metadataForFeaturesInSpecification,
-    );
+    const metadataForFeaturesInSpecification =
+      await this.getFeaturePropertySetsForFeatures(
+        idsOfFeaturesInSpecification,
+        project?.bbox,
+      );
+    const featuresInSpecificationWithPropertiesMetadata =
+      this.extendGeoFeaturesWithPropertiesFromPropertySets(
+        featuresInSpecification,
+        metadataForFeaturesInSpecification,
+      );
     return {
       status: specification.status,
       features: specification.features.map((feature) => {

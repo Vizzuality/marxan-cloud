@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class ImplicitRolesFunctionsAndTriggers1645550554581
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     // remove legacy column - we never used this
     await queryRunner.query(`

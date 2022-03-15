@@ -40,7 +40,7 @@ export const createWorld = async () => {
     WhenNewShapefileIsSubmitted: async (customName?: string) => {
       const validShape = shapes.valid();
       const name = customName ?? validShape.filename;
-      const input = ({
+      const input = {
         data: {
           projectId,
           scenarioId,
@@ -50,7 +50,7 @@ export const createWorld = async () => {
           name,
         },
         id: 'test-job',
-      } as unknown) as Job<JobInput>;
+      } as unknown as Job<JobInput>;
 
       await sut.process(input);
       return name;

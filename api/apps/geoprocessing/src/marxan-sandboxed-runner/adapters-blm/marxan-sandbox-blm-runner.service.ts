@@ -13,7 +13,8 @@ import { MarxanRunnerFactory } from './marxan-runner.factory';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
-  implements SandboxRunner<JobData, void> {
+  implements SandboxRunner<JobData, void>
+{
   readonly #controllers: Record<string, AbortController> = {};
 
   constructor(
@@ -103,9 +104,8 @@ export class MarxanSandboxBlmRunnerService
     scenarioId: string,
     cancellables: Cancellable[],
   ) {
-    const controller = (this.#controllers[
-      scenarioId
-    ] ??= new AbortController());
+    const controller = (this.#controllers[scenarioId] ??=
+      new AbortController());
 
     controller.signal.addEventListener('abort', () => {
       cancellables.forEach((killMe) => killMe.cancel());

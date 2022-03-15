@@ -150,7 +150,8 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
      * Here we extend feature protection gap data (from geodb) with feature
      * metadata (name, etc.) from apidb.
      */
-    const scenarioFeaturesData: ScenarioFeaturesOutputGapData[] = entitiesAndCount[0] as ScenarioFeaturesOutputGapData[];
+    const scenarioFeaturesData: ScenarioFeaturesOutputGapData[] =
+      entitiesAndCount[0] as ScenarioFeaturesOutputGapData[];
     const featureIds: string[] = scenarioFeaturesData.map((i) => i.featureId);
 
     if (featureIds.length === 0) {

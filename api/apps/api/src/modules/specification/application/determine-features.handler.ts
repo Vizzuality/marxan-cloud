@@ -9,7 +9,8 @@ import { DetermineFeatures } from './determine-features.command';
 
 @CommandHandler(DetermineFeatures)
 export class DetermineFeaturesHandler
-  implements IInferredCommandHandler<DetermineFeatures> {
+  implements IInferredCommandHandler<DetermineFeatures>
+{
   constructor(
     private readonly eventPublisher: EventPublisher,
     private readonly specificationRepository: SpecificationRepository,

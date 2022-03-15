@@ -14,7 +14,8 @@ import { isDefined } from '@marxan/utils';
 
 @QueryHandler(LastUpdatedSpecification)
 export class LastUpdatedSpecificationHandler
-  implements IInferredQueryHandler<LastUpdatedSpecification> {
+  implements IInferredQueryHandler<LastUpdatedSpecification>
+{
   constructor(
     private readonly specificationsRepo: ScenarioSpecificationRepo,
     private readonly queryBus: QueryBus,

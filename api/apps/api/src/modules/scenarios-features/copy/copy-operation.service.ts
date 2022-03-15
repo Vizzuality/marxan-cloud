@@ -28,11 +28,8 @@ export class CopyOperation {
       kind: API_EVENT_KINDS.scenario__geofeatureCopy__submitted__v1__alpha1,
     });
     try {
-      const {
-        project,
-        protectedAreaFilterByIds,
-        planningAreaLocation,
-      } = await this.copyDataProvider.prepareData(data);
+      const { project, protectedAreaFilterByIds, planningAreaLocation } =
+        await this.copyDataProvider.prepareData(data);
       const { parameters, query } = this.copyQuery.prepareStatement(
         data,
         planningAreaLocation,

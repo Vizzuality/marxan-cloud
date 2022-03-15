@@ -154,9 +154,8 @@ export class ProjectsService {
       ? { planningAreaGeometryId: project.planningAreaId }
       : this.idToGid(project.planningAreaId);
 
-    const planningAreaEntity = await this.planningAreaService.locatePlanningAreaEntity(
-      planningAreaId,
-    );
+    const planningAreaEntity =
+      await this.planningAreaService.locatePlanningAreaEntity(planningAreaId);
 
     if (!planningAreaEntity) {
       return left(projectNotFound);
@@ -195,10 +194,9 @@ export class ProjectsService {
   ): Promise<
     Either<
       GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
-      { from: string; to: string, query: {} }
+      { from: string; to: string; query: {} }
     >
   > {
-
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -218,15 +216,17 @@ export class ProjectsService {
       return right({
         from: `/projects/${projectId}/grid/tiles`,
         to: `/projects/planning-area/${projectId}/grid/preview/tiles`,
-        query: {}
+        query: {},
       });
     } else {
       return right({
         from: `/projects/${projectId}/grid/tiles/${z}/${x}/${y}.mvt`,
-        to: `/planning-units/preview/regular/${project.planningUnitGridShape}/${project.planningUnitAreakm2}/tiles/${z}/${x}/${y}.mvt?bbox=${JSON.stringify(project.bbox)}`,
+        to: `/planning-units/preview/regular/${project.planningUnitGridShape}/${
+          project.planningUnitAreakm2
+        }/tiles/${z}/${x}/${y}.mvt?bbox=${JSON.stringify(project.bbox)}`,
         query: {
           bbox: JSON.stringify(project.bbox),
-        }
+        },
       });
     }
   }
@@ -353,9 +353,10 @@ export class ProjectsService {
   }
 
   // TODO add ensureThatProjectIsNotBlocked guard
-  savePlanningAreaFromShapefile = this.planningAreaService.savePlanningAreaFromShapefile.bind(
-    this.planningAreaService,
-  );
+  savePlanningAreaFromShapefile =
+    this.planningAreaService.savePlanningAreaFromShapefile.bind(
+      this.planningAreaService,
+    );
 
   private async assertProject(
     projectId = '',
@@ -379,10 +380,8 @@ export class ProjectsService {
     const response = await this.assertProject(projectId, { id: userId });
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(notAllowed);
 
@@ -405,20 +404,17 @@ export class ProjectsService {
 
     if (isLeft(response)) return left(projectNotFound);
 
-    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
-      userId,
-      projectId,
-    );
+    const canDownloadExport =
+      await this.projectAclService.canDownloadProjectExport(userId, projectId);
 
     if (!canDownloadExport) return left(forbiddenError);
 
     try {
-      const latestExportFinishedApiEvent = await this.apiEventsService.getLatestEventForTopic(
-        {
+      const latestExportFinishedApiEvent =
+        await this.apiEventsService.getLatestEventForTopic({
           kind: API_EVENT_KINDS.project__export__finished__v1__alpha,
           topic: projectId,
-        },
-      );
+        });
       const exportId = latestExportFinishedApiEvent.data?.exportId as
         | string
         | undefined;

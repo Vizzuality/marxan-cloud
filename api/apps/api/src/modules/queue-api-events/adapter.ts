@@ -38,7 +38,7 @@ const QueueEventsEmitter: new <JobData, Result = unknown>() => TypedEmitter<
 
 export class QueueEventsAdapter<
   JobData,
-  Result = unknown
+  Result = unknown,
 > extends QueueEventsEmitter<JobData, Result> {
   constructor(
     private readonly queue: Queue<JobData, Result>,

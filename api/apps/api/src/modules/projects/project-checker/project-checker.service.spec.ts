@@ -407,17 +407,15 @@ async function getFixtures() {
       throw new NotFoundException();
     }),
   };
-  const fakeProjectsService: jest.Mocked<
-    Pick<Repository<Project>, 'findOne'>
-  > = {
-    findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
-  };
+  const fakeProjectsService: jest.Mocked<Pick<Repository<Project>, 'findOne'>> =
+    {
+      findOne: jest.fn((_: any) => Promise.resolve({} as Project)),
+    };
 
-  const fakeScenariosRepo: jest.Mocked<
-    Pick<Repository<Scenario>, 'findOne'>
-  > = {
-    findOne: jest.fn(() => Promise.resolve({} as Scenario)),
-  };
+  const fakeScenariosRepo: jest.Mocked<Pick<Repository<Scenario>, 'findOne'>> =
+    {
+      findOne: jest.fn(() => Promise.resolve({} as Scenario)),
+    };
 
   const fakePlaningAreaFacade = {
     locatePlanningAreaEntity: jest.fn(),

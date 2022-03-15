@@ -81,7 +81,8 @@ export const getFixtures = async () => {
 
 @QueryHandler(GetLastUpdatedSpecification)
 class FakeGetSpecificationHandler
-  implements IInferredQueryHandler<GetLastUpdatedSpecification> {
+  implements IInferredQueryHandler<GetLastUpdatedSpecification>
+{
   mock = jest.fn();
 
   execute(query: GetLastUpdatedSpecification) {

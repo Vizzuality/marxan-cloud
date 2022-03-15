@@ -34,7 +34,8 @@ WHERE scenarios_pu_data.id = sub.scenario_pu_id;
 
 @Injectable()
 export class ScenarioPlanningUnitsFeaturesAggregateProcessor
-  implements WorkerProcessor<JobInput, true> {
+  implements WorkerProcessor<JobInput, true>
+{
   constructor(
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {}

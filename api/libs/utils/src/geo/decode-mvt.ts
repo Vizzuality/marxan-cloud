@@ -12,9 +12,7 @@ export const decodeMvt = (
     string,
     {
       _features: unknown[];
-      feature: (
-        index: number,
-      ) => {
+      feature: (index: number) => {
         properties: Record<string, unknown>;
         extent: number;
         toGeoJSON: (x: number, y: number, z: number) => GeoJSON;

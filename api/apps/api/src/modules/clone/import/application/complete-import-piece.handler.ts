@@ -13,7 +13,8 @@ import { Logger } from '@nestjs/common';
 
 @CommandHandler(CompleteImportPiece)
 export class CompleteImportPieceHandler
-  implements IInferredCommandHandler<CompleteImportPiece> {
+  implements IInferredCommandHandler<CompleteImportPiece>
+{
   constructor(
     private readonly importRepository: ImportRepository,
     private readonly eventPublisher: EventPublisher,
@@ -34,9 +35,8 @@ export class CompleteImportPieceHandler
           );
         }
 
-        const importAggregate = this.eventPublisher.mergeObjectContext(
-          importInstance,
-        );
+        const importAggregate =
+          this.eventPublisher.mergeObjectContext(importInstance);
 
         const result = importAggregate.completePiece(componentId);
 

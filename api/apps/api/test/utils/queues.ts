@@ -17,7 +17,7 @@ export class FakeQueueBuilder implements FieldsOf<QueueBuilder> {
       throw new Error('queue exists');
     }
     this.queue = new FakeQueue(queueName);
-    return (this.queue as unknown) as Queue;
+    return this.queue as unknown as Queue;
   }
 
   async onModuleDestroy(): Promise<void> {

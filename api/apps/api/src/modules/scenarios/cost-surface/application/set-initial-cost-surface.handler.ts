@@ -23,7 +23,8 @@ import {
 
 @CommandHandler(SetInitialCostSurface)
 export class SetInitialCostSurfaceHandler
-  implements IInferredCommandHandler<SetInitialCostSurface> {
+  implements IInferredCommandHandler<SetInitialCostSurface>
+{
   constructor(
     @Inject(surfaceCostQueueToken)
     private readonly queue: Queue<InitialCostJobInput>,

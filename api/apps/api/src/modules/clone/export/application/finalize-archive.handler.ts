@@ -13,7 +13,8 @@ import { ArchiveCreator } from './archive-creator.port';
 
 @CommandHandler(FinalizeArchive)
 export class FinalizeArchiveHandler
-  implements IInferredCommandHandler<FinalizeArchive> {
+  implements IInferredCommandHandler<FinalizeArchive>
+{
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
@@ -51,9 +52,8 @@ export class FinalizeArchiveHandler
       return;
     }
 
-    const exportAggregate = this.eventPublisher.mergeObjectContext(
-      exportInstance,
-    );
+    const exportAggregate =
+      this.eventPublisher.mergeObjectContext(exportInstance);
 
     const result = exportAggregate.complete(archiveResult.right);
 

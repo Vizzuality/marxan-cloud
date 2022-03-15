@@ -27,7 +27,7 @@ export class PlanningAreaTilesService {
     /**
      * @todo this generation query is a bit...
      */
-    let whereQuery = `project_id = '${planningAreaId}'`;
+    const whereQuery = `project_id = '${planningAreaId}'`;
 
     return whereQuery;
   }

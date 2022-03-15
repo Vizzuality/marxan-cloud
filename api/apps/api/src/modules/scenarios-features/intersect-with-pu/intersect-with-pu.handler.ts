@@ -12,7 +12,8 @@ import { intersectFeaturesWithPuQueueToken } from './intersect-queue.providers';
 
 @CommandHandler(IntersectWithPlanningUnits)
 export class IntersectWithPuHandler
-  implements IInferredCommandHandler<IntersectWithPlanningUnits> {
+  implements IInferredCommandHandler<IntersectWithPlanningUnits>
+{
   constructor(
     @Inject(intersectFeaturesWithPuQueueToken)
     private readonly queue: Queue<JobInput>,
@@ -32,8 +33,7 @@ export class IntersectWithPuHandler
     );
     assertDefined(id);
     await this.apiEvents.create({
-      kind:
-        API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1,
+      kind: API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1,
       topic: scenarioId,
       externalId: id,
       data: {},

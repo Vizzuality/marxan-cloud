@@ -21,7 +21,8 @@ import { SandboxRunnerInputFiles } from '../../ports/sandbox-runner-input-files'
 @Injectable()
 export class InputFilesFs
   extends SandboxRunnerInputFiles
-  implements Cancellable {
+  implements Cancellable
+{
   constructor(private readonly fetchService: AssetFetcher) {
     super();
   }

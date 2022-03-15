@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddIndexesForPuVSprQueries1627980508000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 create index scenario_features_data__scenario_id__idx on scenario_features_data(scenario_id);

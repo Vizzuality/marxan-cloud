@@ -34,8 +34,7 @@ export class IntersectWithPuEventsService implements EventFactory<JobInput> {
     const data = await eventData.data;
     return {
       topic: data.scenarioId,
-      kind:
-        API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1,
+      kind: API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1,
       externalId: eventData.eventId,
     };
   }
@@ -46,8 +45,7 @@ export class IntersectWithPuEventsService implements EventFactory<JobInput> {
     const data = await eventData.data;
     return {
       topic: data.scenarioId,
-      kind:
-        API_EVENT_KINDS.scenario__featuresWithPuIntersection__failed__v1__alpha1,
+      kind: API_EVENT_KINDS.scenario__featuresWithPuIntersection__failed__v1__alpha1,
       externalId: eventData.eventId,
     };
   }

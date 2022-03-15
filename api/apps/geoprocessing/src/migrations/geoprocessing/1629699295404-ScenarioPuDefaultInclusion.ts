@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class ScenarioPuDefaultInclusion1629699295404
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   name = 'ScenarioPuDefaultInclusion1629699295404';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

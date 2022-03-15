@@ -21,7 +21,8 @@ import { scenarioProtectedAreaEventsFactoryToken } from './queue.providers';
 
 @Injectable()
 export class AddProtectedAreaHandler
-  implements EventFactory<JobInput, JobOutput> {
+  implements EventFactory<JobInput, JobOutput>
+{
   private queueEvents: QueueEventsAdapter<JobInput, JobOutput>;
 
   constructor(

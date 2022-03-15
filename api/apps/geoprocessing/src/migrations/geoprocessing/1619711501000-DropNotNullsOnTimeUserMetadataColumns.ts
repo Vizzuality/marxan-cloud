@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class DropNotNullsOnTimeUserMetadataColumns1619711501000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   private tablesToAlter = ['admin_regions', 'scenario_features_data', 'wdpa'];
 
   public async up(queryRunner: QueryRunner): Promise<void> {

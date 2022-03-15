@@ -39,12 +39,13 @@ export const getFixtures = async () => {
   const scenarioId = scenario.id;
   const filesToRemove: string[] = [];
 
-  const marxanExecutionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
-    getRepositoryToken(
-      MarxanExecutionMetadataGeoEntity,
-      DbConnections.geoprocessingDB,
-    ),
-  );
+  const marxanExecutionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity> =
+    app.get(
+      getRepositoryToken(
+        MarxanExecutionMetadataGeoEntity,
+        DbConnections.geoprocessingDB,
+      ),
+    );
 
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),

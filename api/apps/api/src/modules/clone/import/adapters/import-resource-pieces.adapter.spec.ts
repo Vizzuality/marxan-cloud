@@ -45,18 +45,13 @@ it('should return scenario pieces when invoking resolveForScenario', async () =>
 });
 
 it('should take into account import kind when returning scenario pieces uris relative paths', async () => {
-  const [
-    projectParams,
-    scenarioParams,
-    scenarioId,
-  ] = fixtures.GivenAProjectImportAndAScenarioImport();
-  const [
-    projectResult,
-    scenarioResult,
-  ] = fixtures.WhenCallingResolveForProjectAndForScenario(
-    projectParams,
-    scenarioParams,
-  );
+  const [projectParams, scenarioParams, scenarioId] =
+    fixtures.GivenAProjectImportAndAScenarioImport();
+  const [projectResult, scenarioResult] =
+    fixtures.WhenCallingResolveForProjectAndForScenario(
+      projectParams,
+      scenarioParams,
+    );
   fixtures.ThenScenarioPiecesShouldHaveDifferentRelativePaths(
     projectResult,
     scenarioResult,
@@ -79,7 +74,8 @@ const getFixtures = async () => {
 
   return {
     GivenAProjectImport: () => {
-      const scenarioPiecesObject: ProjectExportConfigContent['pieces']['scenarios'] = {};
+      const scenarioPiecesObject: ProjectExportConfigContent['pieces']['scenarios'] =
+        {};
       Array(scenariosCount)
         .fill(0)
         .forEach(() => {

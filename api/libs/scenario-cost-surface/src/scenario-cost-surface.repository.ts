@@ -40,9 +40,8 @@ export class ScenarioCostSurfaceRepository {
     artifactStream: Readable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        CostSurfaceFileCache,
-      );
+      const repository =
+        transactionalEntityManager.getRepository(CostSurfaceFileCache);
       const existingEntity = await repository.findOne({
         scenarioId: entityToSave.scenarioId,
         artifactType: entityToSave.artifactType,
@@ -76,9 +75,8 @@ export class ScenarioCostSurfaceRepository {
     output: Writable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        CostSurfaceFileCache,
-      );
+      const repository =
+        transactionalEntityManager.getRepository(CostSurfaceFileCache);
       const cacheEntity = await repository.findOne({
         scenarioId,
         artifactType: type,
@@ -92,13 +90,11 @@ export class ScenarioCostSurfaceRepository {
       const largeObjectManager = await this.createLargeObjectManager(
         transactionalEntityManager,
       );
-      const [
-        ,
-        artifactStream,
-      ] = await largeObjectManager.openAndReadableStreamAsync(
-        artifactOid,
-        this.#bufferSize,
-      );
+      const [, artifactStream] =
+        await largeObjectManager.openAndReadableStreamAsync(
+          artifactOid,
+          this.#bufferSize,
+        );
       await new Promise((resolve, reject) => {
         artifactStream.on('end', resolve).on('error', reject).pipe(output);
       });
@@ -107,9 +103,8 @@ export class ScenarioCostSurfaceRepository {
 
   async remove(scenarioId: string, artifactType: ArtifactType): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const repository = transactionalEntityManager.getRepository(
-        CostSurfaceFileCache,
-      );
+      const repository =
+        transactionalEntityManager.getRepository(CostSurfaceFileCache);
       const cacheEntity = await repository.findOne({
         scenarioId,
         artifactType,
@@ -134,10 +129,8 @@ export class ScenarioCostSurfaceRepository {
     repository: Repository<CostSurfaceFileCache>,
     savedEntityId: string,
   ) {
-    const [
-      oid,
-      largeObjectStream,
-    ] = await largeObjectManager.createAndWritableStreamAsync(this.#bufferSize);
+    const [oid, largeObjectStream] =
+      await largeObjectManager.createAndWritableStreamAsync(this.#bufferSize);
     await new Promise((resolve, reject) => {
       largeObjectStream.on('finish', resolve).on('error', reject);
       artifactStream.pipe(largeObjectStream);

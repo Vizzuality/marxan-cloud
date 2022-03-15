@@ -50,9 +50,7 @@ export class AllPlanningAreasService {
    * * a level 1 admin area
    * * a country
    */
-  async getPlanningAreaIdAndName(
-    ids: MultiplePlanningAreaIds,
-  ): Promise<
+  async getPlanningAreaIdAndName(ids: MultiplePlanningAreaIds): Promise<
     | {
         planningAreaName?: string;
         planningAreaId?: string;
@@ -70,9 +68,7 @@ export class AllPlanningAreasService {
     return result;
   }
 
-  async locatePlanningAreaEntity(
-    ids: MultiplePlanningAreaIds,
-  ): Promise<
+  async locatePlanningAreaEntity(ids: MultiplePlanningAreaIds): Promise<
     | {
         id: string;
         tableName: string;

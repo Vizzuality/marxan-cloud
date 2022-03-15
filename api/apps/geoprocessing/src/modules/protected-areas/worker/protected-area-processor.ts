@@ -12,7 +12,8 @@ import { WorkerProcessor } from '../../worker';
 
 @Injectable()
 export class ProtectedAreaProcessor
-  implements WorkerProcessor<JobInput, JobOutput> {
+  implements WorkerProcessor<JobInput, JobOutput>
+{
   constructor(
     private readonly shapefileService: ShapefileExtractorService,
     @InjectEntityManager() private readonly entityManager: EntityManager,

@@ -96,12 +96,13 @@ describe.skip(`when a job in the queue landed and failed`, () => {
 
 async function getFixtures() {
   const application = await bootstrapApplication();
-  const planningUnitsRepository: Repository<ScenariosPlanningUnitGeoEntity> = application.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      geoprocessingConnections.default,
-    ),
-  );
+  const planningUnitsRepository: Repository<ScenariosPlanningUnitGeoEntity> =
+    application.get(
+      getRepositoryToken(
+        ScenariosPlanningUnitGeoEntity,
+        geoprocessingConnections.default,
+      ),
+    );
   const storagePath = AppConfig.get<string>(
     'storage.sharedFileStorage.localPath',
   );

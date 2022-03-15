@@ -36,9 +36,8 @@ export const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
-  const scenarioSpecificationRepo: InMemoryScenarioSpecificationRepo = sandbox.get(
-    ScenarioSpecificationRepo,
-  );
+  const scenarioSpecificationRepo: InMemoryScenarioSpecificationRepo =
+    sandbox.get(ScenarioSpecificationRepo);
   const sut = sandbox.get(ActivateCandidateSpecificationHandler);
   const systemEvents = sandbox.get(EventBus);
 

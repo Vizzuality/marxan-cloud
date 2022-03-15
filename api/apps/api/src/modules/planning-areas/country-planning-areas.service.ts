@@ -15,7 +15,8 @@ import {
 
 @Injectable()
 export class CountryPlanningAreasService
-  implements AbstractPlanningAreasService {
+  implements AbstractPlanningAreasService
+{
   constructor(private readonly countriesService: CountriesService) {}
 
   async getPlanningAreaIdAndName(ids: {

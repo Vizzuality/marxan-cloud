@@ -3,10 +3,8 @@ import { ArePuidsAllowedPort } from '../are-puids-allowed.port';
 
 @Injectable()
 export class ArePuidsAllowedMock implements ArePuidsAllowedPort {
-  mock: jest.Mock<
-    Promise<{ errors: string[] }>,
-    [string, string[]]
-  > = jest.fn();
+  mock: jest.Mock<Promise<{ errors: string[] }>, [string, string[]]> =
+    jest.fn();
 
   async validate(
     scenarioId: string,

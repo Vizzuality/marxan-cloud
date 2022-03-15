@@ -43,7 +43,7 @@ describe(`when planning units exist for a scenario`, () => {
     });
 
     it(`marks relevant pu in desired state`, async () => {
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -53,7 +53,7 @@ describe(`when planning units exist for a scenario`, () => {
             geo: [excludeSampleWithSingleFeature()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedInPlanningUnits()).toEqual(
         world.planningUnitsToBeIncluded(forCase),
@@ -78,7 +78,7 @@ describe(`when planning units exist for a scenario`, () => {
     });
 
     it(`marks relevant pu in desired state`, async () => {
-      await sut.process(({
+      await sut.process({
         data: {
           scenarioId: world.scenarioId,
           include: {
@@ -88,7 +88,7 @@ describe(`when planning units exist for a scenario`, () => {
             geo: [excludeSample()],
           },
         },
-      } as unknown) as Job<JobInput>);
+      } as unknown as Job<JobInput>);
 
       expect(await world.GetLockedInPlanningUnits()).toEqual(
         world.planningUnitsToBeIncluded(forCase),
@@ -126,7 +126,7 @@ describe(`when planning units exist for a scenario`, () => {
 
     it(`the operation should be rejected with an error`, async () => {
       await expect(
-        sut.process(({
+        sut.process({
           data: {
             scenarioId: world.scenarioId,
             include: {
@@ -136,7 +136,7 @@ describe(`when planning units exist for a scenario`, () => {
               geo: [excludeSample()],
             },
           },
-        } as unknown) as Job<JobInput>),
+        } as unknown as Job<JobInput>),
       ).rejects.toThrow(/Contrasting claims/);
     }, 10000);
   });

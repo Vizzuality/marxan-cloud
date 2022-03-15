@@ -23,7 +23,8 @@ import { exportPieceEventsFactoryToken } from './export-queue.provider';
 
 @Injectable()
 export class ExportPieceEventsHandler
-  implements EventFactory<ExportJobInput, ExportJobOutput> {
+  implements EventFactory<ExportJobInput, ExportJobOutput>
+{
   private queueEvents: QueueEventsAdapter<ExportJobInput, ExportJobOutput>;
 
   private failEventsMapper: Record<ResourceKind, API_EVENT_KINDS> = {
@@ -68,13 +69,8 @@ export class ExportPieceEventsHandler
   async createFailedEvent(
     eventData: EventData<ExportJobInput, ExportJobOutput>,
   ): Promise<CreateApiEventDTO> {
-    const {
-      resourceId,
-      resourceKind,
-      exportId,
-      componentId,
-      piece,
-    } = await eventData.data;
+    const { resourceId, resourceKind, exportId, componentId, piece } =
+      await eventData.data;
     const kind = this.failEventsMapper[resourceKind];
 
     return {

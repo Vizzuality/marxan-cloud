@@ -27,9 +27,9 @@ beforeEach(async () => {
       UpdateCostSurfaceHandler,
       {
         provide: surfaceCostQueueToken,
-        useValue: ({
+        useValue: {
           add: addJobMock,
-        } as unknown) as Queue,
+        } as unknown as Queue,
       },
       {
         provide: Logger,

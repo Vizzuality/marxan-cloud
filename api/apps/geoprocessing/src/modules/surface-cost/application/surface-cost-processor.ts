@@ -64,9 +64,8 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
       scenarioId,
     );
 
-    const referenceArea = await this.availablePlanningUnits.getMaxPUAreaForScenario(
-      scenarioId,
-    );
+    const referenceArea =
+      await this.availablePlanningUnits.getMaxPUAreaForScenario(scenarioId);
 
     await this.repo.save(
       scenarioId,

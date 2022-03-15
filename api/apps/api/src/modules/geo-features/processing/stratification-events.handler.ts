@@ -12,7 +12,8 @@ import { stratificationEventsFactoryToken } from './queue-providers';
 
 @Injectable()
 export class StratificationEventsHandler
-  implements EventFactory<FeaturesJobData> {
+  implements EventFactory<FeaturesJobData>
+{
   private queueEvents: QueueEventsAdapter<FeaturesJobData>;
 
   constructor(

@@ -45,14 +45,14 @@ export class GeoOutputRepository {
       scenarioId,
     );
 
-    const planningUnitsState: PlanningUnitsSelectionState = await this.planningUnitsStateCalculator.consume(
-      solutionsStream,
-    );
+    const planningUnitsState: PlanningUnitsSelectionState =
+      await this.planningUnitsStateCalculator.consume(solutionsStream);
 
-    const scenarioFeatureDataFromAllRuns = await this.scenarioFeaturesDataReader.from(
-      runDirectories.output,
-      scenarioId,
-    );
+    const scenarioFeatureDataFromAllRuns =
+      await this.scenarioFeaturesDataReader.from(
+        runDirectories.output,
+        scenarioId,
+      );
 
     await this.entityManager.transaction(async (transaction) => {
       // We chunk delete and insert operations as the generated SQL statements

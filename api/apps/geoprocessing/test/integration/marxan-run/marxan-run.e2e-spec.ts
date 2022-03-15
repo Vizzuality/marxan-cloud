@@ -123,14 +123,12 @@ const getFixtures = async () => {
   const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
     getRepositoryToken(MarxanExecutionMetadataGeoEntity),
   );
-  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
-    getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
-  );
+  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> =
+    app.get(getRepositoryToken(OutputScenariosFeaturesDataGeoEntity));
   // note that SandboxRunner may be both single and blm-calibration one
   const singleRunModuleContext = app.select(SingleRunAdapterModule);
-  const sut: MarxanSandboxRunnerService = singleRunModuleContext.get(
-    sandboxRunnerToken,
-  );
+  const sut: MarxanSandboxRunnerService =
+    singleRunModuleContext.get(sandboxRunnerToken);
 
   const nockScope = nock(host, {
     reqheaders: {

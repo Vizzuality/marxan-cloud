@@ -5,7 +5,8 @@ import { SpecificationProcessingFinishedEvent } from './specification-processing
 
 @EventsHandler(SpecificationProcessingFinishedEvent)
 export class SpecificationActivatedHandler
-  implements IEventHandler<SpecificationProcessingFinishedEvent> {
+  implements IEventHandler<SpecificationProcessingFinishedEvent>
+{
   constructor(private readonly apiEvents: ApiEventsService) {}
 
   async handle(event: SpecificationProcessingFinishedEvent) {

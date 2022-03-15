@@ -37,9 +37,10 @@ export class AdminPlanningAreasService implements AbstractPlanningAreasService {
   > {
     const adminAreaLevelId = ids.adminAreaLevel2Id ?? ids.adminAreaLevel1Id;
     if (!isDefined(adminAreaLevelId)) return notSupported;
-    const adminAreaFields = await this.adminAreasRepository.findAdminAreaGidsAndNames(
-      adminAreaLevelId,
-    );
+    const adminAreaFields =
+      await this.adminAreasRepository.findAdminAreaGidsAndNames(
+        adminAreaLevelId,
+      );
     if (adminAreaFields === notFound) return notFound;
     return {
       planningAreaId:

@@ -3,7 +3,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 import { PostgreSQLUtils } from '@marxan-geoprocessing/utils/postgresql.utils';
 
 export class AddFeatureScenarioOutputEntity1611828857842
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
     if (await PostgreSQLUtils.version13Plus()) {

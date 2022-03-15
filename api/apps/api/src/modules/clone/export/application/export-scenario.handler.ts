@@ -13,7 +13,8 @@ import { ExportRepository } from './export-repository.port';
 
 @CommandHandler(ExportScenario)
 export class ExportScenarioHandler
-  implements IInferredCommandHandler<ExportScenario> {
+  implements IInferredCommandHandler<ExportScenario>
+{
   constructor(
     private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,

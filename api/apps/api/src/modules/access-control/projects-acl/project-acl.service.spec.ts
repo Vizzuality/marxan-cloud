@@ -153,9 +153,8 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ProjectAclService);
 
-  const userProjectsRepoMock: jest.Mocked<
-    Repository<UsersProjectsApiEntity>
-  > = sandbox.get(userProjectsToken);
+  const userProjectsRepoMock: jest.Mocked<Repository<UsersProjectsApiEntity>> =
+    sandbox.get(userProjectsToken);
 
   return {
     GivenNoRoles: () =>

@@ -19,9 +19,7 @@ export class PlanningUnitsGridProcessor {
     private readonly paGarbageCollector: PlanningAreaGarbageCollector,
   ) {}
 
-  async save(
-    shapefile: Express.Multer.File,
-  ): Promise<
+  async save(shapefile: Express.Multer.File): Promise<
     {
       id: string;
       data: GeoJSON;

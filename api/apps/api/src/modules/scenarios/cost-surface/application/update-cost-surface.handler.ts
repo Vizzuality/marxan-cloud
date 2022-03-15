@@ -15,7 +15,8 @@ import { UpdateCostSurface } from './update-cost-surface.command';
 
 @CommandHandler(UpdateCostSurface)
 export class UpdateCostSurfaceHandler
-  implements IInferredCommandHandler<UpdateCostSurface> {
+  implements IInferredCommandHandler<UpdateCostSurface>
+{
   constructor(
     @Inject(surfaceCostQueueToken)
     private readonly queue: Queue<FromShapefileJobInput>,

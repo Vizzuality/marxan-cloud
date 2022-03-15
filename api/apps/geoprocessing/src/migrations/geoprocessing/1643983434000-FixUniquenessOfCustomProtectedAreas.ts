@@ -1,7 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class FixUniquenessOfCustomProtectedAreas1643983434000
-  implements MigrationInterface {
+  implements MigrationInterface
+{
   async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
 -- this previous index was enforcing uniqueness across WDPA and custom areas

@@ -7,12 +7,7 @@ describe('blm-values-calculator', () => {
     const defaultValues = blmValuesCalculator.withDefaultRange();
 
     expect(defaultValues).toStrictEqual([
-      0.001,
-      20.0008,
-      40.0006,
-      60.0004,
-      80.0002,
-      100,
+      0.001, 20.0008, 40.0006, 60.0004, 80.0002, 100,
     ]);
   });
 

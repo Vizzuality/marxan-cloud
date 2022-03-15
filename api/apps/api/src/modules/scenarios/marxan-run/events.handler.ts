@@ -110,9 +110,8 @@ export class EventsHandler {
   }
 
   private async getJob(jobId: string): Promise<Job<JobData, ExecutionResult>> {
-    const job:
-      | Job<JobData, ExecutionResult>
-      | undefined = await this.queue.getJob(jobId);
+    const job: Job<JobData, ExecutionResult> | undefined =
+      await this.queue.getJob(jobId);
     assertDefined(job);
     return job;
   }

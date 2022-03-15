@@ -200,7 +200,8 @@ const getFixtures = async () => {
 
 @CommandHandler(CalculatePlanningUnitsProtectionLevel)
 class CalculatePuHandler
-  implements IInferredCommandHandler<CalculatePlanningUnitsProtectionLevel> {
+  implements IInferredCommandHandler<CalculatePlanningUnitsProtectionLevel>
+{
   executeMock = jest.fn();
 
   execute(command: CalculatePlanningUnitsProtectionLevel): Promise<void> {
@@ -217,10 +218,10 @@ class ScenarioRepo implements Pick<Repository<Scenario>, 'update'> {
 }
 
 class Selection
-  implements Pick<SelectionGetService, 'getFor' | 'getGlobalProtectedAreas'> {
-  getMock: jest.Mocked<
-    Pick<SelectionGetService, 'getFor'>
-  >['getFor'] = jest.fn();
+  implements Pick<SelectionGetService, 'getFor' | 'getGlobalProtectedAreas'>
+{
+  getMock: jest.Mocked<Pick<SelectionGetService, 'getFor'>>['getFor'] =
+    jest.fn();
 
   getGlobalMock: jest.Mocked<
     Pick<SelectionGetService, 'getGlobalProtectedAreas'>
@@ -245,7 +246,8 @@ class PlanningUnits
     Pick<
       ScenarioPlanningUnitsProtectedStatusCalculatorService,
       'calculatedProtectionStatusForPlanningUnitsIn'
-    > {
+    >
+{
   calculateMock: jest.Mocked<
     Pick<
       ScenarioPlanningUnitsProtectedStatusCalculatorService,

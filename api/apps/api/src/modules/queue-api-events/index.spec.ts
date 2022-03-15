@@ -99,7 +99,7 @@ async function getFixtures() {
   const adapter = testingModule
     .get(AdapterFactory)
     .create(
-      (fakeQueue as Partial<Queue>) as Queue,
+      fakeQueue as Partial<Queue> as Queue,
       fakeEventEmitter as QueueEvents,
     )(eventFactory);
   adapter.on(`completed`, reemitedHandler.completed);

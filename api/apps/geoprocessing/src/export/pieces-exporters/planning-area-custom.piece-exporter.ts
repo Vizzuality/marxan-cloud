@@ -60,16 +60,15 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const [planningArea]: [
-      PlanningAreaSelectResult,
-    ] = await this.geoprocessingEntityManager.query(
-      `
+    const [planningArea]: [PlanningAreaSelectResult] =
+      await this.geoprocessingEntityManager.query(
+        `
         SELECT ST_AsEWKB(the_geom) as ewkb
         FROM planning_areas
         WHERE project_id = $1
       `,
-      [input.resourceId],
-    );
+        [input.resourceId],
+      );
 
     if (!planningArea) {
       const errorMessage = `Custom planning area not found for project with ID: ${input.resourceId}`;
