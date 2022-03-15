@@ -8,7 +8,8 @@ resource "kubernetes_service" "geoprocessing_service" {
       name = kubernetes_deployment.geoprocessing_deployment.metadata[0].name
     }
     port {
-      port = 3000
+      port        = 30002
+      target_port = 3000
     }
 
     type = "NodePort"

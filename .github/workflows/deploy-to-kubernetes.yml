@@ -110,6 +110,5 @@ jobs:
         run: |
           kubectl rollout restart deployment api -n staging
           kubectl rollout restart deployment client -n staging
-          kubectl rollout restart deployment client -n staging
           kubectl rollout restart deployment geoprocessing -n staging
           kubectl rollout restart deployment webshot -n staging

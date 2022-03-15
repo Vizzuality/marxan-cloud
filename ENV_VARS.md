@@ -132,7 +132,7 @@ applications.
 
 ## Webshot application env vars
 
-* `WEBSHOT_PORT` (number, optional, default is 3000): port on
+* `WEBSHOT_APP_PORT` (number, optional, default is 3000): port on
   which the Express daemon of the Webshot service will listen. If running the
   Webshot service on the same host as other Marxan backend applications, you
   need to modify at least one.
