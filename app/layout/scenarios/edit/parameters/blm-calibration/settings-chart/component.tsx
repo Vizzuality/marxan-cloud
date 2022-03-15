@@ -5,8 +5,10 @@ import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
+import cx from 'classnames';
 import { format } from 'd3';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
 
 import BLMChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
@@ -34,10 +36,11 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
   const [zoomImage, setZoomImage] = useState(false);
 
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
   const { blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
+  const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
 
   const {
@@ -65,7 +68,10 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
             {({ handleSubmit }) => {
               return (
                 <form
-                  className="relative flex flex-col flex-grow pt-10 overflow-hidden text-white border-t border-gray-500"
+                  className={cx({
+                    'relative flex flex-col flex-grow pt-10 overflow-hidden text-white': true,
+                    'border-t border-gray-500': editable,
+                  })}
                   autoComplete="off"
                   noValidate
                   onSubmit={handleSubmit}
@@ -75,7 +81,11 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
                     type="button"
                     onClick={() => setZoomImage(true)}
                   >
-                    <img src={blmImage || '/images/mock/blm-mock-image.png'} alt="selected blm" className="border-2 border-transparent rounded-lg hover:border-primary-500" />
+                    <img
+                      src={blmImage || '/images/mock/blm-mock-image.png'}
+                      alt="selected blm"
+                      className="border-2 border-transparent rounded-lg hover:border-primary-500"
+                    />
                     <div className="absolute bottom-0 right-0 z-50 w-5 h-5 mb-px mr-px rounded-tl-lg rounded-br-md bg-primary-500">
                       <Icon icon={ZOOM_SVG} />
                     </div>
@@ -132,6 +142,7 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
                               type="number"
                               min={minBlmValue}
                               max={maxBlmValue}
+                              disabled={!editable}
                               onChange={(e) => {
                                 if (!e.target.value) {
                                   return fprops.input.onChange(null);
