@@ -5,14 +5,13 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { Organization } from './organization.api.entity';
-
-import * as faker from 'faker';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { Either, left, right } from 'fp-ts/Either';
 
 const organizationFilterKeyNames = ['name'] as const;
 type OrganizationFilterKeys = keyof Pick<
@@ -20,6 +19,8 @@ type OrganizationFilterKeys = keyof Pick<
   typeof organizationFilterKeyNames[number]
 >;
 type OrganizationFilters = Record<OrganizationFilterKeys, string[]>;
+const notFoundError = Symbol('organization not found');
+type NotFound = typeof notFoundError;
 
 @Injectable()
 export class OrganizationsService extends AppBaseService<
@@ -66,14 +67,10 @@ export class OrganizationsService extends AppBaseService<
     };
   }
 
-  async fakeFindOne(_id: string): Promise<Organization> {
-    const organization = {
-      ...new Organization(),
-      id: faker.random.uuid(),
-      name: faker.lorem.words(5),
-      description: faker.lorem.sentence(),
-    };
-    return organization;
+  async findOne(id: string): Promise<Either<NotFound, Organization>> {
+    const organization = await this.repository.findOne(id);
+
+    return organization ? right(organization) : left(notFoundError);
   }
 
   /**
