@@ -8,11 +8,13 @@ import { FetchSpecification } from 'nestjs-base-service';
 import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-info';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '@marxan-api/modules/users/users.service';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
-export const alreadyUnderModeration = Symbol(`this project is not public`);
+export const sameUnderModerationStatus = Symbol(
+  `this project is already on that moderation status`,
+);
 export const alreadyPublished = Symbol(`this project is public`);
 export const internalError = Symbol(`internal error`);
 
@@ -25,6 +27,7 @@ export type errors =
 export class PublishedProjectService {
   constructor(
     @InjectRepository(Project) private projectRepository: Repository<Project>,
+    protected publicProjectsRepo: Repository<PublishedProject>,
     private crudService: PublishedProjectCrudService,
     private readonly acl: ProjectAccessControl,
     private readonly usersService: UsersService,
@@ -44,19 +47,11 @@ export class PublishedProjectService {
       return left(accessDenied);
     }
 
-    const userIsAdmin = await this.usersService.isPlatformAdmin(
-      requestingUserId,
-    );
-
-    if (userIsAdmin) {
-      const existingPublicProject = await this.crudService.getById(
-        id,
-        undefined,
-        undefined,
-      );
-      if (!existingPublicProject.underModeration) {
-        return left(alreadyPublished);
-      }
+    const isProjectAlreadyPublished = await this.publicProjectsRepo
+      .findOne({ id })
+      .then((result) => (result ? true : false));
+    if (isProjectAlreadyPublished) {
+      return left(alreadyPublished);
     }
 
     await this.crudService.create({
@@ -67,10 +62,11 @@ export class PublishedProjectService {
     return right(true);
   }
 
-  async unpublish(
+  async changeModerationStatus(
     id: string,
     requestingUserId: string,
-  ): Promise<Either<errors | typeof alreadyUnderModeration, true>> {
+    status: boolean,
+  ): Promise<Either<errors | typeof sameUnderModerationStatus, true>> {
     const existingPublicProject = await this.crudService.getById(
       id,
       undefined,
@@ -83,12 +79,13 @@ export class PublishedProjectService {
     if (!(await this.usersService.isPlatformAdmin(requestingUserId))) {
       return left(accessDenied);
     }
-    if (existingPublicProject.underModeration) {
-      return left(alreadyUnderModeration);
+
+    if (status === existingPublicProject.underModeration) {
+      return left(sameUnderModerationStatus);
     }
 
     await this.crudService.update(id, {
-      underModeration: true,
+      underModeration: !existingPublicProject.underModeration,
     });
     return right(true);
   }
@@ -100,12 +97,21 @@ export class PublishedProjectService {
   async findOne(
     id: string,
     info?: ProjectsRequest,
-  ): Promise<PublishedProject | undefined> {
-    try {
-      return await this.crudService.getById(id, undefined, info);
-    } catch (error) {
-      // library-sourced errors are no longer instances of HttpException
-      return undefined;
+  ): Promise<Either<typeof notFound | typeof accessDenied, PublishedProject>> {
+    const result = await this.publicProjectsRepo.findOne(id);
+
+    if (!result) {
+      return left(notFound);
     }
+
+    if (
+      result.underModeration === true &&
+      info?.authenticatedUser?.id &&
+      !(await this.acl.canPublishProject(info?.authenticatedUser.id, id))
+    ) {
+      return left(accessDenied);
+    }
+    return right(result);
+    // library-sourced errors are no longer instances of HttpException
   }
 }

@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  Body,
   Controller,
   ForbiddenException,
   Get,
@@ -17,12 +16,11 @@ import {
 import {
   accessDenied,
   alreadyPublished,
-  alreadyUnderModeration,
+  sameUnderModerationStatus,
   internalError,
   notFound,
   PublishedProjectService,
 } from '../published-project.service';
-import { PublishProjectDto } from '../dto/publish-project.dto';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import {
   ApiBearerAuth,
@@ -67,7 +65,6 @@ export class PublishProjectController {
   @ApiInternalServerErrorResponse()
   async publish(
     @Param('id') id: string,
-    @Body() createPublishedProjectDto: PublishProjectDto,
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
     const result = await this.publishedProjectService.publish(id, req.user.id);
@@ -77,7 +74,7 @@ export class PublishProjectController {
         case accessDenied:
           throw new ForbiddenException();
         case alreadyPublished:
-          throw new BadRequestException();
+          throw new BadRequestException('This project was already published.');
         case notFound:
           throw new NotFoundException();
         case internalError:
@@ -91,18 +88,19 @@ export class PublishProjectController {
     return;
   }
 
-  @Patch(':id/unpublish')
+  @Patch(':id/moderation-status/set')
   @ApiNoContentResponse()
   @ApiNotFoundResponse()
   @ApiForbiddenResponse()
   @ApiInternalServerErrorResponse()
-  async unpublish(
+  async setUnderModeration(
     @Param('id') id: string,
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    const result = await this.publishedProjectService.unpublish(
+    const result = await this.publishedProjectService.changeModerationStatus(
       id,
       req.user.id,
+      true,
     );
 
     if (isLeft(result)) {
@@ -113,8 +111,46 @@ export class PublishProjectController {
           throw new NotFoundException();
         case internalError:
           throw new InternalServerErrorException();
-        case alreadyUnderModeration:
-          throw new BadRequestException();
+        case sameUnderModerationStatus:
+          throw new BadRequestException(
+            'The project is already under moderation.',
+          );
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return;
+  }
+
+  @Patch(':id/moderation-status/clear')
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  async clearUnderModeration(
+    @Param('id') id: string,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.publishedProjectService.changeModerationStatus(
+      id,
+      req.user.id,
+      false,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case accessDenied:
+          throw new ForbiddenException();
+        case notFound:
+          throw new NotFoundException();
+        case internalError:
+          throw new InternalServerErrorException();
+        case sameUnderModerationStatus:
+          throw new BadRequestException(
+            'The project is already not under moderation.',
+          );
         default:
           const _exhaustiveCheck: never = result.left;
           throw _exhaustiveCheck;
