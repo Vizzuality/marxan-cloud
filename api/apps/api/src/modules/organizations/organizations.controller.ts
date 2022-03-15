@@ -3,15 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
+  Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import {
   organizationResource,
-  OrganizationResultSingular,
   OrganizationResultPlural,
+  OrganizationResultSingular,
 } from './organization.api.entity';
 import { OrganizationsService } from './organizations.service';
 
@@ -26,7 +28,6 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { Post } from '@nestjs/common';
 
 import {
   JSONAPIQueryParams,
@@ -40,6 +41,7 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { isLeft } from 'fp-ts/Either';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -82,7 +84,13 @@ export class OrganizationsController {
   })
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<OrganizationResultSingular> {
-    return await this.service.serialize(await this.service.getById(id));
+    const result = await this.service.findOne(id);
+    if (isLeft(result))
+      throw new NotFoundException(
+        `Could not find an organization with ID: ${id}`,
+      );
+
+    return await this.service.serialize(result.right);
   }
 
   @ApiOperation({ description: 'Create organization' })

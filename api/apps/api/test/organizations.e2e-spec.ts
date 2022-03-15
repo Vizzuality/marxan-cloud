@@ -1,20 +1,14 @@
-import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { E2E_CONFIG } from './e2e.config';
-import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
-import { tearDown } from './utils/tear-down';
 import { bootstrapApplication } from './utils/api-application';
-
-afterAll(async () => {
-  await tearDown();
-});
+import { E2E_CONFIG } from './e2e.config';
+import * as request from 'supertest';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 
 describe('OrganizationsController (e2e)', () => {
+  let jwt: string;
   let app: INestApplication;
 
-  let jwtToken: string;
-
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
@@ -24,18 +18,14 @@ describe('OrganizationsController (e2e)', () => {
       })
       .expect(201);
 
-    jwtToken = response.body.accessToken;
-  });
-
-  afterAll(async () => {
-    await Promise.all([app.close()]);
+    jwt = response.body.accessToken;
   });
 
   describe('Organizations', () => {
     it('Gets projects', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .auth(jwt, { type: 'bearer' })
         .expect(200);
 
       const resources = response.body.data;
@@ -43,68 +33,83 @@ describe('OrganizationsController (e2e)', () => {
       expect(resources[0].type).toBe('projects');
     });
 
-    let anOrganization: { id: string; type: 'organizations' };
-
     it('Creates an organization', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/organizations')
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .auth(jwt, { type: 'bearer' })
         .send(E2E_CONFIG.organizations.valid.minimal())
         .expect(201);
 
-      anOrganization = response.body.data;
+      const organization = response.body.data;
 
-      expect(anOrganization.type).toBe('organizations');
+      expect(organization.type).toBe('organizations');
     });
 
     it('Gets organizations', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/organizations')
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .auth(jwt, { type: 'bearer' })
         .expect(200);
 
       const resources = response.body.data;
       expect(resources[0].type).toBe('organizations');
     });
 
-    let aProject: { id: string; type: 'organizations' };
-
     it('Creates a project in the newly created organization', async () => {
+      const organizationResponse = await request(app.getHttpServer())
+        .get('/api/v1/organizations')
+        .auth(jwt, { type: 'bearer' })
+        .expect(200);
+
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
-        organizationId: anOrganization.id,
+        organizationId: organizationResponse.body.data[0].id,
       };
-
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
-        .set('Authorization', `Bearer ${jwtToken}`)
-        .send(createProjectDTO)
-        .expect(201);
+        .auth(jwt, { type: 'bearer' })
+        .expect(HttpStatus.CREATED)
+        .send(createProjectDTO);
 
-      aProject = response.body.data;
-      expect(aProject.type).toBe('projects');
+      const project = response.body.data;
+      expect(project.type).toBe('projects');
     });
 
     it('Deletes the newly created project', async () => {
-      const response = await request(app.getHttpServer())
-        .delete('/api/v1/projects/' + aProject.id)
-        .set('Authorization', `Bearer ${jwtToken}`)
+      const projectsResponse = await request(app.getHttpServer())
+        .get('/api/v1/projects/')
+        .auth(jwt, { type: 'bearer' })
         .expect(200);
 
-      const resources = response.body.data;
+      await request(app.getHttpServer())
+        .delete('/api/v1/projects/' + projectsResponse.body.data[0].id)
+        .auth(jwt, { type: 'bearer' })
+        .expect(200);
 
-      expect(resources).toBeUndefined();
+      const projectsResponseAfterDelete = await request(app.getHttpServer())
+        .get('/api/v1/projects/')
+        .auth(jwt, { type: 'bearer' })
+        .expect(200);
+      expect(projectsResponseAfterDelete.body.data).toHaveLength(0);
     });
 
     it('Deletes the newly created organization', async () => {
       const response = await request(app.getHttpServer())
-        .delete('/api/v1/organizations/' + anOrganization.id)
-        .set('Authorization', `Bearer ${jwtToken}`)
+        .post('/api/v1/organizations')
+        .auth(jwt, { type: 'bearer' })
+        .send(E2E_CONFIG.organizations.valid.minimal())
+        .expect(201);
+
+      const organization = response.body.data;
+      await request(app.getHttpServer())
+        .delete('/api/v1/organizations/' + organization.id)
+        .auth(jwt, { type: 'bearer' })
         .expect(200);
 
-      const resources = response.body.data;
-
-      expect(resources).toBeUndefined();
+      await request(app.getHttpServer())
+        .get('/api/v1/organizations/' + organization.id)
+        .auth(jwt, { type: 'bearer' })
+        .expect(404);
     });
 
     /**

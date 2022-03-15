@@ -129,6 +129,14 @@ export class TestClientApi {
     };
   }
 
+  /**
+   * @deprecated This will be removed
+   * **/
+
+  public getNestInstance() {
+    return this.nestInstance;
+  }
+
   //-----------------------//
   // API Endpoint requests //
   //-----------------------//
@@ -214,7 +222,7 @@ export class TestClientApi {
       email = 'user@email.com',
       password = 'password',
       displayName = undefined as string | undefined,
-    } = {}) => {
+    } = {}): Promise<string> => {
       await this.requests.users
         .registerUser({
           email,
