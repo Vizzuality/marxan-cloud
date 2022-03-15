@@ -268,17 +268,24 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
               />
             )}
             {!editable && (
-              <div>
-                <p>
-                  Included:
-                  {' '}
-                  {PUData.included.length}
-                </p>
-                <p>
-                  Excluded:
-                  {' '}
-                  {PUData.excluded.length}
-                </p>
+              <div className="mt-4 space-y-3 text-xs">
+                {puAction === 'include' && (
+                  <p>
+
+                    {PUData.included.length}
+                    {' '}
+                    PU
+                  </p>
+                )}
+
+                {puAction === 'exclude' && (
+                  <p>
+
+                    {PUData.excluded.length}
+                    {' '}
+                    PU
+                  </p>
+                )}
               </div>
             )}
           </div>
