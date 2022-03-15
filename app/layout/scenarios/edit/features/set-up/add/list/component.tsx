@@ -250,6 +250,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     saveScenarioMutation,
   ]);
 
+  const onContinue = useCallback(() => {
+    setSubmitting(true);
+    dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+  }, [
+    dispatch,
+    setSubTab,
+  ]);
+
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
     return (
@@ -334,12 +342,24 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
             </div>
           )}
 
-          {!!selectedFeaturesData && !!selectedFeaturesData.length && (
+          {!!selectedFeaturesData && !!selectedFeaturesData.length && editable && (
             <Button
               type="submit"
               theme="secondary-alt"
               size="lg"
               className="flex-shrink-0"
+            >
+              Continue
+            </Button>
+          )}
+
+          {!!selectedFeaturesData && !!selectedFeaturesData.length && !editable && (
+            <Button
+              type="button"
+              theme="secondary-alt"
+              size="lg"
+              className="flex-shrink-0"
+              onClick={onContinue}
             >
               Continue
             </Button>
