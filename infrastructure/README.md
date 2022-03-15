@@ -148,13 +148,14 @@ You should now be able to use `kubectl` to access your AKS cluster.
 ## Configuring PostgreSQL
 
 The included Terraform code sets up a PostgreSQL database server in the AKS cluster but, as it cannot reach it once 
-it's set up, it won't create the necessary databases and users for the Marxan application to run - this has to be done
-manually:
+it's set up, it won't create the necessary databases and users for the Marxan application to run, as well as enable
+PostGIS. This has to be done manually:
 
 - Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server.
 - Create a database and a user with the corresponding credentials (see either the relevant 
 [Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or 
 the [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
+- Enable the PostGIS extension for that database.
 - Make sure the user has full access to the associated database.
 - Repeat, as needed, for each database used by the project.
 
