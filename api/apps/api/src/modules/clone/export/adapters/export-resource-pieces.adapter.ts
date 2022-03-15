@@ -48,10 +48,6 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     }
 
     const customPlanningArea = Boolean(project.planningAreaGeometryId);
-    const customGrid =
-      customPlanningArea &&
-      project.planningUnitGridShape === PlanningUnitGridShape.FromShapefile;
-
     const components: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
       ExportComponent.newOne(id, ClonePiece.ExportConfig),
@@ -70,6 +66,7 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
   ): Promise<ExportComponent[]> {
     const pieces: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ScenarioMetadata),
+      ExportComponent.newOne(id, ClonePiece.ScenarioProtectedAreas),
     ];
 
     if (kind === ResourceKind.Scenario) {

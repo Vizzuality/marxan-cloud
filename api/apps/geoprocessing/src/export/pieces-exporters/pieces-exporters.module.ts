@@ -11,6 +11,7 @@ import { PlanningUnitsGridGeojsonPieceExporter } from './planning-units-grid-geo
 import { PlanningUnitsGridPieceExporter } from './planning-units-grid.piece-exporter';
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
 import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
+import { ScenarioProtectedAreasPieceExporter } from './scenario-protected-areas.piece-exporter';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporte
     PlanningUnitsGridPieceExporter,
     PlanningUnitsGridGeojsonPieceExporter,
     ScenarioMetadataPieceExporter,
+    ScenarioProtectedAreasPieceExporter,
     Logger,
   ],
 })
