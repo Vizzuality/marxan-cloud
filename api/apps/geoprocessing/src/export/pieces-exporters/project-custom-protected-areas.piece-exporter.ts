@@ -13,9 +13,10 @@ import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
+import { ProtectedArea } from '@marxan/protected-areas';
 
 interface ProjectCustomProtectedAreasSelectResult {
-  fullname: string;
+  fullName: string;
   ewkb: Buffer;
 }
 
@@ -40,27 +41,22 @@ export class ProjectCustomProtectedAreasPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    console.log('hola');
-    const customProtectedAreas: ProjectCustomProtectedAreasSelectResult[] = await this.geoprocessingEntityManager.query(
-      `
-          SELECT ST_AsEWKB(the_geom) as ewkb, full_name as fullname
-          FROM wdpa
-          WHERE project_id = $1
-        `,
-      [input.resourceId],
-    );
-
-    console.log(customProtectedAreas);
+    const customProtectedAreas: ProjectCustomProtectedAreasSelectResult[] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select('ST_AsEWKB(wdpa.the_geom)', 'ewkb')
+      .addSelect('full_name', 'fullName')
+      .from(ProtectedArea, 'wdpa')
+      .where('project_id = :projectId', { projectId: input.resourceId })
+      .execute();
 
     const content = customProtectedAreas.map<ProjectCustomProtectedAreasContent>(
       (protectedArea) => {
         return {
-          fullName: protectedArea.fullname,
+          fullName: protectedArea.fullName,
           ewkb: protectedArea.ewkb.toJSON().data,
         };
       },
     );
-    console.log(content);
 
     const outputFile = await this.fileRepository.save(
       Readable.from(JSON.stringify(content)),
