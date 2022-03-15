@@ -312,8 +312,8 @@ export class ProjectsCrudService extends AppBaseService<
 
   extendGetByIdQuery(
     query: SelectQueryBuilder<Project>,
-    fetchSpecification?: FetchSpecification,
-    info?: ProjectsRequest,
+    _fetchSpecification?: FetchSpecification,
+    _info?: ProjectsRequest,
   ): SelectQueryBuilder<Project> {
     /**
      * Bring in publicMetadata (if the project has been made public). This is
@@ -327,7 +327,7 @@ export class ProjectsCrudService extends AppBaseService<
 
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
-    fetchSpecification: FetchSpecification,
+    _fetchSpecification: FetchSpecification,
     info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<Project>> {
     const loggedUser = Boolean(info?.authenticatedUser);

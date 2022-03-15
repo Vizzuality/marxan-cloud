@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Injectable } from '@nestjs/common';
 import { Job, Queue, Worker } from 'bullmq';
-import * as config from 'config';
 
 import { ExampleWorkerJobProcessor } from './bullmq-worker-code';
 import { WorkerModule, WorkerBuilder } from '../../src/modules/worker';

@@ -76,7 +76,7 @@ const getFixtures = async () => {
       expect((await repo.find(exportId))?.toSnapshot()).toBeDefined();
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
-      projectId: ResourceId,
+      _projectId: ResourceId,
     ) => {
       const projectMetadataExport = events[0];
       const projectPlanningAreaCustomExport = events[1];

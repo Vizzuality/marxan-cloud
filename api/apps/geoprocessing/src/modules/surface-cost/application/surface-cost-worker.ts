@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Worker } from 'bullmq';
 
-import { JobInput, surfaceCostQueueName } from '@marxan/scenario-cost-surface';
+import { surfaceCostQueueName } from '@marxan/scenario-cost-surface';
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 
 import { SurfaceCostProcessor } from './surface-cost-processor';

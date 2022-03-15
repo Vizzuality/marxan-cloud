@@ -74,7 +74,7 @@ async function getFixtures() {
   const app = await bootstrapApplication();
   const ownerToken: string = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken: string = await GivenUserIsLoggedIn(app, 'bb');
-  const viewerToken: string = await GivenUserIsLoggedIn(app, 'cc');
+  const _viewerToken: string = await GivenUserIsLoggedIn(app, 'cc');
   const projectChecker = app.get(ProjectChecker) as ProjectCheckerFake;
   const scenarioChecker = app.get(ScenarioChecker) as ScenarioCheckerFake;
 

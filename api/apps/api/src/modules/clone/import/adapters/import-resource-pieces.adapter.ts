@@ -1,6 +1,5 @@
 import {
   ArchiveLocation,
-  ClonePiece,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';

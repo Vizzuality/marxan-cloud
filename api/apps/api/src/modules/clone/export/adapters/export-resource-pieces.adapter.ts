@@ -1,5 +1,4 @@
 import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

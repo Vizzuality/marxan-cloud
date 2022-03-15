@@ -20,13 +20,13 @@ export type GetFileError =
 @Injectable()
 export class FileRepository {
   async save(
-    stream: Readable,
-    extension?: string,
+    _stream: Readable,
+    _extension?: string,
   ): Promise<Either<SaveFileError, string>> {
     return left(storageNotReachable);
   }
 
-  async get(uri: string): Promise<Either<GetFileError, Readable>> {
+  async get(_uri: string): Promise<Either<GetFileError, Readable>> {
     return left(storageNotReachable);
   }
 }

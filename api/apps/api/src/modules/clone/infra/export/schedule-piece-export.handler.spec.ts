@@ -1,6 +1,5 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import {
-  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ResourceId,

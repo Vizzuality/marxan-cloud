@@ -174,7 +174,7 @@ const getFixtures = async () => {
         },
       ]);
     },
-    ThenPlanningUnitStatusCalculationIsTriggered(areasToAdd: string[]) {
+    ThenPlanningUnitStatusCalculationIsTriggered(_areasToAdd: string[]) {
       expect(planningUnitsService.calculateMock.mock.calls[0]).toEqual([
         {
           id: scenarioId,

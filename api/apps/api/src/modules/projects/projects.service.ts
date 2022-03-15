@@ -1,5 +1,5 @@
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, isLeft, left, right, isRight } from 'fp-ts/Either';

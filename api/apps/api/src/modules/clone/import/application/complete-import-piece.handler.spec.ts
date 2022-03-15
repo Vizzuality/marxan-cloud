@@ -247,7 +247,7 @@ const getFixtures = async () => {
       importInstance: Import,
       nextBatch: number,
     ) => {
-      const importId = importInstance.importId;
+      const _importId = importInstance.importId;
       const pieces = importInstance.toSnapshot().importPieces;
       const nextBatchPieces = pieces.filter(
         (piece) => piece.order === nextBatch,

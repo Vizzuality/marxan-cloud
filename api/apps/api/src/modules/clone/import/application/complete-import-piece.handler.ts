@@ -5,11 +5,7 @@ import {
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { isLeft } from 'fp-ts/lib/Either';
-import {
-  componentAlreadyCompleted,
-  componentNotFound,
-  Import,
-} from '../domain';
+import { componentAlreadyCompleted, componentNotFound } from '../domain';
 import { CompleteImportPiece } from './complete-import-piece.command';
 import { ImportPieceFailed } from './import-piece-failed.event';
 import { ImportRepository } from './import.repository.port';

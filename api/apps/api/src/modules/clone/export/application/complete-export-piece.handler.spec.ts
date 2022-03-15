@@ -17,9 +17,7 @@ import {
   Export,
   ExportComponent,
   ExportId,
-  ExportRequested,
   PieceExported,
-  PieceExportRequested,
 } from '../domain';
 import { CompleteExportPiece } from './complete-export-piece.command';
 import { CompleteExportPieceHandler } from './complete-export-piece.handler';

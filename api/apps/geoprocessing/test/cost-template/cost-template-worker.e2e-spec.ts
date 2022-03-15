@@ -1,6 +1,5 @@
 import { PromiseType } from 'utility-types';
 import { Repository } from 'typeorm';
-import * as config from 'config';
 import * as stream from 'stream';
 import * as unzipper from 'unzipper';
 import * as fs from 'fs';

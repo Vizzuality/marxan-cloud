@@ -237,7 +237,7 @@ export type AreaUnitSampleGeometry = FeatureCollection<
   AreaUnitSampleGeometryProps
 >;
 
-export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
+export const areaUnitsSample = (_forCase: string): AreaUnitSampleGeometry => ({
   type: 'FeatureCollection',
   features: [
     {

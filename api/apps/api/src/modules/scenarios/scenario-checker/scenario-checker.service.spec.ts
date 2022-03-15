@@ -12,9 +12,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Either } from 'fp-ts/lib/Either';
 import { FindConditions, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { API_EVENT_KINDS } from '../../../../../../libs/api-events/src';
-import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
-import { ApiEventByTopicAndKind } from '../../api-events/api-event.topic+kind.api.entity';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { MarxanScenarioChecker } from './marxan-scenario-checker.service';
 
 let fixtures: FixtureType<typeof getFixtures>;

@@ -1,6 +1,6 @@
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { Parse, Entry } from 'unzipper';
+import { Parse } from 'unzipper';
 
 export const extractFileFailed = Symbol('Extract file failed');
 export const fileNotFound = Symbol('File not found');

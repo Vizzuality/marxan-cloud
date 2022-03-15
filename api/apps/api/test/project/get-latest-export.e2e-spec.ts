@@ -122,7 +122,7 @@ export const getFixtures = async () => {
   const piecesUris: Record<string, string> = {};
   const savePiecesFiles = async (exportInstance: Export) => {
     await Promise.all(
-      exportInstance.toSnapshot().exportPieces.map(async (piece, i) => {
+      exportInstance.toSnapshot().exportPieces.map(async (piece, _i) => {
         const result = await fileRepo.save(
           Readable.from(`${piece.piece}`),
           'txt',

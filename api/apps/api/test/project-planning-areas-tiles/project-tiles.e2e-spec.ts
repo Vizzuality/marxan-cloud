@@ -1,5 +1,5 @@
 import { PromiseType } from 'utility-types';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './world';

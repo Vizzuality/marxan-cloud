@@ -9,7 +9,6 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateAdminAreaDTO } from './dto/create.admin-area.dto';
 import { UpdateAdminAreaDTO } from './dto/update.admin-area.dto';
 
-import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -83,14 +82,6 @@ export class AdminAreasService extends AppBaseService<
       ],
       keyForAttribute: 'camelCase',
     };
-  }
-
-  async fakeFindOne(_id: string): Promise<AdminArea> {
-    return this.serialize({
-      ...new AdminArea(),
-      name0: faker.address.country(),
-      name1: faker.address.state(),
-    });
   }
 
   setFilters(

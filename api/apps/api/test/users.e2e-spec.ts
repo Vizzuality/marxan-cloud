@@ -477,12 +477,10 @@ describe('UsersModule (e2e)', () => {
 
   describe('Users - Find by email', () => {
     let adminToken: string;
-    let adminUserId: string;
     const cleanups: (() => Promise<void>)[] = [];
 
     beforeAll(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
-      adminUserId = await GivenUserExists(app, 'dd');
     });
 
     afterEach(async () => {

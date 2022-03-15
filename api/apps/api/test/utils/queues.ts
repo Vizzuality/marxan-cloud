@@ -4,7 +4,6 @@ import { v4 } from 'uuid';
 import { assertDefined, FieldsOf } from '@marxan/utils';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import { QueueNameToken } from '@marxan-api/modules/queue/queue.tokens';
-import * as config from 'config';
 import { getRedisConfig } from '@marxan-api/utils/redisConfig.utils';
 
 @Injectable({

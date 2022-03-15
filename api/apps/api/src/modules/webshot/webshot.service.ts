@@ -1,6 +1,6 @@
 import { forwardRef, HttpService, Inject, Injectable } from '@nestjs/common';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { Readable } from 'stream';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { forbiddenError } from '@marxan-api/modules/access-control';

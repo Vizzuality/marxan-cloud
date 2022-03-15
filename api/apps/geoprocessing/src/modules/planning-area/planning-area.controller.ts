@@ -7,7 +7,6 @@ import {
   Logger,
   Param,
   Post,
-  Query,
   Res,
 } from '@nestjs/common';
 import {
@@ -15,7 +14,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { ApiConsumesShapefile } from '@marxan-geoprocessing/decoratos/shapefile.decorator';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';

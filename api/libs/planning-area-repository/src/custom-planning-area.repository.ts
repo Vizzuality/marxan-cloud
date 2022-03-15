@@ -1,4 +1,4 @@
-import { EntityManager, LessThan } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { Inject, Injectable } from '@nestjs/common';
 import { BBox, GeoJSON } from 'geojson';
 import { isDefined } from '@marxan/utils';
