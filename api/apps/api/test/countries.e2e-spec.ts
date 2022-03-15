@@ -3,19 +3,14 @@ import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { JSONAPICountryData } from '@marxan-api/modules/countries/country.geo.entity';
 import { JSONAPIAdminAreaData } from '@marxan-api/modules/admin-areas/admin-area.geo.entity';
-import { tearDown } from './utils/tear-down';
 import { bootstrapApplication } from './utils/api-application';
-
-afterAll(async () => {
-  await tearDown();
-});
 
 describe('CountriesModule (e2e)', () => {
   let app: INestApplication;
 
   let jwtToken: string;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
 
     const response = await request(app.getHttpServer())
@@ -40,7 +35,7 @@ describe('CountriesModule (e2e)', () => {
     // is used to populate the geodb in CI pipelines.
     const countryCodeForTests = 'AGO';
 
-    it('Should list countries (paginated; pages of up to 25 items, no explicit page number - should default to 1)', async () => {
+    it.only('Should list countries (paginated; pages of up to 25 items, no explicit page number - should default to 1)', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/v1/countries?page[size]=25')
         .set('Authorization', `Bearer ${jwtToken}`)
