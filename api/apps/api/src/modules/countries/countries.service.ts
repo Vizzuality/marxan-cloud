@@ -6,7 +6,6 @@ import { Country } from './country.geo.entity';
 import { CreateCountryDTO } from './dto/create.country.dto';
 import { UpdateCountryDTO } from './dto/update.country.dto';
 
-import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -74,17 +73,5 @@ export class CountriesService extends AppBaseService<
       ],
       keyForAttribute: 'camelCase',
     };
-  }
-
-  async fakeFindOne(_id: string): Promise<Country> {
-    return this.serialize([
-      {
-        ...new Country(),
-        // faker.address.countryCode() gives alpha2 codes, but we need alpha3
-        // here, so (marginally) better to hardcode something here instead 🤷.
-        gid0: faker.address.countryCode('ESP'),
-        name0: faker.address.country(),
-      },
-    ]);
   }
 }

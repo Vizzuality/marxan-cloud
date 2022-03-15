@@ -14,7 +14,6 @@ import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
-import * as faker from 'faker';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -97,19 +96,6 @@ export class UsersService extends AppBaseService<
           'lastModifiedAt',
         ],
       },
-    };
-  }
-
-  async fakeFindOne(_id: string): Promise<Partial<User>> {
-    return {
-      ...new User(),
-      id: faker.random.uuid(),
-      email: faker.internet.email(),
-      displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
-      fname: faker.name.firstName(),
-      lname: faker.name.lastName(),
-      isActive: faker.random.boolean(),
-      isDeleted: faker.random.boolean(),
     };
   }
 

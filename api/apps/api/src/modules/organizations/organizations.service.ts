@@ -5,8 +5,6 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CreateOrganizationDTO } from './dto/create.organization.dto';
 import { UpdateOrganizationDTO } from './dto/update.organization.dto';
 import { Organization } from './organization.api.entity';
-
-import * as faker from 'faker';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import {
   AppBaseService,
@@ -64,16 +62,6 @@ export class OrganizationsService extends AppBaseService<
         },
       },
     };
-  }
-
-  async fakeFindOne(_id: string): Promise<Organization> {
-    const organization = {
-      ...new Organization(),
-      id: faker.random.uuid(),
-      name: faker.lorem.words(5),
-      description: faker.lorem.sentence(),
-    };
-    return organization;
   }
 
   /**
