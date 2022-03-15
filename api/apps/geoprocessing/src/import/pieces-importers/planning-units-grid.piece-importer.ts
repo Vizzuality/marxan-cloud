@@ -97,7 +97,11 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
       let lastChunkIncompletedData = '';
 
       zipStream
-        .pipe(ParseOne(new RegExp(planningAreaCustomGridLocation.relativePath)))
+        .pipe(
+          ParseOne(
+            new RegExp(`^${planningAreaCustomGridLocation.relativePath}$`),
+          ),
+        )
         .pipe(
           new Transform({
             writableObjectMode: true,

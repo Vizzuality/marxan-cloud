@@ -48,10 +48,10 @@ export class PlanningUnitsGridPieceExporter implements ExportPieceProcessor {
 
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
     const gridStream = await qb
-      // TODO puid should be obtained in a proper way
-      .select('ST_AsEWKB(the_geom) as ewkb, row_number() over () as puid')
+      .select('ST_AsEWKB(the_geom) as ewkb, ppu.puid as puid')
       .from('planning_units_geom', 'pug')
-      .where('project_id = :projectId', { projectId: project.id })
+      .innerJoin('projects_pu', 'ppu', 'pug.id = ppu.geom_id')
+      .where('ppu.project_id = :projectId', { projectId: project.id })
       .stream();
 
     const gridFileTransform = new PlanningUnitsGridTransform();
