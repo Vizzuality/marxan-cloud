@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -40,7 +41,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
 
 ) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -48,6 +49,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
+  const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
   const scenarioMutation = useSaveScenario({
     requestConfig: {
@@ -174,7 +176,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
               )}
             </Pill>
 
-            {!subtab && (
+            {!subtab && editable && (
               <motion.div
                 key="continue-scenario-button"
                 className="flex justify-center flex-shrink-0 mt-4"

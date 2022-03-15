@@ -12,6 +12,7 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useMe } from 'hooks/me';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import { useScenario, useSaveScenario, useRunScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -48,14 +49,15 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
 
   const { user } = useMe();
 
-  const { data: projectData } = useProject(pid);
-
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
+
+  const editable = useCanEditScenario(pid, sid);
+  const { data: projectData } = useProject(pid);
 
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
@@ -228,7 +230,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
 
             </Pill>
 
-            {!subtab && (
+            {!subtab && editable && (
               <motion.div
                 key="run-scenario-button"
                 className="flex justify-center flex-shrink-0 mt-4"
