@@ -48,9 +48,8 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
-  const { data: projectData } = useProject(pid);
-
   const editable = useCanEditScenario(pid, sid);
+  const { data: projectData } = useProject(pid);
 
   const {
     data: scenarioData,
