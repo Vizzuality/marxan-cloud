@@ -4,7 +4,7 @@ import {
   Controller,
   Get,
   Header,
-  Logger,
+  ConsoleLogger,
   Param,
   Post,
   Query,
@@ -35,7 +35,7 @@ export class PlanningUnitsController {
   constructor(
     private service: PlanningUnitsService,
     private shapefileService: ShapefileService,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(PlanningUnitsController.name);
   }

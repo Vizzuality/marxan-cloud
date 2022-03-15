@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { FileRepository } from '@marxan/files-repository';
 import { extractFile } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
@@ -22,7 +22,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(PlanningAreaCustomPieceImporter.name);
   }

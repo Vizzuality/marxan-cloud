@@ -2,7 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import {
@@ -29,7 +29,7 @@ export class ProjectCustomProtectedAreasPieceExporter
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ProjectCustomProtectedAreasPieceExporter.name);
   }

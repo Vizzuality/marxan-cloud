@@ -1,7 +1,7 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ImportRepository } from '../../import/application/import.repository.port';
 import { MarkImportAsSubmitted } from './mark-import-as-submitted.command';
@@ -18,7 +18,7 @@ export class MarkImportAsSubmittedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly importRepository: ImportRepository,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(MarkImportAsSubmittedHandler.name);
   }

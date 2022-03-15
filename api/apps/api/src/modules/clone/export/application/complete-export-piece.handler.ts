@@ -1,5 +1,5 @@
 import { ExportPieceFailed } from '@marxan-api/modules/clone/export/application/export-piece-failed.event';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import {
   CommandHandler,
   EventBus,
@@ -19,7 +19,7 @@ export class CompleteExportPieceHandler
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly eventBus: EventBus,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(CompleteExportPieceHandler.name);
   }

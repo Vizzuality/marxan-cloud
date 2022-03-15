@@ -2,7 +2,7 @@ import {
   InitialCostJobInput,
   jobSubmissionFailed,
 } from '@marxan/scenario-cost-surface';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bullmq';
@@ -31,7 +31,7 @@ export class SetInitialCostSurfaceHandler
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,
     private readonly events: CostSurfaceEventsPort,
-    private logger: Logger,
+    private logger: ConsoleLogger,
   ) {
     this.logger.setContext(SetInitialCostSurfaceHandler.name);
   }

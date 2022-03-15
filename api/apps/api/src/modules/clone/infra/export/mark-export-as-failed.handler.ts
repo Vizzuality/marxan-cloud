@@ -1,7 +1,7 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ExportRepository } from '../../export/application/export-repository.port';
 import { MarkExportAsFailed } from './mark-export-as-failed.command';
@@ -18,7 +18,7 @@ export class MarkExportAsFailedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(MarkExportAsFailedHandler.name);
   }

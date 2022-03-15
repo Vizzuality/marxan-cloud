@@ -9,7 +9,7 @@ import { componentAlreadyCompleted, componentNotFound } from '../domain';
 import { CompleteImportPiece } from './complete-import-piece.command';
 import { ImportPieceFailed } from './import-piece-failed.event';
 import { ImportRepository } from './import.repository.port';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 
 @CommandHandler(CompleteImportPiece)
 export class CompleteImportPieceHandler
@@ -19,7 +19,7 @@ export class CompleteImportPieceHandler
     private readonly importRepository: ImportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly eventBus: EventBus,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(CompleteImportPieceHandler.name);
   }

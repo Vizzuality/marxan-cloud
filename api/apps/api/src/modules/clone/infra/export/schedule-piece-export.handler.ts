@@ -2,7 +2,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, ConsoleLogger } from '@nestjs/common';
 import {
   CommandHandler,
   EventBus,
@@ -29,7 +29,7 @@ export class SchedulePieceExportHandler
     private readonly queue: Queue<ExportJobInput>,
     private readonly eventBus: EventBus,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(SchedulePieceExportHandler.name);
   }
