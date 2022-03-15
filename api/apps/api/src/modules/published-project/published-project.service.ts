@@ -27,7 +27,8 @@ export type errors =
 export class PublishedProjectService {
   constructor(
     @InjectRepository(Project) private projectRepository: Repository<Project>,
-    protected publicProjectsRepo: Repository<PublishedProject>,
+    @InjectRepository(PublishedProject)
+    private publicProjectsRepo: Repository<PublishedProject>,
     private crudService: PublishedProjectCrudService,
     private readonly acl: ProjectAccessControl,
     private readonly usersService: UsersService,
