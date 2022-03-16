@@ -92,17 +92,6 @@ export class Scenario extends TimeUserEntityMetadata {
   projectId!: string;
 
   /**
-   * List of IUCN categories used to select WDPA protected areas for the
-   * scenario's planning area.
-   */
-  @ApiPropertyOptional()
-  @Column('varchar', { name: 'wdpa_iucn_categories', array: true })
-  wdpaIucnCategories?: IUCNCategory[];
-  /** */
-  @ApiPropertyOptional()
-  @Column('varchar', { name: 'custom_protected_area_ids', array: true })
-  customProtectedAreaIds?: string[];
-  /**
    * List of ids of protected areas associated to the scenario.
    */
   @ApiPropertyOptional()
