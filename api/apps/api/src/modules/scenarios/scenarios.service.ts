@@ -7,7 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
-import { classToClass } from 'class-transformer';
+import { instanceToInstance } from 'class-transformer';
 import * as stream from 'stream';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { pick } from 'lodash';
@@ -790,7 +790,7 @@ export class ScenariosService {
     } else {
       marxanInput = this.marxanInputValidator.from({});
     }
-    const withValidatedMetadata: T = classToClass<T>(input);
+    const withValidatedMetadata: T = instanceToInstance<T>(input);
     (withValidatedMetadata.metadata ??= {}).marxanInputParameterFile =
       marxanInput;
     return withValidatedMetadata;

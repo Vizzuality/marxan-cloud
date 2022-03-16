@@ -8,21 +8,21 @@ export class TileRequest {
   @IsInt()
   @Min(0)
   @Max(20)
-  @Transform((i) => Number.parseInt(i))
+  @Transform(({ value }) => Number.parseInt(value))
   z!: number;
 
   /**
    * @description The tile x offset on Mercator Projection
    */
   @IsInt()
-  @Transform((i) => Number.parseInt(i))
+  @Transform(({ value }) => Number.parseInt(value))
   x!: number;
 
   /**
    * @description The tile y offset on Mercator Projection
    */
   @IsInt()
-  @Transform((i) => Number.parseInt(i))
+  @Transform(({ value }) => Number.parseInt(value))
   y!: number;
 
   @IsUUID()

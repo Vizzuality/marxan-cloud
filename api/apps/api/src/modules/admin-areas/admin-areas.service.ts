@@ -30,7 +30,7 @@ export class AdminAreaLevel {
   @IsInt()
   @Min(1)
   @Max(2)
-  @Transform((level: string) => parseInt(level))
+  @Transform(({ value: level }: { value: string }) => parseInt(level))
   level?: 1 | 2;
 }
 
