@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 import { CorsUtils } from './utils/cors.utils';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { ValidationPipe } from '@nestjs/common';
