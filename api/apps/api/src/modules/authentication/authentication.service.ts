@@ -144,6 +144,7 @@ export class AuthenticationService {
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
+
     if (!newUser) return left(unknownError);
 
     await this.apiEventsService.create({
