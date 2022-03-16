@@ -33,7 +33,6 @@
     "username": null,
     "password": null,
     "database": null,
-    "runMigrationsOnStartup": false,
     "logging": "error"
   },
   "api": {

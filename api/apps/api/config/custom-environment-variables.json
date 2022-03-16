@@ -17,7 +17,6 @@
     "password": "GEO_POSTGRES_PASSWORD",
     "database": "GEO_POSTGRES_DB",
     "port": "GEO_POSTGRES_PORT",
-    "runMigrationsOnStartup": "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP",
     "logging": "GEO_POSTGRES_LOGGING"
   },
   "network": {

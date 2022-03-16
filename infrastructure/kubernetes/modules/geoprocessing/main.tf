@@ -202,7 +202,7 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
 
           env {
-            name  = "API_RUN_MIGRATIONS_ON_STARTUP"
+            name  = "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
             value = true
           }
 

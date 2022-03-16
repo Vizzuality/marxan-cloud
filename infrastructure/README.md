@@ -101,6 +101,10 @@ Secrets with the corresponding values:
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
 - `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 
+Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
+and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
+the Frontend app docker image.
+
 ## How to deploy
 
 Deploying the included Terraform project is done in steps:

@@ -44,7 +44,7 @@ export const geoprocessingConnections: {
     migrations: [__dirname + '/migrations/geoprocessing/**/*.ts'],
     migrationsRun:
       `${AppConfig.get<string>(
-        'postgresApi.runMigrationsOnStartup',
+        'postgresGeoApi.runMigrationsOnStartup',
       )}`.toLowerCase() !== 'false',
     cli: {
       migrationsDir: 'apps/geoprocessing/src/migrations/geoprocessing',
