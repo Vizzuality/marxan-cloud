@@ -1,5 +1,5 @@
 import * as config from 'config';
-import { QueueBaseOptions } from 'bullmq/dist/interfaces/queue-options';
+import { QueueBaseOptions } from 'bullmq';
 
 export function getRedisConfig() {
   const redisConfig: Record<string, any> = config.get('redis');

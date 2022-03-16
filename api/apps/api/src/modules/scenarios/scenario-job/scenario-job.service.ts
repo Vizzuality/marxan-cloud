@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Job, Queue } from 'bullmq';
+import { Job, JobState, JobType, Queue } from 'bullmq';
 
 export interface JobDataWithScenarioId {
   scenarioId: string;
@@ -12,7 +12,7 @@ export class ScenarioJobService {
   async getScenarioJob<T extends JobDataWithScenarioId>(
     queue: Queue<T>,
     scenarioId: string,
-    jobTypes: string[],
+    jobTypes: JobState[],
   ): Promise<Job<T> | undefined> {
     const jobs: Job<T>[] = await queue.getJobs(jobTypes);
     return jobs.find((job) => job.data.scenarioId === scenarioId);
