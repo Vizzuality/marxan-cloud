@@ -9,7 +9,6 @@ import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProjectsACLTestUtils } from '../../utils/projects-acl.test.utils';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { v4 } from 'uuid';
 
@@ -31,77 +30,36 @@ export const getFixtures = async () => {
     getRepositoryToken(UsersProjectsApiEntity),
   );
   const nonExistentUserId = v4();
-  const cleanups: (() => Promise<void>)[] = [];
 
   const randomUserInfo = await GivenUserIsCreated(app);
 
   return {
-    cleanup: async () => {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
-      await app.close();
-    },
-
     GivenProjectWasCreated: async () => {
-      const { cleanup, projectId } = await GivenProjectExists(
-        app,
-        ownerUserToken,
-      );
-      cleanups.push(cleanup);
-      cleanups.push(
-        async () =>
-          await ProjectsACLTestUtils.deleteUserFromProject(
-            app,
-            ownerUserToken,
-            projectId,
-            otherOwnerUserId,
-          ),
-      );
-      cleanups.push(
-        async () =>
-          await ProjectsACLTestUtils.deleteUserFromProject(
-            app,
-            ownerUserToken,
-            projectId,
-            viewerUserId,
-          ),
-      );
-      cleanups.push(
-        async () =>
-          await ProjectsACLTestUtils.deleteUserFromProject(
-            app,
-            ownerUserToken,
-            projectId,
-            contributorUserId,
-          ),
-      );
+      const { projectId } = await GivenProjectExists(app, ownerUserToken);
+
       return projectId;
     },
 
     GivenViewerWasAddedToProject: async (projectId: string) => {
-      const userCreated = await userProjectsRepo.save({
+      return userProjectsRepo.save({
         projectId,
         roleName: projectViewerRole,
         userId: viewerUserId,
       });
-      return userCreated;
     },
     GivenContributorWasAddedToProject: async (projectId: string) => {
-      const userCreated = await userProjectsRepo.save({
+      return userProjectsRepo.save({
         projectId,
         roleName: projectContributorRole,
         userId: contributorUserId,
       });
-      return userCreated;
     },
     GivenOwnerWasAddedToProject: async (projectId: string) => {
-      const userCreated = await userProjectsRepo.save({
+      return userProjectsRepo.save({
         projectId,
         roleName: projectOwnerRole,
         userId: otherOwnerUserId,
       });
-      return userCreated;
     },
 
     GivenUserWasAddedToProject: async (projectId: string) => {
@@ -338,10 +296,12 @@ export const getFixtures = async () => {
       expect(error?.message[0]).toEqual('roleName must be a valid enum value');
     },
 
-    ThenQueryFailedIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(400);
+    ThenUserNotFoundIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(404);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(`Error while adding record to the database.`);
+      expect(error.title).toEqual(
+        `User with ID: ${nonExistentUserId} could not be found.`,
+      );
     },
 
     ThenTransactionFailedIsReturned: (response: request.Response) => {

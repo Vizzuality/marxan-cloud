@@ -1,41 +1,41 @@
 import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import {
   forbiddenError,
   lastOwner,
   queryFailed,
   transactionFailed,
 } from '@marxan-api/modules/access-control';
+import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
+import {
+  GetScenarioFailure,
+  scenarioNotFound,
+  unknownError,
+  unknownError as blmUnknownError,
+} from '@marxan-api/modules/blm/values/blm-repos';
+import {
+  bestSolutionNotFound,
+  projectDoesntExist,
+  projectNotReady,
+} from '@marxan-api/modules/scenarios/scenarios.service';
+import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
+import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
+import {
+  nullPlanningUnitGridShape,
+  projectNotFound as initialCostProjectNotFound,
+} from '@marxan-api/modules/scenarios/cost-surface/application/set-initial-cost-surface.command';
+import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import {
   lockedByAnotherUser,
   lockedScenario,
   noLockInPlace,
   unknownError as lockUnknownError,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
-import {
-  GetScenarioFailure,
-  scenarioNotFound,
-  unknownError as blmUnknownError,
-  unknownError,
-} from '@marxan-api/modules/blm/values/blm-repos';
-import {
-  exportIsNotStandalone,
-  exportResourceKindIsNotProject,
-  projectIsMissingInfoForRegularPus,
-  projectIsNotPublished,
-  projectNotFoundForExport,
-} from '@marxan-api/modules/projects/projects.service';
-import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
-import {
-  invalidRange,
-  unknownError as rangeUnknownError,
-  updateFailure,
-} from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
-import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
-import { deleteScenarioFailed } from '@marxan-api/modules/scenarios/delete-scenario/delete-scenario.command';
-import {
-  inputZipNotYetAvailable,
-  metadataNotFound as inputMetadataNotFound,
-} from '@marxan-api/modules/scenarios/input-files';
-import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
 import {
   marxanFailed,
   metadataNotFound,
@@ -53,26 +53,15 @@ import { internalError } from '@marxan-api/modules/specification/application/sub
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
 import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
 import {
+  AclErrors,
+  userNotFound,
+} from '@marxan-api/modules/access-control/access-control.types';
+import {
   unknownPdfWebshotError,
   unknownPngWebshotError,
 } from '@marxan/webshot';
-import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  HttpException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import {
-  exportNotFound,
-  unfinishedExport,
-} from '../modules/clone/export/application/get-archive.query';
-import {
-  ImportProjectError,
-  invalidProjectExport,
-} from '../modules/clone/import/application/import-project.command';
-import { saveError } from '../modules/clone/import/application/import.repository.port';
+import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
+import { projectIsMissingInfoForRegularPus } from '@marxan-api/modules/projects/projects.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -85,6 +74,7 @@ interface ErrorHandlerOptions {
 
 export const mapAclDomainToHttpError = (
   errorToCheck:
+    | AclErrors
     | GetScenarioFailure
     | typeof lockedSolutions
     | typeof forbiddenError
@@ -116,9 +106,14 @@ export const mapAclDomainToHttpError = (
     | typeof blmCreationFailure
     | typeof jobSubmissionFailed
     | typeof submissionFailed
+    | typeof nullPlanningUnitGridShape
+    | typeof initialCostProjectNotFound
     | typeof bestSolutionNotFound
     | typeof unknownPdfWebshotError
     | typeof unknownPngWebshotError
+    | typeof unknownError
+    | typeof userNotFound
+    | typeof unknownPngWebshotError,
     | typeof unknownError
     | typeof exportNotFound
     | typeof exportResourceKindIsNotProject
@@ -130,6 +125,10 @@ export const mapAclDomainToHttpError = (
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
+    case userNotFound:
+      return new NotFoundException(
+        `User with ID: ${options?.userId} could not be found.`,
+      );
     case unknownError:
       return new InternalServerErrorException(options);
     case forbiddenError:
@@ -214,6 +213,10 @@ export const mapAclDomainToHttpError = (
       return new InternalServerErrorException(
         'System could not submit the async job.',
       );
+    case nullPlanningUnitGridShape:
+      return new BadRequestException('Invalid planing unit grid shape.');
+    case initialCostProjectNotFound:
+      return new NotFoundException('Project not found.');
     case unknownPdfWebshotError:
       return new InternalServerErrorException(
         'Unexpected error while preparing PDF snapshot via webshot.',

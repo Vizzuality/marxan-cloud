@@ -8,8 +8,16 @@ export const lastOwner = Symbol(
 );
 export const transactionFailed = Symbol(`transaction failed`);
 export const queryFailed = Symbol(`Query failed`);
+export const userNotFound = Symbol(`user not found`);
 
 export type ForbiddenError = typeof forbiddenError;
 export type LastOwnerError = typeof lastOwner;
 export type TransactionFailedError = typeof transactionFailed;
 export type QueryFailedError = typeof queryFailed;
+export type UserNotFoundError = typeof userNotFound;
+export type AclErrors =
+  | ForbiddenError
+  | LastOwnerError
+  | TransactionFailedError
+  | QueryFailedError
+  | UserNotFoundError;

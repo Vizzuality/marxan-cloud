@@ -6,9 +6,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 beforeEach(async () => {
   fixtures = await getFixtures();
 });
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test(`getting project users when user has no role in the project`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
