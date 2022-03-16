@@ -22,7 +22,7 @@ export class ScenarioComparisonTilesService {
     request: ScenarioComparisonTileRequest,
   ): Promise<Buffer> {
     const tile = await this.getTiles(request);
-    return this.tileService.zip(tile[0].mvt);
+    return this.tileService.zip(tile[0].mvt)
   }
 
   private async getTiles({
@@ -41,7 +41,8 @@ export class ScenarioComparisonTilesService {
         where spd.scenario_id  in ($1, $2)
         ),
         compare as (
-        select q1.the_geom, q1.pu_geom_id, q1.freq as freq1, q2.freq as freq2
+        select q1.the_geom, q1.pu_geom_id as "puGeomId", q1.freq as "freqA",
+          q2.freq as "freqB", q1.scenario_id as "scenarioIdA", q2.scenario_id as "scenarioIdB"
         from
         (select * from t where t.scenario_id = $1) q1
         LEFT JOIN lateral
@@ -51,8 +52,10 @@ export class ScenarioComparisonTilesService {
         )
       select ST_AsMVT(tile.*, 'layer0', 4096, 'mvt_geom') as mvt
       from (
-      select pu_geom_id, freq1, freq2,  ST_AsMVTGeom(ST_Transform(the_geom, 3857),
-      ST_TileEnvelope($3, $4, $5), 4096, 256, true) AS mvt_geom from compare) as tile`,
+        select "puGeomId", "freqA", "freqB", "scenarioIdA", "scenarioIdB",
+        ST_AsMVTGeom(ST_Transform(the_geom, 3857),
+        ST_TileEnvelope($3, $4, $5), 4096, 256, true) AS mvt_geom
+        from compare) as tile`,
       [scenarioIdA, scenarioIdB, z, x, y],
     ).catch(err_msg => {
       Logger.error(err_msg);
