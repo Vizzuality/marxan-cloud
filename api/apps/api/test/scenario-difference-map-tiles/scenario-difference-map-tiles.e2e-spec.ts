@@ -18,48 +18,13 @@ afterAll(async () => {
 });
 
 describe('PlanningUnitsTilesModule (e2e)', () => {
-  test('When creating a regular project whe should be able to access to its planning area tiles', async () => {
-    const tile: Buffer = await world.WhenRequestingTileForProjectPlanningArea(
-      world.regularProjectId,
+  test('When comparing 2 scenarios owner by the user within the same project we should be able to see the tiles', async () => {
+    world.GivenScenarioAPuDataExists();
+    world.GivenScenarioBPuDataExists();
+    const tile: Buffer = await world.WhenRequestingTileToCompareScenarios(
+      world.scenarioIdA,
+      world.scenarioIdB,
     );
-    world.ThenItContainsPlanningAreaTile(tile);
-  });
-
-  test('When creating a regular project whe should be able to access to its grid tiles', async () => {
-    const tile: Buffer = await world.WhenRequestingTileForProjectPlanningGrid(
-      world.regularProjectId,
-    );
-    world.ThenItContainsGridTile(tile);
-  });
-
-  test('When creating a user upload planning Area we should have tiles', async () => {
-    const tile: Buffer = await world.WhenRequestingTileForCustomArea(
-      world.customPlanningAreaId,
-    );
-    world.ThenItContainsPlanningAreaTile(tile);
-  });
-
-  test('When creating a user upload planning Area grid we should have tiles', async () => {
-    const tile: Buffer = await world.WhenRequestingTileForCustomPlanningGrid(
-      world.customPlanningAreaGridId,
-    );
-
-    world.ThenItContainsGridTile(tile);
-  });
-
-  test('When creating a project with custom planning Area we should have tiles', async () => {
-    const tile: Buffer = await world.WhenRequestingTileForCustomArea(
-      world.customProjectId,
-    );
-
-    world.ThenItContainsPlanningAreaTile(tile);
-  });
-
-  test('When creating a project with custom grid we should have tiles', async () => {
-    const tile: Buffer = await world.WhenRequestingTileForProjectPlanningGrid(
-      world.customProjectId,
-    );
-
-    world.ThenItContainsGridTile(tile);
+    world.ThenItContainsScenarioCompareTile(tile);
   });
 });

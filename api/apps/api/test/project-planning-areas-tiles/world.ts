@@ -5,14 +5,12 @@ import * as request from 'supertest';
 
 import { E2E_CONFIG } from '../e2e.config';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { gunzip } from 'zlib';
 
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { decodeMvt } from '@marxan/utils/geo/decode-mvt';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
-import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 
 export const createWorld = async (app: INestApplication) => {
   const projectsRepo: Repository<Project> = app.get(
