@@ -435,7 +435,7 @@ export class ScenariosService {
         },
       )
       .toPromise()
-      .then((response) => response.data.data as FeatureCollection)
+      .then((response) => response?.data.data as FeatureCollection)
       .then(
         (geoJson) =>
           ({

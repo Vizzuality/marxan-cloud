@@ -65,7 +65,7 @@ export class WebshotService {
           { responseType: 'arraybuffer' },
         )
         .toPromise()
-        .then((response) => response.data)
+        .then((response) => response?.data)
         .catch((error) => {
           throw new Error(error);
         });
