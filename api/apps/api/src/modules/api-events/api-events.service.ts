@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { isNil } from 'lodash';
+import { DatabaseError } from 'pg';
 import { DeleteResult, Repository } from 'typeorm';
 import { FindOperator } from 'typeorm/find-options/FindOperator';
 import { AppInfoDTO } from '../../dto/info.dto';
@@ -99,9 +100,18 @@ export class ApiEventsService extends AppBaseService<
     } catch (error) {
       const postgresDuplicateKeyErrorCode = '23505';
       const externalIdConstraint = 'api_events_external_id_unique';
+      /**
+       * @debt This is a bit of a stretch, and stretched like this during the
+       * NestJS v7->v8 upgrade (incl TypeScript upgrade, etc.) to appease the
+       * type checker: pretending that error here could only be a DatabaseError
+       * is an educated guess based for the happy path so making this assumption
+       * explicit should not make things worse than they were, and they're
+       * likely going to be ok, but hic sunt leones.
+       */
+      const dbError: DatabaseError = error as DatabaseError;
       if (
-        error.code === postgresDuplicateKeyErrorCode &&
-        error.constraint === externalIdConstraint
+        dbError.code === postgresDuplicateKeyErrorCode &&
+        dbError.constraint === externalIdConstraint
       ) {
         return left(duplicate);
       }

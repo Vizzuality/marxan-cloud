@@ -54,7 +54,13 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
       await this.apiEvents.event(
         scenarioId,
         UpdatePlanningUnitsState.Failed,
-        error,
+        /**
+         * @debt Pretending that error is always an Error is a stretch: this
+         * assumption was here since initial implementation but we made it
+         * explicit during the NestJS v7->v8 upgrade (incl. TypeScript upgrade,
+         * etc.) to assuage the type checker.
+         */
+        error as Error,
       );
     }
 
