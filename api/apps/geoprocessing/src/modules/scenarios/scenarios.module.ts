@@ -10,6 +10,7 @@ import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 import { BlmCalibrationRunModule } from './runs/blm-calibration/blm-calibration-run.module';
 import { SingleRunModule } from './runs/single-run/single-run.module';
+import { ScenarioComparisonTilesService } from './comparison-difference-tile/comparison-difference-tile.service';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { SingleRunModule } from './runs/single-run/single-run.module';
     SingleRunModule,
     WorkerModule,
   ],
-  providers: [ScenariosService],
+  providers: [ScenariosService, ScenarioComparisonTilesService],
   controllers: [ScenariosController],
   exports: [ScenariosService, TypeOrmModule],
 })
