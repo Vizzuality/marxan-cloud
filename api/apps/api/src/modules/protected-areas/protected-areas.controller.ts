@@ -138,7 +138,7 @@ export class ProtectedAreasController {
      * implementation details away from the controller handler).
      * `fetchSpecification.filter.adminAreaId` will be an array, even if we
      * expect a single value (this is the shape of all the filter values for
-     * each filter key as processed via `FetchSpecificationMiddleware`).
+     * each filter key as processed via `ProcessFetchSpecification`).
      */
     const adminAreaId = Array.isArray(fetchSpecification?.filter?.adminAreaId)
       ? fetchSpecification.filter!.adminAreaId[0]

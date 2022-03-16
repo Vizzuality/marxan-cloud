@@ -10,7 +10,7 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { AuthenticationModule } from '@marxan-api/modules/authentication/authentication.module';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { UserCommand } from '@marxan-api/modules/users/user.command';
-import { FetchSpecificationMiddleware } from 'nestjs-base-service';
+import { ProcessFetchSpecification } from 'nestjs-base-service';
 
 @Module({
   imports: [
@@ -28,11 +28,11 @@ import { FetchSpecificationMiddleware } from 'nestjs-base-service';
 export class AppModule implements NestModule {
   /**
    * @todo Apply middleware more surgically; probably rename it to something
-   * more generic (e.g. `FetchSpecificationMiddleware`?).
+   * more generic (e.g. `ProcessFetchSpecification`?).
    */
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(FetchSpecificationMiddleware)
+      .apply(ProcessFetchSpecification)
       .forRoutes({ path: '*', method: RequestMethod.GET });
   }
 }
