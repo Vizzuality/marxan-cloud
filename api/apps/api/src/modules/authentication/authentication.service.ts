@@ -26,8 +26,12 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { EventBus } from '@nestjs/cqrs';
 import { UserLoggedIn } from './user-logged-in.event';
 import { isStringEntropyHigherThan } from '@marxan-api/utils/passwordValidation.utils';
-import { isLeft } from 'fp-ts/lib/Either';
+import { Either, left, right, isLeft } from 'fp-ts/Either';
 import ms = require('ms');
+
+export const emailAlreadyInUseError = Symbol('email already in use');
+export const unknownError = Symbol('unknown error');
+type SignUpError = typeof emailAlreadyInUseError | typeof unknownError;
 
 /**
  * Access token for the app: key user data and access token
@@ -120,7 +124,7 @@ export class AuthenticationService {
    *
    * @todo Allow to set all of a user's data on signup, if needed.
    */
-  async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
+  async createUser(signupDto: SignUpDto): Promise<Either<SignUpError, Partial<User>>> {
     const passwordCheck = isStringEntropyHigherThan(
       entropyThreshold,
       signupDto.password,
@@ -140,9 +144,8 @@ export class AuthenticationService {
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
-    if (!newUser) {
-      throw new InternalServerErrorException('Error while creating a new user');
-    }
+    if (!newUser) return left(unknownError);
+
     await this.apiEventsService.create({
       topic: newUser.id,
       kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
@@ -171,7 +174,7 @@ export class AuthenticationService {
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
 
-    return newUser;
+    return right(newUser);
   }
 
   /**
