@@ -345,7 +345,7 @@ export const getFixtures = async () => {
       expect(error?.message[0]).toEqual('roleName must be a valid enum value');
     },
 
-    ThenQueryFailedIsReturned: (response: request.Response) => {
+    ThenUserNotFoundIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0];
       expect(error.title).toEqual(`Error while adding record to the database.`);

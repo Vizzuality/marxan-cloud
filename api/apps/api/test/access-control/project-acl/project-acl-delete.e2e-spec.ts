@@ -6,9 +6,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 beforeEach(async () => {
   fixtures = await getFixtures();
 });
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test(`delete every type of user from the project as owner`, async () => {
   const projectId = await fixtures.GivenProjectWasCreated();
