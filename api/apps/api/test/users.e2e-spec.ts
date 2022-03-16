@@ -9,7 +9,6 @@ import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.serv
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
-import { tearDown } from './utils/tear-down';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
@@ -36,10 +35,6 @@ nock.enableNetConnect(process.env.HOST_IP);
  *
  * Please be mindful of this when adding new tests or updating existing ones.
  */
-
-afterAll(async () => {
-  await tearDown();
-});
 
 describe('UsersModule (e2e)', () => {
   let app: INestApplication;
@@ -80,16 +75,12 @@ describe('UsersModule (e2e)', () => {
       .reply(200);
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
     usersRepo = app.get(getRepositoryToken(User));
 
     apiEventsService = app.get<ApiEventsService>(ApiEventsService);
     usersService = app.get<UsersService>(UsersService);
-  });
-
-  afterAll(async () => {
-    await Promise.all([app.close()]);
   });
 
   describe('Users - sign up and validation', () => {
@@ -106,14 +97,15 @@ describe('UsersModule (e2e)', () => {
     });
 
     test('A user should not be able to create an account using an email address already in use', async () => {
-      /**
-       * We should handle this explicitly in the API - until then, this should
-       * throw a 500 error.
-       */
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
-        .expect(HttpStatus.INTERNAL_SERVER_ERROR);
+        .expect(HttpStatus.CREATED);
+
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CONFLICT);
     });
 
     test('A user should not be able to log in until their account has been validated', async () => {
@@ -205,7 +197,7 @@ describe('UsersModule (e2e)', () => {
   describe('Users - password updates which should fail', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       jwtToken = await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -239,7 +231,7 @@ describe('UsersModule (e2e)', () => {
   describe('Users - password updates which should succeed', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       jwtToken = await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -273,7 +265,7 @@ describe('UsersModule (e2e)', () => {
   describe('Users - account deletion', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       jwtToken = await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -358,32 +350,10 @@ describe('UsersModule (e2e)', () => {
     let nonAdminToken: string;
     const cleanups: (() => Promise<void>)[] = [];
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
       nonAdminToken = await GivenUserIsLoggedIn(app, 'aa');
-    });
-
-    afterEach(async () => {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
-    });
-
-    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${adminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
-    });
-
-    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${nonAdminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
     });
 
     test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
@@ -399,11 +369,6 @@ describe('UsersModule (e2e)', () => {
       const { accessToken: newAdminToken, user } = await GivenUserIsCreated(
         app,
       );
-
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
 
       const WhenAddingNewAdminResponse = await request(app.getHttpServer())
         .post(`/api/v1/users/admins/${user.id}`)
@@ -424,6 +389,22 @@ describe('UsersModule (e2e)', () => {
 
       const adminUserIds: string[] = resources.map((s: any) => s.userId);
       expect(adminUserIds.sort()).toEqual(userIds.sort());
+    });
+
+    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
+      const WhenGettingOwnInfo = await request(app.getHttpServer())
+        .get('/api/v1/users/me')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
+    });
+
+    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
+      const WhenGettingOwnInfo = await request(app.getHttpServer())
+        .get('/api/v1/users/me')
+        .set('Authorization', `Bearer ${nonAdminToken}`);
+
+      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
     });
 
     test('A platform admin should be able to remove an existing admin', async () => {
@@ -496,17 +477,10 @@ describe('UsersModule (e2e)', () => {
   describe('Users - Find by email', () => {
     let adminToken: string;
     let adminUserId: string;
-    const cleanups: (() => Promise<void>)[] = [];
 
-    beforeAll(async () => {
+    beforeEach(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
-    });
-
-    afterEach(async () => {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
     });
 
     test('A user can be found by full email', async () => {

@@ -1,6 +1,6 @@
 version: "3.6"
 services:
-  api-postgresql:
+  test-e2e-postgresql-api:
     build:
       context: ./postgresql
       dockerfile: Dockerfile

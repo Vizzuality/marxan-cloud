@@ -29,7 +29,7 @@
     "api:test:typeorm": "NODE_ENV=test, NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/ormconfig.ts",
     "geoprocessing:typeorm": "NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts",
     "geoprocessing:test:typeorm": "NODE_ENV=test, NODE_CONFIG_DIR=apps/geoprocessing/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/geoprocessing/ormconfig.ts",
-    "test:prepare:db": "yarn api:test:typeorm migration:run -t each && yarn geoprocessing:test:typeorm migration:run -t each"
+    "test:prepare-db": "yarn api:test:typeorm migration:run -t each && yarn geoprocessing:test:typeorm migration:run -t each"
   },
   "husky": {
     "hooks": {

@@ -22,7 +22,12 @@ import { v4 } from 'uuid';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 import { Mailer } from '@marxan-api/modules/authentication/password-recovery/mailer';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { Either, left, right } from 'fp-ts/Either';
 import ms = require('ms');
+
+export const emailAlreadyInUseError = Symbol('email already in use');
+export const unknownError = Symbol('unknown error');
+type SignUpError = typeof emailAlreadyInUseError | typeof unknownError;
 
 /**
  * Access token for the app: key user data and access token
@@ -110,7 +115,12 @@ export class AuthenticationService {
    *
    * @todo Allow to set all of a user's data on signup, if needed.
    */
-  async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
+  async createUser(
+    signupDto: SignUpDto,
+  ): Promise<Either<SignUpError, Partial<User>>> {
+    const existingUser = await this.usersService.findByEmail(signupDto.email);
+    if (existingUser) return left(emailAlreadyInUseError);
+
     const user = new User();
     user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
@@ -120,9 +130,8 @@ export class AuthenticationService {
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
-    if (!newUser) {
-      throw new InternalServerErrorException('Error while creating a new user');
-    }
+    if (!newUser) return left(unknownError);
+
     await this.apiEventsService.create({
       topic: newUser.id,
       kind: API_EVENT_KINDS.user__signedUp__v1alpha1,
@@ -151,7 +160,7 @@ export class AuthenticationService {
     }
     await this.mailer.sendSignUpConfirmationEmail(newUser.id, validationToken);
 
-    return newUser;
+    return right(newUser);
   }
 
   /**

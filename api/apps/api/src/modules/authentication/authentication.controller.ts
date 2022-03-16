@@ -1,6 +1,8 @@
 import {
   Body,
+  ConflictException,
   Controller,
+  InternalServerErrorException,
   Post,
   Request,
   UseGuards,
@@ -21,12 +23,15 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import {
   AccessToken,
   AuthenticationService,
+  emailAlreadyInUseError,
+  unknownError,
 } from '@marxan-api/modules/authentication/authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UserAccountValidationDTO } from './dto/user-account.validation.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { isLeft } from 'fp-ts/Either';
 
 @Controller('/auth')
 @ApiTags('Authentication')
@@ -75,7 +80,19 @@ export class AuthenticationController {
     @Request() _req: Request,
     @Body(new ValidationPipe()) signupDto: SignUpDto,
   ): Promise<void> {
-    await this.authenticationService.createUser(signupDto);
+    const result = await this.authenticationService.createUser(signupDto);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case emailAlreadyInUseError:
+          throw new ConflictException(
+            `Email: ${signupDto.email} is already in use`,
+          );
+        case unknownError:
+          throw new InternalServerErrorException(
+            `Unknown error when signing up with this DTO: ${signupDto}`,
+          );
+      }
+    }
   }
 
   @Post('validate')
