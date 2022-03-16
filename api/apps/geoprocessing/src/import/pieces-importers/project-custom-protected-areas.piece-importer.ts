@@ -3,6 +3,7 @@ import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
 import { FileRepository } from '@marxan/files-repository';
+import { ProtectedArea } from '@marxan/protected-areas';
 import { extractFile } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -68,19 +69,18 @@ export class ProjectCustomProtectedAreasPieceImporter
 
     if (customProjectProtectedAreas.length) {
       await this.geoprocessingEntityManager.transaction(async (em) => {
-        const fullNameGeomtriesValues = customProjectProtectedAreas.map(
-          this.parseCustomProjectProtectedAreas,
+        const insertValues = customProjectProtectedAreas.map((protectedArea) =>
+          this.parseCustomProjectProtectedAreas(
+            protectedArea,
+            importResourceId,
+          ),
         );
-        await em.query(
-          `
-        INSERT INTO wdpa(project_id,full_name,the_geom)
-            SELECT '${importResourceId}' as project_id,
-            (protectedArea ->> 'fullName')::text as full_name,
-            ST_GeomFromEwkb((protectedArea ->> 'geom')::bytea) as the_geom
-            FROM json_array_elements($1) as protectedArea
-      `,
-          [JSON.stringify(fullNameGeomtriesValues)],
-        );
+        await em
+          .createQueryBuilder()
+          .insert()
+          .into(ProtectedArea)
+          .values(insertValues)
+          .execute();
       });
     }
 
@@ -95,10 +95,13 @@ export class ProjectCustomProtectedAreasPieceImporter
 
   private parseCustomProjectProtectedAreas(
     customProtecteArea: ProjectCustomProtectedAreasContent,
+    projectId: string,
   ) {
+    const buffer = Buffer.from(customProtecteArea.ewkb).toString('hex');
     return {
+      projectId,
       fullName: customProtecteArea.fullName,
-      geom: '\\x' + Buffer.from(customProtecteArea.ewkb).toString('hex'),
+      theGeom: () => `'${buffer}'`,
     };
   }
 }
