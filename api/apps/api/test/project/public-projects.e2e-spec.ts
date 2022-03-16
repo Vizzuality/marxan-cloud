@@ -51,9 +51,12 @@ test(`when placing a public project under moderation as a platform admin`, async
 
   // Test that findOne only shows project for admin
   response = await fixtures.WhenGettingPublicProjectAsAdmin(projectId);
-  fixtures.ThenPublicProjectDetailsArePresent(projectId, response);
+  fixtures.ThenPublicProjectDetailsWhileUnderModerationArePresent(
+    projectId,
+    response,
+  );
   response = await fixtures.WhenGettingPublicProject(projectId);
-  fixtures.ThenNotFoundIsReturned(response);
+  fixtures.ThenForbiddenIsReturned(response);
 });
 
 test(`when clearing under moderation status from a public project as a platform admin`, async () => {
@@ -111,5 +114,5 @@ test(`when clearing under moderation status from a public project not as platfor
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
   response = await fixtures.WhenGettingPublicProject(projectId);
-  fixtures.ThenNotFoundIsReturned(response);
+  fixtures.ThenForbiddenIsReturned(response);
 });

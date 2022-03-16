@@ -9,6 +9,7 @@ import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-i
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '@marxan-api/modules/users/users.service';
+import { assertDefined } from '@marxan/utils';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -104,12 +105,11 @@ export class PublishedProjectService {
     if (!result) {
       return left(notFound);
     }
-
-    if (
-      result.underModeration === true &&
-      info?.authenticatedUser?.id &&
-      !(await this.acl.canPublishProject(info?.authenticatedUser.id, id))
-    ) {
+    const isUnderModeration = result.underModeration === true;
+    const isPlatformAdmin =
+      info?.authenticatedUser?.id !== undefined &&
+      (await this.usersService.isPlatformAdmin(info?.authenticatedUser?.id));
+    if (isUnderModeration && !isPlatformAdmin) {
       return left(accessDenied);
     }
     return right(result);
