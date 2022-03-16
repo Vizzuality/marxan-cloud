@@ -44,6 +44,6 @@ export const BaseTilesOpenApi = () =>
       Header('Content-Type', 'application/x-protobuf'),
       Header('Content-Disposition', 'attachment'),
       Header('Access-Control-Allow-Origin', '*'),
-      Header('Content-Encoding', 'gzip'),
+      Header('Content-Encoding', 'gzip, deflate'),
     ],
   );
