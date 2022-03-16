@@ -82,9 +82,8 @@ export class ProjectAclController {
       dto,
       req.user.id,
     );
-
     if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left);
+      throw mapAclDomainToHttpError(result.left, { userId: dto.userId });
     }
   }
 

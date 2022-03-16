@@ -7,8 +7,10 @@ import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/proje
 
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import {
+  AclErrors,
   Denied,
   Permit,
+  userNotFound,
 } from '@marxan-api/modules/access-control/access-control.types';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control/projects-acl/project-access-control';
 import {
@@ -26,6 +28,7 @@ import {
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 
 /**
  * Debt: neither UsersProjectsApiEntity should belong to projects
@@ -58,6 +61,8 @@ export class ProjectAclService implements ProjectAccessControl {
   constructor(
     @InjectRepository(UsersProjectsApiEntity)
     private readonly roles: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
     @InjectRepository(PublishedProject)
     private readonly publishedProjectRepo: Repository<PublishedProject>,
     private readonly lockService: LockService,
@@ -233,22 +238,14 @@ export class ProjectAclService implements ProjectAccessControl {
     projectId: string,
     userAndRoleToChange: UserRoleInProjectDto,
     loggedUserId: string,
-  ): Promise<
-    Either<
-      | typeof transactionFailed
-      | typeof forbiddenError
-      | typeof lastOwner
-      | typeof queryFailed,
-      void
-    >
-  > {
+  ): Promise<Either<AclErrors, void>> {
     const { userId, roleName } = userAndRoleToChange;
-    if (!(await this.isOwner(loggedUserId, projectId))) {
+    const userToUpdate = await this.users.findOne(userId);
+    if (!(await this.isOwner(loggedUserId, projectId)))
       return left(forbiddenError);
-    }
-    if (!(await this.hasOtherOwner(userId, projectId))) {
-      return left(lastOwner);
-    }
+    if (!(await this.hasOtherOwner(userId, projectId))) return left(lastOwner);
+    if (!userToUpdate) return left(userNotFound);
+
     assertDefined(roleName);
     const apiDbConnection = getConnection(DbConnections.default);
     const apiQueryRunner = apiDbConnection.createQueryRunner();

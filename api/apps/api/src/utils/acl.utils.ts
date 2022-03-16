@@ -54,6 +54,10 @@ import {
   updateFailure,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
 import {
+  AclErrors,
+  userNotFound,
+} from '@marxan-api/modules/access-control/access-control.types';
+import {
   unknownPdfWebshotError,
   unknownPngWebshotError,
 } from '@marxan/webshot';
@@ -70,6 +74,7 @@ interface ErrorHandlerOptions {
 
 export const mapAclDomainToHttpError = (
   errorToCheck:
+    | AclErrors
     | GetScenarioFailure
     | typeof forbiddenError
     | typeof lastOwner
@@ -105,10 +110,16 @@ export const mapAclDomainToHttpError = (
     | typeof bestSolutionNotFound
     | typeof unknownPdfWebshotError
     | typeof unknownPngWebshotError
-    | typeof unknownError,
+    | typeof unknownError
+    | typeof userNotFound
+    | typeof unknownPngWebshotError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
+    case userNotFound:
+      return new NotFoundException(
+        `User with ID: ${options?.userId} could not be found.`,
+      );
     case unknownError:
       return new InternalServerErrorException(options);
     case forbiddenError:

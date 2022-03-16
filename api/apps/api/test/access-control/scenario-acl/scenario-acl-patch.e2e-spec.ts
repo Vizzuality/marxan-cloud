@@ -98,7 +98,7 @@ test(`adds non-existent userId`, async () => {
   const nonExistentUserIdResponse = await fixtures.WhenAddingNonExistentUserId(
     scenarioId,
   );
-  fixtures.ThenQueryFailedIsReturned(nonExistentUserIdResponse);
+  fixtures.ThenUserNotFoundIsReturned(nonExistentUserIdResponse);
 });
 
 test(`changes user role after user is soft-deleted from the app`, async () => {
