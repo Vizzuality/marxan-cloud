@@ -105,22 +105,30 @@
             //     `http://localhost:3040/api/v1/scenarios/a9cabc9a-7747-44f1-9905-f3b7b5401036/planning-units/tiles/{z}/{x}/{y}.mvt?include=protection,features`,
             //   ],
             // },
-            'postgis-previewPlanningArea': {
+            'postgis-compareScenarios': {
               type: 'vector',
               minzoom: 1,
               maxzoom: 20,
               tiles: [
-                `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/preview/tiles/{z}/{x}/{y}.mvt`,
+                `http://localhost:3040/api/v1/scenarios/825284c0-2b66-4b09-86ae-3e6331c7375a/compare/4f8be13c-c08d-4dc0-ae3a-e0b146e7483a/tiles/{z}/{x}/{y}.mvt`,
               ],
             },
-            'postgis-previewPlanningAreaGrid': {
-              type: 'vector',
-              minzoom: 1,
-              maxzoom: 20,
-              tiles: [
-                `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/grid/preview/tiles/{z}/{x}/{y}.mvt`,
-              ],
-            },
+            // 'postgis-previewPlanningArea': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 20,
+            //   tiles: [
+            //     `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/preview/tiles/{z}/{x}/{y}.mvt`,
+            //   ],
+            // },
+            // 'postgis-previewPlanningAreaGrid': {
+            //   type: 'vector',
+            //   minzoom: 1,
+            //   maxzoom: 20,
+            //   tiles: [
+            //     `http://localhost:3040/api/v1/projects/planning-area/d1cd69e5-4c92-47c4-b0c0-c9ee1df57086/grid/preview/tiles/{z}/{x}/{y}.mvt`,
+            //   ],
+            // },
             BASEMAP: {
               type: 'raster',
               tiles: [
@@ -181,40 +189,52 @@
             //         'fill-opacity': 0.1
             //     }
             // },
+            // {
+            //   id: 'postgis-tiles-layer-wdpa',
+            //   type: 'fill',
+            //   source: 'postgis-tileswdpa',
+            //   'source-layer': 'layer0',
+            //   paint: {
+            //     'fill-outline-color': 'blue',
+            //     'fill-color': 'blue',
+            //     'fill-opacity': 0.3,
+            //   },
+            // },
             {
-              id: 'postgis-tiles-layer-wdpa',
+              id: 'postgis-tiles-layer-compareScenarios',
               type: 'fill',
-              source: 'postgis-tileswdpa',
-              'source-layer': 'layer0',
-              paint: {
-                'fill-outline-color': 'blue',
-                'fill-color': 'blue',
-                'fill-opacity': 0.3,
-              },
-            },
-            {
-              id: 'postgis-tiles-layer-customPlanningArea',
-              type: 'fill',
-              source: 'postgis-previewPlanningArea',
+              source: 'postgis-compareScenarios',
               'source-layer': 'layer0',
 
               paint: {
                 'fill-outline-color': 'yellow',
                 'fill-color': 'red',
-                'fill-opacity': 0.1,
+                'fill-opacity': 0.3,
               },
             },
-            {
-              id: 'postgis-tiles-layer-customPlanningAreaGrid',
-              type: 'line',
-              source: 'postgis-previewPlanningAreaGrid',
-              'source-layer': 'layer0',
+            // {
+            //   id: 'postgis-tiles-layer-customPlanningArea',
+            //   type: 'fill',
+            //   source: 'postgis-previewPlanningArea',
+            //   'source-layer': 'layer0',
 
-              paint: {
-                'line-color': 'yellow',
-                'line-opacity': 1,
-              },
-            },
+            //   paint: {
+            //     'fill-outline-color': 'yellow',
+            //     'fill-color': 'red',
+            //     'fill-opacity': 0.1,
+            //   },
+            // },
+            // {
+            //   id: 'postgis-tiles-layer-customPlanningAreaGrid',
+            //   type: 'line',
+            //   source: 'postgis-previewPlanningAreaGrid',
+            //   'source-layer': 'layer0',
+
+            //   paint: {
+            //     'line-color': 'yellow',
+            //     'line-opacity': 1,
+            //   },
+            // },
             // {
             // id: 'postgis-tiles-layer-features',
             //   type: 'fill',
@@ -278,9 +298,9 @@
         },
       });
       map.on('load', function () {
-        // map.on('click', 'postgis-tiles-layer', function (e) {
-        // console.log(e.features[0].properties)
-        // });
+        map.on('click', 'postgis-tiles-layer-compareScenarios', function (e) {
+        console.log(e.features[0].properties)
+        });
         // map.on('click', 'postgis-tiles-layer1', function (e) {
         // console.log(e.features[0].properties)
         // });
