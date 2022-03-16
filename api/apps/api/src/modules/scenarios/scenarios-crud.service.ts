@@ -117,7 +117,7 @@ export class ScenariosCrudService extends AppBaseService<
     filters: ScenarioFilters,
     _info?: ScenarioInfoDTO,
   ): SelectQueryBuilder<Scenario> {
-    query = this._processBaseFilters<ScenarioFilters>(
+    query = this.processBaseFilters<ScenarioFilters>(
       query,
       filters,
       scenarioFilterKeyNames,

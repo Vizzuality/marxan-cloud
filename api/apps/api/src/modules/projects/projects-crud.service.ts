@@ -128,7 +128,7 @@ export class ProjectsCrudService extends AppBaseService<
     filters: ProjectFilters,
     _info?: ProjectsRequest,
   ): SelectQueryBuilder<Project> {
-    this._processBaseFilters<ProjectFilters>(
+    this.processBaseFilters<ProjectFilters>(
       query,
       filters,
       projectFilterKeyNames,

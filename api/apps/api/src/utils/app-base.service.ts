@@ -144,7 +144,12 @@ export abstract class AppBaseService<
     return { data: entities, metadata: meta };
   }
 
-  _processBaseFilters<Filters>(
+  /**
+   * @debt This duplicates the same method in the parent class, until we either
+   * redefine that as public or we use a different strategy to provide
+   * overridable filter processing algorithms (e.g. via factory).
+   */
+  processBaseFilters<Filters>(
     query: SelectQueryBuilder<Entity>,
     filters: Filters,
     filterKeys: any,
@@ -152,13 +157,18 @@ export abstract class AppBaseService<
     if (filters) {
       Object.entries(filters)
         .filter((i) => Array.from(filterKeys).includes(i[0]))
-        .forEach((i) => this._processBaseFilter(query, i));
+        .forEach((i) => this.processBaseFilter(query, i));
     }
 
     return query;
   }
 
-  _processBaseFilter(
+  /**
+   * @debt This duplicates the same method in the parent class, until we either
+   * redefine that as public or we use a different strategy to provide
+   * overridable filter processing algorithms (e.g. via factory).
+   */
+   processBaseFilter(
     query: SelectQueryBuilder<Entity>,
     [filterKey, filterValues]: [string, unknown],
   ): SelectQueryBuilder<Entity> {

@@ -105,7 +105,7 @@ export class GeoFeaturesService extends AppBaseService<
     filters: GeoFeatureFilters,
     info?: GeoFeaturesRequestInfo,
   ): SelectQueryBuilder<GeoFeature> {
-    this._processBaseFilters<GeoFeatureFilters>(
+    this.processBaseFilters<GeoFeatureFilters>(
       query,
       filters,
       geoFeatureFilterKeyNames,

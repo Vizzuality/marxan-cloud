@@ -128,7 +128,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
         WHERE a.id = '${filters.customAreaId}'))`);
     }
 
-    query = this._processBaseFilters<ProtectedAreaBaseFilters>(
+    query = this.processBaseFilters<ProtectedAreaBaseFilters>(
       query,
       filters,
       protectedAreaFilterKeyNames,
