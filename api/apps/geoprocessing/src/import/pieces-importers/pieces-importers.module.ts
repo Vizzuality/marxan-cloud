@@ -8,6 +8,7 @@ import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer'
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
 import { PlanningUnitsGridPieceImporter } from './planning-units-grid.piece-importer';
 import { ProjectCustomProtectedAreasPieceImporter } from './project-custom-protected-areas.piece-importer';
+import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.piece-importer';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ProjectCustomProtectedAreasPieceImporter } from './project-custom-prote
     PlanningAreaCustomPieceImporter,
     PlanningUnitsGridPieceImporter,
     ProjectCustomProtectedAreasPieceImporter,
+    ScenarioProtectedAreasPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
