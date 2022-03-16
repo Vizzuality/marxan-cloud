@@ -8,7 +8,6 @@ import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
-import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
@@ -44,15 +43,39 @@ describe('UsersModule (e2e)', () => {
 
   const aNewPassword = faker.random.uuid();
 
-  const signUpDto: SignUpDto = {
-    email: `${v4()}@example.com`,
-    password: v4(),
-    displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
-  };
+  let signUpDto: SignUpDto;
+  let loginDto: LoginDto;
 
-  const loginDto: LoginDto = {
-    username: signUpDto.email,
-    password: signUpDto.password,
+  const registerAndValidateUser = async (signUpDto: SignUpDto) => {
+    await request(app.getHttpServer())
+      .post('/auth/sign-up')
+      .send(signUpDto)
+      .expect(HttpStatus.CREATED);
+    const user = await usersService.findByEmail(signUpDto.email);
+    expect(user).toBeDefined();
+
+    if (!user) {
+      throw new Error('Cannot retrieve data for newly created user.');
+    }
+
+    const validationTokenEvent = await apiEventsService.getLatestEventForTopic({
+      topic: user.id,
+      kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+    });
+
+    await request(app.getHttpServer())
+      .post(`/auth/validate`)
+      .send({
+        sub: user.id,
+        validationToken: validationTokenEvent?.data?.validationToken,
+      })
+      .expect(HttpStatus.CREATED);
+
+    return await request(app.getHttpServer())
+      .post('/auth/sign-in')
+      .send(loginDto)
+      .expect(HttpStatus.CREATED)
+      .then((response) => response.body.accessToken);
   };
 
   const mockAccountActivation = () => {
@@ -81,12 +104,19 @@ describe('UsersModule (e2e)', () => {
 
     apiEventsService = app.get<ApiEventsService>(ApiEventsService);
     usersService = app.get<UsersService>(UsersService);
+
+    signUpDto = {
+      email: `${v4()}@example.com`,
+      password: v4(),
+      displayName: `${faker.name.firstName()} ${faker.name.lastName()}`,
+    };
+    loginDto = {
+      username: signUpDto.email,
+      password: signUpDto.password,
+    };
   });
 
   describe('Users - sign up and validation', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
-
     test('A user should be able to create an account using an email address not currently in use', async () => {
       mockAccountActivation();
 
@@ -122,42 +152,97 @@ describe('UsersModule (e2e)', () => {
        * token that they would normally receive via email as part of the account
        * validation/email confirmation workflow.
        */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
 
-      if (!newUser) {
+      const user = await usersService.findByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+
+      if (!user) {
         throw new Error('Cannot retrieve data for newly created user.');
       }
 
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
+      const validationTokenEvent = await apiEventsService.getLatestEventForTopic(
+        {
+          topic: user.id,
+          kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+        },
+      );
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
         .send({
-          sub: newUser.id,
+          sub: user.id,
           validationToken: validationTokenEvent?.data?.validationToken,
         })
         .expect(HttpStatus.CREATED);
     });
 
     test('A user account validation token should not be allowed to be spent more than once', async () => {
-      if (!newUser) {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
+      const user = await usersService.findByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+
+      if (!user) {
         throw new Error('Cannot retrieve data for newly created user.');
       }
+
+      const validationTokenEvent = await apiEventsService.getLatestEventForTopic(
+        {
+          topic: user.id,
+          kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+        },
+      );
 
       await request(app.getHttpServer())
         .post(`/auth/validate`)
         .send({
-          sub: newUser.id,
+          sub: user.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
+
+      await request(app.getHttpServer())
+        .post(`/auth/validate`)
+        .send({
+          sub: user.id,
           validationToken: validationTokenEvent?.data?.validationToken,
         })
         .expect(HttpStatus.NOT_FOUND);
     });
 
     test('A user should be able to log in once their account has been validated', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send(signUpDto)
+        .expect(HttpStatus.CREATED);
+      const user = await usersService.findByEmail(signUpDto.email);
+      expect(user).toBeDefined();
+
+      if (!user) {
+        throw new Error('Cannot retrieve data for newly created user.');
+      }
+
+      const validationTokenEvent = await apiEventsService.getLatestEventForTopic(
+        {
+          topic: user.id,
+          kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
+        },
+      );
+
+      await request(app.getHttpServer())
+        .post(`/auth/validate`)
+        .send({
+          sub: user.id,
+          validationToken: validationTokenEvent?.data?.validationToken,
+        })
+        .expect(HttpStatus.CREATED);
+
       await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
@@ -168,12 +253,8 @@ describe('UsersModule (e2e)', () => {
   describe('Users - metadata', () => {
     let jwtToken: string;
 
-    beforeAll(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+    beforeEach(async () => {
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should be able to read their own metadata', async () => {
@@ -182,7 +263,21 @@ describe('UsersModule (e2e)', () => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(HttpStatus.OK);
 
-      expect(results);
+      expect(results.body.data).toEqual({
+        type: 'users',
+        id: expect.any(String),
+        attributes: {
+          fname: null,
+          lname: null,
+          email: expect.any(String),
+          displayName: expect.any(String),
+          avatarDataUrl: null,
+          isActive: true,
+          isBlocked: false,
+          isDeleted: false,
+          metadata: null,
+        },
+      });
     });
 
     test('A user should be able to update their own metadata', async () => {
@@ -198,11 +293,7 @@ describe('UsersModule (e2e)', () => {
     let jwtToken: string;
 
     beforeEach(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should not be able to change their password as part of the user update lifecycle', async () => {
@@ -232,11 +323,7 @@ describe('UsersModule (e2e)', () => {
     let jwtToken: string;
 
     beforeEach(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should be able to change their password if they provide the correct current password', async () => {
@@ -255,8 +342,8 @@ describe('UsersModule (e2e)', () => {
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
-          currentPassword: aNewPassword,
-          newPassword: loginDto.password,
+          currentPassword: loginDto.password,
+          newPassword: aNewPassword,
         })
         .expect(HttpStatus.OK);
     });
@@ -266,11 +353,7 @@ describe('UsersModule (e2e)', () => {
     let jwtToken: string;
 
     beforeEach(async () => {
-      jwtToken = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
-        .expect(HttpStatus.CREATED)
-        .then((response) => response.body.accessToken);
+      jwtToken = await registerAndValidateUser(signUpDto);
     });
 
     test('A user should be able to delete their own account', async () => {
@@ -282,6 +365,11 @@ describe('UsersModule (e2e)', () => {
 
     test('Once a user account is marked as deleted, the user should be logged out', async () => {
       await request(app.getHttpServer())
+        .delete('/api/v1/users/me')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
         .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${jwtToken}`)
         .expect(HttpStatus.UNAUTHORIZED);
@@ -289,57 +377,25 @@ describe('UsersModule (e2e)', () => {
 
     test('Once a user account is marked as deleted, the user should not be able to log back in', async () => {
       await request(app.getHttpServer())
+        .delete('/api/v1/users/me')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
+
+      await request(app.getHttpServer())
         .post('/auth/sign-in')
         .send(loginDto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
-  });
-
-  describe('Users - Sign up again', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
-      mockAccountActivation();
+      await request(app.getHttpServer())
+        .delete('/api/v1/users/me')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
 
       await request(app.getHttpServer())
         .post('/auth/sign-up')
         .send(signUpDto)
-        .expect(HttpStatus.CREATED);
-    });
-
-    test('A user should be able to validate their account (within the validity timeframe of the validationToken)', async () => {
-      /**
-       * Here we need to dig into the actual database to retrieve both the id
-       * assigned to the user when their account is created, and the one-time
-       * token that they would normally receive via email as part of the account
-       * validation/email confirmation workflow.
-       */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
-
-      if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.');
-      }
-
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
-
-      await request(app.getHttpServer())
-        .post(`/auth/validate`)
-        .send({
-          sub: newUser.id,
-          validationToken: validationTokenEvent?.data?.validationToken,
-        })
-        .expect(HttpStatus.CREATED);
-    });
-
-    test('A user should be able to log in once their account has been validated', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send(loginDto)
         .expect(HttpStatus.CREATED);
     });
   });
@@ -347,13 +403,10 @@ describe('UsersModule (e2e)', () => {
   describe('Users - Platform admins', () => {
     let adminToken: string;
     let adminUserId: string;
-    let nonAdminToken: string;
-    const cleanups: (() => Promise<void>)[] = [];
 
     beforeEach(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
-      nonAdminToken = await GivenUserIsLoggedIn(app, 'aa');
     });
 
     test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
@@ -391,29 +444,8 @@ describe('UsersModule (e2e)', () => {
       expect(adminUserIds.sort()).toEqual(userIds.sort());
     });
 
-    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${adminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
-    });
-
-    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${nonAdminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
-    });
-
     test('A platform admin should be able to remove an existing admin', async () => {
       const { user } = await GivenUserIsCreated(app);
-
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
 
       const WhenAddingNewAdminResponse = await request(app.getHttpServer())
         .post(`/api/v1/users/admins/${user.id}`)
@@ -444,11 +476,6 @@ describe('UsersModule (e2e)', () => {
       const username = `${v4()}@example.com`;
       const password = v4();
       const { user } = await GivenUserIsCreated(app, username, password);
-
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
-      });
 
       const WhenBlockingAUser = await request(app.getHttpServer())
         .patch(`/api/v1/users/admins/block-users`)

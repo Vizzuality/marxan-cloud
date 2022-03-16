@@ -127,9 +127,11 @@ export class AuthenticationService {
     user.email = signupDto.email;
     user.fname = signupDto.fname;
     user.lname = signupDto.lname;
+
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );
+
     if (!newUser) return left(unknownError);
 
     await this.apiEventsService.create({
@@ -280,7 +282,6 @@ export class AuthenticationService {
     };
 
     await this.purgeExpiredIssuedTokens();
-
     return {
       user: UsersService.getSanitizedUserMetadata(user),
       accessToken: this.jwtService.sign(
