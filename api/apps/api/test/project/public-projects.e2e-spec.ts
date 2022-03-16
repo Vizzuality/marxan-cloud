@@ -31,11 +31,11 @@ test(`publishing a project`, async () => {
   fixtures.ThenPublicProjectIsAvailable(projectId, response);
 });
 
-test(`when unpublishing a project as a platform admin`, async () => {
+test(`when placing a public project under moderation as a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
   let response = await fixtures.WhenPublishingAProject(projectId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingUnderModerationAProjectAsAdmin(
+  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
     projectId,
   );
   fixtures.ThenOkIsReturned(response);
@@ -49,18 +49,67 @@ test(`when unpublishing a project as a platform admin`, async () => {
     response,
   );
 
+  // Test that findOne only shows project for admin
+  response = await fixtures.WhenGettingPublicProjectAsAdmin(projectId);
+  fixtures.ThenPublicProjectDetailsArePresent(projectId, response);
   response = await fixtures.WhenGettingPublicProject(projectId);
   fixtures.ThenNotFoundIsReturned(response);
 });
 
-test(`when unpublishing a project as not a platform admin`, async () => {
+test(`when clearing under moderation status from a public project as a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
   let response = await fixtures.WhenPublishingAProject(projectId);
   fixtures.ThenCreatedIsReturned(response);
-  response = await fixtures.WhenPlacingUnderModerationAProjectNotAsAdmin(
+  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
+    projectId,
+  );
+  fixtures.ThenOkIsReturned(response);
+
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenNoProjectIsAvailable(response);
+
+  response = await fixtures.WhenClearingUnderModerationStatusFromAPublicProjectAsAdmin(
+    projectId,
+  );
+  fixtures.ThenOkIsReturned(response);
+
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenPublicProjectIsAvailable(projectId, response);
+});
+
+test(`when placing a public project under moderation as not a platform admin`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  let response = await fixtures.WhenPublishingAProject(projectId);
+  fixtures.ThenCreatedIsReturned(response);
+  response = await fixtures.WhenPlacingAPublicProjectUnderModerationNotAsAdmin(
     projectId,
   );
   fixtures.ThenForbiddenIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenPublicProjectIsAvailable(projectId, response);
+  response = await fixtures.WhenGettingPublicProject(projectId);
+  fixtures.ThenPublicProjectDetailsArePresent(projectId, response);
+});
+
+test(`when clearing under moderation status from a public project not as platform admin`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  let response = await fixtures.WhenPublishingAProject(projectId);
+  fixtures.ThenCreatedIsReturned(response);
+  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
+    projectId,
+  );
+  fixtures.ThenOkIsReturned(response);
+
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenNoProjectIsAvailable(response);
+
+  response = await fixtures.WhenClearingUnderModerationStatusFromAPublicProjectNotAsAdmin(
+    projectId,
+  );
+  fixtures.ThenForbiddenIsReturned(response);
+
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenNoProjectIsAvailable(response);
+  response = await fixtures.WhenGettingPublicProject(projectId);
+  fixtures.ThenNotFoundIsReturned(response);
 });

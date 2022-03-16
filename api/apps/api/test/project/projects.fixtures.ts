@@ -26,6 +26,10 @@ export const getFixtures = async () => {
       await request(app.getHttpServer()).get(
         `/api/v1/published-projects/${projectId}`,
       ),
+    WhenGettingPublicProjectAsAdmin: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/published-projects/${projectId}/by-admin`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
     WhenGettingPublicProjects: async () =>
       await request(app.getHttpServer()).get(`/api/v1/published-projects`),
     WhenGettingPublicProjectsAsAdmin: async () =>
@@ -172,13 +176,29 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/publish`)
         .set('Authorization', `Bearer ${randomUserToken}`),
-    WhenPlacingUnderModerationAProjectAsAdmin: async (projectId: string) =>
+    WhenPlacingAPublicProjectUnderModerationAsAdmin: async (
+      projectId: string,
+    ) =>
       await request(app.getHttpServer())
-        .patch(`/api/v1/projects/${projectId}/unpublish`)
+        .patch(`/api/v1/projects/${projectId}/moderation-status/set`)
         .set('Authorization', `Bearer ${adminUserToken}`),
-    WhenPlacingUnderModerationAProjectNotAsAdmin: async (projectId: string) =>
+    WhenPlacingAPublicProjectUnderModerationNotAsAdmin: async (
+      projectId: string,
+    ) =>
       await request(app.getHttpServer())
-        .patch(`/api/v1/projects/${projectId}/unpublish`)
+        .patch(`/api/v1/projects/${projectId}/moderation-status/set`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenClearingUnderModerationStatusFromAPublicProjectAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/moderation-status/clear`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
+    WhenClearingUnderModerationStatusFromAPublicProjectNotAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/moderation-status/clear`)
         .set('Authorization', `Bearer ${randomUserToken}`),
   };
 };
