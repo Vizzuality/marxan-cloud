@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 

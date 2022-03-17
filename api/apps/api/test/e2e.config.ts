@@ -1,4 +1,4 @@
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 import { CreateOrganizationDTO } from '@marxan-api/modules/organizations/dto/create.organization.dto';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
@@ -10,6 +10,7 @@ import { CreateUserDTO } from '@marxan-api/modules/users/dto/create.user.dto';
 import { UpdateUserDTO } from '@marxan-api/modules/users/dto/update.user.dto';
 import { IUCNCategory } from '@marxan/iucn';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { v4 } from 'uuid';
 
 interface CountryCodeInput {
   countryCode?: string;
@@ -117,7 +118,7 @@ export const E2E_CONFIG: {
     valid: {
       minimal: () => ({
         name: faker.random.words(5),
-        organizationId: faker.random.uuid(),
+        organizationId: v4(),
         planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
       }),
@@ -128,7 +129,7 @@ export const E2E_CONFIG: {
         name?: string;
       }): CreateProjectDTO => ({
         name: options?.name ?? faker.random.words(5),
-        organizationId: faker.random.uuid(),
+        organizationId: v4(),
         countryId: options?.countryCode,
         adminAreaLevel1Id: options?.adminAreaLevel1Id,
         adminAreaLevel2Id: options?.adminAreaLevel2Id,
@@ -137,7 +138,7 @@ export const E2E_CONFIG: {
       }),
       complete: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
-        organizationId: faker.random.uuid(),
+        organizationId: v4(),
         description: faker.lorem.paragraphs(2),
         countryId: options.countryCode,
         adminAreaLevel1Id: options.adminLevel1,
@@ -146,24 +147,24 @@ export const E2E_CONFIG: {
         planningUnitAreakm2: 10,
         metadata: {
           [faker.random.word()]: faker.random.words(3),
-          [faker.random.word()]: faker.random.uuid(),
+          [faker.random.word()]: v4(),
         },
       }),
       customArea: (options: CustomPlanningAreaInput): CreateProjectDTO => ({
         name: faker.random.words(5),
-        organizationId: faker.random.uuid(),
+        organizationId: v4(),
         description: faker.lorem.paragraphs(2),
         planningAreaId: options.planningAreaId,
         planningUnitGridShape: options.planningUnitGridShape,
         planningUnitAreakm2: options.planningUnitAreakm2,
         metadata: {
           [faker.random.word()]: faker.random.words(3),
-          [faker.random.word()]: faker.random.uuid(),
+          [faker.random.word()]: v4(),
         },
       }),
       adminRegion: (options: CountryCodeInput): CreateProjectDTO => ({
         name: faker.random.words(5),
-        organizationId: faker.random.uuid(),
+        organizationId: v4(),
         description: faker.lorem.paragraphs(2),
         countryId: options.countryCode,
         adminAreaLevel1Id: faker.random.alphaNumeric(7),
@@ -172,7 +173,7 @@ export const E2E_CONFIG: {
         planningUnitAreakm2: 10,
         metadata: {
           [faker.random.word()]: faker.random.words(3),
-          [faker.random.word()]: faker.random.uuid(),
+          [faker.random.word()]: v4(),
         },
       }),
     },
@@ -187,12 +188,12 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         type: ScenarioType.marxan,
-        projectId: faker.random.uuid(),
+        projectId: v4(),
       }),
       complete: () => ({
         name: faker.random.words(5),
         type: ScenarioType.marxan,
-        projectId: faker.random.uuid(),
+        projectId: v4(),
         description: faker.lorem.paragraphs(2),
         metadata: {},
         numberOfRuns: 100,

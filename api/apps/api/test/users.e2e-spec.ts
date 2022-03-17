@@ -1,5 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import * as faker from 'faker';
+import { faker } from '@faker-js/faker';
 import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { v4 } from 'uuid';
