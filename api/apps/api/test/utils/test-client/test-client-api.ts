@@ -38,6 +38,7 @@ import { ProjectRequests } from './requests/project-requests';
 import { OrganizationRequests } from './requests/organization-requests';
 import { E2E_CONFIG } from '../../e2e.config';
 import { EventBusTestUtils } from '../event-bus.test.utils';
+import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface';
 
 type Overrides = {
   classes: ClassProvider[];
@@ -62,7 +63,7 @@ export class TestClientApi {
     values: [],
     factories: [],
   };
-  private static emptyOverrides: Overrides = {
+  public static emptyOverrides: Overrides = {
     classes: [],
     values: [],
     factories: [],
@@ -85,9 +86,12 @@ export class TestClientApi {
     }
     this.apps = [];
   }
-  public static async initialize(overrides = TestClientApi.emptyOverrides) {
+  public static async initialize(
+    overrides = TestClientApi.emptyOverrides,
+    imports: ModuleMetadata['imports'] = [],
+  ) {
     const testingModuleBuilder = Test.createTestingModule({
-      imports: [AppModule, CqrsModule],
+      imports: [AppModule, CqrsModule, ...imports],
       providers: [EventBusTestUtils],
     });
 
