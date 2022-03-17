@@ -1,5 +1,5 @@
 import { PromiseType } from 'utility-types';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './world';
@@ -7,14 +7,9 @@ import { createWorld } from './world';
 let app: INestApplication;
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   app = await bootstrapApplication();
   world = await createWorld(app);
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app.close();
 });
 
 describe('PlanningUnitsTilesModule (e2e)', () => {
