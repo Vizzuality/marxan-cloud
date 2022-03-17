@@ -32,14 +32,12 @@ export type EventFactory<JobData, Result = unknown> = {
   ) => Promise<CreateApiEventDTO>;
 };
 
-const QueueEventsEmitter: new <JobData, Result = unknown>() => TypedEmitter<
-  QueueEvents<JobData, Result>
-> = EventEmitter;
+const QueueEventsEmitter = EventEmitter;
 
 export class QueueEventsAdapter<
   JobData,
   Result = unknown,
-> extends QueueEventsEmitter<JobData, Result> {
+> extends QueueEventsEmitter {
   constructor(
     private readonly queue: Queue<JobData, Result>,
     queueEvents: BullmqQueueEvents,
