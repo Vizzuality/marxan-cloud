@@ -7,7 +7,7 @@ export const scenarioPlanningUnitsDataRelativePath = {
 interface PlanningUnitData {
   puid: number;
   cost: number;
-  lockinStatus?: number;
+  lockinStatus?: 1 | 2;
   xloc?: number;
   yloc?: number;
   protectedArea?: number;

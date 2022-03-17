@@ -14,7 +14,7 @@ import {
 } from '../pieces/export-piece-processor';
 
 interface SelectResult {
-  lockin_status?: number;
+  lockin_status?: 1 | 2;
   xloc?: number;
   yloc?: number;
   protected_area?: number;
