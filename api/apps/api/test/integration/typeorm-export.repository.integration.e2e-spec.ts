@@ -1,4 +1,3 @@
-import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import {
   Export,
@@ -13,7 +12,6 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Connection } from 'typeorm';
 import { bootstrapApplication } from '../utils/api-application';
 
 describe('Typeorm export repository', () => {
@@ -22,10 +20,6 @@ describe('Typeorm export repository', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 20000);
-
-  afterAll(async () => {
-    await fixtures.cleanup();
-  });
 
   it('should expose methods for getting an export by id and storing exports', async () => {
     await fixtures.GivenExportWasRequested();
@@ -72,13 +66,6 @@ const getFixtures = async () => {
   const repo = app.get<ExportRepository>(ExportRepository);
 
   return {
-    cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-
-      await exportRepo.delete({});
-      await app.close();
-    },
     GivenExportWasRequested: async () => {
       resourceId = ResourceId.create();
       componentId = ComponentId.create();

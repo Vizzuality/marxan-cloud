@@ -3,7 +3,6 @@ import {
   ImportComponent,
   ImportId,
 } from '@marxan-api/modules/clone/import/domain';
-import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
 import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
 import {
@@ -17,7 +16,6 @@ import {
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
 import { apiConnections } from '../../src/ormconfig';
 import { ImportComponentStatuses } from '../../src/modules/clone/import/domain/import/import-component-status';
 
@@ -27,10 +25,6 @@ describe('Typeorm import repository', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 20000);
-
-  afterAll(async () => {
-    await fixtures.cleanup();
-  });
 
   it('should expose methods for getting an import by id and storing imports', async () => {
     await fixtures.GivenImportWasRequested();
@@ -80,12 +74,6 @@ const getFixtures = async () => {
   const repo = testingModule.get<ImportRepository>(ImportRepository);
 
   return {
-    cleanup: async () => {
-      const connection = testingModule.get<Connection>(Connection);
-      const importRepo = connection.getRepository(ImportEntity);
-      await importRepo.delete({});
-      await testingModule.close();
-    },
     GivenImportWasRequested: async () => {
       importResourceId = ResourceId.create();
       const projectId = importResourceId;

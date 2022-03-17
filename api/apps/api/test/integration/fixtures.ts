@@ -3,7 +3,6 @@ import { SpecificationRepository } from '@marxan-api/modules/specification/appli
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import {
   Specification,
   SpecificationOperation,
@@ -16,7 +15,7 @@ export const getFixtures = async () => {
   const specificationRepository = app.get(SpecificationRepository);
 
   const jwtToken = await GivenUserIsLoggedIn(app);
-  const { projectId, cleanup } = await GivenProjectExists(app, jwtToken);
+  const { projectId } = await GivenProjectExists(app, jwtToken);
   const scenario = await GivenScenarioExists(app, projectId, jwtToken, {
     name: `Specifications ${Date.now()}`,
   });
@@ -29,10 +28,6 @@ export const getFixtures = async () => {
   const nonCalculatedFeatureId = v4();
 
   return {
-    cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, jwtToken, scenario.id);
-      await cleanup();
-    },
     GivenSpecificationWasCreated: async (): Promise<Specification> => {
       const specification = Specification.from({
         id: v4(),
