@@ -17,10 +17,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 /**
  * Please note that bootstrapApplication overrides default implementation
  * with `/tmp/storage/` usage
@@ -45,7 +41,6 @@ const getFixtures = async () => {
   const sut = app.get(CloningFilesRepository);
 
   return {
-    cleanup: async () => app.close(),
     GivenFileWasAdded: async () => {
       const result = await sut.saveCloningFile(
         v4(),
