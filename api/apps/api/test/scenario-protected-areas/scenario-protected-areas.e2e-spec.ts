@@ -8,10 +8,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 test(`selecting protected areas as owner`, async () => {
   const scenario: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   const areaId = await fixtures.GivenCustomProtectedAreaWasAddedToProject();

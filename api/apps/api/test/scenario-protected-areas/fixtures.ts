@@ -20,7 +20,6 @@ import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-ar
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
-  const cleanups: (() => Promise<void>)[] = [];
   const commands: ICommand[] = [];
 
   const wdpa: Repository<ProtectedArea> = app.get(
@@ -46,7 +45,7 @@ export const getFixtures = async () => {
     getRepositoryToken(UsersScenariosApiEntity),
   );
 
-  const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
+  const { projectId } = await GivenProjectExists(app, ownerToken, {
     name: `scenario-pa-${new Date().getTime()}`,
     countryId: countryCode,
     adminAreaLevel1Id,
@@ -56,20 +55,7 @@ export const getFixtures = async () => {
     commands.push(command);
   });
 
-  cleanups.push(cleanup);
-  cleanups.push(() =>
-    wdpa
-      .delete({
-        projectId,
-      })
-      .then(() => void 0),
-  );
-
   return {
-    cleanup: async () => {
-      await Promise.all(cleanups.map((clean) => clean()));
-      await app.close();
-    },
     GivenScenarioInsideNAM41WasCreated: async () => {
       const { id } = await GivenScenarioExists(app, projectId, ownerToken);
       scenarioId = id;
