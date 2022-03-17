@@ -60,7 +60,10 @@ export const bootstrapApplication = async (
   imports: ModuleMetadata['imports'] = [],
   providers: ModuleMetadata['providers'] = [],
 ): Promise<INestApplication> => {
-  const api = await TestClientApi.initialize();
+  const api = await TestClientApi.initialize(
+    TestClientApi.emptyOverrides,
+    imports,
+  );
 
   const aaUserJwt = await seedUsers(api);
 

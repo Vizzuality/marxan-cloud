@@ -22,10 +22,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures.cleanup();
-});
-
 it(`should return defaults when no data`, async () => {
   // given
   const scenarioId = fixtures.getScenarioId();
@@ -68,12 +64,6 @@ async function getFixtures() {
   ]);
   const entityManager = app.get<EntityManager>(
     getEntityManagerToken(DbConnections.geoprocessingDB),
-  );
-  const projectsPuRepo: Repository<ProjectsPuEntity> = app.get(
-    getRepositoryToken(ProjectsPuEntity, DbConnections.geoprocessingDB),
-  );
-  const geomsRepo: Repository<PlanningUnitsGeom> = app.get(
-    getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
   const scenarioPuCostRepo: Repository<ScenariosPuCostDataGeo> = app.get(
     getRepositoryToken(ScenariosPuCostDataGeo, DbConnections.geoprocessingDB),
@@ -120,10 +110,6 @@ async function getFixtures() {
           cost: 6,
         }),
       ]);
-    },
-    async cleanup() {
-      const projectPus = await projectsPuRepo.find({ projectId });
-      await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
     },
     getRangeService(): CostRangeService {
       return app.get(CostRangeService);
