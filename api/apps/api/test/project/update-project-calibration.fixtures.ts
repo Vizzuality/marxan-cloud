@@ -20,15 +20,6 @@ export const getFixtures = async () => {
   let projectId: string;
   const updatedRange = [1, 50];
   return {
-    cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, token, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        token,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenProjectWasCreated: async () => {
       const commandBus = app.get(CommandBus);
       const project = await ProjectsTestUtils.createProject(app, token, {

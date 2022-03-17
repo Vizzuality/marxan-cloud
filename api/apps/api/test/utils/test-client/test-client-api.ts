@@ -18,7 +18,7 @@ import {
 } from '@marxan/files-repository';
 import { ScenarioCalibrationRepo } from '@marxan-api/modules/blm/values/scenario-calibration-repo';
 import { ClassProvider } from '@nestjs/common/interfaces/modules/provider.interface';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import { SetProjectBlm } from '@marxan-api/modules/projects/blm/set-project-blm';
 import {
   FakeMailer,
@@ -37,6 +37,7 @@ import { ScenarioCheckerFake } from '../scenario-checker.service-fake';
 import { ProjectRequests } from './requests/project-requests';
 import { OrganizationRequests } from './requests/organization-requests';
 import { E2E_CONFIG } from '../../e2e.config';
+import { EventBusTestUtils } from '../event-bus.test.utils';
 
 type Overrides = {
   classes: ClassProvider[];
@@ -86,7 +87,8 @@ export class TestClientApi {
   }
   public static async initialize(overrides = TestClientApi.emptyOverrides) {
     const testingModuleBuilder = Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, CqrsModule],
+      providers: [EventBusTestUtils],
     });
 
     const { classes, factories, values } = TestClientApi.defaultOverrides;

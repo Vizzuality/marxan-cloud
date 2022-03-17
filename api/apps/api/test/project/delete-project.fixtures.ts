@@ -17,15 +17,6 @@ export const getFixtures = async () => {
   ).data.id;
   let projectId: string;
   return {
-    cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, token, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        token,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenProjectWasCreated: async () => {
       projectId = (
         await ProjectsTestUtils.createProject(app, token, {

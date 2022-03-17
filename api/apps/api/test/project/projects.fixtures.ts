@@ -14,14 +14,8 @@ export const getFixtures = async () => {
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
   );
-  const cleanups: (() => Promise<void>)[] = [];
 
   return {
-    cleanup: async () => {
-      await Promise.all(cleanups.map((clean) => clean()));
-      await app.close();
-    },
-
     WhenGettingPublicProject: async (projectId: string) =>
       await request(app.getHttpServer()).get(
         `/api/v1/published-projects/${projectId}`,
@@ -52,7 +46,6 @@ export const getFixtures = async () => {
         app,
         randomUserToken,
       );
-      cleanups.push(cleanup);
       return projectId;
     },
     GivenPublicProjectWasCreated: async () => {
@@ -64,14 +57,6 @@ export const getFixtures = async () => {
         id: projectId,
         name: 'Published',
       });
-      cleanups.push(() =>
-        publishedProjectsRepo
-          .delete({
-            id: projectId,
-          })
-          .then(() => void 0),
-      );
-      cleanups.push(cleanup);
       return projectId;
     },
     ThenPublicProjectIsAvailable: (

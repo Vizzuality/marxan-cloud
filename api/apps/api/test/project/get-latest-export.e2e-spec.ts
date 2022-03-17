@@ -1,6 +1,5 @@
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { CompleteExportPiece } from '@marxan-api/modules/clone/export/application/complete-export-piece.command';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import {
@@ -17,24 +16,18 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/These';
 import { Readable } from 'stream';
 import * as request from 'supertest';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
 }, 20_000);
-
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test('should forbid getting latest exportId to unrelated users', async () => {
   await fixtures.GivenProjectWasCreated();
@@ -138,19 +131,6 @@ export const getFixtures = async () => {
   };
 
   return {
-    cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-
-      await exportRepo.delete({});
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        ownerToken,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenProjectWasCreated: async () => {
       const result = await GivenProjectExists(app, ownerToken);
       projectId = result.projectId;
