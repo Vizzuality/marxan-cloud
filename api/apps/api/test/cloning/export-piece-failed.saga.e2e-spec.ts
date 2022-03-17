@@ -1,5 +1,4 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ExportPieceFailed } from '@marxan-api/modules/clone/export/application/export-piece-failed.event';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import { ExportId } from '@marxan-api/modules/clone/export/domain';
@@ -9,13 +8,10 @@ import { ComponentId, ResourceId } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { EventBus } from '@nestjs/cqrs';
 import * as request from 'supertest';
-import { Connection } from 'typeorm';
 import { validate, version } from 'uuid';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { FakeQueue } from '../utils/queues';
 
 interface FakePendingJob {
@@ -35,10 +31,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 }, 20000);
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 it('should mark export as failed', async () => {
   await fixtures.GivenExportWasRequested();
 
@@ -47,7 +39,7 @@ it('should mark export as failed', async () => {
   await fixtures.ThenExportIsMarkedAsFailed();
 }, 10000);
 
-it('should remove pending export-piece jobs and mark expor pieces as failed', async () => {
+it('should remove pending export-piece jobs and mark export pieces as failed', async () => {
   await fixtures.GivenExportWasRequested();
 
   await fixtures.WhenAnExportPieceJobFails({ withPendingJobs: true });
@@ -59,7 +51,7 @@ it('should remove pending export-piece jobs and mark expor pieces as failed', as
 const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
-  const { projectId, organizationId } = await GivenProjectExists(app, token);
+  const { projectId } = await GivenProjectExists(app, token);
 
   const repo = app.get(ExportRepository);
   const eventBus = app.get(EventBus);
@@ -71,19 +63,6 @@ const getFixtures = async () => {
   let fakePendingJobs: FakePendingJob[] = [];
 
   return {
-    cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-
-      await exportRepo.delete({});
-      await ProjectsTestUtils.deleteProject(app, token, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        token,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenExportWasRequested: async () => {
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export/`)
