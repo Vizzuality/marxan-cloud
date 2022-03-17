@@ -12,7 +12,6 @@ import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/
 import { GivenProjectExists } from '../steps/given-project';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ScenarioLockDto } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
@@ -50,18 +49,7 @@ export async function getFixtures() {
     getRepositoryToken(IssuedAuthnToken),
   );
 
-  const cleanups: (() => Promise<void>)[] = [];
-
   return {
-    cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
-      await app.close();
-    },
-
     GivenUserIsLoggedIn: async (user: string) => {
       if (user === 'random') {
         return randomUserInfo.accessToken;
@@ -106,23 +94,6 @@ export async function getFixtures() {
           type: ScenarioType.marxan,
           projectId,
         },
-      );
-
-      cleanups.push(
-        async () =>
-          await ScenariosTestUtils.deleteScenario(
-            app,
-            ownerToken,
-            firstScenario.data.id,
-          ),
-      );
-      cleanups.push(
-        async () =>
-          await ScenariosTestUtils.deleteScenario(
-            app,
-            ownerToken,
-            secondScenario.data.id,
-          ),
       );
 
       return {
@@ -181,10 +152,6 @@ export async function getFixtures() {
         scenarioId,
         userId: randomUserInfo.user.id,
         roleName: scenarioContributorRole,
-      });
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: randomUserInfo.user.id });
-        return;
       });
       return randomUserId;
     },
