@@ -7,10 +7,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 test(`deleting a project should work`, async () => {
   await fixtures.GivenProjectWasCreated();
 
