@@ -38,12 +38,15 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { BlockUsersBatchDTO, ExactEmailParamsDTO, UpdateUserDTO } from './dto/update.user.dto';
+import {
+  BlockUsersBatchDTO,
+  ExactEmailParamsDTO,
+  UpdateUserDTO,
+} from './dto/update.user.dto';
 import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { isLeft } from 'fp-ts/lib/Either';
-import { assertDefined } from '@marxan/utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -141,7 +144,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    description: 'Get list of users with plaform admin role.',
+    description: 'Get list of users with platform admin role.',
   })
   @ApiOkResponse()
   @ApiUnauthorizedResponse()

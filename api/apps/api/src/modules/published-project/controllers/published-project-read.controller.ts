@@ -1,5 +1,16 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { PublishedProjectService } from '../published-project.service';
+import {
+  Controller,
+  ForbiddenException,
+  Get,
+  NotFoundException,
+  Param,
+  Query,
+} from '@nestjs/common';
+import {
+  accessDenied,
+  notFound,
+  PublishedProjectService,
+} from '../published-project.service';
 import {
   ApiBearerAuth,
   ApiNotFoundResponse,
@@ -20,6 +31,7 @@ import {
   PublishedProjectResultPlural,
   PublishedProjectResultSingular,
 } from '@marxan-api/modules/published-project/dto/read-result.dtos';
+import { isLeft } from 'fp-ts/lib/Either';
 
 @ApiBearerAuth()
 @ApiTags(publishedProjectResource.className)
@@ -73,8 +85,20 @@ export class PublishedProjectReadController {
   async getPublishedOne(
     @Param('id') id: string,
   ): Promise<PublishedProjectResultSingular> {
-    return await this.serializer.serialize(
-      await this.publishedProjectService.findOne(id),
-    );
+    const result = await this.publishedProjectService.findOne(id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case notFound:
+          throw new NotFoundException();
+        case accessDenied:
+          throw new ForbiddenException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return await this.serializer.serialize(result.right);
   }
 }
