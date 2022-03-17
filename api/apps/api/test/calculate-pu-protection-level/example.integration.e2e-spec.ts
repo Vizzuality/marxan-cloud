@@ -5,21 +5,15 @@ import { bootstrapApplication } from '../utils/api-application';
 import { FakeQueue } from '../utils/queues';
 import { CalculatePlanningUnitsProtectionLevel } from '@marxan-api/modules/planning-units-protection-level';
 import { v4 } from 'uuid';
-import { tearDown } from '../utils/tear-down';
 
 let app: INestApplication;
 let queue: FakeQueue;
 let commandBus: CommandBus;
 
-beforeAll(async () => {
+beforeEach(async () => {
   app = await bootstrapApplication();
   queue = FakeQueue.getByName(queueName);
   commandBus = app.get(CommandBus);
-});
-
-afterAll(async () => {
-  await app.close();
-  await tearDown();
 });
 
 describe(`when requesting update`, () => {
