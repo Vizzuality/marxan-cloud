@@ -5,7 +5,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 import { PuvsprDatService } from './puvspr.dat.service';
 
-interface Record {
+interface PuvsprRow {
   scenarioId: string;
   puId: string;
   featureId: string;
@@ -13,7 +13,7 @@ interface Record {
 }
 
 let sut: PuvsprDatService;
-let dataRepo: jest.Mocked<Repository<Record>>;
+let dataRepo: jest.Mocked<Repository<PuvsprRow>>;
 
 beforeEach(async () => {
   const token = getConnectionToken(DbConnections.geoprocessingDB);

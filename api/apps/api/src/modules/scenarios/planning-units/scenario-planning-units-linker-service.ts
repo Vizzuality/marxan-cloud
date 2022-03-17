@@ -19,10 +19,11 @@ export class ScenarioPlanningUnitsLinkerService {
     await this.scenariosPuDataRepo.query(
       `
         INSERT INTO scenarios_pu_data (project_pu_id, scenario_id)
-          SELECT id as ppu_id, '${scenario.id}' as scenario_id
+          SELECT id as ppu_id, $1 as scenario_id
           FROM projects_pu
-          WHERE project_id = '${scenario.projectId}'
+          WHERE project_id = $2
       `,
+      [scenario.id, scenario.projectId],
     );
   }
 }

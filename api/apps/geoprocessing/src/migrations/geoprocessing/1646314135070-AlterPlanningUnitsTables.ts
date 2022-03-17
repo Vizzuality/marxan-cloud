@@ -20,6 +20,10 @@ export class AlterPlanningUnitsTables1646314135070
     `);
 
     await queryRunner.query(`
+      CREATE INDEX scenarios_pu_data_scenario_id_idx ON scenarios_pu_data(scenario_id);
+    `);
+
+    await queryRunner.query(`
       ALTER TABLE planning_units_geom
       ADD CONSTRAINT planning_units_geom_the_geom_type_key UNIQUE (the_geom, type);
     `);
@@ -43,6 +47,13 @@ export class AlterPlanningUnitsTables1646314135070
       'ALTER TABLE planning_units_geom ADD COlUMN project_id uuid null',
     );
 
+    await queryRunner.query(`
+      DROP INDEX scenarios_pu_data_scenario_id_idx;
+    `);
+
+    await queryRunner.query(`
+      CREATE INDEX scenarios_pu_data_index ON scenarios_pu_data (puid asc, scenario_id);
+    `);
     await queryRunner.query(`
       ALTER TABLE planning_units_geom
       ADD CONSTRAINT planning_units_geom_the_geom_type_key UNIQUE (the_geom, type, project_id);

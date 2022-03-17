@@ -4,7 +4,6 @@ import {
   ScenariosPlanningUnitGeoEntity,
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
-import { boolean } from 'fp-ts';
 import { DeepPartial, EntityManager } from 'typeorm';
 import {
   GivenProjectsPu,
