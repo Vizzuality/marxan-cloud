@@ -88,8 +88,9 @@ export class ScenarioProtectedAreasPieceImporter
       .execute();
 
     if (wdpaProtectedAreas.length !== wdpa.length) {
+      const wdpaProtectedAreasIds = wdpaProtectedAreas.map((pa) => pa.wdpaid);
       const notFoundIds = wdpa.filter(
-        (id) => !wdpaProtectedAreas.map((pa) => pa.wdpaid).includes(id),
+        (id) => !wdpaProtectedAreasIds.includes(id),
       );
       const errorMessage = `WDPA protected areas not found: ${notFoundIds}`;
       this.logger.error(errorMessage);
