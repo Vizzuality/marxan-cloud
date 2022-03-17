@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ApiEvent } from './api-event.api.entity';
@@ -9,7 +9,7 @@ import {
 import { ApiEventsController } from './api-events.controller';
 import { ApiEventsService } from './api-events.service';
 
-export const logger = new Logger('ApiEvents');
+export const logger = new ConsoleLogger('ApiEvents');
 
 @Module({
   imports: [

@@ -4,7 +4,7 @@ import {
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
-import { Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { FileReader } from '../../file-reader';
 import { MarxanDirectory } from '../../marxan-directory.service';
@@ -25,7 +25,7 @@ import { PlanningUnitSelectionCalculatorService } from './solutions/solution-agg
     ScenarioFeaturesModule,
   ],
   providers: [
-    Logger,
+    ConsoleLogger,
     GeoOutputRepository,
     MetadataArchiver,
     MarxanDirectory,

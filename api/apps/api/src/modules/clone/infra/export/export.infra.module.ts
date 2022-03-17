@@ -1,6 +1,6 @@
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { ConsoleLogger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ExportAdaptersModule } from '../../export/adapters/export-adapters.module';
 import { ArchiveReadySaga } from './archive-ready.saga';
@@ -43,8 +43,8 @@ import { SchedulePieceExportHandler } from './schedule-piece-export.handler';
     MarkExportAsFailedHandler,
     MarkExportPiecesAsFailedHandler,
     {
-      provide: Logger,
-      useClass: Logger,
+      provide: ConsoleLogger,
+      useClass: ConsoleLogger,
       scope: Scope.TRANSIENT,
     },
   ],

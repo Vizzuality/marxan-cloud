@@ -1,4 +1,4 @@
-import { forwardRef, Logger, Module } from '@nestjs/common';
+import { forwardRef, ConsoleLogger, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -35,7 +35,7 @@ import { PasswordRecoveryService } from './password-recovery/password-recovery.s
 import { PasswordRecoveryToken } from './password-recovery/password-recovery-token.api.entity';
 import { PasswordRecoveryController } from './password-recovery/password-recovery.controller';
 
-export const logger = new Logger('Authentication');
+export const logger = new ConsoleLogger('Authentication');
 
 @Module({
   imports: [

@@ -1,6 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { FileRepositoryModule } from '@marxan/files-repository';
-import { Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportConfigProjectPieceExporter } from './export-config.project-piece-exporter';
 import { ExportConfigScenarioPieceExporter } from './export-config.scenario-piece-exporter';
@@ -32,7 +32,7 @@ import { ScenarioProtectedAreasPieceExporter } from './scenario-protected-areas.
     ProjectCustomProtectedAreasPieceExporter,
     ScenarioMetadataPieceExporter,
     ScenarioProtectedAreasPieceExporter,
-    Logger,
+    ConsoleLogger,
   ],
 })
 export class PiecesExportersModule {}

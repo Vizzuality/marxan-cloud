@@ -1,5 +1,5 @@
 import { FileRepositoryModule } from '@marxan/files-repository';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { ConsoleLogger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../../../api-events';
 import { QueueApiEventsModule } from '../../../queue-api-events';
@@ -36,8 +36,8 @@ import { UploadExportFileHandler } from './upload-export-file.handler';
     ImportPieceEventsHandler,
     UploadExportFileHandler,
     {
-      provide: Logger,
-      useClass: Logger,
+      provide: ConsoleLogger,
+      useClass: ConsoleLogger,
       scope: Scope.TRANSIENT,
     },
     importPieceQueueProvider,

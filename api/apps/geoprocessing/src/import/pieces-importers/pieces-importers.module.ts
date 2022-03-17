@@ -1,6 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { FileRepositoryModule } from '@marxan/files-repository';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { ConsoleLogger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlanningAreaGadmPieceImporter } from './planning-area-gadm.piece-importer';
 import { PlanningAreaCustomPieceImporter } from './planning-area-custom.piece-importer';
@@ -23,7 +23,7 @@ import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.
     PlanningUnitsGridPieceImporter,
     ProjectCustomProtectedAreasPieceImporter,
     ScenarioProtectedAreasPieceImporter,
-    { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
+    { provide: ConsoleLogger, useClass: ConsoleLogger, scope: Scope.TRANSIENT },
   ],
 })
 export class PiecesImportersModule {}

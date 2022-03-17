@@ -1,4 +1,4 @@
-import { Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
 import { PlanningUnitsProcessor } from './planning-units.worker';
 import { PlanningUnitsController } from './planning-units.controller';
@@ -15,7 +15,7 @@ import { PlanningUnitsJobProcessor } from './planning-units.job';
     FileService,
     PlanningUnitsService,
     PlanningUnitsJobProcessor,
-    Logger,
+    ConsoleLogger,
   ],
   controllers: [PlanningUnitsController],
   exports: [PlanningUnitsProcessor, PlanningUnitsService],

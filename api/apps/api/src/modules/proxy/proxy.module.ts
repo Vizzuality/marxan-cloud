@@ -1,7 +1,7 @@
-import { Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { ProxyService } from './proxy.service';
 
-export const logger = new Logger('ProxyService');
+export const logger = new ConsoleLogger('ProxyService');
 
 @Module({
   imports: [],

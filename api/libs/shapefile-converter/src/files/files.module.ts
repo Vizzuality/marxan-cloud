@@ -1,8 +1,8 @@
 import { FileService } from './files.service';
-import { Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 
 @Module({
-  providers: [FileService, Logger],
+  providers: [FileService, ConsoleLogger],
   exports: [FileService],
 })
 export class FilesModule {}

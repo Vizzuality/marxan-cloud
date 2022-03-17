@@ -1,6 +1,6 @@
 import {
   DynamicModule,
-  Logger,
+  ConsoleLogger,
   Module,
   ModuleMetadata,
   Scope,
@@ -29,8 +29,8 @@ export class ExportApplicationModule {
         FinalizeArchiveHandler,
         GetArchiveHandler,
         {
-          provide: Logger,
-          useClass: Logger,
+          provide: ConsoleLogger,
+          useClass: ConsoleLogger,
           scope: Scope.TRANSIENT,
         },
       ],
