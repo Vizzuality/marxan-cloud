@@ -229,7 +229,7 @@ export class PublishProjectController {
     description: `A free search over names`,
   })
   @Get('published-projects/by-admin')
-  async findOneByAdmin(
+  async findAllByAdmin(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') namesSearch?: string,
@@ -250,7 +250,7 @@ export class PublishProjectController {
   @ApiOperation({ description: 'Find public project by id for admins.' })
   @ApiOkResponse({ type: PublishedProjectResultSingular })
   @Get('published-projects/:id/by-admin')
-  async findAll(
+  async findOneByAdmin(
     @Req() req: RequestWithAuthenticatedUser,
     @Param('id') id: string,
   ): Promise<PublishedProjectResultSingular> {
