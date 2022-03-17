@@ -123,7 +123,7 @@ test(`when unpublishing a public project as a project owner`, async () => {
   fixtures.ThenCreatedIsReturned(response);
 
   response = await fixtures.WhenUnpublishingAProjectAsProjectOwner(projectId);
-  fixtures.ThenNoContentIsReturned(response);
+  fixtures.ThenOkIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 });
@@ -155,7 +155,7 @@ test(`when unpublishing a public project that is under moderation as a platform 
   response = await fixtures.WhenClearingUnderModerationStatusAndUnpublishingAsAdmin(
     projectId,
   );
-  fixtures.ThenBadRequestIsReturned(response);
+  fixtures.ThenOkIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 });
