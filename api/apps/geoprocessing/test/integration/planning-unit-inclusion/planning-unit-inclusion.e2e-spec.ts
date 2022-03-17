@@ -31,7 +31,7 @@ afterAll(async () => {
   await app.close();
 });
 
-describe(`When planning units exist for a scenario`, () => {
+describe(`when planning units exist for a scenario`, () => {
   describe(`when changing lock status via GeoJSON with one single feature per feature collection`, () => {
     const forCase: ForCase = 'singleFeature';
     beforeEach(async () => {
@@ -102,15 +102,15 @@ describe(`When planning units exist for a scenario`, () => {
     }, 10000);
   });
 
-  describe('When setting inclusions by id and exclusions by GeoJSON', () => {
+  describe('when setting inclusions by id and exclusions by GeoJSON', () => {
     it.todo(
-      'If there are overlaps between these, then exclusions set by GeoJSON should be applied',
+      'if there are overlaps between these, then exclusions set by GeoJSON should be applied',
     );
   });
 
-  describe('When setting exclusions by id and inclusions by GeoJSON', () => {
+  describe('when setting exclusions by id and inclusions by GeoJSON', () => {
     it.todo(
-      'If there are overlaps between these, then inclusions set by GeoJSON should be applied',
+      'if there are overlaps between these, then inclusions set by GeoJSON should be applied',
     );
   });
 

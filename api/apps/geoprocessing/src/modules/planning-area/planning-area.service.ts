@@ -3,8 +3,8 @@ import { GeoJSON } from 'geojson';
 import * as uuid from 'uuid';
 import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { ShapefileService } from '@marxan/shapefile-converter';
-import { GarbageCollectorConfig } from '@marxan-geoprocessing/modules/planning-area/garbage-collector-config';
 import { SaveGeoJsonResult } from '@marxan/planning-area-repository/custom-planning-area.repository';
+import { PlanningAreaGarbageCollector } from './planning-area-garbage-collector.service';
 
 @Injectable()
 export class PlanningAreaService {
@@ -13,7 +13,7 @@ export class PlanningAreaService {
   constructor(
     private readonly repository: CustomPlanningAreaRepository,
     private readonly shapefileService: ShapefileService,
-    private readonly config: GarbageCollectorConfig,
+    private readonly planningAreaGarbageCollector: PlanningAreaGarbageCollector,
   ) {}
 
   async save(
@@ -32,18 +32,8 @@ export class PlanningAreaService {
     setTimeout(async () => {
       const gcId = uuid.v4();
       this.logger.log(`garbage collection ${gcId} scheduled`);
-      const removedCount = await this.collectGarbage();
-      this.logger.log(
-        `garbage collection ${gcId} finished, removed ${
-          removedCount.affected ?? 'N/A'
-        } entities older than ${this.config.maxAgeInMs}`,
-      );
+      await this.planningAreaGarbageCollector.collectGarbage();
+      this.logger.log(`garbage collection ${gcId} finished`);
     });
-  }
-
-  private async collectGarbage() {
-    return await this.repository.deleteUnassignedOldEntries(
-      this.config.maxAgeInMs,
-    );
   }
 }

@@ -48,12 +48,20 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     }
 
     const customPlanningArea = Boolean(project.planningAreaGeometryId);
+
+    const planningAreaComponents = customPlanningArea
+      ? [
+          ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom),
+          ExportComponent.newOne(id, ClonePiece.PlanningAreaCustomGeojson),
+        ]
+      : [ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm)];
+
     const components: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
       ExportComponent.newOne(id, ClonePiece.ExportConfig),
-      customPlanningArea
-        ? ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom)
-        : ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
+      ...planningAreaComponents,
+      ExportComponent.newOne(id, ClonePiece.PlanningUnitsGrid),
+      ExportComponent.newOne(id, ClonePiece.PlanningUnitsGridGeojson),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
       ...scenarioPieces.flat(),
     ];

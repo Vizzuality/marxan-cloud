@@ -18,7 +18,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await world.cleanup();
   await tearDown();
 });
 
@@ -36,6 +35,10 @@ describe(`scenarios-pu-data fetch`, () => {
         scenarioId: world.scenarioId,
       },
     });
+  });
+
+  afterEach(async () => {
+    await world.cleanup();
   });
 
   it(`returns valid data`, () => {

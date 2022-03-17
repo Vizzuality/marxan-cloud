@@ -24,7 +24,7 @@ const includeSelections: IncludeSelections = {
   protection: {
     attributes: ', "percentageProtected"',
     select:
-      'round((COALESCE(test.protected_area, 0)/plan.area)::numeric*100)::int as "percentageProtected"',
+      'round((COALESCE(spd.protected_area, 0)/pug.area)::numeric*100)::int as "percentageProtected"',
   },
   'lock-status': {
     attributes: ', "lockinStatus"',
@@ -40,7 +40,7 @@ const includeSelections: IncludeSelections = {
     select: 'COALESCE(cost,1) as "costValue"',
     table: 'scenarios_pu_cost_data',
     alias: 'cost',
-    condition: 'test.id = cost.scenarios_pu_data_id',
+    condition: 'spd.id = cost.scenarios_pu_data_id',
   },
   results: {
     attributes: ', "frequencyValue", "valuePosition"',
@@ -48,7 +48,7 @@ const includeSelections: IncludeSelections = {
           round((output.included_count/array_length(output.value, 1)::numeric)*100)::int as "frequencyValue"`,
     table: 'output_scenarios_pu_data',
     alias: 'output',
-    condition: 'test.id = output.scenario_pu_id',
+    condition: 'spd.id = output.scenario_pu_id',
   },
 };
 const includeSelectionsKeys: string[] = Object.keys(includeSelections);
@@ -73,7 +73,7 @@ export class ScenariosService {
 
   constructor(
     @InjectRepository(ScenariosPuPaDataGeo)
-    private readonly ScenariosPlanningUnitGeoEntityRepository: Repository<ScenariosPuPaDataGeo>,
+    private readonly scenariosPuDataRepository: Repository<ScenariosPuPaDataGeo>,
     @Inject(TileService)
     private readonly tileService: TileService,
   ) {}
@@ -92,9 +92,9 @@ export class ScenariosService {
      */
 
     const attributes = this.attributeComposer(
-      `test_pu_geom_id as "puGeomId",\
-       test_id as "scenarioPuId",\
-       test_puid as "puid", \
+      `ppu_geom_id as "puGeomId",\
+       spd_id as "scenarioPuId",\
+       ppu_puid as "puid", \
        'valuePosition,featureList' as "parseKeys"`,
       _filters,
     );
@@ -103,16 +103,20 @@ export class ScenariosService {
      * @todo: provide features id array
      * @todo: provide results/output data
      */
-    const sql = this.selectJoins(
+    const qb = this.selectJoins(
       id,
-      this.ScenariosPlanningUnitGeoEntityRepository.createQueryBuilder('test')
-        .addSelect('plan.the_geom')
-        .leftJoin('planning_units_geom', 'plan', `test.pu_geom_id = plan.id`)
-        .where(`"test"."scenario_id" = '${id}'`),
+      this.scenariosPuDataRepository
+        .createQueryBuilder('spd')
+        .addSelect('pug.the_geom')
+        .addSelect('ppu.geom_id', 'ppu_geom_id')
+        .addSelect('ppu.puid', 'ppu_puid')
+        .leftJoin('projects_pu', 'ppu', 'spd.project_pu_id = ppu.id')
+        .leftJoin('planning_units_geom', 'pug', `ppu.geom_id = pug.id`)
+        .where(`"spd"."scenario_id" = '${id}'`),
       _filters,
     );
 
-    const table = `(${sql.getSql()})`;
+    const table = `(${qb.getSql()})`;
 
     return await this.tileService.getTile({
       z,

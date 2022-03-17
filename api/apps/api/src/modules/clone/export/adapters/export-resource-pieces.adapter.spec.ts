@@ -77,14 +77,20 @@ const getFixtures = async () => {
   const sut = sandbox.get(ExportResourcePiecesAdapter);
   const repo = sandbox.get(projectRepoToken) as FakeProjectRepo;
 
-  const expectedProjectPieces = (projectWithCustomPlanningArea: boolean) => [
-    ClonePiece.ExportConfig,
-    ClonePiece.ProjectMetadata,
-    projectWithCustomPlanningArea
-      ? ClonePiece.PlanningAreaCustom
-      : ClonePiece.PlanningAreaGAdm,
-    ClonePiece.ProjectCustomProtectedAreas,
-  ];
+  const expectedProjectPieces = (projectWithCustomPlanningArea: boolean) => {
+    const planningAreaComponents = projectWithCustomPlanningArea
+      ? [ClonePiece.PlanningAreaCustom, ClonePiece.PlanningAreaCustomGeojson]
+      : [ClonePiece.PlanningAreaGAdm];
+
+    return [
+      ClonePiece.ExportConfig,
+      ClonePiece.ProjectMetadata,
+      ...planningAreaComponents,
+      ClonePiece.PlanningUnitsGrid,
+      ClonePiece.PlanningUnitsGridGeojson,
+      ClonePiece.ProjectCustomProtectedAreas,
+    ];
+  };
 
   const expectedScenarioPieces = (projectExport: boolean) => {
     const pieces = [

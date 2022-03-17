@@ -52,7 +52,8 @@ export class PlanningUnitsGridGeojsonPieceExporter
     const geoJsonStream = await qb
       .select('ST_AsGeoJSON(the_geom) as geojson')
       .from('planning_units_geom', 'pug')
-      .where('project_id = :projectId', { projectId: project.id })
+      .innerJoin('projects_pu', 'ppu', 'pug.id = ppu.geom_id')
+      .where('ppu.project_id = :projectId', { projectId: project.id })
       .stream();
 
     const geojsonFileTransform = new PlanningUnitsGridGeoJsonTransform(

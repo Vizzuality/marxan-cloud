@@ -44,7 +44,7 @@ export class SetProjectGridFromShapefileHandler
     await this.entityManager.transaction(async (manager) => {
       await manager.query(
         `
-          UPDATE "planning_units_geom"
+          UPDATE "projects_pu"
           SET "project_id" = $1
           WHERE "project_id" = $2
         `,

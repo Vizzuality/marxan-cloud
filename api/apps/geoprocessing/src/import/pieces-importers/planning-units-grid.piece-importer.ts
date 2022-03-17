@@ -1,4 +1,5 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import {
   ComponentLocationSnapshot,
@@ -53,10 +54,14 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    await this.processGridFile(
-      readableOrError.right,
-      planningAreaCustomGridLocation,
-      importResourceId,
+    await this.geoprocessingEntityManager.transaction(
+      (transactionalEntityManager) =>
+        this.processGridFile(
+          readableOrError.right,
+          planningAreaCustomGridLocation,
+          importResourceId,
+          transactionalEntityManager,
+        ),
     );
 
     return {
@@ -73,8 +78,11 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     const result = regex.exec(pu);
 
     if (result) {
-      const [_, puId, geom] = result;
-      return { puId: parseInt(puId), geom: JSON.parse(geom) as number[] };
+      const [_, puid, geom] = result;
+      return {
+        puid: parseInt(puid),
+        geom: '\\x' + Buffer.from(JSON.parse(geom) as number[]).toString('hex'),
+      };
     }
     throw new Error('unknown line format');
   }
@@ -83,12 +91,17 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     zipStream: Readable,
     planningAreaCustomGridLocation: ComponentLocationSnapshot,
     projectId: string,
+    transactionalEntityManager: EntityManager,
   ) {
     return new Promise<void>((resolve, reject) => {
       let lastChunkIncompletedData = '';
 
       zipStream
-        .pipe(ParseOne(new RegExp(planningAreaCustomGridLocation.relativePath)))
+        .pipe(
+          ParseOne(
+            new RegExp(`^${planningAreaCustomGridLocation.relativePath}$`),
+          ),
+        )
         .pipe(
           new Transform({
             writableObjectMode: true,
@@ -107,17 +120,39 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
                   .split('\n')
                   .map(this.parseGridFileLine);
 
-                const values = geomPUs
-                  .map((pu, index) => `($1,$2,ST_GeomFromEWKB($${index + 3}))`)
-                  .join(',');
-
-                const buffers = geomPUs.map((pu) => Buffer.from(pu.geom));
-                await this.geoprocessingEntityManager.query(
+                const geometries: {
+                  id: string;
+                  puid: number;
+                }[] = await transactionalEntityManager.query(
                   `
-                  INSERT INTO planning_units_geom (type,project_id,the_geom)
-                  VALUES ${values}
+                    WITH puid_geom as (
+                      SELECT (pu ->> 'puid')::int as puid, ST_GeomFromEwkb((pu ->> 'geom')::bytea) as geom
+                      FROM json_array_elements($2) as pu
+                    ), uuid_geom as(
+                      INSERT INTO planning_units_geom(type, the_geom)
+                      SELECT $1, puid_geom.geom
+                      FROM puid_geom
+                      ON CONFLICT (the_geom_hash, type) DO UPDATE SET type = $1
+                      RETURNING id, the_geom
+                    )
+                    SELECT uuid_geom.id , puid_geom.puid
+                    FROM uuid_geom
+                      LEFT JOIN puid_geom ON ST_Equals(uuid_geom.the_geom, puid_geom.geom)
                   `,
-                  [PlanningUnitGridShape.FromShapefile, projectId, ...buffers],
+                  [
+                    PlanningUnitGridShape.FromShapefile,
+                    JSON.stringify(geomPUs),
+                  ],
+                );
+
+                transactionalEntityManager.save(
+                  ProjectsPuEntity,
+                  geometries.map((geom) => ({
+                    projectId,
+                    geomType: PlanningUnitGridShape.FromShapefile,
+                    puid: geom.puid,
+                    geomId: geom.id,
+                  })),
                 );
 
                 callback();

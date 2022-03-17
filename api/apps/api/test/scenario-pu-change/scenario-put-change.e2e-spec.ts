@@ -21,13 +21,18 @@ let world: PromiseType<ReturnType<typeof createWorld>>;
 beforeAll(async () => {
   app = await bootstrapApplication();
   jwtToken = await GivenUserIsLoggedIn(app);
-  world = await createWorld(app, jwtToken);
-  await world.GivenScenarioPuDataExists();
   queue = FakeQueue.getByName(updateQueueName);
 });
 
-afterAll(async () => {
+beforeEach(async () => {
+  world = await createWorld(app, jwtToken);
+});
+
+afterEach(async () => {
   await world.cleanup();
+});
+
+afterAll(async () => {
   await app.close();
   await tearDown();
 });

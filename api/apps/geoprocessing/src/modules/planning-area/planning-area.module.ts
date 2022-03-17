@@ -14,6 +14,7 @@ import { TileModule } from '@marxan-geoprocessing/modules/tile/tile.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
+import { PlanningAreaGarbageCollector } from './planning-area-garbage-collector.service';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
     PlanningUnitsGridProcessor,
     PlanningAreaTilesService,
     PlanningAreaGridTilesService,
+    PlanningAreaGarbageCollector,
   ],
   controllers: [PlanningAreaController],
 })

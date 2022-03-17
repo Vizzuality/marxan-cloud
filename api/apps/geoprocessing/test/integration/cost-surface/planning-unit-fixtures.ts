@@ -1,32 +1,36 @@
-import { INestApplication } from '@nestjs/common';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { v4 } from 'uuid';
-
 import {
-  ScenariosPlanningUnitGeoEntity,
-  ScenariosPuCostDataGeo,
-} from '@marxan/scenarios-planning-unit';
-
-import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 import { isDefined } from '@marxan/utils';
+import { INestApplication } from '@nestjs/common';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import { v4 } from 'uuid';
+import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
 
 export const getFixtures = async (app: INestApplication) => {
+  const projectId = v4();
   const scenarioId = v4();
-  const puCostRepoToken = getRepositoryToken(ScenariosPuCostDataGeo);
-  const puDataRepoToken = getRepositoryToken(ScenariosPlanningUnitGeoEntity);
-  const puDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    puDataRepoToken,
+  const entityManager = app.get(getEntityManagerToken());
+  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
+    ProjectsPuEntity,
+  );
+  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = app.get(
+    getRepositoryToken(PlanningUnitsGeom),
   );
   const puCostDataRepo: Repository<ScenariosPuCostDataGeo> = app.get(
-    puCostRepoToken,
+    getRepositoryToken(ScenariosPuCostDataGeo),
   );
+
   const scenarioPuData = await GivenScenarioPuDataExists(
-    puDataRepo,
+    entityManager,
+    projectId,
     scenarioId,
   );
 
-  const puIds = scenarioPuData.rows.map((row) => row.id);
+  const puIds = scenarioPuData.map((row) => row.id);
 
   return {
     planningUnitDataRepo: scenarioPuData,
@@ -47,7 +51,7 @@ export const getFixtures = async (app: INestApplication) => {
     GivenPuCostDataExists: async () =>
       puCostDataRepo
         .save(
-          scenarioPuData.rows.map((scenarioPuData) =>
+          scenarioPuData.map((scenarioPuData) =>
             puCostDataRepo.create({
               scenariosPuDataId: scenarioPuData.id,
               cost: 300,
@@ -60,8 +64,13 @@ export const getFixtures = async (app: INestApplication) => {
           scenarioPlanningUnits.map((spu) => spu?.id).filter(isDefined),
         ),
     cleanup: async () => {
-      await puDataRepo.delete({
-        scenarioId,
+      const projectsPu = await projectsPuRepo.find({
+        where: {
+          projectId,
+        },
+      });
+      await planningUnitsGeomRepo.delete({
+        id: In(projectsPu.map((pu) => pu.geomId)),
       });
     },
   };

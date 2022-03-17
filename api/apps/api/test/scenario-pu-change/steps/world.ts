@@ -1,16 +1,17 @@
-import { INestApplication } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { v4 } from 'uuid';
-
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
-
-import { GivenScenarioPuDataExists } from '../../steps/given-scenario-pu-data-exists';
-import { WhenChangingPlanningUnitInclusivity } from './WhenChangingPlanningUnitInclusivity';
-import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { INestApplication } from '@nestjs/common';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
+import { v4 } from 'uuid';
+import { GivenScenarioPuDataExists } from '../../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { GivenProjectExists } from '../../steps/given-project';
+import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
+import { WhenChangingPlanningUnitInclusivity } from './WhenChangingPlanningUnitInclusivity';
 
 export const createWorld = async (app: INestApplication, jwt: string) => {
   const { cleanup, projectId } = await GivenProjectExists(app, jwt, {
@@ -18,11 +19,12 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });
-  const scenariosPuData: Repository<ScenariosPlanningUnitGeoEntity> = await app.get(
-    getRepositoryToken(
-      ScenariosPlanningUnitGeoEntity,
-      DbConnections.geoprocessingDB,
-    ),
+  const entityManager = app.get<EntityManager>(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
+  );
+  const projectsPuRepo = entityManager.getRepository(ProjectsPuEntity);
+  const geomsRepo: Repository<PlanningUnitsGeom> = app.get(
+    getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
 
   const scenarioId = (
@@ -33,10 +35,14 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
     })
   ).data.id;
 
+  const scenariosPuData = await GivenScenarioPuDataExists(
+    entityManager,
+    projectId,
+    scenarioId,
+  );
+
   return {
     scenarioId,
-    GivenScenarioPuDataExists: async () =>
-      (await GivenScenarioPuDataExists(scenariosPuData, scenarioId)).rows,
     WhenChangingPlanningUnitInclusivityForRandomPu: async () =>
       WhenChangingPlanningUnitInclusivity(app, scenarioId, jwt, [v4(), v4()]),
     WhenChangingPlanningUnitInclusivityWithExistingPu: async () =>
@@ -44,12 +50,11 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
         app,
         scenarioId,
         jwt,
-        (await GivenScenarioPuDataExists(scenariosPuData, scenarioId)).rows.map(
-          (entity) => entity.id,
-        ),
+        scenariosPuData.map((pu) => pu.id),
       ),
     cleanup: async () => {
-      await scenariosPuData.delete({ scenarioId });
+      const projectPus = await projectsPuRepo.find({ projectId });
+      await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
       await ScenariosTestUtils.deleteScenario(app, jwt, scenarioId);
       await cleanup();
     },
