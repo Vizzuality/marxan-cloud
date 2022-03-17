@@ -357,7 +357,7 @@ Identical flow as above.
 
 ```sql
 create table scenario_features(
-  id uuid not null default uuid_generate_v4(),
+  id uuid not null default gen_random_uuid(),
   scenario_id uuid not null references scenarios(id) on update cascade on delete cascade,
   -- feature_data_ids will be null if the feature from this recipe hasn't been calculated yet;
   -- each id maps to the ids of the `geodb.scenario_features_data` which match
