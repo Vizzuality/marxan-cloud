@@ -1,6 +1,11 @@
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+
 export interface ScenarioMetadataContent {
   name: string;
   description?: string;
+  numberOfRuns?: number;
+  blm?: number;
+  metadata?: Scenario['metadata'];
 }
 
 export const scenarioMetadataRelativePath = {

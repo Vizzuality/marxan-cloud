@@ -1,3 +1,4 @@
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
@@ -12,6 +13,14 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+
+interface SelectScenarioResult {
+  name: string;
+  description?: string;
+  blm?: number;
+  number_of_runs?: number;
+  metadata?: Scenario['metadata'];
+}
 
 @Injectable()
 @PieceExportProvider()
@@ -31,16 +40,13 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
     const [scenario]: [
-      {
-        name: string;
-        description?: string;
-      },
-    ] = await this.entityManager.query(
-      `
-        SELECT name, description FROM scenarios WHERE scenarios.id = $1
-      `,
-      [input.resourceId],
-    );
+      SelectScenarioResult,
+    ] = await this.entityManager
+      .createQueryBuilder()
+      .select('name, description, blm, number_of_runs, metadata')
+      .from('scenarios', 's')
+      .where('s.id = :scenarioId', { scenarioId: input.resourceId })
+      .execute();
 
     if (!scenario) {
       const errorMessage = `${ScenarioMetadataPieceExporter.name} - Scenario ${input.resourceId} does not exist.`;
@@ -49,8 +55,11 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
     }
 
     const fileContent: ScenarioMetadataContent = {
+      blm: scenario.blm,
       description: scenario.description,
+      metadata: scenario.metadata,
       name: scenario.name,
+      numberOfRuns: scenario.number_of_runs,
     };
 
     const outputFile = await this.fileRepository.save(

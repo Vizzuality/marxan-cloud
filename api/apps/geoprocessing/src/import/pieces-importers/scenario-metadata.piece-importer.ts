@@ -63,22 +63,30 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const scenarioMetadata: ScenarioMetadataContent = JSON.parse(
+    const {
+      name,
+      blm,
+      description,
+      metadata,
+      numberOfRuns,
+    }: ScenarioMetadataContent = JSON.parse(
       stringScenarioMetadataOrError.right,
     );
 
-    await this.entityManager.query(
-      `
-      INSERT INTO scenarios(id, name, description, project_id)
-      VALUES ($1, $2, $3, $4)
-    `,
-      [
-        scenarioId,
-        scenarioMetadata.name,
-        scenarioMetadata.description,
-        projectId,
-      ],
-    );
+    await this.entityManager
+      .createQueryBuilder()
+      .insert()
+      .into('scenarios')
+      .values({
+        id: scenarioId,
+        name,
+        description,
+        blm,
+        number_of_runs: numberOfRuns,
+        metadata,
+        project_id: projectId,
+      })
+      .execute();
 
     return {
       importId: input.importId,
