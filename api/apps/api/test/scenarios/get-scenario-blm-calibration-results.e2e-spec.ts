@@ -8,10 +8,6 @@ describe('get-scenario-blm-calibration-results', () => {
     fixtures = await getFixtures();
   }, 100000);
 
-  afterEach(async () => {
-    await fixtures?.cleanup();
-  });
-
   it(`retrieves blm calibration results via API as owner`, async () => {
     await fixtures.GivenScenarioWasCreated();
 

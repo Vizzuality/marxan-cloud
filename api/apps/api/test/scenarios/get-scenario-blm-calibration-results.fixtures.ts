@@ -10,7 +10,6 @@ import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 
@@ -45,16 +44,6 @@ export const getFixtures = async () => {
   );
 
   return {
-    cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        ownerToken,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,
