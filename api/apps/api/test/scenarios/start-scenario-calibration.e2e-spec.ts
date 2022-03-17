@@ -8,10 +8,6 @@ describe('start-scenario-calibration', () => {
     fixtures = await getFixtures();
   });
 
-  afterEach(async () => {
-    await fixtures?.cleanup();
-  });
-
   it(`starting a blm calibration as owner without sending a range`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
