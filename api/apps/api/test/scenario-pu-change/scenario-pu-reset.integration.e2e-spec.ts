@@ -1,16 +1,12 @@
 import { ScenarioPlanningUnitsService } from '@marxan-api/modules/scenarios/planning-units/scenario-planning-units.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import {
-  PlanningUnitsGeom,
-  ProjectsPuEntity,
-} from '@marxan-jobs/planning-unit-geometry';
-import {
   LockStatus,
   ScenariosPlanningUnitGeoEntity,
 } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenScenarioPuDataExists } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { bootstrapApplication } from '../utils/api-application';
@@ -19,10 +15,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-});
-
-afterEach(async () => {
-  await fixtures?.cleanup();
 });
 
 test(`resetting lock status`, async () => {
@@ -35,10 +27,6 @@ const getFixtures = async () => {
   const app = await bootstrapApplication();
   const entityManager = app.get<EntityManager>(
     getEntityManagerToken(DbConnections.geoprocessingDB),
-  );
-  const projectsPuRepo = entityManager.getRepository(ProjectsPuEntity);
-  const geomsRepo: Repository<PlanningUnitsGeom> = app.get(
-    getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
   const repo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
     getRepositoryToken(
@@ -68,11 +56,6 @@ const getFixtures = async () => {
       expect(
         lockStatuses.every((status) => status === LockStatus.LockedIn),
       ).toBeTruthy();
-    },
-    cleanup: async () => {
-      const projectPus = await projectsPuRepo.find({ projectId });
-      await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
-      await app.close();
     },
   };
 };
