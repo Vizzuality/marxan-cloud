@@ -4,7 +4,6 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
@@ -14,10 +13,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 describe('get-scenario-blm-calibration-results', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
-  });
-
-  afterEach(async () => {
-    await fixtures.cleanup();
   });
 
   it('should retrieve the default BLM range that it is the same as the project range', async () => {
@@ -93,16 +88,6 @@ const getFixtures = async () => {
   const mockBlmValues = 25;
 
   return {
-    cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        ownerToken,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,
