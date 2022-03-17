@@ -155,7 +155,21 @@ PostGIS. This has to be done manually:
 - Create a database and a user with the corresponding credentials (see either the relevant 
 [Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or 
 the [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
-- Enable the PostGIS extension for that database.
+- Enable the following extensions for that database, _before starting any
+  backend services_, as the PostgreSQL user through which these services connect
+  to the databases won't have permissions to enable the extensions via the
+  `create extension` queries that are included in the migration scripts:
+  - `pgcrypto`
+    (`api/apps/api/src/migrations/api/1610395720000-AddSupportForAuthentication.ts`
+    and
+    `api/apps/geoprocessing/src/migrations/geoprocessing/1611828857842-AddFeatureScenarioOutputEntity.ts`)
+  - `tablefunc` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`))
+  - `plpgsql`(`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`)
+  - `postgis` (`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`
+    and
+    `api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
+  - `postgis_raster` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`))
+  - `postgis_topology` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`))
 - Make sure the user has full access to the associated database.
 - Repeat, as needed, for each database used by the project.
 
