@@ -55,15 +55,5 @@ export const createWorld = async (app: INestApplication, jwtToken: string) => {
     projectWithCountry,
     projectWithGid1,
     projectWithGid2,
-    cleanup: async () => {
-      await ProjectsTestUtils.deleteProject(app, jwtToken, projectWithGid2);
-      await ProjectsTestUtils.deleteProject(app, jwtToken, projectWithGid1);
-      await ProjectsTestUtils.deleteProject(app, jwtToken, projectWithCountry);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        jwtToken,
-        organizationId,
-      );
-    },
   };
 };

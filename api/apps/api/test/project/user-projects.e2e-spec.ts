@@ -7,10 +7,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 test(`getting own projects`, async () => {
   const projectId = await fixtures.GivenUserCreatedAProject();
   const someonesProjectId = await fixtures.GivenAnotherUserCreatedAProject();

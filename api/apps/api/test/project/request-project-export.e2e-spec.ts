@@ -1,11 +1,10 @@
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import { Connection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { ProjectChecker } from '../../src/modules/projects/project-checker/project-checker.service';
 import { ScenarioChecker } from '../../src/modules/scenarios/scenario-checker/scenario-checker.service';
 import { GivenProjectExists } from '../steps/given-project';
@@ -13,9 +12,7 @@ import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { ScenarioCheckerFake } from '../utils/scenario-checker.service-fake';
 import { FakeQueue } from '../utils/queues';
 import { exportPieceQueueToken } from '../../src/modules/clone/infra/export/export-queue.provider';
@@ -25,10 +22,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 beforeEach(async () => {
   fixtures = await getFixtures();
 }, 12_000);
-
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test('should forbid export to unrelated users', async () => {
   await fixtures.GivenProjectWasCreated();
@@ -145,30 +138,12 @@ export const getFixtures = async () => {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const unrelatedUserToken = await GivenUserIsLoggedIn(app, 'dd');
   let projectId: string;
-  let organizationId: string;
   let scenarioId: string;
 
   return {
-    cleanup: async () => {
-      fakeProjectChecker.clear();
-      fakeScenarioChecker.clear();
-
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-
-      await exportRepo.delete({});
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        ownerToken,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenProjectWasCreated: async () => {
       const project = await GivenProjectExists(app, ownerToken);
       projectId = project.projectId;
-      organizationId = project.organizationId;
       const scenario = await GivenScenarioExists(app, projectId, ownerToken);
       scenarioId = scenario.id;
     },

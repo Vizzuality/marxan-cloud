@@ -24,17 +24,6 @@ export const getFixtures = async () => {
   const originalName = `Test`;
 
   return {
-    cleanup: async () => {
-      projectChecker.clear();
-
-      await ProjectsTestUtils.deleteProject(app, token, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        token,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenProjectWasCreated: async () => {
       projectId = (
         await ProjectsTestUtils.createProject(app, token, {
