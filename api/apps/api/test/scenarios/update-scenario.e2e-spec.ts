@@ -1,8 +1,6 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import * as request from 'supertest';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
@@ -18,10 +16,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 describe('update scenario', () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
-  });
-
-  afterEach(async () => {
-    await fixtures?.cleanup();
   });
 
   it(`should update an scenario with new data`, async () => {
@@ -78,7 +72,7 @@ async function getFixtures() {
   const projectChecker = app.get(ProjectChecker) as ProjectCheckerFake;
   const scenarioChecker = app.get(ScenarioChecker) as ScenarioCheckerFake;
 
-  const { projectId, organizationId } = await GivenProjectExists(
+  const { projectId } = await GivenProjectExists(
     app,
     ownerToken,
     {
@@ -96,23 +90,6 @@ async function getFixtures() {
   const originalName = 'Test scenario';
 
   return {
-    cleanup: async () => {
-      projectChecker.clear();
-      scenarioChecker.clear();
-
-      await Promise.all(
-        scenarios.map((id) =>
-          ScenariosTestUtils.deleteScenario(app, ownerToken, id),
-        ),
-      );
-      await ProjectsTestUtils.deleteProject(app, ownerToken, projectId);
-      await OrganizationsTestUtils.deleteOrganization(
-        app,
-        ownerToken,
-        organizationId,
-      );
-      await app.close();
-    },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: originalName,
