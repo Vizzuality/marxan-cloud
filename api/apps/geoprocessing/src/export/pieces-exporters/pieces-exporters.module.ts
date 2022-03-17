@@ -11,6 +11,7 @@ import { PlanningUnitsGridGeojsonPieceExporter } from './planning-units-grid-geo
 import { PlanningUnitsGridPieceExporter } from './planning-units-grid.piece-exporter';
 import { ProjectCustomProtectedAreasPieceExporter } from './project-custom-protected-areas.piece-exporter';
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
+import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-exporter';
 import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
 import { ScenarioProtectedAreasPieceExporter } from './scenario-protected-areas.piece-exporter';
 
@@ -32,6 +33,7 @@ import { ScenarioProtectedAreasPieceExporter } from './scenario-protected-areas.
     ProjectCustomProtectedAreasPieceExporter,
     ScenarioMetadataPieceExporter,
     ScenarioProtectedAreasPieceExporter,
+    ScenarioRunResultsPieceExporter,
     Logger,
   ],
 })
