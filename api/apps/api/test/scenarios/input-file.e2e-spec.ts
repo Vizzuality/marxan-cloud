@@ -25,10 +25,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures.cleanup();
-});
-
 describe(`when an owner updates scenario with input data`, () => {
   let scenarioId: string;
   beforeEach(async () => {
@@ -452,7 +448,6 @@ describe(`when a viewer updates scenario with invalid input data`, () => {
 
 async function getFixtures() {
   const app = await bootstrapApplication();
-  const cleanups: (() => Promise<unknown>)[] = [() => app.close()];
   const scenarios = app.get<Repository<Scenario>>(getRepositoryToken(Scenario));
   const ownerToken: string = await GivenUserIsLoggedIn(app, 'aa');
   const contributorToken: string = await GivenUserIsLoggedIn(app, 'bb');
@@ -481,7 +476,6 @@ async function getFixtures() {
           name: 'Fresh Alaska array',
         },
       );
-      cleanups.push(cleanup);
       const scenario = await ScenariosTestUtils.createScenario(
         app,
         ownerToken,
@@ -491,7 +485,6 @@ async function getFixtures() {
           name: 'Save the world species',
         },
       );
-      cleanups.push(() => scenarios.delete(scenario.data.id));
       scenarioId = scenario.data.id;
       return scenario.data;
     },
@@ -507,11 +500,6 @@ async function getFixtures() {
         roleName: scenarioViewerRole,
         userId: viewerUserId,
       }),
-    async cleanup() {
-      for (const cleanup of cleanups.reverse()) {
-        await cleanup();
-      }
-    },
     get scenarioMetadata() {
       const params: MarxanParameters = {
         BLM: 2,
