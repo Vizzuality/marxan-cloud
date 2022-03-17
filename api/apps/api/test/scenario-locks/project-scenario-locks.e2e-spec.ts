@@ -6,9 +6,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 beforeEach(async () => {
   fixtures = await getFixtures();
 });
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
 
 test(`getting all locks of scenarios from projects as project owner`, async () => {
   const userId = await fixtures.GivenOwnerExists();
