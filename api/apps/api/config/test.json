@@ -59,7 +59,7 @@
       "secret": "jwtSecret"
     },
     "xApiKey": {
-      "secret": "xApiKeySecret"
+      "secret": "secret"
     }
   },
   "geoprocessing": {
