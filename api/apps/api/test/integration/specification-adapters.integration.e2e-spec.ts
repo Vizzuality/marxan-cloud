@@ -14,7 +14,3 @@ test(`persisting specification`, async () => {
   );
   fixtures.ThenTheyAreEqual(specification, restoredSpecification);
 });
-
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
