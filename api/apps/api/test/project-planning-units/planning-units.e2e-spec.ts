@@ -10,16 +10,11 @@ let app: INestApplication;
 let queue: FakeQueue;
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   app = await bootstrapApplication();
   world = await createWorld(app);
 
   queue = FakeQueue.getByName('planning-units');
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app.close();
 });
 
 describe('PlanningUnitsModule (e2e)', () => {
