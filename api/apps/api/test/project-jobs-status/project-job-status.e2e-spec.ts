@@ -7,14 +7,9 @@ import { bootstrapApplication } from '../utils/api-application';
 let app: INestApplication;
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   app = await bootstrapApplication();
   world = await createWorld(app);
-});
-
-afterAll(async () => {
-  await world?.cleanup();
-  await app.close();
 });
 
 test(`job statuses for project`, async () => {
