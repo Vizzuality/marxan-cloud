@@ -63,7 +63,7 @@
     }
   },
   "geoprocessing": {
-    "url": "http://localhosts:3001"
+    "url": "http://localhost:3001"
   },
   "storage": {
     "sharedFileStorage": {
