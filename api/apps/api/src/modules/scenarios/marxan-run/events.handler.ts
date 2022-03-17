@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Job, Queue, QueueEvents } from 'bullmq';
 import { isLeft } from 'fp-ts/Either';
-import { JobData, ProgressData } from '@marxan/scenario-run-queue';
+import { assertIsProgressData, JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { assertDefined } from '@marxan/utils';
 import { ExecutionResult } from '@marxan/marxan-output';
@@ -32,9 +32,10 @@ export class EventsHandler {
     queueEvents.on(
       `progress`,
       async (
-        { jobId, data }: { data: ProgressData; jobId: string },
+        { jobId, data },
         eventId,
       ) => {
+        assertIsProgressData(data);
         await this.handleProgress(jobId, eventId, data);
       },
     );
