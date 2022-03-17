@@ -167,13 +167,13 @@ the [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
     (`api/apps/api/src/migrations/api/1610395720000-AddSupportForAuthentication.ts`
     and
     `api/apps/geoprocessing/src/migrations/geoprocessing/1611828857842-AddFeatureScenarioOutputEntity.ts`)
-  - `tablefunc` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`))
+  - `tablefunc` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
   - `plpgsql`(`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`)
   - `postgis` (`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`
     and
     `api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
-  - `postgis_raster` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`))
-  - `postgis_topology` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`))
+  - `postgis_raster` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
+  - `postgis_topology` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
 - Make sure the user has full access to the associated database.
 - Repeat, as needed, for each database used by the project.
 

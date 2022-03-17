@@ -6,7 +6,6 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
     // Only CREATEDB privilege required in 13+ rather than SUPERUSER (ht @agnessa)
     if (await PostgreSQLUtils.version13Plus()) {
       await queryRunner.query(`
-    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     CREATE EXTENSION IF NOT EXISTS tablefunc;
     CREATE EXTENSION IF NOT EXISTS plpgsql;
     CREATE EXTENSION IF NOT EXISTS postgis;
@@ -203,7 +202,6 @@ export class InitialGeoDBSetup1611221157285 implements MigrationInterface {
       DROP EXTENSION postgis;
       DROP EXTENSION plpgsql;
       DROP EXTENSION tablefunc;
-      DROP EXTENSION uuid-ossp;
       `);
     }
   }
