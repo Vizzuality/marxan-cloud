@@ -3,17 +3,13 @@ import { getFixtures } from './solutions.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
 describe(`When getting scenario solution results`, () => {
   beforeAll(async () => {
     await fixtures.GivenScenarioHasSolutionsReady();
-  });
-
-  afterAll(async () => {
-    await fixtures?.cleanup();
   });
 
   it(`should return the correct response when the given scenario id does not exists`, async () => {

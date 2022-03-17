@@ -8,6 +8,10 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
+afterEach(async () => {
+  await fixtures?.cleanup();
+});
+
 describe(`As owner: given output zip is available`, () => {
   let zip: Response;
   beforeEach(async () => {
