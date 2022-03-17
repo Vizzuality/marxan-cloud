@@ -2,21 +2,14 @@ import { INestApplication } from '@nestjs/common';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './steps/world';
-import { tearDown } from '../utils/tear-down';
 import { v4 } from 'uuid';
 
 let app: INestApplication;
 let world: FixtureType<typeof createWorld>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   app = await bootstrapApplication();
   world = await createWorld(app);
-});
-
-afterAll(async () => {
-  await world?.cleanup();
-  await app.close();
-  await tearDown();
 });
 
 describe(`when scenario is not available`, () => {
