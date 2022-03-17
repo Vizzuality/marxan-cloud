@@ -3,7 +3,7 @@ import { getFixtures } from './scenario-cost-surface.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-beforeAll(async () => {
+beforeEach(async () => {
   fixtures = await getFixtures();
   await fixtures.GivenScenarioWasCreated();
   await fixtures.GivenScenarioWithPuAndLocks();
@@ -129,8 +129,4 @@ describe(`As user not in scenario, when scenario has PUs with cost and lock stat
     const response = await fixtures.WhenGettingPuInclusionStateAsUserNotInScenario();
     await fixtures.ThenForbiddenIsReturned(response);
   });
-});
-
-afterAll(async () => {
-  await fixtures?.cleanup();
 });

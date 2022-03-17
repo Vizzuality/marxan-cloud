@@ -1,7 +1,7 @@
 import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import * as request from 'supertest';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import {
   LockStatus,
@@ -33,7 +33,7 @@ export const getFixtures = async () => {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
-  const { cleanup: projectCleanup, projectId } = await GivenProjectExists(
+  const { projectId } = await GivenProjectExists(
     app,
     ownerToken,
     {
@@ -70,14 +70,6 @@ export const getFixtures = async () => {
   );
 
   return {
-    cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await projectCleanup();
-      await puGeometryRepo.delete({
-        id: In(geometries),
-      });
-      await app.close();
-    },
     GivenScenarioWasCreated: async () => {
       const result = await ScenariosTestUtils.createScenario(app, ownerToken, {
         name: `Test scenario`,

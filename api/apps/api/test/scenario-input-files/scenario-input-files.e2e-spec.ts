@@ -7,10 +7,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 describe(`when getting input.zip`, () => {
   it(`as owner, should contain required input files`, async () => {
     const archiveResponse = await fixtures.WhenGettingArchivedInputAsOwner();

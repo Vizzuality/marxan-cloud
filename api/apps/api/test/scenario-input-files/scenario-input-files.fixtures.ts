@@ -9,7 +9,6 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { GivenUserExists } from '../steps/given-user-exists';
 
 export const getFixtures = async () => {
@@ -22,7 +21,7 @@ export const getFixtures = async () => {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
-  const { projectId, cleanup } = await GivenProjectExists(
+  const { projectId } = await GivenProjectExists(
     app,
     ownerToken,
     {
@@ -47,11 +46,6 @@ export const getFixtures = async () => {
   // TODO: fill spec.dat
 
   return {
-    cleanup: async () => {
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenario.id);
-      await cleanup();
-      await app.close();
-    },
     GivenContributorWasAddedToScenario: async () =>
       await userScenariosRepo.save({
         scenarioId,
