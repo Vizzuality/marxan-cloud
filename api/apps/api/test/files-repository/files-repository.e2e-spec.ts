@@ -16,10 +16,6 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-afterEach(async () => {
-  await fixtures?.cleanup();
-});
-
 /**
  * Please note that bootstrapApplication overrides default implementation
  * with `/tmp/storage/` usage
@@ -44,7 +40,6 @@ const getFixtures = async () => {
   const sut = app.get(FileRepository);
 
   return {
-    cleanup: async () => app.close(),
     GivenFileWasAdded: async () => {
       const result = await sut.save(
         createReadStream(__dirname + `/some-file.json`),
