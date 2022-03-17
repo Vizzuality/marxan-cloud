@@ -1,21 +1,15 @@
 import { INestApplication } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-
-import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { GivenApiEvent } from '../steps/given-api-event';
-import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import * as request from 'supertest';
 
 export const createWorld = async (app: INestApplication) => {
-  const repo: Repository<ApiEvent> = app.get(getRepositoryToken(ApiEvent));
   const token = await GivenUserIsLoggedIn(app);
-  const { projectId, cleanup: projectCleanup } = await GivenProjectExists(
+  const { projectId } = await GivenProjectExists(
     app,
     token,
     {
@@ -62,16 +56,5 @@ export const createWorld = async (app: INestApplication) => {
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/scenarios/status`)
         .set('Authorization', `Bearer ${token}`),
-    cleanup: async () => {
-      await repo.delete({
-        topic: In(scenarios),
-      });
-      await Promise.all(
-        scenarios.map((scenarioId) =>
-          ScenariosTestUtils.deleteScenario(app, token, scenarioId),
-        ),
-      );
-      await projectCleanup();
-    },
   };
 };

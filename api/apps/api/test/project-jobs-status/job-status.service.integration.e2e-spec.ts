@@ -13,17 +13,11 @@ import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-});
-
-afterEach(async () => {
-  await fixtures.cleanup();
 });
 
 describe(`when has two projects with scenarios and events`, () => {
@@ -155,23 +149,7 @@ async function getFixtures() {
       addedProjects.push(projectId);
       addedEvents.push(event);
     },
-    async cleanup() {
-      await eventsRepository.repo.remove(addedEvents);
-      await Promise.all(
-        addedProjects.map((projectId) =>
-          ProjectsTestUtils.deleteProject(application, token, projectId),
-        ),
-      );
-      await Promise.all(
-        addedOrganizations.map((organizationId) =>
-          OrganizationsTestUtils.deleteOrganization(
-            application,
-            token,
-            organizationId,
-          ),
-        ),
-      );
-    },
+
     getStatusRepository() {
       return statusRepository;
     },
