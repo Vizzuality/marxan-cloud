@@ -34,10 +34,6 @@ describe('Typeorm export repository', () => {
     fixtures = await getFixtures();
   }, 20000);
 
-  afterAll(async () => {
-    await fixtures.cleanup();
-  });
-
   it('should expose methods for getting an export by id and storing exports', async () => {
     await fixtures.GivenExportWasRequested();
 
@@ -128,64 +124,6 @@ const getFixtures = async () => {
     });
 
   return {
-    cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-      await exportRepo.delete({});
-      await OrganizationsTestUtils.deleteOrganization(app, ownerToken, ownerId);
-
-      await app.close();
-    },
-    GivenProject: () => {
-      return v4();
-    },
-    GivenMultipleExports: async (projectId: string) => {
-      const archiveLocation = '/tmp/foo/bar.zip';
-
-      const anotherProjectExport = exportFactory({
-        resourceId: v4(),
-        archiveLocation,
-      });
-      const cloningExport = exportFactory({
-        resourceId: projectId,
-        archiveLocation,
-        importResourceId: v4(),
-      });
-      const unfinishedExport = exportFactory({
-        resourceId: projectId,
-      });
-
-      const exportsToFind = Array(amountOfExportsToFind)
-        .fill(0)
-        .map((_, index) =>
-          exportFactory({
-            resourceId: projectId,
-            archiveLocation,
-            createdAt: new Date(now.getTime() - millisecondsInADay * index),
-            exportPieces: [
-              {
-                finished: true,
-                id: v4(),
-                piece: ClonePiece.ExportConfig,
-                resourceId: projectId,
-                uris: [
-                  {
-                    relativePath: `bar-${index}.zip`,
-                    uri: `/foo/bar-${index}.zip`,
-                  },
-                ],
-              },
-            ],
-          }),
-        );
-
-      await Promise.all([
-        repo.save(anotherProjectExport),
-        repo.save(cloningExport),
-        repo.save(unfinishedExport),
-        ...exportsToFind.map((exportInstance) => repo.save(exportInstance)),
-      ]);
-    },
     GivenExportWasRequested: async () => {
       resourceId = ResourceId.create();
       componentId = ComponentId.create();
