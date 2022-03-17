@@ -34,6 +34,7 @@ export class ProjectsPuEntity {
   @Column('enum', {
     name: 'geom_type',
     enum: PlanningUnitGridShape,
+    enumName: 'planning_unit_grid_shape',
   })
   geomType!: PlanningUnitGridShape;
 }
