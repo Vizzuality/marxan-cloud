@@ -16,7 +16,6 @@ import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/
 import { bootstrapApplication } from '../utils/api-application';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
-import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 
@@ -30,7 +29,7 @@ export const getFixtures = async () => {
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
 
-  const { projectId, cleanup } = await GivenProjectExists(app, ownerToken, {
+  const { projectId } = await GivenProjectExists(app, ownerToken, {
     countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
@@ -53,11 +52,6 @@ export const getFixtures = async () => {
   return {
     cleanup: async () => {
       filesToRemove.forEach((file) => unlinkSync(file));
-      await marxanExecutionMetadataRepo.delete({
-        scenarioId,
-      });
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await cleanup();
     },
     GivenContributorWasAddedToScenario: async () =>
       await userScenariosRepo.save({
