@@ -11,8 +11,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { isDefined } from '@marxan/utils';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Either, left, right } from 'fp-ts/Either';
-import { isRight } from 'fp-ts/lib/These';
+import { Either, isRight, left, right } from 'fp-ts/Either';
 import { In, Repository } from 'typeorm';
 
 @Injectable()
