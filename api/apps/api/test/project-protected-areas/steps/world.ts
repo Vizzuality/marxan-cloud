@@ -14,7 +14,6 @@ export const createWorld = async (app: INestApplication) => {
   const queue = FakeQueue.getByName(addProtectedAreaQueueName);
   const {
     projectId,
-    cleanup: projectCleanup,
     organizationId,
   } = await GivenProjectExists(app, jwtToken, {
     countryId: 'BWA',
@@ -33,6 +32,5 @@ export const createWorld = async (app: INestApplication) => {
     WhenSubmittingShapefileFor: (scenarioId: string) =>
       SubmitsProjectsPaShapefile(app, jwtToken, scenarioId, shapeFilePath),
     GetSubmittedJobs: () => Object.values(queue.jobs),
-    cleanup: async () => Promise.all([projectCleanup()]).then(() => undefined),
   };
 };
