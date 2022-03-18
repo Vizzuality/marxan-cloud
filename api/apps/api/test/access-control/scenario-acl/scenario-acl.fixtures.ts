@@ -336,7 +336,7 @@ export const getFixtures = async () => {
     ThenBadRequestAndUserIdMessageIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(400);
       const error: any = response.body.errors[0].meta.rawError.response;
-      expect(error?.message[0]).toEqual('userId must be an UUID');
+      expect(error?.message[0]).toEqual('userId must be a UUID');
     },
 
     ThenBadRequestAndEnumMessageIsReturned: (response: request.Response) => {
