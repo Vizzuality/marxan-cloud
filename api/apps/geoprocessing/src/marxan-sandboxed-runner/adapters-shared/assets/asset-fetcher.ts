@@ -1,6 +1,7 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import axios, { CancelTokenSource } from 'axios';
 import { WriteStream } from 'fs';
+import { lastValueFrom } from 'rxjs';
 import { FetchConfig } from './fetch.config';
 
 @Injectable()
@@ -16,15 +17,14 @@ export class AssetFetcher {
 
   async fetch(sourceUri: string, output: WriteStream): Promise<void> {
     try {
-      const assetStream = await this.httpService
+      const assetStream = await lastValueFrom(this.httpService
         .get(sourceUri, {
           responseType: 'stream',
           headers: {
             'x-api-key': this.config.secret,
           },
           cancelToken: this.#cancelTokenSource.token,
-        })
-        .toPromise();
+        }));
       assetStream.data.pipe(output);
     } catch (error) {
       output.end();
