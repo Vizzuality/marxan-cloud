@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 import { Repository } from 'typeorm';
@@ -7,14 +7,14 @@ import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 
 @Injectable()
 export class PlanningAreaGridTilesService {
-  private readonly logger = new Logger(this.constructor.name);
-
   constructor(
     @InjectRepository(PlanningUnitsGeom)
     private readonly repository: Repository<PlanningUnitsGeom>,
-    @Inject('TileService')
     private readonly tileService: TileService,
-  ) {}
+    private readonly logger: ConsoleLogger
+  ) {
+    this.logger.setContext(PlanningAreaGridTilesService.name);
+  }
 
   /**
    * @todo get attributes from Entity, based on user selection

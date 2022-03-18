@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
@@ -40,6 +40,7 @@ import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-val
     apiUrlProvider,
     BlmCalibrationEventsService,
     ScenarioJobService,
+    ConsoleLogger,
   ],
   exports: [],
 })

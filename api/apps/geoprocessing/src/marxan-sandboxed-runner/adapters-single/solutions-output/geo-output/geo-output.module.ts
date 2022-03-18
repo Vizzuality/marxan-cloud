@@ -25,13 +25,13 @@ import { PlanningUnitSelectionCalculatorService } from './solutions/solution-agg
     ScenarioFeaturesModule,
   ],
   providers: [
-    ConsoleLogger,
     GeoOutputRepository,
     MetadataArchiver,
     MarxanDirectory,
     FileReader,
     SolutionsReaderService,
     PlanningUnitSelectionCalculatorService,
+    ConsoleLogger,
   ],
   exports: [GeoOutputRepository],
 })

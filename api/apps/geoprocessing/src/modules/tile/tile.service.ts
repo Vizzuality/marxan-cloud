@@ -1,6 +1,7 @@
 // to-do: work on cache later
 import {
   BadRequestException,
+  ConsoleLogger,
   Injectable,
   Logger,
   NotFoundException,
@@ -53,13 +54,17 @@ export interface TileInput<T> extends TileRequest {
 export type TileRenderer<TileInput> = (args: TileInput) => Promise<Buffer>;
 
 @Injectable()
-export class TileService {
   /**
    * @todo move generation of specific query for each point to the api. Generate this query with the query builder
    * @todo fix geometry issue with gid_0 = 'ATA'. Once is fixed, remove this condition from the query.
    * @description The default base query builder
-   */
-  private readonly logger: Logger = new Logger(TileService.name);
+   */ 
+ export class TileService {
+  constructor(
+    private readonly logger: ConsoleLogger,
+  ) {
+    this.logger.setContext(TileService.name);
+  }
 
   /**
    * Simplification based in zoom level

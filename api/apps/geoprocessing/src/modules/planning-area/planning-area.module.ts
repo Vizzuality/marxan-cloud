@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ConsoleLogger, Module, Scope } from '@nestjs/common';
 import { PlanningAreaRepositoryModule } from '@marxan/planning-area-repository';
 
 import { ShapefilesModule } from '@marxan/shapefile-converter';
@@ -32,6 +32,7 @@ import { PlanningAreaGarbageCollector } from './planning-area-garbage-collector.
     PlanningAreaTilesService,
     PlanningAreaGridTilesService,
     PlanningAreaGarbageCollector,
+    ConsoleLogger,
   ],
   controllers: [PlanningAreaController],
 })

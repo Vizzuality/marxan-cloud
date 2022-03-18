@@ -4,7 +4,7 @@ import {
   ArgumentsHost,
   HttpException,
   HttpStatus,
-  Logger,
+  ConsoleLogger,
 } from '@nestjs/common';
 import * as config from 'config';
 import { omit } from 'lodash';
@@ -22,7 +22,11 @@ import { AppConfig } from '../utils/config.utils';
  */
 @Catch(Error)
 export class AllExceptionsFilter implements ExceptionFilter {
-  private readonly logger = new Logger();
+  constructor(
+    private readonly logger: ConsoleLogger,
+  ) {
+    this.logger.setContext(AllExceptionsFilter.name);
+  }
 
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();

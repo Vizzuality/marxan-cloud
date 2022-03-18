@@ -35,8 +35,6 @@ import { PasswordRecoveryService } from './password-recovery/password-recovery.s
 import { PasswordRecoveryToken } from './password-recovery/password-recovery-token.api.entity';
 import { PasswordRecoveryController } from './password-recovery/password-recovery.controller';
 
-export const logger = new ConsoleLogger('Authentication');
-
 @Module({
   imports: [
     UsersModule,
@@ -73,6 +71,7 @@ export const logger = new ConsoleLogger('Authentication');
       useClass: TypeORMRecoveryTokenRepository,
     },
     PasswordRecoveryService,
+    ConsoleLogger,
   ],
   controllers: [AuthenticationController, PasswordRecoveryController],
   exports: [AuthenticationService],

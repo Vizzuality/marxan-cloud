@@ -1,4 +1,4 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
+import { Injectable, Inject, ConsoleLogger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,14 +14,14 @@ export class TileSpecification extends TileRequest {
 
 @Injectable()
 export class PlanningAreaTilesService {
-  private readonly logger = new Logger(this.constructor.name);
-
   constructor(
     @InjectRepository(PlanningArea)
     private readonly repository: Repository<PlanningArea>,
-    @Inject('TileService')
     private readonly tileService: TileService,
-  ) {}
+    private readonly logger: ConsoleLogger,
+  ) {
+    this.logger.setContext(this.constructor.name);
+  }
 
   buildCustomPlanningAreaWhereQuery(planningAreaId: string): string {
     /**

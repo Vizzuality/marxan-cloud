@@ -4,7 +4,7 @@ import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/cl
 import { FileRepository } from '@marxan/files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { extractFile } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
@@ -23,7 +23,7 @@ export class ScenarioProtectedAreasPieceImporter
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScenarioProtectedAreasPieceImporter.name);
   }

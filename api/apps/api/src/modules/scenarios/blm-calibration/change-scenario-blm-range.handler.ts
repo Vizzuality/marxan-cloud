@@ -1,6 +1,6 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left } from 'fp-ts/Either';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger, Logger } from '@nestjs/common';
 
 import { Blm } from '@marxan-api/modules/blm';
 
@@ -17,12 +17,13 @@ import { BlmValuesPolicyFactory } from '@marxan-api/modules/projects/blm/blm-val
 export class ChangeScenarioBlmRangeHandler
   implements IInferredCommandHandler<ChangeScenarioBlmRange>
 {
-  private readonly logger: Logger = new Logger(ChangeScenarioBlmRange.name);
-
   constructor(
     private readonly blmRepository: ScenarioBlmRepo,
     private readonly blmPolicyFactory: BlmValuesPolicyFactory,
-  ) {}
+    private readonly logger: ConsoleLogger,
+  ) {
+    this.logger.setContext(ChangeScenarioBlmRangeHandler.name);
+  }
 
   async execute({
     scenarioId,

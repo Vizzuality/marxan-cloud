@@ -1,5 +1,5 @@
 import { EntityManager, In } from 'typeorm';
-import { Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { MetadataArchiver } from './metadata/data-archiver.service';
 import { SolutionsReaderService } from './solutions/output-file-parsing/solutions-reader.service';
@@ -25,8 +25,10 @@ export class GeoOutputRepository {
     private readonly planningUnitsStateCalculator: PlanningUnitSelectionCalculatorService,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger = new Logger(GeoOutputRepository.name),
-  ) {}
+    private readonly logger: ConsoleLogger,
+  ) {
+    this.logger.setContext(GeoOutputRepository.name);
+  }
 
   async save(
     scenarioId: string,

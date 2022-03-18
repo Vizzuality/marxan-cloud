@@ -9,8 +9,6 @@ import {
 import { ApiEventsController } from './api-events.controller';
 import { ApiEventsService } from './api-events.service';
 
-export const logger = new ConsoleLogger('ApiEvents');
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -19,7 +17,7 @@ export const logger = new ConsoleLogger('ApiEvents');
       FirstApiEventByTopicAndKind,
     ]),
   ],
-  providers: [ApiEventsService],
+  providers: [ApiEventsService, ConsoleLogger],
   controllers: [ApiEventsController],
   exports: [ApiEventsService, TypeOrmModule],
 })

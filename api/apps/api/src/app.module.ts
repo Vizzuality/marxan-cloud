@@ -1,4 +1,5 @@
 import {
+  ConsoleLogger,
   MiddlewareConsumer,
   Module,
   NestModule,
@@ -81,6 +82,7 @@ import { WebshotModule } from './modules/webshot/webshot.module';
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
     },
+    ConsoleLogger,
   ],
 })
 export class AppModule implements NestModule {

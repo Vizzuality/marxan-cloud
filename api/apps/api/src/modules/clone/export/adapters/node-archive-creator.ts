@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import * as archiver from 'archiver';
 import { PassThrough } from 'stream';
@@ -17,10 +17,12 @@ import {
 
 @Injectable()
 export class NodeArchiveCreator extends ArchiveCreator {
-  private readonly logger = new Logger(this.constructor.name);
-
-  constructor(private readonly fileRepository: FileRepository) {
+  constructor(
+    private readonly fileRepository: FileRepository,
+    private readonly logger: ConsoleLogger,
+  ) {
     super();
+    this.logger.setContext(NodeArchiveCreator.name);
   }
 
   async zip(

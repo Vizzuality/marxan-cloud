@@ -1,5 +1,5 @@
 import { FileRepositoryModule } from '@marxan/files-repository';
-import { Module } from '@nestjs/common';
+import { ConsoleLogger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from '../../../projects/project.api.entity';
 import { ArchiveCreator } from '../application/archive-creator.port';
@@ -35,6 +35,11 @@ import { TypeormExportRepository } from './typeorm-export.repository';
       provide: ArchiveCreator,
       useClass: NodeArchiveCreator,
     },
+    {
+      provide: ConsoleLogger,
+      useClass: ConsoleLogger,
+      scope: Scope.TRANSIENT,
+    }
   ],
   exports: [ExportRepository, ExportResourcePieces, ArchiveCreator],
 })
