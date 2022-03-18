@@ -19,6 +19,7 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
+import { v4 } from 'uuid';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
   ImportComponent,
@@ -169,16 +170,17 @@ const getFixtures = async () => {
 class FakeExportConfigReader {
   mock: jest.MockedFunction<
     ExportConfigReader['read']
-  > = jest
-    .fn()
-    .mockResolvedValue(
-      right({ resourceKind: ResourceKind.Scenario } as ExportConfigContent),
-    );
+  > = jest.fn().mockResolvedValue(
+    right({
+      resourceKind: ResourceKind.Scenario,
+      projectId: v4(),
+    } as ExportConfigContent),
+  );
 
   async read(
-    archive: ArchiveLocation,
+    location: ArchiveLocation,
   ): Promise<Either<ArchiveFailure, ExportConfigContent>> {
-    return this.mock(archive);
+    return this.mock(location);
   }
 }
 
