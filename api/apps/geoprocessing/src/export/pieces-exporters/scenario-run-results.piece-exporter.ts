@@ -1,13 +1,9 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
-import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
 import { FileRepository } from '@marxan/files-repository';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
-import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -62,7 +58,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       .addSelect('ppu.puid', 'puid')
       .from('output_scenarios_pu_data', 'results')
       .innerJoin('scenarios_pu_data', 'spd', 'spd.id = results.scenario_pu_id')
-      .innerJoin(ProjectsPuEntity, 'ppu', 'ppu.id = spd.project_pu_id')
+      .innerJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
       .execute();
 
     const content: ScenarioRunResultsContent = { blmResults, marxanRunResults };
