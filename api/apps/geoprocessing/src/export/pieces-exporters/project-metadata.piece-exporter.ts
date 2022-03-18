@@ -4,6 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { FileRepository } from '@marxan/files-repository';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
@@ -36,8 +37,9 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
     const [projectData]: {
       name: string;
       description: string;
+      planning_unit_grid_shape: PlanningUnitGridShape;
     }[] = await this.entityManager.query(
-      `SELECT projects.name, projects.description FROM projects WHERE projects.id = $1`,
+      `SELECT name, description, planning_unit_grid_shape FROM projects WHERE projects.id = $1`,
       [input.resourceId],
     );
 
@@ -50,6 +52,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
     const fileContent: ProjectMetadataContent = {
       name: projectData.name,
       description: projectData.description,
+      planningUnitGridShape: projectData.planning_unit_grid_shape,
     };
 
     const outputFile = await this.fileRepository.save(
