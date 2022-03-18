@@ -12,7 +12,7 @@ import {
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import * as archiver from 'archiver';
@@ -85,7 +85,7 @@ const getFixtures = async () => {
     ],
     providers: [
       PlanningUnitsGridPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
+      { provide: ConsoleLogger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 

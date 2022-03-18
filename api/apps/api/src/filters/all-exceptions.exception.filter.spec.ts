@@ -1,5 +1,5 @@
 import { AllExceptionsFilter } from './all-exceptions.exception.filter';
-import { ArgumentsHost, NotFoundException } from '@nestjs/common';
+import { ArgumentsHost, ConsoleLogger, NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
 describe('AllExceptionFilter class spec (unit)', () => {
@@ -9,7 +9,7 @@ describe('AllExceptionFilter class spec (unit)', () => {
 
   beforeEach(async () => {
     const sandbox = await Test.createTestingModule({
-      providers: [AllExceptionsFilter],
+      providers: [AllExceptionsFilter, ConsoleLogger],
     }).compile();
     sandbox.useLogger(false);
     filter = sandbox.get(AllExceptionsFilter);

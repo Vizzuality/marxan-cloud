@@ -7,7 +7,7 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
@@ -114,7 +114,7 @@ const getFixtures = async () => {
         useClass: MemoryImportRepository,
       },
       {
-        provide: Logger,
+        provide: ConsoleLogger,
         useClass: FakeLogger,
       },
       CompleteImportPieceHandler,

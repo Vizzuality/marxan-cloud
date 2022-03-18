@@ -7,7 +7,7 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
@@ -92,7 +92,7 @@ const getFixtures = async () => {
         },
       },
       {
-        provide: Logger,
+        provide: ConsoleLogger,
         useValue: {
           setContext: () => {},
           error: () => {},

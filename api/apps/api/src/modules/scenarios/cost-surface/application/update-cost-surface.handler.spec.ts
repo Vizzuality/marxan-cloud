@@ -1,5 +1,5 @@
 import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Queue } from 'bullmq';
 import { Either, Left, Right } from 'fp-ts/lib/Either';
@@ -32,7 +32,7 @@ beforeEach(async () => {
         } as unknown as Queue,
       },
       {
-        provide: Logger,
+        provide: ConsoleLogger,
         useClass: FakeLogger,
       },
       {
@@ -43,7 +43,7 @@ beforeEach(async () => {
   }).compile();
 
   sut = sandbox.get(UpdateCostSurfaceHandler);
-  logger = sandbox.get(Logger);
+  logger = sandbox.get(ConsoleLogger);
   eventsService = sandbox.get(CostSurfaceEventsPort);
 });
 

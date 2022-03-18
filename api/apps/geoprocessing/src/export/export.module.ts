@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { ConsoleLogger, Module } from '@nestjs/common';
 import { WorkerModule } from '../modules/worker';
 
 import { ExportPiecesModule } from './pieces/export-pieces.module';
@@ -8,6 +8,6 @@ import { PiecesExportersModule } from './pieces-exporters/pieces-exporters.modul
 
 @Module({
   imports: [WorkerModule, ExportPiecesModule, PiecesExportersModule],
-  providers: [ExportWorker, ExportProcessor],
+  providers: [ExportWorker, ExportProcessor, ConsoleLogger],
 })
 export class ExportModule {}
