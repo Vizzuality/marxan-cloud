@@ -48,15 +48,34 @@ Geo -> GeoDb: Store PNG as blob in BlmFinalResultsRepository, set protected_pu_i
 @enduml
 ```
 
-## Preparing inputs
+Requests from the Geoprocessing service to the API service should be protected
+via `x-api-key` authentication (similarly to what is done in the Geoprocessing
+service's `ApiEventsService` in order to dispatch API events to the API's own
+API events module).
 
-### Planning units selected for protection
+#### To be decided
+
+How to handle authentication to the frontend from the webshot service.
+
+This could be done (as already done for PDF summary reports of scenario
+solutions) via a fresh frontend authentication cookie. However, this would need
+to be provided _alongside the request to start a BLM calibration_ (as the
+workflow outlined above is a post-processing step of the BLM calibration
+itself).
+
+Alternatively, a workflow involving injecting MVT data into a non-authenticated
+app page (via the webshot service/Puppeteer) could be used, if technically
+feasible in terms of frontend architecture.
+
+### Preparing inputs
+
+#### Planning units selected for protection
 
 This data can be gathered directly from the `output/output_best.csv` file from
 the run's workspace. This is a set of `[puid,included]` pairs, for each of the
 planning units in the scenario.
 
-The `puid` is the numeric id (`(geodb)scenarios_pu_data.puid`), which will need
+The `puid` is the numeric id (`(geodb)projects_pu.puid`), which will need
 to be joined to the `id` (UUID) of the planning unit as this is what is used to
 in vector tiles.
 
