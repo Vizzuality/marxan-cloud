@@ -47,7 +47,7 @@ describe('UsersModule (e2e)', () => {
   let usersService: UsersService;
   let usersRepo: Repository<User>;
 
-  const aNewPassword = faker.random.uuid();
+  const aNewPassword = v4();
 
   const signUpDto: SignUpDto = {
     email: `${v4()}@example.com`,
@@ -229,7 +229,7 @@ describe('UsersModule (e2e)', () => {
         .patch('/api/v1/users/me/password')
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
-          currentPassword: faker.random.uuid(),
+          currentPassword: v4(),
           newPassword: aNewPassword,
         })
         .expect(HttpStatus.FORBIDDEN);
