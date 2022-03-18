@@ -141,7 +141,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
               try {
                 const geomPUs = processableData
                   .split('\n')
-                  .map(this.parseGridFileLine);
+                  .map((pu) => this.parseGridFileLine(pu));
 
                 const geometries: {
                   id: string;

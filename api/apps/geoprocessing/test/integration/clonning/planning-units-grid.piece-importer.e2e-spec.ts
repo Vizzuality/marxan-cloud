@@ -1,3 +1,4 @@
+import { PlanningUnitsGridPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/planning-units-grid.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
   PlanningUnitsGeom,
@@ -11,15 +12,19 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import {
+  getEntityManagerToken,
+  getRepositoryToken,
+  TypeOrmModule,
+} from '@nestjs/typeorm';
 import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/Either';
 import { In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { PlanningUnitsGridPieceImporter } from '../../../src/import/pieces-importers/planning-units-grid.piece-importer';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -86,6 +91,10 @@ const getFixtures = async () => {
     providers: [
       PlanningUnitsGridPieceImporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
+      {
+        provide: getEntityManagerToken(geoprocessingConnections.apiDB.name),
+        useClass: FakeEntityManager,
+      },
     ],
   }).compile();
 
@@ -235,3 +244,13 @@ const getFixtures = async () => {
     },
   };
 };
+
+class FakeEntityManager {
+  createQueryBuilder = () => this;
+  select = () => this;
+  from = () => this;
+  where = () => this;
+  async execute() {
+    return [{ geomType: PlanningUnitGridShape.Square }];
+  }
+}
