@@ -1,5 +1,4 @@
 import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -76,6 +75,7 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     const pieces: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ScenarioMetadata),
       ExportComponent.newOne(id, ClonePiece.ScenarioProtectedAreas),
+      ExportComponent.newOne(id, ClonePiece.ScenarioRunResults),
     ];
 
     if (kind === ResourceKind.Scenario) {
