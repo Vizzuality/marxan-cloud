@@ -1,7 +1,7 @@
 export const projectCustomProtectedAreasRelativePath =
   'project-custom-protected-areas.json';
 
-export interface ProjectCustomProtectedAreasContent {
+export type ProjectCustomProtectedAreasContent = {
   fullName: string;
   ewkb: number[];
-}
+};

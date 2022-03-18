@@ -14,9 +14,9 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface PlanningAreaGeojsonSelectResult {
+type PlanningAreaGeojsonSelectResult = {
   geojson: string;
-}
+};
 
 @Injectable()
 @PieceExportProvider()

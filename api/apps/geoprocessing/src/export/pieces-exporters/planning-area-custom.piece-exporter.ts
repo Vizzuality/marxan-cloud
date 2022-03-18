@@ -15,14 +15,14 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface PlanningAreaSelectResult {
+type PlanningAreaSelectResult = {
   ewkb: Buffer;
-}
+};
 
-interface ProjectSelectResult {
+type ProjectSelectResult = {
   planning_unit_grid_shape: PlanningUnitGridShape;
   planning_unit_area_km2: number;
-}
+};
 
 @Injectable()
 @PieceExportProvider()

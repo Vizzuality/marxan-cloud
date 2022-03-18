@@ -14,21 +14,21 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface SelectScenarioResult {
+type SelectScenarioResult = {
   id: string;
   protectedAreasIds?: string[];
   wdpaThreshold?: number;
-}
+};
 
-interface CustomProtectedArea {
+type CustomProtectedArea = {
   ewkb: Buffer;
   name: string;
-}
+};
 
-interface WdpaProtectedArea {
+type WdpaProtectedArea = {
   ewkb: Buffer;
   wdpaid: number;
-}
+};
 
 type SelectWdpaResult = WdpaProtectedArea | CustomProtectedArea;
 

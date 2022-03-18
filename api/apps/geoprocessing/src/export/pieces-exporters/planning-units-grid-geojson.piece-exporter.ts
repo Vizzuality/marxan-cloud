@@ -14,10 +14,10 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface ProjectSelectResult {
+type ProjectSelectResult = {
   id: string;
   bbox: BBox;
-}
+};
 
 @Injectable()
 @PieceExportProvider()

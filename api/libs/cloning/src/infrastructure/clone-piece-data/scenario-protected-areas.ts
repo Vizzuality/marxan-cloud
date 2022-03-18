@@ -4,11 +4,11 @@ export const scenarioProtectedAreasRelativePath = {
     `scenarios/${oldScenarioId}/scenario-protected-areas.json`,
 };
 
-export interface ScenarioProtectedAreasContent {
+export type ScenarioProtectedAreasContent = {
   wdpa: number[];
   customProtectedAreas: {
     name: string;
     geom: number[];
   }[];
   threshold?: number;
-}
+};
