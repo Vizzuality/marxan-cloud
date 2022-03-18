@@ -24,7 +24,7 @@ export class SolutionsReaderService {
   async from(
     outputsDirectory: string,
     scenarioId: string,
-  ): Promise<TypedEmitter<SolutionsEvents>> {
+  ): Promise<TypedEmitter<any>> {
     const solutionsFile = outputsDirectory + `/output_solutionsmatrix.csv`;
     const planningUnits = await this.scenarioPuData.findAndCount({
       where: {
@@ -54,6 +54,6 @@ export class SolutionsReaderService {
     rl.on('close', () => {
       duplex.end();
     });
-    return duplex.pipe(new SolutionTransformer(mapping));
+    return duplex.pipe(new SolutionTransformer(mapping)) as TypedEmitter<any>;
   }
 }

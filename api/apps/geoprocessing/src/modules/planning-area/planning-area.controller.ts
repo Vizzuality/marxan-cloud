@@ -50,7 +50,8 @@ export class PlanningAreaController {
     try {
       const result = await this.planningAreaService.save(shapefileInfo);
       return this.planningAreaSerializer.serialize(result);
-    } catch (error) {
+    } catch (error: any) {
+
       this.logger.error(
         'failed to create a planning area from shapefile: ' + error.message,
       );
@@ -67,7 +68,7 @@ export class PlanningAreaController {
     try {
       const result = await this.planningAreaGridService.save(shapefileInfo);
       return this.planningAreaSerializer.serialize(result);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         'failed to create a planning area from grid shapefile: ' +
           error.message,

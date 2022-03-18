@@ -6,11 +6,12 @@ import {
   PlanningUnitSelectionState,
   PlanningUnitsSelectionState,
 } from '../planning-unit-selection-state';
+import { SolutionRowResult } from '../solution-row-result';
 
 @Injectable()
 export class PlanningUnitSelectionCalculatorService {
   async consume(
-    solutionsStream: TypedEventEmitter<SolutionsEvents>,
+    solutionsStream: TypedEventEmitter<any>,
   ): Promise<PlanningUnitsSelectionState> {
     const result: PlanningUnitsSelectionState = {
       puSelectionState: {},
@@ -20,7 +21,7 @@ export class PlanningUnitSelectionCalculatorService {
     return new Promise((resolve, reject) => {
       solutionsStream.on('error', reject);
       solutionsStream.on('finish', () => resolve(result));
-      solutionsStream.on('data', (planningUnits) => {
+      solutionsStream.on('data', (planningUnits: SolutionRowResult[]) => {
         let index = 0;
         for (const pu of planningUnits) {
           result.puSelectionState[pu.spdId] ??= {

@@ -32,6 +32,7 @@ export type EventFactory<JobData, Result = unknown> = {
   ) => Promise<CreateApiEventDTO>;
 };
 
+// @TODO Redo typing
 const QueueEventsEmitter = EventEmitter;
 
 export class QueueEventsAdapter<

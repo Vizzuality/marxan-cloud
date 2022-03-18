@@ -1,6 +1,6 @@
 import { Job, QueueEvents, Worker } from 'bullmq';
 import { Inject, Injectable } from '@nestjs/common';
-import { JobData, ProgressData } from '@marxan/scenario-run-queue';
+import { assertIsProgressData, JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { ExecutionResult } from '@marxan/marxan-output';
 import {
   QueueEventsBuilder,
@@ -31,7 +31,8 @@ export class RunWorker {
       },
     });
     this.queueEvents = queueEventsBuilder.buildQueueEvents(queueName);
-    this.queueEvents.on(`progress`, ({ data }: { data: ProgressData }) => {
+    this.queueEvents.on(`progress`, ({ data }) => {
+      assertIsProgressData(data);
       this.handleProgress(data);
     });
   }

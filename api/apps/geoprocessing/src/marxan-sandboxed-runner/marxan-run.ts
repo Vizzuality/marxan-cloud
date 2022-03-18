@@ -19,7 +19,8 @@ interface MessageEvents {
   progress(progress: number): void;
 }
 
-const MarxanRunEmitter: new () => TypedEmitter<MessageEvents> = EventEmitter;
+// @TODO Redo typing
+const MarxanRunEmitter = EventEmitter;
 
 export class MarxanRun extends MarxanRunEmitter implements Cancellable {
   #process?: ChildProcessWithoutNullStreams;

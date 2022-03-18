@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Job, QueueEvents, Worker } from 'bullmq';
 import {
+  assertIsFeaturesJobProgressData,
   CopyJobData,
   FeaturesJobCancelProgress,
   FeaturesJobProgress,
@@ -51,7 +52,8 @@ export class ProcessingWorker {
     );
     copyQueueEvents.on(
       `progress`,
-      async ({ data }: { data: FeaturesJobProgress }) => {
+      async ({ data }) => {
+        assertIsFeaturesJobProgressData(data);
         if (this.isCancel(data)) await this.cancelCopy(data);
       },
     );
@@ -63,7 +65,8 @@ export class ProcessingWorker {
     );
     splitQueueEvents.on(
       `progress`,
-      async ({ data }: { data: FeaturesJobProgress }) => {
+      async ({ data }) => {
+        assertIsFeaturesJobProgressData(data);
         if (this.isCancel(data)) await this.cancelSplit(data);
       },
     );
@@ -75,7 +78,8 @@ export class ProcessingWorker {
     });
     stratificationQueueEvents.on(
       `progress`,
-      async ({ data }: { data: FeaturesJobProgress }) => {
+      async ({ data }) => {
+        assertIsFeaturesJobProgressData(data);
         if (this.isCancel(data)) await this.cancelStratification(data);
       },
     );
