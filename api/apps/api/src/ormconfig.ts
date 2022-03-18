@@ -42,7 +42,7 @@ export const apiConnections: Record<DbConnections, PostgresConnectionOptions> =
         ',',
       ) as LoggerOptions,
       cache: false,
-      migrations: [__dirname + '/migrations/api/**/*.ts,js'],
+      migrations: [__dirname + '/migrations/api/**/*.{ts,js}'],
       /** Migrations will run automatically on startup, unless the
        * `API_RUN_MIGRATIONS_ON_STARTUP` or `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`
        * environment variables are set and their value matches, case-insensitively,
