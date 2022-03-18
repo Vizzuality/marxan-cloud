@@ -1,4 +1,5 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
 import { MarxanProjectChecker } from '@marxan-api/modules/projects/project-checker/marxan-project-checker.service';
 import {
   doesntExist,
@@ -423,7 +424,7 @@ async function getFixtures() {
   const testingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: `ApiEventsService`,
+        provide: ApiEventsService,
         useValue: fakeApiEventsService,
       },
       {
@@ -435,7 +436,7 @@ async function getFixtures() {
         useValue: fakeScenariosRepo,
       },
       {
-        provide: `PlanningAreasService`,
+        provide: PlanningAreasService,
         useValue: fakePlaningAreaFacade,
       },
       {
