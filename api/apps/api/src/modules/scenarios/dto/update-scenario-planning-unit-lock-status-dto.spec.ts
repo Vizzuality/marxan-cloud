@@ -7,13 +7,14 @@ import {
 describe(`when changing by id`, () => {
   describe(`when providing invalid uuid`, () => {
     it(`should return error`, () => {
-      const result = validateSync(getDtoWithInvalidUuids())[0].children[0];
-      expect(result.constraints).toMatchInlineSnapshot(`
+      const validationErrors = validateSync(getDtoWithInvalidUuids());
+      const result = validationErrors?.[0]?.children?.[0];
+      expect(result?.constraints).toMatchInlineSnapshot(`
         Object {
-          "isUuid": "each value in include must be an UUID",
+          "isUuid": "each value in include must be a UUID",
         }
       `);
-      expect(result.value).toMatchInlineSnapshot(`
+      expect(result?.value).toMatchInlineSnapshot(`
         Array [
           "non-uuid",
         ]

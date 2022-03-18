@@ -95,7 +95,7 @@ test(`invalid values / types`, () => {
 
   const stratificationFeatureConfigError = errors.find(
     (error) => error.property === 'features',
-  )?.children[0].children;
+  )?.children?.[0].children;
   expect(stratificationFeatureConfigError).toBeDefined();
   expect(stratificationFeatureConfigError).toEqual(
     expect.arrayContaining([
@@ -117,7 +117,7 @@ test(`invalid values / types`, () => {
 
   const splitFeatureConfigError = errors.find(
     (error) => error.property === 'features',
-  )?.children[1].children;
+  )?.children?.[1].children;
   expect(splitFeatureConfigError).toBeDefined();
   expect(splitFeatureConfigError).toEqual(
     expect.arrayContaining([
