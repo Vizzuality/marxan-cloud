@@ -14,10 +14,10 @@ beforeEach(async () => {
 });
 
 describe(`when a pu is included`, () => {
-  let stream: TypedEventEmitter<SolutionsEvents>;
+  let stream: TypedEventEmitter<any>;
 
   beforeEach(() => {
-    stream = new PassThrough();
+    stream = new PassThrough() as TypedEventEmitter<any>;
   });
 
   it(`should return relevant state`, async () => {
@@ -70,7 +70,7 @@ const getFixtures = async () => {
     spdIds: spdIds,
     sut: sandbox.get(PlanningUnitSelectionCalculatorService),
     emitSolutions: (
-      stream: TypedEventEmitter<SolutionsEvents>,
+      stream: TypedEventEmitter<any>,
       solutions: Array<Array<AvailableSpdIds>>,
     ) => {
       solutions.forEach((solution, runId) => {

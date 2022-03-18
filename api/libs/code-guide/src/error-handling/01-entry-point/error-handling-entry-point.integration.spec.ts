@@ -15,7 +15,7 @@ test(`doing stuff`, async () => {
   expect.assertions(1);
   try {
     await sut.doThings();
-  } catch (error) {
+  } catch (error: any) {
     expect(error.toString()).toMatch(/You are not allowed/);
   }
 });
