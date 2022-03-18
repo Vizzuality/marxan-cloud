@@ -23,7 +23,7 @@ export class TileSpecification extends TileRequest {
   @Min(0)
   @Max(2)
   @IsInt()
-  @Transform((value) => Number.parseInt(value))
+  @Transform(({value}) => Number.parseInt(value))
   level!: number;
 }
 
@@ -34,7 +34,7 @@ export class AdminAreasFilters {
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
-  @Transform((value: string): BBox => JSON.parse(value))
+  @Transform(({value}): BBox => JSON.parse(value))
   bbox?: BBox;
 
   @IsOptional()

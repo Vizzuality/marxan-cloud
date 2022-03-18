@@ -24,7 +24,7 @@ export class FeaturesFilters {
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
-  @Transform((value: string): BBox => JSON.parse(value))
+  @Transform(({value}): BBox => JSON.parse(value))
   bbox?: BBox;
 }
 

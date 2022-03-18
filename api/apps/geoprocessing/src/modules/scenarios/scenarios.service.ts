@@ -58,7 +58,7 @@ export class ScenariosPUFilters {
   @IsArray()
   @IsIn(includeSelectionsKeys, { each: true })
   @IsString({ each: true })
-  @Transform((value: string) => value.split(','))
+  @Transform(({value}) => value.split(','))
   include?: Array<string>;
 }
 

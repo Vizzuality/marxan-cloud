@@ -21,7 +21,7 @@ export class tileSpecification extends TileRequest {
 
   @ApiProperty()
   @IsNumber()
-  @Transform((value) => Number.parseInt(value))
+  @Transform(({value}) => Number.parseInt(value))
   planningUnitAreakm2!: number;
 }
 
@@ -29,7 +29,7 @@ export class PlanningUnitsFilters {
   @IsOptional()
   @IsArray()
   @IsNumber({}, { each: true })
-  @Transform((value: string): BBox => JSON.parse(value))
+  @Transform(({value}): BBox => JSON.parse(value))
   bbox?: BBox;
 }
 
