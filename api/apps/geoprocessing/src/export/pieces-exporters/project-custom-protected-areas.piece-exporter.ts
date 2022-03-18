@@ -15,10 +15,10 @@ import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-pie
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
 import { ProtectedArea } from '@marxan/protected-areas';
 
-interface ProjectCustomProtectedAreasSelectResult {
+type ProjectCustomProtectedAreasSelectResult = {
   fullName: string;
   ewkb: Buffer;
-}
+};
 
 @Injectable()
 @PieceExportProvider()

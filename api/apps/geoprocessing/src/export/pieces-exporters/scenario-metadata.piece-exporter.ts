@@ -14,13 +14,13 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface SelectScenarioResult {
+type SelectScenarioResult = {
   name: string;
   description?: string;
   blm?: number;
   number_of_runs?: number;
   metadata?: Scenario['metadata'];
-}
+};
 
 @Injectable()
 @PieceExportProvider()

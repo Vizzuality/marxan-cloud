@@ -15,14 +15,14 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface QueryResult {
+type QueryResult = {
   country_id: string;
   admin_area_l1_id?: string;
   admin_area_l2_id?: string;
   planning_unit_grid_shape: PlanningUnitGridShape;
   planning_unit_area_km2: number;
   bbox: number[];
-}
+};
 
 @Injectable()
 @PieceExportProvider()

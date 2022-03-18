@@ -4,7 +4,7 @@ export const scenarioPlanningUnitsDataRelativePath = {
     `scenarios/${oldScenarioId}/scenario-pu-data.json`,
 };
 
-interface PlanningUnitData {
+type PlanningUnitData = {
   puid: number;
   cost: number;
   lockinStatus?: 1 | 2;
@@ -13,8 +13,8 @@ interface PlanningUnitData {
   protectedArea?: number;
   protectedByDefault: boolean;
   featureList: string[];
-}
+};
 
-export interface ScenarioPlanningUnitsDataContent {
+export type ScenarioPlanningUnitsDataContent = {
   planningUnitsData: PlanningUnitData[];
-}
+};

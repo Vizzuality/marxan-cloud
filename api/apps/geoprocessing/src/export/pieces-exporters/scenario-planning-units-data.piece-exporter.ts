@@ -13,7 +13,7 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface SelectResult {
+type SelectResult = {
   lockin_status?: 1 | 2;
   xloc?: number;
   yloc?: number;
@@ -22,7 +22,7 @@ interface SelectResult {
   feature_list: string[];
   puid: number;
   cost: number;
-}
+};
 
 @Injectable()
 @PieceExportProvider()
