@@ -43,8 +43,10 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   const saveScenarioLockMutation = useSaveScenarioLock({});
   const deleteScenarioLockMutation = useDeleteScenarioLock({});
   const removeScenarioLock = useCallback(() => {
-    deleteScenarioLockMutation.mutate({ sid: `${sid}` });
-  }, [sid, deleteScenarioLockMutation]);
+    if (isLockMe) {
+      deleteScenarioLockMutation.mutate({ sid: `${sid}` });
+    }
+  }, [isLockMe, sid, deleteScenarioLockMutation]);
 
   useEffect(() => {
     globalThis.addEventListener('beforeunload', removeScenarioLock);
