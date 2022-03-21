@@ -3,7 +3,10 @@ import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
 import { FileRepository } from '@marxan/files-repository';
-import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
+import {
+  ScenariosPuCostDataGeo,
+  ScenariosPuPaDataGeo,
+} from '@marxan/scenarios-planning-unit';
 import { toLockEnum } from '@marxan/scenarios-planning-unit/scenarios-planning-unit.geo.entity';
 import { extractFile } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
@@ -67,7 +70,7 @@ export class ScenarioPlanningUnitsDataPieceImporter
       throw new Error(errorMessage);
     }
 
-    const scenariosPlanningUnitsData: ScenarioPlanningUnitsDataContent = JSON.parse(
+    const { planningUnitsData }: ScenarioPlanningUnitsDataContent = JSON.parse(
       stringScenarioPlanningUnitsDataOrError.right,
     );
 
@@ -81,7 +84,7 @@ export class ScenarioPlanningUnitsDataPieceImporter
       });
 
       await em.getRepository(ScenariosPuPaDataGeo).save(
-        scenariosPlanningUnitsData.planningUnitsData.map((puData) => ({
+        planningUnitsData.map((puData) => ({
           featureList: puData.featureList,
           projectPuId: projectPuIdByPuid[puData.puid],
           lockStatus: toLockEnum[puData.lockinStatus ?? 0],
@@ -103,6 +106,13 @@ export class ScenarioPlanningUnitsDataPieceImporter
       scenarioPus.forEach((pu) => {
         scenarioPuIdByPuid[pu.projectPu.puid] = pu.id;
       });
+
+      await em.getRepository(ScenariosPuCostDataGeo).save(
+        planningUnitsData.map((puData) => ({
+          cost: puData.cost,
+          scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
+        })),
+      );
     });
 
     return {
