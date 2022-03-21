@@ -105,7 +105,7 @@ module "api_production" {
   image                      = "marxan.azurecr.io/marxan-api:production"
   deployment_name            = "api"
   application_base_url       = "https://marxan.vizzuality.com"
-  network_cors_origins       = "marxan.vizzuality.com"
+  network_cors_origins       = "https://marxan.vizzuality.com"
 }
 
 module "geoprocessing_production" {
