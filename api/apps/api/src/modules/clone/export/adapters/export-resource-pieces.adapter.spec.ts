@@ -97,6 +97,7 @@ const getFixtures = async () => {
       ClonePiece.ScenarioMetadata,
       ClonePiece.ScenarioProtectedAreas,
       ClonePiece.ScenarioPlanningUnitsData,
+      ClonePiece.ScenarioRunResults,
     ];
     if (!projectExport) pieces.push(ClonePiece.ExportConfig);
     return pieces;

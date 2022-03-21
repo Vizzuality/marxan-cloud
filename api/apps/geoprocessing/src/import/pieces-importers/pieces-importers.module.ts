@@ -10,6 +10,7 @@ import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer'
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
 import { ScenarioPlanningUnitsDataPieceImporter } from './scenario-planning-units-data.piece-importer';
 import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.piece-importer';
+import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-importer';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.
     ProjectCustomProtectedAreasPieceImporter,
     ScenarioProtectedAreasPieceImporter,
     ScenarioPlanningUnitsDataPieceImporter,
+    ScenarioRunResultsPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })

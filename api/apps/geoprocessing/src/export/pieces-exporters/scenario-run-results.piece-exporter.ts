@@ -14,16 +14,16 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface PreviousBlmResultsSelectResult {
+type PreviousBlmResultsSelectResult = {
   cost: number;
   blmValue: number;
   boundaryLength: number;
-}
-interface MarxanRunSelectResult {
+};
+type MarxanRunSelectResult = {
   includedCount: number;
-  value: boolean[];
+  values: boolean[];
   puid: number;
-}
+};
 
 @Injectable()
 @PieceExportProvider()
@@ -54,11 +54,24 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
     const marxanRunResults: MarxanRunSelectResult[] = await this.geoprocessingEntityManager
       .createQueryBuilder()
       .select('included_count', 'includedCount')
-      .addSelect('value')
+      .addSelect('value', 'values')
       .addSelect('ppu.puid', 'puid')
-      .from('output_scenarios_pu_data', 'results')
-      .innerJoin('scenarios_pu_data', 'spd', 'spd.id = results.scenario_pu_id')
-      .innerJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
+      .from(
+        (qb) =>
+          qb
+            .select('id , project_pu_id')
+            .from('scenarios_pu_data', 'inner_spd')
+            .where('scenario_id = :scenarioId', {
+              scenarioId: input.resourceId,
+            }),
+        'spd',
+      )
+      .leftJoin(
+        'output_scenarios_pu_data',
+        'results',
+        'spd.id = results.scenario_pu_id',
+      )
+      .leftJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
       .execute();
 
     const content: ScenarioRunResultsContent = { blmResults, marxanRunResults };
