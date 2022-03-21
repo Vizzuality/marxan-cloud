@@ -29,3 +29,8 @@ variable "sparkpost_api_key" {
   type        = string
   description = "The API key for Sparkpost"
 }
+
+variable "site_url" {
+  type        = string
+  description = "The base URL for the frontend App, as accessed by end users"
+}

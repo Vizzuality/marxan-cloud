@@ -222,6 +222,11 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name  = "NETWORK_CORS_ORIGINS"
+            value = var.site_url
+          }
+
+          env {
             name  = "NODE_CONFIG_DIR"
             value = "apps/api/config"
           }
