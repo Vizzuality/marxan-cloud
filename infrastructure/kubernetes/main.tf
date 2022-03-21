@@ -220,7 +220,7 @@ module "api_staging" {
   image                      = "marxan.azurecr.io/marxan-api:staging"
   deployment_name            = "api"
   application_base_url       = "https://staging.marxan.vizzuality.com"
-  network_cors_origins       = "staging.marxan.vizzuality.com"
+  network_cors_origins       = "https://staging.marxan.vizzuality.com"
 }
 
 module "geoprocessing_staging" {
