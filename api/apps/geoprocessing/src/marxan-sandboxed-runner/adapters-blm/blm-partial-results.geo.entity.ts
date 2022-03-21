@@ -51,4 +51,14 @@ export class BlmPartialResultEntity {
     type: 'float',
   })
   boundaryLength!: number;
+
+  /**
+   * Array of PUIDs used for solution
+   */
+  @Column({
+    name: `boundary_length`,
+    type: 'float',
+    array: true,
+  })
+  protected_pu_ids!: number[];
 }
