@@ -24,10 +24,6 @@ export class AlterPlanningUnitsTables1646314135070
     `);
 
     await queryRunner.query(`
-      ALTER TABLE planning_units_geom
-      ADD CONSTRAINT planning_units_geom_the_geom_type_key UNIQUE (the_geom, type);
-    `);
-    await queryRunner.query(`
       CREATE UNIQUE INDEX planning_units_geom_the_geom_type_check
       ON planning_units_geom(the_geom_hash, type);
     `);
@@ -54,10 +50,7 @@ export class AlterPlanningUnitsTables1646314135070
     await queryRunner.query(`
       CREATE INDEX scenarios_pu_data_index ON scenarios_pu_data (puid asc, scenario_id);
     `);
-    await queryRunner.query(`
-      ALTER TABLE planning_units_geom
-      ADD CONSTRAINT planning_units_geom_the_geom_type_key UNIQUE (the_geom, type, project_id);
-    `);
+
     await queryRunner.query(`
       CREATE UNIQUE INDEX planning_units_geom_the_geom_type_project_id_check
       ON planning_units_geom(the_geom_hash, type, coalesce(project_id, '00000000-0000-0000-0000-000000000000'));
