@@ -3,7 +3,7 @@ import { LockStatus } from './lock-status.enum';
 
 const scenariosPuDataEntityName = 'scenarios_pu_data';
 
-const toLockEnum: Record<0 | 1 | 2, LockStatus> = Object.freeze({
+export const toLockEnum: Record<0 | 1 | 2, LockStatus> = Object.freeze({
   0: LockStatus.Unstated,
   1: LockStatus.LockedIn,
   2: LockStatus.LockedOut,
