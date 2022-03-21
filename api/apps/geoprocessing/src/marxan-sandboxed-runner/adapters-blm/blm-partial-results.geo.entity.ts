@@ -56,8 +56,8 @@ export class BlmPartialResultEntity {
    * Array of PUIDs used for solution
    */
   @Column({
-    name: `boundary_length`,
-    type: 'float',
+    name: `protected_pu_ids`,
+    type: 'int',
     array: true,
   })
   protected_pu_ids!: number[];

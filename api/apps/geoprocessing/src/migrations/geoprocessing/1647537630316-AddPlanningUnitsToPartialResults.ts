@@ -5,7 +5,7 @@ export class AddPlanningUnitsToPartialResults1647537630316
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         ALTER TABLE blm_partial_results
-            ADD COLUMN protected_pu_ids uuid[];
+            ADD COLUMN protected_pu_ids integer[];
         `);
   }
 
