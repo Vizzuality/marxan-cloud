@@ -4,18 +4,18 @@ export const scenarioRunResultsRelativePath = {
     `scenarios/${oldScenarioId}/scenario-run-results.json`,
 };
 
-export interface BlmResultsContent {
+export type BlmResultsContent = {
   cost: number;
   blmValue: number;
   boundaryLength: number;
-}
-export interface MarxanRunResultsContent {
+};
+export type MarxanRunResultsContent = {
   includedCount: number;
-  value: boolean[];
+  values: boolean[];
   puid: number;
-}
+};
 
-export interface ScenarioRunResultsContent {
+export type ScenarioRunResultsContent = {
   blmResults: BlmResultsContent[];
   marxanRunResults: MarxanRunResultsContent[];
-}
+};
