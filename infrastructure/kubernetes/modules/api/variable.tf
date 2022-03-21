@@ -38,3 +38,8 @@ variable "application_base_url" {
   type        = string
   description = "Value for the APPLICATION_BASE_URL env var"
 }
+
+variable "network_cors_origins" {
+  type        = string
+  description = "Value for the NETWORK_CORS_ORIGINS env var"
+}
