@@ -6,7 +6,7 @@ import { useRouter } from 'next/router';
 
 import { motion } from 'framer-motion';
 
-import { useScenario, useScenarioStatus } from 'hooks/scenarios';
+import { useScenario, useScenarioLockMe, useScenarioStatus } from 'hooks/scenarios';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -35,6 +35,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
   const { data: scenarioData } = useScenario(sid);
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
+  const isLockMe = useScenarioLockMe(sid);
   const { jobs = [] } = scenarioStatusData || {};
 
   // Jobs
@@ -70,15 +71,17 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
       // show the correct text while the actions are triggered
       JOB_DONE_REF.current = JOB_DONE;
 
-      ACTIONS_DONE[JOB_DONE?.kind](JOB_DONE_REF);
-
-      // If
+      if (isLockMe) {
+        ACTIONS_DONE[JOB_DONE?.kind](JOB_DONE_REF);
+      }
     }
-  }, [ACTIONS_DONE, JOB_DONE]);
+  }, [ACTIONS_DONE, JOB_DONE, isLockMe]);
 
   const onTryAgain = useCallback(() => {
-    ACTIONS_FAILURE[JOB_FAILURE.kind]();
-  }, [ACTIONS_FAILURE, JOB_FAILURE?.kind]);
+    if (isLockMe) {
+      ACTIONS_FAILURE[JOB_FAILURE.kind]();
+    }
+  }, [ACTIONS_FAILURE, JOB_FAILURE?.kind, isLockMe]);
 
   return (
     <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">

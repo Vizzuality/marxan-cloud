@@ -1,11 +1,12 @@
 import React, {
-  useCallback, useEffect, useLayoutEffect, useState,
+  useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { useProjectUsers } from 'hooks/project-users';
 import {
-  useDeleteScenarioLock, useSaveScenarioLock, useScenarioLock, useScenarioLockMe,
+  useScenarioLock, useScenarioLockMe, useSaveScenarioLock, useDeleteScenarioLock,
 } from 'hooks/scenarios';
 
 import ConfirmationPrompt from 'components/confirmation-prompt';
@@ -16,18 +17,31 @@ export interface ScenarioLockProps {
 }
 
 export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
-  const [modal, setModal] = useState(false);
+  const [lockModal, setLockModal] = useState(false);
+  const [unlockModal, setUnlockModal] = useState(false);
   const [mutatting, setMutatting] = useState(false);
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
+  const { data: projectUsersData = [] } = useProjectUsers(pid);
   const {
     data: scenarioLockData,
   } = useScenarioLock(sid);
   const isLockMe = useScenarioLockMe(sid);
+  const prevIsLockMe = useRef(isLockMe);
+
+  const lockUser = useMemo(() => {
+    if (!isLockMe && scenarioLockData && !!projectUsersData.length) {
+      const { userId: lockUserId } = scenarioLockData;
+      const { user } = projectUsersData.find((pu) => pu?.user.id === lockUserId);
+      return user;
+    }
+
+    return null;
+  }, [isLockMe, projectUsersData, scenarioLockData]);
+
   const saveScenarioLockMutation = useSaveScenarioLock({});
   const deleteScenarioLockMutation = useDeleteScenarioLock({});
-
   const removeScenarioLock = useCallback(() => {
     deleteScenarioLockMutation.mutate({ sid: `${sid}` });
   }, [sid, deleteScenarioLockMutation]);
@@ -42,17 +56,20 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
 
   // Create a lock if it doesn't exist when you start editing
   useEffect(() => {
-    if (!mutatting && !scenarioLockData) {
+    if (!mutatting && !scenarioLockData && !isLockMe) {
       setMutatting(true);
       saveScenarioLockMutation.mutate({ sid: `${sid}` }, {
         onSettled: () => { setMutatting(false); },
       });
     }
-  }, [scenarioLockData]); // eslint-disable-line
+  }, [isLockMe, scenarioLockData]); // eslint-disable-line
 
   // Delete a lock when you finish editing
   useLayoutEffect(() => {
-    setModal(scenarioLockData && !isLockMe);
+    setLockModal(scenarioLockData && !isLockMe);
+    setUnlockModal(prevIsLockMe.current === false && isLockMe);
+    prevIsLockMe.current = isLockMe;
+
     return () => {
       if (isLockMe) {
         removeScenarioLock();
@@ -61,17 +78,29 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   }, [isLockMe]); // eslint-disable-line
 
   return (
-    <ConfirmationPrompt
-      title={'Another team member is editing this scenario, and you won\'t be able to edit it.'}
-      icon={LOCK_WARNING_SVG}
-      options={{
-        acceptText: 'Ok',
-      }}
-      open={!!modal && !isLockMe}
-      onAccept={() => setModal(false)}
-      onDismiss={() => setModal(false)}
-    />
+    <>
+      <ConfirmationPrompt
+        title={`${lockUser?.displayName} is editing this scenario, and you won't be able to edit it.`}
+        icon={LOCK_WARNING_SVG}
+        options={{
+          acceptText: 'Ok',
+        }}
+        open={!!lockModal && !isLockMe}
+        onAccept={() => setLockModal(false)}
+        onDismiss={() => setLockModal(false)}
+      />
 
+      <ConfirmationPrompt
+        title="The other user left the scenario. You can now edit the scenario"
+        icon={LOCK_WARNING_SVG}
+        options={{
+          acceptText: 'Ok',
+        }}
+        open={!!unlockModal}
+        onAccept={() => setUnlockModal(false)}
+        onDismiss={() => setUnlockModal(false)}
+      />
+    </>
   );
 };
 
