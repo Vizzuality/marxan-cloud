@@ -177,6 +177,7 @@ export class PlanningUnitsJobProcessor {
             geomType: job.data.planningUnitGridShape,
             puid: index + 1,
             projectId: job.data.projectId,
+            planningAreaId: job.data.planningAreaId,
           })),
         );
 
