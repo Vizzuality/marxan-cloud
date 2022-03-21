@@ -36,3 +36,7 @@ variable "namespace" {
 variable "api_url" {
   type = string
 }
+
+variable "site_url" {
+  type = string
+}

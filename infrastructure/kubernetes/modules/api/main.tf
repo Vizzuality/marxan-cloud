@@ -223,7 +223,7 @@ resource "kubernetes_deployment" "api_deployment" {
 
           env {
             name  = "NETWORK_CORS_ORIGINS"
-            value = var.site_url
+            value = var.network_cors_origins
           }
 
           env {
