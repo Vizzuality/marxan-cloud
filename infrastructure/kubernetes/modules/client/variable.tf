@@ -18,7 +18,6 @@ variable "k8s_cluster_ca_certificate" {
   type        = string
 }
 
-
 variable "image" {
   type        = string
   description = "The dockerhub image reference to deploy"
@@ -33,11 +32,6 @@ variable "namespace" {
   type        = string
   description = "The k8s namespace to use"
 }
-
-variable "site_url" {
-  type = string
-}
-
 
 variable "api_url" {
   type = string
