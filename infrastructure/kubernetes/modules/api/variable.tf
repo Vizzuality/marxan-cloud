@@ -33,3 +33,8 @@ variable "namespace" {
   type        = string
   description = "The k8s namespace to use"
 }
+
+variable "application_base_url" {
+  type        = string
+  description = "Value for the APPLICATION_BASE_URL env var"
+}
