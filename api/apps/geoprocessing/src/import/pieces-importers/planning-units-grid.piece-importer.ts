@@ -18,6 +18,10 @@ import {
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
 
+type ProjectSelectResult = {
+  geomType: PlanningUnitGridShape;
+};
+
 @Injectable()
 @PieceImportProvider()
 export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
@@ -25,6 +29,8 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     private readonly fileRepository: FileRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(PlanningUnitsGridPieceImporter.name);
@@ -84,7 +90,9 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
         geom: '\\x' + Buffer.from(JSON.parse(geom) as number[]).toString('hex'),
       };
     }
-    throw new Error('unknown line format');
+    const message = 'unknown line format';
+    this.logger.error(message);
+    throw new Error(message);
   }
 
   private async processGridFile(
@@ -93,6 +101,21 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     projectId: string,
     transactionalEntityManager: EntityManager,
   ) {
+    const [{ geomType }]: [
+      ProjectSelectResult,
+    ] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('planning_unit_grid_shape', 'geomType')
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
+
+    if (!geomType) {
+      const errorMessage = `Project with id ${projectId} has undefined planning unit grid shape`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
     return new Promise<void>((resolve, reject) => {
       let lastChunkIncompletedData = '';
 
@@ -118,7 +141,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
               try {
                 const geomPUs = processableData
                   .split('\n')
-                  .map(this.parseGridFileLine);
+                  .map((pu) => this.parseGridFileLine(pu));
 
                 const geometries: {
                   id: string;
@@ -139,17 +162,14 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
                     FROM uuid_geom
                       LEFT JOIN puid_geom ON ST_Equals(uuid_geom.the_geom, puid_geom.geom)
                   `,
-                  [
-                    PlanningUnitGridShape.FromShapefile,
-                    JSON.stringify(geomPUs),
-                  ],
+                  [geomType, JSON.stringify(geomPUs)],
                 );
 
                 transactionalEntityManager.save(
                   ProjectsPuEntity,
                   geometries.map((geom) => ({
                     projectId,
-                    geomType: PlanningUnitGridShape.FromShapefile,
+                    geomType,
                     puid: geom.puid,
                     geomId: geom.id,
                   })),

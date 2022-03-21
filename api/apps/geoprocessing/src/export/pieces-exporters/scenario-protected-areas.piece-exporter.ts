@@ -68,7 +68,10 @@ export class ScenarioProtectedAreasPieceExporter
     }
 
     const geoQb = this.geoprocessingEntityManager.createQueryBuilder();
-    const protectedAreas: SelectWdpaResult[] = scenario.protectedAreasIds
+
+    const scenarioHasProtectedAreas =
+      scenario.protectedAreasIds && scenario.protectedAreasIds.length > 0;
+    const protectedAreas: SelectWdpaResult[] = scenarioHasProtectedAreas
       ? await geoQb
           .select('wdpaid')
           .addSelect('ST_AsEWKB(the_geom)', 'ewkb')

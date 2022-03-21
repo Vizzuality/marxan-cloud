@@ -79,14 +79,15 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
 
     await this.entityManager.query(
       `
-      INSERT INTO projects(id, name, description, organization_id)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO projects(id, name, description, organization_id, planning_unit_grid_shape)
+      VALUES ($1, $2, $3, $4, $5)
     `,
       [
         importResourceId,
         projectMetadata.name,
         projectMetadata.description,
         organizationId,
+        projectMetadata.planningUnitGridShape,
       ],
     );
 
