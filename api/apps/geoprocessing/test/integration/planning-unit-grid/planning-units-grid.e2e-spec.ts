@@ -8,7 +8,7 @@ beforeEach(async () => {
 });
 
 test(`uploading shapefile as planning units`, async () => {
-  const shapefile = await fixtures.GivenShapefileWasUploaded();
+  const shapefile = fixtures.GivenShapefileWasUploaded();
   const output = await fixtures.WhenConvertingShapefileToPlanningUnits(
     shapefile,
   );
