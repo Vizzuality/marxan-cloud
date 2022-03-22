@@ -43,7 +43,6 @@ export const BaseTilesOpenApi = () =>
       ApiUnauthorizedResponse(),
       Header('Content-Type', 'application/x-protobuf'),
       Header('Content-Disposition', 'attachment'),
-      Header('Access-Control-Allow-Origin', '*'),
       Header('Content-Encoding', 'gzip'),
     ],
   );
