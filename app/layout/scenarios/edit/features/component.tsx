@@ -82,7 +82,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
             subtab: null,
           },
           {
-            saveTab: true,
+            saveTab: scenarioData?.metadata?.scenarioEditingMetadata?.status?.solutions !== 'draft',
             saveStatus: false,
           },
         ),

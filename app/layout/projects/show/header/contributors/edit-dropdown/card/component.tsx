@@ -132,7 +132,6 @@ export const UserCard: React.FC<UserCardProps> = ({
               options={ROLE_OPTIONS}
               removeSelected
               onChange={(value: string) => {
-                console.log(value);
                 onEditRole(value);
               }}
             />
