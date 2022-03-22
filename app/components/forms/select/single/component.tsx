@@ -141,7 +141,9 @@ export const SingleSelect: React.FC<SelectProps> = ({
   }, [referenceHidden, closeMenu]);
 
   useEffect(() => {
-    if (update) update();
+    if (update && isOpen) {
+      update();
+    }
   }, [isOpen, update]);
 
   const selectedItems = selectedItem ? [selectedItem] : [];
@@ -172,13 +174,13 @@ export const SingleSelect: React.FC<SelectProps> = ({
           selectedItems={selectedItems}
           placeholder={placeholder}
           getToggleButtonProps={getToggleButtonProps}
+          update={update}
         />
       </div>
 
       {/* Menu */}
 
       {createPortal(
-
         <div
           className={cx({
             'c-select-dropdown': true,

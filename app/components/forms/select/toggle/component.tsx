@@ -18,9 +18,19 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
   opened,
   selectedItems,
   placeholder,
+  update,
   getToggleButtonProps,
   getDropdownProps,
 }: SelectToggleProps) => {
+  const toggleButtonProps = {
+    ...!multiple && {
+      ...getToggleButtonProps(),
+    },
+    ...multiple && {
+      ...getToggleButtonProps(getDropdownProps({ preventKeyAction: opened })),
+    },
+  };
+
   const getEnabledOptions = useMemo(() => {
     return options.filter((o) => !o.disabled && o.enabled);
   }, [options]);
@@ -41,8 +51,13 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
         'relative w-full flex items-center focus:outline-none tracking-wide': true,
         [THEME.sizes[size]]: true,
       })}
-      {...!multiple && getToggleButtonProps()}
-      {...multiple && getToggleButtonProps(getDropdownProps({ preventKeyAction: opened }))}
+      {...{
+        ...toggleButtonProps,
+        onClick: (e) => {
+          toggleButtonProps.onClick(e);
+          if (update) update();
+        },
+      }}
     >
       {prefix && (
         <span
