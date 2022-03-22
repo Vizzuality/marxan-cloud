@@ -52,6 +52,15 @@ export const SingleSelect: React.FC<SelectProps> = ({
     clearSelectionLabel,
   ]);
 
+  const getVisibleOptions = useMemo(() => {
+    return getOptions.filter((o) => {
+      if (removeSelected) {
+        return o.value !== values;
+      }
+      return !!o;
+    });
+  }, [removeSelected, values, getOptions]);
+
   const getInitialSelected = useMemo(() => {
     return getOptions.find((o) => o.value === initialValues && o.value !== null);
   }, [getOptions, initialValues]);
@@ -86,7 +95,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
     closeMenu,
     reset,
   } = useSelect<SelectOptionProps>({
-    items: getOptions,
+    items: getVisibleOptions,
     ...typeof values !== 'undefined' && {
       selectedItem: getSelected,
     },
@@ -224,14 +233,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
                 maxHeight,
               }}
             >
-              {getOptions
-                .filter((o) => {
-                  if (removeSelected) {
-                    return o.value !== values;
-                  }
-
-                  return !!o;
-                })
+              {getVisibleOptions
                 .map((option, index) => (
                   <li
                     className={cx({
