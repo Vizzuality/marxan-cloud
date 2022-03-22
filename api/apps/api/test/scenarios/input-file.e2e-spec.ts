@@ -18,6 +18,7 @@ import { E2E_CONFIG } from '../e2e.config';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -576,12 +577,12 @@ async function getFixtures() {
         .send(input);
     },
     async WhenAcquiringLockForScenarioAsOwner(id: string) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .post(`/api/v1/scenarios/${id}/lock`)
         .set('Authorization', `Bearer ${ownerToken}`);
     },
     async WhenAcquiringLockForScenarioAsContributor(id: string) {
-      return await request(app.getHttpServer())
+      return request(app.getHttpServer())
         .post(`/api/v1/scenarios/${id}/lock`)
         .set('Authorization', `Bearer ${contributorToken}`);
     },
@@ -601,10 +602,7 @@ async function getFixtures() {
     async ThenScenarioHasMetadataForMarxan(id: string) {
       return await request(app.getHttpServer())
         .get(`/api/v1/marxan-run/scenarios/${id}/marxan/dat/input.dat`)
-        .set(
-          'X-Api-Key',
-          process.env.API_AUTH_X_API_KEY ?? 'sure it is valid in envs?',
-        )
+        .set('X-Api-Key', AppConfig.get<string>('auth.xApiKey.secret'))
         .send()
         .then((response) => response.text);
     },
