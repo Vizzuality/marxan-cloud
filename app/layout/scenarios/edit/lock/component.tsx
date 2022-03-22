@@ -20,6 +20,9 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   const [lockModal, setLockModal] = useState(false);
   const [unlockModal, setUnlockModal] = useState(false);
   const [mutatting, setMutatting] = useState(false);
+
+  const beforeunload = useRef(false);
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -42,23 +45,29 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
 
   const saveScenarioLockMutation = useSaveScenarioLock({});
   const deleteScenarioLockMutation = useDeleteScenarioLock({});
+
   const removeScenarioLock = useCallback(() => {
     if (isLockMe) {
       deleteScenarioLockMutation.mutate({ sid: `${sid}` });
     }
   }, [isLockMe, sid, deleteScenarioLockMutation]);
 
+  const beforeunloadScenarioLock = useCallback(() => {
+    beforeunload.current = true;
+    removeScenarioLock();
+  }, [removeScenarioLock]);
+
   useEffect(() => {
-    globalThis.addEventListener('beforeunload', removeScenarioLock);
+    globalThis.addEventListener('beforeunload', beforeunloadScenarioLock);
 
     return () => {
-      globalThis.removeEventListener('beforeunload', removeScenarioLock);
+      globalThis.removeEventListener('beforeunload', beforeunloadScenarioLock);
     };
   }, []); // eslint-disable-line
 
   // Create a lock if it doesn't exist when you start editing
   useEffect(() => {
-    if (!mutatting && !scenarioLockData && !isLockMe) {
+    if (!mutatting && !scenarioLockData && !isLockMe && !beforeunload.current) {
       setMutatting(true);
       saveScenarioLockMutation.mutate({ sid: `${sid}` }, {
         onSettled: () => { setMutatting(false); },
@@ -69,8 +78,6 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   // Delete a lock when you finish editing
   useLayoutEffect(() => {
     setLockModal(scenarioLockData && !isLockMe);
-    setUnlockModal(prevIsLockMe.current === false && isLockMe);
-    prevIsLockMe.current = isLockMe;
 
     return () => {
       if (isLockMe) {
@@ -78,6 +85,11 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
       }
     };
   }, [isLockMe]); // eslint-disable-line
+
+  useLayoutEffect(() => {
+    setUnlockModal(prevIsLockMe.current === false && isLockMe);
+    prevIsLockMe.current = isLockMe;
+  }, [isLockMe]);
 
   return (
     <>
