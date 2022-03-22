@@ -167,7 +167,6 @@ export class ScenariosController {
   }
 
   @BaseTilesOpenApi()
-  @BaseTilesResponseHeaders()
   @ApiOperation({
     description: 'Get tiles for a scenario planning units.',
   })
@@ -203,7 +202,6 @@ export class ScenariosController {
   }
 
   @BaseTilesOpenApi()
-  @BaseTilesResponseHeaders()
   @ApiParam({
     name: 'scenarioIdA',
     description: 'First scenario to be compare',
