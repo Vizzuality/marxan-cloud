@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
 
+import { useOwnsProject } from 'hooks/permissions';
 import {
   useProjectsUsers, useProjectUsers, useSaveProjectUserRole, useUserByEmail,
 } from 'hooks/project-users';
@@ -26,6 +27,8 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
 
   const [search, setSearch] = useState(null);
   const [email, setEmail] = useState(null);
+
+  const isOwner = useOwnsProject(pid);
 
   const {
     data: userByEmailData,
@@ -102,20 +105,23 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
 
   return (
     <div className="overflow-x-visible overflow-y-auto bg-white p-9 rounded-3xl">
-      <div className="flex flex-col w-96">
-        <div className="text-sm text-center text-black pb-9">Project members</div>
-        <Search
-          id="user-search"
-          size="base"
-          value={search}
-          placeholder="Search connections..."
-          aria-label="Search"
-          onChange={onChangeSearch}
-          theme="light"
-        />
+      <div className="flex flex-col space-y-5 w-96">
+        <div className="text-sm text-center text-black">Project members</div>
+
+        {isOwner && (
+          <Search
+            id="user-search"
+            size="sm"
+            value={search}
+            placeholder="Search connections..."
+            aria-label="Search"
+            onChange={onChangeSearch}
+            theme="light"
+          />
+        )}
 
         {SEARCH_RESULT && userByEmailIsFetched && (
-          <div className="flex justify-between text-black pl-9 pr-5 py-2.5">
+          <div className="flex justify-between pr-5 text-black pl-9">
             <div>{SEARCH_RESULT.displayName}</div>
 
             <Button
@@ -132,31 +138,33 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
         )}
 
         {!SEARCH_RESULT && userByEmailIsFetched && (
-          <div className="flex justify-between text-black pl-9 pr-5 py-2.5">
+          <div className="flex justify-between pr-5 text-black pl-9">
             <div>No results</div>
           </div>
         )}
 
-        <p className="py-6 text-xs text-black uppercase font-heading">{`${projectUsersData?.length} ${contributorsSpelling}`}</p>
-        <div className="w-full space-y-2.5 flex-grow flex flex-col overflow-x-visible overflow-y-auto max-h-64">
-          {!!projectUsersData?.length && projectUsersData.map((u) => {
-            const {
-              user: {
-                displayName, id, avatarDataUrl,
-              }, roleName,
-            } = u;
+        <div className="flex flex-col space-y-2.5">
+          <p className="text-xs text-black uppercase font-heading">{`${projectUsersData?.length} ${contributorsSpelling}`}</p>
+          <div className="w-full space-y-2.5 flex-grow flex flex-col overflow-x-visible overflow-y-auto max-h-64">
+            {!!projectUsersData?.length && projectUsersData.map((u) => {
+              const {
+                user: {
+                  displayName, id, avatarDataUrl,
+                }, roleName,
+              } = u;
 
-            return (
-              <UserCard
-                key={id}
-                id={id}
-                name={displayName}
-                roleName={roleName}
-                bgImage={avatarDataUrl}
-                bgColor={projectsUsersData[id]}
-              />
-            );
-          })}
+              return (
+                <UserCard
+                  key={id}
+                  id={id}
+                  name={displayName}
+                  roleName={roleName}
+                  bgImage={avatarDataUrl}
+                  bgColor={projectsUsersData[id]}
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
