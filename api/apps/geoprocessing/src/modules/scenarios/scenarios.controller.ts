@@ -9,7 +9,10 @@ import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 import { Response } from 'express';
 import { ScenarioComparisonTilesService } from './comparison-difference-tile/comparison-difference-tile.service';
-import { BaseTilesOpenApi, BaseTilesResponseHeaders } from '@marxan/tiles';
+import {
+  BaseTilesOpenApi,
+  setTileResponseHeadersForSuccessfulRequests,
+} from '@marxan/tiles';
 import { ScenarioComparisonTileRequest } from './comparison-difference-tile/comparison-difference-tile-request';
 import { ScenarioComparisonFilters } from './comparison-difference-tile/dto/scenario-comparison-filter.dto';
 
@@ -22,7 +25,6 @@ export class ScenariosController {
   ) {}
 
   @BaseTilesOpenApi()
-  @BaseTilesResponseHeaders()
   @ApiOperation({
     description: 'Get tiles for a scenario planning units.',
   })
@@ -41,11 +43,11 @@ export class ScenariosController {
   ): Promise<void> {
     const tile = await this.service.findTile(tileRequest, filters);
 
+    setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);
   }
 
   @BaseTilesOpenApi()
-  @BaseTilesResponseHeaders()
   @ApiParam({
     name: 'scenarioIdA',
     description: 'First scenario to be compared',
@@ -76,6 +78,7 @@ export class ScenariosController {
       },
     );
 
+    setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);
   }
 }

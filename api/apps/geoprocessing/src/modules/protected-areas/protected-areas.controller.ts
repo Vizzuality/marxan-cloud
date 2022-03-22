@@ -3,7 +3,11 @@ import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
 import { Response } from 'express';
 
-import { TileRequest, TilesOpenApi } from '@marxan/tiles';
+import {
+  setTileResponseHeadersForSuccessfulRequests,
+  TileRequest,
+  TilesOpenApi,
+} from '@marxan/tiles';
 
 import { ProtectedAreasFilters } from './dto/protected-areas-filter.dto';
 import { ProtectedAreasTilesService } from './protected-areas-tiles.service';
@@ -27,6 +31,7 @@ export class ProtectedAreasController {
       protectedAreaId: protectedAreasFilters.id,
       bbox: protectedAreasFilters.bbox,
     });
+    setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);
   }
 
@@ -51,6 +56,7 @@ export class ProtectedAreasController {
       protectedAreaId: protectedAreasFilters.id,
       bbox: protectedAreasFilters.bbox,
     });
+    setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);
   }
 }
