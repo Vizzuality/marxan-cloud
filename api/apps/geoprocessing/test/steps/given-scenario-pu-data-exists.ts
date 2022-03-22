@@ -31,6 +31,10 @@ export const GivenScenarioPuDataExists = async (
     projectId,
   );
 
+  /**
+   * @todo Refactor taking into account the recent project/scenario/pu linkage
+   * refactor.
+   */
   const rows = await entityManager.save(ScenariosPlanningUnitGeoEntity, [
     {
       scenarioId,
