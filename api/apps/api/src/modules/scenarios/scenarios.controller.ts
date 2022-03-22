@@ -103,7 +103,7 @@ import {
   ScenarioLockResultSingular,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
-import { BaseTilesOpenApi } from '@marxan/tiles';
+import { BaseTilesOpenApi, BaseTilesResponseHeaders } from '@marxan/tiles';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -167,6 +167,7 @@ export class ScenariosController {
   }
 
   @BaseTilesOpenApi()
+  @BaseTilesResponseHeaders()
   @ApiOperation({
     description: 'Get tiles for a scenario planning units.',
   })
@@ -202,6 +203,7 @@ export class ScenariosController {
   }
 
   @BaseTilesOpenApi()
+  @BaseTilesResponseHeaders()
   @ApiParam({
     name: 'scenarioIdA',
     description: 'First scenario to be compare',

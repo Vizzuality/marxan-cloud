@@ -19,7 +19,7 @@ import {
 
 import { Response } from 'express';
 import { ScenarioComparisonTilesService } from './comparison-difference-tile/comparison-difference-tile.service';
-import { BaseTilesOpenApi } from '@marxan/tiles';
+import { BaseTilesOpenApi, BaseTilesResponseHeaders } from '@marxan/tiles';
 import { ScenarioComparisonTileRequest } from './comparison-difference-tile/comparison-difference-tile-request';
 import { ScenarioComparisonFilters } from './comparison-difference-tile/dto/scenario-comparison-filter.dto';
 
@@ -32,6 +32,7 @@ export class ScenariosController {
     ) {}
 
   @BaseTilesOpenApi()
+  @BaseTilesResponseHeaders()
   @ApiOperation({
     description: 'Get tiles for a scenario planning units.',
   })
@@ -54,6 +55,7 @@ export class ScenariosController {
   }
 
   @BaseTilesOpenApi()
+  @BaseTilesResponseHeaders()
   @ApiParam({
     name: 'scenarioIdA',
     description: 'First scenario to be compare',
