@@ -29,6 +29,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   initialValues,
   clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
+  removeSelected,
   onSelect,
   onFocus,
   onBlur,
@@ -223,29 +224,37 @@ export const SingleSelect: React.FC<SelectProps> = ({
                 maxHeight,
               }}
             >
-              {getOptions.map((option, index) => (
-                <li
-                  className={cx({
-                    'px-4 py-1 mt-0.5 cursor-pointer': true,
-                    [THEME[theme].item.base]: highlightedIndex !== index,
-                    [THEME[theme].item.disabled]: option.disabled,
-                    [THEME[theme].item.highlighted]: (
-                      (highlightedIndex === index && !option.disabled)
-                      || isSelected(option, selectedItems)
-                    ),
-                  })}
-                  key={`${option.value}`}
-                  {...getItemProps({ item: option, index, disabled: option.disabled })}
-                >
-                  <span
+              {getOptions
+                .filter((o) => {
+                  if (removeSelected) {
+                    return o.value !== values;
+                  }
+
+                  return !!o;
+                })
+                .map((option, index) => (
+                  <li
                     className={cx({
-                      'ml-6': !!option.checkbox,
+                      'px-4 py-1 mt-0.5 cursor-pointer': true,
+                      [THEME[theme].item.base]: highlightedIndex !== index,
+                      [THEME[theme].item.disabled]: option.disabled,
+                      [THEME[theme].item.highlighted]: (
+                        (highlightedIndex === index && !option.disabled)
+                      || isSelected(option, selectedItems)
+                      ),
                     })}
+                    key={`${option.value}`}
+                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
-                    {option.label}
-                  </span>
-                </li>
-              ))}
+                    <span
+                      className={cx({
+                        'ml-6': !!option.checkbox,
+                      })}
+                    >
+                      {option.label}
+                    </span>
+                  </li>
+                ))}
             </ul>
           </Menu>
         </div>,

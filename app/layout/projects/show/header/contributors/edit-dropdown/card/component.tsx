@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useState,
 } from 'react';
 
 import { useRouter } from 'next/router';
@@ -34,7 +34,6 @@ export const UserCard: React.FC<UserCardProps> = ({
   const { pid } = query;
 
   const [open, setOpen] = useState(false);
-  const [userRole, setUserRole] = useState(ROLES[roleName]);
 
   const { user: meData } = useMe();
   const isOwner = useOwnsProject(pid);
@@ -47,10 +46,6 @@ export const UserCard: React.FC<UserCardProps> = ({
 
   const deleteUserMutation = useDeleteProjectUser({});
   const { addToast } = useToasts();
-
-  const OPTIONS = useMemo(() => {
-    return ROLE_OPTIONS.filter((o) => o.value !== userRole);
-  }, [userRole]);
 
   const onEditRole = useCallback((value) => {
     editProjectUserRoleMutation.mutate({ projectId: `${pid}`, data: { roleName: value, userId: id, projectId: `${pid}` } }, {
@@ -129,16 +124,15 @@ export const UserCard: React.FC<UserCardProps> = ({
         <div className="w-40 pr-4">
           {isOwner && !(isOwner && id === meData.id) && (
             <Select
-              initialSelected={ROLES[roleName]}
               maxHeight={300}
               size="s"
               status="none"
               theme="light"
-              placeholder={ROLES[roleName]}
-              options={OPTIONS}
+              selected={roleName}
+              options={ROLE_OPTIONS}
+              removeSelected
               onChange={(value: string) => {
                 onEditRole(value);
-                setUserRole(value);
               }}
             />
           )}

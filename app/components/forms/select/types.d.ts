@@ -25,6 +25,7 @@ interface SelectDataProps {
   clearSelectionLabel?: string;
   batchSelectionActive?: boolean;
   batchSelectionLabel?: string;
+  removeSelected?: boolean;
 }
 
 export interface SelectProps extends
