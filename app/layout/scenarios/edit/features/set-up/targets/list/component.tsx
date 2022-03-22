@@ -261,6 +261,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                           >
                             <Item
                               {...item}
+                              editable={editable}
                               onChangeTarget={(v) => {
                                 onChangeTarget(item.id, v, input);
                               }}
