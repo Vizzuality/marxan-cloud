@@ -195,10 +195,9 @@ export class ProjectsService {
   ): Promise<
     Either<
       GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
-      { from: string; to: string, query: {} }
+      { from: string; to: string; query: {} }
     >
   > {
-
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
       return left(forbiddenError);
     }
@@ -218,15 +217,17 @@ export class ProjectsService {
       return right({
         from: `/projects/${projectId}/grid/tiles`,
         to: `/projects/planning-area/${projectId}/grid/preview/tiles`,
-        query: {}
+        query: {},
       });
     } else {
       return right({
         from: `/projects/${projectId}/grid/tiles/${z}/${x}/${y}.mvt`,
-        to: `/planning-units/preview/regular/${project.planningUnitGridShape}/${project.planningUnitAreakm2}/tiles/${z}/${x}/${y}.mvt?bbox=${JSON.stringify(project.bbox)}`,
+        to: `/planning-units/preview/regular/${project.planningUnitGridShape}/${
+          project.planningUnitAreakm2
+        }/tiles/${z}/${x}/${y}.mvt?bbox=${JSON.stringify(project.bbox)}`,
         query: {
           bbox: JSON.stringify(project.bbox),
-        }
+        },
       });
     }
   }

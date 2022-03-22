@@ -1,21 +1,11 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Res,
-  Query,
-  Logger,
-} from '@nestjs/common';
+import { Controller, Get, Param, Res, Query, Logger } from '@nestjs/common';
 import {
   ScenariosPUFilters,
   ScenariosService,
   ScenariosTileRequest,
 } from './scenarios.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
-import {
-  ApiOperation,
-  ApiParam,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam } from '@nestjs/swagger';
 
 import { Response } from 'express';
 import { ScenarioComparisonTilesService } from './comparison-difference-tile/comparison-difference-tile.service';
@@ -28,8 +18,8 @@ export class ScenariosController {
   private readonly logger: Logger = new Logger(ScenariosController.name);
   constructor(
     public service: ScenariosService,
-    private readonly compareTileService: ScenarioComparisonTilesService
-    ) {}
+    private readonly compareTileService: ScenarioComparisonTilesService,
+  ) {}
 
   @BaseTilesOpenApi()
   @BaseTilesResponseHeaders()
@@ -58,14 +48,14 @@ export class ScenariosController {
   @BaseTilesResponseHeaders()
   @ApiParam({
     name: 'scenarioIdA',
-    description: 'First scenario to be compare',
+    description: 'First scenario to be compared',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @ApiParam({
     name: 'scenarioIdB',
-    description: 'Second scenario to be compare with the first',
+    description: 'Second scenario to be compared ',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
@@ -79,11 +69,12 @@ export class ScenariosController {
     @Query() filters: ScenarioComparisonFilters,
     @Res() response: Response,
   ): Promise<void> {
-
-    const tile: Buffer = await this.compareTileService.getScenarioComparisonTile({
-      ...tileRequest,
-      bbox: filters.bbox,
-    });
+    const tile: Buffer = await this.compareTileService.getScenarioComparisonTile(
+      {
+        ...tileRequest,
+        bbox: filters.bbox,
+      },
+    );
 
     response.send(tile);
   }

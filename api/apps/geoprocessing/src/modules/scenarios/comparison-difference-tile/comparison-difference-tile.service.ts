@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import {  Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
@@ -22,7 +22,7 @@ export class ScenarioComparisonTilesService {
     request: ScenarioComparisonTileRequest,
   ): Promise<Buffer> {
     const tile = await this.getTiles(request);
-    return this.tileService.zip(tile[0].mvt)
+    return this.tileService.zip(tile[0].mvt);
   }
 
   private async getTiles({
@@ -30,10 +30,11 @@ export class ScenarioComparisonTilesService {
     x,
     y,
     scenarioIdA,
-    scenarioIdB
+    scenarioIdB,
   }: ScenarioComparisonTileRequest): Promise<[QueryResult]> {
-    const result = await this.areas.manager.query(
-      `with t as (
+    const result = await this.areas.manager
+      .query(
+        `with t as (
         select the_geom, pu_geom_id, scenario_id, included_count / array_length(value,1)::float as freq
         from scenarios_pu_data spd
         inner join output_scenarios_pu_data osp on spd.id =osp.scenario_pu_id
@@ -56,10 +57,11 @@ export class ScenarioComparisonTilesService {
         ST_AsMVTGeom(ST_Transform(the_geom, 3857),
         ST_TileEnvelope($3, $4, $5), 4096, 256, true) AS mvt_geom
         from compare) as tile`,
-      [scenarioIdA, scenarioIdB, z, x, y],
-    ).catch(err_msg => {
-      Logger.error(err_msg);
-  });
+        [scenarioIdA, scenarioIdB, z, x, y],
+      )
+      .catch((err_msg) => {
+        Logger.error(err_msg);
+      });
 
     return result;
   }

@@ -70,8 +70,8 @@ export class TileService {
   geometrySimplification(z: number, geometry: string): string {
     return z > 7
       ? `${geometry}`
-      : z > 0 ?
-      `ST_RemoveRepeatedPoints(${geometry}, ${0.1 / (z * 2)})`
+      : z > 0
+      ? `ST_RemoveRepeatedPoints(${geometry}, ${0.1 / (z * 2)})`
       : `ST_RemoveRepeatedPoints(${geometry}, ${0.1 / (0.1 * 2)})`;
   }
 
