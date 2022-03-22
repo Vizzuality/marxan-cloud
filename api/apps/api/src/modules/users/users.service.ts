@@ -232,7 +232,7 @@ export class UsersService extends AppBaseService<
     return hash(password, 10);
   }
 
-  private async isPlatformAdmin(userId: string): Promise<boolean> {
+  async isPlatformAdmin(userId: string): Promise<boolean> {
     return (await this.adminRepo.count({ where: { userId } })) > 0;
   }
 

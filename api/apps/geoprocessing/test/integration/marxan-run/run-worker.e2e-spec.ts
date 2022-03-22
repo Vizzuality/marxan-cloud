@@ -33,7 +33,7 @@ test(`starting run`, async () => {
 
   // then
   await fixtures.thenScenarioIsRunning(jobData);
-}, 10000);
+}, 15000);
 
 test(`progress reporting`, async () => {
   fixtures.setupForProgressReporting();

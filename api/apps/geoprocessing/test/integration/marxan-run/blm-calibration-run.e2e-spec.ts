@@ -1,30 +1,31 @@
-import { PromiseType } from 'utility-types';
-import { readFileSync } from 'fs';
-import * as nock from 'nock';
-import { v4 } from 'uuid';
-import { last } from 'lodash';
-
+import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
+import {
+  BlmRunAdapterModule,
+  blmSandboxRunner,
+} from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
+import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
+import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
   OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
-
-import { bootstrapApplication, delay } from '../../utils';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
+import { last } from 'lodash';
+import * as nock from 'nock';
+import { EntityManager, In, Repository } from 'typeorm';
+import { PromiseType } from 'utility-types';
+import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
-import { In, Repository } from 'typeorm';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
-import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
-import {
-  BlmRunAdapterModule,
-  blmSandboxRunner,
-} from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
-import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
-import { BlmFinalResultEntity } from '@marxan/blm-calibration';
-import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
+import { bootstrapApplication, delay } from '../../utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -99,6 +100,7 @@ const NUMBER_OF_PU_IN_SAMPLE = 12178;
 const NUMBER_OF_RUNS = 100;
 
 const getFixtures = async () => {
+  const projectId = v4();
   const scenarioId = v4();
   const outputsIds: string[] = [];
   const scenarioFeatures: string[] = [];
@@ -106,14 +108,15 @@ const getFixtures = async () => {
   nock.disableNetConnect();
 
   const app = await bootstrapApplication();
+  const entityManager = app.get<EntityManager>(getEntityManagerToken());
   const featuresData: Repository<GeoFeatureGeometry> = app.get(
     getRepositoryToken(GeoFeatureGeometry),
   );
   const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = app.get(
     getRepositoryToken(ScenarioFeaturesData),
   );
-  const scenariosPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(ScenariosPlanningUnitGeoEntity),
+  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = app.get(
+    getRepositoryToken(PlanningUnitsGeom),
   );
   const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = app.get(
     getRepositoryToken(OutputScenariosPuDataGeoEntity),
@@ -149,10 +152,18 @@ const getFixtures = async () => {
         scenarioId,
       });
       await puOutputRepo.delete({});
-      await scenariosPuDataRepo.delete({
+
+      const projectPus = await entityManager.find(ProjectsPuEntity, {
+        where: { projectId },
+      });
+      await planningUnitsGeomRepo.delete({
+        id: In(projectPus.map((pu) => pu.geomId)),
+      });
+
+      await scenarioFeatureRepo.delete({
         scenarioId,
       });
-      await scenarioFeatureRepo.delete({
+      await blmFinalResultsRepo.delete({
         scenarioId,
       });
       // featuresOutputRepo removes on cascade
@@ -189,7 +200,8 @@ const getFixtures = async () => {
       outputsIds.push(
         ...(
           await GivenScenarioPuData(
-            scenariosPuDataRepo,
+            entityManager,
+            projectId,
             scenarioId,
             NUMBER_OF_PU_IN_SAMPLE,
           )
@@ -246,10 +258,16 @@ const getFixtures = async () => {
       ).toEqual(NUMBER_OF_FEATURES_IN_SAMPLE * NUMBER_OF_RUNS);
     },
     ThenBlmFinalResultsArePersisted: async () => {
-      expect(await blmFinalResultsRepo.count()).toEqual(3);
+      const count = await blmFinalResultsRepo.count({
+        where: { scenarioId },
+      });
+      expect(count).toEqual(3);
     },
     ThenBlmPartialResultsHaveBeenDeleted: async () => {
-      expect(await blmPartialResultsRepo.count()).toEqual(0);
+      const count = await blmPartialResultsRepo.count({
+        where: { scenarioId },
+      });
+      expect(count).toEqual(0);
     },
     ThenProgressWasReported() {
       // checking only the last call, otherwise the test is flaky as it depends on chunking the buffer

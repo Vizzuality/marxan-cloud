@@ -8,7 +8,8 @@ resource "kubernetes_service" "geoprocessing_service" {
       name = kubernetes_deployment.geoprocessing_deployment.metadata[0].name
     }
     port {
-      port = 3000
+      port        = 30002
+      target_port = 3000
     }
 
     type = "NodePort"
@@ -201,7 +202,7 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
 
           env {
-            name  = "API_RUN_MIGRATIONS_ON_STARTUP"
+            name  = "GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP"
             value = true
           }
 

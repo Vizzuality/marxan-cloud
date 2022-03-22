@@ -1,7 +1,6 @@
 FROM node:16.14.0-alpine3.15
 LABEL maintainer="hello@vizzuality.com"
 
-
 ENV NAME marxan-webshot
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME

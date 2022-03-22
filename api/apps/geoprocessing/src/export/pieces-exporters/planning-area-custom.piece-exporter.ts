@@ -2,13 +2,10 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import {
-  PlanningAreaCustomContent,
-  planningAreaCustomGeoJSONRelativePath,
-} from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
+import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { FileRepository } from '@marxan/files-repository';
-import { Injectable, Logger } from '@nestjs/common';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -18,15 +15,14 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
-interface PlanningAreaSelectResult {
-  geojson: string;
+type PlanningAreaSelectResult = {
   ewkb: Buffer;
-}
+};
 
-interface ProjectSelectResult {
+type ProjectSelectResult = {
   planning_unit_grid_shape: PlanningUnitGridShape;
   planning_unit_area_km2: number;
-}
+};
 
 @Injectable()
 @PieceExportProvider()
@@ -68,7 +64,7 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       PlanningAreaSelectResult,
     ] = await this.geoprocessingEntityManager.query(
       `
-        SELECT ST_AsEWKB(the_geom) as ewkb, ST_AsGeoJSON(the_geom) as geojson
+        SELECT ST_AsEWKB(the_geom) as ewkb
         FROM planning_areas
         WHERE project_id = $1
       `,
@@ -80,11 +76,6 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
-
-    const planningAreaGeoJson = await this.fileRepository.save(
-      Readable.from(planningArea.geojson),
-      `json`,
-    );
 
     const content: PlanningAreaCustomContent = {
       puAreaKm2: project.planning_unit_area_km2,
@@ -103,24 +94,12 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    if (isLeft(planningAreaGeoJson)) {
-      const errorMessage = `${PlanningAreaCustomPieceExporter.name} - Project Custom PA - couldn't save file - ${planningAreaGeoJson.left.description}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
     return {
       ...input,
-      uris: [
-        ...ClonePieceUrisResolver.resolveFor(
-          ClonePiece.PlanningAreaCustom,
-          outputFile.right,
-        ),
-        {
-          uri: planningAreaGeoJson.right,
-          relativePath: planningAreaCustomGeoJSONRelativePath,
-        },
-      ],
+      uris: ClonePieceUrisResolver.resolveFor(
+        ClonePiece.PlanningAreaCustom,
+        outputFile.right,
+      ),
     };
   }
 }

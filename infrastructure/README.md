@@ -101,6 +101,10 @@ Secrets with the corresponding values:
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
 - `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 
+Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
+and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
+the Frontend app docker image.
+
 ## How to deploy
 
 Deploying the included Terraform project is done in steps:
@@ -148,13 +152,28 @@ You should now be able to use `kubectl` to access your AKS cluster.
 ## Configuring PostgreSQL
 
 The included Terraform code sets up a PostgreSQL database server in the AKS cluster but, as it cannot reach it once 
-it's set up, it won't create the necessary databases and users for the Marxan application to run - this has to be done
-manually:
+it's set up, it won't create the necessary databases and users for the Marxan application to run, as well as enable
+PostGIS. This has to be done manually:
 
 - Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server.
 - Create a database and a user with the corresponding credentials (see either the relevant 
 [Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or 
 the [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
+- Enable the following extensions for that database, _before starting any
+  backend services_, as the PostgreSQL user through which these services connect
+  to the databases won't have permissions to enable the extensions via the
+  `create extension` queries that are included in the migration scripts:
+  - `pgcrypto`
+    (`api/apps/api/src/migrations/api/1610395720000-AddSupportForAuthentication.ts`
+    and
+    `api/apps/geoprocessing/src/migrations/geoprocessing/1611828857842-AddFeatureScenarioOutputEntity.ts`)
+  - `tablefunc` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
+  - `plpgsql`(`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`)
+  - `postgis` (`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`
+    and
+    `api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
+  - `postgis_raster` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
+  - `postgis_topology` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
 - Make sure the user has full access to the associated database.
 - Repeat, as needed, for each database used by the project.
 

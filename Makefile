@@ -200,7 +200,7 @@ generate-content-dumps: dump-api-data | dump-geodb-data
 
 generate-export-shpfile:
 	-docker-compose exec -T postgresql-geo-api mkdir testdataoutput2
-	-docker-compose exec -T postgresql-geo-api pgsql2shp -f ./testdataoutput2/test.shp -h localhost -p 5432 -r -g the_geom -u ${GEO_POSTGRES_USER} ${GEO_POSTGRES_DB} "SELECT the_geom, pug.id as uid, 1 as cost  FROM scenarios_pu_data spd inner join planning_units_geom pug on pug.id = spd.pu_geom_id ";
+	-docker-compose exec -T postgresql-geo-api pgsql2shp -f ./testdataoutput2/test.shp -h localhost -p 5432 -r -g the_geom -u ${GEO_POSTGRES_USER} ${GEO_POSTGRES_DB} "SELECT the_geom, pug.id as uid, 1 as cost FROM planning_units_geom pug inner join projects_pu ppu on pug.id = ppu.geom_id inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id";
 	-mkdir data/data
 	-docker cp marxan-postgresql-geo-api:testdataoutput2 data/data
 

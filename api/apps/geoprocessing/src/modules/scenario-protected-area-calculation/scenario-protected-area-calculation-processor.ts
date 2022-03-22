@@ -40,7 +40,8 @@ export class ScenarioProtectedAreaCalculationProcessor
     with pu as (
       select spd.id, pug.the_geom, pug.area as pu_area
       from scenarios_pu_data spd
-      inner join planning_units_geom pug on spd.pu_geom_id = pug.id
+      inner join projects_pu ppu on ppu.id = spd.project_pu_id
+      inner join planning_units_geom pug on ppu.geom_id = pug.id
       where scenario_id=$1),
      pa as (select the_geom as the_geom from wdpa ${wdpaFilter}),
      pu_pa_union as (select pu.id, pu.the_geom as pu_the_geom, pa.the_geom as pa_the_geom, pu_area

@@ -8,9 +8,11 @@ import { UpdatePublishedProjectDto } from '@marxan-api/modules/published-project
 import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-info';
 import { CreatePublishedProjectDto } from '@marxan-api/modules/published-project/dto/create-published-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
+import { FetchSpecification } from 'nestjs-base-service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -22,6 +24,7 @@ export class PublishedProjectCrudService extends AppBaseService<
   constructor(
     @InjectRepository(PublishedProject)
     protected repository: Repository<PublishedProject>,
+    private readonly usersService: UsersService,
   ) {
     super(
       repository,
@@ -35,8 +38,26 @@ export class PublishedProjectCrudService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<PublishedProject> {
     return {
-      attributes: ['name', 'description'],
+      attributes: ['name', 'description', 'underModeration'],
       keyForAttribute: 'camelCase',
     };
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<PublishedProject>,
+    fetchSpecification: FetchSpecification,
+    info?: ProjectsRequest,
+  ): Promise<SelectQueryBuilder<PublishedProject>> {
+    let showUnderModerationPublishedProjects = false;
+    const id = info?.authenticatedUser?.id;
+    if (id && (await this.usersService.isPlatformAdmin(id))) {
+      showUnderModerationPublishedProjects = true;
+    }
+
+    query.andWhere('published_project.underModeration = :underModeration', {
+      underModeration: showUnderModerationPublishedProjects,
+    });
+
+    return query;
   }
 }

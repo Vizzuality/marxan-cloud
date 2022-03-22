@@ -3,48 +3,53 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { Repository } from 'typeorm';
+import { Scenario } from '../scenario.api.entity';
 
 @Injectable()
 export class BoundDatService {
   constructor(
+    @InjectRepository(Scenario)
+    private readonly scenariosRepo: Repository<Scenario>,
     @InjectRepository(PlanningUnitsGeom, DbConnections.geoprocessingDB)
-    private readonly repo: Repository<PlanningUnitsGeom>,
+    private readonly puGeomRepo: Repository<PlanningUnitsGeom>,
   ) {}
 
   async getContent(scenarioId: string): Promise<string> {
+    const scenario = await this.scenariosRepo.findOneOrFail(scenarioId);
+
     const rows: {
       id1: number;
       id2: number;
       boundary: number;
-    }[] = await this.repo.query(
+    }[] = await this.puGeomRepo.query(
       `
-with pu as (
-    select the_geom, spd.puid
-    from planning_units_geom pug
-    inner join scenarios_pu_data spd on pug.id = spd.pu_geom_id
-    where spd.scenario_id = $1
-)
-select distinct
-    a.puid id1,
-    b.puid id2,
-    ST_Length(
-        st_transform(
-            ST_CollectionExtract(
-                ST_Intersection(
-                    a.the_geom, b.the_geom
-                ),
-                2
-            )
-            , 3410
+        with pu as (
+          select the_geom, ppu.puid
+          from planning_units_geom pug
+          inner join projects_pu ppu on pug.id = ppu.geom_id
+          where ppu.project_id = $1
         )
-    )/1000
-    boundary
-from pu a, pu b
-where
-    a.puid < b.puid and
-    ST_Touches(a.the_geom, b.the_geom)
+        select distinct
+          a.puid id1,
+          b.puid id2,
+          ST_Length(
+              st_transform(
+                  ST_CollectionExtract(
+                      ST_Intersection(
+                          a.the_geom, b.the_geom
+                      ),
+                      2
+                  )
+                  , 3410
+              )
+          )/1000
+          boundary
+        from pu a, pu b
+        where
+          a.puid < b.puid and
+          ST_Touches(a.the_geom, b.the_geom)
     `,
-      [scenarioId],
+      [scenario.projectId],
     );
     return (
       'id1\tid2\tboundary\n' +

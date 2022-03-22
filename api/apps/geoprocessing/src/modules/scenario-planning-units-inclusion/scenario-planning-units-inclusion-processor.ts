@@ -188,8 +188,9 @@ export class ScenarioPlanningUnitsInclusionProcessor
 
     const queryBuilder = this.scenarioPlanningUnitsRepo
       .createQueryBuilder(`spd`)
-      .select(['spd.scenario_id', 'spd.pu_geom_id', 'spd.id'])
-      .leftJoin(`planning_units_geom`, `pug`, `pug.id = spd.pu_geom_id`)
+      .select(['spd.scenario_id', 'ppu.geom_id', 'spd.id'])
+      .leftJoin(`projects_pu`, `ppu`, `ppu.id = spd.project_pu_id`)
+      .leftJoin(`planning_units_geom`, `pug`, `pug.id = ppu.geom_id`)
       .where(`spd.scenario_id = :scenarioId`, { scenarioId })
       .andWhere(
         `st_intersects(st_union(ARRAY[${geometriesUnion}]), pug.the_geom)`,

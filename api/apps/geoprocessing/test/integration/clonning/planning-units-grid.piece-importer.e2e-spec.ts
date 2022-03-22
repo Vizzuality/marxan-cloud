@@ -1,6 +1,10 @@
+import { PlanningUnitsGridPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/planning-units-grid.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
-import { ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { ImportJobInput } from '@marxan/cloning';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -8,25 +12,29 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import {
+  getEntityManagerToken,
+  getRepositoryToken,
+  TypeOrmModule,
+} from '@nestjs/typeorm';
 import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/Either';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { PlanningAreaCustomGridPieceImporter } from '../../../src/import/pieces-importers/planning-area-custom-grid.piece-importer';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaCustomGridPieceImporter, () => {
+describe(PlanningUnitsGridPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
 
   afterEach(async () => {
-    fixtures?.cleanUp();
+    await fixtures?.cleanUp();
   });
 
   it('should fail when planning area grid file is missing in uris array ', async () => {
@@ -77,25 +85,36 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      TypeOrmModule.forFeature([PlanningUnitsGeom]),
+      TypeOrmModule.forFeature([PlanningUnitsGeom, ProjectsPuEntity]),
       FileRepositoryModule,
     ],
     providers: [
-      PlanningAreaCustomGridPieceImporter,
+      PlanningUnitsGridPieceImporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
+      {
+        provide: getEntityManagerToken(geoprocessingConnections.apiDB.name),
+        useClass: FakeEntityManager,
+      },
     ],
   }).compile();
 
   await sandbox.init();
   const projectId = v4();
-  const sut = sandbox.get(PlanningAreaCustomGridPieceImporter);
+  const sut = sandbox.get(PlanningUnitsGridPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
   const puGeomRepo = sandbox.get<Repository<PlanningUnitsGeom>>(
     getRepositoryToken(PlanningUnitsGeom),
   );
+  const projectsPuRepo = sandbox.get<Repository<ProjectsPuEntity>>(
+    getRepositoryToken(ProjectsPuEntity),
+  );
   return {
     cleanUp: async () => {
-      await puGeomRepo.delete({ projectId });
+      const pus = await projectsPuRepo.find({ projectId });
+      await projectsPuRepo.delete({ projectId });
+      await puGeomRepo.delete({
+        id: In(pus.map((pu) => pu.geomId)),
+      });
     },
     GivenNoGridFileIsAvailable: () => {
       return new ArchiveLocation('not found');
@@ -106,7 +125,7 @@ const getFixtures = async () => {
       });
 
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         'planning area custom grid relative path',
       );
 
@@ -130,7 +149,7 @@ const getFixtures = async () => {
         zlib: { level: 9 },
       });
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         'planning area custom grid relative path',
       );
       archive.append(validGridFile, {
@@ -150,7 +169,7 @@ const getFixtures = async () => {
       });
 
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         'planning area custom grid relative path',
       );
 
@@ -168,7 +187,7 @@ const getFixtures = async () => {
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const [uri] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGridCustom,
+        ClonePiece.PlanningUnitsGrid,
         archiveLocation.value,
       );
       return {
@@ -176,7 +195,7 @@ const getFixtures = async () => {
         componentResourceId: v4(),
         importId: v4(),
         importResourceId: projectId,
-        piece: ClonePiece.PlanningAreaGridCustom,
+        piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
       };
@@ -187,7 +206,7 @@ const getFixtures = async () => {
         componentResourceId: v4(),
         importId: v4(),
         importResourceId: projectId,
-        piece: ClonePiece.PlanningAreaGridCustom,
+        piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [],
       };
@@ -212,12 +231,26 @@ const getFixtures = async () => {
         },
         ThenPlanningUnitsGeometriesShouldBeInserted: async () => {
           const result = await sut.run(input);
-          const geoms = await puGeomRepo.find({
-            projectId: result.importResourceId,
+          const pus = await projectsPuRepo.find({
+            relations: ['puGeom'],
+            where: {
+              projectId: result.importResourceId,
+            },
           });
-          expect(geoms).toHaveLength(4);
+          expect(pus).toHaveLength(4);
+          expect(pus.every((pu) => pu.puGeom !== undefined)).toBe(true);
         },
       };
     },
   };
 };
+
+class FakeEntityManager {
+  createQueryBuilder = () => this;
+  select = () => this;
+  from = () => this;
+  where = () => this;
+  async execute() {
+    return [{ geomType: PlanningUnitGridShape.Square }];
+  }
+}

@@ -48,7 +48,7 @@ export class ScenariosPlanningUnitService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<ScenariosPlanningUnitGeoEntity> {
     return {
-      attributes: ['id', 'lockStatus', 'puGeometryId', 'scenarioId'],
+      attributes: ['id', 'lockStatus', 'projectPuId', 'scenarioId'],
       keyForAttribute: 'camelCase',
     };
   }

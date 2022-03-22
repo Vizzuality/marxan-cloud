@@ -71,9 +71,8 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
           country_id = $2, 
           admin_area_l1_id = $3, 
           admin_area_l2_id = $4,
-          planning_unit_grid_shape = $5,
-          planning_unit_area_km2 = $6,
-          bbox = $7
+          planning_unit_area_km2 = $5,
+          bbox = $6
         WHERE id = $1
       `,
       [
@@ -81,7 +80,6 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
         planningAreaGadm.country,
         planningAreaGadm.l1,
         planningAreaGadm.l2,
-        planningAreaGadm.puGridShape,
         planningAreaGadm.planningUnitAreakm2,
         JSON.stringify(planningAreaGadm.bbox),
       ],

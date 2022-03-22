@@ -1,5 +1,4 @@
 import { ClonePiece, ResourceId, ResourceKind } from '@marxan/cloning/domain';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -48,23 +47,23 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     }
 
     const customPlanningArea = Boolean(project.planningAreaGeometryId);
-    const customGrid =
-      customPlanningArea &&
-      project.planningUnitGridShape === PlanningUnitGridShape.FromShapefile;
+
+    const planningAreaComponents = customPlanningArea
+      ? [
+          ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom),
+          ExportComponent.newOne(id, ClonePiece.PlanningAreaCustomGeojson),
+        ]
+      : [ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm)];
 
     const components: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ProjectMetadata),
       ExportComponent.newOne(id, ClonePiece.ExportConfig),
-      customPlanningArea
-        ? ExportComponent.newOne(id, ClonePiece.PlanningAreaCustom)
-        : ExportComponent.newOne(id, ClonePiece.PlanningAreaGAdm),
+      ...planningAreaComponents,
+      ExportComponent.newOne(id, ClonePiece.PlanningUnitsGrid),
+      ExportComponent.newOne(id, ClonePiece.PlanningUnitsGridGeojson),
+      ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
       ...scenarioPieces.flat(),
     ];
-
-    if (customGrid)
-      components.push(
-        ExportComponent.newOne(id, ClonePiece.PlanningAreaGridCustom),
-      );
 
     return components;
   }
@@ -75,6 +74,9 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
   ): Promise<ExportComponent[]> {
     const pieces: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ScenarioMetadata),
+      ExportComponent.newOne(id, ClonePiece.ScenarioProtectedAreas),
+      ExportComponent.newOne(id, ClonePiece.ScenarioPlanningUnitsData),
+      ExportComponent.newOne(id, ClonePiece.ScenarioRunResults),
     ];
 
     if (kind === ResourceKind.Scenario) {

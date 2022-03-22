@@ -12,6 +12,9 @@ export class PublishedProject {
   @Column('character varying')
   description?: string;
 
+  @Column('boolean', { name: 'under_moderation', default: false })
+  underModeration?: boolean;
+
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })
   originalProject?: Project;

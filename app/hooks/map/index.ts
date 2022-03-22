@@ -919,7 +919,7 @@ export function usePUCompareLayer({
       source: {
         type: 'vector',
         // Use correct tiles using sid1 and sid2 in the correct endpoint: ask BE
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/planning-units/tiles/{z}/{x}/{y}.mvt?include=results`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/compare/${sid2}/tiles/{z}/{x}/{y}.mvt`],
       },
       render: {
         layers: [
@@ -931,8 +931,8 @@ export function usePUCompareLayer({
                 'match',
                 [
                   'concat',
-                  ['round', ['/', ['get', 'frequencyValue'], 100 / COLOR_NUMBER]],
-                  ['round', ['/', ['get', 'frequencyValue'], 100 / COLOR_NUMBER]],
+                  ['round', ['/', ['get', 'freqA'], 100 / COLOR_NUMBER]],
+                  ['round', ['/', ['get', 'freqB'], 100 / COLOR_NUMBER]],
                 ],
                 ...COLOR_RAMP,
                 '#FFF',

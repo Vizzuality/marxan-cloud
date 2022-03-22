@@ -8,7 +8,8 @@ resource "kubernetes_service" "api_service" {
       name = kubernetes_deployment.api_deployment.metadata[0].name
     }
     port {
-      port = 3000
+      port        = 30001
+      target_port = 3000
     }
 
     type = "NodePort"
@@ -151,6 +152,11 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name = "APPLICATION_BASE_URL"
+            value = var.application_base_url
+          }
+
+          env {
             name = "API_AUTH_X_API_KEY"
             value_from {
               secret_key_ref {
@@ -213,6 +219,11 @@ resource "kubernetes_deployment" "api_deployment" {
           env {
             name  = "API_RUN_MIGRATIONS_ON_STARTUP"
             value = true
+          }
+
+          env {
+            name  = "NETWORK_CORS_ORIGINS"
+            value = var.network_cors_origins
           }
 
           env {

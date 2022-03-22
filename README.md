@@ -261,10 +261,13 @@ seed a new instance with the complete GADM and WDPA datasets, which will be 1h+
 on ideal hardware.
 
 To execute this on a cloud hosted version of Marxan, you have a couple of options:
-- Run the import process locally, while having it connect directly to the remote
-`api` and `geoprocessing` databases
 - Run the import process locally on local running PostgreSQL servers, then export 
 the resulting `.sql` locally and import it remotely.
+- Run the import process locally, while having it connect directly to the remote
+`api` and `geoprocessing` databases using kubectl port forwarding. You may need
+to modify the container's 
+[network mode](https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode)
+to "host" for this to work. 
 
 While geographic data is technically necessary on all Marxan environments,
 there is a faster alternative to import equivalent data on development/test 

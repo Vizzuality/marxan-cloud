@@ -8,7 +8,8 @@ resource "kubernetes_service" "client_service" {
       name = kubernetes_deployment.client_deployment.metadata[0].name
     }
     port {
-      port = 3000
+      port        = 30004
+      target_port = 3000
     }
 
     type = "NodePort"

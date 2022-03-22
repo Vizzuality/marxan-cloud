@@ -1,26 +1,27 @@
-import { PromiseType } from 'utility-types';
-import { readFileSync } from 'fs';
-import * as nock from 'nock';
-import { v4 } from 'uuid';
-import { last } from 'lodash';
-
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
+import { SingleRunAdapterModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
+import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
+import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
   OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
-
-import { bootstrapApplication, delay } from '../../utils';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
+import { last } from 'lodash';
+import * as nock from 'nock';
+import { EntityManager, In, Repository } from 'typeorm';
+import { PromiseType } from 'utility-types';
+import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
-import { In, Repository } from 'typeorm';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
-import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
-import { SingleRunAdapterModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
-import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
+import { bootstrapApplication, delay } from '../../utils';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -33,7 +34,7 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test.only(`cancelling marxan run during fetching assets`, async (done) => {
+  test(`cancelling marxan run during fetching assets`, async (done) => {
     expect.assertions(1);
 
     fixtures
@@ -98,6 +99,7 @@ const NUMBER_OF_PU_IN_SAMPLE = 12178;
 const NUMBER_OF_RUNS = 100;
 
 const getFixtures = async () => {
+  const projectId = v4();
   const scenarioId = v4();
   const outputsIds: string[] = [];
   const scenarioFeatures: string[] = [];
@@ -105,14 +107,15 @@ const getFixtures = async () => {
   nock.disableNetConnect();
 
   const app = await bootstrapApplication();
+  const entityManager = app.get<EntityManager>(getEntityManagerToken());
   const featuresData: Repository<GeoFeatureGeometry> = app.get(
     getRepositoryToken(GeoFeatureGeometry),
   );
   const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = app.get(
     getRepositoryToken(ScenarioFeaturesData),
   );
-  const scenariosPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(ScenariosPlanningUnitGeoEntity),
+  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = app.get(
+    getRepositoryToken(PlanningUnitsGeom),
   );
   const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = app.get(
     getRepositoryToken(OutputScenariosPuDataGeoEntity),
@@ -141,11 +144,14 @@ const getFixtures = async () => {
         scenarioId,
       });
       await puOutputRepo.delete({});
-      await scenariosPuDataRepo.delete({
-        scenarioId,
-      });
       await scenarioFeatureRepo.delete({
         scenarioId,
+      });
+      const projectPus = await entityManager.find(ProjectsPuEntity, {
+        where: { projectId },
+      });
+      await planningUnitsGeomRepo.delete({
+        id: In(projectPus.map((pu) => pu.geomId)),
       });
       // featuresOutputRepo removes on cascade
       nockScope.done();
@@ -180,7 +186,8 @@ const getFixtures = async () => {
       outputsIds.push(
         ...(
           await GivenScenarioPuData(
-            scenariosPuDataRepo,
+            entityManager,
+            projectId,
             scenarioId,
             NUMBER_OF_PU_IN_SAMPLE,
           )

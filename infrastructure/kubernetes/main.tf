@@ -104,6 +104,8 @@ module "api_production" {
   namespace                  = "production"
   image                      = "marxan.azurecr.io/marxan-api:production"
   deployment_name            = "api"
+  application_base_url       = "https://marxan.vizzuality.com"
+  network_cors_origins       = "https://marxan.vizzuality.com"
 }
 
 module "geoprocessing_production" {
@@ -217,6 +219,8 @@ module "api_staging" {
   namespace                  = "staging"
   image                      = "marxan.azurecr.io/marxan-api:staging"
   deployment_name            = "api"
+  application_base_url       = "https://staging.marxan.vizzuality.com"
+  network_cors_origins       = "https://staging.marxan.vizzuality.com"
 }
 
 module "geoprocessing_staging" {

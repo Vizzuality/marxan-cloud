@@ -90,7 +90,7 @@ services:
     container_name: marxan-webshot
     command: develop
     environment:
-      - WEBSHOT_PORT
+      - WEBSHOT_APP_PORT
     volumes:
       - ./webshot/src:/opt/marxan-webshot/src
 

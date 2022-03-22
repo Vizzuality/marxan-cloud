@@ -1,8 +1,8 @@
 import { bootstrapApplication } from '../../utils/api-application';
 import { GivenUserIsLoggedIn } from '../../steps/given-user-is-logged-in';
 import * as request from 'supertest';
-import { In, Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import {
   LockStatus,
   PlanningUnitGridShape,
@@ -11,7 +11,10 @@ import {
 } from '@marxan/scenarios-planning-unit';
 import { Polygon } from 'geojson';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 import { GivenProjectExists } from '../../steps/given-project';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
@@ -43,6 +46,12 @@ export const getFixtures = async () => {
   const geometries: string[] = [];
   const scenariosPuData: string[] = [];
 
+  const entityManager = app.get<EntityManager>(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
+  );
+  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
+    ProjectsPuEntity,
+  );
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom, DbConnections.geoprocessingDB),
   );
@@ -64,14 +73,8 @@ export const getFixtures = async () => {
     cleanup: async () => {
       await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
       await projectCleanup();
-      await scenarioPuDataCostRepo.delete({
-        scenariosPuDataId: In(scenariosPuData),
-      });
       await puGeometryRepo.delete({
         id: In(geometries),
-      });
-      await scenarioPuDataRepo.delete({
-        scenarioId,
       });
       await app.close();
     },
@@ -96,15 +99,28 @@ export const getFixtures = async () => {
           ],
         ],
       }));
+      const geomType = PlanningUnitGridShape.Square;
       const geoRows = (
         await puGeometryRepo.insert(
           polygons.map((poly) => ({
             theGeom: () =>
               `st_multi(ST_GeomFromGeoJSON('${JSON.stringify(poly)}'))`,
-            type: PlanningUnitGridShape.Square,
+            type: geomType,
           })),
         )
       ).identifiers;
+      geometries.push(...geoRows.map((geo) => geo.id));
+
+      const projectPus = await projectsPuRepo.save(
+        geometries.map((geomId, index) =>
+          projectsPuRepo.create({
+            geomId,
+            geomType,
+            projectId,
+            puid: index,
+          }),
+        ),
+      );
 
       const lockStatuses: Record<number, LockStatus | null> = {
         0: LockStatus.Unstated,
@@ -113,13 +129,11 @@ export const getFixtures = async () => {
         3: null,
       };
 
-      geometries.push(...geoRows.map((geo) => geo.id));
       const scenarioPuData = await scenarioPuDataRepo.save(
-        geometries.map((id, index) =>
+        projectPus.map((pu, index) =>
           scenarioPuDataRepo.create({
-            puGeometryId: id,
+            projectPuId: pu.id,
             scenarioId,
-            planningUnitMarxanId: index,
             lockStatus: lockStatuses[index] ?? null,
           }),
         ),

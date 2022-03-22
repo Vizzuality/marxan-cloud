@@ -103,6 +103,7 @@ import {
   ScenarioLockResultSingular,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { BaseTilesOpenApi } from '@marxan/tiles';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -165,45 +166,16 @@ export class ScenariosController {
     return this.scenarioSerializer.serialize(results.data, results.metadata);
   }
 
+  @BaseTilesOpenApi()
   @ApiOperation({
-    description: 'Get planning unit tiles for selected scenario.',
+    description: 'Get tiles for a scenario planning units.',
   })
-  /**
-   *@todo Change ApiOkResponse mvt type
-   */
-  @ApiOkResponse({
-    description: 'Binary protobuffer mvt tile',
-    type: String,
-  })
-  @ApiUnauthorizedResponse()
-  @ApiForbiddenResponse()
   @ApiParam({
     name: 'id',
-    description: 'Scenario id',
+    description: 'scenario id',
     type: String,
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @ApiParam({
-    name: 'z',
-    description: 'The zoom level ranging from 0 - 20',
-    type: Number,
-    required: true,
-    example: 6,
-  })
-  @ApiParam({
-    name: 'x',
-    description: 'The tile x offset on Mercator Projection',
-    type: Number,
-    required: true,
-    example: 35,
-  })
-  @ApiParam({
-    name: 'y',
-    description: 'The tile y offset on Mercator Projection',
-    type: Number,
-    required: true,
-    example: 35,
   })
   @ApiQuery({
     name: 'include',
@@ -214,7 +186,7 @@ export class ScenariosController {
     example: 'protection',
   })
   @Get(':id/planning-units/tiles/:z/:x/:y.mvt')
-  async proxyProtectedAreaTile(
+  async proxyPlanningUnitsTile(
     @Req() req: RequestWithAuthenticatedUser,
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) scenarioId: string,
@@ -223,6 +195,42 @@ export class ScenariosController {
     the ACL control for this endpoint is placed in the controller */
     if (
       !(await this.scenarioAclService.canViewScenario(req.user.id, scenarioId))
+    ) {
+      throw new ForbiddenException();
+    }
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @BaseTilesOpenApi()
+  @ApiParam({
+    name: 'scenarioIdA',
+    description: 'First scenario to be compare',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiParam({
+    name: 'scenarioIdB',
+    description: 'Second scenario to be compare with the first',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiOperation({
+    description: 'Get tile to compare scenarios within the same project.',
+  })
+  @Get('/:scenarioIdA/compare/:scenarioIdB/tiles/:z/:x/:y.mvt')
+  async proxyProtectedAreaTile(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('scenarioIdA', ParseUUIDPipe) scenarioIdA: string,
+    @Param('scenarioIdB', ParseUUIDPipe) scenarioIdB: string,
+  ) {
+    /* Due to the usage of proxyService in other modules
+    the ACL control for this endpoint is placed in the controller */
+    if (
+      !(await this.scenarioAclService.canViewScenario(req.user.id, scenarioIdA)
+      && await this.scenarioAclService.canViewScenario(req.user.id, scenarioIdB))
     ) {
       throw new ForbiddenException();
     }

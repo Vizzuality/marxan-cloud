@@ -24,7 +24,6 @@ export class SelectionGetterModule {}
  [
  ProtectedArea,
  ScenariosPlanningUnitGeoEntity,
- ScenariosPuOutputGeoEntity,
  ],
  DbConnections.geoprocessingDB,
  ),

@@ -12,9 +12,6 @@ import { LoggerOptions } from 'typeorm';
  *
  * ['staging', 'production'].includes(config.util.getEnv('NODE_ENV')) ? true : false
  */
-
-// Somehow, without type annotations here, the type checker complains about
-// this data structure not matching that of `AuroraDataApiConnectionOptions`.
 export const apiConnections: Record<
   DbConnections,
   PostgresConnectionOptions
@@ -36,6 +33,7 @@ export const apiConnections: Record<
       path.join(__dirname, '/modules/**/*.api.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.api.entity.{ts,js}'),
     ],
+    uuidExtension: 'pgcrypto',
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
@@ -44,7 +42,7 @@ export const apiConnections: Record<
       ',',
     ) as LoggerOptions,
     cache: false,
-    migrations: [__dirname + '/migrations/api/**/*.ts'],
+    migrations: [__dirname + '/migrations/api/**/*{.ts,.js}'],
     /** Migrations will run automatically on startup, unless the
      * `API_RUN_MIGRATIONS_ON_STARTUP` or `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`
      * environment variables are set and their value matches, case-insensitively,
@@ -74,6 +72,7 @@ export const apiConnections: Record<
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
     ],
+    uuidExtension: 'pgcrypto',
     logging: `${AppConfig.get('postgresGeoApi.logging')}`.split(
       ',',
     ) as LoggerOptions,

@@ -1,13 +1,16 @@
 import { bootstrapApplication } from '../../utils';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { copyFileSync, readFileSync } from 'fs';
 import { v4 } from 'uuid';
-import { Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { booleanEqual } from '@turf/turf';
 import { FeatureCollection } from 'geojson';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 import { PlanningUnitsGridProcessor } from '@marxan-geoprocessing/modules/planning-area/planning-units-grid/planning-units-grid.processor';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PromiseType } from 'utility-types';
@@ -15,6 +18,8 @@ import { PromiseType } from 'utility-types';
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const sut: PlanningUnitsGridProcessor = app.get(PlanningUnitsGridProcessor);
+  const entityManager: EntityManager = app.get(getEntityManagerToken());
+  const projectsPuRepo = entityManager.getRepository(ProjectsPuEntity);
   const puGeoRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom),
   );
@@ -24,8 +29,10 @@ export const getFixtures = async () => {
   const projectId = v4();
   return {
     cleanup: async () => {
+      const projectPus = await projectsPuRepo.find({ projectId });
+
       await puGeoRepo.delete({
-        projectId,
+        id: In(projectPus.map((pu) => pu.geomId)),
       });
       await planningAreaRepo.delete({
         projectId,
@@ -69,10 +76,10 @@ export const getFixtures = async () => {
                      json_agg(ST_AsGeoJSON((t.*)::record, '', 15)::json)
                      )
             from (
-                   select the_geom
-                   from planning_units_geom
+                   select pug.the_geom
+                   from planning_units_geom pug inner join projects_pu ppu on pug.id = ppu.geom_id
                    where type = 'from_shapefile'
-                     and project_id = $1
+                     and ppu.project_id = $1
                  ) as t(geom)
           `,
           [output.id],

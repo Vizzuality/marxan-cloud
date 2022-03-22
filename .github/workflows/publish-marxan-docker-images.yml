@@ -10,9 +10,10 @@ on:
       - 'main'
       - 'develop'
     paths:
+      - '.github/**'
       - 'api/**'
       - 'app/**'
-      - '.github/**'
+      - 'webshot/**'
   workflow_dispatch:
 
 jobs:

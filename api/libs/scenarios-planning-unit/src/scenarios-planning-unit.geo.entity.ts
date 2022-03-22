@@ -3,7 +3,7 @@ import { LockStatus } from './lock-status.enum';
 
 const scenariosPuDataEntityName = 'scenarios_pu_data';
 
-const toLockEnum: Record<0 | 1 | 2, LockStatus> = Object.freeze({
+export const toLockEnum: Record<0 | 1 | 2, LockStatus> = Object.freeze({
   0: LockStatus.Unstated,
   1: LockStatus.LockedIn,
   2: LockStatus.LockedOut,
@@ -25,9 +25,9 @@ export class ScenariosPlanningUnitGeoEntity {
    */
   @Column({
     type: 'uuid',
-    name: 'pu_geom_id',
+    name: 'project_pu_id',
   })
-  puGeometryId!: string;
+  projectPuId!: string;
 
   /**
    * missing FK
@@ -37,18 +37,6 @@ export class ScenariosPlanningUnitGeoEntity {
     name: 'scenario_id',
   })
   scenarioId!: string;
-
-  /**
-   * missing FK
-   */
-  @Column({
-    type: 'int',
-    name: 'puid',
-  })
-  /**
-   * numeric id for each PU (unique within each scenario. It's called puid in the db as it maps directly to the same-named variable in Marxan dat files
-   */
-  planningUnitMarxanId!: number;
 
   // TODO: debt: either 0|1|2|3 or null|1|2|3; currently DB allows nulls
   // @Min(0)

@@ -33,7 +33,7 @@ resource "kubernetes_ingress_v1" "ingress" {
             service {
               name = "api"
               port {
-                number = 3000
+                number = 30001
               }
             }
           }
@@ -49,7 +49,7 @@ resource "kubernetes_ingress_v1" "ingress" {
             service {
               name = "client"
               port {
-                number = 3000
+                number = 30004
               }
             }
           }
