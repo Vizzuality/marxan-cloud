@@ -8,41 +8,34 @@ import { ExportComponent } from '../domain';
 
 @Injectable()
 export class ExportResourcePiecesAdapter implements ExportResourcePieces {
-  private resolverMapping: Record<
-    ResourceKind,
-    (id: ResourceId, kind: ResourceKind) => Promise<ExportComponent[]>
-  > = {
-    project: this.resolveForProject.bind(this),
-    scenario: this.resolveForScenario.bind(this),
-  };
-
   constructor(
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
   ) {}
 
-  resolveFor(id: ResourceId, kind: ResourceKind): Promise<ExportComponent[]> {
-    return this.resolverMapping[kind](id, kind);
-  }
-
-  private async resolveForProject(
+  async resolveForProject(
     id: ResourceId,
-    kind: ResourceKind,
+    scenarioIds: string[],
   ): Promise<ExportComponent[]> {
     const project = await this.projectRepository.findOneOrFail(id.value, {
       relations: ['scenarios'],
     });
     const { scenarios } = project;
 
-    const scenarioPieces: ExportComponent[][] = [];
+    const scenarioPieces: ExportComponent[] = [];
 
     if (scenarios) {
       scenarioPieces.push(
-        ...(await Promise.all(
-          scenarios.map((scenario) =>
-            this.resolveForScenario(new ResourceId(scenario.id), kind),
+        ...scenarios
+          .filter(
+            (scenario) => !scenarioIds || scenarioIds.includes(scenario.id),
+          )
+          .flatMap((scenario) =>
+            this.resolveForScenario(
+              new ResourceId(scenario.id),
+              ResourceKind.Project,
+            ),
           ),
-        )),
       );
     }
 
@@ -62,16 +55,13 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGrid),
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGridGeojson),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
-      ...scenarioPieces.flat(),
+      ...scenarioPieces,
     ];
 
     return components;
   }
 
-  private async resolveForScenario(
-    id: ResourceId,
-    kind: ResourceKind,
-  ): Promise<ExportComponent[]> {
+  resolveForScenario(id: ResourceId, kind: ResourceKind): ExportComponent[] {
     const pieces: ExportComponent[] = [
       ExportComponent.newOne(id, ClonePiece.ScenarioMetadata),
       ExportComponent.newOne(id, ClonePiece.ScenarioProtectedAreas),
