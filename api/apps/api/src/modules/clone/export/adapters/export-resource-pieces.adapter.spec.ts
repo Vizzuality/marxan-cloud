@@ -24,7 +24,7 @@ it('resolves project pieces', async () => {
   fixtures.ThenProjectPiecesShouldBeIncluded({ components: result });
 });
 
-it(`resolves ${ClonePiece.PlanningAreaCustom} piece when invoked with a custom planninga area project`, async () => {
+it(`resolves ${ClonePiece.PlanningAreaCustom} piece when invoked with a custom planning area project`, async () => {
   const projectId = fixtures.GivenAProjectExportWithCustomPlanningArea();
   const result = await fixtures.WhenRequestingExportPieces(
     projectId,
@@ -46,23 +46,6 @@ it('resolves scenario pieces', async () => {
   );
   fixtures.ThenScenarioPiecesShouldBeIncluded({
     components: result,
-  });
-});
-
-it('resolves project and scenario pieces when invoked with a project which has scenarios', async () => {
-  const scenariosCount = 2;
-  const [projectId, scenariosIds] = fixtures.GivenAProjectExportWithScenarios(
-    scenariosCount,
-  );
-  const result = await fixtures.WhenRequestingExportPieces(
-    projectId,
-    ResourceKind.Project,
-    scenariosIds,
-  );
-  fixtures.ThenProjectAndScenarioPiecesShouldBeIncluded({
-    components: result,
-    projectWithCustomPlanningArea: false,
-    scenariosCount,
   });
 });
 
