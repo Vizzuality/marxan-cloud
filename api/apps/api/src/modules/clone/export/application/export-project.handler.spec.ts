@@ -71,7 +71,7 @@ const getFixtures = async () => {
       return { projectId };
     },
     WhenExportIsRequested: async (projectId: ResourceId) =>
-      sut.execute(new ExportProject(projectId)),
+      sut.execute(new ExportProject(projectId, [])),
     ThenExportRequestIsSaved: async (exportId: ExportId) => {
       expect((await repo.find(exportId))?.toSnapshot()).toBeDefined();
     },
@@ -120,7 +120,7 @@ class FakePiecesProvider implements ExportResourcePieces {
 
   async resolveForProject(
     id: ResourceId,
-    scenarioIds?: string[],
+    scenarioIds: string[],
   ): Promise<ExportComponent[]> {
     return this.resolveMock(id, scenarioIds);
   }
