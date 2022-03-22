@@ -100,7 +100,7 @@ export class PublishedProjectService {
     id: string,
     requestingUserId: string,
     status: boolean,
-    withUnpublish?: boolean,
+    alsoUnpublish?: boolean,
   ): Promise<Either<errors | typeof sameUnderModerationStatus, true>> {
     const existingPublicProject = await this.crudService.getById(
       id,
@@ -123,7 +123,7 @@ export class PublishedProjectService {
       underModeration: !existingPublicProject.underModeration,
     });
 
-    if (withUnpublish) {
+    if (alsoUnpublish) {
       await this.unpublish(id, requestingUserId);
     }
 

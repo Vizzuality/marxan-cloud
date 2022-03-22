@@ -48,14 +48,14 @@ export class PublishedProjectCrudService extends AppBaseService<
     fetchSpecification: FetchSpecification,
     info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<PublishedProject>> {
-    const id = info?.authenticatedUser?.id;
+    const userId = info?.authenticatedUser?.id;
 
     /*
       If we are listing projects for non-authenticated requests or for
       authenticated users who are not admin, projects under moderation
       will be hiding from the listing.
     */
-    if (!id || !(await this.usersService.isPlatformAdmin(id))) {
+    if (!userId || !(await this.usersService.isPlatformAdmin(userId))) {
       query.andWhere('published_project.underModeration is false');
     }
 

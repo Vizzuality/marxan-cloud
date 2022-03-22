@@ -123,7 +123,7 @@ test(`when unpublishing a public project as a project owner`, async () => {
   fixtures.ThenCreatedIsReturned(response);
 
   response = await fixtures.WhenUnpublishingAProjectAsProjectOwner(projectId);
-  fixtures.ThenOkIsReturned(response);
+  fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 });

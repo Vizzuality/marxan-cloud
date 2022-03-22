@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Controller,
   DefaultValuePipe,
-  Delete,
   ForbiddenException,
   Get,
   InternalServerErrorException,
@@ -96,7 +95,7 @@ export class PublishProjectController {
     return;
   }
 
-  @Delete(':id/unpublish')
+  @Post(':id/unpublish')
   @ApiNoContentResponse()
   @ApiNotFoundResponse()
   @ApiForbiddenResponse()
@@ -177,14 +176,14 @@ export class PublishProjectController {
   async clearUnderModeration(
     @Param('id') id: string,
     @Request() req: RequestWithAuthenticatedUser,
-    @Query('withUnpublish', new DefaultValuePipe(false), ParseBoolPipe)
-    withUnpublish: boolean,
+    @Query('alsoUnpublish', new DefaultValuePipe(false), ParseBoolPipe)
+    alsoUnpublish: boolean,
   ): Promise<void> {
     const result = await this.publishedProjectService.changeModerationStatus(
       id,
       req.user.id,
       false,
-      withUnpublish,
+      alsoUnpublish,
     );
 
     if (isLeft(result)) {

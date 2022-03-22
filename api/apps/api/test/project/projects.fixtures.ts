@@ -181,7 +181,7 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>
       await request(app.getHttpServer())
-        .delete(`/api/v1/projects/${projectId}/unpublish`)
+        .post(`/api/v1/projects/${projectId}/unpublish`)
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenPlacingAPublicProjectUnderModerationAsAdmin: async (
       projectId: string,
@@ -206,7 +206,7 @@ export const getFixtures = async () => {
     ) =>
       await request(app.getHttpServer())
         .patch(
-          `/api/v1/projects/${projectId}/moderation-status/clear?withUnpublish=true`,
+          `/api/v1/projects/${projectId}/moderation-status/clear?alsoUnpublish=true`,
         )
         .set('Authorization', `Bearer ${adminUserToken}`),
     WhenClearingUnderModerationStatusFromAPublicProjectNotAsAdmin: async (
