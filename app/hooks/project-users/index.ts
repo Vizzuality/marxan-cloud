@@ -7,10 +7,12 @@ import {
 import chroma from 'chroma-js';
 import { uniqBy } from 'lodash';
 import { useSession } from 'next-auth/client';
+import validate from 'validate.js';
 
 import { useMe } from 'hooks/me';
 
 import ROLES from 'services/roles';
+import USERS from 'services/users';
 
 import {
   DeleteProjectUserProps,
@@ -49,7 +51,7 @@ export function useProjectsUsers(projectsIds) {
     }),
   );
 
-  const USERS = useMemo(() => {
+  const PROJECT_USERS = useMemo(() => {
     if (userQueries.every((u) => u?.isFetched)) {
       const uniqUsers = uniqBy(
         userQueries
@@ -67,21 +69,21 @@ export function useProjectsUsers(projectsIds) {
     return [];
   }, [userQueries]);
 
-  const COLORS_SCALE = chroma.scale(COLORS).colors(USERS.length);
+  const COLORS_SCALE = chroma.scale(COLORS).colors(PROJECT_USERS.length);
 
   return useMemo(() => {
     return {
-      data: USERS.reduce((acc, u, i) => {
+      data: PROJECT_USERS.reduce((acc, u, i) => {
         return {
           ...acc,
-          [u]: (USERS.length > 10) ? COLORS_SCALE[i] : COLORS[i],
+          [u]: (PROJECT_USERS.length > 10) ? COLORS_SCALE[i] : COLORS[i],
           ...user.id === u && {
             [u]: COLOR_ME,
           },
         };
       }, {}),
     };
-  }, [user, USERS, COLORS_SCALE]);
+  }, [user, PROJECT_USERS, COLORS_SCALE]);
 }
 
 export function useProjectUsers(projectId) {
@@ -113,6 +115,32 @@ export function useProjectUsers(projectId) {
       ,
     };
   }, [query, data?.data, user]);
+}
+
+export function useUserByEmail(email) {
+  const [session] = useSession();
+
+  const query = useQuery(['users', email], () => USERS.request({
+    method: 'GET',
+    url: `/by-email/${email}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }),
+  {
+    enabled: !!email && !validate.single(email, { email: true }),
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data]);
 }
 
 export function useSaveProjectUserRole({

@@ -1,48 +1,145 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
+import { useRouter } from 'next/router';
+
+import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
+
+import {
+  useProjectsUsers, useProjectUsers, useSaveProjectUserRole, useUserByEmail,
+} from 'hooks/project-users';
+import { useToasts } from 'hooks/toast';
 
 import UserCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
 
+import Button from 'components/button';
 import Search from 'components/search';
 
 export interface EditContributorsDropdownProps {
-  users: any,
-  search?: string;
-  onSearch: (selected: string) => void;
 }
 
-export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = ({
-  users, search, onSearch,
-}: EditContributorsDropdownProps) => {
-  const onChangeSearchDebounced = useDebouncedCallback((value) => {
-    onSearch(value);
+export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = () => {
+  const { query } = useRouter();
+  const { pid } = query;
+
+  const { addToast } = useToasts();
+
+  const [search, setSearch] = useState(null);
+  const [email, setEmail] = useState(null);
+
+  const {
+    data: userByEmailData,
+    isFetched: userByEmailIsFetched,
+  } = useUserByEmail(email);
+
+  const {
+    data: projectUsersData,
+  } = useProjectUsers(pid);
+
+  const { data: projectsUsersData } = useProjectsUsers([pid]);
+
+  const saveProjectUserRoleMutation = useSaveProjectUserRole({});
+
+  const SEARCH_RESULT = useMemo(() => {
+    if (projectUsersData?.find((pu) => pu?.user?.id === userByEmailData?.id)) {
+      return null;
+    }
+
+    return userByEmailData;
+  }, [userByEmailData, projectUsersData]);
+
+  const onChangeEmailDebounced = useDebouncedCallback((value) => {
+    setEmail(value);
   }, 500);
 
-  useEffect(() => {
-    return function unmount() {
-      onSearch(null);
-    };
-  }, [onSearch]);
+  const onChangeSearch = useCallback((value) => {
+    setSearch(value);
+    onChangeEmailDebounced(value);
+  }, [onChangeEmailDebounced]);
 
-  const contributorsSpelling = users?.length !== 1 ? 'contributors' : 'contributor';
+  const addUser = useCallback(() => {
+    saveProjectUserRoleMutation.mutate({
+      projectId: `${pid}`,
+      data: {
+        userId: userByEmailData.id,
+        projectId: `${pid}`,
+        roleName: 'project_contributor',
+      },
+    }, {
+      onSuccess: () => {
+        addToast('add-conttributor-success', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              {userByEmailData.displayName}
+              {' '}
+              added as contributor
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        setSearch(null);
+        setEmail(null);
+      },
+      onError: () => {
+        addToast('add-conttributor-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Something went wrong, please try again.
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [pid, userByEmailData, saveProjectUserRoleMutation, addToast]);
+
+  const contributorsSpelling = projectUsersData?.length !== 1 ? 'contributors' : 'contributor';
 
   return (
     <div className="overflow-x-visible overflow-y-auto bg-white p-9 rounded-3xl">
-      <div className="flex flex-col items-center w-96">
-        <div className="text-sm text-black pb-9">Project members</div>
+      <div className="flex flex-col w-96">
+        <div className="text-sm text-center text-black pb-9">Project members</div>
         <Search
           id="user-search"
           size="base"
-          defaultValue={search}
+          value={search}
           placeholder="Search connections..."
           aria-label="Search"
-          onChange={onChangeSearchDebounced}
+          onChange={onChangeSearch}
           theme="light"
         />
-        <p className="self-start py-6 text-xs text-black uppercase font-heading">{`${users?.length} ${contributorsSpelling}`}</p>
+
+        {SEARCH_RESULT && userByEmailIsFetched && (
+          <div className="flex justify-between text-black pl-9 pr-5 py-2.5">
+            <div>{SEARCH_RESULT.displayName}</div>
+
+            <Button
+              className={cx({
+                'flex-shrink-0 h-6 py-2 text-sm  group': true,
+              })}
+              theme="primary"
+              size="xs"
+              onClick={addUser}
+            >
+              Add
+            </Button>
+          </div>
+        )}
+
+        {!SEARCH_RESULT && userByEmailIsFetched && (
+          <div className="flex justify-between text-black pl-9 pr-5 py-2.5">
+            <div>No results</div>
+          </div>
+        )}
+
+        <p className="py-6 text-xs text-black uppercase font-heading">{`${projectUsersData?.length} ${contributorsSpelling}`}</p>
         <div className="w-full space-y-2.5 flex-grow flex flex-col overflow-x-visible overflow-y-auto max-h-64">
-          {!!users?.length && users.map((u) => {
+          {!!projectUsersData?.length && projectUsersData.map((u) => {
             const {
               user: {
                 displayName, id, avatarDataUrl,
@@ -53,9 +150,10 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
               <UserCard
                 key={id}
                 id={id}
-                image={avatarDataUrl}
                 name={displayName}
                 roleName={roleName}
+                bgImage={avatarDataUrl}
+                bgColor={projectsUsersData[id]}
               />
             );
           })}

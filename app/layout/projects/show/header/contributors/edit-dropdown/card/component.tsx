@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
+import { useMe } from 'hooks/me';
 import { useOwnsProject } from 'hooks/permissions';
 import { useSaveProjectUserRole, useDeleteProjectUser } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
@@ -21,12 +22,13 @@ import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?
 export interface UserCardProps {
   id: string,
   name: string,
-  image?: string,
+  bgImage?: string,
   roleName: string,
+  bgColor: string,
 }
 
 export const UserCard: React.FC<UserCardProps> = ({
-  id, name, image, roleName,
+  id, name, bgImage, roleName, bgColor,
 }: UserCardProps) => {
   const { query } = useRouter();
   const { pid } = query;
@@ -34,6 +36,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   const [open, setOpen] = useState(false);
   const [userRole, setUserRole] = useState(ROLES[roleName]);
 
+  const { user: meData } = useMe();
   const isOwner = useOwnsProject(pid);
 
   const editProjectUserRoleMutation = useSaveProjectUserRole({
@@ -113,13 +116,14 @@ export const UserCard: React.FC<UserCardProps> = ({
   return (
     <div className="box-border flex items-center justify-between flex-grow w-full py-3 pl-3 pr-6 space-x-3 bg-gray-100 rounded-3xl">
       <Avatar
-        className="box-border px-3 text-sm text-white uppercase border-none bg-primary-700"
-        bgImage={image}
+        className="flex-shrink-0 text-sm uppercase border-none bg-primary-700"
+        bgImage={bgImage}
+        bgColor={bgColor}
         name={name}
-        size="lg"
       >
-        {!image && name.slice(0, 2)}
+        {!bgImage && name.slice(0, 2)}
       </Avatar>
+
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
         <p className="w-40 text-sm text-black clamp-1">{name}</p>
         <div className="w-40 pr-4">
@@ -145,7 +149,7 @@ export const UserCard: React.FC<UserCardProps> = ({
       <Button
         className={cx({
           'flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group': true,
-          invisible: !isOwner,
+          invisible: !isOwner || (isOwner && id === meData.id),
         })}
         theme="secondary-alt"
         size="xs"
