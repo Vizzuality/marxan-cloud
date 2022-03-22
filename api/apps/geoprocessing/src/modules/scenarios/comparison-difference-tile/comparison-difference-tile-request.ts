@@ -3,7 +3,6 @@ import { BBox } from 'geojson';
 import { TileRequest } from '@marxan/tiles';
 
 export class ScenarioComparisonTileRequest extends TileRequest {
-
   @IsString()
   scenarioIdA!: string;
 

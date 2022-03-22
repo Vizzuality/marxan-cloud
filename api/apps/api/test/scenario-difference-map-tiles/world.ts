@@ -14,10 +14,8 @@ import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 
 export const createWorld = async (app: INestApplication) => {
-
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
-  const { cleanup, projectId } = await GivenProjectExists(
-    app, ownerToken, {
+  const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
     countryCode: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
@@ -46,8 +44,6 @@ export const createWorld = async (app: INestApplication) => {
     ),
   );
 
-
-
   return {
     scenarioIdA,
     scenarioIdB,
@@ -55,7 +51,10 @@ export const createWorld = async (app: INestApplication) => {
       (await GivenScenarioPuDataExists(scenariosPuData, scenarioIdA)).rows,
     GivenScenarioBPuDataExists: async () =>
       (await GivenScenarioPuDataExists(scenariosPuData, scenarioIdB)).rows,
-    WhenRequestingTileToCompareScenarios: async (scenarioIdA: string, scenarioIdB: string) =>
+    WhenRequestingTileToCompareScenarios: async (
+      scenarioIdA: string,
+      scenarioIdB: string,
+    ) =>
       request(app.getHttpServer())
         .get(
           `/api/v1/scenarios/${scenarioIdA}/compare/${scenarioIdB}/tiles/9/189/291.mvt`,
@@ -70,9 +69,9 @@ export const createWorld = async (app: INestApplication) => {
           throw new Error(`[step] Could not Access tile preview grid tile`);
         }),
     ThenItContainsScenarioCompareTile: async (mvt: Buffer) => {
-        const tile = decodeMvt(mvt);
-        expect(tile.layers).toBeDefined();
-      },
+      const tile = decodeMvt(mvt);
+      expect(tile.layers).toBeDefined();
+    },
 
     cleanup: async () => {
       await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioIdA);

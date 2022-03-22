@@ -231,8 +231,16 @@ export class ScenariosController {
     /* Due to the usage of proxyService in other modules
     the ACL control for this endpoint is placed in the controller */
     if (
-      !(await this.scenarioAclService.canViewScenario(req.user.id, scenarioIdA)
-      && await this.scenarioAclService.canViewScenario(req.user.id, scenarioIdB))
+      !(
+        (await this.scenarioAclService.canViewScenario(
+          req.user.id,
+          scenarioIdA,
+        )) &&
+        (await this.scenarioAclService.canViewScenario(
+          req.user.id,
+          scenarioIdB,
+        ))
+      )
     ) {
       throw new ForbiddenException();
     }
