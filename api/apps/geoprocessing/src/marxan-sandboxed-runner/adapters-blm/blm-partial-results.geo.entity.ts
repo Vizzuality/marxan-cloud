@@ -57,8 +57,8 @@ export class BlmPartialResultEntity {
    */
   @Column({
     name: `protected_pu_ids`,
-    type: 'int',
+    type: 'uuid',
     array: true,
   })
-  protected_pu_ids!: number[];
+  protected_pu_ids!: string[];
 }

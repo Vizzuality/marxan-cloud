@@ -1,3 +1,4 @@
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
@@ -11,6 +12,8 @@ export class BlmPartialResultsRepository {
   constructor(
     @InjectRepository(BlmPartialResultEntity)
     private readonly repository: Repository<BlmPartialResultEntity>,
+    @InjectRepository(ProjectsPuEntity)
+    private readonly projectPuRepository: Repository<ProjectsPuEntity>,
     private readonly blmBestRunService: BlmBestRunService,
     private readonly blmPuidsBestService: BlmPuidFromBestRunService,
   ) {}
@@ -39,13 +42,22 @@ export class BlmPartialResultsRepository {
       .filter((puidRow) => puidRow.solution !== 0)
       .map((puidRow) => puidRow.puid);
 
+    const puidUuids = await Promise.all(
+      filteredPuidList.map(async (puidInt) => {
+        const fullPu = await this.projectPuRepository.findOneOrFail({
+          puid: puidInt,
+        });
+        return fullPu.id;
+      }),
+    );
+
     await this.repository.save({
       blmValue,
       boundaryLength: bestRun.connectivity,
       scenarioId,
       calibrationId,
       cost: bestRun.cost,
-      protected_pu_ids: filteredPuidList,
+      protected_pu_ids: puidUuids,
     });
   }
 
