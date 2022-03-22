@@ -29,7 +29,10 @@ import {
 } from './planning-area-tiles/planning-area-tiles.service';
 import { PlanningAreaGridTilesService } from './planning-units-grid/planning-area-grid-tiles.service';
 import { Response } from 'express';
-import { TilesOpenApi } from '@marxan/tiles';
+import {
+  setTileResponseHeadersForSuccessfulRequests,
+  TilesOpenApi,
+} from '@marxan/tiles';
 
 @Controller(`${apiGlobalPrefixes.v1}/projects/planning-area`)
 export class PlanningAreaController {
@@ -97,6 +100,7 @@ export class PlanningAreaController {
     const tile: Buffer = await this.planningAreaTilesService.findTile(
       tileSpecification,
     );
+    setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }
 
@@ -113,10 +117,6 @@ export class PlanningAreaController {
   })
   @Get('/:planningAreaId/grid/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
-  @Header('Content-Type', 'application/x-protobuf')
-  @Header('Content-Disposition', 'attachment')
-  @Header('Access-Control-Allow-Origin', '*')
-  @Header('Content-Encoding', 'gzip')
   async getGridTile(
     @Param() tileSpecification: TileSpecification,
     @Res() response: Response,
@@ -124,6 +124,7 @@ export class PlanningAreaController {
     const tile: Buffer = await this.planningAreaGridTilesService.findTile(
       tileSpecification,
     );
+    setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }
 }

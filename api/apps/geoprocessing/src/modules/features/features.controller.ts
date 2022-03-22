@@ -22,6 +22,7 @@ import {
 import { BBox } from 'geojson';
 
 import { Response } from 'express';
+import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';
 
 @Controller(`${apiGlobalPrefixes.v1}/geo-features`)
 export class FeaturesController {
@@ -65,10 +66,6 @@ export class FeaturesController {
   })
   @Get('/:id/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
-  @Header('Content-Type', 'application/x-protobuf')
-  @Header('Content-Disposition', 'attachment')
-  @Header('Access-Control-Allow-Origin', '*')
-  @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() TileSpecification: TileSpecification,
     @Query() query: FeaturesFilters,
@@ -78,6 +75,7 @@ export class FeaturesController {
       TileSpecification,
       query.bbox as BBox,
     );
+    setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }
 }

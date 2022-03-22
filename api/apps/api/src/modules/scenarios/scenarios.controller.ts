@@ -103,7 +103,7 @@ import {
   ScenarioLockResultSingular,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
-import { BaseTilesOpenApi, BaseTilesResponseHeaders } from '@marxan/tiles';
+import { BaseTilesOpenApi } from '@marxan/tiles';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;

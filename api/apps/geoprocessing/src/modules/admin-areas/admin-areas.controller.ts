@@ -18,6 +18,7 @@ import {
 import { TileSpecification, AdminAreasFilters } from './admin-areas.service';
 
 import { Response } from 'express';
+import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';
 
 @Controller(`${apiGlobalPrefixes.v1}/administrative-areas`)
 export class AdminAreasController {
@@ -69,10 +70,6 @@ export class AdminAreasController {
   })
   @Get('/:level/preview/tiles/:z/:x/:y.mvt')
   @ApiBadRequestResponse()
-  @Header('Content-Type', 'application/x-protobuf')
-  @Header('Content-Disposition', 'attachment')
-  @Header('Access-Control-Allow-Origin', '*')
-  @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileSpecification: TileSpecification,
     @Query() adminAreasFilters: AdminAreasFilters,
@@ -82,6 +79,7 @@ export class AdminAreasController {
       tileSpecification,
       adminAreasFilters,
     );
+    setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }
 }

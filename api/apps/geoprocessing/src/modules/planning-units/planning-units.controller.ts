@@ -29,6 +29,7 @@ import {
 } from '@nestjs/swagger';
 
 import { Response } from 'express';
+import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
@@ -96,10 +97,6 @@ export class PlanningUnitsController {
     '/preview/regular/:planningUnitGridShape/:planningUnitAreakm2/tiles/:z/:x/:y.mvt',
   )
   @ApiBadRequestResponse()
-  @Header('Content-Type', 'application/x-protobuf')
-  @Header('Content-Disposition', 'attachment')
-  @Header('Access-Control-Allow-Origin', '*')
-  @Header('Content-Encoding', 'gzip')
   async getTile(
     @Param() tileSpecification: tileSpecification,
     @Query() planningUnitsFilters: PlanningUnitsFilters,
@@ -109,6 +106,7 @@ export class PlanningUnitsController {
       tileSpecification,
       planningUnitsFilters,
     );
+    setTileResponseHeadersForSuccessfulRequests(response);
     return response.send(tile);
   }
 }
