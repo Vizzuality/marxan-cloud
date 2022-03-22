@@ -127,7 +127,7 @@ export const UserCard: React.FC<UserCardProps> = ({
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
         <p className="w-40 text-sm text-black clamp-1">{name}</p>
         <div className="w-40 pr-4">
-          {isOwner && (
+          {isOwner && !(isOwner && id === meData.id) && (
             <Select
               initialSelected={ROLES[roleName]}
               maxHeight={300}
@@ -142,7 +142,7 @@ export const UserCard: React.FC<UserCardProps> = ({
               }}
             />
           )}
-          {!isOwner && (<p className="text-sm text-black">{ROLES[roleName]}</p>)}
+          {(!isOwner || (isOwner && id === meData.id)) && (<p className="text-sm text-gray-500">{ROLES[roleName]}</p>)}
         </div>
       </div>
 
