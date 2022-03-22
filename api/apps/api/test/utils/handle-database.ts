@@ -1,6 +1,7 @@
 import { Connection, createConnection, MigrationExecutor } from 'typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { TestClientApi } from './test-client/test-client-api';
+import { insertAdminRegions } from './test-client/seed/admin-regions';
 
 let apiConnection: Connection;
 let geoConnection: Connection;
@@ -16,6 +17,8 @@ beforeAll(async () => {
 beforeEach(async () => {
   await clearTables(apiConnection, ['roles', 'api_event_kinds']);
   await clearTables(geoConnection);
+
+  await insertAdminRegions(geoConnection);
 });
 
 afterEach(async () => {
