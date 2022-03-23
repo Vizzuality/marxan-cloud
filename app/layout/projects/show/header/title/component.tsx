@@ -47,7 +47,7 @@ export const Title: React.FC<TitleProps> = () => {
   });
 
   const handleEdition = () => {
-    if (!editting && !editable) {
+    if (!editting && editable) {
       const $input = document.getElementById('form-title-show-project-input');
       setTimeout(() => {
         if ($input instanceof HTMLElement) {

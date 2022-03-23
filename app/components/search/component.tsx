@@ -4,7 +4,6 @@ import React, { useRef } from 'react';
 import { useButton } from '@react-aria/button'; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { useSearchField } from '@react-aria/searchfield';
 import { useSearchFieldState } from '@react-stately/searchfield';
-
 // react types
 import { AriaSearchFieldProps } from '@react-types/searchfield';
 import cx from 'classnames';
