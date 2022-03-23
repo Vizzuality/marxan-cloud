@@ -132,6 +132,7 @@ export class AdminAreasController {
   })
   @Get('/administrative-areas/:level/preview/tiles/:z/:x/:y.mvt')
   async proxyAdminAreaTile(@Req() request: Request, @Res() response: Response) {
+    console.log('controller');
     return this.proxyService.proxyTileRequest(request, response);
   }
 

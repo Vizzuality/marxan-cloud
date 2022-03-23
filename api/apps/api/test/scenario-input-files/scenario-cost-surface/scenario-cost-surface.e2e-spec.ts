@@ -56,6 +56,7 @@ describe(`As contributor, when scenario has PUs with cost and lock status`, () =
   });
 
   it(`returns relevant data for PU listing`, async () => {
+    await fixtures.GivenContributorWasAddedToScenario();
     const results = await fixtures.WhenGettingPuInclusionStateAsContributor();
     expect(results).toEqual([
       {
@@ -93,6 +94,7 @@ describe(`As viewer, when scenario has PUs with cost and lock status`, () => {
   });
 
   it(`returns relevant data for PU listing`, async () => {
+    await fixtures.GivenViewerWasAddedToScenario();
     const results = await fixtures.WhenGettingPuInclusionStateAsViewer();
     expect(results).toEqual([
       {
