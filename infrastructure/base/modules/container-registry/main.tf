@@ -10,7 +10,7 @@
 # For the time being, that's not possible.
 
 resource "azurerm_container_registry" "acr" {
-  name                = var.project_name
+  name                = var.container_registry_name
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location
   sku                 = "Basic"
@@ -64,20 +64,20 @@ resource "azurerm_role_assignment" "acr-push" {
   principal_id         = azuread_service_principal.github-actions-access.object_id
 }
 
-resource "azuread_application_federated_identity_credential" "github-actions-access-develop" {
+resource "azuread_application_federated_identity_credential" "github-actions-access-staging" {
   application_object_id = azuread_application.github-actions-access.object_id
   display_name          = "github-actions-access-develop"
   description           = "Deployments from github actions"
   audiences             = ["api://AzureADTokenExchange"]
   issuer                = "https://token.actions.githubusercontent.com"
-  subject               = "repo:Vizzuality/marxan-cloud:ref:refs/heads/develop"
+  subject               = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${var.github_staging_branch}"
 }
 
-resource "azuread_application_federated_identity_credential" "github-actions-access-main" {
+resource "azuread_application_federated_identity_credential" "github-actions-access-production" {
   application_object_id = azuread_application.github-actions-access.object_id
   display_name          = "github-actions-access-main"
   description           = "Deployments from github actions"
   audiences             = ["api://AzureADTokenExchange"]
   issuer                = "https://token.actions.githubusercontent.com"
-  subject               = "repo:Vizzuality/marxan-cloud:ref:refs/heads/main"
+  subject               = "repo:${var.github_org}/${var.github_repo}:ref:refs/heads/${var.github_production_branch}"
 }

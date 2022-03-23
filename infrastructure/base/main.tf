@@ -36,9 +36,13 @@ module "bastion" {
 }
 
 module "container_registry" {
-  source         = "./modules/container-registry"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
+  source                   = "./modules/container-registry"
+  resource_group           = data.azurerm_resource_group.resource_group
+  container_registry_name  = var.container_registry_name
+  github_org               = var.github_org
+  github_repo              = var.github_repo
+  github_production_branch = var.github_production_branch
+  github_staging_branch    = var.github_staging_branch
 }
 
 module "kubernetes" {

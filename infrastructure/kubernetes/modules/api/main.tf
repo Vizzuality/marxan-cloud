@@ -152,7 +152,7 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
-            name = "APPLICATION_BASE_URL"
+            name  = "APPLICATION_BASE_URL"
             value = var.application_base_url
           }
 
