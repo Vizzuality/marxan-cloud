@@ -116,3 +116,46 @@ test(`when clearing under moderation status from a public project not as platfor
   response = await fixtures.WhenGettingPublicProject(projectId);
   fixtures.ThenForbiddenIsReturned(response);
 });
+
+test(`when unpublishing a public project as a project owner`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  let response = await fixtures.WhenPublishingAProject(projectId);
+  fixtures.ThenCreatedIsReturned(response);
+
+  response = await fixtures.WhenUnpublishingAProjectAsProjectOwner(projectId);
+  fixtures.ThenCreatedIsReturned(response);
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenNoProjectIsAvailable(response);
+});
+
+test(`when unpublishing a public project that is under moderation as a project owner`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  let response = await fixtures.WhenPublishingAProject(projectId);
+  fixtures.ThenCreatedIsReturned(response);
+  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
+    projectId,
+  );
+  fixtures.ThenOkIsReturned(response);
+
+  response = await fixtures.WhenUnpublishingAProjectAsProjectOwner(projectId);
+  fixtures.ThenBadRequestIsReturned(response);
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenNoProjectIsAvailable(response);
+});
+
+test(`when unpublishing a public project that is under moderation as a platform admin`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  let response = await fixtures.WhenPublishingAProject(projectId);
+  fixtures.ThenCreatedIsReturned(response);
+  response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
+    projectId,
+  );
+  fixtures.ThenOkIsReturned(response);
+
+  response = await fixtures.WhenClearingUnderModerationStatusAndUnpublishingAsAdmin(
+    projectId,
+  );
+  fixtures.ThenOkIsReturned(response);
+  response = await fixtures.WhenGettingPublicProjects();
+  fixtures.ThenNoProjectIsAvailable(response);
+});

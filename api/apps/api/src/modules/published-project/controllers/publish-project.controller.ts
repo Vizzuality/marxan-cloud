@@ -1,11 +1,13 @@
 import {
   BadRequestException,
   Controller,
+  DefaultValuePipe,
   ForbiddenException,
   Get,
   InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseBoolPipe,
   Patch,
   Post,
   Query,
@@ -20,6 +22,8 @@ import {
   internalError,
   notFound,
   PublishedProjectService,
+  notPublished,
+  underModerationError,
 } from '../published-project.service';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import {
@@ -91,6 +95,43 @@ export class PublishProjectController {
     return;
   }
 
+  @Post(':id/unpublish')
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse()
+  @ApiForbiddenResponse()
+  @ApiInternalServerErrorResponse()
+  async unpublish(
+    @Param('id') id: string,
+    @Request() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.publishedProjectService.unpublish(
+      id,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case accessDenied:
+          throw new ForbiddenException();
+        case notPublished:
+          throw new BadRequestException('This project is not published yet.');
+        case notFound:
+          throw new NotFoundException();
+        case internalError:
+          throw new InternalServerErrorException();
+        case underModerationError:
+          throw new BadRequestException(
+            'This project is under moderation and it can not be unpublished.',
+          );
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return;
+  }
+
   @Patch(':id/moderation-status/set')
   @ApiNoContentResponse()
   @ApiNotFoundResponse()
@@ -135,11 +176,14 @@ export class PublishProjectController {
   async clearUnderModeration(
     @Param('id') id: string,
     @Request() req: RequestWithAuthenticatedUser,
+    @Query('alsoUnpublish', new DefaultValuePipe(false), ParseBoolPipe)
+    alsoUnpublish: boolean,
   ): Promise<void> {
     const result = await this.publishedProjectService.changeModerationStatus(
       id,
       req.user.id,
       false,
+      alsoUnpublish,
     );
 
     if (isLeft(result)) {
@@ -184,7 +228,7 @@ export class PublishProjectController {
     description: `A free search over names`,
   })
   @Get('published-projects/by-admin')
-  async findOneByAdmin(
+  async findAllByAdmin(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') namesSearch?: string,
@@ -205,7 +249,7 @@ export class PublishProjectController {
   @ApiOperation({ description: 'Find public project by id for admins.' })
   @ApiOkResponse({ type: PublishedProjectResultSingular })
   @Get('published-projects/:id/by-admin')
-  async findAll(
+  async findOneByAdmin(
     @Req() req: RequestWithAuthenticatedUser,
     @Param('id') id: string,
   ): Promise<PublishedProjectResultSingular> {
