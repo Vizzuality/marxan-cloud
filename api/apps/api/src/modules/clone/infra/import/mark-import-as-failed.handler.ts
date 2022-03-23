@@ -33,6 +33,8 @@ export class MarkImportAsFailedHandler
     }
     const { resourceKind, resourceId, projectId } = importInstance.toSnapshot();
 
+    // TODO Comprobar si ya existe el evento
+
     const kind = this.eventMapper[resourceKind];
 
     await this.apiEvents.createIfNotExists({

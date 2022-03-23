@@ -8,9 +8,17 @@ import {
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
-import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
+import {
+  CommandBus,
+  CommandHandler,
+  CqrsModule,
+  EventBus,
+  ICommand,
+  IEvent,
+} from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
+import { MarkImportAsFailed } from '../../infra/import/mark-import-as-failed.command';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
   AllPiecesImported,
@@ -21,7 +29,6 @@ import {
   PieceImported,
   PieceImportRequested,
 } from '../domain';
-import { ImportBatchFailed } from '../domain/events/import-batch-failed.event';
 import { ImportComponentStatuses } from '../domain/import/import-component-status';
 import { CompleteImportPiece } from './complete-import-piece.command';
 import { CompleteImportPieceHandler } from './complete-import-piece.handler';
@@ -74,11 +81,11 @@ it('should emit a AllPiecesImported event if all components are finished', async
   fixtures.ThenAllPiecesImportedEventIsEmitted(importInstance.importId);
 });
 
-it('should emit a ImportBatchFailed event if import instance is not found', async () => {
+it('should send a MarkImportAsFailed command if import instance is not found', async () => {
   const importId = new ImportId(v4());
   await fixtures.GivenNoneImportWasRequested(importId);
   await fixtures.WhenAPieceOfAnUnexistingImportIsCompleted(importId);
-  fixtures.ThenImportBatchFailedEventIsEmitted(importId);
+  fixtures.ThenMarkImportAsFailedCommandIsSent(importId);
 });
 
 it('should not publish any event if import piece component is already completed', async () => {
@@ -98,12 +105,12 @@ it('should not publish any event if import piece component is already completed'
   fixtures.ThenNoEventIsEmitted();
 });
 
-it('should emit a ImportBatchFailed event if a piece is not found', async () => {
+it('should send a MarkImportAsFailed command if a piece is not found', async () => {
   const importInstance = await fixtures.GivenImportWasRequested();
 
   await fixtures.WhenTryingToCompleteAnUnexistingPiece(importInstance.importId);
 
-  fixtures.ThenImportBatchFailedEventIsEmitted(importInstance.importId);
+  fixtures.ThenMarkImportAsFailedCommandIsSent(importInstance.importId);
 });
 
 const getFixtures = async () => {
@@ -119,16 +126,21 @@ const getFixtures = async () => {
         useClass: FakeLogger,
       },
       CompleteImportPieceHandler,
+      FakeMarkImportAsFailedHandler,
     ],
   }).compile();
   await sandbox.init();
 
   const events: IEvent[] = [];
+  const commands: ICommand[] = [];
 
   const sut = sandbox.get(CompleteImportPieceHandler);
   const repo = sandbox.get(ImportRepository);
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
+  });
+  sandbox.get(CommandBus).subscribe((command) => {
+    commands.push(command);
   });
 
   return {
@@ -232,9 +244,11 @@ const getFixtures = async () => {
 
       expect(components).toBeDefined();
       expect(components?.length).toBe(piecesCompletedIds.length);
-      expect(components?.every((piece) => piece.status)).toEqual(
-        ImportComponentStatuses.Completed,
-      );
+      expect(
+        components?.every(
+          (piece) => piece.status === ImportComponentStatuses.Completed,
+        ),
+      ).toEqual(true);
     },
     ThenPieceImportedEventIsEmitted: (
       importId: ImportId,
@@ -279,16 +293,21 @@ const getFixtures = async () => {
     ThenNoEventIsEmitted: () => {
       expect(events).toHaveLength(0);
     },
-    ThenImportBatchFailedEventIsEmitted: (importId: ImportId) => {
-      const exportPieceFailedEvent = events[0];
+    ThenMarkImportAsFailedCommandIsSent: (importId: ImportId) => {
+      const markImportAsFailedCommand = commands[0];
 
-      expect(exportPieceFailedEvent).toBeInstanceOf(ImportBatchFailed);
-      expect((exportPieceFailedEvent as ImportBatchFailed).importId).toEqual(
-        importId,
-      );
+      expect(markImportAsFailedCommand).toBeInstanceOf(MarkImportAsFailed);
+      expect(
+        (markImportAsFailedCommand as MarkImportAsFailed).importId,
+      ).toEqual(importId);
     },
     WhenCleaningEventBus: () => {
       events.splice(0, events.length);
     },
   };
 };
+
+@CommandHandler(MarkImportAsFailed)
+class FakeMarkImportAsFailedHandler {
+  async execute(): Promise<void> {}
+}

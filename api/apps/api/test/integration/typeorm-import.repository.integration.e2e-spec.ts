@@ -19,6 +19,7 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { apiConnections } from '../../src/ormconfig';
+import { ImportComponentStatuses } from '../../src/modules/clone/import/domain/import/import-component-status';
 
 describe('Typeorm import repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -99,7 +100,7 @@ const getFixtures = async () => {
         [
           ImportComponent.fromSnapshot({
             order: 0,
-            finished: false,
+            status: ImportComponentStatuses.Submitted,
             piece: ClonePiece.ProjectMetadata,
             resourceId: importResourceId.value,
             id: componentId.value,
@@ -121,7 +122,7 @@ const getFixtures = async () => {
       const components = Array(10).map(() =>
         ImportComponent.fromSnapshot({
           order: 0,
-          finished: false,
+          status: ImportComponentStatuses.Submitted,
           piece: ClonePiece.ProjectMetadata,
           resourceId: importResourceId.value,
           id: ComponentId.create().value,
@@ -183,7 +184,11 @@ const getFixtures = async () => {
 
       const [importComponent] = importSnapshot.importPieces;
 
-      expect(importComponent.finished).toBe(componentsAreCompleted);
+      expect(importComponent.status).toBe(
+        componentsAreCompleted
+          ? ImportComponentStatuses.Completed
+          : ImportComponentStatuses.Submitted,
+      );
       expect(importComponent.piece).toBe(ClonePiece.ProjectMetadata);
       expect(importComponent.resourceId).toBe(importResourceId.value);
     },
@@ -194,7 +199,11 @@ const getFixtures = async () => {
     }) => {
       expect(importData).toBeDefined();
       expect(
-        importData!.toSnapshot().importPieces.every((piece) => piece.finished),
+        importData!
+          .toSnapshot()
+          .importPieces.every(
+            (piece) => piece.status === ImportComponentStatuses.Completed,
+          ),
       ).toEqual(true);
     },
   };

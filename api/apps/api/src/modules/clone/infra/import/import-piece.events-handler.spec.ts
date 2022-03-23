@@ -54,6 +54,7 @@ const getFixtures = async () => {
         },
       },
       FakeCompleteImportPieceHandler,
+      FakeMarkImportPieceAsFailedHandler,
     ],
   }).compile();
   await sandbox.init();
@@ -164,5 +165,10 @@ class FakeQueueEvents {
 
 @CommandHandler(CompleteImportPiece)
 class FakeCompleteImportPieceHandler {
+  async execute(): Promise<void> {}
+}
+
+@CommandHandler(MarkImportPieceAsFailed)
+class FakeMarkImportPieceAsFailedHandler {
   async execute(): Promise<void> {}
 }

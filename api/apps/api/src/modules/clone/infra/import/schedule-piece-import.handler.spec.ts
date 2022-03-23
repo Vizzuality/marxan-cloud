@@ -8,14 +8,15 @@ import {
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
-import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
 import { MemoryImportRepository } from '../../import/adapters/memory-import.repository.adapter';
 import { ImportRepository } from '../../import/application/import.repository.port';
 import { Import, ImportComponent, ImportId } from '../../import/domain';
-import { ImportBatchFailed } from '../../import/domain/events/import-batch-failed.event';
 import { importPieceQueueToken } from './import-queue.provider';
+import { MarkImportAsFailed } from './mark-import-as-failed.command';
+import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
 
@@ -36,7 +37,7 @@ it('should add a import-piece job to the queue and create a import piece submitt
   fixtures.ThenImportPieceSubmittedApiEventIsCreated();
 });
 
-it('should emit an ImportBatchFailed event if the import instance cannot be retrieved', async () => {
+it('should send a MarkImportAsFailed command if the import instance cannot be retrieved', async () => {
   fixtures.GivenSchedulePieceImportCommand(
     ImportId.create(),
     ComponentId.create(),
@@ -46,10 +47,10 @@ it('should emit an ImportBatchFailed event if the import instance cannot be retr
     addMockResolvedValue: 'job',
   });
 
-  fixtures.ThenImportBatchFailedEventIsPublished();
+  fixtures.ThenMarkImportAsFailedCommandIsSent();
 });
 
-it('should emit an ImportBatchFailed event if the import component is not found in import pieces', async () => {
+it('should send a MarkImportAsFailed command if the import component is not found in import pieces', async () => {
   const [importInstance] = await fixtures.GivenImportIsCreated();
 
   fixtures.GivenSchedulePieceImportCommand(
@@ -61,10 +62,10 @@ it('should emit an ImportBatchFailed event if the import component is not found 
     addMockResolvedValue: 'job',
   });
 
-  fixtures.ThenImportBatchFailedEventIsPublished();
+  fixtures.ThenMarkImportAsFailedCommandIsSent();
 });
 
-it('should emit an ImportBatchFailed event if the job cannot be added to the queue', async () => {
+it('should send a MarkImportPieceAsFailed command if the job cannot be added to the queue', async () => {
   const [importInstance, componentId] = await fixtures.GivenImportIsCreated();
   fixtures.GivenSchedulePieceImportCommand(importInstance, componentId);
 
@@ -72,7 +73,7 @@ it('should emit an ImportBatchFailed event if the job cannot be added to the que
     addMockResolvedValue: undefined,
   });
 
-  fixtures.ThenImportBatchFailedEventIsPublished();
+  fixtures.ThenMarkImportPieceAsFailedCommandIsSent();
 });
 
 const getFixtures = async () => {
@@ -106,13 +107,15 @@ const getFixtures = async () => {
         useClass: MemoryImportRepository,
       },
       SchedulePieceImportHandler,
+      FakeMarkImportPieceAsFailedHandler,
+      FakeMarkImportAsFailedHandler,
     ],
   }).compile();
   await sandbox.init();
 
-  const events: IEvent[] = [];
-  sandbox.get(EventBus).subscribe((event) => {
-    events.push(event);
+  const commands: ICommand[] = [];
+  sandbox.get(CommandBus).subscribe((command) => {
+    commands.push(command);
   });
   let command: SchedulePieceImport;
 
@@ -165,10 +168,27 @@ const getFixtures = async () => {
         data: expect.any(Object),
       });
     },
-    ThenImportBatchFailedEventIsPublished: () => {
-      expect(events).toHaveLength(1);
-      const [exportPieceFailedEvent] = events;
-      expect(exportPieceFailedEvent).toBeInstanceOf(ImportBatchFailed);
+    ThenMarkImportAsFailedCommandIsSent: () => {
+      expect(commands).toHaveLength(1);
+      const [markImportAsFailedCommand] = commands;
+      expect(markImportAsFailedCommand).toBeInstanceOf(MarkImportAsFailed);
+    },
+    ThenMarkImportPieceAsFailedCommandIsSent: () => {
+      expect(commands).toHaveLength(1);
+      const [markImportPieceAsFailedCommand] = commands;
+      expect(markImportPieceAsFailedCommand).toBeInstanceOf(
+        MarkImportPieceAsFailed,
+      );
     },
   };
 };
+
+@CommandHandler(MarkImportPieceAsFailed)
+class FakeMarkImportPieceAsFailedHandler {
+  async execute(): Promise<void> {}
+}
+
+@CommandHandler(MarkImportAsFailed)
+class FakeMarkImportAsFailedHandler {
+  async execute(): Promise<void> {}
+}
