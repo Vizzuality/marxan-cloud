@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useState,
 } from 'react';
 
 import { useRouter } from 'next/router';
@@ -7,7 +7,9 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { ROLES, ROLE_OPTIONS } from 'utils/constants-roles';
 
-import { useSaveProjectUserRole, useDeleteProjectUser, useProjectRole } from 'hooks/project-users';
+import { useMe } from 'hooks/me';
+import { useOwnsProject } from 'hooks/permissions';
+import { useSaveProjectUserRole, useDeleteProjectUser } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
 import Avatar from 'components/avatar';
@@ -20,21 +22,21 @@ import DELETE_USER_WARNING_SVG from 'svgs/notifications/delete-user-warning.svg?
 export interface UserCardProps {
   id: string,
   name: string,
-  image?: string,
+  bgImage?: string,
   roleName: string,
+  bgColor: string,
 }
 
 export const UserCard: React.FC<UserCardProps> = ({
-  id, name, image, roleName,
+  id, name, bgImage, roleName, bgColor,
 }: UserCardProps) => {
   const { query } = useRouter();
   const { pid } = query;
 
   const [open, setOpen] = useState(false);
-  const [userRole, setUserRole] = useState(ROLES[roleName]);
 
-  const { data: projectRole } = useProjectRole(pid);
-  const OWNER = projectRole === 'project_owner';
+  const { user: meData } = useMe();
+  const isOwner = useOwnsProject(pid);
 
   const editProjectUserRoleMutation = useSaveProjectUserRole({
     requestConfig: {
@@ -44,10 +46,6 @@ export const UserCard: React.FC<UserCardProps> = ({
 
   const deleteUserMutation = useDeleteProjectUser({});
   const { addToast } = useToasts();
-
-  const OPTIONS = useMemo(() => {
-    return ROLE_OPTIONS.filter((o) => o.value !== userRole);
-  }, [userRole]);
 
   const onEditRole = useCallback((value) => {
     editProjectUserRoleMutation.mutate({ projectId: `${pid}`, data: { roleName: value, userId: id, projectId: `${pid}` } }, {
@@ -113,43 +111,43 @@ export const UserCard: React.FC<UserCardProps> = ({
   return (
     <div className="box-border flex items-center justify-between flex-grow w-full py-3 pl-3 pr-6 space-x-3 bg-gray-100 rounded-3xl">
       <Avatar
-        className="box-border px-3 text-sm text-white uppercase border-none bg-primary-700"
-        bgImage={image}
+        className="flex-shrink-0 text-sm uppercase border-none bg-primary-700"
+        bgImage={bgImage}
+        bgColor={bgColor}
         name={name}
-        size="lg"
       >
-        {!image && name.slice(0, 2)}
+        {!bgImage && name.slice(0, 2)}
       </Avatar>
+
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
         <p className="w-40 text-sm text-black clamp-1">{name}</p>
         <div className="w-40 pr-4">
-          {OWNER && (
+          {isOwner && !(isOwner && id === meData.id) && (
             <Select
-              initialSelected={ROLES[roleName]}
               maxHeight={300}
               size="s"
               status="none"
               theme="light"
-              placeholder={ROLES[roleName]}
-              options={OPTIONS}
+              selected={roleName}
+              options={ROLE_OPTIONS}
+              removeSelected
               onChange={(value: string) => {
                 onEditRole(value);
-                setUserRole(value);
               }}
             />
           )}
-          {!OWNER && (<p className="text-sm text-black">{ROLES[roleName]}</p>)}
+          {(!isOwner || (isOwner && id === meData.id)) && (<p className="text-sm text-gray-500">{ROLES[roleName]}</p>)}
         </div>
       </div>
 
       <Button
         className={cx({
           'flex-shrink-0 h-6 py-2 text-sm bg-gray-600 group': true,
-          invisible: !OWNER,
+          invisible: !isOwner || (isOwner && id === meData.id),
         })}
         theme="secondary-alt"
         size="xs"
-        disabled={!OWNER}
+        disabled={!isOwner}
         onClick={() => setOpen(true)}
       >
         <span className="text-white group-hover:text-gray-600">Remove</span>

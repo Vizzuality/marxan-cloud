@@ -201,6 +201,7 @@ export const MultiSelect: React.FC<SelectProps> = ({
       className={cx({
         'c-multi-select': true,
         'w-full leading-tight overflow-hidden': true,
+        'pointer-events-none opacity-50': disabled,
         [THEME[theme].container]: true,
         [THEME[theme].closed]: true,
         [THEME.states[status]]: true,

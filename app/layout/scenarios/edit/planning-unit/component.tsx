@@ -10,7 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -49,15 +49,13 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
-  const VIEWER = projectRole === 'project_viewer';
-
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
 
   const { tab, subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const dispatch = useDispatch();
 
+  const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
   const scenarioMutation = useSaveScenario({
     requestConfig: {
@@ -202,7 +200,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
               )}
             </Pill>
 
-            {!subtab && (
+            {!subtab && editable && (
               <motion.div
                 key="continue-scenario-button"
                 className="flex justify-center flex-shrink-0 mt-4"
@@ -212,7 +210,6 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
                 <Button
                   theme="primary"
                   size="lg"
-                  disabled={VIEWER}
                   onClick={onContinue}
                 >
                   Continue

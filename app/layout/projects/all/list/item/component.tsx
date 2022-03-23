@@ -9,7 +9,8 @@ import type { Project } from 'types/project-model';
 import { ROLES } from 'utils/constants-roles';
 
 import { useMe } from 'hooks/me';
-import { useProjectRole, useProjectUsers } from 'hooks/project-users';
+import { useOwnsProject, useProjectRole } from 'hooks/permissions';
+import { useProjectUsers } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -54,7 +55,8 @@ export const Item: React.FC<ItemProps> = ({
   const { user } = useMe();
 
   const { data: projectRole } = useProjectRole(id);
-  const OWNER = projectRole === 'project_owner';
+
+  const isOwner = useOwnsProject(id);
 
   const { data: projectUsers } = useProjectUsers(id);
 
@@ -122,13 +124,13 @@ export const Item: React.FC<ItemProps> = ({
                 className={cx({
                   'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
                   'opacity-100': !!ROLES[projectRole],
-                  'bg-yellow-500 bg-opacity-20': OWNER,
-                  'border border-gray-500': !OWNER,
+                  'bg-yellow-500 bg-opacity-20': isOwner,
+                  'border border-gray-500': !isOwner,
                 })}
               >
                 <p className={cx({
-                  'text-yellow-500': OWNER,
-                  'text-white': !OWNER,
+                  'text-yellow-500': isOwner,
+                  'text-white': !isOwner,
                 })}
                 >
                   {ROLES[projectRole]}
@@ -295,7 +297,7 @@ export const Item: React.FC<ItemProps> = ({
               theme="secondary"
               size="xs"
               onClick={handleDelete}
-              disabled={!OWNER}
+              disabled={!isOwner}
             >
               Delete
             </Button>

@@ -29,6 +29,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
   initialValues,
   clearSelectionActive,
   clearSelectionLabel = 'Clear selection',
+  removeSelected,
   onSelect,
   onFocus,
   onBlur,
@@ -50,6 +51,15 @@ export const SingleSelect: React.FC<SelectProps> = ({
     clearSelectionActive,
     clearSelectionLabel,
   ]);
+
+  const getVisibleOptions = useMemo(() => {
+    return getOptions.filter((o) => {
+      if (removeSelected) {
+        return o.value !== values;
+      }
+      return !!o;
+    });
+  }, [removeSelected, values, getOptions]);
 
   const getInitialSelected = useMemo(() => {
     return getOptions.find((o) => o.value === initialValues && o.value !== null);
@@ -85,7 +95,7 @@ export const SingleSelect: React.FC<SelectProps> = ({
     closeMenu,
     reset,
   } = useSelect<SelectOptionProps>({
-    items: getOptions,
+    items: getVisibleOptions,
     ...typeof values !== 'undefined' && {
       selectedItem: getSelected,
     },
@@ -141,7 +151,9 @@ export const SingleSelect: React.FC<SelectProps> = ({
   }, [referenceHidden, closeMenu]);
 
   useEffect(() => {
-    if (update) update();
+    if (update && isOpen) {
+      update();
+    }
   }, [isOpen, update]);
 
   const selectedItems = selectedItem ? [selectedItem] : [];
@@ -172,13 +184,13 @@ export const SingleSelect: React.FC<SelectProps> = ({
           selectedItems={selectedItems}
           placeholder={placeholder}
           getToggleButtonProps={getToggleButtonProps}
+          update={update}
         />
       </div>
 
       {/* Menu */}
 
       {createPortal(
-
         <div
           className={cx({
             'c-select-dropdown': true,
@@ -221,29 +233,30 @@ export const SingleSelect: React.FC<SelectProps> = ({
                 maxHeight,
               }}
             >
-              {getOptions.map((option, index) => (
-                <li
-                  className={cx({
-                    'px-4 py-1 mt-0.5 cursor-pointer': true,
-                    [THEME[theme].item.base]: highlightedIndex !== index,
-                    [THEME[theme].item.disabled]: option.disabled,
-                    [THEME[theme].item.highlighted]: (
-                      (highlightedIndex === index && !option.disabled)
-                      || isSelected(option, selectedItems)
-                    ),
-                  })}
-                  key={`${option.value}`}
-                  {...getItemProps({ item: option, index, disabled: option.disabled })}
-                >
-                  <span
+              {getVisibleOptions
+                .map((option, index) => (
+                  <li
                     className={cx({
-                      'ml-6': !!option.checkbox,
+                      'px-4 py-1 mt-0.5 cursor-pointer': true,
+                      [THEME[theme].item.base]: highlightedIndex !== index,
+                      [THEME[theme].item.disabled]: option.disabled,
+                      [THEME[theme].item.highlighted]: (
+                        (highlightedIndex === index && !option.disabled)
+                      || isSelected(option, selectedItems)
+                      ),
                     })}
+                    key={`${option.value}`}
+                    {...getItemProps({ item: option, index, disabled: option.disabled })}
                   >
-                    {option.label}
-                  </span>
-                </li>
-              ))}
+                    <span
+                      className={cx({
+                        'ml-6': !!option.checkbox,
+                      })}
+                    >
+                      {option.label}
+                    </span>
+                  </li>
+                ))}
             </ul>
           </Menu>
         </div>,

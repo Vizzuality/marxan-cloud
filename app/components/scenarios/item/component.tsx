@@ -7,6 +7,7 @@ import cx from 'classnames';
 import Button from 'components/button';
 import Icon from 'components/icon';
 import ProgressBar from 'components/progress-bar';
+import Tooltip from 'components/tooltip';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
 import LOCK_SVG from 'svgs/ui/lock.svg?sprite';
@@ -186,9 +187,22 @@ export const Item: React.FC<ItemProps> = ({
 
                   <div className="flex items-center space-x-4 leading-none">
                     {lock && (
-                      <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-gray-500 rounded-full">
-                        <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
-                      </div>
+                      <Tooltip
+                        arrow
+                        placement="top"
+                        content={(
+                          <div
+                            className="p-2 text-xs text-center text-gray-500 bg-white rounded"
+                          >
+                            <div>{lock.displayName}</div>
+                            <div>is editing this scenario</div>
+                          </div>
+                        )}
+                      >
+                        <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 bg-gray-500 rounded-full">
+                          <Icon className="relative w-3 text-white" icon={LOCK_SVG} />
+                        </div>
+                      </Tooltip>
                     )}
                     <div>
                       <h2

@@ -13,6 +13,7 @@ export const Uploader: React.FC<UploaderProps> = ({
   open,
   caption,
   children,
+  disabled,
   onOpen,
   onClose,
 }: UploaderProps) => {
@@ -22,6 +23,7 @@ export const Uploader: React.FC<UploaderProps> = ({
         className="w-full py-1 text-xs cursor-pointer dropzone hover:bg-gray-500"
         theme="secondary"
         size="base"
+        disabled={disabled}
         onClick={onOpen}
       >
         {caption || 'Upload'}

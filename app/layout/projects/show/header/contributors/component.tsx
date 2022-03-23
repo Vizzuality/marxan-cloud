@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -24,23 +24,16 @@ export const Contributors: React.FC<ContributorsProps> = () => {
   const { pid } = query;
 
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState(null);
 
   const { data = {} } = useProject(pid);
   const { data: projectsUsersData } = useProjectsUsers([pid]);
 
   const {
     data: projectUsers,
-    refetch: refetchProjectUsers,
   } = useProjectUsers(pid);
 
   const projectUsersVisibleSize = 3;
   const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
-
-  useEffect(() => {
-    refetchProjectUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search]);
 
   const handleClick = useCallback(() => {
     setOpen(!open);
@@ -60,10 +53,6 @@ export const Contributors: React.FC<ContributorsProps> = () => {
       setOpen(false);
     }
   }, [setOpen]);
-
-  const onSearch = useCallback((s) => {
-    setSearch(s);
-  }, []);
 
   return (
     <AnimatePresence>
@@ -113,11 +102,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                 onClickOutside={handleClickOutside}
                 zIndex={49}
                 content={(
-                  <EditDropdown
-                    users={projectUsers}
-                    search={search}
-                    onSearch={onSearch}
-                  />
+                  <EditDropdown />
                 )}
               >
                 <button

@@ -13,6 +13,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
+import { useCanEditScenario } from 'hooks/permissions';
 import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -41,7 +42,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   const [successFile, setSuccessFile] = useState(null);
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
   const dispatch = useDispatch();
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -49,6 +50,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     setJob,
   } = scenarioSlice.actions;
 
+  const editable = useCanEditScenario(pid, sid);
   const downloadMutation = useDownloadCostSurface({});
   const uploadMutation = useUploadCostSurface({
     requestConfig: {
@@ -238,7 +240,11 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         <p className="pt-2">By default all projects have an equal area cost surface which means that planning units with the same area have the same cost</p>
 
         <div className="pt-5">
-          <h4 className="mb-2">1. Download cost template</h4>
+          <h4 className="mb-2">
+            {editable && '1. '}
+            Download cost template
+
+          </h4>
           <Button
             theme="primary-alt"
             size="base"
@@ -250,10 +256,12 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         </div>
 
         <div className="pt-5">
-          <h4 className="mb-2">2. Upload cost template</h4>
+          {editable && <h4 className="mb-2">2. Upload cost template</h4>}
+          {!editable && successFile && <h4 className="mb-2">Uploaded cost template</h4>}
 
-          <div className="mt-3 mb-5">
-            {!successFile && (
+          {editable && (
+            <div className="mt-3 mb-5">
+              {!successFile && (
               <Uploader
                 caption="Upload cost surface"
                 open={opened}
@@ -269,64 +277,64 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                           <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
                           {!successFile && (
-                            <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
-                              {(props) => (
-                                <div>
-                                  <div className="flex items-center mb-2.5 space-x-3">
-                                    <h5 className="text-xs text-gray-400">Supported formats</h5>
-                                    <InfoButton
-                                      size="s"
-                                      theme="secondary"
-                                    >
-                                      <span className="text-xs">
-                                        {' '}
-                                        <h4 className="font-heading mb-2.5">
-                                          List of supported file formats:
-                                        </h4>
-                                        <ul>
-                                          Zipped: .shp (zipped shapefiles must include
-                                          <br />
-                                          .shp, .shx, .dbf, and .prj files)
-                                        </ul>
-                                      </span>
-                                    </InfoButton>
-                                  </div>
-
-                                  <div
-                                    {...props}
-                                    {...getRootProps()}
-                                    className={cx({
-                                      'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
-                                      'bg-gray-500': isDragActive,
-                                      'border-green-800': isDragAccept,
-                                      'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
-                                    })}
+                          <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
+                            {(props) => (
+                              <div>
+                                <div className="flex items-center mb-2.5 space-x-3">
+                                  <h5 className="text-xs text-gray-400">Supported formats</h5>
+                                  <InfoButton
+                                    size="s"
+                                    theme="secondary"
                                   >
-
-                                    <input {...getInputProps()} />
-
-                                    <p className="text-sm text-center text-gray-500">
-                                      Drag and drop your polygon data file
-                                      <br />
-                                      or
+                                    <span className="text-xs">
                                       {' '}
-                                      <b>click here</b>
-                                      {' '}
-                                      to upload
-                                    </p>
-
-                                    <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`}</p>
-
-                                    <Loading
-                                      visible={loading}
-                                      className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                                      iconClassName="w-5 h-5 text-primary-500"
-                                    />
-
-                                  </div>
+                                      <h4 className="font-heading mb-2.5">
+                                        List of supported file formats:
+                                      </h4>
+                                      <ul>
+                                        Zipped: .shp (zipped shapefiles must include
+                                        <br />
+                                        .shp, .shx, .dbf, and .prj files)
+                                      </ul>
+                                    </span>
+                                  </InfoButton>
                                 </div>
-                              )}
-                            </Field>
+
+                                <div
+                                  {...props}
+                                  {...getRootProps()}
+                                  className={cx({
+                                    'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                    'bg-gray-500': isDragActive,
+                                    'border-green-800': isDragAccept,
+                                    'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                                  })}
+                                >
+
+                                  <input {...getInputProps()} />
+
+                                  <p className="text-sm text-center text-gray-500">
+                                    Drag and drop your polygon data file
+                                    <br />
+                                    or
+                                    {' '}
+                                    <b>click here</b>
+                                    {' '}
+                                    to upload
+                                  </p>
+
+                                  <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`}</p>
+
+                                  <Loading
+                                    visible={loading}
+                                    className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                    iconClassName="w-5 h-5 text-primary-500"
+                                  />
+
+                                </div>
+                              </div>
+                            )}
+                          </Field>
                           )}
 
                           {successFile && (
@@ -380,35 +388,38 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                   }}
                 />
               </Uploader>
-            )}
+              )}
 
-            {successFile && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="flex flex-col w-full space-y-6 cursor-pointer">
-                  <div className="flex items-center space-x-2">
-                    <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-                      <p className="text-sm text-primary-500">{successFile.name}</p>
-                    </label>
-                    <button
-                      id="cancel-shapefile-btn"
-                      type="button"
-                      className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
-                      onClick={cancelCostSurfaceUpload}
-                    >
-                      <Icon
-                        className="w-4.5 h-1.5 text-white group-hover:text-white"
-                        icon={CLOSE_SVG}
-                      />
-                    </button>
+              {successFile && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="flex flex-col w-full space-y-6 cursor-pointer">
+                    <div className="flex items-center space-x-2">
+                      <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                        <p className="text-sm text-primary-500">{successFile.name}</p>
+                      </label>
+                      <button
+                        id="cancel-shapefile-btn"
+                        type="button"
+                        className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
+                        onClick={cancelCostSurfaceUpload}
+                      >
+                        {editable && (
+                          <Icon
+                            className="w-4.5 h-1.5 text-white group-hover:text-white"
+                            icon={CLOSE_SVG}
+                          />
+                        )}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </div>
+                </motion.div>
+              )}
+            </div>
+          )}
         </div>
 
       </div>

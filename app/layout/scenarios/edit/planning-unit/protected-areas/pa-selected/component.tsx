@@ -1,5 +1,9 @@
 import React from 'react';
 
+import { useRouter } from 'next/router';
+
+import { useCanEditScenario } from 'hooks/permissions';
+
 import Icon from 'components/icon';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -19,6 +23,11 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
   isView = false,
   wdpaIucnCategories,
 }: ProtectedAreasSelectedProps) => {
+  const { query } = useRouter();
+  const { pid, sid } = query;
+
+  const editable = useCanEditScenario(pid, sid);
+
   return (
     <div className="mt-10">
       <h3 className="text-sm">{title}</h3>
@@ -34,14 +43,12 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
               className="flex mb-2.5 mr-5"
             >
               <span className="text-sm text-blue-400 bg-blue-400 bg-opacity-20 rounded-3xl px-2.5 h-6 inline-flex items-center mr-1">
-                {
-                  wdpa.label.length > 25
-                    ? (`${(wdpa.label).substring(0, 25 - 3)}...`)
-                    : wdpa.label
-                }
+                {wdpa.label.length > 25
+                  ? (`${(wdpa.label).substring(0, 25 - 3)}...`)
+                  : wdpa.label}
               </span>
 
-              {!isView && (
+              {(!isView && editable) && (
                 <button
                   aria-label="remove"
                   type="button"

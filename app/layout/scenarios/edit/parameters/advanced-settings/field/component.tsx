@@ -2,6 +2,10 @@ import React, { ReactNode } from 'react';
 
 import { Field as FieldRFF } from 'react-final-form';
 
+import { useRouter } from 'next/router';
+
+import { useCanEditScenario } from 'hooks/permissions';
+
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
@@ -27,6 +31,10 @@ export const ScenariosRunField: React.FC<ScenariosRunFieldProps> = ({
   input,
   validations,
 }: ScenariosRunFieldProps) => {
+  const { query } = useRouter();
+  const { pid, sid } = query;
+  const editable = useCanEditScenario(pid, sid);
+
   return (
     <FieldRFF
       name={id}
@@ -52,6 +60,7 @@ export const ScenariosRunField: React.FC<ScenariosRunFieldProps> = ({
                   {...input}
                   theme="dark"
                   mode="dashed"
+                  disabled={!editable}
                   onChange={(e) => {
                     if (!e.target.value) {
                       return fprops.input.onChange(null);

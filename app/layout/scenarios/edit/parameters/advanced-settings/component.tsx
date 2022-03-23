@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -34,9 +34,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
-  const VIEWER = projectRole === 'project_viewer';
-
+  const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
 
@@ -149,21 +147,23 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
                   </div>
                 </div>
 
-                <div className="flex-shrink-0 px-10">
-                  <Button
-                    type="submit"
-                    theme="primary"
-                    size="base"
-                    className="w-full"
-                    disabled={submitting || VIEWER}
-                  >
-                    <div className="flex items-center space-x-5">
-                      <div className="text-left">
-                        <div className="text-lg">Save</div>
+                {editable && (
+                  <div className="flex-shrink-0 px-10">
+                    <Button
+                      type="submit"
+                      theme="primary"
+                      size="base"
+                      className="w-full"
+                      disabled={submitting}
+                    >
+                      <div className="flex items-center space-x-5">
+                        <div className="text-left">
+                          <div className="text-lg">Save</div>
+                        </div>
                       </div>
-                    </div>
-                  </Button>
-                </div>
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </form>

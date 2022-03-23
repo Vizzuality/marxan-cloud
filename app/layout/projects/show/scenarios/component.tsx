@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 import { flatten } from 'lodash';
 
-import { useProjectRole } from 'hooks/project-users';
+import { useCanEditProject } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
 import {
   useDeleteScenario,
@@ -53,8 +53,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: projectRole } = useProjectRole(pid);
-  const VIEWER = projectRole === 'project_viewer';
+  const editable = useCanEditProject(pid);
 
   const {
     isFetching: projectIsFetching,
@@ -325,7 +324,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                   theme="primary"
                   size="lg"
                   className="mt-10"
-                  disabled={VIEWER}
+                  disabled={!editable}
                   onClick={() => setModal(true)}
                 >
                   <span className="mr-5">Create scenario</span>
@@ -340,9 +339,9 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               type="button"
               className={cx({
                 'flex items-center justify-center flex-shrink-0 w-full h-16 px-8 space-x-3 text-sm transition bg-gray-700 rounded-3xl text-primary-500 group hover:bg-gray-800': true,
-                'pointer-events-none': VIEWER,
+                'pointer-events-none opacity-50': !editable,
               })}
-              disabled={VIEWER}
+              disabled={!editable}
               onClick={() => setModal(true)}
             >
               <span>Create scenario</span>
