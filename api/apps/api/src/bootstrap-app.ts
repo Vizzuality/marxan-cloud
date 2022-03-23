@@ -22,6 +22,7 @@ export async function bootstrapSetUp() {
     allowedHeaders: 'Content-Type,Authorization,Content-Disposition',
     exposedHeaders: 'Authorization',
     origin: CorsUtils.originHandler,
+    credentials: true,
   });
 
   app.useGlobalPipes(
@@ -33,6 +34,4 @@ export async function bootstrapSetUp() {
   );
 
   return app;
-
-  //await app.listen(3000);
 }
