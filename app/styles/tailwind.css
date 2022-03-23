@@ -7,10 +7,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  input {
-    -webkit-background-clip: text !important;
-  }
-
   /* Remove arrows from number inputs */
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
