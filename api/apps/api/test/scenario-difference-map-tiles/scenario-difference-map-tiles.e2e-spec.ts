@@ -18,7 +18,7 @@ afterAll(async () => {
 });
 
 describe('PlanningUnitsTilesModule (e2e)', () => {
-  test('When comparing 2 scenarios owner by the user within the same project we should be able to see the tiles', async () => {
+  test.skip('When comparing 2 scenarios owner by the user within the same project we should be able to see the tiles', async () => {
     world.GivenScenarioAPuDataExists();
     world.GivenScenarioBPuDataExists();
     const tile: Buffer = await world.WhenRequestingTileToCompareScenarios(
