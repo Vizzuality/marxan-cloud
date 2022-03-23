@@ -109,37 +109,39 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
         <div className="text-sm text-center text-black">Project members</div>
 
         {isOwner && (
-          <Search
-            id="user-search"
-            size="sm"
-            value={search}
-            placeholder="Search connections..."
-            aria-label="Search"
-            onChange={onChangeSearch}
-            theme="light"
-          />
-        )}
+          <div>
+            <Search
+              id="user-search"
+              size="sm"
+              value={search}
+              placeholder="Search connections..."
+              aria-label="Search"
+              onChange={onChangeSearch}
+              theme="light"
+            />
 
-        {SEARCH_RESULT && userByEmailIsFetched && (
-          <div className="flex justify-between pr-5 text-black pl-9">
-            <div>{SEARCH_RESULT.displayName}</div>
+            {SEARCH_RESULT && userByEmailIsFetched && (
+              <div className="flex justify-between pt-2 pr-5 text-black pl-9">
+                <div className="text-sm">{SEARCH_RESULT.displayName}</div>
 
-            <Button
-              className={cx({
-                'flex-shrink-0 h-6 py-2 text-sm  group': true,
-              })}
-              theme="primary"
-              size="xs"
-              onClick={addUser}
-            >
-              Add
-            </Button>
-          </div>
-        )}
+                <Button
+                  className={cx({
+                    'flex-shrink-0 h-6 py-2 text-sm  group': true,
+                  })}
+                  theme="primary"
+                  size="xs"
+                  onClick={addUser}
+                >
+                  Add
+                </Button>
+              </div>
+            )}
 
-        {!SEARCH_RESULT && userByEmailIsFetched && (
-          <div className="flex justify-between pr-5 text-black pl-9">
-            <div>No results</div>
+            {!SEARCH_RESULT && userByEmailIsFetched && (
+              <div className="flex justify-between pt-2 pr-5 text-black pl-9">
+                <div className="text-sm">No results</div>
+              </div>
+            )}
           </div>
         )}
 
