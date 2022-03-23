@@ -1,7 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import * as JSONAPISerializer from 'jsonapi-serializer';
-import { tearDown } from './utils/tear-down';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
@@ -14,11 +13,9 @@ import { bootstrapApplication } from './utils/api-application';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { FeaturesTestUtils } from './utils/features.test.utils';
 
-afterAll(async () => {
-  await tearDown();
-});
-
-describe('ProxyVectorTilesModule (e2e)', () => {
+// FIXME: At the moment, this test file is not properly written. Each test only expects that the response is 200
+// but we should test properly the body of the response to check that the filters are working properly.
+describe.skip('ProxyVectorTilesModule (e2e)', () => {
   let app: INestApplication;
   let jwtToken: string;
   const Deserializer = new JSONAPISerializer.Deserializer({
@@ -45,19 +42,19 @@ describe('ProxyVectorTilesModule (e2e)', () => {
     partialMatches: { us: 'us' },
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
 
-    jwtToken = await GivenUserIsLoggedIn(app);
+    jwtToken = await GivenUserIsLoggedIn(app, 'dd');
 
     anOrganization = await OrganizationsTestUtils.createOrganization(
       app,
       jwtToken,
       E2E_CONFIG.organizations.valid.minimal(),
     ).then(async (response) => {
-      return await Deserializer.deserialize(response);
+      return Deserializer.deserialize(response);
     });
-
+    console.log('after org');
     aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(
       app,
       jwtToken,
@@ -70,38 +67,26 @@ describe('ProxyVectorTilesModule (e2e)', () => {
         organizationId: anOrganization.id,
       },
     ).then(async (response) => await Deserializer.deserialize(response));
+
+    console.log('after project');
     await ProjectsTestUtils.generateBlmValues(
       app,
       aProjectWithCountryAsPlanningArea.id,
     );
-
     aFeature = await FeaturesTestUtils.getFeature(
       app,
       jwtToken,
       aProjectWithCountryAsPlanningArea.id,
     );
 
+    console.log('after feature');
     aScenario = await ScenariosTestUtils.createScenario(app, jwtToken, {
       ...E2E_CONFIG.scenarios.valid.minimal(),
       projectId: aProjectWithCountryAsPlanningArea.id,
       // wdpaIucnCategories: [IUCNCategory.NotReported],
     }).then(async (response) => await Deserializer.deserialize(response));
-  });
 
-  afterAll(async () => {
-    await ScenariosTestUtils.deleteScenario(app, jwtToken, aScenario.id);
-
-    await ProjectsTestUtils.deleteProject(
-      app,
-      jwtToken,
-      aProjectWithCountryAsPlanningArea.id,
-    );
-    await OrganizationsTestUtils.deleteOrganization(
-      app,
-      jwtToken,
-      anOrganization.id,
-    );
-    await Promise.all([app.close()]);
+    console.log('after scenario');
   });
 
   describe('Vector Layers', () => {
@@ -113,7 +98,8 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       test.todo('User upload planning units vector tiles');
       test.todo('Irregular planning units vector tiles');
 
-      test('Should give back a valid request for preview', async () => {
+      test.only('Should give back a valid request for preview', async () => {
+        console.log(jwtToken);
         await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
           .set('Accept-Encoding', 'gzip, deflate')
