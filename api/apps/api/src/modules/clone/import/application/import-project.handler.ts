@@ -31,16 +31,23 @@ export class ImportProjectHandler
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
     const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
-    const resourceId = ResourceId.create();
+    const importResourceId = ResourceId.create();
+    const projectId = importResourceId;
 
     const pieces = this.importResourcePieces.resolveForProject(
-      resourceId,
+      projectId,
       archiveLocation,
       exportConfig.pieces,
     );
 
     const importRequest = this.eventPublisher.mergeObjectContext(
-      Import.newOne(resourceId, ResourceKind.Project, archiveLocation, pieces),
+      Import.newOne(
+        importResourceId,
+        ResourceKind.Project,
+        projectId,
+        archiveLocation,
+        pieces,
+      ),
     );
 
     importRequest.run();

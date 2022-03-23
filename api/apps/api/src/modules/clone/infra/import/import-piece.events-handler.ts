@@ -65,8 +65,8 @@ export class ImportPieceEventsHandler
     eventData: EventData<ImportJobInput, ImportJobOutput>,
   ): Promise<CreateApiEventDTO> {
     const {
-      importResourceId,
-      componentResourceId,
+      pieceResourceId,
+      projectId,
       resourceKind,
       importId,
       componentId,
@@ -80,8 +80,8 @@ export class ImportPieceEventsHandler
       externalId: ApiEventsService.composeExternalId(componentId, kind),
       data: {
         importId,
-        importResourceId,
-        componentResourceId,
+        pieceResourceId,
+        projectId,
         resourceKind,
         componentId,
         piece,

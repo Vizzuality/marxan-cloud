@@ -43,7 +43,7 @@ export class SchedulePieceImportHandler
     }
     const {
       resourceKind,
-      resourceId: importResourceId,
+      projectId,
       importPieces,
     } = importInstance.toSnapshot();
 
@@ -57,14 +57,14 @@ export class SchedulePieceImportHandler
       this.eventBus.publish(new ImportPieceFailed(importId, componentId));
       return;
     }
-    const { piece, uris, resourceId: componentResourceId } = component;
+    const { piece, uris, resourceId } = component;
 
     const job = await this.queue.add(`import-piece`, {
       piece,
       importId: importId.value,
       componentId: componentId.value,
-      importResourceId,
-      componentResourceId,
+      pieceResourceId: resourceId,
+      projectId,
       resourceKind,
       uris,
     });
@@ -84,8 +84,8 @@ export class SchedulePieceImportHandler
         piece,
         importId: importId.value,
         componentId: componentId.value,
-        importResourceId,
-        componentResourceId,
+        resourceId,
+        projectId,
       },
     });
   }

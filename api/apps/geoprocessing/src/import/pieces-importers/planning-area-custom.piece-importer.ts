@@ -35,7 +35,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, importResourceId, piece } = input;
+    const { uris, pieceResourceId, projectId, piece } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -48,7 +48,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
       planningAreaCustomLocation.uri,
     );
     if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${importResourceId} is not available at ${planningAreaCustomLocation.uri}`;
+      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaCustomLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -77,7 +77,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
         .insert()
         .into(PlanningArea)
         .values({
-          projectId: importResourceId,
+          projectId,
           theGeom: () => `'${planningAreaGeom}'`,
         })
         .returning(['id', 'bbox'])
@@ -93,15 +93,15 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
           bbox: JSON.stringify(planningArea.bbox),
           planning_area_geometry_id: planningArea.id,
         })
-        .where('id = :importResourceId', { importResourceId })
+        .where('id = :projectId', { projectId })
         .execute();
     });
 
     return {
       importId: input.importId,
       componentId: input.componentId,
-      importResourceId,
-      componentResourceId: input.componentResourceId,
+      pieceResourceId,
+      projectId,
       piece: input.piece,
     };
   }

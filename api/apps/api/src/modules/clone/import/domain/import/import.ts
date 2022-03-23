@@ -27,10 +27,26 @@ export class Import extends AggregateRoot {
     readonly importId: ImportId,
     private readonly resourceId: ResourceId,
     private readonly resourceKind: ResourceKind,
+    private readonly projectId: ResourceId,
     private readonly archiveLocation: ArchiveLocation,
     private readonly pieces: ImportComponent[],
   ) {
     super();
+
+    const isProjectImport = resourceKind === ResourceKind.Project;
+    const equalResourceAndProjectId = resourceId.equals(projectId);
+
+    if (isProjectImport && !equalResourceAndProjectId) {
+      throw new Error(
+        'Project imports should have equal resource and project ids',
+      );
+    }
+
+    if (!isProjectImport && equalResourceAndProjectId) {
+      throw new Error(
+        'Scenario imports should have distinct resource and project ids',
+      );
+    }
   }
 
   static fromSnapshot(snapshot: ImportSnapshot): Import {
@@ -38,6 +54,7 @@ export class Import extends AggregateRoot {
       new ImportId(snapshot.id),
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
+      new ResourceId(snapshot.projectId),
       new ArchiveLocation(snapshot.archiveLocation),
       snapshot.importPieces.map(ImportComponent.fromSnapshot),
     );
@@ -46,11 +63,19 @@ export class Import extends AggregateRoot {
   static newOne(
     resourceId: ResourceId,
     kind: ResourceKind,
+    projectId: ResourceId,
     archiveLocation: ArchiveLocation,
     pieces: ImportComponent[],
   ): Import {
     const id = ImportId.create();
-    const instance = new Import(id, resourceId, kind, archiveLocation, pieces);
+    const instance = new Import(
+      id,
+      resourceId,
+      kind,
+      projectId,
+      archiveLocation,
+      pieces,
+    );
 
     return instance;
   }
@@ -100,6 +125,7 @@ export class Import extends AggregateRoot {
       resourceKind: this.resourceKind,
       importPieces: this.pieces.map((piece) => piece.toSnapshot()),
       archiveLocation: this.archiveLocation.value,
+      projectId: this.projectId.value,
     };
   }
 

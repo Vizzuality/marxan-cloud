@@ -132,15 +132,17 @@ const getFixtures = async () => {
 
   return {
     GivenImportWasRequested: async () => {
-      const resourceId = ResourceId.create();
+      const importResourceId = ResourceId.create();
+      const projectId = importResourceId;
       const pieces = [
-        ImportComponent.newOne(resourceId, ClonePiece.ProjectMetadata, 0, []),
-        ImportComponent.newOne(resourceId, ClonePiece.ExportConfig, 0, []),
-        ImportComponent.newOne(resourceId, ClonePiece.ScenarioMetadata, 1, []),
+        ImportComponent.newOne(projectId, ClonePiece.ProjectMetadata, 0, []),
+        ImportComponent.newOne(projectId, ClonePiece.ExportConfig, 0, []),
+        ImportComponent.newOne(projectId, ClonePiece.ScenarioMetadata, 1, []),
       ];
       const importInstance = Import.newOne(
-        resourceId,
+        importResourceId,
         ResourceKind.Project,
+        projectId,
         new ArchiveLocation('/tmp/location.zip'),
         pieces,
       );

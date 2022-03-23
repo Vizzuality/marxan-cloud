@@ -7,4 +7,5 @@ export interface ImportSnapshot {
   resourceKind: ResourceKind;
   archiveLocation: string;
   importPieces: ImportComponentSnapshot[];
+  projectId: string;
 }
