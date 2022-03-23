@@ -1,20 +1,24 @@
 import { INestApplication, Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { decodeMvt } from '@marxan/utils/geo/decode-mvt';
 import * as request from 'supertest';
 
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
-import { GivenScenarioPuDataExists } from '../steps/given-scenario-pu-data-exists';
+import { GivenScenarioPuDataExists } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
+import { inspect } from 'util';
 
 export const createWorld = async (app: INestApplication) => {
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
+  const entityManager = app.get<EntityManager>(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
+  );
   const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
     countryCode: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
@@ -48,9 +52,9 @@ export const createWorld = async (app: INestApplication) => {
     scenarioIdA,
     scenarioIdB,
     GivenScenarioAPuDataExists: async () =>
-      (await GivenScenarioPuDataExists(scenariosPuData, scenarioIdA)).rows,
+      (await GivenScenarioPuDataExists(entityManager, projectId, scenarioIdA)),
     GivenScenarioBPuDataExists: async () =>
-      (await GivenScenarioPuDataExists(scenariosPuData, scenarioIdB)).rows,
+      (await GivenScenarioPuDataExists(entityManager, projectId, scenarioIdB)),
     WhenRequestingTileToCompareScenarios: async (
       scenarioIdA: string,
       scenarioIdB: string,
