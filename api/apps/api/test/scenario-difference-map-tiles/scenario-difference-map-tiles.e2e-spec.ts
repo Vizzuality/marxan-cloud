@@ -1,5 +1,5 @@
 import { PromiseType } from 'utility-types';
-import { INestApplication, Logger } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './world';
@@ -17,7 +17,7 @@ afterAll(async () => {
   await app.close();
 });
 
-describe.skip('PlanningUnitsTilesModule (e2e)', () => {
+describe('PlanningUnitsTilesModule (e2e)', () => {
   test('When comparing 2 scenarios owner by the user within the same project we should be able to see the tiles', async () => {
     world.GivenScenarioAPuDataExists();
     world.GivenScenarioBPuDataExists();
