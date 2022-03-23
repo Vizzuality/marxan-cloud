@@ -123,7 +123,7 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
         parent_project_id := NEW.project_id;
         new_scenario_id := NEW.id;
         users_to_grant := ARRAY(SELECT ROW(user_id, role_id) FROM users_projects up WHERE up.project_id = parent_project_id);
-          
+
         FOREACH user_to_grant IN array users_to_grant
         LOOP
           RAISE NOTICE 'Granting implicit % role on scenario % to user %', regexp_replace(user_to_grant.role_id, '^project_', 'scenario_'), new_scenario_id, user_to_grant.user_id;
@@ -141,12 +141,14 @@ export class ImplicitRolesFunctionsAndTriggers1645550554581
 
     await queryRunner.query(`
       -- triggers for implicit scenario roles
-      CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_projects
+      DROP TRIGGER IF EXISTS compute_implicit_scenario_roles_for_projects ON users_projects;
+      CREATE TRIGGER compute_implicit_scenario_roles_for_projects
       AFTER INSERT OR UPDATE OR DELETE ON users_projects
       FOR EACH ROW
       EXECUTE PROCEDURE manage_implicit_scenario_roles();
 
-      CREATE OR REPLACE TRIGGER compute_implicit_scenario_roles_for_scenarios
+      DROP TRIGGER IF EXISTS compute_implicit_scenario_roles_for_scenarios ON scenarios;
+      CREATE TRIGGER compute_implicit_scenario_roles_for_scenarios
       AFTER INSERT ON scenarios
       FOR EACH ROW
       EXECUTE PROCEDURE manage_existing_project_roles_for_scenario();
