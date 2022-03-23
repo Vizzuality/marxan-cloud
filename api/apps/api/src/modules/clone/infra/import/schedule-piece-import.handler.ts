@@ -4,14 +4,16 @@ import { ImportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { Inject, Logger } from '@nestjs/common';
 import {
+  CommandBus,
   CommandHandler,
-  EventBus,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
-import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
 import { ImportRepository } from '../../import/application/import.repository.port';
+import { ImportId } from '../../import/domain';
 import { importPieceQueueToken } from './import-queue.provider';
+import { MarkImportAsFailed } from './mark-import-as-failed.command';
+import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 
 @CommandHandler(SchedulePieceImport)
@@ -26,19 +28,26 @@ export class SchedulePieceImportHandler
     private readonly apiEvents: ApiEventsService,
     @Inject(importPieceQueueToken)
     private readonly queue: Queue<ImportJobInput>,
-    private readonly eventBus: EventBus,
+    private readonly commandBus: CommandBus,
     private readonly importRepository: ImportRepository,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(SchedulePieceImportHandler.name);
   }
 
+  private markImportAsFailed(importId: ImportId, reason: string): void {
+    this.logger.error(reason);
+    this.commandBus.execute(new MarkImportAsFailed(importId, reason));
+  }
+
   async execute({ importId, componentId }: SchedulePieceImport): Promise<void> {
     const importInstance = await this.importRepository.find(importId);
 
     if (!importInstance) {
-      this.logger.error(`Import with ID ${importId.value} not found`);
-      this.eventBus.publish(new ImportPieceFailed(importId, componentId));
+      this.markImportAsFailed(
+        importId,
+        `Import with ID ${importId.value} not found`,
+      );
       return;
     }
     const {
@@ -51,10 +60,10 @@ export class SchedulePieceImportHandler
       (piece) => piece.id === componentId.value,
     );
     if (!component) {
-      this.logger.error(
+      this.markImportAsFailed(
+        importId,
         `Import component with ID ${componentId.value} not found`,
       );
-      this.eventBus.publish(new ImportPieceFailed(importId, componentId));
       return;
     }
     const { piece, uris, resourceId } = component;
@@ -71,7 +80,9 @@ export class SchedulePieceImportHandler
 
     if (!job) {
       this.logger.error(`import-piece job couldn't be added to queue`);
-      this.eventBus.publish(new ImportPieceFailed(importId, componentId));
+      await this.commandBus.execute(
+        new MarkImportPieceAsFailed(importId, componentId),
+      );
       return;
     }
 

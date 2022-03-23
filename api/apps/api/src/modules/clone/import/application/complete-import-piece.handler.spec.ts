@@ -21,9 +21,10 @@ import {
   PieceImported,
   PieceImportRequested,
 } from '../domain';
+import { ImportBatchFailed } from '../domain/events/import-batch-failed.event';
+import { ImportComponentStatuses } from '../domain/import/import-component-status';
 import { CompleteImportPiece } from './complete-import-piece.command';
 import { CompleteImportPieceHandler } from './complete-import-piece.handler';
-import { ImportPieceFailed } from './import-piece-failed.event';
 import { ImportRepository } from './import.repository.port';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -73,11 +74,11 @@ it('should emit a AllPiecesImported event if all components are finished', async
   fixtures.ThenAllPiecesImportedEventIsEmitted(importInstance.importId);
 });
 
-it('should emit a ImportPieceFailed event if import instance is not found', async () => {
+it('should emit a ImportBatchFailed event if import instance is not found', async () => {
   const importId = new ImportId(v4());
   await fixtures.GivenNoneImportWasRequested(importId);
   await fixtures.WhenAPieceOfAnUnexistingImportIsCompleted(importId);
-  fixtures.ThenImportPieceFailedEventIsEmitted(importId);
+  fixtures.ThenImportBatchFailedEventIsEmitted(importId);
 });
 
 it('should not publish any event if import piece component is already completed', async () => {
@@ -97,12 +98,12 @@ it('should not publish any event if import piece component is already completed'
   fixtures.ThenNoEventIsEmitted();
 });
 
-it('should emit a ImportPieceFailed event if a piece is not found', async () => {
+it('should emit a ImportBatchFailed event if a piece is not found', async () => {
   const importInstance = await fixtures.GivenImportWasRequested();
 
   await fixtures.WhenTryingToCompleteAnUnexistingPiece(importInstance.importId);
 
-  fixtures.ThenImportPieceFailedEventIsEmitted(importInstance.importId);
+  fixtures.ThenImportBatchFailedEventIsEmitted(importInstance.importId);
 });
 
 const getFixtures = async () => {
@@ -213,7 +214,7 @@ const getFixtures = async () => {
         .importPieces.find((piece) => piece.id === componentId.value);
 
       expect(component).toBeDefined();
-      expect(component?.finished).toEqual(true);
+      expect(component?.status).toEqual(ImportComponentStatuses.Completed);
     },
     ThenBatchComponentsAreFinished: async (
       importId: ImportId,
@@ -231,7 +232,9 @@ const getFixtures = async () => {
 
       expect(components).toBeDefined();
       expect(components?.length).toBe(piecesCompletedIds.length);
-      expect(components?.every((piece) => piece.finished)).toEqual(true);
+      expect(components?.every((piece) => piece.status)).toEqual(
+        ImportComponentStatuses.Completed,
+      );
     },
     ThenPieceImportedEventIsEmitted: (
       importId: ImportId,
@@ -276,11 +279,11 @@ const getFixtures = async () => {
     ThenNoEventIsEmitted: () => {
       expect(events).toHaveLength(0);
     },
-    ThenImportPieceFailedEventIsEmitted: (importId: ImportId) => {
+    ThenImportBatchFailedEventIsEmitted: (importId: ImportId) => {
       const exportPieceFailedEvent = events[0];
 
-      expect(exportPieceFailedEvent).toBeInstanceOf(ImportPieceFailed);
-      expect((exportPieceFailedEvent as ImportPieceFailed).importId).toEqual(
+      expect(exportPieceFailedEvent).toBeInstanceOf(ImportBatchFailed);
+      expect((exportPieceFailedEvent as ImportBatchFailed).importId).toEqual(
         importId,
       );
     },

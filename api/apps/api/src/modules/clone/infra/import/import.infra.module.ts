@@ -14,6 +14,7 @@ import {
 import { ImportRequestedSaga } from './import-requested-saga';
 import { MarkImportAsFinishedHandler } from './mark-import-as-finished.handler';
 import { MarkImportAsSubmittedHandler } from './mark-import-as-submitted.handler';
+import { MarkImportPieceAsFailedHandler } from './mark-import-piece-as-failed.handler';
 import { PieceImportRequestedSaga } from './piece-import-requested.saga';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
 import { UploadExportFileHandler } from './upload-export-file.handler';
@@ -33,6 +34,7 @@ import { UploadExportFileHandler } from './upload-export-file.handler';
     ImportRequestedSaga,
     MarkImportAsSubmittedHandler,
     MarkImportAsFinishedHandler,
+    MarkImportPieceAsFailedHandler,
     ImportPieceEventsHandler,
     UploadExportFileHandler,
     {

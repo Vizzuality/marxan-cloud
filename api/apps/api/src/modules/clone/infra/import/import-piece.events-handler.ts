@@ -8,14 +8,13 @@ import {
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ComponentId, ResourceKind } from '@marxan/cloning/domain';
-import { assertDefined } from '@marxan/utils';
 import { Inject, Injectable } from '@nestjs/common';
-import { CommandBus, EventBus } from '@nestjs/cqrs';
+import { CommandBus } from '@nestjs/cqrs';
 import { ApiEventsService } from '../../../api-events';
 import { CompleteImportPiece } from '../../import/application/complete-import-piece.command';
-import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
 import { ImportId } from '../../import/domain';
 import { importPieceEventsFactoryToken } from './import-queue.provider';
+import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 
 @Injectable()
 export class ImportPieceEventsHandler
@@ -36,7 +35,6 @@ export class ImportPieceEventsHandler
     @Inject(importPieceEventsFactoryToken)
     queueEventsFactory: CreateWithEventFactory<ImportJobInput, ImportJobOutput>,
     private readonly commandBus: CommandBus,
-    private readonly eventBus: EventBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
     this.queueEvents.on(`completed`, (data) => this.completed(data));
@@ -90,20 +88,21 @@ export class ImportPieceEventsHandler
   }
 
   private async completed(event: EventData<ImportJobInput, ImportJobOutput>) {
-    const result = await event.result;
-    assertDefined(result);
+    const { importId, componentId } = await event.data;
+
     await this.commandBus.execute(
       new CompleteImportPiece(
-        new ImportId(result.importId),
-        new ComponentId(result.componentId),
+        new ImportId(importId),
+        new ComponentId(componentId),
       ),
     );
   }
 
   private async failed(event: EventData<ImportJobInput, unknown>) {
     const { importId, componentId } = await event.data;
-    this.eventBus.publish(
-      new ImportPieceFailed(
+
+    await this.commandBus.execute(
+      new MarkImportPieceAsFailed(
         new ImportId(importId),
         new ComponentId(componentId),
       ),

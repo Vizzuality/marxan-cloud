@@ -12,9 +12,9 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
 import { MemoryImportRepository } from '../../import/adapters/memory-import.repository.adapter';
-import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
 import { ImportRepository } from '../../import/application/import.repository.port';
 import { Import, ImportComponent, ImportId } from '../../import/domain';
+import { ImportBatchFailed } from '../../import/domain/events/import-batch-failed.event';
 import { importPieceQueueToken } from './import-queue.provider';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
@@ -26,8 +26,8 @@ beforeEach(async () => {
 });
 
 it('should add a import-piece job to the queue and create a import piece submitted api event', async () => {
-  const [importId, componentId] = await fixtures.GivenImportIsCreated();
-  fixtures.GivenSchedulePieceImportCommand(importId, componentId);
+  const [importInstance, componentId] = await fixtures.GivenImportIsCreated();
+  fixtures.GivenSchedulePieceImportCommand(importInstance, componentId);
 
   await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
     addMockResolvedValue: 'job',
@@ -36,7 +36,7 @@ it('should add a import-piece job to the queue and create a import piece submitt
   fixtures.ThenImportPieceSubmittedApiEventIsCreated();
 });
 
-it('should emit an ImportPieceFailed event if the import instance cannot be retrieved', async () => {
+it('should emit an ImportBatchFailed event if the import instance cannot be retrieved', async () => {
   fixtures.GivenSchedulePieceImportCommand(
     ImportId.create(),
     ComponentId.create(),
@@ -46,30 +46,33 @@ it('should emit an ImportPieceFailed event if the import instance cannot be retr
     addMockResolvedValue: 'job',
   });
 
-  fixtures.ThenImportPieceFailedEventIsPublished();
+  fixtures.ThenImportBatchFailedEventIsPublished();
 });
 
-it('should emit an ImportPieceFailed event if the import component is not found in import pieces', async () => {
-  const [importId] = await fixtures.GivenImportIsCreated();
+it('should emit an ImportBatchFailed event if the import component is not found in import pieces', async () => {
+  const [importInstance] = await fixtures.GivenImportIsCreated();
 
-  fixtures.GivenSchedulePieceImportCommand(importId, ComponentId.create());
+  fixtures.GivenSchedulePieceImportCommand(
+    importInstance,
+    ComponentId.create(),
+  );
 
   await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
     addMockResolvedValue: 'job',
   });
 
-  fixtures.ThenImportPieceFailedEventIsPublished();
+  fixtures.ThenImportBatchFailedEventIsPublished();
 });
 
-it('should emit an ImportPieceFailed event if the job cannot be added to the queue', async () => {
-  const [importId, componentId] = await fixtures.GivenImportIsCreated();
-  fixtures.GivenSchedulePieceImportCommand(importId, componentId);
+it('should emit an ImportBatchFailed event if the job cannot be added to the queue', async () => {
+  const [importInstance, componentId] = await fixtures.GivenImportIsCreated();
+  fixtures.GivenSchedulePieceImportCommand(importInstance, componentId);
 
   await fixtures.WhenSchedulePieceImportHandlerIsInvoked({
     addMockResolvedValue: undefined,
   });
 
-  fixtures.ThenImportPieceFailedEventIsPublished();
+  fixtures.ThenImportBatchFailedEventIsPublished();
 });
 
 const getFixtures = async () => {
@@ -162,10 +165,10 @@ const getFixtures = async () => {
         data: expect.any(Object),
       });
     },
-    ThenImportPieceFailedEventIsPublished: () => {
+    ThenImportBatchFailedEventIsPublished: () => {
       expect(events).toHaveLength(1);
       const [exportPieceFailedEvent] = events;
-      expect(exportPieceFailedEvent).toBeInstanceOf(ImportPieceFailed);
+      expect(exportPieceFailedEvent).toBeInstanceOf(ImportBatchFailed);
     },
   };
 };

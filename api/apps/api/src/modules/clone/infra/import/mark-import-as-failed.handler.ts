@@ -4,14 +4,14 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ImportRepository } from '../../import/application/import.repository.port';
-import { MarkImportAsFinished } from './mark-import-as-finished.command';
+import { MarkImportAsFailed } from './mark-import-as-failed.command';
 
-@CommandHandler(MarkImportAsFinished)
-export class MarkImportAsFinishedHandler
-  implements IInferredCommandHandler<MarkImportAsFinished> {
+@CommandHandler(MarkImportAsFailed)
+export class MarkImportAsFailedHandler
+  implements IInferredCommandHandler<MarkImportAsFailed> {
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
-    project: API_EVENT_KINDS.project__import__finished__v1__alpha,
-    scenario: API_EVENT_KINDS.scenario__import__finished__v1__alpha,
+    project: API_EVENT_KINDS.project__import__failed__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__import__failed__v1__alpha,
   };
 
   constructor(
@@ -19,17 +19,19 @@ export class MarkImportAsFinishedHandler
     private readonly importRepository: ImportRepository,
     private readonly logger: Logger,
   ) {
-    this.logger.setContext(MarkImportAsFinishedHandler.name);
+    this.logger.setContext(MarkImportAsFailedHandler.name);
   }
 
-  async execute({ importId }: MarkImportAsFinished): Promise<void> {
+  async execute({ importId, reason }: MarkImportAsFailed): Promise<void> {
     const importInstance = await this.importRepository.find(importId);
 
     if (!importInstance) {
-      this.logger.error(`Import with ID ${importId.value} not found`);
+      this.logger.error(
+        `Import with ID ${importId.value} not found. Import cannot be marked as failed`,
+      );
       return;
     }
-    const { resourceKind, resourceId } = importInstance.toSnapshot();
+    const { resourceKind, resourceId, projectId } = importInstance.toSnapshot();
 
     const kind = this.eventMapper[resourceKind];
 
@@ -40,6 +42,8 @@ export class MarkImportAsFinishedHandler
         importId: importId.value,
         resourceId,
         resourceKind,
+        reason,
+        projectId,
       },
     });
   }
