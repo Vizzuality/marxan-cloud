@@ -25,6 +25,7 @@ import { isLeft } from 'fp-ts/lib/Either';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { scenarioResource } from '../scenarios/scenario.api.entity';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
+import { AppSessionToken } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
 @ImplementsAcl()
 @UseGuards(JwtAuthGuard)
@@ -39,10 +40,11 @@ export class WebshotController {
   @Header('content-type', 'application/pdf')
   @Post('/scenarios/:scenarioId/solutions/report')
   async getSummaryReportForProject(
-    @Body() config: WebshotSummaryReportConfig,
+    @Body() config: Omit<WebshotSummaryReportConfig, 'cookie'>,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
+    @AppSessionToken() appSessionToken: string,
   ): Promise<any> {
     // @debt Refactor to use @nestjs/common's StreamableFile
     // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
@@ -50,7 +52,10 @@ export class WebshotController {
     const pdfStream = await this.service.getSummaryReportForScenario(
       scenarioId,
       req.user,
-      config,
+      {
+        ...config,
+        cookie: appSessionToken
+      }
     );
     if (isLeft(pdfStream)) {
       throw mapAclDomainToHttpError(pdfStream.left, {
