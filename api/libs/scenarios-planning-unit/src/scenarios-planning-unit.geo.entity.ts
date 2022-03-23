@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { LockStatus } from './lock-status.enum';
 
 const scenariosPuDataEntityName = 'scenarios_pu_data';
@@ -23,7 +23,7 @@ export class ScenariosPlanningUnitGeoEntity {
   /**
    * missing FK
    */
-  @Column({
+  @PrimaryColumn({
     type: 'uuid',
     name: 'project_pu_id',
   })
