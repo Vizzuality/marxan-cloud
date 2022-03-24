@@ -1,8 +1,9 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Logger } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import { ApiEventByTopicAndKind } from '../../../api-events/api-event.topic+kind.api.entity';
 import { ImportRepository } from '../../import/application/import.repository.port';
 import { MarkImportAsFailed } from './mark-import-as-failed.command';
 
@@ -22,6 +23,25 @@ export class MarkImportAsFailedHandler
     this.logger.setContext(MarkImportAsFailedHandler.name);
   }
 
+  async findPreviousEvent(
+    kind: API_EVENT_KINDS,
+    topic: string,
+  ): Promise<ApiEventByTopicAndKind | undefined> {
+    try {
+      const previousEvent = await this.apiEvents.getLatestEventForTopic({
+        kind,
+        topic,
+      });
+
+      return previousEvent;
+    } catch (err) {
+      if (err instanceof NotFoundException) {
+        return undefined;
+      }
+      throw err;
+    }
+  }
+
   async execute({ importId, reason }: MarkImportAsFailed): Promise<void> {
     const importInstance = await this.importRepository.find(importId);
 
@@ -32,10 +52,10 @@ export class MarkImportAsFailedHandler
       return;
     }
     const { resourceKind, resourceId, projectId } = importInstance.toSnapshot();
-
-    // TODO Comprobar si ya existe el evento
-
     const kind = this.eventMapper[resourceKind];
+
+    const previousEvent = await this.findPreviousEvent(kind, resourceId);
+    if (previousEvent) return;
 
     await this.apiEvents.createIfNotExists({
       kind,

@@ -1,3 +1,4 @@
+import { string } from 'fp-ts';
 import { ClonePiece, ComponentLocationSnapshot, ResourceKind } from './domain';
 
 export interface ExportJobInput {
@@ -17,4 +18,10 @@ export interface ImportJobInput {
   readonly resourceKind: ResourceKind;
   readonly piece: ClonePiece;
   readonly uris: ComponentLocationSnapshot[];
+}
+
+export interface FailedImportDbCleanupJobInput {
+  readonly importId: string;
+  readonly resourceId: string;
+  readonly resourceKind: ResourceKind;
 }
