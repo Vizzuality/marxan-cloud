@@ -46,15 +46,23 @@ export class WebshotController {
     @Req() req: RequestWithAuthenticatedUser,
     @AppSessionToken() appSessionToken: string,
   ): Promise<any> {
-    // @debt Refactor to use @nestjs/common's StreamableFile
-    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
-    // after upgrading NestJS to v8.
+    /**
+     * If a frontend app session token was provided via cookie, use this to let
+     * the webshot service authenticate to the app, otherwise fall back to
+     * looking for the relevant cookies in the body of the request.
+     *
+     * @todo Remove this once the new auth workflow via `Cookie` header is
+     * stable.
+     */
     const configForWebshot = appSessionToken
       ? {
           ...config,
           cookie: appSessionToken,
         }
       : config;
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
     const pdfStream = await this.service.getSummaryReportForScenario(
       scenarioId,
       req.user,
