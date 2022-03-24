@@ -40,7 +40,7 @@ export class WebshotController {
   @Header('content-type', 'application/pdf')
   @Post('/scenarios/:scenarioId/solutions/report')
   async getSummaryReportForProject(
-    @Body() config: Omit<WebshotSummaryReportConfig, 'cookie'>,
+    @Body() config: WebshotSummaryReportConfig,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
@@ -49,13 +49,16 @@ export class WebshotController {
     // @debt Refactor to use @nestjs/common's StreamableFile
     // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
     // after upgrading NestJS to v8.
+    const configForWebshot = appSessionToken
+      ? {
+          ...config,
+          cookie: appSessionToken,
+        }
+      : config;
     const pdfStream = await this.service.getSummaryReportForScenario(
       scenarioId,
       req.user,
-      {
-        ...config,
-        cookie: appSessionToken,
-      }
+      config,
     );
     if (isLeft(pdfStream)) {
       throw mapAclDomainToHttpError(pdfStream.left, {
