@@ -1,6 +1,9 @@
 {
   "logging": {
-    "muteAll": "API_LOGGING_MUTE_ALL"
+    "muteAll": "API_LOGGING_MUTE_ALL",
+    "http": {
+      "morganFormat": "BACKEND_HTTP_LOGGING_MORGAN_FORMAT"
+    }
   },
   "postgresApi": {
     "host": "API_POSTGRES_HOST",
