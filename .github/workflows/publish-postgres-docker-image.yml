@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  push_api_to_registry:
+  push_postgres_to_registry:
     name: Push PostgreSQL-Marxan Docker image to Azure Container Registry
     runs-on: ubuntu-20.04
     steps:

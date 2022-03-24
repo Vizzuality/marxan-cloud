@@ -11,6 +11,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 import {
   useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures,
 } from 'hooks/features';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Button from 'components/button';
@@ -26,8 +27,9 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
 }: ScenariosFeaturesTargetsProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
 
+  const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -233,18 +235,21 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                 <FieldRFF name="features">
                   {({ input }) => (
                     <div className="py-6">
-                      <Item
-                        id="all-targets"
-                        defaultTarget={50}
-                        defaultFPF={1}
-                        isAllTargets
-                        onChangeTarget={(v) => {
-                          onChangeTargetAll(v, input);
-                        }}
-                        onChangeFPF={(v) => {
-                          onChangeFPFAll(v, input);
-                        }}
-                      />
+                      {editable && (
+                        <Item
+                          id="all-targets"
+                          defaultTarget={50}
+                          defaultFPF={1}
+                          isAllTargets
+                          editable={editable}
+                          onChangeTarget={(v) => {
+                            onChangeTargetAll(v, input);
+                          }}
+                          onChangeFPF={(v) => {
+                            onChangeFPFAll(v, input);
+                          }}
+                        />
+                      )}
 
                       {values.features.map((item, i) => {
                         return (
@@ -256,6 +261,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                           >
                             <Item
                               {...item}
+                              editable={editable}
                               onChangeTarget={(v) => {
                                 onChangeTarget(item.id, v, input);
                               }}
@@ -286,18 +292,20 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                 size="lg"
                 onClick={onBack}
               >
-                Set features
+                {editable ? 'Set features' : 'Back to features'}
               </Button>
 
-              <Button
-                className="w-full"
-                type="submit"
-                theme="primary"
-                size="lg"
-                disabled={submitting}
-              >
-                Save
-              </Button>
+              {editable && (
+                <Button
+                  className="w-full"
+                  type="submit"
+                  theme="primary"
+                  size="lg"
+                  disabled={submitting}
+                >
+                  Save
+                </Button>
+              )}
             </div>
           )}
         </form>

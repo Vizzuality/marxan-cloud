@@ -6,7 +6,7 @@ import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
+  setBbox, setUploadingGridId, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
 import cx from 'classnames';
@@ -50,7 +50,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     },
   });
 
-  const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
+  const { uploadingGridId } = useSelector((state) => state['/projects/new']);
 
   const onDropAccepted = async (acceptedFiles) => {
     const f = acceptedFiles[0];
@@ -124,7 +124,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
 
   const onUploadSubmit = useCallback(() => {
     input.onChange(successFile.id);
-    dispatch(setUploadingPlanningArea(successFile.geom));
+    dispatch(setUploadingGridId(successFile.id));
     dispatch(setBbox(successFile.geom.bbox));
     dispatch(setMinPuAreaSize(successFile.geom.marxanMetadata.minPuAreaSize));
     dispatch(setMaxPuAreaSize(successFile.geom.marxanMetadata.maxPuAreaSize));
@@ -134,8 +134,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     input.onChange(null);
     setSuccessFile(null);
     resetPlanningAreaGrid(f);
-    dispatch(setUploadingPlanningArea(null));
-  }, [dispatch, input, resetPlanningAreaGrid]);
+  }, [input, resetPlanningAreaGrid]);
 
   const {
     getRootProps,
@@ -152,7 +151,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
 
   return (
     <div className="mt-3 mb-5">
-      {!!uploadingPlanningArea && (
+      {!!uploadingGridId && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -180,7 +179,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
         </motion.div>
       )}
 
-      {!uploadingPlanningArea && (
+      {!uploadingGridId && (
         <Uploader
           caption="Upload shapefile"
           open={opened}
@@ -242,11 +241,9 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                                 to upload
                               </p>
 
-                              <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_GRID_UPLOADER_MAX_SIZE)} MB`}</p>
-
                               <Loading
                                 visible={loading}
-                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
                                 iconClassName="w-5 h-5 text-primary-500"
                               />
 
@@ -271,7 +268,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                             <button
                               id="cancel-shapefile-btn"
                               type="button"
-                              className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
+                              className="flex items-center justify-center flex-shrink-0 w-5 h-5 border border-black rounded-full group hover:bg-black"
                               onClick={() => {
                                 setSuccessFile(null);
                               }}
@@ -285,6 +282,18 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
                         </div>
                       </motion.div>
                     )}
+
+                    <ul className="flex flex-col items-start mt-3 ml-3 leading-5 text-center text-gray-400 list-disc text-xxs">
+                      <li>
+                        {`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_GRID_UPLOADER_MAX_SIZE)} MB`}
+                      </li>
+                      <li>
+                        Include only the geometry.
+                      </li>
+                      <li>
+                        The grid included should work as a continuous surface.
+                      </li>
+                    </ul>
 
                     <div className="flex justify-center mt-16 space-x-6">
                       <Button

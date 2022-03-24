@@ -33,6 +33,7 @@ export interface ItemProps {
     target?: number;
   }[];
   splitFeaturesOptions?: Record<string, unknown>[];
+  editable?: boolean;
   onSplitFeaturesSelected?: (selected: {
     id: string;
     fpf?: number;
@@ -59,6 +60,7 @@ export const Item: React.FC<ItemProps> = ({
 
   splitSelected,
   splitOptions = [],
+  editable,
   onSplitSelected,
 
   splitFeaturesSelected,
@@ -129,14 +131,16 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="mt-1 text-sm font-heading">{name}</h2>
 
-          <Button
-            className="flex-shrink-0 text-xs"
-            theme="secondary"
-            size="xs"
-            onClick={() => onRemove && onRemove(id)}
-          >
-            Remove
-          </Button>
+          {editable && (
+            <Button
+              className="flex-shrink-0 text-xs"
+              theme="secondary"
+              size="xs"
+              onClick={() => onRemove && onRemove(id)}
+            >
+              Remove
+            </Button>
+          )}
 
         </div>
         <div className="mt-2 text-sm opacity-50 clamp-2">{description}</div>
@@ -186,7 +190,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         )}
 
-        {type === 'species' && (
+        {type === 'species' && editable && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />

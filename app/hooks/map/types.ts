@@ -17,6 +17,30 @@ export interface UseAdminPreviewLayer {
   search?: string;
 }
 
+export interface UsePlanningAreaPreviewLayer {
+  cache?: number;
+  active?: boolean;
+  planningAreaId: string;
+}
+
+export interface UseGridPreviewLayer {
+  cache?: number;
+  active?: boolean;
+  gridId: string;
+}
+
+export interface UseProyectPlanningAreaLayer {
+  cache?: number;
+  active?: boolean;
+  pId: string;
+}
+
+export interface UseProyectGridLayer {
+  cache?: number;
+  active?: boolean;
+  pId: string;
+}
+
 export interface UsePUGridPreviewLayer {
   cache?: number;
   active?: boolean;

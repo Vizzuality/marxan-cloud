@@ -16,29 +16,25 @@ export class PlanningAreaGridTilesService {
     private readonly tileService: TileService,
   ) {}
 
-  buildCustomPlanningAreaWhereQuery(planningAreaId: string): string {
-    /**
-     * @todo this generation query is a bit...
-     */
-    let whereQuery = `project_id = '${planningAreaId}'`;
-
-    return whereQuery;
-  }
-
   /**
    * @todo get attributes from Entity, based on user selection
    */
   public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
     const { z, x, y, planningAreaId } = tileSpecification;
     const attributes = 'project_id as planningAreaId';
-    const table = this.repository.metadata.tableName;
-    const customQuery = this.buildCustomPlanningAreaWhereQuery(planningAreaId);
+
+    const qb = this.repository
+      .createQueryBuilder('pug')
+      .select('ppu.project_id', 'project_id')
+      .addSelect('pug.the_geom', 'the_geom')
+      .innerJoin('projects_pu', 'ppu', 'pug.id = ppu.geom_id')
+      .where(`ppu.project_id = '${planningAreaId}'`);
+    const table = `(${qb.getSql()})`;
     return this.tileService.getTile({
       z,
       x,
       y,
       table,
-      customQuery,
       attributes,
     });
   }

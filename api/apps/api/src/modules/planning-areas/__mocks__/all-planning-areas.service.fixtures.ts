@@ -34,10 +34,6 @@ export async function getFixtures() {
       const entity = this.db[id];
       if (isDefined(entity)) entity.projectId = projectId;
     }
-
-    deleteUnassignedOldEntries(): never {
-      throw new Error('not implemented');
-    }
   }
 
   type FakeAdminArea = Pick<

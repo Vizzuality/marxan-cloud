@@ -195,7 +195,7 @@ export class ProjectsService {
   ): Promise<
     Either<
       GetProjectErrors | typeof forbiddenError | typeof projectNotFound,
-      { from: string; to: string }
+      { from: string; to: string; query: {} }
     >
   > {
     if (!(await this.projectAclService.canViewProject(userId, projectId))) {
@@ -207,24 +207,27 @@ export class ProjectsService {
     if (!project.planningUnitGridShape) {
       return left(projectNotFound);
     }
-    project.bbox[0];
-    /*
+    /**
     we are redirecting to the planning area service to get the tiles.
 
     @todo: In the future we should decouple this text url stuff.
 
-    **/
+    */
     if (project.planningUnitGridShape === 'from_shapefile') {
       return right({
         from: `/projects/${projectId}/grid/tiles`,
-        to: `/projects/planning-area/${projectId}/preview/tiles`,
+        to: `/projects/planning-area/${projectId}/grid/preview/tiles`,
+        query: {},
       });
     } else {
       return right({
         from: `/projects/${projectId}/grid/tiles/${z}/${x}/${y}.mvt`,
         to: `/planning-units/preview/regular/${project.planningUnitGridShape}/${
           project.planningUnitAreakm2
-        }/tiles/${z}/${x}/${y}.mvt?bbox=${project.bbox.join(',')}`,
+        }/tiles/${z}/${x}/${y}.mvt?bbox=${JSON.stringify(project.bbox)}`,
+        query: {
+          bbox: JSON.stringify(project.bbox),
+        },
       });
     }
   }

@@ -32,6 +32,7 @@ import { ProjectId, SetProjectGridFromShapefile } from './planning-unit-grid';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { PublishedProject } from '../published-project/entities/published-project.api.entity';
 
 const projectFilterKeyNames = [
   'name',
@@ -70,6 +71,8 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly userProjects: Repository<UsersProjectsApiEntity>,
     @InjectRepository(ProtectedArea, DbConnections.geoprocessingDB)
     private readonly protectedAreas: Repository<ProtectedArea>,
+    @InjectRepository(PublishedProject)
+    private readonly publishedProjects: Repository<PublishedProject>,
     private readonly commandBus: CommandBus,
   ) {
     super(repository, 'project', 'projects', {
@@ -94,6 +97,7 @@ export class ProjectsCrudService extends AppBaseService<
         'planningAreaName',
         'bbox',
         'customProtectedAreas',
+        'isPublic',
       ],
       keyForAttribute: 'camelCase',
       scenarios: {
@@ -306,6 +310,21 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
+  extendGetByIdQuery(
+    query: SelectQueryBuilder<Project>,
+    fetchSpecification?: FetchSpecification,
+    info?: ProjectsRequest,
+  ): SelectQueryBuilder<Project> {
+    /**
+     * Bring in publicMetadata (if the project has been made public). This is
+     * used in the `@AfterLoad()` event listener to set the `isPublic` property
+     * to true for public projects.
+     */
+    query.leftJoinAndSelect('project.publicMetadata', 'publicMetadata');
+
+    return query;
+  }
+
   async extendFindAllQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification: FetchSpecification,
@@ -320,6 +339,11 @@ export class ProjectsCrudService extends AppBaseService<
       `acl`,
       `${this.alias}.id = acl.project_id`,
     );
+
+    /**
+     * @see extendGetByIdQuery()
+     */
+    query.leftJoinAndSelect('project.publicMetadata', 'publicMetadata');
 
     if (namesSearch) {
       const nameSearchFilterField = 'nameSearchFilter' as const;

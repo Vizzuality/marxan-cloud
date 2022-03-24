@@ -103,7 +103,7 @@ seed-geoapi-init-data:
 		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
 		done;
 
-# need notebook service to execute a expecific notebook. this requires a full geodb
+# need notebook service to execute a specific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose.yml exec marxan-science-notebooks papermill --progress-bar --log-output work/notebooks/Lab/convert_csv_sql.ipynb /dev/null
 	mv -f -u -Z data/data/processed/test-wdpa-data.sql api/apps/api/test/fixtures/test-wdpa-data.sql
@@ -114,7 +114,9 @@ generate-geo-test-data: extract-geo-test-data
 # Don't forget to run make clean-slate && make start-api before repopulating the whole db
 # This will delete all existing data and create tables/views/etc. through the migrations that
 # run when starting up the API service.
-seed-geodb-data: seed-api-init-data
+# Also, be sure to create a user before importing the geodata, otherwise it will fail with an
+# unrelated error message
+seed-geodb-data:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
 
 test-start-services: clean-slate
@@ -198,7 +200,7 @@ generate-content-dumps: dump-api-data | dump-geodb-data
 
 generate-export-shpfile:
 	-docker-compose exec -T postgresql-geo-api mkdir testdataoutput2
-	-docker-compose exec -T postgresql-geo-api pgsql2shp -f ./testdataoutput2/test.shp -h localhost -p 5432 -r -g the_geom -u ${GEO_POSTGRES_USER} ${GEO_POSTGRES_DB} "SELECT the_geom, pug.id as uid, 1 as cost  FROM scenarios_pu_data spd inner join planning_units_geom pug on pug.id = spd.pu_geom_id ";
+	-docker-compose exec -T postgresql-geo-api pgsql2shp -f ./testdataoutput2/test.shp -h localhost -p 5432 -r -g the_geom -u ${GEO_POSTGRES_USER} ${GEO_POSTGRES_DB} "SELECT the_geom, pug.id as uid, 1 as cost FROM planning_units_geom pug inner join projects_pu ppu on pug.id = ppu.geom_id inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id";
 	-mkdir data/data
 	-docker cp marxan-postgresql-geo-api:testdataoutput2 data/data
 

@@ -237,6 +237,7 @@ async function getFixtures() {
             values: [],
             defaults: [],
           },
+          setIsPublicProperty: jest.fn(),
         },
         status: JobStatus.done,
         type: ScenarioType.marxanWithZones,

@@ -11,9 +11,6 @@ import { LoggerOptions } from 'typeorm';
  *
  * ['staging', 'production'].includes(config.util.getEnv('NODE_ENV')) ? true : false
  */
-
-// Somehow, without type annotations here, the type checker complains about
-// this data structure not matching that of `AuroraDataApiConnectionOptions`.
 export const geoprocessingConnections: {
   default: PostgresConnectionOptions;
   apiDB: PostgresConnectionOptions;
@@ -33,6 +30,7 @@ export const geoprocessingConnections: {
       path.join(__dirname, '/marxan-sandboxed-runner/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '../../../libs/**/*.geo.entity.{ts,js}'),
     ],
+    uuidExtension: 'pgcrypto',
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose
@@ -41,10 +39,10 @@ export const geoprocessingConnections: {
       ',',
     ) as LoggerOptions,
     cache: false,
-    migrations: [__dirname + '/migrations/geoprocessing/**/*.ts'],
+    migrations: [__dirname + '/migrations/geoprocessing/**/*{.ts,.js}'],
     migrationsRun:
       `${AppConfig.get<string>(
-        'postgresApi.runMigrationsOnStartup',
+        'postgresGeoApi.runMigrationsOnStartup',
       )}`.toLowerCase() !== 'false',
     cli: {
       migrationsDir: 'apps/geoprocessing/src/migrations/geoprocessing',
@@ -64,6 +62,7 @@ export const geoprocessingConnections: {
       __dirname + '/modules/**/*.api.entity.{ts,js}',
       path.join(__dirname, '../../../libs/**/*.api.entity.{ts,js}'),
     ],
+    uuidExtension: 'pgcrypto',
     // Logging may be: ['query', 'error', 'schema', 'warn', 'info', 'log'] Use
     // 'query' if needing to see the actual generated SQL statements (this should
     // be limited to `NODE_ENV=development`). Use 'error' for least verbose

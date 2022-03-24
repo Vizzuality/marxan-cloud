@@ -8,12 +8,14 @@ import { PublishedProjectReadController } from '@marxan-api/modules/published-pr
 import { PublishProjectController } from '@marxan-api/modules/published-project/controllers/publish-project.controller';
 import { PublishedProjectSerializer } from '@marxan-api/modules/published-project/published-project.serializer';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
+import { UsersModule } from '@marxan-api/modules/users/users.module';
 
 @Module({
   imports: [
     AccessControlModule,
     ProjectsModule,
     TypeOrmModule.forFeature([PublishedProject]),
+    UsersModule,
   ],
   controllers: [PublishProjectController, PublishedProjectReadController],
   providers: [

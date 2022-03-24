@@ -1,7 +1,7 @@
 .PHONY: import
 
 URL := $(shell curl -i 'https://esri.maps.arcgis.com/sharing/rest/content/items/12230625b4d8409982f1361a1c03270f/data' | grep "location" | head -1 | cut -d ":" -f 2-20 | tr -d ' \t\n\r')
-MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" -c "select id from users limit 1")
+MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" -c "select id from users limit 1")
 
 # @debt
 # instead of dn being numeric, it will be more usefull in terms of info to join that with the metadata description of those values
@@ -11,12 +11,12 @@ import: data/ecosystems/World_Ecosystems_simp.geojson
 	ogr2ogr -makevalid \
 		-nln "$${table_name}_feature" -nlt PROMOTE_TO_MULTI \
 		-lco GEOMETRY_NAME=the_geom -lco OVERWRITE=yes \
-		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host='marxan-postgresql-geo-api' \
-		port=5432 user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" "$<";\
-	feature_id=`psql -X -A -q -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB" \
+		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host=$$GEO_POSTGRES_HOST \
+		port=$$GEO_POSTGRES_PORT user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" "$<";\
+	feature_id=`psql -X -A -q -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" \
 		-c "insert into features (feature_class_name, alias, list_property_keys, property_name, tag, creation_status, created_by)  \
 		VALUES ('$${table_name}', 'World terrestrial ecoregions','[\"dn\", \"w_ecosystm\"]'::jsonb,'w_ecosystm', 'bioregional','created','$(MarxanUser)') RETURNING id;"`; \
-	psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" \
+	psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@$$GEO_POSTGRES_HOST:$$GEO_POSTGRES_PORT/$$GEO_POSTGRES_DB" \
 	-c "insert into features_data(the_geom, properties, source, feature_id) \
 		(SELECT (st_dump(the_geom)).geom as the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'ecoregions' as source, '$$feature_id' as feature_id from (select * from \"$${table_name}_feature\") t); \
 			DROP TABLE \"$${table_name}_feature\"";

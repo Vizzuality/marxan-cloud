@@ -6,7 +6,7 @@ import cx from 'classnames';
 const SIZE = {
   s: 'h-8 w-8',
   base: 'h-10 w-10',
-  lg: 'h-11 w-14',
+  lg: 'h-14 w-14',
 };
 
 export interface AvatarProps extends ButtonHTMLAttributes<HTMLButtonElement> {

@@ -1,14 +1,16 @@
 import React from 'react';
+
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import Field from 'components/forms/field';
-import Label from 'components/forms/label';
-import Input from 'components/forms/input';
-import Textarea from 'components/forms/textarea';
-import Select from 'components/forms/select';
-import Checkbox from 'components/forms/checkbox';
-import Radio from 'components/forms/radio';
-import Slider from 'components/forms/slider';
+
 import Button from 'components/button';
+import Checkbox from 'components/forms/checkbox';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import Radio from 'components/forms/radio';
+import Select from 'components/forms/select';
+import Slider from 'components/forms/slider';
+import Textarea from 'components/forms/textarea';
 import {
   composeValidators,
   booleanValidator,
@@ -31,14 +33,14 @@ export const Form = (): React.ReactNode => {
       onSubmit={() => {
         // console.info(values);
       }}
-      // initialValues={{
-      //   name: 'Testing initial values',
-      //   email: 'barrenechea.miguel@gmail.com',
-      //   description: 'Lorem ipsum dolor sit amet',
-      //   checkbox: true,
-      //   'checkbox-group': ['option-1', 'option-2'],
-      //   'radio-group': 'option-1',
-      // }}
+    // initialValues={{
+    //   name: 'Testing initial values',
+    //   email: 'barrenechea.miguel@gmail.com',
+    //   description: 'Lorem ipsum dolor sit amet',
+    //   checkbox: true,
+    //   'checkbox-group': ['option-1', 'option-2'],
+    //   'radio-group': 'option-1',
+    // }}
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">

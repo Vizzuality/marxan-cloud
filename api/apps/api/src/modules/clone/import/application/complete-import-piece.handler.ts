@@ -28,7 +28,7 @@ export class CompleteImportPieceHandler
   }
 
   async execute({ importId, componentId }: CompleteImportPiece): Promise<void> {
-    await this.importRepository
+    const aggregate = await this.importRepository
       .transaction(async (repo) => {
         const importInstance = await repo.find(importId);
 
@@ -60,11 +60,13 @@ export class CompleteImportPieceHandler
 
         await repo.save(importAggregate);
 
-        importAggregate.commit();
+        return importAggregate;
       })
       .catch((err) => {
         this.logger.error(err);
         this.eventBus.publish(new ImportPieceFailed(importId, componentId));
       });
+
+    if (aggregate) aggregate.commit();
   }
 }

@@ -9,7 +9,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import {
-  setBbox, setMaxPuAreaSize, setMinPuAreaSize, setUploadingPlanningArea,
+  setBbox,
+  setMaxPuAreaSize,
+  setMinPuAreaSize,
+  setUploadingPlanningArea,
+  setUploadingPlanningAreaId,
+  setUploadingGridId,
 } from 'store/slices/projects/new';
 
 import { usePlausible } from 'next-plausible';
@@ -32,9 +37,7 @@ import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
 import Textarea from 'components/forms/textarea';
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 
 import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
@@ -66,6 +69,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
       dispatch(setMinPuAreaSize(null));
       dispatch(setMaxPuAreaSize(null));
       dispatch(setUploadingPlanningArea(null));
+      dispatch(setUploadingGridId(null));
     };
   }, [dispatch]);
 
@@ -124,6 +128,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
 
   const resetPlanningArea = (form) => {
     dispatch(setUploadingPlanningArea(null));
+    dispatch(setUploadingPlanningAreaId(null));
     dispatch(setBbox(null));
 
     const registeredFields = form.getRegisteredFields();
@@ -136,7 +141,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
   };
 
   const resetPlanningAreaGrid = (form) => {
-    dispatch(setUploadingPlanningArea(null));
+    dispatch(setUploadingGridId(null));
     dispatch(setBbox(null));
 
     const registeredFields = form.getRegisteredFields();
@@ -303,6 +308,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                                 onChange={(value: string) => {
                                   setPAOptionSelected(value);
                                   resetPlanningArea(form);
+                                  resetPlanningAreaGrid(form);
                                 }}
                               />
                             </Field>
@@ -345,9 +351,11 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                               );
                             }}
                           </FieldRFF>
-                          <PlanningAreaSelector
-                            values={values}
-                          />
+                          {values.planningAreaId && (
+                            <PlanningAreaSelector
+                              values={values}
+                            />
+                          )}
                         </div>
                       )}
 

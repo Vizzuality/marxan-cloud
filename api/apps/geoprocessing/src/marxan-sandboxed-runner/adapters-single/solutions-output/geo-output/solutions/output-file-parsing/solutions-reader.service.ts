@@ -7,18 +7,18 @@ import { createInterface } from 'readline';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
 
 import { SolutionTransformer } from './solution-row.transformer';
 import { SolutionRowResult } from '../solution-row-result';
 import { PuToScenarioPu } from './pu-to-scenario-pu';
 import { SolutionsEvents } from '../solutions-events';
+import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class SolutionsReaderService {
   constructor(
-    @InjectRepository(ScenariosPlanningUnitGeoEntity)
-    private readonly scenarioPuData: Repository<ScenariosPlanningUnitGeoEntity>,
+    @InjectRepository(ScenariosPuPaDataGeo)
+    private readonly scenarioPuData: Repository<ScenariosPuPaDataGeo>,
   ) {}
 
   async from(
@@ -30,13 +30,13 @@ export class SolutionsReaderService {
       where: {
         scenarioId,
       },
-      select: ['id', 'planningUnitMarxanId'],
+      relations: ['projectPu'],
     });
     const mapping: Record<
       number,
       string
     > = planningUnits[0].reduce<PuToScenarioPu>((previousValue, pu) => {
-      previousValue[pu.planningUnitMarxanId] = pu.id;
+      previousValue[pu.projectPu.puid] = pu.id;
       return previousValue;
     }, {});
     const duplex: Duplex<SolutionRowResult, string> = new PassThrough({

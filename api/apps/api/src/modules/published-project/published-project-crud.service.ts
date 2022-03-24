@@ -8,9 +8,11 @@ import { UpdatePublishedProjectDto } from '@marxan-api/modules/published-project
 import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-info';
 import { CreatePublishedProjectDto } from '@marxan-api/modules/published-project/dto/create-published-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
+import { FetchSpecification } from 'nestjs-base-service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -22,6 +24,7 @@ export class PublishedProjectCrudService extends AppBaseService<
   constructor(
     @InjectRepository(PublishedProject)
     protected repository: Repository<PublishedProject>,
+    private readonly usersService: UsersService,
   ) {
     super(
       repository,
@@ -35,8 +38,27 @@ export class PublishedProjectCrudService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<PublishedProject> {
     return {
-      attributes: ['name', 'description'],
+      attributes: ['name', 'description', 'underModeration'],
       keyForAttribute: 'camelCase',
     };
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<PublishedProject>,
+    fetchSpecification: FetchSpecification,
+    info?: ProjectsRequest,
+  ): Promise<SelectQueryBuilder<PublishedProject>> {
+    const userId = info?.authenticatedUser?.id;
+
+    /*
+      If we are listing projects for non-authenticated requests or for
+      authenticated users who are not admin, projects under moderation
+      will be hiding from the listing.
+    */
+    if (!userId || !(await this.usersService.isPlatformAdmin(userId))) {
+      query.andWhere('published_project.underModeration is false');
+    }
+
+    return query;
   }
 }

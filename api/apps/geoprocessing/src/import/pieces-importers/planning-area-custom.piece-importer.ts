@@ -66,7 +66,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
       stringPlanningAreaCustomOrError.right,
     );
 
-    this.geoprocessingEntityManager.transaction(async (em) => {
+    await this.geoprocessingEntityManager.transaction(async (em) => {
       await em.query(
         `
         INSERT INTO planning_areas(project_id, the_geom)
@@ -87,15 +87,13 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
         `
         UPDATE projects
         SET
-          planning_unit_grid_shape = $2,
-          planning_unit_area_km2 = $3,
-          bbox = $4,
-          planning_area_geometry_id = $5
+          planning_unit_area_km2 = $2,
+          bbox = $3,
+          planning_area_geometry_id = $4
         WHERE id = $1
       `,
         [
           importResourceId,
-          planningAreaGadm.puGridShape,
           planningAreaGadm.puAreaKm2,
           JSON.stringify(planningArea.bbox),
           planningArea.id,

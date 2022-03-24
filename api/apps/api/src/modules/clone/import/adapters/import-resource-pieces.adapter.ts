@@ -5,8 +5,9 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import {
-  ClonePieceImportOrder,
+  clonePieceImportOrder,
   ClonePieceUrisResolver,
+  exportOnlyClonePieces,
 } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ProjectExportConfigContent,
@@ -24,12 +25,12 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
     pieces: ProjectExportConfigContent['pieces'],
   ): ImportComponent[] {
     const projectComponents = pieces.project
-      .filter((piece) => piece !== ClonePiece.ExportConfig)
+      .filter((piece) => !exportOnlyClonePieces.includes(piece))
       .map((piece) =>
         ImportComponent.newOne(
           projectId,
           piece,
-          ClonePieceImportOrder[piece],
+          clonePieceImportOrder[piece],
           ClonePieceUrisResolver.resolveFor(piece, location.value),
         ),
       );
@@ -56,12 +57,12 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
     oldScenarioId: string,
   ): ImportComponent[] {
     return pieces
-      .filter((piece) => piece !== ClonePiece.ExportConfig)
+      .filter((piece) => !exportOnlyClonePieces.includes(piece))
       .map((piece) =>
         ImportComponent.newOne(
           scenarioId,
           piece,
-          ClonePieceImportOrder[piece],
+          clonePieceImportOrder[piece],
           ClonePieceUrisResolver.resolveFor(piece, location.value, {
             kind,
             scenarioId: oldScenarioId,

@@ -6,7 +6,7 @@ import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
-  setBbox, setUploadingPlanningArea, setMaxPuAreaSize, setMinPuAreaSize,
+  setBbox, setUploadingPlanningArea, setUploadingPlanningAreaId, setMaxPuAreaSize, setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
 import cx from 'classnames';
@@ -53,6 +53,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   const { uploadingPlanningArea } = useSelector((state) => state['/projects/new']);
 
   const onDropAccepted = async (acceptedFiles) => {
+    setLoading(true);
     const f = acceptedFiles[0];
 
     const data = new FormData();
@@ -123,6 +124,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   const onUploadSubmit = useCallback(() => {
     input.onChange(successFile.id);
     dispatch(setUploadingPlanningArea(successFile.geom));
+    dispatch(setUploadingPlanningAreaId(successFile.id));
     dispatch(setBbox(successFile.geom.bbox));
     dispatch(setMinPuAreaSize(successFile.geom.marxanMetadata.minPuAreaSize));
     dispatch(setMaxPuAreaSize(successFile.geom.marxanMetadata.maxPuAreaSize));
@@ -247,7 +249,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
 
                               <Loading
                                 visible={loading}
-                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
                                 iconClassName="w-5 h-5 text-primary-500"
                               />
 

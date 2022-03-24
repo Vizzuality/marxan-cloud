@@ -41,7 +41,8 @@ export class CostTemplateDumper {
                   ) AS "properties"
                 FROM
                   scenarios_pu_data spd
-                    INNER JOIN planning_units_geom pug ON pug.id = spd.pu_geom_id
+                    INNER JOIN projects_pu ppu ON ppu.id = spd.project_pu_id
+                    INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
                 WHERE
                   spd.scenario_id = $1`,
             [scenarioId],

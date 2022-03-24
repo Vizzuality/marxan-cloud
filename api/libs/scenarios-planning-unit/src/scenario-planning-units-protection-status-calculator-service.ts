@@ -39,7 +39,8 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
                  else 0
                  end as perc_protection
         from scenarios_pu_data spd
-               inner join planning_units_geom pug on spd.pu_geom_id = pug.id
+			         inner join projects_pu ppu on ppu.id = spd.project_pu_id
+               inner join planning_units_geom pug on pug.id = ppu.geom_id
         where scenario_id = $1),
            pu_pa as (
              select pu.id,
@@ -61,8 +62,8 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
                ELSE false
               END
               )
-      where scenario_id = $3;
+      where scenario_id = $1;
     `;
-    await puRepo.query(query, [scenario.id, scenario.threshold, scenario.id]);
+    await puRepo.query(query, [scenario.id, scenario.threshold]);
   }
 }

@@ -32,8 +32,10 @@ export class AvailablePlanningUnitsRepository
   async getPUsWithArea(scenarioId: string): Promise<PUWithArea[]> {
     const result: PUWithArea[] = await this.repo.query(
       `
-        SELECT scenarios_pu_data.id, st_area(the_geom) as area
-        FROM scenarios_pu_data INNER JOIN planning_units_geom ON scenarios_pu_data.pu_geom_id = planning_units_geom.id
+        SELECT spd.id, st_area(pug.the_geom) as area
+        FROM scenarios_pu_data spd
+          INNER JOIN projects_pu ppu ON ppu.id = spd.project_pu_id
+          INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
         WHERE scenario_id = $1
       `,
       [scenarioId],
@@ -45,8 +47,10 @@ export class AvailablePlanningUnitsRepository
   async getMaxPUAreaForScenario(scenarioId: string): Promise<number> {
     const [{ area }]: [{ area: number }] = await this.repo.query(
       `
-        SELECT max(st_area(the_geom)) as area
-        FROM scenarios_pu_data INNER JOIN planning_units_geom ON scenarios_pu_data.pu_geom_id = planning_units_geom.id
+        SELECT max(st_area(pug.the_geom)) as area
+        FROM scenarios_pu_data spd
+          INNER JOIN projects_pu ppu ON ppu.id = spd.project_pu_id
+          INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
         WHERE scenario_id = $1
       `,
       [scenarioId],

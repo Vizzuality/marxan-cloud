@@ -9,7 +9,8 @@ import type { Project } from 'types/project-model';
 import { ROLES } from 'utils/constants-roles';
 
 import { useMe } from 'hooks/me';
-import { useProjectRole, useProjectUsers } from 'hooks/project-users';
+import { useOwnsProject, useProjectRole } from 'hooks/permissions';
+import { useProjectUsers } from 'hooks/project-users';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -27,6 +28,7 @@ export interface ItemProps extends Project {
   lastUpdate: string;
   lastUpdateDistance: string;
   userColors?: Record<string, string>;
+  isPublic: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -42,6 +44,7 @@ export const Item: React.FC<ItemProps> = ({
   lastUpdateDistance,
   style,
   userColors,
+  isPublic,
   onClick,
   onDownload,
   onDuplicate,
@@ -52,7 +55,8 @@ export const Item: React.FC<ItemProps> = ({
   const { user } = useMe();
 
   const { data: projectRole } = useProjectRole(id);
-  const OWNER = projectRole === 'project_owner';
+
+  const isOwner = useOwnsProject(id);
 
   const { data: projectUsers } = useProjectUsers(id);
 
@@ -120,32 +124,34 @@ export const Item: React.FC<ItemProps> = ({
                 className={cx({
                   'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
                   'opacity-100': !!ROLES[projectRole],
-                  'bg-yellow-500 bg-opacity-20': OWNER,
-                  'border border-gray-500': !OWNER,
+                  'bg-yellow-500 bg-opacity-20': isOwner,
+                  'border border-gray-500': !isOwner,
                 })}
               >
                 <p className={cx({
-                  'text-yellow-500': OWNER,
-                  'text-white': !OWNER,
+                  'text-yellow-500': isOwner,
+                  'text-white': !isOwner,
                 })}
                 >
                   {ROLES[projectRole]}
                 </p>
               </div>
 
-              {/* <div
-                className={cx({
-                  'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
-                  'opacity-100 bg-primary-500 bg-opacity-20': !!ROLES[projectRole],
-                })}
-              >
-                <p className={cx({
-                  'text-primary-500': ROLES[projectRole],
-                })}
+              {isPublic && (
+                <div
+                  className={cx({
+                    'px-2.5 py-1 text-sm rounded-3xl opacity-0 transition-opacity': true,
+                    'opacity-100 bg-primary-500 bg-opacity-20': !!ROLES[projectRole],
+                  })}
                 >
-                  Public
-                </p>
-              </div> */}
+                  <p className={cx({
+                    'text-primary-500': ROLES[projectRole],
+                  })}
+                  >
+                    Public
+                  </p>
+                </div>
+              )}
 
             </div>
 
@@ -291,7 +297,7 @@ export const Item: React.FC<ItemProps> = ({
               theme="secondary"
               size="xs"
               onClick={handleDelete}
-              disabled={!OWNER}
+              disabled={!isOwner}
             >
               Delete
             </Button>

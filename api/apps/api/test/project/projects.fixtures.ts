@@ -10,6 +10,7 @@ export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const randomUserToken = await GivenUserIsLoggedIn(app);
   const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
+  const adminUserToken = await GivenUserIsLoggedIn(app, 'dd');
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
   );
@@ -25,8 +26,16 @@ export const getFixtures = async () => {
       await request(app.getHttpServer()).get(
         `/api/v1/published-projects/${projectId}`,
       ),
+    WhenGettingPublicProjectAsAdmin: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/published-projects/${projectId}/by-admin`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
     WhenGettingPublicProjects: async () =>
       await request(app.getHttpServer()).get(`/api/v1/published-projects`),
+    WhenGettingPublicProjectsAsAdmin: async () =>
+      await request(app.getHttpServer())
+        .get(`/api/v1/projects/published-projects/by-admin`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
     ThenNoProjectIsAvailable: (response: request.Response) => {
       expect(response.body).toEqual({
         data: [],
@@ -72,6 +81,26 @@ export const getFixtures = async () => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].id).toEqual(publicProjectId);
     },
+    ThenPublicProjectWithUnderModerationStatusIsAvailable: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body.data.length).toEqual(1);
+      expect(response.body.data[0].id).toEqual(publicProjectId);
+      expect(response.body.data[0].attributes.underModeration).toEqual(true);
+    },
+    ThenOkIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+    },
+    ThenCreatedIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(201);
+    },
+    ThenNoContentIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(204);
+    },
+    ThenBadRequestIsReturned: (response: request.Response) => {
+      expect(response.status).toEqual(400);
+    },
     ThenNotFoundIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(404);
     },
@@ -109,6 +138,24 @@ export const getFixtures = async () => {
           attributes: {
             description: null,
             name: expect.any(String),
+            underModeration: false,
+          },
+          id: publicProjectId,
+          type: 'published_projects',
+        },
+        meta: {},
+      });
+    },
+    ThenPublicProjectDetailsWhileUnderModerationArePresent: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body).toEqual({
+        data: {
+          attributes: {
+            description: null,
+            name: expect.any(String),
+            underModeration: true,
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -127,5 +174,46 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
         .set('Authorization', `Bearer ${notIncludedUserToken}`),
+
+    WhenPublishingAProject: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/publish`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/unpublish`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenPlacingAPublicProjectUnderModerationAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/moderation-status/set`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
+    WhenPlacingAPublicProjectUnderModerationNotAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/moderation-status/set`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenClearingUnderModerationStatusFromAPublicProjectAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/moderation-status/clear`)
+        .set('Authorization', `Bearer ${adminUserToken}`),
+    WhenClearingUnderModerationStatusAndUnpublishingAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(
+          `/api/v1/projects/${projectId}/moderation-status/clear?alsoUnpublish=true`,
+        )
+        .set('Authorization', `Bearer ${adminUserToken}`),
+    WhenClearingUnderModerationStatusFromAPublicProjectNotAsAdmin: async (
+      projectId: string,
+    ) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/moderation-status/clear`)
+        .set('Authorization', `Bearer ${randomUserToken}`),
   };
 };

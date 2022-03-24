@@ -433,5 +433,82 @@ describe('UsersModule (e2e)', () => {
       expect(WhenGettingAdminListResponse.body).toHaveLength(1);
       expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
     });
+
+    test('A platform admin should not be able to remove oneself', async () => {
+      const WhenRemovingOneself = await request(app.getHttpServer())
+        .delete(`/api/v1/users/admins/${adminUserId}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenRemovingOneself.status).toEqual(400);
+    });
+
+    test('A platform admin should be able to block existing users', async () => {
+      const username = `${v4()}@example.com`;
+      const password = v4();
+      const { user } = await GivenUserIsCreated(app, username, password);
+
+      cleanups.push(async () => {
+        await usersRepo.delete({ id: user.id });
+        return;
+      });
+
+      const WhenBlockingAUser = await request(app.getHttpServer())
+        .patch(`/api/v1/users/admins/block-users`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userIds: [user.id] });
+      expect(WhenBlockingAUser.status).toEqual(200);
+
+      const WhenLoginAsBlockedUser = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send({
+          username,
+          password,
+        });
+      expect(WhenLoginAsBlockedUser.status).toEqual(401);
+    });
+
+    test('A platform admin should not be able to block oneself', async () => {
+      const WhenBlockingOneself = await request(app.getHttpServer())
+        .patch(`/api/v1/users/admins/block-users`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ userIds: [adminUserId] });
+      expect(WhenBlockingOneself.status).toEqual(400);
+    });
+  });
+
+  describe('Users - Find by email', () => {
+    let adminToken: string;
+    let adminUserId: string;
+    const cleanups: (() => Promise<void>)[] = [];
+
+    beforeAll(async () => {
+      adminToken = await GivenUserIsLoggedIn(app, 'dd');
+      adminUserId = await GivenUserExists(app, 'dd');
+    });
+
+    afterEach(async () => {
+      for (const cleanup of cleanups.reverse()) {
+        await cleanup();
+      }
+    });
+
+    test('A user can be found by full email', async () => {
+      const userId = await GivenUserExists(app, 'aa');
+      const WhenSearchingUserByFullMail = await request(app.getHttpServer())
+        .get('/api/v1/users/by-email/aa@example.com')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenSearchingUserByFullMail.status).toEqual(200);
+      expect(WhenSearchingUserByFullMail.body.data).toBeDefined();
+      expect(WhenSearchingUserByFullMail.body.data.id).toEqual(userId);
+      expect(
+        WhenSearchingUserByFullMail.body.data.attributes.displayName,
+      ).toEqual('User A A');
+    });
+
+    test('Partial email searches return bad request because of validation', async () => {
+      const WhenSearchingUserByFullMail = await request(app.getHttpServer())
+        .get('/api/v1/users/by-email/aa@example')
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenSearchingUserByFullMail.status).toEqual(400);
+    });
   });
 });

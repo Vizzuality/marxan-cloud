@@ -2,13 +2,20 @@
 
 This document covers the different [environment
 variables](https://en.wikipedia.org/wiki/Environment_variable) supported by
-Marxan Cloud and how these affect the behavior of the platform. These variables
+Marxan Cloud and how these affect the behavior of the platform. 
+
+
+## API and Geoprocessing env vars
+
+These variables
 are imported using [node-config](https://www.npmjs.com/package/config) through
 [this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/api/config/custom-environment-variables.json)
 for the API app, and
 [this file](https://github.com/Vizzuality/marxan-cloud/blob/4bcad14eee470e5e403a3949ed25942a229cd2f1/api/apps/geoprocessing/config/custom-environment-variables.json)
 for the Geoprocessing app. Some environment variables are shared by both
 applications.
+
+### API Service
 
 * `API_AUTH_JWT_SECRET` (string, required): a base64-encoded secret for the
   signing of API JWT tokens; can be generated via a command such as `dd
@@ -37,24 +44,35 @@ applications.
   mount point for shared storage (via Docker volumes in development
   environments and via Persistent Volumes in Kubernetes environments) should
   be set accordingly
-* `APP_SERVICE_PORT` (number, required): the port on which the App service
-  should listen on the local machine
+* `API_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on which
+  the Express daemon of the API service will listen. If running the API on the 
+  same host as the Geoprocessing application, you need to modify at least one 
+  of the two, so they don't conflict.
+* `NETWORK_CORS_ORIGINS` (comma-separated list of whitelisted app origins for
+  requests from the in-browser frontend app to the API, required except when
+  accessing the frontend app on the default URL defined in
+  `api/apps/api/config/default.json`, via the `network.cors.origins` config key)
+
+### PostgreSQL service - API database
+
 * `POSTGRES_API_SERVICE_PORT` (number, required): the port on which the
   Docker PostgreSQL service should listen on the local machine
-* API PostgreSQL configuration variables:
-    * `API_POSTGRES_HOST` (string, required): host of the database server to be
-      used for the PostgreSQL connection (API)
-    * `API_POSTGRES_PORT` (number, required): port of the database server to be
-      used for the PostgreSQL connection (API)
-    * `API_POSTGRES_USER` (string, required): username to be used for the
-      PostgreSQL connection (API)
-    * `API_POSTGRES_PASSWORD` (string, required): password to be used for the
-      PostgreSQL connection (API)
-    * `API_POSTGRES_DB` (string, required): name of the database to be used for
-      the PostgreSQL connection (API)
-    * `API_POSTGRES_LOGGING` (string, required): comma separated list of logging
-      options to pass to typeorm. [More
-      info](https://typeorm.io/#/logging/logging-options)
+* `API_POSTGRES_HOST` (string, required): host of the database server to be used
+  for the PostgreSQL connection (API)
+* `API_POSTGRES_PORT` (number, required): port of the database server to be used
+  for the PostgreSQL connection (API)
+* `API_POSTGRES_USER` (string, required): username to be used for the PostgreSQL
+  connection (API)
+* `API_POSTGRES_PASSWORD` (string, required): password to be used for the
+  PostgreSQL connection (API)
+* `API_POSTGRES_DB` (string, required): name of the database to be used for the
+  PostgreSQL connection (API)
+* `API_POSTGRES_LOGGING` (string, required): comma separated list of logging
+  options to pass to typeorm. [More
+  info](https://typeorm.io/#/logging/logging-options)
+
+### Geoprocessing service
+
 * `GEOPROCESSING_SERVICE_PORT` (number, required): the port exposed by Docker
   for the Geoprocessing service; when running an instance under Docker
   Compose, NestJS will always be listening on port 3000 internally, and this
@@ -65,35 +83,46 @@ applications.
 * `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`: (`true|false`, optional, default
   is `true`): set this to `false` if migrations for the Geoprocessing service
   should not run automatically on startup
-* Geoprocessing PostgreSQL configuration variables:
-    * `GEO_POSTGRES_HOST` (string, required): host of the database server to be
-      used for the geoprocessing PostgreSQL connection (API)
-    * `GEO_POSTGRES_PORT` (number, required): port of the database server to be
-      used for the geoprocessing PostgreSQL connection (API)
-    * `GEO_POSTGRES_USER` (string, required): username to be used for the
-      geoprocessing PostgreSQL connection (API)
-    * `GEO_POSTGRES_PASSWORD` (string, required): password to be used for the
-      geoprocessing PostgreSQL connection (API)
-    * `GEO_POSTGRES_DB` (string, required): name of the database to be used for
-      the geoprocessing PostgreSQL connection (API)
-    * `GEO_POSTGRES_LOGGING` (string, required): comma separated list of logging
-      options to pass to typeorm. [More
-      info](https://typeorm.io/#/logging/logging-options)
-* `POSTGRES_AIRFLOW_SERVICE_PORT` (number, required): the port on which the
-  PostgreSQL for Airflow service should listen on the local machine
-* `AIRFLOW_PORT` (number, required): the port on which the
-  Airflow service should listen on the local machine
+* `GEO_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port
+  on which the Express daemon of the Geoprocessing service will listen.
+  If running the API on the same host as the Geoprocessing application, you 
+  need to modify at least one.
+
+### PostgreSQL service - Geoprocessing database
+
+* `GEO_POSTGRES_HOST` (string, required): host of the database server to be used
+  for the geoprocessing PostgreSQL connection (API)
+* `GEO_POSTGRES_PORT` (number, required): port of the database server to be used
+  for the geoprocessing PostgreSQL connection (API)
+* `GEO_POSTGRES_USER` (string, required): username to be used for the
+  geoprocessing PostgreSQL connection (API)
+* `GEO_POSTGRES_PASSWORD` (string, required): password to be used for the
+  geoprocessing PostgreSQL connection (API)
+* `GEO_POSTGRES_DB` (string, required): name of the database to be used for the
+  geoprocessing PostgreSQL connection (API)
+* `GEO_POSTGRES_LOGGING` (string, required): comma separated list of logging
+  options to pass to typeorm. [More
+  info](https://typeorm.io/#/logging/logging-options)
+
+### Redis database
+
 * `REDIS_API_SERVICE_PORT` (number, required): the port on which the
   Redis service should listen on the local machine
-* `REDIS_COMMANDER_PORT` (number, required): the port on which the
-  Redis Commander service should listen on the local machine
+* `REDIS_COMMANDER_PORT` (number, required if running the Redis Commander
+  service through Docker Compose in development environments): the port on which
+  the Redis Commander service should listen on the local machine
+
+### Transactional email features (Sparkpost)
+
 * `SPARKPOST_APIKEY` (string, required): an API key to be used for Sparkpost,
-  an email service
+  the transactional email service used for email notifications and
+  confirmation flows throughout the platform
 * `SPARKPOST_ORIGIN` (string, required): the URL of a SparkPost API service:
   this would normally be either `https://api.sparkpost.com` or
-  `https://api.eu.sparkpost.com` (note: **no trailing `/` character** or the
-  SparkPost API [client library](https://github.com/SparkPost/node-sparkpost)
-  will not work correctly); please check [SparkPost's
+  `https://api.eu.sparkpost.com`; please make sure **not to use a
+  trailing slash ('`/`') character** or the SparkPost API [client
+  library](https://github.com/SparkPost/node-sparkpost) will not be able to
+  issue Sparkpost API requests correctly; please check [SparkPost's
   documentation](https://developers.sparkpost.com/api/#header-sparkpost-eu)
   and the client library's own documentation for details
 * `APPLICATION_BASE_URL` (string, required): the public URL of the
@@ -110,21 +139,25 @@ applications.
 * `PASSWORD_RESET_EXPIRATION` (string, optional, default is 1800000
   milliseconds: 30 minutes): a time (in milliseconds) that a token for a
   password reset is valid for
-* `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the path that should be
-  appended after the application base URL (`APPLICATION_BASE_URL`),
+* `SIGNUP_CONFIRMATION_TOKEN_PREFIX` (string, required): the path that should
+  be appended after the application base URL (`APPLICATION_BASE_URL`),
   corresponding to the **frontend** route where users are redirected from
-  sign-up confirmation emails to complete the process validating their account;
-  the validation token is appended at the end of this URL to compose the actual
-  link that is included in sign-up confirmation emails
-* `API_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on which
-  the Express daemon of the API service will listen. If running the API on the 
-  same host as the Geoprocessing application, you need to modify at least one 
-  of the two, so they don't conflict. 
-* `GEO_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port
-  on which the Express daemon of the Geoprocessing service will listen.
-  If running the API on the same host as the Geoprocessing application, you 
-  need to modify at least one 
-* `WEBSHOT_DAEMON_LISTEN_PORT` (number, optional, default is 3000): port on
+  sign-up confirmation emails to complete the process validating their
+  account; the validation token is appended at the end of this URL to compose
+  the actual link that is included in sign-up confirmation emails
+
+### Webshot application env vars
+
+* `WEBSHOT_APP_PORT` (number, optional, default is 3000): port on
   which the Express daemon of the Webshot service will listen. If running the
   Webshot service on the same host as other Marxan backend applications, you
   need to modify at least one.
+
+### Frontend application env vars
+
+* `APP_SERVICE_PORT` (number, required when running the frontend app via Docker
+  Compose in development environments): the port on which the App service should
+  listen on the local machine
+
+The frontend application has its own set of env vars, which are documented
+[here](/app/README.md#env-variables).

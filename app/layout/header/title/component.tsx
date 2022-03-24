@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useProjectRole } from 'hooks/project-users';
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -24,9 +23,6 @@ export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid, sid } = query;
-
-  const { data: projectRole } = useProjectRole(pid);
-  const VIEWER = projectRole === 'project_viewer';
 
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
   const { data: scenarioData, isLoading: scenarioIsLoading } = useScenario(sid);
@@ -175,7 +171,7 @@ export const Title: React.FC<TitleProps> = () => {
                       <Tooltip
                         arrow
                         placement="bottom"
-                        disabled={meta.active || VIEWER}
+                        disabled={meta.active}
                         content={(
                           <div className="px-2 py-1 text-gray-500 bg-white rounded">
                             <span>Edit name</span>
@@ -193,7 +189,6 @@ export const Title: React.FC<TitleProps> = () => {
                             className={cx({
                               'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer px-1.5': true,
                             })}
-                            disabled={VIEWER}
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();

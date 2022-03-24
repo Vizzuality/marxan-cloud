@@ -9,12 +9,12 @@ restore: restore-api | restore-geodb
 restore-api: api_db-${LATEST_DATE}.tar.gz
 	@echo "Restoring api dbs dumps..."
 	mkdir ./$$(basename $< .tar.gz)/
-	tar -xvf ./db_dumps/$< -C ./$$(basename $< .tar.gz)/ && pg_restore --superuser $$API_POSTGRES_USER -a -d "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@marxan-postgresql-api:5432/$$API_POSTGRES_DB"  -Fd ./$$(basename $< .tar.gz) --disable-triggers
+	tar -xvf ./db_dumps/$< -C ./$$(basename $< .tar.gz)/ && pg_restore --superuser $$API_POSTGRES_USER -a -d "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB"  -Fd ./$$(basename $< .tar.gz) --disable-triggers
 	rm -rf $$(basename $< .tar.gz)/
 restore-geodb: geo_db-${LATEST_DATE}.tar.gz
 	@echo "Restoring geo dbs dumps..."
 	mkdir ./$$(basename $< .tar.gz)/
-	tar -xvf ./db_dumps/$< -C ./$$(basename $< .tar.gz)/ && pg_restore --superuser $$GEO_POSTGRES_USER -a -d "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@marxan-postgresql-geo-api:5432/$$GEO_POSTGRES_DB" -Fd ./$$(basename $< .tar.gz) --disable-triggers
+	tar -xvf ./db_dumps/$< -C ./$$(basename $< .tar.gz)/ && pg_restore --superuser $$GEO_POSTGRES_USER -a -d "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@$$GEO_POSTGRES_HOST:$$GEO_POSTGRES_PORT/$$GEO_POSTGRES_DB" -Fd ./$$(basename $< .tar.gz) --disable-triggers
 	rm -rf $$(basename $< .tar.gz)/
 
 api_db-${LATEST_DATE}.tar.gz:

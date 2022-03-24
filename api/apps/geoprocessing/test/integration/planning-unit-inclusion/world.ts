@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
 
@@ -13,12 +13,22 @@ import {
   AreaUnitSampleGeometry,
   AreaUnitSampleGeometryProps,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
-import { PlanningUnitsGeom } from '@marxan-jobs/planning-unit-geometry';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 
 export type ForCase = 'singleFeature' | 'multipleFeatures';
 
+const geomType = PlanningUnitGridShape.Square;
+
 export const createWorld = async (app: INestApplication) => {
+  const projectId = v4();
   const scenarioId = v4();
+  const entityManager = app.get<EntityManager>(getEntityManagerToken());
+  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
+    ProjectsPuEntity,
+  );
   const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
     getRepositoryToken(PlanningUnitsGeom),
   );
@@ -60,7 +70,7 @@ export const createWorld = async (app: INestApplication) => {
       forCase: ForCase,
       planningUnits: AreaUnitSampleGeometry,
     ): Promise<void> => {
-      const toInclude = await insertPuGeometryFromGeoJson(
+      const geometriesToInclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
           (f) =>
@@ -68,7 +78,7 @@ export const createWorld = async (app: INestApplication) => {
             f.properties[forCase].protectedByDefault,
         ),
       );
-      const toExclude = await insertPuGeometryFromGeoJson(
+      const geometriesToExclude = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
           (f) =>
@@ -76,7 +86,7 @@ export const createWorld = async (app: INestApplication) => {
             !f.properties[forCase].protectedByDefault,
         ),
       );
-      const untouched = await insertPuGeometryFromGeoJson(
+      const untouchedGeometries = await insertPuGeometryFromGeoJson(
         puGeometryRepo,
         planningUnits.features.filter(
           (f) =>
@@ -87,19 +97,44 @@ export const createWorld = async (app: INestApplication) => {
       );
 
       geometriesByCase[forCase].storedGeometries.push(
-        ...toInclude,
-        ...toExclude,
-        ...untouched,
+        ...geometriesToInclude,
+        ...geometriesToExclude,
+        ...untouchedGeometries,
       );
 
-      let index = 1;
+      const puToInclude = await projectsPuRepo.save(
+        geometriesToInclude.map((geomId, index) => ({
+          projectId,
+          puid: index,
+          geomId,
+          geomType,
+        })),
+      );
+
+      const puToExclude = await projectsPuRepo.save(
+        geometriesToExclude.map((geomId, index) => ({
+          projectId,
+          puid: puToInclude.length + index,
+          geomId,
+          geomType,
+        })),
+      );
+
+      const untouchedPu = await projectsPuRepo.save(
+        untouchedGeometries.map((geomId, index) => ({
+          projectId,
+          puid: puToInclude.length + puToExclude.length + index,
+          geomId,
+          geomType,
+        })),
+      );
+
       const puToBeExcluded = (
         await scenarioPuDataRepo.save(
-          toExclude.map((id) =>
+          puToExclude.map((projectPu) =>
             scenarioPuDataRepo.create({
-              puGeometryId: id,
+              projectPuId: projectPu.id,
               scenarioId,
-              planningUnitMarxanId: index++,
             }),
           ),
         )
@@ -107,11 +142,10 @@ export const createWorld = async (app: INestApplication) => {
 
       const puToBeIncluded = (
         await scenarioPuDataRepo.save(
-          toInclude.map((id) =>
+          puToInclude.map((projectPu) =>
             scenarioPuDataRepo.create({
-              puGeometryId: id,
+              projectPuId: projectPu.id,
               scenarioId,
-              planningUnitMarxanId: index++,
               protectedByDefault: true,
             }),
           ),
@@ -120,11 +154,10 @@ export const createWorld = async (app: INestApplication) => {
 
       const puToBeUnstated = (
         await scenarioPuDataRepo.save(
-          untouched.map((id) =>
+          untouchedPu.map((projectPu) =>
             scenarioPuDataRepo.create({
-              puGeometryId: id,
+              projectPuId: projectPu.id,
               scenarioId,
-              planningUnitMarxanId: index++,
             }),
           ),
         )
@@ -177,9 +210,6 @@ export const createWorld = async (app: INestApplication) => {
       await puGeometryRepo.delete({
         id: In(geometriesByCase[forCase].storedGeometries),
       });
-      await scenarioPuDataRepo.delete({
-        scenarioId,
-      });
     },
   };
 };
@@ -193,7 +223,7 @@ const insertPuGeometryFromGeoJson = async (
       features.map((feature) => ({
         theGeom: () =>
           `st_multi(ST_GeomFromGeoJSON('${JSON.stringify(feature.geometry)}'))`,
-        type: PlanningUnitGridShape.Square,
+        type: geomType,
       })),
     )
   ).identifiers;

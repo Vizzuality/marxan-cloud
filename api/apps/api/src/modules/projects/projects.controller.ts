@@ -322,8 +322,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area grid tiles for user uploaded grid.',
+    description: 'Get planning area grid tiles for user uploaded grid.',
   })
   @ApiParam({
     name: 'id',
@@ -351,8 +350,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area tiles for uploaded planning area.',
+    description: 'Get planning area tiles for uploaded planning area.',
   })
   @ApiParam({
     name: 'id',
@@ -381,8 +379,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area tiles for project planning area.',
+    description: 'Get planning area tiles for project planning area.',
   })
   @ApiParam({
     name: 'projectId',
@@ -420,6 +417,10 @@ export class ProjectsController {
       throw new ForbiddenException();
     }
     req.url = req.url.replace(result.right.from, result.right.to);
+    req.originalUrl = req.originalUrl.replace(
+      result.right.from,
+      result.right.to,
+    );
 
     return await this.proxyService.proxyTileRequest(req, response);
   }
@@ -427,8 +428,7 @@ export class ProjectsController {
   @ImplementsAcl()
   @TilesOpenApi()
   @ApiOperation({
-    description:
-      'Get planning area grid tiles for project grid.',
+    description: 'Get planning area grid tiles for project grid.',
   })
   @ApiParam({
     name: 'projectId',
@@ -465,7 +465,14 @@ export class ProjectsController {
     if (isLeft(result)) {
       throw new ForbiddenException();
     }
+
     req.url = req.url.replace(result.right.from, result.right.to);
+    req.originalUrl = req.originalUrl.replace(
+      result.right.from,
+      result.right.to,
+    );
+
+    req.query = result.right.query;
 
     return await this.proxyService.proxyTileRequest(req, response);
   }

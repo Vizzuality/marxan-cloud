@@ -8,7 +8,8 @@ resource "kubernetes_service" "webshot_service" {
       name = kubernetes_deployment.webshot_deployment.metadata[0].name
     }
     port {
-      port = 3000
+      port        = 30003
+      target_port = 3000
     }
 
     type = "NodePort"

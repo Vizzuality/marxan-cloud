@@ -25,6 +25,7 @@ interface SelectDataProps {
   clearSelectionLabel?: string;
   batchSelectionActive?: boolean;
   batchSelectionLabel?: string;
+  removeSelected?: boolean;
 }
 
 export interface SelectProps extends
@@ -59,6 +60,7 @@ export interface SelectToggleProps extends
   SelectThemeProps {
   opened: boolean;
   selectedItems: SelectOptionProps[];
-  getToggleButtonProps: (e?: any) => void;
-  getDropdownProps?: (e?: any) => void;
+  getToggleButtonProps: (e?: any) => any;
+  getDropdownProps?: (e?: any) => any;
+  update?: () => void
 }

@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { User } from '../users/user.api.entity';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import {
+  AfterLoad,
   Column,
   Entity,
   JoinColumn,
@@ -19,6 +20,7 @@ import { ProtectedAreaDto } from '@marxan-api/modules/projects/dto/protected-are
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 import { ProjectBlm } from '@marxan-api/modules/blm/values/repositories/project-blm/project-blm.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { PublishedProject } from '../published-project/entities/published-project.api.entity';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -166,6 +168,34 @@ export class Project extends TimeUserEntityMetadata {
     type: ProtectedAreaDto,
   })
   customProtectedAreas?: ProtectedAreaDto[];
+
+  @ApiPropertyOptional({
+    description: 'Metadata of the project as published (if it was made public)',
+  })
+  @OneToOne(() => PublishedProject)
+  @JoinColumn({ name: 'id' })
+  publicMetadata?: PublishedProject;
+
+  @ApiPropertyOptional({
+    description:
+      'Whether this project is publicly available through the Community section',
+  })
+  isPublic?: boolean;
+
+  @AfterLoad()
+  setIsPublicProperty() {
+    /**
+     * This event listener relies on the `publicMetadata` relation to have been
+     * loaded, which - when using QueryBuilder via BaseService - may mean that
+     * this will only happen if the relation has been explicitly loaded via
+     * `leftJoinAndSelect()` (or similar, as applicable). Therefore, if we have
+     * no publicMetadata here, we cannot definitely say that the project is not
+     * public, but only that we don't know, as the project may well not be
+     * public, or it may be but publicMetadata has not been loaded -- hence the
+     * undefined here rather than an outright false.
+     */
+    this.isPublic = this.publicMetadata ? true : undefined;
+  }
 }
 
 export class JSONAPIProjectData {

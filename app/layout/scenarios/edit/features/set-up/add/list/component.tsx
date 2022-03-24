@@ -16,6 +16,7 @@ import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import IntersectFeatures from 'layout/scenarios/edit/features/set-up/add/intersect';
@@ -42,6 +43,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
 
   const queryClient = useQueryClient();
 
+  const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -248,6 +250,14 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     saveScenarioMutation,
   ]);
 
+  const onContinue = useCallback(() => {
+    setSubmitting(true);
+    dispatch(setSubTab(ScenarioSidebarSubTabs.FEATURES_TARGET));
+  }, [
+    dispatch,
+    setSubTab,
+  ]);
+
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
     return (
@@ -300,6 +310,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                           >
                             <Item
                               {...item}
+                              editable={editable}
                               onSplitSelected={(s) => {
                                 onSplitSelected(item.id, s, input);
                               }}
@@ -331,12 +342,24 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
             </div>
           )}
 
-          {!!selectedFeaturesData && !!selectedFeaturesData.length && (
+          {!!selectedFeaturesData && !!selectedFeaturesData.length && editable && (
             <Button
               type="submit"
               theme="secondary-alt"
               size="lg"
               className="flex-shrink-0"
+            >
+              Continue
+            </Button>
+          )}
+
+          {!!selectedFeaturesData && !!selectedFeaturesData.length && !editable && (
+            <Button
+              type="button"
+              theme="secondary-alt"
+              size="lg"
+              className="flex-shrink-0"
+              onClick={onContinue}
             >
               Continue
             </Button>

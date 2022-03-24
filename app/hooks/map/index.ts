@@ -5,18 +5,30 @@ import cx from 'classnames';
 
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
+  UseGeoJSONLayer,
+
   UseAdminPreviewLayer,
+  UsePlanningAreaPreviewLayer,
+  UseWDPAPreviewLayer,
   UseFeaturePreviewLayer,
   UseFeaturePreviewLayers,
-  UseGeoJSONLayer,
-  UseLegend,
-  UsePUCompareLayer,
-  UsePUGridLayer,
   UsePUGridPreviewLayer,
-  UseWDPAPreviewLayer,
+
+  UseProyectPlanningAreaLayer,
+  UseProyectGridLayer,
+
+  UsePUGridLayer,
+  UsePUCompareLayer,
+
+  UseLegend,
+  UseGridPreviewLayer,
 } from './types';
 
-// GeoJSON
+/**
+ *******************************************************************
+ * GLOBAL LAYERS
+ *******************************************************************
+ */
 export function useGeoJsonLayer({
   id, active, data, options,
 }: UseGeoJSONLayer) {
@@ -47,7 +59,13 @@ export function useGeoJsonLayer({
   }, [id, active, data, customPAshapefileGrid]);
 }
 
-// AdminPreview
+/**
+ *******************************************************************
+ * PREVIEW LAYERS
+ *******************************************************************
+ */
+
+// Admin preview layer
 export function useAdminPreviewLayer({
   active, country, region, subregion, cache = 0,
 }: UseAdminPreviewLayer) {
@@ -87,7 +105,68 @@ export function useAdminPreviewLayer({
   }, [active, level, guid, cache]);
 }
 
-// WDPApreview
+// Planning area preview layer
+export function usePlanningAreaPreviewLayer({
+  active, planningAreaId, cache = 0,
+}: UsePlanningAreaPreviewLayer) {
+  return useMemo(() => {
+    if (!active || !planningAreaId) return null;
+
+    return {
+      id: `planning-area-preview-layer-${planningAreaId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${planningAreaId}/preview/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#FFF',
+              'line-width': 3,
+            },
+          },
+        ],
+      },
+    };
+  }, [active, planningAreaId, cache]);
+}
+
+export function useGridPreviewLayer({
+  active, gridId, cache = 0,
+}: UseGridPreviewLayer) {
+  return useMemo(() => {
+    if (!active || !gridId) return null;
+
+    return {
+      id: `grid-preview-layer-${gridId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${gridId}/grid/preview/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-width': 1,
+              'line-color': COLORS.primary,
+              'line-opacity': 0.5,
+            },
+
+          },
+        ],
+      },
+    };
+  }, [active, gridId, cache]);
+}
+
+// WDPA preview layer
 export function useWDPAPreviewLayer({
   pid, active, bbox, wdpaIucnCategories, cache = 0, options,
 }: UseWDPAPreviewLayer) {
@@ -142,7 +221,7 @@ export function useWDPAPreviewLayer({
   }, [pid, active, bbox, wdpaIucnCategories, cache, opacity, visibility]);
 }
 
-// Featurepreview
+// Feature preview layer
 export function useFeaturePreviewLayer({
   active, bbox, id, cache = 0,
 }: UseFeaturePreviewLayer) {
@@ -281,7 +360,7 @@ export function useFeaturePreviewLayers({
   }, [active, bbox, features, cache, options]);
 }
 
-// PUGridpreview
+// PU Grid preview layer
 export function usePUGridPreviewLayer({
   active, bbox, planningUnitGridShape, planningUnitAreakm2, cache, options = {},
 }: UsePUGridPreviewLayer) {
@@ -328,7 +407,75 @@ export function usePUGridPreviewLayer({
   }, [active, bbox, planningUnitGridShape, planningUnitAreakm2, cache, options]);
 }
 
-// PUGrid
+/**
+ *******************************************************************
+ * PROYECT LAYERS
+ *******************************************************************
+ */
+export function useProyectPlanningAreaLayer({
+  active, pId, cache = 0,
+}: UseProyectPlanningAreaLayer) {
+  return useMemo(() => {
+    if (!active || !pId) return null;
+
+    return {
+      id: `proyect-planning-area-layer-${pId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/planning-area/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': '#FFF',
+              'line-width': 3,
+            },
+          },
+        ],
+      },
+    };
+  }, [active, pId, cache]);
+}
+
+export function useProyectGridLayer({
+  active, pId, cache = 0,
+}: UseProyectGridLayer) {
+  return useMemo(() => {
+    if (!active || !pId) return null;
+
+    return {
+      id: `proyect-grid-layer-${pId}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/grid/tiles/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'line',
+            'source-layer': 'layer0',
+            paint: {
+              'line-color': COLORS.primary,
+              'line-opacity': 0.5,
+            },
+
+          },
+        ],
+      },
+    };
+  }, [active, pId, cache]);
+}
+
+/**
+ *******************************************************************
+ * GRID LAYERS
+ *******************************************************************
+ */
 export function usePUGridLayer({
   active, sid, include, sublayers, options = {}, cache,
 }: UsePUGridLayer) {
@@ -772,7 +919,7 @@ export function usePUCompareLayer({
       source: {
         type: 'vector',
         // Use correct tiles using sid1 and sid2 in the correct endpoint: ask BE
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/planning-units/tiles/{z}/{x}/{y}.mvt?include=results`],
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/compare/${sid2}/tiles/{z}/{x}/{y}.mvt`],
       },
       render: {
         layers: [
@@ -784,8 +931,8 @@ export function usePUCompareLayer({
                 'match',
                 [
                   'concat',
-                  ['round', ['/', ['get', 'frequencyValue'], 100 / COLOR_NUMBER]],
-                  ['round', ['/', ['get', 'frequencyValue'], 100 / COLOR_NUMBER]],
+                  ['round', ['/', ['get', 'freqA'], 100 / COLOR_NUMBER]],
+                  ['round', ['/', ['get', 'freqB'], 100 / COLOR_NUMBER]],
                 ],
                 ...COLOR_RAMP,
                 '#FFF',
