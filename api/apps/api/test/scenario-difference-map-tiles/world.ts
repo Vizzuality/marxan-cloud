@@ -52,9 +52,9 @@ export const createWorld = async (app: INestApplication) => {
     scenarioIdA,
     scenarioIdB,
     GivenScenarioAPuDataExists: async () =>
-      (await GivenScenarioPuDataExists(entityManager, projectId, scenarioIdA)),
+      await GivenScenarioPuDataExists(entityManager, projectId, scenarioIdA),
     GivenScenarioBPuDataExists: async () =>
-      (await GivenScenarioPuDataExists(entityManager, projectId, scenarioIdB)),
+      await GivenScenarioPuDataExists(entityManager, projectId, scenarioIdB),
     WhenRequestingTileToCompareScenarios: async (
       scenarioIdA: string,
       scenarioIdB: string,
