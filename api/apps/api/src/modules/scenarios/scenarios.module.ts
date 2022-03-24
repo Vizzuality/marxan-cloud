@@ -50,6 +50,7 @@ import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block
 import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios-acl/locks/entity/scenario.lock.api.entity';
 import { LockService } from '../access-control/scenarios-acl/locks/lock.service';
 import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
+import { WebshotModule } from '@marxan/webshot';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entit
     BlmValuesModule,
     BlmCalibrationModule,
     AccessControlModule,
+    forwardRef(() => WebshotModule),
   ],
   providers: [
     ScenariosService,

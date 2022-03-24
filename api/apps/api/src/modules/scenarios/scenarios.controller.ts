@@ -104,6 +104,9 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
+import { WebshotSummaryReportConfig } from '@marxan/webshot';
+import { WebshotService } from '@marxan/webshot';
+import { AppSessionToken } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -131,6 +134,7 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly webshotService: WebshotService,
   ) {}
 
   @ApiOperation({
@@ -1214,5 +1218,62 @@ export class ScenariosController {
     }
 
     return result.right;
+  }
+
+  @ApiOperation({ description: 'Get PDF summary report for scenario' })
+  @ApiOkResponse()
+  @Header('content-type', 'application/pdf')
+  @Post('/:scenarioId/solutions/report')
+  async getSummaryReportForProject(
+    @Body() config: WebshotSummaryReportConfig,
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Res() res: Response,
+    @Req() req: RequestWithAuthenticatedUser,
+    @AppSessionToken() appSessionToken: string,
+  ): Promise<any> {
+    /**
+     * If a frontend app session token was provided via cookie, use this to let
+     * the webshot service authenticate to the app, otherwise fall back to
+     * looking for the relevant cookies in the body of the request.
+     *
+     * @todo Remove this once the new auth workflow via `Cookie` header is
+     * stable.
+     */
+    const configForWebshot = appSessionToken
+      ? {
+          ...config,
+          cookie: appSessionToken,
+        }
+      : config;
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
+    const scenario = await this.service.getById(scenarioId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(scenario)) {
+      throw mapAclDomainToHttpError(scenario.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+
+    const pdfStream = await this.webshotService.getSummaryReportForScenario(
+      scenarioId,
+      scenario.right.projectId,
+      configForWebshot,
+    );
+
+    if (isLeft(pdfStream)) {
+      throw mapAclDomainToHttpError(pdfStream.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+
+    pdfStream.right.pipe(res);
   }
 }
