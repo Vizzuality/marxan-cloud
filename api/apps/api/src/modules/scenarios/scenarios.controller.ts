@@ -7,6 +7,7 @@ import {
   Header,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -1267,11 +1268,9 @@ export class ScenariosController {
     );
 
     if (isLeft(pdfStream)) {
-      throw mapAclDomainToHttpError(pdfStream.left, {
-        scenarioId,
-        userId: req.user.id,
-        resourceType: scenarioResource.name.plural,
-      });
+      return new InternalServerErrorException(
+        'Unexpected error while preparing scenario solutions report.',
+      );
     }
 
     pdfStream.right.pipe(res);
