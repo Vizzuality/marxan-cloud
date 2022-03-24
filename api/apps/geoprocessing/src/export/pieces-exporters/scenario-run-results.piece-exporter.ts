@@ -66,12 +66,12 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
             }),
         'spd',
       )
-      .leftJoin(
+      .innerJoin(
         'output_scenarios_pu_data',
         'results',
         'spd.id = results.scenario_pu_id',
       )
-      .leftJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
+      .innerJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
       .execute();
 
     const content: ScenarioRunResultsContent = { blmResults, marxanRunResults };
