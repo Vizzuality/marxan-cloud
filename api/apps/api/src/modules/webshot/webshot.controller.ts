@@ -54,7 +54,7 @@ export class WebshotController {
       req.user,
       {
         ...config,
-        cookie: appSessionToken
+        cookie: appSessionToken,
       }
     );
     if (isLeft(pdfStream)) {
