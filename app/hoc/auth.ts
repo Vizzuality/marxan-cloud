@@ -10,6 +10,8 @@ import { mergeDehydratedState } from './utils';
 export function withProtection(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
+    console.log('***********************************************************session************************************************************************************************', session);
+    console.log('***********************************************************context.cookies************************************************************************************************', context?.req?.headers?.cookie);
     const { resolvedUrl } = context;
 
     if (!session) {

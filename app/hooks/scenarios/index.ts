@@ -49,6 +49,8 @@ import {
   SaveScenarioLockProps,
   UseDeleteScenarioLockProps,
   DeleteScenarioLockProps,
+  UseDownloadScenarioReportProps,
+  DownloadScenarioReportProps,
 } from './types';
 
 /**
@@ -892,6 +894,54 @@ export function useSaveScenarioCalibrationRange({
       queryClient.invalidateQueries(['scenario-calibration-range', scenarioId]);
     },
     onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadScenarioReport({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseDownloadScenarioReportProps) {
+  const [session] = useSession();
+
+  const downloadScenarioReport = ({ sid }: DownloadScenarioReportProps) => {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_VERCEL_URL;
+    return DOWNLOADS.request({
+      url: `/scenarios/${sid}/solutions/report`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      withCredentials: true,
+      data: {
+        baseUrl: process.env.NODE_ENV === 'production' ? baseUrl : 'https://brave-robin-61.loca.lt',
+        pdfOptions: {
+          landscape: true,
+        },
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadScenarioReport, {
+    onSuccess: (data: any, variables, context) => {
+      const { data: blob } = data;
+      const { sid } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `solutions-report-${sid}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

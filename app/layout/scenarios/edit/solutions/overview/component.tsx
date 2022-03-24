@@ -9,7 +9,7 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { motion } from 'framer-motion';
 
 import { LEGEND_LAYERS } from 'hooks/map/constants';
-import { useScenario } from 'hooks/scenarios';
+import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 
 import SolutionFrequency from 'layout/solutions/frequency';
@@ -58,6 +58,8 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     enabled: scenarioData?.ranAtLeastOnce,
   });
 
+  const downloadScenarioReportMutation = useDownloadScenarioReport({});
+
   const isBestSolution = (selectedSolution
     && bestSolutionData
     && selectedSolution?.id === bestSolutionData?.id) || !selectedSolution?.id;
@@ -68,6 +70,17 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     );
 
   const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
+
+  const onDownloadReport = useCallback(() => {
+    downloadScenarioReportMutation.mutate({ sid: `${sid}` }, {
+      onSuccess: () => {
+        console.log('****************************Success*******************************');
+      },
+      onError: () => {
+        console.log('****************************Error*******************************');
+      },
+    });
+  }, [sid, downloadScenarioReportMutation]);
 
   const onChangeVisibility = useCallback((lid) => {
     const { visibility = true } = layerSettings[lid] || {};
@@ -116,6 +129,15 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             >
               View solutions table
               <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
+            </Button>
+
+            <Button
+              theme="primary"
+              size="base"
+              className="flex h-12 mb-4"
+              onClick={onDownloadReport}
+            >
+              Download report
             </Button>
 
             <Modal
