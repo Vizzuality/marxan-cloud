@@ -907,7 +907,7 @@ export function useDownloadScenarioReport({
   const [session] = useSession();
 
   const downloadScenarioReport = ({ sid }: DownloadScenarioReportProps) => {
-    const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_VERCEL_URL;
+    const baseUrl = process.env.NEXT_PUBLIC_URL || `${window.location.protocol}//${process.env.NEXT_PUBLIC_VERCEL_URL}`;
     return DOWNLOADS.request({
       url: `/scenarios/${sid}/solutions/report`,
       responseType: 'arraybuffer',
