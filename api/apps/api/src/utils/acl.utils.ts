@@ -50,7 +50,7 @@ import {
   updateFailure,
   unknownError as rangeUnknownError,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
-import { unknownPdfWebshotError } from '@marxan-api/modules/webshot/webshot.service';
+import { unknownPdfWebshotError } from '@marxan/webshot';
 
 interface ErrorHandlerOptions {
   projectId?: string;

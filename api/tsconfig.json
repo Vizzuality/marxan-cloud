@@ -168,6 +168,12 @@
       ],
       "@marxan/code-guide/*": [
         "libs/code-guide/src/*"
+      ],
+      "@marxan/webshot": [
+        "libs/webshot/src"
+      ],
+      "@marxan/webshot/*": [
+        "libs/webshot/src/*"
       ]
     }
   },
