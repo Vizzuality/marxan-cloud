@@ -31,21 +31,22 @@ export class ImportScenarioHandler
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
     const exportConfig = exportConfigOrError.right as ScenarioExportConfigContent;
-    const resourceId = ResourceId.create();
+    const importResourceId = ResourceId.create();
 
     const pieces = this.importResourcePieces.resolveForScenario(
-      resourceId,
+      importResourceId,
       archiveLocation,
       exportConfig.pieces,
       ResourceKind.Scenario,
       exportConfig.resourceId,
     );
-    const importResourceId = new ResourceId(exportConfig.projectId);
 
     const importRequest = this.eventPublisher.mergeObjectContext(
       Import.newOne(
         importResourceId,
         ResourceKind.Scenario,
+        // TODO
+        // new ResourceId(exportConfig.projectId)
         archiveLocation,
         pieces,
       ),
