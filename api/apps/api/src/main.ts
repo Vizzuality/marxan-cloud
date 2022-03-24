@@ -4,6 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { json } from 'express';
 import { complexGeometry } from './modules/uploads';
+import * as cookieParser from 'cookie-parser';
 
 export async function bootstrap() {
   const app = await bootstrapSetUp();
@@ -24,6 +25,8 @@ export async function bootstrap() {
   );
   // For everything else, stick to the default
   app.use(json({ limit: '100kb' }));
+
+  app.use(cookieParser());
 
   await app.listen(AppConfig.get('api.daemonListenPort'));
 }
