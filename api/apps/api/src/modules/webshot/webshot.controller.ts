@@ -25,7 +25,7 @@ import { isLeft } from 'fp-ts/lib/Either';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { scenarioResource } from '../scenarios/scenario.api.entity';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
-import { AppSessionToken } from '@marxan-api/decorators/app-session-token-cookie.decorator';
+import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
 @ImplementsAcl()
 @UseGuards(JwtAuthGuard)
@@ -44,7 +44,7 @@ export class WebshotController {
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
-    @AppSessionToken() appSessionToken: string,
+    @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<any> {
     /**
      * If a frontend app session token was provided via cookie, use this to let
@@ -54,10 +54,10 @@ export class WebshotController {
      * @todo Remove this once the new auth workflow via `Cookie` header is
      * stable.
      */
-    const configForWebshot = appSessionToken
+    const configForWebshot = appSessionTokenCookie
       ? {
           ...config,
-          cookie: appSessionToken,
+          cookie: appSessionTokenCookie,
         }
       : config;
     // @debt Refactor to use @nestjs/common's StreamableFile
