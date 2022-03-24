@@ -58,7 +58,7 @@ export class WebshotController {
     const pdfStream = await this.service.getSummaryReportForScenario(
       scenarioId,
       req.user,
-      config,
+      configForWebshot,
     );
     if (isLeft(pdfStream)) {
       throw mapAclDomainToHttpError(pdfStream.left, {
