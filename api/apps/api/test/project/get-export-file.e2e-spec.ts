@@ -175,6 +175,7 @@ export const getFixtures = async () => {
       const response = await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
         .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ scenarioIds: [] })
         .expect(201);
 
       exportId = new ExportId(response.body.id);

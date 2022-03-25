@@ -96,7 +96,10 @@ import {
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
-import { RequestProjectExportResponseDto } from './dto/export.project.response.dto';
+import {
+  RequestProjectExportResponseDto,
+  RequestProjectExportBodyDto,
+} from './dto/export.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
 import { unknownError as fileRepositoryUnknownError } from '@marxan/files-repository';
@@ -594,10 +597,12 @@ export class ProjectsController {
   async requestProjectExport(
     @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: RequestProjectExportBodyDto,
   ) {
     const result = await this.projectsService.requestExport(
       projectId,
       req.user.id,
+      dto.scenarioIds,
     );
 
     if (isLeft(result)) {

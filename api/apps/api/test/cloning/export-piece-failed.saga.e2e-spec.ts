@@ -88,6 +88,7 @@ const getFixtures = async () => {
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export/`)
         .set('Authorization', `Bearer ${token}`)
+        .send({ scenarioIds: [] })
         .expect(201)
         .then((response) => {
           exportId = new ExportId(response.body.id);

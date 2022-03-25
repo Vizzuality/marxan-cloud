@@ -20,9 +20,9 @@ export class ExportProjectHandler
     private readonly eventPublisher: EventPublisher,
   ) {}
 
-  async execute({ id }: ExportProject): Promise<ExportId> {
+  async execute({ id, scenarioIds }: ExportProject): Promise<ExportId> {
     const kind = ResourceKind.Project;
-    const pieces = await this.resourcePieces.resolveFor(id, kind);
+    const pieces = await this.resourcePieces.resolveForProject(id, scenarioIds);
     const exportRequest = this.eventPublisher.mergeObjectContext(
       Export.newOne(id, kind, pieces),
     );

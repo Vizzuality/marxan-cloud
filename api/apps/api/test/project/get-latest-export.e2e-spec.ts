@@ -180,6 +180,7 @@ export const getFixtures = async () => {
       const response = await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
         .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ scenarioIds: [] })
         .expect(201);
 
       exportId = new ExportId(response.body.id);
@@ -204,19 +205,23 @@ export const getFixtures = async () => {
     WhenUnrelatedUserRequestLatestExportId: () =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${unrelatedUserToken}`),
+        .set('Authorization', `Bearer ${unrelatedUserToken}`)
+        .send({ scenarioIds: [] }),
     WhenOwnerUserRequestLatestExportId: () =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${ownerToken}`),
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ scenarioIds: [] }),
     WhenContributorUserRequestLatestExportId: () =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${contributorToken}`),
+        .set('Authorization', `Bearer ${contributorToken}`)
+        .send({ scenarioIds: [] }),
     WhenViewerUserRequestLatestExportId: () =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${viewerToken}`),
+        .set('Authorization', `Bearer ${viewerToken}`)
+        .send({ scenarioIds: [] }),
     WhenExportFileIsReady: async () => {
       await eventBusTestUtils.waitUntilEventIsPublished(ArchiveReady);
     },
