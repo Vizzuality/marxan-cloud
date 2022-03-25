@@ -46,12 +46,10 @@ export class SelectionUpdateService {
     const idsToAdd: string[] = [];
     const idsToRemove: string[] = [];
     const projectScopedIdsRemoved: string[] = [];
-
     // TODO refactor to pieces
     const { areas } = await this.selectionGetService.getGlobalProtectedAreas(
       project,
     );
-
     for (const currentAreaState of currentSelection) {
       const entry = newSelection.find(
         (item) => item.id === currentAreaState.id,

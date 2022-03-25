@@ -1181,7 +1181,6 @@ export class ScenariosService {
     if (isLeft(projectResponse)) {
       return projectResponse;
     }
-
     const result = await this.protectedArea.selectFor(
       {
         id: scenarioId,

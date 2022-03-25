@@ -9,6 +9,7 @@ beforeEach(async () => {
 });
 
 test(`selecting protected areas as owner`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
   const scenario: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   const areaId = await fixtures.GivenCustomProtectedAreaWasAddedToProject();
   await fixtures.GivenAreasWereSelectedAsOwner(
@@ -18,7 +19,6 @@ test(`selecting protected areas as owner`, async () => {
   );
 
   const areas = await fixtures.WhenGettingProtectedAreasAsOwner(scenario);
-
   await fixtures.ThenItContainsSelectedGlobalArea(areas, IUCNCategory.III);
   await fixtures.ThenItContainsSelectedCustomArea(areas, areaId);
 
@@ -26,9 +26,12 @@ test(`selecting protected areas as owner`, async () => {
 });
 
 test(`selecting protected areas as contributor`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
+
   const scenario: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   await fixtures.GivenContributorWasAddedToScenario();
   const areaId = await fixtures.GivenCustomProtectedAreaWasAddedToProject();
+
   await fixtures.GivenAreasWereSelectedAsContributor(
     scenario,
     IUCNCategory.III,
@@ -44,6 +47,8 @@ test(`selecting protected areas as contributor`, async () => {
 });
 
 test(`selecting protected areas as viewer`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
+
   const scenario: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   await fixtures.GivenViewerWasAddedToScenario();
   const areaId = await fixtures.GivenCustomProtectedAreaWasAddedToProject();
@@ -66,12 +71,14 @@ test(`selecting protected areas as viewer`, async () => {
 });
 
 test(`getting NAM.2_1 protected areas for scenario as owner`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
   const scenarioId: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   const areas = await fixtures.WhenGettingProtectedAreasAsOwner(scenarioId);
   await fixtures.ThenItContainsRelevantWdpa(areas);
 });
 
 test(`getting NAM.2_1 protected areas for scenario as contributor`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
   const scenarioId: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   await fixtures.GivenContributorWasAddedToScenario();
   const areas = await fixtures.WhenGettingProtectedAreasAsContributor(
@@ -81,6 +88,7 @@ test(`getting NAM.2_1 protected areas for scenario as contributor`, async () => 
 });
 
 test(`getting NAM.2_1 protected areas for scenario as viewer`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
   const scenarioId: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   await fixtures.GivenViewerWasAddedToScenario();
   const areas = await fixtures.WhenGettingProtectedAreasAsViewer(scenarioId);
@@ -88,6 +96,7 @@ test(`getting NAM.2_1 protected areas for scenario as viewer`, async () => {
 });
 
 test(`getting NAM.2_1 protected areas for scenario as user not in scenario`, async () => {
+  await fixtures.GivenGlobalProtectedAreaWasCreated(IUCNCategory.III);
   const scenarioId: string = await fixtures.GivenScenarioInsideNAM41WasCreated();
   const response = await fixtures.WhenGettingProtectedAreasAsUserNotInScenario(
     scenarioId,
