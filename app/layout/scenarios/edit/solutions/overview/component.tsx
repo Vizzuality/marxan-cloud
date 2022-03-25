@@ -74,10 +74,10 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
   const onDownloadReport = useCallback(() => {
     downloadScenarioReportMutation.mutate({ sid: `${sid}` }, {
       onSuccess: () => {
-        console.log('****************************Success*******************************');
+        console.info('****************************Success*******************************');
       },
       onError: () => {
-        console.log('****************************Error*******************************');
+        console.info('****************************Error*******************************');
       },
     });
   }, [sid, downloadScenarioReportMutation]);

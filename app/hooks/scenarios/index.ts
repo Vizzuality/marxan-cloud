@@ -908,6 +908,22 @@ export function useDownloadScenarioReport({
 
   const downloadScenarioReport = ({ sid }: DownloadScenarioReportProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || `${window.location.protocol}//${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+
+    // return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/solutions/report`, {
+    //   method: 'POST',
+    //   mode: 'cors',
+    //   credentials: 'include',
+    //   headers: {
+    //     Authorization: `Bearer ${session.accessToken}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     baseUrl,
+    //     pdfOptions: {
+    //       landscape: true,
+    //     },
+    //   }),
+    // }).then((response) => response.json());
     return DOWNLOADS.request({
       url: `/scenarios/${sid}/solutions/report`,
       responseType: 'arraybuffer',
@@ -915,9 +931,9 @@ export function useDownloadScenarioReport({
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'application/json',
       },
-      withCredentials: true,
+      // withCredentials: true,
       data: {
-        baseUrl: process.env.NODE_ENV === 'production' ? baseUrl : 'https://brave-robin-61.loca.lt',
+        baseUrl,
         pdfOptions: {
           landscape: true,
         },

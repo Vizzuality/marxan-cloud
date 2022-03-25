@@ -58,7 +58,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
         </div>
 
         <h1 className="pb-4 text-2xl text-gray-500 font-heading">
-          {`${projectData.name}-${scenarioData.name}`}
+          {`${projectData?.name}-${scenarioData?.name}`}
         </h1>
 
         <div className="flex space-x-12 text-xxs">

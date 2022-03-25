@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
+
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -14,15 +16,17 @@ export interface WebShotStatusProps {
 
 globalThis.MARXAN = {
   webshot_ready: false,
-  maps: {
-    'report-map-1': false,
-    'report-map-2': false,
-  },
 };
 
 export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const { maps } = useSelector((state) => state['/reports/solutions']);
+
+  const mapsLoaded = useMemo(() => {
+    return Object.keys(maps).every((k) => maps[k]);
+  }, [maps]);
 
   const {
     data: projectData,
@@ -74,8 +78,7 @@ export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
     && PUData && PUDataIsFetched
     && featuresData && featuresDataIsFetched
     && costSurfaceRangeData && costSurfaceRangeDataIsFetched
-    && globalThis.MARXAN.maps['report-map-1']
-    && globalThis.MARXAN.maps['report-map-2'];
+    && mapsLoaded;
 
   console.log({ reportDataIsFetched });
 
@@ -83,6 +86,7 @@ export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
     if (reportDataIsFetched) {
       setTimeout(() => {
         console.log('WEBSHOT!');
+
         globalThis.MARXAN = {
           ...globalThis.MARXAN,
           webshot_ready: true,

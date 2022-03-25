@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { useDispatch } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import { setMaps } from 'store/slices/reports/solutions';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -27,6 +31,8 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
   const { query } = useRouter();
 
   const { pid, sid } = query;
+
+  const dispatch = useDispatch();
 
   const {
     data = {},
@@ -84,24 +90,8 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     return null;
   };
 
-  useEffect(() => {
-    globalThis.MARXAN = {
-      ...globalThis.MARXAN,
-      maps: {
-        ...globalThis.MARXAN.maps,
-        [id]: false,
-      },
-    };
-  }, []); // eslint-disable-line
-
   const handleMapLoad = () => {
-    globalThis.MARXAN = {
-      ...globalThis.MARXAN,
-      maps: {
-        ...globalThis.MARXAN.maps,
-        [id]: true,
-      },
-    };
+    dispatch(setMaps({ [id]: true }));
   };
 
   return (
@@ -128,6 +118,8 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
           onMapViewportChange={handleViewportChange}
           onMapLoad={handleMapLoad}
           transformRequest={handleTransformRequest}
+          preserveDrawingBuffer
+          preventStyleDiffing
         >
           {(map) => {
             return (
