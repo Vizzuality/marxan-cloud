@@ -34,17 +34,20 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const projectId = input.resourceId;
     const [projectData]: {
       name: string;
       description: string;
       planning_unit_grid_shape: PlanningUnitGridShape;
-    }[] = await this.entityManager.query(
-      `SELECT name, description, planning_unit_grid_shape FROM projects WHERE projects.id = $1`,
-      [input.resourceId],
-    );
+    }[] = await this.entityManager
+      .createQueryBuilder()
+      .select(['name', 'description', 'planning_unit_grid_shape'])
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
 
     if (!projectData) {
-      const errorMessage = `${ProjectMetadataPieceExporter.name} - Project ${input.resourceId} does not exist.`;
+      const errorMessage = `${ProjectMetadataPieceExporter.name} - Project ${projectId} does not exist.`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }

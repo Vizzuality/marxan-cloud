@@ -4,6 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { FileRepository } from '@marxan/files-repository';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -45,34 +46,34 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
-      `
-        SELECT planning_unit_grid_shape, planning_unit_area_km2
-        FROM projects
-        WHERE id = $1
-      `,
-      [input.resourceId],
-    );
+    const projectId = input.resourceId;
+    const [project]: [
+      ProjectSelectResult,
+    ] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('planning_unit_grid_shape')
+      .addSelect('planning_unit_area_km2')
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
 
     if (!project) {
-      const errorMessage = `Project with ID ${input.resourceId} not found`;
+      const errorMessage = `Project with ID ${projectId} not found`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
 
     const [planningArea]: [
       PlanningAreaSelectResult,
-    ] = await this.geoprocessingEntityManager.query(
-      `
-        SELECT ST_AsEWKB(the_geom) as ewkb
-        FROM planning_areas
-        WHERE project_id = $1
-      `,
-      [input.resourceId],
-    );
+    ] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select('ST_AsEWKB(the_geom)', 'ewkb')
+      .from(PlanningArea, 'pa')
+      .where('project_id = :projectId', { projectId })
+      .execute();
 
     if (!planningArea) {
-      const errorMessage = `Custom planning area not found for project with ID: ${input.resourceId}`;
+      const errorMessage = `Custom planning area not found for project with ID: ${projectId}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
