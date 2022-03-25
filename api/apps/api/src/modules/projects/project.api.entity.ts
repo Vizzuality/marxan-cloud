@@ -31,7 +31,9 @@ export const projectResource: BaseServiceResource = {
   entitiesAllowedAsIncludes: ['scenarios', 'users'],
 };
 
-@Entity('projects')
+export const projectTableName = 'projects' as const;
+
+@Entity(projectTableName)
 export class Project extends TimeUserEntityMetadata {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')

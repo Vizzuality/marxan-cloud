@@ -1,5 +1,7 @@
+import { projectTableName } from '@marxan-api/modules/projects/project.api.entity';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository } from '@marxan/files-repository';
 import { extractFile } from '@marxan/utils';
@@ -7,7 +9,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
-import { ResourceKind } from '@marxan/cloning/domain';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
@@ -64,26 +65,18 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
       stringPlanningAreaGadmOrError.right,
     );
 
-    await this.entityManager.query(
-      `
-        UPDATE projects
-        SET 
-          country_id = $2, 
-          admin_area_l1_id = $3, 
-          admin_area_l2_id = $4,
-          planning_unit_area_km2 = $5,
-          bbox = $6
-        WHERE id = $1
-      `,
-      [
-        importResourceId,
-        planningAreaGadm.country,
-        planningAreaGadm.l1,
-        planningAreaGadm.l2,
-        planningAreaGadm.planningUnitAreakm2,
-        JSON.stringify(planningAreaGadm.bbox),
-      ],
-    );
+    await this.entityManager
+      .createQueryBuilder()
+      .update(projectTableName)
+      .set({
+        country_id: planningAreaGadm.country,
+        admin_area_l1_id: planningAreaGadm.l1,
+        admin_area_l2_id: planningAreaGadm.l2,
+        planning_unit_area_km2: planningAreaGadm.planningUnitAreakm2,
+        bbox: JSON.stringify(planningAreaGadm.bbox),
+      })
+      .where('id = :importResourceId', { importResourceId })
+      .execute();
 
     return {
       importId: input.importId,
