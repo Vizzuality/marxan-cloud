@@ -77,19 +77,18 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       stringProjectMetadataOrError.right,
     );
 
-    await this.entityManager.query(
-      `
-      INSERT INTO projects(id, name, description, organization_id, planning_unit_grid_shape)
-      VALUES ($1, $2, $3, $4, $5)
-    `,
-      [
-        importResourceId,
-        projectMetadata.name,
-        projectMetadata.description,
-        organizationId,
-        projectMetadata.planningUnitGridShape,
-      ],
-    );
+    await this.entityManager
+      .createQueryBuilder()
+      .insert()
+      .into(`projects`)
+      .values({
+        id: importResourceId,
+        name: projectMetadata.name,
+        description: projectMetadata.description,
+        organization_id: organizationId,
+        planning_unit_grid_shape: projectMetadata.planningUnitGridShape,
+      })
+      .execute();
 
     return {
       importId: input.importId,

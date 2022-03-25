@@ -3,6 +3,7 @@ import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { FileRepository } from '@marxan/files-repository';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { extractFile } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -67,38 +68,33 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
     );
 
     await this.geoprocessingEntityManager.transaction(async (em) => {
-      await em.query(
-        `
-        INSERT INTO planning_areas(project_id, the_geom)
-        VALUES ($1, ST_GeomFromEWKB($2))
-      `,
-        [importResourceId, Buffer.from(planningAreaGadm.planningAreaGeom)],
-      );
-      const [planningArea]: [{ id: string; bbox: number[] }] = await em.query(
-        `
-        SELECT id, bbox
-        FROM planning_areas
-        WHERE project_id = $1
-      `,
-        [importResourceId],
-      );
+      const geoQb = em.createQueryBuilder();
+      const planningAreaGeom = Buffer.from(
+        planningAreaGadm.planningAreaGeom,
+      ).toString('hex');
 
-      await this.apiEntityManager.query(
-        `
-        UPDATE projects
-        SET
-          planning_unit_area_km2 = $2,
-          bbox = $3,
-          planning_area_geometry_id = $4
-        WHERE id = $1
-      `,
-        [
-          importResourceId,
-          planningAreaGadm.puAreaKm2,
-          JSON.stringify(planningArea.bbox),
-          planningArea.id,
-        ],
-      );
+      const result = await geoQb
+        .insert()
+        .into(PlanningArea)
+        .values({
+          projectId: importResourceId,
+          theGeom: () => `'${planningAreaGeom}'`,
+        })
+        .returning(['id', 'bbox'])
+        .execute();
+
+      const [planningArea] = result.raw as [{ id: string; bbox: number[] }];
+
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .update(`projects`)
+        .set({
+          planning_unit_area_km2: planningAreaGadm.puAreaKm2,
+          bbox: JSON.stringify(planningArea.bbox),
+          planning_area_geometry_id: planningArea.id,
+        })
+        .where('id = :importResourceId', { importResourceId })
+        .execute();
     });
 
     return {
