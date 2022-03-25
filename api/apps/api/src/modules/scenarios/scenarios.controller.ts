@@ -1244,26 +1244,23 @@ export class ScenariosController {
           cookie: appSessionTokenCookie,
         }
       : config;
-    const scenario = await this.service.getById(scenarioId, {
-      authenticatedUser: req.user,
-    });
 
-    if (isLeft(scenario)) {
-      throw mapAclDomainToHttpError(scenario.left, {
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
+    const pdfStream = await this.service.getSummaryReportFor(
+      scenarioId,
+      req.user.id,
+      configForWebshot,
+    );
+
+    if (isLeft(pdfStream)) {
+      throw mapAclDomainToHttpError(pdfStream.left, {
         scenarioId,
         userId: req.user.id,
         resourceType: scenarioResource.name.plural,
       });
     }
-
-    // @debt Refactor to use @nestjs/common's StreamableFile
-    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
-    // after upgrading NestJS to v8.
-    const pdfStream = await this.webshotService.getSummaryReportForScenario(
-      scenarioId,
-      scenario.right.projectId,
-      configForWebshot,
-    );
 
     if (isLeft(pdfStream)) {
       return new InternalServerErrorException(

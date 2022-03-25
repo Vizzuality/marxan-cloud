@@ -104,6 +104,11 @@ import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/s
 import { ResourceId } from '@marxan/cloning/domain';
 import { GeoJsonDataDTO } from './dto/shapefile.geojson.response.dto';
 import { FeatureCollection } from 'geojson';
+import {
+  unknownPdfWebshotError,
+  WebshotConfig,
+  WebshotService,
+} from '@marxan/webshot';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -159,6 +164,7 @@ export class ScenariosService {
     private readonly blmValuesRepository: ScenarioBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly webshotService: WebshotService,
   ) {}
 
   async findAllPaginated(
@@ -1110,5 +1116,37 @@ export class ScenariosService {
     >
   > {
     return await this.scenarioAclService.findLock(userId, scenarioId);
+  }
+
+  async getSummaryReportFor(
+    scenarioId: string,
+    userId: string,
+    configForWebshot: WebshotConfig,
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | GetScenarioFailure
+      | typeof unknownPdfWebshotError,
+      stream.Readable
+    >
+  > {
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenario)) {
+      return scenario;
+    }
+
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
+    const pdfStream = await this.webshotService.getSummaryReportForScenario(
+      scenarioId,
+      scenario.right.projectId,
+      configForWebshot,
+    );
+
+    return pdfStream;
   }
 }
