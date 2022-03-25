@@ -1,3 +1,11 @@
+import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { PlanningUnitSet } from '@marxan/planning-units-grid';
+import { PlanningUnitGridShape as ProjectGridShape } from '@marxan/scenarios-planning-unit';
 import {
   CommandHandler,
   EventBus,
@@ -6,14 +14,6 @@ import {
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { ApiEventsService } from '@marxan-api/modules/api-events';
-import { PlanningUnitSet } from '@marxan/planning-units-grid';
-import { API_EVENT_KINDS } from '@marxan/api-events';
-import { PlanningUnitGridShape as ProjectGridShape } from '@marxan/scenarios-planning-unit';
-
 import { SetProjectGridFromShapefile } from './set-project-grid-from-shapefile.command';
 
 @CommandHandler(SetProjectGridFromShapefile)
@@ -42,23 +42,12 @@ export class SetProjectGridFromShapefileHandler
     });
 
     await this.entityManager.transaction(async (manager) => {
-      await manager.query(
-        `
-          UPDATE "projects_pu"
-          SET "project_id" = $1
-          WHERE "project_id" = $2
-        `,
-        [projectId, planningAreaId],
-      );
-
-      await manager.query(
-        `
-          UPDATE "planning_areas"
-          SET "project_id" = $1
-          WHERE "project_id" = $2
-        `,
-        [projectId, planningAreaId],
-      );
+      await manager
+        .getRepository(ProjectsPuEntity)
+        .update({ planningAreaId }, { projectId });
+      await manager
+        .getRepository(PlanningArea)
+        .update({ id: planningAreaId }, { projectId });
     });
     await this.projects.update(
       {

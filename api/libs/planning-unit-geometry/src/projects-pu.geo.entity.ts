@@ -13,8 +13,11 @@ export class ProjectsPuEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column('uuid', { name: 'project_id' })
-  projectId!: string;
+  @Column('uuid', { name: 'project_id', nullable: true })
+  projectId?: string;
+
+  @Column('uuid', { name: 'planning_area_id', nullable: true })
+  planningAreaId?: string;
 
   @Column('int')
   puid!: number;
