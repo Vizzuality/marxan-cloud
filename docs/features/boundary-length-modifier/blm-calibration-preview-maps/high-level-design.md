@@ -49,26 +49,22 @@ protection in the previous step.
 
 ```
 @startuml
-Geo -> Api: Request BLM preview map for given scenario + BLM value
-Api -> Webshot: Forward request
+Geo -> Webshot: Request BLM preview map for given scenario + BLM value
 Webshot -> App: Forward request
-App -> Api: Request tiles for BLM preview
+App -> Api: Request MVT tiles for BLM preview (new endpoint for tiles)
 Api -> Geo: Forward request
 Geo -> GeoDb: Select PU inclusion data from BlmFinalResultsRepository
 GeoDb -> Geo: Send PU inclusion data for given scenario + BLM value
 Geo -> Api: Send MVT tiles with PU inclusion data
 Api -> App: Forward MVT tiles
 App -> Webshot: Send full map
-Webshot -> Api: Send snapshot of map as PNG
-Api -> Geo: Forward PNG
+Webshot -> Geo: Send snapshot of map as PNG
 Geo -> GeoDb: Store PNG as blob in BlmFinalResultsRepository, set protected_pu_ids to null
 @enduml
 ```
 
-Requests from the Geoprocessing service to the API service should be protected
-via `x-api-key` authentication (similarly to what is done in the Geoprocessing
-service's `ApiEventsService` in order to dispatch API events to the API's own
-API events module).
+Requests from the Geoprocessing service to the Webshot service are handled
+through the `@marxan/webshot` shared library.
 
 #### To be decided
 
