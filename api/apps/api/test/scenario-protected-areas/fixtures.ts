@@ -17,6 +17,7 @@ import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { ProtectedAreaDto } from '@marxan-api/modules/scenarios/dto/protected-area.dto';
+import { insertWdpaQuery } from './insert-wdpa-query';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -92,30 +93,12 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/protected-areas`)
         .set('Authorization', `Bearer ${userWithNoRoleToken}`),
-    ThenItContainsRelevantWdpa: async (response: unknown) => {
+    ThenItContainsRelevantWdpa: async (response: any) => {
       expect(response).toEqual([
-        {
-          id: 'II',
-          kind: 'global',
-          name: 'II',
-          selected: false,
-        },
         {
           id: 'III',
           kind: 'global',
           name: 'III',
-          selected: false,
-        },
-        {
-          id: 'Not Applicable',
-          kind: 'global',
-          name: 'Not Applicable',
-          selected: false,
-        },
-        {
-          id: 'Not Reported',
-          kind: 'global',
-          name: 'Not Reported',
           selected: false,
         },
       ]);
@@ -145,6 +128,9 @@ export const getFixtures = async () => {
         ],
       );
       return ids[0].id;
+    },
+    GivenGlobalProtectedAreaWasCreated: async (iucnCategory: IUCNCategory) => {
+      await wdpa.query(insertWdpaQuery(iucnCategory));
     },
     ThenItContainsSelectedCustomArea: async (
       response: ProtectedAreaDto[],
@@ -247,6 +233,7 @@ export const getFixtures = async () => {
       response: ProtectedAreaDto[],
       category: IUCNCategory,
     ) => {
+      console.log(response);
       expect(response.find((e) => e.id === category)).toEqual({
         id: category,
         kind: `global`,
