@@ -122,21 +122,27 @@ consumers (for the task at hand, the frontend app) via the API's tiles
 endpoints.
 
 For BLM preview maps, the app needs tiles that include planning unit geometries
-and a flag for each planning unit indicating whether the unit is included in the
-solution for a given BLM run.
+and a property for each planning unit indicating whether the unit is included in
+the solution for a given BLM value.
 
-This is similar to the conditional inclusion of data such as `protection`
-(boolean value indicating whether a planning unit is considered protected
-according to intersection with protected areas and the protection threshold
-set), `lock-status` (unstated, locked in or locked out), and so on.
+This is similar to the conditional inclusion of data such as `results` (`GET
+/api/v1/scenarios/:id/planning-units/tiles/:z/:x/:y.mvt?include=results`, where
+each planning unit geometry carries data on its selection frequency as gathered
+by the number of iterations of the Marxan run in which the unit has been
+selected for protection).
+
+Data for each planning unit is here fetched from the array if ids of planning
+units selected for protection in each BLM calibration run's best solution, as
+stored in `(geodb)blm_final_results` while preparing data of planning units
+selected for protection (see previous step).
 
 These tiles should be exposed via a new endpoint: `GET
-/api/v1/scenarios/:scenarioId/calibration/tiles/preview/:blmValue/:z/:x/:y.mvt`.
+/api/v1/scenarios/:scenarioId/calibration/tiles/:blmValue/:z/:x/:y.mvt`.
 
 This endpoint should be accessible to users who can view BLM calibration results
 for the relevant scenario (see main permissions matrix for details).
 
-## Retrieving maps
+## Retrieving preview maps
 
 A new endpoint (`GET
 /api/v1/scenarios/:scenarioId/calibration/maps/preview/:blmValue`) serves the
