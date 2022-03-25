@@ -1,26 +1,18 @@
-FROM node:16.14.0-alpine3.15
+FROM node:16.14.0
 LABEL maintainer="hello@vizzuality.com"
 
 ENV NAME marxan-webshot
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
 
-RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
+RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
 
-RUN apk add --update \
-    bash \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    && rm -rf /var/cache/apk/*
+RUN apt-get update && apt-get install -y google-chrome-stable libxtst6 libxss1 --no-install-recommends
 
-# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+# Add Chrome as a user
+RUN groupadd -r $USER && useradd -r -g $USER -G audio,video $USER \
+    && mkdir -p /home/$USER && chown -R $USER:$USER /home/$USER
 
 WORKDIR $APP_HOME
 RUN chown $USER:$USER $APP_HOME
