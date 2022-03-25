@@ -57,9 +57,5 @@ export const getFixtures = async () => {
     ThenResultsAreAvailable: async () => {
       return void 0;
     },
-    cleanup: async () => {
-      await Promise.all(cleanups.map((c) => c()));
-      await app.close();
-    },
   };
 };

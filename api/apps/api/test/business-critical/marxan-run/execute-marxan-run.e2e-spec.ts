@@ -7,11 +7,7 @@ beforeAll(async () => {
   fixtures = await getFixtures();
 });
 
-afterAll(async () => {
-  await fixtures.cleanup();
-});
-
-describe(`Marxan run`, () => {
+describe.skip(`Marxan run`, () => {
   beforeAll(async () => {
     await fixtures.GivenUserIsLoggedIn();
     await fixtures.GivenProjectOrganizationExists();
