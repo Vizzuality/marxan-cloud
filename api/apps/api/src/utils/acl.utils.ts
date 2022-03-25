@@ -50,7 +50,10 @@ import {
   updateFailure,
   unknownError as rangeUnknownError,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
-import { unknownPdfWebshotError } from '@marxan-api/modules/webshot/webshot.service';
+import {
+  unknownPdfWebshotError,
+  unknownPngWebshotError,
+} from '@marxan/webshot';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -91,7 +94,8 @@ export const mapAclDomainToHttpError = (
     | typeof submissionFailed
     | typeof nullPlanningUnitGridShape
     | typeof initialCostProjectNotFound
-    | typeof unknownPdfWebshotError,
+    | typeof unknownPdfWebshotError
+    | typeof unknownPngWebshotError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -179,7 +183,11 @@ export const mapAclDomainToHttpError = (
       return new NotFoundException('Project not found.');
     case unknownPdfWebshotError:
       return new InternalServerErrorException(
-        'Unexpected error while preparing scenario solutions report.',
+        'Unexpected error while preparing PDF snapshot via webshot.',
+      );
+    case unknownPngWebshotError:
+      return new InternalServerErrorException(
+        'Unexpected error while preparing PNG snapshot via webshot.',
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

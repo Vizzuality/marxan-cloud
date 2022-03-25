@@ -7,6 +7,7 @@ import {
   Header,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -30,7 +31,6 @@ import {
   ApiAcceptedResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -38,7 +38,6 @@ import {
   ApiProduces,
   ApiQuery,
   ApiTags,
-  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { plainToClass } from 'class-transformer';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -104,6 +103,9 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
+import { WebshotConfig } from '@marxan/webshot';
+import { WebshotService } from '@marxan/webshot';
+import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -131,6 +133,7 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly webshotService: WebshotService,
   ) {}
 
   @ApiOperation({
@@ -1214,5 +1217,57 @@ export class ScenariosController {
     }
 
     return result.right;
+  }
+
+  @ApiOperation({ description: 'Get PDF summary report for scenario' })
+  @ApiOkResponse()
+  @Header('content-type', 'application/pdf')
+  @Post('/:scenarioId/solutions/report')
+  async getSummaryReportForProject(
+    @Body() config: WebshotConfig,
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Res() res: Response,
+    @Req() req: RequestWithAuthenticatedUser,
+    @AppSessionTokenCookie() appSessionTokenCookie: string,
+  ): Promise<any> {
+    /**
+     * If a frontend app session token was provided via cookie, use this to let
+     * the webshot service authenticate to the app, otherwise fall back to
+     * looking for the relevant cookies in the body of the request.
+     *
+     * @todo Remove this once the new auth workflow via `Cookie` header is
+     * stable.
+     */
+    const configForWebshot = appSessionTokenCookie
+      ? {
+          ...config,
+          cookie: appSessionTokenCookie,
+        }
+      : config;
+
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
+    const pdfStream = await this.service.getSummaryReportFor(
+      scenarioId,
+      req.user.id,
+      configForWebshot,
+    );
+
+    if (isLeft(pdfStream)) {
+      throw mapAclDomainToHttpError(pdfStream.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+
+    if (isLeft(pdfStream)) {
+      return new InternalServerErrorException(
+        'Unexpected error while preparing scenario solutions report.',
+      );
+    }
+
+    pdfStream.right.pipe(res);
   }
 }

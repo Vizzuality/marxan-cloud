@@ -36,7 +36,6 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { FileRepositoryModule } from '@marxan/files-repository';
 import { CloneModule } from './modules/clone';
-import { WebshotModule } from './modules/webshot/webshot.module';
 
 @Module({
   imports: [
@@ -72,7 +71,6 @@ import { WebshotModule } from './modules/webshot/webshot.module';
     AccessControlModule,
     FileRepositoryModule,
     CloneModule,
-    WebshotModule,
   ],
   controllers: [AppController, PingController],
   providers: [

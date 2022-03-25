@@ -22,9 +22,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BlmPartialResultEntity } from './blm-partial-results.geo.entity';
 import { MarxanDirectory } from '../adapters-single/marxan-directory.service';
 import { BlmBestRunService } from './blm-best-run.service';
+import { BlmPuidFromBestRunService } from './blm-output-best-run.service';
 import { RemovePreviousCalibrationPartialResultsHandler } from './cleanup/remove-previous-calibration-partial-results.handler';
 import { BlmCalibrationStartedSaga } from './cleanup/blm-calibration-started.saga';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -33,7 +35,11 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     WorkspaceModule,
     AssetsModule,
     MarxanOutputParserModule,
-    TypeOrmModule.forFeature([BlmPartialResultEntity, BlmFinalResultEntity]),
+    TypeOrmModule.forFeature([
+      BlmPartialResultEntity,
+      BlmFinalResultEntity,
+      ProjectsPuEntity,
+    ]),
     CqrsModule,
   ],
   providers: [
@@ -53,6 +59,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
     MarxanRunnerFactory,
     MarxanDirectory,
     BlmBestRunService,
+    BlmPuidFromBestRunService,
     BlmCalibrationStartedSaga,
     RemovePreviousCalibrationPartialResultsHandler,
   ],

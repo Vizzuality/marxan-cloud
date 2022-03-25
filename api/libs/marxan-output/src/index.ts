@@ -9,3 +9,4 @@ export {
   ResultWithPUValues,
 } from './execution-result';
 export { ScenariosOutputResultsApiEntity } from './scenarios-outputs-summaries.api.entity';
+export { OutputBestParsedRow } from './output-best-result';
