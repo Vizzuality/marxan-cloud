@@ -1,8 +1,8 @@
 import { IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { PDFOptions } from 'puppeteer';
+import { PDFOptions, ScreenshotOptions } from 'puppeteer';
 
-export class WebshotSummaryReportConfig {
+export class WebshotConfig {
   @ApiProperty()
   @IsString()
   baseUrl!: string;
@@ -14,4 +14,8 @@ export class WebshotSummaryReportConfig {
   @ApiPropertyOptional()
   @IsOptional()
   pdfOptions?: PDFOptions;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  screenshotOptions?: ScreenshotOptions;
 }
