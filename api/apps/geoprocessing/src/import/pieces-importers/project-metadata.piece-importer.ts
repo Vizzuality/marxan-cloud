@@ -12,7 +12,6 @@ import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
-import { projectTableName } from '../../../../api/src/modules/projects/project.api.entity';
 
 @Injectable()
 @PieceImportProvider()
@@ -81,7 +80,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     await this.entityManager
       .createQueryBuilder()
       .insert()
-      .into(projectTableName)
+      .into(`projects`)
       .values({
         id: importResourceId,
         name: projectMetadata.name,

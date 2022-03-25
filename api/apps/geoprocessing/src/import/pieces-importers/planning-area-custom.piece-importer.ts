@@ -1,4 +1,3 @@
-import { projectTableName } from '@marxan-api/modules/projects/project.api.entity';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
@@ -88,7 +87,7 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
 
       await this.apiEntityManager
         .createQueryBuilder()
-        .update(projectTableName)
+        .update(`projects`)
         .set({
           planning_unit_area_km2: planningAreaGadm.puAreaKm2,
           bbox: JSON.stringify(planningArea.bbox),
