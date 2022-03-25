@@ -1244,9 +1244,6 @@ export class ScenariosController {
           cookie: appSessionTokenCookie,
         }
       : config;
-    // @debt Refactor to use @nestjs/common's StreamableFile
-    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
-    // after upgrading NestJS to v8.
     const scenario = await this.service.getById(scenarioId, {
       authenticatedUser: req.user,
     });
@@ -1259,6 +1256,9 @@ export class ScenariosController {
       });
     }
 
+    // @debt Refactor to use @nestjs/common's StreamableFile
+    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+    // after upgrading NestJS to v8.
     const pdfStream = await this.webshotService.getSummaryReportForScenario(
       scenarioId,
       scenario.right.projectId,
