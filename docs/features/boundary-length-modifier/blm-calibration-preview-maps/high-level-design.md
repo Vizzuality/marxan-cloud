@@ -66,19 +66,21 @@ Geo -> GeoDb: Store PNG as blob in BlmFinalResultsRepository, set protected_pu_i
 Requests from the Geoprocessing service to the Webshot service are handled
 through the `@marxan/webshot` shared library.
 
-#### To be decided
+### Authentication: Webshot to frontend app
 
-How to handle authentication to the frontend from the webshot service.
+The webshot service needs to access frontend app content that is not only
+restricted to authenticated users, but also relies on the identity of the user
+who performs the BLM calibration request to be passed on to the API (when
+requesting MVT tiles: see diagram above) so that authorization for these tiles
+can be properly handled.
 
-This could be done (as already done for PDF summary reports of scenario
-solutions) via a fresh frontend authentication cookie. However, this would need
-to be provided _alongside the request to start a BLM calibration_ (as the
-workflow outlined above is a post-processing step of the BLM calibration
-itself).
-
-Alternatively, a workflow involving injecting MVT data into a non-authenticated
-app page (via the webshot service/Puppeteer) could be used, if technically
-feasible in terms of frontend architecture.
+In order to enable all these steps of the authenticated workflow, the frontend
+app will include a current Next Auth token for the current user in the `Cookie`
+header of the `POST` request through which a calibration request is sent. API
+clients other than the app will likewise need to somehow grab such token from
+the instance of the app they would like to obtain snapshot from at the end of
+the BLM calibration process, and supply this as a `next-auth.session-token`
+cookie in the `POST` request for the calibration.
 
 ### Preparing inputs
 
