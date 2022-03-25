@@ -105,7 +105,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotSummaryReportConfig } from '@marxan/webshot';
+import { WebshotConfig } from '@marxan/webshot';
 import { WebshotService } from '@marxan/webshot';
 import { AppSessionToken } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
@@ -1226,7 +1226,7 @@ export class ScenariosController {
   @Header('content-type', 'application/pdf')
   @Post('/:scenarioId/solutions/report')
   async getSummaryReportForProject(
-    @Body() config: WebshotSummaryReportConfig,
+    @Body() config: WebshotConfig,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
