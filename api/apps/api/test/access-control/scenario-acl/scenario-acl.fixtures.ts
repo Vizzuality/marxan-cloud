@@ -346,9 +346,11 @@ export const getFixtures = async () => {
     },
 
     ThenUserNotFoundIsReturned: (response: request.Response) => {
-      expect(response.status).toEqual(400);
+      expect(response.status).toEqual(404);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(`Error while adding record to the database.`);
+      expect(error.title).toEqual(
+        `User with ID: ${nonExistentUserId} could not be found.`,
+      );
     },
 
     ThenTransactionFailedIsReturned: (response: request.Response) => {

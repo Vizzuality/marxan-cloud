@@ -5,6 +5,7 @@ import { getConnection, Not, QueryFailedError, Repository } from 'typeorm';
 import {
   Denied,
   Permit,
+  userNotFound,
 } from '@marxan-api/modules/access-control/access-control.types';
 import {
   ScenarioRoles,
@@ -33,6 +34,7 @@ import {
   ScenarioLockDto,
   ScenarioLockResultSingular,
 } from './locks/dto/scenario.lock.dto';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 
 @Injectable()
 export class ScenarioAclService implements ScenarioAccessControl {
@@ -113,6 +115,8 @@ export class ScenarioAclService implements ScenarioAccessControl {
     private readonly roles: Repository<UsersScenariosApiEntity>,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly projectRoles: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
     private readonly lockService: LockService,
   ) {}
 
@@ -334,11 +338,16 @@ export class ScenarioAclService implements ScenarioAccessControl {
       | typeof forbiddenError
       | typeof transactionFailed
       | typeof lastOwner
-      | typeof queryFailed,
+      | typeof queryFailed
+      | typeof userNotFound,
       void
     >
   > {
     const { userId, roleName } = userAndRoleToChange;
+    const userToAdd = await this.users.findOne(userId);
+
+    if (!userToAdd) return left(userNotFound);
+
     if (!(await this.isOwner(loggedUserId, scenarioId))) {
       return left(forbiddenError);
     }

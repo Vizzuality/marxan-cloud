@@ -10,14 +10,18 @@ import { ScenariosModule } from '@marxan-api/modules/scenarios/scenarios.module'
 import { LockService } from './locks/lock.service';
 import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([UsersScenariosApiEntity]),
-    TypeOrmModule.forFeature([UsersProjectsApiEntity]),
-    TypeOrmModule.forFeature([ScenarioLockEntity]),
-    TypeOrmModule.forFeature([IssuedAuthnToken]),
+    TypeOrmModule.forFeature([
+      UsersScenariosApiEntity,
+      UsersProjectsApiEntity,
+      ScenarioLockEntity,
+      IssuedAuthnToken,
+      User,
+    ]),
     forwardRef(() => UsersModule),
     forwardRef(() => ScenariosModule),
   ],
