@@ -1264,4 +1264,31 @@ export class ScenariosController {
 
     pdfStream.right.pipe(res);
   }
+
+  // @debt Refactor to use the correct blm PNG data from table.
+  @ApiOperation({ description: 'Get PNG for BLM values for scenario' })
+  @ApiOkResponse()
+  @Header('content-type', 'image/png')
+  @Post('/:scenarioId/calibration/maps/preview/:blmValue')
+  async getImageFromBlmValue(
+    @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
+    @Param('blmValue') blmValue: number,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<Buffer> {
+    const result = await this.service.getImageFromBlmValues(
+      scenarioId,
+      req.user.id,
+      blmValue,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+
+    return result.right;
+  }
 }
