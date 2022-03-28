@@ -21,7 +21,6 @@ beforeEach(async () => {
   app = await bootstrapApplication();
   jwtToken = await GivenUserIsLoggedIn(app);
   world = await createWorld(app, jwtToken);
-  await world.GivenScenarioPuDataExists();
   queue = FakeQueue.getByName(updateQueueName);
 });
 
