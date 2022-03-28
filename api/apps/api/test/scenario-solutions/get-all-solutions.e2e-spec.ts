@@ -8,7 +8,7 @@ beforeEach(async () => {
 });
 
 describe(`When getting scenario solution results`, () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     await fixtures.GivenScenarioHasSolutionsReady();
   });
 
