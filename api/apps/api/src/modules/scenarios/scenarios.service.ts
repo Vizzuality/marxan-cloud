@@ -109,6 +109,7 @@ import {
   WebshotConfig,
   WebshotService,
 } from '@marxan/webshot';
+import { blmImageMock } from './__mock__/blm-image-mock';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -1148,5 +1149,25 @@ export class ScenariosService {
     );
 
     return pdfStream;
+  }
+
+  async getImageFromBlmValues(
+    scenarioId: string,
+    userId: string,
+    _blmValue: number,
+  ): Promise<Either<typeof forbiddenError, Buffer>> {
+    if (
+      !(await this.scenarioAclService.canViewBlmResults(userId, scenarioId))
+    ) {
+      return left(forbiddenError);
+    }
+
+    // It will return a dummy PNG while the webshot-specific endpoint to
+    // generate the image is still a WIP. This should be substituted for
+    // getting the PNG binary data from the blm_final_results table once
+    // PNG is stored there and/or 404 error if the PNG cannot be found.
+    // blmFinalResultsRepo.findOne({ where: { blmValue, scenarioId }}).image
+
+    return right(Buffer.from(blmImageMock, 'base64'));
   }
 }

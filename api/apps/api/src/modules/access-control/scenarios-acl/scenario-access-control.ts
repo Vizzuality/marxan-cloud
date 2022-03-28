@@ -23,6 +23,10 @@ export abstract class ScenarioAccessControl {
     projectId: string,
   ): Promise<Permit>;
   abstract canCloneScenario(userId: string, projectId: string): Promise<Permit>;
+  abstract canViewBlmResults(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit>;
   abstract canReleaseLock(userId: string, projectId: string): Promise<Permit>;
   abstract acquireLock(
     userId: string,

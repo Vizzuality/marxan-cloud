@@ -58,6 +58,11 @@ export class ScenarioAclService implements ScenarioAccessControl {
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
   ];
+  private readonly canViewBlmResultsRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+    ProjectRoles.project_viewer,
+  ];
 
   private async getRolesWithinScenarioForUser(
     userId: string,
@@ -147,6 +152,13 @@ export class ScenarioAclService implements ScenarioAccessControl {
   }
 
   async canReleaseLock(userId: string, projectId: string): Promise<Permit> {
+    return this.doesUserHaveRoleInProject(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canReleaseLockRoles,
+    );
+  }
+
+  async canViewBlmResults(userId: string, projectId: string): Promise<Permit> {
     return this.doesUserHaveRoleInProject(
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canReleaseLockRoles,
