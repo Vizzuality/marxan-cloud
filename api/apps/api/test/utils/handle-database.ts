@@ -11,6 +11,12 @@ beforeAll(async () => {
   apiConnection = await createConnection(apiConnections.default);
   geoConnection = await createConnection(apiConnections.geoprocessingDB);
 
+  if (!apiConnection.isConnected)
+    throw new Error('Could not connect to API DB');
+  if (!geoConnection.isConnected)
+    throw new Error('Could not connect to Geo DB');
+  console.log('HERE');
+  console.log(apiConnection.isConnected, geoConnection.isConnected);
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
 });
