@@ -8,9 +8,7 @@ export default async function handler(req, res) {
 
   const { sid } = req.query;
 
-  console.log('***************************************COOKIES************************************', req?.headers?.cookie);
-
-  const pdf = await DOWNLOADS.request({
+  const { data: pdf } = await DOWNLOADS.request({
     method: 'POST',
     url: `/scenarios/${sid}/solutions/report`,
     responseType: 'arraybuffer',
@@ -27,5 +25,5 @@ export default async function handler(req, res) {
     },
   });
 
-  res.status(200).arraybuffer(pdf);
+  res.status(200).send(Buffer.from(pdf));
 }
