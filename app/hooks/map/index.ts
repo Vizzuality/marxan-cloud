@@ -740,7 +740,7 @@ export function usePUGridLayer({
           ] : [],
 
           // SOLUTIONS - FREQUENCY
-          ...sublayers.includes('solutions') ? [
+          ...sublayers.includes('frequency') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -764,6 +764,9 @@ export function usePUGridLayer({
                 'fill-opacity': 0.75 * FrequencyOpacity,
               },
             },
+          ] : [],
+
+          ...sublayers.includes('solution') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',

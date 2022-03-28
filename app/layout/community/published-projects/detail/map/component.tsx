@@ -81,7 +81,7 @@ export const PublishedProjectMap: React.FC<PublishedProjectMapProps> = () => {
     active: !!sid,
     sid: `${sid}`,
     include: 'results',
-    sublayers: sid ? ['solutions'] : [],
+    sublayers: sid ? ['frequency'] : [],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,

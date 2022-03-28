@@ -1,46 +1,84 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+
+import { useRouter } from 'next/router';
 
 import { LEGEND_LAYERS } from 'hooks/map/constants';
+import { useScenario } from 'hooks/scenarios';
+import { useBestSolution, useSolution } from 'hooks/solutions';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/map';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/page-2/map';
 
-import LegendTypeGradient from 'components/map/legend/types/gradient';
+import LegendItem from 'components/map/legend/item/component';
 
 export interface ScenariosReportPage2Props {
 
 }
 
 export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
-  const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
+  const { query } = useRouter();
+  const { sid } = query;
+
+  const selectedSolution:any = {};
+
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const {
+    data: selectedSolutionData,
+  } = useSolution(sid, selectedSolution?.id);
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
+
+  const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
+
+  const LEGEND = useMemo(() => {
+    return {
+      ...LEGEND_LAYERS.solution(),
+      name: `Solution ${SOLUTION_DATA?.runId}`,
+      settingsManager: null,
+    };
+  }, [SOLUTION_DATA]);
 
   return (
     <div className="flex space-x-4">
+      <section className="flex flex-col justify-between w-1/3 text-xs">
+        <div className="space-y-8">
+          <div>
+            <p className="font-semibold">Solution</p>
+            <p>{SOLUTION_DATA?.runId}</p>
+          </div>
 
-      <section className="w-1/3 space-y-8 text-xs">
-
-        <div className="space-y-4 border-t-4 border-gray-700">
-          <p className="pt-2 font-sans font-semibold uppercase"> Legend:</p>
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 border border-black rounded-sm" />
-            <p className="font-heading">Protected Areas</p>
+          <div>
+            <p className="font-semibold">Score</p>
+            <p>{SOLUTION_DATA?.scoreValue}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Cost</p>
+            <p>{SOLUTION_DATA?.costValue}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Missing</p>
+            <p>{SOLUTION_DATA?.missingValues}</p>
+          </div>
+          <div>
+            <p className="font-semibold">Planning</p>
+            <p>{SOLUTION_DATA?.planningUnits}</p>
           </div>
         </div>
 
-        <div className="pt-4 space-y-4 border-t border-black border-opacity-30">
-          <p className="text-sm font-heading">Solutions:</p>
-          <p className="text-xs font-heading">Selection Frequency</p>
-
-          <div className="w-full pr-14">
-            <LegendTypeGradient
-              className={{
-                bar: 'h-3 rounded-lg',
-                labels: 'text-sm text-gray-300',
-              }}
-              items={frequencyLegendValues}
-            />
-          </div>
+        <div className="py-5 border-t border-gray-500 mr-14">
+          <LegendItem
+            {...LEGEND}
+            key="solution"
+            className="block"
+            theme="light"
+          />
         </div>
-
       </section>
 
       <ScenarioReportsMap id="report-map-2" />

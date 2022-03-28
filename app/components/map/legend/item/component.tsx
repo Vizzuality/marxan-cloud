@@ -1,5 +1,6 @@
 import React, {
   Children, isValidElement, ReactNode,
+  useMemo,
   useState,
 } from 'react';
 
@@ -36,6 +37,8 @@ export interface LegendItemProps {
     opacity: number,
     visibility: boolean,
   }
+  theme?: 'dark' | 'light';
+  className: string;
   onChangeOpacity?: () => void;
   onChangeVisibility?: () => void;
 }
@@ -51,14 +54,20 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   attributes,
   settingsManager,
   settings,
+  className,
+  theme = 'dark',
   onChangeOpacity,
   onChangeVisibility,
 }: LegendItemProps) => {
   const [openOpacity, setOpenOpacity] = useState(false);
 
-  const validChildren = Children.map(children, (Child) => {
-    return isValidElement(Child);
-  }).some((c) => !!c);
+  const validChildren = useMemo(() => {
+    const chldn = Children
+      .map(children, (Child) => {
+        return isValidElement(Child);
+      });
+    return chldn && chldn.some((c) => !!c);
+  }, [children]);
 
   const { opacity = 1, visibility = true } = settings || {};
 
@@ -69,7 +78,10 @@ export const LegendItem: React.FC<LegendItemProps> = ({
   return (
     <div
       key={id}
-      className="px-5 py-2.5"
+      className={cx({
+        'px-5 py-2.5': !className,
+        [className]: !!className,
+      })}
     >
       <header className="relative flex justify-between mb-1">
         <div
@@ -83,7 +95,15 @@ export const LegendItem: React.FC<LegendItemProps> = ({
               {icon}
             </div>
           )}
-          <div className="text-sm text-white font-heading">{name}</div>
+          <div
+            className={cx({
+              'text-sm text-white font-heading': true,
+              'text-white': theme === 'dark',
+              'text-gray-700': theme === 'light',
+            })}
+          >
+            {name}
+          </div>
         </div>
 
         {sortable?.handle && (

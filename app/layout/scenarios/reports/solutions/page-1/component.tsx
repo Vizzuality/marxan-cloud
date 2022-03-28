@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
-import { useScenario, useScenarioPU } from 'hooks/scenarios';
+import { useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/map';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/page-1/map';
+
+import LegendItem from 'components/map/legend/item/component';
+import LegendTypeGradient from 'components/map/legend/types/gradient';
 
 export interface ScenariosReportPage1Props {
 
@@ -30,11 +34,6 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
   const contributors = projectUsers?.map((u) => u.user.displayName);
 
   const {
-    data: scenarioData,
-    isFetched: scenarioDataIsFetched,
-  } = useScenario(sid);
-
-  const {
     data: protectedAreasData,
     isFetched: protectedAreasDataIsFetched,
   } = useWDPACategories({
@@ -54,42 +53,65 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
     isFetched: PUDataIsFetched,
   } = useScenarioPU(sid);
 
+  const LEGEND = useMemo(() => {
+    return {
+      id: 'frequency',
+      name: 'Solution frequency',
+      items: LEGEND_LAYERS.frequency().items,
+    };
+  }, []);
+
   const reportDataIsFetched = projectDataIsFetched && projectUsersDataIsFetched
-    && scenarioDataIsFetched && protectedAreasDataIsFetched && PUDataIsFetched;
+    && protectedAreasDataIsFetched && PUDataIsFetched;
 
   return (
     reportDataIsFetched && (
       <div className="flex space-x-4">
 
-        <section className="w-1/3 space-y-8 text-xs leading-5">
-          <div>
-            <p className="font-semibold">Contributors</p>
-            <p>{contributors.join(', ')}</p>
+        <section className="flex flex-col justify-between w-1/3">
+          <div className="space-y-8 text-xs">
+            <div>
+              <p className="font-semibold">Contributors</p>
+              <p>{contributors.join(', ')}</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">Protected Areas:</p>
+              <p>{protectedAreas.join(', ')}</p>
+            </div>
+
+            <div>
+              <p className="font-semibold">No. of planning units</p>
+              <p>{`In: ${PUData.included.length || 0}`}</p>
+              <p>{`Out: ${PUData.excluded.length || 0}`}</p>
+            </div>
           </div>
 
-          <div>
+          {/* <div>
             <p className="font-semibold"> Features meeting targets:</p>
           </div>
 
           <div>
             <p className="font-semibold">Cost surface:</p>
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <p className="font-semibold">BLM</p>
             <p>{scenarioData.metadata.marxanInputParameterFile.BLM || null}</p>
+          </div> */}
+          <div className="py-5 border-t border-gray-500 mr-14">
+            <LegendItem
+              {...LEGEND}
+              key="frequency"
+              className="block"
+              theme="light"
+            >
+              <LegendTypeGradient
+                items={LEGEND.items}
+              />
+            </LegendItem>
           </div>
 
-          <div>
-            <p className="font-semibold">Protected Areas:</p>
-            <p>{protectedAreas.join(', ')}</p>
-          </div>
-
-          <div>
-            <p className="font-semibold">No. of planning units</p>
-            <p>{`In: ${PUData.included.length || 0}`}</p>
-            <p>{`Out: ${PUData.excluded.length || 0}`}</p>
-          </div>
         </section>
 
         <ScenarioReportsMap id="report-map-1" />

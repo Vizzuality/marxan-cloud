@@ -100,7 +100,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     sid: sid ? `${sid}` : null,
     include: 'results',
     sublayers: [
-      ...(sid1 && !sid2) ? ['solutions'] : [],
+      ...(sid1 && !sid2) ? ['frequency'] : [],
     ],
     options: {
       settings: {

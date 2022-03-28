@@ -16,7 +16,7 @@ export interface LegendTypeGradientProps {
 }
 
 export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
-  className,
+  className = {},
   items,
 }: LegendTypeGradientProps) => {
   const { format } = useNumberFormatter({
@@ -26,13 +26,13 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
   return (
     <div
       className={cx({
-        [className.box]: !!className.box,
+        [className?.box]: !!className?.box,
       })}
     >
       <div
         className={cx({
           'flex w-full h-2': true,
-          [className.bar]: className.bar,
+          [className?.bar]: className?.bar,
         })}
         style={{
           backgroundImage: `linear-gradient(to right, ${items.map((i) => i.color).join(',')})`,
