@@ -153,7 +153,12 @@ class FakeEntityManager {
     },
   ];
 
-  async query(): Promise<PlanningAreaGadmContent[]> {
+  createQueryBuilder = () => this;
+  select = () => this;
+  addSelect = () => this;
+  from = () => this;
+  where = () => this;
+  async execute() {
     return this.data;
   }
 }

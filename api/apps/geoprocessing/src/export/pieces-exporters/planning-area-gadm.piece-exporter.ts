@@ -43,27 +43,27 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const projectId = input.resourceId;
     if (input.resourceKind === ResourceKind.Scenario) {
       throw new Error(`Exporting scenario is not yet supported.`);
     }
 
-    const [gadm]: [QueryResult] = await this.entityManager.query(
-      `
-        SELECT 
-          country_id, 
-          admin_area_l1_id, 
-          admin_area_l2_id, 
-          planning_unit_grid_shape, 
-          planning_unit_area_km2,
-          bbox
-        FROM projects
-        WHERE id = $1
-      `,
-      [input.resourceId],
-    );
+    const [gadm]: [
+      QueryResult,
+    ] = await this.entityManager
+      .createQueryBuilder()
+      .select('country_id')
+      .addSelect('admin_area_l1_id')
+      .addSelect('admin_area_l2_id')
+      .addSelect('planning_unit_grid_shape')
+      .addSelect('planning_unit_area_km2')
+      .addSelect('bbox')
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
 
     if (!gadm) {
-      const errorMessage = `Gadm data not found for project with ID: ${input.resourceId}`;
+      const errorMessage = `Gadm data not found for project with ID: ${projectId}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
