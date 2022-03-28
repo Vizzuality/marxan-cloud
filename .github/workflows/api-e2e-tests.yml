@@ -49,8 +49,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Run migrations
+      working-directory: ./api
       run: yarn test:prepare-db
     - name: Run API e2e tests
+      working-directory: ./api
       run: yarn api:test:e2e:new
 #    - name: Checkout envs
 #      run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
