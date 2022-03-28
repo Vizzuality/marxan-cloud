@@ -42,7 +42,6 @@ describe('GeoFeaturesModule (e2e)', () => {
    * https://www.figma.com/file/hq0BZNB9fzyFSbEUgQIHdK/Marxan-Visual_V02?node-id=2991%3A2492
    */
   test('As a user, I should be able to retrieve a list of features available within a project', async () => {
-    console.log('projectId', world.projectWithCountry, jwtToken);
     const response = await request(app.getHttpServer())
       .get(`/api/v1/projects/${world.projectWithCountry}/features`)
       .set('Authorization', `Bearer ${jwtToken}`)
