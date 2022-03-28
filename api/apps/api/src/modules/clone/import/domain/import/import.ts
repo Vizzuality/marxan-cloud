@@ -39,15 +39,15 @@ export class Import extends AggregateRoot {
     super();
 
     const isProjectImport = resourceKind === ResourceKind.Project;
-    const equalResourceAndProjectId = resourceId.equals(projectId);
+    const resourceIdAndProjectIdAreEqual = resourceId.equals(projectId);
 
-    if (isProjectImport && !equalResourceAndProjectId) {
+    if (isProjectImport && !resourceIdAndProjectIdAreEqual) {
       throw new Error(
         'Project imports should have equal resource and project ids',
       );
     }
 
-    if (!isProjectImport && equalResourceAndProjectId) {
+    if (!isProjectImport && resourceIdAndProjectIdAreEqual) {
       throw new Error(
         'Scenario imports should have distinct resource and project ids',
       );

@@ -60,11 +60,11 @@ export class MarkImportPieceAsFailedHandler
               importId,
               `Could not find piece with ID: ${componentId} for import with ID: ${importId}`,
             );
+            return;
           case componentAlreadyFailed:
             this.logger.warn(
               `Component with id ${componentId} was already marked as failed`,
             );
-          default:
             return;
         }
       }
