@@ -9,14 +9,9 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 
 export interface ScenariosReportHeaderProps {
-  page: number,
-  totalPages: number,
 }
 
-export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
-  page,
-  totalPages,
-}: ScenariosReportHeaderProps) => {
+export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -51,10 +46,6 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
             </p>
             <p className="capitalize">{projectOwner}</p>
           </div>
-
-          <p className="text-xs font-semibold ">
-            {`Page ${page}/${totalPages}`}
-          </p>
         </div>
 
         <h1 className="pb-4 text-2xl text-gray-500 font-heading">

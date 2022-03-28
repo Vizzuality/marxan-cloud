@@ -34,7 +34,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={1} totalPages={4} />
+        <ReportHeader />
         <Page1 />
       </div>
 
@@ -42,7 +42,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={2} totalPages={4} />
+        <ReportHeader />
         <Page2 />
       </div>
 
@@ -50,7 +50,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={3} totalPages={4} />
+        <ReportHeader />
         <Page3 />
       </div>
 
@@ -58,7 +58,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={4} totalPages={4} />
+        <ReportHeader />
         <Page4 />
       </div>
 

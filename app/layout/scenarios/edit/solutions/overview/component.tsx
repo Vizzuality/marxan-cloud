@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
+import { useToasts } from 'hooks/toast';
 
 import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
@@ -31,7 +32,9 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
 }: ScenariosSolutionsOverviewProps) => {
   const { query } = useRouter();
   const { sid } = query;
+  const [PDFLoader, setPDFLoader] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
+  const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setLayerSettings } = scenarioSlice.actions;
@@ -72,15 +75,49 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
   const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
 
   const onDownloadReport = useCallback(() => {
+    setPDFLoader(true);
+    addToast(`info-generating-report-${sid}`, (
+      <>
+        <h2 className="font-medium">Info</h2>
+        <p className="text-sm">
+          {`Generating "${scenarioData.name}" PDF report`}
+        </p>
+      </>
+    ), {
+      level: 'info',
+    });
+
     downloadScenarioReportMutation.mutate({ sid: `${sid}` }, {
       onSuccess: () => {
-        console.info('****************************Success*******************************');
+        setPDFLoader(false);
+
+        addToast(`success-generating-report-${sid}`, (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              {`"${scenarioData.name}" PDF report generated`}
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: () => {
-        console.info('****************************Error*******************************');
+        setPDFLoader(false);
+
+        addToast(`error-generating-report-${sid}`, (
+          <>
+            <h2 className="font-medium">Error</h2>
+            <p className="text-sm">
+              {`"${scenarioData.name}" PDF report not generated`}
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
       },
     });
-  }, [sid, downloadScenarioReportMutation]);
+  }, [sid, scenarioData.name, downloadScenarioReportMutation, addToast]);
 
   const onChangeVisibility = useCallback((lid) => {
     const { visibility = true } = layerSettings[lid] || {};
@@ -134,9 +171,16 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             <Button
               theme="primary"
               size="base"
-              className="flex h-12 mb-4"
+              className="flex h-12 mb-4 overflow-hidden"
+              disabled={PDFLoader}
               onClick={onDownloadReport}
             >
+              <Loading
+                visible={PDFLoader}
+                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-primary-500 bg-opacity-90"
+                iconClassName="w-10 h-10 text-primary-500"
+              />
+
               Download report
             </Button>
 
