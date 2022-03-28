@@ -9,7 +9,6 @@ on:
 jobs:
   test-api-e2e:
     runs-on: ubuntu-20.04
-    container: node-14
     timeout-minutes: 30
     services:
       api-database:
@@ -50,6 +49,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Run migrations
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'
       working-directory: ./api
       run: yarn test:prepare-db
     - name: Run API e2e tests
