@@ -80,13 +80,9 @@ export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
     && costSurfaceRangeData && costSurfaceRangeDataIsFetched
     && mapsLoaded;
 
-  console.log({ reportDataIsFetched });
-
   useEffect(() => {
     if (reportDataIsFetched) {
       setTimeout(() => {
-        console.log('WEBSHOT!');
-
         globalThis.MARXAN = {
           ...globalThis.MARXAN,
           webshot_ready: true,

@@ -909,35 +909,14 @@ export function useDownloadScenarioReport({
   const downloadScenarioReport = ({ sid }: DownloadScenarioReportProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || `${window.location.protocol}//${process.env.NEXT_PUBLIC_VERCEL_URL}`;
 
-    // return fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/solutions/report`, {
-    //   method: 'POST',
-    //   mode: 'cors',
-    //   credentials: 'include',
-    //   headers: {
-    //     Authorization: `Bearer ${session.accessToken}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     baseUrl,
-    //     pdfOptions: {
-    //       landscape: true,
-    //     },
-    //   }),
-    // }).then((response) => response.json());
     return DOWNLOADS.request({
-      url: `/scenarios/${sid}/solutions/report`,
+      url: `${baseUrl}/api/reports/scenarios/${sid}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'application/json',
       },
-      // withCredentials: true,
-      data: {
-        baseUrl,
-        pdfOptions: {
-          landscape: true,
-        },
-      },
+      withCredentials: true,
       ...requestConfig,
     });
   };
