@@ -68,7 +68,6 @@ describe.skip('ProxyVectorTilesModule (e2e)', () => {
       },
     ).then(async (response) => await Deserializer.deserialize(response));
 
-    console.log('after project');
     await ProjectsTestUtils.generateBlmValues(
       app,
       aProjectWithCountryAsPlanningArea.id,
@@ -79,14 +78,11 @@ describe.skip('ProxyVectorTilesModule (e2e)', () => {
       aProjectWithCountryAsPlanningArea.id,
     );
 
-    console.log('after feature');
     aScenario = await ScenariosTestUtils.createScenario(app, jwtToken, {
       ...E2E_CONFIG.scenarios.valid.minimal(),
       projectId: aProjectWithCountryAsPlanningArea.id,
       // wdpaIucnCategories: [IUCNCategory.NotReported],
     }).then(async (response) => await Deserializer.deserialize(response));
-
-    console.log('after scenario');
   });
 
   describe('Vector Layers', () => {

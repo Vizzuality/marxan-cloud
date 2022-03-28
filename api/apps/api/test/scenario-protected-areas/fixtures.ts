@@ -233,7 +233,6 @@ export const getFixtures = async () => {
       response: ProtectedAreaDto[],
       category: IUCNCategory,
     ) => {
-      console.log(response);
       expect(response.find((e) => e.id === category)).toEqual({
         id: category,
         kind: `global`,

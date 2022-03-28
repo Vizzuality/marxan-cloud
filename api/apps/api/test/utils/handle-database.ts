@@ -9,7 +9,7 @@ let geoConnection: Connection;
 beforeAll(async () => {
   apiConnection = await createConnection(apiConnections.default);
   geoConnection = await createConnection(apiConnections.geoprocessingDB);
-  console.log(apiConnection.isConnected, geoConnection.isConnected);
+
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
 });
