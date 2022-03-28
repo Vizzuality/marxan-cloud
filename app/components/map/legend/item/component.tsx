@@ -38,7 +38,7 @@ export interface LegendItemProps {
     visibility: boolean,
   }
   theme?: 'dark' | 'light';
-  className: string;
+  className?: string;
   onChangeOpacity?: () => void;
   onChangeVisibility?: () => void;
 }
