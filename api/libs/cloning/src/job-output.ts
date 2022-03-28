@@ -1,4 +1,4 @@
-import { ClonePiece } from './domain';
+import { ClonePiece, ResourceKind } from './domain';
 
 export interface ExportJobOutput {
   readonly exportId: string;
@@ -11,7 +11,13 @@ export interface ExportJobOutput {
 export interface ImportJobOutput {
   readonly importId: string;
   readonly componentId: string;
-  readonly importResourceId: string;
-  readonly componentResourceId: string;
+  readonly pieceResourceId: string;
+  readonly projectId: string;
   readonly piece: ClonePiece;
+}
+
+export interface FailedImportDbCleanupJobOutput {
+  readonly importId: string;
+  readonly resourceId: string;
+  readonly resourceKind: ResourceKind;
 }

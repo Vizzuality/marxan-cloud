@@ -6,25 +6,22 @@ import {
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { isLeft } from 'fp-ts/lib/Either';
-import { MarkImportAsFailed } from '../../infra/import/mark-import-as-failed.command';
-import {
-  componentAlreadyCompleted,
-  componentNotFound,
-  ImportId,
-} from '../domain';
-import { CompleteImportPiece } from './complete-import-piece.command';
-import { ImportRepository } from './import.repository.port';
+import { ImportRepository } from '../../import/application/import.repository.port';
+import { componentNotFound, ImportId } from '../../import/domain';
+import { componentAlreadyFailed } from '../../import/domain/import/import';
+import { MarkImportAsFailed } from './mark-import-as-failed.command';
+import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 
-@CommandHandler(CompleteImportPiece)
-export class CompleteImportPieceHandler
-  implements IInferredCommandHandler<CompleteImportPiece> {
+@CommandHandler(MarkImportPieceAsFailed)
+export class MarkImportPieceAsFailedHandler
+  implements IInferredCommandHandler<MarkImportPieceAsFailed> {
   constructor(
     private readonly importRepository: ImportRepository,
-    private readonly eventPublisher: EventPublisher,
     private readonly commandBus: CommandBus,
+    private readonly eventPublisher: EventPublisher,
     private readonly logger: Logger,
   ) {
-    this.logger.setContext(CompleteImportPieceHandler.name);
+    this.logger.setContext(MarkImportPieceAsFailedHandler.name);
   }
 
   private async markImportAsFailed(
@@ -35,14 +32,17 @@ export class CompleteImportPieceHandler
     await this.commandBus.execute(new MarkImportAsFailed(importId, reason));
   }
 
-  async execute({ importId, componentId }: CompleteImportPiece): Promise<void> {
+  async execute({
+    importId,
+    componentId,
+  }: MarkImportPieceAsFailed): Promise<void> {
     const aggregate = await this.importRepository.transaction(async (repo) => {
       const importInstance = await repo.find(importId);
 
       if (!importInstance) {
         await this.markImportAsFailed(
           importId,
-          `Could not find import ${importId.value} to complete piece: ${componentId.value}`,
+          `Could not find import ${importId.value} to mark piece ${componentId.value} as failed`,
         );
         return;
       }
@@ -51,7 +51,7 @@ export class CompleteImportPieceHandler
         importInstance,
       );
 
-      const result = importAggregate.completePiece(componentId);
+      const result = importAggregate.markPieceAsFailed(componentId);
 
       if (isLeft(result)) {
         switch (result.left) {
@@ -60,11 +60,11 @@ export class CompleteImportPieceHandler
               importId,
               `Could not find piece with ID: ${componentId} for import with ID: ${importId}`,
             );
-          case componentAlreadyCompleted:
+            return;
+          case componentAlreadyFailed:
             this.logger.warn(
-              `Component with id ${componentId} was already completed`,
+              `Component with id ${componentId} was already marked as failed`,
             );
-          default:
             return;
         }
       }

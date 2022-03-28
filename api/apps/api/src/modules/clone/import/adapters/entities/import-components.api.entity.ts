@@ -8,6 +8,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { ImportComponentSnapshot } from '../../domain';
+import { ImportComponentStatuses } from '../../domain/import/import-component-status';
 import { ImportComponentLocationEntity } from './import-component-locations.api.entity';
 import { ImportEntity } from './imports.api.entity';
 
@@ -27,10 +28,11 @@ export class ImportComponentEntity {
   piece!: ClonePiece;
 
   @Column({
-    type: 'boolean',
-    name: 'finished',
+    type: 'enum',
+    enum: ImportComponentStatuses,
+    name: 'status',
   })
-  finished!: boolean;
+  status!: ImportComponentStatuses;
 
   @Column({
     type: 'int',
@@ -60,7 +62,7 @@ export class ImportComponentEntity {
     entity.id = componentSnapshot.id;
     entity.piece = componentSnapshot.piece;
     entity.resourceId = componentSnapshot.resourceId;
-    entity.finished = componentSnapshot.finished;
+    entity.status = componentSnapshot.status;
     entity.order = componentSnapshot.order;
     entity.uris = componentSnapshot.uris.map(
       ImportComponentLocationEntity.fromSnapshot,
@@ -72,7 +74,7 @@ export class ImportComponentEntity {
   toSnapshot(): ImportComponentSnapshot {
     return {
       id: this.id,
-      finished: this.finished,
+      status: this.status,
       order: this.order,
       piece: this.piece,
       resourceId: this.resourceId,

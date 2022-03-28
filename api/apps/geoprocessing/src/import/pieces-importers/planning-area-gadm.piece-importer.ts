@@ -32,7 +32,7 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, importResourceId, piece } = input;
+    const { uris, pieceResourceId, projectId, piece } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -45,7 +45,7 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
       planningAreaGadmLocation.uri,
     );
     if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${importResourceId} is not available at ${planningAreaGadmLocation.uri}`;
+      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaGadmLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -74,14 +74,14 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
         planning_unit_area_km2: planningAreaGadm.planningUnitAreakm2,
         bbox: JSON.stringify(planningAreaGadm.bbox),
       })
-      .where('id = :importResourceId', { importResourceId })
+      .where('id = :projectId', { projectId })
       .execute();
 
     return {
       importId: input.importId,
       componentId: input.componentId,
-      importResourceId,
-      componentResourceId: input.componentResourceId,
+      pieceResourceId,
+      projectId,
       piece: input.piece,
     };
   }

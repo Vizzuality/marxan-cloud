@@ -11,6 +11,9 @@ export class ImportEntity {
   @Column({ type: 'uuid', name: 'resource_id' })
   resourceId!: string;
 
+  @Column({ type: 'uuid', name: 'project_id' })
+  projectId!: string;
+
   @Column({
     type: 'enum',
     name: 'resource_kind',
@@ -37,6 +40,7 @@ export class ImportEntity {
     entity.id = snapshot.id;
     entity.resourceId = snapshot.resourceId;
     entity.resourceKind = snapshot.resourceKind;
+    entity.projectId = snapshot.projectId;
     entity.archiveLocation = snapshot.archiveLocation;
     entity.components = snapshot.importPieces.map(
       ImportComponentEntity.fromSnapshot,
@@ -49,6 +53,7 @@ export class ImportEntity {
     return Import.fromSnapshot({
       id: this.id,
       resourceId: this.resourceId,
+      projectId: this.projectId,
       resourceKind: this.resourceKind,
       archiveLocation: this.archiveLocation,
       importPieces: this.components.map((component) => component.toSnapshot()),
