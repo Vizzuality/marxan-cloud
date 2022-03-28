@@ -4,7 +4,8 @@ import DOWNLOADS from 'services/downloads';
 
 export default async function handler(req, res) {
   const session = await getSession({ req });
-  const baseUrl = process.env.NEXT_PUBLIC_URL || `${window.location.protocol}//${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+
+  const baseUrl = req.headers.origin;
 
   const { sid } = req.query;
 
