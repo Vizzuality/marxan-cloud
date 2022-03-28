@@ -8,12 +8,12 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
 
-import { LEGEND_LAYERS } from 'hooks/map/constants';
+// import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
-import SolutionFrequency from 'layout/solutions/frequency';
+// import SolutionFrequency from 'layout/solutions/frequency';
 import SolutionSelected from 'layout/solutions/selected';
 
 import Button from 'components/button';
@@ -72,7 +72,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     || (selectedSolutionisFetching && !selectedSolutionisFetched
     );
 
-  const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
+  // const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
 
   const onDownloadReport = useCallback(() => {
     setPDFLoader(true);
@@ -152,12 +152,28 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
       <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
         <div className="px-0.5 overflow-x-visible overflow-y-auto">
           <div className="relative flex flex-col w-full mt-1 text-sm">
+            <Loading
+              visible={solutionIsLoading}
+              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+              iconClassName="w-10 h-10 text-primary-500"
+            />
+
             <p className="py-4 opacity-50">
               Each solution gives you an alternative answer to your planning
               problem showing which planning units have been selected in the
               proposed conservation network, the overall cost,
               and whether targets have been met.
             </p>
+
+            <div className="w-full py-6 border-t border-gray-600">
+              <SolutionSelected
+                best={isBestSolution}
+                values={selectedSolutionData || bestSolutionData}
+                onChangeVisibility={() => onChangeVisibility('solution')}
+                settings={layerSettings.solution}
+              />
+            </div>
+
             <Button
               theme="primary"
               size="base"
@@ -169,7 +185,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             </Button>
 
             <Button
-              theme="primary"
+              theme="primary-alt"
               size="base"
               className="flex h-12 mb-4 overflow-hidden"
               disabled={PDFLoader}
@@ -177,7 +193,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             >
               <Loading
                 visible={PDFLoader}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-primary-500 bg-opacity-90"
+                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-90"
                 iconClassName="w-10 h-10 text-primary-500"
               />
 
@@ -198,29 +214,13 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             </Modal>
           </div>
 
-          <div className="w-full p-6 mt-12 border-t border-gray-600">
+          {/* <div className="w-full p-6 mt-12 border-t border-gray-600">
             <SolutionFrequency
               values={frequencyLegendValues}
               onChangeVisibility={() => onChangeVisibility('frequency')}
               settings={layerSettings.frequency}
             />
-          </div>
-
-          <div className="w-full p-6 border-t border-gray-600">
-            <Loading
-              visible={solutionIsLoading}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-              iconClassName="w-10 h-10 text-primary-500"
-            />
-            {(selectedSolutionData || bestSolutionData) && (
-              <SolutionSelected
-                best={isBestSolution}
-                values={selectedSolutionData || bestSolutionData}
-                onChangeVisibility={() => onChangeVisibility('solution')}
-                settings={layerSettings.solution}
-              />
-            )}
-          </div>
+          </div> */}
         </div>
       </div>
     </motion.div>

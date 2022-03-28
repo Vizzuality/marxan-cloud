@@ -57,22 +57,22 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
           <Icon icon={visibility ? SHOW_SVG : HIDE_SVG} className="w-5 h-6 ml-3" />
         </button>
       </div>
-      <div className="grid grid-cols-2 pt-5 pl-1 pr-32 text-sm text-white gap-y-6 gap-x-5">
-        <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
+      <div className="grid grid-cols-2 pt-5 pr-32 text-sm text-white gap-y-6 gap-x-5">
+        <div className="flex pl-2.5 text-white border-l-2 border-blue-700 space-x-2">
           <p>Score:</p>
-          <p className="w-20 font-semibold text-left">{scoreValue}</p>
+          <p className="font-semibold text-left">{scoreValue}</p>
         </div>
-        <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
+        <div className="flex pl-2.5 text-white border-l-2 border-blue-700 space-x-2">
           <p>Cost:</p>
-          <p className="w-20 font-semibold text-left">{costValue}</p>
+          <p className="font-semibold text-left">{costValue}</p>
         </div>
-        <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
+        <div className="flex pl-2.5 text-white border-l-2 border-blue-700 space-x-2">
           <p>Missing:</p>
-          <p className="w-20 font-semibold text-left">{missingValues}</p>
+          <p className="font-semibold text-left">{missingValues}</p>
         </div>
-        <div className="flex pl-1.5 text-white border-l-2 border-blue-700 justify-between">
+        <div className="flex pl-2.5 text-white border-l-2 border-blue-700 space-x-2">
           <p>Planning:</p>
-          <p className="w-20 font-semibold text-left">{planningUnits}</p>
+          <p className="font-semibold text-left">{planningUnits}</p>
         </div>
       </div>
     </div>
