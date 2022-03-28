@@ -84,7 +84,9 @@ export class ScenarioAclController {
     );
 
     if (isLeft(result)) {
-      throw mapAclDomainToHttpError(result.left);
+      throw mapAclDomainToHttpError(result.left, {
+        userId: userAndRoleToChange.userId,
+      });
     }
   }
 
