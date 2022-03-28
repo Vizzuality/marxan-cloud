@@ -19,7 +19,7 @@ beforeEach(async () => {
 
 describe('PlanningUnitsModule (e2e)', () => {
   describe('When creating a project without Admin Areas', () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       queue.disposeFakeJobs();
       await world.WhenCreatingProjectWithoutAdminAreas();
     });
