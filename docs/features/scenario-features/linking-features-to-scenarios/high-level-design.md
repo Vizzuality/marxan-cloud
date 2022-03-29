@@ -48,7 +48,7 @@ duplicated, as the copy of all the `(geodb)features_data` and
 `(geodb)scenario_features_data` records will have new, automatically generated
 `id`s).
 
-## Aims
+## Aims and assumptions
 
 The refactor described in this document is limited to the following aims, and
 relies on the following assumptions:
@@ -84,7 +84,106 @@ relies on the following assumptions:
   considered an error (as all platform-wide features referenced in an exported
   project are required to be available in the target platform)
 
-## Implementation
+- one or more import steps of a cloning or import process could be ongoing at
+  the same time for a given project and its scenarios
+
+## Implementation - summary
+
+Details in the full _Implementation_ section below are still in draft; in the
+meanwhile, this section presents a summary of the process (with various extents
+of pseudocode/pseudosql to aid with the identification of the tables/columns
+involved).
+
+### Data schema changes
+
+Features should be guaranteed to be unique either across the space of
+platform-wide features, or across each project.
+
+This can be enforced via partial unique indexes in `apidb`, e.g.
+
+```
+create unique index unique_platform_features on features (feature_class_name) where project_id is null;
+create unique index unique_project_features on features (feature_class_name, project_id) where project_id is not null;
+```
+
+Other than this change, this proposal seeks to retain the current data
+architecture in order to minimize impact on existing code/queries and related
+risks.
+
+### User-uploaded features - export
+
+- At _project export time_, for each `(apidb)features` for the given project, as
+  `current_feature`:
+
+  - Export `(apidb)features` data, adding to the projection a generated column
+    on the fly: `source_feature = '[project|platform]/<feature_class_name>'`
+    (@todo revie: likely not needed)
+
+  - Export `(geodb)features_data` where `features_data.feature_id =
+    current_feature.id`, adding to the projection a generated column on the
+    fly: `source_feature = '[project|platform]/<feature_class_name>'`; this will
+    be used as a back-reference to link `features_data` rows to their matching
+    `(apidb)features` rows at import time.
+
+- At _scenario export time_, for each distinct
+  `(geodb)features_data.feature_id`:
+
+  - Check if `(geodb)features_data.feature_id` for one of the related
+    `(geodb)features_data` rows maps to a user-uploaded `(apidb)features` row;
+    if so, with this as `current_feature`:
+
+  - Check if any of the feature's data rows are linked to the scenario:
+
+```
+select count(*) from scenario_features_data where feature_class_id in (select id from features_data where feature_id = current_feature.id);
+```
+
+If not, this feature is not in use in the scenario being exported, so we can
+skip to the next `(geodb)features_data.feature_id`.
+
+If the feature is in use:
+
+  - Export `(geodb)scenario_features_data where feature_class_id in (select id
+    from features_data where feature_id = current_feature.id)`, adding to the
+    projection a generated column on the fly: `source_feature_data =
+    '<feature_class_name>/<hash>'` of the related `(geodb)features_data` row;
+    this will be used as a back-reference to link `scenario_features_data` rows
+    to their matching `features_data` rows at import time.
+
+### User-uploaded features - import
+
+- Given `new_project_id` as the id of the project created through the current import
+  process;
+
+- At _project import time_, for each `(apidb)features` in the import piece, as
+  `current_feature`:
+
+  - Import `(apidb)features`
+
+  - For each `(apidb)features` row as `current_feature`, import
+    `(geodb)features_data` for it: these are the exported `features_data` rows
+    for the project `where replace(source_feature, 'project/', '') =
+    current_feature.feature_class_name`
+
+    - For each `(geodb)features_data` row being inserted, set `feature_id` to
+      `select id from (apidb)features where project_id = <new_project_id> and
+      feature_class_name = replace(source_feature, 'project/', '')`
+
+- At _scenario import time_, for each distinct `(apidb)features` in the import
+  piece, as `current_feature`:
+
+  - Import `(geodb)scenario_features_data` for it: these are the exported rows
+    `where regexp_replace(source_feature_data, '\/[0-9a-fA-F]+$', '') =
+    <current_feature.feature_class_name>`.
+
+    - For each `(geodb)scenario_features_data` row being inserted, set
+      `feature_class_id` to `select id from features_data where feature_id =
+      current_feature.id and hash = replace(source_feature_data,
+      '<feature_class_name>/', '')
+
+## Implementation (full rationale)
+
+_this section is a working draft - please ignore for the moment_
 
 ### Reliably identifying features referenced from feature geometries
 
@@ -98,33 +197,32 @@ create unique index unique_platform_features on features (feature_class_name) wh
 create unique index unique_project_features on features (feature_class_name, project_id) where project_id is not null;
 ```
 
-2. *At export time*, a unique combined `project_id/feature_class_name` stable
-   identifier, using the nil uuid (`00000000-0000-0000-0000-000000000000`) for
-   platform-wide features, should be added to the exported `(apidb)features`
-   rows via the export piece for project features; this identifier is then used
-   to reference `(apidb)features` in the export piece for scenario features.
+2. *At export time*, a unique combined `[project|platform]/feature_class_name` stable
+   identifier should be added to the exported `(apidb)features` rows via the
+   export piece for project features; this identifier is then used to reference
+   `(apidb)features` in the export piece for scenario features.
 
 For example, such `id`s will look like
-`00000000-0000-0000-0000-000000000000/equus_quagga` or
-`457e033b-e065-46fe-ae34-d4749b834a09/equus_quagga`.
+`platform/equus_quagga` or
+`project/equus_quagga`.
 
 These identifiers are expected to be stable:
 
 - for platform-wide features, their `feature_class_name` is not meant to ever change
 - for user-uploaded features, their `feature_class_name` is guaranteed to be
   stable throughout an export or import step of a clone operation, thanks to
-  locks in place to prevent editing projects being exported or imported
+  locks in place to prevent editing projects that are being exported or imported
 
 3. *At project export time*, the generated export data for
    `(geodb)features_data` should then _also_ reference the combined
-   `project_id/feature_class_name` identifier added at export time to
+   `[project|platform]/feature_class_name` identifier added at export time to
    `(apidb)features`.
 
 This should only be done at export time; permanently persisting these
-`uuid/feature_class_name` identifiers in `(geodb)features_data` would
-essentially duplicate the current role of the `(geodb)features_data.feature_id`
-column, and would need additional logic to keep this column in sync with the
-`(apidb)features` table, for example in case
+`[project|platform]/feature_class_name` identifiers in `(geodb)features_data`
+would essentially duplicate the current role of the
+`(geodb)features_data.feature_id` column, and would need additional logic to
+keep this column in sync with the `(apidb)features` table, for example in case
 `(apidb)features.feature_class_name` is updated.
 
 ### Reliably identifying feature geometries from scenarios
