@@ -973,7 +973,10 @@ export function useLegend({
 
         if (L) {
           return {
-            ...L(options),
+            ...L({
+              ...options,
+              ...layerSettings[l],
+            }),
             settings: layerSettings[l],
           };
         }

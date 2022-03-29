@@ -111,21 +111,6 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
     return null;
   };
 
-  // const onChangeOpacity = useCallback((opacity, id) => {
-  //   dispatch(setLayerSettings({
-  //     id,
-  //     settings: { opacity },
-  //   }));
-  // }, [setLayerSettings, dispatch]);
-
-  // const onChangeVisibility = useCallback((id) => {
-  //   const { visibility = true } = layerSettings[id] || {};
-  //   dispatch(setLayerSettings({
-  //     id,
-  //     settings: { visibility: !visibility },
-  //   }));
-  // }, [setLayerSettings, dispatch, layerSettings]);
-
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map

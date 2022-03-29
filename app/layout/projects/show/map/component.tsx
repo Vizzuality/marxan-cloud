@@ -4,6 +4,8 @@ import React, {
 
 import { useSelector, useDispatch } from 'react-redux';
 
+import pick from 'lodash/pick';
+
 import { useRouter } from 'next/router';
 
 import { setLayerSettings } from 'store/slices/projects/[id]';
@@ -201,6 +203,41 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     return null;
   };
 
+  const onChangeScenario1 = useCallback((s) => {
+    setSid1(s);
+
+    dispatch(setLayerSettings({
+      id: 'compare',
+      settings: {
+        scenario1: pick(rawScenariosData.find((sc) => sc.id === s), ['id', 'name']),
+      },
+    }));
+
+    // Remove compare if you unselect a sceanrio or
+    // if it's the same as the compare one
+    if (!s || s === sid2) {
+      setSid2(null);
+
+      dispatch(setLayerSettings({
+        id: 'compare',
+        settings: {
+          scenario2: null,
+        },
+      }));
+    }
+  }, [dispatch, rawScenariosData, sid2]);
+
+  const onChangeScenario2 = useCallback((s) => {
+    setSid2(s);
+
+    dispatch(setLayerSettings({
+      id: 'compare',
+      settings: {
+        scenario2: pick(rawScenariosData.find((sc) => sc.id === s), ['id', 'name']),
+      },
+    }));
+  }, [rawScenariosData, dispatch]);
+
   const onChangeOpacity = useCallback((opacity, lid) => {
     dispatch(setLayerSettings({
       id: lid,
@@ -348,14 +385,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   clearSelectionActive
                   options={SCENARIOS_RUNNED.sid1Options}
                   selected={sid1}
-                  onChange={(s) => {
-                    setSid1(s);
-                    // Remove compare if you unselect a sceanrio or
-                    // if it's the same as the compare one
-                    if (!s || s === sid2) {
-                      setSid2(null);
-                    }
-                  }}
+                  onChange={onChangeScenario1}
                 />
               </div>
 
@@ -372,9 +402,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   clearSelectionActive
                   options={SCENARIOS_RUNNED.sid2Options}
                   selected={sid2}
-                  onChange={(s) => {
-                    setSid2(s);
-                  }}
+                  onChange={onChangeScenario2}
                 />
               </div>
             </div>

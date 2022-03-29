@@ -321,24 +321,28 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
   }),
-  compare: () => ({
-    id: 'compare',
-    name: 'Solutions distribution',
-    type: 'matrix',
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-    intersections: COLORS.compare2.map((c, i) => ({ id: i, color: c })).reverse(),
-    items: [
-      {
-        value: 'Test - 001',
-        color: '#1C9BD0',
+  compare: (options) => {
+    const { scenario1, scenario2 } = options;
+
+    return ({
+      id: 'compare',
+      name: 'Solutions distribution',
+      type: 'matrix',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
       },
-      {
-        value: 'Test - 002',
-        color: '#DE3397',
-      },
-    ],
-  }),
+      intersections: COLORS.compare2.map((c, i) => ({ id: i, color: c })).reverse(),
+      items: [
+        {
+          value: scenario1?.name,
+          color: '#1C9BD0',
+        },
+        {
+          value: scenario2?.name,
+          color: '#DE3397',
+        },
+      ],
+    });
+  },
 };
