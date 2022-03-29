@@ -97,99 +97,99 @@ export const LegendItem: React.FC<LegendItemProps> = ({
             <Icon className="w-4 " icon={DRAG_SVG} />
           </button>
         )}
+
+        <div className="flex space-x-3">
+          {settingsManager?.opacity && (
+            <div className="flex">
+              <Tooltip
+                arrow
+                placement="top"
+                trigger={openOpacity ? 'manual' : 'mouseenter focus'}
+                content={(
+                  <div
+                    className="p-2 text-gray-500 bg-white rounded"
+                  >
+                    Opacity (
+                    {format(opacity)}
+                    )
+                  </div>
+                )}
+              >
+                <div>
+                  <Tooltip
+                    arrow
+                    placement="top-start"
+                    trigger="click"
+                    interactive
+                    onShow={() => { setOpenOpacity(true); }}
+                    onHide={() => { setOpenOpacity(false); }}
+                    content={(
+                      <div
+                        className="px-6 pt-1.5 pb-4 text-gray-500 bg-white rounded w-60"
+                      >
+                        <Slider
+                          labelRef={null}
+                          theme="dark-small"
+                          defaultValue={opacity}
+                          formatOptions={{
+                            style: 'percent',
+                          }}
+                          maxValue={1}
+                          minValue={0}
+                          step={0.01}
+                          onChange={onChangeOpacity}
+                        />
+                      </div>
+                    )}
+                  >
+                    <button
+                      aria-label="manage-opacity"
+                      type="button"
+                      className={cx({
+                        'text-white w-5 h-5 flex justify-center items-center': true,
+                        'text-gray-300': opacity !== 1,
+                      })}
+                    >
+                      <Icon className="w-4 h-4 pt-px" icon={OPACITY_SVG} />
+                    </button>
+                  </Tooltip>
+                </div>
+              </Tooltip>
+            </div>
+          )}
+
+          {settingsManager?.visibility && (
+            <div className="flex">
+              <Tooltip
+                arrow
+                placement="top"
+                content={(
+                  <div
+                    className="p-2 text-gray-500 bg-white rounded"
+                  >
+                    Visibility
+                  </div>
+                )}
+              >
+                <button
+                  aria-label="manage-visibility"
+                  type="button"
+                  onClick={onChangeVisibility}
+                  className={cx({
+                    'text-white w-5 h-5 flex justify-center items-center': true,
+                    'text-gray-300': !visibility,
+                  })}
+                >
+                  <Icon className="w-4 h-4" icon={visibility ? SHOW_SVG : HIDE_SVG} />
+                </button>
+              </Tooltip>
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="text-sm text-gray-300">
         {description}
-      </div>
-
-      <div className="flex space-x-3">
-        {settingsManager?.opacity && (
-          <div className="mt-2.5 flex">
-            <Tooltip
-              arrow
-              placement="top"
-              trigger={openOpacity ? 'manual' : 'mouseenter focus'}
-              content={(
-                <div
-                  className="p-2 text-gray-500 bg-white rounded"
-                >
-                  Opacity (
-                  {format(opacity)}
-                  )
-                </div>
-              )}
-            >
-              <div>
-                <Tooltip
-                  arrow
-                  placement="top-start"
-                  trigger="click"
-                  interactive
-                  onShow={() => { setOpenOpacity(true); }}
-                  onHide={() => { setOpenOpacity(false); }}
-                  content={(
-                    <div
-                      className="px-6 pt-1.5 pb-4 text-gray-500 bg-white rounded w-60"
-                    >
-                      <Slider
-                        labelRef={null}
-                        theme="dark-small"
-                        defaultValue={opacity}
-                        formatOptions={{
-                          style: 'percent',
-                        }}
-                        maxValue={1}
-                        minValue={0}
-                        step={0.01}
-                        onChange={onChangeOpacity}
-                      />
-                    </div>
-                  )}
-                >
-                  <button
-                    aria-label="manage-opacity"
-                    type="button"
-                    className={cx({
-                      'block text-white': true,
-                      'text-gray-300': opacity !== 1,
-                    })}
-                  >
-                    <Icon className="w-5 h-5 pt-px" icon={OPACITY_SVG} />
-                  </button>
-                </Tooltip>
-              </div>
-            </Tooltip>
-          </div>
-        )}
-
-        {settingsManager?.visibility && (
-          <div className="mt-2.5 flex">
-            <Tooltip
-              arrow
-              placement="top"
-              content={(
-                <div
-                  className="p-2 text-gray-500 bg-white rounded"
-                >
-                  Visibility
-                </div>
-              )}
-            >
-              <button
-                aria-label="manage-visibility"
-                type="button"
-                onClick={onChangeVisibility}
-                className={cx({
-                  'block text-white': true,
-                  'text-gray-300': !visibility,
-                })}
-              >
-                <Icon className="w-5 h-5" icon={visibility ? SHOW_SVG : HIDE_SVG} />
-              </button>
-            </Tooltip>
-          </div>
-        )}
       </div>
 
       {validChildren && (

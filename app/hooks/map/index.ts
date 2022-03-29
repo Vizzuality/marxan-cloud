@@ -1,8 +1,5 @@
 import { useMemo } from 'react';
 
-import chroma from 'chroma-js';
-import cx from 'classnames';
-
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseGeoJSONLayer,
@@ -792,119 +789,129 @@ export function usePUCompareLayer({
   const COLOR_NUMBER = 10;
 
   const COLOR_RAMP = useMemo(() => {
-    if (!active) return null;
+    return COLORS.compare2
+      .map((c, i) => {
+        const position = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
+        return [position, c];
+      })
+      .flat();
+  }, []);
 
-    const COLOR_ARRAY = [...Array(COLOR_NUMBER + 1).keys()];
-    /*
-      COLORS.compare:
-      [
-        [a1,a2,a3,a4],
-        [b1,b2,b3,b4],
-        [c1,c2,c3,c4],
-        [d1,d2,d3,d4],
-      ]
-    */
+  // const COLOR_RAMP = useMemo(() => {
+  //   if (!active) return null;
 
-    const COLOR_RAMPS_X = COLORS.compare.map((ramp) => {
-      return chroma.scale(ramp).colors(COLOR_NUMBER + 1);
-    });
-    // Result:
-    /*
-      [
-        [a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10],
-        [b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,b10],
-        [c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10],
-        [d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10],
-      ]
-    */
+  //   const COLOR_ARRAY = [...Array(COLOR_NUMBER + 1).keys()];
+  //   /*
+  //     COLORS.compare:
+  //     [
+  //       [a1,a2,a3,a4],
+  //       [b1,b2,b3,b4],
+  //       [c1,c2,c3,c4],
+  //       [d1,d2,d3,d4],
+  //     ]
+  //   */
 
-    // Get the opsite COLOR_NUMBER ramp of colors
-    const COLOR_RAMPS_Y = COLOR_ARRAY.map((key) => {
-      return chroma.scale([].concat(...COLOR_RAMPS_X.map((c) => c.filter((c2, j) => {
-        return j === key;
-      })))).colors(COLOR_NUMBER + 1);
-    });
-    // Result:
-    /*
-      [
-        [a0,a0.2,a0.3,b0,b0.2,b0.3,c0,c0.2,c0.3,c0.4,d0],
-        [a1,a1.2,a1.3,b1,b1.2,b1.3,c1,c1.2,c1.3,c1.4,d1],
-        [a2,a2.2,a2.3,b2,b2.2,b2.3,c2,c2.2,c2.3,c2.4,d2],
-        [a3,a3.2,a3.3,b3,b3.2,b3.3,c3,c3.2,c3.3,c3.4,d3],
-        [a4,a4.2,a4.3,b4,b4.2,b4.3,c4,c4.2,c4.3,c4.4,d4],
-        [a5,a5.2,a5.3,b5,b5.2,b5.3,c5,c5.2,c5.3,c5.4,d5],
-        [a6,a6.2,a6.3,b6,b6.2,b6.3,c6,c6.2,c6.3,c6.4,d6],
-        [a7,a7.2,a7.3,b7,b7.2,b7.3,c7,c7.2,c7.3,c7.4,d7],
-        [a8,a8.2,a8.3,b8,b8.2,b8.3,c8,c8.2,c8.3,c8.4,d8],
-        [a9,a9.2,a9.3,b9,b9.2,b9.3,c9,c9.2,c9.3,c9.4,d9],
-        [a10,a10.2,a10.3,b10,b10.2,b10.3,c10,c10.2,c10.3,c10.4,d10],
-      ]
-    */
+  //   const COLOR_RAMPS_X = COLORS.compare.map((ramp) => {
+  //     return chroma.scale(ramp).colors(COLOR_NUMBER + 1);
+  //   });
+  //   // Result:
+  //   /*
+  //     [
+  //       [a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10],
+  //       [b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,b10],
+  //       [c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10],
+  //       [d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10],
+  //     ]
+  //   */
 
-    const COLOR_RAMPS = [].concat(...COLOR_ARRAY.map((key) => {
-      return [].concat(...COLOR_RAMPS_Y.map((c) => c.filter((c2, j) => {
-        return j === key;
-      })));
-    }));
-    // Result:
-    /*
-      [
-        a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,
-        a0.2,a1.2,a2.2,a3.2,a4.2,a5.2,a6.2,a7.2,a8.2,a9.2,a10.2,
-        a0.3,a1.3,a2.3,a3.3,a4.3,a5.3,a6.3,a7.3,a8.3,a9.3,a10.3,
-        b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,
-        b0.2,b1.2,b2.2,b3.2,b4.2,b5.2,b6.2,b7.2,b8.2,b9.2,b10.2,
-        b0.3,b1.3,b2.3,b3.3,b4.3,b5.3,b6.3,b7.3,b8.3,b9.3,b10.3,
-        c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,
-        c0.2,c1.2,c2.2,c3.2,c4.2,c5.2,c6.2,c7.2,c8.2,c9.2,c10.2,
-        c0.3,c1.3,c2.3,c3.3,c4.3,c5.3,c6.3,c7.3,c8.3,c9.3,c10.3,
-        c0.4,c1.4,c2.4,c3.4,c4.4,c5.4,c6.4,c7.4,c8.4,c9.4,c10.4,
-        d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,
-      ]
-    */
+  //   // Get the opsite COLOR_NUMBER ramp of colors
+  //   const COLOR_RAMPS_Y = COLOR_ARRAY.map((key) => {
+  //     return chroma.scale([].concat(...COLOR_RAMPS_X.map((c) => c.filter((c2, j) => {
+  //       return j === key;
+  //     })))).colors(COLOR_NUMBER + 1);
+  //   });
+  //   // Result:
+  //   /*
+  //     [
+  //       [a0,a0.2,a0.3,b0,b0.2,b0.3,c0,c0.2,c0.3,c0.4,d0],
+  //       [a1,a1.2,a1.3,b1,b1.2,b1.3,c1,c1.2,c1.3,c1.4,d1],
+  //       [a2,a2.2,a2.3,b2,b2.2,b2.3,c2,c2.2,c2.3,c2.4,d2],
+  //       [a3,a3.2,a3.3,b3,b3.2,b3.3,c3,c3.2,c3.3,c3.4,d3],
+  //       [a4,a4.2,a4.3,b4,b4.2,b4.3,c4,c4.2,c4.3,c4.4,d4],
+  //       [a5,a5.2,a5.3,b5,b5.2,b5.3,c5,c5.2,c5.3,c5.4,d5],
+  //       [a6,a6.2,a6.3,b6,b6.2,b6.3,c6,c6.2,c6.3,c6.4,d6],
+  //       [a7,a7.2,a7.3,b7,b7.2,b7.3,c7,c7.2,c7.3,c7.4,d7],
+  //       [a8,a8.2,a8.3,b8,b8.2,b8.3,c8,c8.2,c8.3,c8.4,d8],
+  //       [a9,a9.2,a9.3,b9,b9.2,b9.3,c9,c9.2,c9.3,c9.4,d9],
+  //       [a10,a10.2,a10.3,b10,b10.2,b10.3,c10,c10.2,c10.3,c10.4,d10],
+  //     ]
+  //   */
 
-    const RESULT = [].concat(
-      ...COLOR_RAMPS.map((c, i) => {
-        const step = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
-        const color = cx({
-          '#000000': step === '00',
-          '#FFFFFF': step === '1010',
-          [c]: step !== '00' && step !== '1010',
-        });
+  //   const COLOR_RAMPS = [].concat(...COLOR_ARRAY.map((key) => {
+  //     return [].concat(...COLOR_RAMPS_Y.map((c) => c.filter((c2, j) => {
+  //       return j === key;
+  //     })));
+  //   }));
+  //   // Result:
+  //   /*
+  //     [
+  //       a0,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,
+  //       a0.2,a1.2,a2.2,a3.2,a4.2,a5.2,a6.2,a7.2,a8.2,a9.2,a10.2,
+  //       a0.3,a1.3,a2.3,a3.3,a4.3,a5.3,a6.3,a7.3,a8.3,a9.3,a10.3,
+  //       b0,b1,b2,b3,b4,b5,b6,b7,b8,b9,b10,
+  //       b0.2,b1.2,b2.2,b3.2,b4.2,b5.2,b6.2,b7.2,b8.2,b9.2,b10.2,
+  //       b0.3,b1.3,b2.3,b3.3,b4.3,b5.3,b6.3,b7.3,b8.3,b9.3,b10.3,
+  //       c0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,
+  //       c0.2,c1.2,c2.2,c3.2,c4.2,c5.2,c6.2,c7.2,c8.2,c9.2,c10.2,
+  //       c0.3,c1.3,c2.3,c3.3,c4.3,c5.3,c6.3,c7.3,c8.3,c9.3,c10.3,
+  //       c0.4,c1.4,c2.4,c3.4,c4.4,c5.4,c6.4,c7.4,c8.4,c9.4,c10.4,
+  //       d0,d1,d2,d3,d4,d5,d6,d7,d8,d9,d10,
+  //     ]
+  //   */
 
-        return [
-          step, color,
-        ];
-      }),
-    );
-    /*
-      [
-        '00',a0,'01',a1,'02',a2,'03',a3,'04',a4,
-        '05',a5,'06',a6,'07',a7,'08',a8,'09',a9,'010',a10,
-        '10',a0.2,'11',a1.2,'12',a2.2,'13',a3.2,'14',a4.2,
-        '15',a5.2,'16',a6.2,'17',a7.2,'18',a8.2,'19',a9.2,'110',a10.2,
-        '20',a0.3,'21',a1.3,'22',a2.3,'23',a3.3,'24',a4.3,
-        '25',a5.3,'26',a6.3,'27',a7.3,'28',a8.3,'29',a9.3,'210',a10.3,
-        '30',b0,'31',b1,'32',b2,'33',b3,'34',b4,
-        '35',b5,'36',b6,'37',b7,'38',b8,'39',b9,'310',b10,
-        '40',b0.2,'41',b1.2,'42',b2.2,'43',b3.2,'44',b4.2,
-        '45',b5.2,'46',b6.2,'47',b7.2,'48',b8.2,'49',b9.2,'410',b10.2,
-        '50',b0.3,'51',b1.3,'52',b2.3,'53',b3.3,'54',b4.3,
-        '55',b5.3,'56',b6.3,'57',b7.3,'58',b8.3,'59',b9.3,'510',b10.3,
-        '60',c0,'61',c1,'62',c2,'63',c3,'64',c4,
-        '65',c5,'66',c6,'67',c7,'68',c8,'69',c9,'610',c10,
-        '70',c0.2,'71',c1.2,'72',c2.2,'73',c3.2,'74',c4.2,
-        '75',c5.2,'76',c6.2,'77',c7.2,'78',c8.2,'79',c9.2,'710',c10.2,
-        '80',c0.3,'81',c1.3,'82',c2.3,'83',c3.3,'84',c4.3,
-        '85',c5.3,'86',c6.3,'87',c7.3,'88',c8.3,'89',c9.3,'810',c10.3,
-        '90',c0.4,'91',c1.4,'92',c2.4,'93',c3.4,'94',c4.4,
-        '95',c5.4,'96',c6.4,'97',c7.4,'98',c8.4,'99',c9.4,'910',c10.4,
-        '100',d0,'101',d1,'102',d2,'103',d3,'104',d4,
-        '105',d5,'106',d6,'107',d7,'108',d8,'109',d9,'1010',d10,
-      ]
-    */
-    return RESULT;
-  }, [active]);
+  //   const RESULT = [].concat(
+  //     ...COLOR_RAMPS.map((c, i) => {
+  //       const step = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}
+  // ${i % (COLOR_NUMBER + 1)}`;
+  //       const color = cx({
+  //         '#000000': step === '00',
+  //         '#FFFFFF': step === '1010',
+  //         [c]: step !== '00' && step !== '1010',
+  //       });
+
+  //       return [
+  //         step, color,
+  //       ];
+  //     }),
+  //   );
+  //   /*
+  //     [
+  //       '00',a0,'01',a1,'02',a2,'03',a3,'04',a4,
+  //       '05',a5,'06',a6,'07',a7,'08',a8,'09',a9,'010',a10,
+  //       '10',a0.2,'11',a1.2,'12',a2.2,'13',a3.2,'14',a4.2,
+  //       '15',a5.2,'16',a6.2,'17',a7.2,'18',a8.2,'19',a9.2,'110',a10.2,
+  //       '20',a0.3,'21',a1.3,'22',a2.3,'23',a3.3,'24',a4.3,
+  //       '25',a5.3,'26',a6.3,'27',a7.3,'28',a8.3,'29',a9.3,'210',a10.3,
+  //       '30',b0,'31',b1,'32',b2,'33',b3,'34',b4,
+  //       '35',b5,'36',b6,'37',b7,'38',b8,'39',b9,'310',b10,
+  //       '40',b0.2,'41',b1.2,'42',b2.2,'43',b3.2,'44',b4.2,
+  //       '45',b5.2,'46',b6.2,'47',b7.2,'48',b8.2,'49',b9.2,'410',b10.2,
+  //       '50',b0.3,'51',b1.3,'52',b2.3,'53',b3.3,'54',b4.3,
+  //       '55',b5.3,'56',b6.3,'57',b7.3,'58',b8.3,'59',b9.3,'510',b10.3,
+  //       '60',c0,'61',c1,'62',c2,'63',c3,'64',c4,
+  //       '65',c5,'66',c6,'67',c7,'68',c8,'69',c9,'610',c10,
+  //       '70',c0.2,'71',c1.2,'72',c2.2,'73',c3.2,'74',c4.2,
+  //       '75',c5.2,'76',c6.2,'77',c7.2,'78',c8.2,'79',c9.2,'710',c10.2,
+  //       '80',c0.3,'81',c1.3,'82',c2.3,'83',c3.3,'84',c4.3,
+  //       '85',c5.3,'86',c6.3,'87',c7.3,'88',c8.3,'89',c9.3,'810',c10.3,
+  //       '90',c0.4,'91',c1.4,'92',c2.4,'93',c3.4,'94',c4.4,
+  //       '95',c5.4,'96',c6.4,'97',c7.4,'98',c8.4,'99',c9.4,'910',c10.4,
+  //       '100',d0,'101',d1,'102',d2,'103',d3,'104',d4,
+  //       '105',d5,'106',d6,'107',d7,'108',d8,'109',d9,'1010',d10,
+  //     ]
+  //   */
+  //   return RESULT;
+  // }, [active]);
 
   return useMemo(() => {
     if (!active) return null;
@@ -930,8 +937,8 @@ export function usePUCompareLayer({
                 'match',
                 [
                   'concat',
-                  ['round', ['/', ['*', ['get', 'freqA'], 100], 100 / COLOR_NUMBER]],
-                  ['round', ['/', ['*', ['get', 'freqB'], 100], 100 / COLOR_NUMBER]],
+                  ['ceil', ['/', ['*', ['get', 'freqA'], 100], 100 / COLOR_NUMBER]],
+                  ['ceil', ['/', ['*', ['get', 'freqB'], 100], 100 / COLOR_NUMBER]],
                 ],
                 ...COLOR_RAMP,
                 '#FFF',
@@ -959,6 +966,7 @@ export function useLegend({
 }: UseLegend) {
   return useMemo(() => {
     const { layerSettings = {} } = options;
+
     return layers
       .map((l) => {
         const L = LEGEND_LAYERS[l];

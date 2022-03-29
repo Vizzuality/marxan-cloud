@@ -16,34 +16,63 @@ export interface LegendTypeMatrixProps {
 
 export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
   className = '',
-  items,
+  items = [],
   intersections,
 }: LegendTypeMatrixProps) => {
   return (
     <>
-      <div className="relative p-12">
-        <p className="absolute text-xs font-medium text-white pl-7 font-heading top-2">Always</p>
-        <p className="absolute text-xs font-medium text-white pl-7 font-heading bottom-2">Never</p>
-        <div className="transform rotate-45 w-min">
-          <div className="grid grid-flow-col grid-rows-4">
-            {intersections.map((i) => (
-              <div key={i.id} className="w-6 h-6" style={{ background: `${i.color}` }} />
-            ))}
+      <div className="relative px-24 py-12">
+        <p className="absolute text-xs font-medium text-white transform -translate-x-1/2 font-heading top-1 left-1/2">Always</p>
+        <p className="absolute text-xs font-medium text-white transform -translate-x-1/2 font-heading bottom-1 left-1/2">Never</p>
+        <div className="w-full transform rotate-45 preserve-3d">
+          <div className="w-full" style={{ paddingBottom: '100%' }}>
+            <div className="absolute top-0 left-0 flex flex-wrap w-full h-full">
+              {intersections.map((i) => (
+                <div key={i.id} className="relative block" style={{ background: `${i.color}`, width: `${100 / 11}%`, height: `${100 / 11}%` }} />
+              ))}
+            </div>
 
-          </div>
-          <div className="absolute w-3 h-3 bg-white left-0.5 top-0.5" />
-          <div className="absolute w-3 h-3 bg-gray-700 right-0.5 bottom-0.5" />
-          <div className="absolute flex w-24 text-xs text-white font-heading -bottom-6 -left-6">
-            <p className="transform -rotate-45">100%</p>
-            <p className="transform -rotate-45">75%</p>
-            <p className="transform -rotate-45">50%</p>
-            <p className="transform -rotate-45">25%</p>
-          </div>
-          <div className="absolute flex w-24 text-xs text-white transform -rotate-90 top-6 left-16 font-heading">
-            <p className="transform rotate-45">25%</p>
-            <p className="transform rotate-45">50%</p>
-            <p className="transform rotate-45">75%</p>
-            <p className="transform rotate-45">100%</p>
+            <div className="absolute bottom-0 z-10 justify-between w-2 h-full text-white transform text-xxs left-full font-heading">
+              <div className="absolute flex items-center h-px space-x-1 leading-none" style={{ bottom: `${(100 / 11) * 2}%` }}>
+                <span className="relative block w-1 h-px bg-gray-300 top-px" />
+                <span className="relative block transform -rotate-45">
+                  <span>10</span>
+                </span>
+              </div>
+              <div className="absolute flex items-center h-px space-x-1 leading-none" style={{ bottom: `${(100 / 11) * 6}%` }}>
+                <span className="relative block w-1 h-px bg-gray-300 top-px" />
+                <span className="relative block transform -rotate-45">
+                  <span>50</span>
+                </span>
+              </div>
+              <div className="absolute flex items-center h-px space-x-1 leading-none" style={{ bottom: '100%' }}>
+                <span className="relative block w-1 h-px bg-gray-300 top-px" />
+                <span className="relative block transform -rotate-45">
+                  <span>100</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="absolute z-10 justify-between w-2 h-full text-white origin-bottom transform rotate-90 -bottom-1 -left-1 text-xxs font-heading">
+              <div className="absolute flex items-center h-px space-x-1 leading-none transform" style={{ bottom: `${100 - (100 / 11) * 2}%` }}>
+                <span className="relative block w-1 h-px bg-gray-300 top-px" />
+                <span className="relative block transform -rotate-180">
+                  <span className="relative block transform rotate-45">10</span>
+                </span>
+              </div>
+              <div className="absolute flex items-center h-px space-x-1 leading-none transform" style={{ bottom: `${100 - (100 / 11) * 6}%` }}>
+                <span className="relative block w-1 h-px bg-gray-300 top-px" />
+                <span className="relative block transform -rotate-180">
+                  <span className="relative block transform rotate-45">50</span>
+                </span>
+              </div>
+              <div className="absolute flex items-center h-px space-x-1 leading-none transform" style={{ bottom: '0%' }}>
+                <span className="relative block w-1 h-px bg-gray-300 top-px" />
+                <span className="relative block transform -rotate-180">
+                  <span className="relative block transform rotate-45">100</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

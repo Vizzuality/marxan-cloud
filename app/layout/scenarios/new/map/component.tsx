@@ -202,7 +202,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
                 // onChangeVisibility={() => onChangeVisibility(id)}
                 {...i}
               >
-                {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
+                {type === 'matrix' && <LegendTypeMatrix className="text-sm text-white" intersections={intersections} items={items} />}
                 {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
                 {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
                 {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
