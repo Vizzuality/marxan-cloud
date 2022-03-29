@@ -789,13 +789,23 @@ export function usePUCompareLayer({
   const COLOR_NUMBER = 10;
 
   const COLOR_RAMP = useMemo(() => {
-    return COLORS.compare2
+    const colors = [...Array((COLOR_NUMBER + 1) * (COLOR_NUMBER + 1)).keys()];
+
+    return colors
       .map((c, i) => {
         const position = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
-        return [position, c];
+        const color = Object.keys(COLORS.compare).reduce((acc, k) => {
+          if (COLORS.compare[k].includes(position) && !acc) {
+            return k;
+          }
+
+          return acc;
+        }, '');
+
+        return [position, color];
       })
       .flat();
-  }, []);
+  }, [COLOR_NUMBER]);
 
   // const COLOR_RAMP = useMemo(() => {
   //   if (!active) return null;
