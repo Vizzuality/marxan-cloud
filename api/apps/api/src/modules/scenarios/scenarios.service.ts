@@ -1155,9 +1155,20 @@ export class ScenariosService {
     scenarioId: string,
     userId: string,
     _blmValue: number,
-  ): Promise<Either<typeof forbiddenError, Buffer>> {
+  ): Promise<Either<typeof forbiddenError | GetScenarioFailure, Buffer>> {
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenario)) {
+      return scenario;
+    }
+
     if (
-      !(await this.scenarioAclService.canViewBlmResults(userId, scenarioId))
+      !(await this.scenarioAclService.canViewBlmResults(
+        userId,
+        scenario.right.projectId,
+      ))
     ) {
       return left(forbiddenError);
     }

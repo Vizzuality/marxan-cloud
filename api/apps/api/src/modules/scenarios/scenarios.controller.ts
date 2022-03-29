@@ -106,6 +106,7 @@ import { BaseTilesOpenApi } from '@marxan/tiles';
 import { WebshotConfig } from '@marxan/webshot';
 import { WebshotService } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
+import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -1274,13 +1275,13 @@ export class ScenariosController {
   // @debt Refactor to use the correct blm PNG data from table.
   @ApiOperation({ description: 'Get PNG for BLM values for scenario' })
   @ApiOkResponse()
-  @Header('content-type', 'image/png')
-  @Post('/:scenarioId/calibration/maps/preview/:blmValue')
+  @Get('/:scenarioId/calibration/maps/preview/:blmValue')
   async getImageFromBlmValue(
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Param('blmValue') blmValue: number,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<Buffer> {
+    @Res() res: Response,
+  ): Promise<any> {
     const result = await this.service.getImageFromBlmValues(
       scenarioId,
       req.user.id,
@@ -1294,7 +1295,7 @@ export class ScenariosController {
         resourceType: scenarioResource.name.plural,
       });
     }
-
-    return result.right;
+    setImagePngResponseHeadersForSuccessfulRequests(res);
+    res.send(result.right);
   }
 }
