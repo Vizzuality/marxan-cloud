@@ -335,7 +335,7 @@ export const LEGEND_LAYERS = {
       intersections: COLORS.compare2.map((c, i) => ({ id: i, color: c })).reverse(),
       items: [
         {
-          value: scenario1?.name,
+          value: `${scenario1?.name}Hello in the darkness scripi in the night`,
           color: '#1C9BD0',
         },
         {

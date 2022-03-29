@@ -21,7 +21,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
 }: LegendTypeMatrixProps) => {
   return (
     <div className="flex items-center space-x-14">
-      <div className="relative w-16 py-12 ml-10">
+      <div className="relative flex-shrink-0 w-16 py-12 ml-10">
         <p className="absolute text-xs font-medium text-white transform -translate-x-1/2 font-heading top-1 left-1/2">Always</p>
         <p className="absolute text-xs font-medium text-white transform -translate-x-1/2 font-heading bottom-1 left-1/2">Never</p>
         <div className="w-full transform rotate-45 preserve-3d">
@@ -95,7 +95,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                     backgroundColor: color,
                   }}
                 />
-                <div>{value}</div>
+                <div className="clamp-2">{value}</div>
               </li>
             ))}
         </ul>
