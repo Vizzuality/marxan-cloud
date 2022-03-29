@@ -38,17 +38,16 @@ export async function bootstrapSetUp() {
   ).toLowerCase();
   if (allowedMorganFormats.includes(loggingHttpMorganFormat)) {
     Logger.log(
-      `Using Morgan HTTP logger with ${loggingHttpMorganFormat} output format`,
+      `Using Morgan HTTP logger with '${loggingHttpMorganFormat}' output format`,
     );
     app.use(morgan(loggingHttpMorganFormat));
   }
-
   if (
     loggingHttpMorganFormat &&
     !allowedMorganFormats.includes(loggingHttpMorganFormat)
   ) {
     Logger.warn(
-      `Morgan HTTP logging configured via environment variable, but an invalid format was specified (${loggingHttpMorganFormat}); valid formats are ${allowedMorganFormats}.`,
+      `Morgan HTTP logging configured via environment variable, but an invalid format was specified (${loggingHttpMorganFormat}); valid formats are ${allowedMorganFormats.join(', ')}.`,
     );
   }
 
