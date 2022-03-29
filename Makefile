@@ -45,7 +45,7 @@ start-api:
 # Start backend services in debug mode (listening on inspector port)
 debug-api:
 	ENABLE_DEBUG_MODE=true $(DOCKER_COMPOSE_COMMAND) --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
-	
+
 # Start all the services.
 start:
 	$(DOCKER_COMPOSE_COMMAND) --project-name ${COMPOSE_PROJECT_NAME} up --build
@@ -153,6 +153,12 @@ test-e2e-api: test-clean-slate seed-dbs-e2e
 test-e2e-geoprocessing: test-clean-slate seed-dbs-e2e
 	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
 	$(MAKE) test-clean-slate
+
+run-test-e2e-local:
+	$(MAKE) --keep-going test-e2e-backend environment=local
+
+run-test-e2e-ci:
+	$(MAKE) --keep-going test-e2e-backend environment=ci
 
 setup-test-unit-backend:
 	# build API and geoprocessing containers
