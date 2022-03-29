@@ -267,6 +267,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                 onMapViewportChange={handleViewportChange}
                 onMapLoad={() => setMapInteractive(true)}
                 transformRequest={handleTransformRequest}
+                onClick={(e) => {
+                  if (e && e.features) {
+                    console.info(e.features);
+                  }
+                }}
               >
                 {(map) => {
                   return (
