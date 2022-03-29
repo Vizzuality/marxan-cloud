@@ -20,8 +20,8 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
   intersections,
 }: LegendTypeMatrixProps) => {
   return (
-    <>
-      <div className="relative px-24 py-12">
+    <div className="flex items-center space-x-14">
+      <div className="relative w-16 py-12 ml-10">
         <p className="absolute text-xs font-medium text-white transform -translate-x-1/2 font-heading top-1 left-1/2">Always</p>
         <p className="absolute text-xs font-medium text-white transform -translate-x-1/2 font-heading bottom-1 left-1/2">Never</p>
         <div className="w-full transform rotate-45 preserve-3d">
@@ -82,15 +82,15 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
           [className]: !!className,
         })}
       >
-        <ul className="flex flex-col w-full space-y-3">
+        <ul className="flex flex-col w-full space-y-2">
           {items
             .map(({ value, color }) => (
               <li
                 key={`${value}`}
-                className="flex items-center space-x-2 text-sm font-heading"
+                className="flex items-center space-x-2 text-xs font-heading"
               >
                 <div
-                  className="flex-shrink-0 w-3 h-3 rounded-sm"
+                  className="flex-shrink-0 w-2 h-2 rounded-sm"
                   style={{
                     backgroundColor: color,
                   }}
@@ -100,7 +100,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
             ))}
         </ul>
       </div>
-    </>
+    </div>
   );
 };
 

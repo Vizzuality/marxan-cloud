@@ -126,8 +126,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const LAYERS = [
-    PUCompareLayer,
     PUGridLayer,
+    PUCompareLayer,
     PlanningAreaLayer,
   ].filter((l) => !!l);
 
@@ -135,7 +135,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     layers: [
       ...!!sid1 && !sid2 ? ['frequency'] : [],
       ...!!sid1 && !!sid2 ? ['compare'] : [],
-      ...rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? ['pugrid'] : [],
+      ...rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2 ? ['pugrid'] : [],
     ],
     options: {
       layerSettings,

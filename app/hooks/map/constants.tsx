@@ -330,15 +330,15 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
     intersections: COLORS.compare2.map((c, i) => ({ id: i, color: c })).reverse(),
-    // items: [
-    //   {
-    //     value: 'Scenario 2',
-    //     color: '#3C7B7E',
-    //   },
-    //   {
-    //     value: 'Scenario 3',
-    //     color: '#DA9827',
-    //   },
-    // ],
+    items: [
+      {
+        value: 'Test - 001',
+        color: '#1C9BD0',
+      },
+      {
+        value: 'Test - 002',
+        color: '#DE3397',
+      },
+    ],
   }),
 };
