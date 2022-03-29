@@ -119,6 +119,8 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
 
+export const bestSolutionNotFound = Symbol('best solution not found');
+
 export const projectDoesntExist = Symbol(`project doesn't exist`);
 export type ProjectDoesntExist = typeof projectDoesntExist;
 
@@ -128,6 +130,9 @@ export type SubmitProtectedAreaError =
   | typeof scenarioNotFound;
 
 export type GetProtectedAreasError = GetProjectErrors | typeof scenarioNotFound;
+export type GetBestSolutionError =
+  | typeof forbiddenError
+  | typeof bestSolutionNotFound;
 
 export type UpdateProtectedAreasError =
   | ChangeProtectedAreasError
@@ -699,20 +704,20 @@ export class ScenariosService {
     userId: string,
     fetchSpecification: FetchSpecification,
   ): Promise<
-    Either<typeof forbiddenError, Partial<ScenariosOutputResultsApiEntity>[]>
+    Either<GetBestSolutionError, Partial<ScenariosOutputResultsApiEntity>>
   > {
     await this.assertScenario(scenarioId);
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    return right(
-      await this.solutionsCrudService
-        .findAll({
-          ...fetchSpecification,
-          filter: { ...fetchSpecification.filter, best: true, scenarioId },
-        })
-        .then((results) => results[0]),
-    );
+    const [solutions] = await this.solutionsCrudService.findAll({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, best: true, scenarioId },
+    });
+    console.dir(solutions, { depth: Infinity });
+    if (!solutions.length) return left(bestSolutionNotFound);
+
+    return right(solutions[0]);
   }
 
   async getMostDifferentSolutions(

@@ -103,8 +103,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotConfig } from '@marxan/webshot';
-import { WebshotService } from '@marxan/webshot';
+import { WebshotConfig, WebshotService } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
@@ -822,7 +821,7 @@ export class ScenariosController {
       req.user.id,
       fetchSpecification,
     );
-
+    console.dir(result, { depth: Infinity });
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
@@ -831,7 +830,7 @@ export class ScenariosController {
       });
     }
 
-    return this.scenarioSolutionSerializer.serialize(result.right[0]);
+    return this.scenarioSolutionSerializer.serialize(result.right);
   }
 
   @ApiTags(marxanRunTag)

@@ -8,8 +8,8 @@ import {
 import {
   forbiddenError,
   lastOwner,
-  transactionFailed,
   queryFailed,
+  transactionFailed,
 } from '@marxan-api/modules/access-control';
 import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
 import {
@@ -17,6 +17,7 @@ import {
   unknownError as blmUnknownError,
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
+  bestSolutionNotFound,
   projectDoesntExist,
   projectNotReady,
 } from '@marxan-api/modules/scenarios/scenarios.service';
@@ -28,9 +29,9 @@ import {
 } from '@marxan-api/modules/scenarios/cost-surface/application/set-initial-cost-surface.command';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import {
-  noLockInPlace,
   lockedByAnotherUser,
   lockedScenario,
+  noLockInPlace,
   unknownError as lockUnknownError,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import {
@@ -47,8 +48,8 @@ import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-
 import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 import {
   invalidRange,
-  updateFailure,
   unknownError as rangeUnknownError,
+  updateFailure,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
 import {
   unknownPdfWebshotError,
@@ -94,6 +95,7 @@ export const mapAclDomainToHttpError = (
     | typeof submissionFailed
     | typeof nullPlanningUnitGridShape
     | typeof initialCostProjectNotFound
+    | typeof bestSolutionNotFound
     | typeof unknownPdfWebshotError
     | typeof unknownPngWebshotError,
   options?: ErrorHandlerOptions,
@@ -188,6 +190,10 @@ export const mapAclDomainToHttpError = (
     case unknownPngWebshotError:
       return new InternalServerErrorException(
         'Unexpected error while preparing PNG snapshot via webshot.',
+      );
+    case bestSolutionNotFound:
+      return new NotFoundException(
+        `Could not find best solution for scenario with ID: ${options?.scenarioId}.`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

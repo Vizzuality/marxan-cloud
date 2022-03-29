@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { HttpStatus } from '@nestjs/common';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -80,7 +81,19 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions`)
         .set('Authorization', `Bearer ${viewerToken}`),
-    ThenSolutionsShouldBeResolved: async (response: request.Response) => {
+    WhenGettingBestSolutionAsOwner: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenGettingBestSolutionAsContributor: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${contributorToken}`),
+    WhenGettingBestSolutionAsViewer: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${viewerToken}`),
+    ThenSolutionsShouldBeResolved: (response: request.Response) => {
       expect(response.body.meta).toEqual({
         page: 1,
         size: 25,
@@ -96,6 +109,31 @@ export const getFixtures = async () => {
         runId: 1,
         scoreValue: 4000,
       });
+    },
+    ThenBestSolutionShouldBeResolved: (response: request.Response) => {
+      console.dir(response.body, { depth: Infinity });
+      expect(response.body.meta).toEqual({
+        page: 1,
+        size: 25,
+        totalItems: 1,
+        totalPages: 1,
+      });
+      expect(response.body.data.length).toEqual(1);
+      expect(response.body.data[0].attributes).toEqual({
+        costValue: 2000,
+        id: expect.any(String),
+        missingValues: 1,
+        planningUnits: 123,
+        runId: 1,
+        scoreValue: 4000,
+      });
+    },
+    ThenNotFoundShouldBeResolved: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].title).toEqual(
+        `Could not find best solution for scenario with ID: ${scenarioId}.`,
+      );
     },
     cleanup: async () => {
       await marxanOutputRepo.delete({
