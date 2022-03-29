@@ -1,5 +1,70 @@
 version: "3.6"
 services:
+  api:
+    build:
+      context: ./api
+      dockerfile: api.Dockerfile
+    ports:
+      - "${API_SERVICE_PORT}:3000"
+    container_name: marxan-test-e2e-api
+    command: develop
+    volumes:
+      - ./api/apps:/opt/marxan-api/apps
+      - ./api/libs:/opt/marxan-api/libs
+      - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
+    environment:
+      - NODE_PATH=src
+      - NODE_ENV=test
+      - API_POSTGRES_HOST=test-e2e-postgresql-api
+      - API_POSTGRES_USER
+      - API_POSTGRES_PASSWORD
+      - API_POSTGRES_PORT=5432
+      - API_POSTGRES_DB
+      - GEO_POSTGRES_HOST=test-e2e-postgresql-geo-api
+      - GEO_POSTGRES_USER
+      - GEO_POSTGRES_PASSWORD
+      - GEO_POSTGRES_PORT=5432
+      - GEO_POSTGRES_DB
+      - REDIS_HOST=test-e2e-redis
+      - NODE_CONFIG_DIR=apps/api/config
+    depends_on:
+      - test-e2e-postgresql-api
+      - test-e2e-postgresql-geo-api
+      - test-e2e-redis
+
+  geoprocessing:
+      build:
+        context: ./api
+        dockerfile: geo.Dockerfile
+      ports:
+        - "${GEOPROCESSING_SERVICE_PORT}:3000"
+      container_name: marxan-test-e2e-geoprocessing
+      command: develop
+      volumes:
+        - ./api/apps:/opt/marxan-geoprocessing/apps
+        - ./api/libs:/opt/marxan-geoprocessing/libs
+        - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
+      environment:
+        - NODE_PATH=src
+        - NODE_ENV=test
+        - API_POSTGRES_HOST=test-e2e-postgresql-api
+        - API_POSTGRES_USER
+        - API_POSTGRES_PASSWORD
+        - API_POSTGRES_PORT=5432
+        - API_POSTGRES_DB
+        - GEO_POSTGRES_HOST=test-e2e-postgresql-geo-api
+        - GEO_POSTGRES_USER
+        - GEO_POSTGRES_PASSWORD
+        - GEO_POSTGRES_PORT=5432
+        - GEO_POSTGRES_DB
+        - REDIS_HOST=test-e2e-redis
+        - NODE_CONFIG_DIR=apps/geoprocessing/config
+      depends_on:
+        - test-e2e-postgresql-geo-api
+        - test-e2e-postgresql-api
+        - test-e2e-redis
+        - api
+
   test-e2e-postgresql-api:
     build:
       context: ./postgresql
