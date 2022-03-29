@@ -119,7 +119,7 @@ export class ScenariosOutputResultsApiEntity {
   })
   missingValues?: number | null;
 
-  /**g
+  /**
    * Best solution/run for the scenario (1 per scenario)
    */
   @Column({
