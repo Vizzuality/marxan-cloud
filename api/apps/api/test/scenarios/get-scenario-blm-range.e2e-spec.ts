@@ -55,6 +55,15 @@ describe('get-scenario-blm-calibration-results', () => {
 
     await fixtures.ThenAForbiddenErrorShouldBeReturned(response);
   });
+
+  // @debt To be refactored after PNG generation process is complete.
+  it('should block retrieving the BLM range for non allowed users', async () => {
+    await fixtures.GivenScenarioWasCreated();
+
+    const response = await fixtures.WhenGettingPngScreenshotOfBlmValues();
+
+    fixtures.ThenAPngImageShouldBeReturned(response);
+  });
 });
 
 const getFixtures = async () => {
@@ -78,6 +87,10 @@ const getFixtures = async () => {
   await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
   const updatedBlmRange = [1, 50];
+
+  // @debt To be replaced with proper values from BLM
+  // run after process is finished.
+  const mockBlmValues = 25;
 
   return {
     cleanup: async () => {
@@ -140,6 +153,18 @@ const getFixtures = async () => {
       expect(response.body.errors[0].status).toBe(HttpStatus.FORBIDDEN);
       expect(response.status).toBe(HttpStatus.FORBIDDEN);
       expect(response.forbidden).toEqual(true);
+    },
+    // @debt To be refactored when process to store
+    // and get blm screenshots from values is finished.
+    WhenGettingPngScreenshotOfBlmValues: async () =>
+      await request(app.getHttpServer())
+        .get(
+          `/api/v1/scenarios/${scenarioId}/calibration/maps/preview/${mockBlmValues}`,
+        )
+        .set('Authorization', `Bearer ${ownerToken}`),
+
+    ThenAPngImageShouldBeReturned: (response: request.Response) => {
+      expect(response.headers['content-type']).toBe(`image/png`);
     },
   };
 };
