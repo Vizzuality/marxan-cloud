@@ -5,7 +5,7 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import { CorsUtils } from './utils/cors.utils';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 
 /**
  * Allowed Morgan logging formats.
@@ -32,8 +32,25 @@ export async function bootstrapSetUp() {
   /**
    * Set up HTTP request logging via Morgan
    */
-  const loggingHttpMorganFormat = AppConfig.get<string>('logging.http.morganFormat')?.toLowerCase();
-  if (allowedMorganFormats.includes(loggingHttpMorganFormat)) app.use(morgan(loggingHttpMorganFormat));
+  const loggingHttpMorganFormat = AppConfig.get<string>(
+    'logging.http.morganFormat',
+    '',
+  ).toLowerCase();
+  if (allowedMorganFormats.includes(loggingHttpMorganFormat)) {
+    Logger.log(
+      `Using Morgan HTTP logger with ${loggingHttpMorganFormat} output format`,
+    );
+    app.use(morgan(loggingHttpMorganFormat));
+  }
+
+  if (
+    loggingHttpMorganFormat &&
+    !allowedMorganFormats.includes(loggingHttpMorganFormat)
+  ) {
+    Logger.warn(
+      `Morgan HTTP logging configured via environment variable, but an invalid format was specified (${loggingHttpMorganFormat}); valid formats are ${allowedMorganFormats}.`,
+    );
+  }
 
   app.enableCors({
     allowedHeaders: 'Content-Type,Authorization,Content-Disposition',
