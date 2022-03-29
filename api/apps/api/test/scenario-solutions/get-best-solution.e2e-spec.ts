@@ -16,12 +16,18 @@ describe(`When getting scenario best solution`, () => {
     await fixtures?.cleanup();
   });
 
+  it(`should return the correct response when the given scenario id does not exists`, async () => {
+    const response = await fixtures.WhenGettingBestSolutionForAnScenarioThatDoesNotExists();
+
+    fixtures.ThenScenarioNotFoundShouldBeResolved(response);
+  });
+
   it(`should return the correct response when the best solution cannot be found`, async () => {
     await fixtures.GivenScenarioDoesNotHaveBestSolutionReady();
 
     const response = await fixtures.WhenGettingBestSolutionAsOwner();
 
-    fixtures.ThenNotFoundShouldBeResolved(response);
+    fixtures.ThenBestSolutionNotFoundShouldBeResolved(response);
   });
 
   it(`should resolve best solution as owner`, async () => {

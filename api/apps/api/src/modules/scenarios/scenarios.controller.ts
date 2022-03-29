@@ -92,8 +92,6 @@ import { ProtectedAreasChangeDto } from '@marxan-api/modules/scenarios/dto/prote
 import { StartScenarioBlmCalibrationDto } from '@marxan-api/modules/scenarios/dto/start-scenario-blm-calibration.dto';
 import { BlmCalibrationRunResultDto } from './dto/scenario-blm-calibration-results.dto';
 import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
-import { forbiddenError } from '@marxan-api/modules/access-control';
-import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 
 import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenarios-acl/scenario-access-control';
 import { BlmRangeDto } from '@marxan-api/modules/scenarios/dto/blm-range.dto';
@@ -336,17 +334,15 @@ export class ScenariosController {
       id,
       req.user.id,
     );
+
     if (isLeft(result)) {
-      switch (result.left) {
-        case notFoundSpec:
-          return this.geoFeatureSetSerializer.emptySpecification();
-        case forbiddenError:
-          throw new ForbiddenException();
-        default:
-          const _exhaustiveCheck: never = result.left;
-          throw _exhaustiveCheck;
-      }
+      throw mapAclDomainToHttpError(result.left, {
+        scenarioId: id,
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
     }
+
     return await this.geoFeatureSetSerializer.serialize(result.right);
   }
 

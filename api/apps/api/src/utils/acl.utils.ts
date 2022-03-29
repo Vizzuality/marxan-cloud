@@ -13,7 +13,9 @@ import {
 } from '@marxan-api/modules/access-control';
 import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
 import {
+  GetScenarioFailure,
   scenarioNotFound,
+  unknownError,
   unknownError as blmUnknownError,
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
@@ -55,6 +57,7 @@ import {
   unknownPdfWebshotError,
   unknownPngWebshotError,
 } from '@marxan/webshot';
+import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -66,6 +69,7 @@ interface ErrorHandlerOptions {
 
 export const mapAclDomainToHttpError = (
   errorToCheck:
+    | GetScenarioFailure
     | typeof forbiddenError
     | typeof lastOwner
     | typeof transactionFailed
@@ -83,6 +87,7 @@ export const mapAclDomainToHttpError = (
     | typeof inputMetadataNotFound
     | typeof inputZipNotYetAvailable
     | typeof scenarioNotFound
+    | typeof notFoundSpec
     | typeof invalidProtectedAreaId
     | typeof projectNotReady
     | typeof projectDoesntExist
@@ -97,10 +102,13 @@ export const mapAclDomainToHttpError = (
     | typeof initialCostProjectNotFound
     | typeof bestSolutionNotFound
     | typeof unknownPdfWebshotError
-    | typeof unknownPngWebshotError,
+    | typeof unknownPngWebshotError
+    | typeof unknownError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
+    case unknownError:
+      return new InternalServerErrorException(options);
     case forbiddenError:
       return new ForbiddenException(
         `User with ID: ${options?.userId} is not allowed to perform this action on ${options?.resourceType}.`,
@@ -194,6 +202,10 @@ export const mapAclDomainToHttpError = (
     case bestSolutionNotFound:
       return new NotFoundException(
         `Could not find best solution for scenario with ID: ${options?.scenarioId}.`,
+      );
+    case notFoundSpec:
+      return new NotFoundException(
+        `Could not find spec for scenario with ID: ${options?.scenarioId}.`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

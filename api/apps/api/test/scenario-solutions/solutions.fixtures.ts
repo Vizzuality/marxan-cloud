@@ -24,6 +24,8 @@ export const getFixtures = async () => {
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
   const bestSolutionId = v4();
   const anotherSolutionId = v4();
+  const unexistentScenarioId = v4();
+
   const { projectId, cleanup: cleanupProject } = await GivenProjectExists(
     app,
     ownerToken,
@@ -88,6 +90,14 @@ export const getFixtures = async () => {
         roleName: scenarioViewerRole,
         userId: viewerUserId,
       }),
+    WhenGettingBestSolutionForAnScenarioThatDoesNotExists: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${unexistentScenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenGettingSolutionsForAnScenarioThatDoesNotExists: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${unexistentScenarioId}/marxan/solutions`)
+        .set('Authorization', `Bearer ${ownerToken}`),
     WhenGettingSolutionsAsOwner: async () =>
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions`)
@@ -141,11 +151,18 @@ export const getFixtures = async () => {
         scoreValue: 5000,
       });
     },
-    ThenNotFoundShouldBeResolved: (response: request.Response) => {
+    ThenBestSolutionNotFoundShouldBeResolved: (response: request.Response) => {
       expect(response.status).toBe(HttpStatus.NOT_FOUND);
       expect(response.body.errors[0].status).toBe(HttpStatus.NOT_FOUND);
       expect(response.body.errors[0].title).toEqual(
         `Could not find best solution for scenario with ID: ${scenarioId}.`,
+      );
+    },
+    ThenScenarioNotFoundShouldBeResolved: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].title).toEqual(
+        `Scenario ${unexistentScenarioId} could not be found.`,
       );
     },
     cleanup: async () => {

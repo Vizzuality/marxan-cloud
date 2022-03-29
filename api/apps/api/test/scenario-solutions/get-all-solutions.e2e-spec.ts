@@ -16,6 +16,12 @@ describe(`When getting scenario solution results`, () => {
     await fixtures?.cleanup();
   });
 
+  it(`should return the correct response when the given scenario id does not exists`, async () => {
+    const response = await fixtures.WhenGettingSolutionsForAnScenarioThatDoesNotExists();
+
+    fixtures.ThenScenarioNotFoundShouldBeResolved(response);
+  });
+
   it(`should resolve solutions as owner`, async () => {
     const response = await fixtures.WhenGettingSolutionsAsOwner();
     fixtures.ThenSolutionsShouldBeResolved(response);
