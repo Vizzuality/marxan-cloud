@@ -12,21 +12,21 @@ services:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
       - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
-    environment:
-      - NODE_PATH=src
-      - NODE_ENV=test
-      - API_POSTGRES_HOST=test-e2e-postgresql-api
-      - API_POSTGRES_USER
-      - API_POSTGRES_PASSWORD
-      - API_POSTGRES_PORT=5432
-      - API_POSTGRES_DB
-      - GEO_POSTGRES_HOST=test-e2e-postgresql-geo-api
-      - GEO_POSTGRES_USER
-      - GEO_POSTGRES_PASSWORD
-      - GEO_POSTGRES_PORT=5432
-      - GEO_POSTGRES_DB
-      - REDIS_HOST=test-e2e-redis
-      - NODE_CONFIG_DIR=apps/api/config
+#    environment:
+#      - NODE_PATH=src
+#      - NODE_ENV=test
+#      - API_POSTGRES_HOST=test-e2e-postgresql-api
+#      - API_POSTGRES_USER
+#      - API_POSTGRES_PASSWORD
+#      - API_POSTGRES_PORT=5432
+#      - API_POSTGRES_DB
+#      - GEO_POSTGRES_HOST=test-e2e-postgresql-geo-api
+#      - GEO_POSTGRES_USER
+#      - GEO_POSTGRES_PASSWORD
+#      - GEO_POSTGRES_PORT=5432
+#      - GEO_POSTGRES_DB
+#      - REDIS_HOST=test-e2e-redis
+#      - NODE_CONFIG_DIR=apps/api/config
     depends_on:
       - test-e2e-postgresql-api
       - test-e2e-postgresql-geo-api
@@ -44,21 +44,21 @@ services:
         - ./api/apps:/opt/marxan-geoprocessing/apps
         - ./api/libs:/opt/marxan-geoprocessing/libs
         - marxan-cloud-backend-e2e-temp-storage:/tmp/storage
-      environment:
-        - NODE_PATH=src
-        - NODE_ENV=test
-        - API_POSTGRES_HOST=test-e2e-postgresql-api
-        - API_POSTGRES_USER
-        - API_POSTGRES_PASSWORD
-        - API_POSTGRES_PORT=5432
-        - API_POSTGRES_DB
-        - GEO_POSTGRES_HOST=test-e2e-postgresql-geo-api
-        - GEO_POSTGRES_USER
-        - GEO_POSTGRES_PASSWORD
-        - GEO_POSTGRES_PORT=5432
-        - GEO_POSTGRES_DB
-        - REDIS_HOST=test-e2e-redis
-        - NODE_CONFIG_DIR=apps/geoprocessing/config
+#      environment:
+#        - NODE_PATH=src
+#        - NODE_ENV=test
+#        - API_POSTGRES_HOST=test-e2e-postgresql-api
+#        - API_POSTGRES_USER
+#        - API_POSTGRES_PASSWORD
+#        - API_POSTGRES_PORT=5432
+#        - API_POSTGRES_DB
+#        - GEO_POSTGRES_HOST=test-e2e-postgresql-geo-api
+#        - GEO_POSTGRES_USER
+#        - GEO_POSTGRES_PASSWORD
+#        - GEO_POSTGRES_PORT=5432
+#        - GEO_POSTGRES_DB
+#        - REDIS_HOST=test-e2e-redis
+#        - NODE_CONFIG_DIR=apps/geoprocessing/config
       depends_on:
         - test-e2e-postgresql-geo-api
         - test-e2e-postgresql-api
