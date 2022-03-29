@@ -46,6 +46,12 @@ jobs:
 #      POSTGRES_GEO_SERVICE_PORT: 3533
 #      REDIS_API_SERVICE_PORT: 3479
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Checkout envs
+        run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml config
+      - name: Run CI tests via make task
+        run: make run-test-e2e-ci
     - name: Checkout repository
       uses: actions/checkout@v2
     - uses: actions/setup-node@v2
