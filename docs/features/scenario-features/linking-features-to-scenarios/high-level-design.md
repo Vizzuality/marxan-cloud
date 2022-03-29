@@ -106,7 +106,16 @@ create unique index unique_platform_features on features (feature_class_name) wh
 create unique index unique_project_features on features (feature_class_name, project_id) where project_id is not null;
 ```
 
-Other than this change, this proposal seeks to retain the current data
+Likewise, in order to be able to reliably identify `(geodb)features_data`, we
+need a unique hash within each project (or platform-wide `(geodb)features_data`
+rows):
+
+```
+alter table features_data add column hash text not null generated always as (md5(the_geom::bytea::text || properties::text)) stored;
+create unique index unique_feature_data_per_project on features_data(hash, feature_id);
+```
+
+Other than these changes, this proposal seeks to retain the current data
 architecture in order to minimize impact on existing code/queries and related
 risks.
 
@@ -150,10 +159,25 @@ If the feature is in use:
     this will be used as a back-reference to link `scenario_features_data` rows
     to their matching `features_data` rows at import time.
 
+### Platform-wide features - export
+
+For these features, we rely on the core assumption for platform-wide features
+outlined in the _Aims and assumptions_ section above.
+
+As all the project-level metadata and spatial data for these features must be
+already present in the target MarxanCloud instance (this will be true by
+definition for cloning operations, as these are performed within the same
+instance), only `(geodb)scenario_features_data` rows will be exported.
+
+The export process, at scenario export time, is mostly identical to that of
+`(geodb)scenario_features_data` rows for user-uploaded `(apidb)features`, except
+that we iterate over platform-wide `(apidb)features` rows and we reference
+`(geodb)features_data` rows that map to platform-wide data.
+
 ### User-uploaded features - import
 
-- Given `new_project_id` as the id of the project created through the current import
-  process;
+- Given `new_project_id` as the id of the project created through the current
+  import process;
 
 - At _project import time_, for each `(apidb)features` in the import piece, as
   `current_feature`:
@@ -179,7 +203,23 @@ If the feature is in use:
     - For each `(geodb)scenario_features_data` row being inserted, set
       `feature_class_id` to `select id from features_data where feature_id =
       current_feature.id and hash = replace(source_feature_data,
-      '<feature_class_name>/', '')
+      '<feature_class_name>/', '')`
+
+### Platform-wide features - import
+
+As for the export of platform-wide features, this step is largely identical to
+the analogous step (at _scenario import time_) for user-uploaded features.
+
+There is no import step for `(apidb)features` rows and `(geodb)features_data`
+rows as these must be already present in the target instance.
+
+Given that the exported data for `(geodb)scenario_features_data` includes a
+generated column that references `(apidb)features.feature_class_name`, we can
+iterate over the relevant `(apidb)features where project_id is null`, and for
+each of the `(geodb)scenario_features_data` rows in the exported piece, import
+the row, setting its `feature_class_id` column to `select id from
+(geodb)feature_data where feature_id = current_feature.id and hash =
+replace(source_feature_data, '<feature_class_name>/', '')`.
 
 ## Implementation (full rationale)
 
