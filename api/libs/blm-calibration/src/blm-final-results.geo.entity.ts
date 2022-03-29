@@ -42,4 +42,17 @@ export class BlmFinalResultEntity {
     type: 'float',
   })
   boundaryLength!: number;
+
+  @Column({
+    name: `protected_pu_ids`,
+    type: 'uuid',
+    array: true,
+  })
+  protected_pu_ids!: string[];
+
+  @Column({
+    name: `png_data`,
+    type: 'bytea',
+  })
+  pngData!: Buffer;
 }
