@@ -58,6 +58,7 @@ import {
   unknownPngWebshotError,
 } from '@marxan/webshot';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
+import { projectIsMissingInfoForRegularPus } from '@marxan-api/modules/projects/projects.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -91,6 +92,7 @@ export const mapAclDomainToHttpError = (
     | typeof invalidProtectedAreaId
     | typeof projectNotReady
     | typeof projectDoesntExist
+    | typeof projectIsMissingInfoForRegularPus
     | typeof protectedAreaProjectNotFound
     | typeof invalidRange
     | typeof updateFailure
@@ -112,6 +114,10 @@ export const mapAclDomainToHttpError = (
     case forbiddenError:
       return new ForbiddenException(
         `User with ID: ${options?.userId} is not allowed to perform this action on ${options?.resourceType}.`,
+      );
+    case projectIsMissingInfoForRegularPus:
+      return new BadRequestException(
+        `Project with regular planning unit shape is missing GADM id or country id.`,
       );
     case lastOwner:
       return new ForbiddenException(`There must be at least one owner.`);

@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
@@ -18,6 +18,8 @@ import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
+import { OrganizationsTestUtils } from './utils/organizations.test.utils';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 afterAll(async () => {
   await tearDown();
@@ -84,6 +86,37 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultSingular = response.body;
       minimalProject = await Deserializer.deserialize(response.body);
       expect(jsonAPIResponse.data.type).toBe('projects');
+    });
+
+    test.only('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
+      const organization = await OrganizationsTestUtils.createOrganization(
+        app,
+        jwtToken,
+        E2E_CONFIG.organizations.valid.minimal(),
+      );
+
+      const minimalValidProjectDTO: Partial<CreateProjectDTO> = {
+        ...E2E_CONFIG.projects.valid.minimal(),
+        organizationId: organization.data.id,
+      };
+      const invalidProjectDTO: Partial<CreateProjectDTO> = {
+        ...minimalValidProjectDTO,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+        planningAreaId: undefined,
+        adminAreaLevel1Id: undefined,
+        adminAreaLevel2Id: undefined,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/projects')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(invalidProjectDTO);
+
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.errors[0].status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.errors[0].title).toBe(
+        'Project with regular planning unit shape is missing GADM id or country id.',
+      );
     });
 
     test('Creating a project with complete data should succeed', async () => {

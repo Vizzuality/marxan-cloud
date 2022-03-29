@@ -110,6 +110,8 @@ import {
 import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -205,7 +207,10 @@ export class ProjectsController {
     });
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        resourceType: projectResource.name.plural,
+      });
     }
 
     return await this.projectSerializer.serialize(
