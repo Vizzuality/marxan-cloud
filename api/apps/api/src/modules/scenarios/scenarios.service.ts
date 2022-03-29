@@ -714,7 +714,6 @@ export class ScenariosService {
       ...fetchSpecification,
       filter: { ...fetchSpecification.filter, best: true, scenarioId },
     });
-    console.dir(solutions, { depth: Infinity });
     if (!solutions.length) return left(bestSolutionNotFound);
 
     return right(solutions[0]);

@@ -821,7 +821,6 @@ export class ScenariosController {
       req.user.id,
       fetchSpecification,
     );
-    console.dir(result, { depth: Infinity });
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
         scenarioId: id,
