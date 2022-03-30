@@ -45,8 +45,7 @@ export class ImportScenarioHandler
       Import.newOne(
         importResourceId,
         ResourceKind.Scenario,
-        // TODO
-        // new ResourceId(exportConfig.projectId)
+        new ResourceId(exportConfig.projectId),
         archiveLocation,
         pieces,
       ),
