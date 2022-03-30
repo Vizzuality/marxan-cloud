@@ -88,7 +88,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
             subtab: null,
           },
           {
-            saveTab: true,
+            saveTab: scenarioData?.metadata?.scenarioEditingMetadata?.status?.solutions !== 'draft',
             saveStatus: false,
           },
         ),

@@ -22,20 +22,15 @@ import { ScenariosSidebarShowSolutionsProps } from './types';
 
 export const SECTIONS = [
   {
-    id: ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW,
-    name: 'Solutions Overview',
-    description: 'Each solution gives you an alternative answer to your planning problem showing which planning units have been selected in the proposed conservation network, the overall cost, and whether targets have been met.',
+    id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
+    name: 'Gap Analysis',
+    description: 'This gap analysis shows the amount of each feature that would be included if the new conservation plan your are working on is implemented.',
   },
   {
     id: ScenarioSidebarSubTabs.SCHEDULE_SCENARIO,
     name: 'Schedule scenario',
     description: 'Comming feature...',
     disabled: true,
-  },
-  {
-    id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
-    name: 'Gap Analysis',
-    description: 'This gap analysis shows the amount of each feature that would be included if the new conservation plan your are working on is implemented.',
   },
 ];
 
@@ -120,16 +115,15 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
               </header>
 
               {!subtab && (
-                <Sections
-                  key="sections"
-                  sections={SECTIONS}
-                  onChangeSection={onChangeSection}
+                <SolutionsDetails
+                  key="solutions-overview"
                 />
               )}
 
-              {subtab === ScenarioSidebarSubTabs.SOLUTIONS_OVERVIEW && (
-                <SolutionsDetails
-                  key="solutions-overview"
+              {!subtab && (
+                <Sections
+                  key="sections"
+                  sections={SECTIONS}
                   onChangeSection={onChangeSection}
                 />
               )}
