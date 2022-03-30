@@ -111,21 +111,6 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
     return null;
   };
 
-  // const onChangeOpacity = useCallback((opacity, id) => {
-  //   dispatch(setLayerSettings({
-  //     id,
-  //     settings: { opacity },
-  //   }));
-  // }, [setLayerSettings, dispatch]);
-
-  // const onChangeVisibility = useCallback((id) => {
-  //   const { visibility = true } = layerSettings[id] || {};
-  //   dispatch(setLayerSettings({
-  //     id,
-  //     settings: { visibility: !visibility },
-  //   }));
-  // }, [setLayerSettings, dispatch, layerSettings]);
-
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
@@ -202,7 +187,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
                 // onChangeVisibility={() => onChangeVisibility(id)}
                 {...i}
               >
-                {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
+                {type === 'matrix' && <LegendTypeMatrix className="text-sm text-white" intersections={intersections} items={items} />}
                 {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
                 {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
                 {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}

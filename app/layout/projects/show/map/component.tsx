@@ -4,6 +4,8 @@ import React, {
 
 import { useSelector, useDispatch } from 'react-redux';
 
+import pick from 'lodash/pick';
+
 import { useRouter } from 'next/router';
 
 import { setLayerSettings } from 'store/slices/projects/[id]';
@@ -126,8 +128,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   });
 
   const LAYERS = [
-    PUCompareLayer,
     PUGridLayer,
+    PUCompareLayer,
     PlanningAreaLayer,
   ].filter((l) => !!l);
 
@@ -135,7 +137,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     layers: [
       ...!!sid1 && !sid2 ? ['frequency'] : [],
       ...!!sid1 && !!sid2 ? ['compare'] : [],
-      ...rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? ['pugrid'] : [],
+      ...rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2 ? ['pugrid'] : [],
     ],
     options: {
       layerSettings,
@@ -200,6 +202,41 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
     return null;
   };
+
+  const onChangeScenario1 = useCallback((s) => {
+    setSid1(s);
+
+    dispatch(setLayerSettings({
+      id: 'compare',
+      settings: {
+        scenario1: pick(rawScenariosData.find((sc) => sc.id === s), ['id', 'name']),
+      },
+    }));
+
+    // Remove compare if you unselect a sceanrio or
+    // if it's the same as the compare one
+    if (!s || s === sid2) {
+      setSid2(null);
+
+      dispatch(setLayerSettings({
+        id: 'compare',
+        settings: {
+          scenario2: null,
+        },
+      }));
+    }
+  }, [dispatch, rawScenariosData, sid2]);
+
+  const onChangeScenario2 = useCallback((s) => {
+    setSid2(s);
+
+    dispatch(setLayerSettings({
+      id: 'compare',
+      settings: {
+        scenario2: pick(rawScenariosData.find((sc) => sc.id === s), ['id', 'name']),
+      },
+    }));
+  }, [rawScenariosData, dispatch]);
 
   const onChangeOpacity = useCallback((opacity, lid) => {
     dispatch(setLayerSettings({
@@ -267,6 +304,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                 onMapViewportChange={handleViewportChange}
                 onMapLoad={() => setMapInteractive(true)}
                 transformRequest={handleTransformRequest}
+                onClick={(e) => {
+                  if (e && e.features) {
+                    console.info(e.features);
+                  }
+                }}
               >
                 {(map) => {
                   return (
@@ -323,7 +365,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                     onChangeVisibility={() => onChangeVisibility(i.id)}
                     {...i}
                   >
-                    {type === 'matrix' && <LegendTypeMatrix className="pt-6 pb-4 text-sm text-white" intersections={intersections} items={items} />}
+                    {type === 'matrix' && <LegendTypeMatrix className="text-sm text-white" intersections={intersections} items={items} />}
                     {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
                     {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
                     {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
@@ -343,14 +385,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   clearSelectionActive
                   options={SCENARIOS_RUNNED.sid1Options}
                   selected={sid1}
-                  onChange={(s) => {
-                    setSid1(s);
-                    // Remove compare if you unselect a sceanrio or
-                    // if it's the same as the compare one
-                    if (!s || s === sid2) {
-                      setSid2(null);
-                    }
-                  }}
+                  onChange={onChangeScenario1}
                 />
               </div>
 
@@ -367,9 +402,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                   clearSelectionActive
                   options={SCENARIOS_RUNNED.sid2Options}
                   selected={sid2}
-                  onChange={(s) => {
-                    setSid2(s);
-                  }}
+                  onChange={onChangeScenario2}
                 />
               </div>
             </div>

@@ -95,6 +95,18 @@
       var(--tw-gradient-from) 0.125rem, var(--tw-gradient-to) 0.125rem,
       var(--tw-gradient-to) 0.1875rem;
   }
+
+  .backface-visible {
+    backface-visibility: visible;
+  }
+
+  .backface-invisible {
+    backface-visibility: hidden;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
 }
 
 /* PRINT */

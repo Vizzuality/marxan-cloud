@@ -175,6 +175,6 @@ export interface UseLegend {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     runId?: string;
-    layerSettings?: Record<string, unknown>;
+    layerSettings?: Record<string, Record<string, unknown>>;
   };
 }
