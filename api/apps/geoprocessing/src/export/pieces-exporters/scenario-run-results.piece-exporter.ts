@@ -20,7 +20,7 @@ type PreviousBlmResultsSelectResult = {
   boundaryLength: number;
 };
 type MarxanRunSelectResult = {
-  includedCount: number;
+  includedCount: string;
   values: boolean[];
   puid: number;
 };
