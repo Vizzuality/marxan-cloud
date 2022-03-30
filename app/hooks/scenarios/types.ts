@@ -116,3 +116,12 @@ export interface SaveScenarioCalibrationRangeProps {
   id?: string,
   data: any,
 }
+
+export interface UseDownloadScenarioReportProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DownloadScenarioReportProps {
+  sid: string,
+  solutionId: string;
+}

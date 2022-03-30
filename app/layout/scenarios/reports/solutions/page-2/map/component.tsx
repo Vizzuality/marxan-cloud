@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { useDispatch } from 'react-redux';
+
 import { useRouter } from 'next/router';
+
+import { setMaps } from 'store/slices/reports/solutions';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
@@ -11,22 +15,24 @@ import {
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
-import { useBestSolution } from 'hooks/solutions';
+import { useBestSolution, useSolution } from 'hooks/solutions';
 
-import Loading from 'components/loading';
 import Map from 'components/map';
 
 export interface ScenariosReportMapProps {
+  id: string;
 }
 
-export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
-  const [mapInteractive, setMapInteractive] = useState(false);
-
+export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
+  id,
+}: ScenariosReportMapProps) => {
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
 
-  const { pid, sid } = query;
+  const { pid, sid, solutionId } = query;
+
+  const dispatch = useDispatch();
 
   const {
     data = {},
@@ -38,11 +44,15 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
   } = useScenario(sid);
 
   const {
+    data: selectedSolutionData,
+  } = useSolution(sid, solutionId);
+
+  const {
     data: bestSolutionData,
   } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
   });
-  const bestSolution = bestSolutionData;
+  const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -54,9 +64,9 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
-    sublayers: ['solutions'],
+    sublayers: ['solution'],
     options: {
-      runId: bestSolution?.runId,
+      runId: SOLUTION_DATA?.runId,
     },
   });
 
@@ -84,6 +94,10 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
     return null;
   };
 
+  const handleMapLoad = () => {
+    dispatch(setMaps({ [id]: true }));
+  };
+
   return (
     <>
       <div
@@ -106,8 +120,10 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
-          onMapLoad={() => setMapInteractive(true)}
+          onMapLoad={handleMapLoad}
           transformRequest={handleTransformRequest}
+          preserveDrawingBuffer
+          preventStyleDiffing
         >
           {(map) => {
             return (
@@ -118,11 +134,6 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = () => {
           }}
         </Map>
       </div>
-      <Loading
-        visible={!mapInteractive}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
-        iconClassName="w-10 h-10 text-primary-500"
-      />
     </>
   );
 };

@@ -8,8 +8,7 @@ import ReportHeader from 'layout/scenarios/reports/header';
 import Page1 from 'layout/scenarios/reports/solutions/page-1';
 import Page2 from 'layout/scenarios/reports/solutions/page-2';
 import Page3 from 'layout/scenarios/reports/solutions/page-3';
-import Page4 from 'layout/scenarios/reports/solutions/page-4';
-import WebShootStatus from 'layout/scenarios/reports/webshot-status';
+import WebShotStatus from 'layout/scenarios/reports/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
 
@@ -19,6 +18,7 @@ const styles = {
     margin: 'auto',
     padding: '8.73mm 13.49mm',
     width: '297mm',
+    'break-after': 'page',
   },
 };
 
@@ -33,7 +33,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={1} totalPages={4} />
+        <ReportHeader />
         <Page1 />
       </div>
 
@@ -41,7 +41,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={2} totalPages={4} />
+        <ReportHeader />
         <Page2 />
       </div>
 
@@ -49,20 +49,11 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader page={3} totalPages={4} />
+        <ReportHeader />
         <Page3 />
       </div>
 
-      <div
-        style={styles.page}
-        className="flex flex-col h-full text-black bg-white"
-      >
-        <ReportHeader page={4} totalPages={4} />
-        <Page4 />
-      </div>
-
-      <WebShootStatus />
-
+      <WebShotStatus />
     </>
   );
 };

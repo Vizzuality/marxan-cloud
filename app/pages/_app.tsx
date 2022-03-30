@@ -9,6 +9,7 @@ import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 
 import { OverlayProvider } from '@react-aria/overlays';
+import cx from 'classnames';
 import { Provider as AuthenticationProvider } from 'next-auth/client';
 import PlausibleProvider from 'next-plausible';
 import { Hydrate } from 'react-query/hydration';
@@ -34,6 +35,8 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   }
 
   const router = useRouter();
+  const { pathname } = router;
+  const reportsRegex = /reports/;
 
   const onRouteChangeStart = useCallback(() => {
     setRouteLoading((prevState) => ({
@@ -86,7 +89,11 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
                     <HelpProvider>
                       <PlausibleProvider domain="marxan.vercel.app">
                         <Loading {...routeLoading} />
-                        <div className="bg-black">
+                        <div className={cx({
+                          'bg-black': !reportsRegex.test(pathname),
+                          'bg-white': reportsRegex.test(pathname),
+                        })}
+                        >
                           <Component {...pageProps} />
                         </div>
                       </PlausibleProvider>
