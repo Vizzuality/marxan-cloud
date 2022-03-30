@@ -15,6 +15,15 @@ export class BlmFinalResultsRepository {
     return Promise.resolve(undefined);
   }
 
+  async findOneByScenarioId(
+    scenarioId: string,
+  ): Promise<BlmFinalResultEntity | undefined> {
+    const result = await this.entityManager.findOne(BlmFinalResultEntity, {
+      where: { scenarioId },
+    });
+    return result;
+  }
+
   /**
    * clear previous results, move the new ones to target
    * table - everything within transaction

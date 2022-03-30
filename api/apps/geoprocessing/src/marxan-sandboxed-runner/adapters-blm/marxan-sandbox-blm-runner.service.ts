@@ -86,10 +86,33 @@ export class MarxanSandboxBlmRunnerService
           );
         }
         this.interruptIfKilled(scenarioId);
+
         await this.finalResultsRepository.saveFinalResults(
           scenarioId,
           calibrationId,
         );
+
+        const createdFinalResult = await this.finalResultsRepository.findOneByScenarioId(
+          scenarioId,
+        );
+
+        const puIds = createdFinalResult?.protected_pu_ids;
+
+        //-> I need to get the tiles for the APP(FE) to generate the maps.
+        // Once they are ready after the ¿proxy? request to API I need to
+        // request the webshot service png generation with those tiles.
+        // const proxyCall(puids)
+        // this.interruptIfKilled(scenarioId);
+
+        /*
+          Webshot call happens here with puIds.
+          This will return the PNG data, that needs to be inserted in next call to update finalResults.
+          await this.webshot.createScreenshot(puData, scenarioId, runId);
+          this.interruptIfKilled(scenarioId);
+        */
+
+        // When webshot call returns -> this.finalResultsRepository.updateFinalResults(scenarioId, pngData).
+
         this.clearAbortController(scenarioId);
         this.interruptIfKilled(scenarioId);
       } catch (err) {
