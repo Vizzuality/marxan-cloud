@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   const baseUrl = req.headers.origin;
 
-  const { sid } = req.query;
+  const { sid, solutionId } = req.query;
 
   const { data: pdf } = await DOWNLOADS.request({
     method: 'POST',
@@ -22,6 +22,9 @@ export default async function handler(req, res) {
       baseUrl,
       pdfOptions: {
         landscape: true,
+      },
+      reportOptions: {
+        solutionId,
       },
     },
   });

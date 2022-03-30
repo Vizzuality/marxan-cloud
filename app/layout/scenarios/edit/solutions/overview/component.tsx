@@ -63,6 +63,8 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
 
   const downloadScenarioReportMutation = useDownloadScenarioReport({});
 
+  const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
+
   const isBestSolution = (selectedSolution
     && bestSolutionData
     && selectedSolution?.id === bestSolutionData?.id) || !selectedSolution?.id;
@@ -87,7 +89,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
       level: 'info',
     });
 
-    downloadScenarioReportMutation.mutate({ sid: `${sid}` }, {
+    downloadScenarioReportMutation.mutate({ sid: `${sid}`, solutionId: SOLUTION_DATA?.id }, {
       onSuccess: () => {
         setPDFLoader(false);
 
@@ -117,7 +119,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
         });
       },
     });
-  }, [sid, scenarioData.name, downloadScenarioReportMutation, addToast]);
+  }, [sid, scenarioData.name, downloadScenarioReportMutation, SOLUTION_DATA, addToast]);
 
   const onChangeVisibility = useCallback((lid) => {
     const { visibility = true } = layerSettings[lid] || {};

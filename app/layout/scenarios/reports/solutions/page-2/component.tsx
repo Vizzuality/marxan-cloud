@@ -16,9 +16,7 @@ export interface ScenariosReportPage2Props {
 
 export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
   const { query } = useRouter();
-  const { sid } = query;
-
-  const selectedSolution:any = {};
+  const { sid, solutionId } = query;
 
   const {
     data: scenarioData,
@@ -26,7 +24,7 @@ export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
 
   const {
     data: selectedSolutionData,
-  } = useSolution(sid, selectedSolution?.id);
+  } = useSolution(sid, solutionId);
 
   const {
     data: bestSolutionData,

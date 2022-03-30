@@ -8,6 +8,7 @@ import flatten from 'lodash/flatten';
 
 import { useRouter } from 'next/router';
 
+import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
@@ -908,17 +909,16 @@ export function useDownloadScenarioReport({
 }: UseDownloadScenarioReportProps) {
   const [session] = useSession();
 
-  const downloadScenarioReport = ({ sid }: DownloadScenarioReportProps) => {
+  const downloadScenarioReport = ({ sid, solutionId }: DownloadScenarioReportProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
-    return DOWNLOADS.request({
-      url: `${baseUrl}/api/reports/scenarios/${sid}`,
+    return axios.request({
+      url: `${baseUrl}/api/reports/scenarios/${sid}?solutionId=${solutionId}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'application/json',
       },
-      withCredentials: true,
       ...requestConfig,
     });
   };

@@ -123,4 +123,5 @@ export interface UseDownloadScenarioReportProps {
 
 export interface DownloadScenarioReportProps {
   sid: string,
+  solutionId: string;
 }

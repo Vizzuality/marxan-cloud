@@ -15,7 +15,7 @@ import {
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
-import { useBestSolution } from 'hooks/solutions';
+import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Map from 'components/map';
 
@@ -30,7 +30,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   const { query } = useRouter();
 
-  const { pid, sid } = query;
+  const { pid, sid, solutionId } = query;
 
   const dispatch = useDispatch();
 
@@ -44,11 +44,15 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
   } = useScenario(sid);
 
   const {
+    data: selectedSolutionData,
+  } = useSolution(sid, solutionId);
+
+  const {
     data: bestSolutionData,
   } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
   });
-  const bestSolution = bestSolutionData;
+  const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -62,7 +66,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     include: 'results',
     sublayers: ['solution'],
     options: {
-      runId: bestSolution?.runId,
+      runId: SOLUTION_DATA?.runId,
     },
   });
 
