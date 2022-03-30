@@ -3,7 +3,7 @@ import puppeteer, { PDFOptions } from "puppeteer";
 import { ReportOptions } from "./report-options.dto";
 import { waitForReportReady } from "./wait-function";
 
-const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions?runId=:runId";
+const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions?solutionId=:solutionId";
 
 export const generateSummaryReportForScenario = async (
   req: Request,
@@ -18,11 +18,11 @@ export const generateSummaryReportForScenario = async (
     params: { projectId, scenarioId },
   } = req;
 
-  const runId = reportOptions.runId
+  const solutionId = reportOptions.solutionId
 
-  if (!(projectId || scenarioId || runId)) {
+  if (!(projectId || scenarioId || solutionId)) {
     res.status(400).json({
-      error: `Invalid request: projectId (${projectId}), scenarioId (${scenarioId}) or runId (${runId}) were not provided.`,
+      error: `Invalid request: projectId (${projectId}), scenarioId (${scenarioId}) or solutionId (${solutionId}) were not provided.`,
     });
     return;
   }
@@ -44,7 +44,7 @@ export const generateSummaryReportForScenario = async (
   const pageUrl = `${baseUrl}${appRouteTemplate
     .replace(":projectId", projectId)
     .replace(":scenarioId", scenarioId)
-    .replace(":runId", String(runId))}`;
+    .replace(":solutionId", solutionId)}`;
 
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],

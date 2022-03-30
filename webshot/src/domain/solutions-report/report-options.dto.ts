@@ -1,6 +1,6 @@
 /**
- * @see ExportClass DTO in API service.
+ * @see ReportOptions DTO in API service.
  */
 export class ReportOptions {
-  runId!: number;
+  solutionId!: string;
 }

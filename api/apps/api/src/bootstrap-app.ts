@@ -47,7 +47,9 @@ export async function bootstrapSetUp() {
     !allowedMorganFormats.includes(loggingHttpMorganFormat)
   ) {
     Logger.warn(
-      `Morgan HTTP logging configured via environment variable, but an invalid format was specified (${loggingHttpMorganFormat}); valid formats are ${allowedMorganFormats.join(', ')}.`,
+      `Morgan HTTP logging configured via environment variable, but an invalid format was specified (${loggingHttpMorganFormat}); valid formats are ${allowedMorganFormats.join(
+        ', ',
+      )}.`,
     );
   }
 
