@@ -285,7 +285,7 @@ const getFixtures = async () => {
           const savedStrem = file.right;
           const content = await readSavedFile(savedStrem);
           const expectedMarxanResults = randomPuids.map((value) => ({
-            includedCount: '7',
+            includedCount: 7,
             values: [false, true, false, true],
             puid: value,
           }));

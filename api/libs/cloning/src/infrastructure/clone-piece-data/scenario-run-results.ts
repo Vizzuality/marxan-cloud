@@ -10,7 +10,7 @@ export type BlmResultsContent = {
   boundaryLength: number;
 };
 export type MarxanRunResultsContent = {
-  includedCount: string;
+  includedCount: number;
   values: boolean[];
   puid: number;
 };

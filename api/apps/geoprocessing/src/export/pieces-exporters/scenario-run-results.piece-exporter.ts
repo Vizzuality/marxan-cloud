@@ -51,7 +51,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       .where('scenario_id = :scenarioId', { scenarioId: input.resourceId })
       .execute();
 
-    const marxanRunResults: MarxanRunSelectResult[] = await this.geoprocessingEntityManager
+    const marxanRunSelectResult: MarxanRunSelectResult[] = await this.geoprocessingEntityManager
       .createQueryBuilder()
       .select('included_count', 'includedCount')
       .addSelect('value', 'values')
@@ -74,6 +74,10 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       .innerJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
       .execute();
 
+    const marxanRunResults = marxanRunSelectResult.map((result) => ({
+      ...result,
+      includedCount: Number(result.includedCount),
+    }));
     const content: ScenarioRunResultsContent = { blmResults, marxanRunResults };
 
     const outputFile = await this.fileRepository.save(
