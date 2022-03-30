@@ -6,8 +6,8 @@ import { FileRepository } from '@marxan/files-repository';
 import {
   ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
+  toLockEnum,
 } from '@marxan/scenarios-planning-unit';
-import { toLockEnum } from '@marxan/scenarios-planning-unit/scenarios-planning-unit.geo.entity';
 import { extractFile } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';

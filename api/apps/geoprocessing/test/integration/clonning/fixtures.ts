@@ -5,14 +5,18 @@ import {
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { ProtectedArea } from '@marxan/protected-areas';
-import {
-  PlanningUnitGridShape,
-  ScenariosPuCostDataGeo,
-  ScenariosPuPaDataGeo,
-} from '@marxan/scenarios-planning-unit';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
+import { ArchiveLocation } from '@marxan/cloning/domain';
+import { FileRepository } from '@marxan/files-repository';
+import { ProtectedArea } from '@marxan/protected-areas';
+import {
+  ScenariosPuCostDataGeo,
+  PlanningUnitGridShape,
+  ScenariosPuPaDataGeo,
+} from '@marxan/scenarios-planning-unit';
+import * as archiver from 'archiver';
+import { isLeft } from 'fp-ts/lib/Either';
 import { v4 } from 'uuid';
 
 const randomGeometriesBoundary =
@@ -38,6 +42,29 @@ export async function GenerateRandomGeometries(
     `);
 
   return Object.values(result);
+}
+
+export async function PrepareZipFile(
+  content: any,
+  fileRepository: FileRepository,
+  relativePath: string,
+) {
+  const archive = archiver(`zip`, {
+    zlib: { level: 9 },
+  });
+  archive.append(
+    typeof content !== 'string' ? JSON.stringify(content) : content,
+    {
+      name: relativePath,
+    },
+  );
+
+  const saveFile = fileRepository.save(archive);
+  archive.finalize();
+  const uriOrError = await saveFile;
+
+  if (isLeft(uriOrError)) throw new Error("couldn't save file");
+  return new ArchiveLocation(uriOrError.right);
 }
 
 export function GivenOrganizationExists(
@@ -137,6 +164,7 @@ export async function GivenPlanningArea(
     })
     .execute();
 }
+
 export async function GivenProjectPus(
   em: EntityManager,
   projectId: string,

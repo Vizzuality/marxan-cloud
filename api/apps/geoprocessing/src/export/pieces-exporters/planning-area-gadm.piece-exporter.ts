@@ -72,7 +72,6 @@ export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
       bbox: gadm.bbox,
       country: gadm.country_id,
       planningUnitAreakm2: gadm.planning_unit_area_km2,
-      puGridShape: gadm.planning_unit_grid_shape,
       l1: gadm.admin_area_l1_id,
       l2: gadm.admin_area_l2_id,
     };
