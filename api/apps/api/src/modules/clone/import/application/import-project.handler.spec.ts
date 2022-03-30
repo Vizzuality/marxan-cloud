@@ -30,6 +30,7 @@ import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
 import { ImportProjectHandler } from './import-project.handler';
 import { ImportProject } from './import-project.command';
+import { ImportComponentStatuses } from '../domain/import/import-component-status';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -204,7 +205,7 @@ class FakeImportResourcePieces extends ImportResourcePieces {
   mockSequentialPieces() {
     this.mock.mockImplementation((resourceId: ResourceId) => [
       ImportComponent.fromSnapshot({
-        finished: false,
+        status: ImportComponentStatuses.Submitted,
         order: 0,
         resourceId: resourceId.value,
         id: `import component unique id`,
@@ -217,7 +218,7 @@ class FakeImportResourcePieces extends ImportResourcePieces {
         ],
       }),
       ImportComponent.fromSnapshot({
-        finished: false,
+        status: ImportComponentStatuses.Submitted,
         order: 1,
         resourceId: resourceId.value,
         id: `some other piece`,
@@ -235,7 +236,7 @@ class FakeImportResourcePieces extends ImportResourcePieces {
   mockEqualPieces() {
     this.mock.mockImplementation((resourceId: ResourceId) => [
       ImportComponent.fromSnapshot({
-        finished: false,
+        status: ImportComponentStatuses.Submitted,
         order: 2,
         resourceId: resourceId.value,
         id: `import component unique id`,
@@ -248,7 +249,7 @@ class FakeImportResourcePieces extends ImportResourcePieces {
         ],
       }),
       ImportComponent.fromSnapshot({
-        finished: false,
+        status: ImportComponentStatuses.Submitted,
         order: 2,
         resourceId: resourceId.value,
         id: `some other piece`,

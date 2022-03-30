@@ -8,15 +8,18 @@ import {
 import {
   forbiddenError,
   lastOwner,
-  transactionFailed,
   queryFailed,
+  transactionFailed,
 } from '@marxan-api/modules/access-control';
 import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
 import {
+  GetScenarioFailure,
   scenarioNotFound,
+  unknownError,
   unknownError as blmUnknownError,
 } from '@marxan-api/modules/blm/values/blm-repos';
 import {
+  bestSolutionNotFound,
   projectDoesntExist,
   projectNotReady,
 } from '@marxan-api/modules/scenarios/scenarios.service';
@@ -28,9 +31,9 @@ import {
 } from '@marxan-api/modules/scenarios/cost-surface/application/set-initial-cost-surface.command';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import {
-  noLockInPlace,
   lockedByAnotherUser,
   lockedScenario,
+  noLockInPlace,
   unknownError as lockUnknownError,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import {
@@ -47,10 +50,14 @@ import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-
 import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 import {
   invalidRange,
-  updateFailure,
   unknownError as rangeUnknownError,
+  updateFailure,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
-import { unknownPdfWebshotError } from '@marxan-api/modules/webshot/webshot.service';
+import {
+  unknownPdfWebshotError,
+  unknownPngWebshotError,
+} from '@marxan/webshot';
+import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -62,6 +69,7 @@ interface ErrorHandlerOptions {
 
 export const mapAclDomainToHttpError = (
   errorToCheck:
+    | GetScenarioFailure
     | typeof forbiddenError
     | typeof lastOwner
     | typeof transactionFailed
@@ -79,6 +87,7 @@ export const mapAclDomainToHttpError = (
     | typeof inputMetadataNotFound
     | typeof inputZipNotYetAvailable
     | typeof scenarioNotFound
+    | typeof notFoundSpec
     | typeof invalidProtectedAreaId
     | typeof projectNotReady
     | typeof projectDoesntExist
@@ -91,10 +100,15 @@ export const mapAclDomainToHttpError = (
     | typeof submissionFailed
     | typeof nullPlanningUnitGridShape
     | typeof initialCostProjectNotFound
-    | typeof unknownPdfWebshotError,
+    | typeof bestSolutionNotFound
+    | typeof unknownPdfWebshotError
+    | typeof unknownPngWebshotError
+    | typeof unknownError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
+    case unknownError:
+      return new InternalServerErrorException(options);
     case forbiddenError:
       return new ForbiddenException(
         `User with ID: ${options?.userId} is not allowed to perform this action on ${options?.resourceType}.`,
@@ -179,7 +193,19 @@ export const mapAclDomainToHttpError = (
       return new NotFoundException('Project not found.');
     case unknownPdfWebshotError:
       return new InternalServerErrorException(
-        'Unexpected error while preparing scenario solutions report.',
+        'Unexpected error while preparing PDF snapshot via webshot.',
+      );
+    case unknownPngWebshotError:
+      return new InternalServerErrorException(
+        'Unexpected error while preparing PNG snapshot via webshot.',
+      );
+    case bestSolutionNotFound:
+      return new NotFoundException(
+        `Could not find best solution for scenario with ID: ${options?.scenarioId}.`,
+      );
+    case notFoundSpec:
+      return new NotFoundException(
+        `Could not find spec for scenario with ID: ${options?.scenarioId}.`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

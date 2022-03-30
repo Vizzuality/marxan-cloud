@@ -1,4 +1,8 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
@@ -39,20 +43,21 @@ export class PlanningUnitsGridGeojsonPieceExporter
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
-      `
-        SELECT id, bbox
-        FROM projects
-        WHERE id = $1
-      `,
-      [input.resourceId],
-    );
+    const projectId = input.resourceId;
+    const [project]: [
+      ProjectSelectResult,
+    ] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select(['id', 'bbox'])
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
 
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
     const geoJsonStream = await qb
       .select('ST_AsGeoJSON(the_geom) as geojson')
-      .from('planning_units_geom', 'pug')
-      .innerJoin('projects_pu', 'ppu', 'pug.id = ppu.geom_id')
+      .from(PlanningUnitsGeom, 'pug')
+      .innerJoin(ProjectsPuEntity, 'ppu', 'pug.id = ppu.geom_id')
       .where('ppu.project_id = :projectId', { projectId: project.id })
       .stream();
 

@@ -30,12 +30,56 @@ export const COLORS = {
     '#008B8C',
     '#0BC6C2',
   ],
-  compare: [
-    ['#2A511E', '#586527', '#8B7931', '#BD8D3B'],
-    ['#30603F', '#5E774D', '#918E5C', '#C5A66B'],
-    ['#366E5F', '#648975', '#97A38A', '#CCBDA0'],
-    ['#3C7B7E', '#6A9A9B', '#9EB6B8', '#DDDDDD'],
-  ],
+  compare: {
+    '#1F1F1F': ['00'],
+    '#0F0559': ['01', '10', '11'],
+    '#3278B3': [
+      '02', '03', '04', '05',
+      '12', '13', '14', '15',
+    ],
+    '#1C9BD0': [
+      '06', '07', '08', '09', '010',
+      '16', '17', '18', '19', '110',
+    ],
+    '#B41792': [
+      '20', '30', '40', '50',
+      '21', '31', '41', '51',
+    ],
+    '#DE3397': [
+      '60', '70', '80', '90', '100',
+      '61', '71', '81', '91', '101',
+    ],
+    '#AFAAD3': [
+      '22', '23', '24', '25',
+      '32', '33', '34', '35',
+      '42', '43', '44', '45',
+      '52', '53', '54', '55',
+    ],
+    '#89CCE8': [
+      '26', '27', '28', '29', '210',
+      '36', '37', '38', '39', '310',
+      '46', '47', '48', '49', '410',
+      '56', '57', '58', '59', '510',
+    ],
+    '#E1ABD4': [
+      '62', '63', '64', '65',
+      '72', '73', '74', '75',
+      '82', '83', '84', '85',
+      '92', '93', '94', '95',
+      '102', '103', '104', '105',
+    ],
+    '#E5E2F0': [
+      '66', '67', '68', '69', '610',
+      '76', '77', '78', '79', '710',
+      '86', '87', '88', '89', '810',
+      '96', '97', '98',
+      '106', '107', '108',
+    ],
+    '#FFF': [
+      '99', '910',
+      '109', '1010',
+    ],
+  },
 };
 
 export const LEGEND_LAYERS = {
@@ -204,24 +248,46 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
   }),
-  compare: () => ({
-    id: 'compare',
-    name: 'Solutions distribution',
-    type: 'matrix',
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-    intersections: [].concat(...COLORS.compare).map((c, i) => ({ id: i, color: c })).reverse(),
-    items: [
-      {
-        value: 'Scenario 2',
-        color: '#3C7B7E',
+  compare: (options) => {
+    const { scenario1, scenario2 } = options;
+    const COLOR_NUMBER = 10;
+    const colors = [...Array((COLOR_NUMBER + 1) * (COLOR_NUMBER + 1)).keys()];
+
+    const ramp = colors
+      .map((c, i) => {
+        const position = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
+        const color = Object.keys(COLORS.compare)
+          .reduce((acc, k) => {
+            if (COLORS.compare[k].includes(position) && !acc) {
+              return k;
+            }
+
+            return acc;
+          }, '');
+
+        return color;
+      })
+      .flat();
+
+    return ({
+      id: 'compare',
+      name: 'Solutions distribution',
+      type: 'matrix',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
       },
-      {
-        value: 'Scenario 3',
-        color: '#DA9827',
-      },
-    ],
-  }),
+      intersections: ramp.map((c, i) => ({ id: i, color: c })).reverse(),
+      items: [
+        {
+          value: `${scenario1?.name}`,
+          color: '#DE3397',
+        },
+        {
+          value: scenario2?.name,
+          color: '#1C9BD0',
+        },
+      ],
+    });
+  },
 };

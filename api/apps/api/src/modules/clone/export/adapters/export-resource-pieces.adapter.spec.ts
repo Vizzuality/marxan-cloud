@@ -14,20 +14,22 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it('should return project pieces when resolving for a project', async () => {
+it('resolves project pieces', async () => {
   const projectId = fixtures.GivenAProjectExport();
   const result = await fixtures.WhenRequestingExportPieces(
     projectId,
     ResourceKind.Project,
+    [],
   );
   fixtures.ThenProjectPiecesShouldBeIncluded({ components: result });
 });
 
-it(`should return ${ClonePiece.PlanningAreaCustom} when resolving for a project with a custom planning area`, async () => {
+it(`resolves ${ClonePiece.PlanningAreaCustom} piece when invoked with a custom planning area project`, async () => {
   const projectId = fixtures.GivenAProjectExportWithCustomPlanningArea();
   const result = await fixtures.WhenRequestingExportPieces(
     projectId,
     ResourceKind.Project,
+    [],
   );
   fixtures.ThenProjectPiecesShouldBeIncluded({
     components: result,
@@ -35,28 +37,34 @@ it(`should return ${ClonePiece.PlanningAreaCustom} when resolving for a project 
   });
 });
 
-it('should return scenario pieces when resolving for a scenario', async () => {
+it('resolves scenario pieces', async () => {
   const scenarioId = fixtures.GivenAScenarioExport();
   const result = await fixtures.WhenRequestingExportPieces(
     scenarioId,
     ResourceKind.Scenario,
+    [],
   );
   fixtures.ThenScenarioPiecesShouldBeIncluded({
     components: result,
   });
 });
 
-it('should return project and scenario pieces when resolving for a project if the project has scenarios', async () => {
-  const scenariosCount = 2;
-  const projectId = fixtures.GivenAProjectExportWithScenarios(scenariosCount);
+it('resolves project and specific scenario pieces when invoked specifying an array of scenarios ids', async () => {
+  const projectScenariosCount = 5;
+  const [projectId, scenariosIds] = fixtures.GivenAProjectExportWithScenarios(
+    projectScenariosCount,
+  );
+  const scenariosToBeExportedCount = 2;
+
   const result = await fixtures.WhenRequestingExportPieces(
     projectId,
     ResourceKind.Project,
+    scenariosIds.slice(0, scenariosToBeExportedCount),
   );
   fixtures.ThenProjectAndScenarioPiecesShouldBeIncluded({
     components: result,
     projectWithCustomPlanningArea: false,
-    scenariosCount,
+    scenariosCount: scenariosToBeExportedCount,
   });
 });
 
@@ -106,33 +114,50 @@ const getFixtures = async () => {
   return {
     GivenAProjectExport: () => {
       const projectId = ResourceId.create();
+      repo.mockProject(projectId.value, {});
 
+      return projectId;
+    },
+    GivenAProjectExportWithARegularPlanningArea: () => {
+      const projectId = ResourceId.create();
       repo.mockProject(projectId.value, {});
 
       return projectId;
     },
     GivenAProjectExportWithCustomPlanningArea: () => {
       const projectId = ResourceId.create();
-
       repo.mockProject(projectId.value, { planningAreaGeometryId: v4() });
 
       return projectId;
     },
-    GivenAProjectExportWithScenarios: (scenariosCount: number) => {
+    GivenAProjectExportWithScenarios: (
+      scenariosCount: number,
+    ): [ResourceId, string[]] => {
       const projectId = ResourceId.create();
-      const scenarios = Array(scenariosCount).fill({ id: v4() });
+      const scenarios: { id: string }[] = Array(scenariosCount)
+        .fill(0)
+        .map(() => ({
+          id: v4(),
+        }));
 
       repo.mockProject(projectId.value, {
         scenarios,
       });
 
-      return projectId;
+      return [projectId, scenarios.map((scenario) => scenario.id)];
     },
     GivenAScenarioExport: () => {
       return ResourceId.create();
     },
-    WhenRequestingExportPieces: (id: ResourceId, kind: ResourceKind) => {
-      return sut.resolveFor(id, kind);
+    WhenRequestingExportPieces: (
+      id: ResourceId,
+      kind: ResourceKind,
+      scenarioIds: string[],
+    ) => {
+      if (kind === ResourceKind.Project)
+        return sut.resolveForProject(id, scenarioIds);
+
+      return sut.resolveForScenario(id, kind);
     },
     ThenProjectPiecesShouldBeIncluded: ({
       components,

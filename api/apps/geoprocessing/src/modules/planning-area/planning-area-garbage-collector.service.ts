@@ -35,7 +35,7 @@ export class PlanningAreaGarbageCollector {
 
       const projectsPuRepo = em.getRepository(ProjectsPuEntity);
       await projectsPuRepo.delete({
-        projectId: In(deletedPlanningAreasIds),
+        planningAreaId: In(deletedPlanningAreasIds),
       });
     });
   }

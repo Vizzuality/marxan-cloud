@@ -5,6 +5,10 @@ import {
   ResourceId,
 } from '@marxan/cloning/domain';
 import { ImportComponentSnapshot } from '../import/import-component.snapshot';
+import {
+  ImportComponentStatus,
+  ImportComponentStatuses,
+} from './import-component-status';
 
 export class ImportComponent {
   private constructor(
@@ -13,7 +17,7 @@ export class ImportComponent {
     readonly resourceId: ResourceId,
     readonly order: number,
     readonly uris: ComponentLocation[],
-    private finished: boolean = false,
+    private status: ImportComponentStatus = ImportComponentStatus.create(),
   ) {}
 
   static fromSnapshot(snapshot: ImportComponentSnapshot) {
@@ -23,7 +27,7 @@ export class ImportComponent {
       new ResourceId(snapshot.resourceId),
       snapshot.order,
       snapshot.uris.map(ComponentLocation.fromSnapshot),
-      snapshot.finished,
+      new ImportComponentStatus(snapshot.status),
     );
   }
 
@@ -43,18 +47,26 @@ export class ImportComponent {
   }
 
   isReady() {
-    return this.finished;
+    return this.status.value === ImportComponentStatuses.Completed;
+  }
+
+  hasFailed() {
+    return this.status.value === ImportComponentStatuses.Failed;
   }
 
   complete() {
-    this.finished = true;
+    this.status.markAsCompleted();
+  }
+
+  markAsFailed() {
+    this.status.markAsFailed();
   }
 
   toSnapshot(): ImportComponentSnapshot {
     return {
       id: this.id.value,
       order: this.order,
-      finished: this.finished,
+      status: this.status.value,
       piece: this.piece,
       resourceId: this.resourceId.value,
       uris: this.uris,

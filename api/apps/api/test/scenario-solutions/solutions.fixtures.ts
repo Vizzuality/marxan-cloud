@@ -10,6 +10,8 @@ import { Repository } from 'typeorm';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { HttpStatus } from '@nestjs/common';
+import { v4 } from 'uuid';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -20,6 +22,10 @@ export const getFixtures = async () => {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
+  const bestSolutionId = v4();
+  const anotherSolutionId = v4();
+  const unexistentScenarioId = v4();
+
   const { projectId, cleanup: cleanupProject } = await GivenProjectExists(
     app,
     ownerToken,
@@ -44,8 +50,9 @@ export const getFixtures = async () => {
 
   return {
     GivenScenarioHasSolutionsReady: async () => {
-      await marxanOutputRepo.save(
+      await marxanOutputRepo.save([
         marxanOutputRepo.create({
+          id: anotherSolutionId,
           scenarioId,
           runId: 1,
           scoreValue: 4000,
@@ -53,8 +60,23 @@ export const getFixtures = async () => {
           missingValues: 1,
           planningUnits: 123,
         }),
-      );
+      ]);
     },
+    GivenScenarioHasBestSolutionReady: async () => {
+      await marxanOutputRepo.save([
+        marxanOutputRepo.create({
+          id: bestSolutionId,
+          scenarioId,
+          runId: 2,
+          scoreValue: 5000,
+          costValue: 1000,
+          missingValues: 1,
+          planningUnits: 123,
+          best: true,
+        }),
+      ]);
+    },
+    GivenScenarioDoesNotHaveBestSolutionReady: async () => {},
     GivenContributorWasAddedToScenario: async () =>
       await userScenariosRepo.save({
         scenarioId: scenarioId,
@@ -68,6 +90,14 @@ export const getFixtures = async () => {
         roleName: scenarioViewerRole,
         userId: viewerUserId,
       }),
+    WhenGettingBestSolutionForAnScenarioThatDoesNotExists: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${unexistentScenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenGettingSolutionsForAnScenarioThatDoesNotExists: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${unexistentScenarioId}/marxan/solutions`)
+        .set('Authorization', `Bearer ${ownerToken}`),
     WhenGettingSolutionsAsOwner: async () =>
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions`)
@@ -80,7 +110,20 @@ export const getFixtures = async () => {
       request(app.getHttpServer())
         .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions`)
         .set('Authorization', `Bearer ${viewerToken}`),
-    ThenSolutionsShouldBeResolved: async (response: request.Response) => {
+    WhenGettingBestSolutionAsOwner: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${ownerToken}`),
+    WhenGettingBestSolutionAsContributor: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${contributorToken}`),
+    WhenGettingBestSolutionAsViewer: async () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/scenarios/${scenarioId}/marxan/solutions/best`)
+        .set('Authorization', `Bearer ${viewerToken}`),
+    ThenSolutionsShouldBeResolved: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.OK);
       expect(response.body.meta).toEqual({
         page: 1,
         size: 25,
@@ -90,12 +133,37 @@ export const getFixtures = async () => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].attributes).toEqual({
         costValue: 2000,
-        id: expect.any(String),
+        id: anotherSolutionId,
         missingValues: 1,
         planningUnits: 123,
         runId: 1,
         scoreValue: 4000,
       });
+    },
+    ThenBestSolutionShouldBeResolved: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.OK);
+      expect(response.body.data.attributes).toEqual({
+        costValue: 1000,
+        id: bestSolutionId,
+        missingValues: 1,
+        planningUnits: 123,
+        runId: 2,
+        scoreValue: 5000,
+      });
+    },
+    ThenBestSolutionNotFoundShouldBeResolved: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].title).toEqual(
+        `Could not find best solution for scenario with ID: ${scenarioId}.`,
+      );
+    },
+    ThenScenarioNotFoundShouldBeResolved: (response: request.Response) => {
+      expect(response.status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].status).toBe(HttpStatus.NOT_FOUND);
+      expect(response.body.errors[0].title).toEqual(
+        `Scenario ${unexistentScenarioId} could not be found.`,
+      );
     },
     cleanup: async () => {
       await marxanOutputRepo.delete({

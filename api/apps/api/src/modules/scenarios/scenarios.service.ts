@@ -104,6 +104,11 @@ import { ScenarioLockResultSingular } from '@marxan-api/modules/access-control/s
 import { ResourceId } from '@marxan/cloning/domain';
 import { GeoJsonDataDTO } from './dto/shapefile.geojson.response.dto';
 import { FeatureCollection } from 'geojson';
+import {
+  unknownPdfWebshotError,
+  WebshotConfig,
+  WebshotService,
+} from '@marxan/webshot';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -114,6 +119,8 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
 
+export const bestSolutionNotFound = Symbol('best solution not found');
+
 export const projectDoesntExist = Symbol(`project doesn't exist`);
 export type ProjectDoesntExist = typeof projectDoesntExist;
 
@@ -123,6 +130,10 @@ export type SubmitProtectedAreaError =
   | typeof scenarioNotFound;
 
 export type GetProtectedAreasError = GetProjectErrors | typeof scenarioNotFound;
+export type GetBestSolutionError =
+  | typeof forbiddenError
+  | typeof scenarioNotFound
+  | typeof bestSolutionNotFound;
 
 export type UpdateProtectedAreasError =
   | ChangeProtectedAreasError
@@ -159,6 +170,7 @@ export class ScenariosService {
     private readonly blmValuesRepository: ScenarioBlmRepo,
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
     private readonly scenarioAclService: ScenarioAccessControl,
+    private readonly webshotService: WebshotService,
   ) {}
 
   async findAllPaginated(
@@ -198,11 +210,16 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      | typeof forbiddenError
+      | typeof lockedByAnotherUser
+      | typeof noLockInPlace
+      | typeof scenarioNotFound,
       void
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -284,11 +301,16 @@ export class ScenariosService {
     input: UpdateScenarioDTO,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      | typeof forbiddenError
+      | typeof lockedByAnotherUser
+      | typeof noLockInPlace
+      | typeof scenarioNotFound,
       Scenario
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
     });
@@ -312,14 +334,16 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      typeof forbiddenError,
+      typeof forbiddenError | typeof scenarioNotFound,
       {
         data: (Partial<ScenarioFeaturesData> | undefined)[];
         metadata: PaginationMeta | undefined;
       }
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -335,8 +359,10 @@ export class ScenariosService {
   async getInputParameterFile(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, string>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<Either<typeof forbiddenError | typeof scenarioNotFound, string>> {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -351,11 +377,16 @@ export class ScenariosService {
     input: UpdateScenarioPlanningUnitLockStatusDto,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
       void
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -404,11 +435,16 @@ export class ScenariosService {
     file: Express.Multer.File,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
       GeoJsonDataDTO
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -448,32 +484,27 @@ export class ScenariosService {
     return right(geoJson);
   }
 
-  async findScenarioResults(
-    scenarioId: string,
-    fetchSpecification: FetchSpecification,
-  ) {
-    await this.assertScenario(scenarioId);
-    return this.solutionsCrudService.findAll(fetchSpecification);
-  }
-
   async getCostSurfaceCsv(
     scenarioId: string,
     userId: string,
     stream: stream.Writable,
-  ): Promise<Either<typeof forbiddenError, void>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<Either<typeof forbiddenError | typeof scenarioNotFound, void>> {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
     await this.inputFilesService.readCostSurface(scenarioId, stream);
+
     return right(void 0);
   }
 
   async getSpecDatCsv(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, string>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<Either<typeof forbiddenError | typeof scenarioNotFound, string>> {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -483,8 +514,9 @@ export class ScenariosService {
   async getBoundDatCsv(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, string>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<Either<typeof forbiddenError | typeof scenarioNotFound, string>> {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -497,11 +529,20 @@ export class ScenariosService {
     blm?: number,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      | GetScenarioFailure
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
       void
     >
   > {
-    const scenario = await this.assertScenario(scenarioId);
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenario)) return scenario;
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -510,7 +551,7 @@ export class ScenariosService {
       return userCanEditScenario;
     }
     await this.runService.run(
-      pick(scenario, 'id', 'boundaryLengthModifier'),
+      pick(scenario.right, 'id', 'boundaryLengthModifier'),
       blm,
     );
     return right(void 0);
@@ -599,11 +640,16 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
       void
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -620,11 +666,16 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof noLockInPlace | typeof lockedByAnotherUser,
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
       void
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -648,12 +699,15 @@ export class ScenariosService {
   async requestExport(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, string>> {
-    const scenario = await this.assertScenario(scenarioId);
+  ): Promise<Either<typeof forbiddenError | GetScenarioFailure, string>> {
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+    if (isLeft(scenario)) return scenario;
     await this.blockGuard.ensureThatScenarioIsNotBlocked(scenarioId);
     const userCanCloneScenario = await this.scenarioAclService.canCloneScenario(
       userId,
-      scenario.projectId,
+      scenario.right.projectId,
     );
 
     if (!userCanCloneScenario) {
@@ -662,7 +716,7 @@ export class ScenariosService {
 
     const result = await this.commandBus.execute(
       new ExportScenario(
-        new ResourceId(scenario.projectId),
+        new ResourceId(scenario.right.projectId),
         new ResourceId(scenarioId),
       ),
     );
@@ -670,17 +724,20 @@ export class ScenariosService {
     return right(result.value);
   }
 
-  private async assertScenario(scenarioId: string) {
-    return await this.crudService.getById(scenarioId);
-  }
-
   async getOneSolution(
     scenarioId: string,
     runId: string,
     userId: string,
     _fetchSpecification: FetchSpecification,
-  ): Promise<Either<typeof forbiddenError, ScenariosOutputResultsApiEntity>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<
+    Either<
+      typeof scenarioNotFound | typeof forbiddenError,
+      ScenariosOutputResultsApiEntity
+    >
+  > {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     // TODO runId is part of scenarioId
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
@@ -693,20 +750,21 @@ export class ScenariosService {
     userId: string,
     fetchSpecification: FetchSpecification,
   ): Promise<
-    Either<typeof forbiddenError, Partial<ScenariosOutputResultsApiEntity>[]>
+    Either<GetBestSolutionError, Partial<ScenariosOutputResultsApiEntity>>
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
-    return right(
-      await this.solutionsCrudService
-        .findAll({
-          ...fetchSpecification,
-          filter: { ...fetchSpecification.filter, best: true, scenarioId },
-        })
-        .then((results) => results[0]),
-    );
+    const [solutions] = await this.solutionsCrudService.findAll({
+      ...fetchSpecification,
+      filter: { ...fetchSpecification.filter, best: true, scenarioId },
+    });
+    if (!solutions.length) return left(bestSolutionNotFound);
+
+    return right(solutions[0]);
   }
 
   async getMostDifferentSolutions(
@@ -715,11 +773,13 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ): Promise<
     Either<
-      typeof forbiddenError,
+      typeof forbiddenError | typeof scenarioNotFound,
       [Partial<ScenariosOutputResultsApiEntity>[], number]
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -741,14 +801,16 @@ export class ScenariosService {
     fetchSpecification: FetchSpecification,
   ): Promise<
     Either<
-      typeof forbiddenError,
+      typeof forbiddenError | typeof scenarioNotFound,
       {
         data: (Partial<ScenariosOutputResultsApiEntity> | undefined)[];
         metadata: PaginationMeta | undefined;
       }
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -786,6 +848,21 @@ export class ScenariosService {
     return withValidatedMetadata;
   }
 
+  private async givenScenarioExists(scenarioId: string): Promise<boolean> {
+    try {
+      await this.crudService.getById(scenarioId);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  private async givenScenarioDoesNotExist(
+    scenarioId: string,
+  ): Promise<boolean> {
+    return !(await this.givenScenarioExists(scenarioId));
+  }
+
   /**
    * Get geofeatures specification for a scenario. This is part of the scenario
    * itself, but exposed via a separate endpoint.
@@ -793,12 +870,15 @@ export class ScenariosService {
   async getFeatureSetForScenario(
     scenarioId: string,
     userInfo: AppInfoDTO,
-  ): Promise<GeoFeatureSetSpecification | typeof forbiddenError | undefined> {
-    const scenario = await this.getById(scenarioId, userInfo);
-    if (isLeft(scenario)) {
-      return forbiddenError;
-    }
-    assertDefined(scenario.right);
+  ): Promise<
+    | GeoFeatureSetSpecification
+    | typeof forbiddenError
+    | typeof scenarioNotFound
+    | undefined
+  > {
+    const scenarioResult = await this.getById(scenarioId, userInfo);
+    if (isLeft(scenarioResult)) return scenarioNotFound;
+
     return await this.crudService
       .getById(scenarioId)
       .then((result) => {
@@ -808,7 +888,7 @@ export class ScenariosService {
         result
           ? this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
               result,
-              scenario.right,
+              scenarioResult.right,
             )
           : EmptyGeoFeaturesSpecification,
       )
@@ -818,8 +898,15 @@ export class ScenariosService {
   async getMarxanExecutionOutputArchive(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError | OutputZipFailure, Buffer>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof scenarioNotFound | OutputZipFailure,
+      Buffer
+    >
+  > {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -829,8 +916,9 @@ export class ScenariosService {
   async getPuvsprDatCsv(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, string>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<Either<typeof forbiddenError | typeof scenarioNotFound, string>> {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -840,8 +928,14 @@ export class ScenariosService {
   async getMarxanExecutionInputArchive(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError | InputZipFailure, Buffer>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof scenarioNotFound | InputZipFailure,
+      Buffer
+    >
+  > {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
@@ -851,8 +945,14 @@ export class ScenariosService {
   async getPlanningUnits(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError, ScenariosPlanningUnitGeoEntity[]>> {
-    await this.assertScenario(scenarioId);
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof scenarioNotFound,
+      ScenariosPlanningUnitGeoEntity[]
+    >
+  > {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
 
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
@@ -867,14 +967,20 @@ export class ScenariosService {
     dto: CreateGeoFeatureSetDTO,
   ): Promise<
     Either<
+      | GetScenarioFailure
       | typeof forbiddenError
       | typeof internalError
       | typeof lockedByAnotherUser
+      | typeof scenarioNotFound
       | typeof noLockInPlace,
       any
     >
   > {
-    const scenario = await this.assertScenario(scenarioId);
+    const scenarioResult = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+    if (isLeft(scenarioResult)) return scenarioResult;
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -885,7 +991,7 @@ export class ScenariosService {
 
     return await this.specificationService.submit(
       scenarioId,
-      scenario.projectId,
+      scenarioResult.right.projectId,
       dto,
     );
   }
@@ -895,17 +1001,24 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      LastUpdatedSpecificationError | typeof forbiddenError,
+      | GetScenarioFailure
+      | LastUpdatedSpecificationError
+      | typeof forbiddenError
+      | typeof scenarioNotFound,
       CreateGeoFeatureSetDTO
     >
   > {
-    const scenario = await this.assertScenario(scenarioId);
+    const scenarioResult = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+    if (isLeft(scenarioResult)) return scenarioResult;
     if (!(await this.scenarioAclService.canViewScenario(userId, scenarioId))) {
       return left(forbiddenError);
     }
+
     return await this.specificationService.getLastUpdatedFor(
       scenarioId,
-      scenario.projectId,
+      scenarioResult.right.projectId,
     );
   }
 
@@ -924,11 +1037,16 @@ export class ScenariosService {
     userId: string,
   ): Promise<
     Either<
-      typeof forbiddenError | typeof lockedByAnotherUser | typeof noLockInPlace,
+      | typeof forbiddenError
+      | typeof lockedByAnotherUser
+      | typeof noLockInPlace
+      | typeof scenarioNotFound,
       void
     >
   > {
-    await this.assertScenario(scenarioId);
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,
       scenarioId,
@@ -947,6 +1065,7 @@ export class ScenariosService {
     dto: UploadShapefileDto,
   ): Promise<
     Either<
+      | GetScenarioFailure
       | SubmitProtectedAreaError
       | typeof forbiddenError
       | typeof noLockInPlace
@@ -954,38 +1073,36 @@ export class ScenariosService {
       true
     >
   > {
-    try {
-      const scenario = await this.assertScenario(scenarioId);
-      assertDefined(info.authenticatedUser);
-      const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
-        info.authenticatedUser.id,
-        scenarioId,
-      );
-      if (isLeft(userCanEditScenario)) {
-        return userCanEditScenario;
-      }
-      const projectResponse = await this.queryBus.execute(
-        new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
-      );
-      if (isLeft(projectResponse)) {
-        return projectResponse;
-      }
+    const scenario = await this.getById(scenarioId, info);
+    if (isLeft(scenario)) return scenario;
 
-      const submission = await this.protectedArea.addShapeFor(
-        projectResponse.right.id,
-        scenarioId,
-        file,
-        dto.name,
-      );
-
-      if (isLeft(submission)) {
-        return submission;
-      }
-
-      return right(true);
-    } catch {
-      return left(scenarioNotFound);
+    assertDefined(info.authenticatedUser);
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      info.authenticatedUser.id,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
     }
+    const projectResponse = await this.queryBus.execute(
+      new GetProjectQuery(scenario.right.projectId, info.authenticatedUser?.id),
+    );
+    if (isLeft(projectResponse)) {
+      return projectResponse;
+    }
+
+    const submission = await this.protectedArea.addShapeFor(
+      projectResponse.right.id,
+      scenarioId,
+      file,
+      dto.name,
+    );
+
+    if (isLeft(submission)) {
+      return submission;
+    }
+
+    return right(true);
   }
 
   async getProtectedAreasFor(
@@ -993,40 +1110,37 @@ export class ScenariosService {
     info: AppInfoDTO,
   ): Promise<
     Either<
-      GetProtectedAreasError | typeof forbiddenError,
+      GetScenarioFailure | GetProtectedAreasError | typeof forbiddenError,
       ScenarioProtectedArea[]
     >
   > {
-    try {
-      const scenario = await this.assertScenario(scenarioId);
-      assertDefined(info.authenticatedUser);
-      if (
-        !(await this.scenarioAclService.canViewScenario(
-          info.authenticatedUser?.id,
-          scenarioId,
-        ))
-      ) {
-        return left(forbiddenError);
-      }
-      const projectResponse = await this.queryBus.execute(
-        new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
-      );
-      if (isLeft(projectResponse)) {
-        return projectResponse;
-      }
-
-      const areas = await this.protectedArea.getFor(
-        {
-          id: scenarioId,
-          protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
-        },
-        projectResponse.right,
-      );
-
-      return right(areas);
-    } catch {
-      return left(scenarioNotFound);
+    const scenario = await this.getById(scenarioId, info);
+    if (isLeft(scenario)) return scenario;
+    assertDefined(info.authenticatedUser);
+    if (
+      !(await this.scenarioAclService.canViewScenario(
+        info.authenticatedUser?.id,
+        scenarioId,
+      ))
+    ) {
+      return left(forbiddenError);
     }
+    const projectResponse = await this.queryBus.execute(
+      new GetProjectQuery(scenario.right.projectId, info.authenticatedUser?.id),
+    );
+    if (isLeft(projectResponse)) {
+      return projectResponse;
+    }
+
+    const areas = await this.protectedArea.getFor(
+      {
+        id: scenarioId,
+        protectedAreaIds: scenario.right.protectedAreaFilterByIds ?? [],
+      },
+      projectResponse.right,
+    );
+
+    return right(areas);
   }
 
   async updateProtectedAreasFor(
@@ -1035,6 +1149,7 @@ export class ScenariosService {
     info: AppInfoDTO,
   ): Promise<
     Either<
+      | GetScenarioFailure
       | UpdateProtectedAreasError
       | typeof forbiddenError
       | typeof noLockInPlace
@@ -1042,7 +1157,9 @@ export class ScenariosService {
       true
     >
   > {
-    const scenario = await this.assertScenario(scenarioId);
+    const scenarioResult = await this.getById(scenarioId, info);
+    if (isLeft(scenarioResult)) return scenarioResult;
+
     assertDefined(info.authenticatedUser);
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       info.authenticatedUser?.id,
@@ -1052,7 +1169,10 @@ export class ScenariosService {
       return userCanEditScenario;
     }
     const projectResponse = await this.queryBus.execute(
-      new GetProjectQuery(scenario.projectId, info.authenticatedUser?.id),
+      new GetProjectQuery(
+        scenarioResult.right.projectId,
+        info.authenticatedUser?.id,
+      ),
     );
 
     if (isLeft(projectResponse)) {
@@ -1062,7 +1182,7 @@ export class ScenariosService {
     const result = await this.protectedArea.selectFor(
       {
         id: scenarioId,
-        protectedAreaIds: scenario.protectedAreaFilterByIds ?? [],
+        protectedAreaIds: scenarioResult.right.protectedAreaFilterByIds ?? [],
         threshold: dto.threshold,
       },
       projectResponse.right,
@@ -1110,5 +1230,37 @@ export class ScenariosService {
     >
   > {
     return await this.scenarioAclService.findLock(userId, scenarioId);
+  }
+
+  async getSummaryReportFor(
+    scenarioId: string,
+    userId: string,
+    configForWebshot: WebshotConfig,
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | GetScenarioFailure
+      | typeof unknownPdfWebshotError,
+      stream.Readable
+    >
+  > {
+    const scenario = await this.getById(scenarioId, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenario)) {
+      return scenario;
+    }
+
+    /** @debt Refactor to use @nestjs/common's StreamableFile
+     (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+     after upgrading NestJS to v8. **/
+    const pdfStream = await this.webshotService.getSummaryReportForScenario(
+      scenarioId,
+      scenario.right.projectId,
+      configForWebshot,
+    );
+
+    return pdfStream;
   }
 }

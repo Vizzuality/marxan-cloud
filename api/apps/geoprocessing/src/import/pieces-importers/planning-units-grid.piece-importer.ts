@@ -43,7 +43,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, importResourceId, piece } = input;
+    const { uris, pieceResourceId, projectId, piece } = input;
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
       this.logger.error(errorMessage);
@@ -55,7 +55,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
       planningAreaCustomGridLocation.uri,
     );
     if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${importResourceId} is not available at ${planningAreaCustomGridLocation.uri}`;
+      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaCustomGridLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -65,7 +65,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
         this.processGridFile(
           readableOrError.right,
           planningAreaCustomGridLocation,
-          importResourceId,
+          projectId,
           transactionalEntityManager,
         ),
     );
@@ -73,8 +73,8 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     return {
       importId: input.importId,
       componentId: input.componentId,
-      importResourceId,
-      componentResourceId: input.componentResourceId,
+      pieceResourceId,
+      projectId,
       piece: input.piece,
     };
   }

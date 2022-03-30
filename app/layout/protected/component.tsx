@@ -1,8 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 
-import { useRouter } from 'next/router';
-
-import { useSession } from 'next-auth/client';
+import { useSession, signOut } from 'next-auth/client';
 
 import { useMe } from 'hooks/me';
 
@@ -18,7 +16,6 @@ interface ProtectedProps {
 }
 
 const Protected: React.FC = ({ children }: ProtectedProps) => {
-  const router = useRouter();
   const { user } = useMe();
   const [session, loading] = useSession();
   const [modal, setModal] = useState(false);
@@ -30,14 +27,14 @@ const Protected: React.FC = ({ children }: ProtectedProps) => {
     if (!helpUser) {
       setModal(true);
     }
-  }, [user]);
+  }, [user, session]);
 
   // Not display anything when session request is on progress
   if (loading) return null;
 
   // Redirect when session doesn't exist
-  if (!loading && !session) {
-    router.push(`/auth/sign-in?callbackUrl=${window.location.origin}${router.asPath}`);
+  if (!loading && (!session || !user?.id)) {
+    signOut();
     return null;
   }
 

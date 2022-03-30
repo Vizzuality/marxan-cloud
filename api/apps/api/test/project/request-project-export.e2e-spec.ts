@@ -198,11 +198,13 @@ export const getFixtures = async () => {
     WhenUnrelatedUserRequestAnExport: () =>
       request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${unrelatedUserToken}`),
+        .set('Authorization', `Bearer ${unrelatedUserToken}`)
+        .send({ scenarioIds: [] }),
     WhenOwnerUserRequestAnExport: () =>
       request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${ownerToken}`),
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send({ scenarioIds: [] }),
     WhenContributorUserRequestAnExport: async () => {
       await userProjectsRepo.save({
         projectId,
@@ -212,7 +214,8 @@ export const getFixtures = async () => {
 
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${contributorToken}`);
+        .set('Authorization', `Bearer ${contributorToken}`)
+        .send({ scenarioIds: [] });
     },
     WhenViewerUserRequestAnExport: async () => {
       await userProjectsRepo.save({
@@ -223,7 +226,8 @@ export const getFixtures = async () => {
 
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/export`)
-        .set('Authorization', `Bearer ${viewerToken}`);
+        .set('Authorization', `Bearer ${viewerToken}`)
+        .send({ scenarioIds: [] });
     },
     ThenExportIsLaunched: (response: request.Response) => {
       expect(response.status).toBe(201);

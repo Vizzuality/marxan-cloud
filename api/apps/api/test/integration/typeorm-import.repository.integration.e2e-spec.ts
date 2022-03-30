@@ -19,6 +19,7 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { apiConnections } from '../../src/ormconfig';
+import { ImportComponentStatuses } from '../../src/modules/clone/import/domain/import/import-component-status';
 
 describe('Typeorm import repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -62,7 +63,7 @@ describe('Typeorm import repository', () => {
 
 const getFixtures = async () => {
   let importId: ImportId;
-  let resourceId: ResourceId;
+  let importResourceId: ResourceId;
   let componentId: ComponentId;
   let archiveLocation: ArchiveLocation;
 
@@ -86,20 +87,22 @@ const getFixtures = async () => {
       await testingModule.close();
     },
     GivenImportWasRequested: async () => {
-      resourceId = ResourceId.create();
+      importResourceId = ResourceId.create();
+      const projectId = importResourceId;
       componentId = ComponentId.create();
       archiveLocation = new ArchiveLocation('/tmp/file.zip');
 
       const importInstance = Import.newOne(
-        resourceId,
+        importResourceId,
         ResourceKind.Project,
+        projectId,
         archiveLocation,
         [
           ImportComponent.fromSnapshot({
             order: 0,
-            finished: false,
+            status: ImportComponentStatuses.Submitted,
             piece: ClonePiece.ProjectMetadata,
-            resourceId: resourceId.value,
+            resourceId: importResourceId.value,
             id: componentId.value,
             uris: [
               new ComponentLocation('/tmp/file.zip', 'project-metadata.json'),
@@ -111,16 +114,17 @@ const getFixtures = async () => {
       await repo.save(importInstance);
     },
     GivenImportWithMultipleComponentsWasRequested: async () => {
-      resourceId = ResourceId.create();
+      importResourceId = ResourceId.create();
+      const projectId = importResourceId;
 
       archiveLocation = new ArchiveLocation('/tmp/file.zip');
 
       const components = Array(10).map(() =>
         ImportComponent.fromSnapshot({
           order: 0,
-          finished: false,
+          status: ImportComponentStatuses.Submitted,
           piece: ClonePiece.ProjectMetadata,
-          resourceId: resourceId.value,
+          resourceId: importResourceId.value,
           id: ComponentId.create().value,
           uris: [
             new ComponentLocation('/tmp/file.zip', `project-metadata.json`),
@@ -129,8 +133,9 @@ const getFixtures = async () => {
       );
 
       const importInstance = Import.newOne(
-        resourceId,
+        importResourceId,
         ResourceKind.Project,
+        projectId,
         archiveLocation,
         components,
       );
@@ -173,15 +178,19 @@ const getFixtures = async () => {
       const importSnapshot = importData!.toSnapshot();
       expect(importSnapshot.id).toBe(importId.value);
       expect(importSnapshot.resourceKind).toBe(ResourceKind.Project);
-      expect(importSnapshot.resourceId).toBe(resourceId.value);
+      expect(importSnapshot.resourceId).toBe(importResourceId.value);
 
       expect(importSnapshot.importPieces).toHaveLength(1);
 
       const [importComponent] = importSnapshot.importPieces;
 
-      expect(importComponent.finished).toBe(componentsAreCompleted);
+      expect(importComponent.status).toBe(
+        componentsAreCompleted
+          ? ImportComponentStatuses.Completed
+          : ImportComponentStatuses.Submitted,
+      );
       expect(importComponent.piece).toBe(ClonePiece.ProjectMetadata);
-      expect(importComponent.resourceId).toBe(resourceId.value);
+      expect(importComponent.resourceId).toBe(importResourceId.value);
     },
     ThenAllImportComponentsShouldBeFinished: ({
       importData,
@@ -190,7 +199,11 @@ const getFixtures = async () => {
     }) => {
       expect(importData).toBeDefined();
       expect(
-        importData!.toSnapshot().importPieces.every((piece) => piece.finished),
+        importData!
+          .toSnapshot()
+          .importPieces.every(
+            (piece) => piece.status === ImportComponentStatuses.Completed,
+          ),
       ).toEqual(true);
     },
   };

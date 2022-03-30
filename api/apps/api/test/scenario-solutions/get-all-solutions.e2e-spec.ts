@@ -1,5 +1,5 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { getFixtures } from './get-all-solutions.fixtures';
+import { getFixtures } from './solutions.fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -14,6 +14,12 @@ describe(`When getting scenario solution results`, () => {
 
   afterAll(async () => {
     await fixtures?.cleanup();
+  });
+
+  it(`should return the correct response when the given scenario id does not exists`, async () => {
+    const response = await fixtures.WhenGettingSolutionsForAnScenarioThatDoesNotExists();
+
+    fixtures.ThenScenarioNotFoundShouldBeResolved(response);
   });
 
   it(`should resolve solutions as owner`, async () => {

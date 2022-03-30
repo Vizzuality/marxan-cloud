@@ -21,14 +21,14 @@ export class PlanningAreaGridTilesService {
    */
   public findTile(tileSpecification: TileSpecification): Promise<Buffer> {
     const { z, x, y, planningAreaId } = tileSpecification;
-    const attributes = 'project_id as planningAreaId';
+    const attributes = 'planning_area_id as planningAreaId';
 
     const qb = this.repository
       .createQueryBuilder('pug')
-      .select('ppu.project_id', 'project_id')
+      .select('ppu.planning_area_id', 'planning_area_id')
       .addSelect('pug.the_geom', 'the_geom')
       .innerJoin('projects_pu', 'ppu', 'pug.id = ppu.geom_id')
-      .where(`ppu.project_id = '${planningAreaId}'`);
+      .where(`ppu.planning_area_id = '${planningAreaId}'`);
     const table = `(${qb.getSql()})`;
     return this.tileService.getTile({
       z,

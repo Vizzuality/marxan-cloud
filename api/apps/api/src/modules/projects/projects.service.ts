@@ -313,6 +313,7 @@ export class ProjectsService {
   async requestExport(
     projectId: string,
     userId: string,
+    scenarioIds: string[],
   ): Promise<Either<typeof forbiddenError | typeof projectNotFound, string>> {
     await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
@@ -324,7 +325,7 @@ export class ProjectsService {
     if (!canExportProject) return left(forbiddenError);
 
     const exportId = await this.commandBus.execute(
-      new ExportProject(new ResourceId(projectId)),
+      new ExportProject(new ResourceId(projectId), scenarioIds),
     );
     return right(exportId.value);
   }

@@ -1,19 +1,19 @@
+import { Logger } from '@nestjs/common';
 import {
+  CommandBus,
   CommandHandler,
-  EventBus,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { isLeft } from 'fp-ts/lib/Either';
+import { MarkImportAsFailed } from '../../infra/import/mark-import-as-failed.command';
 import {
   componentAlreadyCompleted,
   componentNotFound,
-  Import,
+  ImportId,
 } from '../domain';
 import { CompleteImportPiece } from './complete-import-piece.command';
-import { ImportPieceFailed } from './import-piece-failed.event';
 import { ImportRepository } from './import.repository.port';
-import { Logger } from '@nestjs/common';
 
 @CommandHandler(CompleteImportPiece)
 export class CompleteImportPieceHandler
@@ -21,51 +21,65 @@ export class CompleteImportPieceHandler
   constructor(
     private readonly importRepository: ImportRepository,
     private readonly eventPublisher: EventPublisher,
-    private readonly eventBus: EventBus,
+    private readonly commandBus: CommandBus,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(CompleteImportPieceHandler.name);
   }
 
+  private async markImportAsFailed(
+    importId: ImportId,
+    reason: string,
+  ): Promise<void> {
+    this.logger.error(reason);
+    await this.commandBus.execute(new MarkImportAsFailed(importId, reason));
+  }
+
   async execute({ importId, componentId }: CompleteImportPiece): Promise<void> {
-    const aggregate = await this.importRepository
-      .transaction(async (repo) => {
-        const importInstance = await repo.find(importId);
+    const aggregate = await this.importRepository.transaction(async (repo) => {
+      const importInstance = await repo.find(importId);
 
-        if (!importInstance) {
-          throw new Error(
-            `${CompleteImportPieceHandler.name} could not find import ${importId.value} to complete piece: ${componentId.value}`,
-          );
-        }
-
-        const importAggregate = this.eventPublisher.mergeObjectContext(
-          importInstance,
+      if (!importInstance) {
+        await this.markImportAsFailed(
+          importId,
+          `Could not find import ${importId.value} to complete piece: ${componentId.value}`,
         );
+        return;
+      }
 
-        const result = importAggregate.completePiece(componentId);
+      const importAggregate = this.eventPublisher.mergeObjectContext(
+        importInstance,
+      );
 
-        if (isLeft(result)) {
-          switch (result.left) {
-            case componentNotFound:
-              throw new Error(
-                `Could not find piece with ID: ${componentId} for import with ID: ${importId}`,
-              );
-            case componentAlreadyCompleted:
-              this.logger.error(
-                `Component with id ${componentId} was already completed`,
-              );
-              return;
-          }
+      const result = importAggregate.completePiece(componentId);
+
+      if (isLeft(result)) {
+        switch (result.left) {
+          case componentNotFound:
+            await this.markImportAsFailed(
+              importId,
+              `Could not find piece with ID: ${componentId} for import with ID: ${importId}`,
+            );
+          case componentAlreadyCompleted:
+            this.logger.warn(
+              `Component with id ${componentId} was already completed`,
+            );
+          default:
+            return;
         }
+      }
 
-        await repo.save(importAggregate);
+      const saveResult = await repo.save(importAggregate);
+      if (isLeft(saveResult)) {
+        await this.markImportAsFailed(
+          importId,
+          `Could not save import with ID: ${importId}`,
+        );
+        return;
+      }
 
-        return importAggregate;
-      })
-      .catch((err) => {
-        this.logger.error(err);
-        this.eventBus.publish(new ImportPieceFailed(importId, componentId));
-      });
+      return importAggregate;
+    });
 
     if (aggregate) aggregate.commit();
   }

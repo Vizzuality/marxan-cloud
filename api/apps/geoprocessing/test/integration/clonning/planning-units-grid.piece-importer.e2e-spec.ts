@@ -192,9 +192,9 @@ const getFixtures = async () => {
       );
       return {
         componentId: v4(),
-        componentResourceId: v4(),
+        pieceResourceId: v4(),
         importId: v4(),
-        importResourceId: projectId,
+        projectId,
         piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
@@ -203,9 +203,9 @@ const getFixtures = async () => {
     GivenJobInputWithoutUris: (): ImportJobInput => {
       return {
         componentId: v4(),
-        componentResourceId: v4(),
+        pieceResourceId: v4(),
         importId: v4(),
-        importResourceId: projectId,
+        projectId,
         piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [],
@@ -234,7 +234,7 @@ const getFixtures = async () => {
           const pus = await projectsPuRepo.find({
             relations: ['puGeom'],
             where: {
-              projectId: result.importResourceId,
+              projectId: result.projectId,
             },
           });
           expect(pus).toHaveLength(4);

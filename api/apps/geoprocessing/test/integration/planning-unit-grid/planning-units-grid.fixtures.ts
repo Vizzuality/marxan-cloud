@@ -79,7 +79,7 @@ export const getFixtures = async () => {
                    select pug.the_geom
                    from planning_units_geom pug inner join projects_pu ppu on pug.id = ppu.geom_id
                    where type = 'from_shapefile'
-                     and ppu.project_id = $1
+                     and ppu.planning_area_id = $1
                  ) as t(geom)
           `,
           [output.id],

@@ -337,7 +337,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
         const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
         const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
-        let lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user.id);
+        let lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user?.id);
         if (lock) {
           const userLock = projectUsersData.find((pu) => pu?.user?.id === lock.userId);
 
@@ -385,7 +385,9 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       ...query,
       data: filteredData,
     };
-  }, [query, pages, filters, push, user.id, statusScenarios, scenariosLocksData, projectUsersData]);
+  }, [
+    query, pages, filters, push, user?.id, statusScenarios, scenariosLocksData, projectUsersData,
+  ]);
 }
 
 export function useScenario(id) {

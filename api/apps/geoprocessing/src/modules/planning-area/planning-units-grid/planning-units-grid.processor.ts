@@ -37,7 +37,7 @@ export class PlanningUnitsGridProcessor {
         const geometries: { id: string }[] = await manager.query(
           `
             INSERT INTO "planning_units_geom"("the_geom", "type")
-            SELECT 
+            SELECT
               ST_SetSRID(ST_GeomFromGeoJSON(features ->> 'geometry'), 4326)::geometry,
               $2::planning_unit_grid_shape
             FROM (SELECT json_array_elements($1::json -> 'features') AS features) AS f
@@ -54,7 +54,7 @@ export class PlanningUnitsGridProcessor {
             geomId: id,
             geomType: PlanningUnitGridShape.FromShapefile,
             puid: index + 1,
-            projectId: planningAreaId,
+            planningAreaId: planningAreaId,
           })),
         );
 
@@ -70,7 +70,7 @@ export class PlanningUnitsGridProcessor {
                     (SELECT ST_MULTI(ST_UNION(the_geom))
                      FROM "planning_units_geom" pug
                       INNER JOIN "projects_pu" ppu on pug.id = ppu.geom_id
-                     WHERE ppu.project_id = $1))
+                     WHERE ppu.planning_area_id = $1))
             RETURNING "id", "bbox"
           `,
           [planningAreaId],

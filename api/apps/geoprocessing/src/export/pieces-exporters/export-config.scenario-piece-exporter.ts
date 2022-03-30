@@ -34,19 +34,22 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const scenarioId = input.resourceId;
     const [scenario]: {
       name: string;
       project_id: string;
       description: string;
-    }[] = await this.entityManager.query(
-      `
-       SELECT name, project_id, description FROM scenarios where id = $1
-    `,
-      [input.resourceId],
-    );
+    }[] = await this.entityManager
+      .createQueryBuilder()
+      .select('name')
+      .addSelect('project_id')
+      .addSelect('description')
+      .from('scenarios', 's')
+      .where('id = :scenarioId', { scenarioId })
+      .execute();
 
     if (!scenario) {
-      const errorMessage = `Scenario with ID ${input.resourceId} not found`;
+      const errorMessage = `Scenario with ID ${scenarioId} not found`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -57,7 +60,7 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
       description: scenario.description,
       projectId: scenario.project_id,
       resourceKind: input.resourceKind,
-      resourceId: input.resourceId,
+      resourceId: scenarioId,
       pieces: input.allPieces.map((elem) => elem.piece),
     };
 

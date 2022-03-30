@@ -1,4 +1,8 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
@@ -7,17 +11,11 @@ import { FileRepository } from '@marxan/files-repository';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
-import { BBox } from 'geojson';
 import { EntityManager } from 'typeorm';
 import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
-
-type ProjectSelectResult = {
-  id: string;
-  bbox: BBox;
-};
 
 @Injectable()
 @PieceExportProvider()
@@ -37,21 +35,13 @@ export class PlanningUnitsGridPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
-    const [project]: [ProjectSelectResult] = await this.apiEntityManager.query(
-      `
-        SELECT id, bbox
-        FROM projects
-        WHERE id = $1
-      `,
-      [input.resourceId],
-    );
-
+    const projectId = input.resourceId;
     const qb = this.geoprocessingEntityManager.createQueryBuilder();
     const gridStream = await qb
       .select('ST_AsEWKB(the_geom) as ewkb, ppu.puid as puid')
-      .from('planning_units_geom', 'pug')
-      .innerJoin('projects_pu', 'ppu', 'pug.id = ppu.geom_id')
-      .where('ppu.project_id = :projectId', { projectId: project.id })
+      .from(PlanningUnitsGeom, 'pug')
+      .innerJoin(ProjectsPuEntity, 'ppu', 'pug.id = ppu.geom_id')
+      .where('ppu.project_id = :projectId', { projectId })
       .stream();
 
     const gridFileTransform = new PlanningUnitsGridTransform();

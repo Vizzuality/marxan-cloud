@@ -2,23 +2,16 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import {
-  CommandBus,
-  CommandHandler,
-  CqrsModule,
-  EventBus,
-  ICommand,
-  IEvent,
-} from '@nestjs/cqrs';
+import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
 import { CreateApiEventDTO } from '../../../api-events/dto/create.api-event.dto';
 import { QueueModule } from '../../../queue';
 import { EventData, EventFactory } from '../../../queue-api-events';
 import { CompleteImportPiece } from '../../import/application/complete-import-piece.command';
-import { ImportPieceFailed } from '../../import/application/import-piece-failed.event';
 import { ImportPieceEventsHandler } from './import-piece.events-handler';
 import { importPieceEventsFactoryToken } from './import-queue.provider';
+import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -35,13 +28,13 @@ it('should create a completed api event and send a CompleteImportPiece command w
   fixtures.ThenACompleteImportPieceCommandShouldBeSent();
 });
 
-it('should create a failed api event and publish a ImportPieceFailed event when a job fails', async () => {
+it('should create a failed api event and send a MarkImportPieceAsFailed command when a job fails', async () => {
   const jobInput = fixtures.GivenImportPieceJob();
 
   await fixtures.WhenJobFails(jobInput);
 
   fixtures.ThenAImportPieceFailedApiEventShouldBeCreated();
-  fixtures.ThenAImportPieceFailedEventShouldBePublished();
+  fixtures.ThenAMarkImportPieceAsFailedCommandShouldBeSent();
 });
 
 const getFixtures = async () => {
@@ -61,16 +54,13 @@ const getFixtures = async () => {
         },
       },
       FakeCompleteImportPieceHandler,
+      FakeMarkImportPieceAsFailedHandler,
     ],
   }).compile();
   await sandbox.init();
 
-  const events: IEvent[] = [];
   const commands: ICommand[] = [];
 
-  sandbox.get(EventBus).subscribe((event) => {
-    events.push(event);
-  });
   sandbox.get(CommandBus).subscribe((command) => {
     commands.push(command);
   });
@@ -93,8 +83,8 @@ const getFixtures = async () => {
         componentId: v4(),
         importId: v4(),
         piece: ClonePiece.ProjectMetadata,
-        componentResourceId: v4(),
-        importResourceId: v4(),
+        pieceResourceId: v4(),
+        projectId: v4(),
         resourceKind: ResourceKind.Project,
         uris: [],
       };
@@ -132,10 +122,12 @@ const getFixtures = async () => {
       const [completePieceCommand] = commands;
       expect(completePieceCommand).toBeInstanceOf(CompleteImportPiece);
     },
-    ThenAImportPieceFailedEventShouldBePublished: () => {
-      expect(events).toHaveLength(1);
-      const [importPieceFailedEvent] = events;
-      expect(importPieceFailedEvent).toBeInstanceOf(ImportPieceFailed);
+    ThenAMarkImportPieceAsFailedCommandShouldBeSent: () => {
+      expect(commands).toHaveLength(1);
+      const [markImportPieceAsFailedCommand] = commands;
+      expect(markImportPieceAsFailedCommand).toBeInstanceOf(
+        MarkImportPieceAsFailed,
+      );
     },
   };
 };
@@ -173,5 +165,10 @@ class FakeQueueEvents {
 
 @CommandHandler(CompleteImportPiece)
 class FakeCompleteImportPieceHandler {
+  async execute(): Promise<void> {}
+}
+
+@CommandHandler(MarkImportPieceAsFailed)
+class FakeMarkImportPieceAsFailedHandler {
   async execute(): Promise<void> {}
 }

@@ -1,5 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository } from '@marxan/files-repository';
 import { extractFile } from '@marxan/utils';
@@ -7,7 +8,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
-import { ResourceKind } from '@marxan/cloning/domain';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
@@ -32,7 +32,7 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, importResourceId, piece } = input;
+    const { uris, pieceResourceId, projectId, piece } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -45,7 +45,7 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
       planningAreaGadmLocation.uri,
     );
     if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${importResourceId} is not available at ${planningAreaGadmLocation.uri}`;
+      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaGadmLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -64,32 +64,24 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
       stringPlanningAreaGadmOrError.right,
     );
 
-    await this.entityManager.query(
-      `
-        UPDATE projects
-        SET 
-          country_id = $2, 
-          admin_area_l1_id = $3, 
-          admin_area_l2_id = $4,
-          planning_unit_area_km2 = $5,
-          bbox = $6
-        WHERE id = $1
-      `,
-      [
-        importResourceId,
-        planningAreaGadm.country,
-        planningAreaGadm.l1,
-        planningAreaGadm.l2,
-        planningAreaGadm.planningUnitAreakm2,
-        JSON.stringify(planningAreaGadm.bbox),
-      ],
-    );
+    await this.entityManager
+      .createQueryBuilder()
+      .update(`projects`)
+      .set({
+        country_id: planningAreaGadm.country,
+        admin_area_l1_id: planningAreaGadm.l1,
+        admin_area_l2_id: planningAreaGadm.l2,
+        planning_unit_area_km2: planningAreaGadm.planningUnitAreakm2,
+        bbox: JSON.stringify(planningAreaGadm.bbox),
+      })
+      .where('id = :projectId', { projectId })
+      .execute();
 
     return {
       importId: input.importId,
       componentId: input.componentId,
-      importResourceId,
-      componentResourceId: input.componentResourceId,
+      pieceResourceId,
+      projectId,
       piece: input.piece,
     };
   }

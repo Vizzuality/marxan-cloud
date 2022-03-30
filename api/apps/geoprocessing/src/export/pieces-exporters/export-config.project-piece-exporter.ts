@@ -34,16 +34,20 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const projectId = input.resourceId;
     const [project]: {
       name: string;
       description: string;
-    }[] = await this.entityManager.query(
-      `SELECT name, description FROM projects where id = $1`,
-      [input.resourceId],
-    );
+    }[] = await this.entityManager
+      .createQueryBuilder()
+      .select('name')
+      .addSelect('description')
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
 
     if (!project) {
-      const errorMessage = `Project with ID ${input.resourceId} not found`;
+      const errorMessage = `Project with ID ${projectId} not found`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -51,13 +55,16 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
     const scenarios: {
       name: string;
       id: string;
-    }[] = await this.entityManager.query(
-      `SELECT id, name FROM scenarios where project_id = $1`,
-      [input.resourceId],
-    );
+    }[] = await this.entityManager
+      .createQueryBuilder()
+      .select('id')
+      .addSelect('name')
+      .from('scenarios', 's')
+      .where('project_id = :projectId', { projectId })
+      .execute();
 
     const projectPieces = input.allPieces
-      .filter(({ resourceId }) => resourceId === input.resourceId)
+      .filter(({ resourceId }) => resourceId === projectId)
       .map(({ piece }) => piece);
 
     const scenarioPieces: Record<string, ClonePiece[]> = {};
@@ -65,7 +72,7 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
       scenarioPieces[id] = [];
     });
     input.allPieces
-      .filter(({ resourceId }) => resourceId !== input.resourceId)
+      .filter(({ resourceId }) => resourceId !== projectId)
       .forEach(({ piece, resourceId }) => {
         scenarioPieces[resourceId].push(piece);
       });
@@ -76,7 +83,7 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
       name: project.name,
       description: project.description,
       resourceKind: input.resourceKind,
-      resourceId: input.resourceId,
+      resourceId: projectId,
       pieces: {
         project: projectPieces,
         scenarios: scenarioPieces,

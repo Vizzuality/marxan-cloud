@@ -36,12 +36,7 @@ export class ScenarioPlanningUnitsDataPieceImporter
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const {
-      importResourceId: projectId,
-      componentResourceId: scenarioId,
-      uris,
-      piece,
-    } = input;
+    const { projectId, pieceResourceId: scenarioId, uris, piece } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -118,8 +113,8 @@ export class ScenarioPlanningUnitsDataPieceImporter
     return {
       importId: input.importId,
       componentId: input.componentId,
-      importResourceId: input.importResourceId,
-      componentResourceId: input.componentResourceId,
+      pieceResourceId: scenarioId,
+      projectId,
       piece: input.piece,
     };
   }

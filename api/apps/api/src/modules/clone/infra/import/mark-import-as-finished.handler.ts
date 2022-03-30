@@ -37,7 +37,7 @@ export class MarkImportAsFinishedHandler
       kind,
       topic: resourceId,
       data: {
-        exportId: importId.value,
+        importId: importId.value,
         resourceId,
         resourceKind,
       },
