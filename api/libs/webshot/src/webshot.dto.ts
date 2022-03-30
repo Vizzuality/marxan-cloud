@@ -1,5 +1,4 @@
 import {
-  IsInt,
   IsObject,
   IsOptional,
   IsString,
@@ -11,8 +10,8 @@ import { Type } from 'class-transformer';
 
 class ReportOptions {
   @ApiProperty()
-  @IsInt()
-  runId!: number;
+  @IsString()
+  solutionId!: string;
 }
 
 export class WebshotConfig {
