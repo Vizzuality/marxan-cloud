@@ -203,6 +203,46 @@ export class ScenariosController {
   }
 
   @BaseTilesOpenApi()
+  @ApiOperation({
+    description: 'Get tiles for a scenario blm values to generate maps.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get(':id/calibration/tiles/:blmValues/:z/:x/:y.mvt')
+  async proxyPlanningUnitsBlmValuesTiles(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) scenarioId: string,
+  ) {
+    /* Due to the usage of proxyService in other modules
+    the ACL control for this endpoint is placed in the controller */
+    const scenario = await this.service.getById(scenarioId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(scenario)) {
+      throw mapAclDomainToHttpError(scenario.left, {
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    if (
+      !(await this.scenarioAclService.canViewBlmResults(
+        req.user.id,
+        scenario.right.projectId,
+      ))
+    ) {
+      throw new ForbiddenException();
+    }
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @BaseTilesOpenApi()
   @ApiParam({
     name: 'scenarioIdA',
     description: 'First scenario to be compare',
