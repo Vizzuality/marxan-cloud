@@ -1,25 +1,28 @@
 import { Request, Response } from "express";
 import puppeteer, { PDFOptions } from "puppeteer";
+import { ReportOptions } from "./report-options.dto";
 import { waitForReportReady } from "./wait-function";
 
-const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions";
+const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions?solutionId=:solutionId";
 
 export const generateSummaryReportForScenario = async (
   req: Request,
   res: Response
 ) => {
   const {
-    body: { baseUrl, cookie, pdfOptions },
-  }: { body: { baseUrl: string; cookie: string; pdfOptions: PDFOptions } } =
+    body: { baseUrl, cookie, pdfOptions, reportOptions },
+  }: { body: { baseUrl: string; cookie: string; pdfOptions: PDFOptions, reportOptions: ReportOptions } } =
     req;
 
   const {
     params: { projectId, scenarioId },
   } = req;
 
-  if (!(projectId || scenarioId)) {
+  const solutionId = reportOptions.solutionId
+
+  if (!(projectId || scenarioId || solutionId)) {
     res.status(400).json({
-      error: `Invalid request: projectId (${projectId}) or scenarioId (${scenarioId}) were not provided.`,
+      error: `Invalid request: projectId (${projectId}), scenarioId (${scenarioId}) or solutionId (${solutionId}) were not provided.`,
     });
     return;
   }
@@ -40,7 +43,8 @@ export const generateSummaryReportForScenario = async (
 
   const pageUrl = `${baseUrl}${appRouteTemplate
     .replace(":projectId", projectId)
-    .replace(":scenarioId", scenarioId)}`;
+    .replace(":scenarioId", scenarioId)
+    .replace(":solutionId", solutionId)}`;
 
   const browser = await puppeteer.launch({
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
