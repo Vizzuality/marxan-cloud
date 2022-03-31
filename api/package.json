@@ -234,7 +234,8 @@
       "@marxan/code-guide/(.*)": "<rootDir>/libs/code-guide/src/$1",
       "@marxan/code-guide": "<rootDir>/libs/code-guide/src",
       "@marxan/webshot/(.*)": "<rootDir>/libs/webshot/src/$1",
-      "@marxan/webshot": "<rootDir>/libs/webshot/src"
+      "@marxan/webshot": "<rootDir>/libs/webshot/src",
+      "@marxan/geofeatures": "<rootDir>/libs/geofeatures/src"
     }
   }
 }
