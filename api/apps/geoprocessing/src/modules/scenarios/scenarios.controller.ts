@@ -3,6 +3,7 @@ import {
   ScenariosPUFilters,
   ScenariosService,
   ScenariosTileRequest,
+  ScenariosWithBlmValueRequest,
 } from './scenarios.service';
 import { apiGlobalPrefixes } from '@marxan-geoprocessing/api.config';
 import { ApiOperation, ApiParam } from '@nestjs/swagger';
@@ -38,6 +39,36 @@ export class ScenariosController {
   @Get('/:id/planning-units/tiles/:z/:x/:y.mvt')
   async getPuTile(
     @Param() tileRequest: ScenariosTileRequest,
+    @Res() response: Response,
+  ): Promise<void> {
+    const tile = await this.service.findTile(tileRequest);
+
+    setTileResponseHeadersForSuccessfulRequests(response);
+    response.send(tile);
+  }
+
+  @BaseTilesOpenApi()
+  @ApiOperation({
+    description: 'Get tiles for a scenario blm values to generate maps.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get(':id/calibration/tiles/:blmValues/:z/:x/:y.mvt')
+  @ApiParam({
+    name: 'id',
+    description: 'scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get(':id/calibration/tiles/:blmValues/:z/:x/:y.mvt')
+  async getPlanningUnitsBlmValuesTiles(
+    @Param() tileRequest: ScenariosWithBlmValueRequest,
     @Query() filters: ScenariosPUFilters,
     @Res() response: Response,
   ): Promise<void> {
