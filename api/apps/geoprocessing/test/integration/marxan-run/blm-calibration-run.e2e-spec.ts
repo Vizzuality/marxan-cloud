@@ -4,7 +4,7 @@ import {
   blmSandboxRunner,
 } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
 import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
-import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   PlanningUnitsGeom,
   ProjectsPuEntity,
@@ -211,7 +211,7 @@ const getFixtures = async () => {
     GivenScenarioDataExists: async () => {
       const feature = await featuresData.save(
         featuresData.create({
-          featuresId: v4(),
+          featureId: v4(),
         }),
       );
       scenarioFeatures.push(

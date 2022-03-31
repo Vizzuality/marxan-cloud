@@ -1,6 +1,6 @@
 import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
 import { SingleRunAdapterModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
-import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
 import {
   PlanningUnitsGeom,
@@ -197,7 +197,7 @@ const getFixtures = async () => {
     GivenScenarioDataExists: async () => {
       const feature = await featuresData.save(
         featuresData.create({
-          featuresId: v4(),
+          featureId: v4(),
         }),
       );
       scenarioFeatures.push(

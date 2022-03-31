@@ -1,4 +1,3 @@
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FailedImportDbCleanupJobInput } from '@marxan/cloning/job-input';
 import { FailedImportDbCleanupJobOutput } from '@marxan/cloning/job-output';
@@ -61,7 +60,7 @@ export class DbCleanupProcessor {
     const apiQb = this.apiEntityManager.createQueryBuilder();
     const geoQb = this.geoprocessingEntityManager.createQueryBuilder();
 
-    const scenarios: Scenario[] = await apiQb
+    const scenarios: { id: string }[] = await apiQb
       .select('id')
       .from('scenarios', 's')
       .where('project_id = :projectId', {

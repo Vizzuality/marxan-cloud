@@ -1,4 +1,3 @@
-import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
@@ -19,7 +18,7 @@ type SelectScenarioResult = {
   description?: string;
   blm?: number;
   number_of_runs?: number;
-  metadata?: Scenario['metadata'];
+  metadata?: ScenarioMetadataContent['metadata'];
 };
 
 @Injectable()
