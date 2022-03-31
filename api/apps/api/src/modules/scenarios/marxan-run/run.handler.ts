@@ -46,9 +46,6 @@ export class RunHandler {
     await this.apiEvents.create({
       topic: scenario.id,
       kind,
-      // @todo: remove dependency on job.id - may lead to FK constraint
-      // violations as job ids are not guaranteed to be forever monotonic
-      externalId: job.id + kind,
     });
   }
 }

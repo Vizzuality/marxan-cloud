@@ -78,9 +78,6 @@ export class RunService {
   ) {
     const job = await queue.add(`run`, data);
     await this.apiEvents.create({
-      // @todo: remove dependency on job.id - may lead to FK constraint
-      // violations as job ids are not guaranteed to be forever monotonic
-      externalId: job.id + kind,
       kind,
       topic: data.scenarioId,
       data: {

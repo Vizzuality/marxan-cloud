@@ -51,7 +51,6 @@ export class ImportPieceEventsHandler
     return {
       topic: data.componentId,
       kind,
-      externalId: ApiEventsService.composeExternalId(data.componentId, kind),
       data: {
         kind,
         ...output,
@@ -75,7 +74,6 @@ export class ImportPieceEventsHandler
     return {
       topic: componentId,
       kind,
-      externalId: ApiEventsService.composeExternalId(componentId, kind),
       data: {
         importId,
         pieceResourceId,
