@@ -1,9 +1,14 @@
 import { Cancellable } from '@marxan-geoprocessing/marxan-sandboxed-runner/ports/cancellable';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { JobData } from '@marxan/blm-calibration';
+import { WebshotService } from '@marxan/webshot';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { EventBus } from '@nestjs/cqrs';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import AbortController from 'abort-controller';
+import { EntityManager, getManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { SandboxRunner } from '../ports/sandbox-runner';
 import { BlmFinalResultsRepository } from './blm-final-results.repository';
@@ -21,6 +26,9 @@ export class MarxanSandboxBlmRunnerService
     private readonly finalResultsRepository: BlmFinalResultsRepository,
     private readonly marxanRunnerFactory: MarxanRunnerFactory,
     private readonly eventBus: EventBus,
+    private readonly webshotService: WebshotService,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
   ) {}
 
   kill(ofScenarioId: string): void {
@@ -92,17 +100,23 @@ export class MarxanSandboxBlmRunnerService
           calibrationId,
         );
 
+        // This won't work because every run has same scenarioId
         const createdFinalResult = await this.finalResultsRepository.findOneByScenarioId(
           scenarioId,
         );
 
+        const { blmValue } = createdFinalResult;
+
+        //array of uuid of project_pu table entities included in best solution
+        //need to be joined with scenario_pu_data and planning_units_geom
         const puIds = createdFinalResult?.protected_pu_ids;
 
-        //-> I need to get the tiles for the APP(FE) to generate the maps.
-        // Once they are ready after the ¿proxy? request to API I need to
-        // request the webshot service png generation with those tiles.
-        // const proxyCall(puids)
-        // this.interruptIfKilled(scenarioId);
+        const projectId = await this.apiEntityManager
+          .createQueryBuilder()
+          .select(['project_id'])
+          .from('scenarios', 's')
+          .where('id = :scenarioId', { scenarioId })
+          .execute();
 
         /*
           Webshot call happens here with puIds.
@@ -110,6 +124,13 @@ export class MarxanSandboxBlmRunnerService
           await this.webshot.createScreenshot(puData, scenarioId, runId);
           this.interruptIfKilled(scenarioId);
         */
+        // const pngStream = await this.webshotService.getBlmValuesImage(
+        //   scenarioId,
+        //   projectId,
+        //   configForWebshot,
+        //   blmValue,
+        // );
+        this.interruptIfKilled(scenarioId);
 
         // When webshot call returns -> this.finalResultsRepository.updateFinalResults(scenarioId, pngData).
 

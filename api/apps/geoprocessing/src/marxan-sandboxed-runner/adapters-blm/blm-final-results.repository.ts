@@ -15,12 +15,13 @@ export class BlmFinalResultsRepository {
     return Promise.resolve(undefined);
   }
 
-  async findOneByScenarioId(
-    scenarioId: string,
-  ): Promise<BlmFinalResultEntity | undefined> {
-    const result = await this.entityManager.findOne(BlmFinalResultEntity, {
-      where: { scenarioId },
-    });
+  async findOneByScenarioId(scenarioId: string): Promise<BlmFinalResultEntity> {
+    const result = await this.entityManager.findOneOrFail(
+      BlmFinalResultEntity,
+      {
+        where: { scenarioId },
+      },
+    );
     return result;
   }
 

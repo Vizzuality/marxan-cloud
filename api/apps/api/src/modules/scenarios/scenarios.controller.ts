@@ -101,7 +101,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotConfig, WebshotService } from '@marxan/webshot';
+import { WebshotConfig } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 
@@ -131,7 +131,6 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
-    private readonly webshotService: WebshotService,
   ) {}
 
   @ApiOperation({

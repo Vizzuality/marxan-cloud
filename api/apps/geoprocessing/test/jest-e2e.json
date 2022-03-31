@@ -72,6 +72,8 @@
     "@marxan/cloning/(.*)": "<rootDir>/../../libs/cloning/src/$1",
     "@marxan/cloning": "<rootDir>/../../libs/cloning/src",
     "@marxan/geofeatures/(.*)": "<rootDir>/../../libs/geofeatures/src/$1",
-    "@marxan/geofeatures": "<rootDir>/../../libs/geofeatures/src"
+    "@marxan/geofeatures": "<rootDir>/../../libs/geofeatures/src",
+    "@marxan/webshot/(.*)": "<rootDir>../../libs/webshot/src/$1",
+    "@marxan/webshot": "<rootDir>../../libs/webshot/src"
   }
 }
