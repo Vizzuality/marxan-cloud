@@ -231,6 +231,11 @@ resource "kubernetes_deployment" "api_deployment" {
             value = "apps/api/config"
           }
 
+          env {
+            name  = "BACKEND_HTTP_LOGGING_MORGAN_FORMAT"
+            value = var.http_logging_morgan_format
+          }
+
           resources {
             limits = {
               cpu    = "1"
