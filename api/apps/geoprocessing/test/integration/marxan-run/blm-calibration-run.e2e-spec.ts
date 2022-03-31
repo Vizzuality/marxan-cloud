@@ -4,13 +4,13 @@ import {
   blmSandboxRunner,
 } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
 import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
-import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   PlanningUnitsGeom,
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
@@ -19,6 +19,7 @@ import {
 } from '@marxan/marxan-output';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
+import { Geometry } from 'geojson';
 import { last } from 'lodash';
 import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
@@ -212,6 +213,10 @@ const getFixtures = async () => {
       const feature = await featuresData.save(
         featuresData.create({
           featureId: v4(),
+          properties: {
+            foo: 'bar',
+          },
+          theGeom: geometry,
         }),
       );
       scenarioFeatures.push(
@@ -316,3 +321,15 @@ const resourceResponse = (resourceAddress: string) =>
     process.cwd() +
       `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
   );
+
+const geometry: Geometry = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-3.7023925781249996, 40.657722371758105],
+      [-4.3450927734375, 40.029717557833266],
+      [-3.04046630859375, 39.9434364619742],
+      [-3.7023925781249996, 40.657722371758105],
+    ],
+  ],
+};

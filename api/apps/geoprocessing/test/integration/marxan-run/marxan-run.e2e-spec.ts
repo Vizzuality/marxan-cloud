@@ -22,6 +22,7 @@ import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { bootstrapApplication, delay } from '../../utils';
+import { Geometry } from 'geojson';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -198,6 +199,10 @@ const getFixtures = async () => {
       const feature = await featuresData.save(
         featuresData.create({
           featureId: v4(),
+          properties: {
+            foo: 'bar',
+          },
+          theGeom: geometry,
         }),
       );
       scenarioFeatures.push(
@@ -290,3 +295,15 @@ const resourceResponse = (resourceAddress: string) =>
     process.cwd() +
       `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
   );
+
+const geometry: Geometry = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [-3.7023925781249996, 40.657722371758105],
+      [-4.3450927734375, 40.029717557833266],
+      [-3.04046630859375, 39.9434364619742],
+      [-3.7023925781249996, 40.657722371758105],
+    ],
+  ],
+};
