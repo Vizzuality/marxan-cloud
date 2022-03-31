@@ -242,6 +242,15 @@
         "tsConfigPath": "libs/cloning/tsconfig.lib.json"
       }
     },
+    "geofeatures": {
+      "type": "library",
+      "root": "libs/geofeatures",
+      "entryFile": "index",
+      "sourceRoot": "libs/geofeatures/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/geofeatures/tsconfig.lib.json"
+      }
+    },
     "code-guide": {
       "type": "library",
       "root": "libs/code-guide",
