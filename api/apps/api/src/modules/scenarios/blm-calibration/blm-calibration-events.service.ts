@@ -29,7 +29,6 @@ export class BlmCalibrationEventsService implements EventFactory<JobData> {
     return {
       topic: data.scenarioId,
       kind: API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1,
-      externalId: eventData.eventId,
     };
   }
 
@@ -40,7 +39,6 @@ export class BlmCalibrationEventsService implements EventFactory<JobData> {
     return {
       topic: data.scenarioId,
       kind: API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1,
-      externalId: eventData.eventId,
     };
   }
 }
