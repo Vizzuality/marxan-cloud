@@ -1,12 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
-import { IsArray, IsIn, IsOptional, IsString } from 'class-validator';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository, SelectQueryBuilder } from 'typeorm';
+import { IsArray, IsIn, IsOptional, IsString, IsNumber } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { TileRequest } from '@marxan/tiles';
+import { promisify } from 'util';
+import * as zlib from 'zlib';
 
 interface SelectionsProperties {
   attributes: string;
@@ -67,6 +69,11 @@ export class ScenariosTileRequest extends TileRequest {
   id!: string;
 }
 
+export class ScenariosWithBlmValueRequest extends ScenariosTileRequest {
+  @IsNumber()
+  blmValue!: number;
+}
+
 @Injectable()
 export class ScenariosService {
   private readonly logger: Logger = new Logger(ScenariosService.name);
@@ -76,6 +83,8 @@ export class ScenariosService {
     private readonly scenariosPuDataRepository: Repository<ScenariosPuPaDataGeo>,
     @Inject(TileService)
     private readonly tileService: TileService,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) {}
 
   /**
@@ -173,5 +182,31 @@ export class ScenariosService {
     }
 
     return base;
+  }
+
+  public async findTileWithBlmValue(
+    tileSpecification: ScenariosWithBlmValueRequest,
+    geometry = 'the_geom',
+    extent = 4096,
+    buffer = 256,
+    inputProjection = 4326,
+  ): Promise<Buffer> {
+    const { id, z, x, y, blmValue } = tileSpecification;
+
+    const query = `with data as (select unnest(protected_pu_ids) as pu_ids 
+    from blm_final_results bfr where blm_value = $1) 
+    select ST_AsMVT(tile.*, 'layer0', {extent}, 'mvt_geom') as mvt 
+    from (select pu_ids, ST_AsMVTGeom(ST_Transform(${geometry}, 3857),
+    ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom from scenarios_pu_data spd 
+    inner join projects_pu pp on pp.id = spd.project_pu_id
+    inner join planning_units_geom pug on geom_id = pug.id 
+    left join data on  pp.id = pu_ids
+    where scenario_id = $2 
+    and st_intersects(${geometry}, st_transform(ST_TileEnvelope(${z}, ${x}, ${y}), ${inputProjection})) ) as tile`;
+
+    const result = await this.entityManager.query(query, [blmValue, id]);
+
+    const gzip = promisify(zlib.gzip);
+    return gzip(result[0].mvt);
   }
 }
