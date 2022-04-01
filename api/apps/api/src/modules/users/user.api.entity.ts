@@ -87,6 +87,9 @@ export class User {
   @Column('boolean', { name: 'is_deleted' })
   isDeleted!: boolean;
 
+  @ApiPropertyOptional()
+  isAdmin?: boolean;
+
   @ApiProperty({ type: () => Project, isArray: true })
   @ManyToMany((_type) => Project, (project) => project.users, { eager: false })
   @JoinTable({

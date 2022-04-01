@@ -61,6 +61,7 @@ export class UsersService extends AppBaseService<
         'isActive',
         'isBlocked',
         'isDeleted',
+        'isAdmin',
         'metadata',
         'projects',
         'scenarios',
@@ -230,6 +231,14 @@ export class UsersService extends AppBaseService<
 
   private hash(password: string) {
     return hash(password, 10);
+  }
+
+  async extendGetByIdResult(entity: User): Promise<User> {
+    const isAdmin = await this.isPlatformAdmin(entity.id);
+
+    entity.isAdmin = isAdmin;
+
+    return entity;
   }
 
   async isPlatformAdmin(userId: string): Promise<boolean> {
