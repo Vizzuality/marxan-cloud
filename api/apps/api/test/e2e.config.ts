@@ -16,6 +16,7 @@ interface CountryCodeInput {
   adminLevel1?: string;
   adminLevel2?: string;
 }
+
 interface CustomPlanningAreaInput {
   planningAreaId?: string;
   planningUnitGridShape?: PlanningUnitGridShape;
@@ -118,7 +119,7 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
-        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.Irregular,
         planningUnitAreakm2: 10,
       }),
       minimalInGivenAdminArea: (options?: {
