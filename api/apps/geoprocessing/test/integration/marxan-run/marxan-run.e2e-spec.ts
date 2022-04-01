@@ -22,6 +22,7 @@ import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { bootstrapApplication, delay } from '../../utils';
+import { Geometry } from 'geojson';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -101,6 +102,7 @@ const NUMBER_OF_RUNS = 100;
 const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
+  const featureId = v4();
   const outputsIds: string[] = [];
   const scenarioFeatures: string[] = [];
 
@@ -144,8 +146,8 @@ const getFixtures = async () => {
         scenarioId,
       });
       await puOutputRepo.delete({});
-      await scenarioFeatureRepo.delete({
-        scenarioId,
+      await featuresData.delete({
+        featureId,
       });
       const projectPus = await entityManager.find(ProjectsPuEntity, {
         where: { projectId },
@@ -197,7 +199,21 @@ const getFixtures = async () => {
     GivenScenarioDataExists: async () => {
       const feature = await featuresData.save(
         featuresData.create({
-          featureId: v4(),
+          featureId,
+          properties: {
+            foo: v4(),
+          },
+          theGeom: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [-3.7023925781249996, 40.657722371758105],
+                [-4.3450927734375, 40.029717557833266],
+                [-3.04046630859375, 39.9434364619742],
+                [-3.7023925781249996, 40.657722371758105],
+              ],
+            ],
+          },
         }),
       );
       scenarioFeatures.push(
