@@ -1,3 +1,10 @@
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
+import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkerModule } from '../../modules/worker';
@@ -9,7 +16,18 @@ import { DbCleanupWorker } from './db-cleanup.worker';
   imports: [
     WorkerModule,
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
-    TypeOrmModule.forFeature([], geoprocessingConnections.default),
+    TypeOrmModule.forFeature(
+      [
+        BlmFinalResultEntity,
+        ScenariosPuPaDataGeo,
+        OutputScenariosPuDataGeoEntity,
+        PlanningArea,
+        ProtectedArea,
+        ProjectsPuEntity,
+        GeoFeatureGeometry,
+      ],
+      geoprocessingConnections.default,
+    ),
   ],
   providers: [DbCleanupProcessor, DbCleanupWorker],
 })
