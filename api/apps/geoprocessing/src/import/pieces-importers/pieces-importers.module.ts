@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PlanningAreaCustomPieceImporter } from './planning-area-custom.piece-importer';
 import { PlanningAreaGadmPieceImporter } from './planning-area-gadm.piece-importer';
 import { PlanningUnitsGridPieceImporter } from './planning-units-grid.piece-importer';
+import { ProjectCustomFeaturesPieceImporter } from './project-custom-features.piece-importer';
 import { ProjectCustomProtectedAreasPieceImporter } from './project-custom-protected-areas.piece-importer';
 import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer';
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
@@ -24,6 +25,7 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
     PlanningAreaCustomPieceImporter,
     PlanningUnitsGridPieceImporter,
     ProjectCustomProtectedAreasPieceImporter,
+    ProjectCustomFeaturesPieceImporter,
     ScenarioProtectedAreasPieceImporter,
     ScenarioPlanningUnitsDataPieceImporter,
     ScenarioRunResultsPieceImporter,

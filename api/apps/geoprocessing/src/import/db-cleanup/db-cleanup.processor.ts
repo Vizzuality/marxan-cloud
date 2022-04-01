@@ -1,9 +1,16 @@
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FailedImportDbCleanupJobInput } from '@marxan/cloning/job-input';
 import { FailedImportDbCleanupJobOutput } from '@marxan/cloning/job-output';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
+import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { geoprocessingConnections } from '../../ormconfig';
 
 @Injectable()
@@ -17,13 +24,24 @@ export class DbCleanupProcessor {
   constructor(
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    @InjectEntityManager(geoprocessingConnections.default)
-    private readonly geoprocessingEntityManager: EntityManager,
+    @InjectRepository(ProjectsPuEntity)
+    private readonly projectsPuRepo: Repository<ProjectsPuEntity>,
+    @InjectRepository(BlmFinalResultEntity)
+    private readonly blmFinalResultRepo: Repository<BlmFinalResultEntity>,
+    @InjectRepository(ScenariosPuPaDataGeo)
+    private readonly scenariosPuDataRepo: Repository<ScenariosPuPaDataGeo>,
+    @InjectRepository(OutputScenariosPuDataGeoEntity)
+    private readonly outputScenariosPuDataRepo: Repository<OutputScenariosPuDataGeoEntity>,
+    @InjectRepository(PlanningArea)
+    private readonly planningAreasRepo: Repository<PlanningArea>,
+    @InjectRepository(ProtectedArea)
+    private readonly protectedAreasRepo: Repository<ProtectedArea>,
+    @InjectRepository(GeoFeatureGeometry)
+    private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
   ) {}
 
   private async cleanScenarioImport(scenarioId: string) {
     const apiQb = this.apiEntityManager.createQueryBuilder();
-    const geoQb = this.geoprocessingEntityManager.createQueryBuilder();
 
     await apiQb
       .delete()
@@ -31,36 +49,22 @@ export class DbCleanupProcessor {
       .where('id = :scenarioId', { scenarioId })
       .execute();
 
-    await geoQb
-      .delete()
-      .from('blm_final_results')
-      .where('scenario_id = :scenarioId', { scenarioId })
-      .execute();
+    await this.blmFinalResultRepo.delete({ scenarioId });
 
-    const scenariosPuDataQb = this.geoprocessingEntityManager
-      .createQueryBuilder()
-      .select('id')
-      .from('scenarios_pu_data', 'spd')
-      .where('scenario_id = :scenarioId', { scenarioId });
-    await geoQb
-      .delete()
-      .from('output_scenarios_pu_data', 'ospd')
-      .where(`scenario_pu_id IN (${scenariosPuDataQb.getQuery()})`)
-      .setParameters(scenariosPuDataQb.getParameters())
-      .execute();
+    const scenarioPuData = await this.scenariosPuDataRepo.find({
+      where: { scenarioId },
+    });
 
-    await geoQb
-      .delete()
-      .from('scenarios_pu_data')
-      .where('scenario_id = :scenarioId', { scenarioId })
-      .execute();
+    await this.outputScenariosPuDataRepo.delete({
+      scenarioPuId: In(scenarioPuData.map((pu) => pu.id)),
+    });
+
+    await this.scenariosPuDataRepo.delete({ scenarioId });
   }
 
   private async cleanProjectImport(projectId: string) {
-    const apiQb = this.apiEntityManager.createQueryBuilder();
-    const geoQb = this.geoprocessingEntityManager.createQueryBuilder();
-
-    const scenarios: { id: string }[] = await apiQb
+    const scenarios: { id: string }[] = await this.apiEntityManager
+      .createQueryBuilder()
       .select('id')
       .from('scenarios', 's')
       .where('project_id = :projectId', {
@@ -70,48 +74,41 @@ export class DbCleanupProcessor {
     const scenarioIds = scenarios.map((scenario) => scenario.id);
     const projectHasScenarios = scenarioIds.length > 0;
 
-    await apiQb
+    const projectCustomFeatures: {
+      id: string;
+    }[] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('id')
+      .from('features', 'f')
+      .where('project_id = :projectId', { projectId })
+      .execute();
+
+    await this.apiEntityManager
+      .createQueryBuilder()
       .delete()
       .from('projects')
       .where('id = :projectId', { projectId })
       .execute();
-    await geoQb
-      .delete()
-      .from('planning_areas')
-      .where('project_id = :projectId', { projectId })
-      .execute();
-    await geoQb
-      .delete()
-      .from('wdpa')
-      .where('project_id = :projectId', { projectId })
-      .execute();
+
+    await this.planningAreasRepo.delete({ projectId });
+    await this.protectedAreasRepo.delete({ projectId });
+    await this.featuresDataRepo.delete({
+      featureId: In(projectCustomFeatures.map((feature) => feature.id)),
+    });
 
     if (projectHasScenarios) {
-      await geoQb
-        .delete()
-        .from('blm_final_results')
-        .where('scenario_id IN (:...scenarioIds)', { scenarioIds })
-        .execute();
+      await this.blmFinalResultRepo.delete({ scenarioId: In(scenarioIds) });
 
-      const scenariosPuDataQb = this.geoprocessingEntityManager
-        .createQueryBuilder()
-        .select('id')
-        .from('scenarios_pu_data', 'spd')
-        .where('scenario_id IN (:...scenarioIds)', { scenarioIds });
+      const scenariosPuData = await this.scenariosPuDataRepo.find({
+        where: { scenarioId: In(scenarioIds) },
+      });
 
-      await geoQb
-        .delete()
-        .from('output_scenarios_pu_data', 'ospd')
-        .where(`scenario_pu_id IN (${scenariosPuDataQb.getQuery()})`)
-        .setParameters(scenariosPuDataQb.getParameters())
-        .execute();
+      await this.outputScenariosPuDataRepo.delete({
+        scenarioPuId: In(scenariosPuData.map((pu) => pu.id)),
+      });
     }
 
-    await geoQb
-      .delete()
-      .from('projects_pu')
-      .where('project_id = :projectId', { projectId })
-      .execute();
+    await this.projectsPuRepo.delete({ projectId });
   }
 
   async run(

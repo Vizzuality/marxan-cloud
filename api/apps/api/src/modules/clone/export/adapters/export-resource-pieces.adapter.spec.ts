@@ -97,6 +97,7 @@ const getFixtures = async () => {
       ClonePiece.PlanningUnitsGrid,
       ClonePiece.PlanningUnitsGridGeojson,
       ClonePiece.ProjectCustomProtectedAreas,
+      ClonePiece.ProjectCustomFeatures,
     ];
   };
 

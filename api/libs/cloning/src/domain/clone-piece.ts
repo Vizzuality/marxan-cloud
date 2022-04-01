@@ -2,6 +2,7 @@ export enum ClonePiece {
   ExportConfig = 'export-config',
   ProjectMetadata = 'project-metadata',
   ProjectCustomProtectedAreas = 'project-custom-protected-areas',
+  ProjectCustomFeatures = 'project-custom-features',
   PlanningAreaGAdm = 'planning-area-gadm',
   PlanningAreaCustom = 'planning-area-custom',
   PlanningAreaCustomGeojson = 'planning-area-custom-geojson',
@@ -11,6 +12,6 @@ export enum ClonePiece {
   ScenarioPlanningUnitsData = 'scenario-planning-units-data',
   ScenarioRunResults = 'scenario-run-results',
   ScenarioProtectedAreas = 'scenario-protected-areas',
-  UserUploadedFeatures = 'user-uploaded-features',
+  ScenarioFeaturesData = 'scenario-features-data',
   FeaturesSpecification = 'feautures-specification',
 }
