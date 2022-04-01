@@ -39,9 +39,10 @@ export class ScenariosController {
   @Get('/:id/planning-units/tiles/:z/:x/:y.mvt')
   async getPuTile(
     @Param() tileRequest: ScenariosTileRequest,
+    @Query() filters: ScenariosPUFilters,
     @Res() response: Response,
   ): Promise<void> {
-    const tile = await this.service.findTile(tileRequest);
+    const tile = await this.service.findTile(tileRequest, filters);
 
     setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);
@@ -59,20 +60,11 @@ export class ScenariosController {
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @Get(':id/calibration/tiles/:blmValues/:z/:x/:y.mvt')
-  @ApiParam({
-    name: 'id',
-    description: 'scenario id',
-    type: String,
-    required: true,
-    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
-  })
-  @Get(':id/calibration/tiles/:blmValues/:z/:x/:y.mvt')
   async getPlanningUnitsBlmValuesTiles(
     @Param() tileRequest: ScenariosWithBlmValueRequest,
-    @Query() filters: ScenariosPUFilters,
     @Res() response: Response,
   ): Promise<void> {
-    const tile = await this.service.findTile(tileRequest, filters);
+    const tile = await this.service.findTileWithBlmValue(tileRequest);
 
     setTileResponseHeadersForSuccessfulRequests(response);
     response.send(tile);
