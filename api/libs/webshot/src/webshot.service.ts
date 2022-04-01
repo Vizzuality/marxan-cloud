@@ -1,5 +1,4 @@
 import { HttpService, Injectable } from '@nestjs/common';
-import { AppConfig } from '@marxan-api/utils/config.utils';
 import { Readable } from 'stream';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { WebshotConfig } from './webshot.dto';
@@ -9,19 +8,18 @@ export const unknownPngWebshotError = Symbol(`unknown png webshot error`);
 
 @Injectable()
 export class WebshotService {
-  private webshotServiceUrl: string = AppConfig.get('webshot.url') as string;
-
   constructor(private readonly httpService: HttpService) {}
 
   async getSummaryReportForScenario(
     scenarioId: string,
     projectId: string,
     config: WebshotConfig,
+    webshotUrl: string,
   ): Promise<Either<typeof unknownPdfWebshotError, Readable>> {
     try {
       const pdfBuffer = await this.httpService
         .post(
-          `${this.webshotServiceUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
+          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
           config,
           { responseType: 'arraybuffer' },
         )
@@ -47,11 +45,12 @@ export class WebshotService {
     projectId: string,
     config: WebshotConfig,
     blmValue: number,
+    webshotUrl: string,
   ): Promise<Either<typeof unknownPngWebshotError, Readable>> {
     try {
       const pngBuffer = await this.httpService
         .post(
-          `${this.webshotServiceUrl}/projects/${projectId}/scenarios/${scenarioId}/calibration/maps/preview/${blmValue}`,
+          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/calibration/maps/preview/${blmValue}`,
           config,
           { responseType: 'arraybuffer' },
         )

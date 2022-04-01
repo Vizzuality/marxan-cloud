@@ -1252,6 +1252,7 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return scenario;
     }
+    const webshotUrl = AppConfig.get('webshot.url') as string;
 
     /** @debt Refactor to use @nestjs/common's StreamableFile
      (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
@@ -1260,6 +1261,7 @@ export class ScenariosService {
       scenarioId,
       scenario.right.projectId,
       configForWebshot,
+      webshotUrl,
     );
 
     return pdfStream;
