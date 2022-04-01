@@ -9,6 +9,7 @@ import { PlanningAreaCustomPieceExporter } from './planning-area-custom.piece-ex
 import { PlanningAreaGadmPieceExporter } from './planning-area-gadm.piece-exporter';
 import { PlanningUnitsGridGeojsonPieceExporter } from './planning-units-grid-geojson.piece-exporter';
 import { PlanningUnitsGridPieceExporter } from './planning-units-grid.piece-exporter';
+import { ProjectCustomFeaturesPieceExporter } from './project-custom-features.piece-exporter';
 import { ProjectCustomProtectedAreasPieceExporter } from './project-custom-protected-areas.piece-exporter';
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
 import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
@@ -26,6 +27,7 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
     ProjectMetadataPieceExporter,
     ExportConfigProjectPieceExporter,
     ExportConfigScenarioPieceExporter,
+    ProjectCustomFeaturesPieceExporter,
     PlanningAreaGadmPieceExporter,
     PlanningAreaCustomPieceExporter,
     PlanningAreaCustomGeojsonPieceExporter,
