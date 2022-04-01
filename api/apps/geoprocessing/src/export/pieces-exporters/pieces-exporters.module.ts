@@ -1,5 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { FileRepositoryModule } from '@marxan/files-repository';
+import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportConfigProjectPieceExporter } from './export-config.project-piece-exporter';
@@ -12,6 +14,7 @@ import { PlanningUnitsGridPieceExporter } from './planning-units-grid.piece-expo
 import { ProjectCustomFeaturesPieceExporter } from './project-custom-features.piece-exporter';
 import { ProjectCustomProtectedAreasPieceExporter } from './project-custom-protected-areas.piece-exporter';
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
+import { ScenarioFeaturesDataPieceExporter } from './scenario-features-data.piece-exporter';
 import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
 import { ScenarioPlanningUnitsDataPieceExporter } from './scenario-planning-units-data.piece-exporter';
 import { ScenarioProtectedAreasPieceExporter } from './scenario-protected-areas.piece-exporter';
@@ -21,7 +24,10 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
   imports: [
     FileRepositoryModule,
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
-    TypeOrmModule.forFeature([], geoprocessingConnections.default),
+    TypeOrmModule.forFeature(
+      [ScenarioFeaturesData, OutputScenariosFeaturesDataGeoEntity],
+      geoprocessingConnections.default,
+    ),
   ],
   providers: [
     ProjectMetadataPieceExporter,
@@ -38,6 +44,7 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
     ScenarioProtectedAreasPieceExporter,
     ScenarioRunResultsPieceExporter,
     ScenarioPlanningUnitsDataPieceExporter,
+    ScenarioFeaturesDataPieceExporter,
     Logger,
   ],
 })
