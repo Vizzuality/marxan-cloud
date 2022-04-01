@@ -62,6 +62,11 @@ resource "kubernetes_deployment" "api_deployment" {
 
 
           env {
+            name  = "NODE_ENV"
+            value = var.namespace
+          }
+
+          env {
             name = "API_POSTGRES_HOST"
             value_from {
               secret_key_ref {
