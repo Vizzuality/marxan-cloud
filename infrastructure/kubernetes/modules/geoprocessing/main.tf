@@ -211,6 +211,11 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             value = "apps/geoprocessing/config"
           }
 
+          env {
+            name  = "NODE_ENV"
+            value = var.namespace
+          }
+
           resources {
             limits = {
               cpu    = "1"
