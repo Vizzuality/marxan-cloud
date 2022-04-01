@@ -88,7 +88,7 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data.type).toBe('projects');
     });
 
-    test.only('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
+    test('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
       const organization = await OrganizationsTestUtils.createOrganization(
         app,
         jwtToken,
