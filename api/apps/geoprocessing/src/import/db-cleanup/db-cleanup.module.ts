@@ -1,5 +1,6 @@
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
@@ -25,6 +26,7 @@ import { DbCleanupWorker } from './db-cleanup.worker';
         ProtectedArea,
         ProjectsPuEntity,
         GeoFeatureGeometry,
+        ScenarioFeaturesData,
       ],
       geoprocessingConnections.default,
     ),

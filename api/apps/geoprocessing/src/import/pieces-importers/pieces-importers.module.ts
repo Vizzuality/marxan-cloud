@@ -8,6 +8,7 @@ import { PlanningUnitsGridPieceImporter } from './planning-units-grid.piece-impo
 import { ProjectCustomFeaturesPieceImporter } from './project-custom-features.piece-importer';
 import { ProjectCustomProtectedAreasPieceImporter } from './project-custom-protected-areas.piece-importer';
 import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer';
+import { ScenarioFeaturesDataPieceImporter } from './scenario-features-data.piece-importer';
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
 import { ScenarioPlanningUnitsDataPieceImporter } from './scenario-planning-units-data.piece-importer';
 import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.piece-importer';
@@ -29,6 +30,7 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
     ScenarioProtectedAreasPieceImporter,
     ScenarioPlanningUnitsDataPieceImporter,
     ScenarioRunResultsPieceImporter,
+    ScenarioFeaturesDataPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })

@@ -27,7 +27,7 @@ export type FeatureDataElement = {
   sepNum?: number;
   metadata?: Record<'sepdistance', number | string>;
   featureId: number;
-  specificationId: string;
+  specificationId?: string;
   outputFeaturesData: OutputFeatureDataElement[];
 };
 

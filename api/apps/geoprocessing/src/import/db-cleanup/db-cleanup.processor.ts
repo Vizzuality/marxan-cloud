@@ -3,6 +3,7 @@ import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FailedImportDbCleanupJobInput } from '@marxan/cloning/job-input';
 import { FailedImportDbCleanupJobOutput } from '@marxan/cloning/job-output';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
@@ -38,6 +39,8 @@ export class DbCleanupProcessor {
     private readonly protectedAreasRepo: Repository<ProtectedArea>,
     @InjectRepository(GeoFeatureGeometry)
     private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
+    @InjectRepository(ScenarioFeaturesData)
+    private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
   ) {}
 
   private async cleanScenarioImport(scenarioId: string) {
@@ -57,6 +60,10 @@ export class DbCleanupProcessor {
 
     await this.outputScenariosPuDataRepo.delete({
       scenarioPuId: In(scenarioPuData.map((pu) => pu.id)),
+    });
+
+    await this.scenarioFeaturesDataRepo.delete({
+      scenarioId,
     });
 
     await this.scenariosPuDataRepo.delete({ scenarioId });
@@ -105,6 +112,10 @@ export class DbCleanupProcessor {
 
       await this.outputScenariosPuDataRepo.delete({
         scenarioPuId: In(scenariosPuData.map((pu) => pu.id)),
+      });
+
+      await this.scenarioFeaturesDataRepo.delete({
+        scenarioId: In(scenarioIds),
       });
     }
 

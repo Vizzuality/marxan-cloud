@@ -15,7 +15,7 @@ type RawRemoteScenarioFeaturesData = Pick<
   | 'target'
   | 'scenarioId'
   | 'fpf'
-  | 'featuresDataId'
+  | 'featureDataId'
   | 'totalArea'
   | 'currentArea'
   | 'target2'
@@ -30,7 +30,7 @@ export const getValidNonGeoData = (
       target: 50,
       scenarioId,
       fpf: 1,
-      featuresDataId: featureIdMet,
+      featureDataId: featureIdMet,
       currentArea: 12000,
       totalArea: 20000,
       target2: 0,
@@ -40,7 +40,7 @@ export const getValidNonGeoData = (
       target: 50,
       scenarioId,
       fpf: 1,
-      featuresDataId: featureIdFailed,
+      featureDataId: featureIdFailed,
       currentArea: 4000,
       totalArea: 10000,
       target2: 0,

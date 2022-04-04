@@ -63,7 +63,7 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         currentArea: sfd.currentArea,
         featureDataHash: sfd.featureData.hash,
         featureId: sfd.featureId,
-        specificationId: sfd.specificationId,
+        specificationId: undefined,
         totalArea: sfd.totalArea,
         fpf: sfd.fpf,
         metadata: sfd.metadata,
