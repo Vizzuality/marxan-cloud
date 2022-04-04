@@ -26,9 +26,13 @@ export const GivenProjectExists = async (
       ...(organizationData?.name ? { name: organizationData.name } : {}),
     })
   ).data.id;
+  const projectDto = Boolean(projectData)
+    ? E2E_CONFIG.projects.valid.minimalInGivenAdminArea(projectData)
+    : E2E_CONFIG.projects.valid.minimal();
+
   const projectId = (
     await ProjectsTestUtils.createProject(app, jwt, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(projectData),
+      ...projectDto,
       organizationId,
     })
   ).data.id;
