@@ -5,4 +5,8 @@ export {
   unknownPngWebshotError,
 } from './webshot.service';
 
-export { WebshotConfig } from './webshot.dto';
+export {
+  WebshotConfig,
+  WebshotPdfConfig,
+  WebshotPngConfig,
+} from './webshot.dto';

@@ -107,6 +107,7 @@ import { FeatureCollection } from 'geojson';
 import {
   unknownPdfWebshotError,
   WebshotConfig,
+  WebshotPdfConfig,
   WebshotService,
 } from '@marxan/webshot';
 import { blmImageMock } from './__mock__/blm-image-mock';
@@ -581,6 +582,7 @@ export class ScenariosService {
   async startBlmCalibration(
     id: string,
     userInfo: AppInfoDTO,
+    config: WebshotConfig,
     rangeToUpdate?: [number, number],
   ): Promise<
     Either<
@@ -616,7 +618,7 @@ export class ScenariosService {
     if (isLeft(scenarioBlmValues)) return scenarioBlmValues;
 
     await this.commandBus.execute(
-      new StartBlmCalibration(id, scenarioBlmValues.right.values),
+      new StartBlmCalibration(id, scenarioBlmValues.right.values, config),
     );
 
     return right(true);
@@ -1236,7 +1238,7 @@ export class ScenariosService {
   async getSummaryReportFor(
     scenarioId: string,
     userId: string,
-    configForWebshot: WebshotConfig,
+    configForWebshot: WebshotPdfConfig,
   ): Promise<
     Either<
       | typeof forbiddenError

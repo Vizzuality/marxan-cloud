@@ -22,7 +22,11 @@ export class StartBlmCalibrationHandler
     private readonly assets: AssetsService,
   ) {}
 
-  async execute({ scenarioId, blmValues }: StartBlmCalibration): Promise<void> {
+  async execute({
+    scenarioId,
+    blmValues,
+    config,
+  }: StartBlmCalibration): Promise<void> {
     // In order to ensure that boundary data is included in assets array
     // a non zero value should be provided to `forScenario` method of AssetsService
     const nonZeroBLMValue = 1;
@@ -32,6 +36,7 @@ export class StartBlmCalibrationHandler
       scenarioId,
       blmValues,
       assets,
+      config,
     });
 
     if (!job) {

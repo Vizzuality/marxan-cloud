@@ -15,16 +15,6 @@ export class BlmFinalResultsRepository {
     return Promise.resolve(undefined);
   }
 
-  async findOneByScenarioId(scenarioId: string): Promise<BlmFinalResultEntity> {
-    const result = await this.entityManager.findOneOrFail(
-      BlmFinalResultEntity,
-      {
-        where: { scenarioId },
-      },
-    );
-    return result;
-  }
-
   /**
    * clear previous results, move the new ones to target
    * table - everything within transaction
@@ -53,21 +43,22 @@ export class BlmFinalResultsRepository {
 
   async updatePngDataOnFinalResults(
     scenarioId: string,
+    blmValue: number,
     pngData: string,
   ): Promise<void> {
     await this.entityManager.transaction(async (txManager) => {
       const query = `
         update blm_final_results
         set protected_pu_ids NULL
-        where blm_final_results.scenario_id = $1`;
-      await txManager.query(query, [scenarioId]);
+        where blm_final_results.scenario_id = $1 and blm_final_results.blm_value = $2`;
+      await txManager.query(query, [scenarioId, blmValue]);
 
       const pngDataParsedBuffer = Buffer.from(
         '\\x' + Buffer.from(pngData, 'base64').toString('hex'),
       );
       await txManager.update(
         BlmFinalResultEntity,
-        { scenarioId },
+        { scenarioId, blmValue },
         { pngData: pngDataParsedBuffer },
       );
     });

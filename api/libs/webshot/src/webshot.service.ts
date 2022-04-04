@@ -1,7 +1,7 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { WebshotConfig } from './webshot.dto';
+import { WebshotPdfConfig, WebshotPngConfig } from './webshot.dto';
 
 export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
 export const unknownPngWebshotError = Symbol(`unknown png webshot error`);
@@ -13,7 +13,7 @@ export class WebshotService {
   async getSummaryReportForScenario(
     scenarioId: string,
     projectId: string,
-    config: WebshotConfig,
+    config: WebshotPdfConfig,
     webshotUrl: string,
   ): Promise<Either<typeof unknownPdfWebshotError, Readable>> {
     try {
@@ -43,10 +43,10 @@ export class WebshotService {
   async getBlmValuesImage(
     scenarioId: string,
     projectId: string,
-    config: WebshotConfig,
+    config: WebshotPngConfig,
     blmValue: number,
     webshotUrl: string,
-  ): Promise<Either<typeof unknownPngWebshotError, Readable>> {
+  ): Promise<Either<typeof unknownPngWebshotError, string>> {
     try {
       const pngBuffer = await this.httpService
         .post(
@@ -60,12 +60,9 @@ export class WebshotService {
           throw new Error(error);
         });
 
-      const stream = new Readable();
+      const pngBase64String = Buffer.from(pngBuffer).toString('base64');
 
-      stream.push(pngBuffer);
-      stream.push(null);
-
-      return right(stream);
+      return right(pngBase64String);
     } catch (error) {
       return left(unknownPngWebshotError);
     }

@@ -22,14 +22,18 @@ export class WebshotConfig {
   @ApiPropertyOptional()
   @IsOptional()
   cookie?: string;
+}
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  pdfOptions?: PDFOptions;
-
+export class WebshotPngConfig extends WebshotConfig {
   @ApiPropertyOptional()
   @IsOptional()
   screenshotOptions?: ScreenshotOptions;
+}
+
+export class WebshotPdfConfig extends WebshotConfig {
+  @ApiPropertyOptional()
+  @IsOptional()
+  pdfOptions?: PDFOptions;
 
   @ValidateNested()
   @IsObject()

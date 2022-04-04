@@ -101,7 +101,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotConfig } from '@marxan/webshot';
+import { WebshotConfig, WebshotPdfConfig } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 
@@ -1088,13 +1088,30 @@ export class ScenariosController {
   async startCalibration(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() { range }: StartScenarioBlmCalibrationDto,
+    @Body() config: WebshotConfig,
     @Req() req: RequestWithAuthenticatedUser,
+    @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<JsonApiAsyncJobMeta> {
+    /**
+     * If a frontend app session token was provided via cookie, use this to let
+     * the webshot service authenticate to the app, otherwise fall back to
+     * looking for the relevant cookies in the body of the request.
+     *
+     * @todo Remove this once the new auth workflow via `Cookie` header is
+     * stable.
+     */
+    const configForWebshot = appSessionTokenCookie
+      ? {
+          ...config,
+          cookie: appSessionTokenCookie,
+        }
+      : config;
     const result = await this.service.startBlmCalibration(
       id,
       {
         authenticatedUser: req.user,
       },
+      configForWebshot,
       range,
     );
 
@@ -1258,7 +1275,7 @@ export class ScenariosController {
   @Header('content-type', 'application/pdf')
   @Post('/:scenarioId/solutions/report')
   async getSummaryReportForProject(
-    @Body() config: WebshotConfig,
+    @Body() config: WebshotPdfConfig,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
