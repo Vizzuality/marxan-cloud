@@ -1087,8 +1087,8 @@ export class ScenariosController {
   @Post(`:id/calibration`)
   async startCalibration(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() { range }: StartScenarioBlmCalibrationDto,
-    @Body() config: WebshotConfig,
+    @Body('range') { range }: StartScenarioBlmCalibrationDto,
+    @Body('config') config: WebshotConfig,
     @Req() req: RequestWithAuthenticatedUser,
     @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<JsonApiAsyncJobMeta> {
