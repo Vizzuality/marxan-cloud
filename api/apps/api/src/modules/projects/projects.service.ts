@@ -214,11 +214,11 @@ export class ProjectsService {
       return left(projectNotFound);
     }
     /**
-    we are redirecting to the planning area service to get the tiles.
+     we are redirecting to the planning area service to get the tiles.
 
-    @todo: In the future we should decouple this text url stuff.
+     @todo: In the future we should decouple this text url stuff.
 
-    */
+     */
     if (project.planningUnitGridShape === 'from_shapefile') {
       return right({
         from: `/projects/${projectId}/grid/tiles`,
@@ -270,8 +270,8 @@ export class ProjectsService {
       input.countryId
     );
 
-    if (dtoHasRegularShape && dtoDoesNotHaveInfoForRegularPUShapes)
-      return left(projectIsMissingInfoForRegularPus);
+    // if (dtoHasRegularShape && dtoDoesNotHaveInfoForRegularPUShapes)
+    //   return left(projectIsMissingInfoForRegularPus);
 
     assertDefined(info.authenticatedUser);
     if (
@@ -484,6 +484,7 @@ export class ProjectsService {
 
     return right(importIdOrError.right);
   }
+
   /**
    * @todo: this is a good candidate for a new static method in class
    * Gids (static planningGidsFromAreaId()
