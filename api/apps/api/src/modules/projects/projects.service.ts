@@ -265,6 +265,7 @@ export class ProjectsService {
         input.planningUnitGridShape,
       );
     const dtoDoesNotHaveInfoForRegularPUShapes = !(
+      input.planningAreaId ||
       input.adminAreaLevel1Id ||
       input.adminAreaLevel2Id ||
       input.countryId
