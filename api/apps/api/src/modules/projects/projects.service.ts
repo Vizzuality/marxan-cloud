@@ -270,8 +270,8 @@ export class ProjectsService {
       input.countryId
     );
 
-    // if (dtoHasRegularShape && dtoDoesNotHaveInfoForRegularPUShapes)
-    //   return left(projectIsMissingInfoForRegularPus);
+    if (dtoHasRegularShape && dtoDoesNotHaveInfoForRegularPUShapes)
+      return left(projectIsMissingInfoForRegularPus);
 
     assertDefined(info.authenticatedUser);
     if (

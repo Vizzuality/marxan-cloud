@@ -130,7 +130,7 @@ export const E2E_CONFIG: {
       }): CreateProjectDTO => ({
         name: options?.name ?? faker.random.words(5),
         organizationId: faker.random.uuid(),
-        countryId: options?.countryCode,
+        countryId: options?.countryCode ?? 'NAM',
         adminAreaLevel1Id: options?.adminAreaLevel1Id,
         adminAreaLevel2Id: options?.adminAreaLevel2Id,
         planningUnitGridShape: PlanningUnitGridShape.Hexagon,

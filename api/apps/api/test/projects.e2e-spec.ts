@@ -72,9 +72,15 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     test('Creating a project with minimum required data should succeed', async () => {
+      const organizationResponse = await request(app.getHttpServer())
+        .post('/api/v1/organizations')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(E2E_CONFIG.organizations.valid.minimal())
+        .expect(201);
+
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
-        organizationId: anOrganization.id,
+        organizationId: organizationResponse.body.data.id,
       };
 
       const response = await request(app.getHttpServer())
@@ -88,7 +94,7 @@ describe('ProjectsModule (e2e)', () => {
       expect(jsonAPIResponse.data.type).toBe('projects');
     });
 
-    test.skip('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
+    test('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
       const organization = await OrganizationsTestUtils.createOrganization(
         app,
         jwtToken,
