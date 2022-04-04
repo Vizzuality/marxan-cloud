@@ -1,8 +1,9 @@
+import { PlanningAreaGadmPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-gadm.piece-exporter';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
+import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -11,8 +12,6 @@ import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
-import { PlanningAreaGadmPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-gadm.piece-exporter';
-import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import {
   DeleteProjectAndOrganization,
   GivenProjectExists,
@@ -70,7 +69,6 @@ const getFixtures = async () => {
   );
   const fileRepository = sandbox.get(FileRepository);
   const expectedContent: PlanningAreaGadmContent = {
-    puGridShape: PlanningUnitGridShape.Square,
     l1: 'NAM.12_1',
     l2: 'NAM.12.7_1',
     planningUnitAreakm2: 500,
