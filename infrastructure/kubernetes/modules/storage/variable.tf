@@ -17,3 +17,8 @@ variable "k8s_cluster_ca_certificate" {
   description = "Cluster CA certificate for the k8s cluster"
   type        = string
 }
+
+variable "backend_storage_class" {
+  description = "Storage class for backend storage"
+  type        = string
+}

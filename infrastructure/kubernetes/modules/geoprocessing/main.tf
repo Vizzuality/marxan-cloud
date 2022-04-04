@@ -53,6 +53,14 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
         }
 
+        volume {
+          name = "shared-spatial-data-storage"
+          persistent_volume_claim {
+            # @debt use var
+            claim_name = "backend-shared-spatial-data-storage"
+          }
+        }
+
         container {
           image             = var.image
           image_pull_policy = "Always"
@@ -60,6 +68,10 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
 
           args = ["start"]
 
+          volume_mount {
+            mount_path  = "/tmp/storage"
+            name        = "shared-spatial-data-storage"
+          }
 
           env {
             name = "API_POSTGRES_HOST"
