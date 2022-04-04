@@ -68,6 +68,7 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.ScenarioProtectedAreas),
       ExportComponent.newOne(id, ClonePiece.ScenarioPlanningUnitsData),
       ExportComponent.newOne(id, ClonePiece.ScenarioRunResults),
+      ExportComponent.newOne(id, ClonePiece.ScenarioFeaturesData),
     ];
 
     if (kind === ResourceKind.Scenario) {
