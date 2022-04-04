@@ -136,8 +136,6 @@ export class MarxanSandboxBlmRunnerService
         }
         this.interruptIfKilled(scenarioId);
 
-        // When webshot call returns -> this.finalResultsRepository.updateFinalResults(scenarioId, pngData).
-
         this.clearAbortController(scenarioId);
         this.interruptIfKilled(scenarioId);
       } catch (err) {

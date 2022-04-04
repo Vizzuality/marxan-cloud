@@ -81,6 +81,7 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${ownerToken}`)
         .send({
           range: blmRange,
+          config: { baseUrl: 'example/png', cookie: 'randomCookie' },
         })
         .expect(HttpStatus.CREATED),
     WhenContributorLaunchesCalibration: async () => {
@@ -97,6 +98,7 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${viewerToken}`)
         .send({
           range: blmRange,
+          config: { baseUrl: 'example/png', cookie: 'randomCookie' },
         }),
     ThenCalibrationResultsShouldBeAvailable: async () => {
       const response: { body: BlmCalibrationRunResultDto[] } = await request(
