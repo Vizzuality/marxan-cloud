@@ -20,6 +20,8 @@ import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scen
 import { ProjectsTestUtils } from './utils/projects.test.utils';
 import { OrganizationsTestUtils } from './utils/organizations.test.utils';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 afterAll(async () => {
   await tearDown();
@@ -38,6 +40,7 @@ describe('ProjectsModule (e2e)', () => {
   let minimalProject: Project;
   let completeProject: Project;
   let aScenarioInACompleteProject: Scenario;
+  const projectsToDelete: string[] = [];
 
   beforeAll(async () => {
     app = await bootstrapApplication();
@@ -47,6 +50,10 @@ describe('ProjectsModule (e2e)', () => {
   });
 
   afterAll(async () => {
+    const projectRepository = await app.get<Repository<Project>>(
+      getRepositoryToken(Project),
+    );
+    await projectRepository.delete(projectsToDelete);
     await Promise.all([app.close()]);
   });
 
@@ -92,6 +99,7 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultSingular = response.body;
       minimalProject = await Deserializer.deserialize(response.body);
       expect(jsonAPIResponse.data.type).toBe('projects');
+      projectsToDelete.push(response.body.data.id);
     });
 
     test('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
