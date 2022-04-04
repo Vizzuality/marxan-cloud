@@ -39,6 +39,9 @@ locals {
   k8s_client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_certificate)
   k8s_client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
   k8s_cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
+  backend_storage_class      = "azurefile-csi-nfs"
+  backend_storage_size       = "100Gi"
+  backend_storage_pvc        = "backend-shared-spatial-data-storage"
 }
 
 module "k8s_namespaces" {
@@ -65,6 +68,7 @@ module "k8s_storage" {
   k8s_client_certificate     = local.k8s_client_certificate
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
+  backend_storage_class      = local.backend_storage_class
 }
 
 ####
@@ -115,6 +119,9 @@ module "api_production" {
   application_base_url       = "https://${var.domain}"
   network_cors_origins       = "https://${var.domain}"
   http_logging_morgan_format = ""
+  backend_storage_class      = local.backend_storage_class
+  backend_storage_pvc        = local.backend_storage_pvc
+  backend_storage_size       = local.backend_storage_size
 }
 
 module "geoprocessing_production" {
@@ -126,6 +133,9 @@ module "geoprocessing_production" {
   namespace                  = "production"
   image                      = "marxan.azurecr.io/marxan-geoprocessing:production"
   deployment_name            = "geoprocessing"
+  backend_storage_class      = local.backend_storage_class
+  backend_storage_pvc        = local.backend_storage_pvc
+  backend_storage_size       = local.backend_storage_size
 }
 
 module "client_production" {
@@ -231,6 +241,9 @@ module "api_staging" {
   application_base_url       = "https://staging.${var.domain}"
   network_cors_origins       = "https://staging.${var.domain}"
   http_logging_morgan_format = "short"
+  backend_storage_class      = local.backend_storage_class
+  backend_storage_pvc        = local.backend_storage_pvc
+  backend_storage_size       = local.backend_storage_size
 }
 
 module "geoprocessing_staging" {
@@ -243,6 +256,9 @@ module "geoprocessing_staging" {
   image                      = "marxan.azurecr.io/marxan-geoprocessing:staging"
   deployment_name            = "geoprocessing"
   cleanup_temporary_folders  = "false"
+  backend_storage_class      = local.backend_storage_class
+  backend_storage_pvc        = local.backend_storage_pvc
+  backend_storage_size       = local.backend_storage_size
 }
 
 module "client_staging" {
