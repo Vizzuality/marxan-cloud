@@ -1087,11 +1087,11 @@ export class ScenariosController {
   @Post(`:id/calibration`)
   async startCalibration(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body('range') { range }: StartScenarioBlmCalibrationDto,
-    @Body('config') config: WebshotConfig,
+    @Body() blmCalibrationConfig: StartScenarioBlmCalibrationDto,
     @Req() req: RequestWithAuthenticatedUser,
     @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<JsonApiAsyncJobMeta> {
+    const { config, range } = blmCalibrationConfig;
     /**
      * If a frontend app session token was provided via cookie, use this to let
      * the webshot service authenticate to the app, otherwise fall back to
