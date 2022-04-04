@@ -115,7 +115,10 @@ const getFixtures = async () => {
     GivenScenarioBlmWasUpdated: async () => {
       await request(app.getHttpServer())
         .post(`/api/v1/scenarios/${scenarioId}/calibration`)
-        .send({ range: updatedBlmRange })
+        .send({
+          range: updatedBlmRange,
+          config: { baseUrl: 'example/png', cookie: 'randomCookie' },
+        })
         .set('Authorization', `Bearer ${ownerToken}`);
     },
     WhenAskingForBlmRangeForScenario: () => {
