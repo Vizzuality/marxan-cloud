@@ -2,24 +2,26 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import {
-  getEntityManagerToken,
-  getRepositoryToken,
-  TypeOrmModule,
-} from '@nestjs/typeorm';
-import { Transform } from 'stream';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { MultiPolygon } from 'geojson';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ScenarioProtectedAreasPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/scenario-protected-areas.piece-exporter';
 import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-protected-areas';
+import {
+  DeleteProjectAndOrganization,
+  DeleteProtectedAreas,
+  GivenCustomProtectedAreas,
+  GivenScenarioExists,
+  GivenWdpaProtectedAreas,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -46,7 +48,7 @@ describe(ScenarioProtectedAreasPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenAnEmptyScenarioProtectedAreasFileIsSaved();
   });
-  it('should save file succesfully when protected areas are selecteds', async () => {
+  it('should save file succesfully when protected areas are selected', async () => {
     const input = fixtures.GivenAScenarioProtectedAreasExportJob();
     await fixtures.GivenScenarioExist();
     await fixtures.GivenSelectedAreasForScenario();
@@ -81,56 +83,30 @@ const getFixtures = async () => {
   await sandbox.init();
   const projectId = v4();
   const scenarioId = v4();
-  const commonProtectedAreasWdpaids = [1089, 27037, 4088];
-  let commonProtectedAreasIds: string[];
-  const customProtectedAreaId = v4();
+  let customProtectedAreaId: string = v4();
+  let commonProtectedAreasWdpaids: number[] = [];
+  let commonProtectedAreasIds: string[] = [];
   const organizationId = v4();
   const sut = sandbox.get(ScenarioProtectedAreasPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
-  const fileRepository = sandbox.get(FileRepository);
-  const protectedAreasRepository: Repository<ProtectedArea> = sandbox.get(
-    getRepositoryToken(ProtectedArea),
+  const geoEntityManager: EntityManager = sandbox.get(
+    getEntityManagerToken(geoprocessingConnections.default),
   );
-  const readSavedFile = async (
-    savedStrem: Readable,
-  ): Promise<ScenarioProtectedAreasContent> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
-  };
+  const fileRepository = sandbox.get(FileRepository);
 
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
-      await protectedAreasRepository.delete({
-        projectId: In([projectId]),
-      });
+      await DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
+      return DeleteProtectedAreas(geoEntityManager, [
+        customProtectedAreaId,
+        ...commonProtectedAreasIds,
+      ]);
     },
     GivenAScenarioProtectedAreasExportJob: (): ExportJobInput => {
       return {
@@ -148,56 +124,30 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenScenarioExist: async (): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-        })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('scenarios')
-        .values({
-          id: scenarioId,
-          name: 'scenario1',
-          description: 'desc',
-          blm: 1,
-          number_of_runs: 6,
-          project_id: projectId,
-          metadata: { marxanInputParameterFile: { meta: '1' } },
-        })
-        .execute();
+    GivenScenarioExist: async () => {
+      return GivenScenarioExists(
+        apiEntityManager,
+        scenarioId,
+        projectId,
+        organizationId,
+      );
     },
     GivenNoSelectedAreasForScenario: async (): Promise<void> => {},
-    GivenSelectedAreasForScenario: async (): Promise<void> => {
-      await protectedAreasRepository.save({
-        id: customProtectedAreaId,
-        projectId,
-        fullName: 'custom1',
-        theGeom: expectedGeom,
-      });
-      const commonProtectedAreas = await protectedAreasRepository.find({
-        wdpaId: In(commonProtectedAreasWdpaids),
-      });
-      commonProtectedAreasIds = commonProtectedAreas.map(
-        (protectedArea) => protectedArea.id,
+    GivenSelectedAreasForScenario: async () => {
+      customProtectedAreaId = (
+        await GivenCustomProtectedAreas(geoEntityManager, 1, projectId)
+      )[0].id;
+
+      const commonProtectedAreas = await GivenWdpaProtectedAreas(
+        geoEntityManager,
+        3,
       );
-      await apiEntityManager
+      commonProtectedAreas.forEach((protectedArea) => {
+        commonProtectedAreasIds.push(protectedArea.id);
+        commonProtectedAreasWdpaids.push(protectedArea.wdpaId);
+      });
+
+      return apiEntityManager
         .createQueryBuilder()
         .update('scenarios')
         .set({
@@ -221,7 +171,9 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
+          const content = await readSavedFile<ScenarioProtectedAreasContent>(
+            savedStrem,
+          );
           expect(content).toEqual({
             wdpa: [],
             customProtectedAreas: [],
@@ -234,13 +186,17 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
+          const content = await readSavedFile<ScenarioProtectedAreasContent>(
+            savedStrem,
+          );
           expect(content.threshold).toBe(1);
           expect(content.wdpa.sort()).toEqual(
             commonProtectedAreasWdpaids.sort(),
           );
           expect(content.customProtectedAreas).toHaveLength(1);
-          expect(content.customProtectedAreas[0].name).toBe('custom1');
+          expect(content.customProtectedAreas[0].name).toBe(
+            `custom protected area 1 of ${projectId}`,
+          );
           expect(content.customProtectedAreas[0].geom.length).toBeGreaterThan(
             0,
           );

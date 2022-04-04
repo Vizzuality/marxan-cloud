@@ -2,7 +2,6 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -11,7 +10,6 @@ import {
   getRepositoryToken,
   TypeOrmModule,
 } from '@nestjs/typeorm';
-import { Transform } from 'stream';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager, Repository } from 'typeorm';
@@ -19,6 +17,12 @@ import { v4 } from 'uuid';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PlanningAreaCustomGeojsonPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-custom-geojson.piece-exporter';
 import { MultiPolygon } from 'geojson';
+import {
+  DeletePlanningAreas,
+  DeleteProjectAndOrganization,
+  GivenProjectExists,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -78,44 +82,22 @@ const getFixtures = async () => {
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
+  const geoEntityManager: EntityManager = sandbox.get(
+    getEntityManagerToken(geoprocessingConnections.default),
+  );
   const fileRepository = sandbox.get(FileRepository);
   const planningAreaRepository: Repository<PlanningArea> = sandbox.get(
     getRepositoryToken(PlanningArea),
   );
-  const readSavedFile = async (savedStrem: Readable): Promise<MultiPolygon> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
-  };
 
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
-      await planningAreaRepository.delete({ projectId });
+      await DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
+      return DeletePlanningAreas(geoEntityManager, projectId);
     },
     GivenAPlanningAreaCustomExportJob: (): ExportJobInput => {
       return {
@@ -134,28 +116,12 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenProjectExist: async (): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-          planning_unit_area_km2: 500,
-          planning_area_geometry_id: planningAreaId,
-        })
-        .execute();
+    GivenProjectExist: async () => {
+      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
+        description: 'desc',
+        planning_unit_area_km2: 500,
+        planning_area_geometry_id: planningAreaId,
+      });
     },
     GivenPlanningArea: async (): Promise<void> => {
       await planningAreaRepository.save({
@@ -177,7 +143,7 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
+          const content = await readSavedFile<MultiPolygon>(savedStrem);
           expect(content).toStrictEqual(expectedGeom);
         },
       };

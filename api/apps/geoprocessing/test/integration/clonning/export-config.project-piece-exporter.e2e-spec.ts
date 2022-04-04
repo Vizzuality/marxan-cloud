@@ -2,12 +2,10 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Transform } from 'stream';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
@@ -15,9 +13,14 @@ import { v4 } from 'uuid';
 import {
   exportVersion,
   ProjectExportConfigContent,
-  ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { ExportConfigProjectPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/export-config.project-piece-exporter';
+import {
+  DeleteProjectAndOrganization,
+  GivenProjectExists,
+  GivenScenarioExists,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -47,6 +50,7 @@ describe(ExportConfigProjectPieceExporter, () => {
   it('should save file succesfully when project is found', async () => {
     const input = fixtures.GivenAExportConfigProjectExportJob();
     await fixtures.GivenProjectExist();
+
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenExportConfigProjectFileIsSaved();
@@ -94,13 +98,12 @@ const getFixtures = async () => {
     if (options.projectWithScenario)
       scenarios[scenarioId] = [ClonePiece.ScenarioMetadata];
     return {
-      name: 'name',
-      description: 'desc',
+      name: `test project - ${projectId}`,
       version: exportVersion,
       resourceKind: ResourceKind.Project,
       resourceId: projectId,
       scenarios: options.projectWithScenario
-        ? [{ id: scenarioId, name: 'scenario1' }]
+        ? [{ id: scenarioId, name: `test scenario - ${scenarioId}` }]
         : [],
       pieces: {
         project: [ClonePiece.ProjectMetadata, ClonePiece.ExportConfig],
@@ -108,41 +111,14 @@ const getFixtures = async () => {
       },
     };
   };
-  const readSavedFile = async (
-    savedStrem: Readable,
-  ): Promise<ProjectExportConfigContent> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
-  };
 
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
+      return DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
     },
     GivenAExportConfigProjectExportJob: (
       options = defaultFixtureOptions,
@@ -163,41 +139,16 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenProjectExist: async (
-      options = defaultFixtureOptions,
-    ): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
+    GivenProjectExist: async (options = defaultFixtureOptions) => {
+      if (!options.projectWithScenario)
+        return GivenProjectExists(apiEntityManager, projectId, organizationId);
 
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-        })
-        .execute();
-      if (!options.projectWithScenario) return;
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('scenarios')
-        .values({
-          id: scenarioId,
-          name: 'scenario1',
-          description: 'desc',
-          project_id: projectId,
-        })
-        .execute();
+      return GivenScenarioExists(
+        apiEntityManager,
+        scenarioId,
+        projectId,
+        organizationId,
+      );
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
@@ -213,8 +164,10 @@ const getFixtures = async () => {
           const expectedContent = getExpectedContent(options);
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
-          expect(content).toEqual(expectedContent);
+          const content = await readSavedFile<ProjectExportConfigContent>(
+            savedStrem,
+          );
+          expect(content).toMatchObject(expectedContent);
         },
       };
     },

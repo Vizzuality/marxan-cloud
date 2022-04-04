@@ -8,12 +8,16 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Transform } from 'stream';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import {
+  DeleteProjectAndOrganization,
+  GivenProjectExists,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -66,46 +70,17 @@ const getFixtures = async () => {
   );
   const fileRepository = sandbox.get(FileRepository);
   const expectedContent: ProjectMetadataContent = {
-    name: 'name',
-    description: 'desc',
+    name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,
-  };
-
-  const readSavedFile = async (
-    savedStrem: Readable,
-  ): Promise<ProjectMetadataContent> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
   };
 
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
+      return DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
     },
     GivenAProjectMetadataExportJob: (): ExportJobInput => {
       return {
@@ -119,26 +94,8 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenProjectExist: async (): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-        })
-        .execute();
+    GivenProjectExist: async () => {
+      return GivenProjectExists(apiEntityManager, projectId, organizationId);
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
@@ -151,8 +108,10 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
-          expect(content).toEqual(expectedContent);
+          const content = await readSavedFile<ProjectMetadataContent>(
+            savedStrem,
+          );
+          expect(content).toMatchObject(expectedContent);
         },
       };
     },

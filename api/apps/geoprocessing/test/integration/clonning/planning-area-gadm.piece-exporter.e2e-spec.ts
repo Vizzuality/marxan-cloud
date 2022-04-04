@@ -7,13 +7,17 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Transform } from 'stream';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { PlanningAreaGadmPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-gadm.piece-exporter';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
+import {
+  DeleteProjectAndOrganization,
+  GivenProjectExists,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -34,7 +38,7 @@ describe(PlanningAreaGadmPieceExporter, () => {
   });
   it('should save file succesfully when project is found', async () => {
     const input = fixtures.GivenAPlanningAreaGadmExportJob();
-    await fixtures.GivenProjectExist();
+    await fixtures.GivenProjectWithGadmArea();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenPlanningAreaGadmFileIsSaved();
@@ -74,41 +78,13 @@ const getFixtures = async () => {
     country: 'AGO',
   };
 
-  const readSavedFile = async (
-    savedStrem: Readable,
-  ): Promise<PlanningAreaGadmContent> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
-  };
-
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
+      return DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
     },
     GivenAPlanningAreaGadmExportJob: (): ExportJobInput => {
       return {
@@ -123,31 +99,15 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenProjectExist: async (): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-          admin_area_l1_id: 'NAM.12_1',
-          admin_area_l2_id: 'NAM.12.7_1',
-          planning_unit_area_km2: 500,
-          bbox: JSON.stringify([10, 11, 12, 13]),
-          country_id: 'AGO',
-        })
-        .execute();
+    GivenProjectWithGadmArea: async () => {
+      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
+        description: 'desc',
+        admin_area_l1_id: 'NAM.12_1',
+        admin_area_l2_id: 'NAM.12.7_1',
+        planning_unit_area_km2: 500,
+        bbox: JSON.stringify([10, 11, 12, 13]),
+        country_id: 'AGO',
+      });
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
@@ -162,7 +122,9 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
+          const content = await readSavedFile<PlanningAreaGadmContent>(
+            savedStrem,
+          );
           expect(content).toEqual(expectedContent);
         },
       };

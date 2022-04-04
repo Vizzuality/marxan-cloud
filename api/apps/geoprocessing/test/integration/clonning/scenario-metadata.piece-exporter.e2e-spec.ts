@@ -2,18 +2,21 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Transform } from 'stream';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { ScenarioMetadataPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/scenario-metadata.piece-exporter';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
+import {
+  DeleteProjectAndOrganization,
+  GivenScenarioExists,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -67,48 +70,20 @@ const getFixtures = async () => {
   );
   const fileRepository = sandbox.get(FileRepository);
   const expectedContent: ScenarioMetadataContent = {
-    name: 'scenario1',
+    name: `test scenario - ${scenarioId}`,
     description: 'desc',
     blm: 1,
     numberOfRuns: 6,
     metadata: { marxanInputParameterFile: { meta: '1' } },
   };
 
-  const readSavedFile = async (
-    savedStrem: Readable,
-  ): Promise<ScenarioMetadataContent> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
-  };
-
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
+      return DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
     },
     GivenAScenarioMetadataExportJob: (): ExportJobInput => {
       return {
@@ -122,40 +97,19 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Scenario,
       };
     },
-    GivenScenarioExist: async (): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-        })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('scenarios')
-        .values({
-          id: scenarioId,
-          name: 'scenario1',
+    GivenScenarioExist: async () => {
+      return GivenScenarioExists(
+        apiEntityManager,
+        scenarioId,
+        projectId,
+        organizationId,
+        {
           description: 'desc',
           blm: 1,
           number_of_runs: 6,
-          project_id: projectId,
           metadata: { marxanInputParameterFile: { meta: '1' } },
-        })
-        .execute();
+        },
+      );
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
@@ -168,7 +122,9 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile(savedStrem);
+          const content = await readSavedFile<ScenarioMetadataContent>(
+            savedStrem,
+          );
           expect(content).toEqual(expectedContent);
         },
       };

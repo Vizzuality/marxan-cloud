@@ -2,25 +2,24 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import {
-  getEntityManagerToken,
-  getRepositoryToken,
-  TypeOrmModule,
-} from '@nestjs/typeorm';
-import { Transform } from 'stream';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { MultiPolygon } from 'geojson';
 import { ProjectCustomProtectedAreasPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-custom-protected-areas.piece-exporter';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
+import {
+  DeleteProjectAndOrganization,
+  DeleteProtectedAreas,
+  GivenCustomProtectedAreas,
+  GivenProjectExists,
+  readSavedFile,
+} from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -76,53 +75,29 @@ const getFixtures = async () => {
   await sandbox.init();
   const projectId = v4();
   const otherProjectId = v4();
+  let projectPlanningAreaId: string;
+  let otherProjectPlanningAreaId: string;
   const organizationId = v4();
   const sut = sandbox.get(ProjectCustomProtectedAreasPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
-  const fileRepository = sandbox.get(FileRepository);
-  const protectedAreasRepository: Repository<ProtectedArea> = sandbox.get(
-    getRepositoryToken(ProtectedArea),
+  const geoEntityManager: EntityManager = sandbox.get(
+    getEntityManagerToken(geoprocessingConnections.default),
   );
-  const readSavedFile = async (
-    savedStrem: Readable,
-  ): Promise<ProjectCustomProtectedAreasContent[]> => {
-    let buffer: Buffer;
-    const transformer = new Transform({
-      transform: (chunk) => {
-        buffer = chunk;
-      },
-    });
-    await new Promise<void>((resolve) => {
-      savedStrem.on('close', () => {
-        resolve();
-      });
-      savedStrem.on('finish', () => {
-        resolve();
-      });
-      savedStrem.pipe(transformer);
-    });
-    return JSON.parse(buffer!.toString());
-  };
+  const fileRepository = sandbox.get(FileRepository);
 
   return {
     cleanUp: async () => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('projects')
-        .where('id = :projectId', { projectId })
-        .execute();
-      await apiEntityManager
-        .createQueryBuilder()
-        .delete()
-        .from('organizations')
-        .where('id = :organizationId', { organizationId })
-        .execute();
-      await protectedAreasRepository.delete({
-        projectId: In([projectId, otherProjectId]),
-      });
+      await DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
+      return DeleteProtectedAreas(geoEntityManager, [
+        projectPlanningAreaId,
+        otherProjectPlanningAreaId,
+      ]);
     },
     GivenAProjectCustomProtectedAreasExportJob: (): ExportJobInput => {
       return {
@@ -140,41 +115,21 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenProjectExist: async (): Promise<void> => {
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('organizations')
-        .values({ id: organizationId, name: 'org1' })
-        .execute();
-
-      await apiEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into('projects')
-        .values({
-          id: projectId,
-          name: 'name',
-          description: 'desc',
-          planning_unit_grid_shape: PlanningUnitGridShape.Square,
-          organization_id: organizationId,
-          planning_unit_area_km2: 500,
-        })
-        .execute();
-    },
-    GivenNoCustomProtectedAreaForProject: async (): Promise<void> => {
-      await protectedAreasRepository.save({
-        projectId: otherProjectId,
-        fullName: 'custom2',
-        theGeom: expectedGeom,
+    GivenProjectExist: async () => {
+      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
+        description: 'desc',
+        planning_unit_area_km2: 500,
       });
     },
-    GivenCustomProtectedAreaForProject: async (): Promise<void> => {
-      await protectedAreasRepository.save({
-        projectId,
-        fullName: 'custom1',
-        theGeom: expectedGeom,
-      });
+    GivenNoCustomProtectedAreaForProject: async () => {
+      otherProjectPlanningAreaId = (
+        await GivenCustomProtectedAreas(geoEntityManager, 1, otherProjectId)
+      )[0].id;
+    },
+    GivenCustomProtectedAreaForProject: async () => {
+      projectPlanningAreaId = (
+        await GivenCustomProtectedAreas(geoEntityManager, 1, projectId)
+      )[0].id;
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
@@ -193,42 +148,17 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = (await readSavedFile(savedStrem))[0];
-          expect(content.fullName).toBe('custom1');
+          const content = (
+            await readSavedFile<ProjectCustomProtectedAreasContent[]>(
+              savedStrem,
+            )
+          )[0];
+          expect(content.fullName).toBe(
+            `custom protected area 1 of ${projectId}`,
+          );
           expect(content.ewkb.length).toBeGreaterThan(0);
         },
       };
     },
   };
-};
-
-const expectedGeom: MultiPolygon = {
-  type: 'MultiPolygon',
-  coordinates: [
-    [
-      [
-        [102.0, 2.0],
-        [103.0, 2.0],
-        [103.0, 3.0],
-        [102.0, 3.0],
-        [102.0, 2.0],
-      ],
-    ],
-    [
-      [
-        [100.0, 0.0],
-        [101.0, 0.0],
-        [101.0, 1.0],
-        [100.0, 1.0],
-        [100.0, 0.0],
-      ],
-      [
-        [100.2, 0.2],
-        [100.8, 0.2],
-        [100.8, 0.8],
-        [100.2, 0.8],
-        [100.2, 0.2],
-      ],
-    ],
-  ],
 };

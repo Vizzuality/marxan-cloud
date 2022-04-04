@@ -23,6 +23,7 @@ type SelectScenarioResult = {
 type CustomProtectedArea = {
   ewkb: Buffer;
   name: string;
+  projectId: string;
 };
 
 type WdpaProtectedArea = {
@@ -76,6 +77,7 @@ export class ScenarioProtectedAreasPieceExporter
           .select('wdpaid')
           .addSelect('ST_AsEWKB(the_geom)', 'ewkb')
           .addSelect('full_name', 'name')
+          .addSelect('project_id', 'projectId')
           .from('wdpa', 'pa')
           .where('pa.id IN (:...paIds)', {
             paIds: scenario.protectedAreasIds,
@@ -91,7 +93,7 @@ export class ScenarioProtectedAreasPieceExporter
 
     const customProtectedAreas = protectedAreas
       .filter((pa): pa is CustomProtectedArea =>
-        isDefined((pa as CustomProtectedArea).name),
+        isDefined((pa as CustomProtectedArea).projectId),
       )
       .map((pa) => ({
         name: pa.name,

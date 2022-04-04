@@ -37,7 +37,7 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
     const projectId = input.resourceId;
     const [project]: {
       name: string;
-      description: string;
+      description?: string;
     }[] = await this.entityManager
       .createQueryBuilder()
       .select('name')
