@@ -264,14 +264,13 @@ export class ProjectsService {
       [PlanningUnitGridShape.Hexagon, PlanningUnitGridShape.Square].includes(
         input.planningUnitGridShape,
       );
-    const dtoDoesNotHaveInfoForRegularPUShapes = !(
+    const dtoHasNeededInfoForRegularShapes =
       input.planningAreaId ||
       input.adminAreaLevel1Id ||
       input.adminAreaLevel2Id ||
-      input.countryId
-    );
+      input.countryId;
 
-    if (dtoHasRegularShape && dtoDoesNotHaveInfoForRegularPUShapes)
+    if (dtoHasRegularShape && !dtoHasNeededInfoForRegularShapes)
       return left(projectIsMissingInfoForRegularPus);
 
     assertDefined(info.authenticatedUser);
