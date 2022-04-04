@@ -117,7 +117,7 @@ export const mapAclDomainToHttpError = (
       );
     case projectIsMissingInfoForRegularPus:
       return new BadRequestException(
-        `Project with regular planning unit shape is missing GADM id or country id.`,
+        `When a regular planning grid is requested (hexagon or square) either a custom planning area or a GADM area gid must be provided`,
       );
     case lastOwner:
       return new ForbiddenException(`There must be at least one owner.`);
