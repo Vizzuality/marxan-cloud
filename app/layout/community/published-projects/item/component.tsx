@@ -39,7 +39,13 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
         <p className="text-sm">{planningArea}</p>
       </td>
       <td className="pr-6 text-sm">
-        {!!projectUsersVisible?.length && projectUsersVisible?.map((u) => <p key={`${u.user.id}`}>{u.user.displayName}</p>)}
+        {!!projectUsersVisible?.length && projectUsersVisible?.map((u) => {
+          const { id: userId, email, displayName } = u.user;
+
+          return (
+            <p key={`${userId}`}>{displayName || email}</p>
+          );
+        })}
         {projectUsers?.length > projectUsersVisibleSize && (
           <p>
             {`(+${projectUsers.length - projectUsersVisibleSize})`}

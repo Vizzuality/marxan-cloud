@@ -164,7 +164,11 @@ export const Item: React.FC<ItemProps> = ({
               <div className="flex items-center text-sm">
                 <ul className="flex">
                   {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
-                    const { user: { displayName, id: userId, avatarDataUrl } } = u;
+                    const {
+                      user: {
+                        email, displayName, id: userId, avatarDataUrl,
+                      },
+                    } = u;
 
                     return (
                       <li
@@ -177,9 +181,9 @@ export const Item: React.FC<ItemProps> = ({
                           className="text-sm uppercase"
                           bgColor={userColors[userId]}
                           bgImage={avatarDataUrl}
-                          name={displayName}
+                          name={displayName || email}
                         >
-                          {!avatarDataUrl && displayName.slice(0, 2)}
+                          {!avatarDataUrl && (displayName || email).slice(0, 2)}
                         </Avatar>
                       </li>
                     );

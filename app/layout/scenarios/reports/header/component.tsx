@@ -30,7 +30,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = () =>
     isFetched: projectUsersAreFetched,
   } = useProjectUsers(pid);
 
-  const projectOwner = projectUsers?.find((u) => u.roleName === 'project_owner').user.displayName;
+  const projectOwner = projectUsers?.find((u) => u.roleName === 'project_owner')?.user || {};
 
   const reportDataIsFetched = projectDataIsFetched
     && scenarioDataIsFetched && projectUsersAreFetched;
@@ -44,7 +44,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = () =>
             <p className="font-semibold uppercase">
               Created by:
             </p>
-            <p className="capitalize">{projectOwner}</p>
+            <p className="capitalize">{projectOwner?.displayName || projectOwner?.email}</p>
           </div>
         </div>
 

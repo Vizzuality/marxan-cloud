@@ -74,7 +74,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
           <>
             <h2 className="font-medium">Success!</h2>
             <p className="text-sm">
-              {userByEmailData.displayName}
+              {userByEmailData.displayName || userByEmailData.email}
               {' '}
               added as contributor
             </p>
@@ -122,7 +122,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
 
             {SEARCH_RESULT && userByEmailIsFetched && (
               <div className="flex justify-between pt-2 pr-5 text-black pl-9">
-                <div className="text-sm">{SEARCH_RESULT.displayName}</div>
+                <div className="text-sm">{SEARCH_RESULT.displayName || SEARCH_RESULT.email}</div>
 
                 <Button
                   className={cx({
@@ -151,7 +151,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
             {!!projectUsersData?.length && projectUsersData.map((u) => {
               const {
                 user: {
-                  displayName, id, avatarDataUrl,
+                  email: userEmail, displayName, id, avatarDataUrl,
                 }, roleName,
               } = u;
 
@@ -159,7 +159,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
                 <UserCard
                   key={id}
                   id={id}
-                  name={displayName}
+                  name={displayName || userEmail}
                   roleName={roleName}
                   bgImage={avatarDataUrl}
                   bgColor={projectsUsersData[id]}

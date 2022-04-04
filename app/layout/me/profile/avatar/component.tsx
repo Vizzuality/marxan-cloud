@@ -73,7 +73,9 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeP
     onDropRejected,
   });
 
-  const { displayName } = user;
+  if (!user) return null;
+
+  const { displayName, email } = user;
 
   return (
     <div
@@ -94,7 +96,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeP
             onMouseLeave={() => { setHover(false); }}
           >
             <Avatar className="w-16 h-16 text-sm text-white uppercase bg-blue-700" bgImage={preview}>
-              {!preview && displayName.slice(0, 2)}
+              {!preview && (displayName || email).slice(0, 2)}
             </Avatar>
 
             <motion.div

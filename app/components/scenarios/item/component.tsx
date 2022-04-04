@@ -194,7 +194,7 @@ export const Item: React.FC<ItemProps> = ({
                           <div
                             className="p-2 text-xs text-center text-gray-500 bg-white rounded"
                           >
-                            <div>{lock.displayName}</div>
+                            <div>{lock.displayName || lock.email}</div>
                             <div>is editing this scenario</div>
                           </div>
                         )}

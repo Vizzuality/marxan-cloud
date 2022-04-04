@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 
 import Tippy from '@tippyjs/react/headless';
+import cx from 'classnames';
 import { useSpring, motion } from 'framer-motion';
 import { SpringOptions } from 'popmotion';
 
@@ -10,6 +11,7 @@ import { TooltipProps } from './types';
 export const Tooltip: React.FC<TooltipProps> = ({
   children,
   content,
+  contentClassName,
   arrow,
   arrowClassName,
   interactive,
@@ -66,7 +68,13 @@ export const Tooltip: React.FC<TooltipProps> = ({
             {...attrs}
           >
             <div className="relative shadow-2xl">
-              <div className="relative flex flex-grow overflow-hidden flex-column" style={{ maxWidth: maxWidth || 'none', maxHeight: maxHeight || '100vh' }}>
+              <div
+                className={cx({
+                  'relative flex flex-grow overflow-hidden flex-column': true,
+                  [contentClassName]: !!contentClassName,
+                })}
+                style={{ maxWidth: maxWidth || 'none', maxHeight: maxHeight || '100vh' }}
+              >
                 {interactive && !popup && (
                   <div className="absolute top-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-b from-white via-white" />
                 )}

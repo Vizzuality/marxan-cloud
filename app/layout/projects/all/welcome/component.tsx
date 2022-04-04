@@ -1,7 +1,8 @@
 import React from 'react';
 
-import Wrapper from 'layout/wrapper';
 import { useMe } from 'hooks/me';
+
+import Wrapper from 'layout/wrapper';
 
 export interface ProjectsWelcomeProps {
 
@@ -9,7 +10,7 @@ export interface ProjectsWelcomeProps {
 
 export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
   const { user } = useMe();
-  const { displayName } = user;
+  const { email, displayName } = user;
 
   return (
     <Wrapper>
@@ -17,7 +18,7 @@ export const ProjectsWelcome: React.FC<ProjectsWelcomeProps> = () => {
         Welcome,
         {' '}
         <strong>
-          {displayName}
+          {displayName || email}
         </strong>
       </h2>
     </Wrapper>

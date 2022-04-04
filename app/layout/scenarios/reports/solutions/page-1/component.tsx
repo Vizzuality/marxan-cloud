@@ -31,7 +31,7 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
     isFetched: projectUsersDataIsFetched,
   } = useProjectUsers(pid);
 
-  const contributors = projectUsers?.map((u) => u.user.displayName);
+  const contributors = projectUsers?.map((u) => u.user.displayName || u.user.email);
 
   const {
     data: protectedAreasData,

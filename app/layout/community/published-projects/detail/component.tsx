@@ -102,18 +102,22 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       {!!projectUsersVisible?.length && (
                         <div className="space-y-4">
                           {projectUsersVisible.map((u) => {
-                            const { user: { displayName, id: userId, avatarDataUrl } } = u;
+                            const {
+                              user: {
+                                email, displayName, id: userId, avatarDataUrl,
+                              },
+                            } = u;
 
                             return (
                               <div key={userId} className="flex flex-row items-center space-x-2.5">
                                 <Avatar
                                   className="text-sm text-white uppercase border bg-primary-700"
                                   bgImage={avatarDataUrl}
-                                  name={displayName}
+                                  name={displayName || email}
                                 >
-                                  {!avatarDataUrl && displayName.slice(0, 2)}
+                                  {!avatarDataUrl && (displayName || email).slice(0, 2)}
                                 </Avatar>
-                                <p className="text-sm">{displayName}</p>
+                                <p className="text-sm">{(displayName || email)}</p>
                               </div>
                             );
                           })}

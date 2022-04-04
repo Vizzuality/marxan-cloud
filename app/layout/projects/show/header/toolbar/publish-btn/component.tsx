@@ -147,35 +147,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                   )}
                 </FieldRFF>
               </div>
-
-              <div className="mt-8">
-                <FieldRFF
-                  name="contributors"
-                >
-                  {(fprops) => (
-                    <Field id="contributors" {...fprops}>
-                      <div className="flex items-center mb-3 space-x-2">
-                        <Label theme="light" className="uppercase" id="name">
-                          Contributors
-                        </Label>
-                      </div>
-
-                      <div className="mb-4">
-                        {contributors.map((c) => (
-                          <p key={c.id} className="text-sm leading-6 text-black">{c.displayName}</p>
-                        ))}
-                      </div>
-
-                      <Input
-                        theme="light"
-                        type="text"
-                        className="text-sm"
-                        placeholder="Add up to 10 aditional creators."
-                      />
-                    </Field>
-                  )}
-                </FieldRFF>
-              </div> */}
+              */}
 
               <div className="flex justify-between mx-auto mt-4 space-x-4">
                 <Button
