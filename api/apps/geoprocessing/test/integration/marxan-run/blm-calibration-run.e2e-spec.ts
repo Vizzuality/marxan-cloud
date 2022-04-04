@@ -19,7 +19,6 @@ import {
 } from '@marxan/marxan-output';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
-import { Geometry } from 'geojson';
 import { last } from 'lodash';
 import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
@@ -182,6 +181,7 @@ const getFixtures = async () => {
             url: host + resource.assetUrl,
             relativeDestination: resource.targetRelativeDestination,
           })),
+          config: { baseUrl: 'example/png', cookie: 'randomPngCookie' },
         },
         (value) => {
           this.progressMock(value);
