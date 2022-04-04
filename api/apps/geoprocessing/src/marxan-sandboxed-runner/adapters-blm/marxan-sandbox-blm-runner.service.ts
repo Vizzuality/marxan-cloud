@@ -16,11 +16,13 @@ import { BlmFinalResultsRepository } from './blm-final-results.repository';
 import { BlmInputFiles } from './blm-input-files';
 import { BlmCalibrationStarted } from './events/blm-calibration-started.event';
 import { MarxanRunnerFactory } from './marxan-runner.factory';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class MarxanSandboxBlmRunnerService
   implements SandboxRunner<JobData, void> {
   readonly #controllers: Record<string, AbortController> = {};
+  private readonly logger: Logger = new Logger('Marxan Sandbox Blm Runner');
 
   constructor(
     private readonly moduleRef: ModuleRef,
@@ -125,7 +127,10 @@ export class MarxanSandboxBlmRunnerService
           );
 
           if (isLeft(pngStream)) {
-            throw new InternalServerErrorException();
+            this.logger.error(
+              `Could not add PNG data for blm run for scenario ID: ${scenarioId} and blmValue: ${blmValue}`,
+            );
+            continue;
           }
 
           await this.finalResultsRepository.updatePngDataOnFinalResults(
