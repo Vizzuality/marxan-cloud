@@ -119,7 +119,7 @@ export const getFixtures = async () => {
               -16.959890365600586,
               -28.969440460205078,
             ],
-            countryId: null,
+            countryId: 'NAM',
             description: null,
             createdAt: expect.any(String),
             customProtectedAreas: [],

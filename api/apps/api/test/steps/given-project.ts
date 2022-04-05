@@ -34,7 +34,6 @@ export const GivenProjectExists = async (
     ...projectDto,
     organizationId,
   });
-
   const projectId = projectResult.data.id;
   await ProjectsTestUtils.generateBlmValues(app, projectId);
 
