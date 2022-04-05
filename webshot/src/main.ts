@@ -9,7 +9,7 @@ import cors from "cors";
 import config from "config";
 import helmet from "helmet";
 import { generateSummaryReportForScenario } from "./domain/solutions-report/solutions-report";
-import { generatePngImageFromBlmData } from "./domain/solutions-report/png-image";
+import { generatePngImageFromBlmData } from "./domain/blm-previews/png-image";
 
 const app: Application = express();
 const daemonListenPort = config.get("port");
