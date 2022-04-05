@@ -69,7 +69,7 @@ export const generatePngImageFromBlmData = async (
 
   const pageAsPng = await Promise.race([
     page.screenshot({ ...screenshotOptions }),
-    new Promise((resolve, reject) => setTimeout(reject, 1000)),
+    new Promise((resolve, reject) => setTimeout(reject, 30e3)),
   ]);
   await page.close();
   await browser.close();
