@@ -14,10 +14,8 @@ export const generatePngImageFromBlmData = async (
     req;
 
   const {
-    params: { projectId, scenarioId, },
+    params: { projectId, scenarioId, blmValue },
   } = req;
-
-  const { query: { blmValue } } = req;
 
   if (!(projectId || scenarioId || blmValue)) {
     res.status(400).json({
@@ -62,7 +60,7 @@ export const generatePngImageFromBlmData = async (
   console.info(`Rendering ${pageUrl} as PNG`);
   await page.goto(pageUrl);
   await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
-  const pageAsPng = await page.screenshot({ ...screenshotOptions, timeout: 30e3 });
+  const pageAsPng = await page.screenshot({ ...screenshotOptions });
 
   await page.close();
   await browser.close();
