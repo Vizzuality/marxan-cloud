@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import puppeteer, { PDFOptions } from "puppeteer";
 import { ReportOptions } from "./report-options.dto";
-import { waitForReportReady } from "./wait-function";
+import { waitForReportReady } from "../utils/wait-function";
 
 const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions?solutionId=:solutionId";
 

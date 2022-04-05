@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import puppeteer, { ScreenshotOptions } from "puppeteer";
-import { waitForReportReady } from "./wait-function";
+import { waitForReportReady } from "../utils/wait-function";
 
 const appRouteTemplate = "/reports/:projectId/:scenarioId/blm?blmValue=:blmValue";
 
