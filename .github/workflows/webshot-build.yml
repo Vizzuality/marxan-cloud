@@ -1,0 +1,17 @@
+name: Webshot build
+on:
+  push:
+    paths:
+      - 'webshot/**'
+      - '.github/**'
+  workflow_dispatch:
+jobs:
+  build-webshot:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 10
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Build webshot service
+      run: docker compose build webshot
+
