@@ -39,7 +39,7 @@ export const getFixtures = async () => {
     app,
     ownerUserToken,
     {
-      countryCode: 'AGO',
+      countryId: 'AGO',
       name: `Project name ${Date.now()}`,
     },
     {

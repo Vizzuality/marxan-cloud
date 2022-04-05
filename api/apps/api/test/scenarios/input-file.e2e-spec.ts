@@ -474,7 +474,7 @@ async function getFixtures() {
         app,
         ownerToken,
         {
-          countryCode: 'NAM',
+          countryId: 'NAM',
           name: 'Humanity for living.',
         },
         {

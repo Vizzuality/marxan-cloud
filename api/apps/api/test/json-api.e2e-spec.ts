@@ -41,7 +41,7 @@ describe('JSON API Specs (e2e)', () => {
 
     fakeProject = await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: 'NAM',
+        countryId: 'NAM',
         adminAreaLevel1Id: 'NAM.12_1',
         adminAreaLevel2Id: 'NAM.12.7_1',
       }),
@@ -105,7 +105,7 @@ describe('JSON API Specs (e2e)', () => {
       .set('Authorization', `Bearer ${jwtToken}`)
       .send({
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: 'NAM',
+          countryId: 'NAM',
           adminAreaLevel1Id: 'NAM.12_1',
           adminAreaLevel2Id: 'NAM.12.7_1',
         }),

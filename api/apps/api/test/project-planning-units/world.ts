@@ -8,6 +8,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 export const createWorld = async (app: INestApplication) => {
   const projectsRepo: Repository<Project> = app.get(
@@ -29,6 +30,10 @@ export const createWorld = async (app: INestApplication) => {
         .set('Authorization', `Bearer ${jwtToken}`)
         .send({
           ...E2E_CONFIG.projects.valid.minimal(),
+          countryId: undefined,
+          adminAreaLevel1Id: undefined,
+          adminAreaLevel2Id: undefined,
+          planningUnitGridShape: PlanningUnitGridShape.FromShapefile,
           organizationId: organization.data.id,
         });
       if (response.status !== 201)

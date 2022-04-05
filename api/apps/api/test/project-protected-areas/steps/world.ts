@@ -17,7 +17,7 @@ export const createWorld = async (app: INestApplication) => {
     cleanup: projectCleanup,
     organizationId,
   } = await GivenProjectExists(app, jwtToken, {
-    countryCode: 'BWA',
+    countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });

@@ -27,7 +27,7 @@ export const createWorld = async (app: INestApplication) => {
 
   const regularProject = await ProjectsTestUtils.createProject(app, jwtToken, {
     ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-      countryCode: 'NAM',
+      countryId: 'NAM',
       adminAreaLevel1Id: 'NAM.8_1',
       adminAreaLevel2Id: 'NAM.8.6_1',
     }),

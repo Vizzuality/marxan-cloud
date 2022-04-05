@@ -63,7 +63,7 @@ describe('ProxyVectorTilesModule (e2e)', () => {
       jwtToken,
       {
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-          countryCode: country,
+          countryId: country,
           adminAreaLevel1Id: l1AdminArea,
           adminAreaLevel2Id: l2AdminArea,
         }),
