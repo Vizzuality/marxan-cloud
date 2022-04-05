@@ -3,20 +3,21 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
-import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { Readable, Transform } from 'stream';
-import { DeepPartial, EntityManager, In } from 'typeorm';
 import { ArchiveLocation } from '@marxan/cloning/domain';
 import { FileRepository } from '@marxan/files-repository';
+import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
+import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { ProtectedArea } from '@marxan/protected-areas';
 import {
-  ScenariosPuCostDataGeo,
   PlanningUnitGridShape,
+  ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/Either';
+import { Readable, Transform } from 'stream';
+import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 
 const randomGeometriesBoundary =
@@ -352,6 +353,68 @@ export async function GivenCustomProtectedAreas(
     .execute();
 
   return insertValues;
+}
+
+export async function GivenCustomFeatures(
+  em: EntityManager,
+  amount: number,
+  projectId: string,
+) {
+  const insertValues = Array(amount)
+    .fill(0)
+    .map((_, index) => ({
+      id: v4(),
+      feature_class_name: `${projectId}-${index + 1}`,
+      tag: 'species',
+      creation_status: 'done',
+      project_id: projectId,
+    }));
+
+  await Promise.all(
+    insertValues.map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('features')
+        .values(values)
+        .execute(),
+    ),
+  );
+
+  return insertValues.map((feature) => feature.id);
+}
+
+export async function GivenFeaturesData(
+  em: EntityManager,
+  amountOfRecordsForEachFeature: number,
+  featureIds: string[],
+) {
+  const geometries = await GenerateRandomGeometries(
+    em,
+    amountOfRecordsForEachFeature * featureIds.length,
+    false,
+  );
+
+  const insertValues = featureIds.flatMap((featureId, featureIndex) =>
+    Array(amountOfRecordsForEachFeature)
+      .fill(0)
+      .map((_, dataIndex) => ({
+        featureId,
+        properties: { featureIndex, dataIndex },
+        source: GeometrySource.user_imported,
+        theGeom: () =>
+          `'${geometries[
+            featureIndex * amountOfRecordsForEachFeature + dataIndex
+          ].toString('hex')}'`,
+      })),
+  );
+
+  await em
+    .createQueryBuilder()
+    .insert()
+    .into(GeoFeatureGeometry)
+    .values(insertValues)
+    .execute();
 }
 
 export async function DeleteProtectedAreas(em: EntityManager, ids: string[]) {
