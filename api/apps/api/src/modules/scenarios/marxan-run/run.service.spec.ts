@@ -448,7 +448,6 @@ async function getFixtures() {
       expect(fixtures.fakeApiEvents.create).toBeCalledWith({
         topic: `scenario-1`,
         kind: API_EVENT_KINDS.scenario__run__submitted__v1__alpha1,
-        externalId: `${id}${API_EVENT_KINDS.scenario__run__submitted__v1__alpha1}`,
       });
     },
     ThenShouldAddJob() {

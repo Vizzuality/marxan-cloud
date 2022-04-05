@@ -106,6 +106,7 @@ module "api_production" {
   deployment_name            = "api"
   application_base_url       = "https://${var.domain}"
   network_cors_origins       = "https://${var.domain}"
+  http_logging_morgan_format = ""
 }
 
 module "geoprocessing_production" {
@@ -221,6 +222,7 @@ module "api_staging" {
   deployment_name            = "api"
   application_base_url       = "https://staging.${var.domain}"
   network_cors_origins       = "https://staging.${var.domain}"
+  http_logging_morgan_format = "short"
 }
 
 module "geoprocessing_staging" {

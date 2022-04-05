@@ -8,10 +8,8 @@ import {
   Repository,
   SelectQueryBuilder,
 } from 'typeorm';
-import {
-  GeoFeatureGeometry,
-  geoFeatureResource,
-} from './geo-feature.geo.entity';
+import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
+import { geoFeatureResource } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
 import { Geometry } from 'geojson';
@@ -27,7 +25,6 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { JobStatus, Scenario } from '../scenarios/scenario.api.entity';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { GeometrySource } from './geometry-source.enum';
 import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 import { GeoFeaturesRequestInfo } from './geo-features-request-info';

@@ -149,7 +149,6 @@ class FakeEntityManager {
       bbox: [],
       country: 'AGO',
       planningUnitAreakm2: 1000,
-      puGridShape: PlanningUnitGridShape.Hexagon,
     },
   ];
 

@@ -106,7 +106,7 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       .where('spd.scenario_id = :scenarioId', { scenarioId })
       .execute();
 
-    if (puidScenarioPuIdSelect.length != marxanResultsContent.length) {
+    if (puidScenarioPuIdSelect.length !== marxanResultsContent.length) {
       this.logger.error('missing planning units');
       throw new Error('missing planning units');
     }

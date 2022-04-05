@@ -46,7 +46,6 @@ export class StartBlmCalibrationHandler
     await this.apiEvents.create({
       kind,
       topic: scenarioId,
-      externalId: job.id + kind,
       data: {
         blmValues,
       },

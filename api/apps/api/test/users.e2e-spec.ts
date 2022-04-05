@@ -355,17 +355,35 @@ describe('UsersModule (e2e)', () => {
   describe('Users - Platform admins', () => {
     let adminToken: string;
     let adminUserId: string;
+    let nonAdminToken: string;
     const cleanups: (() => Promise<void>)[] = [];
 
     beforeAll(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
+      nonAdminToken = await GivenUserIsLoggedIn(app, 'aa');
     });
 
     afterEach(async () => {
       for (const cleanup of cleanups.reverse()) {
         await cleanup();
       }
+    });
+
+    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
+      const WhenGettingOwnInfo = await request(app.getHttpServer())
+        .get('/api/v1/users/me')
+        .set('Authorization', `Bearer ${adminToken}`);
+
+      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
+    });
+
+    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
+      const WhenGettingOwnInfo = await request(app.getHttpServer())
+        .get('/api/v1/users/me')
+        .set('Authorization', `Bearer ${nonAdminToken}`);
+
+      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
     });
 
     test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {

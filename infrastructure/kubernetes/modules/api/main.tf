@@ -60,7 +60,6 @@ resource "kubernetes_deployment" "api_deployment" {
 
           args = ["start"]
 
-
           env {
             name = "API_POSTGRES_HOST"
             value_from {
@@ -229,6 +228,16 @@ resource "kubernetes_deployment" "api_deployment" {
           env {
             name  = "NODE_CONFIG_DIR"
             value = "apps/api/config"
+          }
+
+          env {
+            name  = "BACKEND_HTTP_LOGGING_MORGAN_FORMAT"
+            value = var.http_logging_morgan_format
+          }
+
+          env {
+            name  = "NODE_ENV"
+            value = var.namespace
           }
 
           resources {

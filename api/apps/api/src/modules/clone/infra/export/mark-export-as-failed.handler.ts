@@ -37,7 +37,6 @@ export class MarkExportAsFailedHandler
     await this.apiEvents.createIfNotExists({
       kind,
       topic: resourceId.value,
-      externalId: ApiEventsService.composeExternalId(exportId.value, kind),
       data: {
         exportId: exportId.value,
         resourceId: resourceId.value,

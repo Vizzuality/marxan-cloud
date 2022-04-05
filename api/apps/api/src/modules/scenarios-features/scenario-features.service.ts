@@ -53,7 +53,7 @@ export class ScenarioFeaturesService extends AppBaseService<
   ): Promise<[any[], number]> {
     const scenarioFeaturesData = entitiesAndCount[0] as ScenarioFeaturesData[];
     const featuresDataIds = scenarioFeaturesData.map(
-      (rsfd) => rsfd.featuresDataId,
+      (rsfd) => rsfd.featureDataId,
     );
 
     if (featuresDataIds.length === 0) {
@@ -84,7 +84,7 @@ export class ScenarioFeaturesService extends AppBaseService<
       scenarioFeaturesData
         .map((sfd) => {
           const relatedFeature = features.find(
-            (f) => f.id === featureRelations[sfd.featuresDataId],
+            (f) => f.id === featureRelations[sfd.featureDataId],
           );
 
           if (!relatedFeature) {

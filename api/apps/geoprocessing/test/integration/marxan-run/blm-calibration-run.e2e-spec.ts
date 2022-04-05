@@ -4,13 +4,13 @@ import {
   blmSandboxRunner,
 } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-run-adapter.module';
 import { MarxanSandboxBlmRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/marxan-sandbox-blm-runner.service';
-import { GeoFeatureGeometry } from '@marxan-geoprocessing/modules/features/features.geo.entity';
 import {
   PlanningUnitsGeom,
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
@@ -19,6 +19,7 @@ import {
 } from '@marxan/marxan-output';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
+import { Geometry } from 'geojson';
 import { last } from 'lodash';
 import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
@@ -102,6 +103,7 @@ const NUMBER_OF_RUNS = 100;
 const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
+  const featureId = v4();
   const outputsIds: string[] = [];
   const scenarioFeatures: string[] = [];
 
@@ -160,8 +162,8 @@ const getFixtures = async () => {
         id: In(projectPus.map((pu) => pu.geomId)),
       });
 
-      await scenarioFeatureRepo.delete({
-        scenarioId,
+      await featuresData.delete({
+        featureId,
       });
       await blmFinalResultsRepo.delete({
         scenarioId,
@@ -211,7 +213,21 @@ const getFixtures = async () => {
     GivenScenarioDataExists: async () => {
       const feature = await featuresData.save(
         featuresData.create({
-          featuresId: v4(),
+          featureId,
+          properties: {
+            foo: v4(),
+          },
+          theGeom: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [-3.7023925781249996, 40.657722371758105],
+                [-4.3450927734375, 40.029717557833266],
+                [-3.04046630859375, 39.9434364619742],
+                [-3.7023925781249996, 40.657722371758105],
+              ],
+            ],
+          },
         }),
       );
       scenarioFeatures.push(

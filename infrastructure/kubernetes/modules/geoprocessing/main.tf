@@ -211,6 +211,11 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             value = "apps/geoprocessing/config"
           }
 
+          env {
+            name  = "NODE_ENV"
+            value = var.namespace
+          }
+
           resources {
             limits = {
               cpu    = "1"
@@ -231,8 +236,8 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
 
             success_threshold     = 1
             timeout_seconds       = 5
-            initial_delay_seconds = 15
-            period_seconds        = 15
+            initial_delay_seconds = 90
+            period_seconds        = 30
           }
 
           readiness_probe {

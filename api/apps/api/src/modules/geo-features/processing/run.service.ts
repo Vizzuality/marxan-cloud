@@ -78,7 +78,6 @@ export class RunService {
   ) {
     const job = await queue.add(`run`, data);
     await this.apiEvents.create({
-      externalId: job.id + kind,
       kind,
       topic: data.scenarioId,
       data: {
