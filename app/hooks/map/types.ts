@@ -162,6 +162,13 @@ export interface UsePUCompareLayer {
   options?: Record<string, unknown>;
 }
 
+export interface UseScenarioBLMLayer {
+  cache?: number;
+  active?: boolean;
+  sId: string;
+  blm: number;
+}
+
 export interface UseLegend {
   layers: string[];
   options?: {
