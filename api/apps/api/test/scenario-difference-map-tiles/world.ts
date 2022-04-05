@@ -12,7 +12,6 @@ import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { inspect } from 'util';
 
 export const createWorld = async (app: INestApplication) => {
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
@@ -20,7 +19,7 @@ export const createWorld = async (app: INestApplication) => {
     getEntityManagerToken(DbConnections.geoprocessingDB),
   );
   const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
-    countryCode: 'BWA',
+    countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });

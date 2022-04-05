@@ -19,7 +19,7 @@ export const createWorld = async (app: INestApplication) => {
     app,
     token,
     {
-      countryCode: 'BWA',
+      countryId: 'BWA',
       adminAreaLevel1Id: 'BWA.12_1',
       adminAreaLevel2Id: 'BWA.12.1_1',
     },

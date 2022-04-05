@@ -31,7 +31,7 @@ export const getFixtures = async () => {
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
 
   const { projectId, cleanup } = await GivenProjectExists(app, ownerToken, {
-    countryCode: 'BWA',
+    countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });

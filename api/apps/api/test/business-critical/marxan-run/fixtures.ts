@@ -21,7 +21,7 @@ export const getFixtures = async () => {
     },
     GivenProjectOrganizationExists: async () => {
       const organizationProject = await GivenProjectExists(app, authToken, {
-        countryCode: 'AGO',
+        countryId: 'AGO',
         adminAreaLevel1Id: 'AGO.15_1',
         adminAreaLevel2Id: 'AGO.15.4_1',
       });

@@ -17,7 +17,7 @@ export const getFixtures = async () => {
     token,
     {
       name: `Project ${Date.now()}`,
-      countryCode: undefined!,
+      countryId: undefined!,
     },
     {
       name: `Organization ${Date.now()}`,

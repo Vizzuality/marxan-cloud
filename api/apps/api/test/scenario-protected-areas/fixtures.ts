@@ -48,7 +48,7 @@ export const getFixtures = async () => {
 
   const { cleanup, projectId } = await GivenProjectExists(app, ownerToken, {
     name: `scenario-pa-${new Date().getTime()}`,
-    countryCode,
+    countryId: countryCode,
     adminAreaLevel1Id,
   });
 

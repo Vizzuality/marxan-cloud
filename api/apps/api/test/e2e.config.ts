@@ -44,7 +44,7 @@ export const E2E_CONFIG: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
       minimalInGivenAdminArea: (options?: {
-        countryCode: string;
+        countryId: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
         name?: string;
@@ -119,8 +119,9 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
-        planningUnitGridShape: PlanningUnitGridShape.FromShapefile,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
+        countryId: 'NAM',
       }),
       minimalInGivenAdminArea: (options?: {
         countryId?: string;
