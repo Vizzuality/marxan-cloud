@@ -217,6 +217,14 @@ export const mapAclDomainToHttpError = (
       return new InternalServerErrorException(
         'Unexpected error while preparing PNG snapshot via webshot.',
       );
+    case bestSolutionNotFound:
+      return new NotFoundException(
+        `Could not find best solution for scenario with ID: ${options?.scenarioId}.`,
+      );
+    case notFoundSpec:
+      return new NotFoundException(
+        `Could not find spec for scenario with ID: ${options?.scenarioId}.`,
+      );
     default:
       const _exhaustiveCheck: never = errorToCheck;
       return _exhaustiveCheck;
