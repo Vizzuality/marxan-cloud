@@ -59,7 +59,7 @@ export class ScenariosController {
     required: true,
     example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
-  @Get(':id/calibration/tiles/:blmValues/:z/:x/:y.mvt')
+  @Get(':id/calibration/tiles/:blmValue/:z/:x/:y.mvt')
   async getPlanningUnitsBlmValuesTiles(
     @Param() tileRequest: ScenariosWithBlmValueRequest,
     @Res() response: Response,
