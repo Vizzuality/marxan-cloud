@@ -28,7 +28,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
 
   const { query } = useRouter();
 
-  const { pid, sid, blm = 1 } = query;
+  const { pid, sid, blmValue = 1 } = query;
 
   const dispatch = useDispatch();
 
@@ -46,7 +46,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     cache: Date.now(),
     active: true,
     sId: sid ? `${sid}` : null,
-    blm: +blm,
+    blm: +blmValue,
   });
 
   useEffect(() => {
