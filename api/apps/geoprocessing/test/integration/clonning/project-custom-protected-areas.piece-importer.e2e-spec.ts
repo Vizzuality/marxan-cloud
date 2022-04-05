@@ -1,4 +1,3 @@
-import { PlanningAreaGadmPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/planning-area-gadm.piece-importer';
 import { ProjectCustomProtectedAreasPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-custom-protected-areas.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
@@ -25,7 +24,7 @@ import { GenerateRandomGeometries, PrepareZipFile } from './fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaGadmPieceImporter, () => {
+describe(ProjectCustomProtectedAreasPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -94,7 +93,7 @@ const getFixtures = async () => {
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const [uri] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGAdm,
+        ClonePiece.ProjectCustomProtectedAreas,
         archiveLocation.value,
       );
       return {
@@ -102,7 +101,7 @@ const getFixtures = async () => {
         pieceResourceId: v4(),
         importId: v4(),
         projectId,
-        piece: ClonePiece.PlanningAreaGAdm,
+        piece: ClonePiece.ProjectCustomProtectedAreas,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
       };

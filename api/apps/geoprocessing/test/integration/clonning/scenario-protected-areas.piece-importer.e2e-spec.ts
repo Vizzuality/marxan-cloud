@@ -192,7 +192,7 @@ const getFixtures = async () => {
       const [
         uri,
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioProtectedAreas,
         archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
@@ -201,7 +201,7 @@ const getFixtures = async () => {
         pieceResourceId: scenarioId,
         importId: v4(),
         projectId,
-        piece: ClonePiece.ScenarioPlanningUnitsData,
+        piece: ClonePiece.ScenarioProtectedAreas,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
       };
@@ -212,7 +212,7 @@ const getFixtures = async () => {
         pieceResourceId: scenarioId,
         importId: v4(),
         projectId,
-        piece: ClonePiece.ScenarioPlanningUnitsData,
+        piece: ClonePiece.ScenarioProtectedAreas,
         resourceKind: ResourceKind.Project,
         uris: [],
       };
@@ -224,7 +224,7 @@ const getFixtures = async () => {
       const [
         { relativePath },
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioProtectedAreas,
         'scenario protected areas file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
@@ -253,7 +253,7 @@ const getFixtures = async () => {
       const [
         { relativePath },
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioProtectedAreas,
         'scenario protected areas file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
@@ -272,7 +272,7 @@ const getFixtures = async () => {
       const [
         { relativePath },
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioProtectedAreas,
         'scenario protected areas file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
