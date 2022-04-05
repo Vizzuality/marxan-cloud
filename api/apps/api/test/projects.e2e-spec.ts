@@ -119,6 +119,7 @@ describe('ProjectsModule (e2e)', () => {
         planningAreaId: undefined,
         adminAreaLevel1Id: undefined,
         adminAreaLevel2Id: undefined,
+        countryId: undefined,
       };
 
       const response = await request(app.getHttpServer())
@@ -129,7 +130,7 @@ describe('ProjectsModule (e2e)', () => {
       expect(response.status).toBe(HttpStatus.BAD_REQUEST);
       expect(response.body.errors[0].status).toBe(HttpStatus.BAD_REQUEST);
       expect(response.body.errors[0].title).toBe(
-        'Project with regular planning unit shape is missing GADM id or country id.',
+        'When a regular planning grid is requested (hexagon or square) either a custom planning area or a GADM area gid must be provided',
       );
     });
 

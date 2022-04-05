@@ -119,9 +119,8 @@ export const E2E_CONFIG: {
       minimal: () => ({
         name: faker.random.words(5),
         organizationId: faker.random.uuid(),
-        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+        planningUnitGridShape: PlanningUnitGridShape.FromShapefile,
         planningUnitAreakm2: 10,
-        countryId: 'NAM',
       }),
       minimalInGivenAdminArea: (options?: {
         countryId?: string;
