@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import puppeteer, { ScreenshotOptions } from "puppeteer";
 import { waitForReportReady } from "../utils/wait-function";
 
-const appRouteTemplate = "/reports/:projectId/:scenarioId/blm?blmValue=:blmValue";
+const appRouteTemplate =
+  "/reports/:projectId/:scenarioId/blm?blmValue=:blmValue";
 
 export const generatePngImageFromBlmData = async (
   req: Request,
@@ -10,8 +11,13 @@ export const generatePngImageFromBlmData = async (
 ) => {
   const {
     body: { baseUrl, cookie, screenshotOptions },
-  }: { body: { baseUrl: string; cookie: string; screenshotOptions: ScreenshotOptions } } =
-    req;
+  }: {
+    body: {
+      baseUrl: string;
+      cookie: string;
+      screenshotOptions: ScreenshotOptions;
+    };
+  } = req;
 
   const {
     params: { projectId, scenarioId, blmValue },
@@ -60,8 +66,11 @@ export const generatePngImageFromBlmData = async (
   console.info(`Rendering ${pageUrl} as PNG`);
   await page.goto(pageUrl);
   await page.waitForFunction(waitForReportReady, { timeout: 30e3 });
-  const pageAsPng = await page.screenshot({ ...screenshotOptions });
 
+  const pageAsPng = await Promise.race([
+    page.screenshot({ ...screenshotOptions }),
+    new Promise((resolve, reject) => setTimeout(reject, 1000)),
+  ]);
   await page.close();
   await browser.close();
 

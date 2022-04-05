@@ -13,5 +13,5 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Build webshot service
-      run: docker compose build webshot
+      run: docker-compose -f docker-compose-build-webshot.yml
 

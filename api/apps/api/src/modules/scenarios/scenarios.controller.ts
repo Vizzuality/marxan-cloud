@@ -101,7 +101,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotConfig, WebshotPdfConfig } from '@marxan/webshot';
+import { WebshotPdfConfig } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 
