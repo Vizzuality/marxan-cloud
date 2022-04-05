@@ -67,9 +67,36 @@ describe('ProjectsModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
     });
 
-    it.todo("should fail when creating a project with regular PU shape but no PA id or GADM id")
-  });
+    it('should fail when creating a project with regular PU shape but no PA id or GADM id', async () => {
+      const userToken = await api.utils.createWorkingUser();
 
+      const organizationResponse = await api.requests.organizations
+        .createOrganization(userToken)
+        .expect(HttpStatus.CREATED);
+      const projectData = {
+        ...E2E_CONFIG.projects.valid.minimal(),
+        organizationId: organizationResponse.body.data.id,
+      };
+      const projectResponse = await api.requests.projects.createProject(
+        userToken,
+        {
+          ...projectData,
+          countryId: undefined,
+          planningAreaId: undefined,
+          adminAreaLevel1Id: undefined,
+          adminAreaLevel2Id: undefined,
+        },
+      );
+
+      expect(projectResponse.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(projectResponse.body.errors[0].status).toBe(
+        HttpStatus.BAD_REQUEST,
+      );
+      expect(projectResponse.body.errors[0].title).toBe(
+        'When a regular planning grid is requested (hexagon or square) either a custom planning area or a GADM area gid must be provided',
+      );
+    });
+  });
   describe('when listing projects', () => {
     it('should be able to get a list of the projects the user have a role in', async () => {
       const userToken = await api.utils.createWorkingUser();
