@@ -26,15 +26,11 @@ export const getFixtures = async () => {
   const anotherSolutionId = v4();
   const unexistentScenarioId = v4();
 
-  const { projectId, cleanup: cleanupProject } = await GivenProjectExists(
-    app,
-    ownerToken,
-    {
-      countryId: 'BWA',
-      adminAreaLevel1Id: 'BWA.12_1',
-      adminAreaLevel2Id: 'BWA.12.1_1',
-    },
-  );
+  const { projectId } = await GivenProjectExists(app, ownerToken, {
+    countryId: 'BWA',
+    adminAreaLevel1Id: 'BWA.12_1',
+    adminAreaLevel2Id: 'BWA.12.1_1',
+  });
   const scenario = await ScenariosTestUtils.createScenario(app, ownerToken, {
     ...E2E_CONFIG.scenarios.valid.minimal(),
     projectId,
@@ -164,14 +160,6 @@ export const getFixtures = async () => {
       expect(response.body.errors[0].title).toEqual(
         `Scenario ${unexistentScenarioId} could not be found.`,
       );
-    },
-    cleanup: async () => {
-      await marxanOutputRepo.delete({
-        scenarioId: scenarioId,
-      });
-      await ScenariosTestUtils.deleteScenario(app, ownerToken, scenarioId);
-      await cleanupProject();
-      await app.close();
     },
   };
 };

@@ -54,7 +54,6 @@ describe.skip('ProxyVectorTilesModule (e2e)', () => {
     ).then(async (response) => {
       return Deserializer.deserialize(response);
     });
-    console.log('after org');
     aProjectWithCountryAsPlanningArea = await ProjectsTestUtils.createProject(
       app,
       jwtToken,
@@ -95,7 +94,6 @@ describe.skip('ProxyVectorTilesModule (e2e)', () => {
       test.todo('Irregular planning units vector tiles');
 
       test.only('Should give back a valid request for preview', async () => {
-        console.log(jwtToken);
         await request(app.getHttpServer())
           .get('/api/v1/administrative-areas/1/preview/tiles/6/30/25.mvt')
           .set('Accept-Encoding', 'gzip, deflate')
