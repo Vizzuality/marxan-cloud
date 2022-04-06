@@ -81,7 +81,11 @@ export class ShapefileExtractorService {
      * work. Once we refactor the config setup to be unique and shared between
      * services and libs, we can remove this coupling to env var.
      */
-    if(process.env['BACKEND_CLEANUP_TEMPORARY_FOLDERS']?.toLowerCase() === 'false') return;
+    if (
+      process.env['BACKEND_CLEANUP_TEMPORARY_FOLDERS']?.toLowerCase() ===
+      'false'
+    )
+      return;
 
     await this.fileService.deleteDataFromFS(shapeFile.path).catch((error) => {
       this.logger.error(error);
