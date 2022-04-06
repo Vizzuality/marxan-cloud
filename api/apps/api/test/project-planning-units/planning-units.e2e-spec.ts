@@ -30,7 +30,7 @@ describe('PlanningUnitsModule (e2e)', () => {
   });
 
   describe(`When creating a project with Admin Areas`, () => {
-    beforeAll(async () => {
+    beforeEach(async () => {
       queue.disposeFakeJobs();
       await world.WhenCreatingProjectWithAdminAreas();
     });
