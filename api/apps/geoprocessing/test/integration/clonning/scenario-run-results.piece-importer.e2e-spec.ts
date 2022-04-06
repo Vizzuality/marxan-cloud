@@ -170,7 +170,7 @@ const getFixtures = async () => {
         importId: v4(),
         projectId,
         piece: ClonePiece.ScenarioRunResults,
-        resourceKind: ResourceKind.Project,
+        resourceKind,
         uris: [uri.toSnapshot()],
       };
     },
@@ -181,7 +181,7 @@ const getFixtures = async () => {
         importId: v4(),
         projectId,
         piece: ClonePiece.ScenarioRunResults,
-        resourceKind: ResourceKind.Project,
+        resourceKind,
         uris: [],
       };
     },

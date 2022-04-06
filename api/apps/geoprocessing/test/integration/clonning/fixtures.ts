@@ -4,9 +4,13 @@ import {
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ArchiveLocation } from '@marxan/cloning/domain';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { FileRepository } from '@marxan/files-repository';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import {
+  OutputScenariosFeaturesDataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { ProtectedArea } from '@marxan/protected-areas';
 import {
@@ -355,23 +359,33 @@ export async function GivenCustomProtectedAreas(
   return insertValues;
 }
 
-export async function GivenCustomFeatures(
+export async function GivenFeatures(
   em: EntityManager,
-  amount: number,
+  platformFeaturesAmount: number,
+  customFeaturesAmount: number,
   projectId: string,
 ) {
-  const insertValues = Array(amount)
+  const customFeatures = Array(customFeaturesAmount)
     .fill(0)
     .map((_, index) => ({
       id: v4(),
-      feature_class_name: `${projectId}-${index + 1}`,
+      feature_class_name: `custom-${projectId}-${index + 1}`,
       tag: 'species',
       creation_status: 'done',
       project_id: projectId,
     }));
+  const platformFeatures = Array(platformFeaturesAmount)
+    .fill(0)
+    .map((_, index) => ({
+      id: v4(),
+      feature_class_name: `platform-${projectId}-${index + 1}`,
+      tag: 'species',
+      creation_status: 'created',
+      project_id: null,
+    }));
 
   await Promise.all(
-    insertValues.map((values) =>
+    [...customFeatures, ...platformFeatures].map((values) =>
       em
         .createQueryBuilder()
         .insert()
@@ -381,14 +395,17 @@ export async function GivenCustomFeatures(
     ),
   );
 
-  return insertValues.map((feature) => feature.id);
+  return {
+    customFeatures,
+    platformFeatures,
+  };
 }
 
 export async function GivenFeaturesData(
   em: EntityManager,
   amountOfRecordsForEachFeature: number,
   featureIds: string[],
-) {
+): Promise<{ id: string; hash: string; feature_id: string }[]> {
   const geometries = await GenerateRandomGeometries(
     em,
     amountOfRecordsForEachFeature * featureIds.length,
@@ -399,6 +416,7 @@ export async function GivenFeaturesData(
     Array(amountOfRecordsForEachFeature)
       .fill(0)
       .map((_, dataIndex) => ({
+        id: v4(),
         featureId,
         properties: { featureIndex, dataIndex },
         source: GeometrySource.user_imported,
@@ -409,11 +427,81 @@ export async function GivenFeaturesData(
       })),
   );
 
-  await em
+  const result = await em
     .createQueryBuilder()
     .insert()
     .into(GeoFeatureGeometry)
     .values(insertValues)
+    .returning(['id', 'hash', 'featureId'])
+    .execute();
+
+  return result.raw;
+}
+
+export async function GivenScenarioFeaturesData(
+  em: EntityManager,
+  amountOfFeaturesDataRecordsForEachFeature: number,
+  featureIds: string[],
+  scenarioId: string,
+  scenarioFeaturesData: DeepPartial<ScenarioFeaturesData> = {},
+) {
+  const featuresData = await GivenFeaturesData(
+    em,
+    amountOfFeaturesDataRecordsForEachFeature,
+    featureIds,
+  );
+
+  const insertValues = featuresData.map((data, index) => ({
+    ...scenarioFeaturesData,
+    id: v4(),
+    featureDataId: data.feature_id,
+    scenarioId,
+    featureId: index + 1,
+  }));
+
+  await em
+    .createQueryBuilder()
+    .insert()
+    .into(ScenarioFeaturesData)
+    .values(insertValues)
+    .execute();
+
+  return insertValues.map((value) => value.id);
+}
+
+export async function GivenOutputScenarioFeaturesData(
+  em: EntityManager,
+  amountOfFeaturesDataRecordsForEachFeature: number,
+  amountOfOutputDataRecordsForEachScenarioFeaturesData: number,
+  featureIds: string[],
+  scenarioId: string,
+  outputScenarioFeaturesData: DeepPartial<OutputScenariosFeaturesDataGeoEntity> = {},
+  scenarioFeaturesData: DeepPartial<ScenarioFeaturesData> = {},
+) {
+  const scenarioFeaturesDataIds = await GivenScenarioFeaturesData(
+    em,
+    amountOfFeaturesDataRecordsForEachFeature,
+    featureIds,
+    scenarioId,
+    scenarioFeaturesData,
+  );
+
+  await em
+    .createQueryBuilder()
+    .insert()
+    .into(OutputScenariosFeaturesDataGeoEntity)
+    .values(
+      scenarioFeaturesDataIds.flatMap((scenarioFeaturesDataId) =>
+        Array(amountOfOutputDataRecordsForEachScenarioFeaturesData)
+          .fill(0)
+          .map((_, index) => ({
+            totalArea: 1000,
+            ...outputScenarioFeaturesData,
+            runId: index,
+            featureScenarioId: scenarioFeaturesDataId,
+          })),
+      ),
+    )
     .execute();
 }
 

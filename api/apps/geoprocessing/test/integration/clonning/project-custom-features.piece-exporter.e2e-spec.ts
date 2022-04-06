@@ -15,7 +15,7 @@ import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
-  GivenCustomFeatures,
+  GivenFeatures,
   GivenFeaturesData,
   GivenProjectExists,
   readSavedFile,
@@ -120,7 +120,13 @@ const getFixtures = async () => {
     },
     GivenNoCustomFeaturesForProject: () => {},
     GivenCustomFeaturesForProject: async () => {
-      featureIds = await GivenCustomFeatures(apiEntityManager, 5, projectId);
+      const { customFeatures } = await GivenFeatures(
+        apiEntityManager,
+        0,
+        amountOfCustomFeatures,
+        projectId,
+      );
+      featureIds = customFeatures.map((feature) => feature.id);
       await GivenFeaturesData(
         geoEntityManager,
         recordsOfDataForEachCustomFeature,
