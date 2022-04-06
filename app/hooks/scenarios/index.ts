@@ -979,7 +979,7 @@ export function useDownloadScenarioReport({
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
     return axios.request({
-      url: `${baseUrl}/api/reports/scenarios/${sid}?solutionId=${solutionId}`,
+      url: `${baseUrl}/api/reports/scenarios/${sid}/solutions?solutionId=${solutionId}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
