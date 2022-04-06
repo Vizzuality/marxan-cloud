@@ -47,7 +47,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
     const range = [blmCalibrationFrom, blmCalibrationTo];
 
     saveScenarioCalibrationRange.mutate({
-      id: `${sid}`,
+      sid: `${sid}`,
       data: { range },
     }, {
       onSuccess: () => {

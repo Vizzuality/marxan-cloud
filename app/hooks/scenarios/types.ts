@@ -113,7 +113,7 @@ export interface UseSaveScenarioCalibrationRangeProps {
   requestConfig?: AxiosRequestConfig
 }
 export interface SaveScenarioCalibrationRangeProps {
-  id?: string,
+  sid?: string,
   data: any,
 }
 

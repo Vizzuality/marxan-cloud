@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import {
-  useQuery, useInfiniteQuery, useMutation, useQueryClient,
+  useQuery, useInfiniteQuery, useMutation, useQueryClient, useQueries,
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
@@ -53,6 +53,23 @@ import {
   UseDownloadScenarioReportProps,
   DownloadScenarioReportProps,
 } from './types';
+
+function fetchScenarioBLMImage(sId, blmValue, session) {
+  return SCENARIOS.request({
+    method: 'GET',
+    url: `/${sId}/calibration/maps/preview/${blmValue}`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+
+  }).then((response) => {
+    const data = {
+      blmValue,
+      image: response.data,
+    };
+    return data;
+  });
+}
 
 /**
 ****************************************
@@ -823,6 +840,38 @@ export function useCancelRunScenario({
 }
 
 // BLM
+export function useCalibrationBLMImages({ sid, blmValues }) {
+  const [session] = useSession();
+
+  const userQueries = useQueries(
+    blmValues.map((blmValue) => {
+      return {
+        queryKey: ['scenario-blm-image', sid, blmValue],
+        queryFn: () => fetchScenarioBLMImage(sid, blmValue, session),
+      };
+    }),
+  );
+
+  const CALIBRATION_IMAGES = useMemo(() => {
+    if (userQueries.every((u) => u?.isFetched)) {
+      return userQueries.reduce((acc, q: any) => {
+        const { data: { blmValue, image } } = q;
+        return {
+          ...acc,
+          [blmValue]: Buffer.from(image, 'binary').toString('base64'),
+        };
+      }, {});
+    }
+    return {};
+  }, [userQueries]);
+
+  return useMemo(() => {
+    return {
+      data: CALIBRATION_IMAGES,
+    };
+  }, [CALIBRATION_IMAGES]);
+}
+
 export function useScenarioCalibrationResults(scenarioId) {
   const [session] = useSession();
 
@@ -837,14 +886,22 @@ export function useScenarioCalibrationResults(scenarioId) {
 
   const { data } = query;
 
+  const blmValues = data?.data.map((i) => i.blmValue) || [];
+  const { data: blmImages } = useCalibrationBLMImages({ sid: scenarioId, blmValues });
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data)
-      ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)) : [];
+      ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)).map((i) => {
+        return {
+          ...i,
+          pngData: blmImages[i.blmValue],
+        };
+      }) : [];
 
     return {
       ...query,
       data: parsedData,
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, data?.data]);
 }
 
@@ -878,12 +935,15 @@ export function useSaveScenarioCalibrationRange({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const saveScenarioCalibrationRange = ({ id, data }: SaveScenarioCalibrationRangeProps) => {
-    return SCENARIOS.request({
-      url: `/${id}/calibration`,
+  const saveScenarioCalibrationRange = ({ sid, data }: SaveScenarioCalibrationRangeProps) => {
+    const baseUrl = /* process.env.NEXT_PUBLIC_URL || */ window.location.origin;
+
+    return axios.request({
+      url: `${baseUrl}/api/reports/scenarios/${sid}/blm`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
       },
       ...requestConfig,
     });
@@ -892,7 +952,7 @@ export function useSaveScenarioCalibrationRange({
   return useMutation(saveScenarioCalibrationRange, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succcess', data, variables, context);
-      const { id: scenarioId } = variables;
+      const { sid: scenarioId } = variables;
       queryClient.invalidateQueries(['scenario-calibration', scenarioId]);
       queryClient.invalidateQueries(['scenario-calibration-range', scenarioId]);
     },
