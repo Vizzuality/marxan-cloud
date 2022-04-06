@@ -54,12 +54,12 @@ export class CostTemplateGenerator {
       /**
        * Leave temporary folder on filesystem according to feature flag.
        */
-      if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
-
-      await rm(transformationDirectory, {
-        recursive: true,
-        force: true,
-      });
+      if(AppConfig.getBoolean('storage.sharedFileStorage.cleanupTemporaryFolders', true)) {
+        await rm(transformationDirectory, {
+          recursive: true,
+          force: true,
+        });
+      }
     }
   }
 }
