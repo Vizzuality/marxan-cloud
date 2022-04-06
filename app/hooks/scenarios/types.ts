@@ -125,3 +125,7 @@ export interface DownloadScenarioReportProps {
   sid: string,
   solutionId: string;
 }
+
+export interface UseBlmImageProps {
+  [q: string]: any;
+}

@@ -52,6 +52,7 @@ import {
   DeleteScenarioLockProps,
   UseDownloadScenarioReportProps,
   DownloadScenarioReportProps,
+  UseBlmImageProps,
 } from './types';
 
 function fetchScenarioBLMImage(sId, blmValue, session) {
@@ -854,7 +855,7 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
 
   const CALIBRATION_IMAGES = useMemo(() => {
     if (userQueries.every((u) => u?.isFetched)) {
-      return userQueries.reduce((acc, q: any) => {
+      return userQueries.reduce((acc, q: UseBlmImageProps) => {
         const { data: { blmValue, image } } = q;
 
         const encodeBase64 = (data) => {
