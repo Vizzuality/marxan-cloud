@@ -7,28 +7,22 @@ let apiConnection: Connection;
 let geoConnection: Connection;
 
 beforeAll(async () => {
-  console.log('BEFORE ALL');
   apiConnection = await createConnection(apiConnections.default);
   geoConnection = await createConnection(apiConnections.geoprocessingDB);
 
-  console.log('HERE');
-  console.log(apiConnection.isConnected, geoConnection.isConnected);
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
 });
 
 beforeEach(async () => {
-  console.log('BEFORE EACH');
   await clearTables(apiConnection, ['roles', 'api_event_kinds']);
   await clearTables(geoConnection);
   await insertAdminRegions(geoConnection);
 });
 afterEach(async () => {
-  console.log('AFTER EACH');
   await TestClientApi.teardownApps();
 });
 afterAll(async () => {
-  console.log('AFTER ALL');
   await apiConnection.close();
   await geoConnection.close();
 });

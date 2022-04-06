@@ -269,7 +269,6 @@ export class ProjectsService {
       input.adminAreaLevel1Id ||
       input.adminAreaLevel2Id ||
       input.countryId;
-
     if (dtoHasRegularShape && !dtoHasNeededInfoForRegularShapes)
       return left(projectIsMissingInfoForRegularPus);
 
