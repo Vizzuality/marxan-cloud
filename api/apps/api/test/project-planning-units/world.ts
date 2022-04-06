@@ -36,17 +36,6 @@ export const createWorld = async (app: INestApplication) => {
         );
     },
     WhenCreatingProjectWithAdminAreas: async () => {
-      console.dir(
-        {
-          ...E2E_CONFIG.projects.valid.complete({
-            countryCode: 'NAM',
-            adminLevel1: 'NAM.8_1',
-            adminLevel2: 'NAM.8.6_1',
-          }),
-          organizationId: organization.data.id,
-        },
-        { depth: Infinity },
-      );
       const response = await request(app.getHttpServer())
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${jwtToken}`)
