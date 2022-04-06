@@ -1,6 +1,6 @@
 {
   "logging": {
-    "muteAll": "false"
+    "muteAll": true
   },
   "network": {
     "cors": {
