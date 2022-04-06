@@ -73,6 +73,16 @@ export class ShapefileExtractorService {
   }
 
   async cleanup(shapeFile: Shapefile): Promise<void> {
+    /**
+     * Leave temporary folder on filesystem according to feature flag.
+     *
+     * @debt This should use `config`, but since we have distinct config setups
+     * for api and geoprocessing _and_ we are in a lib here, that won't really
+     * work. Once we refactor the config setup to be unique and shared between
+     * services and libs, we can remove this coupling to env var.
+     */
+    if(process.env['BACKEND_CLEANUP_TEMPORARY_FOLDERS']?.toLowerCase() === 'false') return;
+
     await this.fileService.deleteDataFromFS(shapeFile.path).catch((error) => {
       this.logger.error(error);
     });

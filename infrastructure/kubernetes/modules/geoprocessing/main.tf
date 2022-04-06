@@ -216,6 +216,11 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             value = var.namespace
           }
 
+          env {
+            name  = "BACKEND_CLEANUP_TEMPORARY_FOLDERS"
+            value = var.cleanup_temporary_folders
+          }
+
           resources {
             limits = {
               cpu    = "1"
