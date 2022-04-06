@@ -1,23 +1,25 @@
-import { Module } from '@nestjs/common';
-import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
-import { MarxanRunController } from './marxan-run.controller';
-import { RunService } from './run.service';
-import { apiUrlProvider, AssetsService } from './assets.service';
-import { QueueModule } from '@marxan-api/modules/queue';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
+import { QueueModule } from '@marxan-api/modules/queue';
+import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Scenario } from '../scenario.api.entity';
+import { ZipFilesSerializer } from '../dto/zip-files.serializer';
 import { InputFilesModule } from '../input-files';
+import { OutputFilesModule } from '../output-files/output-files.module';
+import { ScenarioJobService } from '../scenario-job/scenario-job.service';
+import { Scenario } from '../scenario.api.entity';
+import { apiUrlProvider, AssetsService } from './assets.service';
+import { CancelHandler } from './cancel.handler';
+import { EventsHandler } from './events.handler';
+import { MarxanRunController } from './marxan-run.controller';
+import { OutputRepository } from './output.repository';
 import {
   blmDefaultProvider,
   runQueueEventsProvider,
   runQueueProvider,
 } from './run-service.providers';
 import { RunHandler } from './run.handler';
-import { CancelHandler } from './cancel.handler';
-import { EventsHandler } from './events.handler';
-import { OutputRepository } from './output.repository';
-import { ScenarioJobService } from '../scenario-job/scenario-job.service';
+import { RunService } from './run.service';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { ScenarioJobService } from '../scenario-job/scenario-job.service';
     ApiEventsModule,
     TypeOrmModule.forFeature([Scenario, ScenariosOutputResultsApiEntity]),
     InputFilesModule,
+    OutputFilesModule,
   ],
   providers: [
     RunHandler,
@@ -38,6 +41,7 @@ import { ScenarioJobService } from '../scenario-job/scenario-job.service';
     apiUrlProvider,
     OutputRepository,
     ScenarioJobService,
+    ZipFilesSerializer,
   ],
   controllers: [MarxanRunController],
   exports: [RunService],

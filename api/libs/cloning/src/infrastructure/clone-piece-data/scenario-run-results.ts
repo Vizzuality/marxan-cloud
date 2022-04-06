@@ -1,8 +1,4 @@
-export const scenarioRunResultsRelativePath = {
-  scenarioImport: `scenario-run-results.json`,
-  projectImport: (oldScenarioId: string) =>
-    `scenarios/${oldScenarioId}/scenario-run-results.json`,
-};
+export const scenarioRunResultsRelativePath = `scenario-run-results.json`;
 
 export type BlmResultsContent = {
   cost: number;

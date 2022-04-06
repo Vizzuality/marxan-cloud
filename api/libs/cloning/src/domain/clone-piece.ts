@@ -5,13 +5,16 @@ export enum ClonePiece {
   ProjectCustomFeatures = 'project-custom-features',
   PlanningAreaGAdm = 'planning-area-gadm',
   PlanningAreaCustom = 'planning-area-custom',
-  PlanningAreaCustomGeojson = 'planning-area-custom-geojson',
   PlanningUnitsGrid = 'planning-units-grid',
-  PlanningUnitsGridGeojson = 'planning-units-grid-geojson',
   ScenarioMetadata = 'scenario-metadata',
   ScenarioPlanningUnitsData = 'scenario-planning-units-data',
   ScenarioRunResults = 'scenario-run-results',
   ScenarioProtectedAreas = 'scenario-protected-areas',
   ScenarioFeaturesData = 'scenario-features-data',
   FeaturesSpecification = 'feautures-specification',
+  // marxan-data pieces
+  PlanningAreaCustomGeojson = 'planning-area-custom-geojson',
+  PlanningUnitsGridGeojson = 'planning-units-grid-geojson',
+  ScenarioInputFolder = 'scenario-input-folder',
+  ScenarioOutputFolder = 'scenario-output-folder',
 }

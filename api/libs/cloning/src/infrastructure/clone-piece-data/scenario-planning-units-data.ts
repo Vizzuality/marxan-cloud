@@ -1,8 +1,4 @@
-export const scenarioPlanningUnitsDataRelativePath = {
-  scenarioImport: `scenario-pu-data.json`,
-  projectImport: (oldScenarioId: string) =>
-    `scenarios/${oldScenarioId}/scenario-pu-data.json`,
-};
+export const scenarioPlanningUnitsDataRelativePath = `scenario-pu-data.json`;
 
 type PlanningUnitData = {
   puid: number;
