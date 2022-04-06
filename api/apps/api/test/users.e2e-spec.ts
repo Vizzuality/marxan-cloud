@@ -284,6 +284,7 @@ describe('UsersModule (e2e)', () => {
           displayName: expect.any(String),
           avatarDataUrl: null,
           isActive: true,
+          isAdmin: false,
           isBlocked: false,
           isDeleted: false,
           metadata: null,
