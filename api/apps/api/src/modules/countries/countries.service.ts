@@ -27,7 +27,7 @@ export class CountriesService extends AppBaseService<
   ) {
     super(countriesRepository, 'country', 'countries', {
       idProperty: 'gid0',
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

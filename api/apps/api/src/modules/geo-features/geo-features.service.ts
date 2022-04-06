@@ -72,7 +72,7 @@ export class GeoFeaturesService extends AppBaseService<
       geoFeatureResource.name.singular,
       geoFeatureResource.name.plural,
       {
-        logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+        logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
       },
     );
   }

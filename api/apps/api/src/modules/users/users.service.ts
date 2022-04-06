@@ -46,7 +46,7 @@ export class UsersService extends AppBaseService<
     private readonly authenticationService: AuthenticationService,
   ) {
     super(repository, userResource.name.singular, userResource.name.plural, {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

@@ -31,7 +31,7 @@ export class PublishedProjectCrudService extends AppBaseService<
       publishedProjectResource.name.singular,
       publishedProjectResource.name.plural,
       {
-        logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+        logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
       },
     );
   }

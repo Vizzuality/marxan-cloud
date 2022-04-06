@@ -26,6 +26,18 @@ export class AppConfig {
   }
 
   /**
+   * Read a config value from a give config property and return it as boolean;
+   * return defaultValue if property does not exist.
+   */
+   static getBoolean(property: string, defaultValue?: boolean): boolean {
+    const parsedValue = this.get<string>(property, defaultValue?.toString()).toLowerCase();
+
+    if(parsedValue === 'true') return true;
+    if(parsedValue === 'false') return false;
+    throw new Error(`Expected boolean value, but ${parsedValue} was provided`);
+  }
+
+  /**
    * Compile list of config values from: 1. a config property as array of
    * values, and 2. a comma-separated list as string. The latter would typically
    * be a string read from an environment variable and mapped to a config

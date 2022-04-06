@@ -78,7 +78,7 @@ export class ProtectedAreasCrudService extends AppBaseService<
     protected readonly repository: Repository<ProtectedArea>,
   ) {
     super(repository, 'protected_area', 'protected_areas', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

@@ -54,7 +54,7 @@ export class ScenariosCrudService extends AppBaseService<
     private readonly userScenarios: Repository<UsersScenariosApiEntity>,
   ) {
     super(repository, 'scenario', 'scenarios', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

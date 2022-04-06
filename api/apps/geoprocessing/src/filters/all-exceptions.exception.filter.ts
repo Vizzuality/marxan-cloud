@@ -49,7 +49,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       },
     };
 
-    if (!AppConfig.get<boolean>('logging.muteAll', false)) {
+    if (!AppConfig.getBoolean('logging.muteAll', false)) {
       this.logger.error(errorData);
     }
 
