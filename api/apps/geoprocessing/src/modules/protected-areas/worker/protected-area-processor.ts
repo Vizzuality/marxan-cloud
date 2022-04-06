@@ -9,6 +9,7 @@ import { ShapefileExtractorService } from '@marxan/shapefile-converter';
 import { JobInput, JobOutput } from '@marxan/protected-areas';
 
 import { WorkerProcessor } from '../../worker';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 @Injectable()
 export class ProtectedAreaProcessor

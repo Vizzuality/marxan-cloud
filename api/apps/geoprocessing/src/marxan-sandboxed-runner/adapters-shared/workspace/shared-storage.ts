@@ -6,6 +6,7 @@ import { resolve } from 'path';
 import { TemporaryDirectory } from './ports/temporary-directory';
 import { WorkingDirectory } from '../../ports/working-directory';
 import { MarxanDirectory } from '../../adapters-single/marxan-directory.service';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 export const SharedStoragePath = Symbol('shared storage temporary directory');
 
@@ -17,6 +18,11 @@ export class SharedStorage implements TemporaryDirectory {
   ) {}
 
   async cleanup(directory: string): Promise<void> {
+    /**
+     * Leave temporary folder on filesystem according to feature flag.
+     */
+    if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
+
     if (this.#hasPoisonNullByte(directory)) {
       throw new Error(`Hacking is not allowed.`);
     }
@@ -24,7 +30,7 @@ export class SharedStorage implements TemporaryDirectory {
     if (this.#isDirectoryTraversal(directory, this.tempDirectory)) {
       throw new Error(`Directory traversal is not allowed.`);
     }
-
+    console.debug(`deleting ${directory}`);
     await promises.rm(directory, {
       recursive: true,
       force: true,

@@ -51,6 +51,11 @@ export class CostTemplateGenerator {
       );
       await this.storage.save(scenarioId, path.join(shapefileDirectory));
     } finally {
+      /**
+       * Leave temporary folder on filesystem according to feature flag.
+       */
+      if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
+
       await fs.promises.rm(transformationDirectory, {
         recursive: true,
         force: true,

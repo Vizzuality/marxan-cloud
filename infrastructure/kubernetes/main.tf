@@ -234,6 +234,7 @@ module "geoprocessing_staging" {
   namespace                  = "staging"
   image                      = "marxan.azurecr.io/marxan-geoprocessing:staging"
   deployment_name            = "geoprocessing"
+  cleanup_temporary_folders  = "false"
 }
 
 module "client_staging" {
