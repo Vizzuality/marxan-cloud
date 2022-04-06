@@ -29,7 +29,7 @@ export class SharedStorage implements TemporaryDirectory {
     /**
      * Leave temporary folder on filesystem according to feature flag.
      */
-    if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
+    if(!AppConfig.getBoolean('storage.sharedFileStorage.cleanupTemporaryFolders', true)) return;
 
     Logger.log(`deleting ${directory}`);
     await rm(directory, {
