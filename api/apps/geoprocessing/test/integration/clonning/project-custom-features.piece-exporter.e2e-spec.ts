@@ -157,7 +157,7 @@ const getFixtures = async () => {
           );
           expect(content.features).toHaveLength(amountOfCustomFeatures);
           const { feature_class_name, data } = content.features[0];
-          expect(feature_class_name).toEqual(`${projectId}-1`);
+          expect(feature_class_name).toEqual(`custom-${projectId}-1`);
           expect(data).toHaveLength(recordsOfDataForEachCustomFeature);
         },
       };

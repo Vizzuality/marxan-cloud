@@ -112,7 +112,7 @@ const getFixtures = async () => {
         pieceResourceId: v4(),
         importId: v4(),
         projectId,
-        piece: ClonePiece.PlanningAreaGAdm,
+        piece: ClonePiece.ProjectCustomProtectedAreas,
         resourceKind: ResourceKind.Project,
         uris: [],
       };
@@ -122,7 +122,7 @@ const getFixtures = async () => {
     },
     GivenValidProjectCustomProtectedAreasFile: async () => {
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaGAdm,
+        ClonePiece.ProjectCustomProtectedAreas,
         'project custom protected areas file relative path',
       );
 

@@ -454,7 +454,7 @@ export async function GivenScenarioFeaturesData(
   const insertValues = featuresData.map((data, index) => ({
     ...scenarioFeaturesData,
     id: v4(),
-    featureDataId: data.feature_id,
+    featureDataId: data.id,
     scenarioId,
     featureId: index + 1,
   }));
