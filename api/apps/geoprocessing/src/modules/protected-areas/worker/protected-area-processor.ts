@@ -53,7 +53,17 @@ export class ProtectedAreaProcessor
         [geo, job.data.projectId, job.data.name || job.data.shapefile.filename],
       );
 
-      await this.shapefileService.cleanup(job.data.shapefile);
+      /**
+       * Leave temporary folder on filesystem according to feature flag.
+       */
+      if (
+        AppConfig.getBoolean(
+          'storage.sharedFileStorage.cleanupTemporaryFolders',
+          true,
+        )
+      ) {
+        await this.shapefileService.cleanup(job.data.shapefile);
+      }
 
       return plainToClass<JobOutput, JobOutput>(JobOutput, {
         protectedAreaId: entities.map((entity) => entity.id),
