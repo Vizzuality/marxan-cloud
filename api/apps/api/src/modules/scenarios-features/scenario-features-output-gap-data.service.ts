@@ -47,7 +47,7 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     private readonly scenarioAclService: ScenarioAccessControl,
   ) {
     super(gapData, 'scenario_features', 'scenario_feature', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 
