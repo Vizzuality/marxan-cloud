@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import * as fs from 'fs';
+import { mkdir, rm } from 'fs/promises';
 import * as path from 'path';
 import * as uuid from 'uuid';
 import { runCommandsXL } from 'mapshaper';
@@ -32,7 +32,7 @@ export class CostTemplateGenerator {
       'cost-templates',
       uuid.v4(),
     );
-    await fs.promises.mkdir(transformationDirectory, { recursive: true });
+    await mkdir(transformationDirectory, { recursive: true });
     const resultFilePrefix = 'result';
 
     try {
@@ -56,7 +56,7 @@ export class CostTemplateGenerator {
        */
       if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
 
-      await fs.promises.rm(transformationDirectory, {
+      await rm(transformationDirectory, {
         recursive: true,
         force: true,
       });
