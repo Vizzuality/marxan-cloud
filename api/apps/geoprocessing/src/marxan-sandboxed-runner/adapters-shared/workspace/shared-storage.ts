@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { v4 } from 'uuid';
 import { mkdir, rm } from 'fs/promises';
 import { existsSync } from 'fs';
@@ -19,11 +19,6 @@ export class SharedStorage implements TemporaryDirectory {
   ) {}
 
   async cleanup(directory: string): Promise<void> {
-    /**
-     * Leave temporary folder on filesystem according to feature flag.
-     */
-    if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
-
     if (this.#hasPoisonNullByte(directory)) {
       throw new Error(`Hacking is not allowed.`);
     }
@@ -31,7 +26,12 @@ export class SharedStorage implements TemporaryDirectory {
     if (this.#isDirectoryTraversal(directory, this.tempDirectory)) {
       throw new Error(`Directory traversal is not allowed.`);
     }
-    console.debug(`deleting ${directory}`);
+    /**
+     * Leave temporary folder on filesystem according to feature flag.
+     */
+    if(AppConfig.get<string>('storage.sharedFileStorage.cleanupTemporaryFolders', 'true').toLowerCase() === 'false') return;
+
+    Logger.log(`deleting ${directory}`);
     await rm(directory, {
       recursive: true,
       force: true,
