@@ -856,9 +856,15 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
     if (userQueries.every((u) => u?.isFetched)) {
       return userQueries.reduce((acc, q: any) => {
         const { data: { blmValue, image } } = q;
+
+        const encodeBase64 = (data) => {
+          return Buffer.from(data).toString('base64');
+        };
+        const base64EncodedStr = encodeBase64(decodeURI(encodeURIComponent(image)));
         return {
           ...acc,
-          [blmValue]: Buffer.from(image, 'binary').toString('base64'),
+          // [blmValue]: Buffer.from(image, 'binary').toString('base64'),
+          [blmValue]: `data:image/png;base64,${base64EncodedStr}`,
         };
       }, {});
     }
