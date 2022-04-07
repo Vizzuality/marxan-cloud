@@ -180,6 +180,12 @@
 			],
 			"@marxan/geofeatures/*": [
         "libs/geofeatures/src/*"
+      ],
+			"@marxan/domain-ids": [
+        "libs/domain-ids/src"
+      ],
+      "@marxan/domain-ids/*": [
+        "libs/domain-ids/src/*"
       ]
     }
   },

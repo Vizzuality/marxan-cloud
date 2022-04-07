@@ -236,7 +236,9 @@
       "@marxan/webshot/(.*)": "<rootDir>/libs/webshot/src/$1",
       "@marxan/webshot": "<rootDir>/libs/webshot/src",
       "@marxan/geofeatures/(.*)": "<rootDir>/libs/geofeatures/src/$1",
-      "@marxan/geofeatures": "<rootDir>/libs/geofeatures/src"
+      "@marxan/geofeatures": "<rootDir>/libs/geofeatures/src",
+      "@marxan/domain-ids/(.*)": "<rootDir>/libs/domain-ids/src/$1",
+      "@marxan/domain-ids": "<rootDir>/libs/domain-ids/src"
     }
   }
 }
