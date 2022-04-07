@@ -63,8 +63,17 @@ export const generatePngImageFromBlmData = async (
    * that is needed is the `__Secure-next-auth.session-token` cookie (or
    * `next-auth.session-token` in development environments where the frontend
    * may not be running behind an HTTPS reverse proxy).
+   *
+   * @todo remove Bypass-Tunnel-Reminder once done with all development and
+   * checks via LocalTunnel; the following line will do instead.
+   *
+   * if (cookie) await page.setExtraHTTPHeaders({ cookie });
    */
-  if (cookie) await page.setExtraHTTPHeaders({ cookie });
+  if (cookie) {
+    await page.setExtraHTTPHeaders({ cookie, 'Bypass-Tunnel-Reminder': 'true' });
+  } else {
+    await page.setExtraHTTPHeaders({ 'Bypass-Tunnel-Reminder': 'true' });
+  }
 
   console.info(`Rendering ${pageUrl} as PNG`);
   await page.goto(pageUrl);
