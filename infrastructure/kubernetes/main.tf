@@ -40,7 +40,6 @@ locals {
   k8s_client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
   k8s_cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
   backend_storage_class      = "azurefile-csi-nfs"
-  backend_storage_size       = "100Gi"
   backend_storage_pvc_name   = "backend-shared-spatial-data-storage"
 }
 
@@ -116,7 +115,7 @@ module "backend_storage_pvc_production" {
   namespace                  = "production"
   backend_storage_class      = local.backend_storage_class
   backend_storage_pvc_name   = local.backend_storage_pvc_name
-  backend_storage_size       = local.backend_storage_size
+  backend_storage_size       = var.backend_storage_size
 }
 
 module "api_production" {
@@ -246,7 +245,7 @@ module "backend_storage_pvc_staging" {
   namespace                  = "staging"
   backend_storage_class      = local.backend_storage_class
   backend_storage_pvc_name   = local.backend_storage_pvc_name
-  backend_storage_size       = local.backend_storage_size
+  backend_storage_size       = var.backend_storage_size
 }
 
 module "api_staging" {
