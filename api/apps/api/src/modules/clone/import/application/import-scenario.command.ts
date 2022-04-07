@@ -6,8 +6,13 @@ import { SaveError } from './import.repository.port';
 
 export type ImportScenarioError = SaveError | ArchiveReadError;
 
+export type ImportScenarioCommandResult = {
+  importId: string;
+  scenarioId: string;
+};
+
 export class ImportScenario extends Command<
-  Either<ImportScenarioError, string>
+  Either<ImportScenarioError, ImportScenarioCommandResult>
 > {
   constructor(public readonly archiveLocation: ArchiveLocation) {
     super();

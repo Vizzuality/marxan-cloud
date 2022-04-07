@@ -8,7 +8,11 @@ import {
 import { Either, isLeft, right } from 'fp-ts/Either';
 import { Import } from '../domain/import/import';
 import { ExportConfigReader } from './export-config-reader';
-import { ImportProject, ImportProjectError } from './import-project.command';
+import {
+  ImportProject,
+  ImportProjectCommandResult,
+  ImportProjectError,
+} from './import-project.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
 
@@ -24,7 +28,9 @@ export class ImportProjectHandler
 
   async execute({
     archiveLocation,
-  }: ImportProject): Promise<Either<ImportProjectError, string>> {
+  }: ImportProject): Promise<
+    Either<ImportProjectError, ImportProjectCommandResult>
+  > {
     const exportConfigOrError = await this.exportConfigReader.read(
       archiveLocation,
     );
@@ -58,6 +64,9 @@ export class ImportProjectHandler
 
     importRequest.commit();
 
-    return right(importRequest.importId.value);
+    return right({
+      importId: importRequest.importId.value,
+      projectId: projectId.value,
+    });
   }
 }

@@ -747,10 +747,10 @@ export class ProjectsController {
   async importProject(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<RequestProjectImportResponseDto> {
-    const importIdOrError = await this.projectsService.importProject(file);
+    const idsOrError = await this.projectsService.importProject(file);
 
-    if (isLeft(importIdOrError)) {
-      switch (importIdOrError.left) {
+    if (isLeft(idsOrError)) {
+      switch (idsOrError.left) {
         case archiveCorrupted:
           throw new BadRequestException('Missing export config file');
         case invalidFiles:
@@ -763,6 +763,9 @@ export class ProjectsController {
       }
     }
 
-    return { importId: importIdOrError.right };
+    return {
+      importId: idsOrError.right.importId,
+      projectId: idsOrError.right.projectId,
+    };
   }
 }
