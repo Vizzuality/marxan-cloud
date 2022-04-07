@@ -235,11 +235,11 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           resources {
             limits = {
               cpu    = "1"
-              memory = "2Gi"
+              memory = "4Gi"
             }
             requests = {
               cpu    = "500m"
-              memory = "2Gi"
+              memory = "3Gi"
             }
           }
 
