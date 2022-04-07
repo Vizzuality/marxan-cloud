@@ -24,6 +24,13 @@ import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 
+export type TestSpecification = {
+  id: string;
+  scenario_id: string;
+  draft: boolean;
+  raw: Record<string, any>;
+};
+
 const randomGeometriesBoundary =
   '0103000020E6100000010000000A00000000000000602630C0A12CF6C9EE913C4000000000F46430C0C6D6EE9332863C4000000000C07A30C06718E5AE99673C40000000008ADD30C0AE5F48C4D85B3C40000000006EAE30C0EF8810F1D7033C4000000000DC7C30C0B0AB582D481D3C4000000000246230C0712DA50F7E533C4000000000086030C0323EBB984F6B3C40000000009E2430C03B55C7C9C18B3C4000000000602630C0A12CF6C9EE913C40';
 
@@ -503,6 +510,86 @@ export async function GivenOutputScenarioFeaturesData(
       ),
     )
     .execute();
+}
+
+export async function GivenSpecifications(
+  em: EntityManager,
+  featuresIds: string[],
+  scenarioId: string,
+) {
+  const specifications = featuresIds.map((featureId) => {
+    return {
+      id: v4(),
+      scenario_id: scenarioId,
+      draft: true,
+      raw: {
+        status: 'any',
+        features: [
+          {
+            featureId,
+            innerObject: {
+              featureId,
+              innnerObject: {
+                featureId,
+              },
+            },
+          },
+        ],
+      },
+    };
+  });
+
+  await Promise.all(
+    specifications.map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('specifications')
+        .values(values)
+        .execute(),
+    ),
+  );
+
+  return specifications;
+}
+
+export async function GivenSpecificationFeaturesConfig(
+  em: EntityManager,
+  featureId: string,
+  specifications: TestSpecification[],
+  featuresConfigsPerSpecification: number,
+  configtData: Record<string, any> = {},
+) {
+  const specificationFeaturesConfig = specifications.flatMap(
+    (specification) => {
+      return Array(featuresConfigsPerSpecification)
+        .fill(0)
+        .map(() => {
+          return {
+            id: v4(),
+            specification_id: specification.id,
+            base_feature_id: featureId,
+            against_feature_id: null,
+            operation: 'copy',
+            features_determined: false,
+            split_by_property: null,
+            select_sub_sets: null,
+            ...configtData,
+          };
+        });
+    },
+  );
+
+  await Promise.all(
+    specificationFeaturesConfig.map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('specification_feature_configs')
+        .values(values)
+        .execute(),
+    ),
+  );
 }
 
 export async function DeleteProtectedAreas(em: EntityManager, ids: string[]) {

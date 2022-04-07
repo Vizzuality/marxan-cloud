@@ -3,7 +3,7 @@ import { SlugService } from '../../../../utils/src/slug.service';
 import { ComponentLocation, ResourceKind } from '../../domain';
 import { ClonePiece } from '../../domain/clone-piece';
 import { exportConfigRelativePath } from './export-config';
-import { featuresSpecificationRelativePath } from './features-specification';
+import { featuresSpecificationRelativePath } from './scenario-features-specification';
 import { planningAreaCustomRelativePath } from './planning-area-custom';
 import { planningAreaCustomGeoJSONRelativePath } from './planning-area-custom-geojson';
 import { planningAreaGadmRelativePath } from './planning-area-gadm';
@@ -123,7 +123,7 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   //
   [ClonePiece.ScenarioRunResults]: 3,
   // Temporal import order
-  [ClonePiece.FeaturesSpecification]: 10,
+  [ClonePiece.FeaturesSpecification]: 3,
 };
 
 export class ClonePieceUrisResolver {
@@ -156,9 +156,9 @@ export class ClonePieceUrisResolver {
     [ClonePiece.ProjectCustomFeatures]: (location) => [
       new ComponentLocation(location, projectCustomFeaturesRelativePath),
     ],
-    [ClonePiece.FeaturesSpecification]: (location) => [
-      new ComponentLocation(location, featuresSpecificationRelativePath),
-    ],
+    [ClonePiece.FeaturesSpecification]: scenarioPieceUriResolver(
+      featuresSpecificationRelativePath,
+    ),
     [ClonePiece.ScenarioMetadata]: scenarioPieceUriResolver(
       scenarioMetadataRelativePath,
     ),

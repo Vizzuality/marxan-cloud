@@ -16,6 +16,7 @@ import { ProjectCustomProtectedAreasPieceExporter } from './project-custom-prote
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
 import { ScenarioFeaturesDataPieceExporter } from './scenario-features-data.piece-exporter';
 import { ScenarioInputFolderPieceExporter } from './scenario-input-folder.piece-exporter';
+import { ScenarioFeaturesSpecificationPieceExporter } from './scenario-features-specification.piece-exporter';
 import { ScenarioMetadataPieceExporter } from './scenario-metadata.piece-exporter';
 import { ScenarioOutputFolderPieceExporter } from './scenario-output-folder.piece-exporter';
 import { ScenarioPlanningUnitsDataPieceExporter } from './scenario-planning-units-data.piece-exporter';
@@ -50,6 +51,7 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
     ScenarioFeaturesDataPieceExporter,
     ScenarioInputFolderPieceExporter,
     ScenarioOutputFolderPieceExporter,
+    ScenarioFeaturesSpecificationPieceExporter,
     Logger,
   ],
 })
