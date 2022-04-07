@@ -17,7 +17,7 @@ const AdminPage: React.FC = () => {
       <Protected>
         <MetaIcons />
 
-        <main className="min-h-screen text-black bg-white">
+        <main className="min-h-screen text-black bg-gray-50">
           <Header size="base" />
 
           <AdminPublishedProjects />

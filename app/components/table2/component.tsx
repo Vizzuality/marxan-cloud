@@ -7,6 +7,8 @@ import {
   useSortBy,
 } from 'react-table';
 
+import cx from 'classnames';
+
 import Pagination from './pagination';
 
 export interface Table2Props {
@@ -46,7 +48,6 @@ export const Table2: React.FC<Table2Props> = ({
     // pagination
     canPreviousPage,
     canNextPage,
-    pageOptions,
     pageCount,
     gotoPage,
     nextPage,
@@ -61,7 +62,7 @@ export const Table2: React.FC<Table2Props> = ({
       data,
       // paginaion
       manualPagination: true,
-      pageCount: meta.totalPages,
+      pageCount: meta?.totalPages || 0,
 
       // sorting
       manualSortBy: true,
@@ -69,8 +70,8 @@ export const Table2: React.FC<Table2Props> = ({
 
       initialState: {
         ...initialState,
-        pageIndex: meta.page - 1,
-        pageSize: meta.size,
+        pageIndex: meta?.page ? meta.page - 1 : 0,
+        pageSize: meta?.size || 10,
       },
     },
     useFlexLayout,
@@ -93,10 +94,12 @@ export const Table2: React.FC<Table2Props> = ({
     }
   }, [state, onPageChange, onSortChange]);
 
+  const { sortBy } = state;
+  const [sortSelected] = sortBy;
+
   return (
     <div className="w-full">
-
-      <div {...getTableProps()} className="w-full">
+      <div {...getTableProps()} className="relative w-full mb-2 bg-white rounded-t-3xl">
         <div>
           {headerGroups.map((headerGroup) => {
             const {
@@ -108,10 +111,10 @@ export const Table2: React.FC<Table2Props> = ({
               <div
                 key={headerGroupKey}
                 {...restHeaderGroupProps}
-                className="tr"
+                className="sticky top-0 z-10 px-10"
               >
                 {headerGroup.headers.map((column) => {
-                  const { isSorted, toggleSortBy } = column;
+                  const { toggleSortBy } = column;
 
                   const {
                     key: headerKey,
@@ -123,9 +126,10 @@ export const Table2: React.FC<Table2Props> = ({
                       role="presentation"
                       key={headerKey}
                       {...restHeaderProps}
-                      className="th"
+                      className="py-5 text-xs font-medium uppercase font-heading"
                       onClick={() => {
-                        toggleSortBy(!isSorted, false);
+                        const direction = !sortSelected ? true : !sortSelected.desc;
+                        toggleSortBy(direction, false);
                       }}
                     >
                       {column.render('Header')}
@@ -149,7 +153,7 @@ export const Table2: React.FC<Table2Props> = ({
               <div
                 key={rowKey}
                 {...restRowProps}
-                className="tr"
+                className="px-10 border-t border-gray-100"
               >
                 {row.cells.map((cell) => {
                   const {
@@ -161,7 +165,10 @@ export const Table2: React.FC<Table2Props> = ({
                     <div
                       key={cellKey}
                       {...restCellProps}
-                      className="td"
+                      className={cx({
+                        'py-5': true,
+                        [cell?.column?.className]: !!cell?.column?.className,
+                      })}
                     >
                       {cell.render('Cell')}
                     </div>
@@ -177,7 +184,6 @@ export const Table2: React.FC<Table2Props> = ({
         pageIndex={state.pageIndex}
         canPreviousPage={canPreviousPage}
         canNextPage={canNextPage}
-        pageOptions={pageOptions}
         pageCount={pageCount}
         gotoPage={gotoPage}
         nextPage={nextPage}

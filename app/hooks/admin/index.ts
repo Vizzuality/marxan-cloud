@@ -6,8 +6,8 @@ import {
 
 import { useSession } from 'next-auth/client';
 
-// import ADMIN from 'services/admin';
-import TEST from 'services/test';
+import ADMIN from 'services/admin';
+// import TEST from 'services/test';
 
 import {
   UseAdminPublishedProjectsProps,
@@ -18,58 +18,72 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
 
   const {
     page,
-    // search,
-    // filters = {},
+    search,
+    filters = {},
     sort,
   } = options;
 
-  // const parsedFilters = Object.keys(filters)
-  //   .reduce((acc, k) => {
-  //     return {
-  //       ...acc,
-  //       [`filter[${k}]`]: filters[k].toString(),
-  //     };
-  //   }, {});
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k].toString(),
+      };
+    }, {});
 
-  // const fetchPublishedProjects = () => ADMIN.request({
-  //   method: 'GET',
-  //   url: '/projects/published-projects/by-admin',
-  //   headers: {
-  //     Authorization: `Bearer ${session.accessToken}`,
-  //   },
-  //   params: {
-  //     'page[number]': page,
-  //     ...parsedFilters,
-  //     ...search && {
-  //       q: search,
-  //     },
-  //   },
-  // }).then((response) => response.data);
+  const parsedSort = useMemo(() => {
+    if (!sort) {
+      return '';
+    }
 
-  const fetchPublishedProjects = () => TEST.request({
+    const direction = sort.direction === 'asc' ? '-' : '';
+    return `${direction}${sort.column}`;
+  }, [sort]);
+
+  const fetchPublishedProjects = () => ADMIN.request({
     method: 'GET',
-    url: '/',
+    url: '/projects/published-projects/by-admin',
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
     params: {
-      _page: page,
-      _limit: 25,
-      ...sort && {
-        _sort: sort.column,
-        _order: sort.direction,
+      'page[number]': page,
+      ...parsedFilters,
+      ...search && {
+        q: search,
+      },
+      ...parsedSort && {
+        sort: parsedSort,
       },
     },
   }).then((response) => response.data);
 
+  // TEST
+  // const fetchPublishedProjects = () => TEST.request({
+  //   method: 'GET',
+  //   url: '/',
+  //   headers: {
+  //     Authorization: `Bearer ${session.accessToken}`,
+  //   },
+  //   params: {
+  //     _page: page,
+  //     _limit: 10,
+  //     ...sort && {
+  //       _sort: sort.column,
+  //       _order: sort.direction,
+  //     },
+  //   },
+  // }).then((response) => response.data);
+
   const query = useQuery(['admin-published-projects', JSON.stringify(options), page], fetchPublishedProjects, {
     retry: false,
     keepPreviousData: true,
-    // placeholderData: {
-    //   data: [],
-    //   meta: {} as any,
-    // },
-    placeholderData: [],
+    placeholderData: {
+      data: [],
+      meta: {} as any,
+    },
+    // TEST
+    // placeholderData: [],
   });
 
   const { data } = query;
@@ -77,21 +91,35 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
   return useMemo(() => {
     return {
       ...query,
-      data: data.map((d) => {
+      // data: data.map((d) => {
+      //   return {
+      //     title: d.title,
+      //     area: 'custom',
+      //     status: 'published',
+      //     owner: {
+      //       name: 'Miguel Barrenechea',
+      //       email: 'barrenechea.miguel@gmail.com',
+      //     },
+      //   };
+      // }),
+      // meta: {
+      //   page: 1,
+      //   totalPages: 20,
+      //   size: 5,
+      //   totalItems: 100,
+      // },
+      data: data?.data.map((d) => {
         return {
-          name: d.title,
-          planningAreaName: 'custom',
-
+          name: d.name,
+          area: 'custom',
+          status: 'published',
+          owner: {
+            name: 'Miguel Barrenechea',
+            email: 'barrenechea.miguel@gmail.com',
+          },
         };
       }),
-      meta: {
-        page: 1,
-        totalPages: 4,
-        size: 25,
-        totalItems: 100,
-      },
-      // data: data?.data,
-      // meta: data?.meta
+      meta: data?.meta,
     };
   }, [query, data]);
 }
