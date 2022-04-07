@@ -39,7 +39,6 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
   const { pid, sid } = query;
 
   const { blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
   const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
 
@@ -159,17 +158,15 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
                     </div>
                   </div>
 
-                  <>
-                    <div className="flex flex-col mt-8 space-y-2">
-                      <h3 className="text-sm font-bold text-white">Boundary Length</h3>
-                      <p className="text-xs text-white">
-                        More
-                      </p>
-                    </div>
-                    <div className="w-full h-32">
-                      <BLMChart data={calibrationResultsData} />
-                    </div>
-                  </>
+                  <div className="flex flex-col mt-8 space-y-2">
+                    <h3 className="text-sm font-bold text-white">Boundary Length</h3>
+                    <p className="text-xs text-white">
+                      More
+                    </p>
+                  </div>
+                  <div className="w-full h-32">
+                    <BLMChart data={calibrationResultsData} />
+                  </div>
                 </form>
               );
             }}

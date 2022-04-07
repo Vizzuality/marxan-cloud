@@ -59,6 +59,7 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
   return SCENARIOS.request({
     method: 'GET',
     url: `/${sId}/calibration/maps/preview/${blmValue}`,
+    responseType: 'arraybuffer',
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
@@ -856,16 +857,11 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
   const CALIBRATION_IMAGES = useMemo(() => {
     if (userQueries.every((u) => u?.isFetched)) {
       return userQueries.reduce((acc, q: UseBlmImageProps) => {
-        const { data: { blmValue, image } } = q;
-
-        const encodeBase64 = (data) => {
-          return Buffer.from(data).toString('base64');
-        };
-        const base64EncodedStr = encodeBase64(decodeURI(encodeURIComponent(image)));
+        const { data: { blmValue, image: blob } } = q;
+        const imageURL = window.URL.createObjectURL(new Blob([blob]));
         return {
           ...acc,
-          // [blmValue]: Buffer.from(image, 'binary').toString('base64'),
-          [blmValue]: `data:image/png;base64,${base64EncodedStr}`,
+          [blmValue]: imageURL,
         };
       }, {});
     }
@@ -895,6 +891,7 @@ export function useScenarioCalibrationResults(scenarioId) {
 
   const blmValues = data?.data.map((i) => i.blmValue) || [];
   const { data: blmImages } = useCalibrationBLMImages({ sid: scenarioId, blmValues });
+
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data)
       ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)).map((i) => {
