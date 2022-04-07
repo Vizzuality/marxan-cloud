@@ -29,3 +29,9 @@ variable "sparkpost_api_key" {
   type        = string
   description = "The API key for Sparkpost"
 }
+
+variable "backend_storage_size" {
+  type = string
+  default = "100Gi"
+  description = "Size of the backend storage claim"
+}
