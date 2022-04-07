@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import puppeteer, { PDFOptions } from "puppeteer";
 import { ReportOptions } from "./report-options.dto";
-import { waitForReportReady } from "../utils/wait-function";
+import { waitForReportReady } from "../../utils/wait-function";
+import { passthroughConsole } from "../../utils/passthrough-console.utils";
 
 const appRouteTemplate = "/reports/:projectId/:scenarioId/solutions?solutionId=:solutionId";
 
@@ -50,6 +51,8 @@ export const generateSummaryReportForScenario = async (
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   const page = await browser.newPage();
+  // Pass through browser console to our own service's console
+  page.on('console', passthroughConsole);
 
   /**
    * The webshot service authenticates to the upstream frontend instance by
