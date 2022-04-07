@@ -95,12 +95,25 @@ export const Footer: React.FC<FooterProps> = () => {
               </div>
             </div>
             <div className="flex flex-col md:flex-row md:items-center md:justify-center md:space-x-8">
-              <Link href="/terms-of-use">
-                <a href="/terms-of-use" className="text-white hover:underline">Terms of use</a>
-              </Link>
-              <Link href="/privacy-policy">
-                <a href="/privacy-policy" className="text-white hover:underline">Privacy policy</a>
-              </Link>
+
+              <a
+                className="text-white hover:underline"
+                href="https://www.nature.org/en-us/about-us/who-we-are/accountability/terms-of-use"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Terms of use
+              </a>
+
+              <a
+                className="text-white hover:underline"
+                href="https://www.nature.org/en-us/about-us/who-we-are/accountability/privacy-policy"
+                rel="noreferrer"
+                target="_blank"
+              >
+                Privacy policy
+              </a>
+
             </div>
           </div>
         </Wrapper>
