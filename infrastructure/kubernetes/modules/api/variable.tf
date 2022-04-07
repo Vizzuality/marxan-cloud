@@ -49,17 +49,7 @@ variable "http_logging_morgan_format" {
   description = "Value for the BACKEND_HTTP_LOGGING_MORGAN_FORMAT env var"
 }
 
-variable "backend_storage_class" {
-  type        = string
-  description = "Name of the storage class to use for backend storage"
-}
-
-variable "backend_storage_pvc" {
+variable "backend_storage_pvc_name" {
   type        = string
   description = "Name of the PVC to use for backend storage"
-}
-
-variable "backend_storage_size" {
-  type        = string
-  description = "Size of the PVC to use for backend storage"
 }
