@@ -122,7 +122,6 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ScenarioFeaturesData]: 2,
   //
   [ClonePiece.ScenarioRunResults]: 3,
-  // Temporal import order
   [ClonePiece.FeaturesSpecification]: 3,
 };
 

@@ -2,11 +2,7 @@ import { SpecificationOperation } from '@marxan-api/modules/specification';
 import { SpecificationFeature } from '@marxan-api/modules/specification/adapters/specification-feature';
 import { FeatureSubSet } from '@marxan-api/modules/specification/domain';
 
-export const featuresSpecificationRelativePath = {
-  scenarioImport: `features-specification.json`,
-  projectImport: (oldScenarioId: string) =>
-    `scenarios/${oldScenarioId}/features-specification.json`,
-};
+export const featuresSpecificationRelativePath = `features-specification.json`;
 
 export type FeatureElement = {
   name: string;
