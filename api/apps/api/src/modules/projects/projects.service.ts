@@ -59,6 +59,7 @@ import {
   ImportProjectError,
 } from '../clone/import/application/import-project.command';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { UserId } from '@marxan/domain-ids';
 
 export { validationFailed } from '../planning-areas';
 
@@ -466,19 +467,27 @@ export class ProjectsService {
 
   async importProject(
     exportFile: Express.Multer.File,
+    userId: string,
   ): Promise<
-    Either<typeof unknownError | ImportProjectError, ImportProjectCommandResult>
+    Either<
+      typeof unknownError | ImportProjectError | typeof forbiddenError,
+      ImportProjectCommandResult
+    >
   > {
     const archiveLocationOrError = await this.commandBus.execute(
       new UploadExportFile(exportFile),
     );
+
+    if (!(await this.projectAclService.canCreateProject(userId))) {
+      return left(forbiddenError);
+    }
 
     if (isLeft(archiveLocationOrError)) {
       return archiveLocationOrError;
     }
 
     const idsOrError = await this.commandBus.execute(
-      new ImportProject(archiveLocationOrError.right),
+      new ImportProject(archiveLocationOrError.right, new UserId(userId)),
     );
 
     if (isLeft(idsOrError)) {

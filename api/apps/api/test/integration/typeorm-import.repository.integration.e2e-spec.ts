@@ -1,11 +1,11 @@
+import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
+import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
+import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
 import {
   Import,
   ImportComponent,
   ImportId,
 } from '@marxan-api/modules/clone/import/domain';
-import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
-import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
-import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -14,12 +14,13 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { apiConnections } from '../../src/ormconfig';
 import { ImportComponentStatuses } from '../../src/modules/clone/import/domain/import/import-component-status';
+import { apiConnections } from '../../src/ormconfig';
 
 describe('Typeorm import repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -66,6 +67,7 @@ const getFixtures = async () => {
   let importResourceId: ResourceId;
   let componentId: ComponentId;
   let archiveLocation: ArchiveLocation;
+  const ownerId = UserId.create();
 
   const testingModule = await Test.createTestingModule({
     imports: [
@@ -96,6 +98,7 @@ const getFixtures = async () => {
         importResourceId,
         ResourceKind.Project,
         projectId,
+        ownerId,
         archiveLocation,
         [
           ImportComponent.fromSnapshot({
@@ -136,6 +139,7 @@ const getFixtures = async () => {
         importResourceId,
         ResourceKind.Project,
         projectId,
+        ownerId,
         archiveLocation,
         components,
       );

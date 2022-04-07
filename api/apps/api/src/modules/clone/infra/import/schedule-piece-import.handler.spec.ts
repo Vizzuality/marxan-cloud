@@ -6,6 +6,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
@@ -113,6 +114,7 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
+  const ownerId = UserId.create();
   const commands: ICommand[] = [];
   sandbox.get(CommandBus).subscribe((command) => {
     commands.push(command);
@@ -136,6 +138,7 @@ const getFixtures = async () => {
         importResourceId,
         ResourceKind.Project,
         projectId,
+        ownerId,
         new ArchiveLocation('/tmp/foo.zip'),
         [importComponent],
       );

@@ -14,6 +14,7 @@ import {
   ProjectExportConfigContent,
   ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
@@ -85,6 +86,7 @@ const getFixtures = async () => {
   await sandbox.init();
 
   let resourceId: ResourceId;
+  const ownerId = UserId.create();
 
   const events: IEvent[] = [];
   sandbox.get(EventBus).subscribe((event) => events.push(event));
@@ -112,7 +114,7 @@ const getFixtures = async () => {
     },
     WhenRequestingImport: async () => {
       const importResult = await sut.execute(
-        new ImportScenario(new ArchiveLocation(`whatever`)),
+        new ImportScenario(new ArchiveLocation(`whatever`), ownerId),
       );
       if (isRight(importResult))
         resourceId = new ResourceId(

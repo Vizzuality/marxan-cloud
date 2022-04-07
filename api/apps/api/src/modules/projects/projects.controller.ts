@@ -746,11 +746,17 @@ export class ProjectsController {
   @UseInterceptors(FileInterceptor('file'))
   async importProject(
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
   ): Promise<RequestProjectImportResponseDto> {
-    const idsOrError = await this.projectsService.importProject(file);
+    const idsOrError = await this.projectsService.importProject(
+      file,
+      req.user.id,
+    );
 
     if (isLeft(idsOrError)) {
       switch (idsOrError.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
         case archiveCorrupted:
           throw new BadRequestException('Missing export config file');
         case invalidFiles:
