@@ -10,7 +10,6 @@ import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 import Contact from 'layout/statics/contact';
-import PrivacyPolicyTerms from 'layout/statics/privacy-policy';
 
 export const getServerSideProps = withUser();
 
@@ -35,7 +34,7 @@ const TermsOfUse: React.FC = () => {
 
       <main className="flex flex-col h-full md:flex-grow">
         <Header size="base" />
-        <PrivacyPolicyTerms />
+
         <Contact />
         <Footer />
       </main>
