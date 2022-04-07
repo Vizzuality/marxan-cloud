@@ -55,6 +55,7 @@ import { UploadExportFile } from '../clone/infra/import/upload-export-file.comma
 import { unknownError } from '@marxan/files-repository';
 import {
   ImportProject,
+  ImportProjectCommandResult,
   ImportProjectError,
 } from '../clone/import/application/import-project.command';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
@@ -465,7 +466,9 @@ export class ProjectsService {
 
   async importProject(
     exportFile: Express.Multer.File,
-  ): Promise<Either<typeof unknownError | ImportProjectError, string>> {
+  ): Promise<
+    Either<typeof unknownError | ImportProjectError, ImportProjectCommandResult>
+  > {
     const archiveLocationOrError = await this.commandBus.execute(
       new UploadExportFile(exportFile),
     );
@@ -474,15 +477,15 @@ export class ProjectsService {
       return archiveLocationOrError;
     }
 
-    const importIdOrError = await this.commandBus.execute(
+    const idsOrError = await this.commandBus.execute(
       new ImportProject(archiveLocationOrError.right),
     );
 
-    if (isLeft(importIdOrError)) {
-      return importIdOrError;
+    if (isLeft(idsOrError)) {
+      return idsOrError;
     }
 
-    return right(importIdOrError.right);
+    return right(idsOrError.right);
   }
 
   /**

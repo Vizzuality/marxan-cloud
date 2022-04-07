@@ -30,7 +30,10 @@ import {
 import { ImportComponentStatuses } from '../domain/import/import-component-status';
 import { ExportConfigReader } from './export-config-reader';
 import { ImportResourcePieces } from './import-resource-pieces.port';
-import { ImportScenario } from './import-scenario.command';
+import {
+  ImportScenario,
+  ImportScenarioCommandResult,
+} from './import-scenario.command';
 import { ImportScenarioHandler } from './import-scenario.handler';
 import { ImportRepository } from './import.repository.port';
 
@@ -113,7 +116,7 @@ const getFixtures = async () => {
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
-          repo.entities[importResult.right].resourceId,
+          repo.entities[importResult.right.importId].resourceId,
         );
       return importResult;
     },
@@ -122,7 +125,9 @@ const getFixtures = async () => {
     ) => {
       expect(isRight(importResult)).toBeTruthy();
       expect(
-        repo.entities[(importResult as Right<string>).right],
+        repo.entities[
+          (importResult as Right<ImportScenarioCommandResult>).right.importId
+        ],
       ).toBeDefined();
     },
     ThenImportFails: (

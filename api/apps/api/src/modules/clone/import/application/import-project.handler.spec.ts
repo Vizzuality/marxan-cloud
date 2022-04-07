@@ -29,7 +29,10 @@ import {
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
 import { ImportProjectHandler } from './import-project.handler';
-import { ImportProject } from './import-project.command';
+import {
+  ImportProject,
+  ImportProjectCommandResult,
+} from './import-project.command';
 import { ImportComponentStatuses } from '../domain/import/import-component-status';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -111,7 +114,7 @@ const getFixtures = async () => {
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
-          repo.entities[importResult.right].resourceId,
+          repo.entities[importResult.right.importId].resourceId,
         );
       return importResult;
     },
@@ -120,7 +123,9 @@ const getFixtures = async () => {
     ) => {
       expect(isRight(importResult)).toBeTruthy();
       expect(
-        repo.entities[(importResult as Right<string>).right],
+        repo.entities[
+          (importResult as Right<ImportProjectCommandResult>).right.importId
+        ],
       ).toBeDefined();
     },
     ThenImportFails: (
