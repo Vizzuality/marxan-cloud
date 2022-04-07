@@ -8,8 +8,4 @@ export type ScenarioMetadataContent = {
   metadata?: Scenario['metadata'];
 };
 
-export const scenarioMetadataRelativePath = {
-  scenarioImport: `scenario-metadata.json`,
-  projectImport: (oldScenarioId: string) =>
-    `scenarios/${oldScenarioId}/scenario-metadata.json`,
-};
+export const scenarioMetadataRelativePath = `scenario-metadata.json`;

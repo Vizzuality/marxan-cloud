@@ -1,3 +1,5 @@
+import { apiGlobalPrefixes } from '@marxan-api/api.config';
+import { XApiGuard } from '@marxan-api/guards/x-api.guard';
 import {
   Controller,
   Get,
@@ -9,14 +11,19 @@ import {
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiProduces } from '@nestjs/swagger';
 import { Response } from 'express';
-import { apiGlobalPrefixes } from '@marxan-api/api.config';
-import { XApiGuard } from '@marxan-api/guards/x-api.guard';
-import { InputFilesService } from '../input-files';
+import { ZipFilesSerializer } from '../dto/zip-files.serializer';
+import { InputFilesArchiverService, InputFilesService } from '../input-files';
+import { OutputFilesService } from '../output-files/output-files.service';
 
 @UseGuards(XApiGuard)
 @Controller(`${apiGlobalPrefixes.v1}/marxan-run/scenarios`)
 export class MarxanRunController {
-  constructor(private readonly service: InputFilesService) {}
+  constructor(
+    private readonly service: InputFilesService,
+    private readonly inputFilesService: InputFilesArchiverService,
+    private readonly outputFilesService: OutputFilesService,
+    private readonly zipFilesSerializer: ZipFilesSerializer,
+  ) {}
 
   @Header('Content-Type', 'text/csv')
   @ApiOkResponse({
@@ -74,5 +81,29 @@ export class MarxanRunController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<string> {
     return await this.service.getSpecDatContent(id);
+  }
+
+  @ApiOperation({ description: `Resolve scenario's input folder` })
+  @Get(':id/marxan/input')
+  @ApiProduces('application/zip')
+  @Header('Content-Type', 'application/zip')
+  async getInputArchive(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Res() response: Response,
+  ) {
+    const result = await this.inputFilesService.archive(id);
+    response.send(this.zipFilesSerializer.serialize(result));
+  }
+
+  @ApiOperation({ description: `Resolve scenario's output folder` })
+  @Get(':id/marxan/output')
+  @ApiProduces('application/zip')
+  @Header('Content-Type', 'application/zip')
+  async getOutputArchive(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Res() response: Response,
+  ) {
+    const result = await this.outputFilesService.get(id);
+    response.send(this.zipFilesSerializer.serialize(result));
   }
 }

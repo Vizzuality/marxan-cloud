@@ -1,3 +1,5 @@
+import { isDefined } from '../../../../utils/src';
+import { SlugService } from '../../../../utils/src/slug.service';
 import { ComponentLocation, ResourceKind } from '../../domain';
 import { ClonePiece } from '../../domain/clone-piece';
 import { exportConfigRelativePath } from './export-config';
@@ -11,7 +13,9 @@ import { projectCustomFeaturesRelativePath } from './project-custom-features';
 import { projectCustomProtectedAreasRelativePath } from './project-custom-protected-areas';
 import { projectMetadataRelativePath } from './project-metadata';
 import { scenarioFeaturesDataRelativePath } from './scenario-features-data';
+import { scenarioInputFolderRelativePath } from './scenario-input-folder';
 import { scenarioMetadataRelativePath } from './scenario-metadata';
+import { scenarioOutputFolderRelativePath } from './scenario-output-folder';
 import { scenarioPlanningUnitsDataRelativePath } from './scenario-planning-units-data';
 import { scenarioProtectedAreasRelativePath } from './scenario-protected-areas';
 import { scenarioRunResultsRelativePath } from './scenario-run-results';
@@ -20,17 +24,22 @@ export const exportOnlyClonePieces: ClonePiece[] = [
   ClonePiece.ExportConfig,
   ClonePiece.PlanningUnitsGridGeojson,
   ClonePiece.PlanningAreaCustomGeojson,
+  ClonePiece.ScenarioInputFolder,
+  ClonePiece.ScenarioOutputFolder,
 ];
+
+type UriResolverExtraData = {
+  kind: ResourceKind;
+  scenarioId: string;
+  scenarioName?: string;
+};
 
 type UriResolver = (
   location: string,
-  scenarioPiecesExtraData?: { kind: ResourceKind; scenarioId: string },
+  extraData?: UriResolverExtraData,
 ) => ComponentLocation[];
 
-function scenarioPieceUriResolver(relativePath: {
-  scenarioImport: string;
-  projectImport: (oldScenarioId: string) => string;
-}): UriResolver {
+function scenarioPieceUriResolver(relativePath: string): UriResolver {
   return (location, extraData) => {
     if (!extraData)
       throw new Error(
@@ -41,8 +50,46 @@ function scenarioPieceUriResolver(relativePath: {
       new ComponentLocation(
         location,
         extraData.kind === ResourceKind.Project
-          ? relativePath.projectImport(extraData.scenarioId)
-          : relativePath.scenarioImport,
+          ? `scenarios/${extraData.scenarioId}/${relativePath}`
+          : relativePath,
+      ),
+    ];
+  };
+}
+
+function marxanDataProjectPieceUriResolver(relativePath: string): UriResolver {
+  return (location) => {
+    return [new ComponentLocation(location, `marxan-data/${relativePath}`)];
+  };
+}
+
+function marxanDataScenarioPieceUriResolver(relativePath: string): UriResolver {
+  return (location, extraData) => {
+    if (!extraData)
+      throw new Error(
+        'It is not possible generate marxan data scenario pieces uris without export kind or old scenario id',
+      );
+
+    const { kind, scenarioId, scenarioName } = extraData;
+
+    if (kind === ResourceKind.Project && !isDefined(scenarioName)) {
+      throw new Error(
+        'It is not possible generate marxan data scenario pieces uris for project exports without scenario name',
+      );
+    }
+
+    const slugService = new SlugService();
+
+    const scenarioFolder = slugService.stringToSlug(
+      `${scenarioName}-${scenarioId}`,
+    );
+
+    return [
+      new ComponentLocation(
+        location,
+        extraData.kind === ResourceKind.Project
+          ? `marxan-data/${scenarioFolder}/${relativePath}`
+          : `marxan-data/${relativePath}`,
       ),
     ];
   };
@@ -54,9 +101,12 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   // we keep ClonePiece.ExportConfig key for typing reasons
   //
   // PlanningAreaGridGeojson and PlanningAreaCustomGeojson should never be imported
+  // ScenarioInputFolder and ScenarioOutputFolder should never be imported
   [ClonePiece.ExportConfig]: -1,
   [ClonePiece.PlanningUnitsGridGeojson]: -1,
   [ClonePiece.PlanningAreaCustomGeojson]: -1,
+  [ClonePiece.ScenarioInputFolder]: -1,
+  [ClonePiece.ScenarioOutputFolder]: -1,
   //
   [ClonePiece.ProjectMetadata]: 0,
   //
@@ -87,15 +137,16 @@ export class ClonePieceUrisResolver {
     [ClonePiece.PlanningAreaCustom]: (location) => [
       new ComponentLocation(location, planningAreaCustomRelativePath),
     ],
-    [ClonePiece.PlanningAreaCustomGeojson]: (location) => [
-      new ComponentLocation(location, planningAreaCustomGeoJSONRelativePath),
-    ],
+    [ClonePiece.PlanningAreaCustomGeojson]: marxanDataProjectPieceUriResolver(
+      planningAreaCustomGeoJSONRelativePath,
+    ),
+
     [ClonePiece.PlanningUnitsGrid]: (location) => [
       new ComponentLocation(location, planningUnitsGridRelativePath),
     ],
-    [ClonePiece.PlanningUnitsGridGeojson]: (location) => [
-      new ComponentLocation(location, planningUnitsGridGeoJSONRelativePath),
-    ],
+    [ClonePiece.PlanningUnitsGridGeojson]: marxanDataProjectPieceUriResolver(
+      planningUnitsGridGeoJSONRelativePath,
+    ),
     [ClonePiece.ProjectMetadata]: (location) => [
       new ComponentLocation(location, projectMetadataRelativePath),
     ],
@@ -123,12 +174,18 @@ export class ClonePieceUrisResolver {
     [ClonePiece.ScenarioRunResults]: scenarioPieceUriResolver(
       scenarioRunResultsRelativePath,
     ),
+    [ClonePiece.ScenarioInputFolder]: marxanDataScenarioPieceUriResolver(
+      scenarioInputFolderRelativePath,
+    ),
+    [ClonePiece.ScenarioOutputFolder]: marxanDataScenarioPieceUriResolver(
+      scenarioOutputFolderRelativePath,
+    ),
   };
 
   static resolveFor(
     clonePiece: ClonePiece,
     location: string,
-    extraData?: { kind: ResourceKind; scenarioId: string },
+    extraData?: UriResolverExtraData,
   ): ComponentLocation[] {
     return this.clonePieceUris[clonePiece](location, extraData);
   }
