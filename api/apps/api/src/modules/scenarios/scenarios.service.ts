@@ -112,6 +112,7 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { EntityManager } from 'typeorm';
+import { blmImageMock } from './__mock__/blm-image-mock';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -1294,24 +1295,16 @@ export class ScenariosService {
       return left(forbiddenError);
     }
 
-    // PngData is stored as bytea array in Postgres, here we are converting it
-    // using the btoa function so in the end we have a base64 string.
-    const pngData = await this.geoEntityManager
+    const result = await this.geoEntityManager
       .createQueryBuilder()
       .select(['png_data'])
       .from('blm_final_results', 'bfr')
       .where('scenario_id = :scenarioId', { scenarioId })
       .andWhere('blm_value = :blmValue', { blmValue })
-      .execute();
+      .getRawOne();
 
-    const base64PngData = btoa(
-      pngData
-        .replace('\\x', '')
-        .match(/\w{2}/g)
-        .map((a: any) => String.fromCharCode(parseInt(a, 16)))
-        .join(''),
-    );
+    const pngData = result.png_data;
 
-    return right(Buffer.from(base64PngData, 'base64'));
+    return right(Buffer.from(pngData, 'base64'));
   }
 }

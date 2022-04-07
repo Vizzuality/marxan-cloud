@@ -1322,7 +1322,6 @@ export class ScenariosController {
     pdfStream.right.pipe(res);
   }
 
-  // @debt Refactor to use the correct blm PNG data from table.
   @ApiOperation({ description: 'Get PNG for BLM values for scenario' })
   @ApiOkResponse()
   @Get('/:scenarioId/calibration/maps/preview/:blmValue')

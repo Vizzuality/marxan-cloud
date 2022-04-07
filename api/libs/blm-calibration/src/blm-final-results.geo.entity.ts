@@ -47,6 +47,7 @@ export class BlmFinalResultEntity {
     name: `protected_pu_ids`,
     type: 'uuid',
     array: true,
+    nullable: true,
   })
   protected_pu_ids!: string[];
 
