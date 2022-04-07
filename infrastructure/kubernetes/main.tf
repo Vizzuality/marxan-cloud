@@ -255,7 +255,7 @@ module "api_staging" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
-  image                      = "marxan.azurecr.io/marxan-api:staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
   deployment_name            = "api"
   application_base_url       = "https://staging.${var.domain}"
   network_cors_origins       = "https://staging.${var.domain}"
@@ -270,7 +270,7 @@ module "geoprocessing_staging" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
-  image                      = "marxan.azurecr.io/marxan-geoprocessing:staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
   deployment_name            = "geoprocessing"
   cleanup_temporary_folders  = "false"
   backend_storage_pvc_name   = local.backend_storage_pvc_name
@@ -283,7 +283,7 @@ module "client_staging" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
-  image                      = "marxan.azurecr.io/marxan-client:staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-client:staging"
   deployment_name            = "client"
   site_url                   = "https://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
   api_url                    = "https://api.staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
@@ -296,7 +296,7 @@ module "webshot_staging" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
-  image                      = "marxan.azurecr.io/marxan-webshot:staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:staging"
   deployment_name            = "webshot"
 }
 
