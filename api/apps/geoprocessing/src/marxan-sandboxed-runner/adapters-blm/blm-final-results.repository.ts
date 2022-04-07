@@ -53,9 +53,8 @@ export class BlmFinalResultsRepository {
         where blm_final_results.scenario_id = $1 and blm_final_results.blm_value = $2`;
       await txManager.query(query, [scenarioId, blmValue]);
 
-      const pngDataParsedBuffer = Buffer.from(
-        '\\x' + Buffer.from(pngData, 'base64').toString('hex'),
-      );
+      const pngDataParsedBuffer = Buffer.from(pngData, 'base64');
+
       await txManager.update(
         BlmFinalResultEntity,
         { scenarioId, blmValue },
