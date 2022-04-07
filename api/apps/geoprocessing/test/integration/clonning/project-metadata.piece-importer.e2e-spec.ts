@@ -1,4 +1,3 @@
-import { PlanningAreaGadmPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/planning-area-gadm.piece-importer';
 import { ProjectMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-metadata.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
@@ -31,7 +30,7 @@ interface ProjectSelectResult {
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaGadmPieceImporter, () => {
+describe(ProjectMetadataPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);

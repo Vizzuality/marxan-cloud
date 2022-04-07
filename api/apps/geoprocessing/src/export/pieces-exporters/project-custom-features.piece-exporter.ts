@@ -94,10 +94,10 @@ export class ProjectCustomFeaturesPieceExporter
     }
 
     const fileContent: ProjectCustomFeaturesContent = {
-      features: customFeatures.map((feature) => ({
+      features: customFeatures.map(({ id, ...feature }) => ({
         ...feature,
         data: customFeaturesData
-          .filter((data) => data.feature_id === feature.id)
+          .filter((data) => data.feature_id === id)
           .map(({ feature_id, ...data }) => data),
       })),
     };
