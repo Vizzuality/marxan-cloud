@@ -28,6 +28,7 @@ export class ImportProjectHandler
 
   async execute({
     archiveLocation,
+    ownerId,
   }: ImportProject): Promise<
     Either<ImportProjectError, ImportProjectCommandResult>
   > {
@@ -51,6 +52,7 @@ export class ImportProjectHandler
         importResourceId,
         ResourceKind.Project,
         projectId,
+        ownerId,
         archiveLocation,
         pieces,
       ),

@@ -76,6 +76,7 @@ const getFixtures = async () => {
 
   await sandbox.init();
   const projectId = v4();
+  const userId = v4();
 
   const entityManager = sandbox.get<EntityManager>(getEntityManagerToken());
   const protectedAreasRepo = sandbox.get<Repository<ProtectedArea>>(
@@ -104,6 +105,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectCustomProtectedAreas,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -115,6 +117,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectCustomProtectedAreas,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoProjectCustomProtectedAreasFileIsAvailable: () => {

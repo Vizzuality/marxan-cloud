@@ -92,6 +92,7 @@ const getFixtures = async () => {
   await sandbox.init();
   const organizationId = v4();
   const projectId = v4();
+  const userId = v4();
 
   const entityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
@@ -111,9 +112,8 @@ const getFixtures = async () => {
       );
       await planningAreaRepo.delete({ projectId });
     },
-    GivenProject: () => {
-      return GivenProjectExists(entityManager, projectId, organizationId);
-    },
+    GivenProject: () =>
+      GivenProjectExists(entityManager, projectId, organizationId),
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const [uri] = ClonePieceUrisResolver.resolveFor(
         ClonePiece.PlanningAreaCustom,
@@ -127,6 +127,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaCustom,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -138,6 +139,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaCustom,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoCustomPlanningAreaFileIsAvailable: () => {

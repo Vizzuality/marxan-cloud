@@ -8,4 +8,5 @@ export interface ImportSnapshot {
   archiveLocation: string;
   importPieces: ImportComponentSnapshot[];
   projectId: string;
+  ownerId: string;
 }

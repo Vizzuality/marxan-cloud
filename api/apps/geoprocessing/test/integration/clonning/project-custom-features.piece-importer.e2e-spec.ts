@@ -93,6 +93,7 @@ const getFixtures = async () => {
   await sandbox.init();
   const projectId = v4();
   const organizationId = v4();
+  const userId = v4();
 
   const geoEntityManager = sandbox.get<EntityManager>(getEntityManagerToken());
   const apiEntityManager = sandbox.get<EntityManager>(
@@ -149,6 +150,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectCustomFeatures,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -160,6 +162,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectCustomFeatures,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoProjectCustomFeaturesFileIsAvailable: () => {

@@ -14,6 +14,7 @@ import { Readable } from 'stream';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
+  DeleteFeatures,
   DeleteProjectAndOrganization,
   GivenFeatures,
   GivenOutputScenarioFeaturesData,
@@ -104,6 +105,7 @@ const getFixtures = async () => {
 
   return {
     cleanUp: async () => {
+      await DeleteFeatures(apiEntityManager, featureIds);
       await DeleteProjectAndOrganization(
         apiEntityManager,
         projectId,

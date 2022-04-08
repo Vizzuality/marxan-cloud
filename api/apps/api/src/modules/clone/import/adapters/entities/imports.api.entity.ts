@@ -1,5 +1,13 @@
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
+import { User } from '../../../../users/user.api.entity';
 import { Import } from '../../domain';
 import { ImportComponentEntity } from './import-components.api.entity';
 
@@ -13,6 +21,9 @@ export class ImportEntity {
 
   @Column({ type: 'uuid', name: 'project_id' })
   projectId!: string;
+
+  @Column({ type: 'uuid', name: 'owner_id' })
+  ownerId!: string;
 
   @Column({
     type: 'enum',
@@ -32,6 +43,15 @@ export class ImportEntity {
   })
   components!: ImportComponentEntity[];
 
+  @ManyToOne(() => User, (user) => user.id, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'owner_id',
+    referencedColumnName: 'id',
+  })
+  owner!: User;
+
   static fromAggregate(importAggregate: Import): ImportEntity {
     const snapshot = importAggregate.toSnapshot();
 
@@ -45,6 +65,7 @@ export class ImportEntity {
     entity.components = snapshot.importPieces.map(
       ImportComponentEntity.fromSnapshot,
     );
+    entity.ownerId = snapshot.ownerId;
 
     return entity;
   }
@@ -57,6 +78,7 @@ export class ImportEntity {
       resourceKind: this.resourceKind,
       archiveLocation: this.archiveLocation,
       importPieces: this.components.map((component) => component.toSnapshot()),
+      ownerId: this.ownerId,
     });
   }
 }

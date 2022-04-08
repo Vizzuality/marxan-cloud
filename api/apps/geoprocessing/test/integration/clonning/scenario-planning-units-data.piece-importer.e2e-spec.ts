@@ -92,6 +92,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
+  const userId = v4();
 
   const sut = sandbox.get(ScenarioPlanningUnitsDataPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
@@ -149,6 +150,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ScenarioPlanningUnitsData,
         resourceKind,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -160,6 +162,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ScenarioPlanningUnitsData,
         resourceKind,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoScenarioPlanningUnitsDataFileIsAvailable: () => {

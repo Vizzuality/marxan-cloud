@@ -19,6 +19,7 @@ import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GivenOrganizationExists,
+  GivenUserExists,
   PrepareZipFile,
 } from './fixtures';
 
@@ -57,6 +58,7 @@ describe(ProjectMetadataPieceImporter, () => {
   it('imports project metadata', async () => {
     // Piece importer picks a random organization
     await fixtures.GivenOrganization();
+    await fixtures.GivenUser();
 
     const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
@@ -85,6 +87,7 @@ const getFixtures = async () => {
   await sandbox.init();
   const projectId = v4();
   const organizationId = v4();
+  const userId = v4();
 
   const sut = sandbox.get(ProjectMetadataPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
@@ -120,8 +123,10 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectMetadata,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
+    GivenUser: () => GivenUserExists(entityManager, userId, projectId),
     GivenOrganization: () => {
       return GivenOrganizationExists(entityManager, organizationId);
     },
@@ -134,6 +139,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectMetadata,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoProjectMetadataFileIsAvailable: () => {

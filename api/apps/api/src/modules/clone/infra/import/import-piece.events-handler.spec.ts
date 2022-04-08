@@ -87,6 +87,7 @@ const getFixtures = async () => {
         projectId: v4(),
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: v4(),
       };
     },
     WhenJobFinishes: async (input: ImportJobInput) => {

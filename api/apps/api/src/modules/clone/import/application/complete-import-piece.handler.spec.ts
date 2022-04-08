@@ -6,6 +6,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import {
@@ -131,6 +132,8 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
+  const ownerId = UserId.create();
+
   const events: IEvent[] = [];
   const commands: ICommand[] = [];
 
@@ -156,6 +159,7 @@ const getFixtures = async () => {
         importResourceId,
         ResourceKind.Project,
         projectId,
+        ownerId,
         new ArchiveLocation('/tmp/location.zip'),
         pieces,
       );

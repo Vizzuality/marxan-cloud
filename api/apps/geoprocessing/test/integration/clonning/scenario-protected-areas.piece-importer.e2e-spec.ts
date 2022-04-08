@@ -125,6 +125,7 @@ const getFixtures = async () => {
   const organizationId = v4();
   const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
+  const userId = v4();
 
   const sut = sandbox.get(ScenarioProtectedAreasPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
@@ -204,6 +205,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ScenarioProtectedAreas,
         resourceKind,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -215,6 +217,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ScenarioProtectedAreas,
         resourceKind,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoScenarioProtectedAreasFileIsAvailable: () => {

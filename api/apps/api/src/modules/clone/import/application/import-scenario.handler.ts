@@ -28,6 +28,7 @@ export class ImportScenarioHandler
 
   async execute({
     archiveLocation,
+    ownerId,
   }: ImportScenario): Promise<
     Either<ImportScenarioError, ImportScenarioCommandResult>
   > {
@@ -52,6 +53,7 @@ export class ImportScenarioHandler
         importResourceId,
         ResourceKind.Scenario,
         new ResourceId(exportConfig.projectId),
+        ownerId,
         archiveLocation,
         pieces,
       ),

@@ -19,6 +19,7 @@ import {
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import * as archiver from 'archiver';
+import { hash } from 'bcrypt';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
@@ -77,6 +78,31 @@ export async function PrepareZipFile(
 
   if (isLeft(uriOrError)) throw new Error("couldn't save file");
   return new ArchiveLocation(uriOrError.right);
+}
+
+export function GivenUserExists(
+  em: EntityManager,
+  userId: string,
+  projectId: string,
+) {
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`users`)
+    .values({
+      id: userId,
+      email: `${userId}@${projectId}.com`,
+      password_hash: hash('supersecretpassword', 10),
+    })
+    .execute();
+}
+
+export function DeleteUser(em: EntityManager, userId: string) {
+  return em
+    .createQueryBuilder()
+    .delete()
+    .from('user')
+    .where('id = :userId', { userId });
 }
 
 export function GivenOrganizationExists(
@@ -406,6 +432,17 @@ export async function GivenFeatures(
     customFeatures,
     platformFeatures,
   };
+}
+
+export async function DeleteFeatures(em: EntityManager, featureIds: string[]) {
+  if (featureIds.length === 0) return;
+
+  await em
+    .createQueryBuilder()
+    .delete()
+    .from('features')
+    .where('id IN (:...featureIds)', { featureIds })
+    .execute();
 }
 
 export async function GivenFeaturesData(
