@@ -19,11 +19,11 @@ import {
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import * as archiver from 'archiver';
+import { hash } from 'bcrypt';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
-import { hash } from 'bcrypt';
 
 const randomGeometriesBoundary =
   '0103000020E6100000010000000A00000000000000602630C0A12CF6C9EE913C4000000000F46430C0C6D6EE9332863C4000000000C07A30C06718E5AE99673C40000000008ADD30C0AE5F48C4D85B3C40000000006EAE30C0EF8810F1D7033C4000000000DC7C30C0B0AB582D481D3C4000000000246230C0712DA50F7E533C4000000000086030C0323EBB984F6B3C40000000009E2430C03B55C7C9C18B3C4000000000602630C0A12CF6C9EE913C40';
@@ -425,6 +425,17 @@ export async function GivenFeatures(
     customFeatures,
     platformFeatures,
   };
+}
+
+export async function DeleteFeatures(em: EntityManager, featureIds: string[]) {
+  if (featureIds.length === 0) return;
+
+  await em
+    .createQueryBuilder()
+    .delete()
+    .from('features')
+    .where('id IN (:...featureIds)', { featureIds })
+    .execute();
 }
 
 export async function GivenFeaturesData(

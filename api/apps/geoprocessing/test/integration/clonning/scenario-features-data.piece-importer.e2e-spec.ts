@@ -19,11 +19,11 @@ import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
+  DeleteFeatures,
   DeleteProjectAndOrganization,
   GivenFeatures,
   GivenFeaturesData,
   GivenScenarioExists,
-  GivenUserExists,
   PrepareZipFile,
 } from './fixtures';
 
@@ -137,6 +137,7 @@ const getFixtures = async () => {
 
   return {
     cleanUp: async () => {
+      await DeleteFeatures(apiEntityManager, featureIds);
       await DeleteProjectAndOrganization(
         apiEntityManager,
         projectId,
