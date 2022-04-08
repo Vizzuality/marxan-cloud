@@ -141,6 +141,15 @@ export const LEGEND_LAYERS = {
       visibility: true,
     },
   }),
+  'features-highlight': () => ({
+    id: 'features-highlight',
+    name: 'Features Highlight',
+    icon: <Icon icon={HEXAGON_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.features }} />,
+    settingsManager: {
+      opacity: true,
+      visibility: true,
+    },
+  }),
 
   // ANALYSIS
   cost: (options) => {

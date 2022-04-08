@@ -130,6 +130,10 @@ export interface UsePUGridLayer {
         opacity?: number;
         visibility?: boolean;
       },
+      'features-highlight'?: {
+        opacity?: number;
+        visibility?: boolean;
+      },
       cost?: {
         opacity?: number;
         visibility?: boolean;
