@@ -252,6 +252,11 @@ resource "kubernetes_deployment" "api_deployment" {
             value = var.namespace
           }
 
+          env {
+            name  = "api_POSTGRES_LOGGING"
+            value = var.api_postgres_logging
+          }
+
           resources {
             limits = {
               cpu    = "1"

@@ -44,6 +44,11 @@ variable "network_cors_origins" {
   description = "Value for the NETWORK_CORS_ORIGINS env var"
 }
 
+variable "api_postgres_logging" {
+  type        = string
+  description = "Value for the API_POSTGRES_LOGGING env var"
+}
+
 variable "http_logging_morgan_format" {
   type        = string
   description = "Value for the BACKEND_HTTP_LOGGING_MORGAN_FORMAT env var"

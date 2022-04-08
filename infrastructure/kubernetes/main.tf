@@ -130,6 +130,7 @@ module "api_production" {
   application_base_url       = "https://${var.domain}"
   network_cors_origins       = "https://${var.domain}"
   http_logging_morgan_format = ""
+  api_postgres_logging       = "error"
   backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
@@ -142,6 +143,7 @@ module "geoprocessing_production" {
   namespace                  = "production"
   image                      = "marxan.azurecr.io/marxan-geoprocessing:production"
   deployment_name            = "geoprocessing"
+  geo_postgres_logging       = "error"
   backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
@@ -260,6 +262,7 @@ module "api_staging" {
   application_base_url       = "https://staging.${var.domain}"
   network_cors_origins       = "https://staging.${var.domain}"
   http_logging_morgan_format = "short"
+  api_postgres_logging       = "query"
   backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
@@ -273,6 +276,7 @@ module "geoprocessing_staging" {
   image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
   deployment_name            = "geoprocessing"
   cleanup_temporary_folders  = "false"
+  geo_postgres_logging       = "query"
   backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
