@@ -17,9 +17,11 @@ import {
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { hash } from 'bcrypt';
+import { Connection, Repository } from 'typeorm';
 import { ImportComponentStatuses } from '../../src/modules/clone/import/domain/import/import-component-status';
+import { User } from '../../src/modules/users/user.api.entity';
 import { apiConnections } from '../../src/ormconfig';
 
 describe('Typeorm import repository', () => {
@@ -75,17 +77,30 @@ const getFixtures = async () => {
         ...apiConnections.default,
         keepConnectionAlive: true,
       }),
+      TypeOrmModule.forFeature([User]),
       ImportAdaptersModule,
     ],
   }).compile();
 
   const repo = testingModule.get<ImportRepository>(ImportRepository);
+  const userRepo = testingModule.get<Repository<User>>(
+    getRepositoryToken(User),
+  );
+
+  const passwordHash = await hash('supersecretpassword', 10);
+
+  await userRepo.save({
+    id: ownerId.value,
+    email: `${ownerId.value}@test.com`,
+    passwordHash,
+  });
 
   return {
     cleanup: async () => {
       const connection = testingModule.get<Connection>(Connection);
       const importRepo = connection.getRepository(ImportEntity);
       await importRepo.delete({});
+      await userRepo.delete({ id: ownerId.value });
       await testingModule.close();
     },
     GivenImportWasRequested: async () => {
