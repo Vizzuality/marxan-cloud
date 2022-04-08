@@ -71,6 +71,7 @@ export class ScenariosTileRequest extends TileRequest {
 
 export class ScenariosWithBlmValueRequest extends ScenariosTileRequest {
   @IsNumber()
+  @Transform((n) => Number.parseFloat(n))
   blmValue!: number;
 }
 
