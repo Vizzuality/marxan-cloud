@@ -23,6 +23,7 @@ import { isLeft } from 'fp-ts/lib/Either';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
+import { hash } from 'bcrypt';
 
 const randomGeometriesBoundary =
   '0103000020E6100000010000000A00000000000000602630C0A12CF6C9EE913C4000000000F46430C0C6D6EE9332863C4000000000C07A30C06718E5AE99673C40000000008ADD30C0AE5F48C4D85B3C40000000006EAE30C0EF8810F1D7033C4000000000DC7C30C0B0AB582D481D3C4000000000246230C0712DA50F7E533C4000000000086030C0323EBB984F6B3C40000000009E2430C03B55C7C9C18B3C4000000000602630C0A12CF6C9EE913C40';
@@ -70,6 +71,31 @@ export async function PrepareZipFile(
 
   if (isLeft(uriOrError)) throw new Error("couldn't save file");
   return new ArchiveLocation(uriOrError.right);
+}
+
+export function GivenUserExists(
+  em: EntityManager,
+  userId: string,
+  projectId: string,
+) {
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`users`)
+    .values({
+      id: userId,
+      email: `${userId}@${projectId}.com`,
+      password_hash: hash('supersecretpassword', 10),
+    })
+    .execute();
+}
+
+export function DeleteUser(em: EntityManager, userId: string) {
+  return em
+    .createQueryBuilder()
+    .delete()
+    .from('user')
+    .where('id = :userId', { userId });
 }
 
 export function GivenOrganizationExists(
