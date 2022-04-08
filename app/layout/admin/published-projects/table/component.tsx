@@ -13,7 +13,7 @@ export interface AdminPublishedProjectsTableProps {
 
 export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTableProps> = () => {
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState({ column: 'name', direction: 'asc' });
+  const [sort, setSort] = useState({ column: 'name', direction: 'desc' });
 
   const {
     data: publishedProjectsData,

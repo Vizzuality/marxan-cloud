@@ -12,9 +12,92 @@ import ADMIN from 'services/admin';
 
 import {
   SaveAdminPublishedProjectProps,
-  UseAdminPublishedProjectsProps, UseSaveAdminPublishedProjectProps,
+  UseAdminPublishedProjectsProps,
+  UseAdminUsersProps,
+  UseSaveAdminPublishedProjectProps,
 } from './types';
 
+/**
+ *
+ *
+ * USERS
+ *
+ *
+*/
+export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
+  const [session] = useSession();
+
+  const {
+    page,
+    search,
+    filters = {},
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k].toString(),
+      };
+    }, {});
+
+  const parsedSort = useMemo(() => {
+    if (!sort) {
+      return '';
+    }
+
+    const direction = sort.direction === 'asc' ? '-' : '';
+    return `${direction}${sort.column}`;
+  }, [sort]);
+
+  const fetchUsers = () => ADMIN.request({
+    method: 'GET',
+    url: '/users',
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      'page[number]': page,
+      ...parsedFilters,
+      ...search && {
+        q: search,
+      },
+      ...parsedSort && {
+        sort: parsedSort,
+      },
+    },
+  }).then((response) => response.data);
+
+  const query = useQuery(['admin-users', JSON.stringify(options), page], fetchUsers, {
+    retry: false,
+    keepPreviousData: true,
+    placeholderData: {
+      data: [],
+      meta: {} as any,
+    },
+    // TEST
+    // placeholderData: [],
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+      meta: data?.meta,
+    };
+  }, [query, data]);
+}
+
+/**
+ *
+ *
+ * PUBLISHED PROJECTS
+ *
+ *
+*/
 export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProps = { page: 1 }) {
   const [session] = useSession();
 

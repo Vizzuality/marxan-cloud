@@ -1,5 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
 
+export interface UseAdminUsersProps {
+  page: number;
+  search?: string;
+  sort?: Record<string, string>;
+  filters?: Record<string, unknown>
+}
+
 export interface UseAdminPublishedProjectsProps {
   page: number;
   search?: string;
