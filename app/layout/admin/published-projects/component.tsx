@@ -1,6 +1,7 @@
 import React from 'react';
 
-import AdminPublishedProjectsTable from 'layout/admin/published-projects/table/component';
+import AdminPublishedProjectsHeader from 'layout/admin/published-projects/header';
+import AdminPublishedProjectsTable from 'layout/admin/published-projects/table';
 import Wrapper from 'layout/wrapper';
 
 export interface AdminPublishedProjectsProps {
@@ -10,6 +11,7 @@ export interface AdminPublishedProjectsProps {
 export const AdminPublishedProjects: React.FC<AdminPublishedProjectsProps> = () => {
   return (
     <Wrapper>
+      <AdminPublishedProjectsHeader />
       <AdminPublishedProjectsTable />
     </Wrapper>
   );
