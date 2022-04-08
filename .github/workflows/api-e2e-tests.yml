@@ -34,17 +34,6 @@ jobs:
         run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml config
       - name: Run CI tests via make task
         run: make run-test-e2e-ci
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '14.18'
-    - name: Run migrations
-      working-directory: ./api
-      run: yarn test:prepare-db
-    - name: Run API e2e tests
-      working-directory: ./api
-      run: yarn api:test:e2e:new
   test-api-unit:
     runs-on: ubuntu-18.04
     timeout-minutes: 10
