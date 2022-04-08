@@ -60,12 +60,14 @@ export class MarxanSandboxBlmRunnerService
     const { blmValues, scenarioId } = input;
     const calibrationId = v4();
 
-    const projectId = await this.apiEntityManager
+    const scenarioResult = await this.apiEntityManager
       .createQueryBuilder()
       .select(['project_id'])
       .from('scenarios', 's')
       .where('id = :scenarioId', { scenarioId })
-      .execute();
+      .getRawOne();
+
+    const projectId = scenarioResult.project_id;
 
     const webshotUrl = AppConfig.get('webshot.url') as string;
 
