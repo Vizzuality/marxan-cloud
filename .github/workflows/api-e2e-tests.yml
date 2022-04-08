@@ -45,7 +45,6 @@ jobs:
     - name: Run API e2e tests
       working-directory: ./api
       run: yarn api:test:e2e:new
-
   test-api-unit:
     runs-on: ubuntu-18.04
     timeout-minutes: 10

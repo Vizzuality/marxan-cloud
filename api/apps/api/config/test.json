@@ -11,22 +11,22 @@
   },
   "redisApi": {
     "connection": {
-      "host": "localhost",
-      "port": 3379
-    },
+      "host": "marxan-test-e2e-redis",
+      "port": 6379
+      },
     "concurrency": 50
   },
   "redis": {
-    "host": "localhost",
-    "port": 3379,
+    "host": "marxan-test-e2e-redis",
+    "port": 6379,
     "password": null,
     "useTLS": false,
     "concurrency" : 50
   },
   "postgresApi": {
     "url": null,
-    "port": 3542,
-    "host": "localhost",
+    "port": 5432,
+    "host": "test-e2e-postgresql-api",
     "username": "marxan-api",
     "password": "marxan-api",
     "database": "marxan-api",
@@ -35,8 +35,8 @@
   },
   "postgresGeoApi": {
     "url": null,
-    "port": 3541,
-    "host": "localhost",
+    "port": 5432,
+    "host": "test-e2e-postgresql-geo-api",
     "username": "marxan-geo",
     "password": "marxan-geo",
     "database": "marxan-geo",
