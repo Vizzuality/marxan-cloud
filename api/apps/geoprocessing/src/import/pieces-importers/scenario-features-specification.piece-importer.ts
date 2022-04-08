@@ -66,11 +66,11 @@ export class ScenarioFeaturesSpecificationPieceImporter
   }
 
   private getScenarioFeaturesDataByFeatureId(
-    scenarioFeatueresData: ScenarioFeaturesDataResult[],
+    scenarioFeaturesData: ScenarioFeaturesDataResult[],
   ) {
     const scenarioFeaturesDataByFeatureId: ScenarioFeaturesDataByFeatureId = {};
 
-    scenarioFeatueresData.forEach(
+    scenarioFeaturesData.forEach(
       ({ id, featureId }) =>
         (scenarioFeaturesDataByFeatureId[featureId] = { id, featureId }),
     );
@@ -119,13 +119,13 @@ export class ScenarioFeaturesSpecificationPieceImporter
     );
   }
 
-  private getFeaturesFromSpecifictaions(
+  private getFeaturesFromSpecifications(
     specifications: ScenarioFeaturesSpecificationContent[],
   ): { platformFeaturesNames: string[]; customFeaturesNames: string[] } {
     const raws = specifications.map((specification) => specification.raw);
-    const features = raws.flatMap((raw) => raw.features);
+    const filteredRaws = raws.filter((raw) => isDefined(raw));
     const results: string[] = [];
-    features.forEach((feature) => searchFeatureIdInObject(feature, results));
+    filteredRaws.forEach((raw) => searchFeatureIdInObject(raw, results));
 
     const configFeatures = specifications
       .flatMap((specification) => {
@@ -210,14 +210,13 @@ export class ScenarioFeaturesSpecificationPieceImporter
     raw: Record<string, any>,
     featutesIdByNameAndProjectMap: Record<string, string>,
   ) {
-    raw.features.forEach((feature: any) =>
-      parseFeatureIdInObject(feature, (featureNamAndProject: string) =>
+    if (isDefined(raw))
+      parseFeatureIdInObject(raw, (featureNamAndProject: string) =>
         this.parseFeatureId(
           featureNamAndProject,
           featutesIdByNameAndProjectMap,
         ),
-      ),
-    );
+      );
   }
 
   private parseFeaturesNumberCalculated(
@@ -243,7 +242,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
     parsedSpecifications: ScenarioFeaturesSpecificationContentWithId[];
     specificationIdByFeatureId: SpecificationIdByFeatureId;
   }> {
-    const featuresNames = this.getFeaturesFromSpecifictaions(specifications);
+    const featuresNames = this.getFeaturesFromSpecifications(specifications);
 
     const featutesIdByNameAndProjectMap = await this.getFeaturesIdByNameAndProject(
       featuresNames,
@@ -336,12 +335,10 @@ export class ScenarioFeaturesSpecificationPieceImporter
         piece: input.piece,
       };
 
-    const scenarioFeatueresData = await this.getScenarioFeaturesData(
-      scenarioId,
-    );
+    const scenarioFeaturesData = await this.getScenarioFeaturesData(scenarioId);
 
     const scenarioFeaturesDataByFeatureId = this.getScenarioFeaturesDataByFeatureId(
-      scenarioFeatueresData,
+      scenarioFeaturesData,
     );
 
     const {
@@ -370,7 +367,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
       await this.geoprocessingEntityManager
         .getRepository(ScenarioFeaturesData)
         .save(
-          scenarioFeatueresData.map(({ id, featureId }) => ({
+          scenarioFeaturesData.map(({ id, featureId }) => ({
             id,
             specificationId: specificationIdByFeatureId[featureId],
           })),

@@ -161,6 +161,7 @@ const getFixtures = async () => {
             emptyObject: {},
           },
         ],
+        featureId: customFeatureId,
       },
       {
         status: 'create',
@@ -175,6 +176,7 @@ const getFixtures = async () => {
             emptyObject: {},
           },
         ],
+        featureId: plaformFeatureId,
       },
     ];
   };
@@ -324,6 +326,7 @@ const getFixtures = async () => {
               emptyObject: {},
             },
           ],
+          featureId,
         },
         configs: [
           {
