@@ -232,6 +232,11 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             value = var.cleanup_temporary_folders
           }
 
+          env {
+            name  = "GEO_POSTGRES_LOGGING"
+            value = var.geo_postgres_logging
+          }
+
           resources {
             limits = {
               cpu    = "1"
