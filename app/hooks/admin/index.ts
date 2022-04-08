@@ -110,9 +110,10 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
       // },
       data: data?.data.map((d) => {
         return {
+          id: d.id,
           name: d.name,
-          area: 'custom',
-          status: 'published',
+          description: d.description,
+          status: d.underModeration ? 'under-moderation' : 'published',
           owner: {
             name: 'Miguel Barrenechea',
             email: 'barrenechea.miguel@gmail.com',

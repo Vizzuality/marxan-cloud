@@ -1,7 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import Link from 'next/link';
+
 import { useAdminPublishedProjects } from 'hooks/admin';
 
+import Select from 'components/forms/select';
 import Table2 from 'components/table2/component';
 
 export interface AdminPublishedProjectsTableProps {
@@ -27,10 +30,22 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         accessor: 'name',
         className: 'font-bold underline leading-none',
         defaultCanSort: true,
+        Cell: function Name({ value, row }: any) {
+          if (!value) return null;
+
+          const { id } = row.original;
+          return (
+            <Link href={`/projects/${id}`}>
+              <a href={`/projects/${id}`} className="font-bold leading-none underline">
+                {value}
+              </a>
+            </Link>
+          );
+        },
       },
       {
-        Header: 'Planning Area',
-        accessor: 'area',
+        Header: 'Description',
+        accessor: 'description',
         className: 'text-sm leading-none',
         defaultCanSort: true,
       },
@@ -63,8 +78,25 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
       {
         Header: 'Status',
         accessor: 'status',
-        className: 'text-sm leading-none',
         defaultCanSort: true,
+        Cell: function Status({ value }: any) {
+          if (!value) return null;
+
+          return (
+            <Select
+              theme="light"
+              size="s"
+              initialSelected={value}
+              options={[
+                { label: 'Under moderation', value: 'under-moderation' },
+                { label: 'Published', value: 'published' },
+              ]}
+              onChange={(v: string) => {
+                console.info(v);
+              }}
+            />
+          );
+        },
       },
     ];
   }, []);
