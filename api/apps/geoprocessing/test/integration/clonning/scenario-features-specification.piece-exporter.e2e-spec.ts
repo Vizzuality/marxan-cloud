@@ -178,13 +178,15 @@ const getFixtures = async () => {
       feature = platformFeatures[0];
     },
     GivenScenarioFeaturesDataExist: async () => {
-      scenarioFeatureDataIds = await GivenScenarioFeaturesData(
-        geoEntityManager,
-        2,
-        [feature.id],
-        scenarioId,
-        { specificationId: specification.id },
-      );
+      scenarioFeatureDataIds = (
+        await GivenScenarioFeaturesData(
+          geoEntityManager,
+          2,
+          [feature.id],
+          scenarioId,
+          { specificationId: specification.id },
+        )
+      ).map((value) => value.id);
     },
     GivenScenarioSpecification: async () => {
       const specifications = await GivenSpecifications(
@@ -240,14 +242,23 @@ const getFixtures = async () => {
             features: [
               {
                 featureId: featureName,
-                innerObject: {
-                  featureId: featureName,
-                  innnerObject: {
+                innerObject: [
+                  {
                     featureId: featureName,
+                    innnerObject: {
+                      featureId: featureName,
+                    },
                   },
-                },
+                  {
+                    featureId: featureName,
+                    nullValue: null,
+                  },
+                ],
               },
             ],
+            featureId: featureName,
+            emptyArray: [],
+            emptyObject: {},
           };
           expect(specification.raw).toEqual(expectedRaw);
           expect(

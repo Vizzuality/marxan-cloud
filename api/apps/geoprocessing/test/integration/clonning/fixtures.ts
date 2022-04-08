@@ -451,6 +451,7 @@ export async function GivenScenarioFeaturesData(
   featureIds: string[],
   scenarioId: string,
   scenarioFeaturesData: DeepPartial<ScenarioFeaturesData> = {},
+  opts: { startingIndex: number } = { startingIndex: 0 },
 ) {
   const featuresData = await GivenFeaturesData(
     em,
@@ -463,7 +464,7 @@ export async function GivenScenarioFeaturesData(
     id: v4(),
     featureDataId: data.id,
     scenarioId,
-    featureId: index + 1,
+    featureId: opts.startingIndex + index + 1,
   }));
 
   await em
@@ -473,7 +474,7 @@ export async function GivenScenarioFeaturesData(
     .values(insertValues)
     .execute();
 
-  return insertValues.map((value) => value.id);
+  return insertValues;
 }
 
 export async function GivenOutputScenarioFeaturesData(
@@ -485,13 +486,15 @@ export async function GivenOutputScenarioFeaturesData(
   outputScenarioFeaturesData: DeepPartial<OutputScenariosFeaturesDataGeoEntity> = {},
   scenarioFeaturesData: DeepPartial<ScenarioFeaturesData> = {},
 ) {
-  const scenarioFeaturesDataIds = await GivenScenarioFeaturesData(
-    em,
-    amountOfFeaturesDataRecordsForEachFeature,
-    featureIds,
-    scenarioId,
-    scenarioFeaturesData,
-  );
+  const scenarioFeaturesDataIds = (
+    await GivenScenarioFeaturesData(
+      em,
+      amountOfFeaturesDataRecordsForEachFeature,
+      featureIds,
+      scenarioId,
+      scenarioFeaturesData,
+    )
+  ).map((value) => value.id);
 
   await em
     .createQueryBuilder()
@@ -527,14 +530,23 @@ export async function GivenSpecifications(
         features: [
           {
             featureId,
-            innerObject: {
-              featureId,
-              innnerObject: {
+            innerObject: [
+              {
                 featureId,
+                innnerObject: {
+                  featureId,
+                },
               },
-            },
+              {
+                featureId,
+                nullValue: null,
+              },
+            ],
           },
         ],
+        featureId,
+        emptyArray: [],
+        emptyObject: {},
       },
     };
   });

@@ -34,10 +34,6 @@ type SelectSpecificationsResult = {
   draft: boolean;
   raw: Record<string, unknown>;
 };
-type ScenarioFeaturesDataBySpecificationId = Record<
-  string,
-  ScenarioFeaturesData[]
->;
 
 type ScenarioFeaturesDataById = Record<string, ScenarioFeaturesData>;
 
@@ -99,11 +95,9 @@ export class ScenarioFeaturesSpecificationPieceExporter
   }
 
   private async getFeaturesByIdFromRaw(raws: Record<string, any>[]) {
-    const features = raws
-      .flatMap((raw) => raw.features)
-      .filter((feature) => isDefined(feature));
+    const filteredRaws = raws.filter((raw) => isDefined(raw));
     const results: string[] = [];
-    features.forEach((feature) => searchFeatureIdInObject(feature, results));
+    filteredRaws.forEach((raw) => searchFeatureIdInObject(raw, results));
     return this.getFeaturesById([...new Set(results)]);
   }
 
@@ -111,15 +105,13 @@ export class ScenarioFeaturesSpecificationPieceExporter
     raw: Record<string, any>,
     featuresById: FeaturesById,
   ) {
-    if (isDefined(raw.features) && Array.isArray(raw.features)) {
-      raw.features.forEach((feature: any) =>
-        parseFeatureIdInObject(
-          feature,
-          (featureId: string) => featuresById[featureId],
-        ),
+    if (isDefined(raw)) {
+      parseFeatureIdInObject(
+        raw,
+        (featureId: string) => featuresById[featureId],
       );
     }
-    return { status: raw.status, features: raw.features };
+    return raw;
   }
 
   private getScenarioFeaturesDataById(
@@ -132,22 +124,6 @@ export class ScenarioFeaturesSpecificationPieceExporter
     });
 
     return scenarioFeaturesDataById;
-  }
-  private getScenarioFeatureDataBySpecificationId(
-    scenarioFeaturesData: ScenarioFeaturesData[],
-  ): ScenarioFeaturesDataBySpecificationId {
-    const scenarioFeaturesDataBySpecificationId: ScenarioFeaturesDataBySpecificationId = {};
-
-    scenarioFeaturesData.forEach((featureData) => {
-      const temp =
-        scenarioFeaturesDataBySpecificationId[featureData.specificationId];
-      if (temp) temp.push(featureData);
-      else
-        scenarioFeaturesDataBySpecificationId[featureData.specificationId] = [
-          featureData,
-        ];
-    });
-    return scenarioFeaturesDataBySpecificationId;
   }
 
   private async getScenarioFeatureConfigsBySpecificationId(

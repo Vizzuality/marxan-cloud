@@ -49,7 +49,7 @@ export function searchFeatureIdInObject(feature: any, results: string[]) {
   Object.keys(feature).forEach((key) => {
     if (typeof feature[key] === 'string' && key === 'featureId')
       results.push(feature[key]);
-    if (typeof feature[key] === 'object')
+    if (typeof feature[key] === 'object' && feature[key] !== null)
       searchFeatureIdInObject(feature[key], results);
   });
 }
@@ -60,7 +60,7 @@ export function parseFeatureIdInObject(
   Object.keys(feature).forEach((key) => {
     if (typeof feature[key] === 'string' && key === 'featureId')
       feature[key] = parseFeature(feature[key]);
-    if (typeof feature[key] === 'object')
+    if (typeof feature[key] === 'object' && feature[key] !== null)
       parseFeatureIdInObject(feature[key], parseFeature);
   });
 }
