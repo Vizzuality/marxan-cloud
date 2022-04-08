@@ -60,6 +60,8 @@ export class ScenarioOutputFolderPieceExporter implements ExportPieceProcessor {
             'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
           },
           responseType: 'stream',
+          validateStatus: (status) =>
+            status === HttpStatus.OK || status === HttpStatus.NOT_FOUND,
         },
       )
       .toPromise();
@@ -69,10 +71,6 @@ export class ScenarioOutputFolderPieceExporter implements ExportPieceProcessor {
         ...input,
         uris: [],
       };
-    }
-
-    if (status !== HttpStatus.OK) {
-      throw new Error(`Error obtaining output folder. Http status: ${status}`);
     }
 
     const outputFile = await this.fileRepository.save(data, `zip`);
