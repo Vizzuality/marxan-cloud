@@ -241,6 +241,15 @@ export class UsersService extends AppBaseService<
     return entity;
   }
 
+  async extendFindAllResults(
+    entitiesAndCount: [User[], number],
+  ): Promise<[User[], number]> {
+    const extendedEntities: Promise<User>[] = entitiesAndCount[0].map(
+      (entity) => this.extendGetByIdResult(entity),
+    );
+    return [await Promise.all(extendedEntities), entitiesAndCount[1]];
+  }
+
   async isPlatformAdmin(userId: string): Promise<boolean> {
     return (await this.adminRepo.count({ where: { userId } })) > 0;
   }
