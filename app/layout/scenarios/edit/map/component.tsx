@@ -199,7 +199,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         'pugrid',
       ];
     }
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features', 'pugrid', 'features-highlight'];
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features', 'features-highlight', 'pugrid'];
 
     if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
 
