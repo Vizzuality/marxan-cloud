@@ -1,6 +1,6 @@
 {
   "logging": {
-    "muteAll": "API_LOGGING_MUTE_ALL"
+    "muteAll": true
   },
   "network": {
     "cors": {

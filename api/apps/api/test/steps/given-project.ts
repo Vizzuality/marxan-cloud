@@ -7,7 +7,7 @@ export const GivenProjectExists = async (
   app: INestApplication,
   jwt: string,
   projectData?: {
-    countryCode: string;
+    countryId: string;
     adminAreaLevel1Id?: string;
     adminAreaLevel2Id?: string;
     name?: string;
@@ -26,12 +26,15 @@ export const GivenProjectExists = async (
       ...(organizationData?.name ? { name: organizationData.name } : {}),
     })
   ).data.id;
-  const projectId = (
-    await ProjectsTestUtils.createProject(app, jwt, {
-      ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea(projectData),
-      organizationId,
-    })
-  ).data.id;
+  const projectDto = Boolean(projectData)
+    ? E2E_CONFIG.projects.valid.minimalInGivenAdminArea(projectData)
+    : E2E_CONFIG.projects.valid.minimal();
+
+  const projectResult = await ProjectsTestUtils.createProject(app, jwt, {
+    ...projectDto,
+    organizationId,
+  });
+  const projectId = projectResult.data.id;
   await ProjectsTestUtils.generateBlmValues(app, projectId);
 
   return {

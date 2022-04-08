@@ -46,7 +46,6 @@ export class RunHandler {
     await this.apiEvents.create({
       topic: scenario.id,
       kind,
-      externalId: job.id + kind,
     });
   }
 }

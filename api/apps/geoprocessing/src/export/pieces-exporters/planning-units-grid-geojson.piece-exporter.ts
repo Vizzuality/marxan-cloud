@@ -82,6 +82,7 @@ export class PlanningUnitsGridGeojsonPieceExporter
       uris: ClonePieceUrisResolver.resolveFor(
         ClonePiece.PlanningUnitsGridGeojson,
         gridGeoJson.right,
+        { kind: ResourceKind.Project, scenarioId: '' },
       ),
     };
   }

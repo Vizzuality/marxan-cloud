@@ -15,7 +15,7 @@ import { WhenChangingPlanningUnitInclusivity } from './WhenChangingPlanningUnitI
 
 export const createWorld = async (app: INestApplication, jwt: string) => {
   const { cleanup, projectId } = await GivenProjectExists(app, jwt, {
-    countryCode: 'BWA',
+    countryId: 'BWA',
     adminAreaLevel1Id: 'BWA.12_1',
     adminAreaLevel2Id: 'BWA.12.1_1',
   });

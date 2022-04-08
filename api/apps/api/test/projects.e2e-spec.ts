@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { HttpStatus, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { E2E_CONFIG } from './e2e.config';
 import { CreateProjectDTO } from '@marxan-api/modules/projects/dto/create.project.dto';
@@ -18,6 +18,10 @@ import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { CreateScenarioDTO } from '@marxan-api/modules/scenarios/dto/create.scenario.dto';
 import { ProjectsTestUtils } from './utils/projects.test.utils';
+import { OrganizationsTestUtils } from './utils/organizations.test.utils';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 afterAll(async () => {
   await tearDown();
@@ -36,6 +40,7 @@ describe('ProjectsModule (e2e)', () => {
   let minimalProject: Project;
   let completeProject: Project;
   let aScenarioInACompleteProject: Scenario;
+  const projectsToDelete: string[] = [];
 
   beforeAll(async () => {
     app = await bootstrapApplication();
@@ -45,6 +50,10 @@ describe('ProjectsModule (e2e)', () => {
   });
 
   afterAll(async () => {
+    const projectRepository = await app.get<Repository<Project>>(
+      getRepositoryToken(Project),
+    );
+    await projectRepository.delete(projectsToDelete);
     await Promise.all([app.close()]);
   });
 
@@ -70,9 +79,15 @@ describe('ProjectsModule (e2e)', () => {
     });
 
     test('Creating a project with minimum required data should succeed', async () => {
+      const organizationResponse = await request(app.getHttpServer())
+        .post('/api/v1/organizations')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(E2E_CONFIG.organizations.valid.minimal())
+        .expect(201);
+
       const createProjectDTO: Partial<CreateProjectDTO> = {
         ...E2E_CONFIG.projects.valid.minimal(),
-        organizationId: anOrganization.id,
+        organizationId: organizationResponse.body.data.id,
       };
 
       const response = await request(app.getHttpServer())
@@ -84,6 +99,39 @@ describe('ProjectsModule (e2e)', () => {
       const jsonAPIResponse: ProjectResultSingular = response.body;
       minimalProject = await Deserializer.deserialize(response.body);
       expect(jsonAPIResponse.data.type).toBe('projects');
+      projectsToDelete.push(response.body.data.id);
+    });
+
+    test('Creating a project with regular PU shape but no PA id or GADM id should be rejected', async () => {
+      const organization = await OrganizationsTestUtils.createOrganization(
+        app,
+        jwtToken,
+        E2E_CONFIG.organizations.valid.minimal(),
+      );
+
+      const minimalValidProjectDTO: Partial<CreateProjectDTO> = {
+        ...E2E_CONFIG.projects.valid.minimal(),
+        organizationId: organization.data.id,
+      };
+      const invalidProjectDTO: Partial<CreateProjectDTO> = {
+        ...minimalValidProjectDTO,
+        planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+        planningAreaId: undefined,
+        adminAreaLevel1Id: undefined,
+        adminAreaLevel2Id: undefined,
+        countryId: undefined,
+      };
+
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/projects')
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(invalidProjectDTO);
+
+      expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.errors[0].status).toBe(HttpStatus.BAD_REQUEST);
+      expect(response.body.errors[0].title).toBe(
+        'When a regular planning grid is requested (hexagon or square) either a custom planning area or a GADM area gid must be provided',
+      );
     });
 
     test('Creating a project with complete data should succeed', async () => {

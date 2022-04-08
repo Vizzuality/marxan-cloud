@@ -28,7 +28,7 @@ export class ScenariosPlanningUnitService extends AppBaseService<
     private readonly puData: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {
     super(puData, 'scenario_planning_unit', 'scenario_planning_units', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

@@ -55,6 +55,7 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGrid),
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGridGeojson),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
+      ExportComponent.newOne(id, ClonePiece.ProjectCustomFeatures),
       ...scenarioPieces,
     ];
 
@@ -67,6 +68,10 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.ScenarioProtectedAreas),
       ExportComponent.newOne(id, ClonePiece.ScenarioPlanningUnitsData),
       ExportComponent.newOne(id, ClonePiece.ScenarioRunResults),
+      ExportComponent.newOne(id, ClonePiece.ScenarioFeaturesData),
+      ExportComponent.newOne(id, ClonePiece.ScenarioInputFolder),
+      ExportComponent.newOne(id, ClonePiece.ScenarioOutputFolder),
+      ExportComponent.newOne(id, ClonePiece.FeaturesSpecification),
     ];
 
     if (kind === ResourceKind.Scenario) {

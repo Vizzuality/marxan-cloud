@@ -1,0 +1,12 @@
+{
+  "api": {
+    "url": "http://api:30001"
+  },
+  "geoprocessing": {
+    "url": "http://geoprocessing:30002"
+  },
+  "webshot": {
+    "url": "http://webshot:30003"
+  }
+}
+

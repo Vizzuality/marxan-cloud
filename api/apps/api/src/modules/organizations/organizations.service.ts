@@ -34,7 +34,7 @@ export class OrganizationsService extends AppBaseService<
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {
     super(repository, 'organization', 'organizations', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

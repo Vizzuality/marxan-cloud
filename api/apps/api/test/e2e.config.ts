@@ -16,6 +16,7 @@ interface CountryCodeInput {
   adminLevel1?: string;
   adminLevel2?: string;
 }
+
 interface CustomPlanningAreaInput {
   planningAreaId?: string;
   planningUnitGridShape?: PlanningUnitGridShape;
@@ -43,7 +44,7 @@ export const E2E_CONFIG: {
     valid: {
       minimal: () => Partial<CreateProjectDTO>;
       minimalInGivenAdminArea: (options?: {
-        countryCode: string;
+        countryId: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
         name?: string;
@@ -120,16 +121,17 @@ export const E2E_CONFIG: {
         organizationId: faker.random.uuid(),
         planningUnitGridShape: PlanningUnitGridShape.Hexagon,
         planningUnitAreakm2: 10,
+        countryId: 'NAM',
       }),
       minimalInGivenAdminArea: (options?: {
-        countryCode?: string;
+        countryId?: string;
         adminAreaLevel1Id?: string;
         adminAreaLevel2Id?: string;
         name?: string;
       }): CreateProjectDTO => ({
         name: options?.name ?? faker.random.words(5),
         organizationId: faker.random.uuid(),
-        countryId: options?.countryCode,
+        countryId: options?.countryId ?? 'NAM',
         adminAreaLevel1Id: options?.adminAreaLevel1Id,
         adminAreaLevel2Id: options?.adminAreaLevel2Id,
         planningUnitGridShape: PlanningUnitGridShape.Hexagon,

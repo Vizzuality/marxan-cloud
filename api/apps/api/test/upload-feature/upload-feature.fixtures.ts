@@ -6,7 +6,7 @@ import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.ent
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as request from 'supertest';
-import { GeoFeatureGeometry } from '@marxan-api/modules/geo-features/geo-feature.geo.entity';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 export const getFixtures = async () => {
@@ -17,7 +17,7 @@ export const getFixtures = async () => {
     token,
     {
       name: `Project ${Date.now()}`,
-      countryCode: undefined!,
+      countryId: undefined!,
     },
     {
       name: `Organization ${Date.now()}`,

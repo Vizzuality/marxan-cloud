@@ -9,6 +9,7 @@ import cors from "cors";
 import config from "config";
 import helmet from "helmet";
 import { generateSummaryReportForScenario } from "./domain/solutions-report/solutions-report";
+import { generatePngImageFromBlmData } from "./domain/blm-previews/png-image";
 
 const app: Application = express();
 const daemonListenPort = config.get("port");
@@ -26,6 +27,16 @@ app.post(
   "/projects/:projectId/scenarios/:scenarioId/solutions/report",
   async (req: Request, res: Response, next: NextFunction) => {
     await generateSummaryReportForScenario(req, res).catch((error) => {
+      console.error(error);
+      next(error);
+    });
+  }
+);
+
+app.post(
+  "/projects/:projectId/scenarios/:scenarioId/calibration/maps/preview/:blmValue",
+  async (req: Request, res: Response, next: NextFunction) => {
+    await generatePngImageFromBlmData(req, res).catch((error) => {
       console.error(error);
       next(error);
     });

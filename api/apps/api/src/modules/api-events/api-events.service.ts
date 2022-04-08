@@ -47,7 +47,7 @@ export class ApiEventsService extends AppBaseService<
     readonly latestEventByTopicAndKindRepo: Repository<LatestApiEventByTopicAndKind>,
   ) {
     super(repo, apiEventResource.name.singular, apiEventResource.name.plural, {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
   get serializerConfig(): JSONAPISerializerConfig<ApiEvent> {

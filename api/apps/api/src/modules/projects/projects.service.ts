@@ -1,8 +1,11 @@
-import { forbiddenError } from '@marxan-api/modules/access-control';
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  forbiddenError,
+  ProjectAccessControl,
+} from '@marxan-api/modules/access-control';
+import { Injectable } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { Either, isLeft, left, right, isRight } from 'fp-ts/Either';
+import { Either, isLeft, isRight, left, right } from 'fp-ts/Either';
 import { validate as isValidUUID } from 'uuid';
 import {
   FindResult,
@@ -41,7 +44,6 @@ import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
 import { Readable } from 'stream';
-import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { ApiEventsService } from '../api-events';
@@ -53,12 +55,18 @@ import { UploadExportFile } from '../clone/infra/import/upload-export-file.comma
 import { unknownError } from '@marxan/files-repository';
 import {
   ImportProject,
+  ImportProjectCommandResult,
   ImportProjectError,
 } from '../clone/import/application/import-project.command';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { UserId } from '@marxan/domain-ids';
 
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
+export const projectIsMissingInfoForRegularPus = Symbol(
+  `project is missing info for regular planning units`,
+);
 export const notAllowed = Symbol(`not allowed to that action`);
 export const notFound = Symbol(`project not found`);
 export const exportNotFound = Symbol(`project export not found`);
@@ -208,11 +216,11 @@ export class ProjectsService {
       return left(projectNotFound);
     }
     /**
-    we are redirecting to the planning area service to get the tiles.
+     we are redirecting to the planning area service to get the tiles.
 
-    @todo: In the future we should decouple this text url stuff.
+     @todo: In the future we should decouple this text url stuff.
 
-    */
+     */
     if (project.planningUnitGridShape === 'from_shapefile') {
       return right({
         from: `/projects/${projectId}/grid/tiles`,
@@ -247,14 +255,33 @@ export class ProjectsService {
   async create(
     input: CreateProjectDTO,
     info: ProjectsRequest,
-  ): Promise<Either<Permit, Project>> {
+  ): Promise<
+    Either<
+      typeof projectIsMissingInfoForRegularPus | typeof forbiddenError,
+      Project
+    >
+  > {
+    const dtoHasRegularShape =
+      input.planningUnitGridShape &&
+      [PlanningUnitGridShape.Hexagon, PlanningUnitGridShape.Square].includes(
+        input.planningUnitGridShape,
+      );
+    const dtoHasNeededInfoForRegularShapes =
+      input.planningAreaId ||
+      input.adminAreaLevel1Id ||
+      input.adminAreaLevel2Id ||
+      input.countryId;
+
+    if (dtoHasRegularShape && !dtoHasNeededInfoForRegularShapes)
+      return left(projectIsMissingInfoForRegularPus);
+
     assertDefined(info.authenticatedUser);
     if (
       !(await this.projectAclService.canCreateProject(
         info.authenticatedUser.id,
       ))
     ) {
-      return left(false);
+      return left(forbiddenError);
     }
     const project = await this.projectsCrud.create(input, info);
     await this.projectsCrud.assignCreatorRole(
@@ -440,25 +467,36 @@ export class ProjectsService {
 
   async importProject(
     exportFile: Express.Multer.File,
-  ): Promise<Either<typeof unknownError | ImportProjectError, string>> {
+    userId: string,
+  ): Promise<
+    Either<
+      typeof unknownError | ImportProjectError | typeof forbiddenError,
+      ImportProjectCommandResult
+    >
+  > {
     const archiveLocationOrError = await this.commandBus.execute(
       new UploadExportFile(exportFile),
     );
+
+    if (!(await this.projectAclService.canCreateProject(userId))) {
+      return left(forbiddenError);
+    }
 
     if (isLeft(archiveLocationOrError)) {
       return archiveLocationOrError;
     }
 
-    const importIdOrError = await this.commandBus.execute(
-      new ImportProject(archiveLocationOrError.right),
+    const idsOrError = await this.commandBus.execute(
+      new ImportProject(archiveLocationOrError.right, new UserId(userId)),
     );
 
-    if (isLeft(importIdOrError)) {
-      return importIdOrError;
+    if (isLeft(idsOrError)) {
+      return idsOrError;
     }
 
-    return right(importIdOrError.right);
+    return right(idsOrError.right);
   }
+
   /**
    * @todo: this is a good candidate for a new static method in class
    * Gids (static planningGidsFromAreaId()

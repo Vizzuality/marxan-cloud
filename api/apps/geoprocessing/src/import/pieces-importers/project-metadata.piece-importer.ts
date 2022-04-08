@@ -39,7 +39,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, pieceResourceId, projectId, piece } = input;
+    const { uris, pieceResourceId, projectId, piece, ownerId } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -77,18 +77,38 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       stringProjectMetadataOrError.right,
     );
 
-    await this.entityManager
-      .createQueryBuilder()
-      .insert()
-      .into(`projects`)
-      .values({
-        id: projectId,
-        name: projectMetadata.name,
-        description: projectMetadata.description,
-        organization_id: organizationId,
-        planning_unit_grid_shape: projectMetadata.planningUnitGridShape,
-      })
-      .execute();
+    await this.entityManager.transaction(async (em) => {
+      await em
+        .createQueryBuilder()
+        .insert()
+        .into(`projects`)
+        .values({
+          id: projectId,
+          name: projectMetadata.name,
+          description: projectMetadata.description,
+          organization_id: organizationId,
+          planning_unit_grid_shape: projectMetadata.planningUnitGridShape,
+        })
+        .execute();
+
+      await em
+        .createQueryBuilder()
+        .insert()
+        .into(`users_projects`)
+        .values({
+          user_id: ownerId,
+          project_id: projectId,
+          // It would be great to use ProjectRoles enum instead of having
+          // the role hardcoded. The thing is that Geoprocessing code shouldn't depend
+          // directly on elements of Api code, so there were two options:
+          // - Move ProjectRoles enum to libs package
+          // - Harcode the rol
+          // We took the second approach because we are only referencing values from that enum
+          // here
+          role_id: 'project_owner',
+        })
+        .execute();
+    });
 
     return {
       importId: input.importId,

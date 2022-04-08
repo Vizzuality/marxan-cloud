@@ -29,3 +29,13 @@ variable "sparkpost_api_key" {
   type        = string
   description = "The API key for Sparkpost"
 }
+
+variable "backend_storage_size" {
+  type        = string
+  description = "Size of the backend storage claim"
+}
+
+variable "container_registry_name" {
+  type        = string
+  description = "Name for the Azure CR. Must be globally unique"
+}

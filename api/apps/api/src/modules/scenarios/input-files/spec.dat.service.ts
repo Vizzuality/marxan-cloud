@@ -34,7 +34,15 @@ export class SpecDatService {
       )
       select
         feature_id as "featureId",
-        target,
+        -- For projects generated within the MarxanCloud platform, we only
+        -- deal with prop. Legacy projects, when support for importing them is
+        -- added, may rely on the target prop, but as this is not something that
+        -- MarxanCloud will handle, we'll always rely on prop and instruct users
+        -- to switch their data based on target to using prop instead; this
+        -- avoids potential issues with measurement units for target potentially
+        -- being different between features (as well as measurement units not
+        -- being attached to the data)
+        NULL as target,
         prop,
         fpf,
         target2,

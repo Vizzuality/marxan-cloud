@@ -23,7 +23,7 @@ export const createWorld = async (app: INestApplication, jwtToken: string) => {
   const projectWithCountry = (
     await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: country,
+        countryId: country,
       }),
       organizationId,
     })
@@ -32,7 +32,7 @@ export const createWorld = async (app: INestApplication, jwtToken: string) => {
   const projectWithGid1 = (
     await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: country,
+        countryId: country,
         adminAreaLevel1Id: l1AdminArea,
       }),
       organizationId,
@@ -42,7 +42,7 @@ export const createWorld = async (app: INestApplication, jwtToken: string) => {
   const projectWithGid2 = (
     await ProjectsTestUtils.createProject(app, jwtToken, {
       ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
-        countryCode: country,
+        countryId: country,
         adminAreaLevel1Id: l1AdminArea,
         adminAreaLevel2Id: l2AdminArea,
       }),

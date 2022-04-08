@@ -13,6 +13,7 @@ resource "kubernetes_ingress_v1" "ingress" {
       "appgw.ingress.kubernetes.io/health-probe-port" = "3000"
       "appgw.ingress.kubernetes.io/health-probe-path" = "/api/ping"
       "appgw.ingress.kubernetes.io/ssl-redirect"      = "true"
+      "appgw.ingress.kubernetes.io/request-timeout"   = "90"
       "cert-manager.io/cluster-issuer"                = "letsencrypt"
       "cert-manager.io/acme-challenge-type"           = "http01"
     }

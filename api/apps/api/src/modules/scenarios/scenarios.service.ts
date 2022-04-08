@@ -11,7 +11,6 @@ import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { pick } from 'lodash';
-
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import { AppConfig } from '@marxan-api/utils/config.utils';
@@ -107,8 +106,12 @@ import { FeatureCollection } from 'geojson';
 import {
   unknownPdfWebshotError,
   WebshotConfig,
+  WebshotPdfConfig,
   WebshotService,
 } from '@marxan/webshot';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { apiConnections } from '@marxan-api/ormconfig';
+import { EntityManager } from 'typeorm';
 import { blmImageMock } from './__mock__/blm-image-mock';
 
 /** @debt move to own module */
@@ -172,6 +175,8 @@ export class ScenariosService {
     private readonly scenarioCalibrationRepository: ScenarioCalibrationRepo,
     private readonly scenarioAclService: ScenarioAccessControl,
     private readonly webshotService: WebshotService,
+    @InjectEntityManager(apiConnections.geoprocessingDB)
+    private readonly geoEntityManager: EntityManager,
   ) {}
 
   async findAllPaginated(
@@ -581,6 +586,7 @@ export class ScenariosService {
   async startBlmCalibration(
     id: string,
     userInfo: AppInfoDTO,
+    config: WebshotConfig,
     rangeToUpdate?: [number, number],
   ): Promise<
     Either<
@@ -616,7 +622,7 @@ export class ScenariosService {
     if (isLeft(scenarioBlmValues)) return scenarioBlmValues;
 
     await this.commandBus.execute(
-      new StartBlmCalibration(id, scenarioBlmValues.right.values),
+      new StartBlmCalibration(id, scenarioBlmValues.right.values, config),
     );
 
     return right(true);
@@ -1236,7 +1242,7 @@ export class ScenariosService {
   async getSummaryReportFor(
     scenarioId: string,
     userId: string,
-    configForWebshot: WebshotConfig,
+    configForWebshot: WebshotPdfConfig,
   ): Promise<
     Either<
       | typeof forbiddenError
@@ -1252,6 +1258,7 @@ export class ScenariosService {
     if (isLeft(scenario)) {
       return scenario;
     }
+    const webshotUrl = AppConfig.get('webshot.url') as string;
 
     /** @debt Refactor to use @nestjs/common's StreamableFile
      (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
@@ -1260,6 +1267,7 @@ export class ScenariosService {
       scenarioId,
       scenario.right.projectId,
       configForWebshot,
+      webshotUrl,
     );
 
     return pdfStream;
@@ -1268,7 +1276,7 @@ export class ScenariosService {
   async getImageFromBlmValues(
     scenarioId: string,
     userId: string,
-    _blmValue: number,
+    blmValue: number,
   ): Promise<Either<typeof forbiddenError | GetScenarioFailure, Buffer>> {
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
@@ -1287,12 +1295,16 @@ export class ScenariosService {
       return left(forbiddenError);
     }
 
-    // It will return a dummy PNG while the webshot-specific endpoint to
-    // generate the image is still a WIP. This should be substituted for
-    // getting the PNG binary data from the blm_final_results table once
-    // PNG is stored there and/or 404 error if the PNG cannot be found.
-    // blmFinalResultsRepo.findOne({ where: { blmValue, scenarioId }}).image
+    const result = await this.geoEntityManager
+      .createQueryBuilder()
+      .select(['png_data'])
+      .from('blm_final_results', 'bfr')
+      .where('scenario_id = :scenarioId', { scenarioId })
+      .andWhere('blm_value = :blmValue', { blmValue })
+      .getRawOne();
 
-    return right(Buffer.from(blmImageMock, 'base64'));
+    const pngData = result.png_data;
+
+    return right(Buffer.from(pngData, 'base64'));
   }
 }

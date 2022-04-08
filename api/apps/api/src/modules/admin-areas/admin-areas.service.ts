@@ -62,7 +62,7 @@ export class AdminAreasService extends AppBaseService<
     private readonly adminAreasRepository: Repository<AdminArea>,
   ) {
     super(adminAreasRepository, 'admin_area', 'admin_areas', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

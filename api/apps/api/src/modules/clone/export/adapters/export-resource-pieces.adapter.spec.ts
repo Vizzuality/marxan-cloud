@@ -97,6 +97,7 @@ const getFixtures = async () => {
       ClonePiece.PlanningUnitsGrid,
       ClonePiece.PlanningUnitsGridGeojson,
       ClonePiece.ProjectCustomProtectedAreas,
+      ClonePiece.ProjectCustomFeatures,
     ];
   };
 
@@ -106,6 +107,10 @@ const getFixtures = async () => {
       ClonePiece.ScenarioProtectedAreas,
       ClonePiece.ScenarioPlanningUnitsData,
       ClonePiece.ScenarioRunResults,
+      ClonePiece.ScenarioFeaturesData,
+      ClonePiece.ScenarioInputFolder,
+      ClonePiece.ScenarioOutputFolder,
+      ClonePiece.FeaturesSpecification,
     ];
     if (!projectExport) pieces.push(ClonePiece.ExportConfig);
     return pieces;

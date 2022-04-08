@@ -35,7 +35,7 @@ export const getFixtures = async () => {
     app,
     ownerToken,
     {
-      countryCode: 'AGO',
+      countryId: 'AGO',
       name: `Project name ${Date.now()}`,
     },
     {
@@ -106,6 +106,7 @@ export const getFixtures = async () => {
           .set('Authorization', `Bearer ${ownerToken}`)
           .send({
             range: updatedRange,
+            config: { baseUrl: 'example/png', cookie: 'randomCookie' },
           }),
       WithoutRange: async () =>
         await request(app.getHttpServer())
@@ -119,6 +120,7 @@ export const getFixtures = async () => {
           .set('Authorization', `Bearer ${contributorToken}`)
           .send({
             range: updatedRange,
+            config: { baseUrl: 'example/png', cookie: 'randomCookie' },
           }),
       WithoutRange: async () =>
         await request(app.getHttpServer())
@@ -132,6 +134,7 @@ export const getFixtures = async () => {
           .set('Authorization', `Bearer ${viewerToken}`)
           .send({
             range: updatedRange,
+            config: { baseUrl: 'example/png', cookie: 'randomCookie' },
           }),
       WithoutRange: async () =>
         await request(app.getHttpServer())
@@ -158,6 +161,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [-1, -50],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RangeWithAMinGreaterThanMax: async () =>
           await request(app.getHttpServer())
@@ -165,6 +169,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [50, 1],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RangeWithValuesThatAreNotNumbers: async () =>
           await request(app.getHttpServer())
@@ -172,6 +177,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [1, '50'],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
@@ -180,6 +186,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${ownerToken}`)
             .send({
               range: [1, 50],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             });
         },
       };
@@ -192,6 +199,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${contributorToken}`)
             .send({
               range: [-1, -50],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RangeWithAMinGreaterThanMax: async () =>
           await request(app.getHttpServer())
@@ -199,6 +207,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${contributorToken}`)
             .send({
               range: [50, 1],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RangeWithValuesThatAreNotNumbers: async () =>
           await request(app.getHttpServer())
@@ -206,6 +215,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${contributorToken}`)
             .send({
               range: [1, '50'],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
@@ -214,6 +224,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${contributorToken}`)
             .send({
               range: [1, 50],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             });
         },
       };
@@ -226,6 +237,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${viewerToken}`)
             .send({
               range: [-1, -50],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RangeWithAMinGreaterThanMax: async () =>
           await request(app.getHttpServer())
@@ -233,6 +245,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${viewerToken}`)
             .send({
               range: [50, 1],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RangeWithValuesThatAreNotNumbers: async () =>
           await request(app.getHttpServer())
@@ -240,6 +253,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${viewerToken}`)
             .send({
               range: [1, '50'],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             }),
         RunningExport: async () => {
           projectChecker.addPendingExportForProject(projectId);
@@ -248,6 +262,7 @@ export const getFixtures = async () => {
             .set('Authorization', `Bearer ${viewerToken}`)
             .send({
               range: [1, 50],
+              config: { baseUrl: 'example/png', cookie: 'randomCookie' },
             });
         },
       };

@@ -26,7 +26,7 @@ export const getFixtures = async () => {
     app,
     ownerToken,
     {
-      countryCode: `NAM`,
+      countryId: `NAM`,
       name: `Humanity for living.`,
     },
     {

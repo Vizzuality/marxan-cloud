@@ -6,6 +6,7 @@ import {
 } from '@marxan/cloning/domain';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
+import { UserId } from '@marxan/domain-ids';
 import { AllPiecesImported } from '../events/all-pieces-imported.event';
 import { ImportBatchFailed } from '../events/import-batch-failed.event';
 import { ImportRequested } from '../events/import-requested.event';
@@ -33,6 +34,7 @@ export class Import extends AggregateRoot {
     private readonly resourceId: ResourceId,
     private readonly resourceKind: ResourceKind,
     private readonly projectId: ResourceId,
+    private readonly ownerId: UserId,
     private readonly archiveLocation: ArchiveLocation,
     private readonly pieces: ImportComponent[],
   ) {
@@ -60,6 +62,7 @@ export class Import extends AggregateRoot {
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
       new ResourceId(snapshot.projectId),
+      new UserId(snapshot.ownerId),
       new ArchiveLocation(snapshot.archiveLocation),
       snapshot.importPieces.map(ImportComponent.fromSnapshot),
     );
@@ -69,6 +72,7 @@ export class Import extends AggregateRoot {
     resourceId: ResourceId,
     kind: ResourceKind,
     projectId: ResourceId,
+    ownerId: UserId,
     archiveLocation: ArchiveLocation,
     pieces: ImportComponent[],
   ): Import {
@@ -78,6 +82,7 @@ export class Import extends AggregateRoot {
       resourceId,
       kind,
       projectId,
+      ownerId,
       archiveLocation,
       pieces,
     );
@@ -184,6 +189,7 @@ export class Import extends AggregateRoot {
       importPieces: this.pieces.map((piece) => piece.toSnapshot()),
       archiveLocation: this.archiveLocation.value,
       projectId: this.projectId.value,
+      ownerId: this.ownerId.value,
     };
   }
 }

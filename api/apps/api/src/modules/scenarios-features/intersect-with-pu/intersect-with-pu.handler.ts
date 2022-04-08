@@ -35,7 +35,6 @@ export class IntersectWithPuHandler
       kind:
         API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1,
       topic: scenarioId,
-      externalId: id,
       data: {},
     });
   }

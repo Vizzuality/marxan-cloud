@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  webshot:
+      build:
+        context: ./webshot
+        dockerfile: Dockerfile
+      container_name: marxan-webshot
+      command: develop
+      environment:
+        - WEBSHOT_APP_PORT
+      volumes:
+        - ./webshot/src:/opt/marxan-webshot/src

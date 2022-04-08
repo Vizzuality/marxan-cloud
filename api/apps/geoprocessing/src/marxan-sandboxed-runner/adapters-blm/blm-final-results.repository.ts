@@ -29,8 +29,8 @@ export class BlmFinalResultsRepository {
       });
 
       const query = `
-        insert into blm_final_results (scenario_id, blm_value, cost, boundary_length)
-        select scenario_id, blm_value, cost, boundary_length from blm_partial_results
+        insert into blm_final_results (scenario_id, blm_value, cost, boundary_length, protected_pu_ids)
+        select scenario_id, blm_value, cost, boundary_length, protected_pu_ids from blm_partial_results
         where blm_partial_results.scenario_id = $1 and blm_partial_results.calibration_id = $2
       `;
 
@@ -39,5 +39,27 @@ export class BlmFinalResultsRepository {
     });
 
     return Promise.resolve(undefined);
+  }
+
+  async updatePngDataOnFinalResults(
+    scenarioId: string,
+    blmValue: number,
+    pngData: string,
+  ): Promise<void> {
+    await this.entityManager.transaction(async (txManager) => {
+      const query = `
+        update blm_final_results
+        set protected_pu_ids NULL
+        where blm_final_results.scenario_id = $1 and blm_final_results.blm_value = $2`;
+      await txManager.query(query, [scenarioId, blmValue]);
+
+      const pngDataParsedBuffer = Buffer.from(pngData, 'base64');
+
+      await txManager.update(
+        BlmFinalResultEntity,
+        { scenarioId, blmValue },
+        { pngData: pngDataParsedBuffer },
+      );
+    });
   }
 }

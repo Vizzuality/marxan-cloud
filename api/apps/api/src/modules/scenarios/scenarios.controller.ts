@@ -101,7 +101,7 @@ import {
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { BaseTilesOpenApi } from '@marxan/tiles';
-import { WebshotConfig, WebshotService } from '@marxan/webshot';
+import { WebshotPdfConfig } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 
@@ -131,7 +131,6 @@ export class ScenariosController {
     private readonly zipFilesSerializer: ZipFilesSerializer,
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
-    private readonly webshotService: WebshotService,
   ) {}
 
   @ApiOperation({
@@ -196,6 +195,46 @@ export class ScenariosController {
     the ACL control for this endpoint is placed in the controller */
     if (
       !(await this.scenarioAclService.canViewScenario(req.user.id, scenarioId))
+    ) {
+      throw new ForbiddenException();
+    }
+    return await this.proxyService.proxyTileRequest(req, response);
+  }
+
+  @BaseTilesOpenApi()
+  @ApiOperation({
+    description: 'Get tiles for a scenario blm values to generate maps.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @Get(':id/calibration/tiles/:blmValue/:z/:x/:y.mvt')
+  async proxyPlanningUnitsBlmValuesTiles(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+    @Param('id', ParseUUIDPipe) scenarioId: string,
+  ) {
+    /* Due to the usage of proxyService in other modules
+    the ACL control for this endpoint is placed in the controller */
+    const scenario = await this.service.getById(scenarioId, {
+      authenticatedUser: req.user,
+    });
+
+    if (isLeft(scenario)) {
+      throw mapAclDomainToHttpError(scenario.left, {
+        userId: req.user.id,
+        resourceType: scenarioResource.name.plural,
+      });
+    }
+    if (
+      !(await this.scenarioAclService.canViewBlmResults(
+        req.user.id,
+        scenario.right.projectId,
+      ))
     ) {
       throw new ForbiddenException();
     }
@@ -1048,14 +1087,31 @@ export class ScenariosController {
   @Post(`:id/calibration`)
   async startCalibration(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() { range }: StartScenarioBlmCalibrationDto,
+    @Body() blmCalibrationConfig: StartScenarioBlmCalibrationDto,
     @Req() req: RequestWithAuthenticatedUser,
+    @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<JsonApiAsyncJobMeta> {
+    const { config, range } = blmCalibrationConfig;
+    /**
+     * If a frontend app session token was provided via cookie, use this to let
+     * the webshot service authenticate to the app, otherwise fall back to
+     * looking for the relevant cookies in the body of the request.
+     *
+     * @todo Remove this once the new auth workflow via `Cookie` header is
+     * stable.
+     */
+    const configForWebshot = appSessionTokenCookie
+      ? {
+          ...config,
+          cookie: appSessionTokenCookie,
+        }
+      : config;
     const result = await this.service.startBlmCalibration(
       id,
       {
         authenticatedUser: req.user,
       },
+      configForWebshot,
       range,
     );
 
@@ -1219,7 +1275,7 @@ export class ScenariosController {
   @Header('content-type', 'application/pdf')
   @Post('/:scenarioId/solutions/report')
   async getSummaryReportForProject(
-    @Body() config: WebshotConfig,
+    @Body() config: WebshotPdfConfig,
     @Param('scenarioId', ParseUUIDPipe) scenarioId: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
@@ -1266,7 +1322,6 @@ export class ScenariosController {
     pdfStream.right.pipe(res);
   }
 
-  // @debt Refactor to use the correct blm PNG data from table.
   @ApiOperation({ description: 'Get PNG for BLM values for scenario' })
   @ApiOkResponse()
   @Get('/:scenarioId/calibration/maps/preview/:blmValue')

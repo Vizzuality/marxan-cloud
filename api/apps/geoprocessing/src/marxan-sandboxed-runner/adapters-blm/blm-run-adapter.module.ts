@@ -27,6 +27,7 @@ import { RemovePreviousCalibrationPartialResultsHandler } from './cleanup/remove
 import { BlmCalibrationStartedSaga } from './cleanup/blm-calibration-started.saga';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { WebshotModule } from '@marxan/webshot';
 
 export const blmSandboxRunner = Symbol(`blm sandbox runner`);
 
@@ -41,6 +42,7 @@ export const blmSandboxRunner = Symbol(`blm sandbox runner`);
       ProjectsPuEntity,
     ]),
     CqrsModule,
+    WebshotModule,
   ],
   providers: [
     MarxanConfig,

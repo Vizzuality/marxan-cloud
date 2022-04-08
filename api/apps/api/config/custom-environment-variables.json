@@ -51,7 +51,8 @@
   },
   "storage": {
     "sharedFileStorage": {
-      "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH"
+      "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH",
+      "cleanupTemporaryFolders": "BACKEND_CLEANUP_TEMPORARY_FOLDERS"
     }
   },
   "marxan": {

@@ -99,7 +99,8 @@ resource "azurerm_subnet" "aks_subnet" {
 
   service_endpoints = [
     "Microsoft.ServiceBus",
-    "Microsoft.ContainerRegistry"
+    "Microsoft.ContainerRegistry",
+    "Microsoft.Storage"
   ]
 }
 
