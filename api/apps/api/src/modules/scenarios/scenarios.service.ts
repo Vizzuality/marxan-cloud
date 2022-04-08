@@ -112,7 +112,6 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { EntityManager } from 'typeorm';
-import { blmImageMock } from './__mock__/blm-image-mock';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
