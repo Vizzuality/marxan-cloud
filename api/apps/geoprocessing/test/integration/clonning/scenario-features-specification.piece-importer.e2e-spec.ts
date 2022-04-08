@@ -21,6 +21,7 @@ import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
+  DeleteFeatures,
   DeleteProjectAndOrganization,
   GivenFeatures,
   GivenFeaturesData,
@@ -121,6 +122,7 @@ const getFixtures = async () => {
   const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();
+  const userId = v4();
 
   const geoEntityManager = sandbox.get<EntityManager>(getEntityManagerToken());
   const apiEntityManager = sandbox.get<EntityManager>(
@@ -179,6 +181,7 @@ const getFixtures = async () => {
 
   return {
     cleanUp: async () => {
+      await DeleteFeatures(apiEntityManager, featureIds);
       await DeleteProjectAndOrganization(
         apiEntityManager,
         projectId,
@@ -209,6 +212,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ScenarioFeaturesData,
         resourceKind,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -220,6 +224,7 @@ const getFixtures = async () => {
         piece: ClonePiece.FeaturesSpecification,
         resourceKind,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoScenarioFeaturesDataFileIsAvailable: () => {

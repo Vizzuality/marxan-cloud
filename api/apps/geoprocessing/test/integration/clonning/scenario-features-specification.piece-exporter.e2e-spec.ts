@@ -11,6 +11,7 @@ import { Readable } from 'stream';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
+  DeleteFeatures,
   DeleteProjectAndOrganization,
   GivenFeatures,
   GivenScenarioExists,
@@ -55,7 +56,7 @@ describe(ScenarioFeaturesSpecificationPieceExporter, () => {
   it('should save succesfully scenario custom features specification', async () => {
     const input = fixtures.GivenAScenarioFeaturesSpecificationExportJob();
     await fixtures.GivenScenarioExist();
-    await fixtures.GivenCustomFeaturesExist();
+    await fixtures.GivenCustomFeatureExist();
     await fixtures.GivenScenarioSpecification();
     await fixtures.GivenScenarioFeaturesDataExist();
     await fixtures.GivenScenarioSpecificationFeaturesConfigExist(2);
@@ -66,7 +67,7 @@ describe(ScenarioFeaturesSpecificationPieceExporter, () => {
   it('should save succesfully scenario platform features specification', async () => {
     const input = fixtures.GivenAScenarioFeaturesSpecificationExportJob();
     await fixtures.GivenScenarioExist();
-    await fixtures.GivenPlatformFeaturesExist();
+    await fixtures.GivenPlatformFeatureExist();
     await fixtures.GivenScenarioSpecification();
     await fixtures.GivenScenarioFeaturesDataExist();
     await fixtures.GivenScenarioSpecificationFeaturesConfigExist(2);
@@ -126,14 +127,16 @@ const getFixtures = async () => {
 
   return {
     cleanUp: async () => {
+      await DeleteFeatures(apiEntityManager, feature ? [feature.id] : []);
       await DeleteProjectAndOrganization(
         apiEntityManager,
         projectId,
         scenarioId,
       );
-      await geoEntityManager.getRepository(GeoFeatureGeometry).delete({
-        id: In([...scenarioFeatureDataIds]),
-      });
+      if (feature)
+        await geoEntityManager.getRepository(GeoFeatureGeometry).delete({
+          featureId: feature.id,
+        });
     },
     GivenAScenarioFeaturesSpecificationExportJob: (): ExportJobInput => {
       return {
@@ -159,7 +162,7 @@ const getFixtures = async () => {
         organizationId,
       );
     },
-    GivenCustomFeaturesExist: async () => {
+    GivenCustomFeatureExist: async () => {
       const { customFeatures } = await GivenFeatures(
         apiEntityManager,
         0,
@@ -168,7 +171,7 @@ const getFixtures = async () => {
       );
       feature = customFeatures[0];
     },
-    GivenPlatformFeaturesExist: async () => {
+    GivenPlatformFeatureExist: async () => {
       const { platformFeatures } = await GivenFeatures(
         apiEntityManager,
         1,
