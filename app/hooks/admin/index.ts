@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 
 import {
-  useQuery,
+  useMutation,
+  useQuery, useQueryClient,
 } from 'react-query';
 
 import { useSession } from 'next-auth/client';
@@ -10,7 +11,8 @@ import ADMIN from 'services/admin';
 // import TEST from 'services/test';
 
 import {
-  UseAdminPublishedProjectsProps,
+  SaveAdminPublishedProjectProps,
+  UseAdminPublishedProjectsProps, UseSaveAdminPublishedProjectProps,
 } from './types';
 
 export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProps = { page: 1 }) {
@@ -123,4 +125,37 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
       meta: data?.meta,
     };
   }, [query, data]);
+}
+
+export function useSaveAdminPublishedProject({
+  requestConfig = {
+    method: 'PATCH',
+  },
+}: UseSaveAdminPublishedProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveAdminPublishedProject = ({ id, data, status }: SaveAdminPublishedProjectProps) => {
+    const action = status === 'published' ? 'clear' : 'set';
+
+    return ADMIN.request({
+      url: `/projects/${id}/moderation-status/${action}`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveAdminPublishedProject, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('admin-published-projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }

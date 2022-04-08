@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 
-import { useAdminPublishedProjects } from 'hooks/admin';
+import { useAdminPublishedProjects, useSaveAdminPublishedProject } from 'hooks/admin';
 
 import Select from 'components/forms/select';
 import Table2 from 'components/table2/component';
@@ -22,6 +22,8 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
     page,
     sort,
   });
+
+  const adminPublishedProjectMutation = useSaveAdminPublishedProject({});
 
   const COLUMNS = useMemo(() => {
     return [
@@ -79,7 +81,7 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         Header: 'Status',
         accessor: 'status',
         defaultCanSort: true,
-        Cell: function Status({ value }: any) {
+        Cell: function Status({ value, row }: any) {
           if (!value) return null;
 
           return (
@@ -92,14 +94,33 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
                 { label: 'Published', value: 'published' },
               ]}
               onChange={(v: string) => {
-                console.info(v);
+                switch (v) {
+                  case 'published': {
+                    adminPublishedProjectMutation.mutate({
+                      id: row.original.id,
+                      data: { alsoUnpublish: false },
+                      status: v,
+                    });
+                    break;
+                  }
+                  case 'under-moderation': {
+                    adminPublishedProjectMutation.mutate({
+                      id: row.original.id,
+                      status: v,
+                    });
+                    break;
+                  }
+                  default: {
+                    break;
+                  }
+                }
               }}
             />
           );
         },
       },
     ];
-  }, []);
+  }, [adminPublishedProjectMutation]);
 
   const onPageChange = useCallback((p) => {
     setPage(p);
