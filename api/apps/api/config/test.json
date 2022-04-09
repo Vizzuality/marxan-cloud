@@ -44,7 +44,7 @@
     "logging": "error"
   },
   "api": {
-    "url": "http://localhost:3000",
+    "url": "http://api:3000",
     "daemonListenPort": 3000
   },
   "jobOptions": {
@@ -63,7 +63,7 @@
     }
   },
   "geoprocessing": {
-    "url": "http://localhost:3001"
+    "url": "http://geoprocessing:3000"
   },
   "storage": {
     "sharedFileStorage": {
