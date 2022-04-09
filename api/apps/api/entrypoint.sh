@@ -18,7 +18,7 @@ case "$1" in
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
         export NODE_ENV=test
-        exec yarn api:test:e2e:new --ci
+        exec yarn api:test:e2e:new --ci --detectOpenHandles --forceExit
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
