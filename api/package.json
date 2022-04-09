@@ -22,7 +22,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "api:test:e2e": "NODE_OPTIONS=\\\"--max_old_space_size=3072\\\" jest --config apps/api/test/jest-e2e-OLD.json",
-    "api:test:e2e:new": "NODE_ENV=test NODE_CONFIG_DIR=apps/api/config jest --config apps/api/test/jest-e2e.json",
+    "api:test:e2e:new": "NODE_ENV=test NODE_CONFIG_DIR=apps/api/config NODE_OPTIONS=\"--max_old_space_size=3072\" jest --config apps/api/test/jest-e2e.json",
     "geoprocessing:test:e2e": "NODE_ENV=test NODE_CONFIG_DIR=apps/geoprocessing/config jest --config ./apps/geoprocessing/test/jest-e2e.json",
     "ts-coverage": "typescript-coverage-report",
     "api:typeorm": "NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js --config apps/api/ormconfig.ts",
