@@ -9,6 +9,10 @@ import {
 
 import cx from 'classnames';
 
+import Icon from 'components/icon';
+
+import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
+
 import Pagination from './pagination';
 
 export interface Table2Props {
@@ -114,7 +118,9 @@ export const Table2: React.FC<Table2Props> = ({
                 className="sticky top-0 z-10 px-10"
               >
                 {headerGroup.headers.map((column) => {
-                  const { toggleSortBy } = column;
+                  const {
+                    id, canSort, sortDescFirst, toggleSortBy,
+                  } = column;
 
                   const {
                     key: headerKey,
@@ -126,13 +132,32 @@ export const Table2: React.FC<Table2Props> = ({
                       role="presentation"
                       key={headerKey}
                       {...restHeaderProps}
-                      className="py-5 text-xs font-medium uppercase font-heading"
-                      onClick={() => {
-                        const direction = !sortSelected ? true : !sortSelected.desc;
-                        toggleSortBy(direction, false);
-                      }}
+                      className={cx({
+                        'flex items-center py-5 space-x-2 text-xs font-medium uppercase font-heading': true,
+                        'cursor-pointer': canSort,
+                      })}
+                      {...(canSort && {
+                        onClick: () => {
+                          if (id === sortSelected?.id) {
+                            toggleSortBy(!sortSelected.desc, false);
+                          }
+
+                          if (id !== sortSelected?.id) {
+                            toggleSortBy(sortDescFirst, false);
+                          }
+                        },
+                      })}
                     >
-                      {column.render('Header')}
+                      <span>{column.render('Header')}</span>
+                      {sortSelected && sortSelected.id === column.id && (
+                        <Icon
+                          icon={ARROW_DOWN_SVG}
+                          className={cx({
+                            'w-3 h-3': true,
+                            'transform rotate-180': !sortSelected.desc,
+                          })}
+                        />
+                      )}
                     </div>
                   );
                 })}

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { withAdmin, withProtection, withUser } from 'hoc/auth';
 
-import AdminPublishedProjects from 'layout/admin/published-projects/component';
+import AdminPublishedProjects from 'layout/admin/published-projects';
 import Head from 'layout/head';
 import Header from 'layout/header';
 import MetaIcons from 'layout/meta-icons';

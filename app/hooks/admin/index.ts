@@ -48,7 +48,7 @@ export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
     }
 
     const direction = sort.direction === 'asc' ? '-' : '';
-    return `${direction}${sort.column}`;
+    return `${direction}${sort.id}`;
   }, [sort]);
 
   const fetchUsers = () => ADMIN.request({
@@ -122,7 +122,7 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
     }
 
     const direction = sort.direction === 'asc' ? '-' : '';
-    return `${direction}${sort.column}`;
+    return `${direction}${sort.id}`;
   }, [sort]);
 
   const fetchPublishedProjects = () => ADMIN.request({

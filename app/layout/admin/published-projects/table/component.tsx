@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import Link from 'next/link';
+import { useAdminPublishedProjects } from 'hooks/admin';
 
-import { useAdminPublishedProjects, useSaveAdminPublishedProject } from 'hooks/admin';
+import Table2 from 'components/table2';
 
-import Select from 'components/forms/select';
-import Table2 from 'components/table2/component';
+import Name from './cells/name';
+import Owner from './cells/owner';
+import Status from './cells/status';
 
 export interface AdminPublishedProjectsTableProps {
 
@@ -13,17 +14,15 @@ export interface AdminPublishedProjectsTableProps {
 
 export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTableProps> = () => {
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState({ column: 'name', direction: 'desc' });
+  const [sort, setSort] = useState({ id: 'name', direction: 'desc' });
 
   const {
-    data: publishedProjectsData,
+    data: publishedProjectsData = [],
     meta,
   } = useAdminPublishedProjects({
     page,
     sort,
   });
-
-  const adminPublishedProjectMutation = useSaveAdminPublishedProject({});
 
   const COLUMNS = useMemo(() => {
     return [
@@ -32,103 +31,49 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         accessor: 'name',
         className: 'font-bold underline leading-none',
         defaultCanSort: true,
-        Cell: function Name({ value, row }: any) {
-          if (!value) return null;
-
-          const { id } = row.original;
-          return (
-            <Link href={`/projects/${id}`}>
-              <a href={`/projects/${id}`} className="font-bold leading-none underline">
-                {value}
-              </a>
-            </Link>
-          );
-        },
+        sortDescFirst: true,
+        Cell: Name,
       },
       {
         Header: 'Description',
         accessor: 'description',
         className: 'text-sm leading-none',
         defaultCanSort: true,
+        sortDescFirst: true,
       },
       {
         Header: 'Owner',
         accessor: 'owner',
         className: 'text-sm leading-none',
-        defaultCanSort: true,
-        Cell: function Owner({ value }: any) {
-          if (!value) return null;
-          const { name, email } = value;
-          return (
-            <div className="space-y-1">
-              <div className="font-semibold">{name}</div>
-              <div>
-                <a
-                  className="underline text-primary-500"
-                  href={`mailto:${email}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {email}
-                </a>
-              </div>
-            </div>
-
-          );
-        },
+        disableSortBy: true,
+        Cell: Owner,
       },
       {
         Header: 'Status',
         accessor: 'status',
-        defaultCanSort: true,
-        Cell: function Status({ value, row }: any) {
-          if (!value) return null;
-
-          return (
-            <Select
-              theme="light"
-              size="s"
-              initialSelected={value}
-              options={[
-                { label: 'Under moderation', value: 'under-moderation' },
-                { label: 'Published', value: 'published' },
-              ]}
-              onChange={(v: string) => {
-                switch (v) {
-                  case 'published': {
-                    adminPublishedProjectMutation.mutate({
-                      id: row.original.id,
-                      data: { alsoUnpublish: false },
-                      status: v,
-                    });
-                    break;
-                  }
-                  case 'under-moderation': {
-                    adminPublishedProjectMutation.mutate({
-                      id: row.original.id,
-                      status: v,
-                    });
-                    break;
-                  }
-                  default: {
-                    break;
-                  }
-                }
-              }}
-            />
-          );
-        },
+        disableSortBy: true,
+        Cell: Status,
       },
     ];
-  }, [adminPublishedProjectMutation]);
+  }, []);
+
+  const initialState = useMemo(() => ({
+    pageIndex: page - 1,
+    sortBy: [
+      {
+        id: sort.id,
+        desc: sort.direction === 'desc',
+      },
+    ],
+  }), [page, sort]);// eslint-disable-line react-hooks/exhaustive-deps
 
   const onPageChange = useCallback((p) => {
     setPage(p);
   }, []);
 
-  const onSortChange = useCallback((column, direction) => {
+  const onSortChange = useCallback((id, direction) => {
     setSort({
-      column,
+      id,
       direction,
     });
   }, []);
@@ -138,9 +83,7 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
       data={publishedProjectsData}
       meta={meta}
       columns={COLUMNS}
-      initialState={{
-        pageIndex: page - 1,
-      }}
+      initialState={initialState}
       onPageChange={onPageChange}
       onSortChange={onSortChange}
     />
