@@ -11,7 +11,8 @@ export enum ClonePiece {
   ScenarioRunResults = 'scenario-run-results',
   ScenarioProtectedAreas = 'scenario-protected-areas',
   ScenarioFeaturesData = 'scenario-features-data',
-  FeaturesSpecification = 'feautures-specification',
+  FeaturesSpecification = 'features-specification',
+  MarxanExecutionMetadata = 'marxan-execution-metadata',
   // marxan-data pieces
   PlanningAreaCustomGeojson = 'planning-area-custom-geojson',
   PlanningUnitsGridGeojson = 'planning-units-grid-geojson',
