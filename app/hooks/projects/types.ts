@@ -72,4 +72,5 @@ export interface UseSaveProjectDownloadProps {
 
 export interface SaveProjectDownloadProps {
   id: string | string[];
+  data: unknown;
 }

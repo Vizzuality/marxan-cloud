@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
+// import { usePlausible } from 'next-plausible';
 
-import { useMe } from 'hooks/me';
-import { useProject } from 'hooks/projects';
+// import { useMe } from 'hooks/me';
+import { useProject, useSaveProjectDownload } from 'hooks/projects';
+import { useScenarios } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
 import ComingSoon from 'layout/help/coming-soon';
@@ -23,11 +25,66 @@ export interface ToolbarProps {
 
 export const Toolbar: React.FC<ToolbarProps> = () => {
   const { query } = useRouter();
+  const { addToast } = useToasts();
   const { pid } = query;
-  const plausible = usePlausible();
+  // const plausible = usePlausible();
 
   const { data: projectData } = useProject(pid);
-  const { user } = useMe();
+  // const { user } = useMe();
+
+  const {
+    data: scenariosData,
+  } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+    sort: '-lastModifiedAt',
+  });
+
+  const scenarioIds = useMemo(() => {
+    return scenariosData?.map((scenario) => scenario.id);
+  }, [scenariosData]);
+
+  const projectDownloadMutation = useSaveProjectDownload({});
+
+  const onDownloadProject = useCallback(() => {
+    projectDownloadMutation.mutate({ id: `${pid}`, data: { scenarioIds } }, {
+
+      onSuccess: () => {
+
+      },
+      onError: ({ e }) => {
+        console.error('error --->', e);
+        addToast('error-project-name', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Unable to download project
+              `$
+              {projectData?.name}
+              `
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+    // plausible('Download project', {
+    //   props: {
+    //     userId: `${user.id}`,
+    //     userEmail: `${user.email}`,
+    //     projectId: `${pid}`,
+    //     projectName: `${projectData.name}`,
+    //   },
+    // });
+  }, [
+    pid,
+    projectDownloadMutation,
+    scenarioIds,
+    addToast,
+    projectData?.name,
+  ]);
 
   return (
     <AnimatePresence>
@@ -82,23 +139,16 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
               )}
             >
               <div>
-                <ComingSoon>
-                  <Button
-                    theme="secondary"
-                    size="base"
-                    onClick={() => plausible('Download project', {
-                      props: {
-                        userId: `${user.id}`,
-                        userEmail: `${user.email}`,
-                        projectId: `${pid}`,
-                        projectName: `${projectData.name}`,
-                      },
-                    })}
-                  >
-                    <span className="mr-2.5">Download project</span>
-                    <Icon icon={DOWNLOAD_SVG} />
-                  </Button>
-                </ComingSoon>
+
+                <Button
+                  theme="secondary"
+                  size="base"
+                  onClick={onDownloadProject}
+                >
+                  <span className="mr-2.5">Download project</span>
+                  <Icon icon={DOWNLOAD_SVG} />
+                </Button>
+
               </div>
             </HelpBeacon>
 

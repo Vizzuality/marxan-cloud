@@ -370,9 +370,10 @@ export function useSaveProjectDownload({
 }: UseSaveProjectDownloadProps) {
   const [session] = useSession();
 
-  const projectDownload = ({ id }: SaveProjectDownloadProps) => {
+  const projectDownload = ({ id, data }: SaveProjectDownloadProps) => {
     return PROJECTS.request({
       url: `${id}/export`,
+      data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
