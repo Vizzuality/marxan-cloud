@@ -393,7 +393,7 @@ export function useSaveProjectDownload({
 export function useExportId(id) {
   const [session] = useSession();
 
-  const query = useQuery(['projects-exportId', id], async () => PROJECTS.request({
+  const query = useQuery(['projects-export-id', id], async () => PROJECTS.request({
     method: 'GET',
     url: `/${id}/export`,
     headers: {
@@ -403,6 +403,31 @@ export function useExportId(id) {
     return response.data;
   }), {
     enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
+export function useDownloadProject(id, exportId) {
+  const [session] = useSession();
+
+  const query = useQuery(['projects-download', id, exportId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${id}/export(${exportId})`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!exportId,
   });
 
   const { data } = query;
