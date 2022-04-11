@@ -1,5 +1,8 @@
 import React, { useCallback, useState } from 'react';
 
+import { useDeleteAdminUser, useSaveAdminUser } from 'hooks/admin';
+import { useToasts } from 'hooks/toast';
+
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Checkbox from 'components/forms/checkbox';
 
@@ -17,17 +20,58 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
   const [confirmAdmin, setConfirmAdmin] = useState<Record<string, any>>();
   const [confirmUnAdmin, setConfirmUnAdmin] = useState<Record<string, any>>();
 
-  const onAdmin = useCallback(() => {
-    console.info(confirmAdmin);
+  const saveAdminMutation = useSaveAdminUser({});
+  const deleteAdminMutation = useDeleteAdminUser({});
 
-    setConfirmAdmin(null);
-  }, [confirmAdmin]);
+  const { addToast } = useToasts();
+
+  const onAdmin = useCallback(() => {
+    saveAdminMutation.mutate({
+      uid: confirmAdmin.id,
+    }, {
+      onSuccess: () => {
+        setConfirmAdmin(null);
+      },
+      onError: () => {
+        addToast('save-admin-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Oops! Something went wrong.
+              <br />
+              Please, try again!
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [confirmAdmin, saveAdminMutation, addToast]);
 
   const onUnAdmin = useCallback(() => {
-    console.info(confirmUnAdmin);
-
-    setConfirmUnAdmin(null);
-  }, [confirmUnAdmin]);
+    deleteAdminMutation.mutate({
+      uid: confirmUnAdmin.id,
+    }, {
+      onSuccess: () => {
+        setConfirmUnAdmin(null);
+      },
+      onError: () => {
+        addToast('delete-admin-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Oops! Something went wrong.
+              <br />
+              Please, try again!
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [confirmUnAdmin, deleteAdminMutation, addToast]);
 
   return (
     <>
@@ -35,6 +79,7 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
         <Checkbox
           theme="light"
           checked={value}
+          className="block"
           onChange={(e) => {
             if (e.target.checked) {
               setConfirmAdmin(row.original);

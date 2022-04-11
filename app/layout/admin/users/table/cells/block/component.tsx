@@ -35,6 +35,7 @@ export const CellBlock: React.FC<CellBlockProps> = ({
         <Checkbox
           theme="light"
           checked={value}
+          className="block"
           onChange={(e) => {
             if (e.target.checked) {
               setConfirmBlock(row.original);

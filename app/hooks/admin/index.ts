@@ -11,10 +11,14 @@ import ADMIN from 'services/admin';
 // import TEST from 'services/test';
 
 import {
+  DeleteAdminUserProps,
   SaveAdminPublishedProjectProps,
+  SaveAdminUserProps,
   UseAdminPublishedProjectsProps,
   UseAdminUsersProps,
+  UseDeleteAdminUserProps,
   UseSaveAdminPublishedProjectProps,
+  UseSaveAdminUserProps,
 } from './types';
 
 /**
@@ -89,6 +93,67 @@ export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
       meta: data?.meta,
     };
   }, [query, data]);
+}
+
+export function useSaveAdminUser({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveAdminUserProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveAdminUser = ({ uid }: SaveAdminUserProps) => {
+    return ADMIN.request({
+      url: `/users/admins/${uid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveAdminUser, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('admin-users');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteAdminUser({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteAdminUserProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveAdminUser = ({ uid }: DeleteAdminUserProps) => {
+    return ADMIN.request({
+      method: 'DELETE',
+      url: `/users/admins/${uid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveAdminUser, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('admin-users');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }
 
 /**

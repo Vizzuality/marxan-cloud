@@ -7,6 +7,22 @@ export interface UseAdminUsersProps {
   filters?: Record<string, unknown>
 }
 
+export interface UseSaveAdminUserProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SaveAdminUserProps {
+  uid?: string;
+}
+
+export interface UseDeleteAdminUserProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DeleteAdminUserProps {
+  uid?: string;
+}
+
 export interface UseAdminPublishedProjectsProps {
   page: number;
   search?: string;
