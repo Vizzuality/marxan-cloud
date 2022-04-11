@@ -7,6 +7,22 @@ export interface UseAdminUsersProps {
   filters?: Record<string, unknown>
 }
 
+export interface UseSaveBlockUserProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SaveBlockUserProps {
+  uid?: string;
+}
+
+export interface UseDeleteBlockUserProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DeleteBlockUserProps {
+  uid?: string;
+}
+
 export interface UseSaveAdminUserProps {
   requestConfig?: AxiosRequestConfig
 }

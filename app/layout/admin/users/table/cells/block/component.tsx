@@ -1,5 +1,8 @@
 import React, { useCallback, useState } from 'react';
 
+import { useDeleteBlockUser, useSaveBlockUser } from 'hooks/admin';
+import { useToasts } from 'hooks/toast';
+
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Checkbox from 'components/forms/checkbox';
 
@@ -17,17 +20,58 @@ export const CellBlock: React.FC<CellBlockProps> = ({
   const [confirmBlock, setConfirmBlock] = useState<Record<string, any>>();
   const [confirmUnBlock, setConfirmUnBlock] = useState<Record<string, any>>();
 
-  const onBlock = useCallback(() => {
-    console.info(confirmBlock);
+  const saveBlockMutation = useSaveBlockUser({});
+  const deleteBlockMutation = useDeleteBlockUser({});
 
-    setConfirmBlock(null);
-  }, [confirmBlock]);
+  const { addToast } = useToasts();
+
+  const onBlock = useCallback(() => {
+    saveBlockMutation.mutate({
+      uid: confirmBlock.id,
+    }, {
+      onSuccess: () => {
+        setConfirmBlock(null);
+      },
+      onError: () => {
+        addToast('save-admin-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Oops! Something went wrong.
+              <br />
+              Please, try again!
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [confirmBlock, saveBlockMutation, addToast]);
 
   const onUnBlock = useCallback(() => {
-    console.info(confirmUnBlock);
-
-    setConfirmUnBlock(null);
-  }, [confirmUnBlock]);
+    deleteBlockMutation.mutate({
+      uid: confirmUnBlock.id,
+    }, {
+      onSuccess: () => {
+        setConfirmUnBlock(null);
+      },
+      onError: () => {
+        addToast('delete-admin-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              Oops! Something went wrong.
+              <br />
+              Please, try again!
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [confirmUnBlock, deleteBlockMutation, addToast]);
 
   return (
     <>

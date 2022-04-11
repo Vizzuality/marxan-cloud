@@ -47,12 +47,14 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         className: 'text-sm leading-none',
         disableSortBy: true,
         Cell: Owner,
+        width: 100,
       },
       {
         Header: 'Status',
         accessor: 'status',
         disableSortBy: true,
         Cell: Status,
+        width: 75,
       },
     ];
   }, []);

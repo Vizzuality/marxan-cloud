@@ -12,13 +12,17 @@ import ADMIN from 'services/admin';
 
 import {
   DeleteAdminUserProps,
+  DeleteBlockUserProps,
   SaveAdminPublishedProjectProps,
   SaveAdminUserProps,
+  SaveBlockUserProps,
   UseAdminPublishedProjectsProps,
   UseAdminUsersProps,
   UseDeleteAdminUserProps,
+  UseDeleteBlockUserProps,
   UseSaveAdminPublishedProjectProps,
   UseSaveAdminUserProps,
+  UseSaveBlockUserProps,
 } from './types';
 
 /**
@@ -145,6 +149,67 @@ export function useDeleteAdminUser({
   };
 
   return useMutation(saveAdminUser, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('admin-users');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useSaveBlockUser({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveBlockUserProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveBlockUser = ({ uid }: SaveBlockUserProps) => {
+    return ADMIN.request({
+      url: `/users/blocks/${uid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveBlockUser, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('admin-users');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeleteBlockUser({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseDeleteBlockUserProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const saveBlockUser = ({ uid }: DeleteBlockUserProps) => {
+    return ADMIN.request({
+      method: 'DELETE',
+      url: `/users/blocks/${uid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveBlockUser, {
     onSuccess: (data: any, variables, context) => {
       queryClient.invalidateQueries('admin-users');
       console.info('Succces', data, variables, context);
