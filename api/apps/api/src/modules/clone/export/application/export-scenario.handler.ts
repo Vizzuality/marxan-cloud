@@ -7,7 +7,10 @@ import {
 import { ResourceKind } from '@marxan/cloning/domain';
 import { Export, ExportId } from '../domain';
 
-import { ExportScenario } from './export-scenario.command';
+import {
+  ExportScenario,
+  ExportScenarioCommandResult,
+} from './export-scenario.command';
 import { ExportResourcePieces } from './export-resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
 
@@ -20,16 +23,25 @@ export class ExportScenarioHandler
     private readonly eventPublisher: EventPublisher,
   ) {}
 
-  async execute({ scenarioId, projectId }: ExportScenario): Promise<ExportId> {
+  async execute({
+    scenarioId,
+    projectId,
+    ownerId,
+  }: ExportScenario): Promise<ExportScenarioCommandResult> {
     const kind = ResourceKind.Scenario;
+    const cloning = true;
     const pieces = this.resourcePieces.resolveForScenario(scenarioId, kind);
+
     const exportRequest = this.eventPublisher.mergeObjectContext(
-      Export.newOne(projectId, kind, pieces),
+      Export.newOne(projectId, kind, ownerId, pieces, cloning),
     );
     await this.exportRepository.save(exportRequest);
 
     exportRequest.commit();
 
-    return exportRequest.id;
+    return {
+      exportId: exportRequest.id,
+      importResourceId: exportRequest.importResourceId!,
+    };
   }
 }
