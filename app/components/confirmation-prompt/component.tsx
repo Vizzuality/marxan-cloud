@@ -14,6 +14,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
   open,
   dismissible = true,
   icon,
+  iconClassName,
   danger = false,
   options = {
     acceptText: 'Yes',
@@ -46,11 +47,11 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
       </header>
       <div
         className={classnames({
-          'flex justify-start items-end': true,
+          'flex justify-between items-end': true,
           'mt-10 sm:mt-12': !icon && !description,
           'mt-8': !icon && !!description,
           'mt-10 sm:mt-1': !!icon && !description,
-          'mt-8 sm:-mt-2': !!icon && !!description,
+          'mt-8 sm:mt-1': !!icon && !!description,
         })}
       >
         <div className={classnames({
@@ -80,8 +81,16 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
             </Button>
           )}
         </div>
+
         {icon && (
-          <Icon icon={icon} className="hidden ml-auto sm:block flex-shrink-1 flex-grow-1 w-36" />
+          <Icon
+            icon={icon}
+            className={classnames({
+              'hidden sm:block flex-shrink-1 flex-grow-1': true,
+              'ml-auto w-36': !iconClassName,
+              [iconClassName]: !!iconClassName,
+            })}
+          />
         )}
       </div>
     </div>

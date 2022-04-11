@@ -92,8 +92,8 @@ export const CellBlock: React.FC<CellBlockProps> = ({
 
       <ConfirmationPrompt
         title={`Are you sure you want to block "${confirmBlock?.displayName}"?`}
-        description="The action can be reverted."
         icon={BLOCK_WARNING_SVG}
+        iconClassName="w-16 h-16"
         open={!!confirmBlock}
         onAccept={onBlock}
         onRefuse={() => setConfirmBlock(null)}
@@ -101,8 +101,8 @@ export const CellBlock: React.FC<CellBlockProps> = ({
       />
       <ConfirmationPrompt
         title={`Are you sure you want to unblock "${confirmUnBlock?.displayName}"?`}
-        description="The action can be reverted."
         icon={BLOCK_WARNING_SVG}
+        iconClassName="w-16 h-16"
         open={!!confirmUnBlock}
         onAccept={onUnBlock}
         onRefuse={() => setConfirmUnBlock(null)}

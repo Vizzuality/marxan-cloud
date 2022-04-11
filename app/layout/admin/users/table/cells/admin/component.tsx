@@ -92,8 +92,9 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
 
       <ConfirmationPrompt
         title={`Are you sure you want to give admin permissions to "${confirmAdmin?.displayName}"?`}
-        description="The action can be reverted."
+        // description="The action can be reverted."
         icon={ADMIN_WARNING_SVG}
+        iconClassName="w-16 h-16"
         open={!!confirmAdmin}
         onAccept={onAdmin}
         onRefuse={() => setConfirmAdmin(null)}
@@ -101,8 +102,9 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
       />
       <ConfirmationPrompt
         title={`Are you sure you want revoke admin permissions from "${confirmUnAdmin?.displayName}"?`}
-        description="The action can be reverted."
+        // description="The action can be reverted."
         icon={ADMIN_WARNING_SVG}
+        iconClassName="w-16 h-16"
         open={!!confirmUnAdmin}
         onAccept={onUnAdmin}
         onRefuse={() => setConfirmUnAdmin(null)}
