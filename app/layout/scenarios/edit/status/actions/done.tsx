@@ -103,6 +103,7 @@ export const useScenarioActionsDone = () => {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
       },
       onError: () => {
@@ -119,6 +120,7 @@ export const useScenarioActionsDone = () => {
     sid,
     scenarioMutation,
     scenarioData?.metadata,
+    queryClient,
     dispatch,
     setJob,
     setCache,
