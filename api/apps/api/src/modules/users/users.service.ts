@@ -264,6 +264,15 @@ export class UsersService extends AppBaseService<
     this.authenticationService.invalidateAllTokensOfUser(userId);
   }
 
+  private async markAsUnblocked(userId: string): Promise<void> {
+    await this.repository.update(
+      { id: userId },
+      {
+        isBlocked: false,
+      },
+    );
+  }
+
   async getPlatformAdmins(
     userId: string,
   ): Promise<Either<typeof forbiddenError, PlatformAdminEntity[]>> {
@@ -317,6 +326,25 @@ export class UsersService extends AppBaseService<
     await Promise.all(
       userIds.map(async (userId) => {
         await this.markAsBlocked(userId);
+      }),
+    );
+    return right(void 0);
+  }
+
+  async unblockUsers(
+    loggedUserId: string,
+    userIds: string[],
+  ): Promise<Either<typeof forbiddenError | typeof badRequestError, void>> {
+    if (userIds.includes(loggedUserId)) {
+      return left(badRequestError);
+    }
+    if (!(await this.isPlatformAdmin(loggedUserId))) {
+      return left(forbiddenError);
+    }
+
+    await Promise.all(
+      userIds.map(async (userId) => {
+        await this.markAsUnblocked(userId);
       }),
     );
     return right(void 0);
