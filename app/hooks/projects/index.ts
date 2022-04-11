@@ -389,3 +389,28 @@ export function useSaveProjectDownload({
     },
   });
 }
+
+export function useExportId(id) {
+  const [session] = useSession();
+
+  const query = useQuery(['projects-exportId', id], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${id}/export`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
