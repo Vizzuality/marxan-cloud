@@ -459,20 +459,65 @@ describe('UsersModule (e2e)', () => {
       expect(WhenRemovingOneself.status).toEqual(400);
     });
 
-    test('A platform admin should be able to block existing users', async () => {
-      const username = `${v4()}@example.com`;
-      const password = v4();
-      const { user } = await GivenUserIsCreated(app, username, password);
+    test('A platform admin should be able to block existing users by batch', async () => {
+      const firstUsername = `${v4()}@example.com`;
+      const firstPassword = v4();
+      const secondUsername = `${v4()}@example.com`;
+      const secondPassword = v4();
+      const { user: firstUser } = await GivenUserIsCreated(
+        app,
+        firstUsername,
+        firstPassword,
+      );
+      const { user: secondUser } = await GivenUserIsCreated(
+        app,
+        secondUsername,
+        secondPassword,
+      );
 
       cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
+        await usersRepo.delete({ id: firstUser.id });
+        return;
+      });
+      cleanups.push(async () => {
+        await usersRepo.delete({ id: secondUser.id });
         return;
       });
 
       const WhenBlockingAUser = await request(app.getHttpServer())
         .patch(`/api/v1/users/admins/block-users`)
         .set('Authorization', `Bearer ${adminToken}`)
-        .send({ userIds: [user.id] });
+        .send({ userIds: [firstUser.id, secondUser.id] });
+      expect(WhenBlockingAUser.status).toEqual(200);
+
+      const WhenLoginAsFirstBlockedUser = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send({
+          firstUsername,
+          firstPassword,
+        });
+      expect(WhenLoginAsFirstBlockedUser.status).toEqual(401);
+      const WhenLoginAsSecondBlockedUser = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send({
+          secondUsername,
+          secondPassword,
+        });
+      expect(WhenLoginAsSecondBlockedUser.status).toEqual(401);
+    });
+
+    test('A platform admin should be able to block a single user by id', async () => {
+      const username = `${v4()}@example.com`;
+      const password = v4();
+      const { user } = await GivenUserIsCreated(app, username, password);
+      cleanups.push(async () => {
+        await usersRepo.delete({ id: user.id });
+        return;
+      });
+
+      const WhenBlockingAUser = await request(app.getHttpServer())
+        .post(`/api/v1/users/block/${user.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
       expect(WhenBlockingAUser.status).toEqual(200);
 
       const WhenLoginAsBlockedUser = await request(app.getHttpServer())
@@ -482,6 +527,41 @@ describe('UsersModule (e2e)', () => {
           password,
         });
       expect(WhenLoginAsBlockedUser.status).toEqual(401);
+    });
+
+    test('A platform admin should be able to unblock a single user by id', async () => {
+      const username = `${v4()}@example.com`;
+      const password = v4();
+      const { user } = await GivenUserIsCreated(app, username, password);
+      cleanups.push(async () => {
+        await usersRepo.delete({ id: user.id });
+        return;
+      });
+      const WhenBlockingAUser = await request(app.getHttpServer())
+        .post(`/api/v1/users/block/${user.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenBlockingAUser.status).toEqual(200);
+
+      const WhenLoginAsBlockedUser = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send({
+          username,
+          password,
+        });
+      expect(WhenLoginAsBlockedUser.status).toEqual(401);
+
+      const WhenUnblockingAUser = await request(app.getHttpServer())
+        .delete(`/api/v1/users/block/${user.id}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenUnblockingAUser.status).toEqual(200);
+
+      const WhenLoginAsUnBlockedUser = await request(app.getHttpServer())
+        .post('/auth/sign-in')
+        .send({
+          username,
+          password,
+        });
+      expect(WhenLoginAsUnBlockedUser.status).toEqual(201);
     });
 
     test('A platform admin should not be able to block oneself', async () => {

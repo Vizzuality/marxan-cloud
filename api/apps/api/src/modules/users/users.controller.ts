@@ -239,6 +239,57 @@ export class UsersController {
   }
 
   @ApiOperation({
+    description: 'Block user by Id.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Post('users/block/:id')
+  async blockUser(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Param('id', ParseUUIDPipe) userIdToBlock: string,
+  ): Promise<void> {
+    const result = await this.service.blockUsers(req.user.id, [userIdToBlock]);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case badRequestError:
+          throw new BadRequestException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+  }
+  @ApiOperation({
+    description: 'Unblock user by Id.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Delete('users/block/:id')
+  async unblockUser(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Param('id', ParseUUIDPipe) userIdToUnblock: string,
+  ): Promise<void> {
+    const result = await this.service.unblockUsers(req.user.id, [
+      userIdToUnblock,
+    ]);
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case badRequestError:
+          throw new BadRequestException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+  }
+
+  @ApiOperation({
     description: 'Find users by full email address.',
   })
   @ApiOkResponse()
