@@ -8,6 +8,7 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { FileRepository } from '@marxan/files-repository';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import {
+  MarxanExecutionMetadataGeoEntity,
   OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
@@ -163,6 +164,32 @@ export async function GivenScenarioExists(
       ...scenarioData,
     })
     .execute();
+}
+
+export function GivenMarxanExecutionMetadata(
+  em: EntityManager,
+  scenarioId: string,
+  amountOfRuns: number,
+) {
+  return em.getRepository(MarxanExecutionMetadataGeoEntity).save(
+    Array(amountOfRuns)
+      .fill('')
+      .map(() => ({
+        scenarioId,
+        stdOutput: 'success',
+        inputZip: Buffer.from('input zip file'),
+        outputZip: Buffer.from('output zip file'),
+      })),
+  );
+}
+
+export function DeleteMarxanExecutionMetadata(
+  em: EntityManager,
+  scenarioId: string,
+) {
+  return em
+    .getRepository(MarxanExecutionMetadataGeoEntity)
+    .delete({ scenarioId });
 }
 
 export async function DeleteProjectAndOrganization(

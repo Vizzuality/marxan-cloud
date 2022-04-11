@@ -3,7 +3,7 @@ import { SlugService } from '../../../../utils/src/slug.service';
 import { ComponentLocation, ResourceKind } from '../../domain';
 import { ClonePiece } from '../../domain/clone-piece';
 import { exportConfigRelativePath } from './export-config';
-import { featuresSpecificationRelativePath } from './scenario-features-specification';
+import { marxanExecutionMetadataRelativePath } from './marxan-execution-metadata';
 import { planningAreaCustomRelativePath } from './planning-area-custom';
 import { planningAreaCustomGeoJSONRelativePath } from './planning-area-custom-geojson';
 import { planningAreaGadmRelativePath } from './planning-area-gadm';
@@ -13,6 +13,7 @@ import { projectCustomFeaturesRelativePath } from './project-custom-features';
 import { projectCustomProtectedAreasRelativePath } from './project-custom-protected-areas';
 import { projectMetadataRelativePath } from './project-metadata';
 import { scenarioFeaturesDataRelativePath } from './scenario-features-data';
+import { featuresSpecificationRelativePath } from './scenario-features-specification';
 import { scenarioInputFolderRelativePath } from './scenario-input-folder';
 import { scenarioMetadataRelativePath } from './scenario-metadata';
 import { scenarioOutputFolderRelativePath } from './scenario-output-folder';
@@ -38,62 +39,6 @@ type UriResolver = (
   location: string,
   extraData?: UriResolverExtraData,
 ) => ComponentLocation[];
-
-function scenarioPieceUriResolver(relativePath: string): UriResolver {
-  return (location, extraData) => {
-    if (!extraData)
-      throw new Error(
-        'It is not possible generate scenario pieces uris without export kind or old scenario id',
-      );
-
-    return [
-      new ComponentLocation(
-        location,
-        extraData.kind === ResourceKind.Project
-          ? `scenarios/${extraData.scenarioId}/${relativePath}`
-          : relativePath,
-      ),
-    ];
-  };
-}
-
-function marxanDataProjectPieceUriResolver(relativePath: string): UriResolver {
-  return (location) => {
-    return [new ComponentLocation(location, `marxan-data/${relativePath}`)];
-  };
-}
-
-function marxanDataScenarioPieceUriResolver(relativePath: string): UriResolver {
-  return (location, extraData) => {
-    if (!extraData)
-      throw new Error(
-        'It is not possible generate marxan data scenario pieces uris without export kind or old scenario id',
-      );
-
-    const { kind, scenarioId, scenarioName } = extraData;
-
-    if (kind === ResourceKind.Project && !isDefined(scenarioName)) {
-      throw new Error(
-        'It is not possible generate marxan data scenario pieces uris for project exports without scenario name',
-      );
-    }
-
-    const slugService = new SlugService();
-
-    const scenarioFolder = slugService.stringToSlug(
-      `${scenarioName}-${scenarioId}`,
-    );
-
-    return [
-      new ComponentLocation(
-        location,
-        extraData.kind === ResourceKind.Project
-          ? `marxan-data/${scenarioFolder}/${relativePath}`
-          : `marxan-data/${relativePath}`,
-      ),
-    ];
-  };
-}
 
 export const clonePieceImportOrder: Record<ClonePiece, number> = {
   // ExportConfig pieces should never be imported. When a import
@@ -122,6 +67,7 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ScenarioFeaturesData]: 2,
   //
   [ClonePiece.ScenarioRunResults]: 3,
+  [ClonePiece.MarxanExecutionMetadata]: 3,
   [ClonePiece.FeaturesSpecification]: 3,
 };
 
@@ -136,14 +82,13 @@ export class ClonePieceUrisResolver {
     [ClonePiece.PlanningAreaCustom]: (location) => [
       new ComponentLocation(location, planningAreaCustomRelativePath),
     ],
-    [ClonePiece.PlanningAreaCustomGeojson]: marxanDataProjectPieceUriResolver(
+    [ClonePiece.PlanningAreaCustomGeojson]: ClonePieceUrisResolver.marxanDataProjectPieceUriResolver(
       planningAreaCustomGeoJSONRelativePath,
     ),
-
     [ClonePiece.PlanningUnitsGrid]: (location) => [
       new ComponentLocation(location, planningUnitsGridRelativePath),
     ],
-    [ClonePiece.PlanningUnitsGridGeojson]: marxanDataProjectPieceUriResolver(
+    [ClonePiece.PlanningUnitsGridGeojson]: ClonePieceUrisResolver.marxanDataProjectPieceUriResolver(
       planningUnitsGridGeoJSONRelativePath,
     ),
     [ClonePiece.ProjectMetadata]: (location) => [
@@ -155,31 +100,90 @@ export class ClonePieceUrisResolver {
     [ClonePiece.ProjectCustomFeatures]: (location) => [
       new ComponentLocation(location, projectCustomFeaturesRelativePath),
     ],
-    [ClonePiece.FeaturesSpecification]: scenarioPieceUriResolver(
+    [ClonePiece.FeaturesSpecification]: ClonePieceUrisResolver.scenarioPieceUriResolver(
       featuresSpecificationRelativePath,
     ),
-    [ClonePiece.ScenarioMetadata]: scenarioPieceUriResolver(
+    [ClonePiece.ScenarioMetadata]: ClonePieceUrisResolver.scenarioPieceUriResolver(
       scenarioMetadataRelativePath,
     ),
-    [ClonePiece.ScenarioPlanningUnitsData]: scenarioPieceUriResolver(
+    [ClonePiece.ScenarioPlanningUnitsData]: ClonePieceUrisResolver.scenarioPieceUriResolver(
       scenarioPlanningUnitsDataRelativePath,
     ),
-    [ClonePiece.ScenarioProtectedAreas]: scenarioPieceUriResolver(
+    [ClonePiece.ScenarioProtectedAreas]: ClonePieceUrisResolver.scenarioPieceUriResolver(
       scenarioProtectedAreasRelativePath,
     ),
-    [ClonePiece.ScenarioFeaturesData]: scenarioPieceUriResolver(
+    [ClonePiece.ScenarioFeaturesData]: ClonePieceUrisResolver.scenarioPieceUriResolver(
       scenarioFeaturesDataRelativePath,
     ),
-    [ClonePiece.ScenarioRunResults]: scenarioPieceUriResolver(
+    [ClonePiece.ScenarioRunResults]: ClonePieceUrisResolver.scenarioPieceUriResolver(
       scenarioRunResultsRelativePath,
     ),
-    [ClonePiece.ScenarioInputFolder]: marxanDataScenarioPieceUriResolver(
+    [ClonePiece.ScenarioInputFolder]: ClonePieceUrisResolver.marxanDataScenarioPieceUriResolver(
       scenarioInputFolderRelativePath,
     ),
-    [ClonePiece.ScenarioOutputFolder]: marxanDataScenarioPieceUriResolver(
+    [ClonePiece.ScenarioOutputFolder]: ClonePieceUrisResolver.marxanDataScenarioPieceUriResolver(
       scenarioOutputFolderRelativePath,
     ),
+    [ClonePiece.MarxanExecutionMetadata]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+      marxanExecutionMetadataRelativePath,
+    ),
   };
+
+  static scenarioPieceUriResolver(relativePath: string): UriResolver {
+    return (location, extraData) => {
+      if (!extraData)
+        throw new Error(
+          'It is not possible generate scenario pieces uris without export kind or old scenario id',
+        );
+
+      return [
+        new ComponentLocation(
+          location,
+          extraData.kind === ResourceKind.Project
+            ? `scenarios/${extraData.scenarioId}/${relativePath}`
+            : relativePath,
+        ),
+      ];
+    };
+  }
+
+  static marxanDataProjectPieceUriResolver(relativePath: string): UriResolver {
+    return (location) => {
+      return [new ComponentLocation(location, `marxan-data/${relativePath}`)];
+    };
+  }
+
+  static marxanDataScenarioPieceUriResolver(relativePath: string): UriResolver {
+    return (location, extraData) => {
+      if (!extraData)
+        throw new Error(
+          'It is not possible generate marxan data scenario pieces uris without export kind or old scenario id',
+        );
+
+      const { kind, scenarioId, scenarioName } = extraData;
+
+      if (kind === ResourceKind.Project && !isDefined(scenarioName)) {
+        throw new Error(
+          'It is not possible generate marxan data scenario pieces uris for project exports without scenario name',
+        );
+      }
+
+      const slugService = new SlugService();
+
+      const scenarioFolder = slugService.stringToSlug(
+        `${scenarioName}-${scenarioId}`,
+      );
+
+      return [
+        new ComponentLocation(
+          location,
+          extraData.kind === ResourceKind.Project
+            ? `marxan-data/${scenarioFolder}/${relativePath}`
+            : `marxan-data/${relativePath}`,
+        ),
+      ];
+    };
+  }
 
   static resolveFor(
     clonePiece: ClonePiece,
