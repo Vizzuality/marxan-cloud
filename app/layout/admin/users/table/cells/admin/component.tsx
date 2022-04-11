@@ -6,7 +6,7 @@ import { useToasts } from 'hooks/toast';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Checkbox from 'components/forms/checkbox';
 
-import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import ADMIN_WARNING_SVG from 'svgs/notifications/admin.svg?sprite';
 
 export interface CellAdminProps {
   value: boolean,
@@ -93,7 +93,7 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
       <ConfirmationPrompt
         title={`Are you sure you want to give admin permissions to "${confirmAdmin?.displayName}"?`}
         description="The action can be reverted."
-        icon={DELETE_WARNING_SVG}
+        icon={ADMIN_WARNING_SVG}
         open={!!confirmAdmin}
         onAccept={onAdmin}
         onRefuse={() => setConfirmAdmin(null)}
@@ -102,7 +102,7 @@ export const CellAdmin: React.FC<CellAdminProps> = ({
       <ConfirmationPrompt
         title={`Are you sure you want revoke admin permissions from "${confirmUnAdmin?.displayName}"?`}
         description="The action can be reverted."
-        icon={DELETE_WARNING_SVG}
+        icon={ADMIN_WARNING_SVG}
         open={!!confirmUnAdmin}
         onAccept={onUnAdmin}
         onRefuse={() => setConfirmUnAdmin(null)}

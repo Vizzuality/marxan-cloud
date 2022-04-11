@@ -170,7 +170,7 @@ export function useSaveBlockUser({
 
   const saveBlockUser = ({ uid }: SaveBlockUserProps) => {
     return ADMIN.request({
-      url: `/users/blocks/${uid}`,
+      url: `/users/block/${uid}`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -201,7 +201,7 @@ export function useDeleteBlockUser({
   const saveBlockUser = ({ uid }: DeleteBlockUserProps) => {
     return ADMIN.request({
       method: 'DELETE',
-      url: `/users/blocks/${uid}`,
+      url: `/users/block/${uid}`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },

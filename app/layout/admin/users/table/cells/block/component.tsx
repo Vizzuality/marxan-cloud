@@ -6,7 +6,7 @@ import { useToasts } from 'hooks/toast';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Checkbox from 'components/forms/checkbox';
 
-import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+import BLOCK_WARNING_SVG from 'svgs/notifications/block.svg?sprite';
 
 export interface CellBlockProps {
   value: boolean,
@@ -93,7 +93,7 @@ export const CellBlock: React.FC<CellBlockProps> = ({
       <ConfirmationPrompt
         title={`Are you sure you want to block "${confirmBlock?.displayName}"?`}
         description="The action can be reverted."
-        icon={DELETE_WARNING_SVG}
+        icon={BLOCK_WARNING_SVG}
         open={!!confirmBlock}
         onAccept={onBlock}
         onRefuse={() => setConfirmBlock(null)}
@@ -102,7 +102,7 @@ export const CellBlock: React.FC<CellBlockProps> = ({
       <ConfirmationPrompt
         title={`Are you sure you want to unblock "${confirmUnBlock?.displayName}"?`}
         description="The action can be reverted."
-        icon={DELETE_WARNING_SVG}
+        icon={BLOCK_WARNING_SVG}
         open={!!confirmUnBlock}
         onAccept={onUnBlock}
         onRefuse={() => setConfirmUnBlock(null)}

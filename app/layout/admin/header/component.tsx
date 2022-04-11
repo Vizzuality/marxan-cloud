@@ -18,13 +18,13 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   backToHref,
 }: AdminHeaderProps) => {
   return (
-    <div className="my-10 space-y-2">
+    <div className="my-10 space-y-3">
       <Link
         href={backToHref || '/admin'}
       >
         <a href={backToHref || '/admin'} className="inline-flex items-center space-x-2 group">
           <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 border border-gray-200 rounded-full group-hover:border-gray-700">
-            <Icon icon={ARROW_LEFT_SVG} className="relative w-4 h-4 -left-px" />
+            <Icon icon={ARROW_LEFT_SVG} className="relative w-3 h-3 -left-px" />
           </div>
           <div className="flex-grow group-hover:underline">
             {backToName || 'Back to Admin Panel'}
