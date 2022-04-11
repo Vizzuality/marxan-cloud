@@ -1,14 +1,14 @@
 import React from 'react';
 
+import AdminHeader from 'layout/admin/header';
+
 export interface AdminUsersHeaderProps {
 
 }
 
 export const AdminUsersHeader: React.FC<AdminUsersHeaderProps> = () => {
   return (
-    <div>
-      <h2 className="my-10 text-5xl font-medium font-heading">Users</h2>
-    </div>
+    <AdminHeader title="Users" />
   );
 };
 
