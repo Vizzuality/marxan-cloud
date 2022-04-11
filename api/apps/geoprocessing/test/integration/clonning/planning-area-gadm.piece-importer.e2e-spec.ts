@@ -85,6 +85,7 @@ const getFixtures = async () => {
   await sandbox.init();
   const organizationId = v4();
   const projectId = v4();
+  const userId = v4();
 
   const entityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
@@ -124,6 +125,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaGAdm,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -135,6 +137,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaGAdm,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoGadmPlanningAreaFileIsAvailable: () => {

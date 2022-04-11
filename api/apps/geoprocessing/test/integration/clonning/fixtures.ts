@@ -3,21 +3,34 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
-import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { Readable, Transform } from 'stream';
-import { DeepPartial, EntityManager, In } from 'typeorm';
 import { ArchiveLocation } from '@marxan/cloning/domain';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { FileRepository } from '@marxan/files-repository';
+import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
+import {
+  OutputScenariosFeaturesDataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { ProtectedArea } from '@marxan/protected-areas';
 import {
-  ScenariosPuCostDataGeo,
   PlanningUnitGridShape,
+  ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import * as archiver from 'archiver';
+import { hash } from 'bcrypt';
 import { isLeft } from 'fp-ts/lib/Either';
+import { Readable, Transform } from 'stream';
+import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
+
+export type TestSpecification = {
+  id: string;
+  scenario_id: string;
+  draft: boolean;
+  raw: Record<string, any>;
+};
 
 const randomGeometriesBoundary =
   '0103000020E6100000010000000A00000000000000602630C0A12CF6C9EE913C4000000000F46430C0C6D6EE9332863C4000000000C07A30C06718E5AE99673C40000000008ADD30C0AE5F48C4D85B3C40000000006EAE30C0EF8810F1D7033C4000000000DC7C30C0B0AB582D481D3C4000000000246230C0712DA50F7E533C4000000000086030C0323EBB984F6B3C40000000009E2430C03B55C7C9C18B3C4000000000602630C0A12CF6C9EE913C40';
@@ -65,6 +78,31 @@ export async function PrepareZipFile(
 
   if (isLeft(uriOrError)) throw new Error("couldn't save file");
   return new ArchiveLocation(uriOrError.right);
+}
+
+export function GivenUserExists(
+  em: EntityManager,
+  userId: string,
+  projectId: string,
+) {
+  return em
+    .createQueryBuilder()
+    .insert()
+    .into(`users`)
+    .values({
+      id: userId,
+      email: `${userId}@${projectId}.com`,
+      password_hash: hash('supersecretpassword', 10),
+    })
+    .execute();
+}
+
+export function DeleteUser(em: EntityManager, userId: string) {
+  return em
+    .createQueryBuilder()
+    .delete()
+    .from('user')
+    .where('id = :userId', { userId });
 }
 
 export function GivenOrganizationExists(
@@ -352,6 +390,255 @@ export async function GivenCustomProtectedAreas(
     .execute();
 
   return insertValues;
+}
+
+export async function GivenFeatures(
+  em: EntityManager,
+  platformFeaturesAmount: number,
+  customFeaturesAmount: number,
+  projectId: string,
+) {
+  const customFeatures = Array(customFeaturesAmount)
+    .fill(0)
+    .map((_, index) => ({
+      id: v4(),
+      feature_class_name: `custom-${projectId}-${index + 1}`,
+      tag: 'species',
+      creation_status: 'done',
+      project_id: projectId,
+    }));
+  const platformFeatures = Array(platformFeaturesAmount)
+    .fill(0)
+    .map((_, index) => ({
+      id: v4(),
+      feature_class_name: `platform-${projectId}-${index + 1}`,
+      tag: 'species',
+      creation_status: 'created',
+      project_id: null,
+    }));
+
+  await Promise.all(
+    [...customFeatures, ...platformFeatures].map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('features')
+        .values(values)
+        .execute(),
+    ),
+  );
+
+  return {
+    customFeatures,
+    platformFeatures,
+  };
+}
+
+export async function DeleteFeatures(em: EntityManager, featureIds: string[]) {
+  if (featureIds.length === 0) return;
+
+  await em
+    .createQueryBuilder()
+    .delete()
+    .from('features')
+    .where('id IN (:...featureIds)', { featureIds })
+    .execute();
+}
+
+export async function GivenFeaturesData(
+  em: EntityManager,
+  amountOfRecordsForEachFeature: number,
+  featureIds: string[],
+): Promise<{ id: string; hash: string; feature_id: string }[]> {
+  const geometries = await GenerateRandomGeometries(
+    em,
+    amountOfRecordsForEachFeature * featureIds.length,
+    false,
+  );
+
+  const insertValues = featureIds.flatMap((featureId, featureIndex) =>
+    Array(amountOfRecordsForEachFeature)
+      .fill(0)
+      .map((_, dataIndex) => ({
+        id: v4(),
+        featureId,
+        properties: { featureIndex, dataIndex },
+        source: GeometrySource.user_imported,
+        theGeom: () =>
+          `'${geometries[
+            featureIndex * amountOfRecordsForEachFeature + dataIndex
+          ].toString('hex')}'`,
+      })),
+  );
+
+  const result = await em
+    .createQueryBuilder()
+    .insert()
+    .into(GeoFeatureGeometry)
+    .values(insertValues)
+    .returning(['id', 'hash', 'featureId'])
+    .execute();
+
+  return result.raw;
+}
+
+export async function GivenScenarioFeaturesData(
+  em: EntityManager,
+  amountOfFeaturesDataRecordsForEachFeature: number,
+  featureIds: string[],
+  scenarioId: string,
+  scenarioFeaturesData: DeepPartial<ScenarioFeaturesData> = {},
+  opts: { startingIndex: number } = { startingIndex: 0 },
+) {
+  const featuresData = await GivenFeaturesData(
+    em,
+    amountOfFeaturesDataRecordsForEachFeature,
+    featureIds,
+  );
+
+  const insertValues = featuresData.map((data, index) => ({
+    ...scenarioFeaturesData,
+    id: v4(),
+    featureDataId: data.id,
+    scenarioId,
+    featureId: opts.startingIndex + index + 1,
+  }));
+
+  await em
+    .createQueryBuilder()
+    .insert()
+    .into(ScenarioFeaturesData)
+    .values(insertValues)
+    .execute();
+
+  return insertValues;
+}
+
+export async function GivenOutputScenarioFeaturesData(
+  em: EntityManager,
+  amountOfFeaturesDataRecordsForEachFeature: number,
+  amountOfOutputDataRecordsForEachScenarioFeaturesData: number,
+  featureIds: string[],
+  scenarioId: string,
+  outputScenarioFeaturesData: DeepPartial<OutputScenariosFeaturesDataGeoEntity> = {},
+  scenarioFeaturesData: DeepPartial<ScenarioFeaturesData> = {},
+) {
+  const scenarioFeaturesDataIds = (
+    await GivenScenarioFeaturesData(
+      em,
+      amountOfFeaturesDataRecordsForEachFeature,
+      featureIds,
+      scenarioId,
+      scenarioFeaturesData,
+    )
+  ).map((value) => value.id);
+
+  await em
+    .createQueryBuilder()
+    .insert()
+    .into(OutputScenariosFeaturesDataGeoEntity)
+    .values(
+      scenarioFeaturesDataIds.flatMap((scenarioFeaturesDataId) =>
+        Array(amountOfOutputDataRecordsForEachScenarioFeaturesData)
+          .fill(0)
+          .map((_, index) => ({
+            totalArea: 1000,
+            ...outputScenarioFeaturesData,
+            runId: index,
+            featureScenarioId: scenarioFeaturesDataId,
+          })),
+      ),
+    )
+    .execute();
+}
+
+export async function GivenSpecifications(
+  em: EntityManager,
+  featuresIds: string[],
+  scenarioId: string,
+) {
+  const specifications = featuresIds.map((featureId) => {
+    return {
+      id: v4(),
+      scenario_id: scenarioId,
+      draft: true,
+      raw: {
+        status: 'any',
+        features: [
+          {
+            featureId,
+            innerObject: [
+              {
+                featureId,
+                innnerObject: {
+                  featureId,
+                },
+              },
+              {
+                featureId,
+                nullValue: null,
+              },
+            ],
+          },
+        ],
+        featureId,
+        emptyArray: [],
+        emptyObject: {},
+      },
+    };
+  });
+
+  await Promise.all(
+    specifications.map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('specifications')
+        .values(values)
+        .execute(),
+    ),
+  );
+
+  return specifications;
+}
+
+export async function GivenSpecificationFeaturesConfig(
+  em: EntityManager,
+  featureId: string,
+  specifications: TestSpecification[],
+  featuresConfigsPerSpecification: number,
+  configtData: Record<string, any> = {},
+) {
+  const specificationFeaturesConfig = specifications.flatMap(
+    (specification) => {
+      return Array(featuresConfigsPerSpecification)
+        .fill(0)
+        .map(() => {
+          return {
+            id: v4(),
+            specification_id: specification.id,
+            base_feature_id: featureId,
+            against_feature_id: null,
+            operation: 'copy',
+            features_determined: false,
+            split_by_property: null,
+            select_sub_sets: null,
+            ...configtData,
+          };
+        });
+    },
+  );
+
+  await Promise.all(
+    specificationFeaturesConfig.map((values) =>
+      em
+        .createQueryBuilder()
+        .insert()
+        .into('specification_feature_configs')
+        .values(values)
+        .execute(),
+    ),
+  );
 }
 
 export async function DeleteProtectedAreas(em: EntityManager, ids: string[]) {

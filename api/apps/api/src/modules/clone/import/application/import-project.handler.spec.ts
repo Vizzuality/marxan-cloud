@@ -6,15 +6,19 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import {
+  Failure as ArchiveFailure,
+  invalidFiles,
+} from '@marxan/cloning/infrastructure/archive-reader.port';
+import {
   ExportConfigContent,
   ProjectExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
-import { ExportConfigReader } from './export-config-reader';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
   ImportComponent,
@@ -22,15 +26,15 @@ import {
   ImportRequested,
   PieceImportRequested,
 } from '../domain';
+import { ImportComponentStatuses } from '../domain/import/import-component-status';
+import { ExportConfigReader } from './export-config-reader';
 import {
-  Failure as ArchiveFailure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
+  ImportProject,
+  ImportProjectCommandResult,
+} from './import-project.command';
+import { ImportProjectHandler } from './import-project.handler';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
-import { ImportProjectHandler } from './import-project.handler';
-import { ImportProject } from './import-project.command';
-import { ImportComponentStatuses } from '../domain/import/import-component-status';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -80,6 +84,7 @@ const getFixtures = async () => {
   await sandbox.init();
 
   let resourceId: ResourceId;
+  const ownerId = UserId.create();
 
   const events: IEvent[] = [];
   sandbox.get(EventBus).subscribe((event) => events.push(event));
@@ -107,11 +112,11 @@ const getFixtures = async () => {
     },
     WhenRequestingImport: async () => {
       const importResult = await sut.execute(
-        new ImportProject(new ArchiveLocation(`whatever`)),
+        new ImportProject(new ArchiveLocation(`whatever`), ownerId),
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
-          repo.entities[importResult.right].resourceId,
+          repo.entities[importResult.right.importId].resourceId,
         );
       return importResult;
     },
@@ -120,7 +125,9 @@ const getFixtures = async () => {
     ) => {
       expect(isRight(importResult)).toBeTruthy();
       expect(
-        repo.entities[(importResult as Right<string>).right],
+        repo.entities[
+          (importResult as Right<ImportProjectCommandResult>).right.importId
+        ],
       ).toBeDefined();
     },
     ThenImportFails: (

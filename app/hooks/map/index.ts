@@ -19,6 +19,7 @@ import {
 
   UseLegend,
   UseGridPreviewLayer,
+  UseScenarioBLMLayer,
 } from './types';
 
 /**
@@ -973,7 +974,37 @@ export function usePUCompareLayer({
   }, [active, sid1, sid2, cache, options, COLOR_RAMP]);
 }
 
-// PUGrid
+export function useScenarioBlmLayer({
+  active, sId, blm, cache = 0,
+}: UseScenarioBLMLayer) {
+  return useMemo(() => {
+    if (!active || !sId) return null;
+
+    return {
+      id: `scenario-blm-layer-${sId}-${blm}-${cache}`,
+      type: 'vector',
+      source: {
+        type: 'vector',
+        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sId}/calibration/tiles/${blm}/{z}/{x}/{y}.mvt`],
+      },
+      render: {
+        layers: [
+          {
+            type: 'fill',
+            'source-layer': 'layer0',
+            paint: {
+              'fill-color': COLORS.primary,
+              'fill-opacity': 0.5,
+            },
+
+          },
+        ],
+      },
+    };
+  }, [active, sId, blm, cache]);
+}
+
+// Legend
 export function useLegend({
   layers, options = {},
 }: UseLegend) {

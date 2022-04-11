@@ -53,6 +53,13 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
         }
 
+        volume {
+          name = "shared-spatial-data-storage"
+          persistent_volume_claim {
+            claim_name = var.backend_storage_pvc_name
+          }
+        }
+
         container {
           image             = var.image
           image_pull_policy = "Always"
@@ -60,6 +67,10 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
 
           args = ["start"]
 
+          volume_mount {
+            mount_path  = "/tmp/storage"
+            name        = "shared-spatial-data-storage"
+          }
 
           env {
             name = "API_POSTGRES_HOST"
@@ -216,14 +227,24 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
             value = var.namespace
           }
 
+          env {
+            name  = "BACKEND_CLEANUP_TEMPORARY_FOLDERS"
+            value = var.cleanup_temporary_folders
+          }
+
+          env {
+            name  = "GEO_POSTGRES_LOGGING"
+            value = var.geo_postgres_logging
+          }
+
           resources {
             limits = {
               cpu    = "1"
-              memory = "2Gi"
+              memory = "4Gi"
             }
             requests = {
               cpu    = "500m"
-              memory = "2Gi"
+              memory = "3Gi"
             }
           }
 

@@ -1,4 +1,3 @@
-import { PlanningAreaGadmPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/planning-area-gadm.piece-importer';
 import { ProjectMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-metadata.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
@@ -20,6 +19,7 @@ import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GivenOrganizationExists,
+  GivenUserExists,
   PrepareZipFile,
 } from './fixtures';
 
@@ -31,7 +31,7 @@ interface ProjectSelectResult {
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaGadmPieceImporter, () => {
+describe(ProjectMetadataPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -58,6 +58,7 @@ describe(PlanningAreaGadmPieceImporter, () => {
   it('imports project metadata', async () => {
     // Piece importer picks a random organization
     await fixtures.GivenOrganization();
+    await fixtures.GivenUser();
 
     const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
@@ -86,6 +87,7 @@ const getFixtures = async () => {
   await sandbox.init();
   const projectId = v4();
   const organizationId = v4();
+  const userId = v4();
 
   const sut = sandbox.get(ProjectMetadataPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
@@ -121,8 +123,10 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectMetadata,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
+    GivenUser: () => GivenUserExists(entityManager, userId, projectId),
     GivenOrganization: () => {
       return GivenOrganizationExists(entityManager, organizationId);
     },
@@ -135,6 +139,7 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectMetadata,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoProjectMetadataFileIsAvailable: () => {

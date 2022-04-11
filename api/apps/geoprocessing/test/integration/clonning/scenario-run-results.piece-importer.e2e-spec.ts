@@ -105,6 +105,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
+  const userId = v4();
 
   const sut = sandbox.get(ScenarioRunResultsPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
@@ -160,7 +161,7 @@ const getFixtures = async () => {
       const [
         uri,
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioRunResults,
         archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
@@ -169,9 +170,10 @@ const getFixtures = async () => {
         pieceResourceId: scenarioId,
         importId: v4(),
         projectId,
-        piece: ClonePiece.ScenarioPlanningUnitsData,
-        resourceKind: ResourceKind.Project,
+        piece: ClonePiece.ScenarioRunResults,
+        resourceKind,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -180,9 +182,10 @@ const getFixtures = async () => {
         pieceResourceId: scenarioId,
         importId: v4(),
         projectId,
-        piece: ClonePiece.ScenarioPlanningUnitsData,
-        resourceKind: ResourceKind.Project,
+        piece: ClonePiece.ScenarioRunResults,
+        resourceKind,
         uris: [],
+        ownerId: userId,
       };
     },
     GivenNoScenarioRunResultsFileIsAvailable: () => {
@@ -192,7 +195,7 @@ const getFixtures = async () => {
       const [
         { relativePath },
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioRunResults,
         'scenario run results file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
@@ -214,7 +217,7 @@ const getFixtures = async () => {
       const [
         { relativePath },
       ] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioPlanningUnitsData,
+        ClonePiece.ScenarioRunResults,
         'scenario run results file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );

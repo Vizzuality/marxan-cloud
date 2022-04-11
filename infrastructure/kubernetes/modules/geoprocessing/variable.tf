@@ -18,7 +18,6 @@ variable "k8s_cluster_ca_certificate" {
   type        = string
 }
 
-
 variable "image" {
   type        = string
   description = "The dockerhub image reference to deploy"
@@ -32,4 +31,21 @@ variable "deployment_name" {
 variable "namespace" {
   type        = string
   description = "The k8s namespace to use"
+}
+
+
+variable "geo_postgres_logging" {
+  type        = string
+  description = "Value for the GEO_POSTGRES_LOGGING env var"
+}
+
+variable "cleanup_temporary_folders" {
+  type        = bool
+  default     = true
+  description = "Whether to cleanup temporary folders (should only be false temporarily and for diagnostic purposes)"
+}
+
+variable "backend_storage_pvc_name" {
+  type        = string
+  description = "Name of the PVC to use for backend storage"
 }

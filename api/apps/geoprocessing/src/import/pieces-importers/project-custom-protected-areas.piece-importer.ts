@@ -58,7 +58,7 @@ export class ProjectCustomProtectedAreasPieceImporter
       customProjectProtectedAreasLocation.relativePath,
     );
     if (isLeft(customProjectProtectedAreasrError)) {
-      const errorMessage = `Custom planning area file extraction failed: ${customProjectProtectedAreasLocation.relativePath}`;
+      const errorMessage = `Project custom protected areas file extraction failed: ${customProjectProtectedAreasLocation.relativePath}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }

@@ -71,6 +71,7 @@ export class PlanningAreaCustomGeojsonPieceExporter
       uris: ClonePieceUrisResolver.resolveFor(
         ClonePiece.PlanningAreaCustomGeojson,
         planningAreaGeoJson.right,
+        { kind: ResourceKind.Project, scenarioId: '' },
       ),
     };
   }

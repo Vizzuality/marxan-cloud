@@ -53,12 +53,24 @@ resource "kubernetes_deployment" "api_deployment" {
           }
         }
 
+        volume {
+          name = "shared-spatial-data-storage"
+          persistent_volume_claim {
+            claim_name = var.backend_storage_pvc_name
+          }
+        }
+
         container {
           image             = var.image
           image_pull_policy = "Always"
           name              = var.deployment_name
 
           args = ["start"]
+
+          volume_mount {
+            mount_path  = "/tmp/storage"
+            name        = "shared-spatial-data-storage"
+          }
 
           env {
             name = "API_POSTGRES_HOST"
@@ -240,14 +252,19 @@ resource "kubernetes_deployment" "api_deployment" {
             value = var.namespace
           }
 
+          env {
+            name  = "api_POSTGRES_LOGGING"
+            value = var.api_postgres_logging
+          }
+
           resources {
             limits = {
               cpu    = "1"
-              memory = "2Gi"
+              memory = "4Gi"
             }
             requests = {
               cpu    = "500m"
-              memory = "2Gi"
+              memory = "4Gi"
             }
           }
 

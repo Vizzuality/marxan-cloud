@@ -55,9 +55,11 @@ import { UploadExportFile } from '../clone/infra/import/upload-export-file.comma
 import { unknownError } from '@marxan/files-repository';
 import {
   ImportProject,
+  ImportProjectCommandResult,
   ImportProjectError,
 } from '../clone/import/application/import-project.command';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { UserId } from '@marxan/domain-ids';
 
 export { validationFailed } from '../planning-areas';
 
@@ -465,24 +467,34 @@ export class ProjectsService {
 
   async importProject(
     exportFile: Express.Multer.File,
-  ): Promise<Either<typeof unknownError | ImportProjectError, string>> {
+    userId: string,
+  ): Promise<
+    Either<
+      typeof unknownError | ImportProjectError | typeof forbiddenError,
+      ImportProjectCommandResult
+    >
+  > {
     const archiveLocationOrError = await this.commandBus.execute(
       new UploadExportFile(exportFile),
     );
+
+    if (!(await this.projectAclService.canCreateProject(userId))) {
+      return left(forbiddenError);
+    }
 
     if (isLeft(archiveLocationOrError)) {
       return archiveLocationOrError;
     }
 
-    const importIdOrError = await this.commandBus.execute(
-      new ImportProject(archiveLocationOrError.right),
+    const idsOrError = await this.commandBus.execute(
+      new ImportProject(archiveLocationOrError.right, new UserId(userId)),
     );
 
-    if (isLeft(importIdOrError)) {
-      return importIdOrError;
+    if (isLeft(idsOrError)) {
+      return idsOrError;
     }
 
-    return right(importIdOrError.right);
+    return right(idsOrError.right);
   }
 
   /**

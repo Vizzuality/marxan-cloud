@@ -76,7 +76,7 @@ export class ProjectsCrudService extends AppBaseService<
     private readonly commandBus: CommandBus,
   ) {
     super(repository, 'project', 'projects', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

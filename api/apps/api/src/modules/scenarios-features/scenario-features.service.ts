@@ -30,7 +30,7 @@ export class ScenarioFeaturesService extends AppBaseService<
     private readonly remoteScenarioFeatures: Repository<ScenarioFeaturesData>,
   ) {
     super(remoteScenarioFeatures, 'scenario_features', 'scenario_feature', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

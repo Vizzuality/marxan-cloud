@@ -3,7 +3,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { JobData } from '@marxan/blm-calibration';
 import { WebshotService } from '@marxan/webshot';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { EventBus } from '@nestjs/cqrs';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -65,7 +65,7 @@ export class MarxanSandboxBlmRunnerService
       .select(['project_id'])
       .from('scenarios', 's')
       .where('id = :scenarioId', { scenarioId })
-      .execute();
+      .getRawOne();
 
     const webshotUrl = AppConfig.get('webshot.url') as string;
 

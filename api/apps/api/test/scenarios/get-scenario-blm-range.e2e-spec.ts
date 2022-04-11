@@ -8,6 +8,11 @@ import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import * as request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { blmImageMock } from '@marxan-api/modules/scenarios/__mock__/blm-image-mock';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -56,9 +61,9 @@ describe('get-scenario-blm-calibration-results', () => {
     await fixtures.ThenAForbiddenErrorShouldBeReturned(response);
   });
 
-  // @debt To be refactored after PNG generation process is complete.
-  it('should block retrieving the BLM range for non allowed users', async () => {
+  it('should retrieve the image from BLM final results', async () => {
     await fixtures.GivenScenarioWasCreated();
+    await fixtures.GivenScenarioBlmFinalResultsWithPngDataExists();
 
     const response = await fixtures.WhenGettingPngScreenshotOfBlmValues();
 
@@ -67,8 +72,18 @@ describe('get-scenario-blm-calibration-results', () => {
 });
 
 const getFixtures = async () => {
-  const app = await bootstrapApplication();
+  const app = await bootstrapApplication([
+    TypeOrmModule.forFeature(
+      [BlmFinalResultEntity],
+      DbConnections.geoprocessingDB,
+    ),
+  ]);
 
+  const blmFinalResultRepo: Repository<BlmFinalResultEntity> = app.get(
+    getRepositoryToken(BlmFinalResultEntity, DbConnections.geoprocessingDB),
+  );
+
+  const pngDataParsedBuffer = Buffer.from(blmImageMock, 'base64');
   const anotherToken = await GivenUserIsLoggedIn(app, 'aa');
   const ownerToken = await GivenUserIsLoggedIn(app, 'bb');
 
@@ -120,6 +135,17 @@ const getFixtures = async () => {
           config: { baseUrl: 'example/png', cookie: 'randomCookie' },
         })
         .set('Authorization', `Bearer ${ownerToken}`);
+    },
+    GivenScenarioBlmFinalResultsWithPngDataExists: async () => {
+      await blmFinalResultRepo.save([
+        {
+          scenarioId,
+          blmValue: mockBlmValues,
+          cost: 1,
+          boundaryLength: 2,
+          pngData: pngDataParsedBuffer,
+        },
+      ]);
     },
     WhenAskingForBlmRangeForScenario: () => {
       return {

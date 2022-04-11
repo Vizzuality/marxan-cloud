@@ -9,6 +9,7 @@ import { ProjectCustomFeaturesPieceImporter } from './project-custom-features.pi
 import { ProjectCustomProtectedAreasPieceImporter } from './project-custom-protected-areas.piece-importer';
 import { ProjectMetadataPieceImporter } from './project-metadata.piece-importer';
 import { ScenarioFeaturesDataPieceImporter } from './scenario-features-data.piece-importer';
+import { ScenarioFeaturesSpecificationPieceImporter } from './scenario-features-specification.piece-importer';
 import { ScenarioMetadataPieceImporter } from './scenario-metadata.piece-importer';
 import { ScenarioPlanningUnitsDataPieceImporter } from './scenario-planning-units-data.piece-importer';
 import { ScenarioProtectedAreasPieceImporter } from './scenario-protected-areas.piece-importer';
@@ -31,6 +32,7 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
     ScenarioPlanningUnitsDataPieceImporter,
     ScenarioRunResultsPieceImporter,
     ScenarioFeaturesDataPieceImporter,
+    ScenarioFeaturesSpecificationPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })

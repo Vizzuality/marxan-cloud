@@ -46,7 +46,7 @@ export class UsersService extends AppBaseService<
     private readonly authenticationService: AuthenticationService,
   ) {
     super(repository, userResource.name.singular, userResource.name.plural, {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 
@@ -239,6 +239,15 @@ export class UsersService extends AppBaseService<
     entity.isAdmin = isAdmin;
 
     return entity;
+  }
+
+  async extendFindAllResults(
+    entitiesAndCount: [User[], number],
+  ): Promise<[User[], number]> {
+    const extendedEntities: Promise<User>[] = entitiesAndCount[0].map(
+      (entity) => this.extendGetByIdResult(entity),
+    );
+    return [await Promise.all(extendedEntities), entitiesAndCount[1]];
   }
 
   async isPlatformAdmin(userId: string): Promise<boolean> {

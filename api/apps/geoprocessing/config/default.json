@@ -36,7 +36,8 @@
   },
   "storage": {
     "sharedFileStorage": {
-      "localPath": "/tmp/storage"
+      "localPath": "/tmp/storage",
+      "cleanupTemporaryFolders": true
     }
   },
   "fileUploads": {

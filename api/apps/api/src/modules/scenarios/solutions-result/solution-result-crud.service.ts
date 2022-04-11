@@ -37,7 +37,7 @@ export class SolutionResultCrudService extends AppBaseService<
     protected readonly repository: Repository<ScenariosOutputResultsApiEntity>,
   ) {
     super(repository, 'solution', 'solutions', {
-      logging: { muteAll: AppConfig.get<boolean>('logging.muteAll', false) },
+      logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
     });
   }
 

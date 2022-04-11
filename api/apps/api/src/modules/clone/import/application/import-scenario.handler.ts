@@ -9,7 +9,11 @@ import { Either, isLeft, right } from 'fp-ts/Either';
 import { Import } from '../domain/import/import';
 import { ExportConfigReader } from './export-config-reader';
 import { ImportResourcePieces } from './import-resource-pieces.port';
-import { ImportScenario, ImportScenarioError } from './import-scenario.command';
+import {
+  ImportScenario,
+  ImportScenarioCommandResult,
+  ImportScenarioError,
+} from './import-scenario.command';
 import { ImportRepository } from './import.repository.port';
 
 @CommandHandler(ImportScenario)
@@ -24,7 +28,10 @@ export class ImportScenarioHandler
 
   async execute({
     archiveLocation,
-  }: ImportScenario): Promise<Either<ImportScenarioError, string>> {
+    ownerId,
+  }: ImportScenario): Promise<
+    Either<ImportScenarioError, ImportScenarioCommandResult>
+  > {
     const exportConfigOrError = await this.exportConfigReader.read(
       archiveLocation,
     );
@@ -46,6 +53,7 @@ export class ImportScenarioHandler
         importResourceId,
         ResourceKind.Scenario,
         new ResourceId(exportConfig.projectId),
+        ownerId,
         archiveLocation,
         pieces,
       ),
@@ -59,6 +67,9 @@ export class ImportScenarioHandler
 
     importRequest.commit();
 
-    return right(importRequest.importId.value);
+    return right({
+      importId: importRequest.importId.value,
+      scenarioId: importResourceId.value,
+    });
   }
 }

@@ -1,11 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { v4 } from 'uuid';
-import { promises, existsSync } from 'fs';
+import { mkdir, rm } from 'fs/promises';
+import { existsSync } from 'fs';
 import { resolve } from 'path';
 
 import { TemporaryDirectory } from './ports/temporary-directory';
 import { WorkingDirectory } from '../../ports/working-directory';
 import { MarxanDirectory } from '../../adapters-single/marxan-directory.service';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 export const SharedStoragePath = Symbol('shared storage temporary directory');
 
@@ -24,8 +26,19 @@ export class SharedStorage implements TemporaryDirectory {
     if (this.#isDirectoryTraversal(directory, this.tempDirectory)) {
       throw new Error(`Directory traversal is not allowed.`);
     }
+    /**
+     * Leave temporary folder on filesystem according to feature flag.
+     */
+    if (
+      !AppConfig.getBoolean(
+        'storage.sharedFileStorage.cleanupTemporaryFolders',
+        true,
+      )
+    )
+      return;
 
-    await promises.rm(directory, {
+    Logger.log(`deleting ${directory}`);
+    await rm(directory, {
       recursive: true,
       force: true,
     });
@@ -36,7 +49,7 @@ export class SharedStorage implements TemporaryDirectory {
     const directory = v4();
     const fullPath = resolve(this.tempDirectory, directory) as WorkingDirectory;
 
-    await promises.mkdir(fullPath);
+    await mkdir(fullPath);
 
     return fullPath as WorkingDirectory;
   }
@@ -50,6 +63,6 @@ export class SharedStorage implements TemporaryDirectory {
     const outputPath = this.marxanDirectory.get('OUTPUTDIR', inside);
     const directoryAlreadyExists = existsSync(outputPath.fullPath);
 
-    if (!directoryAlreadyExists) await promises.mkdir(outputPath.fullPath);
+    if (!directoryAlreadyExists) await mkdir(outputPath.fullPath);
   }
 }

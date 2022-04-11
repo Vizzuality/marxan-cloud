@@ -99,6 +99,7 @@ const getFixtures = async () => {
 
   await sandbox.init();
   const projectId = v4();
+  const userId = v4();
   const sut = sandbox.get(PlanningUnitsGridPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
   const entityManager = sandbox.get<EntityManager>(getEntityManagerToken());
@@ -170,6 +171,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
+        ownerId: userId,
       };
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
@@ -181,6 +183,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
         uris: [],
+        ownerId: userId,
       };
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
