@@ -32,6 +32,8 @@ import {
   UploadProjectPAGridProps,
   UsePublishProjectProps,
   PublishProjectProps,
+  UseSaveProjectDownloadProps,
+  SaveProjectDownloadProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -350,6 +352,39 @@ export function usePublishProject({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+/**
+****************************************
+  DOWNLOAD PROJECT
+****************************************
+*/
+
+export function useSaveProjectDownload({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveProjectDownloadProps) {
+  const [session] = useSession();
+
+  const projectDownload = ({ id }: SaveProjectDownloadProps) => {
+    return PROJECTS.request({
+      url: `${id}/export`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(projectDownload, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });
