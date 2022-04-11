@@ -484,11 +484,11 @@ describe('UsersModule (e2e)', () => {
         return;
       });
 
-      const WhenBlockingAUser = await request(app.getHttpServer())
+      const WhenBlockingUsersInBatch = await request(app.getHttpServer())
         .patch(`/api/v1/users/admins/block-users`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ userIds: [firstUser.id, secondUser.id] });
-      expect(WhenBlockingAUser.status).toEqual(200);
+      expect(WhenBlockingUsersInBatch.status).toEqual(200);
 
       const WhenLoginAsFirstBlockedUser = await request(app.getHttpServer())
         .post('/auth/sign-in')
@@ -518,7 +518,7 @@ describe('UsersModule (e2e)', () => {
       const WhenBlockingAUser = await request(app.getHttpServer())
         .post(`/api/v1/users/block/${user.id}`)
         .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenBlockingAUser.status).toEqual(200);
+      expect(WhenBlockingAUser.status).toEqual(201);
 
       const WhenLoginAsBlockedUser = await request(app.getHttpServer())
         .post('/auth/sign-in')
@@ -540,7 +540,7 @@ describe('UsersModule (e2e)', () => {
       const WhenBlockingAUser = await request(app.getHttpServer())
         .post(`/api/v1/users/block/${user.id}`)
         .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenBlockingAUser.status).toEqual(200);
+      expect(WhenBlockingAUser.status).toEqual(201);
 
       const WhenLoginAsBlockedUser = await request(app.getHttpServer())
         .post('/auth/sign-in')

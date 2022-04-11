@@ -244,7 +244,7 @@ export class UsersController {
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
-  @Post('users/block/:id')
+  @Post('block/:id')
   async blockUser(
     @Request() req: RequestWithAuthenticatedUser,
     @Param('id', ParseUUIDPipe) userIdToBlock: string,
@@ -268,7 +268,7 @@ export class UsersController {
   @ApiOkResponse()
   @ApiUnauthorizedResponse()
   @ApiForbiddenResponse()
-  @Delete('users/block/:id')
+  @Delete('block/:id')
   async unblockUser(
     @Request() req: RequestWithAuthenticatedUser,
     @Param('id', ParseUUIDPipe) userIdToUnblock: string,
