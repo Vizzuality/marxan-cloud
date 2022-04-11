@@ -34,6 +34,8 @@ import {
   PublishProjectProps,
   UseSaveProjectDownloadProps,
   SaveProjectDownloadProps,
+  UseDownloadProjectProps,
+  DownloadProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -417,27 +419,41 @@ export function useExportId(id) {
   }, [query, data?.id]);
 }
 
-export function useDownloadProject(id, exportId) {
+export function useDownloadProject({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseDownloadProjectProps) {
   const [session] = useSession();
 
-  const query = useQuery(['projects-download', id, exportId], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${id}/export(${exportId})`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
+  const downloadProject = ({ id, exportId }: DownloadProjectProps) => {
+    return PROJECTS.request({
+      url: `/${id}/export/${exportId}`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadProject, {
+    onSuccess: (data: any, variables, context) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `project-${id}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      console.info('Success', data, variables, context);
     },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!exportId,
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
   });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
 }

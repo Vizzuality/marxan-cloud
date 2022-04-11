@@ -6,7 +6,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 // import { usePlausible } from 'next-plausible';
 
 // import { useMe } from 'hooks/me';
-import { useProject, useSaveProjectDownload, useExportId } from 'hooks/projects';
+import {
+  useProject, useSaveProjectDownload, useExportId, useDownloadProject,
+} from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -43,6 +45,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   });
 
   const projectDownloadMutation = useSaveProjectDownload({});
+  const downloadProject = useDownloadProject({});
 
   const scenarioIds = useMemo(() => {
     return scenariosData?.map((scenario) => scenario.id);
@@ -52,7 +55,29 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     projectDownloadMutation.mutate({ id: `${pid}`, data: { scenarioIds } }, {
 
       onSuccess: () => {
-        console.log({ exportId });
+        downloadProject.mutate({
+          id: `${pid}`,
+          exportId: `${exportId}`,
+        }, {
+          onSuccess: () => {
+
+          },
+          onError: () => {
+            addToast('download-error', (
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <ul className="text-sm">
+                  `Project $
+                  {projectData?.name}
+                  {' '}
+                  not downloaded. Try again.`
+                </ul>
+              </>
+            ), {
+              level: 'error',
+            });
+          },
+        });
       },
       onError: ({ e }) => {
         console.error('error --->', e);
@@ -60,8 +85,9 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">
-              Unable to download project
-              `$
+              `Unable to download project
+              {' '}
+              $
               {projectData?.name}
               `
             </p>
@@ -86,6 +112,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     addToast,
     projectData?.name,
     exportId,
+    downloadProject,
   ]);
 
   return (
