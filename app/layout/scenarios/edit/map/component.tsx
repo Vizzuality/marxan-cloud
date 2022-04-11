@@ -204,7 +204,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
 
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['frequency', 'solution', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['features'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['features', 'features-highlight'];
 
     return ['pugrid'];
   }, [tab, subtab, protectedAreas, isSpecies, isBioregional]);
