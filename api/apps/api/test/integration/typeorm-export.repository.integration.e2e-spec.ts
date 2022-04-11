@@ -12,9 +12,13 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
+import { GivenUserExists } from '../steps/given-user-exists';
+import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
+import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 
 describe('Typeorm export repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -71,12 +75,16 @@ const getFixtures = async () => {
   const app = await bootstrapApplication();
   const repo = app.get<ExportRepository>(ExportRepository);
 
+  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
+  const ownerId = await GivenUserExists(app, 'aa');
+
   return {
     cleanup: async () => {
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
-
       await exportRepo.delete({});
+      await OrganizationsTestUtils.deleteOrganization(app, ownerToken, ownerId);
+
       await app.close();
     },
     GivenExportWasRequested: async () => {
@@ -84,20 +92,26 @@ const getFixtures = async () => {
       componentId = ComponentId.create();
       componentLocationUri = '/foo/bar/project-metadata.json';
       componentLocationRelativePath = 'project-metadata.json';
-      const exportInstance = Export.newOne(resourceId, ResourceKind.Project, [
-        ExportComponent.fromSnapshot({
-          finished: false,
-          piece: ClonePiece.ProjectMetadata,
-          resourceId: resourceId.value,
-          id: componentId.value,
-          uris: [
-            new ComponentLocation(
-              componentLocationUri,
-              componentLocationRelativePath,
-            ),
-          ],
-        }),
-      ]);
+      const exportInstance = Export.newOne(
+        resourceId,
+        ResourceKind.Project,
+        new UserId(ownerId),
+        [
+          ExportComponent.fromSnapshot({
+            finished: false,
+            piece: ClonePiece.ProjectMetadata,
+            resourceId: resourceId.value,
+            id: componentId.value,
+            uris: [
+              new ComponentLocation(
+                componentLocationUri,
+                componentLocationRelativePath,
+              ),
+            ],
+          }),
+        ],
+        false,
+      );
       exportId = exportInstance.id;
       await repo.save(exportInstance);
     },
@@ -125,7 +139,9 @@ const getFixtures = async () => {
       const exportInstance = Export.newOne(
         resourceId,
         ResourceKind.Project,
+        new UserId(ownerId),
         components,
+        false,
       );
       exportId = exportInstance.id;
       await repo.transaction(async (repository) => {

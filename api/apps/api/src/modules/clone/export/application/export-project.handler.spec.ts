@@ -4,6 +4,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Injectable } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
@@ -28,7 +29,7 @@ beforeEach(async () => {
 
 test(`requesting new project export`, async () => {
   const { projectId } = fixtures.GivenProjectWasCreated();
-  const exportId = await fixtures.WhenExportIsRequested(projectId);
+  const { exportId } = await fixtures.WhenExportIsRequested(projectId);
   await fixtures.ThenExportRequestIsSaved(exportId);
   await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(projectId);
   fixtures.ThenExportRequestsEventIsPresent(exportId);
@@ -59,6 +60,7 @@ const getFixtures = async () => {
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
   });
+  const ownerId = UserId.create();
 
   return {
     GivenProjectWasCreated: () => {
@@ -71,9 +73,11 @@ const getFixtures = async () => {
       return { projectId };
     },
     WhenExportIsRequested: async (projectId: ResourceId) =>
-      sut.execute(new ExportProject(projectId, [])),
+      sut.execute(new ExportProject(projectId, [], ownerId, false)),
     ThenExportRequestIsSaved: async (exportId: ExportId) => {
-      expect((await repo.find(exportId))?.toSnapshot()).toBeDefined();
+      const exportInstance = await repo.find(exportId);
+      expect(exportInstance?.toSnapshot()).toBeDefined();
+      expect(exportInstance?.importResourceId?.value).toEqual(undefined);
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
       projectId: ResourceId,
