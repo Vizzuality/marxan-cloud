@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 // import { usePlausible } from 'next-plausible';
 
 // import { useMe } from 'hooks/me';
-import { useProject, useSaveProjectDownload } from 'hooks/projects';
+import { useProject, useSaveProjectDownload, useExportId } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -30,6 +30,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   // const plausible = usePlausible();
 
   const { data: projectData } = useProject(pid);
+  const { data: exportId } = useExportId(pid);
   // const { user } = useMe();
 
   const {
@@ -41,17 +42,17 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     sort: '-lastModifiedAt',
   });
 
+  const projectDownloadMutation = useSaveProjectDownload({});
+
   const scenarioIds = useMemo(() => {
     return scenariosData?.map((scenario) => scenario.id);
   }, [scenariosData]);
-
-  const projectDownloadMutation = useSaveProjectDownload({});
 
   const onDownloadProject = useCallback(() => {
     projectDownloadMutation.mutate({ id: `${pid}`, data: { scenarioIds } }, {
 
       onSuccess: () => {
-
+        console.log({ exportId });
       },
       onError: ({ e }) => {
         console.error('error --->', e);
@@ -84,6 +85,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     scenarioIds,
     addToast,
     projectData?.name,
+    exportId,
   ]);
 
   return (

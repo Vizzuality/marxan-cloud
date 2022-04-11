@@ -400,6 +400,7 @@ export function useExportId(id) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    transformResponse: (data) => JSON.parse(data),
   }).then((response) => {
     return response.data;
   }), {
@@ -411,9 +412,9 @@ export function useExportId(id) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.id,
     };
-  }, [query, data?.data]);
+  }, [query, data?.id]);
 }
 
 export function useDownloadProject(id, exportId) {
