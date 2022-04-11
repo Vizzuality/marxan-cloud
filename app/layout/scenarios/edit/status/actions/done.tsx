@@ -95,7 +95,7 @@ export const useScenarioActionsDone = () => {
       data: {
         metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
           tab: ScenarioSidebarTabs.PLANNING_UNIT,
-          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
+          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
         }),
 
       },
