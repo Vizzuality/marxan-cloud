@@ -10,6 +10,7 @@ import {
 import cx from 'classnames';
 
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
@@ -20,6 +21,7 @@ export interface Table2Props {
   meta: Record<string, any>;
   columns: Record<string, any>[];
   initialState?: Record<string, any>;
+  loading?: boolean;
   onPageChange?: (page: number) => void;
   onSortChange?: (column: string, direction: string) => void;
 }
@@ -29,6 +31,7 @@ export const Table2: React.FC<Table2Props> = ({
   meta,
   columns,
   initialState,
+  loading,
   onPageChange,
   onSortChange,
 }: Table2Props) => {
@@ -102,7 +105,7 @@ export const Table2: React.FC<Table2Props> = ({
   const [sortSelected] = sortBy;
 
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <div {...getTableProps()} className="relative w-full mb-2 bg-white rounded-t-3xl">
         <div>
           {headerGroups.map((headerGroup) => {
@@ -165,7 +168,7 @@ export const Table2: React.FC<Table2Props> = ({
             );
           })}
         </div>
-        <div className="tbody">
+        <div className="relative tbody">
           {rows.map((row) => {
             prepareRow(row);
 
@@ -202,6 +205,15 @@ export const Table2: React.FC<Table2Props> = ({
               </div>
             );
           })}
+          {loading && (
+            <div className="absolute bottom-0 left-0 flex items-center justify-center w-full h-full">
+              <Loading
+                className="flex items-center justify-center w-full h-full bg-white bg-opacity-50"
+                iconClassName="w-10 h-10"
+                visible
+              />
+            </div>
+          )}
         </div>
       </div>
 

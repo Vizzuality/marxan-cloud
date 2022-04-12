@@ -19,6 +19,7 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
   const {
     data: publishedProjectsData = [],
     meta,
+    isFetching,
   } = useAdminPublishedProjects({
     page,
     sort,
@@ -86,6 +87,7 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
       meta={meta}
       columns={COLUMNS}
       initialState={initialState}
+      loading={isFetching}
       onPageChange={onPageChange}
       onSortChange={onSortChange}
     />

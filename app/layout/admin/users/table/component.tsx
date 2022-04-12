@@ -18,6 +18,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   const {
     data: adminUsersData = [],
     meta,
+    isFetching,
   } = useAdminUsers({
     page,
     sort,
@@ -84,6 +85,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
         meta={meta}
         columns={COLUMNS}
         initialState={initialState}
+        loading={isFetching}
         onPageChange={onPageChange}
         onSortChange={onSortChange}
       />
