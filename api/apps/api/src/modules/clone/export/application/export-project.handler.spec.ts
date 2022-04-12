@@ -35,6 +35,16 @@ test(`requesting new project export`, async () => {
   fixtures.ThenExportRequestsEventIsPresent(exportId);
 });
 
+test(`requesting new project export within a clonning operation`, async () => {
+  const { projectId } = fixtures.GivenProjectWasCreated();
+  const { exportId } = await fixtures.WhenExportIsRequested(projectId, {
+    clonning: true,
+  });
+  await fixtures.ThenExportRequestIsSaved(exportId, { clonning: true });
+  await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(projectId);
+  fixtures.ThenExportRequestsEventIsPresent(exportId);
+});
+
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
@@ -72,12 +82,19 @@ const getFixtures = async () => {
       ]);
       return { projectId };
     },
-    WhenExportIsRequested: async (projectId: ResourceId) =>
-      sut.execute(new ExportProject(projectId, [], ownerId, false)),
-    ThenExportRequestIsSaved: async (exportId: ExportId) => {
+    WhenExportIsRequested: async (
+      projectId: ResourceId,
+      opts: { clonning: boolean } = { clonning: false },
+    ) => sut.execute(new ExportProject(projectId, [], ownerId, opts.clonning)),
+    ThenExportRequestIsSaved: async (
+      exportId: ExportId,
+      opts: { clonning: boolean } = { clonning: false },
+    ) => {
       const exportInstance = await repo.find(exportId);
       expect(exportInstance?.toSnapshot()).toBeDefined();
-      expect(exportInstance?.importResourceId?.value).toEqual(undefined);
+      if (!opts.clonning)
+        expect(exportInstance?.importResourceId).toEqual(undefined);
+      else expect(exportInstance?.importResourceId).toBeDefined();
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
       projectId: ResourceId,

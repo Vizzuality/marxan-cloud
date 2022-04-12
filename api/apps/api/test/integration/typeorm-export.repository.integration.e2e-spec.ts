@@ -192,9 +192,11 @@ const getFixtures = async () => {
       expect(exportData!.id.value).toBe(exportId.value);
       expect(exportData!.resourceKind).toBe(ResourceKind.Project);
       expect(exportData!.resourceId.value).toBe(resourceId.value);
+      expect(exportData!.importResourceId).toBe(undefined);
 
       const exportSnapshot = exportData!.toSnapshot();
 
+      expect(exportSnapshot.ownerId).toBe(ownerId);
       expect(exportSnapshot.exportPieces).toHaveLength(1);
 
       const [exportComponent] = exportSnapshot.exportPieces;
