@@ -196,7 +196,7 @@ export class ScenariosService {
 
     const query = `with data as (select unnest(protected_pu_ids) as pu_ids 
     from blm_final_results bfr where blm_value = $1) 
-    select ST_AsMVT(tile.*, 'layer0', {extent}, 'mvt_geom') as mvt 
+    select ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom') as mvt 
     from (select pu_ids, ST_AsMVTGeom(ST_Transform(${geometry}, 3857),
     ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom from scenarios_pu_data spd 
     inner join projects_pu pp on pp.id = spd.project_pu_id
