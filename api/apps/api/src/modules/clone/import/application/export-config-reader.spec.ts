@@ -60,6 +60,7 @@ describe('ExportConfigReader', () => {
       scenarios: [],
       version: '1.0.0',
       description: 'description',
+      isCloning: false,
     };
     const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
       invalidExportConfig,
@@ -83,6 +84,7 @@ describe('ExportConfigReader', () => {
       scenarios: [],
       version: '1.0.0',
       description: 'description',
+      isCloning: false,
     };
     const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
       invalidExportConfig,
@@ -101,6 +103,7 @@ describe('ExportConfigReader', () => {
       scenarios: [],
       version: '1.0.0',
       description: 'description',
+      isCloning: false,
     };
     const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
       invalidExportConfig,
@@ -148,6 +151,7 @@ const getFixtures = async () => {
     resourceKind: ResourceKind.Project,
     scenarios: [{ id: v4(), name: 'random scenario' }],
     version: exportVersion,
+    isCloning: false,
   };
 
   const sut = sandbox.get(ExportConfigReader);

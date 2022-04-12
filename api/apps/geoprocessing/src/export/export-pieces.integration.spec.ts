@@ -27,6 +27,7 @@ test(`exporting supported piece`, async () => {
     resourceId,
     resourceKind: ResourceKind.Project,
     allPieces: [{ resourceId, piece: ClonePiece.ProjectMetadata }],
+    isCloning: false,
   };
   const result = await fixtures.sut.run(input);
   expect(result).toEqual({
@@ -49,6 +50,7 @@ test(`exporting unsupported piece`, async () => {
     resourceId,
     resourceKind: ResourceKind.Scenario,
     allPieces: [{ resourceId, piece: ClonePiece.ProjectMetadata }],
+    isCloning: false,
   };
   expect(async () => await fixtures.sut.run(input)).rejects.toEqual(
     new Error(`some piece is not yet supported.`),

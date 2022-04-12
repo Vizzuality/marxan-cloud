@@ -102,6 +102,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaGAdm,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
+        isCloning: false,
       };
     },
     GivenAPlanningAreaGadmScenarioExportJob: () => {
@@ -115,6 +116,7 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaGAdm,
         resourceId: scenarioId,
         resourceKind: ResourceKind.Scenario,
+        isCloning: false,
       };
     },
     WhenProjectGadmDataIsMissing: () => {
