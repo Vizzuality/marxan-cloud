@@ -39,7 +39,6 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
   const { pid, sid } = query;
 
   const { blmImage } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
   const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
 
@@ -76,20 +75,22 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
                   noValidate
                   onSubmit={handleSubmit}
                 >
-                  <button
-                    className="absolute right-0"
-                    type="button"
-                    onClick={() => setZoomImage(true)}
-                  >
-                    <img
-                      src={blmImage || '/images/mock/blm-mock-image.png'}
-                      alt="selected blm"
-                      className="border-2 border-transparent rounded-lg hover:border-primary-500"
-                    />
-                    <div className="absolute bottom-0 right-0 z-50 w-5 h-5 mb-px mr-px rounded-tl-lg rounded-br-md bg-primary-500">
-                      <Icon icon={ZOOM_SVG} />
-                    </div>
-                  </button>
+                  {blmImage && (
+                    <button
+                      className="absolute right-0"
+                      type="button"
+                      onClick={() => setZoomImage(true)}
+                    >
+                      <img
+                        src={blmImage}
+                        alt="selected blm"
+                        className="border-2 border-transparent rounded-lg hover:border-primary-500"
+                      />
+                      <div className="absolute bottom-0 right-0 z-50 w-5 h-5 mb-px mr-px rounded-tl-lg rounded-br-md bg-primary-500">
+                        <Icon icon={ZOOM_SVG} />
+                      </div>
+                    </button>
+                  )}
 
                   <div className="flex flex-col">
                     <div className="flex items-center space-x-2">
@@ -157,17 +158,15 @@ export const ScenariosBlmSettingsChart: React.FC<ScenariosBlmSettingsChartProps>
                     </div>
                   </div>
 
-                  <>
-                    <div className="flex flex-col mt-8 space-y-2">
-                      <h3 className="text-sm font-bold text-white">Boundary Length</h3>
-                      <p className="text-xs text-white">
-                        More
-                      </p>
-                    </div>
-                    <div className="w-full h-32">
-                      <BLMChart data={calibrationResultsData} />
-                    </div>
-                  </>
+                  <div className="flex flex-col mt-8 space-y-2">
+                    <h3 className="text-sm font-bold text-white">Boundary Length</h3>
+                    <p className="text-xs text-white">
+                      More
+                    </p>
+                  </div>
+                  <div className="w-full h-32">
+                    <BLMChart data={calibrationResultsData} />
+                  </div>
                 </form>
               );
             }}

@@ -49,7 +49,7 @@ export const BlmImageModal: React.FC<BlmImageModalProps> = ({
               type="button"
               onClick={() => setZoomImage(false)}
             >
-              <img src={blmImage || '/images/mock/blm-mock-image.png'} alt="selected blm" className="border-4 border-transparent rounded-xl hover:border-primary-500 w-60 h-60" />
+              <img src={blmImage} alt="selected blm" className="border-4 border-transparent rounded-xl hover:border-primary-500 w-60 h-60" />
               <div className="absolute bottom-0 right-0 z-50 flex items-center justify-center w-6 h-6 mb-0.5 mr-0.5 rounded-tl-lg rounded-br-lg bg-primary-500">
                 <Icon icon={CLOSE_SVG} className="w-3 h-3 text-black" />
               </div>

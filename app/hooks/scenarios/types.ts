@@ -113,7 +113,7 @@ export interface UseSaveScenarioCalibrationRangeProps {
   requestConfig?: AxiosRequestConfig
 }
 export interface SaveScenarioCalibrationRangeProps {
-  id?: string,
+  sid?: string,
   data: any,
 }
 
@@ -124,4 +124,8 @@ export interface UseDownloadScenarioReportProps {
 export interface DownloadScenarioReportProps {
   sid: string,
   solutionId: string;
+}
+
+export interface UseBlmImageProps {
+  [q: string]: any;
 }
