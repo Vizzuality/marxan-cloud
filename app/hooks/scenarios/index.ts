@@ -857,11 +857,20 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
   const CALIBRATION_IMAGES = useMemo(() => {
     if (userQueries.every((u) => u?.isFetched)) {
       return userQueries.reduce((acc, q: UseBlmImageProps) => {
-        const { data: { blmValue, image: blob } } = q;
-        const imageURL = window.URL.createObjectURL(new Blob([blob]));
+        const { data } = q;
+
+        if (data) {
+          const { blmValue, image: blob } = data;
+          const imageURL = window.URL.createObjectURL(new Blob([blob]));
+
+          return {
+            ...acc,
+            [blmValue]: imageURL,
+          };
+        }
+
         return {
           ...acc,
-          [blmValue]: imageURL,
         };
       }, {});
     }
