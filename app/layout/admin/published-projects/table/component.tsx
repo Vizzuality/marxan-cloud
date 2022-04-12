@@ -7,6 +7,7 @@ import Table2 from 'components/table2';
 import Name from './cells/name';
 import Owner from './cells/owner';
 import Status from './cells/status';
+import Unpublish from './cells/unpublish';
 
 export interface AdminPublishedProjectsTableProps {
 
@@ -48,15 +49,22 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         className: 'text-sm leading-none',
         disableSortBy: true,
         Cell: Owner,
-        width: 100,
+        // width: 100,
       },
       {
         Header: 'Status',
         accessor: 'status',
         disableSortBy: true,
         Cell: Status,
-        width: 75,
+        width: 100,
       },
+      {
+        Header: 'Actions',
+        disableSortBy: true,
+        Cell: Unpublish,
+        width: 50,
+      },
+
     ];
   }, []);
 

@@ -136,7 +136,7 @@ export const Table2: React.FC<Table2Props> = ({
                       key={headerKey}
                       {...restHeaderProps}
                       className={cx({
-                        'flex items-center py-5 space-x-2 text-xs font-medium uppercase font-heading': true,
+                        'flex items-center py-5 pr-5 space-x-2 text-xs font-medium uppercase font-heading': true,
                         'cursor-pointer': canSort,
                       })}
                       {...(canSort && {
@@ -168,7 +168,7 @@ export const Table2: React.FC<Table2Props> = ({
             );
           })}
         </div>
-        <div className="relative tbody">
+        <div className="relative tbody" style={{ minHeight: 50 }}>
           {rows.map((row) => {
             prepareRow(row);
 
@@ -194,7 +194,7 @@ export const Table2: React.FC<Table2Props> = ({
                       key={cellKey}
                       {...restCellProps}
                       className={cx({
-                        'py-5': true,
+                        'py-5 pr-5': true,
                         [cell?.column?.className]: !!cell?.column?.className,
                       })}
                     >
@@ -205,6 +205,7 @@ export const Table2: React.FC<Table2Props> = ({
               </div>
             );
           })}
+
           {loading && (
             <div className="absolute bottom-0 left-0 flex items-center justify-center w-full h-full">
               <Loading
