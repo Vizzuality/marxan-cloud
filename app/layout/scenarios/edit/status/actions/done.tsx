@@ -89,7 +89,7 @@ export const useScenarioActionsDone = () => {
   ]);
 
   // Protected Areas
-  const onProtectedAreasDone = useCallback((JOB_REF) => {
+  const onUploadedProtectedAreaDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -107,7 +107,7 @@ export const useScenarioActionsDone = () => {
         JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onProtectedAreasDone', (
+        addToast('onUploadedProtectedAreaDone', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -333,7 +333,7 @@ export const useScenarioActionsDone = () => {
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
-    protectedAreas: onProtectedAreasDone,
+    protectedAreas: onUploadedProtectedAreaDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     calibration: onCalibrationDone,
