@@ -59,11 +59,9 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">
-              `Unable to download project
+              Unable to download project
               {' '}
-              $
               {projectData?.name}
-              `
             </p>
           </>
         ), {
