@@ -26,6 +26,18 @@ export class ExportProjectHandler
     private readonly projectRepo: Repository<Project>,
   ) {}
 
+  private async createProjectShell(
+    existingProjectId: string,
+    newProjectId: string,
+  ) {
+    const project = await this.projectRepo.findOneOrFail(existingProjectId);
+    await this.projectRepo.save({
+      id: newProjectId,
+      name: '',
+      organizationId: project.organizationId,
+    });
+  }
+
   async execute({
     id,
     scenarioIds,
@@ -42,12 +54,11 @@ export class ExportProjectHandler
     exportRequest.commit();
 
     if (cloning) {
-      const project = await this.projectRepo.findOneOrFail(id.value);
-      await this.projectRepo.save({
-        id: exportRequest.importResourceId!.value,
-        name: '',
-        organizationId: project.organizationId,
-      });
+      // TODO Mark cloning as submitted
+      await this.createProjectShell(
+        id.value,
+        exportRequest.importResourceId!.value,
+      );
     }
 
     return {
