@@ -10,6 +10,8 @@ beforeAll(async () => {
   apiConnection = await createConnection(apiConnections.default);
   geoConnection = await createConnection(apiConnections.geoprocessingDB);
 
+  console.log(apiConnection.isConnected, geoConnection.isConnected);
+
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
 });
@@ -19,9 +21,11 @@ beforeEach(async () => {
   await clearTables(geoConnection);
   await insertAdminRegions(geoConnection);
 });
+
 afterEach(async () => {
   await TestClientApi.teardownApps();
 });
+
 afterAll(async () => {
   await apiConnection.close();
   await geoConnection.close();
