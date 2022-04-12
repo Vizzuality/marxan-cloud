@@ -32,6 +32,10 @@ import {
   UploadProjectPAGridProps,
   UsePublishProjectProps,
   PublishProjectProps,
+  UseSaveProjectDownloadProps,
+  SaveProjectDownloadProps,
+  UseDownloadProjectProps,
+  DownloadProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -350,6 +354,105 @@ export function usePublishProject({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+/**
+****************************************
+  DOWNLOAD PROJECT
+****************************************
+*/
+
+export function useSaveProjectDownload({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveProjectDownloadProps) {
+  const [session] = useSession();
+
+  const projectDownload = ({ id, data }: SaveProjectDownloadProps) => {
+    return PROJECTS.request({
+      url: `${id}/export`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(projectDownload, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useExportId(id) {
+  const [session] = useSession();
+
+  const query = useQuery(['projects-export-id', id], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${id}/export`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!id,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.id,
+    };
+  }, [query, data?.id]);
+}
+
+export function useDownloadProject({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseDownloadProjectProps) {
+  const [session] = useSession();
+
+  const downloadProject = ({ id, exportId }: DownloadProjectProps) => {
+    return PROJECTS.request({
+      url: `/${id}/export/${exportId}`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadProject, {
+    onSuccess: (data: any, variables, context) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `project-${id}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

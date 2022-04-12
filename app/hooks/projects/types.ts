@@ -60,6 +60,27 @@ export interface DuplicateProjectProps {
 export interface UsePublishProjectProps {
   requestConfig?: AxiosRequestConfig;
 }
+
 export interface PublishProjectProps {
   id: string | string[];
+}
+
+// UseSaveProjectDownloadProps,
+export interface UseSaveProjectDownloadProps {
+  requestConfig?: AxiosRequestConfig;
+}
+
+export interface SaveProjectDownloadProps {
+  id: string | string[];
+  data: unknown;
+}
+
+// UseDownloadProjectProps,
+export interface UseDownloadProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface DownloadProjectProps {
+  id: string,
+  exportId: string
 }
