@@ -5,7 +5,9 @@ import { useSelector } from 'react-redux';
 import cx from 'classnames';
 
 import { useProjectsUsers } from 'hooks/project-users';
-import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
+import {
+  useProjects, useDeleteProject, useDuplicateProject,
+} from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
