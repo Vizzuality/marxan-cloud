@@ -3,9 +3,9 @@ import React, { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
-// import { usePlausible } from 'next-plausible';
+import { usePlausible } from 'next-plausible';
 
-// import { useMe } from 'hooks/me';
+import { useMe } from 'hooks/me';
 import {
   useProject, useSaveProjectDownload, useExportId, useDownloadProject,
 } from 'hooks/projects';
@@ -29,11 +29,11 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid } = query;
-  // const plausible = usePlausible();
+  const plausible = usePlausible();
 
   const { data: projectData } = useProject(pid);
   const { data: exportId } = useExportId(pid);
-  // const { user } = useMe();
+  const { user } = useMe();
 
   const {
     data: scenariosData,
@@ -81,7 +81,7 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
       },
       onError: ({ e }) => {
         console.error('error --->', e);
-        addToast('error-project-name', (
+        addToast('error-download-project', (
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">
@@ -97,14 +97,14 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
         });
       },
     });
-    // plausible('Download project', {
-    //   props: {
-    //     userId: `${user.id}`,
-    //     userEmail: `${user.email}`,
-    //     projectId: `${pid}`,
-    //     projectName: `${projectData.name}`,
-    //   },
-    // });
+    plausible('Download project', {
+      props: {
+        userId: `${user.id}`,
+        userEmail: `${user.email}`,
+        projectId: `${pid}`,
+        projectName: `${projectData.name}`,
+      },
+    });
   }, [
     pid,
     projectDownloadMutation,
@@ -113,6 +113,9 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     projectData?.name,
     exportId,
     downloadProject,
+    plausible,
+    user.email,
+    user.id,
   ]);
 
   return (
