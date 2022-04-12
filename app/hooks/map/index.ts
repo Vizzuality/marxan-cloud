@@ -479,7 +479,6 @@ export function usePUGridLayer({
 }: UsePUGridLayer) {
   return useMemo(() => {
     if (!active || !sid) return null;
-
     const {
       wdpaThreshold = 0,
       cost = {
@@ -498,6 +497,7 @@ export function usePUGridLayer({
       pugrid: PUgridSettings = {},
       'wdpa-percentage': WdpaPercentageSettings = {},
       features: FeaturesSettings = {},
+      'features-highlight': FeaturesHighlightSettings = {},
       cost: CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
@@ -517,6 +517,10 @@ export function usePUGridLayer({
       opacity: FeaturesOpacity = 1,
       visibility: FeaturesVisibility = true,
     } = FeaturesSettings;
+    const {
+      opacity: FeaturesHighlightOpacity = 1,
+      visibility: FeaturesHighlightVisibility = true,
+    } = FeaturesHighlightSettings;
     const {
       opacity: CostOpacity = 1,
       visibility: CostVisibility = true,
@@ -635,7 +639,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               layout: {
-                visibility: getLayerVisibility(FeaturesVisibility),
+                visibility: getLayerVisibility(FeaturesHighlightVisibility),
               },
               paint: {
                 'fill-color': COLORS.highlightFeatures,
@@ -646,7 +650,7 @@ export function usePUGridLayer({
                       return ['in', id, ['get', 'featureList']];
                     })),
                   ],
-                  0.5 * FeaturesOpacity,
+                  0.5 * FeaturesHighlightOpacity,
                   0,
                 ],
               },
@@ -655,7 +659,7 @@ export function usePUGridLayer({
               type: 'fill',
               'source-layer': 'layer0',
               layout: {
-                visibility: getLayerVisibility(FeaturesVisibility),
+                visibility: getLayerVisibility(FeaturesHighlightVisibility),
               },
               paint: {
                 'fill-color': COLORS.highlightFeatures,

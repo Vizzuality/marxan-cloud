@@ -199,15 +199,25 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         'pugrid',
       ];
     }
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && !preHighlightFeatures.length) return ['features', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && !!preHighlightFeatures.length) return ['features', 'features-highlight', 'pugrid'];
 
     if (tab === ScenarioSidebarTabs.PARAMETERS) return ['wdpa-percentage', 'features'];
 
     if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab !== ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['frequency', 'solution', 'pugrid'];
-    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS) return ['features'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS && !postHighlightFeatures.length) return ['features'];
+    if (tab === ScenarioSidebarTabs.SOLUTIONS && subtab === ScenarioSidebarSubTabs.POST_GAP_ANALYSIS && !!postHighlightFeatures.length) return ['features', 'features-highlight'];
 
     return ['pugrid'];
-  }, [tab, subtab, protectedAreas, isSpecies, isBioregional]);
+  }, [
+    tab,
+    subtab,
+    protectedAreas,
+    isSpecies,
+    isBioregional,
+    preHighlightFeatures.length,
+    postHighlightFeatures.length,
+  ]);
 
   const featuresIds = useMemo(() => {
     if (allGapAnalysisData) {
@@ -273,6 +283,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         pugrid: layerSettings.pugrid,
         'wdpa-percentage': layerSettings['wdpa-percentage'],
         features: layerSettings.features,
+        'features-highlight': layerSettings['features-highlight'],
         cost: layerSettings.cost,
         'lock-in': layerSettings['lock-in'],
         'lock-out': layerSettings['lock-out'],
