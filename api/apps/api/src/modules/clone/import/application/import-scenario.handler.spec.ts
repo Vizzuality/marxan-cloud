@@ -85,7 +85,6 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
-  let resourceId: ResourceId;
   const ownerId = UserId.create();
 
   const events: IEvent[] = [];
@@ -99,6 +98,7 @@ const getFixtures = async () => {
   const importResourcePieces: FakeImportResourcePieces = sandbox.get(
     ImportResourcePieces,
   );
+  const importResourceId = ResourceId.create();
 
   return {
     GivenExtractingArchiveFails: () => {
@@ -113,14 +113,13 @@ const getFixtures = async () => {
       importResourcePieces.mockEqualPieces();
     },
     WhenRequestingImport: async () => {
-      const importResult = await sut.execute(
-        new ImportScenario(new ArchiveLocation(`whatever`), ownerId),
+      return sut.execute(
+        new ImportScenario(
+          new ArchiveLocation(`whatever`),
+          ownerId,
+          importResourceId,
+        ),
       );
-      if (isRight(importResult))
-        resourceId = new ResourceId(
-          repo.entities[importResult.right.importId].resourceId,
-        );
-      return importResult;
     },
     ThenRequestImportIsSaved: (
       importResult: PromiseType<ReturnType<ImportScenarioHandler['execute']>>,
@@ -131,6 +130,16 @@ const getFixtures = async () => {
           (importResult as Right<ImportScenarioCommandResult>).right.importId
         ],
       ).toBeDefined();
+      expect(
+        repo.entities[
+          (importResult as Right<ImportScenarioCommandResult>).right.importId
+        ].resourceId,
+      ).toEqual(importResourceId.value);
+      expect(
+        repo.entities[
+          (importResult as Right<ImportScenarioCommandResult>).right.importId
+        ].ownerId,
+      ).toEqual(ownerId.value);
     },
     ThenImportFails: (
       importResult: PromiseType<ReturnType<ImportScenarioHandler['execute']>>,
@@ -143,7 +152,7 @@ const getFixtures = async () => {
       ).toEqual([
         {
           importId: expect.any(ImportId),
-          resourceId,
+          resourceId: importResourceId,
           resourceKind: ResourceKind.Scenario,
         },
       ]);
