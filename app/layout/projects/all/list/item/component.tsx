@@ -95,6 +95,7 @@ export const Item: React.FC<ItemProps> = ({
     projectDownloadMutation.mutate({ id: `${id}`, data: { scenarioIds } }, {
 
       onSuccess: () => {
+
       },
       onError: () => {
         addToast('error-download-project', (

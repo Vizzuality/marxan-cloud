@@ -57,13 +57,12 @@ export const useProjectActionsDone = () => {
       },
     }, {
       onSuccess: () => {
-        JOB_REF.current = null;
         downloadProject.mutate({
           id: `${pid}`,
           exportId: `${exportId}`,
         }, {
           onSuccess: () => {
-
+            JOB_REF.current = null;
           },
           onError: () => {
             addToast('download-error', (
