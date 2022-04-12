@@ -350,10 +350,16 @@ export class ProjectsService {
     );
 
     if (!canExportProject) return left(forbiddenError);
-
-    const exportId = await this.commandBus.execute(
-      new ExportProject(new ResourceId(projectId), scenarioIds),
+    //TODO add clonning logic and return value
+    const { exportId, importResourceId } = await this.commandBus.execute(
+      new ExportProject(
+        new ResourceId(projectId),
+        scenarioIds,
+        new UserId(userId),
+        false,
+      ),
     );
+
     return right(exportId.value);
   }
 

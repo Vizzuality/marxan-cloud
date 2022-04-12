@@ -113,6 +113,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { EntityManager } from 'typeorm';
 import { blmImageMock } from './__mock__/blm-image-mock';
+import { UserId } from '@marxan/domain-ids';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -721,14 +722,15 @@ export class ScenariosService {
       return left(forbiddenError);
     }
 
-    const result = await this.commandBus.execute(
+    const { exportId, importResourceId } = await this.commandBus.execute(
       new ExportScenario(
         new ResourceId(scenario.right.projectId),
         new ResourceId(scenarioId),
+        new UserId(userId),
       ),
     );
 
-    return right(result.value);
+    return right(exportId.value);
   }
 
   async getOneSolution(
