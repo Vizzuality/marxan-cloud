@@ -6,6 +6,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, left, right } from 'fp-ts/Either';
 import { AllPiecesExported } from '../events/all-pieces-exported.event';
@@ -25,7 +26,9 @@ export class Export extends AggregateRoot {
     public readonly id: ExportId,
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,
+    private readonly ownerId: UserId,
     private pieces: ExportComponent[],
+    public readonly importResourceId?: ResourceId,
     private archiveLocation?: ArchiveLocation,
   ) {
     super();
@@ -34,9 +37,18 @@ export class Export extends AggregateRoot {
   static newOne(
     id: ResourceId,
     kind: ResourceKind,
+    ownerId: UserId,
     parts: ExportComponent[],
+    cloning: boolean,
   ): Export {
-    const exportRequest = new Export(ExportId.create(), id, kind, parts);
+    const exportRequest = new Export(
+      ExportId.create(),
+      id,
+      kind,
+      ownerId,
+      parts,
+      cloning ? ResourceId.create() : undefined,
+    );
     parts
       .filter((part) => !part.isReady())
       .map((part) => new PieceExportRequested(exportRequest.id, part.id))
@@ -83,7 +95,9 @@ export class Export extends AggregateRoot {
       id: this.id.value,
       resourceId: this.resourceId.value,
       resourceKind: this.resourceKind,
+      ownerId: this.ownerId.value,
       exportPieces: this.pieces.map((piece) => piece.toSnapshot()),
+      importResourceId: this.importResourceId?.value,
       archiveLocation: this.archiveLocation?.value,
     };
   }
@@ -93,7 +107,11 @@ export class Export extends AggregateRoot {
       new ExportId(snapshot.id),
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
+      new UserId(snapshot.ownerId),
       snapshot.exportPieces.map(ExportComponent.fromSnapshot),
+      snapshot.importResourceId
+        ? new ResourceId(snapshot.importResourceId)
+        : undefined,
       snapshot.archiveLocation
         ? new ArchiveLocation(snapshot.archiveLocation)
         : undefined,
@@ -101,4 +119,6 @@ export class Export extends AggregateRoot {
   }
 
   #allPiecesReady = () => this.pieces.every((piece) => piece.isReady());
+
+  isClonning = () => Boolean(this.importResourceId);
 }

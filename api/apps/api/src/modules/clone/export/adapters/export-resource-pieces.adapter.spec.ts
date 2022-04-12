@@ -111,6 +111,7 @@ const getFixtures = async () => {
       ClonePiece.ScenarioInputFolder,
       ClonePiece.ScenarioOutputFolder,
       ClonePiece.FeaturesSpecification,
+      ClonePiece.MarxanExecutionMetadata,
     ];
     if (!projectExport) pieces.push(ClonePiece.ExportConfig);
     return pieces;

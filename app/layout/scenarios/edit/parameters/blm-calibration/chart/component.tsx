@@ -46,7 +46,7 @@ type DataRow = {
    * Image thumbnail associated with the point.
    * The BLM point shouldn't have one.
    */
-  thumbnail: string | null;
+  pngData: string | null;
 };
 
 export interface BlmChartProps {
@@ -254,7 +254,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           {/* Points */}
           <g>
             {data.map(({
-              cost, boundaryLength, thumbnail, blmValue,
+              cost, boundaryLength, pngData, blmValue,
             }, index) => (
               <foreignObject
                 // eslint-disable-next-line react/no-array-index-key
@@ -271,7 +271,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                   onClick={() => {
                     onSaveBlm(blmValue);
                     dispatch(setBlm(blmValue));
-                    dispatch(setBlmImage(thumbnail));
+                    dispatch(setBlmImage(pngData));
                   }}
                   aria-hidden="true"
                 />

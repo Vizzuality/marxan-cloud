@@ -45,7 +45,7 @@ export class PublishedProjectCrudService extends AppBaseService<
 
   async extendFindAllQuery(
     query: SelectQueryBuilder<PublishedProject>,
-    fetchSpecification: FetchSpecification,
+    fetchSpecification?: FetchSpecification,
     info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<PublishedProject>> {
     const userId = info?.authenticatedUser?.id;

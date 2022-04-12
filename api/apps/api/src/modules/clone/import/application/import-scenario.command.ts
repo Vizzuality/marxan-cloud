@@ -1,4 +1,4 @@
-import { ArchiveLocation } from '@marxan/cloning/domain';
+import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { Failure as ArchiveReadError } from '@marxan/cloning/infrastructure/archive-reader.port';
 import { UserId } from '@marxan/domain-ids';
 import { Command } from '@nestjs-architects/typed-cqrs';
@@ -18,6 +18,7 @@ export class ImportScenario extends Command<
   constructor(
     public readonly archiveLocation: ArchiveLocation,
     public readonly ownerId: UserId,
+    public readonly importResourceId: ResourceId,
   ) {
     super();
   }

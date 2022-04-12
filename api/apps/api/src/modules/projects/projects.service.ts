@@ -60,6 +60,7 @@ import {
 } from '../clone/import/application/import-project.command';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { UserId } from '@marxan/domain-ids';
+import { ExportProjectCommandResult } from '../clone/export/application/export-project.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -341,7 +342,13 @@ export class ProjectsService {
     projectId: string,
     userId: string,
     scenarioIds: string[],
-  ): Promise<Either<typeof forbiddenError | typeof projectNotFound, string>> {
+    clonning: boolean,
+  ): Promise<
+    Either<
+      typeof forbiddenError | typeof projectNotFound,
+      ExportProjectCommandResult
+    >
+  > {
     await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
     const canExportProject = await this.projectAclService.canExportProject(
@@ -351,10 +358,16 @@ export class ProjectsService {
 
     if (!canExportProject) return left(forbiddenError);
 
-    const exportId = await this.commandBus.execute(
-      new ExportProject(new ResourceId(projectId), scenarioIds),
+    const res = await this.commandBus.execute(
+      new ExportProject(
+        new ResourceId(projectId),
+        scenarioIds,
+        new UserId(userId),
+        clonning,
+      ),
     );
-    return right(exportId.value);
+
+    return right(res);
   }
 
   async remove(

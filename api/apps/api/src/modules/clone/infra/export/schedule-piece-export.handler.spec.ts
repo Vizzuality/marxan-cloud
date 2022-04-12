@@ -1,11 +1,11 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import {
-  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
@@ -113,6 +113,7 @@ const getFixtures = async () => {
     events.push(event);
   });
   let command: SchedulePieceExport;
+  const ownerId = UserId.create();
 
   const sut = sandbox.get(SchedulePieceExportHandler);
   const exportRepo = sandbox.get(ExportRepository);
@@ -124,9 +125,13 @@ const getFixtures = async () => {
         resourceId,
         ClonePiece.ProjectMetadata,
       );
-      const exportInstance = Export.newOne(resourceId, ResourceKind.Project, [
-        exportComponent,
-      ]);
+      const exportInstance = Export.newOne(
+        resourceId,
+        ResourceKind.Project,
+        ownerId,
+        [exportComponent],
+        false,
+      );
       await exportRepo.save(exportInstance);
 
       return [exportInstance.id, exportComponent.id];

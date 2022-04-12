@@ -6,6 +6,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
@@ -17,9 +18,7 @@ import {
   Export,
   ExportComponent,
   ExportId,
-  ExportRequested,
   PieceExported,
-  PieceExportRequested,
 } from '../domain';
 import { CompleteExportPiece } from './complete-export-piece.command';
 import { CompleteExportPieceHandler } from './complete-export-piece.handler';
@@ -107,6 +106,7 @@ const getFixtures = async () => {
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
   });
+  const ownerId = UserId.create();
 
   return {
     GivenExportWasRequested: async () => {
@@ -118,7 +118,9 @@ const getFixtures = async () => {
       const exportInstance = Export.newOne(
         resourceId,
         ResourceKind.Project,
+        ownerId,
         pieces,
+        false,
       );
 
       await repo.save(exportInstance);

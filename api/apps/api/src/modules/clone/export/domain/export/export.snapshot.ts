@@ -5,6 +5,8 @@ export interface ExportSnapshot {
   id: string;
   resourceId: string;
   resourceKind: ResourceKind;
+  ownerId: string;
+  importResourceId?: string;
   archiveLocation?: string;
   exportPieces: ExportComponentSnapshot[];
 }

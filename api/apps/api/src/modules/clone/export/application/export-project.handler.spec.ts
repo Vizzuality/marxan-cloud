@@ -4,6 +4,7 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
+import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Injectable } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
@@ -28,8 +29,18 @@ beforeEach(async () => {
 
 test(`requesting new project export`, async () => {
   const { projectId } = fixtures.GivenProjectWasCreated();
-  const exportId = await fixtures.WhenExportIsRequested(projectId);
+  const { exportId } = await fixtures.WhenExportIsRequested(projectId);
   await fixtures.ThenExportRequestIsSaved(exportId);
+  await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(projectId);
+  fixtures.ThenExportRequestsEventIsPresent(exportId);
+});
+
+test(`requesting new project export within a clonning operation`, async () => {
+  const { projectId } = fixtures.GivenProjectWasCreated();
+  const { exportId } = await fixtures.WhenExportIsRequested(projectId, {
+    clonning: true,
+  });
+  await fixtures.ThenExportRequestIsSaved(exportId, { clonning: true });
   await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(projectId);
   fixtures.ThenExportRequestsEventIsPresent(exportId);
 });
@@ -59,6 +70,7 @@ const getFixtures = async () => {
   sandbox.get(EventBus).subscribe((event) => {
     events.push(event);
   });
+  const ownerId = UserId.create();
 
   return {
     GivenProjectWasCreated: () => {
@@ -70,10 +82,19 @@ const getFixtures = async () => {
       ]);
       return { projectId };
     },
-    WhenExportIsRequested: async (projectId: ResourceId) =>
-      sut.execute(new ExportProject(projectId, [])),
-    ThenExportRequestIsSaved: async (exportId: ExportId) => {
-      expect((await repo.find(exportId))?.toSnapshot()).toBeDefined();
+    WhenExportIsRequested: async (
+      projectId: ResourceId,
+      opts: { clonning: boolean } = { clonning: false },
+    ) => sut.execute(new ExportProject(projectId, [], ownerId, opts.clonning)),
+    ThenExportRequestIsSaved: async (
+      exportId: ExportId,
+      opts: { clonning: boolean } = { clonning: false },
+    ) => {
+      const exportInstance = await repo.find(exportId);
+      expect(exportInstance?.toSnapshot()).toBeDefined();
+      if (!opts.clonning)
+        expect(exportInstance?.importResourceId).toEqual(undefined);
+      else expect(exportInstance?.importResourceId).toBeDefined();
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
       projectId: ResourceId,

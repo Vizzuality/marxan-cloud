@@ -98,6 +98,8 @@ export class ProjectsCrudService extends AppBaseService<
         'bbox',
         'customProtectedAreas',
         'isPublic',
+        'publicMetadata',
+        'metadata',
       ],
       keyForAttribute: 'camelCase',
       scenarios: {

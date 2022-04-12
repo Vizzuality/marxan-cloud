@@ -60,15 +60,6 @@ export class MarxanSandboxBlmRunnerService
     const { blmValues, scenarioId } = input;
     const calibrationId = v4();
 
-    const projectId = await this.apiEntityManager
-      .createQueryBuilder()
-      .select(['project_id'])
-      .from('scenarios', 's')
-      .where('id = :scenarioId', { scenarioId })
-      .getRawOne();
-
-    const webshotUrl = AppConfig.get('webshot.url') as string;
-
     this.eventBus.publish(new BlmCalibrationStarted(scenarioId, calibrationId));
 
     const inputFilesHandler = await this.moduleRef.create(BlmInputFiles);
@@ -76,6 +67,17 @@ export class MarxanSandboxBlmRunnerService
       inputFilesHandler,
       this.finalResultsRepository,
     ]);
+
+    const result = await this.apiEntityManager
+      .createQueryBuilder()
+      .select(['project_id'])
+      .from('scenarios', 's')
+      .where('id = :scenarioId', { scenarioId })
+      .getRawOne();
+
+    const projectId = result.project_id;
+
+    const webshotUrl = AppConfig.get('webshot.url') as string;
 
     return new Promise<void>(async (resolve, reject) => {
       try {

@@ -17,7 +17,7 @@ import {
   OutputScenariosFeaturesDataGeoEntity,
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
-import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { readFileSync } from 'fs';
 import { last } from 'lodash';
 import * as nock from 'nock';
@@ -25,7 +25,13 @@ import { EntityManager, In, Repository } from 'typeorm';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
-import { bootstrapApplication, delay } from '../../utils';
+import { delay } from '../../utils';
+import { Test } from '@nestjs/testing';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import {
+  GivenScenarioExists,
+  DeleteProjectAndOrganization,
+} from '../clonning/fixtures';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -101,6 +107,7 @@ const NUMBER_OF_RUNS = 100;
 
 const getFixtures = async () => {
   const projectId = v4();
+  const organizationId = v4();
   const scenarioId = v4();
   const featureId = v4();
   const outputsIds: string[] = [];
@@ -108,31 +115,57 @@ const getFixtures = async () => {
 
   nock.disableNetConnect();
 
-  const app = await bootstrapApplication();
+  const app = await Test.createTestingModule({
+    imports: [
+      TypeOrmModule.forRoot({
+        ...geoprocessingConnections.default,
+        keepConnectionAlive: true,
+        logging: false,
+      }),
+      TypeOrmModule.forRoot({
+        ...geoprocessingConnections.apiDB,
+        keepConnectionAlive: true,
+        logging: false,
+      }),
+      TypeOrmModule.forFeature([]),
+      TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
+      BlmRunAdapterModule,
+    ],
+  }).compile();
+
+  const apiEntityManager: EntityManager = app.get(
+    getEntityManagerToken(geoprocessingConnections.apiDB),
+  );
+  await GivenScenarioExists(
+    apiEntityManager,
+    scenarioId,
+    projectId,
+    organizationId,
+  );
   const entityManager = app.get<EntityManager>(getEntityManagerToken());
-  const featuresData: Repository<GeoFeatureGeometry> = app.get(
-    getRepositoryToken(GeoFeatureGeometry),
+  const featuresData: Repository<GeoFeatureGeometry> = entityManager.getRepository(
+    GeoFeatureGeometry,
   );
-  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = app.get(
-    getRepositoryToken(ScenarioFeaturesData),
+  const scenarioFeatureRepo: Repository<ScenarioFeaturesData> = entityManager.getRepository(
+    ScenarioFeaturesData,
   );
-  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = app.get(
-    getRepositoryToken(PlanningUnitsGeom),
+  const planningUnitsGeomRepo: Repository<PlanningUnitsGeom> = entityManager.getRepository(
+    PlanningUnitsGeom,
   );
-  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = app.get(
-    getRepositoryToken(OutputScenariosPuDataGeoEntity),
+  const puOutputRepo: Repository<OutputScenariosPuDataGeoEntity> = entityManager.getRepository(
+    OutputScenariosPuDataGeoEntity,
   );
-  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = app.get(
-    getRepositoryToken(MarxanExecutionMetadataGeoEntity),
+  const metadataRepo: Repository<MarxanExecutionMetadataGeoEntity> = entityManager.getRepository(
+    MarxanExecutionMetadataGeoEntity,
   );
-  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = app.get(
-    getRepositoryToken(OutputScenariosFeaturesDataGeoEntity),
+  const featuresOutputRepo: Repository<OutputScenariosFeaturesDataGeoEntity> = entityManager.getRepository(
+    OutputScenariosFeaturesDataGeoEntity,
   );
-  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = app.get(
-    getRepositoryToken(BlmFinalResultEntity),
+  const blmFinalResultsRepo: Repository<BlmFinalResultEntity> = entityManager.getRepository(
+    BlmFinalResultEntity,
   );
-  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> = app.get(
-    getRepositoryToken(BlmPartialResultEntity),
+  const blmPartialResultsRepo: Repository<BlmPartialResultEntity> = entityManager.getRepository(
+    BlmPartialResultEntity,
   );
   // note that SandboxRunner may be both single and blm-calibration one
   const runModuleContext = app.select(BlmRunAdapterModule);
@@ -149,6 +182,11 @@ const getFixtures = async () => {
   });
   return {
     cleanup: async () => {
+      await DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
       await metadataRepo.delete({
         scenarioId,
       });
