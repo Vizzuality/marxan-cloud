@@ -38,6 +38,12 @@ export class ImportEntity {
   })
   archiveLocation!: string;
 
+  @Column({
+    type: 'boolean',
+    name: 'is_cloning',
+  })
+  isCloning!: boolean;
+
   @OneToMany(() => ImportComponentEntity, (component) => component.import, {
     cascade: true,
   })
@@ -66,6 +72,7 @@ export class ImportEntity {
       ImportComponentEntity.fromSnapshot,
     );
     entity.ownerId = snapshot.ownerId;
+    entity.isCloning = snapshot.isCloning;
 
     return entity;
   }
@@ -79,6 +86,7 @@ export class ImportEntity {
       archiveLocation: this.archiveLocation,
       importPieces: this.components.map((component) => component.toSnapshot()),
       ownerId: this.ownerId,
+      isCloning: this.isCloning,
     });
   }
 }
