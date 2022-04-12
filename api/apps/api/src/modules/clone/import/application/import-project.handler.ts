@@ -40,9 +40,7 @@ export class ImportProjectHandler
 
     const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
 
-    const resourceId = importResourceId
-      ? importResourceId
-      : ResourceId.create();
+    const resourceId = importResourceId ?? ResourceId.create();
 
     const projectId = resourceId;
 
@@ -54,7 +52,7 @@ export class ImportProjectHandler
 
     const importRequest = this.eventPublisher.mergeObjectContext(
       Import.newOne(
-        projectId,
+        resourceId,
         ResourceKind.Project,
         projectId,
         ownerId,
