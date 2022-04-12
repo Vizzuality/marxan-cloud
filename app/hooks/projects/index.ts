@@ -347,6 +347,7 @@ export function usePublishProject({
 
   return useMutation(publishProject, {
     onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('projects');
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
       console.info('Succces', data, variables, context);
@@ -379,6 +380,7 @@ export function useUnPublishProject({
   return useMutation(publishProject, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
+      queryClient.invalidateQueries('projects');
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
     },

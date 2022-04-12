@@ -19,6 +19,7 @@ export const CellStatus: React.FC<CellStatusProps> = ({
 
   return (
     <Select
+      key={row.original.id}
       theme="light"
       size="s"
       initialSelected={value}
