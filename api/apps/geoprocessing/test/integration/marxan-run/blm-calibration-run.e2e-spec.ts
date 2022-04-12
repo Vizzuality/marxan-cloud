@@ -28,7 +28,10 @@ import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { delay } from '../../utils';
 import { Test } from '@nestjs/testing';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { GivenScenarioExists } from '../clonning/fixtures';
+import {
+  GivenScenarioExists,
+  DeleteProjectAndOrganization,
+} from '../clonning/fixtures';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -179,6 +182,11 @@ const getFixtures = async () => {
   });
   return {
     cleanup: async () => {
+      await DeleteProjectAndOrganization(
+        apiEntityManager,
+        projectId,
+        organizationId,
+      );
       await metadataRepo.delete({
         scenarioId,
       });
