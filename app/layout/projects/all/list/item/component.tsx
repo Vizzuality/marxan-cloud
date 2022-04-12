@@ -11,7 +11,7 @@ import { ROLES } from 'utils/constants-roles';
 import { useMe } from 'hooks/me';
 import { useOwnsProject, useProjectRole } from 'hooks/permissions';
 import { useProjectUsers } from 'hooks/project-users';
-import { useSaveProjectDownload, useExportId, useDownloadProject } from 'hooks/projects';
+import { useSaveProjectDownload } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -62,7 +62,6 @@ export const Item: React.FC<ItemProps> = ({
   const isOwner = useOwnsProject(id);
 
   const { data: projectUsers } = useProjectUsers(id);
-  const { data: exportId } = useExportId(id);
   const {
     data: scenariosData,
   } = useScenarios(id, {
@@ -71,7 +70,6 @@ export const Item: React.FC<ItemProps> = ({
   });
 
   const projectDownloadMutation = useSaveProjectDownload({});
-  const downloadProject = useDownloadProject({});
 
   const scenarioIds = useMemo(() => {
     return scenariosData?.map((scenario) => scenario.id);
@@ -97,41 +95,15 @@ export const Item: React.FC<ItemProps> = ({
     projectDownloadMutation.mutate({ id: `${id}`, data: { scenarioIds } }, {
 
       onSuccess: () => {
-        downloadProject.mutate({
-          id: `${id}`,
-          exportId: `${exportId}`,
-        }, {
-          onSuccess: () => {
-
-          },
-          onError: () => {
-            addToast('download-error', (
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <ul className="text-sm">
-                  `Project $
-                  {name}
-                  {' '}
-                  not downloaded. Try again.`
-                </ul>
-              </>
-            ), {
-              level: 'error',
-            });
-          },
-        });
       },
-      onError: ({ e }) => {
-        console.error('error --->', e);
+      onError: () => {
         addToast('error-download-project', (
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">
-              `Unable to download project
+              Unable to download project
               {' '}
-              $
               {name}
-              `
             </p>
           </>
         ), {
@@ -155,8 +127,6 @@ export const Item: React.FC<ItemProps> = ({
     addToast,
     scenarioIds,
     projectDownloadMutation,
-    downloadProject,
-    exportId,
   ]);
 
   const handleDuplicate = useCallback((e) => {
