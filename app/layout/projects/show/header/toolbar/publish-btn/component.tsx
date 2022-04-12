@@ -116,7 +116,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
             disabled={!isOwner}
             onClick={() => setModal(true)}
           >
-            <span className="mr-2.5">Publish to Community</span>
+            <span className="mr-2.5">Publish project</span>
             <Icon icon={COMMUNITY_SVG} />
           </Button>
 
@@ -213,7 +213,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
             disabled={!isOwner}
             onClick={() => setConfirmUnPublish(projectData)}
           >
-            <span className="mr-2.5">Unpublish from Community</span>
+            <span className="mr-2.5">Unpublish project</span>
             <Icon icon={COMMUNITY_SVG} />
           </Button>
 
@@ -221,7 +221,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
             title={`Are you sure you want unpublish "${projectData?.name}"?`}
             // description="The action can be reverted."
             icon={DELETE_WARNING_SVG}
-            iconClassName="w-16 h-16"
+            // iconClassName="w-16 h-16"
             open={!!confirmUnPublish}
             onAccept={handleUnpublish}
             onRefuse={() => setConfirmUnPublish(null)}

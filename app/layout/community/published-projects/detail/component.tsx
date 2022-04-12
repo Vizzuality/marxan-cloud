@@ -33,11 +33,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const {
     data: publishedProject,
     isFetching: publishedProjectIsFetching,
+    isFetched: publishedProjectIsFetched,
   } = usePublishedProject(pid);
 
   const {
     data: publishedProjectScenarios,
     isFetching: publishedProjectScenariosIsFetching,
+    isFetched: publishedProjectScenariosIsFetched,
   } = useScenarios(pid, {
     filters: {
       projectId: pid,
@@ -62,7 +64,6 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
             Projects
           </Backlink>
           <div className="relative" style={{ minHeight: 600 }}>
-
             {publishedProject && scenarios && (
               <div className="flex flex-row">
                 <div className="w-7/12 pr-12">
@@ -172,9 +173,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         </div>
       </Wrapper>
       <Loading
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-50 bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
-        visible={publishedProjectIsFetching && publishedProjectScenariosIsFetching}
+        visible={
+          publishedProjectIsFetching && publishedProjectScenariosIsFetching
+          && !publishedProjectIsFetched && !publishedProjectScenariosIsFetched
+        }
       />
 
     </div>
