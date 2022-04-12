@@ -18,7 +18,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   backToHref,
 }: AdminHeaderProps) => {
   return (
-    <div className="my-10 space-y-3">
+    <div className="mt-10 mb-3 space-y-5">
       <Link
         href={backToHref || '/admin'}
       >
