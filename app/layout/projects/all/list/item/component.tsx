@@ -93,8 +93,7 @@ export const Item: React.FC<ItemProps> = ({
     onClick(e);
   }, [onClick]);
 
-  const handleDownload = useCallback((e) => {
-    e.stopPropagation();
+  const handleDownload = useCallback(() => {
     projectDownloadMutation.mutate({ id, data: { scenarioIds } }, {
 
       onSuccess: () => {
