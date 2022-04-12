@@ -13,7 +13,7 @@ beforeEach(async () => {
 });
 
 describe('PlanningUnitsTilesModule (e2e)', () => {
-  test('When creating a regular project whe should be able to access to its planning area tiles', async () => {
+  test.only('When creating a regular project whe should be able to access to its planning area tiles', async () => {
     const tile: Buffer = await world.WhenRequestingTileForProjectPlanningArea(
       world.regularProjectId,
     );

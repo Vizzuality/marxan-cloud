@@ -10,64 +10,11 @@ jobs:
   test-api-e2e:
     runs-on: ubuntu-20.04
     timeout-minutes: 30
-    services:
-      api-database:
-        image: postgis/postgis:14-3.1-alpine
-        env:
-          POSTGRES_PASSWORD: marxan-api
-          POSTGRES_USER: marxan-api
-          POSTGRES_DB: marxan-api
-        ports:
-          - 3542:5432
-      geo-database:
-        image: postgis/postgis:14-3.1-alpine
-        env:
-          POSTGRES_PASSWORD: marxan-geo
-          POSTGRES_USER: marxan-geo
-          POSTGRES_DB: marxan-geo
-        ports:
-          - 3541:5432
-#    env:
-#      API_SERVICE_PORT: 3130
-#      API_SERVICE_URL: http://api:3000
-#      API_AUTH_JWT_SECRET: jwt-secret
-#      API_RUN_MIGRATIONS_ON_STARTUP: "false"
-#      API_AUTH_X_API_KEY: auth-x-api-key
-#      API_LOGGING_MUTE_ALL: "true"
-#      API_POSTGRES_USER: marxan-api
-#      API_POSTGRES_PASSWORD: marxan-api
-#      API_POSTGRES_DB: marxan-api
-#      POSTGRES_API_SERVICE_PORT: 3542
-#      GEOPROCESSING_SERVICE_PORT: 3140
-#      GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP: "false"
-#      GEO_POSTGRES_USER: marxan-geo
-#      GEO_POSTGRES_PASSWORD: ${{ secrets.GEO_POSTGRES_PASSWORD }}
-#      GEO_POSTGRES_DB: marxan-geo-api
-#      POSTGRES_GEO_SERVICE_PORT: 3533
-#      REDIS_API_SERVICE_PORT: 3479
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Checkout envs
-        run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml config
-      - name: Run CI tests via make task
-        run: make run-test-e2e-ci
     - name: Checkout repository
       uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '14.18'
-    - name: Run migrations
-      working-directory: ./api
-      run: yarn test:prepare-db
-    - name: Run API e2e tests
-      working-directory: ./api
-      run: yarn api:test:e2e:new
-#    - name: Checkout envs
-#      run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
-#    - name: Run CI tests via make task
-#      run: make run-test-e2e-ci
-
+    - name: Run CI tests via make task
+      run: make test-e2e-api
   test-api-unit:
     runs-on: ubuntu-18.04
     timeout-minutes: 10
