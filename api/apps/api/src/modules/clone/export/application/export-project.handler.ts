@@ -1,18 +1,19 @@
+import { ResourceKind } from '@marxan/cloning/domain';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-
-import { ResourceKind } from '@marxan/cloning/domain';
-import { Export, ExportId } from '../domain';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Project } from '../../../projects/project.api.entity';
+import { Export } from '../domain';
 import {
   ExportProject,
   ExportProjectCommandResult,
 } from './export-project.command';
-import { ExportResourcePieces } from './export-resource-pieces.port';
 import { ExportRepository } from './export-repository.port';
+import { ExportResourcePieces } from './export-resource-pieces.port';
 
 @CommandHandler(ExportProject)
 export class ExportProjectHandler
@@ -21,22 +22,33 @@ export class ExportProjectHandler
     private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
+    @InjectRepository(Project)
+    private readonly projectRepo: Repository<Project>,
   ) {}
 
   async execute({
     id,
     scenarioIds,
     ownerId,
-    clonning,
+    cloning,
   }: ExportProject): Promise<ExportProjectCommandResult> {
     const kind = ResourceKind.Project;
     const pieces = await this.resourcePieces.resolveForProject(id, scenarioIds);
     const exportRequest = this.eventPublisher.mergeObjectContext(
-      Export.newOne(id, kind, ownerId, pieces, clonning),
+      Export.newOne(id, kind, ownerId, pieces, cloning),
     );
     await this.exportRepository.save(exportRequest);
 
     exportRequest.commit();
+
+    if (cloning) {
+      const project = await this.projectRepo.findOneOrFail(id.value);
+      await this.projectRepo.save({
+        id: exportRequest.importResourceId!.value,
+        name: '',
+        organizationId: project.organizationId,
+      });
+    }
 
     return {
       exportId: exportRequest.id,

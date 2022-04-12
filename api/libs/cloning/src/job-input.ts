@@ -1,4 +1,3 @@
-import { string } from 'fp-ts';
 import { ClonePiece, ComponentLocationSnapshot, ResourceKind } from './domain';
 
 export interface ExportJobInput {
@@ -7,6 +6,7 @@ export interface ExportJobInput {
   readonly resourceId: string;
   readonly resourceKind: ResourceKind;
   readonly piece: ClonePiece;
+  readonly isCloning: boolean;
   readonly allPieces: { piece: ClonePiece; resourceId: string }[];
 }
 

@@ -62,6 +62,7 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
       resourceKind: input.resourceKind,
       resourceId: scenarioId,
       pieces: input.allPieces.map((elem) => elem.piece),
+      isCloning: true,
     };
 
     const outputFile = await this.fileRepository.save(

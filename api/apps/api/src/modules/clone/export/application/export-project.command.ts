@@ -13,7 +13,7 @@ export class ExportProject extends Command<ExportProjectCommandResult> {
     public readonly id: ResourceId,
     public readonly scenarioIds: string[],
     public readonly ownerId: UserId,
-    public readonly clonning: boolean,
+    public readonly cloning: boolean,
   ) {
     super();
   }
