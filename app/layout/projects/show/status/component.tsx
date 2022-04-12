@@ -62,6 +62,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
 
   // Actions
   const ACTIONS_DONE = useProjectActionsDone();
+
   const ACTIONS_FAILURE = useProjectActionsFailure();
 
   useEffect(() => {
