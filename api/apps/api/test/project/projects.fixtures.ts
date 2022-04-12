@@ -129,6 +129,8 @@ export const getFixtures = async () => {
             planningUnitGridShape: expect.any(String),
             planningAreaId: 'NAM',
             planningAreaName: 'Namibia',
+            metadata: null,
+            publicMetadata: null,
           },
           id: publicProjectId,
           type: 'projects',
