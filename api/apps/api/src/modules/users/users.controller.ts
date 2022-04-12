@@ -27,6 +27,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -71,11 +72,23 @@ export class UsersController {
   })
   @JSONAPIQueryParams({
     entitiesAllowedAsIncludes: userResource.entitiesAllowedAsIncludes,
+    availableFilters: [{ name: 'name' }],
+  })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: `A free search over names`,
   })
   @Get()
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
+    @Request() req: RequestWithAuthenticatedUser,
   ): Promise<User[]> {
+    //Admin-only endpoint so it needs a prior platformAdmin check.
+    if (!(await this.service.isPlatformAdmin(req.user.id))) {
+      throw new ForbiddenException();
+    }
+
     const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
   }
