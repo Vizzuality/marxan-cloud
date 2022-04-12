@@ -1,7 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { useDebouncedCallback } from 'use-debounce';
+
 import { useAdminUsers } from 'hooks/admin';
 
+import Search from 'components/search';
 import Table2 from 'components/table2';
 
 import CellAdmin from './cells/admin';
@@ -14,6 +17,7 @@ export interface AdminUsersTableProps {
 export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState({ id: 'displayName', direction: 'desc' });
+  const [search, setSearch] = useState<string>();
 
   const {
     data: adminUsersData = [],
@@ -22,6 +26,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   } = useAdminUsers({
     page,
     sort,
+    search,
   });
 
   const COLUMNS = useMemo(() => {
@@ -78,8 +83,24 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     });
   }, []);
 
+  const onSearch = useDebouncedCallback((v) => {
+    setSearch(v);
+  }, 250);
+
   return (
-    <>
+    <div className="space-y-5">
+      <div className="max-w-lg">
+        <Search
+          id="published-project-search"
+          defaultValue={search}
+          size="base"
+          theme="light"
+          placeholder="Search by project name, planning area name..."
+          aria-label="Search"
+          onChange={onSearch}
+        />
+      </div>
+
       <Table2
         data={adminUsersData}
         meta={meta}
@@ -89,7 +110,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
         onPageChange={onPageChange}
         onSortChange={onSortChange}
       />
-    </>
+    </div>
   );
 };
 

@@ -1,7 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { useDebouncedCallback } from 'use-debounce';
+
 import { useAdminPublishedProjects } from 'hooks/admin';
 
+import Search from 'components/search';
 import Table2 from 'components/table2';
 
 import Name from './cells/name';
@@ -16,6 +19,7 @@ export interface AdminPublishedProjectsTableProps {
 export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTableProps> = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState({ id: 'name', direction: 'desc' });
+  const [search, setSearch] = useState<string>();
 
   const {
     data: publishedProjectsData = [],
@@ -24,6 +28,7 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
   } = useAdminPublishedProjects({
     page,
     sort,
+    search,
   });
 
   const COLUMNS = useMemo(() => {
@@ -89,16 +94,34 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
     });
   }, []);
 
+  const onSearch = useDebouncedCallback((v) => {
+    setSearch(v);
+  }, 250);
+
   return (
-    <Table2
-      data={publishedProjectsData}
-      meta={meta}
-      columns={COLUMNS}
-      initialState={initialState}
-      loading={isFetching}
-      onPageChange={onPageChange}
-      onSortChange={onSortChange}
-    />
+    <div className="space-y-5">
+      <div className="max-w-lg">
+        <Search
+          id="published-project-search"
+          defaultValue={search}
+          size="base"
+          theme="light"
+          placeholder="Search by project name, planning area name..."
+          aria-label="Search"
+          onChange={onSearch}
+        />
+      </div>
+
+      <Table2
+        data={publishedProjectsData}
+        meta={meta}
+        columns={COLUMNS}
+        initialState={initialState}
+        loading={isFetching}
+        onPageChange={onPageChange}
+        onSortChange={onSortChange}
+      />
+    </div>
   );
 };
 

@@ -105,7 +105,7 @@ export const Table2: React.FC<Table2Props> = ({
   const [sortSelected] = sortBy;
 
   return (
-    <div className="relative w-full">
+    <div className="relative -mx-10">
       <div {...getTableProps()} className="relative w-full mb-2 bg-white rounded-t-3xl">
         <div>
           {headerGroups.map((headerGroup) => {
