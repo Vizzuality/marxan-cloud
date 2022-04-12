@@ -97,8 +97,8 @@ import {
 } from '@marxan-api/decorators/acl.decorator';
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import {
-  RequestProjectExportResponseDto,
   RequestProjectExportBodyDto,
+  RequestProjectExportResponseDto,
 } from './dto/export.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
@@ -111,7 +111,6 @@ import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
-import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -405,6 +404,7 @@ export class ProjectsController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
+    console.log('here');
     const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
       projectId,
       req.user.id,
@@ -412,7 +412,7 @@ export class ProjectsController {
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
-
+    console.log(checkPlanningAreaBelongsToProject);
     const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
       projectId,
       req.user.id,

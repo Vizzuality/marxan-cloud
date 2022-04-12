@@ -112,13 +112,7 @@ export const createWorld = async (app: INestApplication) => {
         .expect(200)
         .responseType('blob')
         .buffer()
-        .then((response) => response.body)
-        .catch((error) => {
-          Logger.error(error);
-          throw new Error(
-            `[step] Could not access project planning area tiles`,
-          );
-        }),
+        .then((response) => response.body),
     WhenRequestingTileForProjectPlanningGrid: async (projectId: string) =>
       request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/grid/tiles/9/189/291.mvt`)

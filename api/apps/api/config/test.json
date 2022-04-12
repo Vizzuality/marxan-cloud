@@ -1,6 +1,6 @@
 {
   "logging": {
-    "muteAll": "API_LOGGING_MUTE_ALL"
+    "muteAll": "true"
   },
   "network": {
     "cors": {
@@ -12,13 +12,16 @@
   "redisApi": {
     "connection": {
       "host": "localhost",
-      "port": 3379
+      "port": 3379,
+      "password": null,
+      "useTLS": false,
+      "concurrency" : 50
     },
     "concurrency": 50
   },
   "redis": {
-    "host": "localhost",
     "port": 3379,
+    "host": "localhost",
     "password": null,
     "useTLS": false,
     "concurrency" : 50

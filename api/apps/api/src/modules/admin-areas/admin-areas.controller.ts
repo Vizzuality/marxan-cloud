@@ -1,7 +1,6 @@
 import {
   Controller,
   Get,
-  HttpStatus,
   Param,
   Query,
   Req,
@@ -157,8 +156,7 @@ export class AdminAreasController {
       fetchSpecification,
     );
 
-    HttpStatus.return;
-    await this.service.serialize(results.data, results.metadata);
+    return this.service.serialize(results.data, results.metadata);
   }
 
   @ApiOperation({ description: 'Find administrative area by id' })
