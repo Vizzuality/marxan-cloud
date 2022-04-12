@@ -29,6 +29,7 @@ export class ImportScenarioHandler
   async execute({
     archiveLocation,
     ownerId,
+    importResourceId,
   }: ImportScenario): Promise<
     Either<ImportScenarioError, ImportScenarioCommandResult>
   > {
@@ -38,7 +39,6 @@ export class ImportScenarioHandler
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
     const exportConfig = exportConfigOrError.right as ScenarioExportConfigContent;
-    const importResourceId = ResourceId.create();
 
     const pieces = this.importResourcePieces.resolveForScenario(
       importResourceId,

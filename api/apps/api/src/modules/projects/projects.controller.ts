@@ -608,6 +608,7 @@ export class ProjectsController {
       projectId,
       req.user.id,
       dto.scenarioIds,
+      false,
     );
 
     if (isLeft(result)) {
@@ -624,7 +625,7 @@ export class ProjectsController {
       }
     }
     return {
-      id: result.right,
+      id: result.right.exportId.value,
     };
   }
 
