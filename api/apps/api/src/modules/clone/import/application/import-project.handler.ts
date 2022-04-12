@@ -29,6 +29,7 @@ export class ImportProjectHandler
   async execute({
     archiveLocation,
     ownerId,
+    importResourceId,
   }: ImportProject): Promise<
     Either<ImportProjectError, ImportProjectCommandResult>
   > {
@@ -38,8 +39,12 @@ export class ImportProjectHandler
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
     const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
-    const importResourceId = ResourceId.create();
-    const projectId = importResourceId;
+
+    const resourceId = importResourceId
+      ? importResourceId
+      : ResourceId.create();
+
+    const projectId = resourceId;
 
     const pieces = this.importResourcePieces.resolveForProject(
       projectId,
@@ -49,7 +54,7 @@ export class ImportProjectHandler
 
     const importRequest = this.eventPublisher.mergeObjectContext(
       Import.newOne(
-        importResourceId,
+        projectId,
         ResourceKind.Project,
         projectId,
         ownerId,
