@@ -3,7 +3,7 @@ import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
-  FolderZipType,
+  MarxanExecutionMetadataFolderType,
   getMarxanExecutionMetadataFolderRelativePath,
   MarxanExecutionMetadataContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
@@ -22,7 +22,7 @@ import {
 
 type FolderZipData = {
   id: string;
-  type: FolderZipType;
+  type: MarxanExecutionMetadataFolderType;
   buffer: Buffer;
 };
 
@@ -46,7 +46,7 @@ export class MarxanExecutionMetadataPieceExporter
   private async saveZipFile(
     file: Buffer,
     executionId: string,
-    type: FolderZipType,
+    type: MarxanExecutionMetadataFolderType,
   ): Promise<string> {
     const locationOrError = await this.fileRepository.save(Readable.from(file));
     if (isLeft(locationOrError)) {
@@ -104,20 +104,14 @@ export class MarxanExecutionMetadataPieceExporter
         scenarioId: input.resourceId,
       },
     );
-    const jsonFileRelativePath = jsonFileLocation.relativePath;
-
-    const foldersZipsRelativePathPrefix = jsonFileRelativePath.substring(
-      0,
-      jsonFileRelativePath.lastIndexOf('/') + 1,
-    );
 
     const folderZipsLocations = await Promise.all(
       foldersZipsData.map(async ({ buffer, id, type }) => {
         const location = await this.saveZipFile(buffer, id, type);
         const relativePath = getMarxanExecutionMetadataFolderRelativePath(
           id,
-          foldersZipsRelativePathPrefix,
           type,
+          jsonFileLocation.relativePath,
         );
 
         return new ComponentLocation(location, relativePath);

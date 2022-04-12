@@ -2,6 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { FileRepositoryModule } from '@marxan/files-repository';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { MarxanExecutionMetadataPieceImporter } from './marxan-execution-metadata.piece-importer';
 import { PlanningAreaCustomPieceImporter } from './planning-area-custom.piece-importer';
 import { PlanningAreaGadmPieceImporter } from './planning-area-gadm.piece-importer';
 import { PlanningUnitsGridPieceImporter } from './planning-units-grid.piece-importer';
@@ -33,6 +34,7 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
     ScenarioRunResultsPieceImporter,
     ScenarioFeaturesDataPieceImporter,
     ScenarioFeaturesSpecificationPieceImporter,
+    MarxanExecutionMetadataPieceImporter,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
