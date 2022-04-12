@@ -61,7 +61,7 @@ export const useScenarioActionsFailure = () => {
   }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
 
   // Protected Areas
-  const onProtectedAreasFailure = useCallback(() => {
+  const onUploadedProtectedAreaFailure = useCallback(() => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
@@ -75,7 +75,7 @@ export const useScenarioActionsFailure = () => {
         dispatch(setJob(null));
       },
       onError: () => {
-        addToast('onProtectedAreasFailure', (
+        addToast('onUploadedProtectedAreaFailure', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -235,7 +235,7 @@ export const useScenarioActionsFailure = () => {
   return {
     features: onFeaturesFailure,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationFailure,
-    protectedAreas: onProtectedAreasFailure,
+    protectedAreas: onUploadedProtectedAreaFailure,
     costSurface: onCostSurfaceFailure,
     planningUnitsInclusion: onPlanningUnitsInclusionFailure,
     calibration: onCalibrationFailure,

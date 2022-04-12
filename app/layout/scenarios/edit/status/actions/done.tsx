@@ -89,13 +89,13 @@ export const useScenarioActionsDone = () => {
   ]);
 
   // Protected Areas
-  const onProtectedAreasDone = useCallback((JOB_REF) => {
+  const onUploadedProtectedAreaDone = useCallback((JOB_REF) => {
     scenarioMutation.mutate({
       id: `${sid}`,
       data: {
         metadata: mergeScenarioStatusMetaData(scenarioData?.metadata, {
           tab: ScenarioSidebarTabs.PLANNING_UNIT,
-          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD,
+          subtab: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
         }),
 
       },
@@ -103,10 +103,11 @@ export const useScenarioActionsDone = () => {
       onSuccess: () => {
         dispatch(setJob(null));
         dispatch(setCache(Date.now()));
+        queryClient.invalidateQueries(['protected-areas']);
         JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onProtectedAreasDone', (
+        addToast('onUploadedProtectedAreaDone', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -119,6 +120,7 @@ export const useScenarioActionsDone = () => {
     sid,
     scenarioMutation,
     scenarioData?.metadata,
+    queryClient,
     dispatch,
     setJob,
     setCache,
@@ -331,7 +333,7 @@ export const useScenarioActionsDone = () => {
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
-    protectedAreas: onProtectedAreasDone,
+    protectedAreas: onUploadedProtectedAreaDone,
     costSurface: onCostSurfaceDone,
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     calibration: onCalibrationDone,
