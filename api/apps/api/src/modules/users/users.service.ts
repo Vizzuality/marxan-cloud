@@ -6,7 +6,7 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, Repository, SelectQueryBuilder } from 'typeorm';
 import { User, userResource } from './user.api.entity';
 
 import { omit } from 'lodash';
@@ -26,6 +26,7 @@ import { v4 } from 'uuid';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { FetchSpecification } from 'nestjs-base-service';
 
 export const forbiddenError = Symbol(`unauthorized access`);
 export const badRequestError = Symbol(`operation not allowed`);
@@ -243,6 +244,7 @@ export class UsersService extends AppBaseService<
 
   async extendFindAllResults(
     entitiesAndCount: [User[], number],
+    _fetchSpecification?: FetchSpecification,
   ): Promise<[User[], number]> {
     const extendedEntities: Promise<User>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),
