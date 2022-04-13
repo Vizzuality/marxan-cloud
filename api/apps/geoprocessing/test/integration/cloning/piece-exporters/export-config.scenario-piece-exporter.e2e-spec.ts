@@ -19,7 +19,7 @@ import {
   DeleteProjectAndOrganization,
   GivenScenarioExists,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

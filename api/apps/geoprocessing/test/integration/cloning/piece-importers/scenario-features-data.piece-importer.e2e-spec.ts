@@ -25,7 +25,7 @@ import {
   GivenFeaturesData,
   GivenScenarioExists,
   PrepareZipFile,
-} from './fixtures';
+} from '../fixtures';
 
 function getFeatureClassNameByIdMap(
   features: { id: string; feature_class_name: string }[],

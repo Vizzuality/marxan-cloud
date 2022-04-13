@@ -1,4 +1,4 @@
-import { ProjectCustomProtectedAreasPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-custom-protected-areas.piece-importer';
+import { PlanningAreaGadmPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/planning-area-gadm.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
@@ -7,24 +7,32 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
+import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { ProtectedArea } from '@marxan/protected-areas';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import {
-  getEntityManagerToken,
-  getRepositoryToken,
-  TypeOrmModule,
-} from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
-import { GenerateRandomGeometries, PrepareZipFile } from './fixtures';
+import {
+  DeleteProjectAndOrganization,
+  GivenProjectExists,
+  PrepareZipFile,
+} from '../fixtures';
+
+interface ProjectSelectResult {
+  country_id: string;
+  admin_area_l1_id: string;
+  admin_area_l2_id: string;
+  planning_unit_grid_shape: string;
+  planning_unit_area_km2: string;
+  bbox: number[];
+}
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(ProjectCustomProtectedAreasPieceImporter, () => {
+describe(PlanningAreaGadmPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -33,7 +41,7 @@ describe(ProjectCustomProtectedAreasPieceImporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('fails when project custom protected areas file uri is missing in uris array', async () => {
+  it('fails when gadm planning area file uri is missing in uris array', async () => {
     const input = fixtures.GivenJobInputWithoutUris();
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -41,19 +49,20 @@ describe(ProjectCustomProtectedAreasPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectCustomProtectedAreasFileIsAvailable();
+    const archiveLocation = fixtures.GivenNoGadmPlanningAreaFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it('imports project custom protected areas', async () => {
-    const archiveLocation = await fixtures.GivenValidProjectCustomProtectedAreasFile();
+  it('imports project gadm planning area', async () => {
+    await fixtures.GivenProject();
+    const archiveLocation = await fixtures.GivenValidGadmPlanningAreaFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenCustomProtectedAreasShouldBeAddedToProject();
+      .ThenProjectShouldBeUpdated();
   });
 });
 
@@ -61,40 +70,51 @@ const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [
       TypeOrmModule.forRoot({
-        ...geoprocessingConnections.default,
+        ...geoprocessingConnections.apiDB,
         keepConnectionAlive: true,
         logging: false,
       }),
-      TypeOrmModule.forFeature([ProtectedArea]),
       FileRepositoryModule,
     ],
     providers: [
-      ProjectCustomProtectedAreasPieceImporter,
+      PlanningAreaGadmPieceImporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
+  const organizationId = v4();
   const projectId = v4();
   const userId = v4();
 
-  const entityManager = sandbox.get<EntityManager>(getEntityManagerToken());
-  const protectedAreasRepo = sandbox.get<Repository<ProtectedArea>>(
-    getRepositoryToken(ProtectedArea, geoprocessingConnections.default.name),
+  const entityManager = sandbox.get<EntityManager>(
+    getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
-
-  const sut = sandbox.get(ProjectCustomProtectedAreasPieceImporter);
+  const sut = sandbox.get(PlanningAreaGadmPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
 
-  let validProjectCustomProtectedAreasFile: ProjectCustomProtectedAreasContent[];
+  const validGadmPlanningAreaFile: PlanningAreaGadmContent = {
+    country: 'AGO',
+    bbox: [10, 11, 12, 13],
+    l1: 'AGO.13_1',
+    l2: 'AGO.13.2_1',
+    planningUnitAreakm2: 100,
+  };
 
   return {
     cleanUp: async () => {
-      await protectedAreasRepo.delete({ projectId });
+      await DeleteProjectAndOrganization(
+        entityManager,
+        projectId,
+        organizationId,
+      );
+    },
+    GivenProject: () => {
+      return GivenProjectExists(entityManager, projectId, organizationId);
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
       const [uri] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectCustomProtectedAreas,
+        ClonePiece.PlanningAreaGAdm,
         archiveLocation.value,
       );
       return {
@@ -102,7 +122,7 @@ const getFixtures = async () => {
         pieceResourceId: v4(),
         importId: v4(),
         projectId,
-        piece: ClonePiece.ProjectCustomProtectedAreas,
+        piece: ClonePiece.PlanningAreaGAdm,
         resourceKind: ResourceKind.Project,
         uris: [uri.toSnapshot()],
         ownerId: userId,
@@ -114,30 +134,23 @@ const getFixtures = async () => {
         pieceResourceId: v4(),
         importId: v4(),
         projectId,
-        piece: ClonePiece.ProjectCustomProtectedAreas,
+        piece: ClonePiece.PlanningAreaGAdm,
         resourceKind: ResourceKind.Project,
         uris: [],
         ownerId: userId,
       };
     },
-    GivenNoProjectCustomProtectedAreasFileIsAvailable: () => {
+    GivenNoGadmPlanningAreaFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectCustomProtectedAreasFile: async () => {
+    GivenValidGadmPlanningAreaFile: async () => {
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectCustomProtectedAreas,
-        'project custom protected areas file relative path',
+        ClonePiece.PlanningAreaGAdm,
+        'planning area gadm file relative path',
       );
 
-      const geometries = await GenerateRandomGeometries(entityManager, 3, true);
-
-      validProjectCustomProtectedAreasFile = geometries.map((geom, index) => ({
-        ewkb: geom.toJSON().data,
-        fullName: `${index}`,
-      }));
-
       return PrepareZipFile(
-        validProjectCustomProtectedAreasFile,
+        validGadmPlanningAreaFile,
         fileRepository,
         relativePath,
       );
@@ -152,19 +165,28 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenCustomProtectedAreasShouldBeAddedToProject: async () => {
+        ThenProjectShouldBeUpdated: async () => {
           await sut.run(input);
+          const [project]: [
+            ProjectSelectResult,
+          ] = await entityManager
+            .createQueryBuilder()
+            .select()
+            .from('projects', 'p')
+            .where('id = :projectId', { projectId: input.projectId })
+            .execute();
 
-          const protectedAreas = await protectedAreasRepo.find({ projectId });
-
-          expect(protectedAreas.length).toEqual(
-            validProjectCustomProtectedAreasFile.length,
+          expect(project).toBeDefined();
+          expect(project.admin_area_l1_id).toEqual(
+            validGadmPlanningAreaFile.l1,
           );
-
-          expect(protectedAreas.map((pa) => pa.fullName).sort()).toEqual(
-            validProjectCustomProtectedAreasFile
-              .map((pa) => pa.fullName)
-              .sort(),
+          expect(project.admin_area_l2_id).toEqual(
+            validGadmPlanningAreaFile.l2,
+          );
+          expect(project.bbox).toEqual(validGadmPlanningAreaFile.bbox);
+          expect(project.country_id).toEqual(validGadmPlanningAreaFile.country);
+          expect(project.planning_unit_area_km2).toEqual(
+            validGadmPlanningAreaFile.planningUnitAreakm2,
           );
         },
       };

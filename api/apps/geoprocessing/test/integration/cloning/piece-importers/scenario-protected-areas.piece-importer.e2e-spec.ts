@@ -29,7 +29,7 @@ import {
   GivenScenarioExists,
   GivenWdpaProtectedAreas,
   PrepareZipFile,
-} from './fixtures';
+} from '../fixtures';
 
 interface ScenarioSelectResult {
   protected_area_filter_by_ids: string[];

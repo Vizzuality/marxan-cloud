@@ -28,7 +28,7 @@ import {
   GivenScenarioExists,
   GivenScenarioFeaturesData,
   PrepareZipFile,
-} from './fixtures';
+} from '../fixtures';
 import { FeaturesConfig } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { isDefined } from '@marxan/utils';
 

@@ -1,4 +1,3 @@
-import { ProjectMetadataPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-metadata.piece-exporter';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
@@ -10,18 +9,25 @@ import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { Polygon } from 'geojson';
+import { PlanningUnitsGridGeojsonPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-units-grid-geojson.piece-exporter';
 import {
   DeleteProjectAndOrganization,
+  DeleteProjectPus,
   GivenProjectExists,
+  GivenProjectPus,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(ProjectMetadataPieceExporter, () => {
+describe(PlanningUnitsGridGeojsonPieceExporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -30,18 +36,13 @@ describe(ProjectMetadataPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('should throw when project is not found', async () => {
-    const input = fixtures.GivenAProjectMetadataExportJob();
-    await fixtures
-      .WhenPieceExporterIsInvoked(input)
-      .ThenAProjectExistErrorShouldBeThrown();
-  });
-  it('should save file succesfully when project is found', async () => {
-    const input = fixtures.GivenAProjectMetadataExportJob();
+  it('should save succesfully project planning units grid geojson', async () => {
+    const input = fixtures.GivenAPlanningUnitsGridExportJob();
     await fixtures.GivenProjectExist();
+    await fixtures.GivenPlanningUnits();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenProjectMetadataFileIsSaved();
+      .ThenAPlanningUnitsGridFileIsSaved();
   });
 });
 
@@ -53,67 +54,88 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
+      TypeOrmModule.forRoot({
+        ...geoprocessingConnections.default,
+        keepConnectionAlive: true,
+        logging: false,
+      }),
+      TypeOrmModule.forFeature([ProjectsPuEntity, PlanningUnitsGeom]),
       FileRepositoryModule,
     ],
     providers: [
-      ProjectMetadataPieceExporter,
+      PlanningUnitsGridGeojsonPieceExporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
   const projectId = v4();
+  const otherProjectId = v4();
   const organizationId = v4();
-  const sut = sandbox.get(ProjectMetadataPieceExporter);
+  const sut = sandbox.get(PlanningUnitsGridGeojsonPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
+  const geoEntityManager: EntityManager = sandbox.get(
+    getEntityManagerToken(geoprocessingConnections.default),
+  );
   const fileRepository = sandbox.get(FileRepository);
-  const expectedContent: ProjectMetadataContent = {
-    name: `test project - ${projectId}`,
-    planningUnitGridShape: PlanningUnitGridShape.Square,
-    projectAlreadyCreated: false,
-  };
 
   return {
     cleanUp: async () => {
-      return DeleteProjectAndOrganization(
+      await DeleteProjectAndOrganization(
         apiEntityManager,
         projectId,
         organizationId,
       );
+      await DeleteProjectPus(geoEntityManager, projectId);
+      return DeleteProjectPus(geoEntityManager, otherProjectId);
     },
-    GivenAProjectMetadataExportJob: (): ExportJobInput => {
+    GivenAPlanningUnitsGridExportJob: (): ExportJobInput => {
       return {
         allPieces: [
           { resourceId: projectId, piece: ClonePiece.ProjectMetadata },
+          {
+            resourceId: projectId,
+            piece: ClonePiece.PlanningUnitsGridGeojson,
+          },
         ],
         componentId: v4(),
         exportId: v4(),
-        piece: ClonePiece.ProjectMetadata,
+        piece: ClonePiece.PlanningUnitsGridGeojson,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
         isCloning: false,
       };
     },
     GivenProjectExist: async () => {
-      return GivenProjectExists(apiEntityManager, projectId, organizationId);
+      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
+        planning_unit_grid_shape: PlanningUnitGridShape.FromShapefile,
+        planning_unit_area_km2: 30,
+        bbox: JSON.stringify([10, 11, 12, 13]),
+      });
+    },
+    GivenPlanningUnits: async () => {
+      await GivenProjectPus(geoEntityManager, projectId, 2);
+
+      return GivenProjectPus(geoEntityManager, otherProjectId, 1);
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
-        ThenAProjectExistErrorShouldBeThrown: async () => {
-          await expect(sut.run(input)).rejects.toThrow(/does not exist/gi);
-        },
-        ThenProjectMetadataFileIsSaved: async () => {
+        ThenAPlanningUnitsGridFileIsSaved: async () => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectMetadataContent>(
-            savedStrem,
-          );
-          expect(content).toMatchObject(expectedContent);
+          const content = await readSavedFile<{
+            type: string;
+            bbox: number[];
+            coordinates: Polygon[];
+          }>(savedStrem);
+          expect(content.type).toBe('MultiPolygon');
+          expect(content.bbox).toEqual([10, 11, 12, 13]);
+          expect(content.coordinates).toHaveLength(2);
         },
       };
     },
