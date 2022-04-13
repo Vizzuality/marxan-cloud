@@ -79,7 +79,7 @@ const getFixtures = async () => {
     resourceKind: ResourceKind.Scenario,
     resourceId: scenarioId,
     pieces: [ClonePiece.ScenarioMetadata, ClonePiece.ExportConfig],
-    isCloning: false,
+    isCloning: true,
   };
 
   return {
