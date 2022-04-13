@@ -41,13 +41,14 @@ export class Export extends AggregateRoot {
     parts: ExportComponent[],
     cloning: boolean,
   ): Export {
+    const importResourceId = cloning ? ResourceId.create() : undefined;
     const exportRequest = new Export(
       ExportId.create(),
       id,
       kind,
       ownerId,
       parts,
-      cloning ? ResourceId.create() : undefined,
+      importResourceId,
     );
     parts
       .filter((part) => !part.isReady())
@@ -59,6 +60,7 @@ export class Export extends AggregateRoot {
         exportRequest.id,
         exportRequest.resourceId,
         exportRequest.resourceKind,
+        importResourceId,
       ),
     );
     return exportRequest;
@@ -120,5 +122,5 @@ export class Export extends AggregateRoot {
 
   #allPiecesReady = () => this.pieces.every((piece) => piece.isReady());
 
-  isClonning = () => Boolean(this.importResourceId);
+  isCloning = () => Boolean(this.importResourceId);
 }

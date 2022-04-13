@@ -10,9 +10,13 @@ import { MarkImportAsFailed } from './mark-import-as-failed.command';
 @CommandHandler(MarkImportAsFailed)
 export class MarkImportAsFailedHandler
   implements IInferredCommandHandler<MarkImportAsFailed> {
-  private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+  private importEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__failed__v1__alpha,
+  };
+  private cloneEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__clone__failed__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__clone__failed__v1__alpha,
   };
 
   constructor(
@@ -51,14 +55,20 @@ export class MarkImportAsFailedHandler
       );
       return;
     }
-    const { resourceKind, resourceId, projectId } = importInstance.toSnapshot();
-    const kind = this.eventMapper[resourceKind];
+    const {
+      resourceKind,
+      resourceId,
+      projectId,
+      isCloning,
+    } = importInstance.toSnapshot();
 
-    const previousEvent = await this.findPreviousEvent(kind, resourceId);
+    const importKind = this.importEventMapper[resourceKind];
+
+    const previousEvent = await this.findPreviousEvent(importKind, resourceId);
     if (previousEvent) return;
 
     await this.apiEvents.createIfNotExists({
-      kind,
+      kind: importKind,
       topic: resourceId,
       data: {
         importId: importId.value,
@@ -68,5 +78,18 @@ export class MarkImportAsFailedHandler
         projectId,
       },
     });
+
+    if (isCloning) {
+      const cloneKind = this.cloneEventMapper[resourceKind];
+
+      await this.apiEvents.createIfNotExists({
+        kind: cloneKind,
+        topic: resourceId,
+        data: {
+          resourceId,
+          resourceKind,
+        },
+      });
+    }
   }
 }

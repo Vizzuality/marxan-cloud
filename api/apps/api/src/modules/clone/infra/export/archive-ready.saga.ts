@@ -59,7 +59,7 @@ export class ArchiveReadySaga {
       ownerId,
     } = exportInstance.toSnapshot();
 
-    if (!exportInstance.isClonning())
+    if (!exportInstance.isCloning())
       return [new MarkExportAsFinished(event.exportId)];
 
     if (!archiveLocation || !importResourceId)
