@@ -54,7 +54,6 @@ export class ExportProjectHandler
     exportRequest.commit();
 
     if (cloning) {
-      // TODO Mark cloning as submitted
       await this.createProjectShell(
         id.value,
         exportRequest.importResourceId!.value,

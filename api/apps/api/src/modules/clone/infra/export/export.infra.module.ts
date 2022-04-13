@@ -13,6 +13,7 @@ import {
   exportPieceQueueProvider,
 } from './export-queue.provider';
 import { ExportStartedSaga } from './export-started.saga';
+import { MarkCloneAsSubmittedHandler } from './mark-clone-as-submitted.handler';
 import { MarkExportAsFailedHandler } from './mark-export-as-failed.handler';
 import { MarkExportAsFinishedHandler } from './mark-export-as-finished.handler';
 import { MarkExportAsSubmittedHandler } from './mark-export-as-submitted.handler';
@@ -38,6 +39,7 @@ import { SchedulePieceExportHandler } from './schedule-piece-export.handler';
     exportPieceEventsFactoryProvider,
     ExportPieceEventsHandler,
     MarkExportAsSubmittedHandler,
+    MarkCloneAsSubmittedHandler,
     MarkExportAsFinishedHandler,
     CancelExportPendingJobsHandler,
     MarkExportAsFailedHandler,

@@ -14,6 +14,7 @@ import {
   importPieceQueueProvider,
 } from './import-queue.provider';
 import { ImportRequestedSaga } from './import-requested-saga';
+import { MarkCloneAsFinishedHandler } from './mark-clone-as-finished.handler';
 import { MarkImportAsFailedHandler } from './mark-import-as-failed.handler';
 import { MarkImportAsFinishedHandler } from './mark-import-as-finished.handler';
 import { MarkImportAsSubmittedHandler } from './mark-import-as-submitted.handler';
@@ -39,6 +40,7 @@ import { UploadExportFileHandler } from './upload-export-file.handler';
     ImportRequestedSaga,
     MarkImportAsSubmittedHandler,
     MarkImportAsFinishedHandler,
+    MarkCloneAsFinishedHandler,
     MarkImportAsFailedHandler,
     MarkImportPieceAsFailedHandler,
     ImportPieceEventsHandler,

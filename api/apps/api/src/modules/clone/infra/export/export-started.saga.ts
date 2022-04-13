@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ICommand, ofType, Saga } from '@nestjs/cqrs';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 
 import { ExportRequested } from '../../export/domain';
+import { MarkCloneAsSubmitted } from './mark-clone-as-submitted.command';
 import { MarkExportAsSubmitted } from './mark-export-as-submitted.command';
 
 @Injectable()
@@ -12,13 +13,15 @@ export class ExportStartedSaga {
   emitApiEvents = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(ExportRequested),
-      map(
-        (event) =>
-          new MarkExportAsSubmitted(
-            event.exportId,
-            event.resourceId,
-            event.resourceKind,
-          ),
-      ),
+      mergeMap(({ exportId, resourceId, resourceKind, importResourceId }) => {
+        const isClonning = Boolean(importResourceId);
+
+        return isClonning
+          ? of(
+              new MarkExportAsSubmitted(exportId, resourceId, resourceKind),
+              new MarkCloneAsSubmitted(importResourceId!, resourceKind),
+            )
+          : of(new MarkExportAsSubmitted(exportId, resourceId, resourceKind));
+      }),
     );
 }

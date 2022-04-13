@@ -7,5 +7,6 @@ export class ExportRequested implements IEvent {
     public readonly exportId: ExportId,
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,
+    public readonly importResourceId?: ResourceId,
   ) {}
 }

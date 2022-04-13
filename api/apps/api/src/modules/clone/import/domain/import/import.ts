@@ -171,7 +171,14 @@ export class Import extends AggregateRoot {
     }
 
     if (isThisTheLastBatch && hasThisBatchFinished)
-      this.apply(new AllPiecesImported(this.importId));
+      this.apply(
+        new AllPiecesImported(
+          this.importId,
+          this.resourceId,
+          this.resourceKind,
+          this.isCloning,
+        ),
+      );
     if (isThisTheLastBatch || !hasThisBatchFinished) return right(true);
 
     const nextBatch = this.pieces.filter(

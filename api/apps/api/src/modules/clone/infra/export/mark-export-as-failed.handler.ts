@@ -9,9 +9,13 @@ import { MarkExportAsFailed } from './mark-export-as-failed.command';
 @CommandHandler(MarkExportAsFailed)
 export class MarkExportAsFailedHandler
   implements IInferredCommandHandler<MarkExportAsFailed> {
-  private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+  private exportEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__failed__v1__alpha,
+  };
+  private cloneEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
+    project: API_EVENT_KINDS.project__clone__failed__v1__alpha,
+    scenario: API_EVENT_KINDS.scenario__clone__failed__v1__alpha,
   };
 
   constructor(
@@ -32,10 +36,10 @@ export class MarkExportAsFailedHandler
 
     const { resourceId, resourceKind } = exportInstance;
 
-    const kind = this.eventMapper[resourceKind];
+    const exportKind = this.exportEventMapper[resourceKind];
 
     await this.apiEvents.createIfNotExists({
-      kind,
+      kind: exportKind,
       topic: resourceId.value,
       data: {
         exportId: exportId.value,
@@ -43,5 +47,19 @@ export class MarkExportAsFailedHandler
         resourceKind,
       },
     });
+
+    if (exportInstance.isClonning()) {
+      const cloneKind = this.cloneEventMapper[resourceKind];
+      const importResourceId = exportInstance.importResourceId!.value;
+
+      await this.apiEvents.createIfNotExists({
+        kind: cloneKind,
+        topic: importResourceId,
+        data: {
+          resourceId: importResourceId,
+          resourceKind,
+        },
+      });
+    }
   }
 }
