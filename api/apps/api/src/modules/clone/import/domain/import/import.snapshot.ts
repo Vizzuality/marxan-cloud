@@ -9,4 +9,5 @@ export interface ImportSnapshot {
   importPieces: ImportComponentSnapshot[];
   projectId: string;
   ownerId: string;
+  isCloning: boolean;
 }

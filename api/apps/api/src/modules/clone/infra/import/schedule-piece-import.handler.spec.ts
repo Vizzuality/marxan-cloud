@@ -127,6 +127,7 @@ const getFixtures = async () => {
   return {
     GivenImportIsCreated: async (): Promise<[ImportId, ComponentId]> => {
       const importResourceId = ResourceId.create();
+      const isCloning = false;
       const projectId = importResourceId;
       const importComponent = ImportComponent.newOne(
         projectId,
@@ -141,6 +142,7 @@ const getFixtures = async () => {
         ownerId,
         new ArchiveLocation('/tmp/foo.zip'),
         [importComponent],
+        isCloning,
       );
       await importRepo.save(importInstance);
 

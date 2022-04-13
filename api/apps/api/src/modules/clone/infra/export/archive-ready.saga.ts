@@ -64,7 +64,7 @@ export class ArchiveReadySaga {
 
     if (!archiveLocation || !importResourceId)
       throw new Error(
-        'When clonning, the archiveLocation and importResourceId should be ready',
+        'When cloning, the archiveLocation and importResourceId should be ready',
       );
 
     const importCommand = this.commandMapper[resourceKind](

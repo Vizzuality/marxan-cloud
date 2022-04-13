@@ -37,6 +37,7 @@ export class Import extends AggregateRoot {
     private readonly ownerId: UserId,
     private readonly archiveLocation: ArchiveLocation,
     private readonly pieces: ImportComponent[],
+    private readonly isCloning: boolean,
   ) {
     super();
 
@@ -65,6 +66,7 @@ export class Import extends AggregateRoot {
       new UserId(snapshot.ownerId),
       new ArchiveLocation(snapshot.archiveLocation),
       snapshot.importPieces.map(ImportComponent.fromSnapshot),
+      snapshot.isCloning,
     );
   }
 
@@ -75,6 +77,7 @@ export class Import extends AggregateRoot {
     ownerId: UserId,
     archiveLocation: ArchiveLocation,
     pieces: ImportComponent[],
+    isCloning: boolean,
   ): Import {
     const id = ImportId.create();
     const instance = new Import(
@@ -85,6 +88,7 @@ export class Import extends AggregateRoot {
       ownerId,
       archiveLocation,
       pieces,
+      isCloning,
     );
 
     return instance;
@@ -190,6 +194,7 @@ export class Import extends AggregateRoot {
       archiveLocation: this.archiveLocation.value,
       projectId: this.projectId.value,
       ownerId: this.ownerId.value,
+      isCloning: this.isCloning,
     };
   }
 }

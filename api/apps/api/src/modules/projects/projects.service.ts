@@ -342,7 +342,7 @@ export class ProjectsService {
     projectId: string,
     userId: string,
     scenarioIds: string[],
-    clonning: boolean,
+    cloning: boolean,
   ): Promise<
     Either<
       typeof forbiddenError | typeof projectNotFound,
@@ -363,7 +363,7 @@ export class ProjectsService {
         new ResourceId(projectId),
         scenarioIds,
         new UserId(userId),
-        clonning,
+        cloning,
       ),
     );
 

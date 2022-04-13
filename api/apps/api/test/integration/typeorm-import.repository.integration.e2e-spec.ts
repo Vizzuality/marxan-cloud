@@ -105,6 +105,7 @@ const getFixtures = async () => {
     },
     GivenImportWasRequested: async () => {
       importResourceId = ResourceId.create();
+      const isCloning = false;
       const projectId = importResourceId;
       componentId = ComponentId.create();
       archiveLocation = new ArchiveLocation('/tmp/file.zip');
@@ -127,12 +128,14 @@ const getFixtures = async () => {
             ],
           }),
         ],
+        isCloning,
       );
       importId = importInstance.importId;
       await repo.save(importInstance);
     },
     GivenImportWithMultipleComponentsWasRequested: async () => {
       importResourceId = ResourceId.create();
+      const isCloning = false;
       const projectId = importResourceId;
 
       archiveLocation = new ArchiveLocation('/tmp/file.zip');
@@ -157,6 +160,7 @@ const getFixtures = async () => {
         ownerId,
         archiveLocation,
         components,
+        isCloning,
       );
       importId = importInstance.importId;
       await repo.transaction(async (repository) => {
@@ -198,6 +202,7 @@ const getFixtures = async () => {
       expect(importSnapshot.id).toBe(importId.value);
       expect(importSnapshot.resourceKind).toBe(ResourceKind.Project);
       expect(importSnapshot.resourceId).toBe(importResourceId.value);
+      expect(importSnapshot.isCloning).toBe(false);
 
       expect(importSnapshot.importPieces).toHaveLength(1);
 

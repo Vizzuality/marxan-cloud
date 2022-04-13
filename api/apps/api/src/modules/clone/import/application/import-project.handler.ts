@@ -41,6 +41,7 @@ export class ImportProjectHandler
     const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
 
     const resourceId = importResourceId ?? ResourceId.create();
+    const isCloning = Boolean(importResourceId);
 
     const projectId = resourceId;
 
@@ -58,6 +59,7 @@ export class ImportProjectHandler
         ownerId,
         archiveLocation,
         pieces,
+        isCloning,
       ),
     );
 

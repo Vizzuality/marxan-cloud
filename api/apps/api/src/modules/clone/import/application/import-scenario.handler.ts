@@ -38,6 +38,7 @@ export class ImportScenarioHandler
     );
     if (isLeft(exportConfigOrError)) return exportConfigOrError;
 
+    const isCloning = true;
     const exportConfig = exportConfigOrError.right as ScenarioExportConfigContent;
 
     const pieces = this.importResourcePieces.resolveForScenario(
@@ -56,6 +57,7 @@ export class ImportScenarioHandler
         ownerId,
         archiveLocation,
         pieces,
+        isCloning,
       ),
     );
 

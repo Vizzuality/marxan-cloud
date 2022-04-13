@@ -38,12 +38,12 @@ test(`requesting new project export`, async () => {
   fixtures.ThenExportRequestsEventIsPresent(exportId);
 });
 
-test(`requesting new project export within a clonning operation`, async () => {
+test(`requesting new project export within a cloning operation`, async () => {
   const { projectId } = fixtures.GivenProjectWasCreated();
   const { exportId } = await fixtures.WhenExportIsRequested(projectId, {
-    clonning: true,
+    cloning: true,
   });
-  await fixtures.ThenExportRequestIsSaved(exportId, { clonning: true });
+  await fixtures.ThenExportRequestIsSaved(exportId, { cloning: true });
   await fixtures.ThenUnfinishedExportPiecesAreRequestedToProcess(projectId);
   fixtures.ThenExportRequestsEventIsPresent(exportId);
 });
@@ -91,15 +91,15 @@ const getFixtures = async () => {
     },
     WhenExportIsRequested: async (
       projectId: ResourceId,
-      opts: { clonning: boolean } = { clonning: false },
-    ) => sut.execute(new ExportProject(projectId, [], ownerId, opts.clonning)),
+      opts: { cloning: boolean } = { cloning: false },
+    ) => sut.execute(new ExportProject(projectId, [], ownerId, opts.cloning)),
     ThenExportRequestIsSaved: async (
       exportId: ExportId,
-      opts: { clonning: boolean } = { clonning: false },
+      opts: { cloning: boolean } = { cloning: false },
     ) => {
       const exportInstance = await repo.find(exportId);
       expect(exportInstance?.toSnapshot()).toBeDefined();
-      if (!opts.clonning)
+      if (!opts.cloning)
         expect(exportInstance?.importResourceId).toEqual(undefined);
       else expect(exportInstance?.importResourceId).toBeDefined();
     },
