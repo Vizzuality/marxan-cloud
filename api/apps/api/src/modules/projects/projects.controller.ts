@@ -99,6 +99,7 @@ import { locationNotFound } from '@marxan-api/modules/clone/export/application/g
 import {
   RequestProjectExportResponseDto,
   RequestProjectExportBodyDto,
+  GetLatestExportResponseDto,
 } from './dto/export.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
@@ -684,19 +685,19 @@ export class ProjectsController {
     name: 'projectId',
     description: 'ID of the Project',
   })
-  @ApiOkResponse({ type: RequestProjectExportResponseDto })
+  @ApiOkResponse({ type: GetLatestExportResponseDto })
   @Get(`:projectId/export`)
   async getLatestExportId(
     @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ) {
-    const exportIdOrError = await this.projectsService.getLatestExportForProject(
+  ): Promise<GetLatestExportResponseDto> {
+    const resultOrError = await this.projectsService.getLatestExportForProject(
       projectId,
       req.user.id,
     );
 
-    if (isLeft(exportIdOrError)) {
-      switch (exportIdOrError.left) {
+    if (isLeft(resultOrError)) {
+      switch (resultOrError.left) {
         case exportNotFound:
           throw new NotFoundException(
             `Export for project with id ${projectId} not found`,
@@ -707,7 +708,7 @@ export class ProjectsController {
           throw new InternalServerErrorException();
       }
     }
-    return { id: exportIdOrError.right };
+    return resultOrError.right;
   }
 
   @ImplementsAcl()
