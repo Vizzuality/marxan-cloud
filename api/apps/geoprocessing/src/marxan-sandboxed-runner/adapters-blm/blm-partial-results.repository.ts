@@ -25,6 +25,7 @@ export class BlmPartialResultsRepository {
   async savePartialResult(
     workspace: Workspace,
     scenarioId: string,
+    projectId: string,
     calibrationId: string,
     blmValue: number,
   ): Promise<void> {
@@ -46,6 +47,7 @@ export class BlmPartialResultsRepository {
       filteredPuidList.map(async (puidInt) => {
         const fullPu = await this.projectPuRepository.findOneOrFail({
           puid: puidInt,
+          projectId,
         });
         return fullPu.id;
       }),
