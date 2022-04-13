@@ -8,7 +8,7 @@ import { ModuleRef } from '@nestjs/core';
 import { EventBus } from '@nestjs/cqrs';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import AbortController from 'abort-controller';
-import { isLeft } from 'fp-ts/lib/Either';
+import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { SandboxRunner } from '../ports/sandbox-runner';
@@ -90,6 +90,7 @@ export class MarxanSandboxBlmRunnerService
           const singleRunner = this.marxanRunnerFactory.for(
             scenarioId,
             calibrationId,
+            projectId,
             blmValue,
             workspace,
           );
@@ -135,11 +136,13 @@ export class MarxanSandboxBlmRunnerService
             continue;
           }
 
-          await this.finalResultsRepository.updatePngDataOnFinalResults(
-            scenarioId,
-            blmValue,
-            pngStream.right,
-          );
+          if (isRight(pngStream)) {
+            await this.finalResultsRepository.updatePngDataOnFinalResults(
+              scenarioId,
+              blmValue,
+              pngStream.right,
+            );
+          }
         }
         this.interruptIfKilled(scenarioId);
 
