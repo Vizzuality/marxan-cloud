@@ -1,18 +1,19 @@
+import { ResourceKind } from '@marxan/cloning/domain';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-
-import { ResourceKind } from '@marxan/cloning/domain';
-import { Export, ExportId } from '../domain';
-
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Scenario } from '../../../scenarios/scenario.api.entity';
+import { Export } from '../domain';
+import { ExportRepository } from './export-repository.port';
+import { ExportResourcePieces } from './export-resource-pieces.port';
 import {
   ExportScenario,
   ExportScenarioCommandResult,
 } from './export-scenario.command';
-import { ExportResourcePieces } from './export-resource-pieces.port';
-import { ExportRepository } from './export-repository.port';
 
 @CommandHandler(ExportScenario)
 export class ExportScenarioHandler
@@ -21,7 +22,21 @@ export class ExportScenarioHandler
     private readonly resourcePieces: ExportResourcePieces,
     private readonly exportRepository: ExportRepository,
     private readonly eventPublisher: EventPublisher,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepo: Repository<Scenario>,
   ) {}
+
+  private async createScenarioShell(
+    existingScenarioId: string,
+    newScenarioId: string,
+  ) {
+    const scenario = await this.scenarioRepo.findOneOrFail(existingScenarioId);
+    await this.scenarioRepo.save({
+      id: newScenarioId,
+      name: '',
+      projectId: scenario.projectId,
+    });
+  }
 
   async execute({
     scenarioId,
@@ -38,6 +53,11 @@ export class ExportScenarioHandler
     await this.exportRepository.save(exportRequest);
 
     exportRequest.commit();
+
+    await this.createScenarioShell(
+      scenarioId.value,
+      exportRequest.importResourceId!.value,
+    );
 
     return {
       exportId: exportRequest.id,
