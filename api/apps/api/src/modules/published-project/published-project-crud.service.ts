@@ -38,8 +38,26 @@ export class PublishedProjectCrudService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<PublishedProject> {
     return {
-      attributes: ['name', 'description', 'underModeration'],
+      attributes: ['name', 'description', 'underModeration', 'originalProject'],
       keyForAttribute: 'camelCase',
+      originalProject: {
+        ref: 'id',
+        attributes: [
+          'name',
+          'description',
+          'countryId',
+          'adminAreaLevel1Id',
+          'adminAreaLevel2Id',
+          'planningUnitGridShape',
+          'planningUnitAreakm2',
+          'createdAt',
+          'lastModifiedAt',
+          'planningAreaId',
+          'planningAreaName',
+          'bbox',
+          'customProtectedAreas',
+        ],
+      },
     };
   }
 
@@ -49,6 +67,18 @@ export class PublishedProjectCrudService extends AppBaseService<
     info?: ProjectsRequest,
   ): Promise<SelectQueryBuilder<PublishedProject>> {
     const userId = info?.authenticatedUser?.id;
+
+    const { namesSearch } = info?.params ?? {};
+
+    if (namesSearch) {
+      const namesSearchFilterField = 'namesSearchFilter' as const;
+      query.andWhere(
+        `(${this.alias}.name
+          ||' '|| COALESCE(${this.alias}.description, '')
+          ) ILIKE :${namesSearchFilterField}`,
+        { [namesSearchFilterField]: `%${namesSearch}%` },
+      );
+    }
 
     /*
       If we are listing projects for non-authenticated requests or for
