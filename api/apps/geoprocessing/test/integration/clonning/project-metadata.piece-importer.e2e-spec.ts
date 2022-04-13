@@ -19,6 +19,7 @@ import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GivenOrganizationExists,
+  GivenProjectExists,
   GivenUserExists,
   PrepareZipFile,
 } from './fixtures';
@@ -55,12 +56,27 @@ describe(ProjectMetadataPieceImporter, () => {
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it('imports project metadata', async () => {
+  it('imports project metadata creating a new project (isolated import process)', async () => {
     // Piece importer picks a random organization
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile({
+      existingProject: false,
+    });
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenProjectMetadataShouldBeImported();
+  });
+
+  it('imports project metadata updating a existing project (cloning import process)', async () => {
+    await fixtures.GivenUser();
+    await fixtures.GivenProject();
+
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile({
+      existingProject: true,
+    });
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -100,6 +116,7 @@ const getFixtures = async () => {
     name: `test project - ${projectId}`,
     description: 'project description',
     planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+    projectAlreadyCreated: false,
   };
 
   return {
@@ -130,6 +147,9 @@ const getFixtures = async () => {
     GivenOrganization: () => {
       return GivenOrganizationExists(entityManager, organizationId);
     },
+    GivenProject: () => {
+      return GivenProjectExists(entityManager, projectId, organizationId);
+    },
     GivenJobInputWithoutUris: (): ImportJobInput => {
       return {
         componentId: v4(),
@@ -145,11 +165,15 @@ const getFixtures = async () => {
     GivenNoProjectMetadataFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectMetadataFile: async () => {
+    GivenValidProjectMetadataFile: async (
+      { existingProject } = { existingProject: false },
+    ) => {
       const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
         ClonePiece.ProjectMetadata,
         'project metadata file relative path',
       );
+
+      validProjectMetadataFileContent.projectAlreadyCreated = existingProject;
 
       return PrepareZipFile(
         validProjectMetadataFileContent,

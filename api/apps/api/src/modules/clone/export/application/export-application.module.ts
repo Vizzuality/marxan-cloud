@@ -6,6 +6,8 @@ import {
   Scope,
 } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Project } from '../../../projects/project.api.entity';
 import { AllPiecesReadySaga } from './all-pieces-ready.saga';
 import { CompleteExportPieceHandler } from './complete-export-piece.handler';
 import { ExportProjectHandler } from './export-project.handler';
@@ -18,7 +20,11 @@ export class ExportApplicationModule {
   static for(adapters: ModuleMetadata['imports']): DynamicModule {
     return {
       module: ExportApplicationModule,
-      imports: [CqrsModule, ...(adapters ?? [])],
+      imports: [
+        CqrsModule,
+        TypeOrmModule.forFeature([Project]),
+        ...(adapters ?? []),
+      ],
       providers: [
         // internal event flow
         AllPiecesReadySaga,

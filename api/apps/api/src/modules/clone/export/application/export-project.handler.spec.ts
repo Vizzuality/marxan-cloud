@@ -9,6 +9,9 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Injectable } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { v4 } from 'uuid';
+import { Project } from '../../../projects/project.api.entity';
 import { MemoryExportRepo } from '../adapters/memory-export.repository';
 import {
   ExportComponent,
@@ -56,6 +59,10 @@ const getFixtures = async () => {
       {
         provide: ExportRepository,
         useClass: MemoryExportRepo,
+      },
+      {
+        provide: getRepositoryToken(Project),
+        useClass: FakeProjectRepoProvider,
       },
       ExportProjectHandler,
     ],
@@ -149,4 +156,13 @@ class FakePiecesProvider implements ExportResourcePieces {
   resolveForScenario(id: ResourceId, kind: ResourceKind): ExportComponent[] {
     return [];
   }
+}
+
+@Injectable()
+class FakeProjectRepoProvider {
+  findOneOrFail() {
+    return { organizationId: v4() };
+  }
+
+  save() {}
 }

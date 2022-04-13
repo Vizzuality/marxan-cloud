@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   Equals,
   IsArray,
+  IsBoolean,
   IsEnum,
   IsOptional,
   IsString,
@@ -32,6 +33,10 @@ class CommonFields {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isCloning!: boolean;
 }
 
 class ScenarioMetadata {

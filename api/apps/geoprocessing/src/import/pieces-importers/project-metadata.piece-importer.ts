@@ -38,6 +38,43 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     return id;
   }
 
+  private createProject(
+    em: EntityManager,
+    projectId: string,
+    organizationId: string,
+    data: ProjectMetadataContent,
+  ) {
+    return em
+      .createQueryBuilder()
+      .insert()
+      .into(`projects`)
+      .values({
+        id: projectId,
+        name: data.name,
+        description: data.description,
+        organization_id: organizationId,
+        planning_unit_grid_shape: data.planningUnitGridShape,
+      })
+      .execute();
+  }
+
+  private updateProject(
+    em: EntityManager,
+    projectId: string,
+    data: ProjectMetadataContent,
+  ) {
+    return em
+      .createQueryBuilder()
+      .update('projects')
+      .set({
+        name: data.name,
+        description: data.description,
+        planning_unit_grid_shape: data.planningUnitGridShape,
+      })
+      .where('id = :projectId', { projectId })
+      .execute();
+  }
+
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, pieceResourceId, projectId, piece, ownerId } = input;
 
@@ -78,18 +115,16 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     );
 
     await this.entityManager.transaction(async (em) => {
-      await em
-        .createQueryBuilder()
-        .insert()
-        .into(`projects`)
-        .values({
-          id: projectId,
-          name: projectMetadata.name,
-          description: projectMetadata.description,
-          organization_id: organizationId,
-          planning_unit_grid_shape: projectMetadata.planningUnitGridShape,
-        })
-        .execute();
+      if (projectMetadata.projectAlreadyCreated) {
+        await this.updateProject(em, projectId, projectMetadata);
+      } else {
+        await this.createProject(
+          em,
+          projectId,
+          organizationId,
+          projectMetadata,
+        );
+      }
 
       await em
         .createQueryBuilder()

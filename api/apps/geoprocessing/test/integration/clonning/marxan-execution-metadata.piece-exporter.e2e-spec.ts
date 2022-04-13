@@ -99,6 +99,7 @@ const getFixtures = async () => {
         piece: ClonePiece.MarxanExecutionMetadata,
         resourceId: scenarioId,
         resourceKind: ResourceKind.Project,
+        isCloning: false,
       };
     },
     GivenMarxanExecutionMetadata: () =>
