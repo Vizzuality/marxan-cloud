@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
   ValidationPipe,
@@ -83,13 +84,18 @@ export class UsersController {
   async findAll(
     @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
     @Request() req: RequestWithAuthenticatedUser,
+    @Query('q') namesSearch?: string,
   ): Promise<User[]> {
     //Admin-only endpoint so it needs a prior platformAdmin check.
     if (!(await this.service.isPlatformAdmin(req.user.id))) {
       throw new ForbiddenException();
     }
 
-    const results = await this.service.findAllPaginated(fetchSpecification);
+    const results = await this.service.findAllPaginated(fetchSpecification, {
+      params: {
+        namesSearch,
+      },
+    });
     return this.service.serialize(results.data, results.metadata);
   }
 
