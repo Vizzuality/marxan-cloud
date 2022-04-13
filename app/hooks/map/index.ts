@@ -996,6 +996,10 @@ export function useScenarioBlmLayer({
           {
             type: 'fill',
             'source-layer': 'layer0',
+            filter: [
+              'all',
+              ['has', 'pu_ids'],
+            ],
             paint: {
               'fill-color': COLORS.primary,
               'fill-opacity': 0.5,

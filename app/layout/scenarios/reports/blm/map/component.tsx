@@ -42,8 +42,8 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
-  const PUGridLayer = useScenarioBlmLayer({
-    cache: Date.now(),
+  const BLMLayer = useScenarioBlmLayer({
+    cache: 1,
     active: true,
     sId: sid ? `${sid}` : null,
     blm: +blmValue,
@@ -106,7 +106,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
           {(map) => {
             return (
               <LayerManager map={map} plugin={PluginMapboxGl}>
-                <Layer key={PUGridLayer.id} {...PUGridLayer} />
+                <Layer key={BLMLayer.id} {...BLMLayer} />
               </LayerManager>
             );
           }}
