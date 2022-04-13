@@ -35,6 +35,11 @@ import { BlockGuardModule } from '@marxan-api/modules/projects/block-guard/block
 import { ProjectCheckerModule } from '@marxan-api/modules/projects/project-checker/project-checker.module';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
+import { ExportEntity } from '../clone/export/adapters/entities/exports.api.entity';
+import { ExportComponentEntity } from '../clone/export/adapters/entities/export-components.api.entity';
+import { ExportComponentLocationEntity } from '../clone/export/adapters/entities/export-component-locations.api.entity';
+import { ExportRepository } from '../clone/export/application/export-repository.port';
+import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export.repository';
 
 @Module({
   imports: [
@@ -50,6 +55,9 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
       ProjectJobStatus,
       PublishedProject,
       UsersProjectsApiEntity,
+      ExportEntity,
+      ExportComponentEntity,
+      ExportComponentLocationEntity,
     ]),
     TypeOrmModule.forFeature(
       [ProtectedArea],
@@ -75,6 +83,10 @@ import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
     JobStatusSerializer,
     GetProjectHandler,
     ProxyService,
+    {
+      provide: ExportRepository,
+      useClass: TypeormExportRepository,
+    },
   ],
   controllers: [
     ProjectsListingController,

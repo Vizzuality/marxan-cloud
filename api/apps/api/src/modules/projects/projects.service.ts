@@ -61,6 +61,7 @@ import {
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { UserId } from '@marxan/domain-ids';
 import { ExportProjectCommandResult } from '../clone/export/application/export-project.command';
+import { ExportRepository } from '../clone/export/application/export-repository.port';
 
 export { validationFailed } from '../planning-areas';
 
@@ -86,6 +87,7 @@ export class ProjectsService {
     private readonly projectAclService: ProjectAccessControl,
     private readonly blockGuard: BlockGuard,
     private readonly apiEventsService: ApiEventsService,
+    private readonly exportRepository: ExportRepository,
   ) {}
 
   async findAllGeoFeatures(
@@ -440,7 +442,7 @@ export class ProjectsService {
       | typeof forbiddenError
       | typeof apiEventDataNotFound
       | typeof projectNotFound,
-      string
+      { exportId: string; userId: string }
     >
   > {
     const response = await this.assertProject(projectId, { id: userId });
@@ -465,7 +467,14 @@ export class ProjectsService {
         | string
         | undefined;
       if (!exportId) return left(apiEventDataNotFound);
-      return right(exportId);
+
+      const exportInstance = await this.exportRepository.find(
+        new ExportId(exportId),
+      );
+
+      if (!exportInstance) return left(exportNotFound);
+
+      return right({ exportId, userId: exportInstance.toSnapshot().ownerId });
     } catch (err) {
       return left(exportNotFound);
     }

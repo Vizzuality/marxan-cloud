@@ -227,7 +227,8 @@ export const getFixtures = async () => {
     },
     ThenLatestExportIdIsObtained: (response: request.Response) => {
       expect(response.status).toBe(200);
-      expect(response.body.id).toEqual(exportId.value);
+      expect(response.body.exportId).toEqual(exportId.value);
+      expect(response.body.userId).toBeDefined();
     },
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toBe(403);
