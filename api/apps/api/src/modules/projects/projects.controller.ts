@@ -100,6 +100,7 @@ import {
   RequestProjectExportResponseDto,
   RequestProjectExportBodyDto,
   GetLatestExportResponseDto,
+  RequestProjectCloneResponseDto,
 } from './dto/export.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
@@ -627,6 +628,45 @@ export class ProjectsController {
     }
     return {
       id: result.right.exportId.value,
+    };
+  }
+
+  @ImplementsAcl()
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: RequestProjectCloneResponseDto })
+  @Post(`:projectId/clone`)
+  async requestProjectClone(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: RequestProjectExportBodyDto,
+  ): Promise<RequestProjectCloneResponseDto> {
+    const result = await this.projectsService.requestExport(
+      projectId,
+      req.user.id,
+      dto.scenarioIds,
+      true,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case projectNotFound:
+          throw new NotFoundException(
+            `Could not find project with ID: ${projectId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return {
+      exportId: result.right.exportId.value,
+      projectId: result.right.importResourceId!.value,
     };
   }
 
