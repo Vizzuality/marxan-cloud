@@ -14,9 +14,9 @@ export class ExportStartedSaga {
     events$.pipe(
       ofType(ExportRequested),
       mergeMap(({ exportId, resourceId, resourceKind, importResourceId }) => {
-        const isClonning = Boolean(importResourceId);
+        const isCloning = Boolean(importResourceId);
 
-        return isClonning
+        return isCloning
           ? of(
               new MarkExportAsSubmitted(exportId, resourceId, resourceKind),
               new MarkCloneAsSubmitted(importResourceId!, resourceKind),

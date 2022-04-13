@@ -48,7 +48,7 @@ export class MarkExportAsFailedHandler
       },
     });
 
-    if (exportInstance.isClonning()) {
+    if (exportInstance.isCloning()) {
       const cloneKind = this.cloneEventMapper[resourceKind];
       const importResourceId = exportInstance.importResourceId!.value;
 

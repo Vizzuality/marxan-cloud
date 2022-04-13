@@ -122,5 +122,5 @@ export class Export extends AggregateRoot {
 
   #allPiecesReady = () => this.pieces.every((piece) => piece.isReady());
 
-  isClonning = () => Boolean(this.importResourceId);
+  isCloning = () => Boolean(this.importResourceId);
 }
