@@ -245,6 +245,7 @@ export class UsersService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [User[], number],
     _fetchSpecification?: FetchSpecification,
+    _info?: AppInfoDTO,
   ): Promise<[User[], number]> {
     const extendedEntities: Promise<User>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),
