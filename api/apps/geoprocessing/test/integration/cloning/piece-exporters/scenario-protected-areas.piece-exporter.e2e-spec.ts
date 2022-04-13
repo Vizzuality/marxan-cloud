@@ -21,7 +21,7 @@ import {
   GivenScenarioExists,
   GivenWdpaProtectedAreas,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

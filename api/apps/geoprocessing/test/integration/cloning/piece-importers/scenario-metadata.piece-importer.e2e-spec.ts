@@ -1,4 +1,4 @@
-import { ProjectMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-metadata.piece-importer';
+import { ScenarioMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/scenario-metadata.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
@@ -7,9 +7,8 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -18,21 +17,21 @@ import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
-  GivenOrganizationExists,
   GivenProjectExists,
   GivenUserExists,
   PrepareZipFile,
-} from './fixtures';
+} from '../fixtures';
 
-interface ProjectSelectResult {
+interface ScenarioSelectResult {
   name: string;
   description: string;
-  planning_unit_grid_shape: PlanningUnitGridShape;
+  number_of_runs: number;
+  blm: number;
 }
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(ProjectMetadataPieceImporter, () => {
+describe(ScenarioMetadataPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -41,7 +40,7 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('fails when project metadata file uri is missing in uris array', async () => {
+  it('fails when scenario metadata file uri is missing in uris array', async () => {
     const input = fixtures.GivenJobInputWithoutUris();
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -49,38 +48,21 @@ describe(ProjectMetadataPieceImporter, () => {
   });
 
   it('fails when the file cannot be retrieved from file repo', async () => {
-    const archiveLocation = fixtures.GivenNoProjectMetadataFileIsAvailable();
+    const archiveLocation = fixtures.GivenNoScenarioMetadataFileIsAvailable();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it('imports project metadata creating a new project (isolated import process)', async () => {
-    // Piece importer picks a random organization
-    await fixtures.GivenOrganization();
-    await fixtures.GivenUser();
-
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile({
-      existingProject: false,
-    });
-    const input = fixtures.GivenJobInput(archiveLocation);
-    await fixtures
-      .WhenPieceImporterIsInvoked(input)
-      .ThenProjectMetadataShouldBeImported();
-  });
-
-  it('imports project metadata updating a existing project (cloning import process)', async () => {
-    await fixtures.GivenUser();
+  it('imports scenario metadata', async () => {
     await fixtures.GivenProject();
-
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile({
-      existingProject: true,
-    });
+    await fixtures.GivenUser();
+    const archiveLocation = await fixtures.GivenValidScenarioMetadataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenProjectMetadataShouldBeImported();
+      .ThenScenarioMetadataShouldBeImported();
   });
 });
 
@@ -95,28 +77,31 @@ const getFixtures = async () => {
       FileRepositoryModule,
     ],
     providers: [
-      ProjectMetadataPieceImporter,
+      ScenarioMetadataPieceImporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
+  const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();
+  const resourceKind = ResourceKind.Project;
+  const oldScenarioId = v4();
   const userId = v4();
 
-  const sut = sandbox.get(ProjectMetadataPieceImporter);
+  const sut = sandbox.get(ScenarioMetadataPieceImporter);
   const fileRepository = sandbox.get(FileRepository);
 
   const entityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
 
-  const validProjectMetadataFileContent: ProjectMetadataContent = {
-    name: `test project - ${projectId}`,
-    description: 'project description',
-    planningUnitGridShape: PlanningUnitGridShape.Hexagon,
-    projectAlreadyCreated: false,
+  const validScenarioMetadataFileContent: ScenarioMetadataContent = {
+    name: `test scenario - ${scenarioId}`,
+    description: 'scenario description',
+    blm: 10,
+    numberOfRuns: 120,
   };
 
   return {
@@ -127,56 +112,55 @@ const getFixtures = async () => {
         organizationId,
       );
     },
+    GivenUser: () => GivenUserExists(entityManager, userId, projectId),
+    GivenProject: () => {
+      return GivenProjectExists(entityManager, projectId, organizationId);
+    },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [uri] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectMetadata,
+      const [
+        uri,
+      ] = ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ScenarioMetadata,
         archiveLocation.value,
+        { kind: resourceKind, scenarioId: oldScenarioId },
       );
       return {
         componentId: v4(),
-        pieceResourceId: v4(),
+        pieceResourceId: scenarioId,
         importId: v4(),
         projectId,
-        piece: ClonePiece.ProjectMetadata,
-        resourceKind: ResourceKind.Project,
+        piece: ClonePiece.ScenarioMetadata,
+        resourceKind,
         uris: [uri.toSnapshot()],
         ownerId: userId,
       };
     },
-    GivenUser: () => GivenUserExists(entityManager, userId, projectId),
-    GivenOrganization: () => {
-      return GivenOrganizationExists(entityManager, organizationId);
-    },
-    GivenProject: () => {
-      return GivenProjectExists(entityManager, projectId, organizationId);
-    },
     GivenJobInputWithoutUris: (): ImportJobInput => {
       return {
         componentId: v4(),
-        pieceResourceId: v4(),
+        pieceResourceId: scenarioId,
         importId: v4(),
         projectId,
-        piece: ClonePiece.ProjectMetadata,
-        resourceKind: ResourceKind.Project,
+        piece: ClonePiece.ScenarioMetadata,
+        resourceKind,
         uris: [],
         ownerId: userId,
       };
     },
-    GivenNoProjectMetadataFileIsAvailable: () => {
+    GivenNoScenarioMetadataFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectMetadataFile: async (
-      { existingProject } = { existingProject: false },
-    ) => {
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectMetadata,
-        'project metadata file relative path',
+    GivenValidScenarioMetadataFile: async () => {
+      const [
+        { relativePath },
+      ] = ClonePieceUrisResolver.resolveFor(
+        ClonePiece.ScenarioMetadata,
+        'scenario metadata file relative path',
+        { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
-      validProjectMetadataFileContent.projectAlreadyCreated = existingProject;
-
       return PrepareZipFile(
-        validProjectMetadataFileContent,
+        validScenarioMetadataFileContent,
         fileRepository,
         relativePath,
       );
@@ -191,24 +175,25 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenProjectMetadataShouldBeImported: async () => {
+        ThenScenarioMetadataShouldBeImported: async () => {
           await sut.run(input);
 
-          const [project]: [
-            ProjectSelectResult,
+          const [scenario]: [
+            ScenarioSelectResult,
           ] = await entityManager
             .createQueryBuilder()
             .select()
-            .from('projects', 'p')
-            .where('id = :projectId', { projectId })
+            .from('scenarios', 's')
+            .where('id = :scenarioId', { scenarioId })
             .execute();
 
-          expect(project.name).toEqual(validProjectMetadataFileContent.name);
-          expect(project.description).toEqual(
-            validProjectMetadataFileContent.description,
+          expect(scenario.name).toEqual(validScenarioMetadataFileContent.name);
+          expect(scenario.description).toEqual(
+            validScenarioMetadataFileContent.description,
           );
-          expect(project.planning_unit_grid_shape).toEqual(
-            validProjectMetadataFileContent.planningUnitGridShape,
+          expect(scenario.blm).toEqual(validScenarioMetadataFileContent.blm);
+          expect(scenario.number_of_runs).toEqual(
+            validScenarioMetadataFileContent.numberOfRuns,
           );
         },
       };

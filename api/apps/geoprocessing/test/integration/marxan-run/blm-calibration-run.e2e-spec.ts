@@ -31,7 +31,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
   GivenScenarioExists,
   DeleteProjectAndOrganization,
-} from '../clonning/fixtures';
+} from '../cloning/fixtures';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 

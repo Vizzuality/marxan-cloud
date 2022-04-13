@@ -20,7 +20,7 @@ import {
   GivenSpecifications,
   readSavedFile,
   TestSpecification,
-} from './fixtures';
+} from '../fixtures';
 import { ScenarioFeaturesSpecificationPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/scenario-features-specification.piece-exporter';
 import { ScenarioFeaturesSpecificationContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';

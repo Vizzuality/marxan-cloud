@@ -30,7 +30,7 @@ import {
   DeleteProjectPus,
   GivenScenarioPuData,
   PrepareZipFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

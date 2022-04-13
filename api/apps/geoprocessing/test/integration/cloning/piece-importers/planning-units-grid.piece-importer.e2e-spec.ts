@@ -23,7 +23,7 @@ import {
 } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { GenerateRandomGeometries, PrepareZipFile } from './fixtures';
+import { GenerateRandomGeometries, PrepareZipFile } from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

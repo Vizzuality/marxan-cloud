@@ -2,31 +2,29 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import {
-  getEntityManagerToken,
-  getRepositoryToken,
-  TypeOrmModule,
-} from '@nestjs/typeorm';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
+import { PlanningAreaCustomPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-custom.piece-exporter';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { PlanningAreaCustomGeojsonPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-custom-geojson.piece-exporter';
-import { MultiPolygon } from 'geojson';
+import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import {
   DeletePlanningAreas,
   DeleteProjectAndOrganization,
+  GivenPlanningArea,
   GivenProjectExists,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaCustomGeojsonPieceExporter, () => {
+describe(PlanningAreaCustomPieceExporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -35,6 +33,12 @@ describe(PlanningAreaCustomGeojsonPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
+  it('should throw when project is not found', async () => {
+    const input = fixtures.GivenAPlanningAreaCustomExportJob();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenAProjectExistErrorShouldBeThrown();
+  });
   it('should throw when planning area is not found', async () => {
     const input = fixtures.GivenAPlanningAreaCustomExportJob();
     await fixtures.GivenProjectExist();
@@ -42,13 +46,13 @@ describe(PlanningAreaCustomGeojsonPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenAPlanningAreatExistErrorShouldBeThrown();
   });
-  it('should save file succesfully when planning area is found', async () => {
+  it('should save file succesfully when project and planning area are found', async () => {
     const input = fixtures.GivenAPlanningAreaCustomExportJob();
     await fixtures.GivenProjectExist();
     await fixtures.GivenPlanningArea();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAPlanningAreaCustomGeoJsonFileIsSaved();
+      .ThenAPlanningAreaCustomFileIsSaved();
   });
 });
 
@@ -69,7 +73,7 @@ const getFixtures = async () => {
       FileRepositoryModule,
     ],
     providers: [
-      PlanningAreaCustomGeojsonPieceExporter,
+      PlanningAreaCustomPieceExporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
@@ -78,7 +82,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const organizationId = v4();
   const planningAreaId = v4();
-  const sut = sandbox.get(PlanningAreaCustomGeojsonPieceExporter);
+  const sut = sandbox.get(PlanningAreaCustomPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
@@ -86,10 +90,6 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.default),
   );
   const fileRepository = sandbox.get(FileRepository);
-  const planningAreaRepository: Repository<PlanningArea> = sandbox.get(
-    getRepositoryToken(PlanningArea),
-  );
-
   return {
     cleanUp: async () => {
       await DeleteProjectAndOrganization(
@@ -104,14 +104,10 @@ const getFixtures = async () => {
         allPieces: [
           { resourceId: projectId, piece: ClonePiece.ProjectMetadata },
           { resourceId: projectId, piece: ClonePiece.PlanningAreaCustom },
-          {
-            resourceId: projectId,
-            piece: ClonePiece.PlanningAreaCustomGeojson,
-          },
         ],
         componentId: v4(),
         exportId: v4(),
-        piece: ClonePiece.PlanningAreaCustomGeojson,
+        piece: ClonePiece.PlanningAreaCustom,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
         isCloning: false,
@@ -124,61 +120,35 @@ const getFixtures = async () => {
         planning_area_geometry_id: planningAreaId,
       });
     },
-    GivenPlanningArea: async (): Promise<void> => {
-      await planningAreaRepository.save({
-        id: planningAreaId,
-        projectId,
-        theGeom: expectedGeom,
-      });
+    GivenPlanningArea: async () => {
+      return GivenPlanningArea(geoEntityManager, planningAreaId, projectId);
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
+        ThenAProjectExistErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(/Project with ID/gi);
+        },
         ThenAPlanningAreatExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
             /Custom planning area not found for project with ID/gi,
           );
         },
-        ThenAPlanningAreaCustomGeoJsonFileIsSaved: async () => {
+        ThenAPlanningAreaCustomFileIsSaved: async () => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<MultiPolygon>(savedStrem);
-          expect(content).toStrictEqual(expectedGeom);
+          const content = await readSavedFile<PlanningAreaCustomContent>(
+            savedStrem,
+          );
+          expect(content.puAreaKm2).toBe(500);
+          expect(content.puGridShape).toBe(PlanningUnitGridShape.Square);
+          const geom = content.planningAreaGeom;
+          expect(geom).toBeDefined();
+          expect(geom.length).toBeGreaterThan(0);
         },
       };
     },
   };
-};
-
-const expectedGeom: MultiPolygon = {
-  type: 'MultiPolygon',
-  coordinates: [
-    [
-      [
-        [102.0, 2.0],
-        [103.0, 2.0],
-        [103.0, 3.0],
-        [102.0, 3.0],
-        [102.0, 2.0],
-      ],
-    ],
-    [
-      [
-        [100.0, 0.0],
-        [101.0, 0.0],
-        [101.0, 1.0],
-        [100.0, 1.0],
-        [100.0, 0.0],
-      ],
-      [
-        [100.2, 0.2],
-        [100.8, 0.2],
-        [100.8, 0.8],
-        [100.2, 0.8],
-        [100.2, 0.2],
-      ],
-    ],
-  ],
 };

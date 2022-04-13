@@ -27,7 +27,7 @@ import {
 } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { DeleteProjectPus, GivenProjectPus, PrepareZipFile } from './fixtures';
+import { DeleteProjectPus, GivenProjectPus, PrepareZipFile } from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

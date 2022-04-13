@@ -1,10 +1,17 @@
+import { ScenarioRunResultsPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/scenario-run-results.piece-exporter';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
+import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import {
   LockStatus,
-  ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -16,23 +23,20 @@ import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
-  PlanningUnitsGeom,
-  ProjectsPuEntity,
-} from '@marxan-jobs/planning-unit-geometry';
-import { ScenarioPlanningUnitsDataPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/scenario-planning-units-data.piece-exporter';
-import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
-import {
   DeleteProjectAndOrganization,
   DeleteProjectPus,
+  DeleteScenarioBlmResults,
+  DeleteScenarioOutputPuDataResults,
+  GivenScenarioBlmResults,
   GivenScenarioExists,
-  GivenScenarioPuCostData,
+  GivenScenarioOutputPuData,
   GivenScenarioPuData,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(ScenarioPlanningUnitsDataPieceExporter, () => {
+describe(ScenarioRunResultsPieceExporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -41,13 +45,24 @@ describe(ScenarioPlanningUnitsDataPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('should save succesfully scenario planning units data', async () => {
-    const input = fixtures.GivenAScenarioPlanningUnistDataExportJob();
+  it('should save empty scenario run results file', async () => {
+    const input = fixtures.GivenAScenarioRunResultsExportJob();
     await fixtures.GivenScenarioExist();
-    await fixtures.GivenPlanningUnitsData();
+    await fixtures.GivenScenarioPlanningUnits();
+    await fixtures.GivenNoScenarioRunResulst();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAScenarioPlanningUnitsDataFileIsSaved();
+      .ThenAnEmptyScenarioRunResultsFileIsSaved();
+  });
+
+  it('should save succesfully scenario run results', async () => {
+    const input = fixtures.GivenAScenarioRunResultsExportJob();
+    await fixtures.GivenScenarioExist();
+    await fixtures.GivenScenarioPlanningUnits();
+    await fixtures.GivenScenarioRunResulst();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenAScenarioRunResultsFileIsSaved();
   });
 });
 
@@ -68,12 +83,13 @@ const getFixtures = async () => {
         ProjectsPuEntity,
         PlanningUnitsGeom,
         ScenariosPuPaDataGeo,
-        ScenariosPuCostDataGeo,
+        BlmFinalResultEntity,
+        OutputScenariosPuDataGeoEntity,
       ]),
       FileRepositoryModule,
     ],
     providers: [
-      ScenarioPlanningUnitsDataPieceExporter,
+      ScenarioRunResultsPieceExporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
@@ -82,7 +98,8 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const organizationId = v4();
-  const sut = sandbox.get(ScenarioPlanningUnitsDataPieceExporter);
+  let scenarioPus: ScenariosPuPaDataGeo[];
+  const sut = sandbox.get(ScenarioRunResultsPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
@@ -96,22 +113,25 @@ const getFixtures = async () => {
       await DeleteProjectAndOrganization(
         apiEntityManager,
         projectId,
-        organizationId,
+        scenarioId,
       );
-      return DeleteProjectPus(geoEntityManager, projectId);
+      await DeleteScenarioOutputPuDataResults(geoEntityManager, scenarioId);
+
+      await DeleteProjectPus(geoEntityManager, projectId);
+      return DeleteScenarioBlmResults(geoEntityManager, scenarioId);
     },
-    GivenAScenarioPlanningUnistDataExportJob: (): ExportJobInput => {
+    GivenAScenarioRunResultsExportJob: (): ExportJobInput => {
       return {
         allPieces: [
           { resourceId: projectId, piece: ClonePiece.ProjectMetadata },
           {
             resourceId: scenarioId,
-            piece: ClonePiece.ScenarioPlanningUnitsData,
+            piece: ClonePiece.ScenarioRunResults,
           },
         ],
         componentId: v4(),
         exportId: v4(),
-        piece: ClonePiece.ScenarioPlanningUnitsData,
+        piece: ClonePiece.ScenarioRunResults,
         resourceId: scenarioId,
         resourceKind: ResourceKind.Project,
         isCloning: false,
@@ -125,8 +145,8 @@ const getFixtures = async () => {
         organizationId,
       );
     },
-    GivenPlanningUnitsData: async () => {
-      const scenariPus = await GivenScenarioPuData(
+    GivenScenarioPlanningUnits: async () => {
+      scenarioPus = await GivenScenarioPuData(
         geoEntityManager,
         scenarioId,
         projectId,
@@ -139,33 +159,45 @@ const getFixtures = async () => {
           yloc: 8,
         },
       );
-
-      return GivenScenarioPuCostData(geoEntityManager, scenariPus);
     },
+    GivenScenarioRunResulst: async () => {
+      await GivenScenarioBlmResults(geoEntityManager, scenarioId);
+      return GivenScenarioOutputPuData(geoEntityManager, scenarioPus);
+    },
+    GivenNoScenarioRunResulst: async (): Promise<void> => {},
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
-        ThenAScenarioPlanningUnitsDataFileIsSaved: async () => {
+        ThenAnEmptyScenarioRunResultsFileIsSaved: async () => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ScenarioPlanningUnitsDataContent>(
+          const content = await readSavedFile(savedStrem);
+          expect(content).toEqual({ blmResults: [], marxanRunResults: [] });
+        },
+        ThenAScenarioRunResultsFileIsSaved: async () => {
+          const result = await sut.run(input);
+          const file = await fileRepository.get(result.uris[0].uri);
+          expect((file as Right<Readable>).right).toBeDefined();
+          if (isLeft(file)) throw new Error();
+          const savedStrem = file.right;
+          const content = await readSavedFile<ScenarioRunResultsContent>(
             savedStrem,
           );
-          expect(content.planningUnitsData).toHaveLength(3);
+          const expectedMarxanResults = [1, 2, 3].map((value) => ({
+            includedCount: 7,
+            values: [false, true, false, true],
+            puid: value,
+          }));
+          expect(content.blmResults[0]).toEqual({
+            blmValue: 30,
+            boundaryLength: 500,
+            cost: 1,
+          });
           expect(
-            content.planningUnitsData.every(
-              (data, index) =>
-                data.cost === 1 &&
-                data.protectedArea === 700.0045 &&
-                data.protectedByDefault &&
-                data.lockinStatus === 1 &&
-                data.xloc === 1 &&
-                data.yloc === 8 &&
-                data.puid === index + 1,
-            ),
-          ).toEqual(true);
+            content.marxanRunResults.sort((a, b) => a.puid - a.puid),
+          ).toEqual(expectedMarxanResults);
         },
       };
     },

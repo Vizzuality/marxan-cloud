@@ -1,8 +1,6 @@
-import { PlanningAreaGadmPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/planning-area-gadm.piece-exporter';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -12,15 +10,17 @@ import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
+import { ScenarioMetadataPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/scenario-metadata.piece-exporter';
+import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import {
   DeleteProjectAndOrganization,
-  GivenProjectExists,
+  GivenScenarioExists,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(PlanningAreaGadmPieceExporter, () => {
+describe(ScenarioMetadataPieceExporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -29,18 +29,18 @@ describe(PlanningAreaGadmPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('should throw when project is not found', async () => {
-    const input = fixtures.GivenAPlanningAreaGadmExportJob();
+  it('should throw when the scenario is not found', async () => {
+    const input = fixtures.GivenAScenarioMetadataExportJob();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAProjectExistErrorShouldBeThrown();
+      .ThenASceanarioExistErrorShouldBeThrown();
   });
-  it('should save file succesfully when project is found', async () => {
-    const input = fixtures.GivenAPlanningAreaGadmExportJob();
-    await fixtures.GivenProjectWithGadmArea();
+  it('should save file succesfully when the scenario is found', async () => {
+    const input = fixtures.GivenAScenarioMetadataExportJob();
+    await fixtures.GivenScenarioExist();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenPlanningAreaGadmFileIsSaved();
+      .ThenScenarioMetadataFileIsSaved();
   });
 });
 
@@ -55,25 +55,26 @@ const getFixtures = async () => {
       FileRepositoryModule,
     ],
     providers: [
-      PlanningAreaGadmPieceExporter,
+      ScenarioMetadataPieceExporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
   const projectId = v4();
+  const scenarioId = v4();
   const organizationId = v4();
-  const sut = sandbox.get(PlanningAreaGadmPieceExporter);
+  const sut = sandbox.get(ScenarioMetadataPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
   const fileRepository = sandbox.get(FileRepository);
-  const expectedContent: PlanningAreaGadmContent = {
-    l1: 'NAM.12_1',
-    l2: 'NAM.12.7_1',
-    planningUnitAreakm2: 500,
-    bbox: [10, 11, 12, 13],
-    country: 'AGO',
+  const expectedContent: ScenarioMetadataContent = {
+    name: `test scenario - ${scenarioId}`,
+    description: 'desc',
+    blm: 1,
+    numberOfRuns: 6,
+    metadata: { marxanInputParameterFile: { meta: '1' } },
   };
 
   return {
@@ -84,44 +85,45 @@ const getFixtures = async () => {
         organizationId,
       );
     },
-    GivenAPlanningAreaGadmExportJob: (): ExportJobInput => {
+    GivenAScenarioMetadataExportJob: (): ExportJobInput => {
       return {
         allPieces: [
-          { resourceId: projectId, piece: ClonePiece.ProjectMetadata },
-          { resourceId: projectId, piece: ClonePiece.PlanningAreaGAdm },
+          { resourceId: scenarioId, piece: ClonePiece.ScenarioMetadata },
         ],
         componentId: v4(),
         exportId: v4(),
-        piece: ClonePiece.PlanningAreaGAdm,
-        resourceId: projectId,
-        resourceKind: ResourceKind.Project,
+        piece: ClonePiece.ScenarioMetadata,
+        resourceId: scenarioId,
+        resourceKind: ResourceKind.Scenario,
         isCloning: false,
       };
     },
-    GivenProjectWithGadmArea: async () => {
-      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
-        description: 'desc',
-        admin_area_l1_id: 'NAM.12_1',
-        admin_area_l2_id: 'NAM.12.7_1',
-        planning_unit_area_km2: 500,
-        bbox: JSON.stringify([10, 11, 12, 13]),
-        country_id: 'AGO',
-      });
+    GivenScenarioExist: async () => {
+      return GivenScenarioExists(
+        apiEntityManager,
+        scenarioId,
+        projectId,
+        organizationId,
+        {
+          description: 'desc',
+          blm: 1,
+          number_of_runs: 6,
+          metadata: { marxanInputParameterFile: { meta: '1' } },
+        },
+      );
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
-        ThenAProjectExistErrorShouldBeThrown: async () => {
-          await expect(sut.run(input)).rejects.toThrow(
-            /Gadm data not found for project with ID/gi,
-          );
+        ThenASceanarioExistErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(/does not exist/gi);
         },
-        ThenPlanningAreaGadmFileIsSaved: async () => {
+        ThenScenarioMetadataFileIsSaved: async () => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<PlanningAreaGadmContent>(
+          const content = await readSavedFile<ScenarioMetadataContent>(
             savedStrem,
           );
           expect(content).toEqual(expectedContent);

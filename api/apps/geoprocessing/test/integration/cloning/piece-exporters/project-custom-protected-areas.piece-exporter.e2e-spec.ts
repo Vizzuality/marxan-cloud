@@ -1,29 +1,29 @@
-import { ProjectCustomFeaturesPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-custom-features.piece-exporter';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ProjectCustomFeaturesContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
-import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager, In } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
+import { ProjectCustomProtectedAreasPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-custom-protected-areas.piece-exporter';
+import { ProtectedArea } from '@marxan/protected-areas';
+import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
 import {
   DeleteProjectAndOrganization,
-  GivenFeatures,
-  GivenFeaturesData,
+  DeleteProtectedAreas,
+  GivenCustomProtectedAreas,
   GivenProjectExists,
   readSavedFile,
-} from './fixtures';
+} from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(ProjectCustomFeaturesPieceExporter, () => {
+describe(ProjectCustomProtectedAreasPieceExporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -32,22 +32,21 @@ describe(ProjectCustomFeaturesPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it("saves an empty file when project doesn't have custom features", async () => {
-    const input = fixtures.GivenAProjectCustomFeaturesExportJob();
+  it('should save empty file when there are not any project custom protected areas', async () => {
+    const input = fixtures.GivenAProjectCustomProtectedAreasExportJob();
     await fixtures.GivenProjectExist();
-    fixtures.GivenNoCustomFeaturesForProject();
+    await fixtures.GivenNoCustomProtectedAreaForProject();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAnEmptyProjectCustomFeaturesFileIsSaved();
+      .ThenAnEmptyProjectCustomProtectedAreasFileIsSaved();
   });
-
-  it('saves succesfully features data when the project has custom features', async () => {
-    const input = fixtures.GivenAProjectCustomFeaturesExportJob();
+  it('should save file succesfully when there are project custom protected areas', async () => {
+    const input = fixtures.GivenAProjectCustomProtectedAreasExportJob();
     await fixtures.GivenProjectExist();
-    await fixtures.GivenCustomFeaturesForProject();
+    await fixtures.GivenCustomProtectedAreaForProject();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAProjectCustomFeaturesFileIsSaved();
+      .ThenAProjectCustomProtectedAreasFileIsSaved();
   });
 });
 
@@ -64,31 +63,29 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      TypeOrmModule.forFeature([GeoFeatureGeometry]),
+      TypeOrmModule.forFeature([ProtectedArea]),
       FileRepositoryModule,
     ],
     providers: [
-      ProjectCustomFeaturesPieceExporter,
+      ProjectCustomProtectedAreasPieceExporter,
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
   const projectId = v4();
+  const otherProjectId = v4();
+  let projectPlanningAreaId: string;
+  let otherProjectPlanningAreaId: string;
   const organizationId = v4();
-  const sut = sandbox.get(ProjectCustomFeaturesPieceExporter);
+  const sut = sandbox.get(ProjectCustomProtectedAreasPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
   const geoEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.default),
   );
-  const featuresDataRepo = geoEntityManager.getRepository(GeoFeatureGeometry);
   const fileRepository = sandbox.get(FileRepository);
-
-  let featureIds: string[] = [];
-  const amountOfCustomFeatures = 5;
-  const recordsOfDataForEachCustomFeature = 3;
 
   return {
     cleanUp: async () => {
@@ -97,69 +94,70 @@ const getFixtures = async () => {
         projectId,
         organizationId,
       );
-      await featuresDataRepo.delete({ featureId: In(featureIds) });
+      return DeleteProtectedAreas(geoEntityManager, [
+        projectPlanningAreaId,
+        otherProjectPlanningAreaId,
+      ]);
     },
-    GivenAProjectCustomFeaturesExportJob: (): ExportJobInput => {
+    GivenAProjectCustomProtectedAreasExportJob: (): ExportJobInput => {
       return {
         allPieces: [
           { resourceId: projectId, piece: ClonePiece.ProjectMetadata },
           {
             resourceId: projectId,
-            piece: ClonePiece.ProjectCustomFeatures,
+            piece: ClonePiece.ProjectCustomProtectedAreas,
           },
         ],
         componentId: v4(),
         exportId: v4(),
-        piece: ClonePiece.ProjectCustomFeatures,
+        piece: ClonePiece.ProjectMetadata,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
         isCloning: false,
       };
     },
     GivenProjectExist: async () => {
-      return GivenProjectExists(apiEntityManager, projectId, organizationId);
+      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
+        description: 'desc',
+        planning_unit_area_km2: 500,
+      });
     },
-    GivenNoCustomFeaturesForProject: () => {},
-    GivenCustomFeaturesForProject: async () => {
-      const { customFeatures } = await GivenFeatures(
-        apiEntityManager,
-        0,
-        amountOfCustomFeatures,
-        projectId,
-      );
-      featureIds = customFeatures.map((feature) => feature.id);
-      await GivenFeaturesData(
-        geoEntityManager,
-        recordsOfDataForEachCustomFeature,
-        featureIds,
-      );
+    GivenNoCustomProtectedAreaForProject: async () => {
+      otherProjectPlanningAreaId = (
+        await GivenCustomProtectedAreas(geoEntityManager, 1, otherProjectId)
+      )[0].id;
+    },
+    GivenCustomProtectedAreaForProject: async () => {
+      projectPlanningAreaId = (
+        await GivenCustomProtectedAreas(geoEntityManager, 1, projectId)
+      )[0].id;
     },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
-        ThenAnEmptyProjectCustomFeaturesFileIsSaved: async () => {
+        ThenAnEmptyProjectCustomProtectedAreasFileIsSaved: async () => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectCustomFeaturesContent>(
-            savedStrem,
-          );
-          expect(content.features).toEqual([]);
+          const content = await readSavedFile(savedStrem);
+          expect(content).toEqual([]);
         },
-        ThenAProjectCustomFeaturesFileIsSaved: async () => {
+        ThenAProjectCustomProtectedAreasFileIsSaved: async () => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const content = await readSavedFile<ProjectCustomFeaturesContent>(
-            savedStrem,
+          const content = (
+            await readSavedFile<ProjectCustomProtectedAreasContent[]>(
+              savedStrem,
+            )
+          )[0];
+          expect(content.fullName).toBe(
+            `custom protected area 1 of ${projectId}`,
           );
-          expect(content.features).toHaveLength(amountOfCustomFeatures);
-          const { feature_class_name, data } = content.features[0];
-          expect(feature_class_name).toEqual(`custom-${projectId}-1`);
-          expect(data).toHaveLength(recordsOfDataForEachCustomFeature);
+          expect(content.ewkb.length).toBeGreaterThan(0);
         },
       };
     },
