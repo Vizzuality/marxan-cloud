@@ -12,7 +12,6 @@ import { User, userResource } from './user.api.entity';
 import { omit } from 'lodash';
 import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateUserDTO } from './dto/update.user.dto';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 
 import * as faker from 'faker';
 import {
@@ -27,16 +26,18 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { FetchSpecification } from 'nestjs-base-service';
+import { UsersRequest } from './user-requests-info';
 
 export const forbiddenError = Symbol(`unauthorized access`);
 export const badRequestError = Symbol(`operation not allowed`);
 export const userNotFoundError = Symbol(`user not found in database`);
+
 @Injectable()
 export class UsersService extends AppBaseService<
   User,
   CreateUserDTO,
   UpdateUserDTO,
-  AppInfoDTO
+  UsersRequest
 > {
   constructor(
     @InjectRepository(User)
@@ -100,6 +101,28 @@ export class UsersService extends AppBaseService<
         ],
       },
     };
+  }
+
+  async extendFindAllQuery(
+    query: SelectQueryBuilder<User>,
+    fetchSpecification: FetchSpecification,
+    info?: UsersRequest,
+  ): Promise<SelectQueryBuilder<User>> {
+    const { namesSearch } = info?.params ?? {};
+
+    if (namesSearch) {
+      const namesSearchFilterField = 'namesSearchFilter' as const;
+      query.andWhere(
+        `(${this.alias}.display_name
+          ||' '|| COALESCE(${this.alias}.fname, '')
+          ||' '|| COALESCE(${this.alias}.lname, '')
+          ||' '|| COALESCE(${this.alias}.email, '')
+          ) ILIKE :${namesSearchFilterField}`,
+        { [namesSearchFilterField]: `%${namesSearch}%` },
+      );
+    }
+
+    return query;
   }
 
   async fakeFindOne(_id: string): Promise<Partial<User>> {
@@ -182,7 +205,7 @@ export class UsersService extends AppBaseService<
   async updateOwnPassword(
     userId: string,
     currentAndNewPasswords: UpdateUserPasswordDTO,
-    _info: AppInfoDTO,
+    _info: UsersRequest,
   ): Promise<void> {
     const user = await this.getById(userId);
     if (
@@ -215,7 +238,7 @@ export class UsersService extends AppBaseService<
   async validateBeforeUpdate(
     id: string,
     updateModel: UpdateUserDTO,
-    _info?: AppInfoDTO,
+    _info?: UsersRequest,
   ): Promise<void> {
     if (updateModel.password) {
       throw new ForbiddenException(
@@ -245,7 +268,7 @@ export class UsersService extends AppBaseService<
   async extendFindAllResults(
     entitiesAndCount: [User[], number],
     _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    _info?: UsersRequest,
   ): Promise<[User[], number]> {
     const extendedEntities: Promise<User>[] = entitiesAndCount[0].map(
       (entity) => this.extendGetByIdResult(entity),
