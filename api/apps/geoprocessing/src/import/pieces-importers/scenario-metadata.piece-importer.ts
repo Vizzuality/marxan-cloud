@@ -29,6 +29,48 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
     return piece === ClonePiece.ScenarioMetadata;
   }
 
+  private updateScenario(
+    em: EntityManager,
+    scenarioId: string,
+    values: ScenarioMetadataContent,
+  ) {
+    return em
+      .createQueryBuilder()
+      .update('scenarios')
+      .set({
+        id: scenarioId,
+        name: values.name,
+        description: values.description,
+        blm: values.blm,
+        number_of_runs: values.numberOfRuns,
+        metadata: values.metadata,
+      })
+      .where('id = :scenarioId', { scenarioId })
+      .execute();
+  }
+
+  private createScenario(
+    em: EntityManager,
+    scenarioId: string,
+    projectId: string,
+    values: ScenarioMetadataContent,
+  ) {
+    return em
+      .createQueryBuilder()
+      .insert()
+      .into('scenarios')
+      .values({
+        id: scenarioId,
+        name: values.name,
+        description: values.description,
+        blm: values.blm,
+        number_of_runs: values.numberOfRuns,
+        metadata: values.metadata,
+        project_id: projectId,
+      })
+      .execute();
+  }
+
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const {
       pieceResourceId: scenarioId,
@@ -66,31 +108,18 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const {
-      name,
-      blm,
-      description,
-      metadata,
-      numberOfRuns,
-    }: ScenarioMetadataContent = JSON.parse(
+    const metadata: ScenarioMetadataContent = JSON.parse(
       stringScenarioMetadataOrError.right,
     );
 
+    const scenarioCloning = resourceKind === ResourceKind.Scenario;
+
     await this.entityManager.transaction(async (em) => {
-      await em
-        .createQueryBuilder()
-        .insert()
-        .into('scenarios')
-        .values({
-          id: scenarioId,
-          name,
-          description,
-          blm,
-          number_of_runs: numberOfRuns,
-          metadata,
-          project_id: projectId,
-        })
-        .execute();
+      if (scenarioCloning) {
+        await this.updateScenario(em, scenarioId, metadata);
+      } else {
+        await this.createScenario(em, scenarioId, projectId, metadata);
+      }
 
       if (resourceKind === ResourceKind.Scenario) {
         await em

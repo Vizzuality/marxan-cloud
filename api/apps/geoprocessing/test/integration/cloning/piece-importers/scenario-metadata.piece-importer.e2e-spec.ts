@@ -18,6 +18,7 @@ import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GivenProjectExists,
+  GivenScenarioExists,
   GivenUserExists,
   PrepareZipFile,
 } from '../fixtures';
@@ -49,17 +50,38 @@ describe(ScenarioMetadataPieceImporter, () => {
 
   it('fails when the file cannot be retrieved from file repo', async () => {
     const archiveLocation = fixtures.GivenNoScenarioMetadataFileIsAvailable();
-    const input = fixtures.GivenJobInput(archiveLocation);
+    const input = fixtures.GivenJobInput(archiveLocation, ResourceKind.Project);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it('imports scenario metadata', async () => {
+  it('imports scenario metadata creating a new scenario (project import process)', async () => {
+    const resourceKind = ResourceKind.Project;
     await fixtures.GivenProject();
     await fixtures.GivenUser();
-    const archiveLocation = await fixtures.GivenValidScenarioMetadataFile();
-    const input = fixtures.GivenJobInput(archiveLocation);
+
+    const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
+      resourceKind,
+    );
+    const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenScenarioMetadataShouldBeImported();
+  });
+
+  it('imports scenario metadata updating an existing scenario (scenario cloning process)', async () => {
+    const resourceKind = ResourceKind.Scenario;
+    await fixtures.GivenScenario();
+    await fixtures.GivenUser();
+
+    const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
+      resourceKind,
+    );
+    const input = fixtures.GivenJobInput(
+      archiveLocation,
+      ResourceKind.Scenario,
+    );
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenScenarioMetadataShouldBeImported();
@@ -86,7 +108,6 @@ const getFixtures = async () => {
   const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();
-  const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
   const userId = v4();
 
@@ -116,7 +137,18 @@ const getFixtures = async () => {
     GivenProject: () => {
       return GivenProjectExists(entityManager, projectId, organizationId);
     },
-    GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
+    GivenScenario: () => {
+      return GivenScenarioExists(
+        entityManager,
+        scenarioId,
+        projectId,
+        organizationId,
+      );
+    },
+    GivenJobInput: (
+      archiveLocation: ArchiveLocation,
+      resourceKind: ResourceKind,
+    ): ImportJobInput => {
       const [
         uri,
       ] = ClonePieceUrisResolver.resolveFor(
@@ -142,7 +174,7 @@ const getFixtures = async () => {
         importId: v4(),
         projectId,
         piece: ClonePiece.ScenarioMetadata,
-        resourceKind,
+        resourceKind: ResourceKind.Project,
         uris: [],
         ownerId: userId,
       };
@@ -150,7 +182,7 @@ const getFixtures = async () => {
     GivenNoScenarioMetadataFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidScenarioMetadataFile: async () => {
+    GivenValidScenarioMetadataFile: async (resourceKind: ResourceKind) => {
       const [
         { relativePath },
       ] = ClonePieceUrisResolver.resolveFor(
