@@ -67,7 +67,6 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       .createQueryBuilder()
       .update('projects')
       .set({
-        name: data.name,
         description: data.description,
         planning_unit_grid_shape: data.planningUnitGridShape,
       })

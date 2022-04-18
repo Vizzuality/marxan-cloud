@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   InternalServerErrorException,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -104,6 +105,9 @@ import { BaseTilesOpenApi } from '@marxan/tiles';
 import { WebshotPdfConfig } from '@marxan/webshot';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
+import { forbiddenError } from '../access-control';
+import { scenarioNotFound } from '../blm/values/blm-repos';
+import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -1346,5 +1350,35 @@ export class ScenariosController {
     }
     setImagePngResponseHeadersForSuccessfulRequests(res);
     res.send(result.right);
+  }
+
+  @ImplementsAcl()
+  @ApiParam({
+    name: 'scenarioId',
+    description: 'ID of the Scenario',
+  })
+  @ApiOkResponse({ type: RequestScenarioCloneResponseDto })
+  @Post(`:scenarioId/clone`)
+  async requestProjectClone(
+    @Param('scenarioId') scenarioId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<RequestScenarioCloneResponseDto> {
+    const result = await this.service.requestExport(scenarioId, req.user.id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case scenarioNotFound:
+          throw new NotFoundException(
+            `Could not find scenario with ID: ${scenarioId}`,
+          );
+
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return result.right;
   }
 }
