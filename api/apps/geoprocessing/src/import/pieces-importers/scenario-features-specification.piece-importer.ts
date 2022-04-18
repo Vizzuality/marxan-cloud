@@ -14,7 +14,7 @@ import { extractFile, isDefined } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { EntityManager } from 'typeorm';
+import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   ImportPieceProcessor,
@@ -22,7 +22,7 @@ import {
 } from '../pieces/import-piece-processor';
 
 type ScenarioFeaturesDataResult = { id: string; featureId: number };
-type SpecificationIdByFeatureId = Record<number, string>;
+type FeatureIdsBySpecificationId = Record<string, number[]>;
 type ScenarioFeaturesDataByFeatureId = Record<
   number,
   ScenarioFeaturesDataResult
@@ -240,7 +240,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
     projectId: string,
   ): Promise<{
     parsedSpecifications: ScenarioFeaturesSpecificationContentWithId[];
-    specificationIdByFeatureId: SpecificationIdByFeatureId;
+    featureIdsBySpecificationId: FeatureIdsBySpecificationId;
   }> {
     const featuresNames = this.getFeaturesFromSpecifications(specifications);
 
@@ -248,18 +248,19 @@ export class ScenarioFeaturesSpecificationPieceImporter
       featuresNames,
       projectId,
     );
-    const specificationIdByFeatureId: Record<number, string> = {};
+    const featureIdsBySpecificationId: FeatureIdsBySpecificationId = {};
 
     const parsedSpecifications = specifications.map(
       ({ draft, raw, configs }) => {
         const specificationId = v4();
+        featureIdsBySpecificationId[specificationId] = [];
 
         this.parseRaw(raw, featutesIdByNameAndProjectMap);
 
         const parsedConfigs = configs.map(
           ({ baseFeature, againstFeature, features, ...rest }) => {
             features.forEach(({ featureId }) => {
-              specificationIdByFeatureId[featureId] = specificationId;
+              featureIdsBySpecificationId[specificationId].push(featureId);
             });
             return {
               ...rest,
@@ -289,7 +290,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
         };
       },
     );
-    return { parsedSpecifications, specificationIdByFeatureId };
+    return { parsedSpecifications, featureIdsBySpecificationId };
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
@@ -343,7 +344,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
 
     const {
       parsedSpecifications,
-      specificationIdByFeatureId,
+      featureIdsBySpecificationId,
     } = await this.parseFileContent(
       specifications,
       scenarioFeaturesDataByFeatureId,
@@ -363,15 +364,23 @@ export class ScenarioFeaturesSpecificationPieceImporter
       );
 
       await this.insertSpecificationFeaturesConfig(parsedSpecifications, apiEm);
+    });
 
-      await this.geoprocessingEntityManager
-        .getRepository(ScenarioFeaturesData)
-        .save(
-          scenarioFeaturesData.map(({ id, featureId }) => ({
-            id,
-            specificationId: specificationIdByFeatureId[featureId],
-          })),
-        );
+    await this.geoprocessingEntityManager.transaction(async (em) => {
+      const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
+
+      await Promise.all(
+        Object.keys(featureIdsBySpecificationId).map(
+          async (specificationId) => {
+            const featureIds = featureIdsBySpecificationId[specificationId];
+
+            return scenarioFeaturesDataRepo.update(
+              { scenarioId, featureId: In(featureIds) },
+              { specificationId },
+            );
+          },
+        ),
+      );
     });
 
     return {
