@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Either } from 'fp-ts/Either';
 import { Readable } from 'stream';
-import { Either, left } from 'fp-ts/Either';
+
+export const CloningStoragePath = Symbol('cloning storage path');
 
 export const unknownError = Symbol(`unknown error`);
 export const storageNotReachable = Symbol(`storage not reachable`);
@@ -17,16 +18,11 @@ export type GetFileError =
   | typeof fileNotFound
   | typeof hackerFound;
 
-@Injectable()
-export class FileRepository {
-  async save(
+export abstract class FileRepository {
+  abstract save(
     stream: Readable,
     extension?: string,
-  ): Promise<Either<SaveFileError, string>> {
-    return left(storageNotReachable);
-  }
+  ): Promise<Either<SaveFileError, string>>;
 
-  async get(uri: string): Promise<Either<GetFileError, Readable>> {
-    return left(storageNotReachable);
-  }
+  abstract get(uri: string): Promise<Either<GetFileError, Readable>>;
 }

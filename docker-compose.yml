@@ -12,6 +12,7 @@ services:
       - ./api/apps:/opt/marxan-api/apps
       - ./api/libs:/opt/marxan-api/libs
       - marxan-cloud-backend-temp-storage:/tmp/storage
+      - marxan-cloud-backend-cloning-storage:/opt/marxan-project-cloning
     env_file: .env
     environment:
       - NODE_PATH=src
@@ -61,6 +62,7 @@ services:
       - ./api/apps:/opt/marxan-geoprocessing/apps
       - ./api/libs:/opt/marxan-geoprocessing/libs
       - marxan-cloud-backend-temp-storage:/tmp/storage
+      - marxan-cloud-backend-cloning-storage:/opt/marxan-project-cloning
     env_file: .env
     environment:
       - NODE_PATH=src
@@ -93,7 +95,6 @@ services:
       - WEBSHOT_APP_PORT
     volumes:
       - ./webshot/src:/opt/marxan-webshot/src
-
 
   postgresql-api:
     build:
@@ -134,7 +135,7 @@ services:
       dockerfile: Dockerfile
     hostname: redis
     container_name: marxan-redis
-    command: [ "redis-server"]
+    command: ["redis-server"]
     ports:
       - "${REDIS_API_SERVICE_PORT}:6379"
     restart: on-failure
@@ -148,7 +149,7 @@ services:
     environment:
       - REDIS_HOSTS=local:marxan-redis:6379
     ports:
-      - '${REDIS_COMMANDER_PORT}:8081'
+      - "${REDIS_COMMANDER_PORT}:8081"
     depends_on:
       - redis
 
@@ -160,3 +161,5 @@ volumes:
   marxan-cloud-redis-api-data:
 
   marxan-cloud-backend-temp-storage:
+
+  marxan-cloud-backend-cloning-storage:

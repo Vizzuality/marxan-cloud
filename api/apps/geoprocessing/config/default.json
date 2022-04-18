@@ -4,7 +4,7 @@
     "host": "marxan-redis",
     "port": 6379,
     "password": null,
-    "concurrency" : 50
+    "concurrency": 50
   },
   "postgresApi": {
     "url": null,
@@ -38,6 +38,9 @@
     "sharedFileStorage": {
       "localPath": "/tmp/storage",
       "cleanupTemporaryFolders": true
+    },
+    "cloningFileStorage": {
+      "localPath": "/opt/marxan-project-cloning"
     }
   },
   "fileUploads": {

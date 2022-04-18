@@ -1,18 +1,15 @@
-import { HttpModule, Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-
-import { FileRepository } from './file.repository';
-import { validate } from './file-repo.config';
+import { Module } from '@nestjs/common';
+import { AppConfig } from '../../../apps/api/src/utils/config.utils';
+import { CloningStoragePath, FileRepository } from './file.repository';
 import { TempStorageRepository } from './temp-storage.repository';
 
 @Module({
-  imports: [
-    HttpModule,
-    ConfigModule.forRoot({
-      validate,
-    }),
-  ],
+  imports: [],
   providers: [
+    {
+      provide: CloningStoragePath,
+      useValue: AppConfig.get<string>('storage.cloningFileStorage.localPath'),
+    },
     {
       provide: FileRepository,
       /**
