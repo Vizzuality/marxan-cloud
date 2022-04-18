@@ -3,7 +3,10 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ScenarioFeaturesDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -75,7 +78,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioFeaturesDataPieceExporter,
@@ -95,7 +98,7 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.default),
   );
   const featuresDataRepo = geoEntityManager.getRepository(GeoFeatureGeometry);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   let featureIds: string[] = [];
   const amountOfCustomFeatures = 3;

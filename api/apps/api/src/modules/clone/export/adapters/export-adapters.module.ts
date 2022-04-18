@@ -1,4 +1,4 @@
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from '../../../projects/project.api.entity';
@@ -14,7 +14,7 @@ import { TypeormExportRepository } from './typeorm-export.repository';
 
 @Module({
   imports: [
-    FileRepositoryModule,
+    CloningFileSRepositoryModule,
     TypeOrmModule.forFeature([
       Project,
       ExportEntity,

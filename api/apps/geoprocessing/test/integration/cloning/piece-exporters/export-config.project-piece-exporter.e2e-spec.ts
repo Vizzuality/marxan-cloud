@@ -1,7 +1,10 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -73,7 +76,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ExportConfigProjectPieceExporter,
@@ -89,7 +92,7 @@ const getFixtures = async () => {
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   const getExpectedContent = (
     options: FixtureOptions,

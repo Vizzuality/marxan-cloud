@@ -1,4 +1,4 @@
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../../../api-events';
@@ -30,7 +30,7 @@ import { UploadExportFileHandler } from './upload-export-file.handler';
     QueueApiEventsModule,
     CqrsModule,
     ImportAdaptersModule,
-    FileRepositoryModule,
+    CloningFileSRepositoryModule,
   ],
   providers: [
     PieceImportRequestedSaga,

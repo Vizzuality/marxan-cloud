@@ -9,7 +9,10 @@ import {
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioFeaturesDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -98,7 +101,7 @@ const getFixtures = async () => {
       }),
       TypeOrmModule.forFeature([]),
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioFeaturesDataPieceImporter,
@@ -126,7 +129,7 @@ const getFixtures = async () => {
     OutputScenariosFeaturesDataGeoEntity,
   );
   const sut = sandbox.get(ScenarioFeaturesDataPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   let validScenarioFeaturesDataFile: ScenarioFeaturesDataContent;
   let featureIds: string[] = [];

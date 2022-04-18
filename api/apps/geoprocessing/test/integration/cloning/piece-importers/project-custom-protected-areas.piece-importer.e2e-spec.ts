@@ -8,7 +8,10 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -66,7 +69,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([ProtectedArea]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ProjectCustomProtectedAreasPieceImporter,
@@ -84,7 +87,7 @@ const getFixtures = async () => {
   );
 
   const sut = sandbox.get(ProjectCustomProtectedAreasPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   let validProjectCustomProtectedAreasFile: ProjectCustomProtectedAreasContent[];
 

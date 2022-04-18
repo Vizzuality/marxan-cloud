@@ -8,7 +8,7 @@ import {
   MarxanRunResultsContent,
   ScenarioRunResultsContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { extractFile } from '@marxan/utils';
@@ -30,7 +30,7 @@ interface ProjectsPuSelectResult {
 @PieceImportProvider()
 export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     private readonly logger: Logger,

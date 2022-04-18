@@ -8,7 +8,10 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -92,7 +95,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ProjectMetadataPieceImporter,
@@ -106,7 +109,7 @@ const getFixtures = async () => {
   const userId = v4();
 
   const sut = sandbox.get(ProjectMetadataPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   const entityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB.name),

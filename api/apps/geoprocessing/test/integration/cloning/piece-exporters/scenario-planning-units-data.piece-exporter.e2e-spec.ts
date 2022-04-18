@@ -1,7 +1,10 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import {
   LockStatus,
   ScenariosPuCostDataGeo,
@@ -70,7 +73,7 @@ const getFixtures = async () => {
         ScenariosPuPaDataGeo,
         ScenariosPuCostDataGeo,
       ]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioPlanningUnitsDataPieceExporter,
@@ -89,7 +92,7 @@ const getFixtures = async () => {
   const geoEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.default),
   );
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   return {
     cleanUp: async () => {

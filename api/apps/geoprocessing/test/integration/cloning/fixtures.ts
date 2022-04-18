@@ -5,7 +5,7 @@ import {
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ArchiveLocation } from '@marxan/cloning/domain';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import {
   MarxanExecutionMetadataGeoEntity,
@@ -60,7 +60,7 @@ export async function GenerateRandomGeometries(
 
 export async function PrepareZipFile(
   content: any,
-  fileRepository: FileRepository,
+  fileRepository: CloningFilesRepository,
   relativePath: string,
 ) {
   const archive = archiver(`zip`, {

@@ -2,7 +2,10 @@ import { ProjectMetadataPieceExporter } from '@marxan-geoprocessing/export/piece
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -53,7 +56,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ProjectMetadataPieceExporter,
@@ -68,7 +71,7 @@ const getFixtures = async () => {
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const expectedContent: ProjectMetadataContent = {
     name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,

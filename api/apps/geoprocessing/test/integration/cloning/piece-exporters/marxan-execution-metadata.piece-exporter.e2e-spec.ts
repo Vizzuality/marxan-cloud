@@ -3,7 +3,10 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { MarxanExecutionMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -61,7 +64,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([MarxanExecutionMetadataGeoEntity]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       MarxanExecutionMetadataPieceExporter,
@@ -77,7 +80,7 @@ const getFixtures = async () => {
   const geoEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.default),
   );
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const amountOfMarxanRuns = 3;
 
   return {

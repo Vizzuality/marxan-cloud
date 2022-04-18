@@ -11,7 +11,10 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -85,7 +88,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([PlanningUnitsGeom, ProjectsPuEntity]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       PlanningUnitsGridPieceImporter,
@@ -101,7 +104,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const userId = v4();
   const sut = sandbox.get(PlanningUnitsGridPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const entityManager = sandbox.get<EntityManager>(getEntityManagerToken());
   const puGeomRepo = sandbox.get<Repository<PlanningUnitsGeom>>(
     getRepositoryToken(PlanningUnitsGeom),

@@ -12,7 +12,10 @@ import {
   MarxanExecutionMetadataContent,
   MarxanExecutionMetadataFolderType,
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -102,7 +105,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([MarxanExecutionMetadataGeoEntity]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       MarxanExecutionMetadataPieceImporter,
@@ -117,7 +120,7 @@ const getFixtures = async () => {
   const userId = v4();
 
   const sut = sandbox.get(MarxanExecutionMetadataPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const marxanExecutionMetadataRepo = sandbox.get<
     Repository<MarxanExecutionMetadataGeoEntity>
   >(getRepositoryToken(MarxanExecutionMetadataGeoEntity));

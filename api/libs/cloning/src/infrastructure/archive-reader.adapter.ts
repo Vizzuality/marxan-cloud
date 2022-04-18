@@ -1,5 +1,7 @@
-import { FileRepository } from '@marxan/files-repository';
-import { fileNotFound } from '@marxan/files-repository/file.repository';
+import {
+  CloningFilesRepository,
+  fileNotFound,
+} from '@marxan/cloning-files-repository';
 import { Injectable } from '@nestjs/common';
 import { Either, isLeft, left } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
@@ -8,7 +10,7 @@ import { ArchiveReader, Failure } from './archive-reader.port';
 
 @Injectable()
 export class ArchiveReaderAdapter implements ArchiveReader {
-  constructor(private readonly fileRepository: FileRepository) {}
+  constructor(private readonly fileRepository: CloningFilesRepository) {}
 
   async get(location: ArchiveLocation): Promise<Either<Failure, Readable>> {
     const readableOrError = await this.fileRepository.get(location.value);

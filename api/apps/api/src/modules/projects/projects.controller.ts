@@ -104,12 +104,14 @@ import {
 } from './dto/export.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
-import { unknownError as fileRepositoryUnknownError } from '@marxan/files-repository';
+import {
+  unknownError as fileRepositoryUnknownError,
+  fileNotFound,
+} from '@marxan/cloning-files-repository';
 import {
   archiveCorrupted,
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
-import { fileNotFound } from '@marxan/files-repository/file.repository';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';

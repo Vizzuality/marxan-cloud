@@ -5,7 +5,7 @@ import {
   ScenarioFeaturesDataContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 import { extractFile } from '@marxan/utils';
@@ -45,7 +45,7 @@ const CHUNK_SIZE = 100;
 @PieceImportProvider()
 export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)

@@ -12,7 +12,10 @@ import {
   ProjectCustomFeaturesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { FeatureTag } from '@marxan/features';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -82,7 +85,7 @@ const getFixtures = async () => {
       }),
       TypeOrmModule.forFeature([GeoFeatureGeometry]),
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ProjectCustomFeaturesPieceImporter,
@@ -107,7 +110,7 @@ const getFixtures = async () => {
   );
 
   const sut = sandbox.get(ProjectCustomFeaturesPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   const amountOfCustomFeatures = 5;
   const recordsOfDataForEachCustomFeature = 3;

@@ -18,7 +18,7 @@ export type GetFileError =
   | typeof fileNotFound
   | typeof hackerFound;
 
-export abstract class FileRepository {
+export abstract class CloningFilesRepository {
   abstract save(
     stream: Readable,
     extension?: string,

@@ -5,15 +5,15 @@ import { Readable } from 'stream';
 import { v4 } from 'uuid';
 import {
   CloningStoragePath,
-  FileRepository,
+  CloningFilesRepository,
   GetFileError,
   hackerFound,
   SaveFileError,
   unknownError,
-} from './file.repository';
+} from './cloning-files.repository';
 
 @Injectable()
-export class TempStorageRepository implements FileRepository {
+export class VolumeCloningFilesStorage implements CloningFilesRepository {
   constructor(
     @Inject(CloningStoragePath) private readonly storagePath: string,
   ) {}

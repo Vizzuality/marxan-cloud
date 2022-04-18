@@ -6,7 +6,7 @@ import {
   exportVersion,
   ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
@@ -21,7 +21,7 @@ import {
 @PieceExportProvider()
 export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,
