@@ -37,7 +37,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
     this.logger.setContext(ScenarioRunResultsPieceExporter.name);
   }
 
-  isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
+  isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioRunResults;
   }
 
@@ -96,7 +96,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       uris: ClonePieceUrisResolver.resolveFor(
         ClonePiece.ScenarioRunResults,
         outputFile.right,
-        { kind: ResourceKind.Project, scenarioId: input.resourceId },
+        { kind: input.resourceKind, scenarioId: input.resourceId },
       ),
     };
   }

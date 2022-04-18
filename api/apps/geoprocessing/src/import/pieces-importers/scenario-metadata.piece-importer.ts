@@ -39,7 +39,6 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       .update('scenarios')
       .set({
         id: scenarioId,
-        name: values.name,
         description: values.description,
         blm: values.blm,
         number_of_runs: values.numberOfRuns,
@@ -119,26 +118,6 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         await this.updateScenario(em, scenarioId, metadata);
       } else {
         await this.createScenario(em, scenarioId, projectId, metadata);
-      }
-
-      if (resourceKind === ResourceKind.Scenario) {
-        await em
-          .createQueryBuilder()
-          .insert()
-          .into(`users_scenarios`)
-          .values({
-            user_id: ownerId,
-            scenario_id: scenarioId,
-            // It would be great to use ScenarioRoles enum instead of having
-            // the role hardcoded. The thing is that Geoprocessing code shouldn't depend
-            // directly on elements of Api code, so there were two options:
-            // - Move ScenarioRoles enum to libs package
-            // - Harcode the rol
-            // We took the second approach because we are only referencing values from that enum
-            // here
-            role_id: 'scenario_owner',
-          })
-          .execute();
       }
     });
 

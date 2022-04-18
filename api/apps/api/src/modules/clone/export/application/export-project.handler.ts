@@ -33,7 +33,7 @@ export class ExportProjectHandler
     const project = await this.projectRepo.findOneOrFail(existingProjectId);
     await this.projectRepo.save({
       id: newProjectId,
-      name: '',
+      name: project.name + ' - copy',
       organizationId: project.organizationId,
     });
   }

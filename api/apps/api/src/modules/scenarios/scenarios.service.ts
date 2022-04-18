@@ -707,7 +707,15 @@ export class ScenariosService {
   async requestExport(
     scenarioId: string,
     userId: string,
-  ): Promise<Either<typeof forbiddenError | GetScenarioFailure, string>> {
+  ): Promise<
+    Either<
+      typeof forbiddenError | GetScenarioFailure,
+      {
+        scenarioId: string;
+        exportId: string;
+      }
+    >
+  > {
     const scenario = await this.getById(scenarioId, {
       authenticatedUser: { id: userId },
     });
@@ -730,7 +738,10 @@ export class ScenariosService {
       ),
     );
 
-    return right(exportId.value);
+    return right({
+      exportId: exportId.value,
+      scenarioId: importResourceId.value,
+    });
   }
 
   async getOneSolution(

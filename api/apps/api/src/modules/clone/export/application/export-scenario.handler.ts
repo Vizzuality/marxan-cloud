@@ -33,7 +33,7 @@ export class ExportScenarioHandler
     const scenario = await this.scenarioRepo.findOneOrFail(existingScenarioId);
     await this.scenarioRepo.save({
       id: newScenarioId,
-      name: '',
+      name: scenario.name + ' - copy',
       projectId: scenario.projectId,
     });
   }
