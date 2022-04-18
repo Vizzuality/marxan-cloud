@@ -131,23 +131,24 @@ export const getFixtures = async () => {
       await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
     },
     ThenImportIsCompleted: async () => {
-      let res: ApiEventByTopicAndKind;
-      await new Promise<void>((resolve, reject) => {
-        const findApiEventInterval = setInterval(async () => {
-          try {
-            res = await apiEvents.getLatestEventForTopic({
-              topic: projectId,
-              kind: API_EVENT_KINDS.project__import__finished__v1__alpha,
-            });
+      const res = await new Promise<ApiEventByTopicAndKind>(
+        (resolve, reject) => {
+          const findApiEventInterval = setInterval(async () => {
+            try {
+              const event = await apiEvents.getLatestEventForTopic({
+                topic: projectId,
+                kind: API_EVENT_KINDS.project__import__finished__v1__alpha,
+              });
+              clearInterval(findApiEventInterval);
+              resolve(event);
+            } catch (error) {}
+          }, 1500);
+          const apiEventTimeOut = setTimeout(() => {
             clearInterval(findApiEventInterval);
-          } catch (error) {}
-        }, 1500);
-        const apiEventTimeOut = setTimeout(() => {
-          clearInterval(findApiEventInterval);
-          if (!res) reject('Import API event was not found');
-          resolve();
-        }, 6000);
-      });
+            reject('Import API event was not found');
+          }, 6000);
+        },
+      );
       expect(res!.data?.importId).toEqual(importId.value);
     },
   };
