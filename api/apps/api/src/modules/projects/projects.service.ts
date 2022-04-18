@@ -357,11 +357,14 @@ export class ProjectsService {
       userId,
       projectId,
     );
+
+    if (!cloning && !canExportProject) return left(forbiddenError);
+
     const canCloneProject =
       !cloning ||
-      (cloning && (await this.projectAclService.canCreateProject(userId)));
+      (cloning && (await this.projectAclService.canCloneProject(userId)));
 
-    if (!canExportProject || !canCloneProject) return left(forbiddenError);
+    if (!canCloneProject) return left(forbiddenError);
 
     const res = await this.commandBus.execute(
       new ExportProject(
@@ -503,7 +506,7 @@ export class ProjectsService {
       new UploadExportFile(exportFile),
     );
 
-    if (!(await this.projectAclService.canCreateProject(userId))) {
+    if (!(await this.projectAclService.canImportProject(userId))) {
       return left(forbiddenError);
     }
 

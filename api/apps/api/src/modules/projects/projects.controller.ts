@@ -769,7 +769,7 @@ export class ProjectsController {
     return result.right;
   }
 
-  @IsMissingAclImplementation()
+  @ImplementsAcl()
   @Post('import')
   @ApiOkResponse({ type: RequestProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
