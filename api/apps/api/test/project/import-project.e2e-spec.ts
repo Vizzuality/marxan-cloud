@@ -18,19 +18,14 @@ import { FileRepository } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
-import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
-import { createReadStream } from 'fs';
-import { Readable } from 'stream';
+import { isLeft } from 'fp-ts/lib/Either';
 import * as request from 'supertest';
-import { Connection, Repository } from 'typeorm';
+import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
-import * as path from 'path';
-import { string } from 'fp-ts';
+import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -136,22 +131,24 @@ export const getFixtures = async () => {
       await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
     },
     ThenImportIsCompleted: async () => {
-      const res = await new Promise<Either<false, true>>((resolve) => {
-        const apiEventTimeOut = setTimeout(() => {
-          resolve(left(false));
-        }, 6000);
-        setInterval(async () => {
+      let res: ApiEventByTopicAndKind;
+      await new Promise<void>((resolve, reject) => {
+        const findApiEventInterval = setInterval(async () => {
           try {
-            const result = await apiEvents.getLatestEventForTopic({
+            res = await apiEvents.getLatestEventForTopic({
               topic: projectId,
               kind: API_EVENT_KINDS.project__import__finished__v1__alpha,
             });
-            clearTimeout(apiEventTimeOut);
-            resolve(right(true));
+            clearInterval(findApiEventInterval);
           } catch (error) {}
         }, 1500);
+        const apiEventTimeOut = setTimeout(() => {
+          clearInterval(findApiEventInterval);
+          if (!res) reject('Import API event was not found');
+          resolve();
+        }, 6000);
       });
-      if (isLeft(res)) throw 'Import API event was not found';
+      expect(res!.data?.importId).toEqual(importId.value);
     },
   };
 };
