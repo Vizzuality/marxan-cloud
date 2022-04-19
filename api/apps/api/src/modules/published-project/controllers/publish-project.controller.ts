@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   DefaultValuePipe,
   ForbiddenException,
@@ -53,6 +54,7 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { PublishedProjectSerializer } from '../published-project.serializer';
+import { PublishProjectDto } from '../dto/publish-project.dto';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -72,9 +74,14 @@ export class PublishProjectController {
   @ApiInternalServerErrorResponse()
   async publish(
     @Param('id') id: string,
+    @Body() dto: PublishProjectDto,
     @Request() req: RequestWithAuthenticatedUser,
   ): Promise<void> {
-    const result = await this.publishedProjectService.publish(id, req.user.id);
+    const result = await this.publishedProjectService.publish(
+      id,
+      req.user.id,
+      dto,
+    );
 
     if (isLeft(result)) {
       switch (result.left) {

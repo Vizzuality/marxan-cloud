@@ -9,6 +9,7 @@ import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-i
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '@marxan-api/modules/users/users.service';
+import { PublishProjectDto } from './dto/publish-project.dto';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -39,6 +40,7 @@ export class PublishedProjectService {
   async publish(
     id: string,
     requestingUserId: string,
+    projectToPublish: PublishProjectDto,
   ): Promise<Either<errors | typeof alreadyPublished, true>> {
     const project = await this.projectRepository.findOne(id);
 
@@ -58,9 +60,7 @@ export class PublishedProjectService {
     }
 
     await this.crudService.create({
-      id,
-      name: project.name,
-      description: project.description,
+      ...projectToPublish,
     });
     return right(true);
   }
