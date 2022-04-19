@@ -187,6 +187,10 @@ export const getFixtures = async () => {
     WhenPublishingAProject: async (projectId: string) =>
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/publish`)
+        .send({
+          id: projectId,
+          name: 'example project',
+        })
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>
       await request(app.getHttpServer())
