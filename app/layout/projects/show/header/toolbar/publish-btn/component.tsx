@@ -1,19 +1,22 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { Form as FormRFF/* , Field as FieldRFF */ } from 'react-final-form';
+import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
 import { useOwnsProject } from 'hooks/permissions';
+import { useProjectsUsers, useProjectUsers } from 'hooks/project-users';
 import { useProject, usePublishProject, useUnPublishProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
+import Avatar from 'components/avatar';
 import Button from 'components/button';
-// import Field from 'components/forms/field';
-// import Input from 'components/forms/input';
-// import Label from 'components/forms/label';
-// import Textarea from 'components/forms/textarea';
 import ConfirmationPrompt from 'components/confirmation-prompt';
+import Field from 'components/forms/field';
+import Input from 'components/forms/input';
+import Label from 'components/forms/label';
+import Textarea from 'components/forms/textarea';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
@@ -35,6 +38,19 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
   const { data: projectData } = useProject(pid);
   const { isPublic } = projectData;
 
+  const { data: projectsUsersData } = useProjectsUsers([pid]);
+
+  const { data: projectUsersData } = useProjectUsers(pid);
+  const projectCreators = useMemo(() => {
+    if (!projectUsersData) {
+      return [];
+    }
+
+    return projectUsersData
+      .filter((user) => user.roleName === 'project_owner' || user.roleName === 'project_contributor')
+      .map((user) => user.user);
+  }, [projectUsersData]);
+
   const isOwner = useOwnsProject(pid);
 
   // const {
@@ -52,6 +68,14 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
       method: 'POST',
     },
   });
+
+  const INITIAL_VALUES = useMemo(() => {
+    return {
+      name: projectData?.name || '',
+      description: projectData?.description || '',
+      creators: projectCreators,
+    };
+  }, [projectData, projectCreators]);
 
   const handlePublish = useCallback(() => {
     publishProjectMutation.mutate({ id: `${pid}` }, {
@@ -129,10 +153,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
           >
             <FormRFF
               onSubmit={handlePublish}
-              initialValues={{
-                name: projectData?.name || '',
-                description: projectData?.description || '',
-              }}
+              initialValues={INITIAL_VALUES}
             >
               {({ form, handleSubmit }) => (
                 <form
@@ -144,9 +165,10 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                     Publish project to the community
                   </h1>
 
-                  {/* <div className="mt-8">
+                  <div className="mt-8">
                     <FieldRFF
                       name="name"
+                      validate={composeValidators([{ presence: true }])}
                     >
                       {(fprops) => (
                         <Field id="name" {...fprops}>
@@ -164,12 +186,12 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                   <div className="mt-8">
                     <FieldRFF
                       name="description"
+                      validate={composeValidators([{ presence: true }])}
                     >
                       {(fprops) => (
                         <Field id="description" {...fprops}>
                           <Label theme="light" className="mb-3 uppercase">Description</Label>
                           <Textarea
-                            className="text-sm"
                             theme="light"
                             rows={4}
                             placeholder="Write your project description..."
@@ -178,12 +200,41 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                       )}
                     </FieldRFF>
                   </div>
-                  */}
+
+                  <div className="mt-8">
+                    <FieldRFF
+                      name="creators"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
+                        <Field id="description" {...fprops}>
+                          <Label theme="light" className="mb-3 uppercase">Creators</Label>
+                          {projectCreators.map((user) => (
+                            <div key={user.id} className="flex items-center mb-3 space-x-2">
+                              <div className="flex items-center">
+                                <Avatar
+                                  className="text-sm uppercase border bg-primary-700 mr-2"
+                                  size="s"
+                                  bgImage={user.avatarDataUrl}
+                                  bgColor={projectsUsersData[user.id]}
+                                >
+                                  {!user.avatarDataUrl && (user.displayName || '').slice(0, 2)}
+                                </Avatar>
+                                <div>
+                                  <span className="text-gray-700">{user.displayName}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
 
                   <div className="flex justify-between mx-auto mt-4 space-x-4">
                     <Button
-                      theme="secondary"
-                      size="base"
+                      theme="tertiary"
+                      size="lg"
                       onClick={() => setModal(false)}
                     >
                       Cancel
@@ -191,7 +242,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
                     <Button
                       disabled={isPublic || !isOwner}
                       theme="primary"
-                      size="base"
+                      size="lg"
                       type="submit"
                     >
                       Publish
