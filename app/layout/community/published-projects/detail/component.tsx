@@ -33,11 +33,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const {
     data: publishedProject,
     isFetching: publishedProjectIsFetching,
+    isFetched: publishedProjectIsFetched,
   } = usePublishedProject(pid);
 
   const {
     data: publishedProjectScenarios,
     isFetching: publishedProjectScenariosIsFetching,
+    isFetched: publishedProjectScenariosIsFetched,
   } = useScenarios(pid, {
     filters: {
       projectId: pid,
@@ -62,7 +64,6 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
             Projects
           </Backlink>
           <div className="relative" style={{ minHeight: 600 }}>
-
             {publishedProject && scenarios && (
               <div className="flex flex-row">
                 <div className="w-7/12 pr-12">
@@ -102,18 +103,22 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       {!!projectUsersVisible?.length && (
                         <div className="space-y-4">
                           {projectUsersVisible.map((u) => {
-                            const { user: { displayName, id: userId, avatarDataUrl } } = u;
+                            const {
+                              user: {
+                                email, displayName, id: userId, avatarDataUrl,
+                              },
+                            } = u;
 
                             return (
                               <div key={userId} className="flex flex-row items-center space-x-2.5">
                                 <Avatar
                                   className="text-sm text-white uppercase border bg-primary-700"
                                   bgImage={avatarDataUrl}
-                                  name={displayName}
+                                  name={displayName || email}
                                 >
-                                  {!avatarDataUrl && displayName.slice(0, 2)}
+                                  {!avatarDataUrl && (displayName || email).slice(0, 2)}
                                 </Avatar>
-                                <p className="text-sm">{displayName}</p>
+                                <p className="text-sm">{(displayName || email)}</p>
                               </div>
                             );
                           })}
@@ -168,9 +173,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         </div>
       </Wrapper>
       <Loading
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-50 bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
-        visible={publishedProjectIsFetching && publishedProjectScenariosIsFetching}
+        visible={
+          publishedProjectIsFetching && publishedProjectScenariosIsFetching
+          && !publishedProjectIsFetched && !publishedProjectScenariosIsFetched
+        }
       />
 
     </div>

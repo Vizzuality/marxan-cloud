@@ -36,7 +36,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
 
   const router = useRouter();
   const { pathname } = router;
-  const reportsRegex = /reports/;
+  const lightThemeRegex = /reports|admin/;
 
   const onRouteChangeStart = useCallback(() => {
     setRouteLoading((prevState) => ({
@@ -90,8 +90,8 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
                       <PlausibleProvider domain="marxan.vercel.app">
                         <Loading {...routeLoading} />
                         <div className={cx({
-                          'bg-black': !reportsRegex.test(pathname),
-                          'bg-white': reportsRegex.test(pathname),
+                          'bg-black': !lightThemeRegex.test(pathname),
+                          'bg-white': lightThemeRegex.test(pathname),
                         })}
                         >
                           <Component {...pageProps} />

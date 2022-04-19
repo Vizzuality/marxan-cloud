@@ -20,7 +20,6 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
 export interface ToolbarProps {
 }
@@ -126,31 +125,6 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
         >
           <div className="flex space-x-4">
             <PublishProjectButton />
-            <HelpBeacon
-              id="scenarios-upload"
-              title="Upload scenario"
-              subtitle=""
-              content={(
-                <div>
-                  You can upload the files of a marxan scenario directly.
-                  You will need to compress your input files
-                  as a zipfile. Make sure that your planning region and grid match the one used
-                  for all the scenarios is this project.
-                </div>
-              )}
-            >
-              <div>
-                <ComingSoon>
-                  <Button
-                    theme="secondary"
-                    size="base"
-                  >
-                    <span className="mr-2.5">Upload new Scenario</span>
-                    <Icon icon={UPLOAD_SVG} />
-                  </Button>
-                </ComingSoon>
-              </div>
-            </HelpBeacon>
 
             <HelpBeacon
               id="project-download"

@@ -14,9 +14,10 @@ const fetchProject = (session, queryClient, { pid }) => {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-  }).then((response) => {
-    return response.data;
-  }));
+  })
+    .then((response) => {
+      return response.data;
+    }));
 };
 
 export function withProject(getServerSidePropsFunc?: Function) {
@@ -46,6 +47,17 @@ export function withProject(getServerSidePropsFunc?: Function) {
     const queryClient = new QueryClient();
 
     await fetchProject(session, queryClient, { pid });
+    const project = queryClient.getQueryData(['projects', pid]);
+
+    if (!project) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/projects',
+          permanent: false,
+        },
+      };
+    }
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};

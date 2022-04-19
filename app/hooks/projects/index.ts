@@ -336,6 +336,7 @@ export function usePublishProject({
     method: 'POST',
   },
 }: UsePublishProjectProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const publishProject = ({ id }: PublishProjectProps) => {
@@ -350,7 +351,42 @@ export function usePublishProject({
 
   return useMutation(publishProject, {
     onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries('published-projects');
+      queryClient.invalidateQueries('admin-published-projects');
       console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUnPublishProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UsePublishProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const publishProject = ({ id }: PublishProjectProps) => {
+    return PROJECTS.request({
+      url: `${id}/unpublish`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(publishProject, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+      queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries('published-projects');
+      queryClient.invalidateQueries('admin-published-projects');
     },
     onError: (error, variables, context) => {
       // An error happened!

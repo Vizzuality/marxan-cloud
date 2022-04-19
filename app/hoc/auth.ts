@@ -7,6 +7,8 @@ import USERS from 'services/users';
 
 import { mergeDehydratedState } from './utils';
 
+const queryClient = new QueryClient();
+
 export function withProtection(getServerSidePropsFunc?: Function) {
   return async (context: any) => {
     const session = await getSession(context);
@@ -61,8 +63,6 @@ export function withUser(getServerSidePropsFunc?: Function) {
       };
     }
 
-    const queryClient = new QueryClient();
-
     await queryClient.prefetchQuery('me', () => USERS.request({
       method: 'GET',
       url: '/me',
@@ -76,6 +76,65 @@ export function withUser(getServerSidePropsFunc?: Function) {
         }
         return response.data;
       }));
+
+    if (getServerSidePropsFunc) {
+      const SSPF = await getServerSidePropsFunc(context) || {};
+
+      const { dehydratedState: prevDehydratedState } = SSPF.props;
+      const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
+
+      const newDehydratedState = mergeDehydratedState(prevDehydratedState, currentDehydratedState);
+
+      return {
+        ...SSPF,
+        props: {
+          session,
+          ...SSPF.props,
+          dehydratedState: newDehydratedState,
+        },
+      };
+    }
+
+    return {
+      props: {
+        session,
+        dehydratedState: JSON.parse(JSON.stringify(dehydrate(queryClient))),
+      },
+    };
+  };
+}
+
+export function withAdmin(getServerSidePropsFunc?: Function) {
+  return async (context: any) => {
+    const session = await getSession(context);
+
+    if (!session) {
+      if (getServerSidePropsFunc) {
+        const SSPF = await getServerSidePropsFunc(context) || {};
+
+        return {
+          props: {
+            ...SSPF.props,
+          },
+        };
+      }
+
+      return {
+        props: {},
+      };
+    }
+
+    const { data } = queryClient.getQueryData<any>(['me']) || {};
+
+    if (!data || !data.isAdmin) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/projects',
+          permanent: false,
+        },
+      };
+    }
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};

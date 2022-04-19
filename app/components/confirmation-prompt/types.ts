@@ -23,6 +23,10 @@ export interface ConfirmationPromptProps {
    */
   icon?: IconProps['icon'],
   /**
+   * Optional icon className
+   */
+  iconClassName?: IconProps['className'],
+  /**
    * Optional boolean to set dangeroust prompts.
    */
   danger?: boolean,

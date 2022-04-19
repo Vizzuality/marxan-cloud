@@ -68,7 +68,12 @@ export const Contributors: React.FC<ContributorsProps> = () => {
 
             <ul className="flex ml-2.5">
               {!!projectUsersVisible?.length && projectUsersVisible.map((u, i) => {
-                const { user: { displayName, id, avatarDataUrl } } = u;
+                const {
+                  user: {
+                    email, displayName, id, avatarDataUrl,
+                  },
+                } = u;
+
                 return (
                   <li
                     key={id}
@@ -80,9 +85,9 @@ export const Contributors: React.FC<ContributorsProps> = () => {
                       className="text-sm uppercase bg-primary-700"
                       bgImage={avatarDataUrl}
                       bgColor={projectsUsersData[id]}
-                      name={displayName}
+                      name={displayName || email}
                     >
-                      {!avatarDataUrl && displayName.slice(0, 2)}
+                      {!avatarDataUrl && (displayName || email).slice(0, 2)}
                     </Avatar>
                   </li>
                 );

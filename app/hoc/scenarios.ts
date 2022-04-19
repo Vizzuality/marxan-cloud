@@ -91,6 +91,17 @@ export function withScenario(getServerSidePropsFunc?: Function) {
     const queryClient = new QueryClient();
 
     await fetchScenario(session, queryClient, { sid });
+    const scenario = queryClient.getQueryData<any>(['scenarios', sid]);
+
+    if (!scenario) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/projects',
+          permanent: false,
+        },
+      };
+    }
 
     if (getServerSidePropsFunc) {
       const SSPF = await getServerSidePropsFunc(context) || {};
@@ -146,14 +157,25 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
     const queryClient = new QueryClient();
 
     await fetchUser(session, queryClient);
-
     await fetchScenarioLock(session, queryClient, { sid });
-
     await fetchProjectUsers(session, queryClient, { pid });
 
-    const { data: meData } = queryClient.getQueryData<any>(['me']);
+    const me = queryClient.getQueryData<any>(['me']);
+    const projectUsers = queryClient.getQueryData<any>(['roles', pid]);
+
+    if (!me || !projectUsers) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/projects',
+          permanent: false,
+        },
+      };
+    }
+
+    const { data: meData } = me;
+    const { data: projectUsersData } = projectUsers;
     const { data: scenarioLockData } = queryClient.getQueryData<any>(['scenario-lock', sid]);
-    const { data: projectUsersData } = queryClient.getQueryData<any>(['roles', pid]);
 
     const meRole = projectUsersData.find((u) => u.user.id === meData.id)?.roleName;
 

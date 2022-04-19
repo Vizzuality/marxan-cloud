@@ -94,7 +94,7 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   return (
     <>
       <ConfirmationPrompt
-        title={`${lockUser?.displayName} is editing this scenario, and you won't be able to edit it.`}
+        title={`${lockUser?.displayName || lockUser?.email} is editing this scenario, and you won't be able to edit it.`}
         icon={LOCK_WARNING_SVG}
         options={{
           acceptText: 'Ok',
