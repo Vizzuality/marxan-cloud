@@ -5,6 +5,8 @@ import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/sce
 
 export abstract class ProjectAccessControl {
   abstract canCreateProject(userId: string): Promise<Permit>;
+  abstract canImportProject(userId: string): Promise<Permit>;
+  abstract canCloneProject(userId: string): Promise<Permit>;
   abstract canEditProject(userId: string, projectId: string): Promise<Permit>;
   abstract canViewProject(userId: string, projectId: string): Promise<Permit>;
   abstract canPublishProject(

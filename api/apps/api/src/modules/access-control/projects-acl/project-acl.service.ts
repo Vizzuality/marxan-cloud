@@ -96,6 +96,24 @@ export class ProjectAclService implements ProjectAccessControl {
     return true;
   }
 
+  // TODO: this will be changed in the following release of user requirements.
+  // For now, anyone should be able to import projects, regardless of having
+  // roles or not. In the future project import will be limited to
+  // organization contributors and organization owners, so this logic will be moved to the access
+  // control module
+  async canImportProject(_userId: string): Promise<Permit> {
+    return true;
+  }
+
+  // TODO: this will be changed in the following release of user requirements.
+  // For now, anyone should be able to clone projects, regardless of having
+  // roles or not. In the future clonning a project will be limited to
+  // organization contributors and organization owners, so this logic will be moved to the access
+  // control module
+  async canCloneProject(_userId: string): Promise<Permit> {
+    return true;
+  }
+
   async canEditProject(userId: string, projectId: string): Promise<Permit> {
     return this.doesUserHaveRole(
       await this.getRolesWithinProjectForUser(userId, projectId),
