@@ -142,7 +142,7 @@ export const getFixtures = async () => {
               clearInterval(findApiEventInterval);
               resolve(event);
             } catch (error) {}
-          }, 1500);
+          }, 150);
           const apiEventTimeOut = setTimeout(() => {
             clearInterval(findApiEventInterval);
             reject('Import API event was not found');
