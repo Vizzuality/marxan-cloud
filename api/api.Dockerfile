@@ -19,6 +19,9 @@ COPY --chown=$USER:$USER nodemon.json tsconfig.json tsconfig.build.json nest-cli
 COPY --chown=$USER:$USER apps ./apps
 COPY --chown=$USER:$USER libs ./libs
 
+RUN mkdir -p /opt/marxan-project-cloning
+RUN chown -R $USER:$USER /opt/marxan-project-cloning
+
 RUN yarn prestart:prod
 
 EXPOSE 3000

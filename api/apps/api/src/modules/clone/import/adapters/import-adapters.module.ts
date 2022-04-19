@@ -1,4 +1,4 @@
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ImportResourcePieces } from '../application/import-resource-pieces.port';
@@ -16,7 +16,7 @@ import { TypeormImportRepository } from './typeorm-import.repository.adapter';
       ImportComponentEntity,
       ImportComponentLocationEntity,
     ]),
-    FileRepositoryModule,
+    CloningFileSRepositoryModule,
   ],
   providers: [
     {

@@ -12,7 +12,10 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-protected-areas';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -110,7 +113,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioProtectedAreasPieceImporter,
@@ -128,7 +131,7 @@ const getFixtures = async () => {
   const userId = v4();
 
   const sut = sandbox.get(ScenarioProtectedAreasPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const geoprocessingEntityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.default.name),
   );

@@ -2,7 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { extractFile } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -17,7 +17,7 @@ import {
 @PieceImportProvider()
 export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,

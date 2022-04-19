@@ -10,7 +10,7 @@ import {
 } from '@marxan-api/modules/clone/export/domain';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ComponentId, ComponentLocation } from '@marxan/cloning/domain';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -100,7 +100,7 @@ export const getFixtures = async () => {
   const eventBusTestUtils = app.get(EventBusTestUtils);
   const commandBus = app.get(CommandBus);
   const exportRepo = app.get(ExportRepository);
-  const fileRepo = app.get(FileRepository);
+  const fileRepo = app.get(CloningFilesRepository);
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
     getRepositoryToken(UsersProjectsApiEntity),
   );

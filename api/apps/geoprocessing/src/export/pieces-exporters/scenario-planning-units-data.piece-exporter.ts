@@ -2,7 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
@@ -29,7 +29,7 @@ type SelectResult = {
 export class ScenarioPlanningUnitsDataPieceExporter
   implements ExportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,

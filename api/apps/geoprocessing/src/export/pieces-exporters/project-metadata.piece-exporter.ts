@@ -3,7 +3,7 @@ import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -19,7 +19,7 @@ import {
 @PieceExportProvider()
 export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,

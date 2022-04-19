@@ -226,11 +226,11 @@
     },
     "files-repository": {
       "type": "library",
-      "root": "libs/files-repository",
+      "root": "libs/cloning-files-repository",
       "entryFile": "index",
-      "sourceRoot": "libs/files-repository/src",
+      "sourceRoot": "libs/cloning-files-repository/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/files-repository/tsconfig.lib.json"
+        "tsConfigPath": "libs/cloning-files-repository/tsconfig.lib.json"
       }
     },
     "cloning": {

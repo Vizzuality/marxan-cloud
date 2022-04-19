@@ -12,7 +12,10 @@ import {
   ScenarioFeaturesSpecificationContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -108,7 +111,7 @@ const getFixtures = async () => {
       }),
       TypeOrmModule.forFeature([]),
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioFeaturesSpecificationPieceImporter,
@@ -133,7 +136,7 @@ const getFixtures = async () => {
     ScenarioFeaturesData,
   );
   const sut = sandbox.get(ScenarioFeaturesSpecificationPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   let validScenarioFeaturesDataFile: ScenarioFeaturesSpecificationContent[];
   let featureIds: string[] = [];

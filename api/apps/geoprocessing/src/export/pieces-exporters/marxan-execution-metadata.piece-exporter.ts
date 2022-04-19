@@ -7,7 +7,7 @@ import {
   getMarxanExecutionMetadataFolderRelativePath,
   MarxanExecutionMetadataContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { isDefined } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
@@ -31,7 +31,7 @@ type FolderZipData = {
 export class MarxanExecutionMetadataPieceExporter
   implements ExportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
     private readonly logger: Logger,

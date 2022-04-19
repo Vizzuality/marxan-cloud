@@ -8,7 +8,10 @@ import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import {
   LockStatus,
@@ -86,7 +89,7 @@ const getFixtures = async () => {
         BlmFinalResultEntity,
         OutputScenariosPuDataGeoEntity,
       ]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioRunResultsPieceExporter,
@@ -106,7 +109,7 @@ const getFixtures = async () => {
   const geoEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.default),
   );
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   return {
     cleanUp: async () => {

@@ -1,29 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { Readable } from 'stream';
+import { Inject, Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
 import { createReadStream, createWriteStream } from 'fs';
-import { ConfigService } from '@nestjs/config';
-
+import { Readable } from 'stream';
+import { v4 } from 'uuid';
 import {
-  FileRepository,
+  CloningStoragePath,
+  CloningFilesRepository,
   GetFileError,
   hackerFound,
   SaveFileError,
   unknownError,
-} from './file.repository';
-import { FileRepoConfig } from './file-repo.config';
-import { v4 } from 'uuid';
+} from './cloning-files.repository';
 
 @Injectable()
-export class TempStorageRepository implements FileRepository {
-  readonly #storage: string;
-
-  constructor(readonly config: ConfigService<FileRepoConfig, true>) {
-    this.#storage = config.get('API_SHARED_FILE_STORAGE_LOCAL_PATH');
-  }
+export class VolumeCloningFilesStorage implements CloningFilesRepository {
+  constructor(
+    @Inject(CloningStoragePath) private readonly storagePath: string,
+  ) {}
 
   async get(uri: string): Promise<Either<GetFileError, Readable>> {
-    if (!uri.startsWith(this.#storage)) {
+    if (!uri.startsWith(this.storagePath)) {
       return left(hackerFound);
     }
 
@@ -37,7 +33,7 @@ export class TempStorageRepository implements FileRepository {
     extension?: string,
   ): Promise<Either<SaveFileError, string>> {
     const name = v4() + `${extension ? `.${extension}` : ''}`;
-    const path = this.#storage + `/` + name;
+    const path = this.storagePath + `/` + name;
     const writer = createWriteStream(path);
 
     return new Promise((resolve) => {

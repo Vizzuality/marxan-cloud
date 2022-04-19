@@ -5,10 +5,10 @@ import { Test } from '@nestjs/testing';
 
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import {
-  FileRepository,
-  FileRepositoryModule,
-  TempStorageRepository,
-} from '@marxan/files-repository';
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+  VolumeCloningFilesStorage,
+} from '@marxan/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -36,12 +36,12 @@ const getFixtures = async () => {
    * to avoid communicating with potential storage provider
    */
   const app = await Test.createTestingModule({
-    imports: [FileRepositoryModule],
+    imports: [CloningFileSRepositoryModule],
   })
-    .overrideProvider(FileRepository)
-    .useClass(TempStorageRepository)
+    .overrideProvider(CloningFilesRepository)
+    .useClass(VolumeCloningFilesStorage)
     .compile();
-  const sut = app.get(FileRepository);
+  const sut = app.get(CloningFilesRepository);
 
   return {
     cleanup: async () => app.close(),

@@ -8,7 +8,10 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -81,7 +84,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       PlanningAreaCustomPieceImporter,
@@ -101,7 +104,7 @@ const getFixtures = async () => {
     getRepositoryToken(PlanningArea, geoprocessingConnections.default.name),
   );
   const sut = sandbox.get(PlanningAreaCustomPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
 
   return {
     cleanUp: async () => {

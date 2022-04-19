@@ -34,7 +34,7 @@ import { ScenarioSpecificationModule } from './modules/scenario-specification';
 import { PublishedProjectModule } from '@marxan-api/modules/published-project/published-project.module';
 import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
 import { CloneModule } from './modules/clone';
 
 @Module({
@@ -69,7 +69,7 @@ import { CloneModule } from './modules/clone';
     PublishedProjectModule,
     BlmValuesModule,
     AccessControlModule,
-    FileRepositoryModule,
+    CloningFileSRepositoryModule,
     CloneModule,
   ],
   controllers: [AppController, PingController],

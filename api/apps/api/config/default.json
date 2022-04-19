@@ -4,9 +4,7 @@
   },
   "network": {
     "cors": {
-      "origins": [
-        "http://localhost:3010"
-      ]
+      "origins": ["http://localhost:3010"]
     }
   },
   "redis": {
@@ -14,7 +12,7 @@
     "port": 6379,
     "password": null,
     "useTLS": false,
-    "concurrency" : 50
+    "concurrency": 50
   },
   "postgresApi": {
     "url": null,
@@ -60,6 +58,9 @@
   "storage": {
     "sharedFileStorage": {
       "localPath": "/tmp/storage"
+    },
+    "cloningFileStorage": {
+      "localPath": "/opt/marxan-project-cloning"
     }
   },
   "marxan": {
@@ -77,8 +78,7 @@
     }
   },
   "fileUploads": {
-    "limits": {
-    }
+    "limits": {}
   },
   "sparkpost": {
     "apikey": "invalidSparkpostApikey",
@@ -95,4 +95,3 @@
     "tokenPrefix": "/auth/sign-up-confirmation?token="
   }
 }
-

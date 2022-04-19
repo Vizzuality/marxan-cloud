@@ -6,7 +6,7 @@ import {
   ScenarioFeaturesDataContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -38,7 +38,7 @@ type FeatureDataElementWithIsCustom = FeatureDataElementWithFeatureId & {
 @PieceExportProvider()
 export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)

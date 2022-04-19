@@ -4,7 +4,7 @@ import * as archiver from 'archiver';
 import { PassThrough } from 'stream';
 
 import { ArchiveLocation } from '@marxan/cloning/domain';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 
 import {
   ArchiveCreationError,
@@ -19,14 +19,14 @@ import {
 export class NodeArchiveCreator extends ArchiveCreator {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly fileRepository: FileRepository) {
+  constructor(private readonly fileRepository: CloningFilesRepository) {
     super();
   }
 
   async zip(
     files: { uri: string; relativeDestination: string }[],
   ): Promise<Either<ArchiveCreationError, ArchiveLocation>> {
-    let archivePersistencePromise: ReturnType<FileRepository['save']>;
+    let archivePersistencePromise: ReturnType<CloningFilesRepository['save']>;
     const passThrough = new PassThrough();
     const onPersistenceFinished = async (
       resolvePromise: (

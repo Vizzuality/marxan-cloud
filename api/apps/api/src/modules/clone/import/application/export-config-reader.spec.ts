@@ -14,7 +14,7 @@ import {
   ExportConfigContent,
   exportVersion,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { fileNotFound } from '@marxan/files-repository/file.repository';
+import { fileNotFound } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import * as archiver from 'archiver';

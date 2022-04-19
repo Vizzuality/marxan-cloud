@@ -12,7 +12,10 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import {
   ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
@@ -79,7 +82,7 @@ const getFixtures = async () => {
         ProjectsPuEntity,
         PlanningUnitsGeom,
       ]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioPlanningUnitsDataPieceImporter,
@@ -95,7 +98,7 @@ const getFixtures = async () => {
   const userId = v4();
 
   const sut = sandbox.get(ScenarioPlanningUnitsDataPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const entityManager = sandbox.get<EntityManager>(getEntityManagerToken());
   const scenarioPuDataRepo = sandbox.get<Repository<ScenariosPuPaDataGeo>>(
     getRepositoryToken(ScenariosPuPaDataGeo),

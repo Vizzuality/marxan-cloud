@@ -1,4 +1,4 @@
-import { GetFileError } from '@marxan/files-repository';
+import { GetFileError } from '@marxan/cloning-files-repository';
 import { Query } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/Either';
 import { Readable } from 'stream';

@@ -45,6 +45,9 @@
     "sharedFileStorage": {
       "localPath": "API_SHARED_FILE_STORAGE_LOCAL_PATH",
       "cleanupTemporaryFolders": "BACKEND_CLEANUP_TEMPORARY_FOLDERS"
+    },
+    "cloningFileStorage": {
+      "localPath": "CLONING_FILE_STORAGE_LOCAL_PATH"
     }
   },
   "fileUploads": {

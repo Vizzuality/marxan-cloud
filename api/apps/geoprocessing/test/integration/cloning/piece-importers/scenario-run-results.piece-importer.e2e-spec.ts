@@ -13,7 +13,10 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import { FileRepository, FileRepositoryModule } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -92,7 +95,7 @@ const getFixtures = async () => {
         OutputScenariosPuDataGeoEntity,
         BlmFinalResultEntity,
       ]),
-      FileRepositoryModule,
+      CloningFileSRepositoryModule,
     ],
     providers: [
       ScenarioRunResultsPieceImporter,
@@ -108,7 +111,7 @@ const getFixtures = async () => {
   const userId = v4();
 
   const sut = sandbox.get(ScenarioRunResultsPieceImporter);
-  const fileRepository = sandbox.get(FileRepository);
+  const fileRepository = sandbox.get(CloningFilesRepository);
   const entityManager = sandbox.get<EntityManager>(getEntityManagerToken());
   const outputScenariosPuDataRepo = sandbox.get<
     Repository<OutputScenariosPuDataGeoEntity>

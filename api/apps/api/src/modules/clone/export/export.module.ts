@@ -1,11 +1,11 @@
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
 import { Module } from '@nestjs/common';
 import { ExportAdaptersModule } from './adapters/export-adapters.module';
 import { ExportApplicationModule } from './application/export-application.module';
 
 const ExportApplication = ExportApplicationModule.for([
   ExportAdaptersModule,
-  FileRepositoryModule,
+  CloningFileSRepositoryModule,
 ]);
 
 @Module({

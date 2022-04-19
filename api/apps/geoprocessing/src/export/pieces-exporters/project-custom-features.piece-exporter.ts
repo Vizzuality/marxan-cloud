@@ -7,7 +7,7 @@ import {
   ProjectCustomFeaturesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { FeatureTag } from '@marxan/features';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeometrySource } from '@marxan/geofeatures';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -45,7 +45,7 @@ type FeaturesDataSelectResult = {
 export class ProjectCustomFeaturesPieceExporter
   implements ExportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)

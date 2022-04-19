@@ -5,7 +5,7 @@ import {
   ComponentLocationSnapshot,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -26,7 +26,7 @@ type ProjectSelectResult = {
 @PieceImportProvider()
 export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)

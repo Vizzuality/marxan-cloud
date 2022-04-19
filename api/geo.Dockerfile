@@ -10,6 +10,9 @@ RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 WORKDIR $APP_HOME
 RUN chown $USER:$USER $APP_HOME
 
+RUN mkdir -p /opt/marxan-project-cloning
+RUN chown -R $USER:$USER /opt/marxan-project-cloning
+
 USER $USER
 
 COPY package.json yarn.lock ./

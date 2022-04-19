@@ -1,4 +1,4 @@
-import { fileNotFound } from '@marxan/files-repository/file.repository';
+import { fileNotFound } from '@marxan/cloning-files-repository';
 import { Either } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { ArchiveLocation } from '../domain/archive-location';

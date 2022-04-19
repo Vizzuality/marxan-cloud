@@ -2,9 +2,9 @@ import { AppModule } from '@marxan-api/app.module';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import {
-  FileRepository,
-  TempStorageRepository,
-} from '@marxan/files-repository';
+  CloningFilesRepository,
+  VolumeCloningFilesStorage,
+} from '@marxan/cloning-files-repository';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface';
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
@@ -29,7 +29,10 @@ const defaultOverrides: Overrides = {
     { provider: QueueBuilder, implementation: FakeQueueBuilder },
     { provider: ProjectChecker, implementation: ProjectCheckerFake },
     { provider: ScenarioChecker, implementation: ScenarioCheckerFake },
-    { provider: FileRepository, implementation: TempStorageRepository },
+    {
+      provider: CloningFilesRepository,
+      implementation: VolumeCloningFilesStorage,
+    },
     {
       provider: ScenarioCalibrationRepo,
       implementation: FakeScenarioCalibrationRepo,

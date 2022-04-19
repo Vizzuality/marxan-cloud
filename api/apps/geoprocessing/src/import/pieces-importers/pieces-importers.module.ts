@@ -1,5 +1,5 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { FileRepositoryModule } from '@marxan/files-repository';
+import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MarxanExecutionMetadataPieceImporter } from './marxan-execution-metadata.piece-importer';
@@ -18,7 +18,7 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
 
 @Module({
   imports: [
-    FileRepositoryModule,
+    CloningFileSRepositoryModule,
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
   ],
   providers: [

@@ -1,4 +1,4 @@
-import { FileRepository } from '@marxan/files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { IInferredQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Either, left } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -14,7 +14,7 @@ export class GetArchiveHandler
   implements IInferredQueryHandler<GetExportArchive> {
   constructor(
     private readonly exportRepo: ExportRepository,
-    private readonly fileRepo: FileRepository,
+    private readonly fileRepo: CloningFilesRepository,
   ) {}
 
   async execute({

@@ -1,5 +1,8 @@
 import { ArchiveLocation } from '@marxan/cloning/domain';
-import { FileRepository, unknownError } from '@marxan/files-repository';
+import {
+  CloningFilesRepository,
+  unknownError,
+} from '@marxan/cloning-files-repository';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
@@ -10,7 +13,7 @@ import { UploadExportFile } from './upload-export-file.command';
 export class UploadExportFileHandler
   implements IInferredCommandHandler<UploadExportFile> {
   constructor(
-    private readonly fileRepository: FileRepository,
+    private readonly fileRepository: CloningFilesRepository,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(UploadExportFileHandler.name);

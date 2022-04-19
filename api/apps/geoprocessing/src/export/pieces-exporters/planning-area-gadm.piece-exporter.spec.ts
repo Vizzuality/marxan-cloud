@@ -2,12 +2,12 @@ import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import {
-  FileRepository,
+  CloningFilesRepository,
   GetFileError,
   SaveFileError,
   storageNotReachable,
   unknownError,
-} from '@marxan/files-repository';
+} from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -69,7 +69,7 @@ const getFixtures = async () => {
     providers: [
       PlanningAreaGadmPieceExporter,
       {
-        provide: FileRepository,
+        provide: CloningFilesRepository,
         useClass: FakeFileRepository,
       },
       {
@@ -82,7 +82,9 @@ const getFixtures = async () => {
   await sandbox.init();
 
   const sut = sandbox.get(PlanningAreaGadmPieceExporter);
-  const fakeFileRepo = sandbox.get(FileRepository) as FakeFileRepository;
+  const fakeFileRepo = sandbox.get(
+    CloningFilesRepository,
+  ) as FakeFileRepository;
   const fakeEntityManager = sandbox.get(
     geoprocessingEntityManagerToken,
   ) as FakeEntityManager;
@@ -164,7 +166,7 @@ class FakeEntityManager {
   }
 }
 
-class FakeFileRepository implements FileRepository {
+class FakeFileRepository implements CloningFilesRepository {
   private files: Record<string, Readable> = {};
   public errorWhileSaving = false;
 
