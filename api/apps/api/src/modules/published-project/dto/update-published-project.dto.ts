@@ -1,6 +1,26 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { PublishProjectDto } from './publish-project.dto';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsString } from 'class-validator';
+import { Creator, Resource } from './create-published-project.dto';
 
-export class UpdatePublishedProjectDto extends PartialType(PublishProjectDto) {
+export class UpdatePublishedProjectDto {
+  @IsString()
+  @ApiProperty()
+  name?: string;
+
+  @IsString()
+  @ApiPropertyOptional()
+  description?: string;
+
+  @ApiPropertyOptional()
+  creators?: Creator[];
+
+  @ApiPropertyOptional()
+  resources?: Resource[];
+
+  @IsString()
+  @ApiPropertyOptional()
+  logo?: string;
+
+  @IsBoolean()
   underModeration?: boolean;
 }
