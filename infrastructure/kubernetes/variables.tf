@@ -39,3 +39,9 @@ variable "container_registry_name" {
   type        = string
   description = "Name for the Azure CR. Must be globally unique"
 }
+
+variable "key_vault_access_users" {
+  type = list(string)
+  description = "The names of the users to grant access to the secrets"
+  default = []
+}

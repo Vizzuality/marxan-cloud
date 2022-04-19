@@ -16,7 +16,7 @@ data "azurerm_subscription" "subscription" {
 
 data "terraform_remote_state" "core" {
   backend = "azurerm"
-  config = {
+  config  = {
     resource_group_name  = "marxan"        // var.project_name
     storage_account_name = "marxan"        // var.project_name
     container_name       = "marxantfstate" // ${var.project_name}tfstate
@@ -74,10 +74,11 @@ module "k8s_storage" {
 # Production
 ####
 module "key_vault_production" {
-  source         = "./modules/key_vault"
-  namespace      = "production"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
+  source                 = "./modules/key_vault"
+  namespace              = "production"
+  resource_group         = data.azurerm_resource_group.resource_group
+  project_name           = var.project_name
+  key_vault_access_users = var.key_vault_access_users
 }
 
 module "k8s_api_database_production" {
@@ -91,6 +92,7 @@ module "k8s_api_database_production" {
   namespace                  = "production"
   name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
+  container_registry_name    = var.container_registry_name
 }
 
 module "k8s_geoprocessing_database_production" {
@@ -104,6 +106,7 @@ module "k8s_geoprocessing_database_production" {
   namespace                  = "production"
   name                       = "geoprocessing"
   key_vault_id               = module.key_vault_production.key_vault_id
+  container_registry_name    = var.container_registry_name
 }
 
 module "backend_storage_pvc_production" {
@@ -125,7 +128,7 @@ module "api_production" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
-  image                      = "marxan.azurecr.io/marxan-api:production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-api:production"
   deployment_name            = "api"
   application_base_url       = "https://${var.domain}"
   network_cors_origins       = "https://${var.domain}"
@@ -141,7 +144,7 @@ module "geoprocessing_production" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
-  image                      = "marxan.azurecr.io/marxan-geoprocessing:production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
   deployment_name            = "geoprocessing"
   geo_postgres_logging       = "error"
   backend_storage_pvc_name   = local.backend_storage_pvc_name
@@ -154,7 +157,7 @@ module "client_production" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
-  image                      = "marxan.azurecr.io/marxan-client:production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-client:production"
   deployment_name            = "client"
   site_url                   = "https://${data.terraform_remote_state.core.outputs.dns_zone_name}"
   api_url                    = "https://api.${data.terraform_remote_state.core.outputs.dns_zone_name}"
@@ -167,7 +170,7 @@ module "webshot_production" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
-  image                      = "marxan.azurecr.io/marxan-webshot:production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:production"
   deployment_name            = "webshot"
 }
 
@@ -206,10 +209,11 @@ module "ingress_production" {
 # Staging
 ####
 module "key_vault_staging" {
-  source         = "./modules/key_vault"
-  namespace      = "staging"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
+  source                 = "./modules/key_vault"
+  namespace              = "staging"
+  resource_group         = data.azurerm_resource_group.resource_group
+  project_name           = var.project_name
+  key_vault_access_users = var.key_vault_access_users
 }
 
 module "k8s_api_database_staging" {
@@ -223,6 +227,7 @@ module "k8s_api_database_staging" {
   namespace                  = "staging"
   name                       = "api"
   key_vault_id               = module.key_vault_staging.key_vault_id
+  container_registry_name    = var.container_registry_name
 }
 
 module "k8s_geoprocessing_database_staging" {
@@ -236,6 +241,7 @@ module "k8s_geoprocessing_database_staging" {
   namespace                  = "staging"
   name                       = "geoprocessing"
   key_vault_id               = module.key_vault_staging.key_vault_id
+  container_registry_name    = var.container_registry_name
 }
 
 module "backend_storage_pvc_staging" {

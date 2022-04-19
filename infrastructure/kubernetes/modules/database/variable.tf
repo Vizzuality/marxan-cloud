@@ -39,3 +39,8 @@ variable "namespace" {
 variable "key_vault_id" {
   description = "Azure key vault id"
 }
+
+variable "container_registry_name" {
+  type        = string
+  description = "Name for the Azure CR. Must be globally unique"
+}

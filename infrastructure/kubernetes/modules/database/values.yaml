@@ -13,7 +13,6 @@ global:
 ## ref: https://hub.docker.com/r/bitnami/postgresql/tags/
 ##
 image:
-  registry: marxan.azurecr.io
   repository: postgres-marxan
   tag: staging
   ## Specify a imagePullPolicy

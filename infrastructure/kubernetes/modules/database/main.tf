@@ -42,6 +42,11 @@ resource "helm_release" "postgres" {
     name  = "existingSecret"
     value = "${var.name}-postgres-secret"
   }
+
+  set {
+    name  = "image.registry"
+    value = "${var.container_registry_name}.azurecr.io"
+  }
 }
 
 resource "kubernetes_secret" "postgres-secret" {
