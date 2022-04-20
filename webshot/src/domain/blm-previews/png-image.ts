@@ -51,11 +51,17 @@ export const generatePngImageFromBlmData = async (
     .replace(":blmValue", blmValue)}`;
 
   const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      '--disable-web-security',
+      "--disable-features=IsolateOrigins",
+      "--disable-site-isolation-trials",
+    ],
   });
   const page = await browser.newPage();
   // Pass through browser console to our own service's console
-  page.on('console', passthroughConsole);
+  page.on("console", passthroughConsole);
 
   /**
    * The webshot service authenticates to the upstream frontend instance by
@@ -70,9 +76,12 @@ export const generatePngImageFromBlmData = async (
    * if (cookie) await page.setExtraHTTPHeaders({ cookie });
    */
   if (cookie) {
-    await page.setExtraHTTPHeaders({ cookie, 'Bypass-Tunnel-Reminder': 'true' });
+    await page.setExtraHTTPHeaders({
+      cookie,
+      "Bypass-Tunnel-Reminder": "true",
+    });
   } else {
-    await page.setExtraHTTPHeaders({ 'Bypass-Tunnel-Reminder': 'true' });
+    await page.setExtraHTTPHeaders({ "Bypass-Tunnel-Reminder": "true" });
   }
 
   console.info(`Rendering ${pageUrl} as PNG`);
