@@ -52,15 +52,19 @@ export class ExportConfigReader {
     );
     if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
 
-    const exportConfigSnapshot: ExportConfigContent = JSON.parse(
-      exportConfigOrError.right,
-    );
+    try {
+      const exportConfigSnapshot: ExportConfigContent = JSON.parse(
+        exportConfigOrError.right,
+      );
 
-    const exportConfig = this.convertToClass(exportConfigSnapshot);
+      const exportConfig = this.convertToClass(exportConfigSnapshot);
 
-    const validationErrors = await validate(exportConfig);
-    if (validationErrors.length > 0) return left(invalidFiles);
+      const validationErrors = await validate(exportConfig);
+      if (validationErrors.length > 0) return left(invalidFiles);
 
-    return right(exportConfig);
+      return right(exportConfig);
+    } catch (error) {
+      return left(archiveCorrupted);
+    }
   }
 }
