@@ -13,7 +13,6 @@ import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
-import ComingSoon from 'layout/help/coming-soon';
 import PublishProjectButton from 'layout/projects/show/header/toolbar/publish-btn';
 
 import Button from 'components/button';

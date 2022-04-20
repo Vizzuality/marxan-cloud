@@ -35,6 +35,8 @@ export interface MapProps extends InteractiveMapProps {
     viewportOptions?: Partial<ViewportProps>;
   };
 
+  screenshot?: boolean;
+
   /** A function that exposes when the map is mounted.
    * It receives and object with the `mapRef` and `mapContainerRef` reference. */
   onMapReady?: ({ map, mapContainer }) => void;
@@ -68,6 +70,7 @@ export const Map = ({
   touchZoom,
   touchRotate,
   doubleClickZoom,
+  screenshot,
   width = '100%',
   height = '100%',
   getCursor,
@@ -99,7 +102,7 @@ export const Map = ({
   }, [onMapLoad]);
 
   const debouncedOnMapViewportChange = useDebouncedCallback((v) => {
-    onMapViewportChange(v);
+    if (onMapViewportChange) onMapViewportChange(v);
   }, 250);
 
   const handleViewportChange = useCallback(
@@ -193,6 +196,12 @@ export const Map = ({
       ...viewport,
     }));
   }, [viewport]);
+
+  useEffect(() => {
+    if (mapContainerRef.current && screenshot) {
+      mapContainerRef.current.querySelector('.mapboxgl-control-container').style.display = 'none';
+    }
+  }, [screenshot]);
 
   return (
     <div
