@@ -1,32 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { Company, Creator, Resource } from './create-published-project.dto';
+import { IsBoolean, IsOptional } from 'class-validator';
+import { PublishProjectDto } from './publish-project.dto';
 
-export class UpdatePublishedProjectDto {
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional()
-  name?: string;
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional()
-  description?: string;
-
-  @IsOptional()
-  @ApiPropertyOptional()
-  creators?: Creator[];
-
-  @IsOptional()
-  @ApiPropertyOptional()
-  resources?: Resource[];
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional()
-  company?: Company;
-
+export class UpdatePublishedProjectDto extends PublishProjectDto {
   @IsBoolean()
   @IsOptional()
+  @ApiPropertyOptional()
   underModeration?: boolean;
 }

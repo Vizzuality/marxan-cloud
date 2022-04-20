@@ -1,14 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { Company, Creator, Resource } from './create-published-project.dto';
 
 export class PublishProjectDto {
-  @IsUUID()
-  id!: string;
-
   @IsString()
+  @IsOptional()
   @ApiProperty()
-  name!: string;
+  name?: string;
 
   @IsString()
   @IsOptional()

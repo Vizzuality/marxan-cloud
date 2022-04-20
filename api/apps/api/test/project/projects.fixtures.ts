@@ -5,6 +5,7 @@ import { GivenProjectExists } from '../steps/given-project';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
+import { blmImageMock } from '@marxan-api/modules/scenarios/__mock__/blm-image-mock';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -145,12 +146,20 @@ export const getFixtures = async () => {
       expect(response.body).toEqual({
         data: {
           attributes: {
-            description: null,
             name: expect.any(String),
             underModeration: false,
-            creators: null,
-            resources: null,
-            company: null,
+            description: expect.any(String),
+            company: {
+              name: expect.any(String),
+              logoDataUrl: expect.any(String),
+            },
+            creators: [
+              {
+                displayName: expect.any(String),
+                avatarDataUrl: expect.any(String),
+              },
+            ],
+            resources: [{ title: expect.any(String), url: expect.any(String) }],
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -165,12 +174,20 @@ export const getFixtures = async () => {
       expect(response.body).toEqual({
         data: {
           attributes: {
-            description: null,
             name: expect.any(String),
             underModeration: true,
-            company: null,
-            resources: null,
-            creators: null,
+            description: expect.any(String),
+            company: {
+              name: expect.any(String),
+              logoDataUrl: expect.any(String),
+            },
+            creators: [
+              {
+                displayName: expect.any(String),
+                avatarDataUrl: expect.any(String),
+              },
+            ],
+            resources: [{ title: expect.any(String), url: expect.any(String) }],
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -189,13 +206,15 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
         .set('Authorization', `Bearer ${notIncludedUserToken}`),
-
     WhenPublishingAProject: async (projectId: string) =>
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/publish`)
         .send({
-          id: projectId,
           name: 'example project',
+          description: 'fake description',
+          company: { name: 'logo', logoDataUrl: blmImageMock },
+          creators: [{ displayName: 'fake name', avatarDataUrl: blmImageMock }],
+          resources: [{ title: 'fake url', url: 'http://www.example.com' }],
         })
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>
