@@ -10,12 +10,7 @@ export function getRedisConfig() {
       host: redisConfig.host,
       port: redisConfig.port,
       password: redisConfig.password,
-      tls: useTLS
-        ? {
-            host: redisConfig.host,
-            port: redisConfig.port,
-          }
-        : undefined,
+      tls: useTLS ? {} : undefined,
     },
   };
 
