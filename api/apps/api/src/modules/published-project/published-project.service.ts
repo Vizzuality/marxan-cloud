@@ -60,6 +60,7 @@ export class PublishedProjectService {
     }
 
     await this.crudService.create({
+      id,
       ...projectToPublish,
     });
     return right(true);

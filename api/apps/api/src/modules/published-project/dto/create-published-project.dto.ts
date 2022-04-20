@@ -15,7 +15,7 @@ export interface Company {
 
 export interface CreatePublishedProjectDto {
   id: string;
-  name: string;
+  name?: string;
   description?: string;
   creators?: Creator[];
   resources?: Resource[];
