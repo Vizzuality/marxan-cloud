@@ -23,7 +23,7 @@ export class PublishedProject {
   resources?: Resource[];
 
   @Column({ type: 'jsonb', name: 'creators', array: true })
-  creator?: Creator[];
+  creators?: Creator[];
 
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })
