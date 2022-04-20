@@ -6,15 +6,15 @@ import {
 } from '@marxan-jobs/planning-unit-geometry';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -24,9 +24,11 @@ import {
   getRepositoryToken,
   TypeOrmModule,
 } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { GenerateRandomGeometries, PrepareZipFile } from '../fixtures';
+import { GenerateRandomGeometries } from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -126,14 +128,20 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenInvalidGridFileFormat: async (): Promise<ArchiveLocation> => {
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const invalidGridFile = '1,[1,2,4\n';
+      const exportId = v4();
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningUnitsGrid,
-        'planning units grid relative path',
       );
 
-      const invalidGridFile = '1,[1,2,4\n';
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(invalidGridFile),
+        relativePath,
+      );
 
-      return PrepareZipFile(invalidGridFile, fileRepository, relativePath);
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenValidGridFile: async () => {
       const geometries = await GenerateRandomGeometries(
@@ -144,27 +152,39 @@ const getFixtures = async () => {
         .map((geom, index) => `${index + 1},[${geom.toJSON().data}]\n`)
         .join('');
 
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const exportId = v4();
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningUnitsGrid,
-        'planning units grid relative path',
       );
 
-      return PrepareZipFile(validGridFile, fileRepository, relativePath);
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(validGridFile),
+        relativePath,
+      );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenInvalidGridFileContent: async (): Promise<ArchiveLocation> => {
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const invalidGridFile = '1,[1,2,4]\n';
+      const exportId = v4();
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningUnitsGrid,
-        'planning units grid relative path',
       );
 
-      const invalidGridFile = '1,[1,2,4]\n';
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(invalidGridFile),
+        relativePath,
+      );
 
-      return PrepareZipFile(invalidGridFile, fileRepository, relativePath);
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [uri] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningUnitsGrid,
-        archiveLocation.value,
       );
       return {
         componentId: v4(),
@@ -173,7 +193,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.PlanningUnitsGrid,
         resourceKind: ResourceKind.Project,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },

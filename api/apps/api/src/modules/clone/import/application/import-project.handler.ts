@@ -1,17 +1,23 @@
-import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
-import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  ArchiveLocation,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { Either, isLeft, right } from 'fp-ts/Either';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { ExportRepository } from '../../export/application/export-repository.port';
 import { Import } from '../domain/import/import';
-import { ExportConfigReader } from './export-config-reader';
 import {
+  exportNotFound,
   ImportProject,
   ImportProjectCommandResult,
   ImportProjectError,
+  invalidProjectExport,
+  unfinishedExport,
 } from './import-project.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
@@ -20,25 +26,32 @@ import { ImportRepository } from './import.repository.port';
 export class ImportProjectHandler
   implements IInferredCommandHandler<ImportProject> {
   constructor(
-    private readonly exportConfigReader: ExportConfigReader,
+    private readonly exportRepo: ExportRepository,
     private readonly importRepo: ImportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly importResourcePieces: ImportResourcePieces,
   ) {}
 
   async execute({
-    archiveLocation,
+    exportId,
     ownerId,
     importResourceId,
   }: ImportProject): Promise<
     Either<ImportProjectError, ImportProjectCommandResult>
   > {
-    const exportConfigOrError = await this.exportConfigReader.read(
-      archiveLocation,
-    );
-    if (isLeft(exportConfigOrError)) return exportConfigOrError;
+    const exportInstance = await this.exportRepo.find(exportId);
 
-    const exportConfig = exportConfigOrError.right as ProjectExportConfigContent;
+    if (!exportInstance) {
+      return left(exportNotFound);
+    }
+
+    if (!exportInstance.toSnapshot().archiveLocation) {
+      return left(unfinishedExport);
+    }
+
+    if (exportInstance.resourceKind !== ResourceKind.Project) {
+      return left(invalidProjectExport);
+    }
 
     const resourceId = importResourceId ?? ResourceId.create();
     const isCloning = Boolean(importResourceId);
@@ -47,8 +60,12 @@ export class ImportProjectHandler
 
     const pieces = this.importResourcePieces.resolveForProject(
       projectId,
-      archiveLocation,
-      exportConfig.pieces,
+      exportInstance.toSnapshot().exportPieces,
+      exportInstance.resourceId,
+    );
+
+    const archiveLocation = new ArchiveLocation(
+      exportInstance.toSnapshot().archiveLocation!,
     );
 
     const importRequest = this.eventPublisher.mergeObjectContext(

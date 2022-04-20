@@ -1,21 +1,17 @@
-import {
-  ArchiveLocation,
-  ResourceId,
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { Injectable } from '@nestjs/common';
 import { ICommand, ofType, Saga } from '@nestjs/cqrs';
 import { from, Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
 import { ExportRepository } from '../../export/application/export-repository.port';
-import { ArchiveReady } from '../../export/domain';
+import { ArchiveReady, ExportId } from '../../export/domain';
 import { ImportProject } from '../../import/application/import-project.command';
 import { ImportScenario } from '../../import/application/import-scenario.command';
 import { MarkExportAsFinished } from './mark-export-as-finished.command';
 
 type CommandMapper = (
-  archiveLocation: string,
+  exportId: ExportId,
   ownerId: string,
   importResourceId: string,
 ) => ICommand;
@@ -25,23 +21,15 @@ export class ArchiveReadySaga {
   constructor(private readonly exportRepository: ExportRepository) {}
 
   private commandMapper: Record<ResourceKind, CommandMapper> = {
-    project: (
-      archiveLocation: string,
-      ownerId: string,
-      importResourceId: string,
-    ) =>
+    project: (exportId: ExportId, ownerId: string, importResourceId: string) =>
       new ImportProject(
-        new ArchiveLocation(archiveLocation),
+        exportId,
         new UserId(ownerId),
         new ResourceId(importResourceId),
       ),
-    scenario: (
-      archiveLocation: string,
-      ownerId: string,
-      importResourceId: string,
-    ) =>
+    scenario: (exportId: ExportId, ownerId: string, importResourceId: string) =>
       new ImportScenario(
-        new ArchiveLocation(archiveLocation),
+        exportId,
         new UserId(ownerId),
         new ResourceId(importResourceId),
       ),
@@ -54,7 +42,6 @@ export class ArchiveReadySaga {
 
     const {
       resourceKind,
-      archiveLocation,
       importResourceId,
       ownerId,
     } = exportInstance.toSnapshot();
@@ -62,13 +49,11 @@ export class ArchiveReadySaga {
     if (!exportInstance.isCloning())
       return [new MarkExportAsFinished(event.exportId)];
 
-    if (!archiveLocation || !importResourceId)
-      throw new Error(
-        'When cloning, the archiveLocation and importResourceId should be ready',
-      );
+    if (!importResourceId)
+      throw new Error('When cloning importResourceId should be ready');
 
     const importCommand = this.commandMapper[resourceKind](
-      archiveLocation,
+      event.exportId,
       ownerId,
       importResourceId,
     );

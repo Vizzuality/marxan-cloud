@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -53,18 +53,11 @@ export class PlanningAreaCustomPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const stringPlanningAreaCustomOrError = await extractFile(
-      readableOrError.right,
-      planningAreaCustomLocation.relativePath,
-    );
-    if (isLeft(stringPlanningAreaCustomOrError)) {
-      const errorMessage = `Custom planning area file extraction failed: ${planningAreaCustomLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringPlanningAreaCustom = buffer.toString();
 
     const planningAreaGadm: PlanningAreaCustomContent = JSON.parse(
-      stringPlanningAreaCustomOrError.right,
+      stringPlanningAreaCustom,
     );
 
     await this.geoprocessingEntityManager.transaction(async (em) => {

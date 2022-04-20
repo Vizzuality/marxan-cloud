@@ -3,7 +3,7 @@ import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-protected-areas';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -108,22 +108,15 @@ export class ScenarioProtectedAreasPieceImporter
       throw new Error(errorMessage);
     }
 
-    const stringScenarioProtectedAreasOrError = await extractFile(
-      readableOrError.right,
-      scenarioProtectedAreasLocation.relativePath,
-    );
-    if (isLeft(stringScenarioProtectedAreasOrError)) {
-      const errorMessage = `Scenario protected areas file extraction failed: ${scenarioProtectedAreasLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringScenarioProtectedAreasOrError = buffer.toString();
 
     const {
       threshold,
       wdpa,
       customProtectedAreas,
     }: ScenarioProtectedAreasContent = JSON.parse(
-      stringScenarioProtectedAreasOrError.right,
+      stringScenarioProtectedAreasOrError,
     );
     const protectedAreasIds: string[] = [];
 

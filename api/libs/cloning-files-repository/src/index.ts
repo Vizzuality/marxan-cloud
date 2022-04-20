@@ -10,4 +10,4 @@ export {
   CloningStoragePath,
 } from './cloning-files.repository';
 
-export { VolumeCloningFilesStorage } from './volume-cloning-files.repository';
+export { LocalCloningFilesStorage as LocalCloningFilesStorage } from './local-cloning-files.repository';

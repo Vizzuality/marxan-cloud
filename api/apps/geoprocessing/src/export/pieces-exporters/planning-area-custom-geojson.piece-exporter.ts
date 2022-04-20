@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { Injectable, Logger } from '@nestjs/common';
@@ -55,9 +55,14 @@ export class PlanningAreaCustomGeojsonPieceExporter
       throw new Error(errorMessage);
     }
 
-    const planningAreaGeoJson = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.PlanningAreaCustomGeojson,
+    );
+
+    const planningAreaGeoJson = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(planningArea.geojson),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(planningAreaGeoJson)) {
@@ -68,11 +73,7 @@ export class PlanningAreaCustomGeojsonPieceExporter
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaCustomGeojson,
-        planningAreaGeoJson.right,
-        { kind: ResourceKind.Project, scenarioId: '' },
-      ),
+      uris: [new ComponentLocation(planningAreaGeoJson.right, relativePath)],
     };
   }
 }

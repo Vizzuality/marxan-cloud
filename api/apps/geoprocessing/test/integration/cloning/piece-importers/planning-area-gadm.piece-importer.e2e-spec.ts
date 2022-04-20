@@ -2,27 +2,25 @@ import { PlanningAreaGadmPieceImporter } from '@marxan-geoprocessing/import/piec
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
-import {
-  DeleteProjectAndOrganization,
-  GivenProjectExists,
-  PrepareZipFile,
-} from '../fixtures';
+import { DeleteProjectAndOrganization, GivenProjectExists } from '../fixtures';
 
 interface ProjectSelectResult {
   country_id: string;
@@ -116,9 +114,8 @@ const getFixtures = async () => {
       return GivenProjectExists(entityManager, projectId, organizationId);
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [uri] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningAreaGAdm,
-        archiveLocation.value,
       );
       return {
         componentId: v4(),
@@ -127,7 +124,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.PlanningAreaGAdm,
         resourceKind: ResourceKind.Project,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -147,16 +144,20 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidGadmPlanningAreaFile: async () => {
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const exportId = v4();
+
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningAreaGAdm,
-        'planning area gadm file relative path',
       );
 
-      return PrepareZipFile(
-        validGadmPlanningAreaFile,
-        fileRepository,
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validGadmPlanningAreaFile)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

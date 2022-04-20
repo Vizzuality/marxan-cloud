@@ -19,10 +19,18 @@ export type GetFileError =
   | typeof hackerFound;
 
 export abstract class CloningFilesRepository {
-  abstract save(
+  abstract get(uri: string): Promise<Either<GetFileError, Readable>>;
+
+  abstract saveZipFile(
+    exportId: string,
     stream: Readable,
-    extension?: string,
   ): Promise<Either<SaveFileError, string>>;
 
-  abstract get(uri: string): Promise<Either<GetFileError, Readable>>;
+  abstract saveCloningFile(
+    exportId: string,
+    stream: Readable,
+    relativePath: string,
+  ): Promise<Either<SaveFileError, string>>;
+
+  abstract deleteExportFolder(exportId: string): Promise<void>;
 }

@@ -7,8 +7,9 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import {
   CloningFilesRepository,
   CloningFileSRepositoryModule,
-  VolumeCloningFilesStorage,
+  LocalCloningFilesStorage,
 } from '@marxan/cloning-files-repository';
+import { v4 } from 'uuid';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -39,16 +40,17 @@ const getFixtures = async () => {
     imports: [CloningFileSRepositoryModule],
   })
     .overrideProvider(CloningFilesRepository)
-    .useClass(VolumeCloningFilesStorage)
+    .useClass(LocalCloningFilesStorage)
     .compile();
   const sut = app.get(CloningFilesRepository);
 
   return {
     cleanup: async () => app.close(),
     GivenFileWasAdded: async () => {
-      const result = await sut.save(
+      const result = await sut.saveCloningFile(
+        v4(),
         createReadStream(__dirname + `/some-file.json`),
-        '.json',
+        'file.json',
       );
       expect(isRight(result)).toBeTruthy();
       return (result as Right<string>).right;

@@ -1,7 +1,8 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentLocation } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
@@ -50,7 +51,7 @@ export class ScenarioInputFolderPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const { status, data } = await this.httpService
+    const { data } = await this.httpService
       .get<IncomingMessage>(
         `${AppConfig.get<string>('api.url')}/api/v1/marxan-run/scenarios/${
           input.resourceId
@@ -65,7 +66,20 @@ export class ScenarioInputFolderPieceExporter implements ExportPieceProcessor {
       )
       .toPromise();
 
-    const outputFile = await this.fileRepository.save(data, `zip`);
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.ScenarioInputFolder,
+      {
+        kind: input.resourceKind,
+        scenarioId: input.resourceId,
+        scenarioName: scenario.name,
+      },
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
+      data,
+      relativePath,
+    );
 
     if (isLeft(outputFile)) {
       const errorMessage = `${ScenarioInputFolderPieceExporter.name} - Scenario - couldn't save file - ${outputFile.left.description}`;
@@ -75,15 +89,7 @@ export class ScenarioInputFolderPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioInputFolder,
-        outputFile.right,
-        {
-          kind: input.resourceKind,
-          scenarioId: input.resourceId,
-          scenarioName: scenario.name,
-        },
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

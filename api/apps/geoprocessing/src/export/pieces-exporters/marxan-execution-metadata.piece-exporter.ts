@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { ComponentLocation } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   MarxanExecutionMetadataFolderType,
   getMarxanExecutionMetadataFolderRelativePath,
@@ -19,6 +19,7 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import { string } from 'fp-ts';
 
 type FolderZipData = {
   id: string;
@@ -45,12 +46,16 @@ export class MarxanExecutionMetadataPieceExporter
 
   private async saveZipFile(
     file: Buffer,
-    executionId: string,
-    type: MarxanExecutionMetadataFolderType,
+    exportId: string,
+    relativePath: string,
   ): Promise<string> {
-    const locationOrError = await this.fileRepository.save(Readable.from(file));
+    const locationOrError = await this.fileRepository.saveCloningFile(
+      exportId,
+      Readable.from(file),
+      relativePath,
+    );
     if (isLeft(locationOrError)) {
-      const errorMessage = `${MarxanExecutionMetadataPieceExporter.name} - couldn't save ${type} folder file for execution with id ${executionId} - ${locationOrError.left.description}`;
+      const errorMessage = `${MarxanExecutionMetadataPieceExporter.name} - couldn't save execution metadata folder zip file - ${locationOrError.left.description}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -85,9 +90,18 @@ export class MarxanExecutionMetadataPieceExporter
       },
     );
 
-    const jsonFile = await this.fileRepository.save(
+    const jsonFileRelativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.MarxanExecutionMetadata,
+      {
+        kind: input.resourceKind,
+        scenarioId: input.resourceId,
+      },
+    );
+
+    const jsonFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(fileContent)),
-      `json`,
+      jsonFileRelativePath,
     );
 
     if (isLeft(jsonFile)) {
@@ -96,22 +110,17 @@ export class MarxanExecutionMetadataPieceExporter
       throw new Error(errorMessage);
     }
 
-    const [jsonFileLocation] = ClonePieceUrisResolver.resolveFor(
-      ClonePiece.MarxanExecutionMetadata,
-      jsonFile.right,
-      {
-        kind: input.resourceKind,
-        scenarioId: input.resourceId,
-      },
-    );
-
     const folderZipsLocations = await Promise.all(
       foldersZipsData.map(async ({ buffer, id, type }) => {
-        const location = await this.saveZipFile(buffer, id, type);
         const relativePath = getMarxanExecutionMetadataFolderRelativePath(
           id,
           type,
-          jsonFileLocation.relativePath,
+          jsonFileRelativePath,
+        );
+        const location = await this.saveZipFile(
+          buffer,
+          input.exportId,
+          relativePath,
         );
 
         return new ComponentLocation(location, relativePath);
@@ -120,7 +129,10 @@ export class MarxanExecutionMetadataPieceExporter
 
     return {
       ...input,
-      uris: [jsonFileLocation, ...folderZipsLocations],
+      uris: [
+        new ComponentLocation(jsonFile.right, jsonFileRelativePath),
+        ...folderZipsLocations,
+      ],
     };
   }
 }

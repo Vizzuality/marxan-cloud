@@ -1,6 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -11,7 +11,7 @@ import {
 } from '../pieces/export-piece-processor';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
 import { ProtectedArea } from '@marxan/protected-areas';
 
@@ -58,9 +58,14 @@ export class ProjectCustomProtectedAreasPieceExporter
       },
     );
 
-    const outputFile = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.ProjectCustomProtectedAreas,
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(content)),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(outputFile)) {
@@ -71,10 +76,7 @@ export class ProjectCustomProtectedAreasPieceExporter
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectCustomProtectedAreas,
-        outputFile.right,
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

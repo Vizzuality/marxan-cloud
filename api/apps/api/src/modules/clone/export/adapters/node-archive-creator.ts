@@ -24,9 +24,12 @@ export class NodeArchiveCreator extends ArchiveCreator {
   }
 
   async zip(
+    exportId: string,
     files: { uri: string; relativeDestination: string }[],
   ): Promise<Either<ArchiveCreationError, ArchiveLocation>> {
-    let archivePersistencePromise: ReturnType<CloningFilesRepository['save']>;
+    let archivePersistencePromise: ReturnType<
+      CloningFilesRepository['saveZipFile']
+    >;
     const passThrough = new PassThrough();
     const onPersistenceFinished = async (
       resolvePromise: (
@@ -62,9 +65,9 @@ export class NodeArchiveCreator extends ArchiveCreator {
         archive.pipe(passThrough);
 
         // connect pipes before starting to flood with data
-        archivePersistencePromise = this.fileRepository.save(
+        archivePersistencePromise = this.fileRepository.saveZipFile(
+          exportId,
           passThrough,
-          `zip`,
         );
         await archive.finalize();
       },

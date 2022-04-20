@@ -9,7 +9,7 @@ import {
   Failure,
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ExportConfigContent,
   exportVersion,
@@ -193,9 +193,8 @@ const getFixtures = async () => {
         zlib: { level: 9 },
       });
 
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ExportConfig,
-        'export-config uri',
       );
 
       archive.append(JSON.stringify(invalidExportConfig), {
@@ -226,9 +225,8 @@ const getFixtures = async () => {
       const invalidExportConfig = expectedExportConfig;
       invalidExportConfig.version = '';
 
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ExportConfig,
-        'export-config uri',
       );
 
       archive.append(JSON.stringify(invalidExportConfig), {
@@ -256,9 +254,8 @@ const getFixtures = async () => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ExportConfig,
-        'export-config uri',
       );
 
       archive.append(JSON.stringify(expectedExportConfig), {

@@ -4,9 +4,10 @@ import { ImportJobInput } from '@marxan/cloning';
 import {
   ArchiveLocation,
   ClonePiece,
+  ComponentLocation,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   getMarxanExecutionMetadataFolderRelativePath,
   MarxanExecutionMetadataContent,
@@ -25,6 +26,7 @@ import * as archiver from 'archiver';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
+import { Readable } from 'stream';
 
 type MetadataFolder = {
   id: string;
@@ -59,7 +61,7 @@ describe(MarxanExecutionMetadataPieceImporter, () => {
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it(`fails if zip file doesn't contain marxan execution metadata folder`, async () => {
+  it(`fails if file repo doesn't contain marxan execution metadata folder`, async () => {
     const resourceKind = ResourceKind.Project;
     await fixtures.GivenWrongMarxanExecutionMetadata();
     const archiveLocation = await fixtures.GivenMarxanExecutionMetadataFile(
@@ -68,7 +70,7 @@ describe(MarxanExecutionMetadataPieceImporter, () => {
     const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenAFolderExtractionErrorShouldBeThrown();
+      .ThenAnErrorShouldBeThrownWhileTryingToGetFolderFromFileRepo();
   });
 
   it('imports marxan execution metadata in a scenario import', async () => {
@@ -200,11 +202,8 @@ const getFixtures = async () => {
       archiveLocation: ArchiveLocation,
       resourceKind: ResourceKind,
     ): ImportJobInput => {
-      const [
-        uri,
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.MarxanExecutionMetadata,
-        archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
@@ -215,7 +214,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.MarxanExecutionMetadata,
         resourceKind,
-        uris: [uri.toSnapshot()],
+        uris: [new ComponentLocation(archiveLocation.value, relativePath)],
         ownerId: userId,
       };
     },
@@ -235,34 +234,33 @@ const getFixtures = async () => {
       return new ArchiveLocation('invalid uri');
     },
     GivenMarxanExecutionMetadataFile: async (resourceKind: ResourceKind) => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.MarxanExecutionMetadata,
-        'marxan execution metadata file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
+      const exportId = v4();
 
-      const archive = archiver(`zip`, {
-        zlib: { level: 9 },
-      });
-      archive.append(JSON.stringify(marxanExecutionMetadataFileContent), {
-        name: relativePath,
-      });
-
-      metadataFolders.forEach(({ buffer, id, type }) => {
-        archive.append(buffer, {
-          name: getMarxanExecutionMetadataFolderRelativePath(
+      await Promise.all(
+        metadataFolders.map(async ({ buffer, id, type }) => {
+          const folderRelativePath = getMarxanExecutionMetadataFolderRelativePath(
             id,
             type,
             relativePath,
-          ),
-        });
-      });
+          );
 
-      const saveFile = fileRepository.save(archive);
-      archive.finalize();
-      const uriOrError = await saveFile;
+          await fileRepository.saveCloningFile(
+            exportId,
+            Readable.from(buffer),
+            folderRelativePath,
+          );
+        }),
+      );
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(marxanExecutionMetadataFileContent)),
+        relativePath,
+      );
 
       if (isLeft(uriOrError)) throw new Error("couldn't save file");
       return new ArchiveLocation(uriOrError.right);
@@ -274,17 +272,12 @@ const getFixtures = async () => {
         },
         ThenADataNotAvailableErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /Export file is not available at/gi,
+            /file with piece data.*not available/gi,
           );
         },
-        ThenAMissingPlanningUnitsErrorShouldBeThrown: async () => {
+        ThenAnErrorShouldBeThrownWhileTryingToGetFolderFromFileRepo: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /missing planning units/gi,
-          );
-        },
-        ThenAFolderExtractionErrorShouldBeThrown: async () => {
-          await expect(sut.run(input)).rejects.toThrow(
-            /error extracting.*folder of execution metadata/gi,
+            /error obtaining.*folder metadata/gi,
           );
         },
         ThenMarxanExecutionMetadataShouldBeImported: async () => {

@@ -28,32 +28,3 @@ export async function extractFile(
     resolve(left(fileNotFound));
   });
 }
-
-export async function extractFiles(
-  readable: Readable,
-  filesRelativePaths: string[],
-): Promise<Either<typeof extractFileFailed, Record<string, Buffer>>> {
-  return new Promise<Either<typeof extractFileFailed, Record<string, Buffer>>>(
-    async (resolve) => {
-      const zip = readable
-        .pipe(Parse({ forceStream: true }))
-        .on('error', () => {
-          resolve(left(extractFileFailed));
-        });
-
-      const buffers: Record<string, Buffer> = {};
-
-      for await (const entry of zip) {
-        if (!filesRelativePaths.includes(entry.path)) {
-          entry.autodrain();
-          continue;
-        }
-        const buffer = await entry.buffer();
-
-        buffers[entry.path] = buffer;
-      }
-
-      resolve(right(buffers));
-    },
-  );
-}

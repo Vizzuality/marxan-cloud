@@ -9,11 +9,12 @@ import {
 } from '@marxan-api/modules/clone/import/domain';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   exportVersion,
   ProjectExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
@@ -25,8 +26,6 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-
 let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
@@ -87,7 +86,7 @@ export const getFixtures = async () => {
         },
         scenarios: [],
       };
-      const [exportConfig] = ClonePieceUrisResolver.resolveFor(
+      const [exportConfig] = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ExportConfig,
         'export location',
       );
@@ -101,7 +100,10 @@ export const getFixtures = async () => {
 
       await zipFile.finalize();
 
-      const saveZipFileOrError = await fileRepository.save(zipFile);
+      const saveZipFileOrError = await fileRepository.saveZipFile(
+        v4(),
+        zipFile,
+      );
 
       if (isLeft(saveZipFileOrError)) throw new Error('could not save zip');
 

@@ -4,18 +4,24 @@ import {
   CloningFilesRepository,
   CloningStoragePath,
 } from './cloning-files.repository';
-import { VolumeCloningFilesStorage } from './volume-cloning-files.repository';
+import { LocalCloningFilesStorage } from './local-cloning-files.repository';
 
 @Module({
   imports: [],
   providers: [
     {
       provide: CloningStoragePath,
-      useValue: AppConfig.get<string>('storage.cloningFileStorage.localPath'),
+      useFactory: () => {
+        const path = AppConfig.get<string>(
+          'storage.cloningFileStorage.localPath',
+        );
+
+        return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+      },
     },
     {
       provide: CloningFilesRepository,
-      useClass: VolumeCloningFilesStorage,
+      useClass: LocalCloningFilesStorage,
     },
   ],
   exports: [CloningFilesRepository],

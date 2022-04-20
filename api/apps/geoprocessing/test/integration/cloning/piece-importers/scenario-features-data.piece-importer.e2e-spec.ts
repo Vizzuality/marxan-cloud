@@ -6,7 +6,7 @@ import {
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioFeaturesDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
 import {
@@ -27,8 +27,9 @@ import {
   GivenFeatures,
   GivenFeaturesData,
   GivenScenarioExists,
-  PrepareZipFile,
 } from '../fixtures';
+import { Readable } from 'stream';
+import { isLeft } from 'fp-ts/lib/Either';
 
 function getFeatureClassNameByIdMap(
   features: { id: string; feature_class_name: string }[],
@@ -131,7 +132,7 @@ const getFixtures = async () => {
   const sut = sandbox.get(ScenarioFeaturesDataPieceImporter);
   const fileRepository = sandbox.get(CloningFilesRepository);
 
-  let validScenarioFeaturesDataFile: ScenarioFeaturesDataContent;
+  let scenarioFeaturesDataFile: ScenarioFeaturesDataContent;
   let featureIds: string[] = [];
   const amountOfCustomFeatures = 3;
   const amountOfPlatformFeatures = 2;
@@ -156,11 +157,8 @@ const getFixtures = async () => {
         organizationId,
       ),
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [
-        uri,
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioFeaturesData,
-        archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       return {
@@ -170,7 +168,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ScenarioFeaturesData,
         resourceKind,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -190,15 +188,12 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenScenarioFeaturesDataWithAnUnknownFeatureFile: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioFeaturesData,
-        'scenario features data file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
-      validScenarioFeaturesDataFile = {
+      scenarioFeaturesDataFile = {
         customFeaturesData: [
           {
             currentArea: 100,
@@ -212,18 +207,20 @@ const getFixtures = async () => {
         platformFeaturesData: [],
       };
 
-      return PrepareZipFile(
-        validScenarioFeaturesDataFile,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(scenarioFeaturesDataFile)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenValidScenarioFeaturesDataFile: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioFeaturesData,
-        'scenario features data file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
@@ -278,7 +275,7 @@ const getFixtures = async () => {
             })),
         }));
 
-      validScenarioFeaturesDataFile = {
+      scenarioFeaturesDataFile = {
         customFeaturesData: getFeatureDataElements(
           customFeaturesData,
           customFeatureNameById,
@@ -289,11 +286,16 @@ const getFixtures = async () => {
         ),
       };
 
-      return PrepareZipFile(
-        validScenarioFeaturesDataFile,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(scenarioFeaturesDataFile)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

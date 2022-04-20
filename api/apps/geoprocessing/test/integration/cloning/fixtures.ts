@@ -3,9 +3,7 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
-import { ArchiveLocation } from '@marxan/cloning/domain';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import {
   MarxanExecutionMetadataGeoEntity,
@@ -19,9 +17,7 @@ import {
   ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
 } from '@marxan/scenarios-planning-unit';
-import * as archiver from 'archiver';
 import { hash } from 'bcrypt';
-import { isLeft } from 'fp-ts/lib/Either';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
@@ -56,29 +52,6 @@ export async function GenerateRandomGeometries(
     `);
 
   return Object.values(result);
-}
-
-export async function PrepareZipFile(
-  content: any,
-  fileRepository: CloningFilesRepository,
-  relativePath: string,
-) {
-  const archive = archiver(`zip`, {
-    zlib: { level: 9 },
-  });
-  archive.append(
-    typeof content !== 'string' ? JSON.stringify(content) : content,
-    {
-      name: relativePath,
-    },
-  );
-
-  const saveFile = fileRepository.save(archive);
-  archive.finalize();
-  const uriOrError = await saveFile;
-
-  if (isLeft(uriOrError)) throw new Error("couldn't save file");
-  return new ArchiveLocation(uriOrError.right);
 }
 
 export function GivenUserExists(

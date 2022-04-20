@@ -64,7 +64,6 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
       (transactionalEntityManager) =>
         this.processGridFile(
           readableOrError.right,
-          planningAreaCustomGridLocation,
           projectId,
           transactionalEntityManager,
         ),
@@ -96,8 +95,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
   }
 
   private async processGridFile(
-    zipStream: Readable,
-    planningAreaCustomGridLocation: ComponentLocationSnapshot,
+    stream: Readable,
     projectId: string,
     transactionalEntityManager: EntityManager,
   ) {
@@ -119,12 +117,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
     return new Promise<void>((resolve, reject) => {
       let lastChunkIncompletedData = '';
 
-      zipStream
-        .pipe(
-          ParseOne(
-            new RegExp(`^${planningAreaCustomGridLocation.relativePath}$`),
-          ),
-        )
+      stream
         .pipe(
           new Transform({
             writableObjectMode: true,

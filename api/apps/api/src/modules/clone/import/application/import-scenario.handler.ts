@@ -1,18 +1,30 @@
-import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
-import { ScenarioExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  ArchiveLocation,
+  ResourceId,
+  ResourceKind,
+} from '@marxan/cloning/domain';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
-import { Either, isLeft, right } from 'fp-ts/Either';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { Repository } from 'typeorm';
+import { Scenario } from '../../../scenarios/scenario.api.entity';
+import { ExportRepository } from '../../export/application/export-repository.port';
 import { Import } from '../domain/import/import';
-import { ExportConfigReader } from './export-config-reader';
+import {
+  exportNotFound,
+  invalidProjectExport,
+  unfinishedExport,
+} from './import-project.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import {
   ImportScenario,
   ImportScenarioCommandResult,
   ImportScenarioError,
+  scenarioShellNotFound,
 } from './import-scenario.command';
 import { ImportRepository } from './import.repository.port';
 
@@ -20,40 +32,56 @@ import { ImportRepository } from './import.repository.port';
 export class ImportScenarioHandler
   implements IInferredCommandHandler<ImportScenario> {
   constructor(
-    private readonly exportConfigReader: ExportConfigReader,
+    private readonly exportRepo: ExportRepository,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepo: Repository<Scenario>,
     private readonly importRepo: ImportRepository,
     private readonly eventPublisher: EventPublisher,
     private readonly importResourcePieces: ImportResourcePieces,
   ) {}
 
   async execute({
-    archiveLocation,
+    exportId,
     ownerId,
     importResourceId,
   }: ImportScenario): Promise<
     Either<ImportScenarioError, ImportScenarioCommandResult>
   > {
-    const exportConfigOrError = await this.exportConfigReader.read(
-      archiveLocation,
-    );
-    if (isLeft(exportConfigOrError)) return exportConfigOrError;
+    const scenario = await this.scenarioRepo.findOne(importResourceId.value);
+
+    if (!scenario) {
+      return left(scenarioShellNotFound);
+    }
+
+    const exportInstance = await this.exportRepo.find(exportId);
+
+    if (!exportInstance) {
+      return left(exportNotFound);
+    }
+
+    if (!exportInstance.toSnapshot().archiveLocation) {
+      return left(unfinishedExport);
+    }
+
+    if (exportInstance.resourceKind !== ResourceKind.Scenario) {
+      return left(invalidProjectExport);
+    }
 
     const isCloning = true;
-    const exportConfig = exportConfigOrError.right as ScenarioExportConfigContent;
 
     const pieces = this.importResourcePieces.resolveForScenario(
       importResourceId,
-      archiveLocation,
-      exportConfig.pieces,
-      ResourceKind.Scenario,
-      exportConfig.resourceId,
+      exportInstance.toSnapshot().exportPieces,
+    );
+    const archiveLocation = new ArchiveLocation(
+      exportInstance.toSnapshot().archiveLocation!,
     );
 
     const importRequest = this.eventPublisher.mergeObjectContext(
       Import.newOne(
         importResourceId,
         ResourceKind.Scenario,
-        new ResourceId(exportConfig.projectId),
+        new ResourceId(scenario.projectId),
         ownerId,
         archiveLocation,
         pieces,

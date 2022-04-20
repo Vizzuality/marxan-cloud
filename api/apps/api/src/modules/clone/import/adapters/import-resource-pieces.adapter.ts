@@ -1,11 +1,12 @@
 import {
   ArchiveLocation,
+  ComponentLocation,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
 import {
   clonePieceImportOrder,
-  ClonePieceUrisResolver,
+  ClonePieceRelativePathResolver,
   exportOnlyClonePieces,
 } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
@@ -13,36 +14,67 @@ import {
   ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { Injectable } from '@nestjs/common';
+import { ExportComponentSnapshot } from '../../export/domain';
 import { ImportResourcePieces } from '../application/import-resource-pieces.port';
 import { ImportComponent } from '../domain';
 
 @Injectable()
 export class ImportResourcePiecesAdapter implements ImportResourcePieces {
+  private getProjectPieces(
+    projectId: ResourceId,
+    pieces: ExportComponentSnapshot[],
+  ): ExportComponentSnapshot[] {
+    return pieces.filter((piece) => piece.resourceId === projectId.value);
+  }
+
+  private getScenarioPieces(
+    projectId: ResourceId,
+    pieces: ExportComponentSnapshot[],
+  ): ExportComponentSnapshot[] {
+    return pieces.filter((piece) => piece.resourceId !== projectId.value);
+  }
+
+  private getImportPieces(
+    pieces: ExportComponentSnapshot[],
+  ): ExportComponentSnapshot[] {
+    return pieces.filter(
+      (component) => !exportOnlyClonePieces.includes(component.piece),
+    );
+  }
+
   resolveForProject(
     projectId: ResourceId,
-    location: ArchiveLocation,
-    pieces: ProjectExportConfigContent['pieces'],
+    pieces: ExportComponentSnapshot[],
+    oldProjectId: ResourceId,
   ): ImportComponent[] {
-    const projectComponents = pieces.project
-      .filter((piece) => !exportOnlyClonePieces.includes(piece))
-      .map((piece) =>
-        ImportComponent.newOne(
-          projectId,
-          piece,
-          clonePieceImportOrder[piece],
-          ClonePieceUrisResolver.resolveFor(piece, location.value),
-        ),
-      );
+    const importPieces = this.getImportPieces(pieces);
 
-    const scenarioIds = Object.keys(pieces.scenarios);
-    const scenarioComponents = scenarioIds.flatMap((scenarioId) =>
-      this.resolveForScenario(
-        ResourceId.create(),
-        location,
-        pieces.scenarios[scenarioId],
-        ResourceKind.Project,
-        scenarioId,
+    const projectComponents = this.getProjectPieces(
+      oldProjectId,
+      importPieces,
+    ).map((component) =>
+      ImportComponent.newOne(
+        projectId,
+        component.piece,
+        clonePieceImportOrder[component.piece],
+        ComponentLocation.fromSnapshots(component.uris),
       ),
+    );
+
+    const resourceIdMapping: Record<string, ResourceId> = {};
+    const scenarioPieces = this.getScenarioPieces(oldProjectId, importPieces);
+
+    scenarioPieces.forEach((piece) => {
+      if (!resourceIdMapping[piece.resourceId])
+        resourceIdMapping[piece.resourceId] = ResourceId.create();
+    });
+
+    const scenarioComponents = Object.keys(resourceIdMapping).flatMap(
+      (oldScenarioId) =>
+        this.resolveForScenario(
+          resourceIdMapping[oldScenarioId],
+          scenarioPieces.filter((piece) => piece.resourceId === oldScenarioId),
+        ),
     );
 
     return [...projectComponents, ...scenarioComponents];
@@ -50,23 +82,17 @@ export class ImportResourcePiecesAdapter implements ImportResourcePieces {
 
   resolveForScenario(
     scenarioId: ResourceId,
-    location: ArchiveLocation,
-    pieces: ScenarioExportConfigContent['pieces'],
-    kind: ResourceKind,
-    oldScenarioId: string,
+    pieces: ExportComponentSnapshot[],
   ): ImportComponent[] {
-    return pieces
-      .filter((piece) => !exportOnlyClonePieces.includes(piece))
-      .map((piece) =>
-        ImportComponent.newOne(
-          scenarioId,
-          piece,
-          clonePieceImportOrder[piece],
-          ClonePieceUrisResolver.resolveFor(piece, location.value, {
-            kind,
-            scenarioId: oldScenarioId,
-          }),
-        ),
-      );
+    const importPieces = this.getImportPieces(pieces);
+
+    return importPieces.map((component) =>
+      ImportComponent.newOne(
+        scenarioId,
+        component.piece,
+        clonePieceImportOrder[component.piece],
+        ComponentLocation.fromSnapshots(component.uris),
+      ),
+    );
   }
 }

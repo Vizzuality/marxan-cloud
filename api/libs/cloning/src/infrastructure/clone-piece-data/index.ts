@@ -29,16 +29,15 @@ export const exportOnlyClonePieces: ClonePiece[] = [
   ClonePiece.ScenarioOutputFolder,
 ];
 
-type UriResolverExtraData = {
+type RelativePathResolverExtraData = {
   kind: ResourceKind;
   scenarioId: string;
   scenarioName?: string;
 };
 
-type UriResolver = (
-  location: string,
-  extraData?: UriResolverExtraData,
-) => ComponentLocation[];
+type RelativePathResolver = (
+  extraData?: RelativePathResolverExtraData,
+) => string;
 
 export const clonePieceImportOrder: Record<ClonePiece, number> = {
   // ExportConfig pieces should never be imported. When a import
@@ -71,100 +70,91 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.FeaturesSpecification]: 3,
 };
 
-export class ClonePieceUrisResolver {
-  private static clonePieceUris: Record<ClonePiece, UriResolver> = {
-    [ClonePiece.ExportConfig]: (location) => [
-      new ComponentLocation(location, exportConfigRelativePath),
-    ],
-    [ClonePiece.PlanningAreaGAdm]: (location) => [
-      new ComponentLocation(location, planningAreaGadmRelativePath),
-    ],
-    [ClonePiece.PlanningAreaCustom]: (location) => [
-      new ComponentLocation(location, planningAreaCustomRelativePath),
-    ],
-    [ClonePiece.PlanningAreaCustomGeojson]: ClonePieceUrisResolver.marxanDataProjectPieceUriResolver(
+export class ClonePieceRelativePathResolver {
+  private static clonePieceRelativePaths: Record<
+    ClonePiece,
+    RelativePathResolver
+  > = {
+    [ClonePiece.ExportConfig]: () => exportConfigRelativePath,
+    [ClonePiece.PlanningAreaGAdm]: () => planningAreaGadmRelativePath,
+    [ClonePiece.PlanningAreaCustom]: () => planningAreaCustomRelativePath,
+    [ClonePiece.PlanningAreaCustomGeojson]: ClonePieceRelativePathResolver.marxanDataProjectPieceRelativePathResolver(
       planningAreaCustomGeoJSONRelativePath,
     ),
-    [ClonePiece.PlanningUnitsGrid]: (location) => [
-      new ComponentLocation(location, planningUnitsGridRelativePath),
-    ],
-    [ClonePiece.PlanningUnitsGridGeojson]: ClonePieceUrisResolver.marxanDataProjectPieceUriResolver(
+    [ClonePiece.PlanningUnitsGrid]: () => planningUnitsGridRelativePath,
+    [ClonePiece.PlanningUnitsGridGeojson]: ClonePieceRelativePathResolver.marxanDataProjectPieceRelativePathResolver(
       planningUnitsGridGeoJSONRelativePath,
     ),
-    [ClonePiece.ProjectMetadata]: (location) => [
-      new ComponentLocation(location, projectMetadataRelativePath),
-    ],
-    [ClonePiece.ProjectCustomProtectedAreas]: (location) => [
-      new ComponentLocation(location, projectCustomProtectedAreasRelativePath),
-    ],
-    [ClonePiece.ProjectCustomFeatures]: (location) => [
-      new ComponentLocation(location, projectCustomFeaturesRelativePath),
-    ],
-    [ClonePiece.FeaturesSpecification]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.ProjectMetadata]: () => projectMetadataRelativePath,
+    [ClonePiece.ProjectCustomProtectedAreas]: () =>
+      projectCustomProtectedAreasRelativePath,
+    [ClonePiece.ProjectCustomFeatures]: () => projectCustomFeaturesRelativePath,
+    [ClonePiece.FeaturesSpecification]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       featuresSpecificationRelativePath,
     ),
-    [ClonePiece.ScenarioMetadata]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.ScenarioMetadata]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       scenarioMetadataRelativePath,
     ),
-    [ClonePiece.ScenarioPlanningUnitsData]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.ScenarioPlanningUnitsData]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       scenarioPlanningUnitsDataRelativePath,
     ),
-    [ClonePiece.ScenarioProtectedAreas]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.ScenarioProtectedAreas]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       scenarioProtectedAreasRelativePath,
     ),
-    [ClonePiece.ScenarioFeaturesData]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.ScenarioFeaturesData]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       scenarioFeaturesDataRelativePath,
     ),
-    [ClonePiece.ScenarioRunResults]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.ScenarioRunResults]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       scenarioRunResultsRelativePath,
     ),
-    [ClonePiece.ScenarioInputFolder]: ClonePieceUrisResolver.marxanDataScenarioPieceUriResolver(
+    [ClonePiece.ScenarioInputFolder]: ClonePieceRelativePathResolver.marxanDataScenarioPieceRelativePathResolver(
       scenarioInputFolderRelativePath,
     ),
-    [ClonePiece.ScenarioOutputFolder]: ClonePieceUrisResolver.marxanDataScenarioPieceUriResolver(
+    [ClonePiece.ScenarioOutputFolder]: ClonePieceRelativePathResolver.marxanDataScenarioPieceRelativePathResolver(
       scenarioOutputFolderRelativePath,
     ),
-    [ClonePiece.MarxanExecutionMetadata]: ClonePieceUrisResolver.scenarioPieceUriResolver(
+    [ClonePiece.MarxanExecutionMetadata]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       marxanExecutionMetadataRelativePath,
     ),
   };
 
-  static scenarioPieceUriResolver(relativePath: string): UriResolver {
-    return (location, extraData) => {
+  static scenarioPieceRelativePathResolver(
+    relativePath: string,
+  ): RelativePathResolver {
+    return (extraData) => {
       if (!extraData)
         throw new Error(
-          'It is not possible generate scenario pieces uris without export kind or old scenario id',
+          'It is not possible generate scenario pieces relative paths without export kind or old scenario id',
         );
 
-      return [
-        new ComponentLocation(
-          location,
-          extraData.kind === ResourceKind.Project
-            ? `scenarios/${extraData.scenarioId}/${relativePath}`
-            : relativePath,
-        ),
-      ];
+      return extraData.kind === ResourceKind.Project
+        ? `scenarios/${extraData.scenarioId}/${relativePath}`
+        : relativePath;
     };
   }
 
-  static marxanDataProjectPieceUriResolver(relativePath: string): UriResolver {
-    return (location) => {
-      return [new ComponentLocation(location, `marxan-data/${relativePath}`)];
+  static marxanDataProjectPieceRelativePathResolver(
+    relativePath: string,
+  ): RelativePathResolver {
+    return () => {
+      return `marxan-data/${relativePath}`;
     };
   }
 
-  static marxanDataScenarioPieceUriResolver(relativePath: string): UriResolver {
-    return (location, extraData) => {
+  static marxanDataScenarioPieceRelativePathResolver(
+    relativePath: string,
+  ): RelativePathResolver {
+    return (extraData) => {
       if (!extraData)
         throw new Error(
-          'It is not possible generate marxan data scenario pieces uris without export kind or old scenario id',
+          'It is not possible generate marxan data scenario pieces relative paths without export kind or old scenario id',
         );
 
       const { kind, scenarioId, scenarioName } = extraData;
 
       if (kind === ResourceKind.Project && !isDefined(scenarioName)) {
         throw new Error(
-          'It is not possible generate marxan data scenario pieces uris for project exports without scenario name',
+          'It is not possible generate marxan data scenario pieces relative paths for project exports without scenario name',
         );
       }
 
@@ -174,22 +164,16 @@ export class ClonePieceUrisResolver {
         `${scenarioName}-${scenarioId}`,
       );
 
-      return [
-        new ComponentLocation(
-          location,
-          extraData.kind === ResourceKind.Project
-            ? `marxan-data/${scenarioFolder}/${relativePath}`
-            : `marxan-data/${relativePath}`,
-        ),
-      ];
+      return extraData.kind === ResourceKind.Project
+        ? `marxan-data/${scenarioFolder}/${relativePath}`
+        : `marxan-data/${relativePath}`;
     };
   }
 
   static resolveFor(
     clonePiece: ClonePiece,
-    location: string,
-    extraData?: UriResolverExtraData,
-  ): ComponentLocation[] {
-    return this.clonePieceUris[clonePiece](location, extraData);
+    extraData?: RelativePathResolverExtraData,
+  ): string {
+    return this.clonePieceRelativePaths[clonePiece](extraData);
   }
 }

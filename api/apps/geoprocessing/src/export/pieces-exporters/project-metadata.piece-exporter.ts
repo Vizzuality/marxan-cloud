@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
@@ -59,9 +59,14 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       projectAlreadyCreated: input.isCloning,
     };
 
-    const outputFile = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.ProjectMetadata,
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(fileContent)),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(outputFile)) {
@@ -72,10 +77,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectMetadata,
-        outputFile.right,
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

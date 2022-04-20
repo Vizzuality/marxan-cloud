@@ -9,7 +9,7 @@ import {
   Failure,
   invalidFiles,
 } from '@marxan/cloning/infrastructure/archive-reader.port';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ExportConfigContent,
   ProjectExportConfigContent,
@@ -41,14 +41,13 @@ export class ExportConfigReader {
     const readableOrError = await this.archiveReader.get(archiveLocation);
     if (isLeft(readableOrError)) return readableOrError;
 
-    const [componentLocation] = ClonePieceUrisResolver.resolveFor(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ExportConfig,
-      archiveLocation.value,
     );
 
     const exportConfigOrError = await extractFile(
       readableOrError.right,
-      componentLocation.relativePath,
+      relativePath,
     );
     if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
 

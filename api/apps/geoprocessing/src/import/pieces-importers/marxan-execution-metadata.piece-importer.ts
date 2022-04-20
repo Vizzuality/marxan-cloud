@@ -1,18 +1,19 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentLocationSnapshot } from '@marxan/cloning/domain';
 import {
-  MarxanExecutionMetadataFolderType,
   getMarxanExecutionMetadataFolderRelativePath,
   MarxanExecutionMetadataContent,
   MarxanExecutionMetadataElement,
+  MarxanExecutionMetadataFolderType,
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
-import { extractFile, extractFiles } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { Readable } from 'stream';
+import { dirname } from 'path';
 import { EntityManager } from 'typeorm/entity-manager/EntityManager';
 import {
   ImportPieceProcessor,
@@ -44,21 +45,9 @@ export class MarxanExecutionMetadataPieceImporter
     return piece === ClonePiece.MarxanExecutionMetadata;
   }
 
-  private async getExportFileFromFileRepo(uri: string): Promise<Readable> {
-    const readableOrError = await this.fileRepository.get(uri);
-    if (isLeft(readableOrError)) {
-      const errorMessage = `Export file is not available at ${uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    return readableOrError.right;
-  }
-
   private async getMetadataFolders(
-    exportFileUri: string,
     marxanExecutionMetadata: MarxanExecutionMetadataElement[],
-    foldersZipsRelativePathPrefix: string,
+    componentLocation: ComponentLocationSnapshot,
   ): Promise<MetadataFolderBuffers> {
     const metadataFoldersBuffers: MetadataFolderBuffers = {};
     const foldersData = marxanExecutionMetadata.flatMap((metadata) => {
@@ -69,7 +58,7 @@ export class MarxanExecutionMetadataPieceImporter
           relativePath: getMarxanExecutionMetadataFolderRelativePath(
             metadata.id,
             'input',
-            foldersZipsRelativePathPrefix,
+            componentLocation.relativePath,
           ),
         },
       ];
@@ -81,31 +70,39 @@ export class MarxanExecutionMetadataPieceImporter
           relativePath: getMarxanExecutionMetadataFolderRelativePath(
             metadata.id,
             'output',
-            foldersZipsRelativePathPrefix,
+            componentLocation.relativePath,
           ),
         });
 
       return relativePaths;
     });
+    const buffers: MetadataFolderBuffers = {};
 
-    const exportFile = await this.getExportFileFromFileRepo(exportFileUri);
+    await Promise.all(
+      foldersData.map(async (data) => {
+        const path = componentLocation.uri.replace(
+          componentLocation.relativePath,
+          data.relativePath,
+        );
+        const readableOrError = await this.fileRepository.get(path);
 
-    const buffersOrErrors = await extractFiles(
-      exportFile,
-      foldersData.map((data) => data.relativePath),
+        if (isLeft(readableOrError)) {
+          const errorMessage = `Error obtaining ${data.type} folder metadata for execution ${data.id}`;
+          this.logger.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        buffers[data.relativePath] = await readableToBuffer(
+          readableOrError.right,
+        );
+      }),
     );
 
-    if (isLeft(buffersOrErrors)) {
-      const errorMessage = `Error extracting input and output folders of marxan execution metadata`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
     foldersData.forEach((data) => {
-      const buffer = buffersOrErrors.right[data.relativePath];
+      const buffer = buffers[data.relativePath];
 
       if (!buffer) {
-        const errorMessage = `Error extracting ${data.type} folder of execution metadata with id ${data.id}`;
+        const errorMessage = `${data.type} folder metadata for execution ${data.id} not found`;
         this.logger.error(errorMessage);
         throw new Error(errorMessage);
       }
@@ -117,7 +114,7 @@ export class MarxanExecutionMetadataPieceImporter
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, projectId, pieceResourceId: scenarioId } = input;
+    const { uris, projectId, pieceResourceId: scenarioId, piece } = input;
 
     const marxanExecutionMetadataRepo = this.entityManager.getRepository(
       MarxanExecutionMetadataGeoEntity,
@@ -130,30 +127,27 @@ export class MarxanExecutionMetadataPieceImporter
     }
     const [marxanExecutionMetadataLocation] = uris;
 
-    const exportFile = await this.getExportFileFromFileRepo(
+    const readableOrError = await this.fileRepository.get(
       marxanExecutionMetadataLocation.uri,
     );
-
-    const marxanExecutionMetadataOrError = await extractFile(
-      exportFile,
-      marxanExecutionMetadataLocation.relativePath,
-    );
-    if (isLeft(marxanExecutionMetadataOrError)) {
-      const errorMessage = `Marxan execution metadata file extraction failed: ${marxanExecutionMetadataLocation.relativePath}`;
+    if (isLeft(readableOrError)) {
+      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${marxanExecutionMetadataLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
 
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringMarxanExecutionMetadata = buffer.toString();
+
     const {
       marxanExecutionMetadata,
     }: MarxanExecutionMetadataContent = JSON.parse(
-      marxanExecutionMetadataOrError.right,
+      stringMarxanExecutionMetadata,
     );
 
     const buffers = await this.getMetadataFolders(
-      marxanExecutionMetadataLocation.uri,
       marxanExecutionMetadata,
-      marxanExecutionMetadataLocation.relativePath,
+      marxanExecutionMetadataLocation,
     );
 
     await marxanExecutionMetadataRepo.save(

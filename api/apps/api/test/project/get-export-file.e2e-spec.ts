@@ -118,9 +118,10 @@ export const getFixtures = async () => {
   const savePiecesFiles = async (exportInstance: Export) => {
     await Promise.all(
       exportInstance.toSnapshot().exportPieces.map(async (piece, i) => {
-        const result = await fileRepo.save(
+        const result = await fileRepo.saveCloningFile(
+          exportInstance.id.value,
           Readable.from(`${piece.piece}`),
-          'txt',
+          `${piece.piece}.txt`,
         );
 
         if (isLeft(result)) {

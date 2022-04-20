@@ -4,8 +4,8 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningUnitsGridTransform } from '@marxan/cloning/infrastructure/clone-piece-data/planning-units-grid';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { Injectable } from '@nestjs/common';
@@ -48,7 +48,15 @@ export class PlanningUnitsGridPieceExporter implements ExportPieceProcessor {
 
     gridStream.pipe(gridFileTransform);
 
-    const gridFile = await this.fileRepository.save(gridFileTransform);
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.PlanningUnitsGrid,
+    );
+
+    const gridFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
+      gridFileTransform,
+      relativePath,
+    );
     if (isLeft(gridFile)) {
       throw new Error(
         `${PlanningUnitsGridPieceExporter.name} - Project Custom PA - couldn't save file - ${gridFile.left.description}`,
@@ -57,10 +65,7 @@ export class PlanningUnitsGridPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningUnitsGrid,
-        gridFile.right,
-      ),
+      uris: [new ComponentLocation(gridFile.right, relativePath)],
     };
   }
 }

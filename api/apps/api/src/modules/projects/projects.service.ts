@@ -502,27 +502,28 @@ export class ProjectsService {
       ImportProjectCommandResult
     >
   > {
-    const archiveLocationOrError = await this.commandBus.execute(
-      new UploadExportFile(exportFile),
-    );
+    return left(forbiddenError);
+    // const archiveLocationOrError = await this.commandBus.execute(
+    //   new UploadExportFile(exportFile),
+    // );
 
-    if (!(await this.projectAclService.canImportProject(userId))) {
-      return left(forbiddenError);
-    }
+    // if (!(await this.projectAclService.canImportProject(userId))) {
+    //   return left(forbiddenError);
+    // }
 
-    if (isLeft(archiveLocationOrError)) {
-      return archiveLocationOrError;
-    }
+    // if (isLeft(archiveLocationOrError)) {
+    //   return archiveLocationOrError;
+    // }
 
-    const idsOrError = await this.commandBus.execute(
-      new ImportProject(archiveLocationOrError.right, new UserId(userId)),
-    );
+    // const idsOrError = await this.commandBus.execute(
+    //   new ImportProject(archiveLocationOrError.right, new UserId(userId)),
+    // );
 
-    if (isLeft(idsOrError)) {
-      return idsOrError;
-    }
+    // if (isLeft(idsOrError)) {
+    //   return idsOrError;
+    // }
 
-    return right(idsOrError.right);
+    // return right(idsOrError.right);
   }
 
   /**

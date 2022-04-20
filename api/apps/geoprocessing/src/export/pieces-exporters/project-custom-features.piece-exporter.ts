@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ProjectCustomFeature,
   ProjectCustomFeaturesContent,
@@ -102,9 +102,14 @@ export class ProjectCustomFeaturesPieceExporter
       })),
     };
 
-    const outputFile = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.ProjectCustomFeatures,
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(fileContent)),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(outputFile)) {
@@ -115,10 +120,7 @@ export class ProjectCustomFeaturesPieceExporter
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectCustomFeatures,
-        outputFile.right,
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

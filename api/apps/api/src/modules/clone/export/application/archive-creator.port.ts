@@ -14,6 +14,7 @@ export type ArchiveCreationError =
 
 export abstract class ArchiveCreator {
   abstract zip(
+    exportId: string,
     files: {
       uri: string;
       relativeDestination: string;

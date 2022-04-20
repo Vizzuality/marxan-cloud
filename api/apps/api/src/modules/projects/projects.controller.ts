@@ -801,13 +801,13 @@ export class ProjectsController {
       switch (idsOrError.left) {
         case forbiddenError:
           throw new ForbiddenException();
-        case archiveCorrupted:
-          throw new BadRequestException('Missing export config file');
-        case invalidFiles:
-          throw new BadRequestException('Invalid export config file');
-        case fileRepositoryUnknownError:
-        case fileNotFound:
-          throw new InternalServerErrorException('Error while saving file');
+        // case archiveCorrupted:
+        //   throw new BadRequestException('Missing export config file');
+        // case invalidFiles:
+        //   throw new BadRequestException('Invalid export config file');
+        // case fileRepositoryUnknownError:
+        // case fileNotFound:
+        //   throw new InternalServerErrorException('Error while saving file');
         default:
           throw new InternalServerErrorException();
       }
