@@ -17,7 +17,6 @@ import {
   exportVersion,
   ScenarioExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { FileRepository } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
@@ -96,7 +95,7 @@ export const getFixtures = async () => {
   const exportRepo = app.get(ExportRepository);
   const apiEvents = app.get(ApiEventsService);
   const importRepo = app.get(ImportRepository);
-  const fileRepo = app.get(FileRepository);
+  const fileRepo = app.get(CloneFileRepository);
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -275,3 +274,6 @@ export const getFixtures = async () => {
     },
   };
 };
+function CloneFileRepository(CloneFileRepository: any) {
+  throw new Error('Function not implemented.');
+}
