@@ -1,6 +1,10 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { Creator, Resource } from '../dto/create-published-project.dto';
+import {
+  Company,
+  Creator,
+  Resource,
+} from '../dto/create-published-project.dto';
 
 @Entity('published_projects')
 export class PublishedProject {
@@ -16,8 +20,8 @@ export class PublishedProject {
   @Column('boolean', { name: 'under_moderation', default: false })
   underModeration?: boolean;
 
-  @Column('character varying', { name: 'logo' })
-  logo?: string;
+  @Column({ type: 'jsonb', name: 'company' })
+  company?: Company;
 
   @Column({ type: 'jsonb', name: 'resources', array: true })
   resources?: Resource[];
