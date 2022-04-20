@@ -42,7 +42,7 @@ export class PublishedProjectCrudService extends AppBaseService<
         'name',
         'description',
         'creators',
-        'logo',
+        'company',
         'resources',
         'underModeration',
         'originalProject',

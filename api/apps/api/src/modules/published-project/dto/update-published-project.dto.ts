@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsString } from 'class-validator';
-import { Creator, Resource } from './create-published-project.dto';
+import { Company, Creator, Resource } from './create-published-project.dto';
 
 export class UpdatePublishedProjectDto {
   @IsString()
@@ -24,7 +24,7 @@ export class UpdatePublishedProjectDto {
   @IsString()
   @IsOptional()
   @ApiPropertyOptional()
-  logo?: string;
+  company?: Company;
 
   @IsBoolean()
   @IsOptional()

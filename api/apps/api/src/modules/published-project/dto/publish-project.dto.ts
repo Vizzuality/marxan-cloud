@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsUUID } from 'class-validator';
-import { Creator, Resource } from './create-published-project.dto';
+import { Company, Creator, Resource } from './create-published-project.dto';
 
 export class PublishProjectDto {
   @IsUUID()
@@ -26,5 +26,5 @@ export class PublishProjectDto {
   @IsString()
   @IsOptional()
   @ApiPropertyOptional()
-  logo?: string;
+  company?: Company;
 }

@@ -4,8 +4,13 @@ export interface Resource {
 }
 
 export interface Creator {
-  fullName: string;
-  avatarUrl: string;
+  displayName: string;
+  avatarDataUrl: string;
+}
+
+export interface Company {
+  name: string;
+  logoDataUrl: string;
 }
 
 export interface CreatePublishedProjectDto {
@@ -14,5 +19,5 @@ export interface CreatePublishedProjectDto {
   description?: string;
   creators?: Creator[];
   resources?: Resource[];
-  logo?: string;
+  company?: Company;
 }
