@@ -91,7 +91,7 @@ test(`when placing a public project under moderation as not a platform admin`, a
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenPublicProjectIsAvailable(projectId, response);
   response = await fixtures.WhenGettingPublicProject(projectId);
-  fixtures.ThenPublicProjectDetailsArePresent(projectId, response);
+  fixtures.ThenCompletePublicProjectDetailsArePresent(projectId, response);
 });
 
 test(`when clearing under moderation status from a public project not as platform admin`, async () => {

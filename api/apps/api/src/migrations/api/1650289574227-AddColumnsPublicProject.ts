@@ -6,8 +6,8 @@ export class AddColumnsPublicProject1650289574227
     await queryRunner.query(`
       ALTER TABLE published_projects
         ADD COLUMN company jsonb,
-        ADD COLUMN resources jsonb[],
-        ADD COLUMN creators jsonb[];
+        ADD COLUMN resources jsonb,
+        ADD COLUMN creators jsonb;
     `);
   }
 

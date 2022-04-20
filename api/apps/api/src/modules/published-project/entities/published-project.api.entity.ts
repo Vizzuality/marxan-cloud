@@ -23,10 +23,10 @@ export class PublishedProject {
   @Column({ type: 'jsonb', name: 'company' })
   company?: Company;
 
-  @Column({ type: 'jsonb', name: 'resources', array: true })
+  @Column('jsonb')
   resources?: Resource[];
 
-  @Column({ type: 'jsonb', name: 'creators', array: true })
+  @Column('jsonb')
   creators?: Creator[];
 
   @OneToOne(() => Project)

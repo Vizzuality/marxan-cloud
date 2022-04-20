@@ -148,6 +148,26 @@ export const getFixtures = async () => {
           attributes: {
             name: expect.any(String),
             underModeration: false,
+            description: null,
+            company: null,
+            resources: null,
+            creators: null,
+          },
+          id: publicProjectId,
+          type: 'published_projects',
+        },
+        meta: {},
+      });
+    },
+    ThenCompletePublicProjectDetailsArePresent: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body).toEqual({
+        data: {
+          attributes: {
+            name: expect.any(String),
+            underModeration: false,
             description: expect.any(String),
             company: {
               name: expect.any(String),

@@ -21,7 +21,6 @@ export class PublishProjectDto {
   @ApiPropertyOptional()
   resources?: Resource[];
 
-  @IsString()
   @IsOptional()
   @ApiPropertyOptional()
   company?: Company;
