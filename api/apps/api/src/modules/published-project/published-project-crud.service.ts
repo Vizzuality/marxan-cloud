@@ -38,7 +38,15 @@ export class PublishedProjectCrudService extends AppBaseService<
 
   get serializerConfig(): JSONAPISerializerConfig<PublishedProject> {
     return {
-      attributes: ['name', 'description', 'underModeration', 'originalProject'],
+      attributes: [
+        'name',
+        'description',
+        'creators',
+        'logo',
+        'resources',
+        'underModeration',
+        'originalProject',
+      ],
       keyForAttribute: 'camelCase',
       originalProject: {
         ref: 'id',
