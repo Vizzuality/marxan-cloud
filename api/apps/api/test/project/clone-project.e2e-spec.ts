@@ -10,6 +10,7 @@ import { CompleteImportPiece } from '@marxan-api/modules/clone/import/applicatio
 import { AllPiecesImported } from '@marxan-api/modules/clone/import/domain';
 import { SchedulePieceImport } from '@marxan-api/modules/clone/infra/import/schedule-piece-import.command';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
@@ -56,7 +57,7 @@ export const getFixtures = async () => {
   const commandBus = app.get(CommandBus);
   const exportRepo = app.get(ExportRepository);
   const apiEvents = app.get(ApiEventsService);
-  const fileRepo = app.get(CloneFileRepository);
+  const fileRepo = app.get(CloningFilesRepository);
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
     getRepositoryToken(UsersProjectsApiEntity),
   );
@@ -204,6 +205,3 @@ export const getFixtures = async () => {
     },
   };
 };
-function CloneFileRepository(CloneFileRepository: any) {
-  throw new Error('Function not implemented.');
-}

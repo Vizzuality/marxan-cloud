@@ -14,7 +14,6 @@ import {
   exportVersion,
   ProjectExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { FileRepository } from '@marxan/files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
@@ -26,6 +25,7 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -53,7 +53,7 @@ export const getFixtures = async () => {
   const commandBus = app.get(CommandBus);
   const importRepo = app.get(ImportRepository);
   const apiEvents = app.get(ApiEventsService);
-  const fileRepository = app.get(FileRepository);
+  const fileRepository = app.get(CloningFilesRepository);
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const oldProjectId = v4();
