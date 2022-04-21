@@ -17,7 +17,9 @@ export interface CreatePublishedProjectDto {
   id: string;
   name?: string;
   description?: string;
+  location?: string;
   creators?: Creator[];
   resources?: Resource[];
   company?: Company;
+  pngData?: string;
 }

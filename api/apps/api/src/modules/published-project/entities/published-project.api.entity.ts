@@ -5,6 +5,7 @@ import {
   Creator,
   Resource,
 } from '../dto/create-published-project.dto';
+import { string } from 'fp-ts';
 
 @Entity('published_projects')
 export class PublishedProject {
@@ -17,6 +18,9 @@ export class PublishedProject {
   @Column('character varying')
   description?: string;
 
+  @Column('character varying')
+  location?: string;
+
   @Column('boolean', { name: 'under_moderation', default: false })
   underModeration?: boolean;
 
@@ -28,6 +32,9 @@ export class PublishedProject {
 
   @Column('jsonb')
   creators?: Creator[];
+
+  @Column('character varying', { name: 'png_data' })
+  pngData?: string;
 
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })
