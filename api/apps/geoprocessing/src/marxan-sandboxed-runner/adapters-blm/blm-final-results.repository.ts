@@ -49,7 +49,7 @@ export class BlmFinalResultsRepository {
     await this.entityManager.transaction(async (txManager) => {
       const query = `
         update blm_final_results
-        set protected_pu_ids NULL
+        set protected_pu_ids = NULL
         where blm_final_results.scenario_id = $1 and blm_final_results.blm_value = $2`;
       await txManager.query(query, [scenarioId, blmValue]);
 

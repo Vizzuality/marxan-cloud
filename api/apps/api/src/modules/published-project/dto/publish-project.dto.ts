@@ -24,4 +24,8 @@ export class PublishProjectDto {
   @IsOptional()
   @ApiPropertyOptional()
   company?: Company;
+
+  @IsOptional()
+  @ApiPropertyOptional()
+  scenarioId?: string;
 }
