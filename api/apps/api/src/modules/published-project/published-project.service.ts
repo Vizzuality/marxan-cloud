@@ -59,9 +59,12 @@ export class PublishedProjectService {
       return left(alreadyPublished);
     }
 
+    // @debt scenarioId will be used in the png_map_data generation.
+    const { scenarioId, ...projectWithoutScenario } = projectToPublish;
+
     await this.crudService.create({
       id,
-      ...projectToPublish,
+      ...projectWithoutScenario,
     });
     return right(true);
   }
