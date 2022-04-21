@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import omit from 'lodash/omit';
 
@@ -6,12 +6,14 @@ import { useRouter } from 'next/router';
 
 import { useOwnsProject } from 'hooks/permissions';
 import { useProject, usePublishProject, useUnPublishProject } from 'hooks/projects';
+import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
+import Tooltip from 'components/tooltip';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import COMMUNITY_SVG from 'svgs/project/community.svg?sprite';
@@ -46,6 +48,22 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
       method: 'POST',
     },
   });
+
+  const {
+    data: rawScenariosData,
+  } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+    sort: '-lastModifiedAt',
+  });
+
+  const SCENARIOS_RUNNED = useMemo(() => {
+    return rawScenariosData
+      .some((s) => {
+        return s.ranAtLeastOnce;
+      });
+  }, [rawScenariosData]);
 
   const handlePublish = useCallback((values) => {
     const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
@@ -106,16 +124,36 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
     <>
       {!isPublic && (
         <>
-          <Button
-            className="text-white"
-            theme="primary-alt"
-            size="base"
-            disabled={!isOwner}
-            onClick={() => setModal(true)}
+          <Tooltip
+            disabled={(isOwner && SCENARIOS_RUNNED)}
+            arrow
+            placement="top"
+            content={(
+              <div
+                className="p-4 text-gray-500 bg-white rounded text-xs"
+                style={{
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                  maxWidth: 200,
+                }}
+              >
+                You need to be the owner and have at
+                least one scenario runned to publish the project.
+              </div>
+            )}
           >
-            <span className="mr-2.5">Publish project</span>
-            <Icon icon={COMMUNITY_SVG} />
-          </Button>
+            <div>
+              <Button
+                className="text-white"
+                theme="primary-alt"
+                size="base"
+                disabled={!isOwner || !SCENARIOS_RUNNED}
+                onClick={() => setModal(true)}
+              >
+                <span className="mr-2.5">Publish project</span>
+                <Icon icon={COMMUNITY_SVG} />
+              </Button>
+            </div>
+          </Tooltip>
 
           <Modal
             dismissable

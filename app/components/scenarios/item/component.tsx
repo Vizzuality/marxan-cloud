@@ -77,6 +77,8 @@ export interface ItemProps {
   lock?: Record<string, any>;
   lastUpdateDistance: string;
   className?: string;
+  ranAtLeastOnce: boolean;
+  numberOfRuns: number;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
