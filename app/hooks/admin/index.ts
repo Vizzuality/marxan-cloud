@@ -324,15 +324,14 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
       //   totalItems: 100,
       // },
       data: data?.data.map((d) => {
+        const owners = d.creators ? d.creators.filter((c) => c.roleName === 'project_owner') : [];
+
         return {
           id: d.id,
           name: d.name,
           description: d.description,
           status: d.underModeration ? 'under-moderation' : 'published',
-          owner: {
-            name: 'Miguel Barrenechea',
-            email: 'barrenechea.miguel@gmail.com',
-          },
+          owners,
         };
       }),
       meta: data?.meta,

@@ -79,14 +79,19 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
   const { data: projectsUsersData } = useProjectsUsers([pid]);
 
   const { data: projectUsersData } = useProjectUsers(pid);
-  const projectCreators = useMemo(() => {
+  const PROJECT_CREATORS = useMemo(() => {
     if (!projectUsersData) {
       return [];
     }
 
     return projectUsersData
       .filter((user) => user.roleName === 'project_owner' || user.roleName === 'project_contributor')
-      .map((user) => user.user);
+      .map((user) => {
+        return {
+          roleName: user.roleName,
+          ...user.user,
+        };
+      });
   }, [projectUsersData]);
 
   const isOwner = useOwnsProject(pid);
@@ -105,11 +110,11 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
     return {
       name: projectData?.name || '',
       description: projectData?.description || '',
-      creators: projectCreators,
+      creators: PROJECT_CREATORS,
       resources: [],
       scenarioId: null,
     };
-  }, [projectData, projectCreators]);
+  }, [projectData, PROJECT_CREATORS]);
 
   const SCENARIOS_RUNNED = useMemo(() => {
     return rawScenariosData
@@ -229,7 +234,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
               {(fprops) => (
                 <Field id="creators" {...fprops}>
                   <Label theme="light" className="mb-3 uppercase">Creators</Label>
-                  {projectCreators.map((user) => (
+                  {PROJECT_CREATORS.map((user) => (
                     <div key={user.id} className="flex items-center mb-3 space-x-2">
                       <div className="flex items-center">
                         <Avatar
