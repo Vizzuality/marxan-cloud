@@ -44,16 +44,14 @@ export const apiConnections: Record<
     cache: false,
     migrations: [__dirname + '/migrations/api/**/*{.ts,.js}'],
     /** Migrations will run automatically on startup, unless the
-     * `API_RUN_MIGRATIONS_ON_STARTUP` or `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP`
-     * environment variables are set and their value matches, case-insensitively,
-     * the string `false`.
-     *
-     * @debt I think this should be way more resilient to user input.
+     * `API_RUN_MIGRATIONS_ON_STARTUP` or
+     * `GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP` environment variables are set
+     * (case-insensitively) to the string `false`.
      */
-    migrationsRun:
-      `${AppConfig.get<string>(
-        'postgresApi.runMigrationsOnStartup',
-      )}`.toLowerCase() !== 'false',
+    migrationsRun: AppConfig.getBoolean(
+      'postgresApi.runMigrationsOnStartup',
+      true,
+    ),
     cli: {
       migrationsDir: 'apps/api/src/migrations/api',
     },
