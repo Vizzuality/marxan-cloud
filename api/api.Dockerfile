@@ -22,7 +22,7 @@ COPY --chown=$USER:$USER libs ./libs
 RUN mkdir -p /opt/marxan-project-cloning
 RUN chown -R $USER:$USER /opt/marxan-project-cloning
 
-RUN yarn prestart:prod
+RUN yarn prestart:prod api
 
 EXPOSE 3000
 USER $USER

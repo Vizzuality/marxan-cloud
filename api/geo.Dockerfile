@@ -30,7 +30,7 @@ RUN chown -R $USER:$USER ./test/integration
 
 RUN mkdir -p ./test/integration/protected-areas/steps/test_multiple_features_v2
 
-RUN yarn prestart:prod
+RUN yarn prestart:prod geoprocessing
 
 EXPOSE 3000
 ENTRYPOINT ["./apps/geoprocessing/entrypoint.sh"]
