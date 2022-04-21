@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PublishedProjectService } from './published-project.service';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { PublishedProjectCrudService } from '@marxan-api/modules/published-project/published-project-crud.service';
@@ -9,6 +9,7 @@ import { PublishProjectController } from '@marxan-api/modules/published-project/
 import { PublishedProjectSerializer } from '@marxan-api/modules/published-project/published-project.serializer';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
+import { WebshotModule } from '@marxan/webshot';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UsersModule } from '@marxan-api/modules/users/users.module';
     ProjectsModule,
     TypeOrmModule.forFeature([PublishedProject]),
     UsersModule,
+    forwardRef(() => WebshotModule),
   ],
   controllers: [PublishProjectController, PublishedProjectReadController],
   providers: [

@@ -67,4 +67,31 @@ export class WebshotService {
       return left(unknownPngWebshotError);
     }
   }
+
+  async getPublishedProjectsImage(
+    scenarioId: string,
+    projectId: string,
+    config: WebshotPngConfig,
+    webshotUrl: string,
+  ): Promise<Either<typeof unknownPngWebshotError, string>> {
+    try {
+      const pngBuffer = await this.httpService
+        .post(
+          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/published-project/frequency`,
+          config,
+          { responseType: 'arraybuffer' },
+        )
+        .toPromise()
+        .then((response) => response.data)
+        .catch((error) => {
+          throw new Error(error);
+        });
+
+      const pngBase64String = Buffer.from(pngBuffer).toString('base64');
+
+      return right(pngBase64String);
+    } catch (error) {
+      return left(unknownPngWebshotError);
+    }
+  }
 }

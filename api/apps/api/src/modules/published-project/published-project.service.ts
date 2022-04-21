@@ -10,6 +10,10 @@ import { PublishedProject } from '@marxan-api/modules/published-project/entities
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { PublishProjectDto } from './dto/publish-project.dto';
+import { WebshotService } from '@marxan/webshot';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { assertDefined } from '@marxan/utils';
+import { isLeft, isRight } from 'fp-ts/lib/These';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -33,6 +37,7 @@ export class PublishedProjectService {
     @InjectRepository(PublishedProject)
     private publicProjectsRepo: Repository<PublishedProject>,
     private crudService: PublishedProjectCrudService,
+    private webshotService: WebshotService,
     private readonly acl: ProjectAccessControl,
     private readonly usersService: UsersService,
   ) {}
@@ -59,13 +64,36 @@ export class PublishedProjectService {
       return left(alreadyPublished);
     }
 
-    // @debt scenarioId will be used in the png_map_data generation.
-    const { scenarioId, ...projectWithoutScenario } = projectToPublish;
+    const webshotUrl = AppConfig.get('webshot.url') as string;
 
-    await this.crudService.create({
+    const { scenarioId, config, ...projectWithoutScenario } = projectToPublish;
+    assertDefined(scenarioId);
+    assertDefined(config);
+    const pngData = await this.webshotService.getPublishedProjectsImage(
+      scenarioId,
       id,
-      ...projectWithoutScenario,
-    });
+      {
+        ...config,
+        screenshotOptions: {
+          clip: { x: 0, y: 0, width: 500, height: 500 },
+        },
+      },
+      webshotUrl,
+    );
+
+    if (isLeft(pngData)) {
+      console.info(
+        `Map screenshot for public project ${id} could not be generated`,
+      );
+    }
+
+    if (isRight(pngData)) {
+      await this.crudService.create({
+        id,
+        ...projectWithoutScenario,
+        pngData: pngData.right,
+      });
+    }
     return right(true);
   }
 
