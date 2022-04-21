@@ -10,7 +10,7 @@ import { useScenarios } from 'hooks/scenarios';
 
 import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Share from 'layout/community/published-projects/detail/share';
-import DuplicateButton from 'layout/community/published-projects/duplicate-button';
+import DuplicateButton from 'layout/community/published-projects/list/table/duplicate-button';
 import ComingSoon from 'layout/help/coming-soon';
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
