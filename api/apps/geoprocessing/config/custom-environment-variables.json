@@ -1,4 +1,10 @@
 {
+  "logging": {
+    "muteAll": "API_LOGGING_MUTE_ALL",
+    "http": {
+      "morganFormat": "BACKEND_HTTP_LOGGING_MORGAN_FORMAT"
+    }
+  },
   "postgresApi": {
     "host": "API_POSTGRES_HOST",
     "username": "API_POSTGRES_USER",
@@ -22,12 +28,30 @@
     }
   },
   "marxan": {
-    "bin": "MARXAN_BIN_PATH"
+    "bin": "MARXAN_BIN_PATH",
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "MARXAN_IO_SETTING_INPUTDIR",
+          "PUNAME": "MARXAN_IO_SETTING_PUNAME",
+          "SPECNAME": "MARXAN_IO_SETTING_SPECNAME",
+          "PUVSPRNAME": "MARXAN_IO_SETTING_PUVSPRNAME",
+          "BOUNDNAME": "MARXAN_IO_SETTING_BOUNDNAME",
+          "OUTPUTDIR": "MARXAN_IO_SETTING_OUTPUTDIR"
+        }
+      }
+    }
   },
   "auth": {
+    "jwt": {
+      "secret": "API_AUTH_JWT_SECRET"
+    },
     "xApiKey": {
       "secret": "API_AUTH_X_API_KEY"
     }
+  },
+  "geoprocessing": {
+    "url": "GEOPROCESSING_URL"
   },
   "redis": {
     "host": "REDIS_HOST",
@@ -36,7 +60,8 @@
     "useTLS": "REDIS_USE_TLS"
   },
   "api": {
-    "url": "API_SERVICE_URL"
+    "url": "API_SERVICE_URL",
+    "daemonListenPort": "API_DAEMON_LISTEN_PORT"
   },
   "geo": {
     "daemonListenPort": "GEO_DAEMON_LISTEN_PORT"
@@ -55,6 +80,25 @@
       "planningAreas": {
         "maxAgeForOrphanUploads": "UPLOADS_PLANNING_AREAS_MAX_AGE"
       }
+    },
+    "limits": {
+      "singleGeometry": "API_UPLOAD_SINGLE_MAX_SIZE_MEBIBYTES",
+      "complexGeometryWithoutProperties": "API_UPLOAD_COMPLEX_MAX_SIZE_MEBIBYTES",
+      "complexGeometryWithProperties": "API_UPLOAD_COMPLEX_PROPERTIES_MAX_SIZE_MEBIBYTES"
     }
+  },
+  "sparkpost": {
+    "apikey": "SPARKPOST_APIKEY",
+    "origin": "SPARKPOST_ORIGIN"
+  },
+  "application": {
+    "baseUrl": "APPLICATION_BASE_URL"
+  },
+  "passwordReset": {
+    "tokenPrefix": "PASSWORD_RESET_TOKEN_PREFIX",
+    "expiration": "PASSWORD_RESET_EXPIRATION"
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "SIGNUP_CONFIRMATION_TOKEN_PREFIX"
   }
 }

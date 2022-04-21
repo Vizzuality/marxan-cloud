@@ -1,4 +1,12 @@
 {
+  "logging": {
+    "muteAll": true
+  },
+  "network": {
+    "cors": {
+      "origins": ["http://localhost:3010"]
+    }
+  },
   "redis": {
     "useTLS": false,
     "host": "marxan-redis",
@@ -26,13 +34,22 @@
     "logging": "error"
   },
   "api": {
-    "url": "http://api:3000"
+    "url": "http://api:3000",
+    "daemonListenPort": 3000
   },
   "webshot": {
     "url": "http://webshot:3000"
   },
+  "geoprocessing": {
+    "url": "http://geoprocessing:3000"
+  },
   "geo": {
     "daemonListenPort": 3000
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h"
+    }
   },
   "storage": {
     "sharedFileStorage": {
@@ -48,9 +65,36 @@
       "planningAreas": {
         "maxAgeForOrphanUploads": "2d"
       }
-    }
+    },
+    "limits": {}
   },
   "marxan": {
-    "bin": "/opt/marxan-geoprocessing/apps/geoprocessing/src/marxan/marxan-linux-4-0-6"
+    "bin": "/opt/marxan-geoprocessing/apps/geoprocessing/src/marxan/marxan-linux-4-0-6",
+    "inputFiles": {
+      "inputDat": {
+        "ioSettings": {
+          "INPUTDIR": "input",
+          "PUNAME": "pu.dat",
+          "SPECNAME": "spec.dat",
+          "PUVSPRNAME": "puvspr.dat",
+          "BOUNDNAME": "bound.dat",
+          "OUTPUTDIR": "output"
+        }
+      }
+    }
+  },
+  "sparkpost": {
+    "apikey": "invalidSparkpostApikey",
+    "origin": "https://api.eu.sparkpost.com:443"
+  },
+  "application": {
+    "baseUrl": "http://localhost:3000"
+  },
+  "passwordReset": {
+    "tokenPrefix": "/auth/reset-password?token=",
+    "expiration": 1800000
+  },
+  "signUpConfirmation": {
+    "tokenPrefix": "/auth/sign-up-confirmation?token="
   }
 }
