@@ -22,7 +22,7 @@ import { MarkImportPieceAsFailedHandler } from './mark-import-piece-as-failed.ha
 import { PieceImportRequestedSaga } from './piece-import-requested.saga';
 import { ScheduleDbCleanupForFailedImportHandler } from './schedule-db-cleanup-for-failed-import.handler';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
-import { UploadExportFileHandler } from './upload-export-file.handler';
+import { GenerateExportFromZipFileHandler } from './generate-export-from-zip-file.handler';
 
 @Module({
   imports: [
@@ -45,7 +45,7 @@ import { UploadExportFileHandler } from './upload-export-file.handler';
     MarkImportPieceAsFailedHandler,
     ImportPieceEventsHandler,
     ScheduleDbCleanupForFailedImportHandler,
-    UploadExportFileHandler,
+    GenerateExportFromZipFileHandler,
     {
       provide: Logger,
       useClass: Logger,

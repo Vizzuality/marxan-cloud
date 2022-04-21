@@ -792,7 +792,7 @@ export class ProjectsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<RequestProjectImportResponseDto> {
-    const idsOrError = await this.projectsService.importProject(
+    const idsOrError = await this.projectsService.importProjectFromZipFile(
       file,
       req.user.id,
     );

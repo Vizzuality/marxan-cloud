@@ -51,7 +51,10 @@ import {
   ChangeProjectBlmRange,
   ChangeProjectRangeErrors,
 } from '@marxan-api/modules/projects/blm';
-import { UploadExportFile } from '../clone/infra/import/upload-export-file.command';
+import {
+  GenerateExportFromZipFile,
+  GenerateExportFromZipFileError,
+} from '../clone/infra/import/generate-export-from-zip-file.command';
 import { unknownError } from '@marxan/cloning-files-repository';
 import {
   ImportProject,
@@ -493,37 +496,38 @@ export class ProjectsService {
     return await this.projectAclService.findAllLocks(userId, projectId);
   }
 
-  async importProject(
+  async importProjectFromZipFile(
     exportFile: Express.Multer.File,
     userId: string,
   ): Promise<
     Either<
-      typeof unknownError | ImportProjectError | typeof forbiddenError,
+      | GenerateExportFromZipFileError
+      | ImportProjectError
+      | typeof forbiddenError,
       ImportProjectCommandResult
     >
   > {
-    return left(forbiddenError);
-    // const archiveLocationOrError = await this.commandBus.execute(
-    //   new UploadExportFile(exportFile),
-    // );
+    if (!(await this.projectAclService.canImportProject(userId))) {
+      return left(forbiddenError);
+    }
 
-    // if (!(await this.projectAclService.canImportProject(userId))) {
-    //   return left(forbiddenError);
-    // }
+    const exportIdOrError = await this.commandBus.execute(
+      new GenerateExportFromZipFile(exportFile),
+    );
 
-    // if (isLeft(archiveLocationOrError)) {
-    //   return archiveLocationOrError;
-    // }
+    if (isLeft(exportIdOrError)) {
+      return exportIdOrError;
+    }
 
-    // const idsOrError = await this.commandBus.execute(
-    //   new ImportProject(archiveLocationOrError.right, new UserId(userId)),
-    // );
+    const idsOrError = await this.commandBus.execute(
+      new ImportProject(exportIdOrError.right, new UserId(userId)),
+    );
 
-    // if (isLeft(idsOrError)) {
-    //   return idsOrError;
-    // }
+    if (isLeft(idsOrError)) {
+      return idsOrError;
+    }
 
-    // return right(idsOrError.right);
+    return right(idsOrError.right);
   }
 
   /**
