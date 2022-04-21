@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
+import omit from 'lodash/omit';
+
 import { useRouter } from 'next/router';
 
 import { useOwnsProject } from 'hooks/permissions';
@@ -45,8 +47,11 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
     },
   });
 
-  const handlePublish = useCallback(() => {
-    publishProjectMutation.mutate({ id: `${pid}` }, {
+  const handlePublish = useCallback((values) => {
+    const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
+
+    // @ts-ignore
+    publishProjectMutation.mutate({ id: `${pid}`, data }, {
       onSuccess: () => {
         addToast('success-publish-project', (
           <>

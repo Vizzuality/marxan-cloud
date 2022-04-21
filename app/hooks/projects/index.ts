@@ -36,6 +36,8 @@ import {
   SaveProjectDownloadProps,
   UseDownloadProjectProps,
   DownloadProjectProps,
+  UseUnPublishProjectProps,
+  UnPublishProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -339,9 +341,10 @@ export function usePublishProject({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const publishProject = ({ id }: PublishProjectProps) => {
+  const publishProject = ({ id, data }: PublishProjectProps) => {
     return PROJECTS.request({
       url: `${id}/publish`,
+      data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -367,11 +370,11 @@ export function useUnPublishProject({
   requestConfig = {
     method: 'POST',
   },
-}: UsePublishProjectProps) {
+}: UseUnPublishProjectProps) {
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const publishProject = ({ id }: PublishProjectProps) => {
+  const unpublishProject = ({ id }: UnPublishProjectProps) => {
     return PROJECTS.request({
       url: `${id}/unpublish`,
       headers: {
@@ -381,7 +384,7 @@ export function useUnPublishProject({
     });
   };
 
-  return useMutation(publishProject, {
+  return useMutation(unpublishProject, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
       queryClient.invalidateQueries('projects');
