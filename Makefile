@@ -100,7 +100,7 @@ seed-geoapi-init-data:
 		table_name=`basename -s .sql "$$i"`; \
 		featureid=`docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+		cat api/apps/api/test/fixtures/features/$${table_name}.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) sh -c 'sed -e "s/\$$feature_id/$$featureid/g" | psql -U "${GEO_POSTGRES_USER}"'; \
 		done;
 
 # need notebook service to execute a specific notebook. this requires a full geodb
