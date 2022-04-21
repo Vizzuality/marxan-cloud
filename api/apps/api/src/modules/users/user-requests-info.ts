@@ -6,4 +6,3 @@ export interface UsersRequest extends AppInfoDTO {
     nameSearch?: string;
   } & AppInfoDTO['params'];
 }
-
