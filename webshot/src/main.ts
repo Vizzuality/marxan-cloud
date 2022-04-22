@@ -10,6 +10,7 @@ import config from "config";
 import helmet from "helmet";
 import { generateSummaryReportForScenario } from "./domain/solutions-report/solutions-report";
 import { generatePngImageFromBlmData } from "./domain/blm-previews/png-image";
+import { generatePngImageFromPublishedProjectData } from "./domain/published-project-maps/published-projects-maps";
 
 const app: Application = express();
 const daemonListenPort = config.get("port");
@@ -37,6 +38,16 @@ app.post(
   "/projects/:projectId/scenarios/:scenarioId/calibration/maps/preview/:blmValue",
   async (req: Request, res: Response, next: NextFunction) => {
     await generatePngImageFromBlmData(req, res).catch((error) => {
+      console.error(error);
+      next(error);
+    });
+  }
+);
+
+app.post(
+  "/projects/:projectId/scenarios/:scenarioId/published-projects/frequency",
+  async (req: Request, res: Response, next: NextFunction) => {
+    await generatePngImageFromPublishedProjectData(req, res).catch((error) => {
       console.error(error);
       next(error);
     });
