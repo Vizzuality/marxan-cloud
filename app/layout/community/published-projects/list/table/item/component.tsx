@@ -4,8 +4,6 @@ import Link from 'next/link';
 
 // import { format } from 'd3';
 
-import { useProjectUsers } from 'hooks/project-users';
-
 import DuplicateButton from 'layout/community/published-projects/list/table/duplicate-button/component';
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -25,7 +23,6 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   // resources,
   // company,
 }: PublishedItemProps) => {
-  const { data: projectUsers } = useProjectUsers(id);
   const creatorsSize = 3;
   const creatorsVisible = creators?.slice(0, creatorsSize);
 
@@ -46,12 +43,12 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
           const { id: userId, displayName } = u;
 
           return (
-            <p key={`${userId}`}>{displayName}</p>
+            <p className="whitespace-nowrap" key={`${userId}`}>{displayName}</p>
           );
         })}
-        {projectUsers?.length > creatorsSize && (
+        {creators?.length > creatorsSize && (
           <p>
-            {`(+${projectUsers.length - creatorsSize})`}
+            {`(+${creators.length - creatorsSize})`}
           </p>
         )}
       </td>

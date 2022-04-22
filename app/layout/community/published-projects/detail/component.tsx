@@ -4,11 +4,8 @@ import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 
-import { useProjectUsers } from 'hooks/project-users';
 import { usePublishedProject } from 'hooks/published-projects';
-import { useScenarios } from 'hooks/scenarios';
 
-import PublishedProjectMap from 'layout/community/published-projects/detail/map';
 import Share from 'layout/community/published-projects/detail/share';
 import DuplicateButton from 'layout/community/published-projects/list/table/duplicate-button';
 import ComingSoon from 'layout/help/coming-soon';
@@ -26,10 +23,6 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const { query } = useRouter();
   const { pid } = query;
 
-  const { data: projectUsers } = useProjectUsers(pid);
-  const projectUsersVisibleSize = 3;
-  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
-
   const {
     data: publishedProject,
     isFetching: publishedProjectIsFetching,
@@ -37,21 +30,15 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   } = usePublishedProject(pid);
 
   const {
-    data: publishedProjectScenarios,
-    isFetching: publishedProjectScenariosIsFetching,
-    isFetched: publishedProjectScenariosIsFetched,
-  } = useScenarios(pid, {
-    filters: {
-      projectId: pid,
-    },
-    sort: '-lastModifiedAt',
-  });
+    creators,
+  } = publishedProject;
+
+  const creatorsVisibleSize = 3;
+  const creatorsVisible = creators?.slice(0, creatorsVisibleSize);
 
   const {
     id, description, name, planningAreaName, timesDuplicated,
   } = publishedProject || {};
-
-  const scenarios = publishedProjectScenarios || [];
 
   const planningArea = planningAreaName || 'Custom';
 
@@ -63,8 +50,9 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
           <Backlink href="/community/projects">
             Projects
           </Backlink>
+
           <div className="relative" style={{ minHeight: 600 }}>
-            {publishedProject && scenarios && (
+            {publishedProject && (
               <div className="flex flex-row">
                 <div className="w-7/12 pr-12">
 
@@ -100,13 +88,11 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                     <div>
                       <h3 className="mb-5 text-sm font-semibold">Contributors</h3>
-                      {!!projectUsersVisible?.length && (
+                      {!!creatorsVisible?.length && (
                         <div className="space-y-4">
-                          {projectUsersVisible.map((u) => {
+                          {creatorsVisible.map((u) => {
                             const {
-                              user: {
-                                email, displayName, id: userId, avatarDataUrl,
-                              },
+                              displayName, id: userId, avatarDataUrl,
                             } = u;
 
                             return (
@@ -114,19 +100,19 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                                 <Avatar
                                   className="text-sm text-white uppercase border bg-primary-700"
                                   bgImage={avatarDataUrl}
-                                  name={displayName || email}
+                                  name={displayName}
                                 >
-                                  {!avatarDataUrl && (displayName || email).slice(0, 2)}
+                                  {!avatarDataUrl && (displayName).slice(0, 2)}
                                 </Avatar>
-                                <p className="text-sm">{(displayName || email)}</p>
+                                <p className="text-sm">{(displayName)}</p>
                               </div>
                             );
                           })}
-                          {projectUsers?.length > projectUsersVisibleSize && (
+                          {creators?.length > creatorsVisibleSize && (
                             <div className="flex flex-row items-center space-x-2.5">
                               <Avatar className="text-sm text-white uppercase border bg-primary-700" />
                               <p className="text-sm">
-                                {`(+${projectUsers.length - projectUsersVisibleSize})`}
+                                {`(+${creators.length - creatorsVisibleSize})`}
                               </p>
                             </div>
                           )}
@@ -139,22 +125,6 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       <p className="text-lg">{planningArea}</p>
                     </div>
 
-                    {!!scenarios.length && (
-                      <div>
-                        <h3 className="mb-6 text-sm font-semibold">Scenarios</h3>
-                        <p className="text-sm">
-                          {scenarios?.length}
-                          {' '}
-                          scenarios
-                        </p>
-                        <p className="text-sm">
-                          Last creation:
-                          {' '}
-                          {scenarios[0].lastUpdateDistance}
-                        </p>
-                      </div>
-                    )}
-
                     <Share />
 
                   </div>
@@ -164,7 +134,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   className="w-5/12 mt-6"
                   style={{ maxHeight: 500 }}
                 >
-                  <PublishedProjectMap />
+                  <div
+                    className="bg-primary-500 rounded-xl"
+                    style={{
+                      width: 500,
+                      height: 500,
+                    }}
+                  />
                 </div>
 
               </div>
@@ -176,8 +152,8 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-50 bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
         visible={
-          publishedProjectIsFetching && publishedProjectScenariosIsFetching
-          && !publishedProjectIsFetched && !publishedProjectScenariosIsFetched
+          publishedProjectIsFetching
+          && !publishedProjectIsFetched
         }
       />
 

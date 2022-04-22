@@ -26,7 +26,7 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
             <h4 className="text-sm text-left whitespace-nowrap">Name</h4>
           </th>
           <th className="py-2.5 pr-16 font-normal w-44">
-            <h4 className="text-sm text-left whitespace-nowrap">Creators</h4>
+            <h4 className="text-sm text-left whitespace-nowrap">Contributors</h4>
           </th>
           <th className="py-2.5 font-normal w-72">
             <div className="flex flex-row">
