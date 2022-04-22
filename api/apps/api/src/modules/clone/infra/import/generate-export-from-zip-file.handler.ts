@@ -164,6 +164,10 @@ export class GenerateExportFromZipFileHandler
       scenarios,
     } = exportConfigOrError.right as ProjectExportConfigContent;
 
+    if (resourceKind !== ResourceKind.Project) {
+      return left(invalidExportZipFile);
+    }
+
     const exportId = new ExportId(stringExportId);
     const previousExport = await this.exportRepo.find(exportId);
     if (previousExport) return right(exportId);
