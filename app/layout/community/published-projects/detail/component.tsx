@@ -37,7 +37,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const creatorsVisible = creators?.slice(0, creatorsVisibleSize);
 
   const {
-    id, description, name, planningAreaName, timesDuplicated,
+    id, description, name, planningAreaName, timesDuplicated, company,
   } = publishedProject || {};
 
   const planningArea = planningAreaName || 'Custom';
@@ -124,6 +124,15 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       <h3 className="mb-6 text-sm font-semibold">Planning area</h3>
                       <p className="text-lg">{planningArea}</p>
                     </div>
+
+                    {!!company && (
+                      <div>
+                        <h3 className="mb-6 text-sm font-semibold">Creator</h3>
+                        <div className="w-28">
+                          <img src={company.logoDataUrl} alt={company.name} className="max-w-full" />
+                        </div>
+                      </div>
+                    )}
 
                     <Share />
 

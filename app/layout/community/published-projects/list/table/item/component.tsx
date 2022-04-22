@@ -13,7 +13,7 @@ export interface PublishedItemProps {
   description: string;
   creators: Record<string, any>[];
   resources?: Record<string, any>[];
-  company?: Record<string, any>[];
+  company?: Record<string, any>;
 }
 export const PublishedItem: React.FC<PublishedItemProps> = ({
   id,
@@ -21,7 +21,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   description,
   creators,
   // resources,
-  // company,
+  company,
 }: PublishedItemProps) => {
   const creatorsSize = 3;
   const creatorsVisible = creators?.slice(0, creatorsSize);
@@ -31,11 +31,20 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="pr-16 py-5">
         <div className="w-24 h-24 bg-primary-200 rounded-xl" />
       </td>
+
       <td className="pr-16 py-5">
         <Link href={`/community/projects/${id}`}>
           <a href={`/community/projects/${id}`} className="pb-1 font-semibold hover:underline">{name}</a>
         </Link>
         <p className="text-sm leading-normal text-gray-400 clamp-2">{description}</p>
+      </td>
+
+      <td className="pr-16 py-5">
+        <div className="w-28">
+          {!!company && (
+            <img src={company.logoDataUrl} alt={company.name} className="max-w-full" />
+          )}
+        </div>
       </td>
 
       <td className="pr-16 text-sm">

@@ -25,10 +25,13 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
           <th className="py-2.5 pr-16 font-normal w-full">
             <h4 className="text-sm text-left whitespace-nowrap">Name</h4>
           </th>
-          <th className="py-2.5 pr-16 font-normal w-44">
+          <th className="py-2.5 pr-16 font-normal">
+            <h4 className="text-sm text-left whitespace-nowrap">Creator</h4>
+          </th>
+          <th className="py-2.5 pr-16 font-normal">
             <h4 className="text-sm text-left whitespace-nowrap">Contributors</h4>
           </th>
-          <th className="py-2.5 font-normal w-72">
+          <th className="py-2.5 font-normal">
             <div className="flex flex-row">
               <h4 className="text-sm text-left whitespace-nowrap">Copy to my account</h4>
               <Icon icon={ARROW_DOWN_SVG} className="w-3.5 h-3.5 ml-2 text-white transform rotate-90" />
