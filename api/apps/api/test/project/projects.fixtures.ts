@@ -23,6 +23,8 @@ import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
+import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
@@ -82,6 +84,19 @@ export const getFixtures = async () => {
       );
       cleanups.push(cleanup);
       return projectId;
+    },
+    GivenScenarioWasCreated: async (projectId: string) => {
+      const result = await ScenariosTestUtils.createScenario(
+        app,
+        randomUserToken,
+        {
+          name: `Test scenario`,
+          type: ScenarioType.marxan,
+          projectId,
+        },
+      );
+
+      return result.data.id;
     },
     GivenPublicProjectWasCreated: async () => {
       const { projectId, cleanup } = await GivenProjectExists(
@@ -179,6 +194,8 @@ export const getFixtures = async () => {
             company: null,
             resources: null,
             creators: null,
+            location: null,
+            pngData: null,
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -207,6 +224,7 @@ export const getFixtures = async () => {
               },
             ],
             resources: [{ title: expect.any(String), url: expect.any(String) }],
+            location: expect.any(String),
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -253,15 +271,18 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}`)
         .set('Authorization', `Bearer ${notIncludedUserToken}`),
-    WhenPublishingAProject: async (projectId: string) =>
+    WhenPublishingAProject: async (projectId: string, scenarioId: string) =>
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/publish`)
         .send({
           name: 'example project',
           description: 'fake description',
+          location: 'fake location',
           company: { name: 'logo', logoDataUrl: blmImageMock },
           creators: [{ displayName: 'fake name', avatarDataUrl: blmImageMock }],
           resources: [{ title: 'fake url', url: 'http://www.example.com' }],
+          config: { baseUrl: 'example/png', cookie: 'randomCookie' },
+          scenarioId,
         })
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>
