@@ -156,6 +156,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
           </Tooltip>
 
           <Modal
+            id="publish-project-modal"
             dismissable
             open={modal}
             size="narrow"

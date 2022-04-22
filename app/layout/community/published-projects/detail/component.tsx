@@ -142,7 +142,6 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                     }}
                   />
                 </div>
-
               </div>
             )}
           </div>

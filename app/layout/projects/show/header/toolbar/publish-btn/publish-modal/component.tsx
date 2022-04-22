@@ -30,6 +30,8 @@ import Map from 'components/map';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
+import CompanyUploader from './company-uploader';
+
 const resourcesValidator = (value) => {
   if (!value) return 'Error';
 
@@ -113,6 +115,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
       creators: PROJECT_CREATORS,
       resources: [],
       scenarioId: null,
+      company: null,
     };
   }, [projectData, PROJECT_CREATORS]);
 
@@ -179,7 +182,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
       onSubmit={onSubmit}
       initialValues={INITIAL_VALUES}
     >
-      {({ handleSubmit, values }) => (
+      {({ form, handleSubmit, values }) => (
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
@@ -253,6 +256,26 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                   ))}
                 </Field>
               )}
+            </FieldRFF>
+          </div>
+
+          <div className="mt-8">
+            <FieldRFF
+              name="company"
+            >
+              {(fprops) => {
+                return (
+                  <div>
+                    <Label theme="light" className="mb-3 uppercase">Company</Label>
+
+                    <CompanyUploader
+                      form={form}
+                      input={fprops.input}
+                      reset={() => fprops.input.onChange(null)}
+                    />
+                  </div>
+                );
+              }}
             </FieldRFF>
           </div>
 
