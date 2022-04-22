@@ -1,6 +1,8 @@
-import { SpecificationOperation } from '@marxan-api/modules/specification';
-import { SpecificationFeature } from '@marxan-api/modules/specification/adapters/specification-feature';
-import { FeatureSubSet } from '@marxan-api/modules/specification/domain';
+import {
+  FeatureSubSet,
+  SpecificationFeature,
+  SpecificationOperation,
+} from '@marxan/specification';
 
 export const featuresSpecificationRelativePath = `features-specification.json`;
 

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppConfig } from '../../../apps/api/src/utils/config.utils';
+import { AppConfig } from '@marxan-api/utils/config.utils';
 import {
   CloningFilesRepository,
   CloningStoragePath,

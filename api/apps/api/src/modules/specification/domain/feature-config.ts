@@ -1,20 +1,9 @@
-export enum SpecificationOperation {
-  Split = 'split',
-  Stratification = 'stratification',
-  Copy = 'copy',
-}
+import { FeatureSubSet, SpecificationOperation } from '@marxan/specification';
 
 export interface FeatureState {
   id?: string;
   featureId: string;
   calculated: boolean;
-}
-
-export interface FeatureSubSet {
-  value: string;
-  target?: number;
-  fpf?: number;
-  prop?: number;
 }
 
 interface FeatureConfigBase {

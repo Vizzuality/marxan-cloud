@@ -5,7 +5,6 @@ import { Test } from '@nestjs/testing';
 import {
   FeatureConfigSplit,
   Specification,
-  SpecificationOperation,
   SpecificationPublished,
 } from '../../domain';
 
@@ -14,6 +13,7 @@ import { DetermineFeaturesHandler } from '../determine-features.handler';
 import { SpecificationRepository } from '../specification.repository';
 
 import { InMemorySpecificationRepo } from './in-memory-specification.repo';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = async () => {
   const events: IEvent[] = [];

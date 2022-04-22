@@ -4,11 +4,9 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenScenarioExists } from '../steps/given-scenario-exists';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
-import {
-  Specification,
-  SpecificationOperation,
-} from '@marxan-api/modules/specification/domain';
+import { Specification } from '@marxan-api/modules/specification/domain';
 import { bootstrapApplication } from '../utils/api-application';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();

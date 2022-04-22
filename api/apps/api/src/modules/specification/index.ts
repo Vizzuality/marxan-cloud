@@ -15,7 +15,6 @@ export { SpecificationGotReady } from './domain/events/specification-got-ready.e
 export { SpecificationPublished } from './domain/events/specification-published.event';
 export {
   FeatureConfigInput,
-  SpecificationOperation,
   FeatureConfigSplit,
   FeatureConfigCopy,
   FeatureConfigStratification,

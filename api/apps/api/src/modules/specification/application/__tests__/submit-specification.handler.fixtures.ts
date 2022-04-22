@@ -10,13 +10,11 @@ import {
   SubmitSpecification,
   SubmitSpecificationError,
 } from '../submit-specification.command';
-import {
-  SpecificationCandidateCreated,
-  SpecificationOperation,
-} from '../../domain';
+import { SpecificationCandidateCreated } from '../../domain';
 
 import { InMemorySpecificationRepo } from './in-memory-specification.repo';
 import { SpecificationFeatureStratification } from '../specification-input';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = async () => {
   const scenarioId = v4();

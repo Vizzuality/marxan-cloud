@@ -2,11 +2,11 @@ import { v4 } from 'uuid';
 import {
   FeatureConfigSplit,
   FeatureConfigStratification,
-  SpecificationOperation,
 } from '../../feature-config';
 import { Specification } from '../../specification';
 import { SpecificationPublished } from '../../events/specification-published.event';
 import { SpecificationGotReady } from '../../events/specification-got-ready.event';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = () => {
   const scenarioId = v4();

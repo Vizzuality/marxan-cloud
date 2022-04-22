@@ -6,8 +6,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { SpecificationApiEntity } from './specification.api.entity';
-import { FeatureSubSet, SpecificationOperation } from '../domain';
-import { SpecificationFeature } from './specification-feature';
+
+import {
+  FeatureSubSet,
+  SpecificationFeature,
+  SpecificationOperation,
+} from '@marxan/specification';
 
 @Entity(`specification_feature_configs`)
 export class SpecificationFeatureConfigApiEntity {

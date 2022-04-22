@@ -7,7 +7,7 @@ import {
   SpecificationFeatureStratification,
   SpecificationInput,
 } from './specification-input';
-import { SpecificationOperation } from '../domain/feature-config';
+import { SpecificationOperation } from '@marxan/specification';
 
 test(`valid values`, () => {
   const errors = validateSync(

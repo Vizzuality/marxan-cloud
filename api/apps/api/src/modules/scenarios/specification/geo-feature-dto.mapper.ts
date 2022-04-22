@@ -10,11 +10,11 @@ import {
   SpecificationFeatureStratification,
 } from '@marxan-api/modules/specification/application/specification-input';
 import { plainToClass } from 'class-transformer';
-import { SpecificationOperation } from '@marxan-api/modules/specification/domain';
 import {
   GeoprocessingOpSplitV1,
   GeoprocessingOpStratificationV1,
 } from '@marxan-api/modules/geo-features/types/geo-feature.geoprocessing-operations.type';
+import { SpecificationOperation } from '@marxan/specification';
 
 @Injectable()
 export class GeoFeatureDtoMapper {

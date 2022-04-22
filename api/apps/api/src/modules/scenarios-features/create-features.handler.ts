@@ -5,7 +5,7 @@ import {
 } from '@nestjs/cqrs';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
-import { SpecificationOperation } from '@marxan-api/modules/specification';
+
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { API_EVENT_KINDS } from '@marxan/api-events';
@@ -14,6 +14,7 @@ import { FeaturesCreated } from './features-created.event';
 import { CopyOperation } from './copy';
 import { SplitOperation } from './split';
 import { StratificationOperation } from './stratification';
+import { SpecificationOperation } from '@marxan/specification';
 
 @CommandHandler(CreateFeaturesCommand)
 export class CreateFeaturesHandler

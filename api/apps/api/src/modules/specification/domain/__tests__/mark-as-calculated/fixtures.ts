@@ -3,9 +3,9 @@ import { Specification } from '../../specification';
 import {
   FeatureConfigSplit,
   FeatureConfigStratification,
-  SpecificationOperation,
 } from '../../feature-config';
 import { SpecificationGotReady } from '../../events/specification-got-ready.event';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = () => {
   const scenarioId = v4();

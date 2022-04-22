@@ -7,7 +7,6 @@ import {
   FeatureConfigSplit,
   Specification,
   SpecificationGotReady,
-  SpecificationOperation,
 } from '../../domain';
 
 import { SpecificationRepository } from '../specification.repository';
@@ -16,6 +15,7 @@ import { CalculateFeatures } from '../calculate-features.command';
 import { CalculateFeaturesHandler } from '../calculate-features.handler';
 
 import { InMemorySpecificationRepo } from './in-memory-specification.repo';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = async () => {
   const events: IEvent[] = [];
