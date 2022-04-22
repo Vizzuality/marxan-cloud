@@ -63,6 +63,22 @@ export interface UsePublishProjectProps {
 
 export interface PublishProjectProps {
   id: string | string[];
+  data: {
+    name: string;
+    description: string;
+    creators?: Record<string, any>[];
+    resources?: Record<string, any>[];
+    company?: Record<string, any>;
+  };
+}
+
+// useUnPublishProject
+export interface UseUnPublishProjectProps {
+  requestConfig?: AxiosRequestConfig;
+}
+
+export interface UnPublishProjectProps {
+  id: string | string[];
 }
 
 // UseSaveProjectDownloadProps,

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 
 import { withUser } from 'hoc/auth';
 
-import PublishedProjects from 'layout/community/published-projects';
+import PublishedProjects from 'layout/community/published-projects/list';
 import Footer from 'layout/footer';
 import Head from 'layout/head';
 import Header from 'layout/header';

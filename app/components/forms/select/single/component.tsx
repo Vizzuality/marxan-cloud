@@ -200,7 +200,10 @@ export const SingleSelect: React.FC<SelectProps> = ({
             invisible: !isOpen,
           })}
           ref={menuRef}
-          style={styles.popper}
+          style={{
+            ...styles.popper,
+            zIndex: 9999,
+          }}
           {...attributes.popper}
         >
           <Menu

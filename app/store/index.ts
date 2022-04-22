@@ -3,6 +3,7 @@ import projects from 'store/slices/projects';
 import projectsDetail from 'store/slices/projects/[id]';
 import projectsNew from 'store/slices/projects/new';
 import reportsBlm from 'store/slices/reports/blm';
+import reportsFrequency from 'store/slices/reports/frequency';
 import reportsSolutions from 'store/slices/reports/solutions';
 
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
@@ -15,6 +16,7 @@ const staticReducers = {
   '/community/projects': communityProjects,
   '/reports/solutions': reportsSolutions,
   '/reports/blm': reportsBlm,
+  '/reports/frequency': reportsFrequency,
 };
 
 const asyncReducers = {

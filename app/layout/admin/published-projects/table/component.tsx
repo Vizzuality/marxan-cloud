@@ -49,8 +49,8 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         sortDescFirst: true,
       },
       {
-        Header: 'Owner',
-        accessor: 'owner',
+        Header: 'Owners',
+        accessor: 'owners',
         className: 'text-sm leading-none',
         disableSortBy: true,
         Cell: Owner,

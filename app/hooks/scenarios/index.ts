@@ -351,7 +351,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 
       return pageData.map((d): ItemProps => {
         const {
-          id, projectId, name, lastModifiedAt, status,
+          id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns,
         } = d;
 
         const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
@@ -384,6 +384,8 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
           runStatus,
           jobs,
           lock,
+          ranAtLeastOnce,
+          numberOfRuns,
           onEdit: () => {
             push(`/projects/${projectId}/scenarios/${id}/edit`);
           },

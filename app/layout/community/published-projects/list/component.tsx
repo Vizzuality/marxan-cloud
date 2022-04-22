@@ -8,14 +8,12 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import { usePublishedProjects } from 'hooks/published-projects';
 
-import PublishedItem from 'layout/community/published-projects/item';
 import Wrapper from 'layout/wrapper';
 
-import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Search from 'components/search';
 
-import ARROW_DOWN_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
+import CommunityProjectsTable from './table';
 
 export interface CommunityProjectsListProps {
 
@@ -73,49 +71,7 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
               </div>
             )}
 
-            {publishedProjectsData && (
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="py-12 font-normal w-96">
-                      <h4 className="text-sm text-left">Name</h4>
-                    </th>
-                    <th className="py-12 font-normal w-44">
-                      <h4 className="text-sm text-left">Planning area</h4>
-                    </th>
-                    <th className="py-12 font-normal w-44">
-                      <h4 className="text-sm text-left">Contributors</h4>
-                    </th>
-                    <th className="py-12 font-normal w-72">
-                      <div className="flex flex-row">
-                        <h4 className="text-sm text-left">Duplicated</h4>
-                        <Icon icon={ARROW_DOWN_SVG} className="w-3.5 h-3.5 ml-2 text-white transform rotate-90" />
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {publishedProjectsData.map((pp) => {
-                    const {
-                      id: pid, name, description, area, timesDuplicated, contributors,
-                    } = pp;
-
-                    return (
-                      <PublishedItem
-                        key={pid}
-                        id={pid}
-                        name={name}
-                        description={description}
-                        area={area}
-                        contributors={contributors}
-                        timesDuplicated={timesDuplicated}
-                      />
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+            <CommunityProjectsTable data={publishedProjectsData} />
           </div>
         </div>
       </Wrapper>

@@ -6,7 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 
-import { PublishedItemProps } from 'layout/community/published-projects/item/component';
+import { PublishedItemProps } from 'layout/community/published-projects/list/table/item/component';
 
 import PUBLISHED_PROJECTS from 'services/published-projects';
 
@@ -62,21 +62,16 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d): PublishedItemProps => {
         const {
-          id, name, description, planningAreaName, timesDuplicated,
+          id, name, description, creators, resources, company,
         } = d;
-
-        const contributors = [
-          { id: 1, name: '', bgImage: '' },
-          { id: 2, name: '', bgImage: '' },
-        ];
 
         return {
           id,
           name,
-          area: planningAreaName,
           description,
-          timesDuplicated,
-          contributors,
+          creators,
+          resources,
+          company,
         };
       });
     })) : [];
