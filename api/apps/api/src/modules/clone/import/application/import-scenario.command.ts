@@ -30,7 +30,6 @@ export class ImportScenario extends Command<
   constructor(
     public readonly exportId: ExportId,
     public readonly ownerId: UserId,
-    public readonly importResourceId: ResourceId,
   ) {
     super();
   }

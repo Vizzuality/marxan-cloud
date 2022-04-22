@@ -1,4 +1,4 @@
-import { ResourceId, ResourceKind } from '@marxan/cloning/domain';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { Injectable } from '@nestjs/common';
 import { ICommand, ofType, Saga } from '@nestjs/cqrs';
@@ -10,29 +10,17 @@ import { ImportProject } from '../../import/application/import-project.command';
 import { ImportScenario } from '../../import/application/import-scenario.command';
 import { MarkExportAsFinished } from './mark-export-as-finished.command';
 
-type CommandMapper = (
-  exportId: ExportId,
-  ownerId: string,
-  importResourceId: string,
-) => ICommand;
+type CommandMapper = (exportId: ExportId, ownerId: string) => ICommand;
 
 @Injectable()
 export class ArchiveReadySaga {
   constructor(private readonly exportRepository: ExportRepository) {}
 
   private commandMapper: Record<ResourceKind, CommandMapper> = {
-    project: (exportId: ExportId, ownerId: string, importResourceId: string) =>
-      new ImportProject(
-        exportId,
-        new UserId(ownerId),
-        new ResourceId(importResourceId),
-      ),
-    scenario: (exportId: ExportId, ownerId: string, importResourceId: string) =>
-      new ImportScenario(
-        exportId,
-        new UserId(ownerId),
-        new ResourceId(importResourceId),
-      ),
+    project: (exportId: ExportId, ownerId: string) =>
+      new ImportProject(exportId, new UserId(ownerId)),
+    scenario: (exportId: ExportId, ownerId: string) =>
+      new ImportScenario(exportId, new UserId(ownerId)),
   };
 
   private async getCommands(event: ArchiveReady) {
@@ -40,22 +28,14 @@ export class ArchiveReadySaga {
 
     if (!exportInstance) throw new Error('cant find export');
 
-    const {
-      resourceKind,
-      importResourceId,
-      ownerId,
-    } = exportInstance.toSnapshot();
+    const { resourceKind, ownerId } = exportInstance.toSnapshot();
 
     if (!exportInstance.isCloning())
       return [new MarkExportAsFinished(event.exportId)];
 
-    if (!importResourceId)
-      throw new Error('When cloning importResourceId should be ready');
-
     const importCommand = this.commandMapper[resourceKind](
       event.exportId,
       ownerId,
-      importResourceId,
     );
 
     return [new MarkExportAsFinished(event.exportId), importCommand];

@@ -43,16 +43,9 @@ export class ImportScenarioHandler
   async execute({
     exportId,
     ownerId,
-    importResourceId,
   }: ImportScenario): Promise<
     Either<ImportScenarioError, ImportScenarioCommandResult>
   > {
-    const scenario = await this.scenarioRepo.findOne(importResourceId.value);
-
-    if (!scenario) {
-      return left(scenarioShellNotFound);
-    }
-
     const exportInstance = await this.exportRepo.find(exportId);
 
     if (!exportInstance) {
@@ -63,8 +56,19 @@ export class ImportScenarioHandler
       return left(unfinishedExport);
     }
 
-    if (exportInstance.resourceKind !== ResourceKind.Scenario) {
+    if (
+      exportInstance.resourceKind !== ResourceKind.Scenario ||
+      exportInstance.importResourceId === undefined
+    ) {
       return left(invalidProjectExport);
+    }
+
+    const { importResourceId } = exportInstance;
+
+    const scenario = await this.scenarioRepo.findOne(importResourceId.value);
+
+    if (!scenario) {
+      return left(scenarioShellNotFound);
     }
 
     const isCloning = true;

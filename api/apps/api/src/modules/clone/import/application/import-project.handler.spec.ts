@@ -5,10 +5,6 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  Failure as ArchiveFailure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
 import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -174,22 +170,6 @@ const getFixtures = async () => {
   };
 };
 
-class FakeExportConfigReader {
-  mock: jest.MockedFunction<
-    ExportConfigReader['read']
-  > = jest
-    .fn()
-    .mockResolvedValue(
-      right({ resourceKind: ResourceKind.Project } as ExportConfigContent),
-    );
-
-  async read(
-    archive: ArchiveLocation,
-  ): Promise<Either<ArchiveFailure, ExportConfigContent>> {
-    return this.mock(archive);
-  }
-}
-
 class FakeExportRepository implements ExportRepository {
   public returnUnfinishedExport = false;
 
@@ -207,6 +187,8 @@ class FakeExportRepository implements ExportRepository {
       resourceId: v4(),
       resourceKind: ResourceKind.Project,
       archiveLocation: this.returnUnfinishedExport ? '' : '/tmp/foo/bar.zip',
+      foreignExport: false,
+      createdAt: new Date(),
     });
   }
 

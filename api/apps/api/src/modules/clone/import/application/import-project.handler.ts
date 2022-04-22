@@ -35,7 +35,6 @@ export class ImportProjectHandler
   async execute({
     exportId,
     ownerId,
-    importResourceId,
   }: ImportProject): Promise<
     Either<ImportProjectError, ImportProjectCommandResult>
   > {
@@ -53,8 +52,8 @@ export class ImportProjectHandler
       return left(invalidProjectExport);
     }
 
-    const resourceId = importResourceId ?? ResourceId.create();
-    const isCloning = Boolean(importResourceId);
+    const resourceId = exportInstance.importResourceId ?? ResourceId.create();
+    const isCloning = Boolean(exportInstance.importResourceId);
 
     const projectId = resourceId;
     const oldProjectId = exportInstance.resourceId;

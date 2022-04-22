@@ -1,25 +1,15 @@
 import {
-  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  Failure as ArchiveFailure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
-import {
-  ExportConfigContent,
-  ProjectExportConfigContent,
-  ScenarioExportConfigContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
+import { Either, isLeft, isRight, Right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { Scenario } from '../../../scenarios/scenario.api.entity';
@@ -37,7 +27,6 @@ import {
   PieceImportRequested,
 } from '../domain';
 import { ImportComponentStatuses } from '../domain/import/import-component-status';
-import { ExportConfigReader } from './export-config-reader';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import {
   ImportScenario,
@@ -110,6 +99,8 @@ const getFixtures = async () => {
   );
   const importResourceId = ResourceId.create();
 
+  exportRepo.importResourceId = importResourceId.value;
+
   return {
     GivenAnUnfinishedExport: () => {
       exportRepo.returnUnfinishedExport = true;
@@ -121,9 +112,7 @@ const getFixtures = async () => {
       importResourcePieces.mockEqualPieces();
     },
     WhenRequestingImport: async () => {
-      return sut.execute(
-        new ImportScenario(ExportId.create(), ownerId, importResourceId),
-      );
+      return sut.execute(new ImportScenario(ExportId.create(), ownerId));
     },
     ThenRequestImportIsSaved: (
       importResult: PromiseType<ReturnType<ImportScenarioHandler['execute']>>,
@@ -188,23 +177,6 @@ const getFixtures = async () => {
   };
 };
 
-class FakeExportConfigReader {
-  mock: jest.MockedFunction<
-    ExportConfigReader['read']
-  > = jest.fn().mockResolvedValue(
-    right({
-      resourceKind: ResourceKind.Scenario,
-      projectId: v4(),
-    } as ExportConfigContent),
-  );
-
-  async read(
-    location: ArchiveLocation,
-  ): Promise<Either<ArchiveFailure, ExportConfigContent>> {
-    return this.mock(location);
-  }
-}
-
 class FakeScenarioRepository {
   async findOne() {
     return {
@@ -215,6 +187,7 @@ class FakeScenarioRepository {
 
 class FakeExportRepository implements ExportRepository {
   public returnUnfinishedExport = false;
+  public importResourceId: string = '';
 
   async save(exportInstance: Export): Promise<Either<SaveError, Success>> {
     throw new Error('Method not implemented.');
@@ -228,6 +201,9 @@ class FakeExportRepository implements ExportRepository {
       resourceId: v4(),
       resourceKind: ResourceKind.Scenario,
       archiveLocation: this.returnUnfinishedExport ? '' : '/tmp/foo/bar.zip',
+      createdAt: new Date(),
+      foreignExport: false,
+      importResourceId: this.importResourceId,
     });
   }
 
