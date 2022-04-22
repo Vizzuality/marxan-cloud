@@ -77,7 +77,7 @@ export class WebshotService {
     try {
       const pngBuffer = await this.httpService
         .post(
-          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/published-project/frequency`,
+          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/published-projects/frequency`,
           config,
           { responseType: 'arraybuffer' },
         )
