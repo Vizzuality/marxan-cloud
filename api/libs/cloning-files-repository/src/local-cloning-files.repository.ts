@@ -85,7 +85,7 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
   }
 
   async deleteExportFolder(exportId: string): Promise<void> {
-    const path = `${exportId}`;
+    const path = `${this.storagePath}/${exportId}`;
 
     rmSync(path, { recursive: true, force: true });
   }

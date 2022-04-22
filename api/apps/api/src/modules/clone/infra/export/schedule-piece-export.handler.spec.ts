@@ -125,12 +125,15 @@ const getFixtures = async () => {
         resourceId,
         ClonePiece.ProjectMetadata,
       );
+      const cloning = false;
+      const foreignExport = false;
       const exportInstance = Export.newOne(
         resourceId,
         ResourceKind.Project,
         ownerId,
         [exportComponent],
-        false,
+        cloning,
+        foreignExport,
       );
       await exportRepo.save(exportInstance);
 

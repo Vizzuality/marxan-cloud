@@ -92,6 +92,8 @@ const getFixtures = async () => {
       componentId = ComponentId.create();
       componentLocationUri = '/foo/bar/project-metadata.json';
       componentLocationRelativePath = 'project-metadata.json';
+      const cloning = false;
+      const foreignExport = false;
       const exportInstance = Export.newOne(
         resourceId,
         ResourceKind.Project,
@@ -110,7 +112,8 @@ const getFixtures = async () => {
             ],
           }),
         ],
-        false,
+        cloning,
+        foreignExport,
       );
       exportId = exportInstance.id;
       await repo.save(exportInstance);
@@ -136,12 +139,16 @@ const getFixtures = async () => {
         }),
       );
 
+      const cloning = false;
+      const foreignExport = false;
+
       const exportInstance = Export.newOne(
         resourceId,
         ResourceKind.Project,
         new UserId(ownerId),
         components,
-        false,
+        cloning,
+        foreignExport,
       );
       exportId = exportInstance.id;
       await repo.transaction(async (repository) => {
