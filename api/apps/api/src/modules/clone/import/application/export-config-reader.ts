@@ -3,12 +3,6 @@ import {
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  archiveCorrupted,
-  ArchiveReader,
-  Failure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ExportConfigContent,
@@ -22,10 +16,17 @@ import { validate } from 'class-validator';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 
+export const zipFileDoesNotContainsExportConfig = Symbol(
+  "zip file doesn't contain export config",
+);
+export const invalidExportConfigFile = Symbol('invalid export config file');
+
+export type ExportConfigReaderError =
+  | typeof invalidExportConfigFile
+  | typeof zipFileDoesNotContainsExportConfig;
+
 @Injectable()
 export class ExportConfigReader {
-  constructor() {}
-
   convertToClass(
     exportConfig: ExportConfigContent,
   ): ProjectExportConfigContent | ScenarioExportConfigContent {
@@ -38,13 +39,14 @@ export class ExportConfigReader {
 
   async read(
     zipReadable: Readable,
-  ): Promise<Either<Failure, ExportConfigContent>> {
+  ): Promise<Either<ExportConfigReaderError, ExportConfigContent>> {
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ExportConfig,
     );
 
     const exportConfigOrError = await extractFile(zipReadable, relativePath);
-    if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
+    if (isLeft(exportConfigOrError))
+      return left(zipFileDoesNotContainsExportConfig);
 
     try {
       const exportConfigSnapshot: ExportConfigContent = JSON.parse(
@@ -54,11 +56,11 @@ export class ExportConfigReader {
       const exportConfig = this.convertToClass(exportConfigSnapshot);
 
       const validationErrors = await validate(exportConfig);
-      if (validationErrors.length > 0) return left(invalidFiles);
+      if (validationErrors.length > 0) return left(invalidExportConfigFile);
 
       return right(exportConfig);
     } catch (error) {
-      return left(archiveCorrupted);
+      return left(zipFileDoesNotContainsExportConfig);
     }
   }
 }

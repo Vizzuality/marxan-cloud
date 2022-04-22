@@ -108,10 +108,6 @@ import {
   unknownError as fileRepositoryUnknownError,
   fileNotFound,
 } from '@marxan/cloning-files-repository';
-import {
-  archiveCorrupted,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';

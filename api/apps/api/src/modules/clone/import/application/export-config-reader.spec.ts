@@ -1,35 +1,21 @@
-import {
-  ArchiveLocation,
-  ClonePiece,
-  ResourceKind,
-} from '@marxan/cloning/domain';
-import {
-  archiveCorrupted,
-  ArchiveReader,
-  Failure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
+import { ClonePiece, ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ExportConfigContent,
   exportVersion,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { fileNotFound } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import * as archiver from 'archiver';
-import {
-  Either,
-  isLeft,
-  isRight,
-  left,
-  Left,
-  Right,
-  right,
-} from 'fp-ts/lib/Either';
+import { Either, isLeft, isRight, Left, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { v4 } from 'uuid';
-import { ExportConfigReader } from './export-config-reader';
+import {
+  ExportConfigReader,
+  ExportConfigReaderError,
+  invalidExportConfigFile,
+  zipFileDoesNotContainsExportConfig,
+} from './export-config-reader';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -38,16 +24,10 @@ describe('ExportConfigReader', () => {
     fixtures = await getFixtures();
   });
 
-  it('should fail when cant find archive', async () => {
-    const archiveLocation = fixtures.GivenNoArchive();
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
-    fixtures.ThenNotFoundErrorShouldBeReturned(result);
-  });
-
-  it('should fail when export config file is missing', async () => {
-    const archiveLocation = await fixtures.GivenArchiveMissingExportConfig();
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
-    fixtures.ThenArchiveCorruptedErrorShouldBeReturned(result);
+  it('should fail when zip file does not contain export config file', async () => {
+    const zipFile = await fixtures.GivenArchiveMissingExportConfig();
+    const result = await fixtures.WhenReadingExportConfig(zipFile);
+    fixtures.ThenZipFileDoesNotContainExportConfigErrorShouldBeReturned(result);
   });
 
   it('should fail when resource kind property of export config file has an invalid value', async () => {
@@ -61,12 +41,13 @@ describe('ExportConfigReader', () => {
       version: '1.0.0',
       description: 'description',
       isCloning: false,
+      exportId: v4(),
     };
-    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
+    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfig(
       invalidExportConfig,
     );
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
-    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+    const result = await fixtures.WhenReadingExportConfig(zipFile);
+    fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });
 
   it('should fail when pieces property of project export config file has an invalid value', async () => {
@@ -85,12 +66,13 @@ describe('ExportConfigReader', () => {
       version: '1.0.0',
       description: 'description',
       isCloning: false,
+      exportId: v4(),
     };
-    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
+    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfig(
       invalidExportConfig,
     );
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
-    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+    const result = await fixtures.WhenReadingExportConfig(zipFile);
+    fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });
 
   it('should fail when pieces property of scenario export config file has an invalid value', async () => {
@@ -104,35 +86,32 @@ describe('ExportConfigReader', () => {
       version: '1.0.0',
       description: 'description',
       isCloning: false,
+      exportId: v4(),
     };
-    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfig(
+    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfig(
       invalidExportConfig,
     );
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
-    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+    const result = await fixtures.WhenReadingExportConfig(zipFile);
+    fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });
 
   it('should fail when version property of export config file has an invalid value', async () => {
-    const archiveLocation = await fixtures.GivenArchiveWithInvalidExportConfigVersion();
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
-    fixtures.ThenInvalidFilesErrorShouldBeReturned(result);
+    const zipFile = await fixtures.GivenArchiveWithInvalidExportConfigVersion();
+    const result = await fixtures.WhenReadingExportConfig(zipFile);
+    fixtures.ThenInvalidExportConfigFileErrorShouldBeReturned(result);
   });
 
   it('should retrieve export config content', async () => {
-    const archiveLocation = await fixtures.GivenValidArchive();
-    const result = await fixtures.WhenReadingExportConfig(archiveLocation);
+    const zipFile = await fixtures.GivenValidArchive();
+    const result = await fixtures.WhenReadingExportConfig(zipFile);
     fixtures.ThenExportConfigShouldBeReturned(result);
   });
 });
 
 const getFixtures = async () => {
-  const archiveReaderGetMock = jest.fn();
   const sandbox = await Test.createTestingModule({
     imports: [],
-    providers: [
-      ExportConfigReader,
-      { provide: ArchiveReader, useValue: { get: archiveReaderGetMock } },
-    ],
+    providers: [ExportConfigReader],
   }).compile();
   await sandbox.init();
 
@@ -148,6 +127,7 @@ const getFixtures = async () => {
     },
     projectId: v4(),
     resourceId: v4(),
+    exportId: v4(),
     resourceKind: ResourceKind.Project,
     scenarios: [{ id: v4(), name: 'random scenario' }],
     version: exportVersion,
@@ -156,11 +136,7 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ExportConfigReader);
   return {
-    GivenNoArchive: () => {
-      archiveReaderGetMock.mockResolvedValue(left(fileNotFound));
-      return new ArchiveLocation('not found');
-    },
-    GivenArchiveMissingExportConfig: (): Promise<ArchiveLocation> => {
+    GivenArchiveMissingExportConfig: async (): Promise<Readable> => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
@@ -169,26 +145,13 @@ const getFixtures = async () => {
         name: 'foo.txt',
       });
 
-      return new Promise((resolve, reject) => {
-        const buffers: Buffer[] = [];
-        archive.on('data', (chunk) => {
-          buffers.push(chunk);
-        });
-        archive.on('finish', () => {
-          archiveReaderGetMock.mockResolvedValue(
-            right(Readable.from(Buffer.concat(buffers))),
-          );
-          resolve(new ArchiveLocation('invalid file'));
-        });
-        archive.on('error', function (err) {
-          reject(err);
-        });
-        archive.finalize();
-      });
+      await archive.finalize();
+
+      return archive;
     },
-    GivenArchiveWithInvalidExportConfig: (
+    GivenArchiveWithInvalidExportConfig: async (
       invalidExportConfig: ExportConfigContent,
-    ): Promise<ArchiveLocation> => {
+    ): Promise<Readable> => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
@@ -201,24 +164,11 @@ const getFixtures = async () => {
         name: relativePath,
       });
 
-      return new Promise((resolve, reject) => {
-        const buffers: Buffer[] = [];
-        archive.on('data', (chunk) => {
-          buffers.push(chunk);
-        });
-        archive.on('finish', () => {
-          archiveReaderGetMock.mockResolvedValue(
-            right(Readable.from(Buffer.concat(buffers))),
-          );
-          resolve(new ArchiveLocation('invalid export config property'));
-        });
-        archive.on('error', function (err) {
-          reject(err);
-        });
-        archive.finalize();
-      });
+      await archive.finalize();
+
+      return archive;
     },
-    GivenArchiveWithInvalidExportConfigVersion: (): Promise<ArchiveLocation> => {
+    GivenArchiveWithInvalidExportConfigVersion: async (): Promise<Readable> => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
@@ -233,24 +183,11 @@ const getFixtures = async () => {
         name: relativePath,
       });
 
-      return new Promise((resolve, reject) => {
-        const buffers: Buffer[] = [];
-        archive.on('data', (chunk) => {
-          buffers.push(chunk);
-        });
-        archive.on('finish', () => {
-          archiveReaderGetMock.mockResolvedValue(
-            right(Readable.from(Buffer.concat(buffers))),
-          );
-          resolve(new ArchiveLocation('invalid export config property'));
-        });
-        archive.on('error', function (err) {
-          reject(err);
-        });
-        archive.finalize();
-      });
+      await archive.finalize();
+
+      return archive;
     },
-    GivenValidArchive: (): Promise<ArchiveLocation> => {
+    GivenValidArchive: async (): Promise<Readable> => {
       const archive = archiver(`zip`, {
         zlib: { level: 9 },
       });
@@ -262,45 +199,29 @@ const getFixtures = async () => {
         name: relativePath,
       });
 
-      return new Promise((resolve, reject) => {
-        const buffers: Buffer[] = [];
-        archive.on('data', (chunk) => {
-          buffers.push(chunk);
-        });
-        archive.on('finish', () => {
-          archiveReaderGetMock.mockResolvedValue(
-            right(Readable.from(Buffer.concat(buffers))),
-          );
-          resolve(new ArchiveLocation('valid export config'));
-        });
-        archive.on('error', function (err) {
-          reject(err);
-        });
-        archive.finalize();
-      });
+      await archive.finalize();
+
+      return archive;
     },
-    WhenReadingExportConfig: async (archiveLocation: ArchiveLocation) =>
-      sut.read(archiveLocation),
-    ThenNotFoundErrorShouldBeReturned: (
-      result: Either<Failure, ExportConfigContent>,
+    WhenReadingExportConfig: async (zipFile: Readable) => sut.read(zipFile),
+    ThenZipFileDoesNotContainExportConfigErrorShouldBeReturned: (
+      result: Either<ExportConfigReaderError, ExportConfigContent>,
     ) => {
       expect(isLeft(result)).toBeTruthy();
-      expect((result as Left<Failure>).left).toBe(fileNotFound);
+      expect((result as Left<ExportConfigReaderError>).left).toBe(
+        zipFileDoesNotContainsExportConfig,
+      );
     },
-    ThenArchiveCorruptedErrorShouldBeReturned: (
-      result: Either<Failure, ExportConfigContent>,
+    ThenInvalidExportConfigFileErrorShouldBeReturned: (
+      result: Either<ExportConfigReaderError, ExportConfigContent>,
     ) => {
       expect(isLeft(result)).toBeTruthy();
-      expect((result as Left<Failure>).left).toBe(archiveCorrupted);
-    },
-    ThenInvalidFilesErrorShouldBeReturned: (
-      result: Either<Failure, ExportConfigContent>,
-    ) => {
-      expect(isLeft(result)).toBeTruthy();
-      expect((result as Left<Failure>).left).toBe(invalidFiles);
+      expect((result as Left<ExportConfigReaderError>).left).toBe(
+        invalidExportConfigFile,
+      );
     },
     ThenExportConfigShouldBeReturned: (
-      result: Either<Failure, ExportConfigContent>,
+      result: Either<ExportConfigReaderError, ExportConfigContent>,
     ) => {
       expect(isRight(result)).toBeTruthy();
       expect((result as Right<ExportConfigContent>).right).toEqual(

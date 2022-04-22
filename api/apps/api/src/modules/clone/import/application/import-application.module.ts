@@ -1,4 +1,3 @@
-import { ArchiveReaderModule } from '@marxan/cloning/infrastructure/archive-reader.module';
 import { Logger, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
