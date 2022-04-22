@@ -64,6 +64,12 @@ export class PublishedProjectService {
       return left(alreadyPublished);
     }
 
+    // @debt If we end up moving the scenario map thumbnail generation
+    // to the end of the Marxan run process, this part here regarding
+    // the webshot should be removed and/or adapted to it. It looks
+    // like it does not belong here at all anyways, but right now there
+    // is not a better place to deal with this.
+
     const webshotUrl = AppConfig.get('webshot.url') as string;
 
     const { scenarioId, config, ...projectWithoutScenario } = projectToPublish;
@@ -87,13 +93,12 @@ export class PublishedProjectService {
       );
     }
 
-    if (isRight(pngData)) {
-      await this.crudService.create({
-        id,
-        ...projectWithoutScenario,
-        pngData: pngData.right,
-      });
-    }
+    await this.crudService.create({
+      id,
+      ...projectWithoutScenario,
+      pngData: isRight(pngData) ? pngData.right : '',
+    });
+
     return right(true);
   }
 

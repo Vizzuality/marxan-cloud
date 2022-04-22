@@ -25,7 +25,8 @@ test(`getting public projects`, async () => {
 
 test(`publishing a project`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenPublicProjectIsAvailable(projectId, response);
@@ -33,7 +34,8 @@ test(`publishing a project`, async () => {
 
 test(`when placing a public project under moderation as a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
     projectId,
@@ -61,7 +63,8 @@ test(`when placing a public project under moderation as a platform admin`, async
 
 test(`when clearing under moderation status from a public project as a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
     projectId,
@@ -82,7 +85,8 @@ test(`when clearing under moderation status from a public project as a platform 
 
 test(`when placing a public project under moderation as not a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenPlacingAPublicProjectUnderModerationNotAsAdmin(
     projectId,
@@ -96,7 +100,8 @@ test(`when placing a public project under moderation as not a platform admin`, a
 
 test(`when clearing under moderation status from a public project not as platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
     projectId,
@@ -119,7 +124,8 @@ test(`when clearing under moderation status from a public project not as platfor
 
 test(`when unpublishing a public project as a project owner`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
 
   response = await fixtures.WhenUnpublishingAProjectAsProjectOwner(projectId);
@@ -130,7 +136,8 @@ test(`when unpublishing a public project as a project owner`, async () => {
 
 test(`when unpublishing a public project that is under moderation as a project owner`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
     projectId,
@@ -145,7 +152,8 @@ test(`when unpublishing a public project that is under moderation as a project o
 
 test(`when unpublishing a public project that is under moderation as a platform admin`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  let response = await fixtures.WhenPublishingAProject(projectId);
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
   fixtures.ThenCreatedIsReturned(response);
   response = await fixtures.WhenPlacingAPublicProjectUnderModerationAsAdmin(
     projectId,
