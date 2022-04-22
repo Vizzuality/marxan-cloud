@@ -27,6 +27,8 @@ export class Export extends AggregateRoot {
     public readonly resourceId: ResourceId,
     public readonly resourceKind: ResourceKind,
     private readonly ownerId: UserId,
+    private readonly foreignExport: boolean,
+    private readonly createdAt: Date,
     private pieces: ExportComponent[],
     public readonly importResourceId?: ResourceId,
     private archiveLocation?: ArchiveLocation,
@@ -40,6 +42,7 @@ export class Export extends AggregateRoot {
     ownerId: UserId,
     parts: ExportComponent[],
     cloning: boolean,
+    foreignExport: boolean,
   ): Export {
     const importResourceId = cloning ? ResourceId.create() : undefined;
     const exportRequest = new Export(
@@ -47,6 +50,8 @@ export class Export extends AggregateRoot {
       id,
       kind,
       ownerId,
+      foreignExport,
+      new Date(),
       parts,
       importResourceId,
     );
@@ -101,6 +106,8 @@ export class Export extends AggregateRoot {
       exportPieces: this.pieces.map((piece) => piece.toSnapshot()),
       importResourceId: this.importResourceId?.value,
       archiveLocation: this.archiveLocation?.value,
+      createdAt: this.createdAt,
+      foreignExport: this.foreignExport,
     };
   }
 
@@ -110,6 +117,8 @@ export class Export extends AggregateRoot {
       new ResourceId(snapshot.resourceId),
       snapshot.resourceKind,
       new UserId(snapshot.ownerId),
+      snapshot.foreignExport,
+      snapshot.createdAt,
       snapshot.exportPieces.map(ExportComponent.fromSnapshot),
       snapshot.importResourceId
         ? new ResourceId(snapshot.importResourceId)

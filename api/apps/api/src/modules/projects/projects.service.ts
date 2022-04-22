@@ -512,7 +512,7 @@ export class ProjectsService {
     }
 
     const exportIdOrError = await this.commandBus.execute(
-      new GenerateExportFromZipFile(exportFile),
+      new GenerateExportFromZipFile(exportFile, new UserId(userId)),
     );
 
     if (isLeft(exportIdOrError)) {

@@ -1,13 +1,13 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
-  MarxanExecutionMetadataFolderType,
   getMarxanExecutionMetadataFolderRelativePath,
   MarxanExecutionMetadataContent,
+  MarxanExecutionMetadataFolderType,
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { isDefined } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
@@ -19,7 +19,6 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
-import { string } from 'fp-ts';
 
 type FolderZipData = {
   id: string;

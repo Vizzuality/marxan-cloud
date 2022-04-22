@@ -7,11 +7,13 @@ export const unknownError = Symbol(`unknown error`);
 export const storageNotReachable = Symbol(`storage not reachable`);
 export const fileNotFound = Symbol(`file not found`);
 export const hackerFound = Symbol(`please hands off`);
+export const fileAlreadyExists = Symbol(`file already exists`);
 
 export type SaveFileError =
   | typeof unknownError
   | typeof storageNotReachable
-  | typeof hackerFound;
+  | typeof hackerFound
+  | typeof fileAlreadyExists;
 
 export type GetFileError =
   | typeof storageNotReachable

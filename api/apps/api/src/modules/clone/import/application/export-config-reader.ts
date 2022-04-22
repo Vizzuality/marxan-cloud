@@ -20,10 +20,11 @@ import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 
 @Injectable()
 export class ExportConfigReader {
-  constructor(private readonly archiveReader: ArchiveReader) {}
+  constructor() {}
 
   convertToClass(
     exportConfig: ExportConfigContent,
@@ -36,19 +37,13 @@ export class ExportConfigReader {
   }
 
   async read(
-    archiveLocation: ArchiveLocation,
+    zipReadable: Readable,
   ): Promise<Either<Failure, ExportConfigContent>> {
-    const readableOrError = await this.archiveReader.get(archiveLocation);
-    if (isLeft(readableOrError)) return readableOrError;
-
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ExportConfig,
     );
 
-    const exportConfigOrError = await extractFile(
-      readableOrError.right,
-      relativePath,
-    );
+    const exportConfigOrError = await extractFile(zipReadable, relativePath);
     if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
 
     try {

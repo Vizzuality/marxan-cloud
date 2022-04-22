@@ -2,6 +2,10 @@ import { MarxanExecutionMetadataPieceImporter } from '@marxan-geoprocessing/impo
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ComponentLocation,
@@ -12,21 +16,17 @@ import {
   getMarxanExecutionMetadataFolderRelativePath,
   MarxanExecutionMetadataContent,
   MarxanExecutionMetadataFolderType,
+  marxanExecutionMetadataRelativePath,
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import * as archiver from 'archiver';
-import { isLeft } from 'fp-ts/lib/Either';
+import { isLeft, isRight } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { Readable } from 'stream';
 
 type MetadataFolder = {
   id: string;
@@ -52,34 +52,104 @@ describe(MarxanExecutionMetadataPieceImporter, () => {
       .ThenAnUrisArrayErrorShouldBeThrown();
   });
 
-  it('fails when the file cannot be retrieved from file repo', async () => {
+  it('fails when marxan execution metadata file cannot be retrieved from file repo', async () => {
     const resourceKind = ResourceKind.Project;
-    const archiveLocation = fixtures.GivenNoMarxanExecutionMetadataFileIsAvailable();
-    const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
+    await fixtures.GivenMarxanExecutionMetadata();
+    const input = fixtures.GivenJobInput(
+      new ComponentLocation('wrong uri', marxanExecutionMetadataRelativePath),
+      [],
+      resourceKind,
+    );
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it(`fails if file repo doesn't contain marxan execution metadata folder`, async () => {
+  it('fails if marxan execution metadata folder relative path is invalid', async () => {
     const resourceKind = ResourceKind.Project;
-    await fixtures.GivenWrongMarxanExecutionMetadata();
-    const archiveLocation = await fixtures.GivenMarxanExecutionMetadataFile(
+    await fixtures.GivenMarxanExecutionMetadata();
+    const {
+      jsonUri,
+      folderUris,
+    } = await fixtures.GivenMarxanExecutionMetadataFiles(resourceKind);
+    const input = fixtures.GivenJobInputWithInvalidMarxanExecutionMetadataFolderRelativePath(
+      jsonUri,
+      folderUris,
       resourceKind,
     );
-    const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenAnErrorShouldBeThrownWhileTryingToGetFolderFromFileRepo();
+      .ThenAnInvalidMarxanExecutionMetadataFolderRelativePathErrorShouldBeThrown();
+  });
+
+  it(`fails if file repo doesn't contain marxan execution metadata folder`, async () => {
+    const resourceKind = ResourceKind.Project;
+    await fixtures.GivenIncompleteMarxanExecutionMetadata();
+    const { jsonUri } = await fixtures.GivenMarxanExecutionMetadataFiles(
+      resourceKind,
+    );
+    const invalidComponentLocation = new ComponentLocation(
+      'invalid/uri.zip',
+      getMarxanExecutionMetadataFolderRelativePath(
+        v4(),
+        'input',
+        marxanExecutionMetadataRelativePath,
+      ),
+    );
+    const input = fixtures.GivenJobInput(
+      jsonUri,
+      [invalidComponentLocation],
+      resourceKind,
+    );
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenAnErrorShouldBeThrownWhileTryingToGetMetadataFolderFromFileRepo();
+  });
+
+  it(`fails if marxan execution metadata input folder uri is not contained in uris array`, async () => {
+    const resourceKind = ResourceKind.Project;
+    await fixtures.GivenMarxanExecutionMetadata();
+    const {
+      folderUris,
+      jsonUri,
+    } = await fixtures.GivenMarxanExecutionMetadataFiles(resourceKind);
+    const input = fixtures.GivenJobInputWithoutFolderUris(
+      jsonUri,
+      folderUris,
+      resourceKind,
+      'input',
+    );
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenAMissingInputFolderUriErrorShouldBeThrown();
+  });
+
+  it(`fails if marxan execution metadata output folder uri is not contained in uris array`, async () => {
+    const resourceKind = ResourceKind.Project;
+    await fixtures.GivenMarxanExecutionMetadata();
+    const {
+      folderUris,
+      jsonUri,
+    } = await fixtures.GivenMarxanExecutionMetadataFiles(resourceKind);
+    const input = fixtures.GivenJobInputWithoutFolderUris(
+      jsonUri,
+      folderUris,
+      resourceKind,
+      'output',
+    );
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenAMissingOutputFolderUriErrorShouldBeThrown();
   });
 
   it('imports marxan execution metadata in a scenario import', async () => {
     const resourceKind = ResourceKind.Scenario;
     await fixtures.GivenMarxanExecutionMetadata();
-    const archiveLocation = await fixtures.GivenMarxanExecutionMetadataFile(
-      resourceKind,
-    );
-    const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
+    const {
+      jsonUri,
+      folderUris,
+    } = await fixtures.GivenMarxanExecutionMetadataFiles(resourceKind);
+    const input = fixtures.GivenJobInput(jsonUri, folderUris, resourceKind);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenMarxanExecutionMetadataShouldBeImported();
@@ -88,10 +158,11 @@ describe(MarxanExecutionMetadataPieceImporter, () => {
   it('imports marxan execution metadata in a project import', async () => {
     const resourceKind = ResourceKind.Project;
     await fixtures.GivenMarxanExecutionMetadata();
-    const archiveLocation = await fixtures.GivenMarxanExecutionMetadataFile(
-      resourceKind,
-    );
-    const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
+    const {
+      jsonUri,
+      folderUris,
+    } = await fixtures.GivenMarxanExecutionMetadataFiles(resourceKind);
+    const input = fixtures.GivenJobInput(jsonUri, folderUris, resourceKind);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenMarxanExecutionMetadataShouldBeImported();
@@ -171,14 +242,14 @@ const getFixtures = async () => {
         ]),
       );
     },
-    GivenWrongMarxanExecutionMetadata: async () => {
+    GivenIncompleteMarxanExecutionMetadata: async () => {
       const metadataList = Array(amountOfMarxanRuns)
         .fill('')
         .map(() => ({
           id: v4(),
           includesOutputFolder: true,
           failed: false,
-          stdOutput: 'Success!!!',
+          stdOutput: '',
         }));
 
       marxanExecutionMetadataFileContent.marxanExecutionMetadata = metadataList;
@@ -199,13 +270,30 @@ const getFixtures = async () => {
       );
     },
     GivenJobInput: (
-      archiveLocation: ArchiveLocation,
+      jsonLocation: ComponentLocation,
+      folderLocations: ComponentLocation[],
       resourceKind: ResourceKind,
     ): ImportJobInput => {
-      const relativePath = ClonePieceRelativePathResolver.resolveFor(
-        ClonePiece.MarxanExecutionMetadata,
-        { kind: resourceKind, scenarioId: oldScenarioId },
-      );
+      return {
+        componentId: v4(),
+        pieceResourceId: scenarioId,
+        importId: v4(),
+        projectId,
+        piece: ClonePiece.MarxanExecutionMetadata,
+        resourceKind,
+        uris: [jsonLocation, ...folderLocations],
+        ownerId: userId,
+      };
+    },
+    GivenJobInputWithInvalidMarxanExecutionMetadataFolderRelativePath: (
+      jsonLocation: ComponentLocation,
+      folderLocations: ComponentLocation[],
+      resourceKind: ResourceKind,
+    ): ImportJobInput => {
+      folderLocations[0] = ComponentLocation.fromSnapshot({
+        relativePath: 'invalid/relative/path/folder.zip',
+        uri: '/tmp/invalid/uri/folder.zip',
+      });
 
       return {
         componentId: v4(),
@@ -214,7 +302,29 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.MarxanExecutionMetadata,
         resourceKind,
-        uris: [new ComponentLocation(archiveLocation.value, relativePath)],
+        uris: [jsonLocation, ...folderLocations],
+        ownerId: userId,
+      };
+    },
+    GivenJobInputWithoutFolderUris: (
+      jsonLocation: ComponentLocation,
+      folderLocations: ComponentLocation[],
+      resourceKind: ResourceKind,
+      typeToRemove: MarxanExecutionMetadataFolderType,
+    ): ImportJobInput => {
+      return {
+        componentId: v4(),
+        pieceResourceId: scenarioId,
+        importId: v4(),
+        projectId,
+        piece: ClonePiece.MarxanExecutionMetadata,
+        resourceKind,
+        uris: [
+          jsonLocation,
+          ...folderLocations.filter(
+            (location) => !location.relativePath.includes(typeToRemove),
+          ),
+        ],
         ownerId: userId,
       };
     },
@@ -233,14 +343,14 @@ const getFixtures = async () => {
     GivenNoMarxanExecutionMetadataFileIsAvailable: () => {
       return new ArchiveLocation('invalid uri');
     },
-    GivenMarxanExecutionMetadataFile: async (resourceKind: ResourceKind) => {
+    GivenMarxanExecutionMetadataFiles: async (resourceKind: ResourceKind) => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.MarxanExecutionMetadata,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       const exportId = v4();
 
-      await Promise.all(
+      const folderUris = await Promise.all(
         metadataFolders.map(async ({ buffer, id, type }) => {
           const folderRelativePath = getMarxanExecutionMetadataFolderRelativePath(
             id,
@@ -248,11 +358,17 @@ const getFixtures = async () => {
             relativePath,
           );
 
-          await fileRepository.saveCloningFile(
+          const uri = await fileRepository.saveCloningFile(
             exportId,
             Readable.from(buffer),
             folderRelativePath,
           );
+
+          if (isLeft(uri)) {
+            throw new Error('Error saving zip file');
+          }
+
+          return new ComponentLocation(uri.right, folderRelativePath);
         }),
       );
 
@@ -262,22 +378,43 @@ const getFixtures = async () => {
         relativePath,
       );
 
-      if (isLeft(uriOrError)) throw new Error("couldn't save file");
-      return new ArchiveLocation(uriOrError.right);
+      if (isLeft(uriOrError)) throw new Error("couldn't save json file");
+
+      return {
+        jsonUri: new ComponentLocation(uriOrError.right, relativePath),
+        folderUris,
+      };
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {
         ThenAnUrisArrayErrorShouldBeThrown: async () => {
-          await expect(sut.run(input)).rejects.toThrow(/uris/gi);
+          await expect(sut.run(input)).rejects.toThrow(
+            /uris array does not contain/gi,
+          );
         },
         ThenADataNotAvailableErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
             /file with piece data.*not available/gi,
           );
         },
-        ThenAnErrorShouldBeThrownWhileTryingToGetFolderFromFileRepo: async () => {
+        ThenAnInvalidMarxanExecutionMetadataFolderRelativePathErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /invalid marxan execution metadata folder relative path/gi,
+          );
+        },
+        ThenAnErrorShouldBeThrownWhileTryingToGetMetadataFolderFromFileRepo: async () => {
           await expect(sut.run(input)).rejects.toThrow(
             /error obtaining.*folder metadata/gi,
+          );
+        },
+        ThenAMissingInputFolderUriErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /uris array doesn't contain uri for metadata input folder/gi,
+          );
+        },
+        ThenAMissingOutputFolderUriErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /uris array doesn't contain uri for metadata output folder/gi,
           );
         },
         ThenMarxanExecutionMetadataShouldBeImported: async () => {

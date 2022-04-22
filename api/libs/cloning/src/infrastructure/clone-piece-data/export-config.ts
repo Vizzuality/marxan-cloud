@@ -27,6 +27,9 @@ class CommonFields {
   @IsUUID(4)
   resourceId!: string;
 
+  @IsUUID(4)
+  exportId!: string;
+
   @IsString()
   name!: string;
 

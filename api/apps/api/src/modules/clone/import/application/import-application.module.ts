@@ -14,7 +14,6 @@ import { ImportScenarioHandler } from './import-scenario.handler';
     CqrsModule,
     ExportAdaptersModule,
     ImportAdaptersModule,
-    ArchiveReaderModule,
     TypeOrmModule.forFeature([Scenario]),
   ],
   providers: [

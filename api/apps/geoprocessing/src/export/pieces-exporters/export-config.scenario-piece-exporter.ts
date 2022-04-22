@@ -61,6 +61,7 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
       projectId: scenario.project_id,
       resourceKind: input.resourceKind,
       resourceId: scenarioId,
+      exportId: input.exportId,
       pieces: input.allPieces.map((elem) => elem.piece),
       isCloning: true,
     };

@@ -12,6 +12,7 @@ import { Readable } from 'stream';
 import {
   CloningFilesRepository,
   CloningStoragePath,
+  fileAlreadyExists,
   fileNotFound,
   GetFileError,
   hackerFound,
@@ -38,6 +39,12 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
     path: string,
     stream: Readable,
   ): Promise<Either<SaveFileError, string>> {
+    const fileExists = existsSync(path);
+
+    if (fileExists) {
+      return left(fileAlreadyExists);
+    }
+
     const writer = createWriteStream(path);
 
     return new Promise((resolve) => {

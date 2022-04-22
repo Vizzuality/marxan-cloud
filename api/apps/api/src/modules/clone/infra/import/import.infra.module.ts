@@ -3,9 +3,12 @@ import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../../../api-events';
 import { QueueApiEventsModule } from '../../../queue-api-events';
+import { ExportAdaptersModule } from '../../export/adapters/export-adapters.module';
 import { ImportAdaptersModule } from '../../import/adapters/import-adapters.module';
+import { ExportConfigReader } from '../../import/application/export-config-reader';
 import { AllPiecesImportedSaga } from './all-pieces-imported.saga';
 import { failedImportDbCleanupQueueProvider } from './failed-import-db-cleanup-queue.provider';
+import { GenerateExportFromZipFileHandler } from './generate-export-from-zip-file.handler';
 import { ImportBatchFailedSaga } from './import-batch-failed.saga';
 import { ImportPieceEventsHandler } from './import-piece.events-handler';
 import {
@@ -22,7 +25,6 @@ import { MarkImportPieceAsFailedHandler } from './mark-import-piece-as-failed.ha
 import { PieceImportRequestedSaga } from './piece-import-requested.saga';
 import { ScheduleDbCleanupForFailedImportHandler } from './schedule-db-cleanup-for-failed-import.handler';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
-import { GenerateExportFromZipFileHandler } from './generate-export-from-zip-file.handler';
 
 @Module({
   imports: [
@@ -30,9 +32,11 @@ import { GenerateExportFromZipFileHandler } from './generate-export-from-zip-fil
     QueueApiEventsModule,
     CqrsModule,
     ImportAdaptersModule,
+    ExportAdaptersModule,
     CloningFileSRepositoryModule,
   ],
   providers: [
+    ExportConfigReader,
     PieceImportRequestedSaga,
     AllPiecesImportedSaga,
     ImportBatchFailedSaga,

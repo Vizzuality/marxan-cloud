@@ -84,6 +84,7 @@ export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
       description: project.description,
       resourceKind: input.resourceKind,
       resourceId: projectId,
+      exportId: input.exportId,
       isCloning: input.isCloning,
       pieces: {
         project: projectPieces,

@@ -57,11 +57,12 @@ export class ImportProjectHandler
     const isCloning = Boolean(importResourceId);
 
     const projectId = resourceId;
+    const oldProjectId = exportInstance.resourceId;
 
     const pieces = this.importResourcePieces.resolveForProject(
       projectId,
       exportInstance.toSnapshot().exportPieces,
-      exportInstance.resourceId,
+      oldProjectId,
     );
 
     const archiveLocation = new ArchiveLocation(

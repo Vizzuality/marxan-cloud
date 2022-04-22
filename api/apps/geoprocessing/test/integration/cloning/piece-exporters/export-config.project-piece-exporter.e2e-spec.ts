@@ -88,6 +88,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const organizationId = v4();
+  const exportId = v4();
   const sut = sandbox.get(ExportConfigProjectPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
@@ -105,6 +106,7 @@ const getFixtures = async () => {
       version: exportVersion,
       resourceKind: ResourceKind.Project,
       resourceId: projectId,
+      exportId: exportId,
       scenarios: options.projectWithScenario
         ? [{ id: scenarioId, name: `test scenario - ${scenarioId}` }]
         : [],
@@ -137,7 +139,7 @@ const getFixtures = async () => {
           ...scenarioPiece,
         ],
         componentId: v4(),
-        exportId: v4(),
+        exportId,
         piece: ClonePiece.ExportConfig,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
