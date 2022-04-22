@@ -5,7 +5,10 @@ import { FailedImportDbCleanupJobInput } from '@marxan/cloning/job-input';
 import { FailedImportDbCleanupJobOutput } from '@marxan/cloning/job-output';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import {
+  MarxanExecutionMetadataGeoEntity,
+  OutputScenariosPuDataGeoEntity,
+} from '@marxan/marxan-output';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
@@ -41,6 +44,8 @@ export class DbCleanupProcessor {
     private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
+    @InjectRepository(MarxanExecutionMetadataGeoEntity)
+    private readonly marxanExecutionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity>,
   ) {}
 
   private async cleanScenarioImport(scenarioId: string) {
@@ -67,6 +72,8 @@ export class DbCleanupProcessor {
     });
 
     await this.scenariosPuDataRepo.delete({ scenarioId });
+
+    await this.marxanExecutionMetadataRepo.delete({ scenarioId });
   }
 
   private async cleanProjectImport(projectId: string) {
@@ -115,6 +122,10 @@ export class DbCleanupProcessor {
       });
 
       await this.scenarioFeaturesDataRepo.delete({
+        scenarioId: In(scenarioIds),
+      });
+
+      await this.marxanExecutionMetadataRepo.delete({
         scenarioId: In(scenarioIds),
       });
     }
