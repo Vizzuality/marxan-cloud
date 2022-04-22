@@ -11,8 +11,13 @@ import { AllPiecesImported } from '@marxan-api/modules/clone/import/domain';
 import { SchedulePieceImport } from '@marxan-api/modules/clone/infra/import/schedule-piece-import.command';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import {
+  ClonePiece,
+  ComponentId,
+  ComponentLocation,
+  ResourceKind,
+} from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   exportVersion,
   ProjectExportConfigContent,
@@ -75,6 +80,7 @@ export const getFixtures = async () => {
     await Promise.all(
       exportInstance.toSnapshot().exportPieces.map(async (piece, i) => {
         let content = `${piece.piece}`;
+        const exportId = exportInstance.id.value;
         if (piece.piece === ClonePiece.ExportConfig) {
           const exportConfigContent: ProjectExportConfigContent = {
             isCloning: true,
@@ -90,11 +96,16 @@ export const getFixtures = async () => {
               scenarios: {},
             },
             scenarios: [],
+            exportId,
           };
           content = JSON.stringify(exportConfigContent);
         }
 
-        const result = await fileRepo.save(Readable.from(content));
+        const result = await fileRepo.saveCloningFile(
+          exportId,
+          Readable.from(content),
+          ClonePieceRelativePathResolver.resolveFor(piece.piece),
+        );
 
         if (isLeft(result)) {
           throw new Error(`Error while saving ${piece.id} file`);
@@ -163,14 +174,12 @@ export const getFixtures = async () => {
 
       exportInstance!.toSnapshot().exportPieces.forEach((exportedPiece) => {
         commandBus.execute(
-          new CompleteExportPiece(
-            exportId,
-            new ComponentId(exportedPiece.id),
-            ClonePieceUrisResolver.resolveFor(
-              exportedPiece.piece,
+          new CompleteExportPiece(exportId, new ComponentId(exportedPiece.id), [
+            new ComponentLocation(
               piecesUris[exportedPiece.id],
+              ClonePieceRelativePathResolver.resolveFor(exportedPiece.piece),
             ),
-          ),
+          ]),
         );
       });
     },
