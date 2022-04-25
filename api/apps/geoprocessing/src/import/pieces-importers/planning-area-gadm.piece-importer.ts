@@ -3,7 +3,7 @@ import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -50,18 +50,11 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const stringPlanningAreaGadmOrError = await extractFile(
-      readableOrError.right,
-      planningAreaGadmLocation.relativePath,
-    );
-    if (isLeft(stringPlanningAreaGadmOrError)) {
-      const errorMessage = `Planning area gadm file extraction failed: ${planningAreaGadmLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringPlanningAreaGadmOrError = buffer.toString();
 
     const planningAreaGadm: PlanningAreaGadmContent = JSON.parse(
-      stringPlanningAreaGadmOrError.right,
+      stringPlanningAreaGadmOrError,
     );
 
     await this.entityManager

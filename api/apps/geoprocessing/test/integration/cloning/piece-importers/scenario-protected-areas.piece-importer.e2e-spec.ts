@@ -10,7 +10,7 @@ import {
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-protected-areas';
 import {
   CloningFilesRepository,
@@ -31,8 +31,9 @@ import {
   GivenCustomProtectedAreas,
   GivenScenarioExists,
   GivenWdpaProtectedAreas,
-  PrepareZipFile,
 } from '../fixtures';
+import { Readable } from 'stream';
+import { isLeft } from 'fp-ts/lib/Either';
 
 interface ScenarioSelectResult {
   protected_area_filter_by_ids: string[];
@@ -193,11 +194,8 @@ const getFixtures = async () => {
       ];
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [
-        uri,
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioProtectedAreas,
-        archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       return {
@@ -207,7 +205,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ScenarioProtectedAreas,
         resourceKind,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -227,11 +225,8 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenScenarioProtectedAreasFileWithAnUnexistingCustomProtectedArea: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioProtectedAreas,
-        'scenario protected areas file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       const [geometry] = await GenerateRandomGeometries(
@@ -249,18 +244,20 @@ const getFixtures = async () => {
         ),
       };
 
-      return PrepareZipFile(
-        invalidScenarioProtectedAreasFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(invalidScenarioProtectedAreasFileContent)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenScenarioProtectedAreasFileWithAnUnexistingWdpaProtectedArea: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioProtectedAreas,
-        'scenario protected areas file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       const invalidScenarioProtectedAreasFileContent: ScenarioProtectedAreasContent = {
@@ -268,26 +265,33 @@ const getFixtures = async () => {
         wdpa: validScenarioProtectedAreasFileContent.wdpa.concat(-1),
       };
 
-      return PrepareZipFile(
-        invalidScenarioProtectedAreasFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(invalidScenarioProtectedAreasFileContent)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenValidScenarioProtectedAreasFile: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioProtectedAreas,
-        'scenario protected areas file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
-      return PrepareZipFile(
-        validScenarioProtectedAreasFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validScenarioProtectedAreasFileContent)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

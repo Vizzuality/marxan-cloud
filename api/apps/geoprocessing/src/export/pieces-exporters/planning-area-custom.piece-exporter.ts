@@ -1,7 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
@@ -84,9 +84,14 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
       planningAreaGeom: planningArea.ewkb.toJSON().data,
     };
 
-    const outputFile = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.PlanningAreaCustom,
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(content)),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(outputFile)) {
@@ -97,10 +102,7 @@ export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningAreaCustom,
-        outputFile.right,
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

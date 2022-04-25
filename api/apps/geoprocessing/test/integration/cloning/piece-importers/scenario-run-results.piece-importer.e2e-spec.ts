@@ -11,7 +11,7 @@ import {
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
 import {
   CloningFilesRepository,
@@ -29,11 +29,9 @@ import {
 } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import {
-  DeleteProjectPus,
-  GivenScenarioPuData,
-  PrepareZipFile,
-} from '../fixtures';
+import { DeleteProjectPus, GivenScenarioPuData } from '../fixtures';
+import { Readable } from 'stream';
+import { isLeft } from 'fp-ts/lib/Either';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -161,11 +159,8 @@ const getFixtures = async () => {
       );
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [
-        uri,
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioRunResults,
-        archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       return {
@@ -175,7 +170,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ScenarioRunResults,
         resourceKind,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -195,11 +190,8 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenScenarioRunResultsFileWithLeastProjectsPu: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioRunResults,
-        'scenario run results file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       const invalidScenarioRunResultsFileContent: ScenarioRunResultsContent = {
@@ -210,26 +202,33 @@ const getFixtures = async () => {
         ),
       };
 
-      return PrepareZipFile(
-        invalidScenarioRunResultsFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(invalidScenarioRunResultsFileContent)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     GivenValidScenarioRunResultsFile: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioRunResults,
-        'scenario run results file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
-      return PrepareZipFile(
-        validScenarioRunResultsFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validScenarioRunResultsFileContent)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

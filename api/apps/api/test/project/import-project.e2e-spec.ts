@@ -1,4 +1,5 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
+import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { CompleteImportPiece } from '@marxan-api/modules/clone/import/application/complete-import-piece.command';
@@ -9,25 +10,44 @@ import {
 } from '@marxan-api/modules/clone/import/domain';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   exportVersion,
   ProjectExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
-import { isLeft } from 'fp-ts/lib/Either';
+import { createWriteStream, rmSync } from 'fs';
+import { Readable } from 'stream';
 import * as request from 'supertest';
 import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
+import { ExportId } from '../../src/modules/clone';
+import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
-import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
+
+async function saveFile(path: string, stream: Readable): Promise<string> {
+  const writer = createWriteStream(path);
+
+  return new Promise((resolve, reject) => {
+    writer.on('close', () => {});
+    writer.on(`finish`, () => {
+      resolve(path);
+    });
+    writer.on('error', (error) => {
+      console.error(error);
+      reject(error);
+    });
+
+    stream.pipe(writer);
+  });
+}
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -43,6 +63,7 @@ test('should permit importing project ', async () => {
 
   await fixtures.WhenProjectIsImported();
 
+  await fixtures.ThenForeignExportIsCreated();
   await fixtures.ThenImportIsCompleted();
 });
 
@@ -52,18 +73,20 @@ export const getFixtures = async () => {
   eventBusTestUtils.startInspectingEvents();
   const commandBus = app.get(CommandBus);
   const importRepo = app.get(ImportRepository);
+  const exportRepo = app.get(ExportRepository);
   const apiEvents = app.get(ApiEventsService);
-  const fileRepository = app.get(CloningFilesRepository);
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const oldProjectId = v4();
 
   let projectId: string;
   let importId: ImportId;
+  const exportId = ExportId.create();
   let uriZipFile: string;
 
   return {
     cleanup: async () => {
+      rmSync(uriZipFile, { force: true, recursive: true });
       const connection = app.get<Connection>(Connection);
       const exportRepo = connection.getRepository(ExportEntity);
       const importRepo = connection.getRepository(ImportEntity);
@@ -86,26 +109,33 @@ export const getFixtures = async () => {
           scenarios: {},
         },
         scenarios: [],
+        exportId: exportId.value,
       };
-      const [exportConfig] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ExportConfig,
-        'export location',
       );
+      const projectMetadataRelativePath = ClonePieceRelativePathResolver.resolveFor(
+        ClonePiece.ProjectMetadata,
+      );
+      const projectMetadataContent: ProjectMetadataContent = {
+        name: 'test project',
+        projectAlreadyCreated: false,
+        description: 'description',
+      };
 
       const zipFile = archiver(`zip`, {
         zlib: { level: 9 },
       });
       zipFile.append(JSON.stringify(exportConfigContent), {
-        name: exportConfig.relativePath,
+        name: relativePath,
+      });
+      zipFile.append(JSON.stringify(projectMetadataContent), {
+        name: projectMetadataRelativePath,
       });
 
       await zipFile.finalize();
 
-      const saveZipFileOrError = await fileRepository.save(zipFile);
-
-      if (isLeft(saveZipFileOrError)) throw new Error('could not save zip');
-
-      uriZipFile = saveZipFileOrError.right;
+      uriZipFile = await saveFile(__dirname + '/export.zip', zipFile);
     },
     GivenImportWasRequested: async () => {
       const response = await request(app.getHttpServer())
@@ -130,6 +160,12 @@ export const getFixtures = async () => {
     WhenProjectIsImported: async () => {
       await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
     },
+    ThenForeignExportIsCreated: async () => {
+      const exportInstance = await exportRepo.find(exportId);
+
+      expect(exportInstance).toBeDefined();
+      expect(exportInstance?.toSnapshot().foreignExport).toBe(true);
+    },
     ThenImportIsCompleted: async () => {
       const res = await new Promise<ApiEventByTopicAndKind>(
         (resolve, reject) => {
@@ -143,7 +179,7 @@ export const getFixtures = async () => {
               resolve(event);
             } catch (error) {}
           }, 150);
-          const apiEventTimeOut = setTimeout(() => {
+          setTimeout(() => {
             clearInterval(findApiEventInterval);
             reject('Import API event was not found');
           }, 6000);

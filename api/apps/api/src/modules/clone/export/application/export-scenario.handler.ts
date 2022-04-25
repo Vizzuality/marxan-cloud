@@ -44,11 +44,12 @@ export class ExportScenarioHandler
     ownerId,
   }: ExportScenario): Promise<ExportScenarioCommandResult> {
     const kind = ResourceKind.Scenario;
-    const cloning = true;
     const pieces = this.resourcePieces.resolveForScenario(scenarioId, kind);
+    const cloning = true;
+    const foreignExport = false;
 
     const exportRequest = this.eventPublisher.mergeObjectContext(
-      Export.newOne(projectId, kind, ownerId, pieces, cloning),
+      Export.newOne(projectId, kind, ownerId, pieces, cloning, foreignExport),
     );
     await this.exportRepository.save(exportRequest);
 

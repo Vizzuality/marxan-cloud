@@ -4,7 +4,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ProjectCustomFeaturesContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -56,18 +56,11 @@ export class ProjectCustomFeaturesPieceImporter
       throw new Error(errorMessage);
     }
 
-    const customProjectFeaturesOrError = await extractFile(
-      readableOrError.right,
-      customProjectFeaturesLocation.relativePath,
-    );
-    if (isLeft(customProjectFeaturesOrError)) {
-      const errorMessage = `Custom project features file extraction failed: ${customProjectFeaturesLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const customProjectFeaturesOrError = buffer.toString();
 
     const { features }: ProjectCustomFeaturesContent = JSON.parse(
-      customProjectFeaturesOrError.right,
+      customProjectFeaturesOrError,
     );
 
     const returnValue = {

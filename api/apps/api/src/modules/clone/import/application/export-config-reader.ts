@@ -3,13 +3,7 @@ import {
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  archiveCorrupted,
-  ArchiveReader,
-  Failure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ExportConfigContent,
   ProjectExportConfigContent,
@@ -20,11 +14,19 @@ import { Injectable } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
+
+export const zipFileDoesNotContainsExportConfig = Symbol(
+  "zip file doesn't contain export config",
+);
+export const invalidExportConfigFile = Symbol('invalid export config file');
+
+export type ExportConfigReaderError =
+  | typeof invalidExportConfigFile
+  | typeof zipFileDoesNotContainsExportConfig;
 
 @Injectable()
 export class ExportConfigReader {
-  constructor(private readonly archiveReader: ArchiveReader) {}
-
   convertToClass(
     exportConfig: ExportConfigContent,
   ): ProjectExportConfigContent | ScenarioExportConfigContent {
@@ -36,21 +38,15 @@ export class ExportConfigReader {
   }
 
   async read(
-    archiveLocation: ArchiveLocation,
-  ): Promise<Either<Failure, ExportConfigContent>> {
-    const readableOrError = await this.archiveReader.get(archiveLocation);
-    if (isLeft(readableOrError)) return readableOrError;
-
-    const [componentLocation] = ClonePieceUrisResolver.resolveFor(
+    zipReadable: Readable,
+  ): Promise<Either<ExportConfigReaderError, ExportConfigContent>> {
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ExportConfig,
-      archiveLocation.value,
     );
 
-    const exportConfigOrError = await extractFile(
-      readableOrError.right,
-      componentLocation.relativePath,
-    );
-    if (isLeft(exportConfigOrError)) return left(archiveCorrupted);
+    const exportConfigOrError = await extractFile(zipReadable, relativePath);
+    if (isLeft(exportConfigOrError))
+      return left(zipFileDoesNotContainsExportConfig);
 
     try {
       const exportConfigSnapshot: ExportConfigContent = JSON.parse(
@@ -60,11 +56,11 @@ export class ExportConfigReader {
       const exportConfig = this.convertToClass(exportConfigSnapshot);
 
       const validationErrors = await validate(exportConfig);
-      if (validationErrors.length > 0) return left(invalidFiles);
+      if (validationErrors.length > 0) return left(invalidExportConfigFile);
 
       return right(exportConfig);
     } catch (error) {
-      return left(archiveCorrupted);
+      return left(zipFileDoesNotContainsExportConfig);
     }
   }
 }

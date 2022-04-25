@@ -10,7 +10,7 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { extractFile, isDefined } from '@marxan/utils';
+import { readableToBuffer, isDefined } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -313,19 +313,11 @@ export class ScenarioFeaturesSpecificationPieceImporter
       throw new Error(errorMessage);
     }
 
-    const specificationaOrError = await extractFile(
-      readableOrError.right,
-      scenarioFeaturesSpecificationLocation.relativePath,
-    );
-
-    if (isLeft(specificationaOrError)) {
-      const errorMessage = `Scenario features specification file extraction failed: ${scenarioFeaturesSpecificationLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const specificationaOrError = buffer.toString();
 
     const specifications: ScenarioFeaturesSpecificationContent[] = JSON.parse(
-      specificationaOrError.right,
+      specificationaOrError,
     );
     if (!specifications.length)
       return {

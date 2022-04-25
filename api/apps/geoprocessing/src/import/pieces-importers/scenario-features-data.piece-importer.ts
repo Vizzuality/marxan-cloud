@@ -1,24 +1,24 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   FeatureDataElement,
   ScenarioFeaturesDataContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { chunk } from 'lodash';
 import { DeepPartial, EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
-import { chunk } from 'lodash';
 
 type FeatureIdByClassNameMap = Record<string, string>;
 
@@ -241,18 +241,11 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const stringScenarioFeaturesDataOrError = await extractFile(
-      readableOrError.right,
-      scenarioFeaturesDataLocation.relativePath,
-    );
-    if (isLeft(stringScenarioFeaturesDataOrError)) {
-      const errorMessage = `Scenario features data file extraction failed: ${scenarioFeaturesDataLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringScenarioFeaturesDataOrError = buffer.toString();
 
     const content: ScenarioFeaturesDataContent = JSON.parse(
-      stringScenarioFeaturesDataOrError.right,
+      stringScenarioFeaturesDataOrError,
     );
     const customFeaturesName = this.getUniqueFeaturesNames(
       content.customFeaturesData,

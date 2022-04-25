@@ -2,16 +2,16 @@ import { PlanningAreaCustomPieceImporter } from '@marxan-geoprocessing/import/pi
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-custom';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -22,13 +22,14 @@ import {
   getRepositoryToken,
   TypeOrmModule,
 } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GenerateRandomGeometries,
   GivenProjectExists,
-  PrepareZipFile,
 } from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -118,9 +119,8 @@ const getFixtures = async () => {
     GivenProject: () =>
       GivenProjectExists(entityManager, projectId, organizationId),
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [uri] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningAreaCustom,
-        archiveLocation.value,
       );
       return {
         componentId: v4(),
@@ -129,7 +129,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.PlanningAreaCustom,
         resourceKind: ResourceKind.Project,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -157,16 +157,20 @@ const getFixtures = async () => {
         planningAreaGeom: geom.toJSON().data,
       };
 
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
+      const exportId = v4();
+
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.PlanningAreaCustom,
-        'planning area custom file relative path',
       );
 
-      return PrepareZipFile(
-        validCustomPlanningAreaFile,
-        fileRepository,
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validCustomPlanningAreaFile)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

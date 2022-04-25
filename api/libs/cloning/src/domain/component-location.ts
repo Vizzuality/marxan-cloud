@@ -9,6 +9,14 @@ export class ComponentLocation extends TinyType {
     return new ComponentLocation(snapshot.uri, snapshot.relativePath);
   }
 
+  static fromSnapshots(
+    snapshots: ComponentLocationSnapshot[],
+  ): ComponentLocation[] {
+    return snapshots.map((snapshot) =>
+      ComponentLocation.fromSnapshot(snapshot),
+    );
+  }
+
   constructor(
     public readonly uri: string,
     public readonly relativePath: string,

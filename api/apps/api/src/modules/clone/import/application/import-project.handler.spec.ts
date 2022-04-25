@@ -5,20 +5,20 @@ import {
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  Failure as ArchiveFailure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
-import {
-  ExportConfigContent,
-  ProjectExportConfigContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
+import { v4 } from 'uuid';
+import { ExportId } from '../../export';
+import {
+  ExportRepository,
+  saveError,
+} from '../../export/application/export-repository.port';
+import { Export, ExportComponentSnapshot } from '../../export/domain';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
   ImportComponent,
@@ -34,7 +34,7 @@ import {
 } from './import-project.command';
 import { ImportProjectHandler } from './import-project.handler';
 import { ImportResourcePieces } from './import-resource-pieces.port';
-import { ImportRepository } from './import.repository.port';
+import { ImportRepository, Success } from './import.repository.port';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -42,8 +42,8 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-test(`importing invalid archive`, async () => {
-  fixtures.GivenExtractingArchiveFails();
+test(`importing invalid export`, async () => {
+  fixtures.GivenAnUnfinishedExport();
   const result = await fixtures.WhenRequestingImport();
   fixtures.ThenImportFails(result);
 });
@@ -70,8 +70,8 @@ const getFixtures = async () => {
     imports: [CqrsModule],
     providers: [
       {
-        provide: ExportConfigReader,
-        useClass: FakeExportConfigReader,
+        provide: ExportRepository,
+        useClass: FakeExportRepository,
       },
       {
         provide: ImportRepository,
@@ -91,18 +91,14 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ImportProjectHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
-  const exportConfigReader: FakeExportConfigReader = sandbox.get(
-    ExportConfigReader,
-  );
+  const exportRepo: FakeExportRepository = sandbox.get(ExportRepository);
   const importResourcePieces: FakeImportResourcePieces = sandbox.get(
     ImportResourcePieces,
   );
 
   return {
-    GivenExtractingArchiveFails: () => {
-      exportConfigReader.mock.mockImplementation(async () =>
-        left(invalidFiles),
-      );
+    GivenAnUnfinishedExport: () => {
+      exportRepo.returnUnfinishedExport = true;
     },
     GivenExtractingArchiveHasSequentialComponents: () => {
       importResourcePieces.mockSequentialPieces();
@@ -112,12 +108,13 @@ const getFixtures = async () => {
     },
     WhenRequestingImport: async () => {
       const importResult = await sut.execute(
-        new ImportProject(new ArchiveLocation(`whatever`), ownerId),
+        new ImportProject(ExportId.create(), ownerId),
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
           repo.entities[importResult.right.importId].resourceId,
         );
+
       return importResult;
     },
     ThenRequestImportIsSaved: (
@@ -173,38 +170,49 @@ const getFixtures = async () => {
   };
 };
 
-class FakeExportConfigReader {
-  mock: jest.MockedFunction<
-    ExportConfigReader['read']
-  > = jest
-    .fn()
-    .mockResolvedValue(
-      right({ resourceKind: ResourceKind.Project } as ExportConfigContent),
-    );
+class FakeExportRepository implements ExportRepository {
+  public returnUnfinishedExport = false;
 
-  async read(
-    archive: ArchiveLocation,
-  ): Promise<Either<ArchiveFailure, ExportConfigContent>> {
-    return this.mock(archive);
+  async save(
+    exportInstance: Export,
+  ): Promise<Either<typeof saveError, Success>> {
+    throw new Error('Method not implemented.');
+  }
+
+  async find(exportId: ExportId): Promise<Export | undefined> {
+    return Export.fromSnapshot({
+      exportPieces: [],
+      id: exportId.value,
+      ownerId: v4(),
+      resourceId: v4(),
+      resourceKind: ResourceKind.Project,
+      archiveLocation: this.returnUnfinishedExport ? '' : '/tmp/foo/bar.zip',
+      foreignExport: false,
+      createdAt: new Date(),
+    });
+  }
+
+  transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
+    throw new Error('Method not implemented.');
   }
 }
 
-class FakeImportResourcePieces extends ImportResourcePieces {
+class FakeImportResourcePieces implements ImportResourcePieces {
   mock: jest.MockedFunction<
     ImportResourcePieces['resolveForProject']
   > = jest.fn();
 
   resolveForProject(
     id: ResourceId,
-    archiveLocation: ArchiveLocation,
-    pieces: ProjectExportConfigContent['pieces'],
+    pieces: ExportComponentSnapshot[],
+    oldProjectId: ResourceId,
   ): ImportComponent[] {
-    return this.mock(id, archiveLocation, pieces);
+    return this.mock(id, pieces, oldProjectId);
   }
 
   resolveForScenario(
     id: ResourceId,
-    archiveLocation: ArchiveLocation,
+    pieces: ExportComponentSnapshot[],
   ): ImportComponent[] {
     return [];
   }

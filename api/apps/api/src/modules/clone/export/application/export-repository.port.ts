@@ -9,7 +9,7 @@ export type Success = true;
 export abstract class ExportRepository {
   abstract save(exportInstance: Export): Promise<Either<SaveError, Success>>;
 
-  abstract find(projectId: ExportId): Promise<Export | undefined>;
+  abstract find(exportId: ExportId): Promise<Export | undefined>;
 
   abstract transaction<T>(
     code: (repo: ExportRepository) => Promise<T>,

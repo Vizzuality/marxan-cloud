@@ -1,26 +1,24 @@
 import {
-  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import {
-  Failure as ArchiveFailure,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
-import {
-  ExportConfigContent,
-  ProjectExportConfigContent,
-  ScenarioExportConfigContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
-import { Either, isLeft, isRight, left, Right, right } from 'fp-ts/Either';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Either, isLeft, isRight, Right } from 'fp-ts/Either';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
+import { Scenario } from '../../../scenarios/scenario.api.entity';
+import { ExportId } from '../../export';
+import {
+  ExportRepository,
+  SaveError,
+} from '../../export/application/export-repository.port';
+import { Export, ExportComponentSnapshot } from '../../export/domain';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
   ImportComponent,
@@ -29,14 +27,13 @@ import {
   PieceImportRequested,
 } from '../domain';
 import { ImportComponentStatuses } from '../domain/import/import-component-status';
-import { ExportConfigReader } from './export-config-reader';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import {
   ImportScenario,
   ImportScenarioCommandResult,
 } from './import-scenario.command';
 import { ImportScenarioHandler } from './import-scenario.handler';
-import { ImportRepository } from './import.repository.port';
+import { ImportRepository, Success } from './import.repository.port';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -44,8 +41,8 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it(`importing invalid archive`, async () => {
-  fixtures.GivenExtractingArchiveFails();
+it(`importing invalid export`, async () => {
+  fixtures.GivenAnUnfinishedExport();
   const result = await fixtures.WhenRequestingImport();
   fixtures.ThenImportFails(result);
 });
@@ -72,8 +69,12 @@ const getFixtures = async () => {
     imports: [CqrsModule],
     providers: [
       {
-        provide: ExportConfigReader,
-        useClass: FakeExportConfigReader,
+        provide: getRepositoryToken(Scenario),
+        useClass: FakeScenarioRepository,
+      },
+      {
+        provide: ExportRepository,
+        useClass: FakeExportRepository,
       },
       {
         provide: ImportRepository,
@@ -92,19 +93,17 @@ const getFixtures = async () => {
 
   const sut = sandbox.get(ImportScenarioHandler);
   const repo: MemoryImportRepository = sandbox.get(ImportRepository);
-  const exportConfigReader: FakeExportConfigReader = sandbox.get(
-    ExportConfigReader,
-  );
+  const exportRepo: FakeExportRepository = sandbox.get(ExportRepository);
   const importResourcePieces: FakeImportResourcePieces = sandbox.get(
     ImportResourcePieces,
   );
   const importResourceId = ResourceId.create();
 
+  exportRepo.importResourceId = importResourceId.value;
+
   return {
-    GivenExtractingArchiveFails: () => {
-      exportConfigReader.mock.mockImplementation(async () =>
-        left(invalidFiles),
-      );
+    GivenAnUnfinishedExport: () => {
+      exportRepo.returnUnfinishedExport = true;
     },
     GivenExtractingArchiveHasSequentialComponents: () => {
       importResourcePieces.mockSequentialPieces();
@@ -113,13 +112,7 @@ const getFixtures = async () => {
       importResourcePieces.mockEqualPieces();
     },
     WhenRequestingImport: async () => {
-      return sut.execute(
-        new ImportScenario(
-          new ArchiveLocation(`whatever`),
-          ownerId,
-          importResourceId,
-        ),
-      );
+      return sut.execute(new ImportScenario(ExportId.create(), ownerId));
     },
     ThenRequestImportIsSaved: (
       importResult: PromiseType<ReturnType<ImportScenarioHandler['execute']>>,
@@ -184,20 +177,38 @@ const getFixtures = async () => {
   };
 };
 
-class FakeExportConfigReader {
-  mock: jest.MockedFunction<
-    ExportConfigReader['read']
-  > = jest.fn().mockResolvedValue(
-    right({
-      resourceKind: ResourceKind.Scenario,
+class FakeScenarioRepository {
+  async findOne() {
+    return {
       projectId: v4(),
-    } as ExportConfigContent),
-  );
+    };
+  }
+}
 
-  async read(
-    location: ArchiveLocation,
-  ): Promise<Either<ArchiveFailure, ExportConfigContent>> {
-    return this.mock(location);
+class FakeExportRepository implements ExportRepository {
+  public returnUnfinishedExport = false;
+  public importResourceId: string = '';
+
+  async save(exportInstance: Export): Promise<Either<SaveError, Success>> {
+    throw new Error('Method not implemented.');
+  }
+
+  async find(exportId: ExportId): Promise<Export | undefined> {
+    return Export.fromSnapshot({
+      exportPieces: [],
+      id: exportId.value,
+      ownerId: v4(),
+      resourceId: v4(),
+      resourceKind: ResourceKind.Scenario,
+      archiveLocation: this.returnUnfinishedExport ? '' : '/tmp/foo/bar.zip',
+      createdAt: new Date(),
+      foreignExport: false,
+      importResourceId: this.importResourceId,
+    });
+  }
+
+  transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
+    throw new Error('Method not implemented.');
   }
 }
 
@@ -208,20 +219,17 @@ class FakeImportResourcePieces extends ImportResourcePieces {
 
   resolveForProject(
     id: ResourceId,
-    archiveLocation: ArchiveLocation,
-    pieces: ProjectExportConfigContent['pieces'],
+    pieces: ExportComponentSnapshot[],
+    oldProjectId: ResourceId,
   ): ImportComponent[] {
     return [];
   }
 
   resolveForScenario(
     id: ResourceId,
-    archiveLocation: ArchiveLocation,
-    pieces: ScenarioExportConfigContent['pieces'],
-    kind: ResourceKind,
-    oldScenarioId: string,
+    pieces: ExportComponentSnapshot[],
   ): ImportComponent[] {
-    return this.mock(id, archiveLocation, pieces, kind, oldScenarioId);
+    return this.mock(id, pieces);
   }
 
   mockSequentialPieces() {

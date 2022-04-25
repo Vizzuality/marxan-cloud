@@ -1,9 +1,9 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -77,7 +77,6 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       uris,
       piece,
       resourceKind,
-      ownerId,
     } = input;
 
     if (uris.length !== 1) {
@@ -97,19 +96,10 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const stringScenarioMetadataOrError = await extractFile(
-      readableOrError.right,
-      scenarioMetadataLocation.relativePath,
-    );
-    if (isLeft(stringScenarioMetadataOrError)) {
-      const errorMessage = `Scenario metadata file extraction failed: ${scenarioMetadataLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const specificationaOrError = buffer.toString();
 
-    const metadata: ScenarioMetadataContent = JSON.parse(
-      stringScenarioMetadataOrError.right,
-    );
+    const metadata: ScenarioMetadataContent = JSON.parse(specificationaOrError);
 
     const scenarioCloning = resourceKind === ResourceKind.Scenario;
 

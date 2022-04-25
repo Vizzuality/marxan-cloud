@@ -2,20 +2,22 @@ import { ScenarioMetadataPieceImporter } from '@marxan-geoprocessing/import/piec
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
@@ -23,7 +25,6 @@ import {
   GivenProjectExists,
   GivenScenarioExists,
   GivenUserExists,
-  PrepareZipFile,
 } from '../fixtures';
 
 interface ScenarioSelectResult {
@@ -152,11 +153,8 @@ const getFixtures = async () => {
       archiveLocation: ArchiveLocation,
       resourceKind: ResourceKind,
     ): ImportJobInput => {
-      const [
-        uri,
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioMetadata,
-        archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       return {
@@ -166,7 +164,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ScenarioMetadata,
         resourceKind,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -186,19 +184,21 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidScenarioMetadataFile: async (resourceKind: ResourceKind) => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioMetadata,
-        'scenario metadata file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
-      return PrepareZipFile(
-        validScenarioMetadataFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validScenarioMetadataFileContent)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

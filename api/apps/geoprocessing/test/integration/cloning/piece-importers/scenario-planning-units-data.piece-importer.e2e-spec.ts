@@ -6,16 +6,16 @@ import {
 } from '@marxan-jobs/planning-unit-geometry';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
 import {
   ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
@@ -28,9 +28,11 @@ import {
   getRepositoryToken,
   TypeOrmModule,
 } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { DeleteProjectPus, GivenProjectPus, PrepareZipFile } from '../fixtures';
+import { DeleteProjectPus, GivenProjectPus } from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -138,11 +140,8 @@ const getFixtures = async () => {
       );
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [
-        uri,
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioPlanningUnitsData,
-        archiveLocation.value,
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
       return {
@@ -152,7 +151,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ScenarioPlanningUnitsData,
         resourceKind,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -172,19 +171,23 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidScenarioPlanningUnitsDataFile: async () => {
-      const [
-        { relativePath },
-      ] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioPlanningUnitsData,
-        'scenario planning units data file relative path',
         { kind: resourceKind, scenarioId: oldScenarioId },
       );
 
-      return PrepareZipFile(
-        validScenarioPlanningUnitsDataFileContent,
-        fileRepository,
+      const exportId = v4();
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(
+          JSON.stringify(validScenarioPlanningUnitsDataFileContent),
+        ),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

@@ -1,9 +1,9 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentLocation } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -80,9 +80,15 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
     }));
     const content: ScenarioRunResultsContent = { blmResults, marxanRunResults };
 
-    const outputFile = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.ScenarioRunResults,
+      { kind: input.resourceKind, scenarioId: input.resourceId },
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(content)),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(outputFile)) {
@@ -93,11 +99,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ScenarioRunResults,
-        outputFile.right,
-        { kind: input.resourceKind, scenarioId: input.resourceId },
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

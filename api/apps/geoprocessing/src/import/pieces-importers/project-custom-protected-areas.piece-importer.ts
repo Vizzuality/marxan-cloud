@@ -1,10 +1,10 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -53,18 +53,11 @@ export class ProjectCustomProtectedAreasPieceImporter
       throw new Error(errorMessage);
     }
 
-    const customProjectProtectedAreasrError = await extractFile(
-      readableOrError.right,
-      customProjectProtectedAreasLocation.relativePath,
-    );
-    if (isLeft(customProjectProtectedAreasrError)) {
-      const errorMessage = `Project custom protected areas file extraction failed: ${customProjectProtectedAreasLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const customProjectProtectedAreasrError = buffer.toString();
 
     const customProjectProtectedAreas: ProjectCustomProtectedAreasContent[] = JSON.parse(
-      customProjectProtectedAreasrError.right,
+      customProjectProtectedAreasrError,
     );
 
     if (customProjectProtectedAreas.length) {

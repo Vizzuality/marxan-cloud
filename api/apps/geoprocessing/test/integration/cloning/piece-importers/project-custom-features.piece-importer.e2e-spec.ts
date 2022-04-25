@@ -2,20 +2,20 @@ import { ProjectCustomFeaturesPieceImporter } from '@marxan-geoprocessing/import
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import {
+  CloningFilesRepository,
+  CloningFileSRepositoryModule,
+} from '@marxan/cloning-files-repository';
+import {
   ArchiveLocation,
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   ProjectCustomFeature,
   ProjectCustomFeaturesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { FeatureTag } from '@marxan/features';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -25,13 +25,14 @@ import {
   getRepositoryToken,
   TypeOrmModule,
 } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { DeepPartial, EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
   GenerateRandomGeometries,
   GivenProjectExists,
-  PrepareZipFile,
 } from '../fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -141,9 +142,8 @@ const getFixtures = async () => {
     GivenProject: () =>
       GivenProjectExists(apiEntityManager, projectId, organizationId),
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [uri] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectCustomFeatures,
-        archiveLocation.value,
       );
       return {
         componentId: v4(),
@@ -152,7 +152,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ProjectCustomFeatures,
         resourceKind: ResourceKind.Project,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -172,11 +172,6 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidProjectCustomFeaturesFile: async () => {
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectCustomFeatures,
-        'project custom features file relative path',
-      );
-
       const geometries = await GenerateRandomGeometries(
         geoEntityManager,
         amountOfCustomFeatures * recordsOfDataForEachCustomFeature,
@@ -207,11 +202,19 @@ const getFixtures = async () => {
           })),
       };
 
-      return PrepareZipFile(
-        validProjectCustomFeaturesFile,
-        fileRepository,
+      const exportId = v4();
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
+        ClonePiece.ProjectCustomFeatures,
+      );
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validProjectCustomFeaturesFile)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

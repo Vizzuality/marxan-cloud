@@ -38,6 +38,7 @@ export class FinalizeArchiveHandler
       .filter(isDefined);
 
     const archiveResult = await this.archiveCreator.zip(
+      exportId.value,
       pieces.map((piece) => ({
         uri: piece.uri,
         relativeDestination: piece.relativePath,

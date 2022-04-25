@@ -6,7 +6,7 @@ import {
   ClonePiece,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
 import {
   CloningFilesRepository,
@@ -23,7 +23,9 @@ import {
 } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { GenerateRandomGeometries, PrepareZipFile } from '../fixtures';
+import { GenerateRandomGeometries } from '../fixtures';
+import { Readable } from 'stream';
+import { isLeft } from 'fp-ts/lib/Either';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -96,9 +98,8 @@ const getFixtures = async () => {
       await protectedAreasRepo.delete({ projectId });
     },
     GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
-      const [uri] = ClonePieceUrisResolver.resolveFor(
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectCustomProtectedAreas,
-        archiveLocation.value,
       );
       return {
         componentId: v4(),
@@ -107,7 +108,7 @@ const getFixtures = async () => {
         projectId,
         piece: ClonePiece.ProjectCustomProtectedAreas,
         resourceKind: ResourceKind.Project,
-        uris: [uri.toSnapshot()],
+        uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
       };
     },
@@ -127,11 +128,6 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidProjectCustomProtectedAreasFile: async () => {
-      const [{ relativePath }] = ClonePieceUrisResolver.resolveFor(
-        ClonePiece.ProjectCustomProtectedAreas,
-        'project custom protected areas file relative path',
-      );
-
       const geometries = await GenerateRandomGeometries(entityManager, 3, true);
 
       validProjectCustomProtectedAreasFile = geometries.map((geom, index) => ({
@@ -139,11 +135,19 @@ const getFixtures = async () => {
         fullName: `${index}`,
       }));
 
-      return PrepareZipFile(
-        validProjectCustomProtectedAreasFile,
-        fileRepository,
+      const exportId = v4();
+      const relativePath = ClonePieceRelativePathResolver.resolveFor(
+        ClonePiece.ProjectCustomProtectedAreas,
+      );
+
+      const uriOrError = await fileRepository.saveCloningFile(
+        exportId,
+        Readable.from(JSON.stringify(validProjectCustomProtectedAreasFile)),
         relativePath,
       );
+
+      if (isLeft(uriOrError)) throw new Error("couldn't save file");
+      return new ArchiveLocation(uriOrError.right);
     },
     WhenPieceImporterIsInvoked: (input: ImportJobInput) => {
       return {

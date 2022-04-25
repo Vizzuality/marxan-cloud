@@ -9,4 +9,6 @@ export interface ExportSnapshot {
   importResourceId?: string;
   archiveLocation?: string;
   exportPieces: ExportComponentSnapshot[];
+  foreignExport: boolean;
+  createdAt: Date;
 }

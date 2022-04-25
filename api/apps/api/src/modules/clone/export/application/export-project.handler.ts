@@ -46,8 +46,9 @@ export class ExportProjectHandler
   }: ExportProject): Promise<ExportProjectCommandResult> {
     const kind = ResourceKind.Project;
     const pieces = await this.resourcePieces.resolveForProject(id, scenarioIds);
+    const foreignExport = false;
     const exportRequest = this.eventPublisher.mergeObjectContext(
-      Export.newOne(id, kind, ownerId, pieces, cloning),
+      Export.newOne(id, kind, ownerId, pieces, cloning, foreignExport),
     );
     await this.exportRepository.save(exportRequest);
 

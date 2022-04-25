@@ -7,11 +7,13 @@ export const unknownError = Symbol(`unknown error`);
 export const storageNotReachable = Symbol(`storage not reachable`);
 export const fileNotFound = Symbol(`file not found`);
 export const hackerFound = Symbol(`please hands off`);
+export const fileAlreadyExists = Symbol(`file already exists`);
 
 export type SaveFileError =
   | typeof unknownError
   | typeof storageNotReachable
-  | typeof hackerFound;
+  | typeof hackerFound
+  | typeof fileAlreadyExists;
 
 export type GetFileError =
   | typeof storageNotReachable
@@ -19,10 +21,18 @@ export type GetFileError =
   | typeof hackerFound;
 
 export abstract class CloningFilesRepository {
-  abstract save(
+  abstract get(uri: string): Promise<Either<GetFileError, Readable>>;
+
+  abstract saveZipFile(
+    exportId: string,
     stream: Readable,
-    extension?: string,
   ): Promise<Either<SaveFileError, string>>;
 
-  abstract get(uri: string): Promise<Either<GetFileError, Readable>>;
+  abstract saveCloningFile(
+    exportId: string,
+    stream: Readable,
+    relativePath: string,
+  ): Promise<Either<SaveFileError, string>>;
+
+  abstract deleteExportFolder(exportId: string): Promise<void>;
 }

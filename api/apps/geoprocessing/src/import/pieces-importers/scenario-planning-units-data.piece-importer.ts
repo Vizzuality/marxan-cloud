@@ -1,14 +1,14 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
-import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ScenarioPlanningUnitsDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-planning-units-data';
 import {
   ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
   toLockEnum,
 } from '@marxan/scenarios-planning-unit';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -55,18 +55,11 @@ export class ScenarioPlanningUnitsDataPieceImporter
       throw new Error(errorMessage);
     }
 
-    const stringScenarioPlanningUnitsDataOrError = await extractFile(
-      readableOrError.right,
-      scenarioPlanningUnitsDataLocation.relativePath,
-    );
-    if (isLeft(stringScenarioPlanningUnitsDataOrError)) {
-      const errorMessage = `Scenario planning units data file extraction failed: ${scenarioPlanningUnitsDataLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringScenarioPlanningUnitsDataOrError = buffer.toString();
 
     const { planningUnitsData }: ScenarioPlanningUnitsDataContent = JSON.parse(
-      stringScenarioPlanningUnitsDataOrError.right,
+      stringScenarioPlanningUnitsDataOrError,
     );
 
     await this.entityManager.transaction(async (em) => {

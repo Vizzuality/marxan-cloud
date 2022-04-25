@@ -2,6 +2,7 @@ import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ResourceKind } from '@marxan/cloning/domain';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -43,6 +44,9 @@ export class ExportEntity {
   })
   archiveLocation?: string;
 
+  @Column({ type: 'bool', name: 'foreign_export' })
+  foreignExport!: boolean;
+
   @ManyToOne(() => User, (user) => user.id, {
     onDelete: 'CASCADE',
   })
@@ -57,6 +61,12 @@ export class ExportEntity {
   })
   components!: ExportComponentEntity[];
 
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamp',
+  })
+  createdAt!: Date;
+
   static fromAggregate(exportAggregate: Export): ExportEntity {
     const snapshot = exportAggregate.toSnapshot();
 
@@ -68,6 +78,8 @@ export class ExportEntity {
     exportEntity.ownerId = snapshot.ownerId;
     exportEntity.importResourceId = snapshot.importResourceId;
     exportEntity.archiveLocation = snapshot.archiveLocation;
+    exportEntity.foreignExport = snapshot.foreignExport;
+    exportEntity.createdAt = snapshot.createdAt;
     exportEntity.components = snapshot.exportPieces.map(
       ExportComponentEntity.fromSnapshot,
     );
@@ -83,6 +95,8 @@ export class ExportEntity {
       ownerId: this.ownerId,
       importResourceId: this.importResourceId,
       archiveLocation: this.archiveLocation,
+      foreignExport: this.foreignExport,
+      createdAt: this.createdAt,
       exportPieces: this.components.map((component) => component.toSnapshot()),
     });
   }

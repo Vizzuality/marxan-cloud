@@ -2,7 +2,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -93,15 +93,8 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const stringProjectMetadataOrError = await extractFile(
-      readableOrError.right,
-      projectMetadataLocation.relativePath,
-    );
-    if (isLeft(stringProjectMetadataOrError)) {
-      const errorMessage = `Project metadata file extraction failed: ${projectMetadataLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringProjectMetadataOrError = buffer.toString();
 
     // TODO As we don't handle organizations for the time being,
     // the imported/cloned project is homed arbitrarily within an
@@ -110,7 +103,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     // an imported/cloned project should be created.
     const organizationId = await this.getRandomOrganizationId();
     const projectMetadata: ProjectMetadataContent = JSON.parse(
-      stringProjectMetadataOrError.right,
+      stringProjectMetadataOrError,
     );
 
     await this.entityManager.transaction(async (em) => {

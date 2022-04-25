@@ -2,16 +2,16 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ResourceKind } from '@marxan/cloning/domain';
 import {
   BlmResultsContent,
   MarxanRunResultsContent,
   ScenarioRunResultsContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
-import { extractFile } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -60,20 +60,15 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const scenarioRunResultsrError = await extractFile(
-      readableOrError.right,
-      scenarioRunResultsLocation.relativePath,
-    );
-    if (isLeft(scenarioRunResultsrError)) {
-      const errorMessage = `Scenario Run Results file extraction failed: ${scenarioRunResultsLocation.relativePath}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringScenarioProtectedAreasOrError = buffer.toString();
 
     const {
       marxanRunResults,
       blmResults,
-    }: ScenarioRunResultsContent = JSON.parse(scenarioRunResultsrError.right);
+    }: ScenarioRunResultsContent = JSON.parse(
+      stringScenarioProtectedAreasOrError,
+    );
 
     await this.geoprocessingEntityManager.transaction(async (em) => {
       if (marxanRunResults.length)

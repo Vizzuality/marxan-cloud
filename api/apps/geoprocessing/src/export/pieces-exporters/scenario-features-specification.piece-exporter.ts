@@ -1,7 +1,9 @@
 import { SpecificationOperation } from '@marxan-api/modules/specification';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentLocation } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   FeatureIdCalculated,
   FeaturesConfig,
@@ -10,7 +12,6 @@ import {
   searchFeatureIdInObject,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features/scenario-features-data.geo.entity';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { isDefined } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
@@ -226,9 +227,19 @@ export class ScenarioFeaturesSpecificationPieceExporter
         };
       });
     }
-    const outputFile = await this.fileRepository.save(
+
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.FeaturesSpecification,
+      {
+        kind: input.resourceKind,
+        scenarioId: input.resourceId,
+      },
+    );
+
+    const outputFile = await this.fileRepository.saveCloningFile(
+      input.exportId,
       Readable.from(JSON.stringify(fileContent)),
-      `json`,
+      relativePath,
     );
 
     if (isLeft(outputFile)) {
@@ -238,14 +249,7 @@ export class ScenarioFeaturesSpecificationPieceExporter
     }
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.FeaturesSpecification,
-        outputFile.right,
-        {
-          kind: input.resourceKind,
-          scenarioId: input.resourceId,
-        },
-      ),
+      uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
   }
 }

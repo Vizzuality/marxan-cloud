@@ -1,29 +1,26 @@
 import {
   ArchiveLocation,
   ClonePiece,
+  ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
-import {
-  ProjectExportConfigContent,
-  ScenarioExportConfigContent,
-} from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { ImportResourcePiecesAdapter } from './import-resource-pieces.adapter';
-import { ImportComponent } from '../domain';
 import { v4 } from 'uuid';
+import { ExportComponentSnapshot } from '../../export/domain';
+import { ImportComponent } from '../domain';
+import { ImportResourcePiecesAdapter } from './import-resource-pieces.adapter';
 
 interface ResolveForProjectParams {
   resourceId: ResourceId;
-  pieces: ProjectExportConfigContent['pieces'];
-  archiveLocation: ArchiveLocation;
+  pieces: ExportComponentSnapshot[];
+  oldProjectId: ResourceId;
 }
 
 interface ResolveForScenarioParams {
   resourceId: ResourceId;
-  pieces: ScenarioExportConfigContent['pieces'];
-  archiveLocation: ArchiveLocation;
+  pieces: ExportComponentSnapshot[];
 }
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -71,35 +68,63 @@ const getFixtures = async () => {
   }).compile();
   await sandbox.init();
 
+  const oldProjectId = ResourceId.create();
   const sut = sandbox.get(ImportResourcePiecesAdapter);
 
-  const projectPieces = [ClonePiece.ProjectMetadata];
-  const scenarioPieces = [ClonePiece.ScenarioMetadata];
+  const projectPieces: ExportComponentSnapshot[] = [
+    {
+      piece: ClonePiece.ProjectMetadata,
+      resourceId: oldProjectId.value,
+      finished: true,
+      id: ComponentId.create().value,
+      uris: [
+        { relativePath: 'foo/bar.txt', uri: '/storage/files/foo/bar.txt' },
+      ],
+    },
+  ];
+  const getScenarioPieces = (
+    id: string,
+    resourceKind: ResourceKind,
+  ): ExportComponentSnapshot[] => {
+    const relativePath =
+      resourceKind === ResourceKind.Project
+        ? `scenarios/${id}/file.json`
+        : 'file.json';
+
+    return [
+      {
+        piece: ClonePiece.ScenarioMetadata,
+        resourceId: id,
+        finished: true,
+        id: ComponentId.create().value,
+        uris: [
+          {
+            relativePath,
+            uri: `/storage/files/${relativePath}`,
+          },
+        ],
+      },
+    ];
+  };
   const scenariosCount = 3;
 
   return {
     GivenAProjectImport: () => {
-      const scenarioPiecesObject: ProjectExportConfigContent['pieces']['scenarios'] = {};
-      Array(scenariosCount)
-        .fill(0)
-        .forEach(() => {
-          const id = v4();
-          scenarioPiecesObject[id] = scenarioPieces;
-        });
-
       return {
         resourceId: ResourceId.create(),
-        pieces: {
-          project: projectPieces,
-          scenarios: scenarioPiecesObject,
-        },
-        archiveLocation: new ArchiveLocation('whatever'),
+        pieces: [
+          ...projectPieces,
+          ...Array(scenariosCount)
+            .fill(0)
+            .flatMap(() => getScenarioPieces(v4(), ResourceKind.Project)),
+        ],
+        oldProjectId,
       };
     },
     GivenAScenarioImport: () => {
       return {
         resourceId: ResourceId.create(),
-        pieces: scenarioPieces,
+        pieces: getScenarioPieces(v4(), ResourceKind.Scenario),
         archiveLocation: new ArchiveLocation('whatever'),
       };
     },
@@ -112,62 +137,46 @@ const getFixtures = async () => {
       return [
         {
           resourceId: ResourceId.create(),
-          pieces: {
-            project: projectPieces,
-            scenarios: {
-              [scenarioId]: scenarioPieces,
-            },
-          },
-          archiveLocation: new ArchiveLocation('whatever'),
+          pieces: [
+            ...projectPieces,
+            ...getScenarioPieces(scenarioId, ResourceKind.Project),
+          ],
+          oldProjectId,
         },
         {
           resourceId: new ResourceId(scenarioId),
-          pieces: scenarioPieces,
-          archiveLocation: new ArchiveLocation('whatever'),
+          pieces: getScenarioPieces(scenarioId, ResourceKind.Scenario),
         },
         scenarioId,
       ];
     },
     WhenCallingResolveForProject: ({
       resourceId,
-      archiveLocation,
       pieces,
+      oldProjectId,
     }: ResolveForProjectParams) =>
-      sut.resolveForProject(resourceId, archiveLocation, pieces),
+      sut.resolveForProject(resourceId, pieces, oldProjectId),
     WhenCallingResolveForScenario: ({
       resourceId,
-      archiveLocation,
       pieces,
-    }: ResolveForScenarioParams) =>
-      sut.resolveForScenario(
-        resourceId,
-        archiveLocation,
-        pieces,
-        ResourceKind.Scenario,
-        'it should not affect the test',
-      ),
+    }: ResolveForScenarioParams) => sut.resolveForScenario(resourceId, pieces),
     WhenCallingResolveForProjectAndForScenario: (
       projectParams: ResolveForProjectParams,
       scenarioParams: ResolveForScenarioParams,
     ) => [
       sut.resolveForProject(
         projectParams.resourceId,
-        projectParams.archiveLocation,
         projectParams.pieces,
+        projectParams.oldProjectId,
       ),
-      sut.resolveForScenario(
-        scenarioParams.resourceId,
-        scenarioParams.archiveLocation,
-        scenarioParams.pieces,
-        ResourceKind.Scenario,
-        'it should not affect the test',
-      ),
+      sut.resolveForScenario(scenarioParams.resourceId, scenarioParams.pieces),
     ],
     ThenProjectAndScenarioPiecesShouldBeReturned: (
       components: ImportComponent[],
     ) => {
       expect(components).toHaveLength(
-        projectPieces.length + scenarioPieces.length * scenariosCount,
+        projectPieces.length +
+          getScenarioPieces('', ResourceKind.Project).length * scenariosCount,
       );
 
       const projectComponent = components.find(
@@ -182,7 +191,9 @@ const getFixtures = async () => {
       );
     },
     ThenScenarioPiecesShouldBeReturned: (components: ImportComponent[]) => {
-      expect(components).toHaveLength(scenarioPieces.length);
+      expect(components).toHaveLength(
+        getScenarioPieces('', ResourceKind.Scenario).length,
+      );
     },
     ThenScenarioPiecesShouldHaveDifferentRelativePaths: (
       projectComponents: ImportComponent[],

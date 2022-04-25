@@ -4,8 +4,8 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { ClonePieceUrisResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
+import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningUnitsGridGeoJsonTransform } from '@marxan/cloning/infrastructure/clone-piece-data/planning-units-grid-geojson';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { Injectable } from '@nestjs/common';
@@ -66,9 +66,14 @@ export class PlanningUnitsGridGeojsonPieceExporter
     );
     geoJsonStream.pipe(geojsonFileTransform);
 
-    const gridGeoJson = await this.fileRepository.save(
+    const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      ClonePiece.PlanningUnitsGridGeojson,
+    );
+
+    const gridGeoJson = await this.fileRepository.saveCloningFile(
+      input.exportId,
       geojsonFileTransform,
-      'json',
+      relativePath,
     );
 
     if (isLeft(gridGeoJson)) {
@@ -79,11 +84,7 @@ export class PlanningUnitsGridGeojsonPieceExporter
 
     return {
       ...input,
-      uris: ClonePieceUrisResolver.resolveFor(
-        ClonePiece.PlanningUnitsGridGeojson,
-        gridGeoJson.right,
-        { kind: ResourceKind.Project, scenarioId: '' },
-      ),
+      uris: [new ComponentLocation(gridGeoJson.right, relativePath)],
     };
   }
 }

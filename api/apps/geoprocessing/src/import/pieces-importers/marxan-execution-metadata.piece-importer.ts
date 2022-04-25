@@ -1,29 +1,23 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
-import {
-  MarxanExecutionMetadataFolderType,
-  getMarxanExecutionMetadataFolderRelativePath,
-  MarxanExecutionMetadataContent,
-  MarxanExecutionMetadataElement,
-} from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentLocationSnapshot } from '@marxan/cloning/domain';
+import {
+  isMarxanExecutionMetadataFolderRelativePath,
+  MarxanExecutionMetadataContent,
+  MarxanExecutionMetadataFolderType,
+  marxanExecutionMetadataRelativePath,
+} from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
-import { extractFile, extractFiles } from '@marxan/utils';
+import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { Readable } from 'stream';
 import { EntityManager } from 'typeorm/entity-manager/EntityManager';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
-
-type FolderData = {
-  id: string;
-  relativePath: string;
-  type: MarxanExecutionMetadataFolderType;
-};
 
 type MetadataFolderBuffers = Record<string, Buffer>;
 
@@ -44,128 +38,107 @@ export class MarxanExecutionMetadataPieceImporter
     return piece === ClonePiece.MarxanExecutionMetadata;
   }
 
-  private async getExportFileFromFileRepo(uri: string): Promise<Readable> {
-    const readableOrError = await this.fileRepository.get(uri);
-    if (isLeft(readableOrError)) {
-      const errorMessage = `Export file is not available at ${uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    return readableOrError.right;
-  }
-
   private async getMetadataFolders(
-    exportFileUri: string,
-    marxanExecutionMetadata: MarxanExecutionMetadataElement[],
-    foldersZipsRelativePathPrefix: string,
+    locations: ComponentLocationSnapshot[],
   ): Promise<MetadataFolderBuffers> {
-    const metadataFoldersBuffers: MetadataFolderBuffers = {};
-    const foldersData = marxanExecutionMetadata.flatMap((metadata) => {
-      const relativePaths: FolderData[] = [
-        {
-          id: metadata.id,
-          type: 'input',
-          relativePath: getMarxanExecutionMetadataFolderRelativePath(
-            metadata.id,
-            'input',
-            foldersZipsRelativePathPrefix,
-          ),
-        },
-      ];
+    const buffers: MetadataFolderBuffers = {};
 
-      if (metadata.includesOutputFolder)
-        relativePaths.push({
-          id: metadata.id,
-          type: 'output',
-          relativePath: getMarxanExecutionMetadataFolderRelativePath(
-            metadata.id,
-            'output',
-            foldersZipsRelativePathPrefix,
-          ),
-        });
+    await Promise.all(
+      locations.map(async (location) => {
+        const readableOrError = await this.fileRepository.get(location.uri);
+        const result = isMarxanExecutionMetadataFolderRelativePath(
+          location.relativePath,
+        );
 
-      return relativePaths;
-    });
+        if (!result) {
+          const errorMessage = `Invalid marxan execution metadata folder relative path: ${location.relativePath}`;
+          this.logger.error(errorMessage);
+          throw new Error(errorMessage);
+        }
 
-    const exportFile = await this.getExportFileFromFileRepo(exportFileUri);
+        const { executionId, type } = result;
 
-    const buffersOrErrors = await extractFiles(
-      exportFile,
-      foldersData.map((data) => data.relativePath),
+        if (isLeft(readableOrError)) {
+          const errorMessage = `Error obtaining ${type} folder metadata for execution ${executionId}`;
+          this.logger.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        const buffer = await readableToBuffer(readableOrError.right);
+
+        buffers[`${executionId}-${type}`] = buffer;
+      }),
     );
 
-    if (isLeft(buffersOrErrors)) {
-      const errorMessage = `Error extracting input and output folders of marxan execution metadata`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    foldersData.forEach((data) => {
-      const buffer = buffersOrErrors.right[data.relativePath];
-
-      if (!buffer) {
-        const errorMessage = `Error extracting ${data.type} folder of execution metadata with id ${data.id}`;
-        this.logger.error(errorMessage);
-        throw new Error(errorMessage);
-      }
-
-      metadataFoldersBuffers[`${data.id}-${data.type}`] = buffer;
-    });
-
-    return metadataFoldersBuffers;
+    return buffers;
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, projectId, pieceResourceId: scenarioId } = input;
+    const { uris, projectId, pieceResourceId: scenarioId, piece } = input;
 
-    const marxanExecutionMetadataRepo = this.entityManager.getRepository(
-      MarxanExecutionMetadataGeoEntity,
+    const marxanExecutionMetadataLocation = uris.find((uri) =>
+      uri.relativePath.includes(marxanExecutionMetadataRelativePath),
     );
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+    if (!marxanExecutionMetadataLocation) {
+      const errorMessage = `uris array does not contain ${marxanExecutionMetadataRelativePath} uri`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
-    const [marxanExecutionMetadataLocation] = uris;
 
-    const exportFile = await this.getExportFileFromFileRepo(
+    const readableOrError = await this.fileRepository.get(
       marxanExecutionMetadataLocation.uri,
     );
-
-    const marxanExecutionMetadataOrError = await extractFile(
-      exportFile,
-      marxanExecutionMetadataLocation.relativePath,
-    );
-    if (isLeft(marxanExecutionMetadataOrError)) {
-      const errorMessage = `Marxan execution metadata file extraction failed: ${marxanExecutionMetadataLocation.relativePath}`;
+    if (isLeft(readableOrError)) {
+      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${marxanExecutionMetadataLocation.uri}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
+
+    const buffer = await readableToBuffer(readableOrError.right);
+    const stringMarxanExecutionMetadata = buffer.toString();
 
     const {
       marxanExecutionMetadata,
     }: MarxanExecutionMetadataContent = JSON.parse(
-      marxanExecutionMetadataOrError.right,
+      stringMarxanExecutionMetadata,
     );
 
-    const buffers = await this.getMetadataFolders(
-      marxanExecutionMetadataLocation.uri,
-      marxanExecutionMetadata,
-      marxanExecutionMetadataLocation.relativePath,
+    const foldersUris = uris.filter(
+      (uri) =>
+        uri.relativePath !== marxanExecutionMetadataLocation.relativePath,
     );
 
-    await marxanExecutionMetadataRepo.save(
-      marxanExecutionMetadata.map((metadata) => ({
-        scenarioId,
-        stdOutput: metadata.stdOutput,
-        stdError: metadata.stdError,
-        inputZip: buffers[`${metadata.id}-input`],
-        outputZip: buffers[`${metadata.id}-output`],
-        failed: metadata.failed,
-      })),
-    );
+    const buffers = await this.getMetadataFolders(foldersUris);
+
+    await this.entityManager
+      .getRepository(MarxanExecutionMetadataGeoEntity)
+      .save(
+        marxanExecutionMetadata.map((metadata) => {
+          const inputZip = buffers[`${metadata.id}-input`];
+          const outputZip = buffers[`${metadata.id}-output`];
+
+          if (!inputZip) {
+            const errorMessage = `uris array doesn't contain uri for metadata input folder for execution ${metadata.id}`;
+            this.logger.error(errorMessage);
+            throw new Error(errorMessage);
+          }
+          if (metadata.includesOutputFolder && !outputZip) {
+            const errorMessage = `uris array doesn't contain uri for metadata output folder for execution ${metadata.id}`;
+            this.logger.error(errorMessage);
+            throw new Error(errorMessage);
+          }
+
+          return {
+            scenarioId,
+            stdOutput: metadata.stdOutput,
+            stdError: metadata.stdError,
+            inputZip,
+            outputZip,
+            failed: metadata.failed,
+          };
+        }),
+      );
 
     return {
       importId: input.importId,

@@ -1,6 +1,4 @@
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
-import { ResourceKind } from '@marxan/cloning/domain';
-import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import {
   CloningFilesRepository,
   GetFileError,
@@ -8,7 +6,8 @@ import {
   storageNotReachable,
   unknownError,
 } from '@marxan/cloning-files-repository';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
+import { ResourceKind } from '@marxan/cloning/domain';
+import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -170,13 +169,14 @@ class FakeFileRepository implements CloningFilesRepository {
   private files: Record<string, Readable> = {};
   public errorWhileSaving = false;
 
-  async save(
+  async saveCloningFile(
+    exportId: string,
     stream: Readable,
-    extension?: string,
+    relativePath: string,
   ): Promise<Either<SaveFileError, string>> {
     if (this.errorWhileSaving) return left(unknownError);
 
-    const filename = `${v4()}${extension ? `.${extension}` : ''}`;
+    const filename = `${exportId}/${relativePath}`;
     this.files[filename] = stream;
     return right(filename);
   }
@@ -187,5 +187,16 @@ class FakeFileRepository implements CloningFilesRepository {
     if (!file) return left(storageNotReachable);
 
     return right(file);
+  }
+
+  saveZipFile(
+    exportId: string,
+    stream: Readable,
+  ): Promise<Either<SaveFileError, string>> {
+    throw new Error('Method not implemented.');
+  }
+
+  deleteExportFolder(exportId: string): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 }

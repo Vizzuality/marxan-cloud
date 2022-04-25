@@ -108,14 +108,11 @@ import {
   unknownError as fileRepositoryUnknownError,
   fileNotFound,
 } from '@marxan/cloning-files-repository';
-import {
-  archiveCorrupted,
-  invalidFiles,
-} from '@marxan/cloning/infrastructure/archive-reader.port';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { invalidExportZipFile } from '../clone/infra/import/generate-export-from-zip-file.command';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -792,7 +789,7 @@ export class ProjectsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<RequestProjectImportResponseDto> {
-    const idsOrError = await this.projectsService.importProject(
+    const idsOrError = await this.projectsService.importProjectFromZipFile(
       file,
       req.user.id,
     );
@@ -801,13 +798,8 @@ export class ProjectsController {
       switch (idsOrError.left) {
         case forbiddenError:
           throw new ForbiddenException();
-        case archiveCorrupted:
-          throw new BadRequestException('Missing export config file');
-        case invalidFiles:
-          throw new BadRequestException('Invalid export config file');
-        case fileRepositoryUnknownError:
-        case fileNotFound:
-          throw new InternalServerErrorException('Error while saving file');
+        case invalidExportZipFile:
+          throw new BadRequestException('Invalid export zip file');
         default:
           throw new InternalServerErrorException();
       }
