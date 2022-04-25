@@ -19,11 +19,11 @@ import {
 import {
   accessDenied,
   alreadyPublished,
-  sameUnderModerationStatus,
   internalError,
   notFound,
-  PublishedProjectService,
   notPublished,
+  PublishedProjectService,
+  sameUnderModerationStatus,
   underModerationError,
 } from '../published-project.service';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
@@ -55,6 +55,11 @@ import {
 } from 'nestjs-base-service';
 import { PublishedProjectSerializer } from '../published-project.serializer';
 import { PublishProjectDto } from '../dto/publish-project.dto';
+import { RequestPublishedProjectCloneResponseDto } from '@marxan-api/modules/projects/dto/export.project.dto';
+import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
+import { ExportId } from '@marxan-api/modules/clone';
+import { UserId } from '@marxan/domain-ids';
+import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -65,6 +70,7 @@ export class PublishProjectController {
   constructor(
     private readonly publishedProjectService: PublishedProjectService,
     private readonly serializer: PublishedProjectSerializer,
+    private readonly projectsService: ProjectsService,
   ) {}
 
   @Post(':id/publish')
@@ -277,5 +283,35 @@ export class PublishProjectController {
     }
 
     return await this.serializer.serialize(result.right);
+  }
+
+  @ApiNotFoundResponse()
+  @ApiOperation({
+    description:
+      'Clones a public project and makes the user the owner of the new project.',
+  })
+  @ApiOkResponse({ type: RequestPublishedProjectCloneResponseDto })
+  @Get('published-projects/:exportId/clone')
+  async clone(
+    @Req() req: RequestWithAuthenticatedUser,
+    @Param('exportId') exportId: string,
+  ): Promise<RequestPublishedProjectCloneResponseDto> {
+    const cloneResult = await this.projectsService.clone(
+      new ExportId(exportId),
+      new UserId(req.user.id),
+    );
+
+    if (isLeft(cloneResult)) {
+      throw mapAclDomainToHttpError(cloneResult.left, {
+        userId: req.user.id,
+        resourceType: projectResource.name.plural,
+        exportId,
+      });
+    }
+
+    return {
+      importId: cloneResult.right.importId,
+      projectId: cloneResult.right.projectId,
+    };
   }
 }

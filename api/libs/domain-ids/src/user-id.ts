@@ -1,10 +1,11 @@
-import { v4, version, validate } from 'uuid';
+import { v4, validate, version } from 'uuid';
 
 export class UserId {
   private readonly _token = 'user-id';
+
   constructor(public readonly value: string) {
-    if (!validate(value) || version(value) !== 4) {
-      throw new Error();
+    if (!value || !validate(value) || version(value) !== 4) {
+      throw new Error(`Invalid UserId: ${value}`);
     }
   }
 

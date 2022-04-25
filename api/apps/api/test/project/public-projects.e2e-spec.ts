@@ -159,3 +159,12 @@ test(`when unpublishing a public project that is under moderation as a platform 
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 });
+
+test(`when clonning a project that does not belong to the requesting user, it should work and make the user the owner of the new project`, async () => {
+  const projectId = await fixtures.GivenPublicProjectWasCreated();
+  await fixtures.GivenProjectHasAnExportRequested(projectId);
+
+  const newProjectId = await fixtures.WhenCloningAPublicProject(projectId);
+
+  await fixtures.ThenTheUserIsTheOwnerOfTheNewProject(newProjectId);
+});

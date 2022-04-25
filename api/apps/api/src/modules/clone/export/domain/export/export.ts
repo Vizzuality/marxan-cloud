@@ -132,4 +132,8 @@ export class Export extends AggregateRoot {
   #allPiecesReady = () => this.pieces.every((piece) => piece.isReady());
 
   isCloning = () => Boolean(this.importResourceId);
+
+  isProject() {
+    return this.resourceKind === ResourceKind.Project;
+  }
 }

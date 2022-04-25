@@ -11,6 +11,7 @@ export const getFixtures = async () => {
   const app = await bootstrapApplication();
   const randomUserToken = await GivenUserIsLoggedIn(app);
   const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
+  const userThatClonesTheProjectToken = await GivenUserIsLoggedIn(app, 'cc');
   const adminUserToken = await GivenUserIsLoggedIn(app, 'dd');
   const publishedProjectsRepo: Repository<PublishedProject> = app.get(
     getRepositoryToken(PublishedProject),
@@ -273,5 +274,10 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/moderation-status/clear`)
         .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenCloningAPublicProject: async (projectId: string) => {
+      const res = await request(app.getHttpServer());
+    },
+    GivenProjectHasAnExportRequested: async (projectId: string) => {},
+    ThenTheUserIsTheOwnerOfTheNewProject: async (newProjectId: string) => {},
   };
 };
