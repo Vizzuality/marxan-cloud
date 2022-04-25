@@ -55,7 +55,6 @@ import {
   GenerateExportFromZipFile,
   GenerateExportFromZipFileError,
 } from '../clone/infra/import/generate-export-from-zip-file.command';
-import { unknownError } from '@marxan/cloning-files-repository';
 import {
   ImportProject,
   ImportProjectCommandResult,
@@ -76,6 +75,14 @@ export const notAllowed = Symbol(`not allowed to that action`);
 export const notFound = Symbol(`project not found`);
 export const exportNotFound = Symbol(`project export not found`);
 export const apiEventDataNotFound = Symbol(`missing data in api event`);
+
+// Check where to centralize this symbols
+export const exportResourceKindIsNotProject = Symbol(
+  `export is not for a project`,
+);
+export const exportIsNotStandalone = Symbol(`export is not standalone`);
+export const projectIsNotPublished = Symbol(`project is not published`);
+export const projectNotFoundForExport = Symbol(`project not found`);
 
 @Injectable()
 export class ProjectsService {
@@ -328,6 +335,14 @@ export class ProjectsService {
     return right(void 0);
   }
 
+  async find(projectId: string): Promise<Project | undefined> {
+    try {
+      return this.projectsCrud.getById(projectId);
+    } catch {
+      return undefined;
+    }
+  }
+
   async updateBlmValues(
     projectId: string,
     userId: string,
@@ -379,6 +394,23 @@ export class ProjectsService {
     );
 
     return right(res);
+  }
+
+  async clone(
+    exportId: ExportId,
+    userId: UserId,
+  ): Promise<Either<any, ImportProjectCommandResult>> {
+    const exportInstance = await this.exportRepository.find(exportId);
+    if (!exportInstance) return left(exportNotFound);
+    if (!exportInstance.isForProject())
+      return left(exportResourceKindIsNotProject);
+    if (exportInstance.importResourceId) return left(exportIsNotStandalone);
+
+    const project = await this.find(exportInstance.resourceId.value);
+    if (!project) return left(projectNotFoundForExport);
+    if (!project.isPublic) return left(projectIsNotPublished);
+
+    return this.commandBus.execute(new ImportProject(exportId, userId));
   }
 
   async remove(

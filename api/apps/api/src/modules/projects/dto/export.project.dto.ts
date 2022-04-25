@@ -50,3 +50,17 @@ export class RequestProjectCloneResponseDto {
   })
   projectId!: string;
 }
+
+export class RequestPublishedProjectCloneResponseDto {
+  @ApiProperty({
+    description: 'ID of the import',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  importId!: string;
+
+  @ApiProperty({
+    description: 'ID of the new project',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  projectId!: string;
+}

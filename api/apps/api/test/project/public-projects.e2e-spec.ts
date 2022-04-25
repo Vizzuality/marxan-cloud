@@ -159,3 +159,15 @@ test(`when unpublishing a public project that is under moderation as a platform 
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenNoProjectIsAvailable(response);
 });
+
+test(`when cloning a project that does not belong to the requesting user, it should import the public project`, async () => {
+  const projectId = await fixtures.GivenPublicProjectWasCreated();
+  const exportId = await fixtures.GivenProjectHasAnExportPrepared(projectId);
+
+  const {
+    importId,
+    projectId: newProjectId,
+  } = await fixtures.WhenCloningAPublicProject(exportId);
+
+  await fixtures.ThenTheProjectShouldBeImported(newProjectId, importId);
+});

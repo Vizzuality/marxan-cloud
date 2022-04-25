@@ -97,21 +97,16 @@ import {
 } from '@marxan-api/decorators/acl.decorator';
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import {
-  RequestProjectExportResponseDto,
-  RequestProjectExportBodyDto,
   GetLatestExportResponseDto,
   RequestProjectCloneResponseDto,
+  RequestProjectExportBodyDto,
+  RequestProjectExportResponseDto,
 } from './dto/export.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
 import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
-import {
-  unknownError as fileRepositoryUnknownError,
-  fileNotFound,
-} from '@marxan/cloning-files-repository';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
-import { scenarioResource } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { invalidExportZipFile } from '../clone/infra/import/generate-export-from-zip-file.command';
 
 @UseGuards(JwtAuthGuard)

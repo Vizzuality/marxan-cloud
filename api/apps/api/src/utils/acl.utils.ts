@@ -58,7 +58,14 @@ import {
   unknownPngWebshotError,
 } from '@marxan/webshot';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
-import { projectIsMissingInfoForRegularPus } from '@marxan-api/modules/projects/projects.service';
+import {
+  exportIsNotStandalone,
+  exportNotFound,
+  exportResourceKindIsNotProject,
+  projectIsMissingInfoForRegularPus,
+  projectIsNotPublished,
+  projectNotFoundForExport,
+} from '@marxan-api/modules/projects/projects.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -66,6 +73,7 @@ interface ErrorHandlerOptions {
   resourceType?: string;
   scenarioId?: string;
   userId?: string;
+  exportId?: string;
 }
 
 export const mapAclDomainToHttpError = (
@@ -105,7 +113,12 @@ export const mapAclDomainToHttpError = (
     | typeof bestSolutionNotFound
     | typeof unknownPdfWebshotError
     | typeof unknownPngWebshotError
-    | typeof unknownError,
+    | typeof unknownError
+    | typeof exportNotFound
+    | typeof exportResourceKindIsNotProject
+    | typeof exportIsNotStandalone
+    | typeof projectNotFoundForExport
+    | typeof projectIsNotPublished,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -212,6 +225,27 @@ export const mapAclDomainToHttpError = (
     case notFoundSpec:
       return new NotFoundException(
         `Could not find spec for scenario with ID: ${options?.scenarioId}.`,
+      );
+
+    case exportNotFound:
+      return new NotFoundException(
+        `Could not find export with ID: ${options?.exportId}`,
+      );
+    case exportResourceKindIsNotProject:
+      return new BadRequestException(
+        `Export with ID ${options?.exportId} is not a project export`,
+      );
+    case exportIsNotStandalone:
+      return new BadRequestException(
+        `Export with ID ${options?.exportId} is not a standalone export`,
+      );
+    case projectNotFoundForExport:
+      return new NotFoundException(
+        `Project not found for export with ID ${options?.exportId}`,
+      );
+    case projectIsNotPublished:
+      return new ForbiddenException(
+        `Trying to clone project export with ID ${options?.exportId} which is not a published project`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

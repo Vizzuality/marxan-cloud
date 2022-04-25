@@ -94,6 +94,6 @@ import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export
     ProjectsController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
-  exports: [ProjectsCrudService, TypeOrmModule],
+  exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],
 })
 export class ProjectsModule {}
