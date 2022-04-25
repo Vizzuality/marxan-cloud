@@ -1,15 +1,19 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 import { blmFormat } from 'utils/units';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useCanEditScenario } from 'hooks/permissions';
-import { useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
+import { useSaveScenario, useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
 
+import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
@@ -28,11 +32,18 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
   maxBlmValue,
   minBlmValue,
 }: ScenariosBlmResultsProps) => {
+  const [submitting, setSubmitting] = useState(false);
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
+  const { addToast } = useToasts();
+
   const editable = useCanEditScenario(pid, sid);
+
   const { data: scenarioData } = useScenario(sid);
+  const { metadata } = scenarioData || {};
+  const { scenarioEditingMetadata, marxanInputParameterFile } = metadata || {};
 
   const {
     data: calibrationResultsData,
@@ -44,16 +55,77 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      blmCalibration: BLM < 10 ? BLM.toFixed(2) : BLM.toFixed(),
+      blmCalibration: BLM,
     };
   }, [BLM]);
+
+  const saveScenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
+
+  const onSaveBlm = useCallback((values) => {
+    setSubmitting(true);
+    const { blmCalibration } = values;
+    const meta = {
+      scenarioEditingMetadata,
+      marxanInputParameterFile: {
+        ...marxanInputParameterFile,
+        BLM: blmCalibration,
+      },
+    };
+
+    saveScenarioMutation.mutate({
+      id: `${sid}`,
+      data:
+      {
+        boundaryLengthModifier: blmCalibration,
+        metadata: mergeScenarioStatusMetaData(meta, {
+          tab: ScenarioSidebarTabs.PARAMETERS,
+          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
+        }),
+      },
+    }, {
+      onSuccess: ({ data: { data: s } }) => {
+        setSubmitting(false);
+        addToast('success-save-blm-value', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Scenario blm calibration saved</p>
+          </>
+        ), {
+          level: 'success',
+        });
+
+        console.info('Scenario blm calibration saved', s);
+      },
+      onError: () => {
+        setSubmitting(false);
+        addToast('error-save-blm-value', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">Scenario blm calibration not saved</p>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    saveScenarioMutation,
+    addToast,
+    marxanInputParameterFile,
+    scenarioEditingMetadata,
+  ]);
 
   return (
     <>
       <div className="flex">
         {calibrationResultsAreFetched && !!calibrationResultsData.length && (
           <FormRFF
-            onSubmit={() => { }}
+            onSubmit={onSaveBlm}
             initialValues={INITIAL_VALUES}
           >
             {({ form, values, handleSubmit }) => {
@@ -162,6 +234,25 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                   {/* <div className="w-full h-32">
                     <BLMChart data={calibrationResultsData} />
                   </div> */}
+
+                  <div
+                    className="flex justify-center mt-10"
+                  >
+                    <Button
+                      type="submit"
+                      theme="primary"
+                      size="lg"
+                      disabled={!editable}
+                    >
+                      Save
+                    </Button>
+                  </div>
+
+                  <Loading
+                    visible={submitting}
+                    className="absolute z-10 top-0 left-0 flex items-center justify-center w-full h-full text-white bg-gray-700 bg-opacity-90"
+                    iconClassName="w-10 h-10"
+                  />
                 </form>
               );
             }}

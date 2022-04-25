@@ -917,7 +917,7 @@ export function useScenarioCalibrationResults(scenarioId) {
       data: parsedData,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, data?.data]);
+  }, [query, data?.data, blmImages]);
 }
 
 export function useScenarioCalibrationRange(scenarioId) {
