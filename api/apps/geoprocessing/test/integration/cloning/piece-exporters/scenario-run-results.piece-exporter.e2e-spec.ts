@@ -137,7 +137,6 @@ const getFixtures = async () => {
         piece: ClonePiece.ScenarioRunResults,
         resourceId: scenarioId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     GivenScenarioExist: async () => {

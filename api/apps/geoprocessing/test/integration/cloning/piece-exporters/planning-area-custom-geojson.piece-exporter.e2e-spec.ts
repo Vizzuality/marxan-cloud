@@ -117,7 +117,6 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaCustomGeojson,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     GivenProjectExist: async () => {
