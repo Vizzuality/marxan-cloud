@@ -56,7 +56,6 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       name: projectData.name,
       description: projectData.description,
       planningUnitGridShape: projectData.planning_unit_grid_shape,
-      projectAlreadyCreated: input.isCloning,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

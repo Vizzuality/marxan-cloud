@@ -75,7 +75,6 @@ const getFixtures = async () => {
   const expectedContent: ProjectMetadataContent = {
     name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,
-    projectAlreadyCreated: false,
   };
 
   return {
@@ -96,7 +95,6 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectMetadata,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     GivenProjectExist: async () => {

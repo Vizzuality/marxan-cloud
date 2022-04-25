@@ -71,7 +71,6 @@ export class SchedulePieceExportHandler
       resourceId,
       resourceKind,
       allPieces,
-      isCloning: Boolean(importResourceId),
     });
 
     if (!job) {

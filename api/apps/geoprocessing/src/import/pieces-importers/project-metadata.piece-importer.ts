@@ -74,6 +74,17 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       .execute();
   }
 
+  private async checkIfProjectExists(em: EntityManager, projectId: string) {
+    const [project]: [{ id: string }] = await em
+      .createQueryBuilder()
+      .select('id')
+      .from('projects', 'p')
+      .where('id = :projectId', { projectId })
+      .execute();
+
+    return Boolean(project);
+  }
+
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, pieceResourceId, projectId, piece, ownerId } = input;
 
@@ -107,7 +118,11 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     );
 
     await this.entityManager.transaction(async (em) => {
-      if (projectMetadata.projectAlreadyCreated) {
+      const projectAlreadyCreated = await this.checkIfProjectExists(
+        em,
+        projectId,
+      );
+      if (projectAlreadyCreated) {
         await this.updateProject(em, projectId, projectMetadata);
       } else {
         await this.createProject(

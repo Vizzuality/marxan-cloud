@@ -36,10 +36,6 @@ class CommonFields {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  isCloning!: boolean;
 }
 
 class ScenarioMetadata {

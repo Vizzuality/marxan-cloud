@@ -83,7 +83,6 @@ export const getFixtures = async () => {
         const exportId = exportInstance.id.value;
         if (piece.piece === ClonePiece.ExportConfig) {
           const exportConfigContent: ProjectExportConfigContent = {
-            isCloning: true,
             version: exportVersion,
             name: 'random name',
             description: 'random desc',

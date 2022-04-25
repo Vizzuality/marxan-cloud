@@ -100,7 +100,6 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectMetadata,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     WhenJobFinishes: async (input: ExportJobInput) => {

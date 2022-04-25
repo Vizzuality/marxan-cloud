@@ -116,7 +116,6 @@ const getFixtures = async () => {
         piece: ClonePiece.ProjectCustomFeatures,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     GivenProjectExist: async () => {

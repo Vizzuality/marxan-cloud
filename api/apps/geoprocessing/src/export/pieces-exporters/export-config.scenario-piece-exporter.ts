@@ -63,7 +63,6 @@ export class ExportConfigScenarioPieceExporter implements ExportPieceProcessor {
       resourceId: scenarioId,
       exportId: input.exportId,
       pieces: input.allPieces.map((elem) => elem.piece),
-      isCloning: true,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

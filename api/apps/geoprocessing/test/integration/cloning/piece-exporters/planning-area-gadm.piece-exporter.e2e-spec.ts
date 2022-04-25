@@ -98,7 +98,6 @@ const getFixtures = async () => {
         piece: ClonePiece.PlanningAreaGAdm,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     GivenProjectWithGadmArea: async () => {

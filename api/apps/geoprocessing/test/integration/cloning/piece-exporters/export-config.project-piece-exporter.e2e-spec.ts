@@ -114,7 +114,6 @@ const getFixtures = async () => {
         project: [ClonePiece.ProjectMetadata, ClonePiece.ExportConfig],
         scenarios,
       },
-      isCloning: false,
     };
   };
 
@@ -143,7 +142,6 @@ const getFixtures = async () => {
         piece: ClonePiece.ExportConfig,
         resourceId: projectId,
         resourceKind: ResourceKind.Project,
-        isCloning: false,
       };
     },
     GivenProjectExist: async (options = defaultFixtureOptions) => {
