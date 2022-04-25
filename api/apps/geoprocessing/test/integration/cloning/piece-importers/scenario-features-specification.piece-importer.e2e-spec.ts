@@ -12,10 +12,7 @@ import {
   ScenarioFeaturesSpecificationContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -35,6 +32,7 @@ import { FeaturesConfig } from '@marxan/cloning/infrastructure/clone-piece-data/
 import { isDefined } from '@marxan/utils';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 function getFeatureClassNameByIdMap(
   features: {
@@ -112,7 +110,7 @@ const getFixtures = async () => {
       }),
       TypeOrmModule.forFeature([]),
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ScenarioFeaturesSpecificationPieceImporter,

@@ -1,11 +1,15 @@
-import { Module } from '@nestjs/common';
-import { AppConfig } from '@marxan-api/utils/config.utils';
+import { Module, Provider } from '@nestjs/common';
+import { AppConfig } from '../../../apps/api/src/utils/config.utils';
 import {
   CloningFilesRepository,
   CloningStoragePath,
 } from './cloning-files.repository';
 import { LocalCloningFilesStorage } from './local-cloning-files.repository';
 
+export const CloningFileProvider: Provider = {
+  provide: CloningFilesRepository,
+  useClass: VolumeCloningFilesStorage,
+};
 @Module({
   imports: [],
   providers: [

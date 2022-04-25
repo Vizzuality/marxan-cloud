@@ -1,4 +1,4 @@
-import { CloningFileSRepositoryModule } from '@marxan/cloning-files-repository';
+import { ApiCloningFilesRepositoryModule } from '@marxan-api/modules/cloning-file-repository/api-cloning-file-repository.module';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../../../api-events';
@@ -33,7 +33,7 @@ import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
     CqrsModule,
     ImportAdaptersModule,
     ExportAdaptersModule,
-    CloningFileSRepositoryModule,
+    ApiCloningFilesRepositoryModule,
   ],
   providers: [
     ExportConfigReader,

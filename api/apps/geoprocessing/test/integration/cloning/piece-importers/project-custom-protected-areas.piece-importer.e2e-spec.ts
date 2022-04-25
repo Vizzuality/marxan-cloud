@@ -8,10 +8,7 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -26,6 +23,7 @@ import { v4 } from 'uuid';
 import { GenerateRandomGeometries } from '../fixtures';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -71,7 +69,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([ProtectedArea]),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ProjectCustomProtectedAreasPieceImporter,

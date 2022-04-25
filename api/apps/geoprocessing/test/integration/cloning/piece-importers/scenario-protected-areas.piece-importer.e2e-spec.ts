@@ -12,10 +12,7 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-protected-areas';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -34,6 +31,7 @@ import {
 } from '../fixtures';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 interface ScenarioSelectResult {
   protected_area_filter_by_ids: string[];
@@ -114,7 +112,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ScenarioProtectedAreasPieceImporter,

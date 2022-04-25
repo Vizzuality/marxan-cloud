@@ -1,4 +1,3 @@
-export { CloningFileSRepositoryModule } from './cloning-files-repository.module';
 export {
   GetFileError,
   CloningFilesRepository,
@@ -10,4 +9,8 @@ export {
   CloningStoragePath,
 } from './cloning-files.repository';
 
-export { LocalCloningFilesStorage as LocalCloningFilesStorage } from './local-cloning-files.repository';
+export { LocalCloningFilesStorage } from './local-cloning-files.repository';
+export {
+  CloningFileProvider,
+  CloningFileSRepositoryModule,
+} from './cloning-files-repository.module';

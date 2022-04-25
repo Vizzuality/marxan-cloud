@@ -1,10 +1,7 @@
 import { ProjectMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-metadata.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -27,6 +24,7 @@ import {
   GivenProjectExists,
   GivenUserExists,
 } from '../fixtures';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 interface ProjectSelectResult {
   name: string;
@@ -96,7 +94,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ProjectMetadataPieceImporter,
