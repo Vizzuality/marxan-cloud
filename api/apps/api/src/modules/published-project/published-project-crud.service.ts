@@ -41,11 +41,13 @@ export class PublishedProjectCrudService extends AppBaseService<
       attributes: [
         'name',
         'description',
+        'location',
         'creators',
         'company',
         'resources',
         'underModeration',
         'originalProject',
+        'pngData',
       ],
       keyForAttribute: 'camelCase',
       originalProject: {
