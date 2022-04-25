@@ -59,7 +59,7 @@ import {
 } from '@marxan/webshot';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 import {
-  exportIsAlreadyImported,
+  exportIsNotStandalone,
   exportNotFound,
   exportResourceKindIsNotProject,
   projectIsMissingInfoForRegularPus,
@@ -116,7 +116,7 @@ export const mapAclDomainToHttpError = (
     | typeof unknownError
     | typeof exportNotFound
     | typeof exportResourceKindIsNotProject
-    | typeof exportIsAlreadyImported
+    | typeof exportIsNotStandalone
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished,
   options?: ErrorHandlerOptions,
@@ -235,9 +235,9 @@ export const mapAclDomainToHttpError = (
       return new BadRequestException(
         `Export with ID ${options?.exportId} is not a project export`,
       );
-    case exportIsAlreadyImported:
+    case exportIsNotStandalone:
       return new BadRequestException(
-        `Export with ID ${options?.exportId} is already imported`,
+        `Export with ID ${options?.exportId} is not a standalone export`,
       );
     case projectNotFoundForExport:
       return new NotFoundException(

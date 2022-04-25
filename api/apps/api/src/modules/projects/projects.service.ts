@@ -80,7 +80,7 @@ export const apiEventDataNotFound = Symbol(`missing data in api event`);
 export const exportResourceKindIsNotProject = Symbol(
   `export is not for a project`,
 );
-export const exportIsAlreadyImported = Symbol(`export is already imported`);
+export const exportIsNotStandalone = Symbol(`export is not standalone`);
 export const projectIsNotPublished = Symbol(`project is not published`);
 export const projectNotFoundForExport = Symbol(`project not found`);
 
@@ -402,9 +402,9 @@ export class ProjectsService {
   ): Promise<Either<any, ImportProjectCommandResult>> {
     const exportInstance = await this.exportRepository.find(exportId);
     if (!exportInstance) return left(exportNotFound);
-    if (!exportInstance.isProject())
+    if (!exportInstance.isForProject())
       return left(exportResourceKindIsNotProject);
-    if (exportInstance.importResourceId) return left(exportIsAlreadyImported);
+    if (exportInstance.importResourceId) return left(exportIsNotStandalone);
 
     const project = await this.find(exportInstance.resourceId.value);
     if (!project) return left(projectNotFoundForExport);

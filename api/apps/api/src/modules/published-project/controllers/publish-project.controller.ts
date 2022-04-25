@@ -291,7 +291,7 @@ export class PublishProjectController {
       'Clones a public project and makes the user the owner of the new project.',
   })
   @ApiOkResponse({ type: RequestPublishedProjectCloneResponseDto })
-  @Get('published-projects/:exportId/clone')
+  @Post('published-projects/:exportId/clone')
   async clone(
     @Req() req: RequestWithAuthenticatedUser,
     @Param('exportId') exportId: string,

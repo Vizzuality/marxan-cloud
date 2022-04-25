@@ -1,15 +1,32 @@
-import * as request from 'supertest';
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { GivenProjectExists } from '../steps/given-project';
-import { Repository } from 'typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { blmImageMock } from '@marxan-api/modules/scenarios/__mock__/blm-image-mock';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
+import { ComponentId, ComponentLocation } from '@marxan/cloning/domain';
+import { HttpStatus } from '@nestjs/common';
+import { CommandBus, CqrsModule } from '@nestjs/cqrs';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
+import * as request from 'supertest';
+import { Repository } from 'typeorm';
+import { validate, version } from 'uuid';
+import { ApiEventsService } from '../../src/modules/api-events';
+import { ApiEventByTopicAndKind } from '../../src/modules/api-events/api-event.topic+kind.api.entity';
+import { CompleteExportPiece } from '../../src/modules/clone/export/application/complete-export-piece.command';
+import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
+import { ArchiveReady, ExportId } from '../../src/modules/clone/export/domain';
+import { CompleteImportPiece } from '../../src/modules/clone/import/application/complete-import-piece.command';
+import { AllPiecesImported } from '../../src/modules/clone/import/domain';
+import { SchedulePieceImport } from '../../src/modules/clone/infra/import/schedule-piece-import.command';
+import { GivenProjectExists } from '../steps/given-project';
+import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../utils/api-application';
+import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 
 export const getFixtures = async () => {
-  const app = await bootstrapApplication();
-  const randomUserToken = await GivenUserIsLoggedIn(app);
+  const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
+  const randomUserToken = await GivenUserIsLoggedIn(app, 'aa');
   const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const userThatClonesTheProjectToken = await GivenUserIsLoggedIn(app, 'cc');
   const adminUserToken = await GivenUserIsLoggedIn(app, 'dd');
@@ -18,8 +35,17 @@ export const getFixtures = async () => {
   );
   const cleanups: (() => Promise<void>)[] = [];
 
+  const apiEvents = app.get(ApiEventsService);
+  const exportRepo = app.get(ExportRepository);
+  const fileRepo = app.get(CloningFilesRepository);
+  const commandBus = app.get(CommandBus);
+  const eventBusTestUtils = app.get(EventBusTestUtils);
+
+  eventBusTestUtils.startInspectingEvents();
+
   return {
     cleanup: async () => {
+      eventBusTestUtils.stopInspectingEvents();
       await Promise.all(cleanups.map((clean) => clean()));
       await app.close();
     },
@@ -274,10 +300,101 @@ export const getFixtures = async () => {
       await request(app.getHttpServer())
         .patch(`/api/v1/projects/${projectId}/moderation-status/clear`)
         .set('Authorization', `Bearer ${randomUserToken}`),
-    WhenCloningAPublicProject: async (projectId: string) => {
-      const res = await request(app.getHttpServer());
+    WhenCloningAPublicProject: async (exportId: string) => {
+      commandBus.subscribe((command) => {
+        if (command instanceof SchedulePieceImport) {
+          commandBus.execute(
+            new CompleteImportPiece(command.importId, command.componentId),
+          );
+        }
+      });
+
+      const res = await request(app.getHttpServer())
+        .post(`/api/v1/projects/published-projects/${exportId}/clone`)
+        .set('Authorization', `Bearer ${userThatClonesTheProjectToken}`)
+        .send()
+        .expect(HttpStatus.CREATED);
+
+      const importId: string = res.body.importId;
+      const projectId: string = res.body.projectId;
+
+      expect(importId).toBeDefined();
+      expect(projectId).toBeDefined();
+      expect(validate(importId) && version(importId) === 4).toEqual(true);
+      expect(validate(projectId) && version(projectId) === 4).toEqual(true);
+
+      await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
+
+      return { importId, projectId };
     },
-    GivenProjectHasAnExportRequested: async (projectId: string) => {},
-    ThenTheUserIsTheOwnerOfTheNewProject: async (newProjectId: string) => {},
+    GivenProjectHasAnExportPrepared: async (projectId: string) => {
+      const response = await request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/export`)
+        .set('Authorization', `Bearer ${randomUserToken}`)
+        .send({ scenarioIds: [] })
+        .expect(HttpStatus.CREATED);
+
+      const exportId = new ExportId(response.body.id);
+
+      const exportInstance = await exportRepo.find(exportId);
+
+      expect(exportInstance).toBeDefined();
+
+      const piecesUris: Record<string, string> = {};
+      await Promise.all(
+        exportInstance!.toSnapshot().exportPieces.map(async (piece, i) => {
+          const result = await fileRepo.saveCloningFile(
+            exportInstance!.id.value,
+            Readable.from(`${piece.piece}`),
+            `${piece.piece}.txt`,
+          );
+
+          if (isLeft(result)) {
+            throw new Error(`Error while saving ${piece.id} file`);
+          }
+
+          piecesUris[piece.id] = result.right;
+        }),
+      );
+
+      exportInstance!.toSnapshot().exportPieces.forEach((piece) => {
+        commandBus.execute(
+          new CompleteExportPiece(exportId, new ComponentId(piece.id), [
+            new ComponentLocation(
+              piecesUris[piece.id],
+              `${piece.id}-${piece.piece}.txt`,
+            ),
+          ]),
+        );
+      });
+
+      await eventBusTestUtils.waitUntilEventIsPublished(ArchiveReady);
+
+      return exportId.value;
+    },
+    ThenTheProjectShouldBeImported: async (
+      newProjectId: string,
+      importId: string,
+    ) => {
+      const res = await new Promise<ApiEventByTopicAndKind>(
+        (resolve, reject) => {
+          const findApiEventInterval = setInterval(async () => {
+            try {
+              const event = await apiEvents.getLatestEventForTopic({
+                topic: newProjectId,
+                kind: API_EVENT_KINDS.project__import__finished__v1__alpha,
+              });
+              clearInterval(findApiEventInterval);
+              resolve(event);
+            } catch (error) {}
+          }, 150);
+          setTimeout(() => {
+            clearInterval(findApiEventInterval);
+            reject('Import finished API event was not found');
+          }, 6000);
+        },
+      );
+      expect(res.data?.importId).toEqual(importId);
+    },
   };
 };

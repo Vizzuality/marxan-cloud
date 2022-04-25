@@ -185,7 +185,7 @@ export const getFixtures = async () => {
           }, 6000);
         },
       );
-      expect(res!.data?.importId).toEqual(importId.value);
+      expect(res.data?.importId).toEqual(importId.value);
     },
   };
 };
