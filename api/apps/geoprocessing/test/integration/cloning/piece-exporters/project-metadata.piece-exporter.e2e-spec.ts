@@ -75,7 +75,6 @@ const getFixtures = async () => {
   const expectedContent: ProjectMetadataContent = {
     name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,
-    projectAlreadyCreated: false,
   };
 
   return {

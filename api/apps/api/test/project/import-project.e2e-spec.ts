@@ -119,7 +119,6 @@ export const getFixtures = async () => {
       );
       const projectMetadataContent: ProjectMetadataContent = {
         name: 'test project',
-        projectAlreadyCreated: false,
         description: 'description',
       };
 

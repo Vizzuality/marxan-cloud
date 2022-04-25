@@ -65,9 +65,7 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile({
-      existingProject: false,
-    });
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -78,9 +76,7 @@ describe(ProjectMetadataPieceImporter, () => {
     await fixtures.GivenUser();
     await fixtures.GivenProject();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile({
-      existingProject: true,
-    });
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
@@ -120,7 +116,6 @@ const getFixtures = async () => {
     name: `test project - ${projectId}`,
     description: 'project description',
     planningUnitGridShape: PlanningUnitGridShape.Hexagon,
-    projectAlreadyCreated: false,
   };
 
   return {
@@ -168,11 +163,7 @@ const getFixtures = async () => {
     GivenNoProjectMetadataFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectMetadataFile: async (
-      { existingProject } = { existingProject: false },
-    ) => {
-      validProjectMetadataFileContent.projectAlreadyCreated = existingProject;
-
+    GivenValidProjectMetadataFile: async () => {
       const exportId = v4();
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectMetadata,
