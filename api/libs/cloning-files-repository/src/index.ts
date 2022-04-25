@@ -10,7 +10,4 @@ export {
 } from './cloning-files.repository';
 
 export { LocalCloningFilesStorage } from './local-cloning-files.repository';
-export {
-  CloningFileProvider,
-  CloningFileSRepositoryModule,
-} from './cloning-files-repository.module';
+export { CloningFilesRepositoryProvider } from './cloning-files-repository.provider';

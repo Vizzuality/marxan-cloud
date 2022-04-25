@@ -1,6 +1,6 @@
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import {
-  CloningFileProvider,
+  CloningFilesRepositoryProvider,
   CloningStoragePath,
 } from '@marxan/cloning-files-repository';
 import { Module } from '@nestjs/common';
@@ -10,10 +10,16 @@ import { Module } from '@nestjs/common';
   providers: [
     {
       provide: CloningStoragePath,
-      useValue: AppConfig.get<string>('storage.cloningFileStorage.localPath'),
+      useFactory: () => {
+        const path = AppConfig.get<string>(
+          'storage.cloningFileStorage.localPath',
+        );
+
+        return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
+      },
     },
-    CloningFileProvider,
+    CloningFilesRepositoryProvider,
   ],
-  exports: [CloningFileProvider],
+  exports: [CloningFilesRepositoryProvider],
 })
 export class ApiCloningFilesRepositoryModule {}

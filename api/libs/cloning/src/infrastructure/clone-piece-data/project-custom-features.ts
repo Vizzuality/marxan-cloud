@@ -3,7 +3,8 @@ import { GeometrySource } from '../../../../geofeatures/src';
 
 export const projectCustomFeaturesRelativePath = 'custom-features.json';
 
-//TODO Add debt
+// @debt JobStatus is a duplicated type as it is declared here and in
+// api/src/modules/scenarios/scenario.api.entity.ts
 enum JobStatus {
   draft = 'draft',
   created = 'created',
