@@ -225,6 +225,7 @@ export const getFixtures = async () => {
             ],
             resources: [{ title: expect.any(String), url: expect.any(String) }],
             location: expect.any(String),
+            pngData: expect.any(String),
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -242,6 +243,7 @@ export const getFixtures = async () => {
             name: expect.any(String),
             underModeration: true,
             description: expect.any(String),
+            location: expect.any(String),
             company: {
               name: expect.any(String),
               logoDataUrl: expect.any(String),
@@ -253,6 +255,7 @@ export const getFixtures = async () => {
               },
             ],
             resources: [{ title: expect.any(String), url: expect.any(String) }],
+            pngData: expect.any(String),
           },
           id: publicProjectId,
           type: 'published_projects',
