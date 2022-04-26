@@ -111,13 +111,18 @@ generate-geo-test-data: extract-geo-test-data
 	mv -f -u -Z data/data/processed/test-features.sql api/apps/api/test/fixtures/test-features.sql
 	rm -rf api/apps/api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/apps/api/test/fixtures/features
 
-# Don't forget to run make clean-slate && make start-api before repopulating the whole db
-# This will delete all existing data and create tables/views/etc. through the migrations that
-# run when starting up the API service.
-# Also, be sure to create a user before importing the geodata, otherwise it will fail with an
-# unrelated error message
+# Don't forget to run make clean-slate && make start-api before repopulating the
+# whole db This will delete all existing data and create tables/views/etc.
+# through the migrations that run when starting up the API service.
+#
+# No users are needed for this seed operation, strictly speaking, as
+# ETL-imported data is "associated" to a dummy userid (UUID zero).
 seed-geodb-data:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-seed-data
+
+# Same as seed-geodb-data, but it also creates a handful of users with hardcoded
+# passwords (not recommended for anything else than dev environments).
+seed-geodb-data-plus-initial-test-users: seed-api-init-data seed-geodb-data
 
 test-start-services: clean-slate
 	@echo "$(RED)Mounting docker file:$(NC) docker-compose-test-e2e.yml / docker-compose-test-e2e.local.yml"
