@@ -19,6 +19,7 @@ import {
 import {
   accessDenied,
   alreadyPublished,
+  exportError,
   internalError,
   notFound,
   notPublished,
@@ -118,6 +119,10 @@ export class PublishProjectController {
           throw new BadRequestException('This project was already published.');
         case notFound:
           throw new NotFoundException();
+        case exportError:
+          throw new InternalServerErrorException(
+            `The export could not be generated.`,
+          );
         case internalError:
           throw new InternalServerErrorException();
         default:

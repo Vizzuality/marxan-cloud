@@ -1,7 +1,7 @@
 import { WebshotConfig } from '@marxan/webshot';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
 import { Company, Creator, Resource } from './create-published-project.dto';
 
 export class PublishProjectDto {
@@ -41,4 +41,11 @@ export class CreatePublishProjectDto extends PublishProjectDto {
   @ValidateNested({ each: true })
   @Type(() => WebshotConfig)
   config!: WebshotConfig;
+
+  @ApiProperty()
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @IsUUID('all', { each: true })
+  scenarioIds?: string[];
 }
