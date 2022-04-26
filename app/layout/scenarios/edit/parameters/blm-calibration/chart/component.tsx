@@ -2,21 +2,13 @@ import React, {
   useRef, useState, useMemo, useEffect, useCallback,
 } from 'react';
 
-import { useDispatch, useSelector } from 'react-redux';
-
-import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
 import classnames from 'classnames';
 import {
   scaleLinear, line, area,
 } from 'd3';
-import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+import { blmFormat } from 'utils/units';
 
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
+import Tooltip from 'components/tooltip';
 
 import {
   VISUALIZATION_PADDING,
@@ -55,22 +47,24 @@ export interface BlmChartProps {
    * The array should contain 6 elements: 5 points + the BLM point.
    */
   data: DataRow[];
+
+  /**
+   * selected BLM value.
+  */
+  selected: number;
+
+  /**
+   * onChange selection.
+   */
+  onChange: (v: number) => void;
 }
 
-export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
+export const BlmChart: React.FC<BlmChartProps> = ({
+  data,
+  selected,
+  onChange,
+}: BlmChartProps) => {
   const containerRef: React.MutableRefObject<HTMLDivElement> = useRef(null);
-
-  const dispatch = useDispatch();
-
-  const { query } = useRouter();
-  const { sid } = query;
-
-  const { addToast } = useToasts();
-
-  const scenarioSlice = getScenarioEditSlice(sid);
-  const { setBlm, setBlmImage } = scenarioSlice.actions;
-
-  const { blm } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -118,68 +112,6 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
       setDimensions({ width: w, height: h });
     }
   }, [containerRef, setDimensions]);
-
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
-  const { scenarioEditingMetadata, marxanInputParameterFile } = metadata || {};
-
-  const saveScenarioMutation = useSaveScenario({
-    requestConfig: {
-      method: 'PATCH',
-    },
-  });
-
-  const onSaveBlm = useCallback((value) => {
-    const BLM = +value.toFixed(0);
-    const meta = {
-      scenarioEditingMetadata,
-      marxanInputParameterFile: {
-        ...marxanInputParameterFile,
-        BLM,
-      },
-    };
-
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data:
-      {
-        boundaryLengthModifier: BLM,
-        metadata: mergeScenarioStatusMetaData(meta, {
-          tab: ScenarioSidebarTabs.PARAMETERS,
-          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
-        }),
-      },
-    }, {
-      onSuccess: ({ data: { data: s } }) => {
-        addToast('success-save-blm-value', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario blm calibration saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-
-        console.info('Scenario blm calibration saved', s);
-      },
-      onError: () => {
-        addToast('error-save-blm-value', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario blm calibration not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [
-    sid,
-    saveScenarioMutation,
-    addToast,
-    marxanInputParameterFile,
-    scenarioEditingMetadata,
-  ]);
 
   /**
    * When containerRef changes, we update the dimensions of the SVG
@@ -254,7 +186,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           {/* Points */}
           <g>
             {data.map(({
-              cost, boundaryLength, pngData, blmValue,
+              cost, boundaryLength, blmValue,
             }, index) => (
               <foreignObject
                 // eslint-disable-next-line react/no-array-index-key
@@ -263,18 +195,47 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 y={yScale(boundaryLength)}
                 className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
               >
-                <div
-                  className={classnames({
-                    'w-3 h-3 rounded-full border-blue-500 border-2 bg-black hover:bg-primary-500 cursor-pointer hover:border-2': true,
-                    'bg-blue-500': blmValue === blm,
-                  })}
-                  onClick={() => {
-                    onSaveBlm(blmValue);
-                    dispatch(setBlm(blmValue));
-                    dispatch(setBlmImage(pngData));
-                  }}
-                  aria-hidden="true"
-                />
+                <Tooltip
+                  content={(
+                    <div className="flex flex-col bg-white p-2 rounded-md">
+                      <div className="flex justify-between text-xs space-x-2">
+                        <div>
+                          <span className="text-gray-600">Boundary Length:</span>
+                        </div>
+                        <div className="text-xs text-gray-700">
+                          {`${blmFormat(boundaryLength)}`}
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-xs space-x-2">
+                        <div>
+                          <span className="text-gray-600">Cost:</span>
+                        </div>
+                        <div className="text-xs text-gray-700">
+                          {`${blmFormat(cost)}`}
+                        </div>
+                      </div>
+                      <div className="flex justify-between text-xs space-x-2">
+                        <div>
+                          <span className="text-gray-600">BLM:</span>
+                        </div>
+                        <div className="text-xs text-gray-700">
+                          {`${blmFormat(blmValue)}`}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                >
+                  <div
+                    aria-hidden="true"
+                    className={classnames({
+                      'w-3 h-3 rounded-full border-blue-500 border-2 bg-black hover:bg-primary-500 cursor-pointer hover:border-2': true,
+                      'bg-blue-500': blmValue === selected,
+                    })}
+                    onClick={() => {
+                      onChange(blmValue);
+                    }}
+                  />
+                </Tooltip>
               </foreignObject>
             ))}
           </g>

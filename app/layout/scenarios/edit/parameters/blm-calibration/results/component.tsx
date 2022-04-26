@@ -13,6 +13,8 @@ import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
+import BlmChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
+
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
@@ -205,6 +207,14 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                         )}
                       </FieldRFF>
                       <p className="text-sm whitespace-pre opacity-50">{`max ${blmFormat(maxBlmValue)}`}</p>
+                      <Button
+                        type="submit"
+                        theme="primary"
+                        size="base"
+                        disabled={!editable}
+                      >
+                        Save
+                      </Button>
                     </div>
                   </div>
 
@@ -225,27 +235,22 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                     })}
                   </div>
 
-                  {/* <div className="flex flex-col mt-8 space-y-2">
-                    <h3 className="text-sm font-bold text-white">Boundary Length</h3>
-                    <p className="text-xs text-white">
-                      More
-                    </p>
-                  </div> */}
-                  {/* <div className="w-full h-32">
-                    <BLMChart data={calibrationResultsData} />
-                  </div> */}
-
-                  <div
-                    className="flex justify-center mt-10"
-                  >
-                    <Button
-                      type="submit"
-                      theme="primary"
-                      size="lg"
-                      disabled={!editable}
-                    >
-                      Save
-                    </Button>
+                  <div>
+                    <div className="flex flex-col mt-8 space-y-2">
+                      <h3 className="text-sm font-bold text-white">Boundary Length</h3>
+                      <p className="text-xs text-white">
+                        More
+                      </p>
+                    </div>
+                    <div className="w-full h-32">
+                      <BlmChart
+                        data={calibrationResultsData.sort((a, b) => a.cost - b.cost)}
+                        selected={values.blmCalibration}
+                        onChange={(v) => {
+                          form.change('blmCalibration', v);
+                        }}
+                      />
+                    </div>
                   </div>
 
                   <Loading
