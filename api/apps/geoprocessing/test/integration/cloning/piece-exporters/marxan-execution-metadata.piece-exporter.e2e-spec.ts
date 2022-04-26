@@ -3,10 +3,7 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { MarxanExecutionMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -21,6 +18,7 @@ import {
   GivenMarxanExecutionMetadata,
   readSavedFile,
 } from '../fixtures';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -64,7 +62,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([MarxanExecutionMetadataGeoEntity]),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       MarxanExecutionMetadataPieceExporter,

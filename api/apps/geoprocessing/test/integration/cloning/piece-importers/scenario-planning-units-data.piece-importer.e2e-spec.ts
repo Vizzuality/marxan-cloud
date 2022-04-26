@@ -5,10 +5,7 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { ImportJobInput } from '@marxan/cloning';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -33,6 +30,7 @@ import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { DeleteProjectPus, GivenProjectPus } from '../fixtures';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -84,7 +82,7 @@ const getFixtures = async () => {
         ProjectsPuEntity,
         PlanningUnitsGeom,
       ]),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ScenarioPlanningUnitsDataPieceImporter,

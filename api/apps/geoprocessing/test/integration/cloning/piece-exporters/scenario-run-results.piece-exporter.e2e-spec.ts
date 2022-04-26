@@ -8,10 +8,7 @@ import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
 import {
   LockStatus,
@@ -36,6 +33,7 @@ import {
   GivenScenarioPuData,
   readSavedFile,
 } from '../fixtures';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -89,7 +87,7 @@ const getFixtures = async () => {
         BlmFinalResultEntity,
         OutputScenariosPuDataGeoEntity,
       ]),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ScenarioRunResultsPieceExporter,

@@ -22,7 +22,10 @@ COPY --chown=$USER:$USER libs ./libs
 RUN mkdir -p /opt/marxan-project-cloning
 RUN chown -R $USER:$USER /opt/marxan-project-cloning
 
-RUN yarn prestart:prod
+# By deleting the full geoprocessing source tree we strictly enforce that no
+# direct or indirect dependencies between geoprocessing and api may
+# accidentally sneak in.
+RUN rm -rf apps/geoprocessing && yarn prestart:prod api
 
 EXPOSE 3000
 USER $USER

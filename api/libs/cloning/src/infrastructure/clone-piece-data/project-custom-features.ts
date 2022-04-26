@@ -1,8 +1,17 @@
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { FeatureTag } from '../../../../features/src';
 import { GeometrySource } from '../../../../geofeatures/src';
 
 export const projectCustomFeaturesRelativePath = 'custom-features.json';
+
+// @debt JobStatus is a duplicated type as it is declared here and in
+// api/src/modules/scenarios/scenario.api.entity.ts
+enum JobStatus {
+  draft = 'draft',
+  created = 'created',
+  running = 'running',
+  done = 'done',
+  failure = 'failure',
+}
 
 type FeatureData = {
   the_geom: string;

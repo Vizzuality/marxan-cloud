@@ -36,6 +36,8 @@ export enum ScenarioType {
   marxanWithZones = 'marxan-with-zones',
 }
 
+// @debt JobStatus is a duplicated type as it is declared here and in
+// libs/cloning/src/infrastructure/clone-piece-data/project-custom-features.ts
 export enum JobStatus {
   draft = 'draft',
   created = 'created',

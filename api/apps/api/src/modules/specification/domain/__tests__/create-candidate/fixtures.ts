@@ -1,10 +1,8 @@
 import { v4 } from 'uuid';
-import {
-  FeatureConfigInput,
-  SpecificationOperation,
-} from '../../feature-config';
+import { FeatureConfigInput } from '../../feature-config';
 import { Specification } from '../../specification';
 import { SpecificationCandidateCreated } from '../../events/specification-candidate-created.event';
+import { SpecificationOperation } from '@marxan/specification';
 
 export const getFixtures = () => {
   const scenarioId = v4();

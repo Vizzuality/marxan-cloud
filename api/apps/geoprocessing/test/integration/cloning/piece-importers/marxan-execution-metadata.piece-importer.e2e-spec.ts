@@ -1,10 +1,7 @@
 import { MarxanExecutionMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/marxan-execution-metadata.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -27,6 +24,7 @@ import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 type MetadataFolder = {
   id: string;
@@ -178,7 +176,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature([MarxanExecutionMetadataGeoEntity]),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       MarxanExecutionMetadataPieceImporter,

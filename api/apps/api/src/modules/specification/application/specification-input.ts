@@ -1,3 +1,4 @@
+import { SpecificationOperation } from '@marxan/specification';
 import {
   Equals,
   IsArray,
@@ -13,7 +14,6 @@ import {
   FeatureConfigCopy,
   FeatureConfigSplit,
   FeatureConfigStratification,
-  SpecificationOperation,
 } from '../domain';
 
 export class SpecificationInput {

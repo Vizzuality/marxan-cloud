@@ -1,10 +1,7 @@
 import { ScenarioMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/scenario-metadata.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -26,6 +23,7 @@ import {
   GivenScenarioExists,
   GivenUserExists,
 } from '../fixtures';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 interface ScenarioSelectResult {
   name: string;
@@ -100,7 +98,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ScenarioMetadataPieceImporter,

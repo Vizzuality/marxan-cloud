@@ -1,10 +1,7 @@
 import { ProjectCustomFeaturesPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-custom-features.piece-importer';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
-import {
-  CloningFilesRepository,
-  CloningFileSRepositoryModule,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -34,6 +31,7 @@ import {
   GenerateRandomGeometries,
   GivenProjectExists,
 } from '../fixtures';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -86,7 +84,7 @@ const getFixtures = async () => {
       }),
       TypeOrmModule.forFeature([GeoFeatureGeometry]),
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
-      CloningFileSRepositoryModule,
+      GeoCloningFilesRepositoryModule,
     ],
     providers: [
       ProjectCustomFeaturesPieceImporter,

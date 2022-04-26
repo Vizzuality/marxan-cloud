@@ -1,4 +1,3 @@
-import { SpecificationOperation } from '@marxan-api/modules/specification';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -23,6 +22,7 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import { SpecificationOperation } from '@marxan/specification';
 
 type SelectFeaturesResult = {
   id: string;
