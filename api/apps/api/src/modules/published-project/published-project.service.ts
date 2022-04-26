@@ -9,7 +9,7 @@ import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-i
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '@marxan-api/modules/users/users.service';
-import { PublishProjectDto } from './dto/publish-project.dto';
+import { CreatePublishProjectDto } from './dto/publish-project.dto';
 import { WebshotService } from '@marxan/webshot';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
@@ -45,7 +45,7 @@ export class PublishedProjectService {
   async publish(
     id: string,
     requestingUserId: string,
-    projectToPublish: PublishProjectDto,
+    projectToPublish: CreatePublishProjectDto,
   ): Promise<Either<errors | typeof alreadyPublished, true>> {
     const project = await this.projectRepository.findOne(id);
 
