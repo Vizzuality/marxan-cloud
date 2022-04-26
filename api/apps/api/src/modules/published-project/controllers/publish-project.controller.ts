@@ -54,12 +54,13 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { PublishedProjectSerializer } from '../published-project.serializer';
-import { PublishProjectDto } from '../dto/publish-project.dto';
+import { CreatePublishProjectDto } from '../dto/publish-project.dto';
 import { RequestPublishedProjectCloneResponseDto } from '@marxan-api/modules/projects/dto/export.project.dto';
 import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
 import { ExportId } from '@marxan-api/modules/clone';
 import { UserId } from '@marxan/domain-ids';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -80,13 +81,33 @@ export class PublishProjectController {
   @ApiInternalServerErrorResponse()
   async publish(
     @Param('id') id: string,
-    @Body() dto: PublishProjectDto,
+    @Body() dto: CreatePublishProjectDto,
     @Request() req: RequestWithAuthenticatedUser,
+    @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<void> {
+    const { config } = dto;
+    /**
+     * If a frontend app session token was provided via cookie, use this to let
+     * the webshot service authenticate to the app, otherwise fall back to
+     * looking for the relevant cookies in the body of the request.
+     *
+     * @todo Remove this once the new auth workflow via `Cookie` header is
+     * stable.
+     */
+    const configForWebshot = appSessionTokenCookie
+      ? {
+          ...config,
+          cookie: appSessionTokenCookie,
+        }
+      : config;
+    const dtoWithUpdatedConfig = {
+      ...dto,
+      config: configForWebshot || config,
+    };
     const result = await this.publishedProjectService.publish(
       id,
       req.user.id,
-      dto,
+      dtoWithUpdatedConfig,
     );
 
     if (isLeft(result)) {

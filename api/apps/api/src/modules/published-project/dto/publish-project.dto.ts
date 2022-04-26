@@ -34,9 +34,11 @@ export class PublishProjectDto {
   @IsOptional()
   @ApiPropertyOptional()
   featuredScenarioId?: string;
+}
 
+export class CreatePublishProjectDto extends PublishProjectDto {
   @ApiProperty()
   @ValidateNested({ each: true })
   @Type(() => WebshotConfig)
-  config?: WebshotConfig;
+  config!: WebshotConfig;
 }
