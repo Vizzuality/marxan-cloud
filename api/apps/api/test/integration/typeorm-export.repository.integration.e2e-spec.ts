@@ -97,9 +97,6 @@ const getFixtures = async () => {
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const ownerId = await GivenUserExists(app, 'aa');
 
-  // 5 buenos con fechas distintas
-  // Pero solo pedimos 3
-
   const amountOfExportsToFind = 5;
   const now = new Date();
 
