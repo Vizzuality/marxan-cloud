@@ -11,7 +11,7 @@ import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenarioCalibrationRange, useScenarioCalibrationRange } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import BlmSettingsChart from 'layout/scenarios/edit/parameters/blm-calibration/settings-chart';
+import BlmSettingsChart from 'layout/scenarios/edit/parameters/blm-calibration/results';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';

@@ -905,7 +905,7 @@ export function useScenarioCalibrationResults(scenarioId) {
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data)
-      ? data?.data.sort((a, b) => (a.cost > b.cost ? 1 : -1)).map((i) => {
+      ? data?.data.sort((a, b) => (a.blmValue > b.blmValue ? 1 : -1)).map((i) => {
         return {
           ...i,
           pngData: blmImages[i.blmValue],
@@ -917,7 +917,7 @@ export function useScenarioCalibrationResults(scenarioId) {
       data: parsedData,
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, data?.data]);
+  }, [query, data?.data, blmImages]);
 }
 
 export function useScenarioCalibrationRange(scenarioId) {
