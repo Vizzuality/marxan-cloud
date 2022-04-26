@@ -9,6 +9,7 @@ import orderBy from 'lodash/orderBy';
 
 import { useRouter } from 'next/router';
 
+import axios from 'axios';
 import { formatDistance } from 'date-fns';
 import { useSession } from 'next-auth/client';
 
@@ -341,12 +342,16 @@ export function usePublishProject({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const publishProject = ({ id, data }: PublishProjectProps) => {
-    return PROJECTS.request({
-      url: `${id}/publish`,
+  const publishProject = ({ pid, data }: PublishProjectProps) => {
+    const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
+
+    return axios.request({
+      method: 'POST',
+      url: `${baseUrl}/api/publish/${pid}`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/json',
       },
       ...requestConfig,
     });

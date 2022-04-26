@@ -26,6 +26,7 @@ import Select from 'components/forms/select';
 import Textarea from 'components/forms/textarea';
 import { arrayValidator, composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 import Map from 'components/map';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
@@ -58,11 +59,13 @@ const resourcesValidator = (value) => {
 };
 
 export interface PublishProjectModalProps {
+  publishing: boolean;
   onSubmit: (values: any) => void;
   onCancel: () => void;
 }
 
 export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
+  publishing,
   onSubmit,
   onCancel,
 }: PublishProjectModalProps) => {
@@ -114,7 +117,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
       description: projectData?.description || '',
       creators: PROJECT_CREATORS,
       resources: [],
-      scenarioId: null,
+      featuredScenarioId: null,
       company: null,
     };
   }, [projectData, PROJECT_CREATORS]);
@@ -134,14 +137,14 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
       .filter((s) => !!s);
   }, [rawScenariosData]);
 
-  const { scenarioId } = tmpValues;
+  const { featuredScenarioId } = tmpValues;
 
   const PUGridLayer = usePUGridLayer({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
-    sid: scenarioId,
+    sid: featuredScenarioId,
     include: 'results',
     sublayers: [
-      ...(scenarioId) ? ['frequency'] : [],
+      ...(featuredScenarioId) ? ['frequency'] : [],
     ],
     options: {
       settings: {
@@ -188,7 +191,14 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
           autoComplete="off"
           className="flex flex-col justify-between flex-grow w-full px-6 overflow-auto"
         >
+          <Loading
+            className="z-10 absolute top-0 left-0 flex items-center justify-center w-full h-full bg-white bg-opacity-50"
+            iconClassName="w-10 h-10"
+            visible={publishing}
+          />
+
           <FormSpy onChange={({ values: spyValues }) => setTmpValues(spyValues)} />
+
           <h1 className="mb-5 text-xl font-medium text-black">
             Publish project to the community
           </h1>
@@ -387,19 +397,19 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
           <div className="mt-8">
             <FieldRFF
-              name="scenarioId"
+              name="featuredScenarioId"
               validate={composeValidators([{ presence: true }])}
             >
               {(fprops) => (
                 <div>
-                  <Label id="scenarioId" theme="light" className="mb-3 uppercase">Scenario thumbnail</Label>
+                  <Label id="featuredScenarioId" theme="light" className="mb-3 uppercase">Scenario thumbnail</Label>
                   <div className="flex items-start justify-between space-x-5">
-                    <Field id="scenarioId" {...fprops} className="w-full">
+                    <Field id="featuredScenarioId" {...fprops} className="w-full">
                       <Select
                         theme="light"
                         size="base"
                         placeholder="Select..."
-                          // selected={values.scenarioId}
+                          // selected={values.featuredScenarioId}
                         options={SCENARIOS_RUNNED}
                         onChange={fprops.input.onChange}
                       />
