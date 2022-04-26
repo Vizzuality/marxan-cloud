@@ -98,6 +98,7 @@ import {
 import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import {
   GetLatestExportResponseDto,
+  GetLatestExportsResponseDto,
   RequestProjectCloneResponseDto,
   RequestProjectExportBodyDto,
   RequestProjectExportResponseDto,
@@ -107,7 +108,10 @@ import { RequestProjectImportResponseDto } from './dto/import.project.response.d
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
-import { invalidExportZipFile } from '../clone/infra/import/generate-export-from-zip-file.command';
+import {
+  cloningExportProvided,
+  invalidExportZipFile,
+} from '../clone/infra/import/generate-export-from-zip-file.command';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -746,6 +750,40 @@ export class ProjectsController {
   }
 
   @ImplementsAcl()
+  @ApiOperation({
+    description: 'Returns the latest exports for a given project',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'ID of the Project',
+  })
+  @ApiOkResponse({ type: GetLatestExportsResponseDto })
+  @Get(`:projectId/latest-exports`)
+  async getLatestExports(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<GetLatestExportsResponseDto> {
+    const resultOrError = await this.projectsService.getLatestExportsForProject(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(resultOrError)) {
+      switch (resultOrError.left) {
+        case exportNotFound:
+          throw new NotFoundException(
+            `Export for project with id ${projectId} not found`,
+          );
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+    return { exports: resultOrError.right };
+  }
+
+  @ImplementsAcl()
   @Get(':projectId/editing-locks')
   @ApiOperation({ summary: 'Get all locks by project' })
   async findLocksForProject(
@@ -793,6 +831,7 @@ export class ProjectsController {
       switch (idsOrError.left) {
         case forbiddenError:
           throw new ForbiddenException();
+        case cloningExportProvided:
         case invalidExportZipFile:
           throw new BadRequestException('Invalid export zip file');
         default:

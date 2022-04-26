@@ -4,6 +4,7 @@ import {
   Export,
   ExportComponent,
   ExportId,
+  ExportSnapshot,
 } from '@marxan-api/modules/clone/export/domain';
 import {
   ClonePiece,
@@ -15,10 +16,13 @@ import {
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Connection } from 'typeorm';
+import { v4 } from 'uuid';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+
+const millisecondsInADay = 24 * 60 * 60 * 1000;
 
 describe('Typeorm export repository', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -63,6 +67,21 @@ describe('Typeorm export repository', () => {
       exportData,
     });
   });
+
+  it('finds latest standalone exports for a given project', async () => {
+    const projectId = fixtures.GivenProject();
+    await fixtures.GivenMultipleExports(projectId);
+
+    const {
+      threeLatestExports,
+      tenLatestExports,
+    } = await fixtures.WhenRequestingLatestStandaloneExports(projectId);
+
+    fixtures.ThenFilteredExportsShouldBeReturned(
+      threeLatestExports,
+      tenLatestExports,
+    );
+  });
 });
 
 const getFixtures = async () => {
@@ -78,6 +97,26 @@ const getFixtures = async () => {
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const ownerId = await GivenUserExists(app, 'aa');
 
+  // 5 buenos con fechas distintas
+  // Pero solo pedimos 3
+
+  const amountOfExportsToFind = 5;
+  const now = new Date();
+
+  const exportFactory = (overrides: Partial<ExportSnapshot>) =>
+    Export.fromSnapshot({
+      id: v4(),
+      archiveLocation: '',
+      createdAt: now,
+      exportPieces: [],
+      foreignExport: false,
+      importResourceId: undefined,
+      ownerId,
+      resourceId: v4(),
+      resourceKind: ResourceKind.Project,
+      ...overrides,
+    });
+
   return {
     cleanup: async () => {
       const connection = app.get<Connection>(Connection);
@@ -86,6 +125,56 @@ const getFixtures = async () => {
       await OrganizationsTestUtils.deleteOrganization(app, ownerToken, ownerId);
 
       await app.close();
+    },
+    GivenProject: () => {
+      return v4();
+    },
+    GivenMultipleExports: async (projectId: string) => {
+      const archiveLocation = '/tmp/foo/bar.zip';
+
+      const anotherProjectExport = exportFactory({
+        resourceId: v4(),
+        archiveLocation,
+      });
+      const cloningExport = exportFactory({
+        resourceId: projectId,
+        archiveLocation,
+        importResourceId: v4(),
+      });
+      const unfinishedExport = exportFactory({
+        resourceId: projectId,
+      });
+
+      const exportsToFind = Array(amountOfExportsToFind)
+        .fill(0)
+        .map((_, index) =>
+          exportFactory({
+            resourceId: projectId,
+            archiveLocation,
+            createdAt: new Date(now.getTime() - millisecondsInADay * index),
+            exportPieces: [
+              {
+                finished: true,
+                id: v4(),
+                piece: ClonePiece.ExportConfig,
+                resourceId: projectId,
+                uris: [
+                  {
+                    relativePath: `bar-${index}.zip`,
+                    uri: `/foo/bar-${index}.zip`,
+                  },
+                ],
+              },
+            ],
+          }),
+        );
+
+      await Promise.all([
+        repo.save(anotherProjectExport),
+        repo.save(cloningExport),
+        repo.save(unfinishedExport),
+        ...exportsToFind.map((exportInstance) => repo.save(exportInstance)),
+      ]);
     },
     GivenExportWasRequested: async () => {
       resourceId = ResourceId.create();
@@ -188,6 +277,20 @@ const getFixtures = async () => {
     WhenReadingTheSavedExportFromRepository: async () => {
       return await repo.find(exportId);
     },
+    WhenRequestingLatestStandaloneExports: async (projectId: string) => {
+      return {
+        threeLatestExports: await repo.findLatestExportsFor(projectId, 3, {
+          isFinished: true,
+          isLocal: true,
+          isStandalone: true,
+        }),
+        tenLatestExports: await repo.findLatestExportsFor(projectId, 10, {
+          isFinished: true,
+          isLocal: true,
+          isStandalone: true,
+        }),
+      };
+    },
     ThenExportDataShouldBeOk: async ({
       exportData,
       componentsAreCompleted,
@@ -234,6 +337,31 @@ const getFixtures = async () => {
       expect(exportData).toBeDefined();
       expect(
         exportData!.toSnapshot().exportPieces.every((piece) => piece.finished),
+      ).toEqual(true);
+    },
+    ThenFilteredExportsShouldBeReturned: (
+      threeLatestExports: Export[],
+      tenLatestExports: Export[],
+    ) => {
+      expect(threeLatestExports).toHaveLength(3);
+      expect(tenLatestExports).toHaveLength(amountOfExportsToFind);
+
+      const [first, second, third] = threeLatestExports;
+
+      expect(first.toSnapshot().createdAt.getTime()).toEqual(now.getTime());
+      expect(first.toSnapshot().createdAt.getTime()).toBeGreaterThan(
+        second.toSnapshot().createdAt.getTime(),
+      );
+
+      expect(second.toSnapshot().createdAt.getTime()).toBeGreaterThan(
+        third.toSnapshot().createdAt.getTime(),
+      );
+
+      expect(
+        tenLatestExports.every(
+          (exportInstance) =>
+            exportInstance.toSnapshot().exportPieces.length === 1,
+        ),
       ).toEqual(true);
     },
   };
