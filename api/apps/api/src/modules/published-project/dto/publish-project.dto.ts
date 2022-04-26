@@ -33,7 +33,7 @@ export class PublishProjectDto {
 
   @IsOptional()
   @ApiPropertyOptional()
-  scenarioId?: string;
+  featuredScenarioId?: string;
 
   @ApiProperty()
   @ValidateNested({ each: true })
