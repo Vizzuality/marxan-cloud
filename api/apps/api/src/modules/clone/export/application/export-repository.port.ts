@@ -11,6 +11,16 @@ export abstract class ExportRepository {
 
   abstract find(exportId: ExportId): Promise<Export | undefined>;
 
+  abstract findLatestExportsFor(
+    projectId: string,
+    limit: number,
+    options?: {
+      isStandalone?: boolean;
+      isFinished?: boolean;
+      isLocal?: boolean;
+    },
+  ): Promise<Export[]>;
+
   abstract transaction<T>(
     code: (repo: ExportRepository) => Promise<T>,
   ): Promise<T>;

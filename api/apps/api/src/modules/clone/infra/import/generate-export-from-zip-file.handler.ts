@@ -17,6 +17,7 @@ import { ExportRepository } from '../../export/application/export-repository.por
 import { Export, ExportComponent } from '../../export/domain';
 import { ExportConfigReader } from '../../import/application/export-config-reader';
 import {
+  cloningExportProvided,
   errorSavingExport,
   errorStoringCloningFile,
   GenerateExportFromZipFile,
@@ -170,7 +171,11 @@ export class GenerateExportFromZipFileHandler
 
     const exportId = new ExportId(stringExportId);
     const previousExport = await this.exportRepo.find(exportId);
-    if (previousExport) return right(exportId);
+    if (previousExport) {
+      if (previousExport.importResourceId) return left(cloningExportProvided);
+
+      return right(exportId);
+    }
 
     const urisOrError = await this.storeCloningFiles(
       exportId.value,

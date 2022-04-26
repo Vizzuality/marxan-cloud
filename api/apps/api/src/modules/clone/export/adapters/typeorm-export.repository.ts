@@ -1,8 +1,15 @@
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { EntityManager, Repository } from 'typeorm';
+import {
+  EntityManager,
+  FindConditions,
+  IsNull,
+  Not,
+  Repository,
+} from 'typeorm';
 import {
   ExportRepository,
   saveError,
@@ -63,6 +70,44 @@ export class TypeormExportRepository implements ExportRepository {
     }
 
     return right(true);
+  }
+
+  async findLatestExportsFor(
+    projectId: string,
+    limit: number,
+    options?: {
+      isStandalone?: boolean;
+      isFinished?: boolean;
+      isLocal?: boolean;
+    },
+  ): Promise<Export[]> {
+    const importResourceIdFilter = {
+      importResourceId: options?.isStandalone ? IsNull() : Not(IsNull()),
+    };
+    const archiveLocationFilter = {
+      archiveLocation: options?.isFinished ? Not(IsNull()) : IsNull(),
+    };
+    const foreignExportFilter = {
+      foreignExport: !options?.isLocal,
+    };
+    const findConditions: FindConditions<ExportEntity> = {
+      resourceId: projectId,
+      resourceKind: ResourceKind.Project,
+      ...(options?.isStandalone === undefined ? {} : importResourceIdFilter),
+      ...(options?.isFinished === undefined ? {} : archiveLocationFilter),
+      ...(options?.isLocal === undefined ? {} : foreignExportFilter),
+    };
+
+    const entities = await this.exportRepo.find({
+      where: findConditions,
+      take: limit,
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['components', 'components.uris'],
+    });
+
+    return entities.map((entity) => entity.toAggregate());
   }
 
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {

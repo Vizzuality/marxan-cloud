@@ -207,6 +207,18 @@ class FakeExportRepository implements ExportRepository {
     });
   }
 
+  async findLatestExportsFor(
+    projectId: string,
+    limit: number,
+    options?: {
+      isStandalone?: boolean | undefined;
+      isFinished?: boolean | undefined;
+      isLocal?: boolean | undefined;
+    },
+  ): Promise<Export[]> {
+    return [];
+  }
+
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
     throw new Error('Method not implemented.');
   }

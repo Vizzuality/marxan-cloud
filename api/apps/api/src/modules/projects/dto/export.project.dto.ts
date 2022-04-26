@@ -35,6 +35,16 @@ export class GetLatestExportResponseDto {
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
   })
   userId!: string;
+
+  @ApiProperty({
+    description: 'Export creation timestamp',
+  })
+  createdAt!: Date;
+}
+
+export class GetLatestExportsResponseDto {
+  @ApiProperty({ type: GetLatestExportResponseDto, isArray: true })
+  exports!: GetLatestExportResponseDto[];
 }
 
 export class RequestProjectCloneResponseDto {

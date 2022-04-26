@@ -41,12 +41,10 @@ import {
 } from '@marxan-api/modules/clone';
 import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
-import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
 import { Readable } from 'stream';
 import { Permit } from '@marxan-api/modules/access-control/access-control.types';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
-import { ApiEventsService } from '../api-events';
 import {
   ChangeProjectBlmRange,
   ChangeProjectRangeErrors,
@@ -74,7 +72,6 @@ export const projectIsMissingInfoForRegularPus = Symbol(
 export const notAllowed = Symbol(`not allowed to that action`);
 export const notFound = Symbol(`project not found`);
 export const exportNotFound = Symbol(`project export not found`);
-export const apiEventDataNotFound = Symbol(`missing data in api event`);
 
 // Check where to centralize this symbols
 export const exportResourceKindIsNotProject = Symbol(
@@ -96,7 +93,6 @@ export class ProjectsService {
     private readonly commandBus: CommandBus,
     private readonly projectAclService: ProjectAccessControl,
     private readonly blockGuard: BlockGuard,
-    private readonly apiEventsService: ApiEventsService,
     private readonly exportRepository: ExportRepository,
   ) {}
 
@@ -479,11 +475,8 @@ export class ProjectsService {
     userId: string,
   ): Promise<
     Either<
-      | typeof exportNotFound
-      | typeof forbiddenError
-      | typeof apiEventDataNotFound
-      | typeof projectNotFound,
-      { exportId: string; userId: string }
+      typeof exportNotFound | typeof forbiddenError | typeof projectNotFound,
+      { exportId: string; userId: string; createdAt: Date }
     >
   > {
     const response = await this.assertProject(projectId, { id: userId });
@@ -497,28 +490,62 @@ export class ProjectsService {
 
     if (!canDownloadExport) return left(forbiddenError);
 
-    try {
-      const latestExportFinishedApiEvent = await this.apiEventsService.getLatestEventForTopic(
-        {
-          kind: API_EVENT_KINDS.project__export__finished__v1__alpha,
-          topic: projectId,
-        },
-      );
-      const exportId = latestExportFinishedApiEvent.data?.exportId as
-        | string
-        | undefined;
-      if (!exportId) return left(apiEventDataNotFound);
+    const [latestExport] = await this.exportRepository.findLatestExportsFor(
+      projectId,
+      1,
+      {
+        isFinished: true,
+        isLocal: true,
+        isStandalone: true,
+      },
+    );
 
-      const exportInstance = await this.exportRepository.find(
-        new ExportId(exportId),
-      );
+    if (!latestExport) return left(exportNotFound);
 
-      if (!exportInstance) return left(exportNotFound);
+    return right({
+      exportId: latestExport.id.value,
+      userId: latestExport.toSnapshot().ownerId,
+      createdAt: latestExport.toSnapshot().createdAt,
+    });
+  }
 
-      return right({ exportId, userId: exportInstance.toSnapshot().ownerId });
-    } catch (err) {
-      return left(exportNotFound);
-    }
+  async getLatestExportsForProject(
+    projectId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      typeof exportNotFound | typeof forbiddenError | typeof projectNotFound,
+      { exportId: string; userId: string; createdAt: Date }[]
+    >
+  > {
+    const response = await this.assertProject(projectId, { id: userId });
+
+    if (isLeft(response)) return left(projectNotFound);
+
+    const canDownloadExport = await this.projectAclService.canDownloadProjectExport(
+      userId,
+      projectId,
+    );
+
+    if (!canDownloadExport) return left(forbiddenError);
+
+    const latestExports = await this.exportRepository.findLatestExportsFor(
+      projectId,
+      5,
+      {
+        isFinished: true,
+        isLocal: true,
+        isStandalone: true,
+      },
+    );
+
+    return right(
+      latestExports.map((exportInstance) => ({
+        exportId: exportInstance.id.value,
+        userId: exportInstance.toSnapshot().ownerId,
+        createdAt: exportInstance.toSnapshot().createdAt,
+      })),
+    );
   }
 
   async findAllLocks(
