@@ -5,7 +5,6 @@ import {
   Creator,
   Resource,
 } from '../dto/create-published-project.dto';
-import { string } from 'fp-ts';
 
 @Entity('published_projects')
 export class PublishedProject {

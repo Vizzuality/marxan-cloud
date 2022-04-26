@@ -285,7 +285,7 @@ export const getFixtures = async () => {
           creators: [{ displayName: 'fake name', avatarDataUrl: blmImageMock }],
           resources: [{ title: 'fake url', url: 'http://www.example.com' }],
           config: { baseUrl: 'example/png', cookie: 'randomCookie' },
-          scenarioId,
+          featuredScenarioId: scenarioId,
         })
         .set('Authorization', `Bearer ${randomUserToken}`),
     WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>

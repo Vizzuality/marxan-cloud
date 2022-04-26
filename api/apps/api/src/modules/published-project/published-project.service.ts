@@ -13,7 +13,7 @@ import { PublishProjectDto } from './dto/publish-project.dto';
 import { WebshotService } from '@marxan/webshot';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
-import { isLeft, isRight } from 'fp-ts/lib/These';
+import { isLeft, isRight } from 'fp-ts/lib/Either';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -72,11 +72,17 @@ export class PublishedProjectService {
 
     const webshotUrl = AppConfig.get('webshot.url') as string;
 
-    const { scenarioId, config, ...projectWithoutScenario } = projectToPublish;
-    assertDefined(scenarioId);
+    const {
+      featuredScenarioId,
+      config,
+      ...projectWithoutScenario
+    } = projectToPublish;
+
+    assertDefined(featuredScenarioId);
     assertDefined(config);
+
     const pngData = await this.webshotService.getPublishedProjectsImage(
-      scenarioId,
+      featuredScenarioId,
       id,
       {
         ...config,
