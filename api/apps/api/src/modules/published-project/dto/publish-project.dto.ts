@@ -46,6 +46,6 @@ export class CreatePublishProjectDto extends PublishProjectDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @IsUUID('all', { each: true })
+  @IsUUID('4', { each: true })
   scenarioIds?: string[];
 }

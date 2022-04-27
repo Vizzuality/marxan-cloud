@@ -15,6 +15,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { ProjectsService } from '../projects/projects.service';
+import { Scenario } from '../scenarios/scenario.api.entity';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -38,6 +39,8 @@ export class PublishedProjectService {
     @InjectRepository(Project) private projectRepository: Repository<Project>,
     @InjectRepository(PublishedProject)
     private publicProjectsRepo: Repository<PublishedProject>,
+    @InjectRepository(Scenario)
+    private scenarioRepo: Repository<Scenario>,
     private crudService: PublishedProjectCrudService,
     private projectService: ProjectsService,
     private webshotService: WebshotService,
@@ -68,14 +71,15 @@ export class PublishedProjectService {
       return left(alreadyPublished);
     }
 
-    const scenarioQuery = `SELECT id from scenarios where scenarios.project_id = $1`;
-    const scenarioIds = await this.projectRepository.query(scenarioQuery, [id]);
+    const allScenariosInProject = await this.scenarioRepo.find({
+      select: ['id'],
+      where: { projectId: id },
+    });
     const scenarioIdsForExport =
       projectToPublish.scenarioIds ||
-      scenarioIds.map((scenario: any) => {
+      allScenariosInProject.map((scenario: any) => {
         return scenario?.id;
       });
-
     const exportResult = await this.projectService.requestExport(
       id,
       requestingUserId,
