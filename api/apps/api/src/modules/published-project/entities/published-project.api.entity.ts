@@ -35,7 +35,7 @@ export class PublishedProject {
   @Column('character varying', { name: 'png_data' })
   pngData?: string;
 
-  @Column('character varying', { name: 'export_id' })
+  @Column('uuid', { name: 'export_id' })
   exportId?: string;
 
   @OneToOne(() => Project)

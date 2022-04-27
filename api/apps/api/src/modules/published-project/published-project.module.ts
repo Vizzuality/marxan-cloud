@@ -10,14 +10,17 @@ import { PublishedProjectSerializer } from '@marxan-api/modules/published-projec
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { WebshotModule } from '@marxan/webshot';
+import { ScenariosModule } from '../scenarios/scenarios.module';
+import { Scenario } from '../scenarios/scenario.api.entity';
 
 @Module({
   imports: [
     AccessControlModule,
     ProjectsModule,
-    TypeOrmModule.forFeature([PublishedProject]),
+    TypeOrmModule.forFeature([PublishedProject, Scenario]),
     UsersModule,
     forwardRef(() => WebshotModule),
+    ScenariosModule,
   ],
   controllers: [PublishProjectController, PublishedProjectReadController],
   providers: [

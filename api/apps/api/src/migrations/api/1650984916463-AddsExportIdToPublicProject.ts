@@ -5,7 +5,7 @@ export class AddsExportIdToPublicProject1650984916463
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
           ALTER TABLE published_projects
-            ADD COLUMN export_id varchar;
+            ADD COLUMN export_id uuid;
         `);
   }
 
