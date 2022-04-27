@@ -951,7 +951,7 @@ export function useSaveScenarioCalibrationRange({
   const [session] = useSession();
 
   const saveScenarioCalibrationRange = ({ sid, data }: SaveScenarioCalibrationRangeProps) => {
-    const baseUrl = /* process.env.NEXT_PUBLIC_URL || */ window.location.origin;
+    const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
 
     return axios.request({
       url: `${baseUrl}/api/reports/scenarios/${sid}/blm`,

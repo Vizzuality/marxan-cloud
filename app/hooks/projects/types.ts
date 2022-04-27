@@ -62,7 +62,7 @@ export interface UsePublishProjectProps {
 }
 
 export interface PublishProjectProps {
-  id: string | string[];
+  pid: string | string[];
   data: {
     name: string;
     description: string;

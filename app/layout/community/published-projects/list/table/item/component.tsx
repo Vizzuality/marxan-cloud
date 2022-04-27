@@ -14,22 +14,25 @@ export interface PublishedItemProps {
   creators: Record<string, any>[];
   resources?: Record<string, any>[];
   company?: Record<string, any>;
+  pngData: string;
+  location: string;
 }
 export const PublishedItem: React.FC<PublishedItemProps> = ({
   id,
   name,
   description,
-  creators,
-  // resources,
   company,
+  pngData,
+  location,
 }: PublishedItemProps) => {
-  const creatorsSize = 3;
-  const creatorsVisible = creators?.slice(0, creatorsSize);
-
   return (
     <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
       <td className="pr-16 py-5">
-        <div className="w-24 h-24 bg-primary-200 rounded-xl" />
+        <div className="w-24 h-24 bg-primary-200 rounded-xl overflow-hidden">
+          {pngData && (
+            <img src={`data:image/png;base64,${pngData}`} alt={name} />
+          )}
+        </div>
       </td>
 
       <td className="pr-16 py-5">
@@ -47,19 +50,10 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
         </div>
       </td>
 
-      <td className="pr-16 text-sm">
-        {!!creatorsVisible?.length && creatorsVisible?.map((u) => {
-          const { id: userId, displayName } = u;
-
-          return (
-            <p className="whitespace-nowrap" key={`${userId}`}>{displayName}</p>
-          );
-        })}
-        {creators?.length > creatorsSize && (
-          <p>
-            {`(+${creators.length - creatorsSize})`}
-          </p>
-        )}
+      <td className="pr-16 text-sm w-28">
+        <div className="w-28">
+          <p className="text-sm">{location}</p>
+        </div>
       </td>
 
       <td className="">

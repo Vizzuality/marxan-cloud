@@ -24,6 +24,7 @@ export interface PublishProjectButtonProps {
 }
 
 export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
+  const [publishing, setPublishing] = useState(false);
   const [modal, setModal] = useState(false);
   const [confirmUnPublish, setConfirmUnPublish] = useState<Record<string, any>>();
 
@@ -66,11 +67,14 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
   }, [rawScenariosData]);
 
   const handlePublish = useCallback((values) => {
+    setPublishing(true);
     const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
 
     // @ts-ignore
-    publishProjectMutation.mutate({ id: `${pid}`, data }, {
+    publishProjectMutation.mutate({ pid: `${pid}`, data }, {
       onSuccess: () => {
+        setPublishing(false);
+        setModal(false);
         addToast('success-publish-project', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -79,10 +83,9 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
         ), {
           level: 'success',
         });
-
-        setModal(false);
       },
       onError: () => {
+        setPublishing(false);
         addToast('error-publish-project', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -164,6 +167,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
             onDismiss={() => setModal(false)}
           >
             <PublishModal
+              publishing={publishing}
               onSubmit={handlePublish}
               onCancel={() => setModal(false)}
             />

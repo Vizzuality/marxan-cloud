@@ -83,7 +83,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
                 className="w-full md:w-64"
                 theme="secondary"
                 size="lg"
-                href="/community"
+                href="/community/projects"
               >
                 Explore the community
               </Button>

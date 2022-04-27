@@ -29,7 +29,7 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
             <h4 className="text-sm text-left whitespace-nowrap">Creator</h4>
           </th>
           <th className="py-2.5 pr-16 font-normal">
-            <h4 className="text-sm text-left whitespace-nowrap">Contributors</h4>
+            <h4 className="text-sm text-left whitespace-nowrap">Location</h4>
           </th>
           <th className="py-2.5 font-normal">
             <div className="flex flex-row">
@@ -43,7 +43,7 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
       <tbody>
         {data.map((pp) => {
           const {
-            id: pid, name, description, creators, resources, company,
+            id: pid, name, description, creators, resources, company, pngData, location,
           } = pp;
 
           return (
@@ -55,6 +55,8 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
               creators={creators}
               resources={resources}
               company={company}
+              pngData={pngData}
+              location={location}
             />
           );
         })}
