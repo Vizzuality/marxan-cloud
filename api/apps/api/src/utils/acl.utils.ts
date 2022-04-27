@@ -1,31 +1,9 @@
 import {
-  BadRequestException,
-  ConflictException,
-  ForbiddenException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import {
   forbiddenError,
   lastOwner,
   queryFailed,
   transactionFailed,
 } from '@marxan-api/modules/access-control';
-import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
-import {
-  GetScenarioFailure,
-  scenarioNotFound,
-  unknownError,
-  unknownError as blmUnknownError,
-} from '@marxan-api/modules/blm/values/blm-repos';
-import {
-  bestSolutionNotFound,
-  projectDoesntExist,
-  projectNotReady,
-} from '@marxan-api/modules/scenarios/scenarios.service';
-import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
-import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
-import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import {
   lockedByAnotherUser,
   lockedScenario,
@@ -33,35 +11,64 @@ import {
   unknownError as lockUnknownError,
 } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import {
-  marxanFailed,
-  metadataNotFound,
-  outputZipNotYetAvailable,
-} from '@marxan-api/modules/scenarios/output-files/output-files.service';
-import {
-  inputZipNotYetAvailable,
-  metadataNotFound as inputMetadataNotFound,
-} from '@marxan-api/modules/scenarios/input-files';
-import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
-import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-area/selection/selection-update.service';
-import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
-import {
-  invalidRange,
-  unknownError as rangeUnknownError,
-  updateFailure,
-} from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
-import {
-  unknownPdfWebshotError,
-  unknownPngWebshotError,
-} from '@marxan/webshot';
-import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
+  GetScenarioFailure,
+  scenarioNotFound,
+  unknownError as blmUnknownError,
+  unknownError,
+} from '@marxan-api/modules/blm/values/blm-repos';
 import {
   exportIsNotStandalone,
-  exportNotFound,
   exportResourceKindIsNotProject,
   projectIsMissingInfoForRegularPus,
   projectIsNotPublished,
   projectNotFoundForExport,
 } from '@marxan-api/modules/projects/projects.service';
+import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
+import {
+  invalidRange,
+  unknownError as rangeUnknownError,
+  updateFailure,
+} from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
+import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
+import {
+  inputZipNotYetAvailable,
+  metadataNotFound as inputMetadataNotFound,
+} from '@marxan-api/modules/scenarios/input-files';
+import { notFound as marxanRunNotFound } from '@marxan-api/modules/scenarios/marxan-run';
+import {
+  marxanFailed,
+  metadataNotFound,
+  outputZipNotYetAvailable,
+} from '@marxan-api/modules/scenarios/output-files/output-files.service';
+import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
+import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-area/selection/selection-update.service';
+import {
+  bestSolutionNotFound,
+  projectDoesntExist,
+  projectNotReady,
+} from '@marxan-api/modules/scenarios/scenarios.service';
+import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
+import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
+import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
+import {
+  unknownPdfWebshotError,
+  unknownPngWebshotError,
+} from '@marxan/webshot';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  HttpException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  exportNotFound,
+  ImportProjectError,
+  invalidProjectExport,
+  unfinishedExport,
+} from '../modules/clone/import/application/import-project.command';
+import { saveError } from '../modules/clone/import/application/import.repository.port';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -112,7 +119,8 @@ export const mapAclDomainToHttpError = (
     | typeof exportResourceKindIsNotProject
     | typeof exportIsNotStandalone
     | typeof projectNotFoundForExport
-    | typeof projectIsNotPublished,
+    | typeof projectIsNotPublished
+    | ImportProjectError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -221,6 +229,17 @@ export const mapAclDomainToHttpError = (
       return new NotFoundException(
         `Could not find export with ID: ${options?.exportId}`,
       );
+    case unfinishedExport:
+      return new HttpException(
+        `Export with ID ${options?.exportId} hasn't finished`,
+        423,
+      );
+    case invalidProjectExport:
+      return new BadRequestException(
+        `Export with ID ${options?.exportId} isn't a valid project export`,
+      );
+    case saveError:
+      return new InternalServerErrorException('Error while saving import');
     case exportResourceKindIsNotProject:
       return new BadRequestException(
         `Export with ID ${options?.exportId} is not a project export`,

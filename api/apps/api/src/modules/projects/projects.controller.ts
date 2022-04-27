@@ -54,7 +54,6 @@ import {
 import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
-  exportNotFound,
   notAllowed,
   projectNotFound,
   ProjectsService,
@@ -112,6 +111,7 @@ import {
   cloningExportProvided,
   invalidExportZipFile,
 } from '../clone/infra/import/generate-export-from-zip-file.command';
+import { exportNotFound } from '../clone/import/application/import-project.command';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
