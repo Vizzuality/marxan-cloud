@@ -54,6 +54,7 @@ import {
   GenerateExportFromZipFileError,
 } from '../clone/infra/import/generate-export-from-zip-file.command';
 import {
+  exportNotFound,
   ImportProject,
   ImportProjectCommandResult,
   ImportProjectError,
@@ -71,7 +72,6 @@ export const projectIsMissingInfoForRegularPus = Symbol(
 );
 export const notAllowed = Symbol(`not allowed to that action`);
 export const notFound = Symbol(`project not found`);
-export const exportNotFound = Symbol(`project export not found`);
 
 // Check where to centralize this symbols
 export const exportResourceKindIsNotProject = Symbol(
@@ -395,7 +395,17 @@ export class ProjectsService {
   async clone(
     exportId: ExportId,
     userId: UserId,
-  ): Promise<Either<any, ImportProjectCommandResult>> {
+  ): Promise<
+    Either<
+      | typeof exportNotFound
+      | typeof exportResourceKindIsNotProject
+      | typeof exportIsNotStandalone
+      | typeof projectNotFoundForExport
+      | typeof projectIsNotPublished
+      | ImportProjectError,
+      ImportProjectCommandResult
+    >
+  > {
     const exportInstance = await this.exportRepository.find(exportId);
     if (!exportInstance) return left(exportNotFound);
     if (!exportInstance.isForProject())
