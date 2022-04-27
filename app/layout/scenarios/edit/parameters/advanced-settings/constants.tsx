@@ -7,10 +7,10 @@ import React from 'react';
 export const FIELDS = [
   {
     id: 'BLM',
-    label: 'Boundary Lenght Modifier (BLM)',
+    label: 'Boundary Length Modifier (BLM)',
     description: (
       <div className="space-y-2">
-        <h4 className="font-heading text-lg mb-2.5">Boundary Lenght Modifier (BLM)</h4>
+        <h4 className="font-heading text-lg mb-2.5">Boundary Length Modifier (BLM)</h4>
         <p>
           The BLM should be either ‘0’ or a positive number.
         </p>
