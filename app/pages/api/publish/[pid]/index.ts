@@ -25,8 +25,9 @@ export default async function handler(req, res) {
         },
       },
     });
-    res.status(200);
   } catch (error) {
     res.status(error.response.status).send(error.response.statusText);
   }
+
+  res.status(200).send({});
 }

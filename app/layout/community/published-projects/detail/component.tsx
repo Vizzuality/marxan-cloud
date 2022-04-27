@@ -37,7 +37,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const creatorsVisible = creators?.slice(0, creatorsVisibleSize);
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, company,
+    id, description, name, planningAreaName, timesDuplicated, company, pngData,
   } = publishedProject || {};
 
   const planningArea = planningAreaName || 'Custom';
@@ -144,12 +144,20 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   style={{ maxHeight: 500 }}
                 >
                   <div
-                    className="bg-primary-500 rounded-xl"
+                    className="bg-primary-500 rounded-xl overflow-hidden"
                     style={{
                       width: 500,
                       height: 500,
                     }}
-                  />
+                  >
+                    {pngData && (
+                      <img
+                        src={`data:image/png;base64,${pngData}`}
+                        alt={name}
+                        className="max-w-full"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             )}

@@ -62,7 +62,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d): PublishedItemProps => {
         const {
-          id, name, description, creators, resources, company,
+          id, name, description, creators, resources, company, pngData,
         } = d;
 
         return {
@@ -72,6 +72,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
           creators,
           resources,
           company,
+          pngData,
         };
       });
     })) : [];

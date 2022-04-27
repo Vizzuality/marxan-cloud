@@ -14,6 +14,7 @@ export interface PublishedItemProps {
   creators: Record<string, any>[];
   resources?: Record<string, any>[];
   company?: Record<string, any>;
+  pngData: string;
 }
 export const PublishedItem: React.FC<PublishedItemProps> = ({
   id,
@@ -22,6 +23,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   creators,
   // resources,
   company,
+  pngData,
 }: PublishedItemProps) => {
   const creatorsSize = 3;
   const creatorsVisible = creators?.slice(0, creatorsSize);
@@ -29,7 +31,11 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   return (
     <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
       <td className="pr-16 py-5">
-        <div className="w-24 h-24 bg-primary-200 rounded-xl" />
+        <div className="w-24 h-24 bg-primary-200 rounded-xl overflow-hidden">
+          {pngData && (
+            <img src={`data:image/png;base64,${pngData}`} alt={name} />
+          )}
+        </div>
       </td>
 
       <td className="pr-16 py-5">
