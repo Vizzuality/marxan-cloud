@@ -2,8 +2,6 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { format } from 'd3';
-
 import { usePublishedProject } from 'hooks/published-projects';
 
 import Share from 'layout/community/published-projects/detail/share';
@@ -33,14 +31,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
     creators,
   } = publishedProject;
 
-  const creatorsVisibleSize = 3;
+  const creatorsVisibleSize = 2;
   const creatorsVisible = creators?.slice(0, creatorsVisibleSize);
 
   const {
-    id, description, name, planningAreaName, timesDuplicated, company, pngData,
+    id, description, name, location, company, pngData, resources,
   } = publishedProject || {};
-
-  const planningArea = planningAreaName || 'Custom';
 
   return (
     <div className="text-black bg-primary-50">
@@ -73,23 +69,30 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                         theme="dark"
                       />
                     </ComingSoon>
-
-                    {timesDuplicated && (
-                      <p className="ml-5 text-sm">
-                        Duplicated
-                        {format('.3s')(timesDuplicated)}
-                        {' '}
-                        times
-                      </p>
-                    )}
                   </div>
 
-                  <div className="grid grid-cols-2 grid-rows-2 gap-y-9 gap-x-9">
+                  <div className="grid grid-cols-2 gap-y-9 gap-x-9">
+                    {/* LOCATION */}
+                    <div>
+                      <h3 className="mb-5 text-sm font-semibold">Location</h3>
+                      <p className="text-sm">{location}</p>
+                    </div>
 
+                    {/* COMPANY */}
+                    {!!company && (
+                      <div>
+                        <h3 className="mb-5 text-sm font-semibold">Creator</h3>
+                        <div className="w-28">
+                          <img src={company.logoDataUrl} alt={company.name} className="max-w-full" />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ÇONTRIBUTORS */}
                     <div>
                       <h3 className="mb-5 text-sm font-semibold">Contributors</h3>
                       {!!creatorsVisible?.length && (
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           {creatorsVisible.map((u) => {
                             const {
                               displayName, id: userId, avatarDataUrl,
@@ -98,42 +101,59 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                             return (
                               <div key={userId} className="flex flex-row items-center space-x-2.5">
                                 <Avatar
+                                  size="s"
                                   className="text-sm text-white uppercase border bg-primary-700"
                                   bgImage={avatarDataUrl}
                                   name={displayName}
                                 >
-                                  {!avatarDataUrl && (displayName).slice(0, 2)}
+                                  {!avatarDataUrl && displayName.slice(0, 2)}
                                 </Avatar>
-                                <p className="text-sm">{(displayName)}</p>
+                                <p className="text-sm">{displayName}</p>
                               </div>
                             );
                           })}
                           {creators?.length > creatorsVisibleSize && (
                             <div className="flex flex-row items-center space-x-2.5">
-                              <Avatar className="text-sm text-white uppercase border bg-primary-700" />
-                              <p className="text-sm">
-                                {`(+${creators.length - creatorsVisibleSize})`}
-                              </p>
+                              <Avatar
+                                size="s"
+                                className="text-sm text-white uppercase border bg-primary-700"
+                              >
+                                {`+${creators.length - creatorsVisibleSize}`}
+                              </Avatar>
                             </div>
                           )}
                         </div>
                       )}
                     </div>
 
-                    <div>
-                      <h3 className="mb-6 text-sm font-semibold">Planning area</h3>
-                      <p className="text-lg">{planningArea}</p>
-                    </div>
-
-                    {!!company && (
+                    {/* RESOURCES */}
+                    {!!resources && (
                       <div>
-                        <h3 className="mb-6 text-sm font-semibold">Creator</h3>
-                        <div className="w-28">
-                          <img src={company.logoDataUrl} alt={company.name} className="max-w-full" />
-                        </div>
+                        <h3 className="mb-5 text-sm font-semibold">Resources</h3>
+                        <ul className="space-y-1">
+                          {resources.map((r) => {
+                            const {
+                              id: resourceId, title: resourceTitle, url: resourceUrl,
+                            } = r;
+
+                            return (
+                              <li key={resourceId} className="flex flex-row items-center">
+                                <a
+                                  href={resourceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sm text-primary-500"
+                                >
+                                  {resourceTitle}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
                       </div>
                     )}
 
+                    {/* SHARE */}
                     <Share />
 
                   </div>

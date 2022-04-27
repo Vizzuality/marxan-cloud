@@ -62,13 +62,14 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d): PublishedItemProps => {
         const {
-          id, name, description, creators, resources, company, pngData,
+          id, name, description, location, creators, resources, company, pngData,
         } = d;
 
         return {
           id,
           name,
           description,
+          location,
           creators,
           resources,
           company,

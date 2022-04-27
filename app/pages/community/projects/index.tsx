@@ -42,7 +42,6 @@ const CommunityProjects: React.FC = () => {
           section="Community"
           title={TITLE_TEXT}
           description={DESCRIPTION_TEXT}
-          backlink="/community"
           theme="light"
         />
         <PublishedProjects />

@@ -113,8 +113,9 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
   const INITIAL_VALUES = useMemo(() => {
     return {
-      name: projectData?.name || '',
-      description: projectData?.description || '',
+      name: projectData?.name || null,
+      description: projectData?.description || null,
+      location: projectData?.planningArea || null,
       creators: PROJECT_CREATORS,
       resources: [],
       featuredScenarioId: null,
@@ -234,6 +235,20 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                     rows={4}
                     placeholder="Write your project description..."
                   />
+                </Field>
+              )}
+            </FieldRFF>
+          </div>
+
+          <div className="mt-8">
+            <FieldRFF
+              name="location"
+              validate={composeValidators([{ presence: true }])}
+            >
+              {(fprops) => (
+                <Field id="location" {...fprops}>
+                  <Label theme="light" className="mb-3 uppercase">Location</Label>
+                  <Input theme="light" type="text" placeholder="Write country or region from this project..." />
                 </Field>
               )}
             </FieldRFF>
