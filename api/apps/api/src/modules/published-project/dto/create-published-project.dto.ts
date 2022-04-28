@@ -13,8 +13,7 @@ export interface Company {
   logoDataUrl: string;
 }
 
-export interface CreatePublishedProjectDto {
-  id: string;
+export interface PublishedProjectDto {
   name?: string;
   description?: string;
   location?: string;
@@ -23,4 +22,11 @@ export interface CreatePublishedProjectDto {
   company?: Company;
   pngData?: string;
   exportId?: string;
+}
+
+export interface CreatePublishedProjectDto extends PublishedProjectDto {
+  id: string;
+}
+export interface UpdatePublishedProjectDto extends PublishedProjectDto {
+  underModeration?: boolean;
 }
