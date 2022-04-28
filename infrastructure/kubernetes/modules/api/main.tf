@@ -178,6 +178,16 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name = "CLONING_SIGNING_SECRET"
+            value_from {
+              secret_key_ref {
+                name = "api"
+                key  = "CLONING_SIGNING_SECRET"
+              }
+            }
+          }
+
+          env {
             name = "SPARKPOST_APIKEY"
             value_from {
               secret_key_ref {
