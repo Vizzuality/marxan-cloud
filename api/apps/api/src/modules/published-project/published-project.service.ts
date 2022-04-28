@@ -116,7 +116,7 @@ export class PublishedProjectService {
 
       if (isLeft(result)) {
         console.info(
-          `Scenario snapshot could not be generated for scenario ${featuredScenarioId}`,
+          `Map snapshot could not be generated for scenario ${featuredScenarioId} of project ${id}`,
         );
       }
 
@@ -193,7 +193,7 @@ export class PublishedProjectService {
 
       if (isLeft(result)) {
         console.info(
-          `Scenario snapshot could not be generated for scenario ${featuredScenarioId}`,
+          `Scenario snapshot could not be generated for scenario ${featuredScenarioId} of project ${projectId}`,
         );
       }
 
