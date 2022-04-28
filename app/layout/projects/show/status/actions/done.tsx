@@ -4,7 +4,7 @@ import React, {
 
 import { useRouter } from 'next/router';
 
-import { useDownloadProject, useExportId, useSaveProject } from 'hooks/projects';
+import { useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 export const useProjectActionsDone = () => {
@@ -18,9 +18,6 @@ export const useProjectActionsDone = () => {
       method: 'PATCH',
     },
   });
-
-  const downloadProject = useDownloadProject({});
-  const { data: exportId } = useExportId(pid);
 
   const onDone = useCallback((JOB_REF) => {
     projectMutation.mutate({
@@ -46,53 +43,9 @@ export const useProjectActionsDone = () => {
     });
   }, [pid, projectMutation, addToast]);
 
-  const onDownloadProjectDone = useCallback((JOB_REF) => {
-    projectMutation.mutate({
-      id: `${pid}`,
-      data: {
-        metadata: {
-          cache: new Date().getTime(),
-          // cacheByUserId: { userId, cache: new Date().getTime() }
-        },
-      },
-    }, {
-      onSuccess: () => {
-        downloadProject.mutate({
-          id: `${pid}`,
-          exportId: `${exportId}`,
-        }, {
-          onSuccess: () => {
-            JOB_REF.current = null;
-          },
-          onError: () => {
-            addToast('download-error', (
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <ul className="text-sm">
-                  Project not downloaded. Try again.
-                </ul>
-              </>
-            ), {
-              level: 'error',
-            });
-          },
-        });
-      },
-      onError: () => {
-        addToast('onDownloadProject', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [pid, projectMutation, addToast, downloadProject, exportId]);
-
   return {
     default: onDone,
     planningUnits: onDone,
-    export: onDownloadProjectDone,
+    export: onDone,
   };
 };

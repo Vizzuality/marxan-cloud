@@ -11,7 +11,7 @@ import { ROLES } from 'utils/constants-roles';
 import { useMe } from 'hooks/me';
 import { useOwnsProject, useProjectRole } from 'hooks/permissions';
 import { useProjectUsers } from 'hooks/project-users';
-import { useSaveProjectDownload } from 'hooks/projects';
+import { useExportProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -71,7 +71,7 @@ export const Item: React.FC<ItemProps> = ({
     sort: '-lastModifiedAt',
   });
 
-  const projectDownloadMutation = useSaveProjectDownload({});
+  const projectDownloadMutation = useExportProject({});
 
   const scenarioIds = useMemo(() => {
     return scenariosData?.map((scenario) => scenario.id);
@@ -95,7 +95,6 @@ export const Item: React.FC<ItemProps> = ({
 
   const handleDownload = useCallback(() => {
     projectDownloadMutation.mutate({ id, data: { scenarioIds } }, {
-
       onSuccess: () => {
 
       },
