@@ -286,7 +286,7 @@ export class ScenariosService {
     await this.planningUnitsLinkerService.link(scenario);
 
     const costSurfaceInitializationResult = await this.commandBus.execute(
-      new SetInitialCostSurface(scenario.id, scenario.projectId),
+      new SetInitialCostSurface(scenario.id),
     );
 
     if (isLeft(costSurfaceInitializationResult)) {

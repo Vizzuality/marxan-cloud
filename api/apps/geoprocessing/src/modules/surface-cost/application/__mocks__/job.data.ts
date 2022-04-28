@@ -23,10 +23,8 @@ export const getFromShapeFileJob = (
 
 export const getInitialCostJob = (
   scenarioId: string,
-  puGridShape: PlanningUnitGridShape,
 ): Job<InitialCostJobInput, true> => {
   const input: InitialCostJobInput = {
-    puGridShape,
     scenarioId,
   };
   return ({
