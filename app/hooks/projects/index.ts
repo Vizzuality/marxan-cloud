@@ -99,7 +99,14 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
 
       return pageData.map((d): ItemProps => {
         const {
-          id, name, description, lastModifiedAt, scenarios, planningAreaName, isPublic,
+          id,
+          name,
+          description,
+          lastModifiedAt,
+          scenarios,
+          planningAreaName,
+          isPublic,
+          publicMetadata,
         } = d;
 
         const lastUpdate = scenarios.reduce((acc, s) => {
@@ -125,6 +132,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
           lastUpdateDistance: lastUpdateDistance(),
           contributors: [],
           isPublic,
+          underModeration: publicMetadata?.underModeration,
           onClick: () => {
             push(`/projects/${id}`);
           },

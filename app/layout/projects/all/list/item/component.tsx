@@ -29,6 +29,7 @@ export interface ItemProps extends Project {
   lastUpdateDistance: string;
   userColors?: Record<string, string>;
   isPublic: boolean;
+  underModeration: boolean;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -45,6 +46,7 @@ export const Item: React.FC<ItemProps> = ({
   style,
   userColors,
   isPublic,
+  underModeration,
   onClick,
   onDownload,
   onDuplicate,
@@ -148,7 +150,8 @@ export const Item: React.FC<ItemProps> = ({
                     'text-primary-500': ROLES[projectRole],
                   })}
                   >
-                    Public
+                    {!underModeration && 'Public'}
+                    {underModeration && 'Under moderation'}
                   </p>
                 </div>
               )}

@@ -4,6 +4,7 @@ import { getSession } from 'next-auth/client';
 import { dehydrate } from 'react-query/hydration';
 
 import PROJECTS from 'services/projects';
+import PUBLISHED_PROJECTS from 'services/published-projects';
 
 import { mergeDehydratedState } from './utils';
 
@@ -96,9 +97,9 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
 
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery(['published-projects', pid], () => PROJECTS.request({
+    await queryClient.prefetchQuery(['published-projects', pid], () => PUBLISHED_PROJECTS.request({
       method: 'GET',
-      url: `/published/${pid}`,
+      url: `/${pid}`,
     }).then((response) => {
       return response.data;
     }));
