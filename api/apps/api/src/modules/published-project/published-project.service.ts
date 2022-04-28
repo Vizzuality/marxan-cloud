@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
 import { PublishedProjectCrudService } from '@marxan-api/modules/published-project/published-project-crud.service';
 import { Repository } from 'typeorm';
@@ -14,6 +14,8 @@ import { WebshotService } from '@marxan/webshot';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { isLeft, isRight } from 'fp-ts/lib/Either';
+import { ProjectsService } from '../projects/projects.service';
+import { Scenario } from '../scenarios/scenario.api.entity';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -24,6 +26,7 @@ export const sameUnderModerationStatus = Symbol(
 export const alreadyPublished = Symbol(`this project is public`);
 export const notPublished = Symbol(`this project is not public yet`);
 export const internalError = Symbol(`internal error`);
+export const exportError = Symbol(`error while exporting project`);
 
 export type errors =
   | typeof notFound
@@ -36,7 +39,10 @@ export class PublishedProjectService {
     @InjectRepository(Project) private projectRepository: Repository<Project>,
     @InjectRepository(PublishedProject)
     private publicProjectsRepo: Repository<PublishedProject>,
+    @InjectRepository(Scenario)
+    private scenarioRepo: Repository<Scenario>,
     private crudService: PublishedProjectCrudService,
+    private projectService: ProjectsService,
     private webshotService: WebshotService,
     private readonly acl: ProjectAccessControl,
     private readonly usersService: UsersService,
@@ -46,9 +52,10 @@ export class PublishedProjectService {
     id: string,
     requestingUserId: string,
     projectToPublish: CreatePublishProjectDto,
-  ): Promise<Either<errors | typeof alreadyPublished, true>> {
+  ): Promise<
+    Either<errors | typeof alreadyPublished | typeof exportError, true>
+  > {
     const project = await this.projectRepository.findOne(id);
-
     if (!project) {
       return left(notFound);
     }
@@ -62,6 +69,26 @@ export class PublishedProjectService {
       .then((result) => (result ? true : false));
     if (isProjectAlreadyPublished) {
       return left(alreadyPublished);
+    }
+
+    const allScenariosInProject = await this.scenarioRepo.find({
+      select: ['id'],
+      where: { projectId: id },
+    });
+    const scenarioIdsForExport =
+      projectToPublish.scenarioIds ||
+      allScenariosInProject.map((scenario: any) => {
+        return scenario?.id;
+      });
+    const exportResult = await this.projectService.requestExport(
+      id,
+      requestingUserId,
+      scenarioIdsForExport,
+      false,
+    );
+
+    if (isLeft(exportResult)) {
+      return left(exportError);
     }
 
     // @debt If we end up moving the scenario map thumbnail generation
@@ -103,6 +130,7 @@ export class PublishedProjectService {
       id,
       ...projectWithoutScenario,
       pngData: isRight(pngData) ? pngData.right : '',
+      exportId: exportResult.right.exportId.value,
     });
 
     return right(true);

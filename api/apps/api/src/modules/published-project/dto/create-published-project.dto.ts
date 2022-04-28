@@ -22,4 +22,5 @@ export interface CreatePublishedProjectDto {
   resources?: Resource[];
   company?: Company;
   pngData?: string;
+  exportId?: string;
 }
