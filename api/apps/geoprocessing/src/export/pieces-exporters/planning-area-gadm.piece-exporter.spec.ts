@@ -197,4 +197,8 @@ class FakeFileRepository implements CloningFilesRepository {
   deleteExportFolder(exportId: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
+  getFilesFolderFor(exportId: string): string {
+    throw new Error('Method not implemented.');
+  }
 }
