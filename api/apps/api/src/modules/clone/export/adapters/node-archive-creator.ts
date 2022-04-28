@@ -12,6 +12,7 @@ import {
   cannotCreateArchive,
   cannotGetFile,
   cannotStoreArchive,
+  FileDestination,
   unknownError,
 } from '../application/archive-creator.port';
 
@@ -25,7 +26,7 @@ export class NodeArchiveCreator extends ArchiveCreator {
 
   async zip(
     exportId: string,
-    files: { uri: string; relativeDestination: string }[],
+    files: FileDestination[],
   ): Promise<Either<ArchiveCreationError, ArchiveLocation>> {
     let archivePersistencePromise: ReturnType<
       CloningFilesRepository['saveZipFile']

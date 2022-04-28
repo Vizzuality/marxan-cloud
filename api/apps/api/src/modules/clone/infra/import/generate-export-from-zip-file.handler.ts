@@ -2,7 +2,12 @@ import {
   CloningFilesRepository,
   unknownError,
 } from '@marxan/cloning-files-repository';
-import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
+import {
+  ClonePiece,
+  ComponentId,
+  ComponentLocationSnapshot,
+  ResourceKind,
+} from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { isMarxanExecutionMetadataFolderRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
@@ -14,6 +19,7 @@ import { Readable } from 'stream';
 import { Entry, Parse } from 'unzipper';
 import { ExportId } from '../../export';
 import { ExportRepository } from '../../export/application/export-repository.port';
+import { ManifestFileService } from '../../export/application/manifest-file-service.port';
 import { Export, ExportComponent } from '../../export/domain';
 import { ExportConfigReader } from '../../import/application/export-config-reader';
 import {
@@ -33,6 +39,7 @@ export class GenerateExportFromZipFileHandler
     private readonly fileRepository: CloningFilesRepository,
     private readonly logger: Logger,
     private readonly exportRepo: ExportRepository,
+    private readonly manifestFileService: ManifestFileService,
   ) {
     this.logger.setContext(GenerateExportFromZipFileHandler.name);
   }
@@ -47,6 +54,7 @@ export class GenerateExportFromZipFileHandler
     >
   > {
     const uris: Record<string, string> = {};
+    let error = false;
 
     return new Promise<
       Either<
@@ -57,6 +65,11 @@ export class GenerateExportFromZipFileHandler
       zipReadable
         .pipe(Parse())
         .on('entry', async (entry: Entry) => {
+          if (entry.type !== 'File' || error) {
+            entry.autodrain();
+            return;
+          }
+
           const result = await this.fileRepository.saveCloningFile(
             exportId,
             entry,
@@ -64,18 +77,22 @@ export class GenerateExportFromZipFileHandler
           );
 
           if (isLeft(result)) {
-            resolve(left(errorStoringCloningFile));
+            error = true;
+            return;
           }
 
-          if (isRight(result)) {
-            uris[entry.path] = result.right;
-          }
+          uris[entry.path] = result.right;
         })
         .on('close', () => {
+          if (error) {
+            resolve(left(errorStoringCloningFile));
+            return;
+          }
+
           resolve(right(uris));
         })
         .on('error', () => {
-          resolve(left(unknownError));
+          resolve(left(errorStoringCloningFile));
         });
     });
   }
@@ -89,7 +106,6 @@ export class GenerateExportFromZipFileHandler
     const projectPieces = exportPieces.project.map((piece) => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(piece);
       const uri = uris[relativePath];
-
       return ExportComponent.fromSnapshot({
         finished: true,
         id: ComponentId.create().value,
@@ -112,7 +128,10 @@ export class GenerateExportFromZipFileHandler
           scenarioName: data.name,
         });
         const uri = uris[relativePath];
-        const urisArray = [{ uri, relativePath }];
+        const urisArray: ComponentLocationSnapshot[] = [];
+        if (uri) {
+          urisArray.push({ uri, relativePath });
+        }
 
         // We should include marxan execution metadata folders uris
         if (piece === ClonePiece.MarxanExecutionMetadata) {
@@ -147,8 +166,6 @@ export class GenerateExportFromZipFileHandler
   }: GenerateExportFromZipFile): Promise<
     Either<GenerateExportFromZipFileError, ExportId>
   > {
-    // TODO Integrity check
-
     const exportConfigOrError = await this.exportConfigReader.read(
       Readable.from(file.buffer),
     );
@@ -188,6 +205,17 @@ export class GenerateExportFromZipFileHandler
 
     if (isLeft(urisOrError) || isLeft(storeZipResult)) {
       return left(errorStoringCloningFile);
+    }
+
+    const integrityCheckResult = this.manifestFileService.performIntegrityCheck(
+      exportId,
+    );
+
+    // TODO Signature check
+
+    if (isLeft(integrityCheckResult)) {
+      await this.fileRepository.deleteExportFolder(exportId.value);
+      return integrityCheckResult;
     }
 
     const exportComponents = this.getExportComponents(

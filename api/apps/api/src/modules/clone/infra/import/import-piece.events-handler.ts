@@ -10,7 +10,6 @@ import { ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ComponentId, ResourceKind } from '@marxan/cloning/domain';
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiEventsService } from '../../../api-events';
 import { CompleteImportPiece } from '../../import/application/complete-import-piece.command';
 import { ImportId } from '../../import/domain';
 import { importPieceEventsFactoryToken } from './import-queue.provider';

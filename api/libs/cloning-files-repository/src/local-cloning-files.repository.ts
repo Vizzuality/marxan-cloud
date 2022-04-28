@@ -61,11 +61,19 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
     });
   }
 
+  private getStorageRootPath(exportId: string): string {
+    return `${this.storagePath}/${exportId}`;
+  }
+
+  getFilesFolderFor(exportId: string): string {
+    return `${this.getStorageRootPath(exportId)}/files`;
+  }
+
   saveZipFile(
     exportId: string,
     stream: Readable,
   ): Promise<Either<SaveFileError, string>> {
-    const path = `${this.storagePath}/${exportId}/export.zip`;
+    const path = `${this.getStorageRootPath(exportId)}/export.zip`;
 
     this.ensureFolderExists(path);
 
@@ -77,7 +85,7 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
     stream: Readable,
     relativePath: string,
   ): Promise<Either<SaveFileError, string>> {
-    const path = `${this.storagePath}/${exportId}/files/${relativePath}`;
+    const path = `${this.getFilesFolderFor(exportId)}/${relativePath}`;
 
     this.ensureFolderExists(path);
 
@@ -85,7 +93,7 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
   }
 
   async deleteExportFolder(exportId: string): Promise<void> {
-    const path = `${this.storagePath}/${exportId}`;
+    const path = this.getStorageRootPath(exportId);
 
     rmSync(path, { recursive: true, force: true });
   }
