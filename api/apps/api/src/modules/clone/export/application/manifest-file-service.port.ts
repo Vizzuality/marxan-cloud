@@ -1,5 +1,4 @@
 import { GetFileError, SaveFileError } from '@marxan/cloning-files-repository';
-import { ArchiveLocation } from '@marxan/cloning/domain';
 import { Either } from 'fp-ts/Either';
 import { ExportId } from '../domain';
 import { FileDestination } from './archive-creator.port';
@@ -13,7 +12,7 @@ export const signatureFileGenerationError = Symbol(
   'signature file generation error',
 );
 
-export const ManifestFilePrivateKey = Symbol('manifest file private key');
+export const CloningSigningSecret = Symbol('cloning signing secret');
 
 export abstract class ManifestFileService {
   abstract performIntegrityCheck(

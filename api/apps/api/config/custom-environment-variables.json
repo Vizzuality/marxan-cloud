@@ -59,9 +59,7 @@
     }
   },
   "cloning": {
-    "manifestFile": {
-      "privateKey": "CLONING_MANIFEST_FILE_PRIVATE_KEY"
-    }
+    "signingSecret": "CLONING_SIGNING_SECRET"
   },
   "marxan": {
     "inputFiles": {

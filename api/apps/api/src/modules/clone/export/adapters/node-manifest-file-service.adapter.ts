@@ -19,7 +19,7 @@ import {
   integrityCheckFailed,
   invalidSignature,
   manifestFileGenerationError,
-  ManifestFilePrivateKey,
+  CloningSigningSecret,
   ManifestFileService,
   signatureFileGenerationError,
 } from '../application/manifest-file-service.port';
@@ -29,8 +29,8 @@ import { ExportId } from '../domain';
 export class NodeManifestFileService implements ManifestFileService {
   constructor(
     private readonly fileRepository: CloningFilesRepository,
-    @Inject(ManifestFilePrivateKey)
-    private readonly manifestFilePrivateKey: string,
+    @Inject(CloningSigningSecret)
+    private readonly cloningSigningSecret: string,
   ) {}
 
   private async getManifestFileReadable(
@@ -84,7 +84,7 @@ export class NodeManifestFileService implements ManifestFileService {
       const signer = createSign('RSA-SHA256');
       signer.update(manifestFileBuffer);
       const recalculatedSignature = signer.sign(
-        this.manifestFilePrivateKey,
+        this.cloningSigningSecret,
         'hex',
       );
 
@@ -128,7 +128,7 @@ export class NodeManifestFileService implements ManifestFileService {
 
       const signer = createSign('RSA-SHA256');
       signer.update(manifestFileBuffer);
-      const result = signer.sign(this.manifestFilePrivateKey, 'hex');
+      const result = signer.sign(this.cloningSigningSecret, 'hex');
 
       const signatureFile = await this.fileRepository.saveCloningFile(
         exportId.value,
