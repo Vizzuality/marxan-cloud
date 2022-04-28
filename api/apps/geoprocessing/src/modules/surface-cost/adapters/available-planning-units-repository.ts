@@ -32,7 +32,7 @@ export class AvailablePlanningUnitsRepository
   async getPUsWithArea(scenarioId: string): Promise<PUWithArea[]> {
     const result: PUWithArea[] = await this.repo.query(
       `
-        SELECT spd.id, st_area(pug.the_geom::geography) / 1000000 as area
+        SELECT spd.id, ST_Area(ST_Transform(the_geom, 3410)) / 1000000 as area
         FROM scenarios_pu_data spd
           INNER JOIN projects_pu ppu ON ppu.id = spd.project_pu_id
           INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
