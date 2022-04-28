@@ -7,7 +7,7 @@ import { ArchiveCreator } from '../application/archive-creator.port';
 import { ExportRepository } from '../application/export-repository.port';
 import { ExportResourcePieces } from '../application/export-resource-pieces.port';
 import {
-  ManifestFilePrivateKey,
+  CloningSigningSecret,
   ManifestFileService,
 } from '../application/manifest-file-service.port';
 import { ExportComponentLocationEntity } from './entities/export-component-locations.api.entity';
@@ -30,11 +30,9 @@ import { TypeormExportRepository } from './typeorm-export.repository';
   ],
   providers: [
     {
-      provide: ManifestFilePrivateKey,
+      provide: CloningSigningSecret,
       useFactory: () => {
-        const base64Value = AppConfig.get<string>(
-          'cloning.manifestFile.privateKey',
-        );
+        const base64Value = AppConfig.get<string>('cloning.signingSecret');
 
         return Buffer.from(base64Value, 'base64').toString();
       },
