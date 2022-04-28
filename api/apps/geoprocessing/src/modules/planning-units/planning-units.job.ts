@@ -8,6 +8,7 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { Job } from 'bullmq';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
+import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
 
 type CustomPlanningAreaJob = Required<
@@ -170,15 +171,21 @@ export class PlanningUnitsJobProcessor {
           [job.data.planningUnitGridShape, job.data.planningUnitAreakm2],
         );
         const geometryIds = geometries.map((geom) => geom.id);
+
         const projectsPuRepo = em.getRepository(ProjectsPuEntity);
-        await projectsPuRepo.save(
-          geometryIds.map((id, index) => ({
-            geomId: id,
-            geomType: job.data.planningUnitGridShape,
-            puid: index + 1,
-            projectId: job.data.projectId,
-            planningAreaId: job.data.planningAreaId,
-          })),
+        const chunkSize = 1000;
+        await Promise.all(
+          chunk(geometryIds, chunkSize).map(async (ids, chunkIndex) => {
+            return projectsPuRepo.insert(
+              ids.map((id, index) => ({
+                geomId: id,
+                geomType: job.data.planningUnitGridShape,
+                puid: chunkIndex * chunkSize + (index + 1),
+                projectId: job.data.projectId,
+                planningAreaId: job.data.planningAreaId,
+              })),
+            );
+          }),
         );
 
         return geometries;
