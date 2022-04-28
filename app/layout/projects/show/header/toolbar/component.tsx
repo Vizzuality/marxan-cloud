@@ -3,11 +3,11 @@ import React, { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/router';
 
 import { AnimatePresence, motion } from 'framer-motion';
-// import { usePlausible } from 'next-plausible';
+import { usePlausible } from 'next-plausible';
 
-// import { useMe } from 'hooks/me';
+import { useMe } from 'hooks/me';
 import {
-  useProject, useSaveProjectDownload, useExportId, useDownloadProject,
+  useProject, useSaveProjectDownload,
 } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -27,11 +27,10 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid } = query;
-  // const plausible = usePlausible();
+  const plausible = usePlausible();
 
   const { data: projectData } = useProject(pid);
-  const { data: exportId } = useExportId(pid);
-  // const { user } = useMe();
+  const { user } = useMe();
 
   const {
     data: scenariosData,
@@ -43,7 +42,6 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
   });
 
   const projectDownloadMutation = useSaveProjectDownload({});
-  const downloadProject = useDownloadProject({});
 
   const scenarioIds = useMemo(() => {
     return scenariosData?.map((scenario) => scenario.id);
@@ -53,41 +51,17 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
     projectDownloadMutation.mutate({ id: `${pid}`, data: { scenarioIds } }, {
 
       onSuccess: () => {
-        downloadProject.mutate({
-          id: `${pid}`,
-          exportId: `${exportId}`,
-        }, {
-          onSuccess: () => {
 
-          },
-          onError: () => {
-            addToast('download-error', (
-              <>
-                <h2 className="font-medium">Error!</h2>
-                <ul className="text-sm">
-                  `Project $
-                  {projectData?.name}
-                  {' '}
-                  not downloaded. Try again.`
-                </ul>
-              </>
-            ), {
-              level: 'error',
-            });
-          },
-        });
       },
       onError: ({ e }) => {
         console.error('error --->', e);
-        addToast('error-project-name', (
+        addToast('error-download-project', (
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">
-              `Unable to download project
+              Unable to download project
               {' '}
-              $
               {projectData?.name}
-              `
             </p>
           </>
         ), {
@@ -95,22 +69,23 @@ export const Toolbar: React.FC<ToolbarProps> = () => {
         });
       },
     });
-    // plausible('Download project', {
-    //   props: {
-    //     userId: `${user.id}`,
-    //     userEmail: `${user.email}`,
-    //     projectId: `${pid}`,
-    //     projectName: `${projectData.name}`,
-    //   },
-    // });
+    plausible('Download project', {
+      props: {
+        userId: `${user.id}`,
+        userEmail: `${user.email}`,
+        projectId: `${pid}`,
+        projectName: `${projectData.name}`,
+      },
+    });
   }, [
     pid,
     projectDownloadMutation,
     scenarioIds,
     addToast,
     projectData?.name,
-    exportId,
-    downloadProject,
+    plausible,
+    user.email,
+    user.id,
   ]);
 
   return (

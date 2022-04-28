@@ -422,6 +422,7 @@ export function useSaveProjectDownload({
     method: 'POST',
   },
 }: UseSaveProjectDownloadProps) {
+  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const projectDownload = ({ id, data }: SaveProjectDownloadProps) => {
@@ -438,6 +439,8 @@ export function useSaveProjectDownload({
   return useMutation(projectDownload, {
     onSuccess: (data: any, variables, context) => {
       console.info('Succces', data, variables, context);
+      const { id } = variables;
+      queryClient.invalidateQueries(['projects-export-id', id]);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
