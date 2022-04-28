@@ -23,9 +23,6 @@ export const getScenarioSnapshot = async (
   );
 
   if (isLeft(pngData)) {
-    console.info(
-      `Map screenshot for public project ${projectId} could not be generated`,
-    );
     return left(imgGenerationError);
   }
 
