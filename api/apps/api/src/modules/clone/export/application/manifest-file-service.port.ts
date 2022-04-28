@@ -21,7 +21,7 @@ export abstract class ManifestFileService {
   ): Either<typeof integrityCheckFailed, true>;
 
   abstract verifyManifestFileSignature(
-    archiveLocation: ArchiveLocation,
+    manifestFileUri: string,
   ): Promise<Either<typeof invalidSignature, true>>;
 
   abstract generateManifestFileFor(

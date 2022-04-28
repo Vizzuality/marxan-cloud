@@ -3,7 +3,6 @@ import {
   GetFileError,
   SaveFileError,
 } from '@marxan/cloning-files-repository';
-import { ArchiveLocation } from '@marxan/cloning/domain';
 import {
   manifestFileRelativePath,
   signatureFileRelativePath,
@@ -70,10 +69,43 @@ export class NodeManifestFileService implements ManifestFileService {
     return right(true);
   }
 
-  verifyManifestFileSignature(
-    archiveLocation: ArchiveLocation,
+  async verifyManifestFileSignature(
+    manifestFileUri: string,
   ): Promise<Either<typeof invalidSignature, true>> {
-    throw new Error('Method not implemented.');
+    try {
+      const manifestFile = await this.fileRepository.get(manifestFileUri);
+
+      if (isLeft(manifestFile)) {
+        throw manifestFile;
+      }
+
+      const manifestFileBuffer = await readableToBuffer(manifestFile.right);
+
+      const signer = createSign('RSA-SHA256');
+      signer.update(manifestFileBuffer);
+      const recalculatedSignature = signer.sign(
+        this.manifestFilePrivateKey,
+        'hex',
+      );
+
+      const signatureFileUri = manifestFileUri.replace(
+        manifestFileRelativePath,
+        signatureFileRelativePath,
+      );
+      const signatureFile = await this.fileRepository.get(signatureFileUri);
+      if (isLeft(signatureFile)) {
+        throw signatureFile;
+      }
+      const signatureFileBuffer = await readableToBuffer(signatureFile.right);
+      const uploadedSignature = signatureFileBuffer.toString();
+
+      if (recalculatedSignature !== uploadedSignature)
+        return left(invalidSignature);
+
+      return right(true);
+    } catch (err) {
+      return left(invalidSignature);
+    }
   }
 
   async generateSignatureFileFor(
