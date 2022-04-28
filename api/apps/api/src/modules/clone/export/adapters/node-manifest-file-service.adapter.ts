@@ -10,7 +10,7 @@ import {
 import { readableToBuffer } from '@marxan/utils';
 import { Inject, Injectable } from '@nestjs/common';
 import { spawnSync } from 'child_process';
-import { createSign } from 'crypto';
+import { createSign, createVerify } from 'crypto';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { isLeft } from 'fp-ts/lib/These';
 import { Readable } from 'stream';
@@ -27,6 +27,8 @@ import { ExportId } from '../domain';
 
 @Injectable()
 export class NodeManifestFileService implements ManifestFileService {
+  private readonly algorithm = 'RSA-SHA256';
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @Inject(CloningSigningSecret)
@@ -72,40 +74,26 @@ export class NodeManifestFileService implements ManifestFileService {
   async verifyManifestFileSignature(
     manifestFileUri: string,
   ): Promise<Either<typeof invalidSignature, true>> {
-    try {
-      const manifestFile = await this.fileRepository.get(manifestFileUri);
+    const signatureFileUri = manifestFileUri.replace(
+      manifestFileRelativePath,
+      signatureFileRelativePath,
+    );
 
-      if (isLeft(manifestFile)) {
-        throw manifestFile;
-      }
-
-      const manifestFileBuffer = await readableToBuffer(manifestFile.right);
-
-      const signer = createSign('RSA-SHA256');
-      signer.update(manifestFileBuffer);
-      const recalculatedSignature = signer.sign(
-        this.cloningSigningSecret,
-        'hex',
-      );
-
-      const signatureFileUri = manifestFileUri.replace(
-        manifestFileRelativePath,
-        signatureFileRelativePath,
-      );
-      const signatureFile = await this.fileRepository.get(signatureFileUri);
-      if (isLeft(signatureFile)) {
-        throw signatureFile;
-      }
-      const signatureFileBuffer = await readableToBuffer(signatureFile.right);
-      const uploadedSignature = signatureFileBuffer.toString();
-
-      if (recalculatedSignature !== uploadedSignature)
-        return left(invalidSignature);
-
-      return right(true);
-    } catch (err) {
+    const manifestFile = await this.fileRepository.get(manifestFileUri);
+    const signatureFile = await this.fileRepository.get(signatureFileUri);
+    if (isLeft(signatureFile) || isLeft(manifestFile)) {
       return left(invalidSignature);
     }
+    const manifestFileBuffer = await readableToBuffer(manifestFile.right);
+    const signatureFileBuffer = await readableToBuffer(signatureFile.right);
+    const uploadedSignature = signatureFileBuffer.toString();
+
+    const verifier = createVerify(this.algorithm);
+    verifier.update(manifestFileBuffer);
+
+    return verifier.verify(this.cloningSigningSecret, uploadedSignature, 'hex')
+      ? right(true)
+      : left(invalidSignature);
   }
 
   async generateSignatureFileFor(
@@ -126,7 +114,7 @@ export class NodeManifestFileService implements ManifestFileService {
 
       const manifestFileBuffer = await readableToBuffer(manifestFile.right);
 
-      const signer = createSign('RSA-SHA256');
+      const signer = createSign(this.algorithm);
       signer.update(manifestFileBuffer);
       const result = signer.sign(this.cloningSigningSecret, 'hex');
 
