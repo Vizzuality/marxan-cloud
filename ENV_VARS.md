@@ -52,6 +52,10 @@ applications.
   requests from the in-browser frontend app to the API, required except when
   accessing the frontend app on the default URL defined in
   `api/apps/api/config/default.json`, via the `network.cors.origins` config key)
+* `CLONING_SIGNING_SECRET` (base64-encoded string, required): this is a
+  base64-encoded representation of a PEM-format RSA private key; the key must be
+  created without a passphrase, for example via a command such as `openssl
+  genrsa 4096 | base64 -w0`.
 
 ### PostgreSQL service - API database
 
