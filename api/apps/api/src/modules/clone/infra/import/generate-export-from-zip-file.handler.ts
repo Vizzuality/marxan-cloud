@@ -10,11 +10,11 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import { manifestFileRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/manifest-file';
 import { isMarxanExecutionMetadataFolderRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
-import { isRight } from 'fp-ts/lib/These';
 import { Readable } from 'stream';
 import { Entry, Parse } from 'unzipper';
 import { ExportId } from '../../export';
@@ -207,11 +207,21 @@ export class GenerateExportFromZipFileHandler
       return left(errorStoringCloningFile);
     }
 
+    const manifestFileUri = `${this.fileRepository.getFilesFolderFor(
+      exportId.value,
+    )}/${manifestFileRelativePath}`;
+    const signatureVerificationResult = await this.manifestFileService.verifyManifestFileSignature(
+      manifestFileUri,
+    );
+
+    if (isLeft(signatureVerificationResult)) {
+      await this.fileRepository.deleteExportFolder(exportId.value);
+      return signatureVerificationResult;
+    }
+
     const integrityCheckResult = this.manifestFileService.performIntegrityCheck(
       exportId,
     );
-
-    // TODO Signature check
 
     if (isLeft(integrityCheckResult)) {
       await this.fileRepository.deleteExportFolder(exportId.value);

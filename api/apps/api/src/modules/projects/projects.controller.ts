@@ -112,7 +112,10 @@ import {
   invalidExportZipFile,
 } from '../clone/infra/import/generate-export-from-zip-file.command';
 import { exportNotFound } from '../clone/import/application/import-project.command';
-import { integrityCheckFailed } from '../clone/export/application/manifest-file-service.port';
+import {
+  integrityCheckFailed,
+  invalidSignature,
+} from '../clone/export/application/manifest-file-service.port';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -832,6 +835,7 @@ export class ProjectsController {
       switch (idsOrError.left) {
         case forbiddenError:
           throw new ForbiddenException();
+        case invalidSignature:
         case integrityCheckFailed:
         case cloningExportProvided:
         case invalidExportZipFile:

@@ -3,7 +3,10 @@ import { UserId } from '@marxan/domain-ids';
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
 import { ExportId } from '../../export';
-import { integrityCheckFailed } from '../../export/application/manifest-file-service.port';
+import {
+  integrityCheckFailed,
+  invalidSignature,
+} from '../../export/application/manifest-file-service.port';
 
 export const invalidExportZipFile = Symbol('invalid export zip file');
 export const cloningExportProvided = Symbol('cloning export provided');
@@ -16,7 +19,8 @@ export type GenerateExportFromZipFileError =
   | typeof cloningExportProvided
   | typeof errorStoringCloningFile
   | typeof errorSavingExport
-  | typeof integrityCheckFailed;
+  | typeof integrityCheckFailed
+  | typeof invalidSignature;
 
 export class GenerateExportFromZipFile extends Command<
   Either<GenerateExportFromZipFileError, ExportId>
