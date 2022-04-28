@@ -10,8 +10,9 @@ locals {
     database = "geoprocessing-${var.namespace}"
   }
 
-  api_auth_jwt_secret = random_password.jwt_secret.result
-  x_auth_api_key      = random_password.x_auth_api_key.result
+  api_auth_jwt_secret    = random_password.jwt_secret.result
+  x_auth_api_key         = random_password.x_auth_api_key.result
+  cloning_signing_secret = tls_private_key.cloning_signing_secret.private_key_pem
 }
 
 resource "random_password" "postgresql_api_user_generator" {
@@ -46,6 +47,11 @@ resource "azurerm_key_vault_secret" "geoprocessing_user_postgresql" {
   key_vault_id = var.key_vault_id
 }
 
+resource "tls_private_key" "cloning_signing_secret" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 resource "kubernetes_secret" "api_secret" {
   metadata {
     name      = "api"
@@ -53,8 +59,9 @@ resource "kubernetes_secret" "api_secret" {
   }
 
   data = {
-    API_AUTH_JWT_SECRET = sensitive(local.api_auth_jwt_secret)
-    API_AUTH_X_API_KEY  = sensitive(local.x_auth_api_key)
+    API_AUTH_JWT_SECRET    = sensitive(local.api_auth_jwt_secret)
+    API_AUTH_X_API_KEY     = sensitive(local.x_auth_api_key)
+    CLONING_SIGNING_SECRET = sensitive(base64encode(local.cloning_signing_secret))
 
     API_POSTGRES_HOST     = "api-postgres-postgresql.${var.namespace}.svc.cluster.local"
     API_POSTGRES_USER     = sensitive(local.api_postgres_secret_json.username)
@@ -100,7 +107,3 @@ resource "kubernetes_secret" "geoprocessing_secret" {
     REDIS_PORT     = var.redis_port
   }
 }
-
-
-
-
