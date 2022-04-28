@@ -55,7 +55,7 @@ import {
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
 import { PublishedProjectSerializer } from '../published-project.serializer';
-import { CreatePublishProjectDto } from '../dto/publish-project.dto';
+import { PublishProjectDto } from '../dto/publish-project.dto';
 import { RequestPublishedProjectCloneResponseDto } from '@marxan-api/modules/projects/dto/export.project.dto';
 import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
 import { ExportId } from '@marxan-api/modules/clone';
@@ -82,7 +82,7 @@ export class PublishProjectController {
   @ApiInternalServerErrorResponse()
   async publish(
     @Param('id') id: string,
-    @Body() dto: CreatePublishProjectDto,
+    @Body() dto: PublishProjectDto,
     @Request() req: RequestWithAuthenticatedUser,
     @AppSessionTokenCookie() appSessionTokenCookie: string,
   ): Promise<void> {
@@ -169,6 +169,26 @@ export class PublishProjectController {
     }
 
     return;
+  }
+
+  @ApiOperation({ description: 'Update public project' })
+  @ApiOkResponse({ type: PublishedProjectResultSingular })
+  @Patch('/published-projects/:id')
+  async update(
+    @Param('id') id: string,
+    @Body() dto: PublishProjectDto,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<PublishedProjectResultSingular> {
+    const result = await this.publishedProjectService.update(
+      id,
+      dto,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      throw new ForbiddenException();
+    }
+    return await this.serializer.serialize(result.right);
   }
 
   @Patch(':id/moderation-status/set')

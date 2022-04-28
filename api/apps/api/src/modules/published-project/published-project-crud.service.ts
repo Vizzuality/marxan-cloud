@@ -4,9 +4,11 @@ import {
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
-import { UpdatePublishedProjectDto } from '@marxan-api/modules/published-project/dto/update-published-project.dto';
 import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-info';
-import { CreatePublishedProjectDto } from '@marxan-api/modules/published-project/dto/create-published-project.dto';
+import {
+  CreatePublishedProjectDto,
+  UpdatePublishedProjectDto,
+} from '@marxan-api/modules/published-project/dto/create-published-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AppConfig } from '@marxan-api/utils/config.utils';

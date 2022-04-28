@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
 import { PublishedProjectCrudService } from '@marxan-api/modules/published-project/published-project-crud.service';
 import { Repository } from 'typeorm';
@@ -9,13 +9,14 @@ import { ProjectsRequest } from '@marxan-api/modules/projects/project-requests-i
 import { PublishedProject } from '@marxan-api/modules/published-project/entities/published-project.api.entity';
 import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '@marxan-api/modules/users/users.service';
-import { CreatePublishProjectDto } from './dto/publish-project.dto';
+import { PublishProjectDto } from './dto/publish-project.dto';
 import { WebshotService } from '@marxan/webshot';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
 import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { ProjectsService } from '../projects/projects.service';
 import { Scenario } from '../scenarios/scenario.api.entity';
+import { getScenarioSnapshot } from '@marxan-api/utils/webshot.utils';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -51,7 +52,7 @@ export class PublishedProjectService {
   async publish(
     id: string,
     requestingUserId: string,
-    projectToPublish: CreatePublishProjectDto,
+    projectToPublish: PublishProjectDto,
   ): Promise<
     Either<errors | typeof alreadyPublished | typeof exportError, true>
   > {
@@ -97,39 +98,37 @@ export class PublishedProjectService {
     // like it does not belong here at all anyways, but right now there
     // is not a better place to deal with this.
 
-    const webshotUrl = AppConfig.get('webshot.url') as string;
-
     const {
       featuredScenarioId,
       config,
       ...projectWithoutScenario
     } = projectToPublish;
 
-    assertDefined(featuredScenarioId);
-    assertDefined(config);
+    let pngDataResult: string | undefined;
 
-    const pngData = await this.webshotService.getPublishedProjectsImage(
-      featuredScenarioId,
-      id,
-      {
-        ...config,
-        screenshotOptions: {
-          clip: { x: 0, y: 0, width: 500, height: 500 },
-        },
-      },
-      webshotUrl,
-    );
-
-    if (isLeft(pngData)) {
-      console.info(
-        `Map screenshot for public project ${id} could not be generated`,
+    if (featuredScenarioId) {
+      const result = await getScenarioSnapshot(
+        featuredScenarioId,
+        id,
+        this.webshotService,
+        config,
       );
+
+      if (isLeft(result)) {
+        console.info(
+          `Scenario snapshot could not be generated for scenario ${featuredScenarioId}`,
+        );
+      }
+
+      if (isRight(result)) {
+        pngDataResult = result.right;
+      }
     }
 
     await this.crudService.create({
       id,
       ...projectWithoutScenario,
-      pngData: isRight(pngData) ? pngData.right : '',
+      pngData: pngDataResult || '',
       exportId: exportResult.right.exportId.value,
     });
 
@@ -165,6 +164,50 @@ export class PublishedProjectService {
 
     await this.publicProjectsRepo.delete({ id });
     return right(true);
+  }
+
+  async update(
+    projectId: string,
+    input: PublishProjectDto,
+    userId: string,
+  ): Promise<Either<typeof accessDenied | typeof notFound, PublishedProject>> {
+    const publicProject = await this.publicProjectsRepo.findOne(projectId);
+    if (!publicProject) {
+      return left(notFound);
+    }
+
+    if (!(await this.acl.canPublishProject(userId, projectId))) {
+      return left(accessDenied);
+    }
+
+    const { featuredScenarioId, config, ...projectWithoutScenario } = input;
+    let pngDataResult: string | undefined;
+
+    if (featuredScenarioId) {
+      const result = await getScenarioSnapshot(
+        featuredScenarioId,
+        projectId,
+        this.webshotService,
+        config,
+      );
+
+      if (isLeft(result)) {
+        console.info(
+          `Scenario snapshot could not be generated for scenario ${featuredScenarioId}`,
+        );
+      }
+
+      if (isRight(result)) {
+        pngDataResult = result.right;
+      }
+    }
+
+    return right(
+      await this.crudService.update(projectId, {
+        ...projectWithoutScenario,
+        pngData: pngDataResult || publicProject.pngData,
+      }),
+    );
   }
 
   async changeModerationStatus(
