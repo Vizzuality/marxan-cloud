@@ -12,12 +12,14 @@ export type ArchiveCreationError =
   | typeof cannotCreateArchive
   | typeof cannotStoreArchive;
 
+export type FileDestination = {
+  uri: string;
+  relativeDestination: string;
+};
+
 export abstract class ArchiveCreator {
   abstract zip(
     exportId: string,
-    files: {
-      uri: string;
-      relativeDestination: string;
-    }[],
+    files: FileDestination[],
   ): Promise<Either<ArchiveCreationError, ArchiveLocation>>;
 }

@@ -35,4 +35,6 @@ export abstract class CloningFilesRepository {
   ): Promise<Either<SaveFileError, string>>;
 
   abstract deleteExportFolder(exportId: string): Promise<void>;
+
+  abstract getFilesFolderFor(exportId: string): string;
 }

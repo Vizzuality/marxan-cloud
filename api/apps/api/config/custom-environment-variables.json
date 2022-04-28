@@ -58,6 +58,11 @@
       "localPath": "CLONING_FILE_STORAGE_LOCAL_PATH"
     }
   },
+  "cloning": {
+    "manifestFile": {
+      "privateKey": "CLONING_MANIFEST_FILE_PRIVATE_KEY"
+    }
+  },
   "marxan": {
     "inputFiles": {
       "inputDat": {
