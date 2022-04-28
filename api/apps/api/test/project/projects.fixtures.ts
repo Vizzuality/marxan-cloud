@@ -124,6 +124,21 @@ export const getFixtures = async () => {
       expect(response.body.data.length).toEqual(1);
       expect(response.body.data[0].id).toEqual(publicProjectId);
     },
+    ThenPublicProjectIsUpdated: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.status).toEqual(200);
+      expect(response.body.data.id).toEqual(publicProjectId);
+      expect(response.body.data.type).toEqual('published_projects');
+      expect(response.body.data.attributes.name).toEqual('Updated Name');
+      expect(response.body.data.attributes.description).toEqual(
+        'Updated Description',
+      );
+      expect(response.body.data.attributes.location).toEqual(
+        'Updated Location',
+      );
+    },
     ThenPublicProjectWithUnderModerationStatusIsAvailable: (
       publicProjectId: string,
       response: request.Response,
@@ -288,6 +303,24 @@ export const getFixtures = async () => {
           featuredScenarioId: scenarioId,
         })
         .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenUpdatingAPublicProject: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/published-projects/${projectId}`)
+        .send({
+          name: 'Updated Name',
+          description: 'Updated Description',
+          location: 'Updated Location',
+        })
+        .set('Authorization', `Bearer ${randomUserToken}`),
+    WhenUpdatingAPublicProjectAsNotIncludedUser: async (projectId: string) =>
+      await request(app.getHttpServer())
+        .patch(`/api/v1/projects/published-projects/${projectId}`)
+        .send({
+          name: 'Updated Name',
+          description: 'Updated Description',
+          location: 'Updated Location',
+        })
+        .set('Authorization', `Bearer ${notIncludedUserToken}`),
     WhenUnpublishingAProjectAsProjectOwner: async (projectId: string) =>
       await request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/unpublish`)
