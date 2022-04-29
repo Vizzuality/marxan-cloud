@@ -18,7 +18,7 @@ export const DownloadProjectButton: React.FC<DownloadProjectButtonProps> = () =>
     <>
       <Button
         className="text-white"
-        theme="primary-alt"
+        theme="secondary"
         size="base"
         onClick={() => setModal(true)}
       >

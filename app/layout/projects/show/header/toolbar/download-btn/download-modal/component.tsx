@@ -18,9 +18,12 @@ import Icon from 'components/icon';
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 export interface DownloadProjectModalProps {
+  onDismiss?: () => void;
 }
 
-export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = () => {
+export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
+  onDismiss,
+}: DownloadProjectModalProps) => {
   const { query } = useRouter();
   const { addToast } = useToasts();
   const { pid } = query;
@@ -51,9 +54,8 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = () => {
 
   const onExportProject = useCallback(() => {
     exportProjectMutation.mutate({ id: `${pid}`, data: { scenarioIds } }, {
-
       onSuccess: () => {
-
+        if (onDismiss) onDismiss();
       },
       onError: ({ e }) => {
         console.error('error --->', e);
@@ -88,12 +90,26 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = () => {
     plausible,
     user.email,
     user.id,
+    onDismiss,
   ]);
 
   const onDownloadExport = useCallback((exportId) => {
     downloadExportMutation.mutate({ pid: `${pid}`, exportId }, {
       onSuccess: () => {
-
+        addToast('success-download-project', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              Project
+              {' '}
+              {projectData?.name}
+              {' '}
+              has been downloaded
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: ({ e }) => {
         console.error('error --->', e);
