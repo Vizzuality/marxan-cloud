@@ -28,6 +28,7 @@ jobs:
       GEO_POSTGRES_DB: marxan-geo-api
       POSTGRES_GEO_SERVICE_PORT: 3533
       REDIS_API_SERVICE_PORT: 3479
+      CLONING_SIGNING_SECRET: ${{ secrets.CLONING_SIGNING_SECRET }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
