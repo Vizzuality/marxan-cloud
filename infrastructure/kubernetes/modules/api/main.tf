@@ -263,7 +263,7 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
-            name  = "api_POSTGRES_LOGGING"
+            name  = "API_POSTGRES_LOGGING"
             value = var.api_postgres_logging
           }
 
