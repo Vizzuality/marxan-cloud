@@ -25,10 +25,6 @@ import {
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
-import {
-  nullPlanningUnitGridShape,
-  projectNotFound as initialCostProjectNotFound,
-} from '@marxan-api/modules/scenarios/cost-surface/application/set-initial-cost-surface.command';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import {
   lockedByAnotherUser,
@@ -108,8 +104,6 @@ export const mapAclDomainToHttpError = (
     | typeof blmCreationFailure
     | typeof jobSubmissionFailed
     | typeof submissionFailed
-    | typeof nullPlanningUnitGridShape
-    | typeof initialCostProjectNotFound
     | typeof bestSolutionNotFound
     | typeof unknownPdfWebshotError
     | typeof unknownPngWebshotError
@@ -206,10 +200,6 @@ export const mapAclDomainToHttpError = (
       return new InternalServerErrorException(
         'System could not submit the async job.',
       );
-    case nullPlanningUnitGridShape:
-      return new BadRequestException('Invalid planing unit grid shape.');
-    case initialCostProjectNotFound:
-      return new NotFoundException('Project not found.');
     case unknownPdfWebshotError:
       return new InternalServerErrorException(
         'Unexpected error while preparing PDF snapshot via webshot.',

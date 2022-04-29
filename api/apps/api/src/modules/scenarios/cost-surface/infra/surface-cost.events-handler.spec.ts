@@ -1,19 +1,18 @@
+import { API_EVENT_KINDS } from '@marxan/api-events';
 import {
+  FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-  FromShapefileJobInput,
 } from '@marxan/scenario-cost-surface';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
-import { API_EVENT_KINDS } from '@marxan/api-events';
 import { CreateApiEventDTO } from '../../../api-events/dto/create.api-event.dto';
 import { EventData, EventFactory } from '../../../queue-api-events';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { SurfaceCostEventsHandler } from './surface-cost.events-handler';
-import { surfaceCostEventsFactoryToken } from './surface-cost-queue.provider';
-import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { DeleteScenario } from './delete-scenario.command';
+import { surfaceCostEventsFactoryToken } from './surface-cost-queue.provider';
+import { SurfaceCostEventsHandler } from './surface-cost.events-handler';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -106,7 +105,6 @@ const getFixtures = async () => {
     GivenInitialCostJob: (): InitialCostJobInput => {
       return {
         scenarioId: v4(),
-        puGridShape: PlanningUnitGridShape.Square,
       };
     },
     GivenFromShapeFileJob: (): FromShapefileJobInput => {

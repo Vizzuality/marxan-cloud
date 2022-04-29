@@ -4,10 +4,7 @@ import {
   InitialCostJobInput,
   JobInput,
 } from '@marxan/scenario-cost-surface';
-import {
-  canPlanningUnitsBeLocked,
-  PlanningUnitGridShape,
-} from '@marxan/scenarios-planning-unit';
+import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
 import { GetAvailablePlanningUnits } from '../ports/available-planning-units/get-available-planning-units';
@@ -45,26 +42,9 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   }
 
   private async initialCostProcessor({
-    data: { scenarioId, puGridShape },
+    data: { scenarioId },
   }: Job<InitialCostJobInput, true>): Promise<true> {
-    const hexagonPuShape = puGridShape === PlanningUnitGridShape.Hexagon;
-    const squarePuShape = puGridShape === PlanningUnitGridShape.Square;
-
-    if (hexagonPuShape || squarePuShape) {
-      const { ids: puIds } = await this.availablePlanningUnits.get(scenarioId);
-
-      await this.repo.save(
-        scenarioId,
-        puIds.map((id) => ({ puid: id, cost: 1 })),
-      );
-      return true;
-    }
-
     const pusWithArea = await this.availablePlanningUnits.getPUsWithArea(
-      scenarioId,
-    );
-
-    const referenceArea = await this.availablePlanningUnits.getMaxPUAreaForScenario(
       scenarioId,
     );
 
@@ -72,7 +52,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
       scenarioId,
       pusWithArea.map(({ id, area }) => ({
         puid: id,
-        cost: Math.round((area * 100) / referenceArea) / 100,
+        cost: area,
       })),
     );
 
@@ -86,9 +66,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
       return this.fromShapefileProcessor(
         job as Job<FromShapefileJobInput, true>,
       );
-    if ((data as InitialCostJobInput).puGridShape)
-      return this.initialCostProcessor(job as Job<InitialCostJobInput, true>);
 
-    throw new Error('Unknown type of job');
+    return this.initialCostProcessor(job as Job<InitialCostJobInput, true>);
   }
 }

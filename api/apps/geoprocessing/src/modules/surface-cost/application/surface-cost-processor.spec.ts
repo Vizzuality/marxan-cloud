@@ -147,58 +147,17 @@ describe('when processing shapefile job input', () => {
 });
 
 describe('when processing initial cost job input', () => {
+  const area = getAreaByPlanningUnit(availablePlanningUnitIds);
+  const costByArea = getCostByAreaOfPlanningUnit(area);
   beforeEach(() => {
     puRepo.mock.mockResolvedValue({
       ids: availablePlanningUnitIds,
     });
-  });
-  const costOne = getCostByPlanningUnit(availablePlanningUnitIds, 1);
-  describe('when planning unit grid shape is a square', () => {
-    it('should persist cost one for all planning units', async () => {
-      expect(
-        await sut.process(
-          getInitialCostJob(scenarioId, PlanningUnitGridShape.Square),
-        ),
-      ).toEqual(true);
-      expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costOne);
-    });
+    puRepo.getPUsWithAreaMock.mockResolvedValue(area);
   });
 
-  describe('when planning unit grid shape is a hexagon', () => {
-    it('should persist cost one for all planning units', async () => {
-      expect(
-        await sut.process(
-          getInitialCostJob(scenarioId, PlanningUnitGridShape.Hexagon),
-        ),
-      ).toEqual(true);
-      expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costOne);
-    });
-  });
-
-  describe('when planning unit grid shape is irregular', () => {
-    const area = getAreaByPlanningUnit(availablePlanningUnitIds);
-    const maxPuArea = Math.max(...area.map((pu) => pu.area));
-    const costByArea = getCostByAreaOfPlanningUnit(area, maxPuArea);
-    beforeEach(() => {
-      puRepo.getMaxPUAreaForScenarioMock.mockResolvedValue(maxPuArea);
-      puRepo.getPUsWithAreaMock.mockResolvedValue(area);
-    });
-
-    it('should persist cost based on area for all planning units', async () => {
-      expect(
-        await sut.process(
-          getInitialCostJob(scenarioId, PlanningUnitGridShape.FromShapefile),
-        ),
-      ).toEqual(true);
-      expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costByArea);
-    });
-  });
-});
-
-describe('when processing unknown type of job input', () => {
-  it('should throw', async () => {
-    await expect(sut.process(getUnknownJob())).rejects.toThrow(
-      /Unknown type of job/,
-    );
+  it('should persist cost based on area for all planning units', async () => {
+    expect(await sut.process(getInitialCostJob(scenarioId))).toEqual(true);
+    expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costByArea);
   });
 });

@@ -10,6 +10,4 @@ export abstract class GetAvailablePlanningUnits {
   }>;
 
   abstract getPUsWithArea(scenarioId: string): Promise<PUWithArea[]>;
-
-  abstract getMaxPUAreaForScenario(scenarioId: string): Promise<number>;
 }

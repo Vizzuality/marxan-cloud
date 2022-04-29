@@ -4,19 +4,14 @@ import {
 } from '@marxan/scenario-cost-surface';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Queue } from 'bullmq';
-import { right, left, Either } from 'fp-ts/lib/Either';
-import { Repository } from 'typeorm';
-import { Project } from '../../../projects/project.api.entity';
+import { Either, left, right } from 'fp-ts/lib/Either';
 import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
 import {
   CostSurfaceEventsPort,
   CostSurfaceState,
 } from '../ports/cost-surface-events.port';
 import {
-  nullPlanningUnitGridShape,
-  projectNotFound,
   SetInitialCostSurface,
   SetInitialCostSurfaceError,
 } from './set-initial-cost-surface.command';
@@ -27,8 +22,6 @@ export class SetInitialCostSurfaceHandler
   constructor(
     @Inject(surfaceCostQueueToken)
     private readonly queue: Queue<InitialCostJobInput>,
-    @InjectRepository(Project)
-    private readonly projectRepo: Repository<Project>,
     private readonly events: CostSurfaceEventsPort,
     private logger: Logger,
   ) {
@@ -37,18 +30,9 @@ export class SetInitialCostSurfaceHandler
 
   async execute({
     scenarioId,
-    projectId,
   }: SetInitialCostSurface): Promise<Either<SetInitialCostSurfaceError, true>> {
-    const project = await this.projectRepo.findOne(projectId);
-
-    if (!project) return left(projectNotFound);
-    const { planningUnitGridShape } = project;
-
-    if (!planningUnitGridShape) return left(nullPlanningUnitGridShape);
-
     try {
       await this.queue.add(`set-initial-cost-surface`, {
-        puGridShape: planningUnitGridShape,
         scenarioId,
       });
       await this.events.event(scenarioId, CostSurfaceState.Submitted);

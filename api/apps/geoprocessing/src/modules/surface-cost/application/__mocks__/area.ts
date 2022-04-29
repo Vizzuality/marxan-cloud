@@ -11,9 +11,8 @@ export const getAreaByPlanningUnit = (
 
 export const getCostByAreaOfPlanningUnit = (
   puWithArea: PUWithArea[],
-  referenceArea: number,
 ): PlanningUnitCost[] =>
   puWithArea.map((pu) => ({
     puid: pu.id,
-    cost: Math.round((pu.area * 100) / referenceArea) / 100,
+    cost: pu.area,
   }));
