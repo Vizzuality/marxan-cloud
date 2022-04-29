@@ -1,22 +1,21 @@
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import {
+  ScenariosPuCostDataGeo,
+  ScenariosPuPaDataGeo,
+} from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
-import { EntityManager, In, Repository } from 'typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { chunk } from 'lodash';
-
+import { EntityManager, In, Repository } from 'typeorm';
 import { CostSurfacePersistencePort } from '../ports/persistence/cost-surface-persistence.port';
 import { PlanningUnitCost } from '../ports/planning-unit-cost';
-import {
-  ScenariosPlanningUnitGeoEntity,
-  ScenariosPuCostDataGeo,
-} from '@marxan/scenarios-planning-unit';
 
 @Injectable()
 export class TypeormCostSurface implements CostSurfacePersistencePort {
   constructor(
     @InjectRepository(ScenariosPuCostDataGeo)
     private readonly costs: Repository<ScenariosPuCostDataGeo>,
-    @InjectRepository(ScenariosPlanningUnitGeoEntity)
-    private readonly scenarioDataRepo: Repository<ScenariosPlanningUnitGeoEntity>,
+    @InjectRepository(ScenariosPuPaDataGeo)
+    private readonly scenarioDataRepo: Repository<ScenariosPuPaDataGeo>,
     @InjectEntityManager() private readonly entityManager: EntityManager,
   ) {
     //
@@ -26,7 +25,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     const scenarioData = await this.scenarioDataRepo.find({
       where: {
         scenarioId,
-        id: In(values.map((pair) => pair.puid)),
+        id: In(values.map((pair) => pair.id)),
       },
     });
     const puDataIds = scenarioData.map((sd) => sd.id);
@@ -42,7 +41,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
           ScenariosPuCostDataGeo,
           rows.map((row) => ({
             cost: row.cost,
-            scenariosPuDataId: row.puid,
+            scenariosPuDataId: row.id,
           })),
         );
       }

@@ -1,10 +1,10 @@
-import { PlanningUnitCost } from '../../ports/planning-unit-cost';
+import { ShapefileRecord } from '../../ports/shapefile-record';
 
 export const getCostByPlanningUnit = (
-  planningUnitsIds: string[],
+  planningUnitsPuids: number[],
   expectedCost?: number,
-): PlanningUnitCost[] =>
-  planningUnitsIds.map((pu) => ({
+): ShapefileRecord[] =>
+  planningUnitsPuids.map((pu) => ({
     cost: expectedCost ?? 200,
     puid: pu,
   }));

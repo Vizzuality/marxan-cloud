@@ -38,11 +38,11 @@ describe(`when given GeoJson has pu costs`, () => {
       Array [
         Object {
           "cost": 200,
-          "puid": "uuid-1",
+          "puid": 1,
         },
         Object {
           "cost": 200,
-          "puid": "uuid-2",
+          "puid": 2,
         },
       ]
     `);
@@ -65,7 +65,7 @@ const getFixtures = async () => {
   return {
     getService: () => sandbox.get(PuCostExtractor),
     geoFeaturesWithoutCost: () => getGeoJsonWithMissingCost(),
-    geoFeaturesWithData: () => getGeoJson(['uuid-1', 'uuid-2']),
+    geoFeaturesWithData: () => getGeoJson([1, 2]),
     geoFeaturesWithNegativeCost: () => getGeoJsonWithNegativeCost(),
     simpleGeometry: () => getGeometryMultiPolygon(),
   };

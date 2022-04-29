@@ -9,6 +9,6 @@
  * also, upperCase can cause troubles.
  */
 export interface PlanningUnitCost {
-  puid: string;
+  id: string;
   cost: number;
 }

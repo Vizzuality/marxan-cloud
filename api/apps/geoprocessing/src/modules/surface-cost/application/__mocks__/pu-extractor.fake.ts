@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { GeoJSON } from 'geojson';
 import { PuExtractorPort } from '../../ports/pu-extractor/pu-extractor.port';
-import { PlanningUnitCost } from '../../ports/planning-unit-cost';
+import { ShapefileRecord } from '../../ports/shapefile-record';
 
 @Injectable()
 export class PuExtractorFake implements PuExtractorPort {
-  mock: jest.Mock<PlanningUnitCost[]> = jest.fn();
+  mock: jest.Mock<ShapefileRecord[]> = jest.fn();
 
-  extract(geoJsonSurface: GeoJSON): PlanningUnitCost[] {
+  extract(geoJsonSurface: GeoJSON): ShapefileRecord[] {
     return this.mock(geoJsonSurface);
   }
 }
