@@ -96,10 +96,24 @@ Secrets with the corresponding values:
 - `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
 - `AZURE_TENANT_ID`: The Azure Tenant Id. Get from `Base`'s `azure_tenant_id`
 - `BASTION_HOST`: The hostname for the bastion machine. Get from `Base`'s `bastion_hostname`
+- `BASTION_USER`: By default this will be `ubuntu` if using the initial user
+  created on bastion host instantiation. It is configurable in case
+  infrastructure admins wish to configure a different user on the bastion host
+  or the default distro user is renamed.
+- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
-- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
+- `NEXT_PUBLIC_URL_STAGING`: The base URL for the frontend app in the staging
+  environment. Get from `Kubernetes`' `staging_client_url`
+- `NEXT_PUBLIC_URL_PRODUCTION`: The base URL for the frontend app in the
+  production environment. Get from `Kubernetes`' `production_client_url`
+- `NEXT_PUBLIC_API_URL_STAGING`: The base URL for the API in the staging
+  environment (no trailing slash). Get from `Kubernetes`' `staging_api_url`
+  output
+- `NEXT_PUBLIC_API_URL_PRODUCTION`: The base URL for the API in the production
+  environment (no trailing slash). Get from `Kubernetes`' `production_api_url`
+  output
 
 Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
 and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
