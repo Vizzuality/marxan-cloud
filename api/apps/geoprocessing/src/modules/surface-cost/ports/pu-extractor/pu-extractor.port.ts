@@ -1,6 +1,6 @@
 import { GeoJSON } from 'geojson';
-import { ShapefileRecord } from '../shapefile-record';
+import { CostSurfaceShapefileRecord } from '../cost-surface-shapefile-record';
 
 export abstract class PuExtractorPort {
-  abstract extract(geoJsonSurface: GeoJSON): ShapefileRecord[];
+  abstract extract(geoJsonSurface: GeoJSON): CostSurfaceShapefileRecord[];
 }

@@ -30,13 +30,15 @@ export const getFixtures = async (app: INestApplication) => {
     scenarioId,
   );
 
-  const puIds = scenarioPuData.map((row) => row.id);
+  const planningUnitsIds = scenarioPuData.map((row) => row.id);
+  const planningUnitsPuids = scenarioPuData.map((row) => row.projectPu.puid);
 
   return {
     planningUnitDataRepo: scenarioPuData,
     planningUnitCostDataRepo: puCostDataRepo,
     scenarioId,
-    planningUnitsIds: puIds,
+    planningUnitsIds,
+    planningUnitsPuids,
     scenarioPlanningUnitsGeometry: scenarioPuData,
     GetPuCostsData: async (
       scenarioId: string,

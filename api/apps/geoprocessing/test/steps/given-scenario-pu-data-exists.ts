@@ -25,7 +25,7 @@ export const GivenScenarioPuDataExists = async (
   {
     protectedByDefault,
   }: GivenScenarioPuDataExistsOpts = defaultGivenScenarioPuDataExistsOpts,
-): Promise<ScenariosPlanningUnitGeoEntity[]> => {
+): Promise<ScenariosPuPaDataGeo[]> => {
   const [first, second, third] = await GivenProjectsPuExists(
     entityManager,
     projectId,
@@ -35,27 +35,30 @@ export const GivenScenarioPuDataExists = async (
    * @todo Refactor taking into account the recent project/scenario/pu linkage
    * refactor.
    */
-  const rows = await entityManager.save(ScenariosPlanningUnitGeoEntity, [
+  const rows = await entityManager.save(ScenariosPuPaDataGeo, [
     {
       scenarioId,
       lockStatus: LockStatus.Unstated,
       projectPuId: first.id,
+      projectPu: first,
       protectedByDefault,
     },
     {
       scenarioId,
       lockStatus: LockStatus.LockedOut,
       projectPuId: second.id,
+      projectPu: second,
       protectedByDefault,
     },
     {
       scenarioId,
       lockStatus: LockStatus.LockedIn,
       projectPuId: third.id,
+      projectPu: third,
       protectedByDefault,
     },
   ]);
-  return rows as ScenariosPlanningUnitGeoEntity[];
+  return rows as ScenariosPuPaDataGeo[];
 };
 
 export const GivenScenarioPuData = async (

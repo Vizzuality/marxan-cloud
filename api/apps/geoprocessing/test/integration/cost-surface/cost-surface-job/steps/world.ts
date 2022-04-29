@@ -7,17 +7,17 @@ import { Feature, Polygon } from 'geojson';
 import { Job } from 'bullmq';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
-import { PlanningUnitCost } from '@marxan-geoprocessing/modules/surface-cost/ports/planning-unit-cost';
 import { FromShapefileJobInput } from '@marxan/scenario-cost-surface';
 import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 
 import { getFixtures } from '../../planning-unit-fixtures';
+import { CostSurfaceShapefileRecord } from '../../../../../src/modules/surface-cost/ports/cost-surface-shapefile-record';
 
 export const createWorld = async (app: INestApplication) => {
   const newCost = [199.99, 300, 1];
   const fixtures = await getFixtures(app);
   const shapefile = await getShapefileForPlanningUnits(
-    fixtures.planningUnitsIds,
+    fixtures.planningUnitsPuids,
     newCost,
   );
 
@@ -49,7 +49,7 @@ export const createWorld = async (app: INestApplication) => {
 };
 
 const getShapefileForPlanningUnits = async (
-  ids: string[],
+  ids: number[],
   costs: number[],
 ): Promise<FromShapefileJobInput['shapefile']> => {
   const baseDir = AppConfig.get<string>(
@@ -57,7 +57,7 @@ const getShapefileForPlanningUnits = async (
   ) as string;
   const fileName = 'shape-with-cost';
   const fileFullPath = `${baseDir}/${fileName}.zip`;
-  const features: Feature<Polygon, PlanningUnitCost>[] = ids.map(
+  const features: Feature<Polygon, CostSurfaceShapefileRecord>[] = ids.map(
     (puid, index) => ({
       type: 'Feature',
       bbox: [0, 0, 0, 0, 0, 0],

@@ -1,9 +1,9 @@
 import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
-import { ShapefileRecord } from '../../ports/shapefile-record';
+import { CostSurfaceShapefileRecord } from '../../ports/cost-surface-shapefile-record';
 
 export const getGeoJson = (
   puids: number[],
-): FeatureCollection<MultiPolygon | Polygon, ShapefileRecord> => ({
+): FeatureCollection<MultiPolygon | Polygon, CostSurfaceShapefileRecord> => ({
   type: 'FeatureCollection',
   features: puids.map((puid) => ({
     properties: {
@@ -20,7 +20,7 @@ export const getGeoJson = (
 
 export const getGeoJsonWithMissingCost = (): FeatureCollection<
   MultiPolygon | Polygon,
-  ShapefileRecord | Record<string, undefined>
+  CostSurfaceShapefileRecord | Record<string, undefined>
 > => ({
   type: 'FeatureCollection',
   features: [
@@ -45,7 +45,7 @@ export const getGeoJsonWithMissingCost = (): FeatureCollection<
 
 export const getGeoJsonWithNegativeCost = (): FeatureCollection<
   MultiPolygon | Polygon,
-  ShapefileRecord | Record<string, undefined>
+  CostSurfaceShapefileRecord | Record<string, undefined>
 > => ({
   type: 'FeatureCollection',
   features: [

@@ -2,12 +2,12 @@ import { isDefined } from '@marxan/utils';
 import { MaybeProperties } from '@marxan/utils/types';
 import { FeatureCollection, GeoJSON, Geometry } from 'geojson';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
-import { ShapefileRecord } from '../ports/shapefile-record';
+import { CostSurfaceShapefileRecord } from '../ports/cost-surface-shapefile-record';
 
-type MaybeCost = MaybeProperties<ShapefileRecord>;
+type MaybeCost = MaybeProperties<CostSurfaceShapefileRecord>;
 
 export class PuCostExtractor implements PuExtractorPort {
-  extract(geo: GeoJSON): ShapefileRecord[] {
+  extract(geo: GeoJSON): CostSurfaceShapefileRecord[] {
     if (!this.isFeatureCollection(geo)) {
       throw new Error('Only FeatureCollection is supported.');
     }
@@ -36,7 +36,9 @@ export class PuCostExtractor implements PuExtractorPort {
     return geo.type === 'FeatureCollection';
   }
 
-  private hasCostValues(properties: MaybeCost): properties is ShapefileRecord {
+  private hasCostValues(
+    properties: MaybeCost,
+  ): properties is CostSurfaceShapefileRecord {
     return (
       isDefined(properties) &&
       isDefined(properties.cost) &&
@@ -44,7 +46,9 @@ export class PuCostExtractor implements PuExtractorPort {
     );
   }
 
-  private hasACostEqualOrGreaterThanZero(puCost: ShapefileRecord): boolean {
+  private hasACostEqualOrGreaterThanZero(
+    puCost: CostSurfaceShapefileRecord,
+  ): boolean {
     return puCost.cost >= 0;
   }
 }
