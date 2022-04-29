@@ -1,13 +1,13 @@
 import { isDefined } from '@marxan/utils';
 import { MaybeProperties } from '@marxan/utils/types';
 import { FeatureCollection, GeoJSON, Geometry } from 'geojson';
-import { PlanningUnitCost } from '../ports/planning-unit-cost';
 import { PuExtractorPort } from '../ports/pu-extractor/pu-extractor.port';
+import { CostSurfaceShapefileRecord } from '../ports/cost-surface-shapefile-record';
 
-type MaybeCost = MaybeProperties<PlanningUnitCost>;
+type MaybeCost = MaybeProperties<CostSurfaceShapefileRecord>;
 
 export class PuCostExtractor implements PuExtractorPort {
-  extract(geo: GeoJSON): PlanningUnitCost[] {
+  extract(geo: GeoJSON): CostSurfaceShapefileRecord[] {
     if (!this.isFeatureCollection(geo)) {
       throw new Error('Only FeatureCollection is supported.');
     }
@@ -29,17 +29,16 @@ export class PuCostExtractor implements PuExtractorPort {
       throw new Error(`Some of the Features has invalid cost values`);
     }
 
-    return puCosts.map((puCost) => ({
-      puid: puCost.puid,
-      cost: puCost.cost,
-    }));
+    return puCosts;
   }
 
   private isFeatureCollection(geo: GeoJSON): geo is FeatureCollection {
     return geo.type === 'FeatureCollection';
   }
 
-  private hasCostValues(properties: MaybeCost): properties is PlanningUnitCost {
+  private hasCostValues(
+    properties: MaybeCost,
+  ): properties is CostSurfaceShapefileRecord {
     return (
       isDefined(properties) &&
       isDefined(properties.cost) &&
@@ -47,7 +46,9 @@ export class PuCostExtractor implements PuExtractorPort {
     );
   }
 
-  private hasACostEqualOrGreaterThanZero(puCost: PlanningUnitCost): boolean {
+  private hasACostEqualOrGreaterThanZero(
+    puCost: CostSurfaceShapefileRecord,
+  ): boolean {
     return puCost.cost >= 0;
   }
 }

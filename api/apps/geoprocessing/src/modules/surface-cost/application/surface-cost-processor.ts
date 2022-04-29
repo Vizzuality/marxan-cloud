@@ -26,17 +26,31 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   ): Promise<true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
     const surfaceCosts = this.puExtractor.extract(geoJson);
-    const scenarioPlanningUnitIds = (
-      await this.availablePlanningUnits.get(job.data.scenarioId)
-    ).ids;
+    const scenarioPlanningUnits = await this.availablePlanningUnits.get(
+      job.data.scenarioId,
+    );
+    const puids = scenarioPlanningUnits.map((spu) => spu.puid);
+
     const { errors } = canPlanningUnitsBeLocked(
       surfaceCosts.map((cost) => cost.puid),
-      scenarioPlanningUnitIds,
+      puids,
     );
     if (errors.length > 0) {
       throw new Error(errors.join('.'));
     }
-    await this.repo.save(job.data.scenarioId, surfaceCosts);
+
+    const scenarioPlanningUnitIdByPuid: Record<number, string> = {};
+    scenarioPlanningUnits.forEach((record) => {
+      scenarioPlanningUnitIdByPuid[record.puid] = record.id;
+    });
+
+    await this.repo.save(
+      job.data.scenarioId,
+      surfaceCosts.map((record) => ({
+        cost: record.cost,
+        id: scenarioPlanningUnitIdByPuid[record.puid],
+      })),
+    );
 
     return true;
   }
@@ -51,7 +65,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     await this.repo.save(
       scenarioId,
       pusWithArea.map(({ id, area }) => ({
-        puid: id,
+        id,
         cost: area,
       })),
     );

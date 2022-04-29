@@ -1,14 +1,14 @@
 import { difference } from 'lodash';
 
 export const canPlanningUnitsBeLocked = (
-  planningUnitsIds: string[],
-  availablePlanningUnitsIds: string[],
+  puids: number[],
+  availablePuids: number[],
 ): { errors: string[] } => {
-  const diff = difference(planningUnitsIds, availablePlanningUnitsIds);
+  const diff = difference(puids, availablePuids);
   return {
     errors: diff.map(
       (missingId) =>
-        `Planning Unit with id ${missingId} is not a part of this project`,
+        `This project doesn't have a planning unit with ${missingId} as puid`,
     ),
   };
 };

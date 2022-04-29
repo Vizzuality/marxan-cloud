@@ -1,14 +1,14 @@
 import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
-import { PlanningUnitCost } from '../../ports/planning-unit-cost';
+import { CostSurfaceShapefileRecord } from '../../ports/cost-surface-shapefile-record';
 
 export const getGeoJson = (
-  planningUnitsIds: string[],
-): FeatureCollection<MultiPolygon | Polygon, PlanningUnitCost> => ({
+  puids: number[],
+): FeatureCollection<MultiPolygon | Polygon, CostSurfaceShapefileRecord> => ({
   type: 'FeatureCollection',
-  features: planningUnitsIds.map((id) => ({
+  features: puids.map((puid) => ({
     properties: {
       cost: 200,
-      puid: id,
+      puid,
     },
     type: 'Feature',
     geometry: {
@@ -20,7 +20,7 @@ export const getGeoJson = (
 
 export const getGeoJsonWithMissingCost = (): FeatureCollection<
   MultiPolygon | Polygon,
-  PlanningUnitCost | Record<string, undefined>
+  CostSurfaceShapefileRecord | Record<string, undefined>
 > => ({
   type: 'FeatureCollection',
   features: [
@@ -45,7 +45,7 @@ export const getGeoJsonWithMissingCost = (): FeatureCollection<
 
 export const getGeoJsonWithNegativeCost = (): FeatureCollection<
   MultiPolygon | Polygon,
-  PlanningUnitCost | Record<string, undefined>
+  CostSurfaceShapefileRecord | Record<string, undefined>
 > => ({
   type: 'FeatureCollection',
   features: [
@@ -53,7 +53,7 @@ export const getGeoJsonWithNegativeCost = (): FeatureCollection<
       type: 'Feature',
       properties: {
         cost: 200,
-        puid: 'uuid-1',
+        puid: 1,
       },
       geometry: {
         type: 'MultiPolygon',
@@ -63,7 +63,7 @@ export const getGeoJsonWithNegativeCost = (): FeatureCollection<
     {
       properties: {
         cost: -100,
-        puid: 'uuid-2',
+        puid: 2,
       },
       type: 'Feature',
       geometry: {

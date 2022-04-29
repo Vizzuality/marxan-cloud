@@ -13,6 +13,6 @@ export const getCostByAreaOfPlanningUnit = (
   puWithArea: PUWithArea[],
 ): PlanningUnitCost[] =>
   puWithArea.map((pu) => ({
-    puid: pu.id,
+    id: pu.id,
     cost: pu.area,
   }));

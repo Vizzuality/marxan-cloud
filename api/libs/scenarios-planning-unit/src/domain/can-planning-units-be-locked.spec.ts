@@ -1,18 +1,18 @@
 import { canPlanningUnitsBeLocked } from './can-planning-units-be-locked';
 import { v4 } from 'uuid';
 
-const availablePlanningUnits = ['1', '2', '3', '4'];
+const availablePlanningUnits = [1, 2, 3, 4];
 
 const fixtures = {
   availablePlanningUnits,
   someOfTheAvailable: [availablePlanningUnits[0], availablePlanningUnits[2]],
-  withNonAvailable: [v4(), v4()],
+  withNonAvailable: [5, 6],
   everyAvailable: availablePlanningUnits,
-  allAvailableAndOneMissing: [...availablePlanningUnits, v4()],
+  allAvailableAndOneMissing: [...availablePlanningUnits, 5],
 };
 
-type UnitsToChange = string[];
-type AvailablePlanningUnits = string[];
+type UnitsToChange = number[];
+type AvailablePlanningUnits = number[];
 type ErrorsCount = number;
 type TestCase = [UnitsToChange, AvailablePlanningUnits, ErrorsCount];
 

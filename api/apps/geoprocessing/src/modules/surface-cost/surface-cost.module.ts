@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { CqrsModule } from '@nestjs/cqrs';
 import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
@@ -24,10 +24,7 @@ import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
     WorkerModule,
     ShapefilesModule,
     CqrsModule,
-    TypeOrmModule.forFeature([
-      ScenariosPuCostDataGeo,
-      ScenariosPlanningUnitGeoEntity,
-    ]),
+    TypeOrmModule.forFeature([ScenariosPuCostDataGeo, ScenariosPuPaDataGeo]),
   ],
   providers: [
     SurfaceCostWorker,

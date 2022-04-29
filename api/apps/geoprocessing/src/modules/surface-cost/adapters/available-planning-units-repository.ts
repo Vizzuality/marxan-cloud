@@ -1,11 +1,10 @@
-import { Repository } from 'typeorm';
+import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-
+import { Repository } from 'typeorm';
 import {
   GetAvailablePlanningUnits,
+  PlanningUnitWithPuid,
   PUWithArea,
 } from '../ports/available-planning-units/get-available-planning-units';
 
@@ -13,20 +12,17 @@ import {
 export class AvailablePlanningUnitsRepository
   implements GetAvailablePlanningUnits {
   constructor(
-    @InjectRepository(ScenariosPlanningUnitGeoEntity)
-    private readonly repo: Repository<ScenariosPlanningUnitGeoEntity>,
+    @InjectRepository(ScenariosPuPaDataGeo)
+    private readonly repo: Repository<ScenariosPuPaDataGeo>,
   ) {}
 
-  get(scenarioId: string): Promise<{ ids: string[] }> {
-    return this.repo
-      .find({
-        where: {
-          scenarioId,
-        },
-      })
-      .then((rows) => ({
-        ids: rows.map((row) => row.id),
-      }));
+  async get(scenarioId: string): Promise<PlanningUnitWithPuid[]> {
+    const result = await this.repo.find({
+      where: { scenarioId },
+      relations: ['projectPu'],
+    });
+
+    return result.map((spd) => ({ id: spd.id, puid: spd.projectPu.puid }));
   }
 
   async getPUsWithArea(scenarioId: string): Promise<PUWithArea[]> {
