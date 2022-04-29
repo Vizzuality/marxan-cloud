@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
-import { useRouter } from 'next/router';
+import { useQueryClient } from 'react-query';
 
 import { format } from 'date-fns';
 import { usePlausible } from 'next-plausible';
@@ -9,24 +9,27 @@ import { useMe } from 'hooks/me';
 import {
   useProject, useExportProject, useExports, useDownloadExport,
 } from 'hooks/projects';
-import { useScenarios } from 'hooks/scenarios';
+import { useScenarios, useScenariosStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import Loading from 'components/loading';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 export interface DownloadProjectModalProps {
-  onDismiss?: () => void;
+  pid: string;
+  name: string;
 }
 
 export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
-  onDismiss,
+  pid,
+  name,
 }: DownloadProjectModalProps) => {
-  const { query } = useRouter();
+  const queryClient = useQueryClient();
+
   const { addToast } = useToasts();
-  const { pid } = query;
   const plausible = usePlausible();
 
   const { data: projectData } = useProject(pid);
@@ -43,8 +46,22 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
 
   const {
     data: exportsData,
+    isFetching: exportsIsFetching,
   } = useExports(pid);
 
+  // JOBS
+  const { data: scenarioStatusData } = useScenariosStatus(pid);
+  const { jobs = [], scenarios = [] } = scenarioStatusData || {};
+  const JOBS = useMemo(() => {
+    return [
+      ...jobs,
+      ...scenarios.map((scenario) => (scenario.jobs || [])).flat(),
+    ];
+  }, [jobs, scenarios]);
+  const JOBS_RUNNING = JOBS.some(({ status }) => status === 'running');
+  const EXPORT_JOBS_RUNNING = JOBS.filter((j) => j.kind === 'export').some(({ status }) => status === 'running');
+
+  // MUTATIONS
   const exportProjectMutation = useExportProject({});
   const downloadExportMutation = useDownloadExport({});
 
@@ -52,10 +69,25 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
     return scenariosData?.map((scenario) => scenario.id);
   }, [scenariosData]);
 
+  useEffect(() => {
+    if (!EXPORT_JOBS_RUNNING) {
+      queryClient.invalidateQueries(['projects-exports', pid]);
+    }
+  }, [EXPORT_JOBS_RUNNING]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onExportProject = useCallback(() => {
     exportProjectMutation.mutate({ id: `${pid}`, data: { scenarioIds } }, {
       onSuccess: () => {
-        if (onDismiss) onDismiss();
+        addToast('success-download-project', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              {`Exporting project "${projectData?.name}" started`}
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
       },
       onError: ({ e }) => {
         console.error('error --->', e);
@@ -63,7 +95,7 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
           <>
             <h2 className="font-medium">Error!</h2>
             <p className="text-sm">
-              Unable to download project
+              Unable to export project
               {' '}
               {projectData?.name}
             </p>
@@ -90,7 +122,6 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
     plausible,
     user.email,
     user.id,
-    onDismiss,
   ]);
 
   const onDownloadExport = useCallback((exportId) => {
@@ -140,46 +171,75 @@ export const DownloadProjectModal: React.FC<DownloadProjectModalProps> = ({
   }, [pid, downloadExportMutation, projectData?.name, user.email, user.id, plausible, addToast]);
 
   return (
-    <div className="px-6">
+    <div className="relative px-6">
+      <Loading
+        className="absolute top-0 left-0 z-10 flex items-center justify-center w-full h-full bg-white bg-opacity-50"
+        iconClassName="w-10 h-10"
+        visible={exportsIsFetching || EXPORT_JOBS_RUNNING}
+      />
+
       <h1 className="mb-5 text-xl font-medium text-black">
-        Download project
+        {`Download "${name}"`}
       </h1>
 
-      <ul>
-        {exportsData.map((e) => {
-          return (
-            <li
-              key={e.exportId}
-              className="flex items-center justify-between py-2 border-t border-gray-100"
-            >
-              <span className="text-sm text-gray-700">
-                {format(new Date(e.createdAt), 'MM/dd/yyyy hh:mm a')}
-              </span>
+      <div className="mb-5 space-y-1 text-sm text-gray-500">
+        <p>
+          The last 5 exported .zips will be available for download.
+        </p>
+        <p>
+          {`
+            If you don't have any exported .zips,
+            you can export your project by clicking the button below "Generate new export".
+          `}
+        </p>
+      </div>
 
-              <Button
-                theme="primary"
-                size="xs"
-                className="space-x-2"
-                onClick={() => {
-                  onDownloadExport(e.exportId);
-                }}
+      <div>
+        <ul>
+          {exportsData.map((e) => {
+            return (
+              <li
+                key={e.exportId}
+                className="flex items-center justify-between py-2 border-t border-gray-100"
               >
-                <span>Download</span>
-                <Icon icon={DOWNLOAD_SVG} className="w-3 h-3" />
-              </Button>
-            </li>
-          );
-        })}
-      </ul>
+                <span className="text-sm text-gray-700">
+                  {format(new Date(e.createdAt), 'MM/dd/yyyy hh:mm a')}
+                </span>
 
-      <Button
-        theme="secondary"
-        size="base"
-        className="w-full mt-5"
-        onClick={onExportProject}
-      >
-        Generate new export
-      </Button>
+                <Button
+                  theme="primary"
+                  size="xs"
+                  className="space-x-2"
+                  onClick={() => {
+                    onDownloadExport(e.exportId);
+                  }}
+                >
+                  <span>Download</span>
+                  <Icon icon={DOWNLOAD_SVG} className="w-3 h-3" />
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <div className="mt-5 space-y-1">
+        {JOBS_RUNNING && (
+          <p className="text-xs text-center text-red-500">
+            {`You can't generate a new export
+              while there are running jobs.`}
+          </p>
+        )}
+        <Button
+          theme="secondary"
+          size="base"
+          className="w-full"
+          disabled={JOBS_RUNNING}
+          onClick={onExportProject}
+        >
+          Generate new export
+        </Button>
+      </div>
     </div>
   );
 };

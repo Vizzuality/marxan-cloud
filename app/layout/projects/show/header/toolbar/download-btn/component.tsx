@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
 
+import { useRouter } from 'next/router';
+
+import { useProject } from 'hooks/projects';
+
+import DownloadProjectModal from 'layout/projects/common/download-modal';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
-import DownloadProjectModal from './download-modal';
-
 export interface DownloadProjectButtonProps {
 }
 
 export const DownloadProjectButton: React.FC<DownloadProjectButtonProps> = () => {
+  const { query } = useRouter();
+  const { pid } = query;
+
+  const {
+    data: projectData,
+  } = useProject(pid);
+
   const [modal, setModal] = useState(false);
 
   return (
@@ -34,7 +45,10 @@ export const DownloadProjectButton: React.FC<DownloadProjectButtonProps> = () =>
         title="Download project"
         onDismiss={() => setModal(false)}
       >
-        <DownloadProjectModal />
+        <DownloadProjectModal
+          pid={`${pid}`}
+          name={projectData?.name}
+        />
       </Modal>
     </>
   );

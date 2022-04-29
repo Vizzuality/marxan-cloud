@@ -40,7 +40,7 @@ export const UnderModeration: React.FC<UnderModerationProps> = () => {
             >
               <p>Your published project is under moderation. An admin will contact you soon.</p>
               <p>
-                During this time you project will be removed
+                During this time your project will be removed
                 from the list of published projects until resolution
               </p>
             </div>

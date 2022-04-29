@@ -1,19 +1,14 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
 import type { Project } from 'types/project-model';
 import { ROLES } from 'utils/constants-roles';
 
-import { useMe } from 'hooks/me';
 import { useOwnsProject, useProjectRole } from 'hooks/permissions';
 import { useProjectUsers } from 'hooks/project-users';
-import { useExportProject } from 'hooks/projects';
-import { useScenarios } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
 
 import ComingSoon from 'layout/help/coming-soon';
 
@@ -50,32 +45,17 @@ export const Item: React.FC<ItemProps> = ({
   isPublic,
   underModeration,
   onClick,
+  onDownload,
   onDuplicate,
   onDelete,
 }: ItemProps) => {
   const [animate, setAnimate] = useState('leave');
-  const plausible = usePlausible();
-  const { addToast } = useToasts();
-
-  const { user } = useMe();
 
   const { data: projectRole } = useProjectRole(id);
 
   const isOwner = useOwnsProject(id);
 
   const { data: projectUsers } = useProjectUsers(id);
-  const {
-    data: scenariosData,
-  } = useScenarios(id, {
-    filters: { projectId: id },
-    sort: '-lastModifiedAt',
-  });
-
-  const projectDownloadMutation = useExportProject({});
-
-  const scenarioIds = useMemo(() => {
-    return scenariosData?.map((scenario) => scenario.id);
-  }, [scenariosData]);
 
   const projectUsersVisibleSize = 3;
   const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
@@ -93,43 +73,10 @@ export const Item: React.FC<ItemProps> = ({
     onClick(e);
   }, [onClick]);
 
-  const handleDownload = useCallback(() => {
-    projectDownloadMutation.mutate({ id, data: { scenarioIds } }, {
-      onSuccess: () => {
-
-      },
-      onError: () => {
-        addToast('error-download-project', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Unable to download project
-              {' '}
-              {name}
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-    plausible('Download project', {
-      props: {
-        userId: `${user.id}`,
-        userEmail: `${user.email}`,
-        projectId: `${id}`,
-        projectName: `${name}`,
-      },
-    });
-  }, [
-    plausible,
-    id,
-    name,
-    user,
-    addToast,
-    scenarioIds,
-    projectDownloadMutation,
-  ]);
+  const handleDownload = useCallback((e) => {
+    e.stopPropagation();
+    onDownload(e);
+  }, [onDownload]);
 
   const handleDuplicate = useCallback((e) => {
     e.stopPropagation();
