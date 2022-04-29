@@ -148,9 +148,9 @@ describe('when processing initial cost job input', () => {
   const area = getAreaByPlanningUnit(availablePlanningUnitIds);
   const costByArea = getCostByAreaOfPlanningUnit(area);
   beforeEach(() => {
-    puRepo.mock.mockResolvedValue({
-      ids: availablePlanningUnitIds,
-    });
+    puRepo.mock.mockResolvedValue(
+      availablePlanningUnitPuids.map((puid) => ({ id: v4(), puid })),
+    );
     puRepo.getPUsWithAreaMock.mockResolvedValue(area);
   });
 
