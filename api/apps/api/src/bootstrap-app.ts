@@ -54,7 +54,6 @@ export async function bootstrapSetUp() {
   }
 
   app.enableCors({
-    allowedHeaders: 'Content-Type,Authorization,Content-Disposition',
     exposedHeaders: 'Authorization',
     origin: CorsUtils.originHandler,
     credentials: true,
