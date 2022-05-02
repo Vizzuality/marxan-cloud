@@ -5,8 +5,7 @@ import { useRouter } from 'next/router';
 import { usePublishedProject } from 'hooks/published-projects';
 
 import Share from 'layout/community/published-projects/detail/share';
-import DuplicateButton from 'layout/community/published-projects/list/table/duplicate-button';
-import ComingSoon from 'layout/help/coming-soon';
+import DuplicateButton from 'layout/community/published-projects/list/table/item/duplicate-button';
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
@@ -35,7 +34,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
   const creatorsVisible = creators?.slice(0, creatorsVisibleSize);
 
   const {
-    id, description, name, location, company, pngData, resources,
+    description, name, location, company, pngData, resources, exportId,
   } = publishedProject || {};
 
   return (
@@ -61,14 +60,11 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   </p>
 
                   <div className="flex flex-row items-center mb-10">
-
-                    <ComingSoon theme="dark" placement="top">
-                      <DuplicateButton
-                        id={id}
-                        name={name}
-                        theme="dark"
-                      />
-                    </ComingSoon>
+                    <DuplicateButton
+                      exportId={exportId}
+                      name={name}
+                      theme="dark"
+                    />
                   </div>
 
                   <div className="grid grid-cols-2 gap-y-9 gap-x-9">
@@ -164,7 +160,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                   style={{ maxHeight: 500 }}
                 >
                   <div
-                    className="bg-primary-500 rounded-xl overflow-hidden"
+                    className="overflow-hidden bg-primary-500 rounded-xl"
                     style={{
                       width: 500,
                       height: 500,
