@@ -43,7 +43,7 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
       <tbody>
         {data.map((pp) => {
           const {
-            id: pid, name, description, creators, resources, company, pngData, location,
+            id: pid, name, description, creators, resources, company, pngData, location, exportId,
           } = pp;
 
           return (
@@ -57,6 +57,7 @@ export const CommunityProjectsTable: React.FC<CommunityProjectsTableProps> = ({
               company={company}
               pngData={pngData}
               location={location}
+              exportId={exportId}
             />
           );
         })}
