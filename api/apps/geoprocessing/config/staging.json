@@ -1,5 +1,8 @@
 {
   "api": {
     "url": "http://api:30001"
+  },
+  "webshot": {
+    "url": "http://webshot:30003"
   }
 }
