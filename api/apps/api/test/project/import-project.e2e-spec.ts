@@ -9,16 +9,24 @@ import {
   ImportId,
 } from '@marxan-api/modules/clone/import/domain';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ClonePiece, ComponentId, ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   exportVersion,
   ProjectExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
+import {
+  manifestFileRelativePath,
+  signatureFileRelativePath,
+} from '@marxan/cloning/infrastructure/clone-piece-data/manifest-file';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
+import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
+import { Either, left, right } from 'fp-ts/lib/Either';
+import { isLeft } from 'fp-ts/lib/These';
 import { createWriteStream, rmSync } from 'fs';
 import { Readable } from 'stream';
 import * as request from 'supertest';
@@ -26,6 +34,13 @@ import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
 import { ExportId } from '../../src/modules/clone';
 import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
+import {
+  integrityCheckFailed,
+  invalidSignature,
+  manifestFileGenerationError,
+  ManifestFileService,
+  signatureFileGenerationError,
+} from '../../src/modules/clone/export/application/manifest-file-service.port';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
@@ -57,7 +72,7 @@ afterEach(async () => {
   await fixtures?.cleanup();
 });
 
-test('should permit importing project ', async () => {
+test('should permit importing project when a valid zip is provided', async () => {
   await fixtures.GivenImportFile();
   await fixtures.GivenImportWasRequested();
 
@@ -67,8 +82,15 @@ test('should permit importing project ', async () => {
   await fixtures.ThenImportIsCompleted();
 });
 
+test('should deny importing project when a modified zip is provided', async () => {
+  await fixtures.GivenImportFile({ withZipFileModification: true });
+  await fixtures.WhenImportIsRequested().ThenABadRequestErrorIsReturned();
+});
+
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
+  const manifestFileService = app.get(ManifestFileService);
+  const cloningFilesRepo = app.get(CloningFilesRepository);
   const eventBusTestUtils = app.get(EventBusTestUtils);
   eventBusTestUtils.startInspectingEvents();
   const commandBus = app.get(CommandBus);
@@ -96,7 +118,9 @@ export const getFixtures = async () => {
       eventBusTestUtils.stopInspectingEvents();
       await app.close();
     },
-    GivenImportFile: async () => {
+    GivenImportFile: async (
+      { withZipFileModification } = { withZipFileModification: false },
+    ) => {
       const exportConfigContent: ProjectExportConfigContent = {
         version: exportVersion,
         name: 'random name',
@@ -110,7 +134,7 @@ export const getFixtures = async () => {
         scenarios: [],
         exportId: exportId.value,
       };
-      const relativePath = ClonePieceRelativePathResolver.resolveFor(
+      const exportConfigRelativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ExportConfig,
       );
       const projectMetadataRelativePath = ClonePieceRelativePathResolver.resolveFor(
@@ -121,17 +145,57 @@ export const getFixtures = async () => {
         description: 'description',
       };
 
+      await cloningFilesRepo.saveCloningFile(
+        exportId.value,
+        Readable.from(JSON.stringify(exportConfigContent)),
+        exportConfigRelativePath,
+      );
+      await cloningFilesRepo.saveCloningFile(
+        exportId.value,
+        Readable.from(JSON.stringify(projectMetadataContent)),
+        projectMetadataRelativePath,
+      );
+
+      const exportFolder = cloningFilesRepo.getFilesFolderFor(exportId.value);
+      const manifestFile = await manifestFileService.generateManifestFileFor(
+        exportFolder,
+      );
+
+      if (isLeft(manifestFile)) {
+        throw new Error('Error generating manifest file');
+      }
+
+      const signatureFile = await manifestFileService.generateSignatureFileFor(
+        manifestFile.right,
+      );
+
+      if (isLeft(signatureFile)) {
+        throw new Error('Error generating signature file');
+      }
+
+      if (withZipFileModification) {
+        projectMetadataContent.name = 'modification';
+      }
+
       const zipFile = archiver(`zip`, {
         zlib: { level: 9 },
       });
       zipFile.append(JSON.stringify(exportConfigContent), {
-        name: relativePath,
+        name: exportConfigRelativePath,
       });
       zipFile.append(JSON.stringify(projectMetadataContent), {
         name: projectMetadataRelativePath,
       });
+      zipFile.append(manifestFile.right, {
+        name: manifestFileRelativePath,
+      });
+      zipFile.append(signatureFile.right, {
+        name: signatureFileRelativePath,
+      });
 
       await zipFile.finalize();
+
+      await cloningFilesRepo.deleteExportFolder(exportId.value);
 
       uriZipFile = await saveFile(__dirname + '/export.zip', zipFile);
     },
@@ -154,6 +218,17 @@ export const getFixtures = async () => {
           new CompleteImportPiece(importId, new ComponentId(piece.id)),
         );
       });
+    },
+    WhenImportIsRequested: () => {
+      return {
+        ThenABadRequestErrorIsReturned: async () => {
+          await request(app.getHttpServer())
+            .post(`/api/v1/projects/import`)
+            .set('Authorization', `Bearer ${ownerToken}`)
+            .attach('file', uriZipFile)
+            .expect(HttpStatus.BAD_REQUEST);
+        },
+      };
     },
     WhenProjectIsImported: async () => {
       await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
