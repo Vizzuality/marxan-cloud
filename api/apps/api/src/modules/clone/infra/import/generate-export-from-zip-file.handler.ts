@@ -10,13 +10,17 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ProjectExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
-import { manifestFileRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/manifest-file';
+import {
+  manifestFileRelativePath,
+  signatureFileRelativePath,
+} from '@marxan/cloning/infrastructure/clone-piece-data/manifest-file';
 import { isMarxanExecutionMetadataFolderRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { Entry, Parse } from 'unzipper';
+import { readableToBuffer } from '../../../../../../../libs/utils/src';
 import { ExportId } from '../../export';
 import { ExportRepository } from '../../export/application/export-repository.port';
 import { ManifestFileService } from '../../export/application/manifest-file-service.port';
@@ -207,11 +211,29 @@ export class GenerateExportFromZipFileHandler
       return left(errorStoringCloningFile);
     }
 
-    const manifestFileUri = `${this.fileRepository.getFilesFolderFor(
+    const exportFilesFolder = this.fileRepository.getFilesFolderFor(
       exportId.value,
-    )}/${manifestFileRelativePath}`;
+    );
+    const manifestFilePath = `${exportFilesFolder}/${manifestFileRelativePath}`;
+    const signatureFilePath = `${exportFilesFolder}/${signatureFileRelativePath}`;
+
+    const manifestFileReadable = await this.fileRepository.get(
+      manifestFilePath,
+    );
+    const signatureFileReadable = await this.fileRepository.get(
+      signatureFilePath,
+    );
+
+    if (isLeft(manifestFileReadable) || isLeft(signatureFileReadable)) {
+      return left(invalidExportZipFile);
+    }
+
+    const manifestFile = await readableToBuffer(manifestFileReadable.right);
+    const signatureFile = await readableToBuffer(signatureFileReadable.right);
+
     const signatureVerificationResult = await this.manifestFileService.verifyManifestFileSignature(
-      manifestFileUri,
+      manifestFile,
+      signatureFile,
     );
 
     if (isLeft(signatureVerificationResult)) {
@@ -220,7 +242,7 @@ export class GenerateExportFromZipFileHandler
     }
 
     const integrityCheckResult = this.manifestFileService.performIntegrityCheck(
-      exportId,
+      manifestFilePath,
     );
 
     if (isLeft(integrityCheckResult)) {

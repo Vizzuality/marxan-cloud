@@ -1,7 +1,4 @@
-import { GetFileError, SaveFileError } from '@marxan/cloning-files-repository';
 import { Either } from 'fp-ts/Either';
-import { ExportId } from '../domain';
-import { FileDestination } from './archive-creator.port';
 
 export const integrityCheckFailed = Symbol('integrity check failed');
 export const invalidSignature = Symbol('invalid signature');
@@ -16,26 +13,19 @@ export const CloningSigningSecret = Symbol('cloning signing secret');
 
 export abstract class ManifestFileService {
   abstract performIntegrityCheck(
-    exportId: ExportId,
+    manifestFilePath: string,
   ): Either<typeof integrityCheckFailed, true>;
 
   abstract verifyManifestFileSignature(
-    manifestFileUri: string,
+    manifestFile: Buffer,
+    signatureFile: Buffer,
   ): Promise<Either<typeof invalidSignature, true>>;
 
   abstract generateManifestFileFor(
-    exportId: ExportId,
-  ): Promise<
-    Either<typeof manifestFileGenerationError | SaveFileError, FileDestination>
-  >;
+    folderPath: string,
+  ): Promise<Either<typeof manifestFileGenerationError, Buffer>>;
 
   abstract generateSignatureFileFor(
-    exportId: ExportId,
-    manifestFileUri: string,
-  ): Promise<
-    Either<
-      typeof signatureFileGenerationError | SaveFileError | GetFileError,
-      FileDestination
-    >
-  >;
+    manifestFile: Buffer,
+  ): Promise<Either<typeof signatureFileGenerationError, Buffer>>;
 }
