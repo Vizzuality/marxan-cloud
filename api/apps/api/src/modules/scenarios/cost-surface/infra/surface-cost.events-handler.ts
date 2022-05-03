@@ -32,7 +32,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     private readonly commandBus: CommandBus,
   ) {
     this.queueEvents = queueEventsFactory(this);
-    this.queueEvents.on('failed', this.failed);
+    this.queueEvents.on('failed', (data) => this.failed(data));
   }
 
   async createCompletedEvent(
@@ -61,7 +61,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     };
   }
 
-  async failed(eventData: EventData<JobInput, true>): Promise<void> {
+  async failed(eventData: EventData<JobInput, unknown>): Promise<void> {
     const jobInput = await eventData.data;
 
     const isFromShapefileJob = Boolean(

@@ -45,7 +45,6 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     });
 
     await this.repo.save(
-      job.data.scenarioId,
       surfaceCosts.map((record) => ({
         cost: record.cost,
         id: scenarioPlanningUnitIdByPuid[record.puid],
@@ -58,17 +57,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   private async initialCostProcessor({
     data: { scenarioId },
   }: Job<InitialCostJobInput, true>): Promise<true> {
-    const pusWithArea = await this.availablePlanningUnits.getPUsWithArea(
-      scenarioId,
-    );
-
-    await this.repo.save(
-      scenarioId,
-      pusWithArea.map(({ id, area }) => ({
-        id,
-        cost: area,
-      })),
-    );
+    await this.repo.generateInitialCostSurface(scenarioId);
 
     return true;
   }
