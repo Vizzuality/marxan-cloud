@@ -33,7 +33,17 @@ export class CostTemplateGenerator {
       uuid.v4(),
     );
     await mkdir(transformationDirectory, { recursive: true });
-    const resultFilePrefix = 'result';
+
+    /**
+     * To help users identify shapefile components when dealing with multiple
+     * projects/scenarios/cost surface templates, we include scenarioId and a
+     * ISO8601-ish timestamp (YYYYMMDDTHHMMSS) in the prefix of each component
+     * file.
+     */
+    const resultFilePrefix = `cost-surface-template_${scenarioId}_${new Date()
+      .toISOString()
+      .replace(/\..+?Z$/, '')
+      .replace(/[:\-.]/g, '')}`;
 
     try {
       await this.scenarioGeoJsonCostTemplateDumper.dumpGeoJson(
