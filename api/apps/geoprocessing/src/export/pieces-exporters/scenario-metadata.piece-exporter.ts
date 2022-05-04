@@ -22,6 +22,12 @@ type SelectScenarioResult = {
   metadata?: ScenarioMetadataContent['metadata'];
 };
 
+type SelectScenarioBlmResult = {
+  defaults: number[];
+  values: number[];
+  range: number[];
+};
+
 @Injectable()
 @PieceExportProvider()
 export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
@@ -39,17 +45,34 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
   }
 
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const scenarioId = input.resourceId;
+
     const [scenario]: [
       SelectScenarioResult,
     ] = await this.entityManager
       .createQueryBuilder()
       .select('name, description, blm, number_of_runs, metadata')
       .from('scenarios', 's')
-      .where('s.id = :scenarioId', { scenarioId: input.resourceId })
+      .where('s.id = :scenarioId', { scenarioId })
       .execute();
 
     if (!scenario) {
-      const errorMessage = `${ScenarioMetadataPieceExporter.name} - Scenario ${input.resourceId} does not exist.`;
+      const errorMessage = `${ScenarioMetadataPieceExporter.name} - Scenario ${scenarioId} does not exist.`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const [blmRange]: [
+      SelectScenarioBlmResult,
+    ] = await this.entityManager
+      .createQueryBuilder()
+      .select(['values', 'defaults', 'range'])
+      .from('scenario_blms', 'pblms')
+      .where('id = :scenarioId', { scenarioId })
+      .execute();
+
+    if (!blmRange) {
+      const errorMessage = `${ScenarioMetadataPieceExporter.name} - Blm for scenario with id ${scenarioId} does not exist.`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);
     }
@@ -60,6 +83,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       metadata: scenario.metadata,
       name: scenario.name,
       numberOfRuns: scenario.number_of_runs,
+      blmRange,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
