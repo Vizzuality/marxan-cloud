@@ -38,6 +38,8 @@ export type ScenarioFeaturesSpecificationContentWithId = {
   id: string;
   raw: Record<string, any>;
   draft: boolean;
+  activeSpecification: boolean;
+  candidateSpecification: boolean;
   configs: {
     baseFeatureId: string;
     againstFeatureId: string | null;

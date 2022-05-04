@@ -312,6 +312,8 @@ const getFixtures = async () => {
       const getSpecifications = (
         featureId: string,
         featuresNamerCalculated: FeatureNumberCalculated[],
+        active = false,
+        candidate = false,
       ): ScenarioFeaturesSpecificationContent => ({
         draft: true,
         raw: {
@@ -326,6 +328,8 @@ const getFixtures = async () => {
           ],
           featureId,
         },
+        activeSpecification: active,
+        candidateSpecification: candidate,
         configs: [
           {
             baseFeature: featureId,
@@ -359,6 +363,8 @@ const getFixtures = async () => {
             featureId,
             calculated: true,
           })),
+          true,
+          false,
         ),
         getSpecifications(
           platformFeatureNameById[platformFeaturesIds[0]],
@@ -366,6 +372,8 @@ const getFixtures = async () => {
             featureId,
             calculated: true,
           })),
+          false,
+          true,
         ),
       ];
 
@@ -405,6 +413,18 @@ const getFixtures = async () => {
 
           await sut.run(input);
 
+          const [{ active_specification_id, candidate_specification_id }]: [
+            {
+              active_specification_id: string;
+              candidate_specification_id: string;
+            },
+          ] = await apiEntityManager
+            .createQueryBuilder()
+            .select('active_specification_id, candidate_specification_id')
+            .from('scenarios', 's')
+            .where('id = :scenarioId', { scenarioId })
+            .execute();
+
           const specifications: {
             id: string;
             raw: Record<string, any>;
@@ -414,6 +434,16 @@ const getFixtures = async () => {
             .from('specifications', 's')
             .where('scenario_id = :scenarioId', { scenarioId })
             .execute();
+
+          const candidateSpecification = specifications.find(
+            (specification) => specification.id === candidate_specification_id,
+          );
+          const activeSpecification = specifications.find(
+            (specification) => specification.id === active_specification_id,
+          );
+
+          expect(candidateSpecification).toBeDefined();
+          expect(activeSpecification).toBeDefined();
 
           const expectedAmountOfSpecifications = 2;
 
