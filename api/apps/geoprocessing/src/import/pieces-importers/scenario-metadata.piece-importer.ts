@@ -109,6 +109,13 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       } else {
         await this.createScenario(em, scenarioId, projectId, metadata);
       }
+
+      await em
+        .createQueryBuilder()
+        .insert()
+        .into('scenario_blms')
+        .values({ id: scenarioId, ...metadata.blmRange })
+        .execute();
     });
 
     return {

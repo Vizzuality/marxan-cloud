@@ -1,4 +1,5 @@
 import { ScenarioMetadataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/scenario-metadata.piece-importer';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -8,6 +9,7 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
+import { BlmRange } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -23,7 +25,6 @@ import {
   GivenScenarioExists,
   GivenUserExists,
 } from '../fixtures';
-import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 interface ScenarioSelectResult {
   name: string;
@@ -125,6 +126,11 @@ const getFixtures = async () => {
     description: 'scenario description',
     blm: 10,
     numberOfRuns: 120,
+    blmRange: {
+      defaults: [0, 20, 40, 60, 80, 100],
+      range: [0, 100],
+      values: [],
+    },
   };
 
   return {
@@ -227,6 +233,19 @@ const getFixtures = async () => {
           expect(scenario.blm).toEqual(validScenarioMetadataFileContent.blm);
           expect(scenario.number_of_runs).toEqual(
             validScenarioMetadataFileContent.numberOfRuns,
+          );
+
+          const [blmRange]: [
+            BlmRange,
+          ] = await entityManager
+            .createQueryBuilder()
+            .select()
+            .from('scenario_blms', 'pblms')
+            .where('id = :scenarioId', { scenarioId })
+            .execute();
+
+          expect(blmRange).toMatchObject(
+            validScenarioMetadataFileContent.blmRange,
           );
         },
       };

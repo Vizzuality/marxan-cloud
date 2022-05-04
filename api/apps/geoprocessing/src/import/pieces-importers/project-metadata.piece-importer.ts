@@ -136,6 +136,13 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       await em
         .createQueryBuilder()
         .insert()
+        .into('project_blms')
+        .values({ id: projectId, ...projectMetadata.blmRange })
+        .execute();
+
+      await em
+        .createQueryBuilder()
+        .insert()
         .into(`users_projects`)
         .values({
           user_id: ownerId,
