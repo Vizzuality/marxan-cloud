@@ -41,7 +41,10 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
+import {
+  ensureShapefileHasRequiredFiles,
+  uploadOptions,
+} from '@marxan-api/utils/file-uploads.utils';
 
 import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { UpdateProjectDTO } from './dto/update.project.dto';
@@ -274,6 +277,8 @@ export class ProjectsController {
   async uploadCustomGridShapefile(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<PlanningAreaResponseDto> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.projectsService.savePlanningAreaFromShapefile(
       file,
       true,
@@ -315,6 +320,8 @@ export class ProjectsController {
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<PlanningAreaResponseDto> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.projectsService.savePlanningAreaFromShapefile(
       file,
     );
@@ -503,6 +510,8 @@ export class ProjectsController {
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
+    await ensureShapefileHasRequiredFiles(shapefile);
+
     const { data } = await this.shapefileService.transformToGeoJson(shapefile);
 
     if (!isFeatureCollection(data)) {
