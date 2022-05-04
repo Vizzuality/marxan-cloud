@@ -47,6 +47,7 @@ describe(ScenarioFeaturesSpecificationPieceExporter, () => {
   });
 
   it('should save empty scenario features specification file', async () => {
+    await fixtures.GivenScenarioExist();
     const input = fixtures.GivenAScenarioFeaturesSpecificationExportJob();
     await fixtures.GivenNoScenarioFeaturesSpecification();
     await fixtures
@@ -199,6 +200,17 @@ const getFixtures = async () => {
         scenarioId,
       );
       specification = specifications[0];
+
+      await apiEntityManager.update(
+        'scenarios',
+        { id: scenarioId },
+        { active_specification_id: specification.id },
+      );
+      await apiEntityManager.update(
+        'scenarios',
+        { id: scenarioId },
+        { candidate_specification_id: specification.id },
+      );
     },
     GivenScenarioSpecificationFeaturesConfigExist: async (
       featuresConfigsPerSpecification: number,
@@ -237,7 +249,7 @@ const getFixtures = async () => {
           expect((file as Right<Readable>).right).toBeDefined();
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
-          const [specification] = await readSavedFile<
+          const [firstSpecification] = await readSavedFile<
             ScenarioFeaturesSpecificationContent[]
           >(savedStrem);
           const featureName = getFeatureName(opts);
@@ -264,9 +276,12 @@ const getFixtures = async () => {
             emptyArray: [],
             emptyObject: {},
           };
-          expect(specification.raw).toEqual(expectedRaw);
+
+          expect(firstSpecification.activeSpecification).toEqual(true);
+          expect(firstSpecification.candidateSpecification).toEqual(true);
+          expect(firstSpecification.raw).toEqual(expectedRaw);
           expect(
-            specification.configs.every((config) => {
+            firstSpecification.configs.every((config) => {
               return (
                 config.againstFeature === null &&
                 config.baseFeature === featureName &&
@@ -277,7 +292,7 @@ const getFixtures = async () => {
             }),
           ).toEqual(true);
 
-          specification.configs.forEach((config) => {
+          firstSpecification.configs.forEach((config) => {
             expect(config.features).toEqual(
               scenarioFeatureDataIds.map((featureId, index) => ({
                 featureId: index + 1,
