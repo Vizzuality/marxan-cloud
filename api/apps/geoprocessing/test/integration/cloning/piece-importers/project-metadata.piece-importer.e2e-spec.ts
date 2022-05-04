@@ -110,8 +110,11 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
 
+  const projectName = `test project - ${projectId}`;
+  const copyProjectName = projectName + ' - copy';
+
   const validProjectMetadataFileContent: ProjectMetadataContent = {
-    name: `test project - ${projectId}`,
+    name: projectName,
     description: 'project description',
     planningUnitGridShape: PlanningUnitGridShape.Hexagon,
   };
@@ -144,7 +147,9 @@ const getFixtures = async () => {
       return GivenOrganizationExists(entityManager, organizationId);
     },
     GivenProject: () => {
-      return GivenProjectExists(entityManager, projectId, organizationId);
+      return GivenProjectExists(entityManager, projectId, organizationId, {
+        name: copyProjectName,
+      });
     },
     GivenJobInputWithoutUris: (): ImportJobInput => {
       return {
@@ -198,7 +203,7 @@ const getFixtures = async () => {
             .where('id = :projectId', { projectId })
             .execute();
 
-          expect(project.name).toEqual(validProjectMetadataFileContent.name);
+          expect(project.name).toEqual(copyProjectName);
           expect(project.description).toEqual(
             validProjectMetadataFileContent.description,
           );

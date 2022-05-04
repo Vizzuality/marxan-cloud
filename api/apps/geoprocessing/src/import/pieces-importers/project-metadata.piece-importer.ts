@@ -50,7 +50,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       .into(`projects`)
       .values({
         id: projectId,
-        name: data.name,
+        name: data.name + ' - copy',
         description: data.description,
         organization_id: organizationId,
         planning_unit_grid_shape: data.planningUnitGridShape,
