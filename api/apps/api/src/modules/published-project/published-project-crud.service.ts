@@ -16,7 +16,6 @@ import { publishedProjectResource } from '@marxan-api/modules/published-project/
 import { FetchSpecification } from 'nestjs-base-service';
 import { UsersService } from '../users/users.service';
 import { ExportId } from '../clone';
-import { assertDefined } from '@marxan/utils';
 import { ExportRepository } from '../clone/export/application/export-repository.port';
 
 @Injectable()
@@ -82,14 +81,14 @@ export class PublishedProjectCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: ProjectsRequest,
   ): Promise<PublishedProject> {
-    const exportIdString = entity.exportId;
-    assertDefined(exportIdString);
-    const exportId = new ExportId(exportIdString);
+    const exportIdString = entity?.exportId;
 
-    const finalExport = await this.exportRepo.find(exportId);
-
-    if (!finalExport) {
-      delete entity.exportId;
+    if (exportIdString) {
+      const exportId = new ExportId(exportIdString);
+      const finalExport = await this.exportRepo.find(exportId);
+      if (!finalExport) {
+        delete entity.exportId;
+      }
     }
 
     return entity;

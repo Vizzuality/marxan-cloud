@@ -259,12 +259,13 @@ export class PublishedProjectService {
       return left(notFound);
     }
 
-    assertDefined(result?.exportId);
-    const exportId: ExportId = new ExportId(result.exportId);
+    if (result.exportId) {
+      const exportId: ExportId = new ExportId(result.exportId);
 
-    const exportResult = await this.exportRepo.find(exportId);
-    if (!exportResult) {
-      delete result.exportId;
+      const exportResult = await this.exportRepo.find(exportId);
+      if (!exportResult) {
+        delete result.exportId;
+      }
     }
 
     const isUnderModeration = result.underModeration === true;
