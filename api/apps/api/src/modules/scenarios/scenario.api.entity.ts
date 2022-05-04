@@ -9,7 +9,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IUCNCategory } from '@marxan/iucn';
 import { User } from '../users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
@@ -116,10 +115,6 @@ export class Scenario extends TimeUserEntityMetadata {
   @Column('integer', { name: 'wdpa_threshold' })
   @IsOptional()
   wdpaThreshold?: number | null;
-
-  @Column('jsonb', { name: 'feature_set' })
-  @IsOptional()
-  featureSet?: GeoFeatureSetSpecification;
 
   /**
    * Number of runs for Marxan calculations.
