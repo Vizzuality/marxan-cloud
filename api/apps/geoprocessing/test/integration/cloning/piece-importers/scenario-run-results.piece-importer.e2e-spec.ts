@@ -119,11 +119,30 @@ const getFixtures = async () => {
   const scenarioPlanningUnitsAmount = 4;
   const scenarioPuDataIds: string[] = [];
 
+  const firstPng = 'first!';
+  const secondPng = 'second!';
+  const thirdPng = 'third!';
+
   const validScenarioRunResultsFileContent: ScenarioRunResultsContent = {
     blmResults: [
-      { blmValue: 1, boundaryLength: 100, cost: 10 },
-      { blmValue: 2, boundaryLength: 200, cost: 20 },
-      { blmValue: 3, boundaryLength: 300, cost: 30 },
+      {
+        blmValue: 1,
+        boundaryLength: 100,
+        cost: 10,
+        png: Buffer.from(firstPng).toJSON().data,
+      },
+      {
+        blmValue: 2,
+        boundaryLength: 200,
+        cost: 20,
+        png: Buffer.from(secondPng).toJSON().data,
+      },
+      {
+        blmValue: 3,
+        boundaryLength: 300,
+        cost: 30,
+        png: Buffer.from(thirdPng).toJSON().data,
+      },
     ],
     marxanRunResults: [],
   };
@@ -258,6 +277,10 @@ const getFixtures = async () => {
           expect(blmResults).toHaveLength(
             validScenarioRunResultsFileContent.blmResults.length,
           );
+
+          const pngs = blmResults.map((result) => result.pngData.toString());
+          const expectedPngs = [firstPng, secondPng, thirdPng];
+          expect(pngs.sort()).toEqual(expectedPngs.sort());
         },
       };
     },
