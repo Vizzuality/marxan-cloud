@@ -32,7 +32,7 @@ describe(`when updating some of the costs`, () => {
     const costOf9999Id = puCostDataIds[0];
     const costOf1Id = puCostDataIds[1];
 
-    await sut.save(world.scenarioId, [
+    await sut.save([
       {
         cost: 9999,
         id: costOf9999Id,
