@@ -6,6 +6,7 @@ import {
   ForbiddenException,
   Get,
   Header,
+  ImATeapotException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -41,7 +42,10 @@ import {
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadOptions } from '@marxan-api/utils/file-uploads.utils';
+import {
+  ensureShapefileHasRequiredFiles,
+  uploadOptions,
+} from '@marxan-api/utils/file-uploads.utils';
 
 import { JSONAPIQueryParams } from '@marxan-api/decorators/json-api-parameters.decorator';
 import { UpdateProjectDTO } from './dto/update.project.dto';
@@ -274,14 +278,18 @@ export class ProjectsController {
   async uploadCustomGridShapefile(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<PlanningAreaResponseDto> {
-    const result = await this.projectsService.savePlanningAreaFromShapefile(
-      file,
-      true,
-    );
-    if (isLeft(result)) {
-      throw new InternalServerErrorException(result.left);
-    }
-    return result.right;
+    await ensureShapefileHasRequiredFiles(file);
+
+    throw new ImATeapotException('END');
+
+    /*    const result = await this.projectsService.savePlanningAreaFromShapefile(
+          file,
+          true,
+        );
+        if (isLeft(result)) {
+          throw new InternalServerErrorException(result.left);
+        }
+        return result.right;*/
   }
 
   @IsMissingAclImplementation()

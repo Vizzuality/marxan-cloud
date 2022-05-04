@@ -1,4 +1,3 @@
-// require('dotenv').config();
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
@@ -17,4 +16,5 @@ async function bootstrap() {
   app.useGlobalFilters(new AllExceptionsFilter());
   await app.listen(AppConfig.get('geo.daemonListenPort'));
 }
+
 bootstrap();
