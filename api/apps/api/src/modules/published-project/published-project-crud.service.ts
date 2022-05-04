@@ -15,6 +15,9 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
 import { FetchSpecification } from 'nestjs-base-service';
 import { UsersService } from '../users/users.service';
+import { ExportId } from '../clone';
+import { assertDefined } from '@marxan/utils';
+import { ExportRepository } from '../clone/export/application/export-repository.port';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -27,6 +30,7 @@ export class PublishedProjectCrudService extends AppBaseService<
     @InjectRepository(PublishedProject)
     protected repository: Repository<PublishedProject>,
     private readonly usersService: UsersService,
+    private exportRepo: ExportRepository,
   ) {
     super(
       repository,
@@ -71,6 +75,24 @@ export class PublishedProjectCrudService extends AppBaseService<
         ],
       },
     };
+  }
+
+  async extendGetByIdResult(
+    entity: PublishedProject,
+    _fetchSpecification?: FetchSpecification,
+    _info?: ProjectsRequest,
+  ): Promise<PublishedProject> {
+    const exportIdString = entity.exportId;
+    assertDefined(exportIdString);
+    const exportId = new ExportId(exportIdString);
+
+    const finalExport = await this.exportRepo.find(exportId);
+
+    if (!finalExport) {
+      delete entity.exportId;
+    }
+
+    return entity;
   }
 
   async extendFindAllQuery(

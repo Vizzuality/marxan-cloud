@@ -11,12 +11,13 @@ import { ProjectAccessControl } from '@marxan-api/modules/access-control';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { PublishProjectDto } from './dto/publish-project.dto';
 import { WebshotService } from '@marxan/webshot';
-import { AppConfig } from '@marxan-api/utils/config.utils';
-import { assertDefined } from '@marxan/utils';
 import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { ProjectsService } from '../projects/projects.service';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { getScenarioSnapshot } from '@marxan-api/utils/webshot.utils';
+import { ExportRepository } from '../clone/export/application/export-repository.port';
+import { assertDefined } from '@marxan/utils';
+import { ExportId } from '@marxan-api/modules/clone';
 
 export const notFound = Symbol(`project not found`);
 export const accessDenied = Symbol(`not allowed`);
@@ -42,6 +43,7 @@ export class PublishedProjectService {
     private publicProjectsRepo: Repository<PublishedProject>,
     @InjectRepository(Scenario)
     private scenarioRepo: Repository<Scenario>,
+    private exportRepo: ExportRepository,
     private crudService: PublishedProjectCrudService,
     private projectService: ProjectsService,
     private webshotService: WebshotService,
@@ -253,10 +255,18 @@ export class PublishedProjectService {
     info?: ProjectsRequest,
   ): Promise<Either<typeof notFound | typeof accessDenied, PublishedProject>> {
     const result = await this.publicProjectsRepo.findOne(id);
-
     if (!result) {
       return left(notFound);
     }
+
+    assertDefined(result?.exportId);
+    const exportId: ExportId = new ExportId(result.exportId);
+
+    const exportResult = await this.exportRepo.find(exportId);
+    if (!exportResult) {
+      delete result.exportId;
+    }
+
     const isUnderModeration = result.underModeration === true;
     const isPlatformAdmin =
       info?.authenticatedUser?.id !== undefined &&
