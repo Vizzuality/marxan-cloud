@@ -32,6 +32,9 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
 
   const { addToast } = useToasts();
 
+  // DOWNLOAD
+  const [downloadProject, setDownloadProject] = useState(null);
+
   // DUPLICATE
   const duplicateProjectMutation = useDuplicateProject({
     requestConfig: {
@@ -43,10 +46,13 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const [deleteProject, setDeleteProject] = useState(null);
   const deleteMutation = useDeleteProject({});
 
-  const [downloadProject, setDownloadProject] = useState(null);
-
-  const onDuplicate = useCallback((projectId, projectName) => {
-    duplicateProjectMutation.mutate({ id: projectId }, {
+  const onDuplicate = useCallback((projectId, projectName, scenarios) => {
+    duplicateProjectMutation.mutate({
+      id: projectId,
+      data: {
+        scenarioIds: scenarios.map((s) => s.id),
+      },
+    }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
           <>
@@ -152,7 +158,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                     {...d}
                     userColors={projectsUsersData}
                     onDownload={() => setDownloadProject(d)}
-                    onDuplicate={() => onDuplicate(d.id, d.name)}
+                    onDuplicate={() => onDuplicate(d.id, d.name, d.scenarios)}
                     onDelete={() => { setDeleteProject(d); }}
                   />
                 );

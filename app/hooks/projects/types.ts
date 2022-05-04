@@ -61,6 +61,9 @@ export interface UseDuplicateProjectProps {
 
 export interface DuplicateProjectProps {
   id: string | string[];
+  data: {
+    scenarioIds: string[];
+  }
 }
 
 // usePublishProject

@@ -134,6 +134,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
           lastUpdateDistance: lastUpdateDistance(),
           contributors: [],
           isPublic,
+          scenarios,
           underModeration: publicMetadata?.underModeration,
           onClick: () => {
             push(`/projects/${id}`);
@@ -350,10 +351,10 @@ export function useDuplicateProject({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const duplicateProject = ({ id }: DuplicateProjectProps) => {
+  const duplicateProject = ({ id, data }: DuplicateProjectProps) => {
     return PROJECTS.request({
-      // Pending endpoint
-      url: `/${id}`,
+      url: `/${id}/clone`,
+      data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },

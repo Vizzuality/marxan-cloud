@@ -10,8 +10,6 @@ import { ROLES } from 'utils/constants-roles';
 import { useOwnsProject, useProjectRole } from 'hooks/permissions';
 import { useProjectUsers } from 'hooks/project-users';
 
-import ComingSoon from 'layout/help/coming-soon';
-
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -27,6 +25,7 @@ export interface ItemProps extends Project {
   userColors?: Record<string, string>;
   isPublic: boolean;
   underModeration: boolean;
+  scenarios: Record<string, any>;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -273,16 +272,14 @@ export const Item: React.FC<ItemProps> = ({
               Download
             </Button>
 
-            <ComingSoon>
-              <Button
-                className="ml-3"
-                theme="secondary"
-                size="xs"
-                onClick={handleDuplicate}
-              >
-                Duplicate
-              </Button>
-            </ComingSoon>
+            <Button
+              className="ml-3"
+              theme="secondary"
+              size="xs"
+              onClick={handleDuplicate}
+            >
+              Duplicate
+            </Button>
 
             <Button
               className="ml-3"
