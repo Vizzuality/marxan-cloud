@@ -30,12 +30,16 @@ export type ScenarioFeaturesSpecificationContent = {
   raw: Record<string, any>;
   draft: boolean;
   configs: FeaturesConfig[];
+  activeSpecification: boolean;
+  candidateSpecification: boolean;
 };
 
 export type ScenarioFeaturesSpecificationContentWithId = {
   id: string;
   raw: Record<string, any>;
   draft: boolean;
+  activeSpecification: boolean;
+  candidateSpecification: boolean;
   configs: {
     baseFeatureId: string;
     againstFeatureId: string | null;

@@ -30,6 +30,11 @@ type SelectFeaturesResult = {
   is_custom: boolean;
 };
 
+type SelectScenarioResult = {
+  active_specification_id: string | null;
+  candidate_specification_id: string | null;
+};
+
 type SelectSpecificationsResult = {
   id: string;
   draft: boolean;
@@ -166,7 +171,32 @@ export class ScenarioFeaturesSpecificationPieceExporter
     return scenarioFeatureConfigsBySpecificationId;
   }
 
+  private async getCandidateAndActiveSpecificationsForScenario(
+    scenarioId: string,
+  ): Promise<{ candidate: string | null; active: string | null }> {
+    const [specificationIds]: [
+      SelectScenarioResult | undefined,
+    ] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('candidate_specification_id, active_specification_id')
+      .from('scenarios', 's')
+      .where('id = :scenarioId', { scenarioId })
+      .execute();
+
+    if (!specificationIds)
+      throw new Error(`Scenario with id ${scenarioId} doesn't exist`);
+
+    return {
+      active: specificationIds.active_specification_id,
+      candidate: specificationIds.candidate_specification_id,
+    };
+  }
+
   async run(input: ExportJobInput): Promise<ExportJobOutput> {
+    const scenarioSpecificationIds = await this.getCandidateAndActiveSpecificationsForScenario(
+      input.resourceId,
+    );
+
     const specifications: SelectSpecificationsResult[] = await this.apiEntityManager
       .createQueryBuilder()
       .select('id')
@@ -224,6 +254,8 @@ export class ScenarioFeaturesSpecificationPieceExporter
           draft,
           raw: parsedRaw,
           configs: scenarioFeatureConfigsBySpecificationId[id],
+          activeSpecification: id === scenarioSpecificationIds.active,
+          candidateSpecification: id === scenarioSpecificationIds.candidate,
         };
       });
     }

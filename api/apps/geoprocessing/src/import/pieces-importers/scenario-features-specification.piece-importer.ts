@@ -1,5 +1,6 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   FeatureIdCalculated,
   FeatureNumberCalculated,
@@ -9,10 +10,9 @@ import {
   searchFeatureIdInObject,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { readableToBuffer, isDefined } from '@marxan/utils';
+import { isDefined, readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
@@ -251,7 +251,13 @@ export class ScenarioFeaturesSpecificationPieceImporter
     const featureIdsBySpecificationId: FeatureIdsBySpecificationId = {};
 
     const parsedSpecifications = specifications.map(
-      ({ draft, raw, configs }) => {
+      ({
+        draft,
+        raw,
+        configs,
+        activeSpecification,
+        candidateSpecification,
+      }) => {
         const specificationId = v4();
         featureIdsBySpecificationId[specificationId] = [];
 
@@ -286,6 +292,8 @@ export class ScenarioFeaturesSpecificationPieceImporter
           id: specificationId,
           draft,
           raw,
+          activeSpecification,
+          candidateSpecification,
           configs: parsedConfigs,
         };
       },
@@ -344,18 +352,38 @@ export class ScenarioFeaturesSpecificationPieceImporter
     );
 
     await this.apiEntityManager.transaction(async (apiEm) => {
+      const activeSpecification = parsedSpecifications.find(
+        (specification) => specification.activeSpecification,
+      );
+      const candidateSpecification = parsedSpecifications.find(
+        (specification) => specification.candidateSpecification,
+      );
+
+      const activeSpecificationId = activeSpecification?.id;
+      const candidateSpecificationId = candidateSpecification?.id;
+
       await Promise.all(
-        parsedSpecifications.map(({ id, draft, raw }) => {
+        parsedSpecifications.map(({ id, draft, raw }) =>
           apiEm
             .createQueryBuilder()
             .insert()
             .into('specifications')
             .values({ id, scenario_id: scenarioId, draft, raw })
-            .execute();
-        }),
+            .execute(),
+        ),
       );
 
       await this.insertSpecificationFeaturesConfig(parsedSpecifications, apiEm);
+
+      await apiEm
+        .createQueryBuilder()
+        .update('scenarios')
+        .set({
+          active_specification_id: activeSpecificationId,
+          candidate_specification_id: candidateSpecificationId,
+        })
+        .where({ id: scenarioId })
+        .execute();
     });
 
     await this.geoprocessingEntityManager.transaction(async (em) => {
