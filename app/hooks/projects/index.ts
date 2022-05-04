@@ -39,6 +39,8 @@ import {
   UnPublishProjectProps,
   UseExportProjectProps,
   ExportProjectProps,
+  ImportProjectProps,
+  UseImportProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -246,6 +248,37 @@ export function useDeleteProject({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useImportProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseImportProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const uploadProject = ({ data }: ImportProjectProps) => {
+    return UPLOADS.request({
+      url: '/projects/import',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProject, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

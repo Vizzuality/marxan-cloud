@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { setSearch } from 'store/slices/projects';
 
 import HelpBeacon from 'layout/help/beacon';
-import ComingSoon from 'layout/help/coming-soon';
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
@@ -15,7 +14,8 @@ import Icon from 'components/icon';
 import Search from 'components/search';
 
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+
+import ProjectsUploadBtn from './upload-btn/component';
 
 export interface ProjectsToolbarProps {
 
@@ -96,12 +96,7 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
             )}
           >
             <div>
-              <ComingSoon>
-                <Button theme="secondary" size="base">
-                  <span>Upload project</span>
-                  <Icon className="w-3 h-3 ml-4" icon={UPLOAD_SVG} />
-                </Button>
-              </ComingSoon>
+              <ProjectsUploadBtn />
             </div>
           </HelpBeacon>
         </div>
