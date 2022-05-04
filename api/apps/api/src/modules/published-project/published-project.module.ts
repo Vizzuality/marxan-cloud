@@ -12,6 +12,8 @@ import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { WebshotModule } from '@marxan/webshot';
 import { ScenariosModule } from '../scenarios/scenarios.module';
 import { Scenario } from '../scenarios/scenario.api.entity';
+import { ExportRepository } from '../clone/export/application/export-repository.port';
+import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export.repository';
 
 @Module({
   imports: [
@@ -27,6 +29,10 @@ import { Scenario } from '../scenarios/scenario.api.entity';
     PublishedProjectService,
     PublishedProjectCrudService,
     PublishedProjectSerializer,
+    {
+      provide: ExportRepository,
+      useClass: TypeormExportRepository,
+    },
   ],
 })
 export class PublishedProjectModule {}
