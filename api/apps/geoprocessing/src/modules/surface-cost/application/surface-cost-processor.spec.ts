@@ -137,7 +137,7 @@ describe('when processing shapefile job input', () => {
             id: expect.any(String),
           }));
 
-          expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costArray);
+          expect(repo.saveMock).toHaveBeenCalledWith(costArray);
         });
       });
     });
@@ -151,11 +151,12 @@ describe('when processing initial cost job input', () => {
     puRepo.mock.mockResolvedValue(
       availablePlanningUnitPuids.map((puid) => ({ id: v4(), puid })),
     );
-    puRepo.getPUsWithAreaMock.mockResolvedValue(area);
   });
 
   it('should persist cost based on area for all planning units', async () => {
     expect(await sut.process(getInitialCostJob(scenarioId))).toEqual(true);
-    expect(repo.saveMock).toHaveBeenCalledWith(scenarioId, costByArea);
+    expect(repo.generateInitialCostSurfaceMock).toHaveBeenCalledWith(
+      scenarioId,
+    );
   });
 });

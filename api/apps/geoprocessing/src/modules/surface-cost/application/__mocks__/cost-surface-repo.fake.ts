@@ -5,8 +5,13 @@ import { PlanningUnitCost } from '../../ports/planning-unit-cost';
 @Injectable()
 export class CostSurfaceRepoFake implements CostSurfacePersistencePort {
   saveMock = jest.fn();
+  generateInitialCostSurfaceMock = jest.fn();
 
-  async save(scenarioId: string, costs: PlanningUnitCost[]): Promise<void> {
-    return this.saveMock(scenarioId, costs);
+  async save(costs: PlanningUnitCost[]): Promise<void> {
+    return this.saveMock(costs);
+  }
+
+  generateInitialCostSurface(scenarioId: string): Promise<void> {
+    return this.generateInitialCostSurfaceMock(scenarioId);
   }
 }
