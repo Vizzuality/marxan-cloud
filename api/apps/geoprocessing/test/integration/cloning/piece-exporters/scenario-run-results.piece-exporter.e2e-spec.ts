@@ -109,6 +109,8 @@ const getFixtures = async () => {
   );
   const fileRepository = sandbox.get(CloningFilesRepository);
 
+  const imageBuffer = Buffer.from('foo bar');
+
   return {
     cleanUp: async () => {
       await DeleteProjectAndOrganization(
@@ -161,7 +163,7 @@ const getFixtures = async () => {
       );
     },
     GivenScenarioRunResulst: async () => {
-      await GivenScenarioBlmResults(geoEntityManager, scenarioId);
+      await GivenScenarioBlmResults(geoEntityManager, scenarioId, imageBuffer);
       return GivenScenarioOutputPuData(geoEntityManager, scenarioPus);
     },
     GivenNoScenarioRunResulst: async (): Promise<void> => {},
@@ -194,6 +196,7 @@ const getFixtures = async () => {
             blmValue: 30,
             boundaryLength: 500,
             cost: 1,
+            png: imageBuffer.toJSON().data,
           });
           expect(
             content.marxanRunResults.sort((a, b) => a.puid - a.puid),
