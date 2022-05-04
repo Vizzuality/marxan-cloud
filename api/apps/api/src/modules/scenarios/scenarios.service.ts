@@ -883,38 +883,6 @@ export class ScenariosService {
     return !(await this.givenScenarioExists(scenarioId));
   }
 
-  /**
-   * Get geofeatures specification for a scenario. This is part of the scenario
-   * itself, but exposed via a separate endpoint.
-   */
-  async getFeatureSetForScenario(
-    scenarioId: string,
-    userInfo: AppInfoDTO,
-  ): Promise<
-    | GeoFeatureSetSpecification
-    | typeof forbiddenError
-    | typeof scenarioNotFound
-    | undefined
-  > {
-    const scenarioResult = await this.getById(scenarioId, userInfo);
-    if (isLeft(scenarioResult)) return scenarioNotFound;
-
-    return await this.crudService
-      .getById(scenarioId)
-      .then((result) => {
-        return result.featureSet;
-      })
-      .then((result) =>
-        result
-          ? this.geoFeaturePropertySetService.extendGeoFeatureProcessingSpecification(
-              result,
-              scenarioResult.right,
-            )
-          : EmptyGeoFeaturesSpecification,
-      )
-      .catch((e) => Logger.error(e));
-  }
-
   async getMarxanExecutionOutputArchive(
     scenarioId: string,
     userId: string,
