@@ -108,6 +108,7 @@ import { setImagePngResponseHeadersForSuccessfulRequests } from '@marxan/utils';
 import { forbiddenError } from '../access-control';
 import { scenarioNotFound } from '../blm/values/blm-repos';
 import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
+import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -399,6 +400,8 @@ export class ScenariosController {
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<JsonApiAsyncJobMeta> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.service.processCostSurfaceShapefile(
       scenarioId,
       req.user.id,
@@ -441,6 +444,8 @@ export class ScenariosController {
     @Req() req: RequestWithAuthenticatedUser,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<GeoJsonDataDTO> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.service.uploadLockInShapeFile(
       scenarioId,
       req.user.id,
@@ -1065,6 +1070,8 @@ export class ScenariosController {
     @Req() req: RequestWithAuthenticatedUser,
     @Body() dto: UploadShapefileDto,
   ): Promise<JsonApiAsyncJobMeta> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const outcome = await this.service.addProtectedAreaFor(
       scenarioId,
       file,

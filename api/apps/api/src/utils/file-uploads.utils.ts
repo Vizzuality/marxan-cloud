@@ -34,6 +34,11 @@ export const uploadOptions: MulterOptions = {
   },
 };
 
+/**
+ *
+ * @param file An Express Multer File of a zip
+ * @throws A 400 exception when the zipfile doesn't contain the required shapefile components
+ */
 export const ensureShapefileHasRequiredFiles = async (
   file: Express.Multer.File,
 ) => {

@@ -6,7 +6,6 @@ import {
   ForbiddenException,
   Get,
   Header,
-  ImATeapotException,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -280,16 +279,14 @@ export class ProjectsController {
   ): Promise<PlanningAreaResponseDto> {
     await ensureShapefileHasRequiredFiles(file);
 
-    throw new ImATeapotException('END');
-
-    /*    const result = await this.projectsService.savePlanningAreaFromShapefile(
-          file,
-          true,
-        );
-        if (isLeft(result)) {
-          throw new InternalServerErrorException(result.left);
-        }
-        return result.right;*/
+    const result = await this.projectsService.savePlanningAreaFromShapefile(
+      file,
+      true,
+    );
+    if (isLeft(result)) {
+      throw new InternalServerErrorException(result.left);
+    }
+    return result.right;
   }
 
   @IsMissingAclImplementation()
@@ -323,6 +320,8 @@ export class ProjectsController {
   async shapefileWithProjectPlanningArea(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<PlanningAreaResponseDto> {
+    await ensureShapefileHasRequiredFiles(file);
+
     const result = await this.projectsService.savePlanningAreaFromShapefile(
       file,
     );
@@ -511,6 +510,8 @@ export class ProjectsController {
     @UploadedFile() shapefile: Express.Multer.File,
     @Body() body: UploadShapefileDTO,
   ): Promise<ShapefileUploadResponse> {
+    await ensureShapefileHasRequiredFiles(shapefile);
+
     const { data } = await this.shapefileService.transformToGeoJson(shapefile);
 
     if (!isFeatureCollection(data)) {
