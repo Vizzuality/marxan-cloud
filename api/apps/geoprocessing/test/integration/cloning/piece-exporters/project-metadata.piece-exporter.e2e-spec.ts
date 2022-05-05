@@ -80,6 +80,8 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
   const fileRepository = sandbox.get(CloningFilesRepository);
+  const metadata = { foo: 'bar' };
+
   const expectedContent: ProjectMetadataContent = {
     name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,
@@ -88,6 +90,7 @@ const getFixtures = async () => {
       range: [0, 100],
       values: [],
     },
+    metadata,
   };
 
   return {
@@ -111,7 +114,9 @@ const getFixtures = async () => {
       };
     },
     GivenProjectExist: async () => {
-      return GivenProjectExists(apiEntityManager, projectId, organizationId);
+      return GivenProjectExists(apiEntityManager, projectId, organizationId, {
+        metadata,
+      });
     },
     GivenProjectBlmRangeExist: async () => {
       return apiEntityManager

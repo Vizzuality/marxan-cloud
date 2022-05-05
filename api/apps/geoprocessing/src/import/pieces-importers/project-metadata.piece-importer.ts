@@ -43,6 +43,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     projectId: string,
     organizationId: string,
     data: ProjectMetadataContent,
+    ownerId: string,
   ) {
     return em
       .createQueryBuilder()
@@ -54,6 +55,8 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         description: data.description,
         organization_id: organizationId,
         planning_unit_grid_shape: data.planningUnitGridShape,
+        metadata: data.metadata,
+        created_by: ownerId,
       })
       .execute();
   }
@@ -62,6 +65,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     em: EntityManager,
     projectId: string,
     data: ProjectMetadataContent,
+    ownerId: string,
   ) {
     return em
       .createQueryBuilder()
@@ -69,6 +73,8 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       .set({
         description: data.description,
         planning_unit_grid_shape: data.planningUnitGridShape,
+        metadata: data.metadata,
+        created_by: ownerId,
       })
       .where('id = :projectId', { projectId })
       .execute();
@@ -123,13 +129,14 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         projectId,
       );
       if (projectAlreadyCreated) {
-        await this.updateProject(em, projectId, projectMetadata);
+        await this.updateProject(em, projectId, projectMetadata, ownerId);
       } else {
         await this.createProject(
           em,
           projectId,
           organizationId,
           projectMetadata,
+          ownerId,
         );
       }
 
