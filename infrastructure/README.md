@@ -104,16 +104,6 @@ Secrets with the corresponding values:
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
-- `NEXT_PUBLIC_URL_STAGING`: The base URL for the frontend app in the staging
-  environment. Get from `Kubernetes`' `staging_client_url`
-- `NEXT_PUBLIC_URL_PRODUCTION`: The base URL for the frontend app in the
-  production environment. Get from `Kubernetes`' `production_client_url`
-- `NEXT_PUBLIC_API_URL_STAGING`: The base URL for the API in the staging
-  environment (no trailing slash). Get from `Kubernetes`' `staging_api_url`
-  output
-- `NEXT_PUBLIC_API_URL_PRODUCTION`: The base URL for the API in the production
-  environment (no trailing slash). Get from `Kubernetes`' `production_api_url`
-  output
 
 Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
 and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
