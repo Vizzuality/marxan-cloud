@@ -87,7 +87,7 @@ export class PublishedProjectCrudService extends AppBaseService<
     if (exportIdString) {
       const exportId = new ExportId(exportIdString);
       const finalExport = await this.exportRepo.find(exportId);
-      if (!finalExport) {
+      if (!finalExport?.hasFinished()) {
         delete entity.exportId;
       }
     }
