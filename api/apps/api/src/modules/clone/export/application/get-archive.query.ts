@@ -4,9 +4,13 @@ import { Either } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { ExportId } from '../domain';
 
-export { ExportId };
-export const locationNotFound = Symbol(`location not found`);
-export type GetFailure = typeof locationNotFound | GetFileError;
+export const exportNotFound = Symbol('export not found');
+export const unfinishedExport = Symbol('unfinished export');
+
+export type GetFailure =
+  | typeof unfinishedExport
+  | typeof exportNotFound
+  | GetFileError;
 
 export class GetExportArchive extends Query<Either<GetFailure, Readable>> {
   constructor(public readonly exportId: ExportId) {

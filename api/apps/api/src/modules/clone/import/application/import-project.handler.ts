@@ -10,14 +10,16 @@ import {
 } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { ExportRepository } from '../../export/application/export-repository.port';
-import { Import } from '../domain/import/import';
 import {
   exportNotFound,
+  unfinishedExport,
+} from '../../export/application/get-archive.query';
+import { Import } from '../domain/import/import';
+import {
   ImportProject,
   ImportProjectCommandResult,
   ImportProjectError,
   invalidProjectExport,
-  unfinishedExport,
 } from './import-project.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository } from './import.repository.port';
@@ -44,11 +46,11 @@ export class ImportProjectHandler
       return left(exportNotFound);
     }
 
-    if (!exportInstance.toSnapshot().archiveLocation) {
+    if (!exportInstance.hasFinished()) {
       return left(unfinishedExport);
     }
 
-    if (exportInstance.resourceKind !== ResourceKind.Project) {
+    if (!exportInstance.isForProject()) {
       return left(invalidProjectExport);
     }
 

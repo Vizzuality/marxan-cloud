@@ -41,11 +41,7 @@ export class SchedulePieceExportHandler
       this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       return;
     }
-    const {
-      resourceKind,
-      exportPieces,
-      importResourceId,
-    } = exportInstance.toSnapshot();
+    const { resourceKind, exportPieces } = exportInstance.toSnapshot();
 
     const component = exportPieces.find(
       (piece) => piece.id === componentId.value,

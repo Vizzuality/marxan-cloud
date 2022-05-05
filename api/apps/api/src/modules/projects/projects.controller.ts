@@ -97,7 +97,6 @@ import {
   ImplementsAcl,
   IsMissingAclImplementation,
 } from '@marxan-api/decorators/acl.decorator';
-import { locationNotFound } from '@marxan-api/modules/clone/export/application/get-archive.query';
 import {
   GetLatestExportResponseDto,
   GetLatestExportsResponseDto,
@@ -114,11 +113,14 @@ import {
   cloningExportProvided,
   invalidExportZipFile,
 } from '../clone/infra/import/generate-export-from-zip-file.command';
-import { exportNotFound } from '../clone/import/application/import-project.command';
 import {
   integrityCheckFailed,
   invalidSignature,
 } from '../clone/export/application/manifest-file-service.port';
+import {
+  exportNotFound,
+  unfinishedExport,
+} from '../clone/export/application/get-archive.query';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -707,9 +709,9 @@ export class ProjectsController {
 
     if (isLeft(result)) {
       switch (result.left) {
-        case locationNotFound:
-          throw new NotFoundException(
-            `Could not find export .zip location for export with ID: ${exportId} for project with ID: ${projectId}`,
+        case unfinishedExport:
+          throw new BadRequestException(
+            `Export with ID ${exportId} hasn't finished`,
           );
         case notAllowed:
           throw new ForbiddenException(
@@ -718,6 +720,10 @@ export class ProjectsController {
         case projectNotFound:
           throw new NotFoundException(
             `Could not find project with ID: ${projectId}`,
+          );
+        case exportNotFound:
+          throw new NotFoundException(
+            `Could not find export with ID: ${exportId}`,
           );
 
         default:

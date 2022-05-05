@@ -1,4 +1,3 @@
-import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
@@ -6,17 +5,17 @@ import { ExportId } from '../../export';
 import {
   exportNotFound,
   unfinishedExport,
-  invalidProjectExport,
-} from './import-project.command';
+} from '../../export/application/get-archive.query';
 import { SaveError } from './import.repository.port';
 
 export const scenarioShellNotFound = Symbol('scenario shell not found');
+export const invalidScenarioExport = Symbol('invalid scenario export');
 
 export type ImportScenarioError =
   | SaveError
   | typeof exportNotFound
   | typeof unfinishedExport
-  | typeof invalidProjectExport
+  | typeof invalidScenarioExport
   | typeof scenarioShellNotFound;
 
 export type ImportScenarioCommandResult = {
