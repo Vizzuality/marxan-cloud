@@ -263,7 +263,7 @@ export class PublishedProjectService {
       const exportId: ExportId = new ExportId(result.exportId);
 
       const exportResult = await this.exportRepo.find(exportId);
-      if (!exportResult) {
+      if (!exportResult?.hasFinished()) {
         delete result.exportId;
       }
     }

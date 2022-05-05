@@ -25,7 +25,6 @@ import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { async } from 'rxjs';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
@@ -219,6 +218,7 @@ export const getFixtures = async () => {
             creators: null,
             location: null,
             pngData: null,
+            exportId: null,
           },
           id: publicProjectId,
           type: 'published_projects',
