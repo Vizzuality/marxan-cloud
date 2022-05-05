@@ -98,10 +98,8 @@ const getFixtures = async () => {
       opts: { cloning: boolean } = { cloning: false },
     ) => {
       const exportInstance = await repo.find(exportId);
-      expect(exportInstance?.toSnapshot()).toBeDefined();
-      if (!opts.cloning)
-        expect(exportInstance?.importResourceId).toEqual(undefined);
-      else expect(exportInstance?.importResourceId).toBeDefined();
+      expect(exportInstance).toBeDefined();
+      expect(exportInstance!.isCloning()).toEqual(opts.cloning);
     },
     ThenUnfinishedExportPiecesAreRequestedToProcess: async (
       projectId: ResourceId,

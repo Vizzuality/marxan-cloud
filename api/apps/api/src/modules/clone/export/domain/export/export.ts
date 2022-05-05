@@ -133,6 +133,10 @@ export class Export extends AggregateRoot {
 
   isCloning = () => Boolean(this.importResourceId);
 
+  hasFinished = () => Boolean(this.archiveLocation);
+
+  isForeignExport = () => this.foreignExport;
+
   isForProject() {
     return this.resourceKind === ResourceKind.Project;
   }

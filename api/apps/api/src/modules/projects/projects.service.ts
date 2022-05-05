@@ -39,7 +39,10 @@ import {
   ExportProject,
   GetExportArchive,
 } from '@marxan-api/modules/clone';
-import { GetFailure as GetArchiveLocationFailure } from '@marxan-api/modules/clone/export/application/get-archive.query';
+import {
+  exportNotFound,
+  GetFailure as GetArchiveLocationFailure,
+} from '@marxan-api/modules/clone/export/application/get-archive.query';
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { ResourceId } from '@marxan/cloning/domain';
 import { Readable } from 'stream';
@@ -54,7 +57,6 @@ import {
   GenerateExportFromZipFileError,
 } from '../clone/infra/import/generate-export-from-zip-file.command';
 import {
-  exportNotFound,
   ImportProject,
   ImportProjectCommandResult,
   ImportProjectError,
@@ -463,7 +465,10 @@ export class ProjectsService {
     exportId: string,
   ): Promise<
     Either<
-      GetArchiveLocationFailure | typeof notAllowed | typeof projectNotFound,
+      | GetArchiveLocationFailure
+      | typeof notAllowed
+      | typeof projectNotFound
+      | typeof exportNotFound,
       Readable
     >
   > {

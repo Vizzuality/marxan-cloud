@@ -37,28 +37,35 @@ export class MemoryExportRepo implements ExportRepository {
   ): Promise<Export[]> {
     return Object.values(this.#memory)
       .filter((exportInstance) => {
-        const { resourceId, resourceKind } = exportInstance.toSnapshot();
-        return (
-          projectId === resourceId && resourceKind === ResourceKind.Project
-        );
+        const { resourceId } = exportInstance.toSnapshot();
+        return projectId === resourceId && exportInstance.isForProject();
       })
       .filter((exportInstance) => {
-        const { archiveLocation } = exportInstance.toSnapshot();
-        return options?.isFinished === undefined || options.isFinished
-          ? archiveLocation !== undefined
-          : archiveLocation === undefined;
+        if (!options) return true;
+        const { isFinished } = options;
+        if (isFinished === undefined) return true;
+
+        const exportHasFinished = exportInstance.hasFinished();
+
+        return isFinished === exportHasFinished;
       })
       .filter((exportInstance) => {
-        const { importResourceId } = exportInstance.toSnapshot();
-        return options?.isStandalone === undefined || options.isStandalone
-          ? importResourceId === undefined
-          : importResourceId !== undefined;
+        if (!options) return true;
+        const { isStandalone } = options;
+        if (isStandalone === undefined) return true;
+
+        const isStandaloneExport = !exportInstance.isCloning();
+
+        return isStandalone === isStandaloneExport;
       })
       .filter((exportInstance) => {
-        const { foreignExport } = exportInstance.toSnapshot();
-        return (
-          options?.isLocal === undefined || foreignExport === !options.isLocal
-        );
+        if (!options) return true;
+        const { isLocal } = options;
+        if (isLocal === undefined) return true;
+
+        const isLocalExport = !exportInstance.isForeignExport();
+
+        return isLocal === isLocalExport;
       })
       .sort(createdAtPropertySorter)
       .slice(0, limit);

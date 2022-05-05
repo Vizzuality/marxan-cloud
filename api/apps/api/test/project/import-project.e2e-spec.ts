@@ -235,7 +235,7 @@ export const getFixtures = async () => {
       const exportInstance = await exportRepo.find(exportId);
 
       expect(exportInstance).toBeDefined();
-      expect(exportInstance?.toSnapshot().foreignExport).toBe(true);
+      expect(exportInstance!.isForeignExport()).toBe(true);
     },
     ThenImportIsCompleted: async () => {
       const res = await new Promise<ApiEventByTopicAndKind>(

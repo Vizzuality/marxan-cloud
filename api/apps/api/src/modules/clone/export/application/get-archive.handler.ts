@@ -4,9 +4,10 @@ import { Either, left } from 'fp-ts/Either';
 import { Readable } from 'stream';
 import { ExportRepository } from './export-repository.port';
 import {
+  exportNotFound,
   GetExportArchive,
   GetFailure,
-  locationNotFound,
+  unfinishedExport,
 } from './get-archive.query';
 
 @QueryHandler(GetExportArchive)
@@ -20,11 +21,18 @@ export class GetArchiveHandler
   async execute({
     exportId,
   }: GetExportArchive): Promise<Either<GetFailure, Readable>> {
-    const location = (await this.exportRepo.find(exportId))?.toSnapshot()
-      .archiveLocation;
+    const exportInstance = await this.exportRepo.find(exportId);
 
-    if (!location) return left(locationNotFound);
+    if (!exportInstance) {
+      return left(exportNotFound);
+    }
 
-    return this.fileRepo.get(location);
+    const { archiveLocation } = exportInstance.toSnapshot();
+
+    if (!exportInstance.hasFinished() || !archiveLocation) {
+      return left(unfinishedExport);
+    }
+
+    return this.fileRepo.get(archiveLocation);
   }
 }

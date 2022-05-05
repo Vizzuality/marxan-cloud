@@ -13,17 +13,18 @@ import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { Repository } from 'typeorm';
 import { Scenario } from '../../../scenarios/scenario.api.entity';
 import { ExportRepository } from '../../export/application/export-repository.port';
-import { Import } from '../domain/import/import';
 import {
   exportNotFound,
-  invalidProjectExport,
   unfinishedExport,
-} from './import-project.command';
+} from '../../export/application/get-archive.query';
+import { Import } from '../domain/import/import';
+import { invalidProjectExport } from './import-project.command';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import {
   ImportScenario,
   ImportScenarioCommandResult,
   ImportScenarioError,
+  invalidScenarioExport,
   scenarioShellNotFound,
 } from './import-scenario.command';
 import { ImportRepository } from './import.repository.port';
@@ -52,18 +53,15 @@ export class ImportScenarioHandler
       return left(exportNotFound);
     }
 
-    if (!exportInstance.toSnapshot().archiveLocation) {
+    if (!exportInstance.hasFinished()) {
       return left(unfinishedExport);
     }
 
-    if (
-      exportInstance.resourceKind !== ResourceKind.Scenario ||
-      exportInstance.importResourceId === undefined
-    ) {
-      return left(invalidProjectExport);
+    if (exportInstance.isForProject() || !exportInstance.isCloning()) {
+      return left(invalidScenarioExport);
     }
 
-    const { importResourceId } = exportInstance;
+    const importResourceId = exportInstance.importResourceId!;
 
     const scenario = await this.scenarioRepo.findOne(importResourceId.value);
 
