@@ -11,6 +11,7 @@ export type ProjectMetadataContent = {
   description?: string;
   planningUnitGridShape?: PlanningUnitGridShape;
   blmRange: BlmRange;
+  metadata?: Record<string, unknown>;
 };
 
 export const projectMetadataRelativePath = 'project-metadata.json';

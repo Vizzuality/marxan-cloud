@@ -20,6 +20,9 @@ type SelectScenarioResult = {
   blm?: number;
   number_of_runs?: number;
   metadata?: ScenarioMetadataContent['metadata'];
+  ran_at_least_once: boolean;
+  status: ScenarioMetadataContent['status'] | null;
+  type: string;
 };
 
 type SelectScenarioBlmResult = {
@@ -51,7 +54,16 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       SelectScenarioResult,
     ] = await this.entityManager
       .createQueryBuilder()
-      .select('name, description, blm, number_of_runs, metadata')
+      .select([
+        'name',
+        'description',
+        'blm',
+        'number_of_runs',
+        'metadata',
+        'type',
+        'status',
+        'ran_at_least_once',
+      ])
       .from('scenarios', 's')
       .where('s.id = :scenarioId', { scenarioId })
       .execute();
@@ -84,6 +96,9 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       name: scenario.name,
       numberOfRuns: scenario.number_of_runs,
       blmRange,
+      ranAtLeastOnce: scenario.ran_at_least_once,
+      type: scenario.type,
+      status: scenario.status ?? undefined,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

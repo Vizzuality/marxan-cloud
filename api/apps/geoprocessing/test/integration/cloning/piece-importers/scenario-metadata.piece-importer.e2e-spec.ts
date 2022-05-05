@@ -31,6 +31,9 @@ interface ScenarioSelectResult {
   description: string;
   number_of_runs: number;
   blm: number;
+  ran_at_least_once: boolean;
+  type: string;
+  created_by: string;
 }
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -131,6 +134,8 @@ const getFixtures = async () => {
       range: [0, 100],
       values: [],
     },
+    ranAtLeastOnce: true,
+    type: 'marxan',
   };
 
   return {
@@ -234,6 +239,11 @@ const getFixtures = async () => {
           expect(scenario.number_of_runs).toEqual(
             validScenarioMetadataFileContent.numberOfRuns,
           );
+          expect(scenario.ran_at_least_once).toEqual(
+            validScenarioMetadataFileContent.ranAtLeastOnce,
+          );
+          expect(scenario.type).toEqual(validScenarioMetadataFileContent.type);
+          expect(scenario.created_by).toEqual(userId);
 
           const [blmRange]: [
             BlmRange,

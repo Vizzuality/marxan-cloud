@@ -45,9 +45,10 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       name: string;
       description: string;
       planning_unit_grid_shape: PlanningUnitGridShape;
+      metadata: Record<string, unknown> | null;
     }[] = await this.entityManager
       .createQueryBuilder()
-      .select(['name', 'description', 'planning_unit_grid_shape'])
+      .select(['name', 'description', 'planning_unit_grid_shape', 'metadata'])
       .from('projects', 'p')
       .where('id = :projectId', { projectId })
       .execute();
@@ -78,6 +79,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       description: projectData.description,
       planningUnitGridShape: projectData.planning_unit_grid_shape,
       blmRange,
+      metadata: projectData.metadata ?? undefined,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

@@ -33,6 +33,8 @@ interface ProjectSelectResult {
   name: string;
   description: string;
   planning_unit_grid_shape: PlanningUnitGridShape;
+  metadata: Record<string, unknown> | null;
+  created_by: string;
 }
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -116,6 +118,8 @@ const getFixtures = async () => {
   const projectName = `test project - ${projectId}`;
   const copyProjectName = projectName + ' - copy';
 
+  const expectedMetadata = { foo: 'bar' };
+
   const validProjectMetadataFileContent: ProjectMetadataContent = {
     name: projectName,
     description: 'project description',
@@ -125,6 +129,7 @@ const getFixtures = async () => {
       range: [0, 100],
       values: [],
     },
+    metadata: expectedMetadata,
   };
 
   return {
@@ -218,6 +223,8 @@ const getFixtures = async () => {
           expect(project.planning_unit_grid_shape).toEqual(
             validProjectMetadataFileContent.planningUnitGridShape,
           );
+          expect(project.metadata).toMatchObject(expectedMetadata);
+          expect(project.created_by).toEqual(userId);
 
           const [blmRange]: [
             BlmRange,
