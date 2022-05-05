@@ -568,6 +568,7 @@ export class ProjectsService {
   async importProjectFromZipFile(
     exportFile: Express.Multer.File,
     userId: string,
+    projectName?: string,
   ): Promise<
     Either<
       | GenerateExportFromZipFileError
@@ -589,7 +590,7 @@ export class ProjectsService {
     }
 
     const idsOrError = await this.commandBus.execute(
-      new ImportProject(exportIdOrError.right, new UserId(userId)),
+      new ImportProject(exportIdOrError.right, new UserId(userId), projectName),
     );
 
     if (isLeft(idsOrError)) {

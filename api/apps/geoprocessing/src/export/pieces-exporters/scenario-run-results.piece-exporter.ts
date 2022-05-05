@@ -18,7 +18,7 @@ type PreviousBlmResultsSelectResult = {
   cost: number;
   blmValue: number;
   boundaryLength: number;
-  pngData: Buffer;
+  pngData?: Buffer;
 };
 
 type MarxanRunSelectResult = {
@@ -84,7 +84,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
     const content: ScenarioRunResultsContent = {
       blmResults: blmResults.map(({ pngData, ...result }) => ({
         ...result,
-        png: pngData.toJSON().data,
+        png: pngData ? pngData.toJSON().data : undefined,
       })),
       marxanRunResults,
     };

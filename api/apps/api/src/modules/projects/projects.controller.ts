@@ -104,9 +104,10 @@ import {
   RequestProjectCloneResponseDto,
   RequestProjectExportBodyDto,
   RequestProjectExportResponseDto,
-} from './dto/export.project.dto';
+  RequestProjectImportBodyDto,
+  RequestProjectImportResponseDto,
+} from './dto/cloning.project.dto';
 import { ScenarioLockResultPlural } from '@marxan-api/modules/access-control/scenarios-acl/locks/dto/scenario.lock.dto';
-import { RequestProjectImportResponseDto } from './dto/import.project.response.dto';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { TilesOpenApi } from '@marxan/tiles';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
@@ -818,26 +819,16 @@ export class ProjectsController {
   @Post('import')
   @ApiOkResponse({ type: RequestProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          description: 'Export zip file',
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
   @UseInterceptors(FileInterceptor('file'))
   async importProject(
+    @Body() dto: RequestProjectImportBodyDto,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<RequestProjectImportResponseDto> {
     const idsOrError = await this.projectsService.importProjectFromZipFile(
       file,
       req.user.id,
+      dto.projectName,
     );
 
     if (isLeft(idsOrError)) {

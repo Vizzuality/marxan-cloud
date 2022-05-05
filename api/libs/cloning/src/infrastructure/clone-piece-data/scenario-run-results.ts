@@ -4,7 +4,7 @@ export type BlmResultsContent = {
   cost: number;
   blmValue: number;
   boundaryLength: number;
-  png: number[];
+  png?: number[];
 };
 export type MarxanRunResultsContent = {
   includedCount: number;
