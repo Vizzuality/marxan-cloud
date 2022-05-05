@@ -6,6 +6,8 @@ import {
 } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ProjectRoles } from '../../../access-control/projects-acl/dto/user-role-project.dto';
+import { UsersProjectsApiEntity } from '../../../access-control/projects-acl/entity/users-projects.api.entity';
 import { Project } from '../../../projects/project.api.entity';
 import { Export } from '../domain';
 import {
@@ -24,17 +26,26 @@ export class ExportProjectHandler
     private readonly eventPublisher: EventPublisher,
     @InjectRepository(Project)
     private readonly projectRepo: Repository<Project>,
+    @InjectRepository(UsersProjectsApiEntity)
+    private readonly userProjectsRepo: Repository<UsersProjectsApiEntity>,
   ) {}
 
   private async createProjectShell(
     existingProjectId: string,
     newProjectId: string,
+    ownerId: string,
   ) {
     const project = await this.projectRepo.findOneOrFail(existingProjectId);
     await this.projectRepo.save({
       id: newProjectId,
       name: project.name + ' - copy',
       organizationId: project.organizationId,
+    });
+
+    await this.userProjectsRepo.save({
+      projectId: newProjectId,
+      userId: ownerId,
+      roleName: ProjectRoles.project_owner,
     });
   }
 
@@ -58,6 +69,7 @@ export class ExportProjectHandler
       await this.createProjectShell(
         id.value,
         exportRequest.importResourceId!.value,
+        ownerId.value,
       );
     }
 
