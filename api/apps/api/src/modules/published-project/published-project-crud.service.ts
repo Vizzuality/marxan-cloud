@@ -53,6 +53,7 @@ export class PublishedProjectCrudService extends AppBaseService<
         'underModeration',
         'originalProject',
         'pngData',
+        'exportId',
       ],
       keyForAttribute: 'camelCase',
       originalProject: {

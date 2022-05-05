@@ -95,7 +95,10 @@ test(`when placing a public project under moderation as not a platform admin`, a
   response = await fixtures.WhenGettingPublicProjects();
   fixtures.ThenPublicProjectIsAvailable(projectId, response);
   response = await fixtures.WhenGettingPublicProject(projectId);
-  fixtures.ThenCompletePublicProjectDetailsArePresent(projectId, response);
+  fixtures.ThenCompletePublicProjectDetailsWithoutExportIdArePresent(
+    projectId,
+    response,
+  );
 });
 
 test(`when clearing under moderation status from a public project not as platform admin`, async () => {
@@ -186,6 +189,44 @@ test(`when updating a public project as not project owner`, async () => {
     projectId,
   );
   fixtures.ThenForbiddenIsReturned(response);
+});
+
+test(`when publishing a project an exportId should be generated to be used in imports`, async () => {
+  const projectId = await fixtures.GivenPrivateProjectWasCreated();
+  const scenarioId = await fixtures.GivenScenarioWasCreated(projectId);
+  let response = await fixtures.WhenPublishingAProject(projectId, scenarioId);
+  fixtures.ThenCreatedIsReturned(response);
+
+  response = await fixtures.WhenGettingPublicProject(projectId);
+  fixtures.ThenCompletePublicProjectDetailsWithoutExportIdArePresent(
+    projectId,
+    response,
+  );
+
+  const publicProjectExportId = await fixtures.GivenPublicProjectExportIdIsAvailable(
+    projectId,
+  );
+
+  if (!publicProjectExportId) {
+    throw Error('This public project has no exportId');
+  }
+
+  const exportId = await fixtures.GivenPublicProjectHasAnExportPrepared(
+    publicProjectExportId,
+  );
+
+  const {
+    importId,
+    projectId: newProjectId,
+  } = await fixtures.WhenCloningAPublicProject(exportId);
+
+  await fixtures.ThenTheProjectShouldBeImported(newProjectId, importId);
+
+  response = await fixtures.WhenGettingPublicProject(projectId);
+  fixtures.ThenCompletePublicProjectDetailsWithExportIdArePresent(
+    projectId,
+    response,
+  );
 });
 
 test(`when cloning a project that does not belong to the requesting user, it should import the public project`, async () => {

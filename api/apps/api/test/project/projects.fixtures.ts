@@ -25,6 +25,7 @@ import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
 import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { async } from 'rxjs';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
@@ -116,6 +117,13 @@ export const getFixtures = async () => {
       );
       cleanups.push(cleanup);
       return projectId;
+    },
+    GivenPublicProjectExportIdIsAvailable: async (projectId: string) => {
+      const publishedProject = await publishedProjectsRepo.find({
+        id: projectId,
+      });
+
+      return publishedProject[0].exportId;
     },
     ThenPublicProjectIsAvailable: (
       publicProjectId: string,
@@ -218,7 +226,7 @@ export const getFixtures = async () => {
         meta: {},
       });
     },
-    ThenCompletePublicProjectDetailsArePresent: (
+    ThenCompletePublicProjectDetailsWithoutExportIdArePresent: (
       publicProjectId: string,
       response: request.Response,
     ) => {
@@ -241,6 +249,37 @@ export const getFixtures = async () => {
             resources: [{ title: expect.any(String), url: expect.any(String) }],
             location: expect.any(String),
             pngData: expect.any(String),
+          },
+          id: publicProjectId,
+          type: 'published_projects',
+        },
+        meta: {},
+      });
+    },
+    ThenCompletePublicProjectDetailsWithExportIdArePresent: (
+      publicProjectId: string,
+      response: request.Response,
+    ) => {
+      expect(response.body).toEqual({
+        data: {
+          attributes: {
+            name: expect.any(String),
+            underModeration: false,
+            description: expect.any(String),
+            company: {
+              name: expect.any(String),
+              logoDataUrl: expect.any(String),
+            },
+            creators: [
+              {
+                displayName: expect.any(String),
+                avatarDataUrl: expect.any(String),
+              },
+            ],
+            resources: [{ title: expect.any(String), url: expect.any(String) }],
+            location: expect.any(String),
+            pngData: expect.any(String),
+            exportId: expect.any(String),
           },
           id: publicProjectId,
           type: 'published_projects',
@@ -392,6 +431,45 @@ export const getFixtures = async () => {
         .expect(HttpStatus.CREATED);
 
       const exportId = new ExportId(response.body.id);
+
+      const exportInstance = await exportRepo.find(exportId);
+
+      expect(exportInstance).toBeDefined();
+
+      const piecesUris: Record<string, string> = {};
+      await Promise.all(
+        exportInstance!.toSnapshot().exportPieces.map(async (piece, i) => {
+          const result = await fileRepo.saveCloningFile(
+            exportInstance!.id.value,
+            Readable.from(`${piece.piece}`),
+            `${piece.piece}.txt`,
+          );
+
+          if (isLeft(result)) {
+            throw new Error(`Error while saving ${piece.id} file`);
+          }
+
+          piecesUris[piece.id] = result.right;
+        }),
+      );
+
+      exportInstance!.toSnapshot().exportPieces.forEach((piece) => {
+        commandBus.execute(
+          new CompleteExportPiece(exportId, new ComponentId(piece.id), [
+            new ComponentLocation(
+              piecesUris[piece.id],
+              `${piece.id}-${piece.piece}.txt`,
+            ),
+          ]),
+        );
+      });
+
+      await eventBusTestUtils.waitUntilEventIsPublished(ArchiveReady);
+
+      return exportId.value;
+    },
+    GivenPublicProjectHasAnExportPrepared: async (expId: string) => {
+      const exportId = new ExportId(expId);
 
       const exportInstance = await exportRepo.find(exportId);
 
