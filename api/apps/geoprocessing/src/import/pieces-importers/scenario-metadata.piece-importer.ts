@@ -33,6 +33,7 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
     em: EntityManager,
     scenarioId: string,
     values: ScenarioMetadataContent,
+    ownerId: string,
   ) {
     return em
       .createQueryBuilder()
@@ -43,6 +44,10 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         blm: values.blm,
         number_of_runs: values.numberOfRuns,
         metadata: values.metadata,
+        ran_at_least_once: values.ranAtLeastOnce,
+        type: values.type,
+        status: values.status,
+        created_by: ownerId,
       })
       .where('id = :scenarioId', { scenarioId })
       .execute();
@@ -53,6 +58,7 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
     scenarioId: string,
     projectId: string,
     values: ScenarioMetadataContent,
+    ownerId: string,
   ) {
     return em
       .createQueryBuilder()
@@ -66,6 +72,10 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         number_of_runs: values.numberOfRuns,
         metadata: values.metadata,
         project_id: projectId,
+        ran_at_least_once: values.ranAtLeastOnce,
+        type: values.type,
+        status: values.status,
+        created_by: ownerId,
       })
       .execute();
   }
@@ -105,9 +115,15 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
 
     await this.entityManager.transaction(async (em) => {
       if (scenarioCloning) {
-        await this.updateScenario(em, scenarioId, metadata);
+        await this.updateScenario(em, scenarioId, metadata, input.ownerId);
       } else {
-        await this.createScenario(em, scenarioId, projectId, metadata);
+        await this.createScenario(
+          em,
+          scenarioId,
+          projectId,
+          metadata,
+          input.ownerId,
+        );
       }
 
       await em

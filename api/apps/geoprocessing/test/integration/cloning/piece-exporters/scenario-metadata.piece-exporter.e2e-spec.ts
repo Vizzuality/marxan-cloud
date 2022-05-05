@@ -91,6 +91,8 @@ const getFixtures = async () => {
       range: [0, 100],
       values: [],
     },
+    ranAtLeastOnce: false,
+    type: 'marxan',
   };
 
   return {
