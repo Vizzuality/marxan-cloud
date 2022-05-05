@@ -18,7 +18,9 @@ type PreviousBlmResultsSelectResult = {
   cost: number;
   blmValue: number;
   boundaryLength: number;
+  pngData: Buffer;
 };
+
 type MarxanRunSelectResult = {
   includedCount: string;
   values: boolean[];
@@ -47,6 +49,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       .select('cost')
       .addSelect('blm_value', 'blmValue')
       .addSelect('boundary_length', 'boundaryLength')
+      .addSelect('png_data', 'pngData')
       .from('blm_final_results', 'blm')
       .where('scenario_id = :scenarioId', { scenarioId: input.resourceId })
       .execute();
@@ -78,7 +81,13 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       ...result,
       includedCount: Number(result.includedCount),
     }));
-    const content: ScenarioRunResultsContent = { blmResults, marxanRunResults };
+    const content: ScenarioRunResultsContent = {
+      blmResults: blmResults.map(({ pngData, ...result }) => ({
+        ...result,
+        png: pngData.toJSON().data,
+      })),
+      marxanRunResults,
+    };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
       ClonePiece.ScenarioRunResults,

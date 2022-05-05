@@ -277,12 +277,14 @@ export async function GivenScenarioPuCostData(
 export async function GivenScenarioBlmResults(
   em: EntityManager,
   scenarioId: string,
+  pngData: Buffer = Buffer.from('"image bytes"'),
 ) {
   return em.getRepository(BlmFinalResultEntity).save({
     blmValue: 30,
     boundaryLength: 500,
     cost: 1,
     scenarioId,
+    pngData,
   });
 }
 

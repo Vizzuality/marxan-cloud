@@ -132,8 +132,8 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
     blmResultsContent: BlmResultsContent[],
     em: EntityManager,
   ) {
-    const insertBlmResultsValues = blmResultsContent.map((blm) => {
-      return { ...blm, scenarioId };
+    const insertBlmResultsValues = blmResultsContent.map(({ png, ...blm }) => {
+      return { ...blm, pngData: Buffer.from(png), scenarioId };
     });
     await em
       .createQueryBuilder()
