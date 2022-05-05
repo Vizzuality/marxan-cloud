@@ -55,6 +55,7 @@ export class SchedulePieceImportHandler
       projectId,
       importPieces,
       ownerId,
+      resourceName,
     } = importInstance.toSnapshot();
 
     const component = importPieces.find(
@@ -78,6 +79,7 @@ export class SchedulePieceImportHandler
       ownerId,
       resourceKind,
       uris,
+      resourceName,
     });
 
     if (!job) {
