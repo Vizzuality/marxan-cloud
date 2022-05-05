@@ -8,7 +8,10 @@ import {
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import {
+  BlmRange,
+  ProjectMetadataContent,
+} from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -117,6 +120,11 @@ const getFixtures = async () => {
     name: projectName,
     description: 'project description',
     planningUnitGridShape: PlanningUnitGridShape.Hexagon,
+    blmRange: {
+      defaults: [0, 20, 40, 60, 80, 100],
+      range: [0, 100],
+      values: [],
+    },
   };
 
   return {
@@ -209,6 +217,19 @@ const getFixtures = async () => {
           );
           expect(project.planning_unit_grid_shape).toEqual(
             validProjectMetadataFileContent.planningUnitGridShape,
+          );
+
+          const [blmRange]: [
+            BlmRange,
+          ] = await entityManager
+            .createQueryBuilder()
+            .select()
+            .from('project_blms', 'pblms')
+            .where('id = :projectId', { projectId })
+            .execute();
+
+          expect(blmRange).toMatchObject(
+            validProjectMetadataFileContent.blmRange,
           );
         },
       };

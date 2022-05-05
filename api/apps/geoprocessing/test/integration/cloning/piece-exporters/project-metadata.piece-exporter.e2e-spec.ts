@@ -31,15 +31,25 @@ describe(ProjectMetadataPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('should throw when project is not found', async () => {
+  it('fails when project is not found', async () => {
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenAProjectExistErrorShouldBeThrown();
   });
-  it('should save file succesfully when project is found', async () => {
+
+  it('fails when project blm range is not found', async () => {
+    await fixtures.GivenProjectExist();
+    const input = fixtures.GivenAProjectMetadataExportJob();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenAProjectBlmExistErrorShouldBeThrown();
+  });
+
+  it('saves file succesfully when project is found', async () => {
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures.GivenProjectExist();
+    await fixtures.GivenProjectBlmRangeExist();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenProjectMetadataFileIsSaved();
@@ -73,6 +83,11 @@ const getFixtures = async () => {
   const expectedContent: ProjectMetadataContent = {
     name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,
+    blmRange: {
+      defaults: [0, 20, 40, 60, 80, 100],
+      range: [0, 100],
+      values: [],
+    },
   };
 
   return {
@@ -98,10 +113,26 @@ const getFixtures = async () => {
     GivenProjectExist: async () => {
       return GivenProjectExists(apiEntityManager, projectId, organizationId);
     },
+    GivenProjectBlmRangeExist: async () => {
+      return apiEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into('project_blms')
+        .values({
+          id: projectId,
+          values: [],
+          defaults: [0, 20, 40, 60, 80, 100],
+          range: [0, 100],
+        })
+        .execute();
+    },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
         ThenAProjectExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(/does not exist/gi);
+        },
+        ThenAProjectBlmExistErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(/blm.*does not exist/gi);
         },
         ThenProjectMetadataFileIsSaved: async () => {
           const result = await sut.run(input);

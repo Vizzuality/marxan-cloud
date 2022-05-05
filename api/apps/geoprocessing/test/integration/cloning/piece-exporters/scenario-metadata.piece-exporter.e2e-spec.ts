@@ -30,15 +30,25 @@ describe(ScenarioMetadataPieceExporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('should throw when the scenario is not found', async () => {
+  it('fails when the scenario is not found', async () => {
     const input = fixtures.GivenAScenarioMetadataExportJob();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenASceanarioExistErrorShouldBeThrown();
+      .ThenAScenarioExistErrorShouldBeThrown();
   });
-  it('should save file succesfully when the scenario is found', async () => {
+
+  it('fails when scenario blm range is not found', async () => {
     const input = fixtures.GivenAScenarioMetadataExportJob();
     await fixtures.GivenScenarioExist();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenAScenarioBlmExistErrorShouldBeThrown();
+  });
+
+  it('saves file succesfully when the scenario is found', async () => {
+    const input = fixtures.GivenAScenarioMetadataExportJob();
+    await fixtures.GivenScenarioExist();
+    await fixtures.GivenScenarioBlmRangeExist();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenScenarioMetadataFileIsSaved();
@@ -76,6 +86,11 @@ const getFixtures = async () => {
     blm: 1,
     numberOfRuns: 6,
     metadata: { marxanInputParameterFile: { meta: '1' } },
+    blmRange: {
+      defaults: [0, 20, 40, 60, 80, 100],
+      range: [0, 100],
+      values: [],
+    },
   };
 
   return {
@@ -112,10 +127,26 @@ const getFixtures = async () => {
         },
       );
     },
+    GivenScenarioBlmRangeExist: async () => {
+      return apiEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into('scenario_blms')
+        .values({
+          id: scenarioId,
+          values: [],
+          defaults: [0, 20, 40, 60, 80, 100],
+          range: [0, 100],
+        })
+        .execute();
+    },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
-        ThenASceanarioExistErrorShouldBeThrown: async () => {
+        ThenAScenarioExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(/does not exist/gi);
+        },
+        ThenAScenarioBlmExistErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(/blm.*does not exist/gi);
         },
         ThenScenarioMetadataFileIsSaved: async () => {
           const result = await sut.run(input);

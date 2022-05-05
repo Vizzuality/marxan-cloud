@@ -15,6 +15,12 @@ import {
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
 
+type SelectProjectBlmResult = {
+  defaults: number[];
+  values: number[];
+  range: number[];
+};
+
 @Injectable()
 @PieceExportProvider()
 export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
@@ -52,10 +58,26 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
+    const [blmRange]: [
+      SelectProjectBlmResult,
+    ] = await this.entityManager
+      .createQueryBuilder()
+      .select(['values', 'defaults', 'range'])
+      .from('project_blms', 'pblms')
+      .where('id = :projectId', { projectId })
+      .execute();
+
+    if (!blmRange) {
+      const errorMessage = `${ProjectMetadataPieceExporter.name} - Blm for project with id ${projectId} does not exist.`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
     const fileContent: ProjectMetadataContent = {
       name: projectData.name,
       description: projectData.description,
       planningUnitGridShape: projectData.planning_unit_grid_shape,
+      blmRange,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(

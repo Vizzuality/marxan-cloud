@@ -25,7 +25,6 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import * as archiver from 'archiver';
-import { Either, left, right } from 'fp-ts/lib/Either';
 import { isLeft } from 'fp-ts/lib/These';
 import { createWriteStream, rmSync } from 'fs';
 import { Readable } from 'stream';
@@ -34,13 +33,7 @@ import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
 import { ExportId } from '../../src/modules/clone';
 import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
-import {
-  integrityCheckFailed,
-  invalidSignature,
-  manifestFileGenerationError,
-  ManifestFileService,
-  signatureFileGenerationError,
-} from '../../src/modules/clone/export/application/manifest-file-service.port';
+import { ManifestFileService } from '../../src/modules/clone/export/application/manifest-file-service.port';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { EventBusTestUtils } from '../utils/event-bus.test.utils';
@@ -143,6 +136,11 @@ export const getFixtures = async () => {
       const projectMetadataContent: ProjectMetadataContent = {
         name: 'test project',
         description: 'description',
+        blmRange: {
+          defaults: [0, 20, 40, 60, 80, 100],
+          range: [0, 100],
+          values: [],
+        },
       };
 
       await cloningFilesRepo.saveCloningFile(

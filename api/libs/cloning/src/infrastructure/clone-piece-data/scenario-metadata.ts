@@ -1,4 +1,5 @@
 import { ScenarioMetadata } from '@marxan/scenario-metadata';
+import { BlmRange } from './project-metadata';
 
 export type ScenarioMetadataContent = {
   name: string;
@@ -6,6 +7,7 @@ export type ScenarioMetadataContent = {
   numberOfRuns?: number;
   blm?: number;
   metadata?: ScenarioMetadata;
+  blmRange: BlmRange;
 };
 
 export const scenarioMetadataRelativePath = `scenario-metadata.json`;
