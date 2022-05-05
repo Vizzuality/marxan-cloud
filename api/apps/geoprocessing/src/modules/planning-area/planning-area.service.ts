@@ -5,6 +5,7 @@ import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { SaveGeoJsonResult } from '@marxan/planning-area-repository/custom-planning-area.repository';
 import { PlanningAreaGarbageCollector } from './planning-area-garbage-collector.service';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 @Injectable()
 export class PlanningAreaService {
@@ -19,7 +20,13 @@ export class PlanningAreaService {
   async save(
     shapefile: Express.Multer.File,
   ): Promise<{ data: GeoJSON } & SaveGeoJsonResult> {
-    const { data } = await this.shapefileService.transformToGeoJson(shapefile);
+    const cleanupTemporaryFolders = AppConfig.getBoolean(
+      'storage.sharedFileStorage.cleanupTemporaryFolders',
+      true,
+    );
+    const { data } = await this.shapefileService.transformToGeoJson(shapefile, {
+      cleanupTemporaryFolders,
+    });
     const result = await this.repository.saveGeoJson(data);
     this.scheduleGarbageCollection();
     return {

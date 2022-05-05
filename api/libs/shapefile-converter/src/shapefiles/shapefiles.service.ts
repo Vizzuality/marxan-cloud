@@ -71,6 +71,9 @@ export class ShapefileService {
    */
   async transformToGeoJson(
     shapeFile: Pick<Express.Multer.File, 'path' | 'filename' | 'destination'>,
+    config: { cleanupTemporaryFolders?: boolean } = {
+      cleanupTemporaryFolders: true,
+    },
   ): Promise<{
     data: GeoJSON;
   }> {
@@ -91,9 +94,14 @@ export class ShapefileService {
       this.logger.error(err);
       throw new Error(`Invalid Shapefile: ${err}`);
     } finally {
-      await this.fileService
-        .deleteDataFromFS(shapeFile.path)
-        .catch((error) => this.logger.error(error));
+      /**
+       * Leave temporary folder on filesystem according to feature flag.
+       */
+      if (config.cleanupTemporaryFolders) {
+        await this.fileService
+          .deleteDataFromFS(shapeFile.path)
+          .catch((error) => this.logger.error(error));
+      }
     }
   }
 }

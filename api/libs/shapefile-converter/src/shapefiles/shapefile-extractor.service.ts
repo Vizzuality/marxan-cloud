@@ -72,10 +72,20 @@ export class ShapefileExtractorService {
     return right(geoJson);
   }
 
-  async cleanup(shapeFile: Shapefile): Promise<void> {
-    await this.fileService.deleteDataFromFS(shapeFile.path).catch((error) => {
-      this.logger.error(error);
-    });
+  async cleanup(
+    shapeFile: Shapefile,
+    config: { cleanupTemporaryFolders?: boolean } = {
+      cleanupTemporaryFolders: true,
+    },
+  ): Promise<void> {
+    /**
+     * Leave temporary folder on filesystem according to feature flag.
+     */
+    if (config.cleanupTemporaryFolders) {
+      await this.fileService.deleteDataFromFS(shapeFile.path).catch((error) => {
+        this.logger.error(error);
+      });
+    }
   }
 
   private async unzip(shapeFile: Shapefile): Promise<UnpackedShapefile> {
