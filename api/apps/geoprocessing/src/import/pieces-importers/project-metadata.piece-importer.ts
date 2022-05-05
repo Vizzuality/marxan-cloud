@@ -44,6 +44,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     organizationId: string,
     data: ProjectMetadataContent,
     ownerId: string,
+    resourceName?: string,
   ) {
     return em
       .createQueryBuilder()
@@ -51,7 +52,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       .into(`projects`)
       .values({
         id: projectId,
-        name: data.name + ' - copy',
+        name: resourceName ?? data.name + ' - copy',
         description: data.description,
         organization_id: organizationId,
         planning_unit_grid_shape: data.planningUnitGridShape,
@@ -92,7 +93,14 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
   }
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
-    const { uris, pieceResourceId, projectId, piece, ownerId } = input;
+    const {
+      uris,
+      pieceResourceId,
+      projectId,
+      piece,
+      ownerId,
+      resourceName,
+    } = input;
 
     if (uris.length !== 1) {
       const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
@@ -137,6 +145,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
           organizationId,
           projectMetadata,
           ownerId,
+          resourceName,
         );
       }
 

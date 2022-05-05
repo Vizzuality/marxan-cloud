@@ -18,6 +18,7 @@ export interface ImportJobInput {
   readonly resourceKind: ResourceKind;
   readonly piece: ClonePiece;
   readonly uris: ComponentLocationSnapshot[];
+  readonly resourceName?: string;
 }
 
 export interface FailedImportDbCleanupJobInput {

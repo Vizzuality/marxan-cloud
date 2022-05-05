@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class RequestProjectExportBodyDto {
   @ApiProperty({
@@ -71,6 +71,38 @@ export class RequestPublishedProjectCloneResponseDto {
   @ApiProperty({
     description: 'ID of the new project',
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  projectId!: string;
+}
+
+export class RequestProjectImportBodyDto {
+  @ApiProperty({
+    description: 'Name of the new project',
+    type: 'string',
+    example: 'My new project!',
+  })
+  @IsOptional()
+  @IsString()
+  projectName?: string;
+
+  @ApiProperty({
+    description: 'Export zip file',
+    type: 'string',
+    format: 'binary',
+  })
+  file!: Express.Multer.File;
+}
+
+export class RequestProjectImportResponseDto {
+  @ApiProperty({
+    description: 'ID of the import',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  importId!: string;
+
+  @ApiProperty({
+    description: 'ID of the new project',
+    example: 'dbe1a039-44d1-4e66-a02d-a3cadf691892',
   })
   projectId!: string;
 }

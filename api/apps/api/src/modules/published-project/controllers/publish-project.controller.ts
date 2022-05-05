@@ -56,7 +56,7 @@ import {
 } from 'nestjs-base-service';
 import { PublishedProjectSerializer } from '../published-project.serializer';
 import { PublishProjectDto } from '../dto/publish-project.dto';
-import { RequestPublishedProjectCloneResponseDto } from '@marxan-api/modules/projects/dto/export.project.dto';
+import { RequestPublishedProjectCloneResponseDto } from '@marxan-api/modules/projects/dto/cloning.project.dto';
 import { ProjectsService } from '@marxan-api/modules/projects/projects.service';
 import { ExportId } from '@marxan-api/modules/clone';
 import { UserId } from '@marxan/domain-ids';

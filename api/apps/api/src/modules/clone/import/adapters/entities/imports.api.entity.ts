@@ -39,6 +39,13 @@ export class ImportEntity {
   archiveLocation!: string;
 
   @Column({
+    type: 'text',
+    name: 'resource_name',
+    nullable: true,
+  })
+  resourceName?: string;
+
+  @Column({
     type: 'boolean',
     name: 'is_cloning',
   })
@@ -73,6 +80,7 @@ export class ImportEntity {
     );
     entity.ownerId = snapshot.ownerId;
     entity.isCloning = snapshot.isCloning;
+    entity.resourceName = snapshot.resourceName;
 
     return entity;
   }
@@ -87,6 +95,7 @@ export class ImportEntity {
       importPieces: this.components.map((component) => component.toSnapshot()),
       ownerId: this.ownerId,
       isCloning: this.isCloning,
+      resourceName: this.resourceName,
     });
   }
 }

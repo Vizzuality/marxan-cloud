@@ -75,6 +75,19 @@ describe(ProjectMetadataPieceImporter, () => {
       .ThenProjectMetadataShouldBeImported();
   });
 
+  it('imports project metadata creating a new project (isolated import process) with resource name', async () => {
+    // Piece importer picks a random organization
+    await fixtures.GivenOrganization();
+    await fixtures.GivenUser();
+
+    const resourceName = 'custom project name!!';
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
+    const input = fixtures.GivenJobInput(archiveLocation, resourceName);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenProjectMetadataShouldBeImported({ withResourceName: resourceName });
+  });
+
   it('imports project metadata updating a existing project (cloning import process)', async () => {
     await fixtures.GivenUser();
     await fixtures.GivenProject();
@@ -140,7 +153,10 @@ const getFixtures = async () => {
         organizationId,
       );
     },
-    GivenJobInput: (archiveLocation: ArchiveLocation): ImportJobInput => {
+    GivenJobInput: (
+      archiveLocation: ArchiveLocation,
+      resourceName?: string,
+    ): ImportJobInput => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectMetadata,
       );
@@ -153,6 +169,7 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
         uris: [{ relativePath, uri: archiveLocation.value }],
         ownerId: userId,
+        resourceName,
       };
     },
     GivenUser: () => GivenUserExists(entityManager, userId, projectId),
@@ -204,7 +221,11 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenProjectMetadataShouldBeImported: async () => {
+        ThenProjectMetadataShouldBeImported: async (
+          { withResourceName }: { withResourceName?: string } = {
+            withResourceName: undefined,
+          },
+        ) => {
           await sut.run(input);
 
           const [project]: [
@@ -216,7 +237,7 @@ const getFixtures = async () => {
             .where('id = :projectId', { projectId })
             .execute();
 
-          expect(project.name).toEqual(copyProjectName);
+          expect(project.name).toEqual(withResourceName ?? copyProjectName);
           expect(project.description).toEqual(
             validProjectMetadataFileContent.description,
           );

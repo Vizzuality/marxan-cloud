@@ -65,6 +65,16 @@ test(`importing archive with equal order components`, async () => {
   fixtures.ThenAllComponentsAreRequested();
 });
 
+test(`importing project specifying resource name`, async () => {
+  const resourceName = 'My new project!';
+
+  fixtures.GivenExtractingArchiveHasEqualComponents();
+  const result = await fixtures.WhenRequestingImport({
+    withResourceName: resourceName,
+  });
+  fixtures.ThenRequestImportIsSaved(result, { withResourceName: resourceName });
+});
+
 const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     imports: [CqrsModule],
@@ -106,9 +116,13 @@ const getFixtures = async () => {
     GivenExtractingArchiveHasEqualComponents: () => {
       importResourcePieces.mockEqualPieces();
     },
-    WhenRequestingImport: async () => {
+    WhenRequestingImport: async (
+      { withResourceName }: { withResourceName?: string } = {
+        withResourceName: undefined,
+      },
+    ) => {
       const importResult = await sut.execute(
-        new ImportProject(ExportId.create(), ownerId),
+        new ImportProject(ExportId.create(), ownerId, withResourceName),
       );
       if (isRight(importResult))
         resourceId = new ResourceId(
@@ -119,13 +133,18 @@ const getFixtures = async () => {
     },
     ThenRequestImportIsSaved: (
       importResult: PromiseType<ReturnType<ImportProjectHandler['execute']>>,
+      { withResourceName }: { withResourceName?: string } = {
+        withResourceName: undefined,
+      },
     ) => {
-      expect(isRight(importResult)).toBeTruthy();
-      expect(
-        repo.entities[
-          (importResult as Right<ImportProjectCommandResult>).right.importId
-        ],
-      ).toBeDefined();
+      if (isLeft(importResult)) {
+        throw new Error('left import result');
+      }
+
+      expect(repo.entities[importResult.right.importId]).toBeDefined();
+      expect(repo.entities[importResult.right.importId].resourceName).toEqual(
+        withResourceName,
+      );
     },
     ThenImportFails: (
       importResult: PromiseType<ReturnType<ImportProjectHandler['execute']>>,

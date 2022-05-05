@@ -27,6 +27,7 @@ export class ImportProject extends Command<
   constructor(
     public readonly exportId: ExportId,
     public readonly ownerId: UserId,
+    public readonly projectName?: string,
   ) {
     super();
   }
