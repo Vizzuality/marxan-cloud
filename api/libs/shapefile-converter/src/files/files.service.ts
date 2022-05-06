@@ -14,7 +14,11 @@ export class FileService {
     return new Promise((resolve, reject) => {
       const stream = createReadStream(origin);
       stream.on('error', (error: Error) =>
-        reject(new Error(`${fileName} could not be streamed from filesystem: ` + error)),
+        reject(
+          new Error(
+            `${fileName} could not be streamed from filesystem: ` + error,
+          ),
+        ),
       );
       stream
         .pipe(
