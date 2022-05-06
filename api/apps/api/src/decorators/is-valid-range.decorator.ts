@@ -6,6 +6,14 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator';
 
+/**
+ * A valid blm range:
+ *
+ * - should be an array
+ * - should have length 2
+ * - the first number should be lower than the second
+ * - both values should be numbers strictly greater than zero
+ */
 export function IsValidRange(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
@@ -53,5 +61,5 @@ class IsValidRangeConstraint implements ValidatorConstraintInterface {
   }
 
   private someValueIsNotAValidNumber = (value: any) =>
-    value.some((v: any) => typeof v !== 'number' || v < 0);
+    value.some((v: any) => typeof v !== 'number' || v <= 0);
 }
