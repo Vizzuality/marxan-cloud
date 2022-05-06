@@ -16,8 +16,15 @@ type CustomPlanningAreaJob = Required<
     PlanningUnitsJob,
     'countryId' | 'adminRegionId' | 'adminAreaLevel1Id' | 'adminAreaLevel2Id'
   >
->;
-type RegularPlanningAreaJob = Omit<PlanningUnitsJob, 'planningAreaId'>;
+> & { planningUnitGridShape: RegularPlanningUnitGridShape };
+
+type RegularPlanningAreaJob = Omit<PlanningUnitsJob, 'planningAreaId'> & {
+  planningUnitGridShape: RegularPlanningUnitGridShape;
+};
+
+export type RegularPlanningUnitGridShape =
+  | PlanningUnitGridShape.Hexagon
+  | PlanningUnitGridShape.Square;
 
 function isCustomPlanningAreaJob(
   job: PlanningUnitsJob,
@@ -25,14 +32,24 @@ function isCustomPlanningAreaJob(
   return job.planningAreaId !== undefined;
 }
 
+export const calculateGridSize: {
+  [value in RegularPlanningUnitGridShape]: (areaKm2: number) => number;
+} = {
+  [PlanningUnitGridShape.Square]: (areaKm2) => Math.sqrt(areaKm2) * 1000,
+  [PlanningUnitGridShape.Hexagon]: (areaKm2) =>
+    Math.sqrt((2 * areaKm2) / (3 * Math.sqrt(3))) * 1000,
+};
+
+export const gridShapeFnMapping: {
+  [value in RegularPlanningUnitGridShape]: string;
+} = {
+  [PlanningUnitGridShape.Hexagon]: 'ST_HexagonGrid',
+  [PlanningUnitGridShape.Square]: 'ST_SquareGrid',
+};
+
 @Injectable()
 export class PlanningUnitsJobProcessor {
   private logger = new Logger('planning-units-job-processor');
-
-  private gridShapeFnMapping: { [value in PlanningUnitGridShape]?: string } = {
-    [PlanningUnitGridShape.Hexagon]: 'ST_HexagonGrid',
-    [PlanningUnitGridShape.Square]: 'ST_SquareGrid',
-  };
 
   constructor(
     @InjectEntityManager()
@@ -85,8 +102,10 @@ export class PlanningUnitsJobProcessor {
   private getCustomPlanningAreaGridSubquery(
     data: CustomPlanningAreaJob,
   ): string {
-    const gridFn = this.gridShapeFnMapping[data.planningUnitGridShape];
-    const size = Math.sqrt(data.planningUnitAreakm2) * 1000;
+    const gridFn = gridShapeFnMapping[data.planningUnitGridShape];
+    const size = calculateGridSize[data.planningUnitGridShape](
+      data.planningUnitAreakm2,
+    );
 
     return `
       WITH region AS (
@@ -115,8 +134,8 @@ export class PlanningUnitsJobProcessor {
       adminAreaLevel1Id ? `gid_1 = '${adminAreaLevel1Id}'` : 'gid_1 is null',
       adminAreaLevel2Id ? `gid_2 = '${adminAreaLevel2Id}'` : 'gid_2 is null',
     ];
-    const gridFn = this.gridShapeFnMapping[planningUnitGridShape];
-    const size = Math.sqrt(planningUnitAreakm2) * 1000;
+    const gridFn = gridShapeFnMapping[planningUnitGridShape];
+    const size = calculateGridSize[planningUnitGridShape]!(planningUnitAreakm2);
 
     return `
       WITH region AS (
@@ -133,7 +152,9 @@ export class PlanningUnitsJobProcessor {
     `;
   }
 
-  private getGridSubquery(data: PlanningUnitsJob): string {
+  private getGridSubquery(
+    data: RegularPlanningAreaJob | CustomPlanningAreaJob,
+  ): string {
     return isCustomPlanningAreaJob(data)
       ? this.getCustomPlanningAreaGridSubquery(data)
       : this.getRegularPlanningAreaGridSubquery(data);
@@ -151,7 +172,9 @@ export class PlanningUnitsJobProcessor {
    * * Better handle the validation, plus check why Polygon validation is not working
    * make sure we avoid at all costs unescaped user input
    */
-  async process(job: Job<PlanningUnitsJob>): Promise<void> {
+  async process(
+    job: Job<RegularPlanningAreaJob | CustomPlanningAreaJob>,
+  ): Promise<void> {
     this.logger.debug(`Start planning-units processing for ${job.id}...`);
 
     await this.ensureJobDataIsValid(job);
@@ -160,6 +183,13 @@ export class PlanningUnitsJobProcessor {
       const subquery = this.getGridSubquery(job.data);
 
       await this.entityManager.transaction(async (em) => {
+        // since size column is of type integer we have to apply Math.round
+        const size = Math.round(
+          calculateGridSize[job.data.planningUnitGridShape](
+            job.data.planningUnitAreakm2,
+          ),
+        );
+
         const geometries: { id: string }[] = await em.query(
           `
             INSERT INTO planning_units_geom (the_geom, type, size)
@@ -168,7 +198,7 @@ export class PlanningUnitsJobProcessor {
             ON CONFLICT (the_geom_hash, type) DO UPDATE SET type = $1::planning_unit_grid_shape
             RETURNING id
           `,
-          [job.data.planningUnitGridShape, job.data.planningUnitAreakm2],
+          [job.data.planningUnitGridShape, size],
         );
         const geometryIds = geometries.map((geom) => geom.id);
 
@@ -182,7 +212,9 @@ export class PlanningUnitsJobProcessor {
                 geomType: job.data.planningUnitGridShape,
                 puid: chunkIndex * chunkSize + (index + 1),
                 projectId: job.data.projectId,
-                planningAreaId: job.data.planningAreaId,
+                planningAreaId: isCustomPlanningAreaJob(job.data)
+                  ? job.data.planningAreaId
+                  : undefined,
               })),
             );
           }),
