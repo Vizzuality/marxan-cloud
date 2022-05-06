@@ -20,7 +20,7 @@ DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-redis-api-data )
-COMPOSE_PROJECT_NAME := "marxan-cloud"
+COMPOSE_PROJECT_NAME := marxan-cloud
 
 ## some color to give live to the outputs
 RED :=\033[1;32m
