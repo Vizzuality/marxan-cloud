@@ -50,15 +50,16 @@ duplicated, as the copy of all the `(geodb)features_data` and
 
 ## Aims and assumptions
 
-The refactor described in this document is limited to the following aims, and
-relies on the following assumptions:
+The refactor described in this document is limited to the following aims:
 
-- provide stable `id`s that can be reliably referenced within each of an
-  arbitrary number of copies of a project and its scenarios, whether in the same
-  MarxanCloud instance or across different instances.
+- provide stable, numeric `id`s that can be reliably referenced within each of
+  an arbitrary number of copies of a project and its scenarios, whether in the
+  same MarxanCloud instance or across different instances.
 
 - allow to reliably link features to scenarios across cloning operations, both
   for platform-wide and for user-uploaded features.
+
+Additionally, the refactor relies on the following assumptions:
 
 - projects and their scenarios are locked for edits during the entire duration
   of an export (i.e. since the export process has started and until it
@@ -82,17 +83,22 @@ relies on the following assumptions:
   `project_id/feature_class_name`) cannot be resolved to a feature in the target
   MarxanCloud instance, if different from the source one, this should be
   considered an error (as all platform-wide features referenced in an exported
-  project are required to be available in the target platform)
+  project are required to be available in the target platform, if different from
+  the source one)
 
 - one or more import steps of a cloning or import process could be ongoing at
   the same time for a given project and its scenarios
 
 ## Implementation - summary
 
-Details in the full _Implementation_ section below are still in draft; in the
-meanwhile, this section presents a summary of the process (with various extents
-of pseudocode/pseudosql to aid with the identification of the tables/columns
-involved).
+This section presents a summary of the process, with various extents of
+pseudocode/pseudosql to aid with the identification of the tables/columns
+involved.
+
+For final implementation details, always refer to the code: this document's
+scope is only to guide the development of the refactor, not to be an overview of
+the actual implementation nor to be kept up to date as the implementation may
+evolve after the initial refactor.
 
 ### Data schema changes
 
@@ -223,32 +229,30 @@ replace(source_feature_data, '<feature_class_name>/', '')`.
 
 ## Implementation (full rationale)
 
-_this section is a working draft - please ignore for the moment_
+This section outlines some implementation details originally meant as guidance
+to the implementation of the refactor; its main reference value should be the
+rationale behind the suggestions outlined, irrespective of the implementation
+choices that ended up being taken during development.
 
 ### Reliably identifying features referenced from feature geometries
 
 1. Features should be guaranteed to be unique either across the space of
    platform-wide features, or across each project.
 
-This can be enforced via partial unique indexes in `apidb`, e.g.
+This can be enforced via partial unique indexes in `apidb`.
 
-```
-create unique index unique_platform_features on features (feature_class_name) where project_id is null;
-create unique index unique_project_features on features (feature_class_name, project_id) where project_id is not null;
-```
+2. *At export time*, a unique combined `[project|platform]/feature_class_name`
+   stable identifier should be added to the exported `(apidb)features` rows via
+   the export piece for project features; this identifier is then used to
+   reference `(apidb)features` in the export piece for scenario features.
 
-2. *At export time*, a unique combined `[project|platform]/feature_class_name` stable
-   identifier should be added to the exported `(apidb)features` rows via the
-   export piece for project features; this identifier is then used to reference
-   `(apidb)features` in the export piece for scenario features.
-
-For example, such `id`s will look like
-`platform/equus_quagga` or
+For example, such `id`s will look like `platform/equus_quagga` or
 `project/equus_quagga`.
 
 These identifiers are expected to be stable:
 
-- for platform-wide features, their `feature_class_name` is not meant to ever change
+- for platform-wide features, their `feature_class_name` is not meant to ever
+  change
 - for user-uploaded features, their `feature_class_name` is guaranteed to be
   stable throughout an export or import step of a clone operation, thanks to
   locks in place to prevent editing projects that are being exported or imported
