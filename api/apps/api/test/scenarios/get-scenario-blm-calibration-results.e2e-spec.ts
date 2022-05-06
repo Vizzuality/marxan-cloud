@@ -12,7 +12,7 @@ describe('get-scenario-blm-calibration-results', () => {
     await fixtures?.cleanup();
   });
 
-  it(`retrieves blm calibration results via API as owner`, async () => {
+  it(`retrieves blm calibration results as owner`, async () => {
     await fixtures.GivenScenarioWasCreated();
 
     await fixtures.WhenBlmCalibrationIsLaunchedAsOwner();
@@ -35,6 +35,6 @@ describe('get-scenario-blm-calibration-results', () => {
 
     const response = await fixtures.WhenViewerLaunchesCalibration();
 
-    await fixtures.ThenForbiddenIsReturned(response);
+    fixtures.ThenForbiddenIsReturned(response);
   });
 });
