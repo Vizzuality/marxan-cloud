@@ -38,7 +38,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     return id;
   }
 
-  private createProject(
+  private async createProject(
     em: EntityManager,
     projectId: string,
     organizationId: string,
@@ -46,7 +46,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
     ownerId: string,
     resourceName?: string,
   ) {
-    return em
+    await em
       .createQueryBuilder()
       .insert()
       .into(`projects`)
@@ -58,6 +58,24 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         planning_unit_grid_shape: data.planningUnitGridShape,
         metadata: data.metadata,
         created_by: ownerId,
+      })
+      .execute();
+
+    await em
+      .createQueryBuilder()
+      .insert()
+      .into(`users_projects`)
+      .values({
+        user_id: ownerId,
+        project_id: projectId,
+        // It would be great to use ProjectRoles enum instead of having
+        // the role hardcoded. The thing is that Geoprocessing code shouldn't depend
+        // directly on elements of Api code, so there were two options:
+        // - Move ProjectRoles enum to libs package
+        // - Harcode the rol
+        // We took the second approach because we are only referencing values from that enum
+        // here
+        role_id: 'project_owner',
       })
       .execute();
   }
@@ -154,24 +172,6 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         .insert()
         .into('project_blms')
         .values({ id: projectId, ...projectMetadata.blmRange })
-        .execute();
-
-      await em
-        .createQueryBuilder()
-        .insert()
-        .into(`users_projects`)
-        .values({
-          user_id: ownerId,
-          project_id: projectId,
-          // It would be great to use ProjectRoles enum instead of having
-          // the role hardcoded. The thing is that Geoprocessing code shouldn't depend
-          // directly on elements of Api code, so there were two options:
-          // - Move ProjectRoles enum to libs package
-          // - Harcode the rol
-          // We took the second approach because we are only referencing values from that enum
-          // here
-          role_id: 'project_owner',
-        })
         .execute();
     });
 

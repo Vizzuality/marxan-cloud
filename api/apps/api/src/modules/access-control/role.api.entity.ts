@@ -20,6 +20,6 @@ export enum Roles {
 @Entity('roles')
 export class Role {
   @PrimaryColumn({ type: 'varchar', enum: Roles })
-  @IsEnum(Object.values(Roles))
+  @IsEnum(Roles)
   name!: Roles;
 }

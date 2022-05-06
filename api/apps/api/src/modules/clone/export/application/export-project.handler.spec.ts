@@ -11,6 +11,7 @@ import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
+import { UsersProjectsApiEntity } from '../../../access-control/projects-acl/entity/users-projects.api.entity';
 import { Project } from '../../../projects/project.api.entity';
 import { MemoryExportRepo } from '../adapters/memory-export.repository';
 import {
@@ -63,6 +64,10 @@ const getFixtures = async () => {
       {
         provide: getRepositoryToken(Project),
         useClass: FakeProjectRepoProvider,
+      },
+      {
+        provide: getRepositoryToken(UsersProjectsApiEntity),
+        useClass: FakeUserProjectsRepoProvider,
       },
       ExportProjectHandler,
     ],
@@ -162,5 +167,10 @@ class FakeProjectRepoProvider {
     return { organizationId: v4() };
   }
 
+  save() {}
+}
+
+@Injectable()
+class FakeUserProjectsRepoProvider {
   save() {}
 }

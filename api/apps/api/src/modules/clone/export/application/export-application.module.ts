@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersProjectsApiEntity } from '../../../access-control/projects-acl/entity/users-projects.api.entity';
 import { Project } from '../../../projects/project.api.entity';
 import { Scenario } from '../../../scenarios/scenario.api.entity';
 import { AllPiecesReadySaga } from './all-pieces-ready.saga';
@@ -23,7 +24,7 @@ export class ExportApplicationModule {
       module: ExportApplicationModule,
       imports: [
         CqrsModule,
-        TypeOrmModule.forFeature([Project, Scenario]),
+        TypeOrmModule.forFeature([Project, Scenario, UsersProjectsApiEntity]),
         ...(adapters ?? []),
       ],
       providers: [
