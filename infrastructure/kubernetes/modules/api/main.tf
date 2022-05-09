@@ -56,7 +56,7 @@ resource "kubernetes_deployment" "api_deployment" {
         volume {
           name = "shared-spatial-data-storage"
           persistent_volume_claim {
-            claim_name = var.backend_storage_pvc_name
+            claim_name = var.temp_data_pvc_name
           }
         }
 
