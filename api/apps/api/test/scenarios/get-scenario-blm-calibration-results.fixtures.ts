@@ -117,6 +117,7 @@ export const getFixtures = async () => {
         expect(result.scenarioId).toBe(scenarioId);
         expect(result.cost).toBeGreaterThanOrEqual(0);
         expect(result.boundaryLength).toBeGreaterThanOrEqual(0);
+        expect(result.blmValue).toBeGreaterThan(0);
       });
     },
 
