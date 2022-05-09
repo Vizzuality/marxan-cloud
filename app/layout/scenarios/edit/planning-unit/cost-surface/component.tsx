@@ -251,7 +251,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             className="w-full"
             onClick={onDownload}
           >
-            Template
+            Download cost surface template
           </Button>
         </div>
 

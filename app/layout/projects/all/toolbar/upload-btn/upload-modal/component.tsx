@@ -74,7 +74,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
     const { file, name } = values;
 
     const data = new FormData();
-    data.append('name', name);
+    data.append('projectName', name);
     data.append('file', file);
 
     importMutation.mutate({ data }, {
