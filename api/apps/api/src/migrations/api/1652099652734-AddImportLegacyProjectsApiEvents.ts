@@ -7,7 +7,10 @@ export class AddImportLegacyProjectsApiEvents1652099652734
       INSERT INTO api_event_kinds (id) values
       ('project.legacy.import.submitted/v1/alpha'),
       ('project.legacy.import.finished/v1/alpha'),
-      ('project.legacy.import.failed/v1/alpha');
+      ('project.legacy.import.failed/v1/alpha'),
+      ('project.legacy.import.piece.submitted/v1/alpha'),
+      ('project.legacy.import.piece.finished/v1/alpha'),
+      ('project.legacy.import.piece.failed/v1/alpha');
     `);
   }
 
@@ -22,6 +25,18 @@ export class AddImportLegacyProjectsApiEvents1652099652734
 
     await queryRunner.query(
       `DELETE FROM api_event_kinds WHERE id = 'project.legacy.import.failed/v1/alpha';`,
+    );
+
+    await queryRunner.query(
+      `DELETE FROM api_event_kinds WHERE id = 'project.legacy.import.piece.submitted/v1/alpha';`,
+    );
+
+    await queryRunner.query(
+      `DELETE FROM api_event_kinds WHERE id = 'project.legacy.import.piece.finished/v1/alpha';`,
+    );
+
+    await queryRunner.query(
+      `DELETE FROM api_event_kinds WHERE id = 'project.legacy.import.piece.failed/v1/alpha';`,
     );
   }
 }

@@ -82,4 +82,10 @@ const eventToJobStatusMapping: Record<ValuesType<ProjectEvents>, JobStatus> = {
     JobStatus.done,
   [API_EVENT_KINDS.project__legacy__import__submitted__v1__alpha]:
     JobStatus.running,
+  [API_EVENT_KINDS.project__legacy__import__piece__failed__v1__alpha]:
+    JobStatus.failure,
+  [API_EVENT_KINDS.project__legacy__import__piece__finished__v1__alpha]:
+    JobStatus.done,
+  [API_EVENT_KINDS.project__legacy__import__piece__submitted__v1__alpha]:
+    JobStatus.running,
 };
