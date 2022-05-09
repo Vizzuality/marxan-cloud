@@ -5,15 +5,19 @@ import { useSelector } from 'react-redux';
 import cx from 'classnames';
 
 import { useProjectsUsers } from 'hooks/project-users';
-import { useProjects, useDeleteProject, useDuplicateProject } from 'hooks/projects';
+import {
+  useProjects, useDeleteProject, useDuplicateProject,
+} from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
 import Item from 'layout/projects/all/list/item';
+import DownloadModal from 'layout/projects/common/download-modal';
 import Wrapper from 'layout/wrapper';
 
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Loading from 'components/loading';
+import Modal from 'components/modal';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
@@ -26,50 +30,29 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const { data, isFetching, isFetched } = useProjects({ search });
   const { data: projectsUsersData } = useProjectsUsers(data.map((p) => p.id));
 
-  const [deleteProject, setDelete] = useState(null);
-  const deleteMutation = useDeleteProject({});
-
   const { addToast } = useToasts();
 
-  const onDelete = useCallback(() => {
-    deleteMutation.mutate({ id: deleteProject.id }, {
-      onSuccess: () => {
-        addToast(`success-project-delete-${deleteProject.id}`, (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">
-              {`Project "${deleteProject.name}" deleted`}
-            </p>
-          </>
-        ), {
-          level: 'success',
-        });
-        setDelete(null);
-      },
-      onError: () => {
-        addToast(`error-project-delete-${deleteProject.id}`, (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              {`Project "${deleteProject.name}" could not be deleted`}
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-        setDelete(null);
-      },
-    });
-  }, [deleteProject, deleteMutation, addToast]);
+  // DOWNLOAD
+  const [downloadProject, setDownloadProject] = useState(null);
 
+  // DUPLICATE
   const duplicateProjectMutation = useDuplicateProject({
     requestConfig: {
       method: 'POST',
     },
   });
 
-  const onDuplicate = useCallback((projectId, projectName) => {
-    duplicateProjectMutation.mutate({ id: projectId }, {
+  // DELETE
+  const [deleteProject, setDeleteProject] = useState(null);
+  const deleteMutation = useDeleteProject({});
+
+  const onDuplicate = useCallback((projectId, projectName, scenarios) => {
+    duplicateProjectMutation.mutate({
+      id: projectId,
+      data: {
+        scenarioIds: scenarios.map((s) => s.id),
+      },
+    }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
           <>
@@ -109,6 +92,37 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
     });
   }, [addToast, duplicateProjectMutation]);
 
+  const onDelete = useCallback(() => {
+    deleteMutation.mutate({ id: deleteProject.id }, {
+      onSuccess: () => {
+        addToast(`success-project-delete-${deleteProject.id}`, (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">
+              {`Project "${deleteProject.name}" deleted`}
+            </p>
+          </>
+        ), {
+          level: 'success',
+        });
+        setDeleteProject(null);
+      },
+      onError: () => {
+        addToast(`error-project-delete-${deleteProject.id}`, (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <p className="text-sm">
+              {`Project "${deleteProject.name}" could not be deleted`}
+            </p>
+          </>
+        ), {
+          level: 'error',
+        });
+        setDeleteProject(null);
+      },
+    });
+  }, [deleteProject, deleteMutation, addToast]);
+
   return (
     <Wrapper>
       <div className="relative pb-10">
@@ -143,10 +157,9 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                     key={`${d.id}`}
                     {...d}
                     userColors={projectsUsersData}
-                    onDelete={() => {
-                      setDelete(d);
-                    }}
-                    onDuplicate={() => onDuplicate(d.id, d.name)}
+                    onDownload={() => setDownloadProject(d)}
+                    onDuplicate={() => onDuplicate(d.id, d.name, d.scenarios)}
+                    onDelete={() => { setDeleteProject(d); }}
                   />
                 );
               })}
@@ -157,9 +170,20 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                 icon={DELETE_WARNING_SVG}
                 open={!!deleteProject}
                 onAccept={onDelete}
-                onRefuse={() => setDelete(null)}
-                onDismiss={() => setDelete(null)}
+                onRefuse={() => setDeleteProject(null)}
+                onDismiss={() => setDeleteProject(null)}
               />
+
+              <Modal
+                open={!!downloadProject}
+                size="narrow"
+                onDismiss={() => setDownloadProject(null)}
+              >
+                <DownloadModal
+                  pid={downloadProject?.id}
+                  name={downloadProject?.name}
+                />
+              </Modal>
 
             </div>
           </HelpBeacon>

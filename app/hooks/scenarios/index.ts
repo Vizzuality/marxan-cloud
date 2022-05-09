@@ -896,7 +896,9 @@ export function useScenarioCalibrationResults(scenarioId) {
       Authorization: `Bearer ${session.accessToken}`,
     },
     transformResponse: (data) => JSON.parse(data),
-  }));
+  }), {
+    retry: false,
+  });
 
   const { data } = query;
 

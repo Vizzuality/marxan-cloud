@@ -29,6 +29,13 @@ export interface DeleteProjectProps {
   id: string
 }
 
+export interface UseImportProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+export interface ImportProjectProps {
+  data: any,
+}
+
 // useUploadProjectPA
 export interface UseUploadProjectPAProps {
   requestConfig?: AxiosRequestConfig
@@ -54,6 +61,9 @@ export interface UseDuplicateProjectProps {
 
 export interface DuplicateProjectProps {
   id: string | string[];
+  data: {
+    scenarioIds: string[];
+  }
 }
 
 // usePublishProject
@@ -81,22 +91,22 @@ export interface UnPublishProjectProps {
   id: string | string[];
 }
 
-// UseSaveProjectDownloadProps,
-export interface UseSaveProjectDownloadProps {
+// UseExportProjectProps,
+export interface UseExportProjectProps {
   requestConfig?: AxiosRequestConfig;
 }
 
-export interface SaveProjectDownloadProps {
+export interface ExportProjectProps {
   id: string | string[];
   data: unknown;
 }
 
-// UseDownloadProjectProps,
-export interface UseDownloadProjectProps {
+// UseDownloadExportProps,
+export interface UseDownloadExportProps {
   requestConfig?: AxiosRequestConfig
 }
 
-export interface DownloadProjectProps {
-  id: string,
+export interface DownloadExportProps {
+  pid: string,
   exportId: string
 }

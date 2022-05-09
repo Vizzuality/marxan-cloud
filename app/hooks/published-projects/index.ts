@@ -1,16 +1,21 @@
 import { useMemo } from 'react';
 
 import {
-  useInfiniteQuery, useQuery,
+  useInfiniteQuery, useMutation, useQuery, useQueryClient,
 } from 'react-query';
 
 import flatten from 'lodash/flatten';
 
+import { useSession } from 'next-auth/client';
+
 import { PublishedItemProps } from 'layout/community/published-projects/list/table/item/component';
 
+import PROJECTS from 'services/projects';
 import PUBLISHED_PROJECTS from 'services/published-projects';
 
 import {
+  DuplicatePublishedProjectProps,
+  UseDuplicatePublishedProjectProps,
   UsePublishedProjectsProps,
 } from './types';
 
@@ -43,7 +48,6 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
   const query = useInfiniteQuery(['published-projects', JSON.stringify(options)], fetchPublishedProjects, {
     retry: false,
     keepPreviousData: true,
-    refetchInterval: 5000,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
       const { page, totalPages } = meta;
@@ -62,7 +66,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
 
       return pageData.map((d): PublishedItemProps => {
         const {
-          id, name, description, location, creators, resources, company, pngData,
+          id, name, description, location, creators, resources, company, pngData, exportId,
         } = d;
 
         return {
@@ -74,6 +78,7 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
           resources,
           company,
           pngData,
+          exportId,
         };
       });
     })) : [];
@@ -89,9 +94,6 @@ export function usePublishedProject(id) {
   const query = useQuery(['published-projects', id], async () => PUBLISHED_PROJECTS.request({
     method: 'GET',
     url: `/${id}`,
-    params: {
-      include: 'scenarios,users',
-    },
   }).then((response) => {
     return response.data;
   }), {
@@ -101,15 +103,42 @@ export function usePublishedProject(id) {
   const { data } = query;
 
   return useMemo(() => {
-    const contributors = [
-      { id: 1, name: '', bgImage: '' },
-      { id: 2, name: '', bgImage: '' },
-    ];
-    const parsedData = { ...data?.data, contributors } || {};
-
     return {
       ...query,
-      data: parsedData,
+      data: data?.data,
     };
   }, [query, data?.data]);
+}
+
+export function useDuplicatePublishedProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseDuplicatePublishedProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const duplicateProject = ({ exportId }: DuplicatePublishedProjectProps) => {
+    return PROJECTS.request({
+      // Pending endpoint
+      url: `/published-projects/${exportId}/clone`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(duplicateProject, {
+    onSuccess: (data: any, variables, context) => {
+      const { id } = data;
+      queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['projects', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }

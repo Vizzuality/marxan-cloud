@@ -9,7 +9,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
 import {
-  useProyectPlanningAreaLayer,
+  useProjectPlanningAreaLayer,
   useLegend,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
@@ -52,7 +52,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
 
-  const PlanningAreaLayer = useProyectPlanningAreaLayer({
+  const PlanningAreaLayer = useProjectPlanningAreaLayer({
     active: true,
     pId: `${pid}`,
   });

@@ -4,21 +4,16 @@ import isEmpty from 'lodash/isEmpty';
 
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { usePlausible } from 'next-plausible';
 import type { Project } from 'types/project-model';
 import { ROLES } from 'utils/constants-roles';
 
-import { useMe } from 'hooks/me';
 import { useOwnsProject, useProjectRole } from 'hooks/permissions';
 import { useProjectUsers } from 'hooks/project-users';
-
-import ComingSoon from 'layout/help/coming-soon';
 
 import Avatar from 'components/avatar';
 import Button from 'components/button';
 import Icon from 'components/icon';
 
-// import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 import ARROW_RIGHT_2_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
 export interface ItemProps extends Project {
@@ -30,6 +25,7 @@ export interface ItemProps extends Project {
   userColors?: Record<string, string>;
   isPublic: boolean;
   underModeration: boolean;
+  scenarios: Record<string, any>;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDownload: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onDuplicate: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -53,8 +49,6 @@ export const Item: React.FC<ItemProps> = ({
   onDelete,
 }: ItemProps) => {
   const [animate, setAnimate] = useState('leave');
-  const plausible = usePlausible();
-  const { user } = useMe();
 
   const { data: projectRole } = useProjectRole(id);
 
@@ -81,15 +75,7 @@ export const Item: React.FC<ItemProps> = ({
   const handleDownload = useCallback((e) => {
     e.stopPropagation();
     onDownload(e);
-    plausible('Download project', {
-      props: {
-        userId: `${user.id}`,
-        userEmail: `${user.email}`,
-        projectId: `${id}`,
-        projectName: `${name}`,
-      },
-    });
-  }, [onDownload, plausible, id, name, user]);
+  }, [onDownload]);
 
   const handleDuplicate = useCallback((e) => {
     e.stopPropagation();
@@ -277,27 +263,23 @@ export const Item: React.FC<ItemProps> = ({
         <footer className="mt-7">
           <div className="flex">
 
-            <ComingSoon>
-              <Button
-                className=""
-                theme="secondary"
-                size="xs"
-                onClick={handleDownload}
-              >
-                Download
-              </Button>
-            </ComingSoon>
+            <Button
+              className=""
+              theme="secondary"
+              size="xs"
+              onClick={handleDownload}
+            >
+              Download
+            </Button>
 
-            <ComingSoon>
-              <Button
-                className="ml-3"
-                theme="secondary"
-                size="xs"
-                onClick={handleDuplicate}
-              >
-                Duplicate
-              </Button>
-            </ComingSoon>
+            <Button
+              className="ml-3"
+              theme="secondary"
+              size="xs"
+              onClick={handleDuplicate}
+            >
+              Duplicate
+            </Button>
 
             <Button
               className="ml-3"

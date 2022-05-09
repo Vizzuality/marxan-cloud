@@ -20,7 +20,7 @@ import {
   useLegend,
   usePUCompareLayer,
   usePUGridLayer,
-  useProyectPlanningAreaLayer,
+  useProjectPlanningAreaLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -92,7 +92,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
   }, [sid1, rawScenariosData, rawScenariosIsFetched]);
 
-  const PlanningAreaLayer = useProyectPlanningAreaLayer({
+  const PlanningAreaLayer = useProjectPlanningAreaLayer({
     active: rawScenariosIsFetched && rawScenariosData && !rawScenariosData.length,
     pId: `${pid}`,
   });

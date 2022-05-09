@@ -33,12 +33,14 @@ import {
   UploadProjectPAGridProps,
   UsePublishProjectProps,
   PublishProjectProps,
-  UseSaveProjectDownloadProps,
-  SaveProjectDownloadProps,
-  UseDownloadProjectProps,
-  DownloadProjectProps,
+  UseDownloadExportProps,
+  DownloadExportProps,
   UseUnPublishProjectProps,
   UnPublishProjectProps,
+  UseExportProjectProps,
+  ExportProjectProps,
+  ImportProjectProps,
+  UseImportProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -132,6 +134,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
           lastUpdateDistance: lastUpdateDistance(),
           contributors: [],
           isPublic,
+          scenarios,
           underModeration: publicMetadata?.underModeration,
           onClick: () => {
             push(`/projects/${id}`);
@@ -251,6 +254,37 @@ export function useDeleteProject({
   });
 }
 
+export function useImportProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseImportProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const uploadProject = ({ data }: ImportProjectProps) => {
+    return UPLOADS.request({
+      url: '/projects/import',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadProject, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
 export function useUploadProjectPA({
   requestConfig = {
     method: 'POST',
@@ -317,10 +351,10 @@ export function useDuplicateProject({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const duplicateProject = ({ id }: DuplicateProjectProps) => {
+  const duplicateProject = ({ id, data }: DuplicateProjectProps) => {
     return PROJECTS.request({
-      // Pending endpoint
-      url: `/${id}`,
+      url: `/${id}/clone`,
+      data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -416,36 +450,33 @@ export function useUnPublishProject({
   DOWNLOAD PROJECT
 ****************************************
 */
-
-export function useSaveProjectDownload({
-  requestConfig = {
-    method: 'POST',
-  },
-}: UseSaveProjectDownloadProps) {
+export function useExports(pid) {
   const [session] = useSession();
 
-  const projectDownload = ({ id, data }: SaveProjectDownloadProps) => {
-    return PROJECTS.request({
-      url: `${id}/export`,
-      data,
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(projectDownload, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+  const query = useQuery(['projects-exports', pid], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/${pid}/latest-exports`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
     },
-    onError: (error, variables, context) => {
-      console.info('Error', error, variables, context);
-    },
+    transformResponse: (data) => JSON.parse(data),
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!pid,
   });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.exports || [],
+    };
+  }, [query, data]);
 }
 
-export function useExportId(id) {
+export function useExport(id) {
   const [session] = useSession();
 
   const query = useQuery(['projects-export-id', id], async () => PROJECTS.request({
@@ -471,16 +502,47 @@ export function useExportId(id) {
   }, [query, data?.id]);
 }
 
-export function useDownloadProject({
+export function useExportProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseExportProjectProps) {
+  const queryClient = useQueryClient();
+  const [session] = useSession();
+
+  const projectDownload = ({ id, data }: ExportProjectProps) => {
+    return PROJECTS.request({
+      url: `${id}/export`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(projectDownload, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+      const { id } = variables;
+      queryClient.invalidateQueries(['projects-export', id]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadExport({
   requestConfig = {
     method: 'GET',
   },
-}: UseDownloadProjectProps) {
+}: UseDownloadExportProps) {
   const [session] = useSession();
 
-  const downloadProject = ({ id, exportId }: DownloadProjectProps) => {
+  const downloadProject = ({ pid, exportId }: DownloadExportProps) => {
     return PROJECTS.request({
-      url: `/${id}/export/${exportId}`,
+      url: `/${pid}/export/${exportId}`,
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
@@ -493,12 +555,12 @@ export function useDownloadProject({
   return useMutation(downloadProject, {
     onSuccess: (data: any, variables, context) => {
       const { data: blob } = data;
-      const { id } = variables;
+      const { pid } = variables;
 
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `project-${id}.zip`);
+      link.setAttribute('download', `project-${pid}.zip`);
       document.body.appendChild(link);
       link.click();
       link.remove();

@@ -2,6 +2,8 @@ import React, {
   useCallback,
 } from 'react';
 
+import { useQueryClient } from 'react-query';
+
 import { useRouter } from 'next/router';
 
 import { useSaveProject } from 'hooks/projects';
@@ -11,13 +13,15 @@ export const useProjectActionsDone = () => {
   const { query } = useRouter();
   const { pid } = query;
 
+  const queryClient = useQueryClient();
+
+  const { addToast } = useToasts();
+
   const projectMutation = useSaveProject({
     requestConfig: {
       method: 'PATCH',
     },
   });
-
-  const { addToast } = useToasts();
 
   const onDone = useCallback((JOB_REF) => {
     projectMutation.mutate({
@@ -43,7 +47,7 @@ export const useProjectActionsDone = () => {
     });
   }, [pid, projectMutation, addToast]);
 
-  const onDownloadProject = useCallback((JOB_REF) => {
+  const onCloneDone = useCallback((JOB_REF) => {
     projectMutation.mutate({
       id: `${pid}`,
       data: {
@@ -54,9 +58,11 @@ export const useProjectActionsDone = () => {
     }, {
       onSuccess: () => {
         JOB_REF.current = null;
+        queryClient.invalidateQueries('projects');
+        queryClient.invalidateQueries(['scenarios', pid]);
       },
       onError: () => {
-        addToast('onDownloadProject', (
+        addToast('onDone', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -65,11 +71,12 @@ export const useProjectActionsDone = () => {
         });
       },
     });
-  }, [pid, projectMutation, addToast]);
+  }, [pid, projectMutation, addToast, queryClient]);
 
   return {
     default: onDone,
     planningUnits: onDone,
-    export: onDownloadProject,
+    export: onDone,
+    clone: onCloneDone,
   };
 };
