@@ -82,6 +82,9 @@ export enum API_EVENT_KINDS {
   scenario__clone__submitted__v1__alpha = 'scenario.clone.submitted/v1/alpha',
   scenario__clone__finished__v1__alpha = 'scenario.clone.finished/v1/alpha',
   scenario__clone__failed__v1__alpha = 'scenario.clone.failed/v1/alpha',
+  project__legacy__import__submitted__v1__alpha = 'project.legacy.import.submitted/v1/alpha',
+  project__legacy__import__finished__v1__alpha = 'project.legacy.import.finished/v1/alpha',
+  project__legacy__import__failed__v1__alpha = 'project.legacy.import.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<
