@@ -38,7 +38,7 @@ export const getFixtures = async () => {
 
   await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
-  const blmRange = [0, 100];
+  const blmRange = [0.01, 100];
 
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),
@@ -116,8 +116,6 @@ export const getFixtures = async () => {
         expect(result.id).toBeDefined();
         expect(result.scenarioId).toBe(scenarioId);
         expect(result.cost).toBeGreaterThanOrEqual(0);
-        expect(result.blmValue).toBeGreaterThanOrEqual(blmRange[0]);
-        expect(result.blmValue).toBeLessThanOrEqual(blmRange[1]);
         expect(result.boundaryLength).toBeGreaterThanOrEqual(0);
       });
     },

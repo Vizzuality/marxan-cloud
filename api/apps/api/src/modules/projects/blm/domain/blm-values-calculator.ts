@@ -4,16 +4,35 @@ export class BlmValuesCalculator {
     private range: [number, number] = [0.001, 100],
   ) {}
 
+  private roundTo(number: number, amountOfDecimalDigits: number): number {
+    if (number <= 0 || !Number.isInteger(amountOfDecimalDigits))
+      throw new Error(
+        `Invalid amount of decimal digits: ${amountOfDecimalDigits}`,
+      );
+
+    const factor = Math.pow(10, amountOfDecimalDigits);
+
+    return Math.round(number * factor) / factor;
+  }
+
   private execute() {
     const [min, max] = this.range;
-    const initialArray = Array(this.cardinality - 1)
+    const initialArray = Array(this.cardinality)
       .fill(0)
-      .map((_, i) => i + 1);
+      .map((_, i) => i);
 
-    const formulaResults = initialArray.map(
-      (i) => min + ((max - min) / (this.cardinality - 1)) * i,
-    );
-    return [min, ...formulaResults];
+    const minExp = Math.log10(min);
+    const maxExp = Math.log10(max);
+    const plusVal = (maxExp - minExp) / (this.cardinality - 1);
+
+    const decimalDigits = Math.abs(Math.floor(minExp));
+
+    const formulaResults = initialArray.map((i) => {
+      const exponent = minExp + i * plusVal;
+
+      return this.roundTo(Math.pow(10, exponent), decimalDigits);
+    });
+    return formulaResults;
   }
 
   with(range: [number, number]) {
