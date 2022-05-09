@@ -54,7 +54,7 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
         }
 
         volume {
-          name = "shared-spatial-data-storage"
+          name = "shared-temp-data-storage"
           persistent_volume_claim {
             claim_name = var.temp_data_pvc_name
           }
@@ -69,7 +69,7 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
 
           volume_mount {
             mount_path  = "/tmp/storage"
-            name        = "shared-spatial-data-storage"
+            name        = "shared-temp-data-storage"
           }
 
           env {
