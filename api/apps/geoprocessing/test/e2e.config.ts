@@ -4,6 +4,8 @@ import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 
 interface OptionsWithCountryCode {
   countryCode: string;
+  adminAreaLevel1Id?: string;
+  adminAreaLevel2Id?: string;
 }
 
 export const E2E_CONFIG: {
@@ -25,8 +27,10 @@ export const E2E_CONFIG: {
       valid: {
         customArea: (options: OptionsWithCountryCode): PlanningUnitsJob => ({
           countryId: options.countryCode,
-          adminAreaLevel1Id: faker.random.alphaNumeric(7),
-          adminAreaLevel2Id: faker.random.alphaNumeric(12),
+          adminAreaLevel1Id:
+            options.adminAreaLevel1Id ?? faker.random.alphaNumeric(7),
+          adminAreaLevel2Id:
+            options.adminAreaLevel2Id ?? faker.random.alphaNumeric(12),
           planningUnitGridShape: PlanningUnitGridShape.Hexagon,
           planningUnitAreakm2: 100,
           projectId: 'a9d965a2-35ce-44b2-8112-50bcdfe98447',

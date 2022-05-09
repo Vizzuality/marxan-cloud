@@ -18,7 +18,10 @@ type CustomPlanningAreaJob = Required<
   >
 > & { planningUnitGridShape: RegularPlanningUnitGridShape };
 
-type RegularPlanningAreaJob = Omit<PlanningUnitsJob, 'planningAreaId'> & {
+export type RegularPlanningAreaJob = Omit<
+  PlanningUnitsJob,
+  'planningAreaId'
+> & {
   planningUnitGridShape: RegularPlanningUnitGridShape;
 };
 
