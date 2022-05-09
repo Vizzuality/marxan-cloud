@@ -1,22 +1,21 @@
-import { Injectable, Logger, Inject } from '@nestjs/common';
-import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { IsOptional, IsString, IsArray, IsNumber } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { BBox } from 'geojson';
-import { Transform } from 'class-transformer';
-
 import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { TileRequest } from '@marxan/tiles';
-
-enum RegularPlanningUnitGridShape {
-  hexagon = PlanningUnitGridShape.Hexagon,
-  square = PlanningUnitGridShape.Square,
-}
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsArray, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { BBox } from 'geojson';
+import {
+  calculateGridSize,
+  gridShapeFnMapping,
+  RegularPlanningUnitGridShape,
+} from './planning-units.job';
 
 export class tileSpecification extends TileRequest {
   @ApiProperty()
-  @IsString()
+  @IsIn([PlanningUnitGridShape.Hexagon, PlanningUnitGridShape.Square])
   planningUnitGridShape!: RegularPlanningUnitGridShape;
 
   @ApiProperty()
@@ -100,8 +99,10 @@ export class PlanningUnitsService {
     planningUnitAreakm2: number,
     filters?: PlanningUnitsFilters,
   ): string {
-    const gridShape = this.regularFunctionGridSelector(planningUnitGridShape);
-    const gridSize = this.calculateGridSize(planningUnitAreakm2);
+    const gridShapeFn = gridShapeFnMapping[planningUnitGridShape];
+    const gridSize = calculateGridSize[planningUnitGridShape](
+      planningUnitAreakm2,
+    );
     // 156412 references to m per pixel at z level 0 at the equator in EPSG:3857
     const ratioPixelExtent = gridSize / (156412 / 2 ** z);
     /**
@@ -112,9 +113,9 @@ export class PlanningUnitsService {
      */
     const query =
       ratioPixelExtent < 8 && !filters?.bbox
-        ? `( SELECT row_number() over() as id, st_centroid((${gridShape}(${gridSize}, \
+        ? `( SELECT row_number() over() as id, st_centroid((${gridShapeFn}(${gridSize}, \
         ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom ) as the_geom )`
-        : `( SELECT row_number() over() as id, (${gridShape}(${gridSize}, \
+        : `( SELECT row_number() over() as id, (${gridShapeFn}(${gridSize}, \
                     ST_Transform(ST_TileEnvelope(${z}, ${x}, ${y}), 3857))).geom as the_geom)`;
 
     return query;
@@ -131,30 +132,5 @@ export class PlanningUnitsService {
       )}, 4326), 3857) ,the_geom)`;
     }
     return whereQuery;
-  }
-
-  /**
-   * @param planningUnitGridShape the grid shape that would be use for generating the grid. This grid shape
-   * can be square or hexagon. If any grid shape is provided, square would be the default.
-   */
-  private regularFunctionGridSelector(
-    planningUnitGridShape: RegularPlanningUnitGridShape,
-  ): string {
-    const functionEquivalence: {
-      [key in keyof typeof RegularPlanningUnitGridShape]: string;
-    } = {
-      hexagon: 'ST_HexagonGrid',
-      square: 'ST_SquareGrid',
-    };
-
-    return functionEquivalence[planningUnitGridShape];
-  }
-  /**
-   *
-   * @param planningUnitAreakm2
-   * @returns grid h size in m
-   */
-  private calculateGridSize(planningUnitAreakm2: number): number {
-    return Math.sqrt(planningUnitAreakm2) * 1000;
   }
 }
