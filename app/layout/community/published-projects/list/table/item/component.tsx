@@ -22,6 +22,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
   company,
   pngData,
   location,
+  exportId,
 }: PublishedItemProps) => {
   return (
     <tr key={id} className="border-b border-white border-opacity-20 last:border-transparent">
@@ -57,7 +58,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       <td className="">
         <div className="flex flex-row justify-between">
           <DuplicateButton
-            exportId={undefined}
+            exportId={exportId}
             name={name}
           />
         </div>
