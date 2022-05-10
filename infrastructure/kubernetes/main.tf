@@ -41,6 +41,8 @@ locals {
   k8s_cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
   temp_data_storage_class    = "azurefile-csi-temp-data"
   temp_data_pvc_name         = "shared-temp-data-storage"
+  cloning_storage_class      = "azurefile-csi-cloning-data"
+  cloning_pvc_name           = "shared-cloning-storage"
 }
 
 module "k8s_namespaces" {
@@ -68,6 +70,7 @@ module "k8s_storage" {
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   temp_data_storage_class    = local.temp_data_storage_class
+  cloning_storage_class      = local.cloning_storage_class
 }
 
 ####
@@ -109,7 +112,7 @@ module "k8s_geoprocessing_database_production" {
   container_registry_name    = var.container_registry_name
 }
 
-module "temp_storage_pvc_production" {
+module "storage_pvc_production" {
   source                     = "./modules/volumes"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -119,6 +122,9 @@ module "temp_storage_pvc_production" {
   temp_data_storage_class    = local.temp_data_storage_class
   temp_data_pvc_name         = local.temp_data_pvc_name
   temp_data_storage_size     = var.temp_data_storage_size
+  cloning_storage_class      = local.cloning_storage_class
+  cloning_pvc_name           = local.cloning_pvc_name
+  cloning_storage_size       = var.cloning_storage_size
 }
 
 module "api_production" {
@@ -135,6 +141,7 @@ module "api_production" {
   http_logging_morgan_format = ""
   api_postgres_logging       = "error"
   temp_data_pvc_name         = local.temp_data_pvc_name
+  cloning_pvc_name           = local.cloning_pvc_name
 }
 
 module "geoprocessing_production" {
@@ -148,6 +155,7 @@ module "geoprocessing_production" {
   deployment_name            = "geoprocessing"
   geo_postgres_logging       = "error"
   temp_data_pvc_name         = local.temp_data_pvc_name
+  cloning_pvc_name           = local.cloning_pvc_name
 }
 
 module "client_production" {
@@ -244,7 +252,7 @@ module "k8s_geoprocessing_database_staging" {
   container_registry_name    = var.container_registry_name
 }
 
-module "temp_storage_pvc_staging" {
+module "storage_pvc_staging" {
   source                     = "./modules/volumes"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -254,6 +262,9 @@ module "temp_storage_pvc_staging" {
   temp_data_storage_class    = local.temp_data_storage_class
   temp_data_pvc_name         = local.temp_data_pvc_name
   temp_data_storage_size     = var.temp_data_storage_size
+  cloning_storage_class      = local.cloning_storage_class
+  cloning_pvc_name           = local.cloning_pvc_name
+  cloning_storage_size       = var.cloning_storage_size
 }
 
 module "api_staging" {
@@ -270,6 +281,7 @@ module "api_staging" {
   http_logging_morgan_format = "short"
   api_postgres_logging       = "query"
   temp_data_pvc_name         = local.temp_data_pvc_name
+  cloning_pvc_name           = local.cloning_pvc_name
 }
 
 module "geoprocessing_staging" {
@@ -284,6 +296,7 @@ module "geoprocessing_staging" {
   cleanup_temporary_folders  = "false"
   geo_postgres_logging       = "query"
   temp_data_pvc_name         = local.temp_data_pvc_name
+  cloning_pvc_name           = local.cloning_pvc_name
 }
 
 module "client_staging" {

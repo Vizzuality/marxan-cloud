@@ -60,6 +60,13 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
         }
 
+        volume {
+          name = "shared-cloning-storage"
+          persistent_volume_claim {
+            claim_name = var.cloning_pvc_name
+          }
+        }
+
         container {
           image             = var.image
           image_pull_policy = "Always"
@@ -70,6 +77,11 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           volume_mount {
             mount_path  = "/tmp/storage"
             name        = "shared-temp-data-storage"
+          }
+
+          volume_mount {
+            mount_path  = "/opt/marxan-project-cloning"
+            name        = "shared-cloning-storage"
           }
 
           env {
