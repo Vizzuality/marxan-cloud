@@ -16,25 +16,22 @@
 
 ## Choices when uploading a legacy project
 
-1. Are you creating a new project or uploading a legacy project?
-2. If the answer is “uploading legacy project” then the user is given the option
-    to upload five different kinds of data (each should have info buttons). The
-    first (planning unit shapefile) will be always needed; all the other kinds
-    of data are optional *but* users must provide *at least* one of them (see
-    following section for details on what will be available after importing a
-    legacy project based on which data has been uploaded).
+1. If users wish to upload a legacy project (rather than an exported MarxanCloud
+   archive), they are given the option to upload five different kinds of data
+   (each should have info buttons).
 
-   a. Upload your planning unit shapefile (this *must* be provided)
+   a. Upload a planning unit shapefile (this *must* be provided)
 
-   b. Upload your input database (optional)
+   b. Upload all the required input files (required)
 
-   c. Upload your output databases (optional)
+   c. Upload output data files produced by running Marxan outside of the
+      platform (optional)
 
-   d. Upload your feature data (optional)
+   d. Upload feature data as shapefiles (optional)
 
-   e. Upload cost surface data (optional)
+   e. Upload cost surface data as shapefile (optional)
 
-3. If users choose to upload output data, they should also be given the option
+2. If users choose to upload output data, they should also be given the option
    to _lock_ these results calculated outside of the Marxan MaPP platform:
    re-running Marxan on such imported scenarios should be disallowed.
 
