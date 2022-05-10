@@ -40,6 +40,7 @@ import { ExportComponentEntity } from '../clone/export/adapters/entities/export-
 import { ExportComponentLocationEntity } from '../clone/export/adapters/entities/export-component-locations.api.entity';
 import { ExportRepository } from '../clone/export/application/export-repository.port';
 import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export.repository';
+import { LegacyProjectImportModule } from '../legacy-project-import/legacy-project-import.module';
 
 @Module({
   imports: [
@@ -70,6 +71,7 @@ import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export
     PlanningUnitGridModule,
     ProjectBlmModule,
     CloneModule,
+    LegacyProjectImportModule,
     AccessControlModule,
     BlockGuardModule,
     ProjectCheckerModule,

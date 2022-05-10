@@ -237,6 +237,8 @@
       "@marxan/cloning-files-repository": "<rootDir>/libs/cloning-files-repository/src",
       "@marxan/cloning/(.*)": "<rootDir>/libs/cloning/src/$1",
       "@marxan/cloning": "<rootDir>/libs/cloning/src",
+      "@marxan/legacy-project-import/(.*)": "<rootDir>/libs/legacy-project-import/src/$1",
+      "@marxan/legacy-project-import": "<rootDir>/libs/legacy-project-import/src",
       "@marxan/code-guide/(.*)": "<rootDir>/libs/code-guide/src/$1",
       "@marxan/code-guide": "<rootDir>/libs/code-guide/src",
       "@marxan/webshot/(.*)": "<rootDir>/libs/webshot/src/$1",
