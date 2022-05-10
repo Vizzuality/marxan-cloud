@@ -9,7 +9,10 @@ import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import {
+  OutputScenariosPuDataGeoEntity,
+  ScenariosOutputResultsApiEntity,
+} from '@marxan/marxan-output';
 import {
   LockStatus,
   ScenariosPuPaDataGeo,
@@ -17,10 +20,14 @@ import {
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
+import {
+  getEntityManagerToken,
+  getRepositoryToken,
+  TypeOrmModule,
+} from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
@@ -60,7 +67,8 @@ describe(ScenarioRunResultsPieceExporter, () => {
     const input = fixtures.GivenAScenarioRunResultsExportJob();
     await fixtures.GivenScenarioExist();
     await fixtures.GivenScenarioPlanningUnits();
-    await fixtures.GivenScenarioRunResulst();
+    await fixtures.GivenScenarioRunResults();
+    await fixtures.GivenOutputScenarioSummaries();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenAScenarioRunResultsFileIsSaved();
@@ -75,6 +83,10 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
+      TypeOrmModule.forFeature(
+        [ScenariosOutputResultsApiEntity],
+        geoprocessingConnections.apiDB.name,
+      ),
       TypeOrmModule.forRoot({
         ...geoprocessingConnections.default,
         keepConnectionAlive: true,
@@ -101,6 +113,16 @@ const getFixtures = async () => {
   const organizationId = v4();
   let scenarioPus: ScenariosPuPaDataGeo[];
   const sut = sandbox.get(ScenarioRunResultsPieceExporter);
+
+  const outputSummariesRepo = sandbox.get<
+    Repository<ScenariosOutputResultsApiEntity>
+  >(
+    getRepositoryToken(
+      ScenariosOutputResultsApiEntity,
+      geoprocessingConnections.apiDB.name,
+    ),
+  );
+
   const apiEntityManager: EntityManager = sandbox.get(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
@@ -110,6 +132,7 @@ const getFixtures = async () => {
   const fileRepository = sandbox.get(CloningFilesRepository);
 
   const imageBuffer = Buffer.from('foo bar');
+  const amountOfRuns = 10;
 
   return {
     cleanUp: async () => {
@@ -147,6 +170,27 @@ const getFixtures = async () => {
         organizationId,
       );
     },
+    GivenOutputScenarioSummaries: () => {
+      return outputSummariesRepo.save(
+        Array(amountOfRuns)
+          .fill(0)
+          .map((_, index) => ({
+            scenarioId,
+            runId: index,
+            scoreValue: index,
+            costValue: index,
+            planningUnits: index,
+            connectivity: index,
+            connectivityTotal: index,
+            mpm: index,
+            penaltyValue: index,
+            shortfall: index,
+            missingValues: index,
+            best: index === 0,
+            distinctFive: index < 5,
+          })),
+      );
+    },
     GivenScenarioPlanningUnits: async () => {
       scenarioPus = await GivenScenarioPuData(
         geoEntityManager,
@@ -162,7 +206,7 @@ const getFixtures = async () => {
         },
       );
     },
-    GivenScenarioRunResulst: async () => {
+    GivenScenarioRunResults: async () => {
       await GivenScenarioBlmResults(geoEntityManager, scenarioId, imageBuffer);
       return GivenScenarioOutputPuData(geoEntityManager, scenarioPus);
     },
@@ -176,7 +220,11 @@ const getFixtures = async () => {
           if (isLeft(file)) throw new Error();
           const savedStrem = file.right;
           const content = await readSavedFile(savedStrem);
-          expect(content).toEqual({ blmResults: [], marxanRunResults: [] });
+          expect(content).toEqual({
+            blmResults: [],
+            marxanRunResults: [],
+            outputSummaries: [],
+          });
         },
         ThenAScenarioRunResultsFileIsSaved: async () => {
           const result = await sut.run(input);
@@ -201,6 +249,8 @@ const getFixtures = async () => {
           expect(
             content.marxanRunResults.sort((a, b) => a.puid - a.puid),
           ).toEqual(expectedMarxanResults);
+
+          expect(content.outputSummaries).toHaveLength(amountOfRuns);
         },
       };
     },

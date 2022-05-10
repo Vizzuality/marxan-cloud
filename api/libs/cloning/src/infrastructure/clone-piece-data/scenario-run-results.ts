@@ -12,7 +12,24 @@ export type MarxanRunResultsContent = {
   puid: number;
 };
 
+export type OutputScenarioSummary = {
+  runId?: number;
+  scoreValue?: number;
+  costValue?: number;
+  planningUnits?: number;
+  connectivity?: number;
+  connectivityTotal?: number;
+  mpm?: number;
+  penaltyValue?: number;
+  shortfall?: number;
+  missingValues?: number;
+  metadata?: Record<string, unknown>;
+  best?: boolean;
+  distinctFive?: boolean;
+};
+
 export type ScenarioRunResultsContent = {
   blmResults: BlmResultsContent[];
   marxanRunResults: MarxanRunResultsContent[];
+  outputSummaries: OutputScenarioSummary[];
 };
