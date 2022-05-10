@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { COLORS } from 'hooks/map/constants';
+
 import Icon from 'components/icon';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
@@ -35,7 +37,7 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
         <div className="flex items-center space-x-4">
           {runId && (
             <div className="flex items-center space-x-2">
-              <div className="relative w-3.5 h-4 bg-blue-700" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }} />
+              <div className="relative w-3.5 h-4" style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)', backgroundColor: COLORS.primary }} />
               <p className="pl-1 mr-4 text-sm text-white font-heading">
                 {`Run ${runId}`}
               </p>
