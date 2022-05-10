@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
@@ -20,6 +20,7 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import Loading from 'components/loading';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -30,6 +31,7 @@ export interface ScenariosBLMCalibrationProps {
 export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = ({
   onChangeSection,
 }: ScenariosBLMCalibrationProps) => {
+  const [loading, setLoading] = useState(false);
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -43,6 +45,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const maxBlmValue = 10000000;
 
   const onSaveBlmRange = useCallback((values) => {
+    setLoading(true);
     const { blmCalibrationFrom, blmCalibrationTo } = values;
     const range = [blmCalibrationFrom, blmCalibrationTo];
 
@@ -51,6 +54,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
       data: { range },
     }, {
       onSuccess: () => {
+        setLoading(false);
         addToast('success-calibration-range', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -62,6 +66,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         console.info('Calibration range sent succesfully');
       },
       onError: () => {
+        setLoading(false);
         addToast('error-calibration-range', (
           <>
             <h2 className="font-medium">Error!</h2>
@@ -122,11 +127,17 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
             >
               {({ handleSubmit }) => (
                 <form
-                  className="flex flex-col w-full mt-5 text-gray-500"
+                  className="relative flex flex-col w-full mt-5 text-gray-500"
                   autoComplete="off"
                   noValidate
                   onSubmit={handleSubmit}
                 >
+                  <Loading
+                    visible={loading}
+                    className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+                    iconClassName="w-10 h-10 text-primary-500"
+                  />
+
                   <div className="flex justify-between space-x-6">
                     <div className="flex items-center">
                       <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
