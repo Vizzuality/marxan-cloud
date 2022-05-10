@@ -172,46 +172,49 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             </InfoButton>
           </div>
 
-          <div className="flex items-center justify-between space-x-8">
-            <div className="flex items-center">
-              <Checkbox
-                theme="light"
-                id="checkbox-5-dif-solutions"
-                className="block w-4 h-4 text-green-300 form-checkbox-dark"
-                onChange={(event) => setMostDifSolutions(event.target.checked)}
-              />
-              <Label className="mx-2 text-sm text-gray-700">
-                View 5 most different solutions
-              </Label>
+          {!noSolutionResults && (
+            <div className="flex items-center justify-between space-x-8">
+              <div className="flex items-center">
+                <Checkbox
+                  theme="light"
+                  id="checkbox-5-dif-solutions"
+                  className="block w-4 h-4 text-green-300 form-checkbox-dark"
+                  onChange={(event) => setMostDifSolutions(event.target.checked)}
+                />
+                <Label className="mx-2 text-sm text-gray-700">
+                  View 5 most different solutions
+                </Label>
 
-              <InfoButton theme="secondary">
-                <div>
-                  <h4 className="font-heading text-lg mb-2.5">Five different solutions</h4>
-                  <div className="space-y-2">
-                    <p className="mb-6">
-                      One of Marxan’s advantages is that it creates a range of good solutions
-                      that can be presented to decision-makers. With this feature you can
-                      automatically call the 5 most different solutions that meet your
-                      objectives. These are identified through a 5 group cluster analysis
-                      and the solution with the lowest score is used as the representative
-                      solution of the group.
-                    </p>
-                    <img src={FIVE_DIFF_SOLUTIONS_IMG} alt="Five different solutions" />
+                <InfoButton theme="secondary">
+                  <div>
+                    <h4 className="font-heading text-lg mb-2.5">Five different solutions</h4>
+                    <div className="space-y-2">
+                      <p className="mb-6">
+                        One of Marxan’s advantages is that it creates a range of good solutions
+                        that can be presented to decision-makers. With this feature you can
+                        automatically call the 5 most different solutions that meet your
+                        objectives. These are identified through a 5 group cluster analysis
+                        and the solution with the lowest score is used as the representative
+                        solution of the group.
+                      </p>
+                      <img src={FIVE_DIFF_SOLUTIONS_IMG} alt="Five different solutions" />
+                    </div>
                   </div>
-                </div>
-              </InfoButton>
-            </div>
+                </InfoButton>
+              </div>
 
-            <Button
-              theme="secondary"
-              size="base"
-              className="flex items-center justify-between pl-4 pr-4"
-              onClick={onDownload}
-            >
-              Download solutions
-              <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
-            </Button>
-          </div>
+              <Button
+                theme="secondary"
+                size="base"
+                className="flex items-center justify-between pl-4 pr-4"
+                onClick={onDownload}
+                disabled={noSolutionResults}
+              >
+                Download solutions
+                <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
+              </Button>
+            </div>
+          )}
         </div>
         <div className="relative">
           {solutionsAreLoading && (
@@ -231,7 +234,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
             </div>
           )}
 
-          {allSolutionsFetched && (
+          {allSolutionsFetched && !noSolutionResults && (
             <SolutionsTable
               bestSolutionId={bestSolutionData?.id}
               body={mostDifSolutions ? mostDifSolutionsData : solutionsData}
@@ -245,23 +248,25 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-center w-full pt-8">
-        <Button
-          theme="secondary"
-          size="lg"
-          onClick={() => onCancel()}
-        >
-          Cancel
-        </Button>
-        <Button
-          theme="primary"
-          size="lg"
-          onClick={() => onSave()}
-          className="ml-4"
-        >
-          Save
-        </Button>
-      </div>
+      {!noSolutionResults && (
+        <div className="flex items-center justify-center w-full pt-8">
+          <Button
+            theme="secondary"
+            size="lg"
+            onClick={() => onCancel()}
+          >
+            Cancel
+          </Button>
+          <Button
+            theme="primary"
+            size="lg"
+            onClick={() => onSave()}
+            className="ml-4"
+          >
+            Save
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

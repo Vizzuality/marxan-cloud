@@ -156,7 +156,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
           <div className="relative flex flex-col w-full mt-1 text-sm">
             <Loading
               visible={solutionIsLoading}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
               iconClassName="w-10 h-10 text-primary-500"
             />
 
