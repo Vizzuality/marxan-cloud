@@ -19,6 +19,7 @@ import { ScenarioPlanningUnitsFeaturesAggregateModule } from '@marxan-geoprocess
 import { ExportModule } from '@marxan-geoprocessing/export/export.module';
 import { ImportModule } from '@marxan-geoprocessing/import/import.module';
 import { PingController } from '@marxan-geoprocessing/modules/ping/ping.controller';
+import { LegacyProjectImportModule } from './legacy-project-import/legacy-project-import.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { PingController } from '@marxan-geoprocessing/modules/ping/ping.controll
     ScenarioPlanningUnitsFeaturesAggregateModule,
     ExportModule,
     ImportModule,
+    LegacyProjectImportModule,
   ],
   controllers: [AppController, PingController],
   providers: [AppService],

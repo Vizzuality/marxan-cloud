@@ -13,4 +13,4 @@ import { LegacyProjectImportPiecesModule } from './pieces/legacy-project-import-
   ],
   providers: [LegacyProjectImportWorker, LegacyProjectImportProcessor],
 })
-export class ImportModule {}
+export class LegacyProjectImportModule {}
