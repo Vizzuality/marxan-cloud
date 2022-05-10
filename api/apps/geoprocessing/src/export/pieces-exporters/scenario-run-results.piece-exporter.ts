@@ -27,6 +27,22 @@ type MarxanRunSelectResult = {
   puid: number;
 };
 
+type OutputSummariesSelectResult = {
+  run_id: number | null;
+  score: number | null;
+  cost: number | null;
+  planning_units: number | null;
+  connectivity: number | null;
+  connectivity_total: number | null;
+  mpm: number | null;
+  penalty: number | null;
+  shortfall: number | null;
+  missing_values: number | null;
+  metadata: Record<string, unknown> | null;
+  best: boolean | null;
+  distinct_five: boolean | null;
+};
+
 @Injectable()
 @PieceExportProvider()
 export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
@@ -34,6 +50,8 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.apiDB)
+    private readonly apiEntityManager: EntityManager,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(ScenarioRunResultsPieceExporter.name);
@@ -77,6 +95,27 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
       .innerJoin('projects_pu', 'ppu', 'ppu.id = spd.project_pu_id')
       .execute();
 
+    const outputScenarioSummaries: OutputSummariesSelectResult[] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select([
+        'run_id',
+        'score',
+        'cost',
+        'planning_units',
+        'connectivity',
+        'connectivity_total',
+        'mpm',
+        'penalty',
+        'shortfall',
+        'missing_values',
+        'metadata',
+        'best',
+        'distinct_five',
+      ])
+      .from('output_scenarios_summaries', 'oss')
+      .where('scenario_id = :scenarioId', { scenarioId: input.resourceId })
+      .execute();
+
     const marxanRunResults = marxanRunSelectResult.map((result) => ({
       ...result,
       includedCount: Number(result.includedCount),
@@ -87,6 +126,21 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
         png: pngData ? pngData.toJSON().data : undefined,
       })),
       marxanRunResults,
+      outputSummaries: outputScenarioSummaries.map((row) => ({
+        best: row.best ?? undefined,
+        connectivity: row.connectivity ?? undefined,
+        connectivityTotal: row.connectivity_total ?? undefined,
+        costValue: row.cost ?? undefined,
+        distinctFive: row.distinct_five ?? undefined,
+        metadata: row.metadata ?? undefined,
+        missingValues: row.missing_values ?? undefined,
+        mpm: row.mpm ?? undefined,
+        penaltyValue: row.penalty ?? undefined,
+        planningUnits: row.planning_units ?? undefined,
+        runId: row.run_id ?? undefined,
+        scoreValue: row.score ?? undefined,
+        shortfall: row.shortfall ?? undefined,
+      })),
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
