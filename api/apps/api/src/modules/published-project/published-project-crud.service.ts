@@ -10,13 +10,17 @@ import {
   UpdatePublishedProjectDto,
 } from '@marxan-api/modules/published-project/dto/create-published-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { In, Repository, SelectQueryBuilder } from 'typeorm';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
 import { FetchSpecification } from 'nestjs-base-service';
 import { UsersService } from '../users/users.service';
 import { ExportId } from '../clone';
 import { ExportRepository } from '../clone/export/application/export-repository.port';
+import { Project } from '../projects/project.api.entity';
+import { UsersProjectsApiEntity } from '../access-control/projects-acl/entity/users-projects.api.entity';
+import { ProjectRoles } from '../access-control/projects-acl/dto/user-role-project.dto';
+import { groupBy } from 'lodash';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -28,6 +32,10 @@ export class PublishedProjectCrudService extends AppBaseService<
   constructor(
     @InjectRepository(PublishedProject)
     protected repository: Repository<PublishedProject>,
+    @InjectRepository(UsersProjectsApiEntity)
+    private usersProjectsRepo: Repository<UsersProjectsApiEntity>,
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
     private readonly usersService: UsersService,
     private exportRepo: ExportRepository,
   ) {
@@ -54,6 +62,7 @@ export class PublishedProjectCrudService extends AppBaseService<
         'originalProject',
         'pngData',
         'exportId',
+        'ownerEmails',
       ],
       keyForAttribute: 'camelCase',
       originalProject: {
@@ -124,5 +133,39 @@ export class PublishedProjectCrudService extends AppBaseService<
     }
 
     return query;
+  }
+
+  async extendFindAllResults(
+    entitiesAndCount: [PublishedProject[], number],
+    fetchSpecification?: FetchSpecification,
+    info?: ProjectsRequest,
+  ): Promise<[PublishedProject[], number]> {
+    const userId = info?.authenticatedUser?.id;
+
+    if (!userId || !(await this.usersService.isPlatformAdmin(userId))) {
+      return entitiesAndCount;
+    }
+
+    const allOwnersOfAllProjects = await this.usersProjectsRepo.find({
+      projectId: In(entitiesAndCount[0].map((entity) => entity.id)),
+      roleName: ProjectRoles.project_owner,
+    });
+    const ownersPerProject = groupBy(
+      allOwnersOfAllProjects,
+      (item) => item.projectId,
+    );
+
+    const extendedEntities: PublishedProject[] = entitiesAndCount[0].map(
+      (entity) => ({
+        ...entity,
+        ownerEmails: ownersPerProject[entity.id]
+          .map((item) => item.user?.email)
+          .filter((item: string | undefined): item is string => {
+            return !(item === null || item === undefined);
+          }),
+      }),
+    );
+
+    return [extendedEntities, entitiesAndCount[1]];
   }
 }

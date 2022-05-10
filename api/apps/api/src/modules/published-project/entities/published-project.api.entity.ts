@@ -38,6 +38,8 @@ export class PublishedProject {
   @Column('uuid', { name: 'export_id' })
   exportId?: string;
 
+  ownerEmails?: string[];
+
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })
   originalProject?: Project;

@@ -38,6 +38,7 @@ export class UsersProjectsApiEntity {
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
     primary: true,
+    eager: true,
   })
   @JoinColumn({
     name: `user_id`,
