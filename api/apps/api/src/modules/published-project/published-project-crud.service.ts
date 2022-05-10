@@ -146,20 +146,25 @@ export class PublishedProjectCrudService extends AppBaseService<
       return entitiesAndCount;
     }
 
-    const allOwnersOfAllProjects = await this.usersProjectsRepo.find({
-      projectId: In(entitiesAndCount[0].map((entity) => entity.id)),
-      roleName: ProjectRoles.project_owner,
-    });
+    const allOwnersOfAllProjectsPlusEmail = await this.usersProjectsRepo.query(
+      `
+      select up.project_id, u.email
+        from users_projects as up
+           left join users as u
+                on (u."id" = up.user_id)
+        where up.project_id IN (SELECT id FROM published_projects) AND up.role_id = $1;`,
+      [ProjectRoles.project_owner],
+    );
     const ownersPerProject = groupBy(
-      allOwnersOfAllProjects,
-      (item) => item.projectId,
+      allOwnersOfAllProjectsPlusEmail,
+      (item) => item.project_id,
     );
 
     const extendedEntities: PublishedProject[] = entitiesAndCount[0].map(
       (entity) => ({
         ...entity,
         ownerEmails: ownersPerProject[entity.id]
-          .map((item) => item.user?.email)
+          .map((item) => item.email)
           .filter((item: string | undefined): item is string => {
             return !(item === null || item === undefined);
           }),
