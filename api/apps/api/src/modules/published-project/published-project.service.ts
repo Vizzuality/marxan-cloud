@@ -16,7 +16,6 @@ import { ProjectsService } from '../projects/projects.service';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { getScenarioSnapshot } from '@marxan-api/utils/webshot.utils';
 import { ExportRepository } from '../clone/export/application/export-repository.port';
-import { assertDefined } from '@marxan/utils';
 import { ExportId } from '@marxan-api/modules/clone';
 
 export const notFound = Symbol(`project not found`);
