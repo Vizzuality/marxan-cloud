@@ -4,7 +4,5 @@ export { LegacyProjectImportJobOutput } from './job-output';
 export {
   LegacyProjectImportPiece,
   LegacyProjectImportPieceOrderResolver,
-  LegacyProjectImportPieceRelativePathResolver,
-  LegacyProjectImportPieceId,
-} from './domain';
+} from './domain/legacy-project-import-piece';
 export { LegacyProjectImportPieceProcessor } from './legacy-project-import-piece-processor.port';
