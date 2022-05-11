@@ -33,7 +33,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader />
+        <ReportHeader title="Solution Frequency" />
         <Page1 />
       </div>
 
@@ -41,7 +41,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader />
+        <ReportHeader title="Selected Solution" />
         <Page2 />
       </div>
 
@@ -49,7 +49,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader />
+        <ReportHeader title="Settings" />
         <Page3 />
       </div>
 
