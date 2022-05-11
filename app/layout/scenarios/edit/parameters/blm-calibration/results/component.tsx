@@ -150,7 +150,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                       >
                         {(fprops) => (
                           <Field className="w-44" id="blmCalibration" {...fprops}>
-                            <Label id="blmCalibration" theme="dark" className="text-xs uppercase flex items-center space-x-2">
+                            <Label id="blmCalibration" theme="dark" className="flex items-center space-x-2 text-xs uppercase">
                               <span>BLM:</span>
 
                               <InfoButton
@@ -218,7 +218,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                     </div>
                   </div>
 
-                  <div className="grid gap-5 grid-cols-3 mt-10">
+                  <div className="grid grid-cols-3 gap-5 mt-10">
                     {calibrationResultsData.map((result) => {
                       const selected = result.blmValue === values.blmCalibration;
 
@@ -236,12 +236,9 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                   </div>
 
                   <div>
-                    <div className="flex flex-col mt-8 space-y-2">
-                      <h3 className="text-sm font-bold text-white">Boundary Length</h3>
-                      <p className="text-xs text-white">
-                        More
-                      </p>
-                    </div>
+
+                    <h3 className="mt-10 mb-4 text-sm font-bold text-white">Boundary Length</h3>
+
                     <div className="w-full h-32">
                       <BlmChart
                         data={calibrationResultsData.sort((a, b) => a.cost - b.cost)}
@@ -255,7 +252,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
 
                   <Loading
                     visible={submitting}
-                    className="absolute z-10 top-0 left-0 flex items-center justify-center w-full h-full text-white bg-gray-700 bg-opacity-90"
+                    className="absolute top-0 left-0 z-10 flex items-center justify-center w-full h-full text-white bg-gray-700 bg-opacity-90"
                     iconClassName="w-10 h-10"
                   />
                 </form>
