@@ -56,17 +56,28 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
           <h1 className="pb-2 text-2xl font-semibold text-gray-500 font-heading">
             {title}
           </h1>
-          <div className="flex space-x-12 text-xs">
-            <p>
-              {`Project: ${projectData?.name} `}
-            </p>
-            <p>
-              {`Scenario: ${scenarioData?.name}`}
-            </p>
+          <div className="flex flex-col text-xxs">
+            <div className="flex space-x-1">
+              <p className="font-semibold">Project:</p>
+              <p>
+                {projectData?.name}
+              </p>
+            </div>
+
+            <div className="flex space-x-1">
+              <p className="font-semibold">Scenario:</p>
+              <p>
+                {scenarioData?.name}
+              </p>
+            </div>
+
+            <div className="flex space-x-1">
+              <p className="font-semibold">Description:</p>
+              <p>
+                {projectData?.description}
+              </p>
+            </div>
           </div>
-          <p className="flex space-x-12 text-xs">
-            {`Description: ${projectData?.description}`}
-          </p>
 
           <div className="flex space-x-12 text-xxs">
             <div className="flex space-x-1">
