@@ -1,9 +1,9 @@
 export enum LegacyProjectImportPiece {
   PlanningGrid = 'planning-grid',
-  ShapefileFeature = 'shapefile-feature',
-  NonShapefileFeatures = 'non-shapefile-features',
+  FeatureShapefile = 'feature-shapefile',
+  Features = 'features',
   ScenarioPusData = 'scenario-pus-data',
-  FeatureSpecification = 'features-specification',
+  FeaturesSpecification = 'features-specification',
   Solutions = 'solutions',
 }
 
@@ -14,10 +14,10 @@ export class LegacyProjectImportPieceOrderResolver {
   > = {
     // TODO Establish proper order for pieces
     [LegacyProjectImportPiece.PlanningGrid]: 0,
-    [LegacyProjectImportPiece.ShapefileFeature]: 1,
-    [LegacyProjectImportPiece.NonShapefileFeatures]: 1,
+    [LegacyProjectImportPiece.Features]: 1,
     [LegacyProjectImportPiece.ScenarioPusData]: 1,
-    [LegacyProjectImportPiece.FeatureSpecification]: 2,
+    [LegacyProjectImportPiece.FeatureShapefile]: 2,
+    [LegacyProjectImportPiece.FeaturesSpecification]: 2,
     [LegacyProjectImportPiece.Solutions]: 2,
   };
 

@@ -11,27 +11,35 @@ export class LegacyProjectImportComponentStatus {
     );
   }
 
-  #status: LegacyProjectImportComponentStatuses;
+  constructor(private readonly status: LegacyProjectImportComponentStatuses) {}
 
-  constructor(status: LegacyProjectImportComponentStatuses) {
-    this.#status = status;
-  }
-
-  get value(): LegacyProjectImportComponentStatuses {
-    return this.#status;
-  }
-
-  markAsCompleted(): void {
-    if (this.value === LegacyProjectImportComponentStatuses.Failed)
+  markAsCompleted(): LegacyProjectImportComponentStatus {
+    if (this.status === LegacyProjectImportComponentStatuses.Failed)
       throw new Error('Import component has already failed');
 
-    this.#status = LegacyProjectImportComponentStatuses.Completed;
+    return new LegacyProjectImportComponentStatus(
+      LegacyProjectImportComponentStatuses.Completed,
+    );
   }
 
-  markAsFailed(): void {
-    if (this.value === LegacyProjectImportComponentStatuses.Completed)
+  markAsFailed(): LegacyProjectImportComponentStatus {
+    if (this.status === LegacyProjectImportComponentStatuses.Completed)
       throw new Error('Import component has already been completed');
 
-    this.#status = LegacyProjectImportComponentStatuses.Failed;
+    return new LegacyProjectImportComponentStatus(
+      LegacyProjectImportComponentStatuses.Failed,
+    );
+  }
+
+  isReady() {
+    return this.status === LegacyProjectImportComponentStatuses.Completed;
+  }
+
+  hasFailed() {
+    return this.status === LegacyProjectImportComponentStatuses.Failed;
+  }
+
+  toSnapshot(): LegacyProjectImportComponentStatuses {
+    return this.status;
   }
 }

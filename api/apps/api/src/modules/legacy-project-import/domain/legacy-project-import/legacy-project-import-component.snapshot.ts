@@ -4,7 +4,6 @@ import { LegacyProjectImportComponentStatuses } from './legacy-project-import-co
 export interface LegacyProjectImportComponentSnapshot {
   readonly id: string;
   readonly kind: LegacyProjectImportPiece;
-  readonly resourceId: string;
   readonly order: number;
   readonly archiveLocation?: string;
   readonly status: LegacyProjectImportComponentStatuses;
