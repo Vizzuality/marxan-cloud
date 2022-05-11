@@ -148,7 +148,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
             <div
               id="projects-list"
               className={cx({
-                'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4': true,
+                'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4': true,
               })}
             >
               {data.map((d) => {

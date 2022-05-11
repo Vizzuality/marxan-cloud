@@ -74,20 +74,16 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
                   <a href="/projects" className="hover:underline">Projects</a>
                 </Link>
               </li>
-
-              <li>
-                Manage Team
-              </li>
             </ul>
 
-            <ul className="pt-5 space-y-1 border-t-2 border-gray-100">
+            {/* <ul className="pt-5 space-y-1 border-t-2 border-gray-100">
               <li className="text-xs font-semibold text-gray-300 uppercase font-heading">
                 Language
               </li>
               <li className="text-xs font-semibold text-gray-300 uppercase font-heading">
                 Help page
               </li>
-            </ul>
+            </ul> */}
           </nav>
 
           <button
