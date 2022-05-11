@@ -5,6 +5,9 @@ import {
   useQuery, useQueryClient,
 } from 'react-query';
 
+import keyBy from 'lodash/keyBy';
+import merge from 'lodash/merge';
+
 import { useSession } from 'next-auth/client';
 
 import ADMIN from 'services/admin';
@@ -324,6 +327,8 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
       //   totalItems: 100,
       // },
       data: data?.data.map((d) => {
+        const { creators, ownerEmails } = d;
+        merge(keyBy(creators, 'id'), keyBy(ownerEmails, 'id'));
         const owners = d.creators ? d.creators.filter((c) => c.roleName === 'project_owner') : [];
 
         return {
@@ -332,6 +337,7 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
           description: d.description,
           status: d.underModeration ? 'under-moderation' : 'published',
           owners,
+          emails: owners,
         };
       }),
       meta: data?.meta,
