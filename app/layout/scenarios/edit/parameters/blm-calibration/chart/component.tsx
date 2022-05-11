@@ -148,7 +148,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                 y="0"
                 className="text-xs text-white fill-current"
               >
-                {Math.min(...blmCostValues)}
+                {Math.floor(Math.min(...blmCostValues) / 1000) * 1000}
               </text>
             </g>
             <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
@@ -168,11 +168,18 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                 y="0"
                 textAnchor="end"
               >
-                {Math.max(...blmCostValues)}
+                {Math.ceil(Math.max(...blmCostValues) / 1000) * 1000}
               </text>
             </g>
           </g>
           {/* Area */}
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="35%" stopColor="#FFFFFF4D" />
+              <stop offset="55%" stopColor="#FFFFFF33" />
+              <stop offset="100%" stopColor="transparent" />
+            </linearGradient>
+          </defs>
           <path
             d={areaGenerator(data)}
             fill="url(#gradient)"
