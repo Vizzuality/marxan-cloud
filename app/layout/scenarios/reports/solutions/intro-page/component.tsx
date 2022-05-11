@@ -31,9 +31,11 @@ export const IntroPage: React.FC<IntroPageProps> = () => {
   return (
     reportDataIsFetched && (
       <div className="flex pt-6 space-x-4">
-
         <section className="w-1/2 space-y-8 text-xs">
-          <div className="flex flex-col text-xxs">
+          <h1 className="pb-2 text-2xl font-semibold text-gray-500 font-heading">
+            Solution Report
+          </h1>
+          <div className="flex flex-col text-xs">
             <div className="flex space-x-1">
               <p className="font-semibold">Project:</p>
               <p>
@@ -47,14 +49,35 @@ export const IntroPage: React.FC<IntroPageProps> = () => {
                 {scenarioData?.name}
               </p>
             </div>
-          </div>
-          <div className="flex space-x-1">
-            <p className="font-semibold">Description:</p>
-            <p>
-              {projectData?.description}
-            </p>
-          </div>
-          <div className="flex space-x-12 text-xxs">
+
+            <div className="flex space-x-1">
+              <p className="font-semibold">Description:</p>
+              <p>
+                {projectData?.description}
+              </p>
+            </div>
+
+            <div className="flex space-x-1">
+              <p className="font-semibold">Planning Area:</p>
+              <p>
+                {projectData?.planningAreaName}
+              </p>
+            </div>
+
+            <div className="flex space-x-1">
+              <p className="font-semibold">Planning Unit Area:</p>
+              <p>
+                {`${projectData?.planningUnitAreakm2}
+                km2`}
+              </p>
+            </div>
+            <div className="flex space-x-1">
+              <p className="font-semibold">Planning Unit Grid Shape:</p>
+              <p>
+                {projectData?.planningUnitGridShape}
+              </p>
+            </div>
+
             <div className="flex space-x-1">
               <p className="font-semibold">Marxan platform version:</p>
               <p> V.0.0.1</p>
@@ -64,7 +87,6 @@ export const IntroPage: React.FC<IntroPageProps> = () => {
               <p>{format(new Date().getTime(), 'MM/dd/yyyy')}</p>
             </div>
           </div>
-
         </section>
       </div>
     )
