@@ -60,7 +60,7 @@ export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
             <p>{SOLUTION_DATA?.costValue}</p>
           </div>
           <div>
-            <p className="font-semibold">Missing</p>
+            <p className="font-semibold">Missing features</p>
             <p>{SOLUTION_DATA?.missingValues}</p>
           </div>
           <div>

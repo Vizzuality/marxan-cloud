@@ -42,7 +42,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
 
   return (
     reportDataIsFetched && (
-      <header className="flex items-center justify-between w-full pb-6">
+      <header className="flex justify-between w-full pb-6">
         <div>
           <div className="flex justify-between">
             <div className="flex space-x-1 text-xs">
@@ -92,7 +92,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
         </div>
         <div>
           <img
-            className="w-32 h-32"
+            className="w-32 h-12"
             alt="Marxan logo"
             src={LOGO_BLACK}
           />
