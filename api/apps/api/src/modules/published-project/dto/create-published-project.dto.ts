@@ -12,6 +12,10 @@ export interface Company {
   name: string;
   logoDataUrl: string;
 }
+export interface UserEmail {
+  id: string;
+  email: string;
+}
 
 export interface PublishedProjectDto {
   name?: string;
