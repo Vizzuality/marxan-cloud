@@ -17,5 +17,5 @@ export interface TargetSPFItemProps {
   editable?: boolean;
   onChangeTarget?: (value) => void;
   onChangeFPF?: (value) => void;
-  onRemove?: (value) => void
+  onRemove?: (value) => void;
 }
