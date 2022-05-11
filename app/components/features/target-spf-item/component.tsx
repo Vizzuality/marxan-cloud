@@ -24,6 +24,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   onChangeTarget,
   onChangeFPF,
 }: TargetSPFItemProps) => {
+  const inputRef = useRef<HTMLInputElement>();
   const [targetValue, setTargetValue] = useState((target || defaultTarget) / 100);
   const [FPFValue, setFPFValue] = useState(fpf || defaultFPF);
   const [inputFPFValue, setInputFPFValue] = useState(String(FPFValue));
@@ -104,7 +105,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
           </div>
         </div>
         <div className="flex flex-col justify-between w-24 px-4 border-l border-gray-500">
-          <span>{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
+          <span className="whitespace-nowrap">{isAllTargets ? 'ALL SPF' : 'SPF'}</span>
           <div className="w-10 mb-6">
             <Input
               className="px-0 py-1 rounded"
@@ -113,6 +114,9 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
               type="number"
               value={inputFPFValue}
               disabled={!editable}
+              onReady={(input) => {
+                inputRef.current = input;
+              }}
               onChange={({ target: { value: inputValue } }) => {
                 setInputFPFValue(inputValue);
               }}
@@ -124,9 +128,22 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
                 }
                 // Prevent changing all targets if user didn't actually change it
                 // (despite clicking on the input)
-                if (FPFValue === Number(inputFPFValue)) return;
+                // if (FPFValue === Number(inputFPFValue)) return;
                 setFPFValue(Number(inputFPFValue));
                 if (onChangeFPF) onChangeFPF(Number(inputFPFValue));
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.nativeEvent.stopImmediatePropagation();
+                  event.nativeEvent.stopPropagation();
+                  event.nativeEvent.preventDefault();
+
+                  if (inputRef.current) {
+                    inputRef?.current?.blur();
+                  }
+                }
               }}
             />
           </div>

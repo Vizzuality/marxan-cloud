@@ -49,6 +49,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   onFocus?: () => void;
   onBlur?: () => void;
   onFocusChange?: (isFocused: boolean) => void;
+  onReady?: (ref) => void;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -61,6 +62,7 @@ export const Input: React.FC<InputProps> = ({
   onFocus,
   onBlur,
   onFocusChange,
+  onReady,
   ...props
 }: InputProps) => {
   const st = disabled ? 'disabled' : status;
@@ -85,6 +87,7 @@ export const Input: React.FC<InputProps> = ({
 
       <input
         {...props}
+        ref={onReady}
         disabled={disabled}
         className={cx({
           'form-input': true,

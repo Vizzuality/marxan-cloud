@@ -5,6 +5,7 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useRouter } from 'next/router';
 
 import cx from 'classnames';
+import { useDebouncedCallback } from 'use-debounce';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
@@ -15,6 +16,7 @@ import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Button from 'components/button';
+import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
 
@@ -26,6 +28,8 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
   onBack,
 }: ScenariosFeaturesTargetsProps) => {
   const [submitting, setSubmitting] = useState(false);
+  const [confirmationTarget, setConfirmationTarget] = useState(null);
+  const [confirmationFPF, setConfirmationFPF] = useState(null);
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -71,13 +75,22 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
     onChange(features);
   }, []);
 
-  const onChangeTargetAll = useCallback((v, input) => {
+  const onAskTargetAll = useDebouncedCallback((v, input) => {
+    setConfirmationTarget({
+      v,
+      input,
+    });
+  }, 1000);
+
+  const onChangeTargetAll = useCallback(({ v, input }) => {
     const { value, onChange } = input;
     const features = [...value].map((f) => ({
       ...f,
       target: v,
     }));
     onChange(features);
+
+    setConfirmationTarget(null);
   }, []);
 
   const onChangeFPF = useCallback((id, v, input) => {
@@ -94,13 +107,22 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
     onChange(features);
   }, []);
 
-  const onChangeFPFAll = useCallback((v, input) => {
+  const onAskFPFAll = useDebouncedCallback((v, input) => {
+    setConfirmationFPF({
+      v,
+      input,
+    });
+  }, 250);
+
+  const onChangeFPFAll = useCallback(({ v, input }) => {
     const { value, onChange } = input;
     const features = [...value].map((f) => ({
       ...f,
       fpf: v,
     }));
     onChange(features);
+
+    setConfirmationFPF(null);
   }, []);
 
   const onRemove = useCallback((id, input) => {
@@ -236,19 +258,39 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                   {({ input }) => (
                     <div className="py-6">
                       {editable && (
-                        <Item
-                          id="all-targets"
-                          defaultTarget={50}
-                          defaultFPF={1}
-                          isAllTargets
-                          editable={editable}
-                          onChangeTarget={(v) => {
-                            onChangeTargetAll(v, input);
-                          }}
-                          onChangeFPF={(v) => {
-                            onChangeFPFAll(v, input);
-                          }}
-                        />
+                        <>
+                          <Item
+                            id="all-targets"
+                            defaultTarget={50}
+                            defaultFPF={1}
+                            isAllTargets
+                            editable={editable}
+                            onChangeTarget={(v) => {
+                              onAskTargetAll(v, input);
+                            }}
+                            onChangeFPF={(v) => {
+                              onAskFPFAll(v, input);
+                            }}
+                          />
+
+                          <ConfirmationPrompt
+                            title={`Are you sure you want to change all features target to ${confirmationTarget?.v}?`}
+                            description="The action cannot be reverted."
+                            open={!!confirmationTarget}
+                            onAccept={() => onChangeTargetAll(confirmationTarget)}
+                            onRefuse={() => setConfirmationTarget(null)}
+                            onDismiss={() => setConfirmationTarget(null)}
+                          />
+
+                          <ConfirmationPrompt
+                            title={`Are you sure you want to change all features SPF to ${confirmationFPF?.v}?`}
+                            description="The action cannot be reverted."
+                            open={!!confirmationFPF}
+                            onAccept={() => onChangeFPFAll(confirmationFPF)}
+                            onRefuse={() => setConfirmationFPF(null)}
+                            onDismiss={() => setConfirmationFPF(null)}
+                          />
+                        </>
                       )}
 
                       {values.features.map((item, i) => {
