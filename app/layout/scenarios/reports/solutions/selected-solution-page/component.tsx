@@ -60,7 +60,7 @@ export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
             <p>{SOLUTION_DATA?.costValue}</p>
           </div>
           <div>
-            <p className="font-semibold">Missing features</p>
+            <p className="font-semibold">Missing</p>
             <p>{SOLUTION_DATA?.missingValues}</p>
           </div>
           <div>
