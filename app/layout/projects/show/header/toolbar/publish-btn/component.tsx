@@ -133,7 +133,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
             placement="top"
             content={(
               <div
-                className="p-4 text-gray-500 bg-white rounded text-xs"
+                className="p-4 text-xs text-gray-500 bg-white rounded"
                 style={{
                   boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
                   maxWidth: 200,

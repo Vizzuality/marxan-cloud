@@ -47,7 +47,7 @@ export const useProjectActionsDone = () => {
     });
   }, [pid, projectMutation, addToast]);
 
-  const onCloneDone = useCallback((JOB_REF) => {
+  const onCloneImportDone = useCallback((JOB_REF) => {
     projectMutation.mutate({
       id: `${pid}`,
       data: {
@@ -77,6 +77,7 @@ export const useProjectActionsDone = () => {
     default: onDone,
     planningUnits: onDone,
     export: onDone,
-    clone: onCloneDone,
+    import: onCloneImportDone,
+    clone: onCloneImportDone,
   };
 };
