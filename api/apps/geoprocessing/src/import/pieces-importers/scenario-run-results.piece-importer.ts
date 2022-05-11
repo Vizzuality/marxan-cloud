@@ -7,14 +7,19 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import {
   BlmResultsContent,
   MarxanRunResultsContent,
+  OutputScenarioSummary,
   ScenarioRunResultsContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import { OutputScenariosPuDataGeoEntity } from '@marxan/marxan-output';
+import {
+  OutputScenariosPuDataGeoEntity,
+  ScenariosOutputResultsApiEntity,
+} from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { Repository } from 'typeorm';
 import { EntityManager } from 'typeorm/entity-manager/EntityManager';
 import {
   ImportPieceProcessor,
@@ -33,6 +38,11 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
+    @InjectRepository(
+      ScenariosOutputResultsApiEntity,
+      geoprocessingConnections.apiDB.name,
+    )
+    private readonly outputSummariesRepo: Repository<ScenariosOutputResultsApiEntity>,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(ScenarioRunResultsPieceImporter.name);
@@ -66,6 +76,7 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
     const {
       marxanRunResults,
       blmResults,
+      outputSummaries,
     }: ScenarioRunResultsContent = JSON.parse(
       stringScenarioProtectedAreasOrError,
     );
@@ -76,6 +87,10 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
 
       if (blmResults.length)
         await this.insertBlmResults(scenarioId, blmResults, em);
+
+      if (outputSummaries.length) {
+        await this.insertOutputSummaries(scenarioId, outputSummaries);
+      }
     });
 
     return {
@@ -145,5 +160,17 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       .into(BlmFinalResultEntity)
       .values(insertBlmResultsValues)
       .execute();
+  }
+
+  private async insertOutputSummaries(
+    scenarioId: string,
+    outputSummaries: OutputScenarioSummary[],
+  ) {
+    return this.outputSummariesRepo.save(
+      outputSummaries.map((row) => ({
+        ...row,
+        scenarioId,
+      })),
+    );
   }
 }

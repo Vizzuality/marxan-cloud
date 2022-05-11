@@ -242,6 +242,15 @@
         "tsConfigPath": "libs/cloning/tsconfig.lib.json"
       }
     },
+    "legacy-project-import": {
+      "type": "library",
+      "root": "libs/legacy-project-import",
+      "entryFile": "index",
+      "sourceRoot": "libs/legacy-project-import/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/legacy-project-import/tsconfig.lib.json"
+      }
+    },
     "geofeatures": {
       "type": "library",
       "root": "libs/geofeatures",

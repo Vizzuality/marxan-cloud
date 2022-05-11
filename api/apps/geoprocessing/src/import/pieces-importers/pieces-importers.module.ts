@@ -2,6 +2,7 @@ import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/c
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScenariosOutputResultsApiEntity } from '../../../../../libs/marxan-output/src';
 import { MarxanExecutionMetadataPieceImporter } from './marxan-execution-metadata.piece-importer';
 import { PlanningAreaCustomPieceImporter } from './planning-area-custom.piece-importer';
 import { PlanningAreaGadmPieceImporter } from './planning-area-gadm.piece-importer';
@@ -19,7 +20,10 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
 @Module({
   imports: [
     GeoCloningFilesRepositoryModule,
-    TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
+    TypeOrmModule.forFeature(
+      [ScenariosOutputResultsApiEntity],
+      geoprocessingConnections.apiDB,
+    ),
   ],
   providers: [
     ProjectMetadataPieceImporter,
