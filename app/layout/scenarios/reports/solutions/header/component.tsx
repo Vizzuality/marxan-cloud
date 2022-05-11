@@ -2,8 +2,6 @@ import React from 'react';
 
 import { useRouter } from 'next/router';
 
-import { format } from 'date-fns';
-
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
@@ -42,8 +40,8 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
 
   return (
     reportDataIsFetched && (
-      <header className="flex justify-between w-full pb-6">
-        <div>
+      <header className="flex items-start justify-between w-full pb-6">
+        <div className="w-1/3">
           <div className="flex justify-between">
             <div className="flex space-x-1 text-xs">
               <p className="font-semibold uppercase">
@@ -70,33 +68,16 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
                 {scenarioData?.name}
               </p>
             </div>
-
-            <div className="flex space-x-1">
-              <p className="font-semibold">Description:</p>
-              <p>
-                {projectData?.description}
-              </p>
-            </div>
           </div>
 
-          <div className="flex space-x-12 text-xxs">
-            <div className="flex space-x-1">
-              <p className="font-semibold">Marxan platform version:</p>
-              <p> V.0.0.1</p>
-            </div>
-            <div className="flex space-x-1">
-              <p className="font-semibold">Date:</p>
-              <p>{format(new Date().getTime(), 'MM/dd/yyyy')}</p>
-            </div>
-          </div>
         </div>
-        <div>
-          <img
-            className="w-32 h-12"
-            alt="Marxan logo"
-            src={LOGO_BLACK}
-          />
-        </div>
+
+        <img
+          className="w-32 h-12"
+          alt="Marxan logo"
+          src={LOGO_BLACK}
+        />
+
       </header>
     )
   );

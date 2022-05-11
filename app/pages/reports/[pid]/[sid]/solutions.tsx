@@ -10,6 +10,7 @@ import { useBestSolution, useSolution } from 'hooks/solutions';
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
+import IntroPage from 'layout/scenarios/reports/solutions/intro-page';
 import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
 import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
 import SolutionFrequencyPage from 'layout/scenarios/reports/solutions/solution-frequency-page';
@@ -52,6 +53,12 @@ const SolutionsReport: React.FC = () => {
       <Head title="Solutions Report" />
 
       <MetaIcons />
+      <div
+        style={styles.page}
+        className="flex flex-col h-full text-black bg-white"
+      >
+        <IntroPage />
+      </div>
 
       <div
         style={styles.page}

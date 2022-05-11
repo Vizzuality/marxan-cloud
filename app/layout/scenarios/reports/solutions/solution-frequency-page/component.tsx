@@ -82,7 +82,7 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
 
   return (
     reportDataIsFetched && (
-      <div className="flex space-x-4">
+      <div className="flex space-x-8">
 
         <section className="flex flex-col justify-between w-1/3">
           <div className="space-y-8 text-xs">

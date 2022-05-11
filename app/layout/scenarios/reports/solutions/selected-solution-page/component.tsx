@@ -43,7 +43,7 @@ export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
   }, [SOLUTION_DATA]);
 
   return (
-    <div className="flex space-x-4">
+    <div className="flex space-x-8">
       <section className="flex flex-col justify-between w-1/3 text-xs">
         <div className="space-y-8">
           <div>
