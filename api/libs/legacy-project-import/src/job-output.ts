@@ -1,4 +1,4 @@
-import { LegacyProjectImportPiece } from './domain';
+import { LegacyProjectImportPiece } from './domain/legacy-project-import-piece';
 
 export interface LegacyProjectImportJobOutput {
   readonly legacyProjectImportId: string;
