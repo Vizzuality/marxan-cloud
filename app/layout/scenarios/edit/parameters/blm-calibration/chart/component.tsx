@@ -4,7 +4,7 @@ import React, {
 
 import classnames from 'classnames';
 import {
-  scaleLinear, line, area,
+  scaleLinear, line, area, format,
 } from 'd3';
 import { blmFormat } from 'utils/units';
 
@@ -69,6 +69,9 @@ export const BlmChart: React.FC<BlmChartProps> = ({
   const costValues = useMemo(() => {
     return data?.map((v) => v.cost);
   }, [data]);
+
+  const maxCostValue = format('.3~s')(Math.ceil(Math.max(...costValues) / 1000) * 1000);
+  const minCostValue = format('.3~s')(Math.floor(Math.min(...costValues) / 1000) * 1000);
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -149,7 +152,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                 y="0"
                 className="text-xs text-white fill-current"
               >
-                {Math.floor(Math.min(...costValues) / 1000) * 1000}
+                {minCostValue}
               </text>
             </g>
             <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
@@ -169,7 +172,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                 y="0"
                 textAnchor="end"
               >
-                {Math.ceil(Math.max(...costValues) / 1000) * 1000}
+                {maxCostValue}
               </text>
             </g>
           </g>
