@@ -4,7 +4,7 @@ import React, {
 
 import classnames from 'classnames';
 import {
-  scaleLinear, line, area,
+  scaleLinear, line, area, format,
 } from 'd3';
 import { blmFormat } from 'utils/units';
 
@@ -65,6 +65,13 @@ export const BlmChart: React.FC<BlmChartProps> = ({
   onChange,
 }: BlmChartProps) => {
   const containerRef: React.MutableRefObject<HTMLDivElement> = useRef(null);
+
+  const costValues = useMemo(() => {
+    return data?.map((v) => v.cost);
+  }, [data]);
+
+  const maxCostValue = format('.3~s')(Math.ceil(Math.max(...costValues) / 1000) * 1000);
+  const minCostValue = format('.3~s')(Math.floor(Math.min(...costValues) / 1000) * 1000);
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -145,7 +152,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                 y="0"
                 className="text-xs text-white fill-current"
               >
-                Less
+                {minCostValue}
               </text>
             </g>
             <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
@@ -165,7 +172,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                 y="0"
                 textAnchor="end"
               >
-                More
+                {maxCostValue}
               </text>
             </g>
           </g>
@@ -197,8 +204,8 @@ export const BlmChart: React.FC<BlmChartProps> = ({
               >
                 <Tooltip
                   content={(
-                    <div className="flex flex-col bg-white p-2 rounded-md">
-                      <div className="flex justify-between text-xs space-x-2">
+                    <div className="flex flex-col p-2 bg-white rounded-md">
+                      <div className="flex justify-between space-x-2 text-xs">
                         <div>
                           <span className="text-gray-600">Boundary Length:</span>
                         </div>
@@ -206,7 +213,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                           {`${blmFormat(boundaryLength)}`}
                         </div>
                       </div>
-                      <div className="flex justify-between text-xs space-x-2">
+                      <div className="flex justify-between space-x-2 text-xs">
                         <div>
                           <span className="text-gray-600">Cost:</span>
                         </div>
@@ -214,7 +221,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                           {`${blmFormat(cost)}`}
                         </div>
                       </div>
-                      <div className="flex justify-between text-xs space-x-2">
+                      <div className="flex justify-between space-x-2 text-xs">
                         <div>
                           <span className="text-gray-600">BLM:</span>
                         </div>
