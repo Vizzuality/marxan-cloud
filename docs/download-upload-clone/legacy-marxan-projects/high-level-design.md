@@ -1,13 +1,86 @@
-# High-level design
+# Uploading legacy Marxan projects - High-level design
 
 Importing legacy projects requires several steps, outlined below.
 
-## Initial data upload and project shell creation
+## Workflow overview
 
-- Users upload all the data they have and wish to use:
+From an API consumer point of view, importing a legacy project happens through
+three main steps and related endpoints.
+
+### Preparation of project import process
+
+`POST /api/v1/projects/import/legacy`
+
+This step will prepare an empty project shell, as well as an empty scenario
+shell, both of which will be populated later in the import process, unless
+errors are raised while validating the user-uploaded data.
+
+The `projectId` of the project being created will be returned, so that the next
+steps can reference the project.
+
+### Data upload
+
+`POST /api/v1/projects/import/legacy/:projectId/data-file`
+
+API clients will need to use this endpoint to upload each of the files that
+users provide.
+
+Each upload will include the actual file alongside a small JSON metadata snippet
+through which the API is informed about which kind of file this is, alongside
+any other metadata needed to import it.
+
+As API clients send requests to this endpoint, the API keeps the uploaded files
+in a temporary storage area, from which they will be later read and processed.
+
+### Data validation and import
+
+`POST /api/v1/projects/import/legacy/:projectId`
+
+This endpoint will validate if all the required files have been uploaded,
+return an error if not, or initiate the actual processing of the data to import.
+
+Warnings or errors encountered during the validation phase of each piece
+importer will be available via a dedicated endpoint: `GET
+/api/v1/projects/import/legacy/:projectId/validation-results`.
+
+Status of the import process will be available, like any other project- or
+scenario-related status, via `GET /api/v1/projects/:projectId/status`.
+
+As an example, API clients may decide to request validation results if the
+project import process terminates with a failure, as reported by polling the
+status endpoint.
+
+## Workflow details
+
+### Preparation of project import process
+
+- Users request to initiate a legacy project import, and provide basic project
+  data:
 
   - project name
-  - project description
+  - project description (optional)
+
+- A shell of project should be created (this allows to have an id and to fire
+  events as needed, and also to set things up for eventual cleanup).
+
+- Project source (see section _Changes needed to existing platform features_
+  below) should be set to `legacy_import`.
+
+- A legacy project import start event (API event) should be emitted. This will
+  signal that the project is not usable yet and it should not be included in
+  lists of projects, displayed or edited in any way until the import process has
+  completed successfully.
+
+- The initial project owner should be set to the user performing the upload.
+
+- A single new scenario shell should be created within the project shell, with
+  the same name as the project name supplied by the user on upload.
+
+### Data upload
+
+Users will need to upload required files, and they will have the option to
+upload optional files:
+
   - planning grid shapefile (as zip file, identical to any other shapefile in
     the platform)
   - `input.dat`
@@ -24,17 +97,23 @@ Importing legacy projects requires several steps, outlined below.
   - optionally, one shapefile for each feature (a zip file for each of these)
   - optionally, a cost surface shapefile (a zip file)
 
-- A shell of project should be created (this allows to have an id and to fire
-  events as needed, and also to set things up for eventual cleanup)
+- Uploaded content should be stored in a temporary import folder linked to the
+  `projectId` of the project being imported, within the storage folder allocated
+  to project cloning (`/opt/marxan-project-cloning`).
 
-- Project source (see section _Changes needed to existing platform features_
-  below) should be set to `legacy_import`.
+### Data validation and import
 
-- The initial project owner should be set to the user performing the upload.
+Project components will be validated and imported through piece importers (and
+associated validators). As for importing and cloning of native MarxanCloud
+projects, these piece importers may run in batches, with batches being scheduled
+according to data dependencies.
 
-- Uploaded content should be stored in a temporary import folder.
-
-## Validation of uploaded content
+A failure (validation error or other kind of expected or unexpected failure)
+within a piece importer will cause processing of the whole import process to
+halt with failure _once all the pieces of the current batch have finished
+processing, either with success or failure_. A failure event should then be
+emitted, and API clients can use the validation results endpoint (see initial
+section) to retrieve a list of errors that led to the import failure.
 
 All validations for input files are expected to be done according to the
 settings and column types and allowed values documented in the _[Marxan Manual,
@@ -117,17 +196,17 @@ through a dedicated API endpoint.
 
     - Validation as other shapefiles
 
-## When initial validation fails
+### When initial validation fails
 
 If any errors are gathered through the validation step, the import process
 should fail, the project should be marked as incomplete (and the only action
 allowed on it should be the deletion of the project itself), and all the
 temporary uploaded data should be deleted (honouring the feature flag that
 allows to keep temporary files on the filesystem); users should be able to see
-the list of errors gathered through the validation step (via the status
-endpoint for the project).
+the list of errors gathered through the validation step (via the validation
+results endpoint for the project).
 
-## Importing data
+### Importing data
 
 If the validation step was successful, any warnings gathered through it should
 be available to users via the status endpoint for the shell project, as part
@@ -137,20 +216,25 @@ Data can now be imported.
 
 - Planning grid should be set from the grid shapefile.
 
+- Initial cost surface should be set from `pu.dat`.
+
+- PU lock status should be set from `pu.dat`. If any unexpected values are found
+  in the `status` column of `pu.dat`, this will trigger a db error and this
+  should cause the import to fail, with an error message pushed to the list of
+  errors to inform the user.
+
 - Project features should be created:
 
   - either from the uploaded shapefiles for features (if supplied), or
   - via a spatial join between `puvspr.dat` and the planning grid: in practice,
     this should lead to a single geometry per feature (that is, one
-    `(geodb)features` row) which is the spatial union of all the planning units
-    listed for the given feature in `puvspr.dat` (but see note below about
+    `(geodb)features_data` row) which is the spatial union of all the planning
+    units listed for the given feature in `puvspr.dat` (but see note below about
     manually setting the feature `amount` per planning unit in order to preserve
     the value provided on input via `puvspr.dat`). The name of the feature
     (`(apidb)features.feature_class_name`) should be set from `spec.dat`
 
-- A single new scenario should be created, with the same name as the project
-  name supplied by the user on upload; all the following import steps are for
-  this only scenario created on import.
+All the following import steps are for this only scenario created on import.
 
 - Lock status of planning units for the scenario should be set from `pu.dat`.
 
