@@ -42,7 +42,7 @@ export const Footer: React.FC<FooterProps> = () => {
 
       <div className="py-24 bg-gray-700">
         <Wrapper>
-          <div className="justify-between w-full max-w-5xl pb-16 mx-auto space-y-24 md:flex md:space-y-0 md:space-x-36">
+          <div className="grid justify-between w-full max-w-5xl grid-cols-1 pb-16 mx-auto md:grid-cols-2 gap-36">
             <div className="space-y-12">
               <h3 className="text-2xl font-heading">
                 Reach out with comments
@@ -60,18 +60,24 @@ export const Footer: React.FC<FooterProps> = () => {
               </Button>
             </div>
 
-            <div className="space-y-12">
+            <div className="space-y-8">
               <h3 className="text-2xl font-heading">
-                Join the Google Marxan group discussion forum.
+                <a
+                  className="underline hover:no-underline"
+                  href="https://groups.google.com/g/marxan"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Join the Google Marxan
+                </a>
+                {' '}
+                group discussion forum.
               </h3>
-              <Button
-                href="https://groups.google.com/g/marxan"
-                className="w-full md:w-64"
-                theme="secondary-alt"
-                size="lg"
-              >
-                MARXAN Google Group
-              </Button>
+              <p>
+                Marxan’s social media and google group is moderated by a vibrant
+                community of practice and not by TNC or partners of the Marxan
+                Planning Platform.
+              </p>
             </div>
           </div>
 
