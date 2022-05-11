@@ -4,8 +4,11 @@ import { useRouter } from 'next/router';
 
 import { format } from 'date-fns';
 
+import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
+
+import LOGO_BLACK from 'svgs/logo-black.svg';
 
 export interface IntroPageProps {
 
@@ -25,21 +28,47 @@ export const IntroPage: React.FC<IntroPageProps> = () => {
     isFetched: scenarioDataIsFetched,
   } = useScenario(sid);
 
+  const {
+    data: projectUsers,
+    isFetched: projectUsersAreFetched,
+  } = useProjectUsers(pid);
+
+  const projectOwner = projectUsers?.find((u) => u.roleName === 'project_owner')?.user || {};
+
   const reportDataIsFetched = projectDataIsFetched
-    && scenarioDataIsFetched;
+    && scenarioDataIsFetched && projectUsersAreFetched;
+
+  const {
+    description, name, planningAreaName, planningUnitGridShape, planningUnitAreakm2,
+  } = projectData || {};
 
   return (
     reportDataIsFetched && (
-      <div className="flex pt-6 space-x-4">
+      <div className="pt-6 space-y-6">
+        <div className="flex justify-between">
+          <div>
+            <div className="flex space-x-1 text-xs">
+              <p className="font-semibold uppercase">
+                Created by:
+              </p>
+              <p className="capitalize">{projectOwner?.displayName || projectOwner?.email}</p>
+            </div>
+            <h1 className="pb-2 text-2xl font-semibold text-gray-500 font-heading">
+              Solution Report
+            </h1>
+          </div>
+          <img
+            className="w-32 h-12"
+            alt="Marxan logo"
+            src={LOGO_BLACK}
+          />
+        </div>
         <section className="w-1/2 space-y-8 text-xs">
-          <h1 className="pb-2 text-2xl font-semibold text-gray-500 font-heading">
-            Solution Report
-          </h1>
-          <div className="flex flex-col text-xs">
+          <div className="flex flex-col space-y-3 text-xs">
             <div className="flex space-x-1">
               <p className="font-semibold">Project:</p>
               <p>
-                {projectData?.name}
+                {name}
               </p>
             </div>
 
@@ -53,28 +82,28 @@ export const IntroPage: React.FC<IntroPageProps> = () => {
             <div className="flex space-x-1">
               <p className="font-semibold">Description:</p>
               <p>
-                {projectData?.description}
+                {description}
               </p>
             </div>
 
             <div className="flex space-x-1">
               <p className="font-semibold">Planning Area:</p>
               <p>
-                {projectData?.planningAreaName}
+                {planningAreaName || 'Custom'}
               </p>
             </div>
 
             <div className="flex space-x-1">
               <p className="font-semibold">Planning Unit Area:</p>
               <p>
-                {`${projectData?.planningUnitAreakm2}
-                km2`}
+                {planningUnitAreakm2 ? `${planningUnitAreakm2}
+                km2` : 'Custom'}
               </p>
             </div>
             <div className="flex space-x-1">
               <p className="font-semibold">Planning Unit Grid Shape:</p>
               <p>
-                {projectData?.planningUnitGridShape}
+                {planningUnitGridShape === 'hexagon' ? 'Hexagon' : 'Custom'}
               </p>
             </div>
 
