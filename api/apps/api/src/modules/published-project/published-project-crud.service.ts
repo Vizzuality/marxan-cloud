@@ -163,11 +163,7 @@ export class PublishedProjectCrudService extends AppBaseService<
     const extendedEntities: PublishedProject[] = entitiesAndCount[0].map(
       (entity) => ({
         ...entity,
-        ownerEmails: ownersPerProject[entity.id]
-          .map((item) => item.email)
-          .filter((item: string | undefined): item is string => {
-            return !(item === null || item === undefined);
-          }),
+        ownerEmails: ownersPerProject[entity.id].map((item) => item.email),
       }),
     );
 
