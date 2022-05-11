@@ -6,15 +6,15 @@ import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario } from 'hooks/scenarios';
 import { useBestSolution, useSolution } from 'hooks/solutions';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/solutions/page-2/map';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selected-solution-page/map';
 
 import LegendItem from 'components/map/legend/item/component';
 
-export interface ScenariosReportPage2Props {
+export interface SelectedSolutionPageProps {
 
 }
 
-export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
+export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
   const { query } = useRouter();
   const { sid, solutionId } = query;
 
@@ -84,4 +84,4 @@ export const ScenariosReportPage2: React.FC<ScenariosReportPage2Props> = () => {
   );
 };
 
-export default ScenariosReportPage2;
+export default SelectedSolutionPage;

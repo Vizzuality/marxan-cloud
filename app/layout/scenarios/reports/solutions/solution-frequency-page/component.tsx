@@ -8,16 +8,16 @@ import { useProject } from 'hooks/projects';
 import { useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/solutions/page-1/map';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/solution-frequency-page/map';
 
 import LegendItem from 'components/map/legend/item/component';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 
-export interface ScenariosReportPage1Props {
+export interface SolutionFrequencyPageProps {
 
 }
 
-export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
+export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -136,4 +136,4 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
   );
 };
 
-export default ScenariosReportPage1;
+export default SolutionFrequencyPage;

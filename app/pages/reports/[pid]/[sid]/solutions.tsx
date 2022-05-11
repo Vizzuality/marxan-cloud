@@ -5,9 +5,9 @@ import { withProtection, withUser } from 'hoc/auth';
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
-import Page1 from 'layout/scenarios/reports/solutions/page-1';
-import Page2 from 'layout/scenarios/reports/solutions/page-2';
-import Page3 from 'layout/scenarios/reports/solutions/page-3';
+import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
+import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
+import SolutionFrequencyPage from 'layout/scenarios/reports/solutions/solution-frequency-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
@@ -34,7 +34,7 @@ const SolutionsReport: React.FC = () => {
         className="flex flex-col h-full text-black bg-white"
       >
         <ReportHeader title="Solution Frequency" />
-        <Page1 />
+        <SolutionFrequencyPage />
       </div>
 
       <div
@@ -42,7 +42,7 @@ const SolutionsReport: React.FC = () => {
         className="flex flex-col h-full text-black bg-white"
       >
         <ReportHeader title="Selected Solution" />
-        <Page2 />
+        <SelectedSolutionPage />
       </div>
 
       <div
@@ -50,7 +50,7 @@ const SolutionsReport: React.FC = () => {
         className="flex flex-col h-full text-black bg-white"
       >
         <ReportHeader title="Settings" />
-        <Page3 />
+        <SettingsPage />
       </div>
 
       <WebShotStatus />

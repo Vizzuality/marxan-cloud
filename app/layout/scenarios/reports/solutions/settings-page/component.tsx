@@ -9,11 +9,11 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import { SCENARIO_PARAMETERS, Types } from './constants';
 
-export interface ScenariosReportPage3Props {
+export interface SettingsPageProps {
 
 }
 
-export const ScenariosReportPage3: React.FC<ScenariosReportPage3Props> = () => {
+export const SettingsPage: React.FC<SettingsPageProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -164,4 +164,4 @@ export const ScenariosReportPage3: React.FC<ScenariosReportPage3Props> = () => {
   );
 };
 
-export default ScenariosReportPage3;
+export default SettingsPage;
