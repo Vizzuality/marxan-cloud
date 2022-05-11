@@ -10,7 +10,7 @@ import {
   UpdatePublishedProjectDto,
 } from '@marxan-api/modules/published-project/dto/create-published-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
 import { FetchSpecification } from 'nestjs-base-service';
@@ -148,7 +148,7 @@ export class PublishedProjectCrudService extends AppBaseService<
 
     const allOwnersOfAllProjectsPlusEmail = await this.usersProjectsRepo.query(
       `
-      select up.project_id, u.email
+      select up.project_id, up.user_id, u.email
         from users_projects as up
            left join users as u
                 on (u."id" = up.user_id)
@@ -163,7 +163,10 @@ export class PublishedProjectCrudService extends AppBaseService<
     const extendedEntities: PublishedProject[] = entitiesAndCount[0].map(
       (entity) => ({
         ...entity,
-        ownerEmails: ownersPerProject[entity.id].map((item) => item.email),
+        ownerEmails: ownersPerProject[entity.id].map((item) => ({
+          id: item.user_id,
+          email: item.email,
+        })),
       }),
     );
 

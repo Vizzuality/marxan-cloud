@@ -4,6 +4,7 @@ import {
   Company,
   Creator,
   Resource,
+  UserEmail,
 } from '../dto/create-published-project.dto';
 
 @Entity('published_projects')
@@ -38,7 +39,7 @@ export class PublishedProject {
   @Column('uuid', { name: 'export_id' })
   exportId?: string;
 
-  ownerEmails?: string[];
+  ownerEmails?: UserEmail[];
 
   @OneToOne(() => Project)
   @JoinColumn({ name: 'id' })
