@@ -1,6 +1,11 @@
 import React from 'react';
 
+import { useRouter } from 'next/router';
+
 import { withProtection, withUser } from 'hoc/auth';
+
+import { useScenario } from 'hooks/scenarios';
+import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
@@ -23,6 +28,25 @@ const styles = {
 };
 
 const SolutionsReport: React.FC = () => {
+  const { query } = useRouter();
+  const { sid, solutionId } = query;
+
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const {
+    data: selectedSolutionData,
+  } = useSolution(sid, solutionId);
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
+
+  const { runId: solutionNumber } = selectedSolutionData || bestSolutionData;
+
   return (
     <>
       <Head title="Solutions Report" />
@@ -41,7 +65,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader title="Selected Solution" />
+        <ReportHeader title={`Selected Solution: ${solutionNumber}`} />
         <SelectedSolutionPage />
       </div>
 
