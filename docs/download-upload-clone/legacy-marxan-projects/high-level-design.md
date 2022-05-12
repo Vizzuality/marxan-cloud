@@ -4,8 +4,8 @@ Importing legacy projects requires several steps, outlined below.
 
 ## Workflow overview
 
-From an API consumer point of view, importing a legacy project happens through
-three main steps and related endpoints.
+From an API consumer point of view, importing a legacy project is performed
+through three main steps and related endpoints.
 
 ### Preparation of project import process
 
@@ -13,7 +13,7 @@ three main steps and related endpoints.
 
 This step will prepare an empty project shell, as well as an empty scenario
 shell, both of which will be populated later in the import process, unless
-errors are raised while validating the user-uploaded data.
+errors are raised while validating user-uploaded data.
 
 The `projectId` of the project being created will be returned, so that the next
 steps can reference the project.
@@ -29,8 +29,22 @@ Each upload will include the actual file alongside a small JSON metadata snippet
 through which the API is informed about which kind of file this is, alongside
 any other metadata needed to import it.
 
+A unique `dataFileId` is returned for each file uploaded successfully.
+
 As API clients send requests to this endpoint, the API keeps the uploaded files
 in a temporary storage area, from which they will be later read and processed.
+
+If a specific kind of file (for example, a planning grid shapefile) is uploaded
+more than once, any previously uploaded copy is discarded and replaced with the
+latest file uploaded. This would be sufficient if a user accidentally uploads
+the wrong file.
+
+In case an uploaded file needs to be fully removed from the set of uploaded
+files (for example, if a user accidentally uploads a `puvspr.dat` file _as if it
+was_ an `output.zip` file), a `DELETE` endpoint is provided, which can be used
+with the `dataFileId` returned on upload:
+
+`DELETE /api/v1/projects/import/legacy/:projectId/data-file/:dataFileId`
 
 ### Data validation and import
 
@@ -43,12 +57,14 @@ Warnings or errors encountered during the validation phase of each piece
 importer will be available via a dedicated endpoint: `GET
 /api/v1/projects/import/legacy/:projectId/validation-results`.
 
-Status of the import process will be available, like any other project- or
-scenario-related status, via `GET /api/v1/projects/:projectId/status`.
+Status information for the import process will be available, like any other
+project- or scenario-related status, via `GET
+/api/v1/projects/:projectId/status`.
 
 As an example, API clients may decide to request validation results if the
 project import process terminates with a failure, as reported by polling the
-status endpoint.
+status endpoint, in order to display a list of errors to the user so that they
+can amend their data before retrying the upload.
 
 ## Workflow details
 
@@ -91,11 +107,11 @@ upload optional files:
     Marxan `output` folder; not all these files will be needed/used, but they
     can be allowed in the import and discarded if not used
   - if users upload output files, they should be given the option to specify via
-    a boolean flag whether the Marxan should be allowed to run (if not,
+    a boolean flag whether the Marxan solver should be allowed to run (if not,
     historical imported solutions will be considered "final" as an archived
     representation of planning done outside of the Marxan Cloud platform)
-  - optionally, one shapefile for each feature (a zip file for each of these)
-  - optionally, a cost surface shapefile (a zip file)
+  - if users upload output files, the `ranAtLeastOnce` flag of the scenario
+    should be set to `true`
 
 - Uploaded content should be stored in a temporary import folder linked to the
   `projectId` of the project being imported, within the storage folder allocated
@@ -115,126 +131,135 @@ processing, either with success or failure_. A failure event should then be
 emitted, and API clients can use the validation results endpoint (see initial
 section) to retrieve a list of errors that led to the import failure.
 
-All validations for input files are expected to be done according to the
-settings and column types and allowed values documented in the _[Marxan Manual,
-2021
+All validations for input files are expected to be done according to settings,
+column types and allowed values documented in the _[Marxan Manual, 2021
 edition](https://marxansolutions.org/wp-content/uploads/2021/02/Marxan-User-Manual_2021.pdf)_.
 
 Validation is carried out asynchronously, using events linked to the id of the
 project shell to report on status.
 
-All validation errors and warnings should be collected and reported back to
-the API consumer as a single document gathering all the errors and warnings,
-through a dedicated API endpoint.
+All validation errors and warnings should be collected and reported back to API
+consumers as a single document gathering all the errors and warnings, through a
+dedicated API endpoint.
 
-  - Planning grid
+#### Validation of Planning grid files
 
-    - Should be validated like any other shapefile (required components, size,
-      etc.)
+- Should be validated like any other shapefile (required components, size,
+  etc.).
 
-    - Each distinct geometry should have a `puid` attribute in the attribute
-      table, and this needs to be an integer number, zero or positive
+- Each distinct geometry should have a `puid` attribute in the attribute table,
+  and this needs to be an integer number, zero or positive.
 
-  - `input.dat`
+#### Validation of `input.dat` files
 
-    - All values in the _General Parameter_, _Annealing Parameters_, _Cost
-      Threshold_ and _Program Control_ setting groups (see Manual section _5.3.1
-      The Input Parameter File (input.dat)_) should be validated to be of the
-      correct type
+- All values in the _General Parameter_, _Annealing Parameters_, _Cost
+  Threshold_ and _Program Control_ setting groups (see Manual section _5.3.1 The
+  Input Parameter File (input.dat)_) should be validated to be of the correct
+  type.
 
-    - Additionally, `BLM` and `NUMREPS` should be validated for their value as
-      for existing validations (for `BLM`) and for consistency (`NUMREPS` should
-      have a sensible upper bound)
+- Additionally, `BLM` and `NUMREPS` should be validated for their value as for
+  existing validations (for `BLM`) and for consistency (`NUMREPS` should have a
+  sensible upper bound).
 
-  - `pu.dat`
+#### Validation of `pu.dat` files
 
-    - All the `puid` values in the planning grid shapefile should have a
-      corresponding row in this file (`id` column values must match the `puid`
-      values in the shapefile's attribute table) and not be duplicated; rows
-      with `id`s that don't match any geometry in the shapefile should be
-      reported as validation warnings only.
+- All the `puid` values in the planning grid shapefile should have a
+  corresponding row in this file (`id` column values must match the `puid`
+  values in the shapefile's attribute table) and not be duplicated; rows with
+  `id`s that don't match any geometry in the shapefile should be reported as
+  validation warnings only.
 
-    - Validation according to section 5.3.3 of the Marxan Manual for `cost` and
-      `status`; `xloc` and `yloc` should be ignored.
+- Validation according to section 5.3.3 of the Marxan Manual for `cost` and
+  `status`; `xloc` and `yloc` should be ignored.
 
-  - `spec.dat`
+#### Validation of `spec.dat` files
 
-    - Validation according to section 5.3.2 of the Marxan Manual.
-    
-    - Only `prop` is supported: if `target` is set for any of the rows, an error
-      should be reported to API consumers, advising to repeat the upload after
-      translating `target` to `prop`.
-    
-    - The `name` property should be enforced as compulsory (it is not compulsory
-      per se according to the Marxan manual, but it will be needed in order to
-      set feature names further on during the import process).
+- Validation according to section 5.3.2 of the Marxan Manual.
 
-  - `puvspr.dat`
+- Only `prop` is supported: if `target` is set for any of the rows, an error
+  should be reported to API consumers, advising to repeat the upload after
+  translating `target` to `prop`.
 
-    - Validation according to section 5.3.4 of the Marxan Manual.
+- The `name` property should be enforced as compulsory (it is not compulsory per
+  se according to the Marxan manual, but it will be needed in order to set
+  feature names further on during the import process).
 
-    - `amount` is assumed to be extent of the feature within the PU in the
-      EPSG:3410 SRID units
+#### Validation of `puvspr.dat` files
 
-  - Output files
+- Validation according to section 5.3.4 of the Marxan Manual.
 
-    - Validation according to section 7 of the Marxan Manual.
+- `amount` is assumed to be extent of the feature within the PU in the
+  EPSG:3410 SRID units
 
-    - For a first iteration of the import functionality, these files may be
-      assumed to be substantially valid; handling possible user tampering of
-      these files would be a complex task way beyond the scope of an initial
-      implementation.
+### Validation of Output files
 
-  - Shapefiles for features (if provided)
+- Validation according to section 7 of the Marxan Manual.
 
-    - Validation as other shapefiles
+- For a first iteration of the import functionality, these files may be assumed
+  to be substantially valid; handling possible tampering of these files would be
+  a complex task way beyond the scope of an initial implementation.
 
-    - Users will provide a numeric id for each shapefile: this needs to match
-      the `id` of one of the `spec.dat` rows
+### When validation fails
 
-  - Cost surface shapefile (if provided)
+If any errors are raised through the validation step linked to any of the
+relevant piece importers, the import process should fail, the project should be
+marked as incomplete, and the only action allowed on it should be the deletion
+of the project itself.
 
-    - Validation as other shapefiles
+All the temporary uploaded data should be deleted from the cloning storage
+volume (honouring the feature flag that allows to keep temporary files on the
+filesystem).
 
-### When initial validation fails
-
-If any errors are gathered through the validation step, the import process
-should fail, the project should be marked as incomplete (and the only action
-allowed on it should be the deletion of the project itself), and all the
-temporary uploaded data should be deleted (honouring the feature flag that
-allows to keep temporary files on the filesystem); users should be able to see
-the list of errors gathered through the validation step (via the validation
-results endpoint for the project).
+Users should be able to see the list of errors gathered through the
+validation step, via the validation results endpoint for the project.
 
 ### Importing data
 
-If the validation step was successful, any warnings gathered through it should
-be available to users via the status endpoint for the shell project, as part
-of the "legacy project import validation completed" event.
-
-Data can now be imported.
-
-- Planning grid should be set from the grid shapefile.
+- Planning grid should be set from the grid shapefile. The numeric `puid` of
+  each planning unit should be set from the `puid` attribute in the source
+  shapefile, so that this can then be matched to the relevant rows in input
+  files.
 
 - Initial cost surface should be set from `pu.dat`.
 
 - PU lock status should be set from `pu.dat`. If any unexpected values are found
   in the `status` column of `pu.dat`, this will trigger a db error and this
-  should cause the import to fail, with an error message pushed to the list of
-  errors to inform the user.
+  should cause the piece importer to fail.
 
-- Project features should be created:
+- Project features should be created, via a spatial join between `puvspr.dat`
+  and the planning grid.
 
-  - either from the uploaded shapefiles for features (if supplied), or
-  - via a spatial join between `puvspr.dat` and the planning grid: in practice,
-    this should lead to a single geometry per feature (that is, one
-    `(geodb)features_data` row) which is the spatial union of all the planning
-    units listed for the given feature in `puvspr.dat` (but see note below about
-    manually setting the feature `amount` per planning unit in order to preserve
-    the value provided on input via `puvspr.dat`). The name of the feature
-    (`(apidb)features.feature_class_name`) should be set from `spec.dat`
+In practice, this should lead to a single geometry per feature (that is, one
+`(geodb)features_data` row) which is the spatial union of all the planning units
+listed for the given feature in `puvspr.dat` (but see note below about manually
+setting the feature `amount` per planning unit in order to preserve the value
+provided on input via `puvspr.dat`). The name of the feature
+(`(apidb)features.feature_class_name`) should be set from the `name` field of
+`spec.dat`; if this is not present (it is not compulsory according to the Marxan
+Manual) a warning should be raised and a dummy feature name should be set (e.g.
+`Unnamed Feature #1`, etc. in some kind of numeric sequence).
 
-All the following import steps are for this only scenario created on import.
+Complexity of these geometries may be a concern in terms of storage and
+performance, and it will depend on some key factors:
+
+- Whether a regular or irregular grid is used
+- Area and count of planning units
+- Dispersion of the feature over the grid
+- Area of the original geometry that falls into the grid (this need to be taken
+  into account due to problems on recalculations that can occur later using the
+  regenerated feature area)
+
+The following assumptions and caveats apply for the initial implementation
+described above:
+
+- The aggregation of regular grids should not generate a large complexity in
+  terms of geometry unless the PU size is small enough or the feature is very
+  dispersed.
+- The aggregation of irregular grids could become very messy due to initial
+  polygon complexity, due to size, or due to dispersion.
+
+All the following import steps are for the initial and only scenario created on
+import.
 
 - Lock status of planning units for the scenario should be set from `pu.dat`.
 
@@ -252,6 +277,10 @@ All the following import steps are for this only scenario created on import.
 - If provided, solutions should be inserted in the relevant tables, marking best
   solutions as appropriate, alongside all the relevant data.
 
+If the validation step linked to any piece importer was successful but warnings
+were raised, these should likewise be available to users via the validation
+results endpoint.
+
 ## Changes needed to existing platform features
 
 - New db and TS enum: `(apidb)project_sources: ['marxan_cloud',
@@ -268,3 +297,8 @@ All the following import steps are for this only scenario created on import.
   that is normally carried out.
 - When processing a request to run Marxan, reject the request if
   `(apidb)scenarios.solutions_are_locked is true`.
+- Exclude projects for which an import process has started but hasn't finished
+  yet, or has failed, from lists of projects.
+- Forbid any changes to be applied to projects that have not been fully
+  imported; deleting them should nevertheless still be possible (in which case
+  any ongoing import process should be halted).
