@@ -23,6 +23,8 @@ export class LegacyProjectImportComponent {
       snapshot.kind,
       snapshot.order,
       new LegacyProjectImportComponentStatus(snapshot.status),
+      snapshot.errors,
+      snapshot.warnings,
     );
   }
 
