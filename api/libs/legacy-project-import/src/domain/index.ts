@@ -1,6 +1,7 @@
+export { LegacyProjectImportFile } from './legacy-project-import-file';
+export { LegacyProjectImportFileType } from './legacy-project-import-file-type';
+export { LegacyProjectImportFileSnapshot } from './legacy-project-import-file.snapshot';
 export {
   LegacyProjectImportPiece,
-  LegacyProjectImportPieceRelativePathResolver,
   LegacyProjectImportPieceOrderResolver,
 } from './legacy-project-import-piece';
-export { LegacyProjectImportPieceId } from './legacy-project-import-piece.id';
