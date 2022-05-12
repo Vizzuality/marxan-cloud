@@ -146,15 +146,14 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   const SCENARIOS_RUNNED = useMemo(() => {
     const status = rawScenariosData
+      .filter((s) => {
+        return s.ranAtLeastOnce;
+      })
       .map((s) => {
-        if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
-          return {
-            label: s.name,
-            value: s.id,
-          };
-        }
-
-        return null;
+        return {
+          label: s.name,
+          value: s.id,
+        };
       });
 
     return {

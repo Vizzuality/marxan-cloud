@@ -125,17 +125,15 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
   const SCENARIOS_RUNNED = useMemo(() => {
     return rawScenariosData
-      .map((s) => {
-        if (s.jobs.find((j) => j.kind === 'run' && j.status === 'done')) {
-          return {
-            label: s.name,
-            value: s.id,
-          };
-        }
-
-        return null;
+      .filter((s) => {
+        return s.ranAtLeastOnce;
       })
-      .filter((s) => !!s);
+      .map((s) => {
+        return {
+          label: s.name,
+          value: s.id,
+        };
+      });
   }, [rawScenariosData]);
 
   const { featuredScenarioId } = tmpValues;
