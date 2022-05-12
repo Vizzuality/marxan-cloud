@@ -28,6 +28,9 @@ export const legacyProjectImportComponentAlreadyFailed = Symbol(
 export const legacyProjectImportDuplicateFile = Symbol(
   `legacy project import already has this file`,
 );
+export const legacyProjectImportDuplicateFileType = Symbol(
+  `legacy project import already has this file type`,
+);
 export const legacyProjectImportMissingRequiredFile = Symbol(
   `legacy project import missing required file`,
 );
@@ -40,7 +43,9 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentNotFound
   | typeof legacyProjectImportComponentAlreadyFailed;
 
-export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportDuplicateFile;
+export type AddFileToLegacyProjectImportErrors =
+  | typeof legacyProjectImportDuplicateFile
+  | typeof legacyProjectImportDuplicateFileType;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
 
@@ -270,6 +275,14 @@ export class LegacyProjectImport extends AggregateRoot {
     );
 
     if (fileTypeAlreadyPresent && !isFeatureShapefileFile) {
+      return left(legacyProjectImportDuplicateFileType);
+    }
+
+    const duplicateArchiveLocation = this.files.some(
+      (el) => el.location === file.location,
+    );
+
+    if (duplicateArchiveLocation) {
       return left(legacyProjectImportDuplicateFile);
     }
 
