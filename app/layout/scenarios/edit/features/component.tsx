@@ -148,7 +148,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
                   <header className="flex justify-between flex-shrink-0">
                     <div>
                       <div className="flex items-baseline space-x-4">
-                        <h2 className="text-lg font-medium font-heading">Sorting out the features</h2>
+                        <h2 className="text-lg font-medium font-heading">Features</h2>
                       </div>
                     </div>
                   </header>

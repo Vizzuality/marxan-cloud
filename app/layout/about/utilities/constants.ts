@@ -25,7 +25,7 @@ export const UTILITIES = [
   },
   {
     order: '07',
-    description: 'Schedule portfolio investments.',
+    description: 'Centralize management and planning portfolios.',
   },
   {
     order: '08',

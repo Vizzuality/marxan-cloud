@@ -15,7 +15,7 @@ export interface HomeBannerProps {
 
 }
 
-const claimLines = [{ id: '0', text: 'free and open' }, { id: '1', text: 'flexible' }, { id: '2', text: 'efficient & repitable' }];
+const claimLines = [{ id: '0', text: 'free & open-source' }, { id: '1', text: 'transparent' }, { id: '2', text: 'repeatable' }];
 
 export const HomeBanner: React.FC<HomeBannerProps> = () => {
   const { ref, inView } = useInView({
