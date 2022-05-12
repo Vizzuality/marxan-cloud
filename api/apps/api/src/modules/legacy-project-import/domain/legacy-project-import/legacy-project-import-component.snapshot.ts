@@ -5,7 +5,6 @@ export interface LegacyProjectImportComponentSnapshot {
   readonly id: string;
   readonly kind: LegacyProjectImportPiece;
   readonly order: number;
-  readonly archiveLocation?: string;
   readonly status: LegacyProjectImportComponentStatuses;
   readonly errors: string[];
   readonly warnings: string[];

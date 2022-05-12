@@ -5,5 +5,4 @@ export enum LegacyProjectImportFileType {
   SpecDat = 'spec-dat',
   PuvsprDat = 'puvspr-dat',
   Output = 'output',
-  FeatureShapefile = 'feature-shapefile',
 }

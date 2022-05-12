@@ -12,7 +12,6 @@ export class LegacyProjectImportComponent {
     readonly id: LegacyProjectImportComponentId,
     readonly kind: LegacyProjectImportPiece,
     readonly order: number,
-    readonly archiveLocation?: ArchiveLocation,
     private status: LegacyProjectImportComponentStatus = LegacyProjectImportComponentStatus.create(),
     private errors: string[] = [],
     private warnings: string[] = [],
@@ -23,22 +22,15 @@ export class LegacyProjectImportComponent {
       new LegacyProjectImportComponentId(snapshot.id),
       snapshot.kind,
       snapshot.order,
-      snapshot.archiveLocation
-        ? new ArchiveLocation(snapshot.archiveLocation)
-        : undefined,
       new LegacyProjectImportComponentStatus(snapshot.status),
     );
   }
 
-  static newOne(
-    kind: LegacyProjectImportPiece,
-    archiveLocation?: ArchiveLocation,
-  ): LegacyProjectImportComponent {
+  static newOne(kind: LegacyProjectImportPiece): LegacyProjectImportComponent {
     return new LegacyProjectImportComponent(
       LegacyProjectImportComponentId.create(),
       kind,
       LegacyProjectImportPieceOrderResolver.resolveFor(kind),
-      archiveLocation,
     );
   }
 
@@ -67,7 +59,6 @@ export class LegacyProjectImportComponent {
       order: this.order,
       status: this.status.toSnapshot(),
       kind: this.kind,
-      archiveLocation: this.archiveLocation?.value,
       errors: this.errors,
       warnings: this.warnings,
     };

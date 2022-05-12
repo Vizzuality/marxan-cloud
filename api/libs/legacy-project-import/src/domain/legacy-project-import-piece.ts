@@ -1,6 +1,5 @@
 export enum LegacyProjectImportPiece {
   PlanningGrid = 'planning-grid',
-  FeatureShapefile = 'feature-shapefile',
   Features = 'features',
   ScenarioPusData = 'scenario-pus-data',
   FeaturesSpecification = 'features-specification',
@@ -16,7 +15,6 @@ export class LegacyProjectImportPieceOrderResolver {
     [LegacyProjectImportPiece.PlanningGrid]: 0,
     [LegacyProjectImportPiece.Features]: 1,
     [LegacyProjectImportPiece.ScenarioPusData]: 1,
-    [LegacyProjectImportPiece.FeatureShapefile]: 2,
     [LegacyProjectImportPiece.FeaturesSpecification]: 2,
     [LegacyProjectImportPiece.Solutions]: 2,
   };

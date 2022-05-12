@@ -138,42 +138,29 @@ export class LegacyProjectImport extends AggregateRoot {
     if (!areRequiredFilesPresent)
       return left(legacyProjectImportMissingRequiredFile);
 
-    const piecesData: {
-      kind: LegacyProjectImportPiece;
-      location?: ArchiveLocation;
-    }[] = [
-      { kind: LegacyProjectImportPiece.PlanningGrid },
-      { kind: LegacyProjectImportPiece.ScenarioPusData },
-      { kind: LegacyProjectImportPiece.Features },
-      { kind: LegacyProjectImportPiece.FeaturesSpecification },
+    const pieces: LegacyProjectImportComponent[] = [
+      LegacyProjectImportComponent.newOne(
+        LegacyProjectImportPiece.PlanningGrid,
+      ),
+      LegacyProjectImportComponent.newOne(
+        LegacyProjectImportPiece.ScenarioPusData,
+      ),
+      LegacyProjectImportComponent.newOne(LegacyProjectImportPiece.Features),
+      LegacyProjectImportComponent.newOne(
+        LegacyProjectImportPiece.FeaturesSpecification,
+      ),
     ];
 
     const solutionsFile = this.files.find(
       (file) => file.type === LegacyProjectImportFileType.Output,
     );
     if (solutionsFile) {
-      piecesData.push({
-        kind: LegacyProjectImportPiece.Solutions,
-        location: solutionsFile.location,
-      });
+      pieces.push(
+        LegacyProjectImportComponent.newOne(LegacyProjectImportPiece.Solutions),
+      );
     }
 
-    this.files
-      .filter(
-        (file) => file.type === LegacyProjectImportFileType.FeatureShapefile,
-      )
-      .forEach((featureShapefile) => {
-        piecesData.push({
-          kind: LegacyProjectImportPiece.FeatureShapefile,
-          location: featureShapefile.location,
-        });
-      });
-
-    return right(
-      piecesData.map(({ kind, location }) =>
-        LegacyProjectImportComponent.newOne(kind, location),
-      ),
-    );
+    return right(pieces);
   }
 
   start(): Either<GenerateLegacyProjectImportPiecesErrors, true> {
@@ -268,13 +255,11 @@ export class LegacyProjectImport extends AggregateRoot {
   addFile(
     file: LegacyProjectImportFile,
   ): Either<AddFileToLegacyProjectImportErrors, true> {
-    const isFeatureShapefileFile =
-      file.type === LegacyProjectImportFileType.FeatureShapefile;
     const fileTypeAlreadyPresent = this.files.some(
       (el) => el.type === file.type,
     );
 
-    if (fileTypeAlreadyPresent && !isFeatureShapefileFile) {
+    if (fileTypeAlreadyPresent) {
       return left(legacyProjectImportDuplicateFileType);
     }
 
