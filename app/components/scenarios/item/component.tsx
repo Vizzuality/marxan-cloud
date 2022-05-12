@@ -95,6 +95,7 @@ export const Item: React.FC<ItemProps> = ({
   jobs,
   runStatus,
   lock,
+  ranAtLeastOnce,
   onEdit,
   onCancelRun,
   onDelete,
@@ -152,8 +153,10 @@ export const Item: React.FC<ItemProps> = ({
     if (runStatus === 'failure') return 'run-failure';
     if (runStatus === 'done') return 'run-done';
 
+    if (ranAtLeastOnce) return 'run-done';
+
     return 'draft';
-  }, [jobs, runStatus]);
+  }, [jobs, runStatus, ranAtLeastOnce]);
 
   const onSettings = useCallback(() => {
     setSettings(!settings);
