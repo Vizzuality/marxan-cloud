@@ -1,13 +1,19 @@
 import React from 'react';
 
+import { useRouter } from 'next/router';
+
 import { withProtection, withUser } from 'hoc/auth';
+
+import { useScenario } from 'hooks/scenarios';
+import { useBestSolution, useSolution } from 'hooks/solutions';
 
 import Head from 'layout/head';
 import MetaIcons from 'layout/meta-icons';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
-import Page1 from 'layout/scenarios/reports/solutions/page-1';
-import Page2 from 'layout/scenarios/reports/solutions/page-2';
-import Page3 from 'layout/scenarios/reports/solutions/page-3';
+import IntroPage from 'layout/scenarios/reports/solutions/intro-page';
+import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
+import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
+import SolutionFrequencyPage from 'layout/scenarios/reports/solutions/solution-frequency-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
@@ -23,34 +29,59 @@ const styles = {
 };
 
 const SolutionsReport: React.FC = () => {
+  const { query } = useRouter();
+  const { sid, solutionId } = query;
+
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+
+  const {
+    data: selectedSolutionData,
+  } = useSolution(sid, solutionId);
+
+  const {
+    data: bestSolutionData,
+  } = useBestSolution(sid, {
+    enabled: scenarioData?.ranAtLeastOnce,
+  });
+
+  const { runId: solutionNumber } = selectedSolutionData || bestSolutionData;
+
   return (
     <>
       <Head title="Solutions Report" />
 
       <MetaIcons />
-
       <div
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader />
-        <Page1 />
+        <IntroPage />
       </div>
 
       <div
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader />
-        <Page2 />
+        <ReportHeader title="Solution Frequency" />
+        <SolutionFrequencyPage />
       </div>
 
       <div
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader />
-        <Page3 />
+        <ReportHeader title={`Selected Solution: ${solutionNumber}`} />
+        <SelectedSolutionPage />
+      </div>
+
+      <div
+        style={styles.page}
+        className="flex flex-col h-full text-black bg-white"
+      >
+        <ReportHeader title="Settings" />
+        <SettingsPage />
       </div>
 
       <WebShotStatus />

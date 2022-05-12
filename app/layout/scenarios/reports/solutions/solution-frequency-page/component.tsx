@@ -8,16 +8,16 @@ import { useProject } from 'hooks/projects';
 import { useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/solutions/page-1/map';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/solution-frequency-page/map';
 
 import LegendItem from 'components/map/legend/item/component';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 
-export interface ScenariosReportPage1Props {
+export interface SolutionFrequencyPageProps {
 
 }
 
-export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
+export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -46,7 +46,23 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
     scenarioId: sid,
   });
 
-  const protectedAreas = protectedAreasData?.filter((a) => a.selected).map((a) => a.name);
+  const protectedAreas = useMemo(() => {
+    return protectedAreasData?.sort((a, b) => {
+      if (a.kind === 'project') return 1;
+      if (a.name === 'Not Reported') return 1;
+      if (b.name !== 'Not Reported') return -1;
+      return a - b;
+    }).map((pa) => {
+      if (pa.kind === 'global' && pa.name !== 'Not Reported') {
+        return {
+          ...pa,
+          name: `Category ${pa.name}`,
+        };
+      } return {
+        ...pa,
+      };
+    }).filter((a) => a.selected).map((a) => a.name);
+  }, [protectedAreasData]);
 
   const {
     data: PUData,
@@ -66,7 +82,7 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
 
   return (
     reportDataIsFetched && (
-      <div className="flex space-x-4">
+      <div className="flex space-x-8">
 
         <section className="flex flex-col justify-between w-1/3">
           <div className="space-y-8 text-xs">
@@ -74,7 +90,6 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
               <p className="font-semibold">Contributors</p>
               <p>{contributors.join(', ')}</p>
             </div>
-
             <div>
               <p className="font-semibold">Protected Areas:</p>
               <p>{protectedAreas.join(', ')}</p>
@@ -82,8 +97,8 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
 
             <div>
               <p className="font-semibold">No. of planning units</p>
-              <p>{`In: ${PUData.included.length || 0}`}</p>
-              <p>{`Out: ${PUData.excluded.length || 0}`}</p>
+              <p>{`In the solution: ${PUData.included.length || 0}`}</p>
+              <p>{`Not included in the solution: ${PUData.excluded.length || 0}`}</p>
             </div>
           </div>
 
@@ -121,4 +136,4 @@ export const ScenariosReportPage1: React.FC<ScenariosReportPage1Props> = () => {
   );
 };
 
-export default ScenariosReportPage1;
+export default SolutionFrequencyPage;
