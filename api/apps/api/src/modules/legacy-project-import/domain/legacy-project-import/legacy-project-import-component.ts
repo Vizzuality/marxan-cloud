@@ -14,6 +14,8 @@ export class LegacyProjectImportComponent {
     readonly order: number,
     readonly archiveLocation?: ArchiveLocation,
     private status: LegacyProjectImportComponentStatus = LegacyProjectImportComponentStatus.create(),
+    private errors: string[] = [],
+    private warnings: string[] = [],
   ) {}
 
   static fromSnapshot(snapshot: LegacyProjectImportComponentSnapshot) {
@@ -48,12 +50,15 @@ export class LegacyProjectImportComponent {
     return this.status.hasFailed();
   }
 
-  complete() {
+  complete(warnings: string[] = []) {
     this.status = this.status.markAsCompleted();
+    this.warnings.push(...warnings);
   }
 
-  markAsFailed() {
+  markAsFailed(errors: string[] = [], warnings: string[] = []) {
     this.status = this.status.markAsFailed();
+    this.errors.push(...errors);
+    this.warnings.push(...warnings);
   }
 
   toSnapshot(): LegacyProjectImportComponentSnapshot {
@@ -63,6 +68,8 @@ export class LegacyProjectImportComponent {
       status: this.status.toSnapshot(),
       kind: this.kind,
       archiveLocation: this.archiveLocation?.value,
+      errors: this.errors,
+      warnings: this.warnings,
     };
   }
 }
