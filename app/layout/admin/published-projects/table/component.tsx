@@ -7,6 +7,7 @@ import { useAdminPublishedProjects } from 'hooks/admin';
 import Search from 'components/search';
 import Table2 from 'components/table2';
 
+import Email from './cells/email';
 import Name from './cells/name';
 import Owner from './cells/owner';
 import Status from './cells/status';
@@ -30,7 +31,6 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
     sort,
     search,
   });
-
   const COLUMNS = useMemo(() => {
     return [
       {
@@ -55,6 +55,13 @@ export const AdminPublishedProjectsTable: React.FC<AdminPublishedProjectsTablePr
         disableSortBy: true,
         Cell: Owner,
         // width: 100,
+      },
+      {
+        Header: 'Email',
+        accessor: 'emails',
+        className: 'text-sm leading-none',
+        disableSortBy: true,
+        Cell: Email,
       },
       {
         Header: 'Status',

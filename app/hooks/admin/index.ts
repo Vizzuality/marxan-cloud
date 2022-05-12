@@ -324,7 +324,14 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
       //   totalItems: 100,
       // },
       data: data?.data.map((d) => {
-        const owners = d.creators ? d.creators.filter((c) => c.roleName === 'project_owner') : [];
+        const { creators, ownerEmails } = d;
+
+        const mergeCreators = creators.map((c) => ({
+          ...ownerEmails.find((o) => (o.id === c.id) && o),
+          ...c,
+        }));
+
+        const owners = mergeCreators ? mergeCreators.filter((c) => c.roleName === 'project_owner') : [];
 
         return {
           id: d.id,
@@ -332,6 +339,7 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
           description: d.description,
           status: d.underModeration ? 'under-moderation' : 'published',
           owners,
+          emails: owners,
         };
       }),
       meta: data?.meta,
