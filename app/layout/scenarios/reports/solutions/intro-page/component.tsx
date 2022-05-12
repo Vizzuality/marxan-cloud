@@ -103,7 +103,7 @@ export const IntroPage: React.FC<IntroPageProps> = () => {
             <div className="flex space-x-1">
               <p className="font-semibold">Planning Unit Grid Shape:</p>
               <p>
-                {planningUnitGridShape === 'hexagon' ? 'Hexagon' : 'Custom'}
+                {(planningUnitGridShape === 'hexagon' || planningUnitGridShape === 'square') ? planningUnitGridShape : 'Custom'}
               </p>
             </div>
 
