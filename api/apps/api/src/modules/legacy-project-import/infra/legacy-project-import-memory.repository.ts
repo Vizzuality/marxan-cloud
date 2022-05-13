@@ -12,15 +12,16 @@ import { LegacyProjectImportEntity } from './entities/legacy-project-import.api.
 @Injectable()
 export class LegacyProjectImportMemoryRepository
   implements LegacyProjectImportRepository {
-  private readonly legacyProjectImports: LegacyProjectImportEntity[] = [];
+  private readonly legacyProjectImports: Record<
+    string,
+    LegacyProjectImportEntity
+  > = {};
   public saveFailure = false;
 
   async find(
     projectId: ResourceId,
   ): Promise<Either<typeof legacyProjectImportNotFound, LegacyProjectImport>> {
-    const legacyProjectImport = this.legacyProjectImports.find(
-      (entity) => entity.projectId === projectId.value,
-    );
+    const legacyProjectImport = this.legacyProjectImports[projectId.value];
 
     if (!legacyProjectImport) return left(legacyProjectImportNotFound);
 
@@ -32,8 +33,12 @@ export class LegacyProjectImportMemoryRepository
   ): Promise<Either<typeof legacyProjectImportSaveError, true>> {
     if (this.saveFailure) return left(legacyProjectImportSaveError);
 
-    this.legacyProjectImports.push(
-      LegacyProjectImportEntity.fromSnapshot(legacyProjectImport.toSnapshot()),
+    const { projectId } = legacyProjectImport.toSnapshot();
+
+    this.legacyProjectImports[
+      projectId
+    ] = LegacyProjectImportEntity.fromSnapshot(
+      legacyProjectImport.toSnapshot(),
     );
     return right(true);
   }

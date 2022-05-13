@@ -4,7 +4,7 @@ import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
-  LocalLegacyProjectImportFilesRepository,
+  LegacyProjectImportFilesLocalRepository,
 } from '@marxan/legacy-project-import';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -35,7 +35,7 @@ import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-im
     },
     {
       provide: LegacyProjectImportFilesRepository,
-      useClass: LocalLegacyProjectImportFilesRepository,
+      useClass: LegacyProjectImportFilesLocalRepository,
     },
     {
       provide: LegacyProjectImportStoragePath,

@@ -17,7 +17,7 @@ import {
   LegacyProjectImportStoragePath,
 } from '../domain/legacy-project-import-files.repository';
 
-export class LocalLegacyProjectImportFilesRepository
+export class LegacyProjectImportFilesLocalRepository
   implements LegacyProjectImportFilesRepository {
   constructor(
     @Inject(LegacyProjectImportStoragePath)
