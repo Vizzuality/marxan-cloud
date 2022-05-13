@@ -137,7 +137,7 @@ module "api_production" {
   image                      = "${var.container_registry_name}.azurecr.io/marxan-api:production"
   deployment_name            = "api"
   application_base_url       = "https://${var.domain}"
-  network_cors_origins       = "https://${var.domain}"
+  network_cors_origins       = "https://${var.domain},http://localhost:3000"
   http_logging_morgan_format = ""
   api_postgres_logging       = "error"
   temp_data_pvc_name         = local.temp_data_pvc_name
@@ -277,7 +277,7 @@ module "api_staging" {
   image                      = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
   deployment_name            = "api"
   application_base_url       = "https://staging.${var.domain}"
-  network_cors_origins       = "https://staging.${var.domain}"
+  network_cors_origins       = "https://staging.${var.domain},http://localhost:3000"
   http_logging_morgan_format = "short"
   api_postgres_logging       = "query"
   temp_data_pvc_name         = local.temp_data_pvc_name
