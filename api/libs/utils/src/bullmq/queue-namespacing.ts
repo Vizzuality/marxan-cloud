@@ -8,7 +8,5 @@
  * provide namespacing through different means than `NODE_ENV`.
  */
 export const bullmqPrefix = () => {
-  return process.env.NODE_ENV
-    ? `bull-${process.env.NODE_ENV}`
-    : 'bull';
+  return process.env.NODE_ENV ? `bull-${process.env.NODE_ENV}` : 'bull';
 };
