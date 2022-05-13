@@ -1,3 +1,6 @@
+import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,6 +17,9 @@ import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-im
       LegacyProjectImportEntity,
       LegacyProjectImportComponentEntity,
       LegacyProjectImportFileEntity,
+      Project,
+      Scenario,
+      Organization,
     ]),
   ],
   providers: [

@@ -13,6 +13,7 @@ import { LegacyProjectImportEntity } from './entities/legacy-project-import.api.
 export class LegacyProjectImportMemoryRepository
   implements LegacyProjectImportRepository {
   private readonly legacyProjectImports: LegacyProjectImportEntity[] = [];
+  public saveFailure = false;
 
   async find(
     projectId: ResourceId,
@@ -29,10 +30,11 @@ export class LegacyProjectImportMemoryRepository
   async save(
     legacyProjectImport: LegacyProjectImport,
   ): Promise<Either<typeof legacyProjectImportSaveError, true>> {
+    if (this.saveFailure) return left(legacyProjectImportSaveError);
+
     this.legacyProjectImports.push(
       LegacyProjectImportEntity.fromSnapshot(legacyProjectImport.toSnapshot()),
     );
-
     return right(true);
   }
 
