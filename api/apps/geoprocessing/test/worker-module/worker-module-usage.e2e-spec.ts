@@ -6,6 +6,7 @@ import * as config from 'config';
 import { ExampleWorkerJobProcessor } from './bullmq-worker-code';
 import { WorkerModule, WorkerBuilder } from '../../src/modules/worker';
 import { getRedisConfig } from '@marxan-geoprocessing/utils/redisConfig.utils';
+import { bullmqPrefix } from '@marxan/utils';
 
 let app: TestingModule;
 let queue: Queue;
@@ -24,7 +25,10 @@ beforeAll(async () => {
   app = await sandbox.init();
   processor = app.get(ExampleProcessingService);
 
-  queue = new Queue(queueName, getRedisConfig());
+  queue = new Queue(queueName, {
+    ...getRedisConfig(),
+    prefix: bullmqPrefix(),
+  });
 });
 
 afterAll(async () => {
