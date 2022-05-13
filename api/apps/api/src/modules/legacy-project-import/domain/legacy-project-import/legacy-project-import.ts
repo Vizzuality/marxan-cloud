@@ -117,7 +117,7 @@ export class LegacyProjectImport extends AggregateRoot {
       .some((piece) => piece.hasFailed());
   }
 
-  private areRequiredFilesPresent(): boolean {
+  public areRequiredFilesUploaded(): boolean {
     const requiredFilesTypes = [
       LegacyProjectImportFileType.PlanningGridShapefile,
       LegacyProjectImportFileType.InputDat,
@@ -134,7 +134,7 @@ export class LegacyProjectImport extends AggregateRoot {
     GenerateLegacyProjectImportPiecesErrors,
     LegacyProjectImportComponent[]
   > {
-    const areRequiredFilesPresent = this.areRequiredFilesPresent();
+    const areRequiredFilesPresent = this.areRequiredFilesUploaded();
     if (!areRequiredFilesPresent)
       return left(legacyProjectImportMissingRequiredFile);
 
