@@ -24,8 +24,8 @@ export class LegacyProjectImportFilesLocalRepository
     private readonly storagePath: string,
   ) {}
 
-  private getStorageRootPath(exportId: string): string {
-    return `${this.storagePath}/${exportId}`;
+  private getStorageRootPath(id: string): string {
+    return `${this.storagePath}/${id}`;
   }
 
   async get(uri: string): Promise<Either<GetFileError, Readable>> {
