@@ -14,7 +14,10 @@ export class QueueEventsBuilder implements OnModuleDestroy {
     if (this.queueEvents) {
       throw new Error('Queue Events is already created!');
     }
-    this.queueEvents = new QueueEvents(queueName, this.config.redis);
+    this.queueEvents = new QueueEvents(
+      queueName,
+      this.config.redis,
+    );
     return this.queueEvents;
   }
 
