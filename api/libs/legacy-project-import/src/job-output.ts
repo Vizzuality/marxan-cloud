@@ -8,4 +8,5 @@ export interface LegacyProjectImportJobOutput {
   readonly projectId: string;
   readonly scenarioId: string;
   readonly piece: LegacyProjectImportPiece;
+  readonly warnings?: string[];
 }
