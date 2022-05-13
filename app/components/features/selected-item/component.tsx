@@ -2,6 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 
 import cx from 'classnames';
 
+import { useFeatureFlags } from 'hooks/feature-flags';
+
 import Button from 'components/button';
 import Checkbox from 'components/forms/checkbox';
 import Select from 'components/forms/select';
@@ -55,7 +57,6 @@ export const Item: React.FC<ItemProps> = ({
   id,
   name,
   className,
-  description,
   type,
 
   splitSelected,
@@ -74,6 +75,11 @@ export const Item: React.FC<ItemProps> = ({
   onMouseEnter,
   onMouseLeave,
 }: ItemProps) => {
+  const {
+    split,
+    strat,
+  } = useFeatureFlags();
+
   // EVENTS
   const onSplitChanged = useCallback(
     (selected) => {
@@ -123,13 +129,13 @@ export const Item: React.FC<ItemProps> = ({
     >
       <header
         className={cx({
-          'px-4 pt-2 pb-4 border-l-4': true,
+          'px-4 py-2 border-l-4': true,
           'border-green-300': type === 'bioregional',
           'border-yellow-300': type === 'species',
         })}
       >
         <div className="flex items-start justify-between">
-          <h2 className="mt-1 text-sm font-heading">{name}</h2>
+          <h2 className="text-sm font-heading">{name}</h2>
 
           {editable && (
             <Button
@@ -141,11 +147,9 @@ export const Item: React.FC<ItemProps> = ({
               Remove
             </Button>
           )}
-
         </div>
-        <div className="mt-2 text-sm opacity-50 clamp-2">{description}</div>
 
-        {type === 'bioregional' && (
+        {type === 'bioregional' && split && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
@@ -190,7 +194,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         )}
 
-        {type === 'species' && editable && (
+        {type === 'species' && editable && strat && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
