@@ -1,3 +1,4 @@
+import { bullmqPrefix } from '@marxan/utils';
 import { Injectable, OnModuleDestroy, Scope } from '@nestjs/common';
 import { Job, Worker } from 'bullmq';
 import { Config } from './config';
@@ -26,6 +27,7 @@ export class WorkerBuilder implements OnModuleDestroy {
         lockDuration: 60000,
         lockRenewTime: 10000,
         concurrency: 10,
+        prefix: bullmqPrefix(),
       },
     );
     return this._worker;

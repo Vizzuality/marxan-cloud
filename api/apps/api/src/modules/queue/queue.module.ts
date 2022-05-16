@@ -13,10 +13,12 @@ export interface QueueConfig {
 @Module({})
 export class QueueModule {
   static register(): DynamicModule;
+
   /**
    * @deprecated
    */
   static register(options: QueueConfig): DynamicModule;
+
   static register(options?: QueueConfig): DynamicModule {
     return {
       module: QueueModule,
