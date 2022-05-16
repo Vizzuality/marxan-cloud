@@ -5,6 +5,7 @@ import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import {
   FeatureDataElement,
+  OutputFeatureDataElement,
   ScenarioFeaturesDataContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
@@ -13,7 +14,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
-import { EntityManager, In } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import {
   ExportPieceProcessor,
   PieceExportProvider,
@@ -23,6 +24,10 @@ type FeaturesSelectResult = {
   id: string;
   feature_class_name: string;
   is_custom: boolean;
+};
+
+type OutputScenarioFeaturesDataSelectResult = OutputFeatureDataElement & {
+  featureScenarioId: string;
 };
 
 type FeatureDataElementWithFeatureId = FeatureDataElement & {
@@ -108,7 +113,7 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
 
   private getFileContent(
     scenarioFeaturesDataWithIsCustom: FeatureDataElementWithIsCustom[],
-    outputScenariosFeaturesData: OutputScenariosFeaturesDataGeoEntity[],
+    outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[],
   ): ScenarioFeaturesDataContent {
     const customFeaturesData: FeatureDataElement[] = [];
     const platformFeaturesData: FeatureDataElement[] = [];
@@ -123,7 +128,7 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         array.push({
           ...sfd,
           outputFeaturesData: outputData.map(
-            ({ id, featureScenarioId, ...rest }) => ({
+            ({ featureScenarioId, ...rest }) => ({
               ...rest,
             }),
           ),
@@ -144,13 +149,27 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         where: { scenarioId: input.resourceId },
         relations: ['featureData'],
       });
-    const outputScenariosFeaturesData = await this.geoprocessingEntityManager
-      .getRepository(OutputScenariosFeaturesDataGeoEntity)
-      .find({
-        where: {
-          featureScenarioId: In(scenarioFeaturesData.map((el) => el.id)),
-        },
-      });
+
+    const outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select('osfd.run_id', 'runId')
+      .addSelect('osfd.amount', 'amount')
+      .addSelect('osfd.occurrences', 'occurrences')
+      .addSelect('osfd.separation', 'separation')
+      .addSelect('osfd.target', 'target')
+      .addSelect('osfd.mpm', 'mpm')
+      .addSelect('osfd.total_area', 'totalArea')
+      .addSelect('osfd.feature_scenario_id', 'featureScenarioId')
+      .from(ScenarioFeaturesData, 'sfd')
+      .innerJoin(
+        OutputScenariosFeaturesDataGeoEntity,
+        'osfd',
+        'sfd.id = osfd.feature_scenario_id',
+      )
+      .where('sfd.scenario_id = :scenarioId', {
+        scenarioId: input.resourceId,
+      })
+      .execute();
 
     const scenarioFeaturesDataWithFeatureId = this.parseScenarioFeaturesDataToFeatureDataElementWithFeatureId(
       scenarioFeaturesData,
