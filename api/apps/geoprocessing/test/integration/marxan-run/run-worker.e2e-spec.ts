@@ -1,7 +1,6 @@
 import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
 import { Job, Queue } from 'bullmq';
-import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
 import { assertDefined, bullmqPrefix } from '@marxan/utils';
 import { JobData, ProgressData } from '@marxan/scenario-run-queue';
@@ -52,7 +51,7 @@ test(`progress reporting`, async () => {
   await fixtures.thenProgressChangedInTheJob(job, progress);
 });
 
-test(`killing run`, async () => {
+test.skip(`killing run`, async () => {
   fixtures.setupForKillingRun();
 
   // given
