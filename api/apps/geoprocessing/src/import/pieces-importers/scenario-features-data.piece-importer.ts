@@ -39,7 +39,7 @@ type FeatureSelectResult = {
   feature_class_name: string;
 };
 
-const CHUNK_SIZE = 100;
+const CHUNK_SIZE = 1000;
 
 @Injectable()
 @PieceImportProvider()
@@ -165,15 +165,19 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     let featureData: FeatureDataSelectResult[] = [];
 
     if (featureIdAndHashes.length > 0) {
-      featureData = await this.geoEntityManager
-        .createQueryBuilder()
-        .select('id', 'featureDataId')
-        .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
-        .from(GeoFeatureGeometry, 'fd')
-        .where(`feature_id || '/' || hash IN (:...featureIdAndHashes)`, {
-          featureIdAndHashes,
-        })
-        .execute();
+      featureData = await Promise.all(
+        chunk(featureIdAndHashes, CHUNK_SIZE).flatMap((idAndHashes) =>
+          this.geoEntityManager
+            .createQueryBuilder()
+            .select('id', 'featureDataId')
+            .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
+            .from(GeoFeatureGeometry, 'fd')
+            .where(`feature_id || '/' || hash IN (:...idAndHashes)`, {
+              idAndHashes,
+            })
+            .execute(),
+        ),
+      );
     }
 
     const map: FeatureDataIdByFeatureIdAndHashMap = {};
