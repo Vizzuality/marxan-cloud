@@ -1,14 +1,15 @@
 export class ScenarioEditingMetadata {
-  analysisPreview = () => ({
+  solutionsTab = () => ({
     scenarioEditingMetadata: {
+      tab: "solutions",
       status: {
-        "protected-areas": "draft",
-        features: "empty",
-        analysis: "empty",
+        features: "draft",
+        solutions: "draft",
+        parameters: "draft",
+        "planning-unit": "draft"
       },
-      tab: "protected-areas",
-      subtab: "protected-areas-preview",
-      lastJobCheck: new Date().getTime(),
-    },
+      subtab: null,
+      lastJobCheck: Date.now(),
+    }
   });
 }
