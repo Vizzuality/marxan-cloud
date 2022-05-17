@@ -19,6 +19,7 @@ import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { chunk } from 'lodash';
 import { Repository } from 'typeorm';
 import { EntityManager } from 'typeorm/entity-manager/EntityManager';
 import {
@@ -134,12 +135,17 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       };
     });
 
-    await em
-      .createQueryBuilder()
-      .insert()
-      .into(OutputScenariosPuDataGeoEntity)
-      .values(insertMarxanRunResultsValues)
-      .execute();
+    const chunkSize = 1000;
+    await Promise.all(
+      chunk(insertMarxanRunResultsValues, chunkSize).map((values) =>
+        em
+          .createQueryBuilder()
+          .insert()
+          .into(OutputScenariosPuDataGeoEntity)
+          .values(values)
+          .execute(),
+      ),
+    );
   }
 
   private async insertBlmResults(
