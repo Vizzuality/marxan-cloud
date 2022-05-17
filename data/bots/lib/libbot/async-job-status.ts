@@ -151,6 +151,7 @@ export class AsyncJobStatus {
     projectId: string,
     waitForTime: keyof typeof WaitForTime = "some",
   ): Promise<boolean> {
+    logInfo(`Generating planning grid...`);
     const opStart = Process.hrtime();
 
     const waitResult = await this.waitFor(
@@ -167,10 +168,10 @@ export class AsyncJobStatus {
     const tookSeconds = tookMs(Process.hrtime(opStart)) / 1e3;
 
     if (waitResult) {
-      logInfo(`Planning grid calculations done in ${tookSeconds}s.`);
+      logInfo(`Planning grid generation done in ${tookSeconds}s.`);
     } else {
       logError(
-        `Waited for ${tookSeconds}s for planning grid calculations, but operation is still ongoing.`,
+        `Waited for ${tookSeconds}s for planning grid generation, but operation is still ongoing.`,
       );
     }
 
@@ -182,6 +183,7 @@ export class AsyncJobStatus {
     scenarioId: string,
     waitForTime: keyof typeof WaitForTime = "short",
   ): Promise<boolean> {
+    logInfo(`Calculating protected area per planning unit grid...`);
     const opStart = Process.hrtime();
 
     const waitResult = await this.waitFor(
@@ -199,10 +201,12 @@ export class AsyncJobStatus {
     const tookSeconds = tookMs(Process.hrtime(opStart)) / 1e3;
 
     if (waitResult) {
-      logInfo(`Protected area calculations done in ${tookSeconds}s.`);
+      logInfo(
+        `Calculation of protected area per planning unit done in ${tookSeconds}s.`,
+      );
     } else {
       logError(
-        `Waited for ${tookSeconds}s for protected area calculations, but operation is still ongoing.`,
+        `Waited for ${tookSeconds}s for calculation of protected area per planning unit, but operation is still ongoing.`,
       );
     }
 
@@ -214,6 +218,7 @@ export class AsyncJobStatus {
     scenarioId: string,
     waitForTime: keyof typeof WaitForTime = "some",
   ): Promise<boolean> {
+    logInfo(`Processing feature specification...`);
     const opStart = Process.hrtime();
 
     const waitResult = await this.waitFor(
@@ -232,11 +237,11 @@ export class AsyncJobStatus {
 
     if (waitResult) {
       logInfo(
-        `Geofeature specification calculations done in ${tookSeconds}s.`,
+        `Feature specification processed in ${tookSeconds}s.`,
       );
     } else {
       logError(
-        `Waited for ${tookSeconds}s for geofeature specification calculations, but operation is still ongoing.`,
+        `Waited for ${tookSeconds}s for feature specification to be processed, but operation is still ongoing.`,
       );
     }
 
@@ -248,6 +253,7 @@ export class AsyncJobStatus {
     scenarioId: string,
     waitForTime: keyof typeof WaitForTime = "some",
   ): Promise<boolean> {
+    logInfo(`Running Marxan...`);
     const opStart = Process.hrtime();
 
     const waitResult = await this.waitFor(
@@ -268,7 +274,7 @@ export class AsyncJobStatus {
       logInfo(`Marxan calculations done in ${tookSeconds}s.`);
     } else {
       logError(
-        `Waited for ${tookSeconds}s for Marxan calculations, but operation is still ongoing.`,
+        `Waited for ${tookSeconds}s for Marxan results, but operation is still ongoing.`,
       );
     }
 
