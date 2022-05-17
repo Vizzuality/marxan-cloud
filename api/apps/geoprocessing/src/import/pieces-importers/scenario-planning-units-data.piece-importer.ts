@@ -12,7 +12,9 @@ import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
+import { v4 } from 'uuid';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
@@ -61,45 +63,49 @@ export class ScenarioPlanningUnitsDataPieceImporter
     const { planningUnitsData }: ScenarioPlanningUnitsDataContent = JSON.parse(
       stringScenarioPlanningUnitsDataOrError,
     );
+    const projectPuIdByPuid: Record<number, string> = {};
 
     await this.entityManager.transaction(async (em) => {
-      const projectPuIdByPuid: Record<number, string> = {};
-      const projectPus = await em
-        .getRepository(ProjectsPuEntity)
-        .find({ projectId });
+      const projectsPuRepo = em.getRepository(ProjectsPuEntity);
+      const projectPus = await projectsPuRepo.find({
+        select: ['id', 'puid'],
+        where: { projectId },
+      });
       projectPus.forEach((pu) => {
         projectPuIdByPuid[pu.puid] = pu.id;
       });
 
-      await em.getRepository(ScenariosPuPaDataGeo).save(
-        planningUnitsData.map((puData) => ({
-          featureList: puData.featureList,
-          projectPuId: projectPuIdByPuid[puData.puid],
-          lockStatus: toLockEnum[puData.lockinStatus ?? 0],
-          protectedArea: puData.protectedArea,
-          protectedByDefault: puData.protectedByDefault,
-          xloc: puData.xloc,
-          yloc: puData.yloc,
-          scenarioId,
-        })),
-      );
+      const chunkSize = 1000;
 
-      const scenarioPus = await em.getRepository(ScenariosPuPaDataGeo).find({
-        where: {
-          scenarioId,
-        },
-        relations: ['projectPu'],
-      });
-      const scenarioPuIdByPuid: Record<number, string> = {};
-      scenarioPus.forEach((pu) => {
-        scenarioPuIdByPuid[pu.projectPu.puid] = pu.id;
-      });
+      await Promise.all(
+        chunk(planningUnitsData, chunkSize).map(async (pusData) => {
+          const scenarioPuIdByPuid: Record<number, string> = {};
 
-      await em.getRepository(ScenariosPuCostDataGeo).save(
-        planningUnitsData.map((puData) => ({
-          cost: puData.cost,
-          scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
-        })),
+          await em.getRepository(ScenariosPuPaDataGeo).save(
+            pusData.map((puData) => {
+              const id = v4();
+              scenarioPuIdByPuid[puData.puid] = id;
+              return {
+                id,
+                featureList: puData.featureList,
+                projectPuId: projectPuIdByPuid[puData.puid],
+                lockStatus: toLockEnum[puData.lockinStatus ?? 0],
+                protectedArea: puData.protectedArea,
+                protectedByDefault: puData.protectedByDefault,
+                xloc: puData.xloc,
+                yloc: puData.yloc,
+                scenarioId,
+              };
+            }),
+          );
+
+          await em.getRepository(ScenariosPuCostDataGeo).save(
+            pusData.map((puData) => ({
+              cost: puData.cost,
+              scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
+            })),
+          );
+        }),
       );
     });
 
