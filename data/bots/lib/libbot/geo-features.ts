@@ -17,7 +17,7 @@ export class GeoFeatures {
     const opStart = Process.hrtime();
 
     const id = await this.baseHttpClient.get(
-      `/projects/${projectId}/features?q=${nameFragment}&fields=id`,
+      `/projects/${projectId}/features?q=${nameFragment}&fields=id&omitFields=properties`,
     )
       .then(getJsonApiDataFromResponse)
       .then((data: { id: string; type: string }[]) => {
