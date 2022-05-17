@@ -96,6 +96,8 @@ Secrets with the corresponding values:
 - `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
 - `AZURE_TENANT_ID`: The Azure Tenant Id. Get from `Base`'s `azure_tenant_id`
 - `BASTION_HOST`: The hostname for the bastion machine. Get from `Base`'s `bastion_hostname`
+- `BASTION_USER`: By default this will be `ubuntu` if using the initial user created on bastion host instantiation. It is configurable in case infrastructure admins wish to configure a different user on the bastion host or the default distro user is renamed.
+- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
@@ -129,10 +131,6 @@ Here's an example of how to run said tunnel on linux:
 
 `ssh -N -L <local port>:<target resource hostname>:<target resource port> <bastion user>@<bastion hostname>`
 
-For TNC's Azure Marxan instance, this would look like:
-
-`ssh -N -i <path to private key file> -L 4433:marxan-f954d274.marxan.privatelink.westeurope.azmk8s.io:433 ubuntu@bastion.marxanplanning.org`
-
 You can now access the target cloud resource on your local host on the port specified above.
 
 
@@ -143,10 +141,9 @@ to match the hostname, so that the certificate can be validated successfully. Th
 this, but one of them is as follows:
 
 - Modify your hosts file (`/etc/hosts` on linux or `C:\Windows\System32\drivers\etc\hosts` on Windows) to resolve the Kubernetes hostname to `127.0.0.1`.
-That is, add `127.0.0.1 marxan-f954d274.marxan.privatelink.westeurope.azmk8s.io` to your hosts file.
+That is, add `127.0.0.1 ********.marxan.privatelink.********.azmk8s.io` to your hosts file.
 - Modify your `kubectl` [configuration file](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/)
 to use a different port when reaching the AKS cluster (append `:<port number>` to the cluster hostname). The config file is at `~/.kube/config`.
-If you are having issues with this, ask Eric Coffman for help.
 - Create an [SSH tunnel](#network-access-to-azure-resources) to that hostname, using the above specified port as
 your local port.
 
@@ -159,28 +156,25 @@ The included Terraform code sets up a PostgreSQL database server in the AKS clus
 it's set up, it won't create the necessary databases and users for the Marxan application to run, as well as enable
 PostGIS. This has to be done manually:
 
-- Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server. You can do this by running:
-`kubectl exec --namespace <namespace> -it <pod name> -- /bin/sh`. The pod names are: `api-postgres-postgresql-0` and `geoprocessing-postgres-postgresql-0`
-for both the `staging` and `production` environments.
+- Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server. You can do this by running: `kubectl exec --namespace <namespace> -it <pod name> -- /bin/sh`. The pod names are: `api-postgres-postgresql-0` and `geoprocessing-postgres-postgresql-0` for both the `staging` and `production` environments.
 - Create a database and a user with the corresponding credentials (see either the relevant
 [Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or
 the [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
-Note: this should already be done by Terraform in the secrets module (see ./modules/secrets/main.tf).
+***Note***: this should already be done by Terraform (see secrets module ./modules/secrets/main.tf).
 - Enable the following extensions for that database, _before starting any
   backend services_, as the PostgreSQL user through which these services connect
   to the databases won't have permissions to enable the extensions via the
-  `create extension` queries that are included in the migration scripts:
-  - `pgcrypto`
-    (`api/apps/api/src/migrations/api/1610395720000-AddSupportForAuthentication.ts`
-    and
-    `api/apps/geoprocessing/src/migrations/geoprocessing/1611828857842-AddFeatureScenarioOutputEntity.ts`)
-  - `tablefunc` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
-  - `plpgsql`(`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`)
-  - `postgis` (`api/apps/api/src/migrations/api/1608149578000-EnablePostgis.ts`
-    and
-    `api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
-  - `postgis_raster` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
-  - `postgis_topology` (`api/apps/geoprocessing/src/migrations/geoprocessing/1611221157285-InitialGeoDBSetup.ts`)
+  `create extension` queries that are included in the migration scripts. To accomplish this bullet, run the following sql with elevated privileges:
+
+```sql
+create extension IF NOT EXISTS pgcrypto;
+create extension IF NOT EXISTS tablefunc;
+create extension IF NOT EXISTS plpgsql;
+create extension IF NOT EXISTS postgis;
+create extension IF NOT EXISTS postgis_raster;
+create extension IF NOT EXISTS postgis_topology;
+```
+
 - Make sure the user has full access to the associated database.
 - Repeat, as needed, for each database used by the project.
 
