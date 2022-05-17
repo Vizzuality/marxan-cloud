@@ -156,15 +156,17 @@ The included Terraform code sets up a PostgreSQL database server in the AKS clus
 it's set up, it won't create the necessary databases and users for the Marxan application to run, as well as enable
 PostGIS. This has to be done manually:
 
-- Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server. You can do this by running: `kubectl exec --namespace <namespace> -it <pod name> -- /bin/sh`. The pod names are: `api-postgres-postgresql-0` and `geoprocessing-postgres-postgresql-0` for both the `staging` and `production` environments.
+- Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server.
+You can do this by running: `kubectl exec --namespace <namespace> -it <pod name> -- /bin/sh`.
+The pod names are: `api-postgres-postgresql-0` and `geoprocessing-postgres-postgresql-0` for
+both the `staging` and `production` environments.
 - Create a database and a user with the corresponding credentials (see either the relevant
-[Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or
-the [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
-***Note***: this should already be done by Terraform (see secrets module ./modules/secrets/main.tf).
-- Enable the following extensions for that database, _before starting any
-  backend services_, as the PostgreSQL user through which these services connect
-  to the databases won't have permissions to enable the extensions via the
-  `create extension` queries that are included in the migration scripts. To accomplish this bullet, run the following sql with elevated privileges:
+[Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or the
+[Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
+***Note***:
+this should already be done by Terraform (see secrets module ./modules/secrets/main.tf).
+- Enable the required database extensions. They must be executed by a user with elevated
+privileges initially for the migrations to succeed. Execute the following sql commands:
 
 ```sql
 create extension IF NOT EXISTS pgcrypto;
@@ -174,9 +176,8 @@ create extension IF NOT EXISTS postgis;
 create extension IF NOT EXISTS postgis_raster;
 create extension IF NOT EXISTS postgis_topology;
 ```
-
 - Make sure the user has full access to the associated database.
-- Repeat, as needed, for each database used by the project.
+- Repeat for each database used by the project.
 
 You may need to manually restart application pods once the PostgreSQL users and databases are in place, and verify
 that they connect successfully.
