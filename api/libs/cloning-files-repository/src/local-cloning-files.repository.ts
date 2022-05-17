@@ -1,23 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
-import {
-  createReadStream,
-  createWriteStream,
-  existsSync,
-  mkdirSync,
-  rmSync,
-} from 'fs';
-import { dirname } from 'path';
+import { createReadStream, existsSync, rmSync } from 'fs';
 import { Readable } from 'stream';
+import { ensureFolderExists, storeFile } from '../../utils/src/file-operations';
 import {
   CloningFilesRepository,
   CloningStoragePath,
-  fileAlreadyExists,
   fileNotFound,
   GetFileError,
   hackerFound,
   SaveFileError,
-  unknownError,
 } from './cloning-files.repository';
 
 @Injectable()
@@ -25,41 +17,6 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
   constructor(
     @Inject(CloningStoragePath) private readonly storagePath: string,
   ) {}
-
-  private ensureFolderExists(path: string): void {
-    const directory = dirname(path);
-    const directoryExists = existsSync(directory);
-
-    if (!directoryExists) {
-      mkdirSync(directory, { recursive: true });
-    }
-  }
-
-  private async saveFile(
-    path: string,
-    stream: Readable,
-  ): Promise<Either<SaveFileError, string>> {
-    const fileExists = existsSync(path);
-
-    if (fileExists) {
-      return left(fileAlreadyExists);
-    }
-
-    const writer = createWriteStream(path);
-
-    return new Promise((resolve) => {
-      writer.on('close', () => {});
-      writer.on(`finish`, () => {
-        resolve(right(path));
-      });
-      writer.on('error', (error) => {
-        console.error(error);
-        resolve(left(unknownError));
-      });
-
-      stream.pipe(writer);
-    });
-  }
 
   private getStorageRootPath(exportId: string): string {
     return `${this.storagePath}/${exportId}`;
@@ -75,9 +32,9 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
   ): Promise<Either<SaveFileError, string>> {
     const path = `${this.getStorageRootPath(exportId)}/export.zip`;
 
-    this.ensureFolderExists(path);
+    ensureFolderExists(path);
 
-    return this.saveFile(path, stream);
+    return storeFile(path, stream);
   }
 
   saveCloningFile(
@@ -87,9 +44,9 @@ export class LocalCloningFilesStorage implements CloningFilesRepository {
   ): Promise<Either<SaveFileError, string>> {
     const path = `${this.getFilesFolderFor(exportId)}/${relativePath}`;
 
-    this.ensureFolderExists(path);
+    ensureFolderExists(path);
 
-    return this.saveFile(path, stream);
+    return storeFile(path, stream);
   }
 
   async deleteExportFolder(exportId: string): Promise<void> {

@@ -25,6 +25,9 @@ export const legacyProjectImportComponentAlreadyCompleted = Symbol(
 export const legacyProjectImportComponentAlreadyFailed = Symbol(
   `legacy project import component already failed`,
 );
+export const legacyProjectImportIsNotAcceptingFiles = Symbol(
+  `legacy project import file is not accepting files`,
+);
 export const legacyProjectImportDuplicateFile = Symbol(
   `legacy project import already has this file`,
 );
@@ -44,6 +47,7 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentAlreadyFailed;
 
 export type AddFileToLegacyProjectImportErrors =
+  | typeof legacyProjectImportIsNotAcceptingFiles
   | typeof legacyProjectImportDuplicateFile
   | typeof legacyProjectImportDuplicateFileType;
 
@@ -255,6 +259,10 @@ export class LegacyProjectImport extends AggregateRoot {
   addFile(
     file: LegacyProjectImportFile,
   ): Either<AddFileToLegacyProjectImportErrors, true> {
+    if (!this.isAcceptingFiles) {
+      return left(legacyProjectImportIsNotAcceptingFiles);
+    }
+
     const fileTypeAlreadyPresent = this.files.some(
       (el) => el.type === file.type,
     );
