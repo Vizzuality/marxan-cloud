@@ -113,7 +113,7 @@ export class AsyncJobStatus {
     until: JobStatuses,
     retryOptions: RetryOptions,
   ): Promise<boolean> {
-    logInfo(
+    logDebug(
       `Polling for ${job.kind} until status is ${until} for ${
         job.for.scenarioId
           ? "scenario " + job.for.scenarioId
@@ -130,17 +130,17 @@ export class AsyncJobStatus {
     const interval = ms(retryOptions.interval) as number;
 
     for (const i of [...Array(retryOptions.maxTries).keys()]) {
-      logInfo(`Retry ${i} of ${retryOptions.maxTries}...`);
+      logDebug(`Retry ${i} of ${retryOptions.maxTries}...`);
       const status = await this.get(job);
       if (status === until) {
-        logInfo(`Current status is ${status}.`);
+        logDebug(`Current status is ${status}.`);
         return true;
       }
       if (status === JobStatuses.failure) {
         logError(`Operation failed.`);
         return false;
       }
-      logInfo(`Current status is ${status}: waiting for ${interval / 1e3}s`);
+      logDebug(`Current status is ${status}: waiting for ${interval / 1e3}s`);
       await sleep(interval / 1e3);
     }
 
@@ -169,7 +169,7 @@ export class AsyncJobStatus {
     if (waitResult) {
       logInfo(`Planning grid calculations done in ${tookSeconds}s.`);
     } else {
-      logInfo(
+      logError(
         `Waited for ${tookSeconds}s for planning grid calculations, but operation is still ongoing.`,
       );
     }
@@ -201,7 +201,7 @@ export class AsyncJobStatus {
     if (waitResult) {
       logInfo(`Protected area calculations done in ${tookSeconds}s.`);
     } else {
-      logInfo(
+      logError(
         `Waited for ${tookSeconds}s for protected area calculations, but operation is still ongoing.`,
       );
     }
@@ -235,7 +235,7 @@ export class AsyncJobStatus {
         `Geofeature specification calculations done in ${tookSeconds}s.`,
       );
     } else {
-      logInfo(
+      logError(
         `Waited for ${tookSeconds}s for geofeature specification calculations, but operation is still ongoing.`,
       );
     }
@@ -267,7 +267,7 @@ export class AsyncJobStatus {
     if (waitResult) {
       logInfo(`Marxan calculations done in ${tookSeconds}s.`);
     } else {
-      logInfo(
+      logError(
         `Waited for ${tookSeconds}s for Marxan calculations, but operation is still ongoing.`,
       );
     }

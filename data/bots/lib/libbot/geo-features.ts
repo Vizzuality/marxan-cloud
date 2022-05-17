@@ -33,7 +33,7 @@ export class GeoFeatures {
 
     if (!id || id.length === 0) {
       throw new Error(
-        "No feature found with given name: this is probably a bug in this bot",
+        `No feature found with name "${nameFragment}": this is probably a bug in this bot.`,
       );
     }
 

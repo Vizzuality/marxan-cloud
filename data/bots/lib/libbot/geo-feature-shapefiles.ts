@@ -51,7 +51,7 @@ export class GeoFeatureShapefiles extends FileUploader {
       .catch(logError);
 
     logInfo(
-      `Custom geofeature shapefile uploaded in ${
+      `Custom geofeature shapefile (${shapefile.metadata.name} from ${shapefile.metadata.fileName}) uploaded in ${
         tookMs(Process.hrtime(opStart))
       }ms.`,
     );
