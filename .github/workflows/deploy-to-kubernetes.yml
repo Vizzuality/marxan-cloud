@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'develop'
+      - 'staging'
     paths:
       - 'app/**'
       - 'api/**'
@@ -106,7 +106,7 @@ jobs:
           kubectl rollout restart deployment webshot -n production
 
       - name: Redeploy staging pods
-        if: ${{ github.ref == 'refs/heads/develop' }}
+        if: ${{ github.ref == 'refs/heads/staging' }}
         run: |
           kubectl rollout restart deployment api -n staging
           kubectl rollout restart deployment client -n staging

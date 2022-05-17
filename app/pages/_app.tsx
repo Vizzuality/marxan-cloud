@@ -23,6 +23,7 @@ import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
 
 import 'styles/tailwind.css';
+import { CookiesProvider } from 'react-cookie';
 
 const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   const [routeLoading, setRouteLoading] = useState({
@@ -68,44 +69,46 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   }, []); // eslint-disable-line
 
   return (
-    <ReduxProvider store={store}>
-      <QueryClientProvider client={queryClientRef.current}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <AuthenticationProvider
-            session={pageProps.session}
-            options={{
-              clientMaxAge: 5 * 60, // Re-fetch session if cache is older than 60 seconds
-              keepAlive: 10 * 60, // Send keepAlive message every 10 minutes
-            }}
-          >
-            <MediaContextProvider>
-              <OverlayProvider>
-                <MultipleModalProvider>
-                  <ToastProvider
-                    placement="top-right"
-                    defaultAutoDismiss
-                    defaultAutoDismissTime={5000}
-                  >
-                    <HelpProvider>
-                      <PlausibleProvider domain="marxan.vercel.app">
-                        <Loading {...routeLoading} />
-                        <div className={cx({
-                          'bg-black': !lightThemeRegex.test(pathname),
-                          'bg-white': lightThemeRegex.test(pathname),
-                        })}
-                        >
-                          <Component {...pageProps} />
-                        </div>
-                      </PlausibleProvider>
-                    </HelpProvider>
-                  </ToastProvider>
-                </MultipleModalProvider>
-              </OverlayProvider>
-            </MediaContextProvider>
-          </AuthenticationProvider>
-        </Hydrate>
-      </QueryClientProvider>
-    </ReduxProvider>
+    <CookiesProvider>
+      <ReduxProvider store={store}>
+        <QueryClientProvider client={queryClientRef.current}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <AuthenticationProvider
+              session={pageProps.session}
+              options={{
+                clientMaxAge: 5 * 60, // Re-fetch session if cache is older than 60 seconds
+                keepAlive: 10 * 60, // Send keepAlive message every 10 minutes
+              }}
+            >
+              <MediaContextProvider>
+                <OverlayProvider>
+                  <MultipleModalProvider>
+                    <ToastProvider
+                      placement="top-right"
+                      defaultAutoDismiss
+                      defaultAutoDismissTime={5000}
+                    >
+                      <HelpProvider>
+                        <PlausibleProvider domain="marxan.vercel.app">
+                          <Loading {...routeLoading} />
+                          <div className={cx({
+                            'bg-black': !lightThemeRegex.test(pathname),
+                            'bg-white': lightThemeRegex.test(pathname),
+                          })}
+                          >
+                            <Component {...pageProps} />
+                          </div>
+                        </PlausibleProvider>
+                      </HelpProvider>
+                    </ToastProvider>
+                  </MultipleModalProvider>
+                </OverlayProvider>
+              </MediaContextProvider>
+            </AuthenticationProvider>
+          </Hydrate>
+        </QueryClientProvider>
+      </ReduxProvider>
+    </CookiesProvider>
   );
 };
 

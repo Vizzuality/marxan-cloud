@@ -30,9 +30,14 @@ variable "sparkpost_api_key" {
   description = "The API key for Sparkpost"
 }
 
-variable "backend_storage_size" {
+variable "temp_data_storage_size" {
   type        = string
-  description = "Size of the backend storage claim"
+  description = "Size of the backend storage claim for temporary data"
+}
+
+variable "cloning_storage_size" {
+  type        = string
+  description = "Size of the backend storage claim for project cloning"
 }
 
 variable "container_registry_name" {

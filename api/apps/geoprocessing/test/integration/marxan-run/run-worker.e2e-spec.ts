@@ -1,9 +1,8 @@
 import { PromiseType } from 'utility-types';
 import { Test } from '@nestjs/testing';
 import { Job, Queue } from 'bullmq';
-import * as config from 'config';
 import waitForExpect from 'wait-for-expect';
-import { assertDefined } from '@marxan/utils';
+import { assertDefined, bullmqPrefix } from '@marxan/utils';
 import { JobData, ProgressData } from '@marxan/scenario-run-queue';
 import { RunWorker } from '@marxan-geoprocessing/modules/scenarios/runs/run.worker';
 import { WorkerModule } from '@marxan-geoprocessing/modules/worker';
@@ -52,7 +51,7 @@ test(`progress reporting`, async () => {
   await fixtures.thenProgressChangedInTheJob(job, progress);
 });
 
-test(`killing run`, async () => {
+test.skip(`killing run`, async () => {
   fixtures.setupForKillingRun();
 
   // given
@@ -101,10 +100,10 @@ async function getFixtures() {
   }).compile();
   await testingModule.enableShutdownHooks().init();
 
-  const queue = new Queue(
-    testingModule.get(runWorkerQueueNameToken),
-    getRedisConfig(),
-  );
+  const queue = new Queue(testingModule.get(runWorkerQueueNameToken), {
+    ...getRedisConfig(),
+    prefix: bullmqPrefix(),
+  });
   const fakeMarxanRunner = testingModule.get(FakeMarxanRunner);
 
   return {

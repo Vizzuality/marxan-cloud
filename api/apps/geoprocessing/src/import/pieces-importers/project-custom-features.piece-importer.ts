@@ -14,6 +14,7 @@ import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
+import { chunk } from 'lodash';
 
 @Injectable()
 @PieceImportProvider()
@@ -113,12 +114,17 @@ export class ProjectCustomFeaturesPieceImporter
         }),
       );
 
-      await this.geoprocessingEntityManager
-        .createQueryBuilder()
-        .insert()
-        .into(GeoFeatureGeometry)
-        .values(featuresDataInsertValues)
-        .execute();
+      const chunkSize = 1000;
+      await Promise.all(
+        chunk(featuresDataInsertValues, chunkSize).map((values) =>
+          this.geoprocessingEntityManager
+            .createQueryBuilder()
+            .insert()
+            .into(GeoFeatureGeometry)
+            .values(values)
+            .execute(),
+        ),
+      );
     });
 
     return returnValue;
