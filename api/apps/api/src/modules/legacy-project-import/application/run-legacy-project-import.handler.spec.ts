@@ -1,3 +1,4 @@
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import {
@@ -7,8 +8,11 @@ import {
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { isLeft, isRight } from 'fp-ts/Either';
 import { v4 } from 'uuid';
+import { LegacyProjectImportPieceRequested } from '../domain/events/legacy-project-import-piece-requested.event';
+import { LegacyProjectImportRequested } from '../domain/events/legacy-project-import-requested.event';
 import {
   LegacyProjectImport,
   legacyProjectImportMissingRequiredFile,
@@ -16,6 +20,7 @@ import {
 import {
   legacyProjectImportNotFound,
   LegacyProjectImportRepository,
+  legacyProjectImportSaveError,
 } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { LegacyProjectImportMemoryRepository } from '../infra/legacy-project-import-memory.repository';
 import {
@@ -32,23 +37,36 @@ beforeEach(async () => {
 
 it(`runs a legacy project import`, async () => {
   await fixtures.GivenAnExistingLegacyProjectImport();
-  await fixtures.GivenFilesAreUploaded();
+  await fixtures.GivenAllFilesAreUploaded();
   const result = await fixtures.WhenRunningALegacyProjectImport();
   await fixtures.ThenStartingLegacyProjectImportIsUpdated(result);
+  fixtures.ThenLegacyProjectImportRequestedEventIsEmitted();
+  fixtures.ThenLegacyProjectImportPieceRequestedAreRequested();
 });
 
 it(`fails to run when missing uploaded files`, async () => {
   fixtures.GivenAnExistingLegacyProjectImport();
+  fixtures.GivenNotAllFilesAreUploaded();
   const result = await fixtures.WhenRunningALegacyProjectImport();
   fixtures.ThenNoEventsAreEmitted();
-  fixtures.ThenMissingUploadedError(result);
+  await fixtures.ThenLegacyProjectImportIsNotUpdated();
+  fixtures.ThenMissingUploadedErrorIsReturned(result);
 });
 
-it(`fails to run when there is not an existing legacy project import  `, async () => {
+it(`fails to run when there is not an existing legacy project import`, async () => {
   fixtures.GivenNoExistingLegacyProjectImport();
   const result = await fixtures.WhenRunningALegacyProjectImport();
   fixtures.ThenNoEventsAreEmitted();
-  fixtures.ThenMissingLegacyProjectImportError(result);
+  fixtures.ThenMissingLegacyProjectImportErrorIsReturned(result);
+});
+
+it(`fails to run when updating legacy project import fails`, async () => {
+  await fixtures.GivenAnExistingLegacyProjectImport();
+  await fixtures.GivenAllFilesAreUploaded();
+  fixtures.GivenUpdatingALegacyProjectImportFails();
+  const result = await fixtures.WhenRunningALegacyProjectImport();
+  fixtures.ThenNoEventsAreEmitted();
+  fixtures.ThenUpdateErrorIsReturned(result);
 });
 
 const getFixtures = async () => {
@@ -58,6 +76,10 @@ const getFixtures = async () => {
       {
         provide: LegacyProjectImportRepository,
         useClass: LegacyProjectImportMemoryRepository,
+      },
+      {
+        provide: getRepositoryToken(UsersProjectsApiEntity),
+        useValue: { save: () => {} },
       },
       RunLegacyProjectImportHandler,
     ],
@@ -98,7 +120,8 @@ const getFixtures = async () => {
     GivenNoExistingLegacyProjectImport: () => {},
     GivenAnExistingLegacyProjectImport: () =>
       repo.save(existingLegacyProjectImport),
-    GivenFilesAreUploaded: () => {
+    GivenNotAllFilesAreUploaded: () => {},
+    GivenAllFilesAreUploaded: () => {
       allRequiredFiles.forEach((importFile) =>
         existingLegacyProjectImport.addFile(importFile),
       );
@@ -113,7 +136,25 @@ const getFixtures = async () => {
     ThenNoEventsAreEmitted: () => {
       expect(events).toHaveLength(0);
     },
-    ThenMissingLegacyProjectImportError: async (
+    ThenLegacyProjectImportRequestedEventIsEmitted: () => {
+      expect(events[0] as LegacyProjectImportRequested).toEqual(
+        new LegacyProjectImportRequested(
+          existingLegacyProjectImport.id,
+          new ResourceId(projectId),
+        ),
+      );
+    },
+    ThenLegacyProjectImportPieceRequestedAreRequested: () => {
+      expect(
+        events.slice(1).every((event) => {
+          return (
+            event instanceof LegacyProjectImportPieceRequested &&
+            event.legacyProjectImportId === existingLegacyProjectImport.id
+          );
+        }),
+      );
+    },
+    ThenMissingLegacyProjectImportErrorIsReturned: (
       result: RunLegacyProjectImportResponse,
     ) => {
       expect(result).toBeDefined();
@@ -121,14 +162,21 @@ const getFixtures = async () => {
 
       expect(result.left).toEqual(legacyProjectImportNotFound);
     },
-    ThenMissingUploadedError: async (
+    ThenMissingUploadedErrorIsReturned: (
       result: RunLegacyProjectImportResponse,
     ) => {
       expect(result).toBeDefined();
       if (isRight(result)) throw new Error('the handler should have failed');
 
       expect(result.left).toEqual(legacyProjectImportMissingRequiredFile);
+    },
+    ThenUpdateErrorIsReturned: (result: RunLegacyProjectImportResponse) => {
+      expect(result).toBeDefined();
+      if (isRight(result)) throw new Error('the handler should have failed');
 
+      expect(result.left).toEqual(legacyProjectImportSaveError);
+    },
+    ThenLegacyProjectImportIsNotUpdated: async () => {
       const savedLegacyProjectImport = await repo.find(
         new ResourceId(projectId),
       );
