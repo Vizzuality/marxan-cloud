@@ -29,12 +29,12 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.BLM_CALIBRATION,
     name: 'BLM Calibration',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.',
+    description: 'The boundary length modifier (BLM) adjusts the level of compectness of your plan. You can cailbrate the  BLM value and vizualise the impacts on your plan.',
   },
   {
     id: ScenarioSidebarSubTabs.ADVANCED_SETTINGS,
     name: 'Advanced Settings',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.',
+    description: 'If desirable, you can adjust the runs, iterations and other default Marxan paramters. We recommend consulting the Marxan Manual before adjusting he default values.',
   },
 ];
 export interface ScenariosSidebarEditAnalysisProps {

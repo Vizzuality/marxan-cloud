@@ -25,7 +25,7 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.FEATURES_ADD,
     name: 'Set up features',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    description: 'Add conservation features, set targets, and penalty Factors and vizualise feature distributions.',
   },
   {
     id: ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,

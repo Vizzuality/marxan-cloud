@@ -34,8 +34,8 @@ export const SECTIONS = [
   },
   {
     id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
-    name: 'Gap Analysis',
-    description: 'This gap analysis shows the amount of each feature that would be included if the new conservation plan your are working on is implemented.',
+    name: 'Target Achievement',
+    description: 'View the selected solution´s performance in achieveing the feature targets.',
   },
 ];
 
