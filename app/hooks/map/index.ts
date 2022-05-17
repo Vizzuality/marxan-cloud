@@ -677,6 +677,30 @@ export function usePUGridLayer({
             },
           ] : [],
 
+          // PROTECTED AREAS
+          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null
+            ? [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                layout: {
+                  visibility: getLayerVisibility(WdpaPercentageVisibility),
+                },
+                paint: {
+                  'fill-color': COLORS.wdpa,
+                  'fill-opacity': [
+                    'case',
+                    ['all',
+                      ['has', 'percentageProtected'],
+                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
+                    ],
+                    0.5 * WdpaPercentageOpacity,
+                    0,
+                  ],
+                },
+              },
+            ] : [],
+
           // ANALYSIS - ADJUST PLANNING UNITS
           ...sublayers.includes('lock-in') && !!puIncludedValue ? [
             {
@@ -716,30 +740,6 @@ export function usePUGridLayer({
               },
             },
           ] : [],
-
-          // PROTECTED AREAS
-          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null
-            ? [
-              {
-                type: 'fill',
-                'source-layer': 'layer0',
-                layout: {
-                  visibility: getLayerVisibility(WdpaPercentageVisibility),
-                },
-                paint: {
-                  'fill-color': COLORS.wdpa,
-                  'fill-opacity': [
-                    'case',
-                    ['all',
-                      ['has', 'percentageProtected'],
-                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
-                    ],
-                    0.5 * WdpaPercentageOpacity,
-                    0,
-                  ],
-                },
-              },
-            ] : [],
 
           // SOLUTIONS - FREQUENCY
           ...sublayers.includes('frequency') ? [

@@ -263,7 +263,7 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {type === 'bioregional' && splitSelected && (
+      {type === 'bioregional' && splitSelected && split && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length
@@ -299,7 +299,7 @@ export const Item: React.FC<ItemProps> = ({
         </ul>
       )}
 
-      {type === 'species' && intersectFeaturesSelected && !!intersectFeaturesSelected.length && (
+      {type === 'species' && intersectFeaturesSelected && !!intersectFeaturesSelected.length && strat && (
         <ul className="pl-3">
           {intersectFeaturesSelected.map((f) => {
             return (
