@@ -70,6 +70,8 @@ These resources include, but are not limited to:
 
 The output values include access data for some of the resources above.
 
+When the 'base' is applied, Terraform will create a couple of service principals and so, az cli logged in user must have privileges to do so. When you don't have the privileges, you will get an error that looks like this: `ApplicationsClient.BaseClient.Patch(): unexpected status 403 with OData error: Authorization_RequestDenied: Insufficient privileges to complete the operation`.
+
 #### Kubernetes
 
 Contains the Kubernetes configuration to run Marxan on the resources created in the previous section, as well as some
