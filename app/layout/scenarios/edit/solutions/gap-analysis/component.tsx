@@ -40,23 +40,23 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
           }}
         >
           <Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Gap analysis</h4>
+          <h4 className="text-xs uppercase font-heading text-primary-500">Target Achievement</h4>
         </button>
         <InfoButton
           theme="primary"
         >
           <div>
-            <h4 className="font-heading text-lg mb-2.5">What is the Solutions Gap Analysis?</h4>
+            <h4 className="font-heading text-lg mb-2.5">What is the Solutions Target Achievement?</h4>
             <div className="space-y-2 text-sm opacity-100">
               <p>
                 Before running Marxan you were able to see
                 the percentage of each feature that was currently
                 inside your conservation network in
                 {' '}
-                <b>Gap Analysis</b>
+                <b>Target Achievement</b>
               </p>
               <p>
-                In this Gap analysis, you add to that
+                In this Target Achievement, you add to that
                 previous network all the planning units that have been
                 selected by Marxan,
                 so this new percentage shows the amount of each feature that
@@ -72,7 +72,7 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
           theme="secondary"
           size="xs"
           className="ml-6"
-          onClick={() => console.info('Download - Gap Analysis')}
+          onClick={() => console.info('Download - Target Achievement')}
         >
           Download
         </Button>

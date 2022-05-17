@@ -25,12 +25,12 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.FEATURES_ADD,
     name: 'Set up features',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    description: 'Add conservation features, set targets, and penalty Factors and vizualise feature distributions.',
   },
   {
     id: ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
     name: 'Gap Analysis',
-    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
+    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in the Protected Areas step and/or locked-in planning units). These amounts are shown in relation to the targets.',
   },
 ];
 export interface ScenariosSidebarFeaturesProps {
@@ -106,29 +106,20 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
         content={(
           <div className="space-y-2">
             <p>
-              Features are everything you want to include in
-              your conservation or land/sea use plan such as
-              species ranges, habitats or ecoregions.
+              Features are the important habitats, species, processes, activities,
+              and discrete areas that you want to consider in your planning process.
             </p>
             <p>
-              The first step requires adding features.
-              There are public features available for use that
-              you can access directly
-              or you can upload your private features as a shapefile.
-            </p>
-            <p>
-              The second step of this section requires setting a
-              conservation target and feature penalty factor for
-              each feature.
+              You can add feaures in the Set Up Features step, set targets for them
+              and run gap anlayses.
             </p>
             <p>
               <i>
-                Note on privacy: The features you upload will only
-                be accessible inside your project to you and your
-                contributors. They will not be shared with other users.
+                Note on privacy: the features you upload will only be accessible inside
+                your project to you and your contributors. They will not be shared with
+                other users unless you publish them to the community.
               </i>
             </p>
-
           </div>
         )}
         modifiers={['flip']}
@@ -148,7 +139,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
                   <header className="flex justify-between flex-shrink-0">
                     <div>
                       <div className="flex items-baseline space-x-4">
-                        <h2 className="text-lg font-medium font-heading">Sorting out the features</h2>
+                        <h2 className="text-lg font-medium font-heading">Features</h2>
                       </div>
                     </div>
                   </header>

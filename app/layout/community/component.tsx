@@ -16,14 +16,14 @@ export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
     <>
       <div
         style={{ backgroundImage: `url(${BackgroundImage})` }}
-        className="bg-cover bg-center"
+        className="bg-center bg-cover"
       >
         <Wrapper>
           <div className="grid w-full max-w-5xl grid-cols-2 py-16 mx-auto gap-x-36">
             <Column
               title="Explore the projects shared by the community"
               subtitle="Ready to make a difference? As a user of this platform, you can easily share your projects with others."
-              description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor."
+              description="Publish your projects, promote your plans, engage with others and help build the global evidence base for Marxan applications."
               caption="Explore projects"
               href="/community/projects"
             />
@@ -38,7 +38,7 @@ export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
           </div>
         </Wrapper>
       </div>
-      <div className="bg-white text-black">
+      <div className="text-black bg-white">
         <Wrapper>
           <div className="flex flex-col items-center w-full max-w-5xl py-16 mx-auto gap-x-36 ">
             <div className="flex flex-col w-96">
