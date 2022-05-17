@@ -6,10 +6,10 @@ export class ScenarioEditingMetadata {
         features: "draft",
         solutions: "draft",
         parameters: "draft",
-        "planning-unit": "draft"
+        "planning-unit": "draft",
       },
       subtab: null,
       lastJobCheck: Date.now(),
-    }
+    },
   });
 }
