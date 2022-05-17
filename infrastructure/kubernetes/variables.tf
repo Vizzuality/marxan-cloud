@@ -3,6 +3,11 @@ variable "project_name" {
   description = "The name of the project. Used in naming most of the resources in the infrastructure."
 }
 
+variable "project_resource_group" {
+  type        = string
+  description = "Azure resource group to use for the project."
+}
+
 variable "location" {
   type        = string
   description = "Azure Location in which the resources will be created"
@@ -17,7 +22,6 @@ variable "port" {
 variable "cert_email" {
   type        = string
   description = "Email address to use for cert renovation warnings"
-  default     = "cert@marxan.com"
 }
 
 variable "domain" {
@@ -30,14 +34,9 @@ variable "sparkpost_api_key" {
   description = "The API key for Sparkpost"
 }
 
-variable "temp_data_storage_size" {
+variable "backend_storage_size" {
   type        = string
-  description = "Size of the backend storage claim for temporary data"
-}
-
-variable "cloning_storage_size" {
-  type        = string
-  description = "Size of the backend storage claim for project cloning"
+  description = "Size of the backend storage claim"
 }
 
 variable "container_registry_name" {
@@ -46,7 +45,12 @@ variable "container_registry_name" {
 }
 
 variable "key_vault_access_users" {
-  type = list(string)
+  type        = list(string)
   description = "The names of the users to grant access to the secrets"
-  default = []
+  default     = []
+}
+
+variable "key_vault_name_prefix" {
+  type        = string
+  description = "The prefix to use for the key vault names. KV names must be globally unique."
 }

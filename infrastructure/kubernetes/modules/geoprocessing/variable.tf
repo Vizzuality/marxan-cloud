@@ -45,12 +45,7 @@ variable "cleanup_temporary_folders" {
   description = "Whether to cleanup temporary folders (should only be false temporarily and for diagnostic purposes)"
 }
 
-variable "temp_data_pvc_name" {
+variable "backend_storage_pvc_name" {
   type        = string
-  description = "Name of the PVC to use for backend storage for temporary data"
-}
-
-variable "cloning_pvc_name" {
-  type        = string
-  description = "Name of the PVC to use for backend storage for cloning"
+  description = "Name of the PVC to use for backend storage"
 }

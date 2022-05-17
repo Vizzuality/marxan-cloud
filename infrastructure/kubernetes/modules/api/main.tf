@@ -54,16 +54,9 @@ resource "kubernetes_deployment" "api_deployment" {
         }
 
         volume {
-          name = "shared-temp-data-storage"
+          name = "shared-spatial-data-storage"
           persistent_volume_claim {
-            claim_name = var.temp_data_pvc_name
-          }
-        }
-
-        volume {
-          name = "shared-cloning-storage"
-          persistent_volume_claim {
-            claim_name = var.cloning_pvc_name
+            claim_name = var.backend_storage_pvc_name
           }
         }
 
@@ -75,13 +68,8 @@ resource "kubernetes_deployment" "api_deployment" {
           args = ["start"]
 
           volume_mount {
-            mount_path  = "/tmp/storage"
-            name        = "shared-temp-data-storage"
-          }
-
-          volume_mount {
-            mount_path  = "/opt/marxan-project-cloning"
-            name        = "shared-cloning-storage"
+            mount_path = "/tmp/storage"
+            name       = "shared-spatial-data-storage"
           }
 
           env {
@@ -320,5 +308,3 @@ resource "kubernetes_deployment" "api_deployment" {
     }
   }
 }
-
-

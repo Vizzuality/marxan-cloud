@@ -1,23 +1,25 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan"        // var.project_name
-    storage_account_name = "marxan"        // var.project_name
+    resource_group_name  = "marxan-rg"     // var.project_resource_group
+    storage_account_name = "marxansa"      // ${var.project_name}sa
     container_name       = "marxantfstate" // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
 }
 
 data "azurerm_resource_group" "resource_group" {
-  name = var.project_name
+  name = var.project_resource_group
 }
 
-data "azurerm_subscription" "subscription" {
-}
+data "azurerm_subscription" "subscription" {}
+
+data "github_ip_ranges" "latest" {}
 
 module "network" {
   source         = "./modules/network"
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
+  vpn_cidrs      = concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4)
 }
 
 module "dns" {
@@ -100,6 +102,11 @@ module "log_analytics_workspace" {
   name                = var.project_name
   location            = var.location
   resource_group_name = data.azurerm_resource_group.resource_group.name
+  tags = {
+    Environment = "PRD-STG"
+    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
+    Manager     = "Zach Ferdana (zferdana@tnc.org)"
+  }
 }
 
 module "firewall" {
@@ -114,6 +121,11 @@ module "firewall" {
   subnet_id                    = module.network.firewall_subnet_id
   log_analytics_workspace_id   = module.log_analytics_workspace.id
   log_analytics_retention_days = 30
+  tags = {
+    Environment = "PRD-STG"
+    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
+    Manager     = "Zach Ferdana (zferdana@tnc.org)"
+  }
 }
 
 module "routetable" {
@@ -129,6 +141,11 @@ module "routetable" {
       resource_group_name  = data.azurerm_resource_group.resource_group.name
       virtual_network_name = module.network.aks_vnet_name
     }
+  }
+  tags = {
+    Environment = "PRD-STG"
+    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
+    Manager     = "Zach Ferdana (zferdana@tnc.org)"
   }
 }
 
@@ -159,4 +176,9 @@ module "redis_private_endpoint" {
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
+  tags = {
+    Environment = "PRD-STG"
+    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
+    Manager     = "Zach Ferdana (zferdana@tnc.org)"
+  }
 }

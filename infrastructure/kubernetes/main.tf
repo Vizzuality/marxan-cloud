@@ -1,14 +1,14 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan"        // var.project_name
-    storage_account_name = "marxan"        // var.project_name
+    resource_group_name  = "marxan-rg"     // var.project_resource_group
+    storage_account_name = "marxansa"      // ${var.project_name}sa
     container_name       = "marxantfstate" // ${var.project_name}tfstate
     key                  = "kubernetes.tfstate"
   }
 }
 
 data "azurerm_resource_group" "resource_group" {
-  name = var.project_name
+  name = var.project_resource_group
 }
 
 data "azurerm_subscription" "subscription" {
@@ -16,9 +16,9 @@ data "azurerm_subscription" "subscription" {
 
 data "terraform_remote_state" "core" {
   backend = "azurerm"
-  config  = {
-    resource_group_name  = "marxan"        // var.project_name
-    storage_account_name = "marxan"        // var.project_name
+  config = {
+    resource_group_name  = "marxan-rg"     // var.project_name
+    storage_account_name = "marxansa"      // var.project_name
     container_name       = "marxantfstate" // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
@@ -39,10 +39,8 @@ locals {
   k8s_client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_certificate)
   k8s_client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
   k8s_cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
-  temp_data_storage_class    = "azurefile-csi-temp-data"
-  temp_data_pvc_name         = "shared-temp-data-storage"
-  cloning_storage_class      = "azurefile-csi-cloning-data"
-  cloning_pvc_name           = "shared-cloning-storage"
+  backend_storage_class      = "azurefile-csi-nfs"
+  backend_storage_pvc_name   = "backend-shared-spatial-data-storage"
 }
 
 module "k8s_namespaces" {
@@ -69,19 +67,18 @@ module "k8s_storage" {
   k8s_client_certificate     = local.k8s_client_certificate
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  temp_data_storage_class    = local.temp_data_storage_class
-  cloning_storage_class      = local.cloning_storage_class
+  backend_storage_class      = local.backend_storage_class
 }
 
-####
-# Production
-####
+#region Production
+
 module "key_vault_production" {
   source                 = "./modules/key_vault"
   namespace              = "production"
   resource_group         = data.azurerm_resource_group.resource_group
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
+  key_vault_name_prefix  = var.key_vault_name_prefix
 }
 
 module "k8s_api_database_production" {
@@ -112,19 +109,16 @@ module "k8s_geoprocessing_database_production" {
   container_registry_name    = var.container_registry_name
 }
 
-module "storage_pvc_production" {
+module "backend_storage_pvc_production" {
   source                     = "./modules/volumes"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
-  temp_data_storage_class    = local.temp_data_storage_class
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  temp_data_storage_size     = var.temp_data_storage_size
-  cloning_storage_class      = local.cloning_storage_class
-  cloning_pvc_name           = local.cloning_pvc_name
-  cloning_storage_size       = var.cloning_storage_size
+  backend_storage_class      = local.backend_storage_class
+  backend_storage_pvc_name   = local.backend_storage_pvc_name
+  backend_storage_size       = var.backend_storage_size
 }
 
 module "api_production" {
@@ -137,11 +131,10 @@ module "api_production" {
   image                      = "${var.container_registry_name}.azurecr.io/marxan-api:production"
   deployment_name            = "api"
   application_base_url       = "https://${var.domain}"
-  network_cors_origins       = "https://${var.domain},http://localhost:3000"
+  network_cors_origins       = "https://${var.domain}"
   http_logging_morgan_format = ""
   api_postgres_logging       = "error"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
 module "geoprocessing_production" {
@@ -154,8 +147,7 @@ module "geoprocessing_production" {
   image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
   deployment_name            = "geoprocessing"
   geo_postgres_logging       = "error"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
 module "client_production" {
@@ -212,16 +204,16 @@ module "ingress_production" {
   domain                     = var.domain
 }
 
+#endregion
 
-####
-# Staging
-####
+#region Staging
 module "key_vault_staging" {
   source                 = "./modules/key_vault"
   namespace              = "staging"
   resource_group         = data.azurerm_resource_group.resource_group
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
+  key_vault_name_prefix  = var.key_vault_name_prefix
 }
 
 module "k8s_api_database_staging" {
@@ -252,19 +244,16 @@ module "k8s_geoprocessing_database_staging" {
   container_registry_name    = var.container_registry_name
 }
 
-module "storage_pvc_staging" {
+module "backend_storage_pvc_staging" {
   source                     = "./modules/volumes"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
   k8s_client_key             = local.k8s_client_key
   k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
-  temp_data_storage_class    = local.temp_data_storage_class
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  temp_data_storage_size     = var.temp_data_storage_size
-  cloning_storage_class      = local.cloning_storage_class
-  cloning_pvc_name           = local.cloning_pvc_name
-  cloning_storage_size       = var.cloning_storage_size
+  backend_storage_class      = local.backend_storage_class
+  backend_storage_pvc_name   = local.backend_storage_pvc_name
+  backend_storage_size       = var.backend_storage_size
 }
 
 module "api_staging" {
@@ -277,11 +266,10 @@ module "api_staging" {
   image                      = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
   deployment_name            = "api"
   application_base_url       = "https://staging.${var.domain}"
-  network_cors_origins       = "https://staging.${var.domain},http://localhost:3000"
+  network_cors_origins       = "https://staging.${var.domain}"
   http_logging_morgan_format = "short"
   api_postgres_logging       = "query"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
 module "geoprocessing_staging" {
@@ -295,8 +283,7 @@ module "geoprocessing_staging" {
   deployment_name            = "geoprocessing"
   cleanup_temporary_folders  = "false"
   geo_postgres_logging       = "query"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  backend_storage_pvc_name   = local.backend_storage_pvc_name
 }
 
 module "client_staging" {
@@ -353,3 +340,4 @@ module "ingress_staging" {
   domain                     = var.domain
   domain_prefix              = "staging"
 }
+#endregion

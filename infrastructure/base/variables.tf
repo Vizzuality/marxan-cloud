@@ -3,6 +3,11 @@ variable "project_name" {
   description = "The name of the project. Used in naming most of the resources in the infrastructure."
 }
 
+variable "project_resource_group" {
+  type        = string
+  description = "Azure resource group to use for the project."
+}
+
 variable "container_registry_name" {
   type        = string
   description = "Name for the Azure CR. Must be globally unique"
@@ -20,7 +25,7 @@ variable "bastion_ssh_public_key" {
 
 variable "domain" {
   type        = string
-  description = "The domain name"
+  description = "The domain name without the 'www.' prefix."
 }
 
 variable "github_org" {
@@ -41,4 +46,9 @@ variable "github_staging_branch" {
 variable "github_production_branch" {
   type        = string
   description = "Name of the Github branch for the staging deployment code"
+}
+
+variable "vpn_cidrs" {
+  type        = list(string)
+  description = "Comma separated list of CIDRs for the TNC VPN"
 }
