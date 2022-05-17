@@ -4,10 +4,10 @@ import {
   GetFileError,
   SaveFileError,
   storageNotReachable,
-  unknownError,
 } from '@marxan/cloning-files-repository';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
+import { unknownError } from '@marxan/utils/file-operations';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';

@@ -14,6 +14,7 @@ import { isDefined, readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { chunk } from 'lodash';
 import { EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
 import {
@@ -390,16 +391,17 @@ export class ScenarioFeaturesSpecificationPieceImporter
       const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
 
       await Promise.all(
-        Object.keys(featureIdsBySpecificationId).map(
-          async (specificationId) => {
-            const featureIds = featureIdsBySpecificationId[specificationId];
+        Object.keys(featureIdsBySpecificationId).flatMap((specificationId) => {
+          const featureIds = featureIdsBySpecificationId[specificationId];
+          const chunkSize = 1000;
 
-            return scenarioFeaturesDataRepo.update(
-              { scenarioId, featureId: In(featureIds) },
+          return chunk(featureIds, chunkSize).map((chunkFeatureIds) =>
+            scenarioFeaturesDataRepo.update(
+              { scenarioId, featureId: In(chunkFeatureIds) },
               { specificationId },
-            );
-          },
-        ),
+            ),
+          );
+        }),
       );
     });
 

@@ -1,7 +1,4 @@
-import {
-  CloningFilesRepository,
-  unknownError,
-} from '@marxan/cloning-files-repository';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ClonePiece,
   ComponentId,
@@ -15,12 +12,13 @@ import {
   signatureFileRelativePath,
 } from '@marxan/cloning/infrastructure/clone-piece-data/manifest-file';
 import { isMarxanExecutionMetadataFolderRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
+import { readableToBuffer } from '@marxan/utils';
+import { unknownError } from '@marxan/utils/file-operations';
 import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { Entry, Parse } from 'unzipper';
-import { readableToBuffer } from '../../../../../../../libs/utils/src';
 import { ExportId } from '../../export';
 import { ExportRepository } from '../../export/application/export-repository.port';
 import { ManifestFileService } from '../../export/application/manifest-file-service.port';
