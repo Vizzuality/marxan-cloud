@@ -136,7 +136,6 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
           <HelpBeacon
             id="project-list"
             title="Project list"
-            subtitle="project list"
             content={(
               <div>
                 You can see all your projects listed here.
