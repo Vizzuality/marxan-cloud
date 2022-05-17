@@ -30,7 +30,7 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
     name: 'Gap Analysis',
-    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in Protected Areas) and will inform you of the amount of conservation action still needed to achieve your targets.',
+    description: 'A gap analysis shows the percentage of each feature that is currently inside the selected conservation network (the conservation areas that were added in the Protected Areas step and/or locked-in planning units). These amounts are shown in relation to the targets.',
   },
 ];
 export interface ScenariosSidebarFeaturesProps {
