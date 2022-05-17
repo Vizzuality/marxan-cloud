@@ -2,14 +2,15 @@ import { Organization } from '@marxan-api/modules/organizations/organization.api
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import {
+  LegacyProjectImportFilesLocalRepository,
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
-  LegacyProjectImportFilesLocalRepository,
 } from '@marxan/legacy-project-import';
-import { Module } from '@nestjs/common';
+import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../../utils/config.utils';
+import { ApiEventsModule } from '../../api-events';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { LegacyProjectImportComponentEntity } from '../infra/entities/legacy-project-import-component.api.entity';
 import { LegacyProjectImportFileEntity } from '../infra/entities/legacy-project-import-file.api.entity';
@@ -21,6 +22,7 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
 
 @Module({
   imports: [
+    ApiEventsModule,
     CqrsModule,
     TypeOrmModule.forFeature([
       LegacyProjectImportEntity,
@@ -53,6 +55,7 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
     MarkLegacyProjectImportAsFailedHandler,
     MarkLegacyProjectImportPieceAsFailedHandler,
     StartLegacyProjectImportHandler,
+    { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
 export class LegacyProjectImportApplicationModule {}
