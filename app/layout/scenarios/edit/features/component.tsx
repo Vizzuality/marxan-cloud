@@ -106,29 +106,20 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
         content={(
           <div className="space-y-2">
             <p>
-              Features are everything you want to include in
-              your conservation or land/sea use plan such as
-              species ranges, habitats or ecoregions.
+              Features are the important habitats, species, processes, activities,
+              and discrete areas that you want to consider in your planning process.
             </p>
             <p>
-              The first step requires adding features.
-              There are public features available for use that
-              you can access directly
-              or you can upload your private features as a shapefile.
-            </p>
-            <p>
-              The second step of this section requires setting a
-              conservation target and feature penalty factor for
-              each feature.
+              You can add feaures in the Set Up Features step, set targets for them
+              and run gap anlayses.
             </p>
             <p>
               <i>
-                Note on privacy: The features you upload will only
-                be accessible inside your project to you and your
-                contributors. They will not be shared with other users.
+                Note on privacy: the features you upload will only be accessible inside
+                your project to you and your contributors. They will not be shared with
+                other users unless you publish them to the community.
               </i>
             </p>
-
           </div>
         )}
         modifiers={['flip']}

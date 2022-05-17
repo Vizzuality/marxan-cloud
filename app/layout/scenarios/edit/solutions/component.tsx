@@ -86,16 +86,14 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
               You can see all solutions or you can
               filter to see only
               the 5 most different ones.
-              You can select here which solution to view on the map and download the results.
+              You can select which solution to view on the map and download the results.
             </p>
             <p>
               Under
               {' '}
-              <b>Gap Analysis</b>
+              <b>Target Achievement</b>
               {' '}
-              you can see
-              how much your conservation network would improve
-              the current conservation of your features.
+              you can see how well the solutions meet your feature targets.
             </p>
 
           </div>

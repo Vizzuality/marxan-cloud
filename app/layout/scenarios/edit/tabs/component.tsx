@@ -78,11 +78,13 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
 
           <ul className="pl-6 space-y-1 list-decimal">
             <li>
-              First you will
-              decide if you want to
-              include existing conservation areas in
-              <b> Planning unit</b>
-              .
+              The
+              {' '}
+              <b> Planning units</b>
+              {' '}
+              stage allows you to include conservation areas in your conservation plan,
+              adjust or exlude other areas you don&apos;t want to consider, and include
+              cost surfaces.
             </li>
             <li>
               Then you will
@@ -94,24 +96,20 @@ export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
               .
             </li>
             <li>
-              Next you will be able to see the current
-              conservation state of your features, add a cost
-              surface and decide
-              if there are any other areas that
-              you would like to exclude or
-              include in
+              Next you will be able to review the current conservation coverage
+              of your features in the network based on your actions in Step 1,
+              and Calibrate your settings in
               {' '}
               <b> Parameters</b>
               .
             </li>
             <li>
-              Finally, you will
-              run Marxan and view the results in
+              Finally, in the
               {' '}
               <b> Solutions</b>
-              .
-              You can then go back to the other tabs to make
-              modifications and run Marxan again
+              {' '}
+              stage you will be able to run and view your results.
+              You can make modifications to any of these stages as you go along.
             </li>
           </ul>
 

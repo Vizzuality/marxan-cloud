@@ -57,11 +57,9 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
             title="Create new project"
             content={(
               <div>
-                Creating a project is the first step to be able to
-                perform a Marxan analysis.
-                Under a project you can create multiple alternative scenarios that
-                share the same planning region.
-
+                Creating a project is the first step to starting a planning analysis.
+                Within a project you can create multiple Marxan scenarios that share
+                the same planning region.
               </div>
             )}
           >

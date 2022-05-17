@@ -135,8 +135,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
                 </p>
               </li>
               <li>
-                Exclude or force include
-                some planning units in the analysis in
+                Exclude or lock-in additional areas in
                 <b>
                   {' '}
                   ADJUST
