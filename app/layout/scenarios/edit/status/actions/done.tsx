@@ -31,6 +31,7 @@ export const useScenarioActionsDone = () => {
   const { subtab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: scenarioData } = useScenario(sid);
+  console.log(scenarioData);
 
   const scenarioMutation = useSaveScenario({
     requestConfig: {
@@ -311,7 +312,7 @@ export const useScenarioActionsDone = () => {
         JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onRunRone', (
+        addToast('onRunError', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -330,6 +331,40 @@ export const useScenarioActionsDone = () => {
     addToast,
   ]);
 
+  // Run
+  const onCloneImportDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          scenarioData?.metadata?.scenarioEditingMetadata,
+        ),
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onCloneError', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    addToast,
+  ]);
+
   return {
     features: onFeaturesDone,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationDone,
@@ -338,5 +373,7 @@ export const useScenarioActionsDone = () => {
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     calibration: onCalibrationDone,
     run: onRunDone,
+    clone: onCloneImportDone,
+    import: onCloneImportDone,
   };
 };

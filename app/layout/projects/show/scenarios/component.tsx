@@ -130,7 +130,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   });
 
   const onDuplicate = useCallback((scenarioId, scenarioName) => {
-    duplicateScenarioMutation.mutate({ id: scenarioId }, {
+    duplicateScenarioMutation.mutate({ sid: scenarioId }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
           <>
@@ -140,7 +140,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               {' '}
               {scenarioName}
               {' '}
-              duplicated
+              start duplicating
             </p>
           </>
         ), {
