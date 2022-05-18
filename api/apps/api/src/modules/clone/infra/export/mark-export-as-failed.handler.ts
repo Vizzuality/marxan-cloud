@@ -26,7 +26,7 @@ export class MarkExportAsFailedHandler
     this.logger.setContext(MarkExportAsFailedHandler.name);
   }
 
-  async execute({ exportId }: MarkExportAsFailed): Promise<void> {
+  async execute({ exportId, reason }: MarkExportAsFailed): Promise<void> {
     const exportInstance = await this.exportRepository.find(exportId);
 
     if (!exportInstance) {
@@ -45,6 +45,7 @@ export class MarkExportAsFailedHandler
         exportId: exportId.value,
         resourceId: resourceId.value,
         resourceKind,
+        reason,
       },
     });
 
@@ -58,6 +59,7 @@ export class MarkExportAsFailedHandler
         data: {
           resourceId: importResourceId,
           resourceKind,
+          reason: 'Export failed' + reason ? ` - ${reason}` : '',
         },
       });
     }
