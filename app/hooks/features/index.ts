@@ -121,7 +121,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
               label: k,
               values: properties[k].map((v) => ({ id: v, name: v })),
             };
-          }): [];
+          }) : [];
 
           splitFeaturesOptions = splitSelected ? splitOptions
             .find((s) => s.key === splitSelected).values
