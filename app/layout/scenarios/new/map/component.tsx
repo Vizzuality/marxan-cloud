@@ -21,6 +21,7 @@ import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 import Legend from 'components/map/legend';
 import LegendItem from 'components/map/legend/item';
@@ -51,6 +52,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const PlanningAreaLayer = useProjectPlanningAreaLayer({
     active: true,
@@ -125,6 +127,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
         onClick={handleClick}
         onMapViewportChange={handleViewportChange}
         onMapLoad={() => setMapInteractive(true)}
+        onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
         {(map) => {
@@ -145,6 +148,10 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
       {/* Controls */}
       <Controls>
+        <LoadingControl
+          loading={!mapTilesLoaded}
+        />
+
         <ZoomControl
           viewport={{
             ...viewport,
