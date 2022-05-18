@@ -26,7 +26,7 @@ export const HomeBeta: React.FC<HomeBetaProps> = () => {
         setCookie('beta', 'true', { path: '/' });
       }}
     >
-      <div className="p-10 pb-2.5 space-y-2.5 text-gray-700">
+      <div className="p-10 pb-2.5 space-y-2.5 text-gray-700 overflow-x-hidden overflow-y-auto">
         <h2 className="mb-5 text-2xl">Welcome to the Marxan Planning Platform (MaPP) - Beta!</h2>
         <p>
           While we put the finishing touches on development, we invite you to come inside and see what Marxan MaPP has to offer. Once you complete registration and enter the platform, you can bring the Okavango demo from the Community page into your dashboard and start exploring!
