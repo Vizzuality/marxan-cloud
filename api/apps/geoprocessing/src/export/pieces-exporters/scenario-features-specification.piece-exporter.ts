@@ -155,10 +155,20 @@ export class ScenarioFeaturesSpecificationPieceExporter
         operation: config.operation,
         selectSubSets: config.selectSubSets,
         splitByProperty: config.splitByProperty,
-        features: config.features.map(({ calculated, featureId }) => ({
-          featureId: scenarioFeaturesDataById[featureId].featureId,
-          calculated,
-        })),
+        // featureId property refers to scenario_feature_data id column.
+        // Since a scenario can have several non-draft specifications and each
+        // time a new specification is set scenario_feature_data records are changed
+        // it is possible to have old scenario_features_data ids. Thats the reason why
+        // config.features array should be filtered here. In practice, only the features
+        // array of the last non-draft feature specification config will be exported
+        features: config.features
+          .filter(({ featureId }) =>
+            Boolean(scenarioFeaturesDataById[featureId]),
+          )
+          .map(({ calculated, featureId }) => ({
+            featureId: scenarioFeaturesDataById[featureId].featureId,
+            calculated,
+          })),
       };
       const temp =
         scenarioFeatureConfigsBySpecificationId[config.specificationId];
