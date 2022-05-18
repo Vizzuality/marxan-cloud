@@ -138,7 +138,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                     iconClassName="w-10 h-10 text-primary-500"
                   />
 
-                  <div className="flex justify-between space-x-10">
+                  <div className="grid justify-between w-full grid-cols-2 gap-x-10">
                     <div className="flex items-center flex-grow flex-shrink-0">
                       <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
                       <div className="flex flex-col items-end flex-grow">
