@@ -311,7 +311,43 @@ export const useScenarioActionsDone = () => {
         JOB_REF.current = null;
       },
       onError: () => {
-        addToast('onRunRone', (
+        addToast('onRunError', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [
+    sid,
+    scenarioMutation,
+    scenarioData?.metadata,
+    dispatch,
+    setJob,
+    setCache,
+    addToast,
+  ]);
+
+  // Run
+  const onCloneImportDone = useCallback((JOB_REF) => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          scenarioData?.metadata?.scenarioEditingMetadata,
+        ),
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+        dispatch(setCache(Date.now()));
+        JOB_REF.current = null;
+      },
+      onError: () => {
+        addToast('onCloneError', (
           <>
             <h2 className="font-medium">Error!</h2>
           </>
@@ -338,5 +374,7 @@ export const useScenarioActionsDone = () => {
     planningUnitsInclusion: onPlanningUnitsInclusionDone,
     calibration: onCalibrationDone,
     run: onRunDone,
+    clone: onCloneImportDone,
+    import: onCloneImportDone,
   };
 };

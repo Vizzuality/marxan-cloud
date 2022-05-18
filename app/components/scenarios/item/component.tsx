@@ -60,6 +60,14 @@ const SCENARIO_STATES = {
     text: 'Fail Features',
     styles: 'text-red-500',
   },
+  'clone-running': {
+    text: 'Running cloning',
+    styles: 'text-white',
+  },
+  'clone-failure': {
+    text: 'Fail cloning scenario',
+    styles: 'text-red-500',
+  },
   draft: {
     text: 'Edited',
     styles: 'text-gray-400',
@@ -112,6 +120,7 @@ export const Item: React.FC<ItemProps> = ({
     const geofeatureStratification = jobs.find((j) => j.kind === 'geofeatureStratification');
     const specification = jobs.find((j) => j.kind === 'specification');
     const calibration = jobs.find((j) => j.kind === 'calibration');
+    const clone = jobs.find((j) => j.kind === 'clone');
     const run = jobs.find((j) => j.kind === 'run');
 
     // PROTECTED AREAS
@@ -152,6 +161,10 @@ export const Item: React.FC<ItemProps> = ({
     if (runStatus === 'running') return 'run-running';
     if (runStatus === 'failure') return 'run-failure';
     if (runStatus === 'done') return 'run-done';
+
+    // CLONE
+    if (clone && clone.status === 'running') return 'clone-running';
+    if (clone && clone.status === 'failure') return 'clone-failure';
 
     if (ranAtLeastOnce) return 'run-done';
 
