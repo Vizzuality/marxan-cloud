@@ -34,7 +34,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
     >
       <HeroAnimation />
       <Wrapper>
-        <div className="relative z-10 flex flex-col justify-between w-full h-full max-w-5xl py-8 m-auto md:py-0 md:mt-64 md:mb-48">
+        <div className="relative z-10 flex flex-col justify-between w-full h-full max-w-5xl py-8 m-auto md:py-0 md:mt-52 md:mb-48">
           <div className="lg:pr-80">
             <motion.h1
               className="pb-8 text-5xl font-semibold leading-tight"
