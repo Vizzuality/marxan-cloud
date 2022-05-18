@@ -47,7 +47,6 @@ variable "container_registry_name" {
 variable "key_vault_access_users" {
   type        = list(string)
   description = "The names of the users to grant access to the secrets"
-  default     = []
 }
 
 variable "key_vault_name_prefix" {
