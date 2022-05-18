@@ -232,6 +232,31 @@ export const useScenarioActionsFailure = () => {
     });
   }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
 
+  const onCloneImportFailure = useCallback(() => {
+    scenarioMutation.mutate({
+      id: `${sid}`,
+      data: {
+        metadata: mergeScenarioStatusMetaData(
+          scenarioData?.metadata,
+          scenarioData?.metadata?.scenarioEditingMetadata?.lastTab,
+        ),
+      },
+    }, {
+      onSuccess: () => {
+        dispatch(setJob(null));
+      },
+      onError: () => {
+        addToast('onRunFailure', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [sid, scenarioMutation, scenarioData?.metadata, dispatch, setJob, addToast]);
+
   return {
     features: onFeaturesFailure,
     planningAreaProtectedCalculation: onPlanningAreaProtectedCalculationFailure,
@@ -240,5 +265,7 @@ export const useScenarioActionsFailure = () => {
     planningUnitsInclusion: onPlanningUnitsInclusionFailure,
     calibration: onCalibrationFailure,
     run: onRunFailure,
+    clone: onCloneImportFailure,
+    import: onCloneImportFailure,
   };
 };
