@@ -6,6 +6,8 @@ export const TEXTS_RUNNING = {
   costSurface: () => 'Processing cost surface...',
   calibration: () => 'Processing calibration...',
   run: () => 'Running Marxan...',
+  clone: () => 'Cloning scenario...',
+  import: () => 'Importing scenario...',
 };
 
 export const TEXTS_FAILURE = {
@@ -16,4 +18,6 @@ export const TEXTS_FAILURE = {
   costSurface: () => 'Fail Processing cost surface',
   calibration: () => 'Fail Processing calibration',
   run: () => 'Fail Running Marxan',
+  clone: () => 'Fail Cloning scenario',
+  import: () => 'Fail Importing scenario',
 };

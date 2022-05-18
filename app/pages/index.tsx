@@ -8,7 +8,6 @@ import Footer from 'layout/footer';
 import Head from 'layout/head';
 import Header from 'layout/header';
 import Banner from 'layout/home/banner';
-import Beta from 'layout/home/beta';
 import Features from 'layout/home/features';
 import Intro from 'layout/home/intro';
 import PartnersList from 'layout/home/partners';
@@ -44,7 +43,6 @@ const Home: React.FC = () => {
         <Features />
         <PartnersList />
         <Footer />
-        <Beta />
       </main>
     </>
   );

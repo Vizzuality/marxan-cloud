@@ -760,10 +760,10 @@ export function useDuplicateScenario({
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const duplicateScenario = ({ id }: DuplicateScenarioProps) => {
+  const duplicateScenario = ({ sid }: DuplicateScenarioProps) => {
     // Pending endpoint
     return SCENARIOS.request({
-      url: `/${id}`,
+      url: `/${sid}/clone`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -773,9 +773,7 @@ export function useDuplicateScenario({
 
   return useMutation(duplicateScenario, {
     onSuccess: (data: any, variables, context) => {
-      const { id, projectId } = data;
-      queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.invalidateQueries(['scenarios', id]);
+      queryClient.invalidateQueries(['scenarios']);
       console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {

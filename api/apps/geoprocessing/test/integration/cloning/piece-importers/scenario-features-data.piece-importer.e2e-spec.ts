@@ -1,6 +1,8 @@
 import { ScenarioFeaturesDataPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/scenario-features-data.piece-importer';
+import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ImportJobInput } from '@marxan/cloning';
+import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import {
   ArchiveLocation,
   ClonePiece,
@@ -9,15 +11,16 @@ import {
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioFeaturesDataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
+import { isLeft } from 'fp-ts/lib/Either';
+import { Readable } from 'stream';
 import { EntityManager, In } from 'typeorm';
-import { v4 } from 'uuid';
+import { v4, validate } from 'uuid';
 import {
   DeleteFeatures,
   DeleteProjectAndOrganization,
@@ -25,9 +28,6 @@ import {
   GivenFeaturesData,
   GivenScenarioExists,
 } from '../fixtures';
-import { Readable } from 'stream';
-import { isLeft } from 'fp-ts/lib/Either';
-import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 
 function getFeatureClassNameByIdMap(
   features: { id: string; feature_class_name: string }[],
@@ -331,6 +331,10 @@ const getFixtures = async () => {
           expect(scenarioFeaturesData).toHaveLength(
             expectedAmountOfScenarioFeaturesDataRecords,
           );
+          const [scenarioFeatureData] = scenarioFeaturesData;
+          expect(validate(scenarioFeatureData.featureDataId)).toBe(true);
+          expect(scenarioFeatureData.scenarioId).toBe(scenarioId);
+
           expect(outputScenarioFeaturesData).toHaveLength(
             expectedAmountOfScenarioFeaturesDataRecords *
               recordsOfOutputDataForEachScenarioFeaturesData,
