@@ -165,8 +165,8 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     let featureData: FeatureDataSelectResult[] = [];
 
     if (featureIdAndHashes.length > 0) {
-      featureData = await Promise.all(
-        chunk(featureIdAndHashes, CHUNK_SIZE).flatMap((idAndHashes) =>
+      const records = await Promise.all(
+        chunk(featureIdAndHashes, CHUNK_SIZE).map((idAndHashes) =>
           this.geoEntityManager
             .createQueryBuilder()
             .select('id', 'featureDataId')
@@ -178,6 +178,7 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
             .execute(),
         ),
       );
+      featureData = records.flat();
     }
 
     const map: FeatureDataIdByFeatureIdAndHashMap = {};
