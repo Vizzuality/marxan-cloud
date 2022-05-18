@@ -70,8 +70,13 @@ export const BlmChart: React.FC<BlmChartProps> = ({
     return data?.map((v) => v.cost);
   }, [data]);
 
+  const boundaryLengthValues = useMemo(() => {
+    return data?.map((v) => v.boundaryLength);
+  }, [data]);
+
   const maxCostValue = format('.3~s')(Math.ceil(Math.max(...costValues) / 1000) * 1000);
   const minCostValue = format('.3~s')(Math.floor(Math.min(...costValues) / 1000) * 1000);
+  const maxBoundaryLengthValue = format('.3~s')(Math.ceil(Math.max(...boundaryLengthValues) / 1000) * 1000);
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -142,8 +147,34 @@ export const BlmChart: React.FC<BlmChartProps> = ({
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
+
+      {containerRef.current && (
+        <div className="flex flex-col">
+          <g>
+            <text
+              x="0"
+              y="0"
+              textAnchor="middle"
+              className="text-xs text-white fill-current"
+            >
+              Boundary length
+            </text>
+          </g>
+          <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) - 85})`}>
+            <text
+              x="0"
+              y="0"
+              className="text-xs text-white fill-current"
+            >
+              {maxBoundaryLengthValue}
+            </text>
+          </g>
+        </div>
+      )}
+
       {containerRef.current && (
         <svg width={width} height={height}>
+
           {/* X axis */}
           <g>
             <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>

@@ -130,7 +130,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
   });
 
   const onDuplicate = useCallback((scenarioId, scenarioName) => {
-    duplicateScenarioMutation.mutate({ id: scenarioId }, {
+    duplicateScenarioMutation.mutate({ sid: scenarioId }, {
       onSuccess: ({ data: { data: s } }) => {
         addToast('success-duplicate-project', (
           <>
@@ -140,7 +140,7 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
               {' '}
               {scenarioName}
               {' '}
-              duplicated
+              start duplicating
             </p>
           </>
         ), {
@@ -248,10 +248,10 @@ export const ProjectScenarios: React.FC<ProjectScenariosProps> = () => {
                         subtitle: 'List and detail overview',
                         content: (
                           <div>
-                            Here you can see listed all the scenarios under the same project.
-                            You can access a scenario and edit it at any time, unless there is
-                            a contributor working on the same scenario. In this case, you will
-                            see a warning.
+                            This is the list of all the scenarios you create under a project.
+                            You can access, edit and view scenarios. Updates on scenario edits
+                            and analysis are provided. Warnings will be issued if the scenario
+                            is currently being edited by another contributor.
                           </div>
                         ),
                       }}

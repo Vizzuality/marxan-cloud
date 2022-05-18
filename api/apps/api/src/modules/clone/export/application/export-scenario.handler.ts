@@ -35,6 +35,7 @@ export class ExportScenarioHandler
       id: newScenarioId,
       name: scenario.name + ' - copy',
       projectId: scenario.projectId,
+      metadata: scenario.metadata,
     });
   }
 

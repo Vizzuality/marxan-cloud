@@ -17,7 +17,7 @@ export class GeoFeatures {
     const opStart = Process.hrtime();
 
     const id = await this.baseHttpClient.get(
-      `/projects/${projectId}/features?q=${nameFragment}&fields=id`,
+      `/projects/${projectId}/features?q=${nameFragment}&fields=id&omitFields=properties`,
     )
       .then(getJsonApiDataFromResponse)
       .then((data: { id: string; type: string }[]) => {
@@ -33,7 +33,7 @@ export class GeoFeatures {
 
     if (!id || id.length === 0) {
       throw new Error(
-        "No feature found with given name: this is probably a bug in this bot",
+        `No feature found with name "${nameFragment}": this is probably a bug in this bot.`,
       );
     }
 

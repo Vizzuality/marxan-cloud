@@ -26,12 +26,12 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
     name: 'Protected Areas',
-    description: 'You can select current protected areas listed in World Database of Protected Areas (WCMC-UNEP) or upload your own protected area geometry.',
+    description: ' You can import protected areas from the World Database of Protected Areas (WDPA), and upload your own custom protected area geometry.',
   },
   {
     id: ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS,
-    name: 'Adjust planning units (optional)',
-    description: 'The status of a planning unit determines whether it is included in every solution (i.e. locked in) or excluded (i.e. locked out). The default status is neither included or excluded but determined during the Marxan analysis.',
+    name: 'Adjust planning unit status (optional)',
+    description: 'The status of a planning unit determines whether it is included in every solution (i.e. locked in) or excluded (i.e. locked out). The default status is "available" for selection.',
   },
   {
     id: ScenarioSidebarSubTabs.COST_SURFACE,
@@ -135,8 +135,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
                 </p>
               </li>
               <li>
-                Exclude or force include
-                some planning units in the analysis in
+                Exclude or lock-in additional areas in
                 <b>
                   {' '}
                   ADJUST

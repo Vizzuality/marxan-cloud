@@ -2,7 +2,6 @@ export {
   GetFileError,
   CloningFilesRepository,
   SaveFileError,
-  unknownError,
   storageNotReachable,
   fileNotFound,
   hackerFound,

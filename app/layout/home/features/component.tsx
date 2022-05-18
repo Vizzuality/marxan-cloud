@@ -82,7 +82,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
               >
                 <Link href="/community/projects">
                   <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
-                    Explore planning examples from around the world and learn
+                    Explore and learn from planning examples around the world
                   </p>
                 </Link>
                 <div className="w-full mt-10 overflow-hidden">

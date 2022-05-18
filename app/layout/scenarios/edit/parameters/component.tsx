@@ -29,12 +29,12 @@ const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.BLM_CALIBRATION,
     name: 'BLM Calibration',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.',
+    description: 'The boundary length modifier (BLM) adjusts the level of compectness of your plan. You can cailbrate the  BLM value and vizualise the impacts on your plan.',
   },
   {
     id: ScenarioSidebarSubTabs.ADVANCED_SETTINGS,
     name: 'Advanced Settings',
-    description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. In a iaculis nulla. Duis aliquam lacus massa, id sollicitudin massa.',
+    description: 'If desirable, you can adjust the runs, iterations and other default Marxan paramters. We recommend consulting the Marxan Manual before adjusting he default values.',
   },
 ];
 export interface ScenariosSidebarEditAnalysisProps {
@@ -170,18 +170,8 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
               by the Marxan manual, but you can choose other allowed values.
             </p>
             <p>
-              Some of these parameters have more implications that others.
-              Particularly important is to decide the
-              {' '}
-              <b>Number of Runs</b>
-              ,
-              the
-              {' '}
-              <b>Clumping</b>
-              {' '}
-              and the
-              {' '}
-              <b>Conservation Feature missing proportion</b>
+              Please see info buttons and refer to the Marxan resources available
+              from the marxan solutions website for more information on settings.
             </p>
           </div>
         )}
