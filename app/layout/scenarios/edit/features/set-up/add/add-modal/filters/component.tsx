@@ -37,7 +37,7 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
   const INITIAL_VALUES = useMemo(() => {
     return {
       ...filters,
-      sort: sort || SORT[0].id,
+      sort: sort || SORT[2].id,
     };
   }, [filters, sort]);
 

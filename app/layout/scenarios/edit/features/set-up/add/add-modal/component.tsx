@@ -68,8 +68,10 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   } = useAllFeatures(pid, {
     search,
     filters,
-    sort,
+    sort: 'featureClassName',
   });
+
+  console.log({ allFeaturesData });
 
   const INITIAL_VALUES = useMemo(() => {
     if (initialSelectedFeatures) {

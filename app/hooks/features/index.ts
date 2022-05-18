@@ -34,6 +34,7 @@ interface AllItemProps extends IntersectItemProps, RawItemProps { }
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const [session] = useSession();
 
+  console.log({ optionsHook: options });
   const {
     filters = {},
     search,
@@ -121,7 +122,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
               label: k,
               values: properties[k].map((v) => ({ id: v, name: v })),
             };
-          }): [];
+          }) : [];
 
           splitFeaturesOptions = splitSelected ? splitOptions
             .find((s) => s.key === splitSelected).values
