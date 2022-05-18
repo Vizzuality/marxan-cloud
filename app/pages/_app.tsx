@@ -2,6 +2,7 @@ import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 
+import { CookiesProvider } from 'react-cookie';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 
@@ -23,7 +24,6 @@ import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
 
 import 'styles/tailwind.css';
-import { CookiesProvider } from 'react-cookie';
 
 const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
   const [routeLoading, setRouteLoading] = useState({
@@ -91,6 +91,7 @@ const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
                       <HelpProvider>
                         <PlausibleProvider domain="marxan.vercel.app">
                           <Loading {...routeLoading} />
+
                           <div className={cx({
                             'bg-black': !lightThemeRegex.test(pathname),
                             'bg-white': lightThemeRegex.test(pathname),
