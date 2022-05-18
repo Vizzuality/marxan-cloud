@@ -235,9 +235,9 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                     })}
                   </div>
 
-                  <div>
+                  <div className="mb-8">
 
-                    <h3 className="mt-10 mb-4 text-sm font-bold text-white">Boundary Length</h3>
+                    <h3 className="mt-10 mb-2 text-sm font-bold text-white">Calibration results</h3>
 
                     <div className="w-full h-32">
                       <BlmChart
