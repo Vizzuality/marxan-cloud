@@ -1,7 +1,7 @@
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { TimeUserEntityMetadata } from '@marxan/utils';
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
-import { defaultBlmRange } from '../../../../projects/blm/domain/blm-values-calculator';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 @Entity('scenario_blms')
 export class ScenarioBlm extends TimeUserEntityMetadata {

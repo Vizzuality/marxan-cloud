@@ -2,13 +2,13 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { HttpStatus } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { Repository } from 'typeorm';
-import { defaultBlmRange } from '../../src/modules/projects/blm/domain/blm-values-calculator';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';

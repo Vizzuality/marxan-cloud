@@ -3,7 +3,7 @@ import { WebshotConfig } from '@marxan/webshot';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, ValidateNested } from 'class-validator';
-import { defaultBlmRange } from '../../projects/blm/domain/blm-values-calculator';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 export class StartScenarioBlmCalibrationDto {
   @ApiProperty({ example: defaultBlmRange, required: false })

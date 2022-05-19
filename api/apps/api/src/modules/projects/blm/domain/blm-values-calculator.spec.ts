@@ -6,7 +6,7 @@ describe('blm-values-calculator', () => {
   it('should calculate the correct default values', async () => {
     const defaultValues = blmValuesCalculator.withDefaultRange();
 
-    expect(defaultValues).toStrictEqual([0.001, 0.01, 0.1, 1, 10, 100]);
+    expect(defaultValues).toStrictEqual([0.001, 0.006, 0.04, 0.251, 1.585, 10]);
   });
 
   it('should calculate the correct values with a given range', async () => {

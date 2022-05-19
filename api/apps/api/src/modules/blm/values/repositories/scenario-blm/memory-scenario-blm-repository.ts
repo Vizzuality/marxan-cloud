@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
-import { defaultBlmRange } from '../../../../projects/blm/domain/blm-values-calculator';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 import {
   alreadyCreated,
   Blm,

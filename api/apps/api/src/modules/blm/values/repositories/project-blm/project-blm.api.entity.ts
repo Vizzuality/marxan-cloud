@@ -1,7 +1,7 @@
 import { Column, Entity, OneToOne, PrimaryColumn } from 'typeorm';
 import { TimeUserEntityMetadata } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
-import { defaultBlmRange } from '../../../../projects/blm/domain/blm-values-calculator';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 @Entity('project_blms')
 export class ProjectBlm extends TimeUserEntityMetadata {

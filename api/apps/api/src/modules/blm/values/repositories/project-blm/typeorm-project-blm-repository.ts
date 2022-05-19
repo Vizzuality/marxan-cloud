@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/Either';
 import { Repository } from 'typeorm';
-import { defaultBlmRange } from '../../../../projects/blm/domain/blm-values-calculator';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 import {
   alreadyCreated,
   CreateFailure,
