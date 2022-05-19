@@ -24,6 +24,9 @@ export interface ScreenshotBLMMapProps {
 export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
   id,
 }: ScreenshotBLMMapProps) => {
+  const [cache] = useState<number>(Date.now());
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
@@ -43,7 +46,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
   const [bounds, setBounds] = useState(null);
 
   const BLMLayer = useScenarioBlmLayer({
-    cache: 1,
+    cache,
     active: true,
     sId: sid ? `${sid}` : null,
     blm: +blmValue,
@@ -73,9 +76,15 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     return null;
   };
 
-  const handleMapLoad = () => {
-    dispatch(setMaps({ [id]: true }));
-  };
+  // const handleMapLoad = () => {
+  //   dispatch(setMaps({ [id]: true }));
+  // };
+
+  useEffect(() => {
+    if (mapTilesLoaded) {
+      dispatch(setMaps({ [id]: true }));
+    }
+  }, [id, dispatch, mapTilesLoaded]);
 
   return (
     <>
@@ -98,7 +107,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
-          onMapLoad={handleMapLoad}
+          onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
           transformRequest={handleTransformRequest}
           preserveDrawingBuffer
           preventStyleDiffing

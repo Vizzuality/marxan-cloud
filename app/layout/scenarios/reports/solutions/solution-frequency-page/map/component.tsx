@@ -25,6 +25,9 @@ export interface ScenariosReportMapProps {
 export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
   id,
 }: ScenariosReportMapProps) => {
+  const [cache] = useState<number>(Date.now());
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
@@ -48,7 +51,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
   const [bounds, setBounds] = useState(null);
 
   const PUGridLayer = usePUGridLayer({
-    cache: Date.now(),
+    cache,
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
@@ -82,9 +85,15 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     return null;
   };
 
-  const handleMapLoad = () => {
-    dispatch(setMaps({ [id]: true }));
-  };
+  // const handleMapLoad = () => {
+  //   dispatch(setMaps({ [id]: true }));
+  // };
+
+  useEffect(() => {
+    if (mapTilesLoaded) {
+      dispatch(setMaps({ [id]: true }));
+    }
+  }, [id, dispatch, mapTilesLoaded]);
 
   return (
     <>
@@ -108,7 +117,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
-          onMapLoad={handleMapLoad}
+          onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
           transformRequest={handleTransformRequest}
           preserveDrawingBuffer
           preventStyleDiffing
