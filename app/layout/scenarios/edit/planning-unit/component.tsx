@@ -130,7 +130,7 @@ export const ScenariosSidebarEditPlanningUnit: React.FC<ScenariosSidebarEditPlan
                 <p>
                   You can select current
                   protected areas listed in World Database of
-                  Protected Areas (WCMC-UNEP)
+                  Protected Areas (UNEP-WCMC)
                   or upload your own protected area geometry.
                 </p>
               </li>
