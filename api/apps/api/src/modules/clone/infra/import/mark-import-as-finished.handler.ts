@@ -48,6 +48,17 @@ export class MarkImportAsFinishedHandler
     const kind = this.eventMapper[resourceKind];
 
     if (resourceKind === ResourceKind.Project) {
+      /**
+       * Since api events aren't copied when cloning operations are dispatched
+       * and some use cases depend on api events, we have to create "synthetic"
+       * events when importing projects. For the time being, these are the
+       * events needed:
+       *
+       * - project__planningUnits__finished__v1__alpha: To be able to create a scenario
+       *   it is required to have processed the planning units grid of the project.
+       *   This check is made by ensuring that there is a api event of this type associated
+       *   to the project
+       */
       await this.emitSyntheticEvents(resourceId);
     }
 
