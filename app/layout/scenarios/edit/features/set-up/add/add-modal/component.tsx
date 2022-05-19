@@ -36,7 +36,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
-  const [sort, setSort] = useState(null);
+  const [sort, setSort] = useState('featureClassName');
 
   const dispatch = useDispatch();
   const { query } = useRouter();
@@ -68,10 +68,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   } = useAllFeatures(pid, {
     search,
     filters,
-    sort: 'featureClassName',
+    sort,
   });
-
-  console.log({ allFeaturesData });
 
   const INITIAL_VALUES = useMemo(() => {
     if (initialSelectedFeatures) {
