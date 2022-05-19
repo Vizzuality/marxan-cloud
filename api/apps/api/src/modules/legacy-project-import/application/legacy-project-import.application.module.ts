@@ -16,6 +16,8 @@ import { LegacyProjectImportComponentEntity } from '../infra/entities/legacy-pro
 import { LegacyProjectImportFileEntity } from '../infra/entities/legacy-project-import-file.api.entity';
 import { LegacyProjectImportEntity } from '../infra/entities/legacy-project-import.api.entity';
 import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-import-typeorm.repository';
+import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
+import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
 import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
 import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
@@ -55,6 +57,8 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
     MarkLegacyProjectImportAsFailedHandler,
     MarkLegacyProjectImportPieceAsFailedHandler,
     StartLegacyProjectImportHandler,
+    AddFileToLegacyProjectImportHandler,
+    CompleteLegacyProjectImportPieceHandler,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
