@@ -89,7 +89,7 @@ export interface UseDuplicateScenarioProps {
 }
 
 export interface DuplicateScenarioProps {
-  id: string | string[];
+  sid: string | string[];
 }
 
 export interface UseRunScenarioProps {

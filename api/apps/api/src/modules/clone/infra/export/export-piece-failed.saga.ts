@@ -14,7 +14,10 @@ export class ExportPieceFailedSaga {
       ofType(ExportPieceFailed),
       mergeMap((event) =>
         of(
-          new MarkExportAsFailed(event.exportId),
+          new MarkExportAsFailed(
+            event.exportId,
+            `Piece with id ${event.componentId} failed`,
+          ),
           new CancelExportPendingJobs(event.exportId),
         ),
       ),
