@@ -51,7 +51,7 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
 
   const onClear = useCallback(() => {
     onChangeFilters({});
-    onChangeSort(null);
+    onChangeSort(SORT[2].id);
     if (onDismiss) onDismiss();
   }, [onChangeFilters, onChangeSort, onDismiss]);
 

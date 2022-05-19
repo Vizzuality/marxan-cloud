@@ -34,7 +34,6 @@ interface AllItemProps extends IntersectItemProps, RawItemProps { }
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const [session] = useSession();
 
-  console.log({ optionsHook: options });
   const {
     filters = {},
     search,
