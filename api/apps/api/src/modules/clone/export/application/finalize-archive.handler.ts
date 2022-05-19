@@ -51,7 +51,7 @@ export class FinalizeArchiveHandler
   ): Promise<void> {
     this.logger.error(error);
 
-    await this.commandBus.execute(new MarkExportAsFailed(exportId));
+    await this.commandBus.execute(new MarkExportAsFailed(exportId, error));
   }
 
   private async generateManifestAndSignatureFiles(
@@ -121,7 +121,7 @@ export class FinalizeArchiveHandler
     if (!exportInstance) {
       this.logErrorAndMarkExportAsFailed(
         exportId,
-        `${FinalizeArchiveHandler.name} could not find export ${exportId.value} to complete archive.`,
+        `${FinalizeArchiveHandler.name} could not find export ${exportId} to complete archive.`,
       );
       return;
     }
@@ -160,7 +160,7 @@ export class FinalizeArchiveHandler
     if (isLeft(archiveResult)) {
       this.logErrorAndMarkExportAsFailed(
         exportId,
-        `${FinalizeArchiveHandler.name} could not create archive for ${exportId.value}.`,
+        `${FinalizeArchiveHandler.name} could not create archive for ${exportId}.`,
       );
       return;
     }
@@ -174,7 +174,7 @@ export class FinalizeArchiveHandler
     if (isLeft(result)) {
       this.logErrorAndMarkExportAsFailed(
         exportId,
-        `${FinalizeArchiveHandler.name} tried to complete Export with archive but pieces were not ready.`,
+        `${FinalizeArchiveHandler.name} tried to complete export with id ${exportId} but pieces were not ready.`,
       );
       return;
     }
