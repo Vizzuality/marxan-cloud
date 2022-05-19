@@ -1,21 +1,22 @@
-import { bootstrapApplication } from '../utils/api-application';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
-import { ProjectsTestUtils } from '../utils/projects.test.utils';
-import * as request from 'supertest';
-import { HttpStatus } from '@nestjs/common';
-import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
-import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
-import { GivenProjectExists } from '../steps/given-project';
-import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
-import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
-import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
-import { GivenUserExists } from '../steps/given-user-exists';
-import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
+import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
+import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
+import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
+import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { HttpStatus } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import * as request from 'supertest';
+import { Repository } from 'typeorm';
+import { GivenProjectExists } from '../steps/given-project';
+import { GivenUserExists } from '../steps/given-user-exists';
+import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
+import { bootstrapApplication } from '../utils/api-application';
+import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
+import { ProjectCheckerFake } from '../utils/project-checker.service-fake';
+import { ProjectsTestUtils } from '../utils/projects.test.utils';
+import { ScenariosTestUtils } from '../utils/scenarios.test.utils';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -61,7 +62,7 @@ export const getFixtures = async () => {
   await ProjectsTestUtils.generateBlmValues(app, projectId);
   let scenarioId: string;
   const updatedRange = [1, 50];
-  const defaultRange = [0.001, 100];
+  const defaultRange = defaultBlmRange;
 
   const userScenariosRepo: Repository<UsersScenariosApiEntity> = app.get(
     getRepositoryToken(UsersScenariosApiEntity),

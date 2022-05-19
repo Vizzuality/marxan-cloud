@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { defaultBlmRange } from '../blm/domain/blm-values-calculator';
 
 export class ProjectBlmValuesResponseDto {
   @ApiProperty({
@@ -9,7 +10,7 @@ export class ProjectBlmValuesResponseDto {
 
   @ApiProperty({
     description: 'Range used to calculate values',
-    example: [0.001, 100],
+    example: defaultBlmRange,
     isArray: true,
   })
   range!: [number, number];

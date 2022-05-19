@@ -1,11 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsOptional, ValidateNested } from 'class-validator';
 import { IsValidRange } from '@marxan-api/decorators/is-valid-range.decorator';
 import { WebshotConfig } from '@marxan/webshot';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { IsArray, IsOptional, ValidateNested } from 'class-validator';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 export class StartScenarioBlmCalibrationDto {
-  @ApiProperty({ example: [0.001, 100], required: false })
+  @ApiProperty({ example: defaultBlmRange, required: false })
   @IsOptional()
   @IsArray()
   @IsValidRange()
