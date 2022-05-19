@@ -22,6 +22,20 @@ export class MarkImportAsFinishedHandler
     this.logger.setContext(MarkImportAsFinishedHandler.name);
   }
 
+  private async emitSyntheticEvents(projectId: string): Promise<void> {
+    const kind = API_EVENT_KINDS.project__planningUnits__finished__v1__alpha;
+
+    await this.apiEvents.createIfNotExists({
+      topic: projectId,
+      kind,
+      data: {
+        kind,
+        projectId,
+        syntheticEvent: true,
+      },
+    });
+  }
+
   async execute({ importId }: MarkImportAsFinished): Promise<void> {
     const importInstance = await this.importRepository.find(importId);
 
@@ -32,6 +46,10 @@ export class MarkImportAsFinishedHandler
     const { resourceKind, resourceId } = importInstance.toSnapshot();
 
     const kind = this.eventMapper[resourceKind];
+
+    if (resourceKind === ResourceKind.Project) {
+      await this.emitSyntheticEvents(resourceId);
+    }
 
     await this.apiEvents.createIfNotExists({
       kind,
