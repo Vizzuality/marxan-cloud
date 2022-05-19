@@ -39,7 +39,7 @@ export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
           ...globalThis.MARXAN,
           webshot_ready: true,
         };
-      }, 5000);
+      }, 1000);
     }
   }, [reportDataIsFetched]);
 
