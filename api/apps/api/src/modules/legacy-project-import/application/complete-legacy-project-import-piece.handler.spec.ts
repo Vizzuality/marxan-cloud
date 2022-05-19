@@ -19,7 +19,7 @@ import {
 import { Test } from '@nestjs/testing';
 import { isLeft } from 'fp-ts/lib/These';
 import { v4 } from 'uuid';
-import { AllLegacyProjectPiecesImported } from '../domain/events/all-legacy-project-import-pieces-imported.event';
+import { AllLegacyProjectImportPiecesImported } from '../domain/events/all-legacy-project-import-pieces-imported.event';
 import { LegacyProjectImportPieceImported } from '../domain/events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../domain/events/legacy-project-import-piece-requested.event';
 import { LegacyProjectImport } from '../domain/legacy-project-import/legacy-project-import';
@@ -80,7 +80,7 @@ it('advances to next batch and emits LegacyProjectImportPieceRequested events fo
   );
 });
 
-it('emits a AllLegacyProjectPiecesImported event if all components are finished', async () => {
+it('emits a AllLegacyProjectImportPiecesImported event if all components are finished', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
@@ -92,7 +92,7 @@ it('emits a AllLegacyProjectPiecesImported event if all components are finished'
   await fixtures.WhenABatchIsCompleted(legacyProjectImport, firstBatchOrder);
   await fixtures.WhenABatchIsCompleted(legacyProjectImport, lastBatchOrder);
 
-  fixtures.ThenAllLegacyProjectPiecesImportedEventIsEmitted(resourceId);
+  fixtures.ThenAllLegacyProjectImportPiecesImportedEventIsEmitted(resourceId);
 });
 
 it('sends a MarkLegacyProjectImportAsFailed command if import instance is not found', async () => {
@@ -377,7 +377,7 @@ const getFixtures = async () => {
 
       expect(allNextBatchPiecesImportRequestEvents).toBe(true);
     },
-    ThenAllLegacyProjectPiecesImportedEventIsEmitted: (
+    ThenAllLegacyProjectImportPiecesImportedEventIsEmitted: (
       projectId: ResourceId,
     ) => {
       const lastEventPosition = events.length - 1;
@@ -386,7 +386,7 @@ const getFixtures = async () => {
         projectId,
       });
       expect(allComponentsFinishedEvent).toBeInstanceOf(
-        AllLegacyProjectPiecesImported,
+        AllLegacyProjectImportPiecesImported,
       );
     },
     ThenNoEventIsEmitted: () => {

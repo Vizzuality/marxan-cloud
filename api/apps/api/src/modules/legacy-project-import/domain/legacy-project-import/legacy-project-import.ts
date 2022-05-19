@@ -1,4 +1,4 @@
-import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
+import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import {
   LegacyProjectImportFile,
@@ -7,7 +7,7 @@ import {
 } from '@marxan/legacy-project-import';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
-import { AllLegacyProjectPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
+import { AllLegacyProjectImportPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
 import { LegacyProjectImportBatchFailed } from '../events/legacy-project-import-batch-failed.event';
 import { LegacyProjectImportPieceImported } from '../events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../events/legacy-project-import-piece-requested.event';
@@ -240,7 +240,7 @@ export class LegacyProjectImport extends AggregateRoot {
     }
 
     if (isThisTheLastBatch && hasThisBatchFinished)
-      this.apply(new AllLegacyProjectPiecesImported(this.projectId));
+      this.apply(new AllLegacyProjectImportPiecesImported(this.projectId));
     if (isThisTheLastBatch || !hasThisBatchFinished) return right(true);
 
     const nextBatch = this.pieces.filter(

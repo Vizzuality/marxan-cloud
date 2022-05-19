@@ -2,7 +2,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
-import { isLeft } from 'fp-ts/lib/Either';
+import { isRight } from 'fp-ts/lib/Either';
 import { ApiEventByTopicAndKind } from '../../api-events/api-event.topic+kind.api.entity';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as-failed.command';
@@ -45,13 +45,14 @@ export class MarkLegacyProjectImportAsFailedHandler
       projectId,
     );
 
-    if (isLeft(legacyProjectImport)) {
-      this.logger.error(
-        `Legacy project import for project with ID ${projectId.value} not found. Legacy project import cannot be marked as failed`,
-      );
-      return;
+    let ownerId: string | undefined;
+    let scenarioId: string | undefined;
+
+    if (isRight(legacyProjectImport)) {
+      const snapshot = legacyProjectImport.right.toSnapshot();
+      ownerId = snapshot.ownerId;
+      scenarioId = snapshot.scenarioId;
     }
-    const { ownerId, scenarioId } = legacyProjectImport.right.toSnapshot();
     const kind = API_EVENT_KINDS.project__legacy__import__failed__v1__alpha;
     const topic = projectId.value;
 
