@@ -9,7 +9,7 @@ on:
 jobs:
   test-api-e2e:
     runs-on: ubuntu-20.04
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       API_SERVICE_PORT: 3130
       API_SERVICE_URL: http://api:3000
