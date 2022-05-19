@@ -7,4 +7,8 @@ export class ExportId {
   static create(): ExportId {
     return new ExportId(v4());
   }
+
+  toString(): string {
+    return this.value;
+  }
 }

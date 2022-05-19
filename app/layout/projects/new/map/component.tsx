@@ -20,6 +20,7 @@ import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 
 import ProjectMapProps from './types';
@@ -41,6 +42,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const accessToken = useAccessToken();
 
@@ -139,6 +141,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
         mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
         onMapViewportChange={handleViewportChange}
         onMapLoad={() => setMapInteractive(true)}
+        onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
         {(map) => {
@@ -153,6 +156,9 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       </Map>
 
       <Controls>
+        <LoadingControl
+          loading={!mapTilesLoaded}
+        />
         <ZoomControl
           viewport={{
             ...viewport,

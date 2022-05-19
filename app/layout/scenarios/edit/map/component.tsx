@@ -35,6 +35,7 @@ import Map from 'components/map';
 // Controls
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 import Legend from 'components/map/legend';
 import LegendItem from 'components/map/legend/item';
@@ -49,6 +50,7 @@ export interface ScenariosEditMapProps {
 export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const accessToken = useAccessToken();
 
@@ -433,6 +435,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         onClick={handleClick}
         onMapViewportChange={handleViewportChange}
         onMapLoad={() => setMapInteractive(true)}
+        onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
         transformRequest={handleTransformRequest}
       >
         {(map) => {
@@ -453,6 +456,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
       {/* Controls */}
       <Controls>
+        <LoadingControl
+          loading={!mapTilesLoaded}
+        />
+
         <ZoomControl
           viewport={{
             ...viewport,
