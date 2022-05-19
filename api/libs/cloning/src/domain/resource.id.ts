@@ -16,4 +16,8 @@ export class ResourceId {
   equals(other: ResourceId): boolean {
     return this.value === other.value;
   }
+
+  toString(): string {
+    return this.value;
+  }
 }

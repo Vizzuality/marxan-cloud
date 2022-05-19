@@ -101,7 +101,9 @@ export class LegacyProjectImport extends AggregateRoot {
     for (const component of this.pieces.filter(
       (pc) => pc.order === firstBatchOrder,
     )) {
-      this.apply(new LegacyProjectImportPieceRequested(this.id, component.id));
+      this.apply(
+        new LegacyProjectImportPieceRequested(this.projectId, component.id),
+      );
     }
   }
 
@@ -175,7 +177,7 @@ export class LegacyProjectImport extends AggregateRoot {
 
     this.pieces = piecesOrError.right;
 
-    this.apply(new LegacyProjectImportRequested(this.id, this.projectId));
+    this.apply(new LegacyProjectImportRequested(this.projectId));
     this.requestFirstBatch();
 
     return right(true);
@@ -197,7 +199,9 @@ export class LegacyProjectImport extends AggregateRoot {
     const hasThisBatchFailed = this.hasBatchFailed(piece.order);
 
     if (hasThisBatchFinished && hasThisBatchFailed) {
-      this.apply(new LegacyProjectImportBatchFailed(this.id, piece.order));
+      this.apply(
+        new LegacyProjectImportBatchFailed(this.projectId, piece.order),
+      );
     }
 
     return right(true);
@@ -217,7 +221,7 @@ export class LegacyProjectImport extends AggregateRoot {
     if (pieceToComplete.isReady())
       return left(legacyProjectImportComponentAlreadyCompleted);
 
-    this.apply(new LegacyProjectImportPieceImported(this.id, pieceId));
+    this.apply(new LegacyProjectImportPieceImported(this.projectId, pieceId));
 
     pieceToComplete.complete(warnings);
 
@@ -227,13 +231,16 @@ export class LegacyProjectImport extends AggregateRoot {
 
     if (hasThisBatchFinished && hasThisBatchFailed) {
       this.apply(
-        new LegacyProjectImportBatchFailed(this.id, pieceToComplete.order),
+        new LegacyProjectImportBatchFailed(
+          this.projectId,
+          pieceToComplete.order,
+        ),
       );
       return right(true);
     }
 
     if (isThisTheLastBatch && hasThisBatchFinished)
-      this.apply(new AllLegacyProjectPiecesImported(this.id, this.projectId));
+      this.apply(new AllLegacyProjectPiecesImported(this.projectId));
     if (isThisTheLastBatch || !hasThisBatchFinished) return right(true);
 
     const nextBatch = this.pieces.filter(
@@ -241,7 +248,9 @@ export class LegacyProjectImport extends AggregateRoot {
     );
 
     for (const component of nextBatch) {
-      this.apply(new LegacyProjectImportPieceRequested(this.id, component.id));
+      this.apply(
+        new LegacyProjectImportPieceRequested(this.projectId, component.id),
+      );
     }
 
     return right(true);
