@@ -3,12 +3,15 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { LegacyProjectImportJobInput } from '@marxan/legacy-project-import';
 import { Inject, Logger } from '@nestjs/common';
 import {
+  CommandBus,
   CommandHandler,
-  EventBus,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { isLeft } from 'fp-ts/lib/Either';
+import { MarkLegacyProjectImportAsFailed } from '../application/mark-legacy-project-import-as-failed.command';
+import { MarkLegacyProjectImportPieceAsFailed } from '../application/mark-legacy-project-import-piece-as-failed.command';
+import { LegacyProjectImportComponentId } from '../domain/legacy-project-import/legacy-project-import-component.id';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { importLegacyProjectPieceQueueToken } from './legacy-project-import-queue.provider';
 import { ScheduleLegacyProjectImportPiece } from './schedule-legacy-project-import-piece.command';
@@ -21,6 +24,7 @@ export class ScheduleLegacyProjectImportPieceHandler
     @Inject(importLegacyProjectPieceQueueToken)
     private readonly queue: Queue<LegacyProjectImportJobInput>,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
+    private readonly commandBus: CommandBus,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(ScheduleLegacyProjectImportPieceHandler.name);
@@ -38,10 +42,11 @@ export class ScheduleLegacyProjectImportPieceHandler
     );
 
     if (isLeft(legacyProjectImportOrError)) {
-      this.logger.error(
-        `Legacy project import with project ID ${projectId.value} not found`,
+      const errorMsg = `Legacy project import with project ID ${projectId.value} not found`;
+      this.logger.error(errorMsg);
+      await this.commandBus.execute(
+        new MarkLegacyProjectImportAsFailed(projectId, errorMsg),
       );
-      //this.eventBus.publish(new ExportPieceFailed(projectId, componentId));
       return;
     }
     const legacyProjectImportInstance = legacyProjectImportOrError.right;
@@ -54,10 +59,11 @@ export class ScheduleLegacyProjectImportPieceHandler
 
     const component = pieces.find((piece) => piece.id === componentId.value);
     if (!component) {
-      this.logger.error(
-        `Legacy project import component with ID ${componentId.value} not found`,
+      const errorMsg = `Legacy project import component with ID ${componentId.value} not found`;
+      this.logger.error(errorMsg);
+      await this.commandBus.execute(
+        new MarkLegacyProjectImportAsFailed(projectId, errorMsg),
       );
-      //this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       return;
     }
 
@@ -72,10 +78,15 @@ export class ScheduleLegacyProjectImportPieceHandler
     });
 
     if (!job) {
-      this.logger.error(
-        `[ScheduleLegacyProjectImportPieceHandler] Unable to start job - projectId=${projectId.value}`,
+      const errorMsg = `[ScheduleLegacyProjectImportPieceHandler] Unable to start job - projectId=${projectId.value}`;
+      this.logger.error(errorMsg);
+      await this.commandBus.execute(
+        new MarkLegacyProjectImportPieceAsFailed(
+          projectId,
+          new LegacyProjectImportComponentId(pieceId),
+          [errorMsg],
+        ),
       );
-      //this.eventBus.publish(new ExportPieceFailed(exportId, componentId));
       return;
     }
 
