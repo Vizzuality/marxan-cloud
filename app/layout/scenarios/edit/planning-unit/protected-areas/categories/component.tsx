@@ -364,6 +364,25 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               </div>
               <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
+            <div className="flex flex-col space-y-4 text-xs text-white">
+              <p className="leading-relaxed opacity-50">
+                UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on
+                Protected Areas (WDPA) [On-line],
+                [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
+              </p>
+              <p>
+                Available at:
+                {' '}
+                <a
+                  className="text-primary-500"
+                  href="www.protectedplanet.net"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  www.protectedplanet.net.
+                </a>
+              </p>
+            </div>
 
             {!!wdpaCategories?.wdpaIucnCategories?.length && (
               <div className="flex justify-center mt-5 space-x-2">
