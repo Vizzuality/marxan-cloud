@@ -14,8 +14,10 @@ import Wrapper from 'layout/wrapper';
 
 import LinkButton from 'components/button';
 
+import LOGO_BETA from 'images/logo-beta.png';
+
 import LOGO_BLACK from 'svgs/logo-black.svg';
-import LOGO_SVG from 'svgs/logo.svg';
+// import LOGO_SVG from 'svgs/logo.svg';
 
 export interface HeaderProps {
   className?: string;
@@ -67,7 +69,7 @@ export const Header: React.FC<HeaderProps> = ({
               <a href="/">
                 <img
                   alt="Marxan logo"
-                  src={theme === 'light' ? LOGO_BLACK : LOGO_SVG}
+                  src={theme === 'light' ? LOGO_BLACK : LOGO_BETA}
                   style={SIZE[size].logo}
                 />
               </a>
