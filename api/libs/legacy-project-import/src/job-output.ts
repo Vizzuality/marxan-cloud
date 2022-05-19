@@ -10,3 +10,7 @@ export interface LegacyProjectImportJobOutput {
   readonly piece: LegacyProjectImportPiece;
   readonly warnings?: string[];
 }
+
+export interface FailedLegacyProjectImportDbCleanupJobOutput {
+  readonly projectId: string;
+}
