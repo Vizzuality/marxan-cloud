@@ -1,3 +1,4 @@
+import { ResourceId } from '@marxan/cloning/domain';
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
 import { GenerateLegacyProjectImportPiecesErrors } from '../domain/legacy-project-import/legacy-project-import';
@@ -17,7 +18,7 @@ export type RunLegacyProjectImportResponse = Either<
 >;
 
 export class RunLegacyProjectImport extends Command<RunLegacyProjectImportResponse> {
-  constructor(public readonly projectId: string) {
+  constructor(public readonly projectId: ResourceId) {
     super();
   }
 }

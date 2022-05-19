@@ -29,7 +29,7 @@ export class RunLegacyProjectImportHandler
     projectId,
   }: RunLegacyProjectImport): Promise<RunLegacyProjectImportResponse> {
     const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
-      new ResourceId(projectId),
+      projectId,
     );
 
     if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
@@ -53,7 +53,7 @@ export class RunLegacyProjectImportHandler
 
     await this.usersRepo.save({
       userId,
-      projectId,
+      projectId: projectId.value,
       roleName: ProjectRoles.project_owner,
     });
 

@@ -131,7 +131,7 @@ const getFixtures = async () => {
       repo.saveFailure = true;
     },
     WhenRunningALegacyProjectImport: () => {
-      return sut.execute(new RunLegacyProjectImport(projectId));
+      return sut.execute(new RunLegacyProjectImport(new ResourceId(projectId)));
     },
     ThenNoEventsAreEmitted: () => {
       expect(events).toHaveLength(0);
