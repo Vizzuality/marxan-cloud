@@ -1,7 +1,9 @@
+export const defaultBlmRange: [number, number] = [0.001, 10];
+
 export class BlmValuesCalculator {
   constructor(
     private readonly cardinality = 6,
-    private range: [number, number] = [0.001, 100],
+    private range: [number, number] = defaultBlmRange,
   ) {}
 
   private roundTo(number: number, amountOfDecimalDigits: number): number {

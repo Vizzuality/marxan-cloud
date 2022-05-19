@@ -6,6 +6,7 @@ import { MarxanParametersDefaults } from '@marxan/marxan-input';
 import { JobStatus, Scenario, ScenarioType } from '../../scenario.api.entity';
 import { InputParameterFileProvider } from './input-parameter-file.provider';
 import { ioSettingsToken } from './io-settings';
+import { defaultBlmRange } from '../../../projects/blm/domain/blm-values-calculator';
 
 jest.useFakeTimers('modern').setSystemTime(new Date('2020-01-01').getTime());
 
@@ -219,7 +220,7 @@ async function getFixtures() {
           id: 'anId',
           values: [],
           defaults: [],
-          range: [0.001, 100],
+          range: defaultBlmRange,
         },
         project: {
           name: 'Project Name',
