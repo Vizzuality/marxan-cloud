@@ -36,7 +36,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const [search, setSearch] = useState(null);
   const [filters, setFilters] = useState({});
-  const [sort, setSort] = useState(null);
+  const [sort, setSort] = useState('featureClassName');
 
   const dispatch = useDispatch();
   const { query } = useRouter();

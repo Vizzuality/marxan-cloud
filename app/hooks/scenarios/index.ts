@@ -78,7 +78,7 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
   SCENARIO STATUS
 ****************************************
 */
-export function useScenariosStatus(pId) {
+export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
   const [session] = useSession();
 
   const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
@@ -87,6 +87,7 @@ export function useScenariosStatus(pId) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    ...requestConfig,
   }).then((response) => {
     return response.data;
   }), {
@@ -98,6 +99,7 @@ export function useScenariosStatus(pId) {
       },
     },
     refetchInterval: 2500,
+    ...queryConfig,
   });
 
   const { data } = query;
@@ -142,6 +144,36 @@ export function useScenarioStatus(pId, sId) {
       data: CURRENT || {},
     };
   }, [query, data?.data, sId]);
+}
+
+export function useScenariosStatusOnce({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseSaveScenarioLockProps) {
+  const [session] = useSession();
+
+  const saveScenarioLock = ({ pId }) => {
+    return PROJECTS.request({
+      url: `/${pId}/scenarios/status`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      ...requestConfig,
+    }).then((response) => {
+      return response.data;
+    });
+  };
+
+  return useMutation(saveScenarioLock, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
 }
 
 /**

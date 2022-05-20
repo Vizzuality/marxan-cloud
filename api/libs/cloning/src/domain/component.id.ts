@@ -11,4 +11,8 @@ export class ComponentId {
   equals(other: ComponentId): boolean {
     return this.value === other.value;
   }
+
+  toString(): string {
+    return this.value;
+  }
 }

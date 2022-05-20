@@ -11,7 +11,7 @@ import { v4 } from 'uuid';
 import { CreateApiEventDTO } from '../../api-events/dto/create.api-event.dto';
 import { QueueModule } from '../../queue';
 import { EventData, EventFactory } from '../../queue-api-events';
-import { CompleteLegacyProjectImportPiece } from '../application/complete-import-legacy-project-piece.command';
+import { CompleteLegacyProjectImportPiece } from '../application/complete-legacy-project-import-piece.command';
 import { MarkLegacyProjectImportPieceAsFailed } from '../application/mark-legacy-project-import-piece-as-failed.command';
 import { ImportLegacyProjectPieceEventsHandler } from './import-legacy-project-piece.events-handler';
 import { importLegacyProjectPieceEventsFactoryToken } from './legacy-project-import-queue.provider';

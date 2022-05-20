@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 
 import { motion } from 'framer-motion';
 
-import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
@@ -68,14 +67,14 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
             </div>
           </div>
         </InfoButton>
-        <Button
+        {/* <Button
           theme="secondary"
           size="xs"
           className="ml-6"
           onClick={() => console.info('Download - Target Achievement')}
         >
           Download
-        </Button>
+        </Button> */}
       </header>
 
       <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">

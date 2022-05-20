@@ -22,6 +22,20 @@ export class MarkImportAsFinishedHandler
     this.logger.setContext(MarkImportAsFinishedHandler.name);
   }
 
+  private async emitSyntheticEvents(projectId: string): Promise<void> {
+    const kind = API_EVENT_KINDS.project__planningUnits__finished__v1__alpha;
+
+    await this.apiEvents.createIfNotExists({
+      topic: projectId,
+      kind,
+      data: {
+        kind,
+        projectId,
+        syntheticEvent: true,
+      },
+    });
+  }
+
   async execute({ importId }: MarkImportAsFinished): Promise<void> {
     const importInstance = await this.importRepository.find(importId);
 
@@ -32,6 +46,21 @@ export class MarkImportAsFinishedHandler
     const { resourceKind, resourceId } = importInstance.toSnapshot();
 
     const kind = this.eventMapper[resourceKind];
+
+    if (resourceKind === ResourceKind.Project) {
+      /**
+       * Since api events aren't copied when cloning operations are dispatched
+       * and some use cases depend on api events, we have to create "synthetic"
+       * events when importing projects. For the time being, these are the
+       * events needed:
+       *
+       * - project__planningUnits__finished__v1__alpha: To be able to create a scenario
+       *   it is required to have processed the planning units grid of the project.
+       *   This check is made by ensuring that there is a api event of this type associated
+       *   to the project
+       */
+      await this.emitSyntheticEvents(resourceId);
+    }
 
     await this.apiEvents.createIfNotExists({
       kind,
