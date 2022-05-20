@@ -126,6 +126,14 @@ import {
   StartLegacyProjectImportBodyDto,
   StartLegacyProjectImportResponseDto,
 } from './dto/legacy-project-import.dto';
+import {
+  legacyProjectImportAlreadyStarted,
+  legacyProjectImportMissingRequiredFile,
+} from '../legacy-project-import/domain/legacy-project-import/legacy-project-import';
+import {
+  legacyProjectImportNotFound,
+  legacyProjectImportSaveError,
+} from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -208,6 +216,42 @@ export class ProjectsController {
       projectId: result.right.projectId.value,
       scenarioId: result.right.scenarioId.value,
     };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Runs a legacy project import project',
+    summary: 'Runs a legacy project import project',
+  })
+  @Post('legacy-project-import/:projectId/run')
+  async runLegacyProject(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.projectsService.runLegacyProject(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        case legacyProjectImportMissingRequiredFile:
+          throw new BadRequestException(
+            'missing required files for running a legacy project import',
+          );
+        case legacyProjectImportAlreadyStarted:
+          throw new BadRequestException(
+            'a run has already being made on this legacy project import',
+          );
+        case legacyProjectImportSaveError:
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
   }
 
   @ImplementsAcl()

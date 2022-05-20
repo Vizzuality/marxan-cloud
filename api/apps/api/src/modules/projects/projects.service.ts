@@ -71,6 +71,7 @@ import {
   StartLegacyProjectImportResult,
 } from '../legacy-project-import/application/start-legacy-project-import.command';
 import { string } from 'fp-ts';
+import { RunLegacyProjectImport } from '../legacy-project-import/application/run-legacy-project-import.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -463,6 +464,12 @@ export class ProjectsService {
 
     return this.commandBus.execute(
       new StartLegacyProjectImport(projectName, new UserId(userId)),
+    );
+  }
+
+  async runLegacyProject(projectId: string, userId: string) {
+    return this.commandBus.execute(
+      new RunLegacyProjectImport(new ResourceId(projectId), new UserId(userId)),
     );
   }
 

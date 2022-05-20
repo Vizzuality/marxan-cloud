@@ -25,9 +25,6 @@ export const legacyProjectImportComponentAlreadyCompleted = Symbol(
 export const legacyProjectImportComponentAlreadyFailed = Symbol(
   `legacy project import component already failed`,
 );
-export const legacyProjectImportIsNotAcceptingFiles = Symbol(
-  `legacy project import file is not accepting files`,
-);
 export const legacyProjectImportDuplicateFile = Symbol(
   `legacy project import already has this file`,
 );
@@ -36,6 +33,9 @@ export const legacyProjectImportDuplicateFileType = Symbol(
 );
 export const legacyProjectImportMissingRequiredFile = Symbol(
   `legacy project import missing required file`,
+);
+export const legacyProjectImportAlreadyStarted = Symbol(
+  `legacy project import already started`,
 );
 
 export type CompleteLegacyProjectImportPieceSuccess = true;
@@ -47,11 +47,15 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentAlreadyFailed;
 
 export type AddFileToLegacyProjectImportErrors =
-  | typeof legacyProjectImportIsNotAcceptingFiles
+  | typeof legacyProjectImportAlreadyStarted
   | typeof legacyProjectImportDuplicateFile
   | typeof legacyProjectImportDuplicateFileType;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
+
+export type RunLegacyProjectImportErrors =
+  | typeof legacyProjectImportAlreadyStarted
+  | GenerateLegacyProjectImportPiecesErrors;
 
 export class LegacyProjectImport extends AggregateRoot {
   private constructor(
@@ -123,6 +127,10 @@ export class LegacyProjectImport extends AggregateRoot {
       .some((piece) => piece.hasFailed());
   }
 
+  private importProcessAlreadyStarted() {
+    return !this.isAcceptingFiles;
+  }
+
   public areRequiredFilesUploaded(): boolean {
     const requiredFilesTypes = [
       LegacyProjectImportFileType.PlanningGridShapefile,
@@ -169,7 +177,10 @@ export class LegacyProjectImport extends AggregateRoot {
     return right(pieces);
   }
 
-  start(): Either<GenerateLegacyProjectImportPiecesErrors, true> {
+  run(): Either<RunLegacyProjectImportErrors, true> {
+    if (this.importProcessAlreadyStarted())
+      return left(legacyProjectImportAlreadyStarted);
+
     this.isAcceptingFiles = false;
     const piecesOrError = this.generatePieces();
 
@@ -271,8 +282,8 @@ export class LegacyProjectImport extends AggregateRoot {
   addFile(
     file: LegacyProjectImportFile,
   ): Either<AddFileToLegacyProjectImportErrors, true> {
-    if (!this.isAcceptingFiles) {
-      return left(legacyProjectImportIsNotAcceptingFiles);
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
     }
 
     const fileTypeAlreadyPresent = this.files.some(

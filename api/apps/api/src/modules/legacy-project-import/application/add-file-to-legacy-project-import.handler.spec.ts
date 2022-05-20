@@ -16,8 +16,8 @@ import { isLeft } from 'fp-ts/lib/Either';
 import { v4 } from 'uuid';
 import {
   LegacyProjectImport,
+  legacyProjectImportAlreadyStarted,
   legacyProjectImportDuplicateFileType,
-  legacyProjectImportIsNotAcceptingFiles,
 } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentSnapshot } from '../domain/legacy-project-import/legacy-project-import-component.snapshot';
 import {
@@ -74,7 +74,7 @@ it('fails if given file cannot be stored', async () => {
     .ThenErrorStoringFileShouldBeReturned();
 });
 
-it('fails if legacy project import is not accepting more files', async () => {
+it('fails if legacy project import has already started', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
     { files: [], isAcceptingFiles: false, pieces: [] },
   );
@@ -86,7 +86,7 @@ it('fails if legacy project import is not accepting more files', async () => {
       file: Buffer.from('example file'),
       fileType: LegacyProjectImportFileType.InputDat,
     })
-    .ThenLegacyProjectImportIsNotAcceptingFileErrorShouldBeReturned();
+    .ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned();
 });
 
 it('fails if legacy project import already has a file of the same type of the provided file', async () => {
@@ -242,11 +242,11 @@ const getFixtures = async () => {
 
           expect(result).toMatchObject({ left: unknownError });
         },
-        ThenLegacyProjectImportIsNotAcceptingFileErrorShouldBeReturned: async () => {
+        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned: async () => {
           const result = await sut.execute(command);
 
           expect(result).toMatchObject({
-            left: legacyProjectImportIsNotAcceptingFiles,
+            left: legacyProjectImportAlreadyStarted,
           });
         },
         ThenLegacyProjectImportDuplicateFileTypeErrorShouldBeReturned: async () => {
