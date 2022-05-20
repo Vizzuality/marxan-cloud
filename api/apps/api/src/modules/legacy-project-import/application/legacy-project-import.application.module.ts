@@ -18,6 +18,8 @@ import { LegacyProjectImportEntity } from '../infra/entities/legacy-project-impo
 import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-import-typeorm.repository';
 import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
 import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
+import { LegacyProjectImportRequestedSaga } from './legacy-project-import-requested.saga';
+import { MarkLegacyProjectImportAsSubmittedHandler } from './mark-legacy-project-as-submitted.handler';
 import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
 import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
@@ -54,6 +56,8 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
         return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
       },
     },
+    LegacyProjectImportRequestedSaga,
+    MarkLegacyProjectImportAsSubmittedHandler,
     MarkLegacyProjectImportAsFailedHandler,
     MarkLegacyProjectImportPieceAsFailedHandler,
     StartLegacyProjectImportHandler,
