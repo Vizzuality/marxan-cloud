@@ -129,20 +129,19 @@ test-start-services: clean-slate
 seed-dbs-e2e: test-start-services
 	$(MAKE) seed-api-with-test-data
 
-test-e2e-api: seed-dbs-e2e
+# Run e2e tests via
+# `make test-e2e-<api|groprocessing> environment=local`
+# except in GitHub Actions CI, where we use a different env setup, which relies
+# on a different environment:
+# `make test-e2e-<api|groprocessing> environment=ci`
+test-e2e-api: test-clean-slate seed-dbs-e2e
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh test-e2e
-
-test-e2e-geoprocessing: seed-dbs-e2e
-	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
-
-test-e2e-backend: test-e2e-api test-e2e-geoprocessing
 	$(MAKE) test-clean-slate
 
-run-test-e2e-local:
-	$(MAKE) --keep-going test-e2e-backend environment=local
-
-run-test-e2e-ci:
-	$(MAKE) --keep-going test-e2e-backend environment=ci
+# See note for test-e2e-api above
+test-e2e-geoprocessing: test-clean-slate seed-dbs-e2e
+	docker-compose $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
+	$(MAKE) test-clean-slate
 
 setup-test-unit-backend:
 	# build API and geoprocessing containers
