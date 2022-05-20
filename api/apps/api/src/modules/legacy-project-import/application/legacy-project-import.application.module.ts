@@ -17,10 +17,12 @@ import { LegacyProjectImportFileEntity } from '../infra/entities/legacy-project-
 import { LegacyProjectImportEntity } from '../infra/entities/legacy-project-import.api.entity';
 import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-import-typeorm.repository';
 import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
+import { AllLegacyProjectImportPiecesImportedSaga } from './all-legacy-project-import-pieces-imported.saga';
 import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
 import { LegacyProjectImportRequestedSaga } from './legacy-project-import-requested.saga';
 import { MarkLegacyProjectImportAsSubmittedHandler } from './mark-legacy-project-as-submitted.handler';
 import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
+import { MarkLegacyProjectImportAsFinishedHandler } from './mark-legacy-project-import-as-finished.handler';
 import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
 
@@ -58,6 +60,8 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
     },
     LegacyProjectImportRequestedSaga,
     MarkLegacyProjectImportAsSubmittedHandler,
+    AllLegacyProjectImportPiecesImportedSaga,
+    MarkLegacyProjectImportAsFinishedHandler,
     MarkLegacyProjectImportAsFailedHandler,
     MarkLegacyProjectImportPieceAsFailedHandler,
     StartLegacyProjectImportHandler,
