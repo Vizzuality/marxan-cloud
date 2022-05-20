@@ -52,3 +52,25 @@ variable "vpn_cidrs" {
   type        = list(string)
   description = "Comma separated list of CIDRs for the TNC VPN"
 }
+
+variable "sparkpost_dns_cname_name" {
+  type        = string
+  description = "The name of the DNS CNAME record for Sparkpost"
+  default = "mail"
+}
+
+variable "sparkpost_dns_cname_value" {
+  type        = string
+  description = "value of the DNS CNAME record for Sparkpost"
+  default = "sparkpostmail.com"
+}
+
+variable "sparkpost_dns_dkim_name" {
+  type        = string
+  description = "The name of the DNS TXT record for Sparkpost DKIM"
+}
+
+variable "sparkpost_dns_dkim_value" {
+  type        = string
+  description = "The value of the DNS TXT record for Sparkpost DKIM"
+}

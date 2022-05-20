@@ -182,3 +182,15 @@ module "redis_private_endpoint" {
     Manager     = "Zach Ferdana (zferdana@tnc.org)"
   }
 }
+
+module "mail_host_dns_records" {
+  source         = "./modules/mail"
+  resource_group = data.azurerm_resource_group.resource_group
+  dns_zone       = module.dns.dns_zone
+
+  cname_name  = var.sparkpost_dns_cname_name
+  cname_value = var.sparkpost_dns_cname_value
+
+  dkim_name  = var.sparkpost_dns_dkim_name
+  dkim_value = var.sparkpost_dns_dkim_value
+}

@@ -27,3 +27,4 @@ node_modules/
 
 infrastructure/tncvars.md
 infrastructure/tncnotes.md
+tnc-marxan-full.tfvars
