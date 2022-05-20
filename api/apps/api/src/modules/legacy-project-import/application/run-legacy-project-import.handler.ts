@@ -41,7 +41,7 @@ export class RunLegacyProjectImportHandler
 
     const { ownerId } = legacyProjectImport.toSnapshot();
 
-    if (userId.value === ownerId) return left(forbiddenError);
+    if (userId.value !== ownerId) return left(forbiddenError);
 
     const result = legacyProjectImport.run();
 
