@@ -138,10 +138,7 @@ const getFixtures = async () => {
     },
     ThenLegacyProjectImportRequestedEventIsEmitted: () => {
       expect(events[0] as LegacyProjectImportRequested).toEqual(
-        new LegacyProjectImportRequested(
-          existingLegacyProjectImport.id,
-          new ResourceId(projectId),
-        ),
+        new LegacyProjectImportRequested(new ResourceId(projectId)),
       );
     },
     ThenLegacyProjectImportPieceRequestedAreRequested: () => {
@@ -149,7 +146,7 @@ const getFixtures = async () => {
         events.slice(1).every((event) => {
           return (
             event instanceof LegacyProjectImportPieceRequested &&
-            event.legacyProjectImportId === existingLegacyProjectImport.id
+            event.projectId === new ResourceId(projectId)
           );
         }),
       );
