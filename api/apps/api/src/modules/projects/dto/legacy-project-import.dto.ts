@@ -1,5 +1,6 @@
+import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 
 export class StartLegacyProjectImportBodyDto {
   @ApiProperty({
@@ -22,6 +23,23 @@ export class StartLegacyProjectImportResponseDto {
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
   })
   scenarioId!: string;
+}
+
+export class AddFileToLegacyProjectImportBodyDto {
+  @ApiProperty({
+    description: 'Type of the file',
+    example: LegacyProjectImportFileType.InputDat,
+  })
+  @IsEnum(LegacyProjectImportFileType)
+  fileType!: LegacyProjectImportFileType;
+}
+
+export class AddFileToLegacyProjectImportResponseDto {
+  @ApiProperty({
+    description: 'ID of the project',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  projectId!: string;
 }
 
 export class RunLegacyProjectImportResponseDto {
