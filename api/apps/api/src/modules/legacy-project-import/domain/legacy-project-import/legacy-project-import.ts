@@ -52,6 +52,9 @@ export type AddFileToLegacyProjectImportErrors =
   | typeof legacyProjectImportDuplicateFileType;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
+export type RunLegacyProjectImportErrors =
+  | typeof legacyProjectImportAlreadyStarted
+  | GenerateLegacyProjectImportPiecesErrors;
 
 export type RunLegacyProjectImportErrors =
   | typeof legacyProjectImportAlreadyStarted

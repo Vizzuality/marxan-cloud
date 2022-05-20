@@ -17,8 +17,8 @@ import { v4 } from 'uuid';
 import { forbiddenError } from '../../access-control';
 import {
   LegacyProjectImport,
-  legacyProjectImportAlreadyStarted,
   legacyProjectImportDuplicateFileType,
+  legacyProjectImportAlreadyStarted,
 } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentSnapshot } from '../domain/legacy-project-import/legacy-project-import-component.snapshot';
 import {
