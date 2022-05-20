@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 export class BlmRangeDto {
   @ApiProperty({
     description: 'Range used to calculate values',
-    example: [0.001, 100],
+    example: defaultBlmRange,
     isArray: true,
   })
   range!: [number, number];

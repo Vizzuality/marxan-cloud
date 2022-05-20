@@ -2,22 +2,29 @@ import { Organization } from '@marxan-api/modules/organizations/organization.api
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import {
+  LegacyProjectImportFilesLocalRepository,
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
-  LegacyProjectImportFilesLocalRepository,
 } from '@marxan/legacy-project-import';
-import { Module } from '@nestjs/common';
+import { Logger, Module, Scope } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../../utils/config.utils';
+import { ApiEventsModule } from '../../api-events';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { LegacyProjectImportComponentEntity } from '../infra/entities/legacy-project-import-component.api.entity';
 import { LegacyProjectImportFileEntity } from '../infra/entities/legacy-project-import-file.api.entity';
 import { LegacyProjectImportEntity } from '../infra/entities/legacy-project-import.api.entity';
 import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-import-typeorm.repository';
+import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
+import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
+import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
+import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
+import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
 
 @Module({
   imports: [
+    ApiEventsModule,
     CqrsModule,
     TypeOrmModule.forFeature([
       LegacyProjectImportEntity,
@@ -47,6 +54,12 @@ import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-im
         return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
       },
     },
+    MarkLegacyProjectImportAsFailedHandler,
+    MarkLegacyProjectImportPieceAsFailedHandler,
+    StartLegacyProjectImportHandler,
+    AddFileToLegacyProjectImportHandler,
+    CompleteLegacyProjectImportPieceHandler,
+    { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
 export class LegacyProjectImportApplicationModule {}

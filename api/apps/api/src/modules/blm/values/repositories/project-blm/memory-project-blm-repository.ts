@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/Either';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 
 import {
   alreadyCreated,
@@ -32,7 +33,7 @@ export class MemoryProjectBlmRepository extends ProjectBlmRepo {
     this.memory[projectId] = {
       defaults,
       id: projectId,
-      range: [0.001, 100],
+      range: defaultBlmRange,
       values: [],
     };
 
