@@ -122,6 +122,10 @@ import {
   exportNotFound,
   unfinishedExport,
 } from '../clone/export/application/get-archive.query';
+import {
+  StartLegacyProjectImportBodyDto,
+  StartLegacyProjectImportResponseDto,
+} from './dto/legacy-project-import.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -175,32 +179,35 @@ export class ProjectsController {
     return this.geoFeatureSerializer.serialize(data, metadata);
   }
 
-  /**
-   * Import a Marxan legacy project via file upload
-   *
-   * @debt We may want to use a custom interceptor to process import files
-   */
   @ImplementsAcl()
   @ApiOperation({
-    description: 'Import a Marxan project via file upload',
-    summary: 'Import a Marxan project',
+    description: 'Starts a legacy marxan project import process',
+    summary: 'Starts a legacy marxan project import process',
   })
-  @UseInterceptors(FileInterceptor('file', uploadOptions))
-  @Post('legacy')
+  @ApiOkResponse({ type: StartLegacyProjectImportResponseDto })
+  @Post('legacy-project-import/start')
   async importLegacyProject(
-    @UploadedFile() file: Express.Multer.File,
+    @Body() dto: StartLegacyProjectImportBodyDto,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<Project> {
-    const result = await this.projectsService.importLegacyProject(
-      file,
+  ): Promise<StartLegacyProjectImportResponseDto> {
+    const result = await this.projectsService.startLegacyProjectImport(
+      dto.projectName,
       req.user.id,
     );
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          throw new InternalServerErrorException();
+      }
     }
 
-    return result.right;
+    return {
+      projectId: result.right.projectId.value,
+      scenarioId: result.right.scenarioId.value,
+    };
   }
 
   @ImplementsAcl()
