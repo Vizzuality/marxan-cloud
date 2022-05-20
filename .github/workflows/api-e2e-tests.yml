@@ -40,7 +40,7 @@ jobs:
   test-geoprocessing-e2e:
     name: E2E tests - Geoprocessing
     runs-on: ubuntu-20.04
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       API_SERVICE_PORT: 3130
       API_SERVICE_URL: http://api:3000
