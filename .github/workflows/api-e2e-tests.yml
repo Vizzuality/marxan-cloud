@@ -8,8 +8,9 @@ on:
   workflow_dispatch:
 jobs:
   test-api-e2e:
+    name: API e2e tests
     runs-on: ubuntu-20.04
-    timeout-minutes: 40
+    timeout-minutes: 30
     env:
       API_SERVICE_PORT: 3130
       API_SERVICE_URL: http://api:3000
@@ -35,7 +36,37 @@ jobs:
     - name: Checkout envs
       run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
     - name: Run CI tests via make task
-      run: make run-test-e2e-ci
+      run: make test-e2e-api environment=ci
+  test-geoprocessing-e2e:
+    name: Geoprocessing e2e tests
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    env:
+      API_SERVICE_PORT: 3130
+      API_SERVICE_URL: http://api:3000
+      API_AUTH_JWT_SECRET: ${{ secrets.API_AUTH_JWT_SECRET }}
+      API_RUN_MIGRATIONS_ON_STARTUP: "false"
+      API_AUTH_X_API_KEY: ${{ secrets.API_AUTH_X_API_KEY }}
+      API_LOGGING_MUTE_ALL: "true"
+      API_POSTGRES_USER: marxan-api
+      API_POSTGRES_PASSWORD: ${{ secrets.API_POSTGRES_PASSWORD }}
+      API_POSTGRES_DB: marxan-api
+      POSTGRES_API_SERVICE_PORT: 3532
+      GEOPROCESSING_SERVICE_PORT: 3140
+      GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP: "false"
+      GEO_POSTGRES_USER: marxan-geo-api
+      GEO_POSTGRES_PASSWORD: ${{ secrets.GEO_POSTGRES_PASSWORD }}
+      GEO_POSTGRES_DB: marxan-geo-api
+      POSTGRES_GEO_SERVICE_PORT: 3533
+      REDIS_API_SERVICE_PORT: 3479
+      CLONING_SIGNING_SECRET: ${{ secrets.CLONING_SIGNING_SECRET }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Checkout envs
+      run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
+    - name: Run CI tests via make task
+      run: make test-e2e-geoprocessing environment=ci
   test-api-unit:
     runs-on: ubuntu-18.04
     timeout-minutes: 10
