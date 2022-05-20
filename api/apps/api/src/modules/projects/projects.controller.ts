@@ -179,11 +179,6 @@ export class ProjectsController {
     return this.geoFeatureSerializer.serialize(data, metadata);
   }
 
-  /**
-   * Import a Marxan legacy project via file upload
-   *
-   * @debt We may want to use a custom interceptor to process import files
-   */
   @ImplementsAcl()
   @ApiOperation({
     description: 'Starts a legacy marxan project import process',
