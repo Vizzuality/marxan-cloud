@@ -65,6 +65,12 @@ import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { UserId } from '@marxan/domain-ids';
 import { ExportProjectCommandResult } from '../clone/export/application/export-project.command';
 import { ExportRepository } from '../clone/export/application/export-repository.port';
+import {
+  StartLegacyProjectImport,
+  StartLegacyProjectImportError,
+  StartLegacyProjectImportResult,
+} from '../legacy-project-import/application/start-legacy-project-import.command';
+import { string } from 'fp-ts';
 
 export { validationFailed } from '../planning-areas';
 
@@ -438,11 +444,26 @@ export class ProjectsService {
     return await this.jobStatusService.getJobStatusFor(projectId);
   }
 
-  async importLegacyProject(_: Express.Multer.File, userId: string) {
-    if (!(await this.projectAclService.canCreateProject(userId))) {
-      return left(false);
+  async startLegacyProjectImport(
+    projectName: string,
+    userId: string,
+  ): Promise<
+    Either<
+      typeof forbiddenError | StartLegacyProjectImportError,
+      StartLegacyProjectImportResult
+    >
+  > {
+    const userCanCreateProject = await this.projectAclService.canCreateProject(
+      userId,
+    );
+
+    if (!userCanCreateProject) {
+      return left(forbiddenError);
     }
-    return right(new Project());
+
+    return this.commandBus.execute(
+      new StartLegacyProjectImport(projectName, new UserId(userId)),
+    );
   }
 
   // TODO add ensureThatProjectIsNotBlocked guard
