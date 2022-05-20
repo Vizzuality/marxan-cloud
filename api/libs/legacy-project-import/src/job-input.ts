@@ -9,3 +9,7 @@ export interface LegacyProjectImportJobInput {
   readonly scenarioId: string;
   readonly piece: LegacyProjectImportPiece;
 }
+
+export interface FailedLegacyProjectImportDbCleanupJobInput {
+  readonly projectId: string;
+}
