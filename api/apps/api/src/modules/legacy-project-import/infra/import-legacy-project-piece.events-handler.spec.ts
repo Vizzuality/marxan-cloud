@@ -45,7 +45,6 @@ const getFixtures = async () => {
 
   const projectId = v4();
   const scenarioId = v4();
-  const legacyProjectImportId = v4();
   const pieceId = v4();
 
   const sandbox = await Test.createTestingModule({
@@ -94,7 +93,6 @@ const getFixtures = async () => {
     GivenLegacyProjectImportJob: (): LegacyProjectImportJobInput => {
       return {
         files: [],
-        legacyProjectImportId,
         projectId,
         scenarioId,
         pieceId,
