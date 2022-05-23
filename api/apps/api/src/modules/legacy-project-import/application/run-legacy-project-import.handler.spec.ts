@@ -1,3 +1,4 @@
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
@@ -15,6 +16,7 @@ import { LegacyProjectImportPieceRequested } from '../domain/events/legacy-proje
 import { LegacyProjectImportRequested } from '../domain/events/legacy-project-import-requested.event';
 import {
   LegacyProjectImport,
+  legacyProjectImportAlreadyStarted,
   legacyProjectImportMissingRequiredFile,
 } from '../domain/legacy-project-import/legacy-project-import';
 import {
@@ -42,6 +44,29 @@ it(`runs a legacy project import`, async () => {
   await fixtures.ThenStartingLegacyProjectImportIsUpdated(result);
   fixtures.ThenLegacyProjectImportRequestedEventIsEmitted();
   fixtures.ThenLegacyProjectImportPieceRequestedAreRequested();
+});
+
+it(`fails to run when a non owner role runs a legacy project import`, async () => {
+  fixtures.GivenAnExistingLegacyProjectImport();
+  fixtures.GivenAllFilesAreUploaded();
+  const result = await fixtures.WhenRunningALegacyProjectImport({
+    unauthorizedUser: true,
+  });
+  fixtures.ThenNoEventsAreEmitted();
+  await fixtures.ThenLegacyProjectImportIsNotUpdated();
+  fixtures.ThenForbiddenErrorIsReturned(result);
+});
+
+it(`fails to run for a second time`, async () => {
+  await fixtures.GivenAnExistingLegacyProjectImport();
+  await fixtures.GivenAllFilesAreUploaded();
+  const result = await fixtures.WhenRunningALegacyProjectImport();
+  await fixtures.ThenStartingLegacyProjectImportIsUpdated(result);
+
+  const secondTimeRunningResult = await fixtures.WhenRunningALegacyProjectImport();
+  fixtures.ThenLegacyProjectImportIsAlreadyStartedErrorIsRetured(
+    secondTimeRunningResult,
+  );
 });
 
 it(`fails to run when missing uploaded files`, async () => {
@@ -88,6 +113,7 @@ const getFixtures = async () => {
   await sandbox.init();
 
   const ownerId = UserId.create();
+  const unauthorizedUserId = UserId.create();
   const projectId = v4();
   const scenarioId = v4();
   const existingLegacyProjectImport = LegacyProjectImport.newOne(
@@ -130,8 +156,15 @@ const getFixtures = async () => {
     GivenUpdatingALegacyProjectImportFails: () => {
       repo.saveFailure = true;
     },
-    WhenRunningALegacyProjectImport: () => {
-      return sut.execute(new RunLegacyProjectImport(new ResourceId(projectId)));
+    WhenRunningALegacyProjectImport: (
+      { unauthorizedUser } = { unauthorizedUser: false },
+    ) => {
+      return sut.execute(
+        new RunLegacyProjectImport(
+          new ResourceId(projectId),
+          unauthorizedUser ? unauthorizedUserId : ownerId,
+        ),
+      );
     },
     ThenNoEventsAreEmitted: () => {
       expect(events).toHaveLength(0);
@@ -150,6 +183,20 @@ const getFixtures = async () => {
           );
         }),
       );
+    },
+    ThenLegacyProjectImportIsAlreadyStartedErrorIsRetured: (
+      result: RunLegacyProjectImportResponse,
+    ) => {
+      expect(result).toBeDefined();
+      if (isRight(result)) throw new Error('the handler should have failed');
+
+      expect(result.left).toEqual(legacyProjectImportAlreadyStarted);
+    },
+    ThenForbiddenErrorIsReturned: (result: RunLegacyProjectImportResponse) => {
+      expect(result).toBeDefined();
+      if (isRight(result)) throw new Error('the handler should have failed');
+
+      expect(result.left).toEqual(forbiddenError);
     },
     ThenMissingLegacyProjectImportErrorIsReturned: (
       result: RunLegacyProjectImportResponse,

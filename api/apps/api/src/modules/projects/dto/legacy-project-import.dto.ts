@@ -23,3 +23,11 @@ export class StartLegacyProjectImportResponseDto {
   })
   scenarioId!: string;
 }
+
+export class RunLegacyProjectImportResponseDto {
+  @ApiProperty({
+    description: 'ID of the project',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  projectId!: string;
+}
