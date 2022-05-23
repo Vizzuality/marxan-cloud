@@ -70,6 +70,18 @@ it('overrides a file of legacy project import', async () => {
 });
 
 it('fails if legacy project import is not found', async () => {
+  const projectId = await fixtures.GivenNoneLegacyProjectImportWasRequested();
+
+  await fixtures
+    .WhenAddingAFileToLegacyProjectImport({
+      id: projectId.value,
+      file: Buffer.from('example file'),
+      fileType: LegacyProjectImportFileType.InputDat,
+    })
+    .ThenLegacyProjectImportNotFoundErrorShouldBeReturned();
+});
+
+it('fails if a user tries to add a file to a not owned legacy project import', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
 
@@ -81,18 +93,6 @@ it('fails if legacy project import is not found', async () => {
       differentUser: true,
     })
     .ThenForbiddenErrorShouldBeReturned();
-});
-
-it('fails if a user tries to add a file to a not owned legacy project import', async () => {
-  const projectId = await fixtures.GivenNoneLegacyProjectImportWasRequested();
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId.value,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
-    })
-    .ThenLegacyProjectImportNotFoundErrorShouldBeReturned();
 });
 
 it('fails if given file cannot be stored', async () => {
