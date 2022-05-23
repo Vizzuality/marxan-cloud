@@ -135,6 +135,10 @@ import {
   legacyProjectImportNotFound,
   legacyProjectImportSaveError,
 } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import {
+  AddFileToLegacyProjectImportBodyDto,
+  AddFileToLegacyProjectImportResponseDto,
+} from './dto/legacy-project-import.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -250,6 +254,50 @@ export class ProjectsController {
             'a run has already being made on this legacy project import',
           );
         case legacyProjectImportSaveError:
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { projectId };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Adds a file to a legacy project import',
+    summary: 'Adds a file to a legacy project import',
+  })
+  @Post('legacy-project-import/:projectId/add-file')
+  @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
+  async addFileToLegacyProjectImport(
+    @Body() dto: AddFileToLegacyProjectImportBodyDto,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<AddFileToLegacyProjectImportResponseDto> {
+    const result = await this.projectsService.addFileToLegacyProjectImport(
+      projectId,
+      file,
+      dto.fileType,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        case legacyProjectImportSaveError:
+          throw new NotFoundException(
+            `Legacy project import with project ID ${projectId} not found`,
+          );
+        case legacyProjectImportAlreadyStarted:
+          throw new BadRequestException(
+            `Legacy project import with project ID ${projectId} has already started`,
+          );
         default:
           throw new InternalServerErrorException();
       }

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
+import { forbiddenError } from '../../access-control';
 import { LegacyProjectImport } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import {
@@ -34,14 +35,22 @@ export class AddFileToLegacyProjectImportHandler
     file,
     projectId,
     type,
+    userId,
   }: AddFileToLegacyProjectImport): Promise<
-    Either<AddFileToLegacyProjectImportHandlerErrors, true>
+    Either<
+      AddFileToLegacyProjectImportHandlerErrors | typeof forbiddenError,
+      true
+    >
   > {
     const result = await this.legacyProjectImportRepo.transaction(
       async (repo) => {
         const legacyProjectImport = await repo.find(projectId);
 
         if (isLeft(legacyProjectImport)) return legacyProjectImport.left;
+
+        if (legacyProjectImport.right.toSnapshot().ownerId !== userId.value) {
+          return forbiddenError;
+        }
 
         const legacyProjectImportAggregate = this.eventPublisher.mergeObjectContext(
           legacyProjectImport.right,

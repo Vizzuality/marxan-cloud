@@ -14,10 +14,10 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { isLeft } from 'fp-ts/lib/Either';
 import { v4 } from 'uuid';
+import { forbiddenError } from '../../access-control';
 import {
   LegacyProjectImport,
   legacyProjectImportAlreadyStarted,
-  legacyProjectImportDuplicateFileType,
 } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentSnapshot } from '../domain/legacy-project-import/legacy-project-import-component.snapshot';
 import {
@@ -48,6 +48,27 @@ it('adds a file to legacy project import', async () => {
     .ThenLegacyProjectImportShouldBePersistedWithTheNewFile();
 });
 
+it('overrides a file of legacy project import', async () => {
+  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const { projectId } = legacyProjectImport.toSnapshot();
+
+  const fileType = LegacyProjectImportFileType.InputDat;
+
+  await fixtures
+    .WhenAddingAFileToLegacyProjectImport({
+      id: projectId,
+      file: Buffer.from('example file'),
+      fileType,
+    })
+    .ThenLegacyProjectImportShouldBePersistedWithTheNewFile();
+
+  await fixtures.ThenItIsPossibleToOverridePreviouslyAddedFiles({
+    id: projectId,
+    file: Buffer.from('new file'),
+    fileType,
+  });
+});
+
 it('fails if legacy project import is not found', async () => {
   const projectId = await fixtures.GivenNoneLegacyProjectImportWasRequested();
 
@@ -58,6 +79,20 @@ it('fails if legacy project import is not found', async () => {
       fileType: LegacyProjectImportFileType.InputDat,
     })
     .ThenLegacyProjectImportNotFoundErrorShouldBeReturned();
+});
+
+it('fails if a user tries to add a file to a not owned legacy project import', async () => {
+  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const { projectId } = legacyProjectImport.toSnapshot();
+
+  await fixtures
+    .WhenAddingAFileToLegacyProjectImport({
+      id: projectId,
+      file: Buffer.from('example file'),
+      fileType: LegacyProjectImportFileType.InputDat,
+      differentUser: true,
+    })
+    .ThenForbiddenErrorShouldBeReturned();
 });
 
 it('fails if given file cannot be stored', async () => {
@@ -87,27 +122,6 @@ it('fails if legacy project import has already started', async () => {
       fileType: LegacyProjectImportFileType.InputDat,
     })
     .ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned();
-});
-
-it('fails if legacy project import already has a file of the same type of the provided file', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    {
-      files: [
-        { location: 'foo/bar.dat', type: LegacyProjectImportFileType.InputDat },
-      ],
-      isAcceptingFiles: true,
-      pieces: [],
-    },
-  );
-  const { projectId } = legacyProjectImport.toSnapshot();
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
-    })
-    .ThenLegacyProjectImportDuplicateFileTypeErrorShouldBeReturned();
 });
 
 it('fails if legacy project import aggregate cannot be persisted', async () => {
@@ -195,18 +209,21 @@ const getFixtures = async () => {
       fileType,
       errorStoringFile,
       errorPersistingAggregate,
+      differentUser,
     }: {
       id: string;
       file: Buffer;
       fileType: LegacyProjectImportFileType;
       errorStoringFile?: boolean;
       errorPersistingAggregate?: boolean;
+      differentUser?: boolean;
     }) => {
       const projectId = new ResourceId(id);
       const command = new AddFileToLegacyProjectImport(
         projectId,
         file,
         fileType,
+        differentUser ? UserId.create() : ownerId,
       );
 
       filesRepo.saveFailure = Boolean(errorStoringFile);
@@ -237,6 +254,11 @@ const getFixtures = async () => {
 
           expect(result).toMatchObject({ left: legacyProjectImportNotFound });
         },
+        ThenForbiddenErrorShouldBeReturned: async () => {
+          const result = await sut.execute(command);
+
+          expect(result).toMatchObject({ left: forbiddenError });
+        },
         ThenErrorStoringFileShouldBeReturned: async () => {
           const result = await sut.execute(command);
 
@@ -249,13 +271,6 @@ const getFixtures = async () => {
             left: legacyProjectImportAlreadyStarted,
           });
         },
-        ThenLegacyProjectImportDuplicateFileTypeErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({
-            left: legacyProjectImportDuplicateFileType,
-          });
-        },
         ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
           const result = await sut.execute(command);
 
@@ -264,6 +279,25 @@ const getFixtures = async () => {
           });
         },
       };
+    },
+    ThenItIsPossibleToOverridePreviouslyAddedFiles: async ({
+      id,
+      file,
+      fileType,
+    }: {
+      id: string;
+      file: Buffer;
+      fileType: LegacyProjectImportFileType;
+    }) => {
+      const projectId = new ResourceId(id);
+      const command = new AddFileToLegacyProjectImport(
+        projectId,
+        file,
+        fileType,
+        ownerId,
+      );
+
+      await expect(sut.execute(command)).resolves.not.toThrow();
     },
   };
 };

@@ -49,7 +49,7 @@ export class LegacyProjectImportFilesLocalRepository
 
     ensureFolderExists(path);
 
-    return storeFile(path, stream);
+    return storeFile(path, stream, { override: true });
   }
 
   async deleteFolder(id: string): Promise<void> {
