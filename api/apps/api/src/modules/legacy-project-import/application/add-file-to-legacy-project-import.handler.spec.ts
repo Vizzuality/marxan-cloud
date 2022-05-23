@@ -17,7 +17,6 @@ import { v4 } from 'uuid';
 import { forbiddenError } from '../../access-control';
 import {
   LegacyProjectImport,
-  legacyProjectImportDuplicateFileType,
   legacyProjectImportAlreadyStarted,
 } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentSnapshot } from '../domain/legacy-project-import/legacy-project-import-component.snapshot';
@@ -102,27 +101,6 @@ it('fails if legacy project import has already started', async () => {
       fileType: LegacyProjectImportFileType.InputDat,
     })
     .ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned();
-});
-
-it('fails if legacy project import already has a file of the same type of the provided file', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    {
-      files: [
-        { location: 'foo/bar.dat', type: LegacyProjectImportFileType.InputDat },
-      ],
-      isAcceptingFiles: true,
-      pieces: [],
-    },
-  );
-  const { projectId } = legacyProjectImport.toSnapshot();
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
-    })
-    .ThenLegacyProjectImportDuplicateFileTypeErrorShouldBeReturned();
 });
 
 it('fails if legacy project import aggregate cannot be persisted', async () => {
@@ -270,13 +248,6 @@ const getFixtures = async () => {
 
           expect(result).toMatchObject({
             left: legacyProjectImportAlreadyStarted,
-          });
-        },
-        ThenLegacyProjectImportDuplicateFileTypeErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({
-            left: legacyProjectImportDuplicateFileType,
           });
         },
         ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {

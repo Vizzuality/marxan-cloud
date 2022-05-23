@@ -25,12 +25,6 @@ export const legacyProjectImportComponentAlreadyCompleted = Symbol(
 export const legacyProjectImportComponentAlreadyFailed = Symbol(
   `legacy project import component already failed`,
 );
-export const legacyProjectImportDuplicateFile = Symbol(
-  `legacy project import already has this file`,
-);
-export const legacyProjectImportDuplicateFileType = Symbol(
-  `legacy project import already has this file type`,
-);
 export const legacyProjectImportMissingRequiredFile = Symbol(
   `legacy project import missing required file`,
 );
@@ -46,10 +40,7 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentNotFound
   | typeof legacyProjectImportComponentAlreadyFailed;
 
-export type AddFileToLegacyProjectImportErrors =
-  | typeof legacyProjectImportAlreadyStarted
-  | typeof legacyProjectImportDuplicateFile
-  | typeof legacyProjectImportDuplicateFileType;
+export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
 export type RunLegacyProjectImportErrors =
@@ -289,20 +280,12 @@ export class LegacyProjectImport extends AggregateRoot {
       return left(legacyProjectImportAlreadyStarted);
     }
 
-    const fileTypeAlreadyPresent = this.files.some(
+    const sameFileTypeFileIndex = this.files.findIndex(
       (el) => el.type === file.type,
     );
 
-    if (fileTypeAlreadyPresent) {
-      return left(legacyProjectImportDuplicateFileType);
-    }
-
-    const duplicateArchiveLocation = this.files.some(
-      (el) => el.location === file.location,
-    );
-
-    if (duplicateArchiveLocation) {
-      return left(legacyProjectImportDuplicateFile);
+    if (sameFileTypeFileIndex !== -1) {
+      this.files.splice(sameFileTypeFileIndex, 1);
     }
 
     this.files.push(file);

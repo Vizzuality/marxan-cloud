@@ -29,9 +29,17 @@ export class AddFileToLegacyProjectImportBodyDto {
   @ApiProperty({
     description: 'Type of the file',
     example: LegacyProjectImportFileType.InputDat,
+    enum: LegacyProjectImportFileType,
   })
   @IsEnum(LegacyProjectImportFileType)
   fileType!: LegacyProjectImportFileType;
+
+  @ApiProperty({
+    description: 'Export zip file',
+    type: 'string',
+    format: 'binary',
+  })
+  file!: Express.Multer.File;
 }
 
 export class AddFileToLegacyProjectImportResponseDto {
