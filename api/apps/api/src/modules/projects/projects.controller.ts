@@ -224,10 +224,6 @@ export class ProjectsController {
   }
 
   @ImplementsAcl()
-  @Post('legacy-project-import/:projectId/add-file')
-  @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
-  @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
   @ApiOperation({
     description: 'Runs a legacy project import project',
     summary: 'Runs a legacy project import project',
@@ -271,6 +267,10 @@ export class ProjectsController {
     description: 'Adds a file to a legacy project import',
     summary: 'Adds a file to a legacy project import',
   })
+  @Post('legacy-project-import/:projectId/add-file')
+  @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
   async addFileToLegacyProjectImport(
     @Body() dto: AddFileToLegacyProjectImportBodyDto,
     @Param('projectId', ParseUUIDPipe) projectId: string,

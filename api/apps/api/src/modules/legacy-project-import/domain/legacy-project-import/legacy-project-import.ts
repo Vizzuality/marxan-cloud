@@ -43,9 +43,6 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
 export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
-export type RunLegacyProjectImportErrors =
-  | typeof legacyProjectImportAlreadyStarted
-  | GenerateLegacyProjectImportPiecesErrors;
 
 export type RunLegacyProjectImportErrors =
   | typeof legacyProjectImportAlreadyStarted
