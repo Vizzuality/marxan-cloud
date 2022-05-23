@@ -12,8 +12,8 @@ import MetaIcons from 'layout/meta-icons';
 import ReportHeader from 'layout/scenarios/reports/solutions/header';
 import IntroPage from 'layout/scenarios/reports/solutions/intro-page';
 import SelectedSolutionPage from 'layout/scenarios/reports/solutions/selected-solution-page';
+import SelectionFrequencyPage from 'layout/scenarios/reports/solutions/selection-frequency-page';
 import SettingsPage from 'layout/scenarios/reports/solutions/settings-page';
-import SolutionFrequencyPage from 'layout/scenarios/reports/solutions/solution-frequency-page';
 import WebShotStatus from 'layout/scenarios/reports/solutions/webshot-status';
 
 export const getServerSideProps = withProtection(withUser());
@@ -65,7 +65,7 @@ const SolutionsReport: React.FC = () => {
         className="flex flex-col h-full text-black bg-white"
       >
         <ReportHeader title="Selection Frequency" />
-        <SolutionFrequencyPage />
+        <SelectionFrequencyPage />
       </div>
 
       <div
