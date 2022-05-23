@@ -11,14 +11,14 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../../utils/config.utils';
 import { ApiEventsModule } from '../../api-events';
-import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
-import { LegacyProjectImportComponentEntity } from '../infra/entities/legacy-project-import-component.api.entity';
-import { LegacyProjectImportFileEntity } from '../infra/entities/legacy-project-import-file.api.entity';
-import { LegacyProjectImportEntity } from '../infra/entities/legacy-project-import.api.entity';
-import { LegacyProjectImportTypeormRepository } from '../infra/legacy-project-import-typeorm.repository';
 import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
+import { AllLegacyProjectImportPiecesImportedSaga } from './all-legacy-project-import-pieces-imported.saga';
 import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
+import { LegacyProjectImportRequestedSaga } from './legacy-project-import-requested.saga';
+import { MarkLegacyProjectImportAsSubmittedHandler } from './mark-legacy-project-as-submitted.handler';
+import { LegacyProjectImportRepositoryModule } from '../infra/legacy-project-import.repository.module';
 import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
+import { MarkLegacyProjectImportAsFinishedHandler } from './mark-legacy-project-import-as-finished.handler';
 import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
 
@@ -26,20 +26,10 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
   imports: [
     ApiEventsModule,
     CqrsModule,
-    TypeOrmModule.forFeature([
-      LegacyProjectImportEntity,
-      LegacyProjectImportComponentEntity,
-      LegacyProjectImportFileEntity,
-      Project,
-      Scenario,
-      Organization,
-    ]),
+    TypeOrmModule.forFeature([Project, Scenario, Organization]),
+    LegacyProjectImportRepositoryModule,
   ],
   providers: [
-    {
-      provide: LegacyProjectImportRepository,
-      useClass: LegacyProjectImportTypeormRepository,
-    },
     {
       provide: LegacyProjectImportFilesRepository,
       useClass: LegacyProjectImportFilesLocalRepository,
@@ -54,6 +44,10 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
         return path.endsWith('/') ? path.substring(0, path.length - 1) : path;
       },
     },
+    LegacyProjectImportRequestedSaga,
+    MarkLegacyProjectImportAsSubmittedHandler,
+    AllLegacyProjectImportPiecesImportedSaga,
+    MarkLegacyProjectImportAsFinishedHandler,
     MarkLegacyProjectImportAsFailedHandler,
     MarkLegacyProjectImportPieceAsFailedHandler,
     StartLegacyProjectImportHandler,
