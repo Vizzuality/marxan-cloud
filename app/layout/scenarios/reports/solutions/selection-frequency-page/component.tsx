@@ -85,7 +85,7 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
               <p>{contributors.join(', ')}</p>
             </div>
             <div>
-              <p className="font-semibold">Protected Areas:</p>
+              <p className="font-semibold">Protected Areas [1]:</p>
               <p>{protectedAreas.join(', ')}</p>
             </div>
           </div>
@@ -102,17 +102,37 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
             <p className="font-semibold">BLM</p>
             <p>{scenarioData.metadata.marxanInputParameterFile.BLM || null}</p>
           </div> */}
-          <div className="py-5 border-t border-gray-500 mr-14">
-            <LegendItem
-              {...LEGEND}
-              key="frequency"
-              className="block"
-              theme="light"
-            >
-              <LegendTypeGradient
-                items={LEGEND.items}
-              />
-            </LegendItem>
+          <div>
+            <div className="py-5 border-t border-gray-500 mr-14">
+              <LegendItem
+                {...LEGEND}
+                key="frequency"
+                className="block"
+                theme="light"
+              >
+                <LegendTypeGradient
+                  items={LEGEND.items}
+                />
+              </LegendItem>
+            </div>
+            <div className="mt-5">
+              <p className="text-xxs">
+                [1] The IUCN Protected Area Categories is a global standard that classifies sites
+                according to their conservation objectives. It is not a compulsory non-hierarchical
+                standard nor is applied by IUCN globally. It is for government agencies or other
+                institutions to use, which means that in some countries there might not be any
+                categories assigned yet. For more information about this standard, see:
+                <a
+                  className="underline"
+                  href="https://www.iucn.org/theme/protected-areas/about/protected-area-categories"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {' '}
+                  https://www.iucn.org/theme/protected-areas/about/protected-area-categories
+                </a>
+              </p>
+            </div>
           </div>
 
         </section>
