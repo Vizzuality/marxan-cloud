@@ -1,18 +1,7 @@
-import { ArchiveLocation } from '@marxan/cloning/domain';
-import {
-  LegacyProjectImportFile,
-  LegacyProjectImportFilesRepository,
-} from '@marxan/legacy-project-import';
-import { Logger } from '@nestjs/common';
-import {
-  CommandHandler,
-  EventPublisher,
-  IInferredCommandHandler,
-} from '@nestjs/cqrs';
+import { LegacyProjectImportFilesRepository } from '@marxan/legacy-project-import';
+import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
-import { Readable } from 'stream';
 import { forbiddenError } from '../../access-control';
-import { LegacyProjectImport } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import {
   DeleteFileFromLegacyProjectImport,

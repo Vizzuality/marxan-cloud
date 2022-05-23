@@ -3,6 +3,7 @@ import {
   LegacyProjectImportFile,
   LegacyProjectImportFilesRepository,
 } from '@marxan/legacy-project-import';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import {
   CommandHandler,
   EventPublisher,
@@ -33,8 +34,10 @@ export class AddFileToLegacyProjectImportHandler
     type,
     userId,
   }: AddFileToLegacyProjectImport): Promise<
-    Either<AddFileToLegacyProjectImportHandlerErrors, true>
+    Either<AddFileToLegacyProjectImportHandlerErrors, LegacyProjectImportFileId>
   > {
+    const fileId = LegacyProjectImportFileId.create();
+
     const result = await this.legacyProjectImportRepo.transaction(
       async (repo) => {
         const legacyProjectImport = await repo.find(projectId);
@@ -58,10 +61,11 @@ export class AddFileToLegacyProjectImportHandler
         if (isLeft(pathOrError)) return pathOrError.left;
 
         const archiveLocation = new ArchiveLocation(pathOrError.right);
-        const legacyProjectImportFile = LegacyProjectImportFile.newOne(
+        const legacyProjectImportFile = LegacyProjectImportFile.fromSnapshot({
+          id: fileId.value,
           type,
-          archiveLocation,
-        );
+          location: archiveLocation.value,
+        });
 
         const addFileResult = legacyProjectImportAggregate.addFile(
           legacyProjectImportFile,
@@ -79,7 +83,7 @@ export class AddFileToLegacyProjectImportHandler
 
     if (result instanceof LegacyProjectImport) {
       result.commit();
-      return right(true);
+      return right(fileId);
     }
 
     return left(result);

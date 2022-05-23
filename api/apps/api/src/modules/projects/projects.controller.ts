@@ -303,7 +303,7 @@ export class ProjectsController {
       }
     }
 
-    return { projectId };
+    return { projectId, fileId: result.right.value };
   }
 
   @ImplementsAcl()

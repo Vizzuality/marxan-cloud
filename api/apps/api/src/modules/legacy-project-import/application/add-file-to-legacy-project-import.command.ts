@@ -2,6 +2,7 @@ import { SaveFileError } from '@marxan/cloning-files-repository';
 import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '../../access-control';
@@ -19,7 +20,7 @@ export type AddFileToLegacyProjectImportHandlerErrors =
   | typeof forbiddenError;
 
 export class AddFileToLegacyProjectImport extends Command<
-  Either<AddFileToLegacyProjectImportHandlerErrors, true>
+  Either<AddFileToLegacyProjectImportHandlerErrors, LegacyProjectImportFileId>
 > {
   constructor(
     public readonly projectId: ResourceId,

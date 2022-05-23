@@ -27,6 +27,8 @@ import {
 import { LegacyProjectImportMemoryRepository } from '../infra/legacy-project-import-memory.repository';
 import { AddFileToLegacyProjectImport } from './add-file-to-legacy-project-import.command';
 import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
+import { DeleteFileFromLegacyProjectImport } from './delete-file-from-legacy-project-import.command';
+import { DeleteFileFromLegacyProjectImportHandler } from './delete-file-from-legacy-project-import.handler';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -34,107 +36,84 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it('adds a file to legacy project import', async () => {
+it('deletes a file from a legacy project import', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
-    })
-    .ThenLegacyProjectImportShouldBePersistedWithTheNewFile();
-});
-
-it('overrides a file of legacy project import', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
-  const { projectId } = legacyProjectImport.toSnapshot();
-
-  const fileType = LegacyProjectImportFileType.InputDat;
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType,
-    })
-    .ThenLegacyProjectImportShouldBePersistedWithTheNewFile();
-
-  await fixtures.ThenItIsPossibleToOverridePreviouslyAddedFiles({
+  const resourceId = new ResourceId(projectId);
+  const fileId = await fixtures.GivenAFileHasBeenAddedToLegacyProjectImport({
     id: projectId,
-    file: Buffer.from('new file'),
-    fileType,
+    file: Buffer.from('example file'),
+    fileType: LegacyProjectImportFileType.InputDat,
   });
+
+  await fixtures
+    .WhenDeletingAFileFromLegacyProjectImport({
+      projectId: resourceId,
+      fileId,
+    })
+    .ThenLegacyProjectImportShouldBePersistedWithoutTheFile();
 });
 
 it('fails if legacy project import is not found', async () => {
   const projectId = await fixtures.GivenNoneLegacyProjectImportWasRequested();
 
   await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId.value,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
+    .WhenDeletingAFileFromLegacyProjectImport({
+      projectId,
+      fileId: LegacyProjectImportFileId.create(),
     })
     .ThenLegacyProjectImportNotFoundErrorShouldBeReturned();
 });
 
-it('fails if a user tries to add a file to a not owned legacy project import', async () => {
+it('fails if a user tries to delete a file from a not owned legacy project import', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
+  const resourceId = new ResourceId(projectId);
+  const fileId = await fixtures.GivenAFileHasBeenAddedToLegacyProjectImport({
+    id: projectId,
+    file: Buffer.from('example file'),
+    fileType: LegacyProjectImportFileType.InputDat,
+  });
 
   await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
+    .WhenDeletingAFileFromLegacyProjectImport({
+      projectId: resourceId,
+      fileId,
       differentUser: true,
     })
     .ThenForbiddenErrorShouldBeReturned();
 });
 
-it('fails if given file cannot be stored', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
-  const { projectId } = legacyProjectImport.toSnapshot();
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
-      errorStoringFile: true,
-    })
-    .ThenErrorStoringFileShouldBeReturned();
-});
-
-it('fails if legacy project import has already started', async () => {
-  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
-    { files: [], isAcceptingFiles: false, pieces: [] },
-  );
-  const { projectId } = legacyProjectImport.toSnapshot();
-
-  await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
-    })
-    .ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned();
-});
-
 it('fails if legacy project import aggregate cannot be persisted', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
+  const resourceId = new ResourceId(projectId);
+  const fileId = await fixtures.GivenAFileHasBeenAddedToLegacyProjectImport({
+    id: projectId,
+    file: Buffer.from('example file'),
+    fileType: LegacyProjectImportFileType.InputDat,
+  });
 
   await fixtures
-    .WhenAddingAFileToLegacyProjectImport({
-      id: projectId,
-      file: Buffer.from('example file'),
-      fileType: LegacyProjectImportFileType.InputDat,
+    .WhenDeletingAFileFromLegacyProjectImport({
+      projectId: resourceId,
+      fileId,
       errorPersistingAggregate: true,
     })
     .ThenLegacyProjectImportSaveErrorShouldBeReturned();
+});
+
+it('does not fail when deleting a not existing file', async () => {
+  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const { projectId } = legacyProjectImport.toSnapshot();
+  const resourceId = new ResourceId(projectId);
+
+  await fixtures
+    .WhenDeletingAFileFromLegacyProjectImport({
+      projectId: resourceId,
+      fileId: LegacyProjectImportFileId.create(),
+    })
+    .ThenLegacyProjectImportShouldBePersistedWithoutTheFile();
 });
 
 const getFixtures = async () => {
@@ -150,6 +129,7 @@ const getFixtures = async () => {
         useClass: LegacyProjectImportFilesMemoryRepository,
       },
       AddFileToLegacyProjectImportHandler,
+      DeleteFileFromLegacyProjectImportHandler,
     ],
   }).compile();
   await sandbox.init();
@@ -158,7 +138,8 @@ const getFixtures = async () => {
   const projectId = ResourceId.create();
   const scenarioId = ResourceId.create();
 
-  const sut = sandbox.get(AddFileToLegacyProjectImportHandler);
+  const addFileHandler = sandbox.get(AddFileToLegacyProjectImportHandler);
+  const sut = sandbox.get(DeleteFileFromLegacyProjectImportHandler);
   const repo: LegacyProjectImportMemoryRepository = sandbox.get(
     LegacyProjectImportRepository,
   );
@@ -192,92 +173,7 @@ const getFixtures = async () => {
 
       return legacyProjectImport;
     },
-    GivenNoneLegacyProjectImportWasRequested: async () => {
-      const result = await repo.find(projectId);
-      expect(result).toMatchObject({ left: legacyProjectImportNotFound });
-
-      return projectId;
-    },
-    WhenAddingAFileToLegacyProjectImport: ({
-      id,
-      file,
-      fileType,
-      errorStoringFile,
-      errorPersistingAggregate,
-      differentUser,
-    }: {
-      id: string;
-      file: Buffer;
-      fileType: LegacyProjectImportFileType;
-      errorStoringFile?: boolean;
-      errorPersistingAggregate?: boolean;
-      differentUser?: boolean;
-    }) => {
-      const projectId = new ResourceId(id);
-      const command = new AddFileToLegacyProjectImport(
-        projectId,
-        file,
-        fileType,
-        differentUser ? UserId.create() : ownerId,
-      );
-
-      filesRepo.saveFailure = Boolean(errorStoringFile);
-      repo.saveFailure = Boolean(errorPersistingAggregate);
-
-      return {
-        ThenLegacyProjectImportShouldBePersistedWithTheNewFile: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({
-            right: expect.any(LegacyProjectImportFileId),
-          });
-
-          const persistedAggregate = await repo.find(projectId);
-          if (isLeft(persistedAggregate))
-            throw new Error('Legacy project import not found');
-
-          const { files } = persistedAggregate.right.toSnapshot();
-
-          expect(files).toHaveLength(1);
-
-          const [file] = files;
-
-          const expectedPath = filesRepo.getPathFor(id, fileType);
-          expect(file.location).toBe(expectedPath);
-          expect(file.type).toBe(fileType);
-        },
-        ThenLegacyProjectImportNotFoundErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({ left: legacyProjectImportNotFound });
-        },
-        ThenForbiddenErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({ left: forbiddenError });
-        },
-        ThenErrorStoringFileShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({ left: unknownError });
-        },
-        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({
-            left: legacyProjectImportAlreadyStarted,
-          });
-        },
-        ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
-          const result = await sut.execute(command);
-
-          expect(result).toMatchObject({
-            left: legacyProjectImportSaveError,
-          });
-        },
-      };
-    },
-    ThenItIsPossibleToOverridePreviouslyAddedFiles: async ({
+    GivenAFileHasBeenAddedToLegacyProjectImport: async ({
       id,
       file,
       fileType,
@@ -294,7 +190,75 @@ const getFixtures = async () => {
         ownerId,
       );
 
-      await expect(sut.execute(command)).resolves.not.toThrow();
+      const result = await addFileHandler.execute(command);
+
+      if (isLeft(result))
+        throw new Error('Error adding file to legacy project import');
+
+      return result.right;
+    },
+    GivenNoneLegacyProjectImportWasRequested: async () => {
+      const result = await repo.find(projectId);
+      expect(result).toMatchObject({ left: legacyProjectImportNotFound });
+
+      return projectId;
+    },
+    WhenDeletingAFileFromLegacyProjectImport: ({
+      projectId,
+      fileId,
+      errorStoringFile,
+      errorPersistingAggregate,
+      differentUser,
+    }: {
+      projectId: ResourceId;
+      fileId: LegacyProjectImportFileId;
+      errorStoringFile?: boolean;
+      errorPersistingAggregate?: boolean;
+      differentUser?: boolean;
+    }) => {
+      const command = new DeleteFileFromLegacyProjectImport(
+        projectId,
+        fileId,
+        differentUser ? UserId.create() : ownerId,
+      );
+
+      filesRepo.saveFailure = Boolean(errorStoringFile);
+      repo.saveFailure = Boolean(errorPersistingAggregate);
+
+      return {
+        ThenLegacyProjectImportShouldBePersistedWithoutTheFile: async () => {
+          const result = await sut.execute(command);
+
+          expect(result).toMatchObject({ right: true });
+
+          const persistedAggregate = await repo.find(projectId);
+          if (isLeft(persistedAggregate))
+            throw new Error('Legacy project import not found');
+
+          const { files } = persistedAggregate.right.toSnapshot();
+          const fileOrUndefined = files.find(
+            (file) => file.id === fileId.value,
+          );
+          expect(fileOrUndefined).toBeUndefined();
+        },
+        ThenLegacyProjectImportNotFoundErrorShouldBeReturned: async () => {
+          const result = await sut.execute(command);
+
+          expect(result).toMatchObject({ left: legacyProjectImportNotFound });
+        },
+        ThenForbiddenErrorShouldBeReturned: async () => {
+          const result = await sut.execute(command);
+
+          expect(result).toMatchObject({ left: forbiddenError });
+        },
+        ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
+          const result = await sut.execute(command);
+
+          expect(result).toMatchObject({
+            left: legacyProjectImportSaveError,
+          });
+        },
+      };
     },
   };
 };

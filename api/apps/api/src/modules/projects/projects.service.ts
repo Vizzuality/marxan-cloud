@@ -76,6 +76,7 @@ import {
   AddFileToLegacyProjectImport,
   AddFileToLegacyProjectImportHandlerErrors,
 } from '../legacy-project-import/application/add-file-to-legacy-project-import.command';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 
 export { validationFailed } from '../planning-areas';
 
@@ -476,7 +477,9 @@ export class ProjectsService {
     file: Express.Multer.File,
     fileType: LegacyProjectImportFileType,
     userIdentifier: string,
-  ): Promise<Either<AddFileToLegacyProjectImportHandlerErrors, boolean>> {
+  ): Promise<
+    Either<AddFileToLegacyProjectImportHandlerErrors, LegacyProjectImportFileId>
+  > {
     const resourceId = new ResourceId(projectId);
     const userId = new UserId(userIdentifier);
 
