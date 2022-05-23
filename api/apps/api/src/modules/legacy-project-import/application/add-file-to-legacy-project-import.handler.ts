@@ -3,7 +3,6 @@ import {
   LegacyProjectImportFile,
   LegacyProjectImportFilesRepository,
 } from '@marxan/legacy-project-import';
-import { Logger } from '@nestjs/common';
 import {
   CommandHandler,
   EventPublisher,
@@ -26,10 +25,7 @@ export class AddFileToLegacyProjectImportHandler
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
     private readonly legacyProjectImportFilesRepo: LegacyProjectImportFilesRepository,
     private readonly eventPublisher: EventPublisher,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(AddFileToLegacyProjectImportHandler.name);
-  }
+  ) {}
 
   async execute({
     file,
@@ -37,10 +33,7 @@ export class AddFileToLegacyProjectImportHandler
     type,
     userId,
   }: AddFileToLegacyProjectImport): Promise<
-    Either<
-      AddFileToLegacyProjectImportHandlerErrors | typeof forbiddenError,
-      true
-    >
+    Either<AddFileToLegacyProjectImportHandlerErrors, true>
   > {
     const result = await this.legacyProjectImportRepo.transaction(
       async (repo) => {

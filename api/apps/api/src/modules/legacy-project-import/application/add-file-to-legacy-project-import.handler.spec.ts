@@ -150,10 +150,6 @@ const getFixtures = async () => {
         provide: LegacyProjectImportFilesRepository,
         useClass: LegacyProjectImportFilesMemoryRepository,
       },
-      {
-        provide: Logger,
-        useClass: FakeLogger,
-      },
       AddFileToLegacyProjectImportHandler,
     ],
   }).compile();
