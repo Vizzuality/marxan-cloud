@@ -3,10 +3,7 @@ import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
-import {
-  GenerateLegacyProjectImportPiecesErrors,
-  RunLegacyProjectImportErrors,
-} from '../domain/legacy-project-import/legacy-project-import';
+import { RunLegacyProjectImportErrors } from '../domain/legacy-project-import/legacy-project-import';
 import {
   LegacyProjectImportRepositoryFindErrors,
   LegacyProjectImportRepositorySaveErrors,
@@ -14,7 +11,6 @@ import {
 
 export type RunLegacyProjectImportError =
   | RunLegacyProjectImportErrors
-  | GenerateLegacyProjectImportPiecesErrors
   | LegacyProjectImportRepositorySaveErrors
   | LegacyProjectImportRepositoryFindErrors
   | typeof forbiddenError;
