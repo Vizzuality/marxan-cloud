@@ -65,7 +65,7 @@ export class AddFileToLegacyProjectImportHandler
         if (isLeft(pathOrError)) return pathOrError.left;
 
         const archiveLocation = new ArchiveLocation(pathOrError.right);
-        const legacyProjectImportFile = new LegacyProjectImportFile(
+        const legacyProjectImportFile = LegacyProjectImportFile.newOne(
           type,
           archiveLocation,
         );
