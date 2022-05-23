@@ -123,6 +123,7 @@ import {
   unfinishedExport,
 } from '../clone/export/application/get-archive.query';
 import {
+  RunLegacyProjectImportResponseDto,
   StartLegacyProjectImportBodyDto,
   StartLegacyProjectImportResponseDto,
 } from './dto/legacy-project-import.dto';
@@ -223,11 +224,12 @@ export class ProjectsController {
     description: 'Runs a legacy project import project',
     summary: 'Runs a legacy project import project',
   })
+  @ApiOkResponse({ type: RunLegacyProjectImportResponseDto })
   @Post('legacy-project-import/:projectId/run')
   async runLegacyProject(
     @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<void> {
+  ): Promise<RunLegacyProjectImportResponseDto> {
     const result = await this.projectsService.runLegacyProject(
       projectId,
       req.user.id,
@@ -252,6 +254,8 @@ export class ProjectsController {
           throw new InternalServerErrorException();
       }
     }
+
+    return { projectId };
   }
 
   @ImplementsAcl()
