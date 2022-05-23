@@ -48,6 +48,27 @@ it('adds a file to legacy project import', async () => {
     .ThenLegacyProjectImportShouldBePersistedWithTheNewFile();
 });
 
+it('overrides a file of legacy project import', async () => {
+  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  const { projectId } = legacyProjectImport.toSnapshot();
+
+  const fileType = LegacyProjectImportFileType.InputDat;
+
+  await fixtures
+    .WhenAddingAFileToLegacyProjectImport({
+      id: projectId,
+      file: Buffer.from('example file'),
+      fileType,
+    })
+    .ThenLegacyProjectImportShouldBePersistedWithTheNewFile();
+
+  await fixtures.ThenItIsPossibleToOverridePreviouslyAddedFiles({
+    id: projectId,
+    file: Buffer.from('new file'),
+    fileType,
+  });
+});
+
 it('fails if legacy project import is not found', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
   const { projectId } = legacyProjectImport.toSnapshot();
@@ -258,6 +279,25 @@ const getFixtures = async () => {
           });
         },
       };
+    },
+    ThenItIsPossibleToOverridePreviouslyAddedFiles: async ({
+      id,
+      file,
+      fileType,
+    }: {
+      id: string;
+      file: Buffer;
+      fileType: LegacyProjectImportFileType;
+    }) => {
+      const projectId = new ResourceId(id);
+      const command = new AddFileToLegacyProjectImport(
+        projectId,
+        file,
+        fileType,
+        ownerId,
+      );
+
+      await expect(sut.execute(command)).resolves.not.toThrow();
     },
   };
 };
