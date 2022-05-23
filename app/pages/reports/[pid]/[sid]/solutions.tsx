@@ -64,7 +64,7 @@ const SolutionsReport: React.FC = () => {
         style={styles.page}
         className="flex flex-col h-full text-black bg-white"
       >
-        <ReportHeader title="Solution Frequency" />
+        <ReportHeader title="Selection Frequency" />
         <SolutionFrequencyPage />
       </div>
 

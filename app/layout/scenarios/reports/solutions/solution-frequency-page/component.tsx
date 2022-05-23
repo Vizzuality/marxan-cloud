@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
-import { useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import ScenarioReportsMap from 'layout/scenarios/reports/solutions/solution-frequency-page/map';
@@ -64,21 +63,16 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
     }).filter((a) => a.selected).map((a) => a.name);
   }, [protectedAreasData]);
 
-  const {
-    data: PUData,
-    isFetched: PUDataIsFetched,
-  } = useScenarioPU(sid);
-
   const LEGEND = useMemo(() => {
     return {
       id: 'frequency',
-      name: 'Solution frequency',
+      name: 'Selection frequency',
       items: LEGEND_LAYERS.frequency().items,
     };
   }, []);
 
   const reportDataIsFetched = projectDataIsFetched && projectUsersDataIsFetched
-    && protectedAreasDataIsFetched && PUDataIsFetched;
+    && protectedAreasDataIsFetched;
 
   return (
     reportDataIsFetched && (
@@ -93,12 +87,6 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
             <div>
               <p className="font-semibold">Protected Areas:</p>
               <p>{protectedAreas.join(', ')}</p>
-            </div>
-
-            <div>
-              <p className="font-semibold">No. of planning units</p>
-              <p>{`In the solution: ${PUData.included.length || 0}`}</p>
-              <p>{`Not included in the solution: ${PUData.excluded.length || 0}`}</p>
             </div>
           </div>
 
