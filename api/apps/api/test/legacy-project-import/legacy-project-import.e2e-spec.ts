@@ -71,7 +71,6 @@ it('runs a legacy project import once required files are uploaded', async () => 
   await fixtures.WhenRunningALegacyProjectImport();
 
   await fixtures.ThenLegacyProjectImportRunStarted();
-  await fixtures.ThenLegacyProjectImportIsMarkedAsSubmitted();
 });
 
 it('deletes files from a legacy project import', async () => {
@@ -238,15 +237,6 @@ const getFixtures = async () => {
       expect(files).toHaveLength(1);
       const [file] = files;
       expect(file.type).toEqual(fileType);
-    },
-    ThenLegacyProjectImportIsMarkedAsSubmitted: async () => {
-      const apiEvent = await apiEventsService.getLatestEventForTopic({
-        kind: API_EVENT_KINDS.project__legacy__import__submitted__v1__alpha,
-        topic: projectId,
-      });
-
-      expect(apiEvent).toBeDefined();
-      expect(apiEvent.data?.projectId).toEqual(projectId);
     },
     ThenLegacyProjectImportRunStarted: async () => {
       const legacyProjectImport = await repo.find(new ResourceId(projectId));
