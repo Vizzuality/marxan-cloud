@@ -7,7 +7,6 @@ import {
   LegacyProjectImportFileType,
 } from '@marxan/legacy-project-import';
 import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
-import { unknownError } from '@marxan/utils/file-operations';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
@@ -101,6 +100,21 @@ it('fails if legacy project import aggregate cannot be persisted', async () => {
       errorPersistingAggregate: true,
     })
     .ThenLegacyProjectImportSaveErrorShouldBeReturned();
+});
+
+it('fails if legacy project import has already started', async () => {
+  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
+    { isAcceptingFiles: false, files: [], pieces: [] },
+  );
+  const { projectId } = legacyProjectImport.toSnapshot();
+  const resourceId = new ResourceId(projectId);
+
+  await fixtures
+    .WhenDeletingAFileFromLegacyProjectImport({
+      projectId: resourceId,
+      fileId: LegacyProjectImportFileId.create(),
+    })
+    .ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned();
 });
 
 it('does not fail when deleting a not existing file', async () => {
@@ -250,6 +264,13 @@ const getFixtures = async () => {
           const result = await sut.execute(command);
 
           expect(result).toMatchObject({ left: forbiddenError });
+        },
+        ThenLegacyProjectImportHasAlreadyStartedErrorShouldBeReturned: async () => {
+          const result = await sut.execute(command);
+
+          expect(result).toMatchObject({
+            left: legacyProjectImportAlreadyStarted,
+          });
         },
         ThenLegacyProjectImportSaveErrorShouldBeReturned: async () => {
           const result = await sut.execute(command);

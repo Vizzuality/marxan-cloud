@@ -34,11 +34,12 @@ export class DeleteFileFromLegacyProjectImportHandler
 
       const legacyProjectImportAggregate = legacyProjectImport.right;
 
-      const deletedFile = legacyProjectImportAggregate.deleteFile(fileId);
+      const deleteResult = legacyProjectImportAggregate.deleteFile(fileId);
+      if (isLeft(deleteResult)) return deleteResult;
 
-      if (deletedFile) {
+      if (deleteResult.right) {
         await this.legacyProjectImportFilesRepo.deleteFile(
-          deletedFile.toSnapshot().location,
+          deleteResult.right.toSnapshot().location,
         );
       }
 

@@ -1,4 +1,3 @@
-import { ArchiveLocation } from '@marxan/cloning/domain/archive-location';
 import {
   LegacyProjectImportFile,
   LegacyProjectImportFileSnapshot,
@@ -24,6 +23,9 @@ export class LegacyProjectImportFileEntity {
   @ManyToOne(
     () => LegacyProjectImportEntity,
     (legacyProjectImport) => legacyProjectImport.files,
+    {
+      orphanedRowAction: 'delete',
+    },
   )
   @JoinColumn({
     name: 'legacy_project_import_id',

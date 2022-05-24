@@ -77,6 +77,10 @@ import {
   AddFileToLegacyProjectImportHandlerErrors,
 } from '../legacy-project-import/application/add-file-to-legacy-project-import.command';
 import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
+import {
+  DeleteFileFromLegacyProjectImport,
+  DeleteFileFromLegacyProjectImportHandlerErrors,
+} from '../legacy-project-import/application/delete-file-from-legacy-project-import.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -488,6 +492,24 @@ export class ProjectsService {
         resourceId,
         file.buffer,
         fileType,
+        userId,
+      ),
+    );
+  }
+
+  async deleteFileFromLegacyProjectImport(
+    projectId: string,
+    fileId: string,
+    userIdentifier: string,
+  ): Promise<Either<DeleteFileFromLegacyProjectImportHandlerErrors, true>> {
+    const resourceId = new ResourceId(projectId);
+    const legacyProjectImportFileId = new LegacyProjectImportFileId(fileId);
+    const userId = new UserId(userIdentifier);
+
+    return this.commandBus.execute(
+      new DeleteFileFromLegacyProjectImport(
+        resourceId,
+        legacyProjectImportFileId,
         userId,
       ),
     );

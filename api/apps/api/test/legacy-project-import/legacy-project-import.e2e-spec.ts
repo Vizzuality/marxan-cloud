@@ -74,6 +74,15 @@ it('runs a legacy project import once required files are uploaded', async () => 
   await fixtures.ThenLegacyProjectImportIsMarkedAsSubmitted();
 });
 
+it('deletes files from a legacy project import', async () => {
+  await fixtures.GivenLegacyProjectImportWasStarted();
+  const [fileId] = await fixtures.GivenAllRequiredFilesWereUploaded();
+
+  await fixtures.WhenDeletingAFileFromALegacyProjectImport(fileId);
+
+  await fixtures.ThenLegacyProjectImportDoesNotContainsThatFile(fileId);
+});
+
 const getFixtures = async () => {
   const app = await bootstrapApplication();
   const token = await GivenUserIsLoggedIn(app);
@@ -129,7 +138,7 @@ const getFixtures = async () => {
         LegacyProjectImportFileType.SpecDat,
       ];
 
-      await Promise.all(
+      return Promise.all(
         requiredFiles.map(async (fileType) => {
           const filePath = await saveFile(
             __dirname + fileType,
@@ -148,6 +157,9 @@ const getFixtures = async () => {
             .expect(201);
 
           expect(result.body.projectId).toBeDefined();
+          expect(result.body.fileId).toBeDefined();
+
+          return result.body.fileId as string;
         }),
       );
     },
@@ -161,6 +173,16 @@ const getFixtures = async () => {
       expect(result.body.projectId).toBeDefined();
 
       projectId = result.body.projectId;
+    },
+    WhenDeletingAFileFromALegacyProjectImport: async (fileId: string) => {
+      const result = await request(app.getHttpServer())
+        .delete(
+          `/api/v1/projects/legacy-project-import/${projectId}/file/${fileId}`,
+        )
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      expect(result.body.projectId).toBeDefined();
     },
     WhenUploadingAFileForLegacyProjectImport: async (
       fileType: LegacyProjectImportFileType,
@@ -180,6 +202,7 @@ const getFixtures = async () => {
         .expect(201);
 
       expect(result.body.projectId).toBeDefined();
+      expect(result.body.fileId).toBeDefined();
     },
     WhenRunningALegacyProjectImport: async () => {
       const result = await request(app.getHttpServer())
@@ -259,6 +282,16 @@ const getFixtures = async () => {
       );
 
       expect(legacyProjectImportRequestedEvent).toBeDefined();
+    },
+    ThenLegacyProjectImportDoesNotContainsThatFile: async (fileId: string) => {
+      const legacyProjectImport = await repo.find(new ResourceId(projectId));
+      if (isLeft(legacyProjectImport))
+        throw new Error('Legacy project import not found');
+
+      expect(legacyProjectImport.right).toBeDefined();
+      const { files } = legacyProjectImport.right.toSnapshot();
+
+      expect(files.some((file) => file.id === fileId)).toBe(false);
     },
   };
 };

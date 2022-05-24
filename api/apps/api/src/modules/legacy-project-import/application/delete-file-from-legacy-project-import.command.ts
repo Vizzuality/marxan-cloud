@@ -4,6 +4,7 @@ import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '../../access-control';
+import { DeleteFileFromLegacyProjectImportErrors } from '../domain/legacy-project-import/legacy-project-import';
 import {
   LegacyProjectImportRepositoryFindErrors,
   LegacyProjectImportRepositorySaveErrors,
@@ -12,7 +13,8 @@ import {
 export type DeleteFileFromLegacyProjectImportHandlerErrors =
   | typeof forbiddenError
   | LegacyProjectImportRepositoryFindErrors
-  | LegacyProjectImportRepositorySaveErrors;
+  | LegacyProjectImportRepositorySaveErrors
+  | DeleteFileFromLegacyProjectImportErrors;
 
 export class DeleteFileFromLegacyProjectImport extends Command<
   Either<DeleteFileFromLegacyProjectImportHandlerErrors, true>

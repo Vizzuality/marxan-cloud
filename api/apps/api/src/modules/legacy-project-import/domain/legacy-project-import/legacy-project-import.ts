@@ -42,6 +42,7 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentAlreadyFailed;
 
 export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
+export type DeleteFileFromLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
 
@@ -293,13 +294,20 @@ export class LegacyProjectImport extends AggregateRoot {
 
   deleteFile(
     fileId: LegacyProjectImportFileId,
-  ): LegacyProjectImportFile | undefined {
+  ): Either<
+    DeleteFileFromLegacyProjectImportErrors,
+    LegacyProjectImportFile | undefined
+  > {
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
+    }
+
     const fileIndex = this.files.findIndex((file) => file.id.equals(fileId));
 
-    if (fileIndex === -1) return undefined;
+    if (fileIndex === -1) return right(undefined);
 
     const [deletedFile] = this.files.splice(fileIndex, 1);
 
-    return deletedFile;
+    return right(deletedFile);
   }
 }
