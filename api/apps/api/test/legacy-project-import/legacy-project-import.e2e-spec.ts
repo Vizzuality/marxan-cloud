@@ -120,7 +120,7 @@ const getFixtures = async () => {
     },
     GivenLegacyProjectImportWasStarted: async () => {
       const result = await request(app.getHttpServer())
-        .post(`/api/v1/projects/legacy-project-import/start`)
+        .post(`/api/v1/projects/import/legacy`)
         .set('Authorization', `Bearer ${token}`)
         .send({ projectName: 'Legacy project' })
         .expect(201);
@@ -148,9 +148,7 @@ const getFixtures = async () => {
           files.push(filePath);
 
           const result = await request(app.getHttpServer())
-            .post(
-              `/api/v1/projects/legacy-project-import/${projectId}/add-file`,
-            )
+            .post(`/api/v1/projects/import/legacy/${projectId}/data-file`)
             .set('Authorization', `Bearer ${token}`)
             .field('fileType', fileType)
             .attach('file', filePath)
@@ -165,7 +163,7 @@ const getFixtures = async () => {
     },
     WhenInvokingStartEndpoint: async (name: string) => {
       const result = await request(app.getHttpServer())
-        .post(`/api/v1/projects/legacy-project-import/start`)
+        .post(`/api/v1/projects/import/legacy`)
         .set('Authorization', `Bearer ${token}`)
         .send({ projectName: name })
         .expect(201);
@@ -177,7 +175,7 @@ const getFixtures = async () => {
     WhenDeletingAFileFromALegacyProjectImport: async (fileId: string) => {
       const result = await request(app.getHttpServer())
         .delete(
-          `/api/v1/projects/legacy-project-import/${projectId}/file/${fileId}`,
+          `/api/v1/projects/import/legacy/${projectId}/data-file/${fileId}`,
         )
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
@@ -195,7 +193,7 @@ const getFixtures = async () => {
       files.push(filePath);
 
       const result = await request(app.getHttpServer())
-        .post(`/api/v1/projects/legacy-project-import/${projectId}/add-file`)
+        .post(`/api/v1/projects/import/legacy/${projectId}/data-file`)
         .set('Authorization', `Bearer ${token}`)
         .field('fileType', fileType)
         .attach('file', filePath)
@@ -206,7 +204,7 @@ const getFixtures = async () => {
     },
     WhenRunningALegacyProjectImport: async () => {
       const result = await request(app.getHttpServer())
-        .post(`/api/v1/projects/legacy-project-import/${projectId}/run`)
+        .post(`/api/v1/projects/import/legacy/${projectId}`)
         .set('Authorization', `Bearer ${token}`)
         .expect(201);
 

@@ -199,7 +199,7 @@ export class ProjectsController {
     summary: 'Starts a legacy marxan project import process',
   })
   @ApiOkResponse({ type: StartLegacyProjectImportResponseDto })
-  @Post('legacy-project-import/start')
+  @Post('import/legacy')
   async importLegacyProject(
     @Body() dto: StartLegacyProjectImportBodyDto,
     @Req() req: RequestWithAuthenticatedUser,
@@ -226,11 +226,11 @@ export class ProjectsController {
 
   @ImplementsAcl()
   @ApiOperation({
-    description: 'Runs a legacy project import project',
-    summary: 'Runs a legacy project import project',
+    description: 'Runs a legacy project import',
+    summary: 'Runs a legacy project import',
   })
   @ApiOkResponse({ type: RunLegacyProjectImportResponseDto })
-  @Post('legacy-project-import/:projectId/run')
+  @Post('import/legacy/:projectId')
   async runLegacyProject(
     @Param('projectId') projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
@@ -268,7 +268,7 @@ export class ProjectsController {
     description: 'Adds a file to a legacy project import',
     summary: 'Adds a file to a legacy project import',
   })
-  @Post('legacy-project-import/:projectId/add-file')
+  @Post('import/legacy/:projectId/data-file')
   @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
@@ -309,16 +309,16 @@ export class ProjectsController {
     description: 'Deletes a file from a legacy project import',
     summary: 'Deletes a file from a legacy project import',
   })
-  @Delete('legacy-project-import/:projectId/file/:fileId')
+  @Delete('import/legacy/:projectId/data-file/:dataFileId')
   @ApiOkResponse({ type: DeleteFileFromLegacyProjectImportResponseDto })
   async deleteFileFromLegacyProjectImport(
     @Param('projectId', ParseUUIDPipe) projectId: string,
-    @Param('fileId', ParseUUIDPipe) fileId: string,
+    @Param('dataFileId', ParseUUIDPipe) dataFileId: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<DeleteFileFromLegacyProjectImportResponseDto> {
     const result = await this.projectsService.deleteFileFromLegacyProjectImport(
       projectId,
-      fileId,
+      dataFileId,
       req.user.id,
     );
 
