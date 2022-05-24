@@ -134,12 +134,11 @@ const getFixtures = async () => {
     LegacyProjectImportFileType.PuDat,
     LegacyProjectImportFileType.PuvsprDat,
     LegacyProjectImportFileType.SpecDat,
-  ].map(
-    (type) =>
-      new LegacyProjectImportFile(
-        type,
-        new ArchiveLocation(`${type}.location`),
-      ),
+  ].map((type) =>
+    LegacyProjectImportFile.newOne(
+      type,
+      new ArchiveLocation(`${type}.location`),
+    ),
   );
 
   return {

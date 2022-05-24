@@ -182,14 +182,17 @@ const getFixtures = async () => {
 
   const defaultFiles: LegacyProjectImportFileSnapshot[] = [
     {
+      id: v4(),
       location: `/tmp/${projectId}/pu.dat`,
       type: LegacyProjectImportFileType.PuDat,
     },
     {
+      id: v4(),
       location: `/tmp/${projectId}/grid.zip`,
       type: LegacyProjectImportFileType.PlanningGridShapefile,
     },
     {
+      id: v4(),
       location: `/tmp/${projectId}/spec.dat`,
       type: LegacyProjectImportFileType.SpecDat,
     },

@@ -16,6 +16,7 @@ import { LegacyProjectImportRepositoryModule } from '../infra/legacy-project-imp
 import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
 import { AllLegacyProjectImportPiecesImportedSaga } from './all-legacy-project-import-pieces-imported.saga';
 import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
+import { DeleteFileFromLegacyProjectImportHandler } from './delete-file-from-legacy-project-import.handler';
 import { LegacyProjectImportRequestedSaga } from './legacy-project-import-requested.saga';
 import { MarkLegacyProjectImportAsSubmittedHandler } from './mark-legacy-project-as-submitted.handler';
 import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
@@ -59,6 +60,7 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
     MarkLegacyProjectImportPieceAsFailedHandler,
     StartLegacyProjectImportHandler,
     AddFileToLegacyProjectImportHandler,
+    DeleteFileFromLegacyProjectImportHandler,
     RunLegacyProjectImportHandler,
     CompleteLegacyProjectImportPieceHandler,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },

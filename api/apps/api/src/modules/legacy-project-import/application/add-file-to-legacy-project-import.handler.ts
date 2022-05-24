@@ -3,7 +3,7 @@ import {
   LegacyProjectImportFile,
   LegacyProjectImportFilesRepository,
 } from '@marxan/legacy-project-import';
-import { Logger } from '@nestjs/common';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import {
   CommandHandler,
   EventPublisher,
@@ -26,10 +26,7 @@ export class AddFileToLegacyProjectImportHandler
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
     private readonly legacyProjectImportFilesRepo: LegacyProjectImportFilesRepository,
     private readonly eventPublisher: EventPublisher,
-    private readonly logger: Logger,
-  ) {
-    this.logger.setContext(AddFileToLegacyProjectImportHandler.name);
-  }
+  ) {}
 
   async execute({
     file,
@@ -37,11 +34,10 @@ export class AddFileToLegacyProjectImportHandler
     type,
     userId,
   }: AddFileToLegacyProjectImport): Promise<
-    Either<
-      AddFileToLegacyProjectImportHandlerErrors | typeof forbiddenError,
-      true
-    >
+    Either<AddFileToLegacyProjectImportHandlerErrors, LegacyProjectImportFileId>
   > {
+    const fileId = LegacyProjectImportFileId.create();
+
     const result = await this.legacyProjectImportRepo.transaction(
       async (repo) => {
         const legacyProjectImport = await repo.find(projectId);
@@ -65,10 +61,11 @@ export class AddFileToLegacyProjectImportHandler
         if (isLeft(pathOrError)) return pathOrError.left;
 
         const archiveLocation = new ArchiveLocation(pathOrError.right);
-        const legacyProjectImportFile = new LegacyProjectImportFile(
+        const legacyProjectImportFile = LegacyProjectImportFile.fromSnapshot({
+          id: fileId.value,
           type,
-          archiveLocation,
-        );
+          location: archiveLocation.value,
+        });
 
         const addFileResult = legacyProjectImportAggregate.addFile(
           legacyProjectImportFile,
@@ -86,7 +83,7 @@ export class AddFileToLegacyProjectImportHandler
 
     if (result instanceof LegacyProjectImport) {
       result.commit();
-      return right(true);
+      return right(fileId);
     }
 
     return left(result);

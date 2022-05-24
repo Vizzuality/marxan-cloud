@@ -16,4 +16,6 @@ export abstract class LegacyProjectImportFilesRepository {
   ): Promise<Either<SaveFileError, string>>;
 
   abstract deleteFolder(id: string): Promise<void>;
+
+  abstract deleteFile(path: string): Promise<void>;
 }

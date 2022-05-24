@@ -48,4 +48,8 @@ export class LegacyProjectImportFilesMemoryRepository
       delete this.files[path];
     });
   }
+
+  async deleteFile(path: string): Promise<void> {
+    delete this.files[path];
+  }
 }

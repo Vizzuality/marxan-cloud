@@ -5,6 +5,7 @@ import {
   LegacyProjectImportFileType,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { AllLegacyProjectImportPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
@@ -41,6 +42,7 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentAlreadyFailed;
 
 export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
+export type DeleteFileFromLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
 
@@ -288,5 +290,24 @@ export class LegacyProjectImport extends AggregateRoot {
     this.files.push(file);
 
     return right(true);
+  }
+
+  deleteFile(
+    fileId: LegacyProjectImportFileId,
+  ): Either<
+    DeleteFileFromLegacyProjectImportErrors,
+    LegacyProjectImportFile | undefined
+  > {
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
+    }
+
+    const fileIndex = this.files.findIndex((file) => file.id.equals(fileId));
+
+    if (fileIndex === -1) return right(undefined);
+
+    const [deletedFile] = this.files.splice(fileIndex, 1);
+
+    return right(deletedFile);
   }
 }

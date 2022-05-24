@@ -57,4 +57,8 @@ export class LegacyProjectImportFilesLocalRepository
 
     rmSync(path, { recursive: true, force: true });
   }
+
+  async deleteFile(path: string): Promise<void> {
+    rmSync(path, { recursive: true, force: true });
+  }
 }

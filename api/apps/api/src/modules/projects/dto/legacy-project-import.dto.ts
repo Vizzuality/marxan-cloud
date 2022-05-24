@@ -48,9 +48,23 @@ export class AddFileToLegacyProjectImportResponseDto {
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
   })
   projectId!: string;
+
+  @ApiProperty({
+    description: 'ID of the file',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  fileId!: string;
 }
 
 export class RunLegacyProjectImportResponseDto {
+  @ApiProperty({
+    description: 'ID of the project',
+    example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+  })
+  projectId!: string;
+}
+
+export class DeleteFileFromLegacyProjectImportResponseDto {
   @ApiProperty({
     description: 'ID of the project',
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
