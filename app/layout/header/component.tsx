@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
       <header
         className={cx({
           [className]: true,
-          'w-full row-auto z-70': true,
+          'w-full row-auto z-10': true,
           'bg-black text-white': theme === 'dark',
           'bg-primary-50 text-gray-800': theme === 'light',
         })}

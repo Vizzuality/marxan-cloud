@@ -24,7 +24,7 @@ export const HomeBeta: React.FC<HomeBetaProps> = () => {
   return (
     <>
 
-      <div className="relative w-full bg-yellow-500 z-60">
+      <div className="relative z-10 w-full bg-yellow-500">
         <Wrapper>
           <div
             className="flex items-center py-2 space-x-5 text-sm text-gray-700"
