@@ -5,7 +5,6 @@ import {
   LegacyProjectImportJobOutput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/These';
@@ -58,10 +57,12 @@ export class ScenarioPusDataLegacyProjectPieceImporter
       );
     }
 
-    const rowsOrError = await this.puDatReader.readPuDatFile(readable.right);
+    const rowsOrError = await this.puDatReader.readFile(readable.right);
     if (isLeft(rowsOrError)) {
       this.logAndThrow(rowsOrError.left);
     }
+
+    console.log(rowsOrError.right);
 
     return input;
   }

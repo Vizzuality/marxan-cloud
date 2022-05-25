@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
-import { Readable } from 'stream';
-import { parseStream, CsvParserStream } from 'fast-csv';
+import { number } from 'fp-ts';
+import { Either, right, left } from 'fp-ts/lib/Either';
+import { DatFileReader, ValidationCheck } from './dat-file.reader';
 
-type PuDatRow = {
+type ReadRow = {
+  id: string;
+  cost?: string;
+  status?: '0' | '1' | '2';
+  xloc?: string;
+  yloc?: string;
+};
+
+export type PuDatRow = {
   id: number;
   cost?: number;
   status?: 0 | 1 | 2;
@@ -12,51 +20,61 @@ type PuDatRow = {
 };
 
 @Injectable()
-export class PuDatReader {
-  private validateData(data: PuDatRow): Either<string, true> {
+export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
+  validateData({
+    id,
+    cost,
+    status,
+    xloc,
+    yloc,
+  }: PuDatRow): Either<string, true> {
+    const checks: ValidationCheck[] = [
+      {
+        result: !Number.isInteger(id),
+        errorMessage: 'Invalid non integer puid',
+      },
+      {
+        result: id < 0,
+        errorMessage: 'Negative puid',
+      },
+      {
+        result: cost !== undefined && typeof cost !== 'number',
+        errorMessage: 'Invalid non number cost',
+      },
+      {
+        result: cost !== undefined && cost < 0,
+        errorMessage: 'Negative cost',
+      },
+      {
+        result: status !== undefined && ![0, 1, 2].includes(status),
+        errorMessage: `Invalid status value: ${status}`,
+      },
+      {
+        result: xloc !== undefined && typeof xloc === 'number',
+        errorMessage: 'Invalid non number xloc',
+      },
+      {
+        result: yloc !== undefined && typeof yloc === 'number',
+        errorMessage: 'Invalid non number yloc',
+      },
+    ];
+
+    const errors = checks
+      .filter((check) => check.result)
+      .map((check) => check.errorMessage);
+
+    if (errors.length) return left(errors.join('. '));
+
     return right(true);
   }
 
-  async readPuDatFile(file: Readable): Promise<Either<string, PuDatRow[]>> {
-    const result: PuDatRow[] = [];
-    const errors: string[] = [];
-    let parser: CsvParserStream<PuDatRow, PuDatRow>;
-
-    await new Promise<void>((resolve) => {
-      parser = parseStream<PuDatRow, PuDatRow>(file, {
-        headers: true,
-        delimiter: ' ',
-        ignoreEmpty: true,
-      })
-        .validate((data: PuDatRow, cb): void => {
-          const isValidOrError = this.validateData(data);
-          if (isLeft(isValidOrError)) {
-            return cb(null, false, isValidOrError.left);
-          }
-          return cb(null, true);
-        })
-        .on('error', (error) => {
-          console.error(error);
-        })
-        .on('data', (row: PuDatRow) => {
-          console.log(row);
-          result.push(row);
-        })
-        .on('data-invalid', (row, rowNumber, reason) => {
-          console.log(
-            `Invalid [rowNumber=${rowNumber}] [row=${JSON.stringify(row)}]`,
-          );
-          errors.push(reason);
-        })
-        .on('end', (rowCount: number) => {
-          console.log(`Parsed ${rowCount} rows`);
-          resolve();
-        });
-    });
-
-    if (errors.length) {
-      return left(JSON.stringify(errors));
-    }
-    return right(result);
+  transform({ id, cost, status, xloc, yloc }: ReadRow): PuDatRow {
+    return {
+      id: parseInt(id),
+      cost: cost ? parseFloat(cost) : undefined,
+      status: status ? (parseInt(status) as 0 | 1 | 2) : undefined,
+      xloc: xloc ? parseFloat(xloc) : undefined,
+      yloc: yloc ? parseFloat(yloc) : undefined,
+    };
   }
 }
