@@ -76,8 +76,6 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
     }));
   }, [allSolutionsData]);
 
-  console.log(ALL_SOLUTIONS_OPTIONS);
-
   // CALLBACKS
   const onChangeSection = useCallback((s) => {
     const sub = s || null;
@@ -139,7 +137,7 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
                 <div className="flex items-baseline space-x-4">
                   <h2 className="text-lg font-medium font-heading">Solutions</h2>
                 </div>
-                <div>
+                <div className="mt-0.5">
                   <Select
                     theme="dark"
                     status="none"
