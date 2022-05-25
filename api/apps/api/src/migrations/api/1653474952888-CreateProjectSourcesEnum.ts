@@ -4,7 +4,7 @@ export class CreateProjectSourcesEnum1653474952888
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-    CREATE TYPE "project_sources_enum" AS ENUM(
+    CREATE TYPE "project_sources_enum" AS ENUM (
       'marxan_cloud',
       'legacy_import'
     );
@@ -12,7 +12,6 @@ export class CreateProjectSourcesEnum1653474952888
     await queryRunner.query(`
     ALTER TABLE projects
         ADD COLUMN sources project_sources_enum not null default 'marxan_cloud';
-    );
   `);
   }
 
@@ -21,6 +20,6 @@ export class CreateProjectSourcesEnum1653474952888
     ALTER TABLE projects
         DROP COLUMN sources;
     `);
-    await queryRunner.query(`DROP TYPE "project_sources_enum"`);
+    await queryRunner.query(`DROP TYPE IF EXISTS "project_sources_enum";`);
   }
 }
