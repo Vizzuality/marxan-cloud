@@ -33,7 +33,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
       };
     }, {});
 
-  const fetchFeatures = ({ pageParam = 1 }) => SCENARIOS.request({
+  const fetchSolutions = ({ pageParam = 1 }) => SCENARIOS.request({
     method: 'GET',
     url: `/${sid}/marxan/solutions`,
     headers: {
@@ -48,7 +48,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
     },
   });
 
-  const query = useInfiniteQuery(['solutions', sid, JSON.stringify(options)], fetchFeatures, {
+  const query = useInfiniteQuery(['solutions', sid, JSON.stringify(options)], fetchSolutions, {
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -94,6 +94,51 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
   }, [query, pages]);
 }
 
+export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
+  const [session] = useSession();
+
+  const {
+    filters = {},
+    sort,
+  } = options;
+
+  const parsedFilters = Object.keys(filters)
+    .reduce((acc, k) => {
+      return {
+        ...acc,
+        [`filter[${k}]`]: filters[k],
+      };
+    }, {});
+
+  const fetchSolutions = () => SCENARIOS.request({
+    method: 'GET',
+    url: `/${sid}/marxan/solutions`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+    params: {
+      disablePagination: true,
+      ...parsedFilters,
+      ...sort && {
+        sort,
+      },
+    },
+  }).then((response) => response.data);
+
+  const query = useQuery(['all-solutions', sid, JSON.stringify(options)], fetchSolutions, {
+    keepPreviousData: true,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data]);
+}
+
 export function useSolution(sid, solutionId) {
   const [session] = useSession();
 
@@ -106,6 +151,7 @@ export function useSolution(sid, solutionId) {
   }).then((response) => {
     return response.data;
   }), {
+    keepPreviousData: true,
     enabled: !!solutionId,
   });
 
@@ -174,6 +220,7 @@ export function useBestSolution(sid, queryOptions) {
   }).then((response) => {
     return response.data;
   }), {
+    keepPreviousData: true,
     ...queryOptions,
   });
 
