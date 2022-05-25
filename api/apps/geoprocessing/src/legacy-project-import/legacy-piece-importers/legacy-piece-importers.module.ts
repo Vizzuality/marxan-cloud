@@ -8,7 +8,9 @@ import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../utils/config.utils';
+import { PuDatReader } from './file-readers/pu-dat.reader';
 import { PlanningGridLegacyProjectPieceImporter } from './planning-grid.legacy-piece-importer';
+import { ScenarioPusDataLegacyProjectPieceImporter } from './scenarios-pus-data.legacy-piece-importer';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProjectsPuEntity]), ShapefilesModule],
@@ -29,6 +31,8 @@ import { PlanningGridLegacyProjectPieceImporter } from './planning-grid.legacy-p
       },
     },
     PlanningGridLegacyProjectPieceImporter,
+    ScenarioPusDataLegacyProjectPieceImporter,
+    PuDatReader,
   ],
 })
 export class LegacyPieceImportersModule {}
