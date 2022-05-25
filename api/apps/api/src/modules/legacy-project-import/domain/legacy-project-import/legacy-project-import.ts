@@ -190,14 +190,13 @@ export class LegacyProjectImport extends AggregateRoot {
   markPieceAsFailed(
     pieceId: LegacyProjectImportComponentId,
     errors: string[] = [],
-    warnings: string[] = [],
   ): Either<MarkLegacyProjectImportPieceAsFailedErrors, true> {
     const piece = this.pieces.find((pc) => pc.id.value === pieceId.value);
     if (!piece) return left(legacyProjectImportComponentNotFound);
     if (piece.hasFailed())
       return left(legacyProjectImportComponentAlreadyFailed);
 
-    piece.markAsFailed(errors, warnings);
+    piece.markAsFailed(errors);
 
     const hasThisBatchFinished = this.hasBatchFinished(piece.order);
     const hasThisBatchFailed = this.hasBatchFailed(piece.order);

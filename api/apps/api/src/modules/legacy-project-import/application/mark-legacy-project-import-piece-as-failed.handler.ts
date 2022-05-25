@@ -40,7 +40,6 @@ export class MarkLegacyProjectImportPieceAsFailedHandler
     errors,
     legacyProjectImportComponentId,
     projectId,
-    warnings,
   }: MarkLegacyProjectImportPieceAsFailed): Promise<void> {
     const result = await this.legacyProjectImportRepository.transaction(
       async (repo) => {
@@ -61,7 +60,6 @@ export class MarkLegacyProjectImportPieceAsFailedHandler
         const result = aggregate.markPieceAsFailed(
           legacyProjectImportComponentId,
           errors,
-          warnings,
         );
 
         if (isLeft(result)) {
