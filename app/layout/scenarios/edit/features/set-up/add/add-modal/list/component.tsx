@@ -34,7 +34,6 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     hasNextPage,
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
-    isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
     filters,
@@ -62,14 +61,14 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
           'bg-white divide-y divide-black divide-dashed divide-opacity-20 overflow-y-auto overflow-x-hidden px-8': true,
         })}
       >
-        {(allFeaturesIsFetching && !allFeaturesIsFetched) && (
+        {(allFeaturesIsFetching) && (
           <div className="absolute top-0 left-0 z-10 flex flex-col items-center justify-center w-full h-full bg-white bg-opacity-90">
             <Loading
               visible
               className="z-40 flex items-center justify-center w-full "
               iconClassName="w-10 h-10 text-primary-500"
             />
-            <div className="mt-5 text-xs uppercase font-heading">Loading features</div>
+            <div className="mt-2.5 text-xs uppercase font-heading">Loading features</div>
           </div>
         )}
 
