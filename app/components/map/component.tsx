@@ -267,7 +267,7 @@ export const Map = ({
         getCursor={getCursor || handleGetCursor}
         transitionInterpolator={new FlyToInterpolator()}
         transitionEasing={easeCubic}
-        attributionControl={false}
+        // attributionControl={false}
       >
         {ready
           && loaded
