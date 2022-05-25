@@ -1,4 +1,3 @@
-import { ArchiveLocation } from '@marxan/cloning/domain';
 import {
   LegacyProjectImportPiece,
   LegacyProjectImportPieceOrderResolver,
@@ -49,10 +48,9 @@ export class LegacyProjectImportComponent {
     this.warnings.push(...warnings);
   }
 
-  markAsFailed(errors: string[] = [], warnings: string[] = []) {
+  markAsFailed(errors: string[] = []) {
     this.status = this.status.markAsFailed();
     this.errors.push(...errors);
-    this.warnings.push(...warnings);
   }
 
   toSnapshot(): LegacyProjectImportComponentSnapshot {
