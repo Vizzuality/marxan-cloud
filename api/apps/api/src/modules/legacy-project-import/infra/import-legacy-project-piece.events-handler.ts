@@ -99,13 +99,16 @@ export class ImportLegacyProjectPieceEventsHandler
   private async failed(event: EventData<LegacyProjectImportJobInput, unknown>) {
     const { pieceId, projectId } = await event.data;
 
+    const result = await event.result;
+    const errors: string[] = [];
+
+    if (typeof result === 'string') errors.push(result);
+
     await this.commandBus.execute(
       new MarkLegacyProjectImportPieceAsFailed(
         new ResourceId(projectId),
         new LegacyProjectImportComponentId(pieceId),
-        // TODO Obtain actual errors and/or warnings
-        [],
-        [],
+        errors,
       ),
     );
   }

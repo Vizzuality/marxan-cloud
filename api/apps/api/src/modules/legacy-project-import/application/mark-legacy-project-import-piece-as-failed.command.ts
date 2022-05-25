@@ -7,7 +7,6 @@ export class MarkLegacyProjectImportPieceAsFailed extends Command<void> {
     public readonly projectId: ResourceId,
     public readonly legacyProjectImportComponentId: LegacyProjectImportComponentId,
     public readonly errors: string[] = [],
-    public readonly warnings: string[] = [],
   ) {
     super();
   }
