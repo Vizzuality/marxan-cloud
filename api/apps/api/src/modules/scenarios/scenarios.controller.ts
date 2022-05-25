@@ -109,6 +109,9 @@ import { forbiddenError } from '../access-control';
 import { scenarioNotFound } from '../blm/values/blm-repos';
 import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as csv from 'fast-csv';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -137,6 +140,24 @@ export class ScenariosController {
     private readonly planningUnitsSerializer: ScenarioPlanningUnitSerializer,
     private readonly scenarioAclService: ScenarioAccessControl,
   ) {}
+
+  @ImplementsAcl()
+  @Get(`whatever`)
+  async remember(): Promise<void> {
+    const itemsArray: any = [];
+
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(path.resolve(__dirname, 'spec.dat'))
+        .pipe(csv.parse({ headers: true, delimiter: '\t', objectMode: true }))
+        .on('error', (error) => console.log(error))
+        .on('data', (data) => itemsArray.push(data))
+        .on('end', () => {
+          resolve(itemsArray);
+        });
+    });
+
+    console.log(itemsArray);
+  }
 
   @ApiOperation({
     description: 'Find all scenarios',
