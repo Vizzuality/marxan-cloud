@@ -156,7 +156,31 @@ export const SignUp: React.FC<SignUpProps> = () => {
                     {(fprops) => (
                       <Field className="flex mt-2" id="form-checkbox" {...fprops}>
                         <Checkbox theme="light" />
-                        <Label theme="light" className="pr-20 ml-2 -mt-1 font-sans text-sm">I accept the Terms of service and privacy policy</Label>
+                        <Label theme="light" className="pr-20 ml-2 -mt-1 font-sans text-sm">
+                          I accept the
+                          {' '}
+                          <a
+                            className="underline hover:no-underline"
+                            href="https://www.nature.org/en-us/about-us/who-we-are/accountability/terms-of-use"
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            terms of service
+                            {' '}
+                          </a>
+                          and
+                          {' '}
+                          <a
+                            className="underline hover:no-underline"
+                            href="https://www.nature.org/en-us/about-us/who-we-are/accountability/privacy-policy"
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            privacy policy
+                          </a>
+
+                        </Label>
+
                       </Field>
                     )}
                   </FieldRFF>
