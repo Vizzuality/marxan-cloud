@@ -186,6 +186,22 @@ export class PlanningGridLegacyProjectPieceImporter
       .execute();
   }
 
+  private checkPuidsUniqueness(geojson: ExpectedGeoJsonFormat): number[] {
+    const duplicatePuids = new Set<number>();
+    const knownPuids: Record<number, true> = {};
+
+    geojson.features.forEach((feature) => {
+      const { puid } = feature.properties;
+
+      const knownPuid = knownPuids[puid];
+
+      if (knownPuid) duplicatePuids.add(puid);
+      else knownPuids[puid] = true;
+    });
+
+    return Array.from(duplicatePuids);
+  }
+
   async run(
     input: LegacyProjectImportJobInput,
   ): Promise<LegacyProjectImportJobOutput> {
@@ -207,6 +223,15 @@ export class PlanningGridLegacyProjectPieceImporter
     );
 
     const geojson = this.ensureShapefileValidity(data);
+
+    const duplicatePuids = this.checkPuidsUniqueness(geojson);
+    if (duplicatePuids.length) {
+      this.logAndThrow(
+        `Shapefile contains geometries with the same puid. Duplicate puids: ${duplicatePuids.join(
+          ', ',
+        )}`,
+      );
+    }
 
     await this.geoEntityManager.transaction(async (em) => {
       try {
