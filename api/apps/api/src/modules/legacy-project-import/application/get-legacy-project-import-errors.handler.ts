@@ -1,4 +1,4 @@
-import { CommandHandler, IInferredQueryHandler } from '@nestjs/cqrs';
+import { QueryHandler, IInferredQueryHandler } from '@nestjs/cqrs';
 import { isLeft, left, right } from 'fp-ts/lib/Either';
 import { forbiddenError } from '../../access-control';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
@@ -7,7 +7,7 @@ import {
   GetLegacyProjectImportErrorsReturnType,
 } from './get-legacy-project-import-errors.query';
 
-@CommandHandler(GetLegacyProjectImportErrors)
+@QueryHandler(GetLegacyProjectImportErrors)
 export class GetLegacyProjectImportErrorsHandler
   implements IInferredQueryHandler<GetLegacyProjectImportErrors> {
   constructor(
@@ -33,7 +33,7 @@ export class GetLegacyProjectImportErrorsHandler
     return right(
       piecesWithErrorsOrWarnings
         .map((piece) => piece.toSnapshot())
-        .map(({ order, ...piece }) => piece),
+        .map(({ order, id, ...piece }) => ({ ...piece, componentId: id })),
     );
   }
 }

@@ -164,16 +164,18 @@ const getFixtures = async () => {
 
           expect(result.right).toHaveLength(expectedErrors.length);
 
-          result.right.forEach(({ errors, id, kind, status, warnings }) => {
-            expect(errors).toBeInstanceOf(Array);
-            expect(warnings).toBeInstanceOf(Array);
-            expect(version(id)).toBe(4);
-            expect(validate(id)).toBe(true);
-            expect(Object.values(LegacyProjectImportPiece)).toContain(kind);
-            expect(
-              Object.values(LegacyProjectImportComponentStatuses),
-            ).toContain(status);
-          });
+          result.right.forEach(
+            ({ errors, componentId, kind, status, warnings }) => {
+              expect(errors).toBeInstanceOf(Array);
+              expect(warnings).toBeInstanceOf(Array);
+              expect(version(componentId)).toBe(4);
+              expect(validate(componentId)).toBe(true);
+              expect(Object.values(LegacyProjectImportPiece)).toContain(kind);
+              expect(
+                Object.values(LegacyProjectImportComponentStatuses),
+              ).toContain(status);
+            },
+          );
 
           result.right.every((piece) =>
             expectedErrors.some(
