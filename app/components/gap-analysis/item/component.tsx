@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react';
+import React, { MouseEventHandler, useMemo, useRef } from 'react';
 
 import { useNumberFormatter } from '@react-aria/i18n';
 import classnames from 'classnames';
@@ -32,22 +32,56 @@ export interface ItemProps {
 export const Item: React.FC<ItemProps> = ({
   name, current, target, className, highlighted, muted, onMouseEnter, onMouseLeave, onHighlight,
 }: ItemProps) => {
+  const chartRef = useRef<HTMLDivElement>(null);
   const percentFormatter = useNumberFormatter({ style: 'percent' });
+
+  const isNotMet = useMemo(() => {
+    return current.percent < target.percent;
+  }, [current, target]);
+
+  const metStyles = useMemo(() => {
+    if (chartRef.current) {
+      const tWidth = 85 / 2;
+      const { width } = chartRef.current.getBoundingClientRect();
+
+      const middle = width * current.percent > tWidth && (width * current.percent < width - tWidth);
+      const left = width * current.percent < tWidth;
+      const right = width * current.percent > width - tWidth;
+
+      return {
+        'translate-x-0': left,
+        '-translate-x-1/2': middle,
+        '-translate-x-full': right,
+      };
+    }
+    return {
+      '-translate-x-1/2': true,
+    };
+  }, [current]);
 
   return (
     <div
       className={classnames({
-        'text-white px-4 pt-1 pb-4 border-l-4 border-purple-700 transition-opacity duration-300': true,
+        'text-white px-4 pt-1 pb-4 border-l-4 transition-opacity duration-300 relative overflow-hidden': true,
         'opacity-20': muted,
+        'border-purple-700': true,
+        'pb-8': isNotMet,
         [className]: className !== undefined && className !== null,
       })}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
+      <div
+        className={classnames({
+          'absolute top-0 left-0 w-5 h-5 transform rotate-45 -translate-x-1/2 -translate-y-1/2': true,
+          'bg-red-500': isNotMet,
+        })}
+      />
       <div className="flex justify-between">
         <div className="pt-1 mr-4 overflow-hidden text-sm flex-shrink-1 overflow-ellipsis whitespace-nowrap font-heading">
           {name}
         </div>
+
         <button
           type="button"
           className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs border border-transparent focus:border-white rounded-4xl"
@@ -87,9 +121,30 @@ export const Item: React.FC<ItemProps> = ({
           </span>
         </div>
       </div>
-      <div className="mt-4 relative h-2.5 bg-gray-600 rounded-sm">
+      <div ref={chartRef} className="mt-4 relative h-2.5 bg-gray-600 rounded-sm">
         <div className="absolute h-full bg-purple-700 rounded-sm" style={{ width: `${current.percent * 100}%` }} />
-        <div className="absolute top-1/2 left-1 transform -translate-y-1/2 h-1.5 border border-black bg-gradient-repeat-to-br from-gray-100 with-stripes to-gray-800 rounded-md" style={{ width: `${target.percent * 100}%` }} />
+        <div
+          className="absolute top-1/2 left-1 transform -translate-y-1/2 h-1.5 border border-black bg-gradient-repeat-to-br from-gray-100 with-stripes to-gray-800 rounded-md"
+          style={{ width: `${target.percent * 100}%` }}
+        />
+
+        {(isNotMet && (
+          <div
+            className="absolute w-px h-4 transform -translate-y-1/2 bg-red-500 top-1/2"
+            style={{
+              left: `${current.percent * 100}%`,
+            }}
+          >
+            <div
+              className={classnames({
+                'absolute mt-2.5 text-xs text-red-500 transform -translate-y-1/2 top-full left-1/2 whitespace-nowrap': true,
+                ...metStyles,
+              })}
+            >
+              Target not met
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
