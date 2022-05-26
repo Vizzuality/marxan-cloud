@@ -135,9 +135,7 @@ export class ScenarioPusDataLegacyProjectPieceImporter
 
     const readable = await this.filesRepo.get(puDatFile.location);
     if (isLeft(readable)) {
-      this.logAndThrow(
-        'pu.dat file not found in LegacyProjectImportFilesRepository',
-      );
+      this.logAndThrow('pu.dat file not found in files repo');
     }
 
     const rowsOrError = await this.puDatReader.readFile(readable.right);
@@ -148,47 +146,40 @@ export class ScenarioPusDataLegacyProjectPieceImporter
     const notFoundPuids: number[] = [];
 
     await this.geoEntityManager.transaction(async (em) => {
-      try {
-        const chunkSize = 2500;
-        const projectsPuRepo = em.getRepository(ProjectsPuEntity);
-        const scenariosPuDataRepo = em.getRepository(ScenariosPuPaDataGeo);
-        const scenariosPuCostDataRepo = em.getRepository(
-          ScenariosPuCostDataGeo,
-        );
+      const chunkSize = 2500;
+      const projectsPuRepo = em.getRepository(ProjectsPuEntity);
+      const scenariosPuDataRepo = em.getRepository(ScenariosPuPaDataGeo);
+      const scenariosPuCostDataRepo = em.getRepository(ScenariosPuCostDataGeo);
 
-        await Promise.all(
-          chunk(rowsOrError.right, chunkSize).map(async (chunk) => {
-            const projectPuIdByPuid = await this.getProjectPusMap(
-              projectsPuRepo,
-              chunk,
-            );
+      await Promise.all(
+        chunk(rowsOrError.right, chunkSize).map(async (chunk) => {
+          const projectPuIdByPuid = await this.getProjectPusMap(
+            projectsPuRepo,
+            chunk,
+          );
 
-            const notFound = this.getNotFoundPuids(chunk, projectPuIdByPuid);
-            notFoundPuids.push(...notFound);
+          const notFound = this.getNotFoundPuids(chunk, projectPuIdByPuid);
+          notFoundPuids.push(...notFound);
 
-            const scenarioPuDataIdByPuid = await this.insertScenarioPuData(
-              scenariosPuDataRepo,
-              chunk,
-              projectPuIdByPuid,
-              input.scenarioId,
-            );
+          const scenarioPuDataIdByPuid = await this.insertScenarioPuData(
+            scenariosPuDataRepo,
+            chunk,
+            projectPuIdByPuid,
+            input.scenarioId,
+          );
 
-            await this.insertScenarioPuCostData(
-              scenariosPuCostDataRepo,
-              chunk,
-              scenarioPuDataIdByPuid,
-            );
-          }),
-        );
-      } catch (err) {
-        this.logger.error(err);
-        this.logAndThrow('Error inserting data in database');
-      }
+          await this.insertScenarioPuCostData(
+            scenariosPuCostDataRepo,
+            chunk,
+            scenarioPuDataIdByPuid,
+          );
+        }),
+      );
     });
     return {
       ...input,
       warnings: notFoundPuids.length
-        ? [`Not found planning units: ${notFoundPuids.join(', ')}`]
+        ? [`Some planning units were not found: ${notFoundPuids.join(', ')}`]
         : [],
     };
   }
