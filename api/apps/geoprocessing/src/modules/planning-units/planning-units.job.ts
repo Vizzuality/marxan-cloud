@@ -123,7 +123,7 @@ export class PlanningUnitsJobProcessor {
       st_transform(ST_MakeEnvelope(-180, -90, 180, 90, 4326), 3410)) as geom
       FROM region, bboxes
       )
-SELECT
+SELECT distinct
 grid.geom
       FROM grid, region
       WHERE ST_Intersects(grid.geom, region.geom)
@@ -158,7 +158,7 @@ grid.geom
         st_transform(ST_MakeEnvelope(-180, -90, 180, 90, 4326), 3410)) as geom
         FROM region, bboxes
       )
-      SELECT
+      SELECT distinct
       		grid.geom
       FROM grid, region
       WHERE ST_Intersects(grid.geom, region.geom)

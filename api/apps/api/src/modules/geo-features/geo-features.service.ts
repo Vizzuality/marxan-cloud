@@ -28,6 +28,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 import { GeoFeaturesRequestInfo } from './geo-features-request-info';
+import { antimeridianBbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -167,21 +168,28 @@ export class GeoFeaturesService extends AppBaseService<
      *
      */
     if (projectId && info?.params?.bbox) {
+      const {westBbox, eastBbox} = antimeridianBbox(
+        [info.params.bbox[1],info.params.bbox[3],
+        info.params.bbox[0],info.params.bbox[2]]
+      );
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
         .select('"geoFeatureGeometries"."feature_id"', 'featureId')
         .distinctOn(['"geoFeatureGeometries"."feature_id"'])
         .where(
-          `st_intersects(
-        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
+          `(st_intersects(
+            st_intersection(st_makeenvelope(:...westBbox, 4326),
+            ST_MakeEnvelope(0, -90, 180, 90, 4326)),
         "geoFeatureGeometries".the_geom
-      )`,
-          {
-            xmin: info.params.bbox[1],
-            ymin: info.params.bbox[3],
-            xmax: info.params.bbox[0],
-            ymax: info.params.bbox[2],
-          },
+      ) or st_intersects(
+        st_intersection(st_makeenvelope(:...eastBbox, 4326),
+          ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
+          "geoFeatureGeometries".the_geom
+      ))`,
+      {
+        westBbox: westBbox,
+        eastBbox: eastBbox,
+      },
         )
         .getRawMany()
         .then((result) => result.map((i) => i.featureId))

@@ -10,6 +10,7 @@ import { GeoFeature } from './geo-feature.api.entity';
 import { GeoFeaturePropertySet } from './geo-feature.geo.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { BBox } from 'geojson';
+import { antimeridianBbox, nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 
 @Injectable()
 export class GeoFeaturePropertySetService {
@@ -31,20 +32,27 @@ export class GeoFeaturePropertySetService {
       .distinct(true)
       .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
 
-    if (withinBBox) {
-      query.andWhere(
-        `st_intersects(
-        st_makeenvelope(:xmin, :ymin, :xmax, :ymax, 4326),
-        "propertySets".bbox
-      )`,
-        {
-          xmin: withinBBox[1],
-          ymin: withinBBox[3],
-          xmax: withinBBox[0],
-          ymax: withinBBox[2],
-        },
-      );
-    }
+      if (withinBBox) {
+        const {westBbox, eastBbox} = antimeridianBbox(
+            [withinBBox[1],withinBBox[3],withinBBox[0],withinBBox[2]]
+          );
+        query.andWhere(
+          `(st_intersects(
+            st_intersection(st_makeenvelope(:...westBbox, 4326),
+                                  ST_MakeEnvelope(0, -90, 180, 90, 4326)),
+          "propertySets".bbox)
+          or
+          st_intersects(
+            st_intersection(st_makeenvelope(:...eastBbox, 4326),
+                                  ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
+            "propertySets".bbox))`,
+          {
+            westBbox: westBbox,
+            eastBbox: eastBbox,
+          }
+          ,
+        );
+      }
     return query.getMany();
   }
 
