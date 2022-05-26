@@ -13,6 +13,7 @@ import {
   usePUGridPreviewLayer,
   usePlanningAreaPreviewLayer,
   useGridPreviewLayer,
+  useBBOX,
 } from 'hooks/map';
 
 import Loading from 'components/loading';
@@ -38,6 +39,8 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   const {
     bbox, uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId,
   } = useSelector((state) => state['/projects/new']);
+
+  const BBOX = useBBOX({ bbox });
 
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
@@ -78,9 +81,9 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
   ].filter((l) => !!l);
 
   useEffect(() => {
-    if (bbox) {
+    if (BBOX) {
       setBounds({
-        bbox,
+        bbox: BBOX,
         options: {
           padding: 50,
         },
@@ -91,7 +94,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
     } else {
       setBounds(null);
     }
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

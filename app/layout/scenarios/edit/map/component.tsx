@@ -22,6 +22,7 @@ import {
   usePUGridLayer,
   useFeaturePreviewLayers,
   useLegend,
+  useBBOX,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
@@ -99,6 +100,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     data = {},
   } = useProject(pid);
   const { bbox } = data;
+
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const {
     data: scenarioData,
@@ -321,11 +326,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

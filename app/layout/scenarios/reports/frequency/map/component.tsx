@@ -11,6 +11,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
 import {
+  useBBOX,
   usePUGridLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
@@ -39,6 +40,9 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     data = {},
   } = useProject(pid);
   const { bbox } = data;
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -57,11 +61,11 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
