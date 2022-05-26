@@ -1,11 +1,11 @@
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox, antimeridianBbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { TileRequest } from '@marxan/tiles';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsArray, IsIn, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsIn, IsNumber, IsOptional} from 'class-validator';
 import { BBox } from 'geojson';
 import {
   calculateGridSize,
@@ -110,6 +110,7 @@ export class PlanningUnitsService {
      * Because we want to reduce the overhead for the db if an uncontroled area requests
      * a large area.
      * If so the shape we are getting is down the optimal to visualize it as points
+     *
      */
     const query =
       ratioPixelExtent < 8 && !filters?.bbox
@@ -122,14 +123,20 @@ export class PlanningUnitsService {
   }
   /**
    * @param filters including only bounding box of the area where the grids would be generated
+   *
    */
   private buildPlanningUnitsWhereQuery(filters?: PlanningUnitsFilters): string {
     let whereQuery = ``;
 
     if (filters?.bbox) {
-      whereQuery = `st_intersects(ST_Transform(ST_MakeEnvelope(${nominatim2bbox(
-        filters.bbox,
-      )}, 4326), 3857) ,the_geom)`;
+      const {westBbox, eastBbox} = antimeridianBbox(nominatim2bbox(
+        filters.bbox
+      ));
+      whereQuery = `st_intersects(ST_Transform(st_intersection(ST_MakeEnvelope(${eastBbox}, 4326),
+                                  ST_MakeEnvelope(0, -90, 180, 90, 4326)), 3857), the_geom)
+                    OR
+                    st_intersects(ST_Transform(st_intersection(ST_MakeEnvelope(${westBbox}, 4326),
+                                  ST_MakeEnvelope(-180, -90, 0, 90, 4326)), 3857), the_geom)`;
     }
     return whereQuery;
   }

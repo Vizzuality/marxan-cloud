@@ -115,11 +115,16 @@ export class PlanningUnitsJobProcessor {
         SELECT ST_Transform(the_geom, 3410) as geom
         FROM planning_areas
         WHERE id = '${data.planningAreaId}'
-      ), grid AS (
-        SELECT (${gridFn}(${size}, geom)).*
-        FROM region
+      ),
+      bboxes as (select * from (values (st_transform(ST_MakeEnvelope(-180, -90, 0, 90, 4326), 3410), 'west'),
+      (st_transform(ST_MakeEnvelope(0, -90, 180, 90, 4326),3410), 'east')) as t(geom, pos)),
+      grid AS (
+      SELECT ST_ClipByBox2D((${gridFn}(${size}, st_intersection(region.geom, bboxes.geom))).geom,
+      st_transform(ST_MakeEnvelope(-180, -90, 180, 90, 4326), 3410)) as geom
+      FROM region, bboxes
       )
-      SELECT grid.geom
+SELECT
+grid.geom
       FROM grid, region
       WHERE ST_Intersects(grid.geom, region.geom)
     `;
@@ -145,11 +150,16 @@ export class PlanningUnitsJobProcessor {
         SELECT ST_Transform(the_geom, 3410) as geom
         FROM admin_regions
         WHERE ${whereConditions.join(' AND ')}
-      ), grid AS (
-        SELECT (${gridFn}(${size}, geom)).*
-        FROM region
+      ),
+      bboxes as (select * from (values (st_transform(ST_MakeEnvelope(-180, -90, 0, 90, 4326), 3410), 'west'),
+									 (st_transform(ST_MakeEnvelope(0, -90, 180, 90, 4326),3410), 'east')) as t(geom, pos)),
+      grid AS (
+        SELECT ST_ClipByBox2D((${gridFn}(${size}, st_intersection(region.geom, bboxes.geom))).geom,
+        st_transform(ST_MakeEnvelope(-180, -90, 180, 90, 4326), 3410)) as geom
+        FROM region, bboxes
       )
-      SELECT grid.geom
+      SELECT
+      		grid.geom
       FROM grid, region
       WHERE ST_Intersects(grid.geom, region.geom)
     `;
@@ -196,7 +206,7 @@ export class PlanningUnitsJobProcessor {
         const geometries: { id: string }[] = await em.query(
           `
             INSERT INTO planning_units_geom (the_geom, type, size)
-            SELECT st_transform(geom, 4326) AS the_geom, $1::planning_unit_grid_shape AS type, $2 AS size 
+            SELECT ST_MakeValid(st_transform(geom, 4326)) AS the_geom, $1::planning_unit_grid_shape AS type, $2 AS size
             FROM (${subquery}) grid
             ON CONFLICT (the_geom_hash, type) DO UPDATE SET type = $1::planning_unit_grid_shape
             RETURNING id
