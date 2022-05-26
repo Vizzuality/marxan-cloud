@@ -4,6 +4,10 @@ import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
 } from '@marxan/legacy-project-import';
+import {
+  ScenariosPuCostDataGeo,
+  ScenariosPuPaDataGeo,
+} from '@marxan/scenarios-planning-unit';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,7 +18,11 @@ import { ScenarioPusDataLegacyProjectPieceImporter } from './scenarios-pus-data.
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ProjectsPuEntity]),
+    TypeOrmModule.forFeature([
+      ProjectsPuEntity,
+      ScenariosPuPaDataGeo,
+      ScenariosPuCostDataGeo,
+    ]),
     ShapefilesModule,
     FileReadersModule,
   ],

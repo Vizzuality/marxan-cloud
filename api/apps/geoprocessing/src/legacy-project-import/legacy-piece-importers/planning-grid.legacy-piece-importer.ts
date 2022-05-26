@@ -209,23 +209,28 @@ export class PlanningGridLegacyProjectPieceImporter
     const geojson = this.ensureShapefileValidity(data);
 
     await this.geoEntityManager.transaction(async (em) => {
-      const planningAreaId = v4();
+      try {
+        const planningAreaId = v4();
 
-      const geomIdsAndPuids = await this.insertGeometries(em, geojson);
+        const geomIdsAndPuids = await this.insertGeometries(em, geojson);
 
-      await this.insertProjectPus(
-        em,
-        geomIdsAndPuids,
-        input.projectId,
-        planningAreaId,
-      );
-      const bbox = await this.insertPlanningArea(
-        em,
-        planningAreaId,
-        input.projectId,
-      );
+        await this.insertProjectPus(
+          em,
+          geomIdsAndPuids,
+          input.projectId,
+          planningAreaId,
+        );
+        const bbox = await this.insertPlanningArea(
+          em,
+          planningAreaId,
+          input.projectId,
+        );
 
-      await this.updateProject(input.projectId, planningAreaId, bbox);
+        await this.updateProject(input.projectId, planningAreaId, bbox);
+      } catch (err) {
+        this.logger.error(err);
+        this.logAndThrow('Error inserting data in database');
+      }
     });
 
     return input;
