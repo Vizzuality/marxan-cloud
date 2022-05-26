@@ -197,9 +197,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                                       List of supported file formats:
                                     </h4>
                                     <ul>
-                                      Zipped: .shp (zipped shapefiles must include
-                                      <br />
-                                      .shp, .shx, .dbf, and .prj files)
+                                      .jpg and .png files
                                     </ul>
                                   </span>
                                 </InfoButton>
