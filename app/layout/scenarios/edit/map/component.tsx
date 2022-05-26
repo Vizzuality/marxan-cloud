@@ -245,7 +245,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     cache,
     active: tab === ScenarioSidebarTabs.PLANNING_UNIT
       && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW,
-    bbox: BBOX,
+    bbox,
     options: {
       ...layerSettings['wdpa-preview'],
     },
@@ -256,7 +256,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     cache,
     active: tab === ScenarioSidebarTabs.FEATURES
       && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
-    bbox: BBOX,
+    bbox,
     options: {
       featuresRecipe,
       featureHoverId,
