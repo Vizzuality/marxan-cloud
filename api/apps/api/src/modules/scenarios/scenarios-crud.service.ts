@@ -78,6 +78,7 @@ export class ScenariosCrudService extends AppBaseService<
         'createdByUser',
         'lastModifiedAt',
         'ranAtLeastOnce',
+        'solutionsAreLocked',
       ],
       keyForAttribute: 'camelCase',
       project: {

@@ -13,9 +13,9 @@ import { User } from '../users/user.api.entity';
 import { IsArray, IsOptional } from 'class-validator';
 import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
-import { GeoFeatureSetSpecification } from '../geo-features/dto/geo-feature-set-specification.dto';
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 import { ScenarioBlm } from '@marxan-api/modules/blm/values/repositories/scenario-blm/scenario-blm.api.entity';
+import { boolean } from 'fp-ts';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -77,6 +77,9 @@ export class Scenario extends TimeUserEntityMetadata {
   @ApiProperty()
   @OneToOne(() => ScenarioBlm)
   scenarioBlm!: ScenarioBlm;
+
+  @Column('boolean')
+  solutionsAreLocked?: boolean;
 
   /**
    * The project to which this scenario belongs.
