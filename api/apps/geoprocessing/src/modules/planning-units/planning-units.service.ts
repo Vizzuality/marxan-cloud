@@ -1,11 +1,11 @@
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { nominatim2bbox, antimeridianBbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox, antimeridianBbox } from '@marxan/utils/geo/bbox';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { TileRequest } from '@marxan/tiles';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsArray, IsIn, IsNumber, IsOptional} from 'class-validator';
+import { IsArray, IsIn, IsNumber, IsOptional } from 'class-validator';
 import { BBox } from 'geojson';
 import {
   calculateGridSize,
@@ -129,9 +129,9 @@ export class PlanningUnitsService {
     let whereQuery = ``;
 
     if (filters?.bbox) {
-      const {westBbox, eastBbox} = antimeridianBbox(nominatim2bbox(
-        filters.bbox
-      ));
+      const { westBbox, eastBbox } = antimeridianBbox(
+        nominatim2bbox(filters.bbox),
+      );
       whereQuery = `st_intersects(ST_Transform(st_intersection(ST_MakeEnvelope(${eastBbox}, 4326),
                                   ST_MakeEnvelope(0, -90, 180, 90, 4326)), 3857), the_geom)
                     OR

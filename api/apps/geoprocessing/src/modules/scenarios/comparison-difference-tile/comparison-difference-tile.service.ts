@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';

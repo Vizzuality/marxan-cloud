@@ -15,7 +15,7 @@ import {
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
 import { AdminArea } from '@marxan/admin-regions';
-import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox } from '@marxan/utils/geo/bbox';
 import { TileRequest } from '@marxan/tiles';
 
 export class TileSpecification extends TileRequest {

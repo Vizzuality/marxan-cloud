@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
-import { nominatim2bbox, antimeridianBbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { nominatim2bbox, antimeridianBbox } from '@marxan/utils/geo/bbox';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -73,9 +73,7 @@ export class ProtectedAreasTilesService {
         }
 
         if (bbox) {
-          const {westBbox, eastBbox} = antimeridianBbox(nominatim2bbox(
-            bbox
-          ));
+          const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
           subQuery.andWhere(
             `(st_intersects(ST_MakeEnvelope(:...westBbox, 4326), the_geom)
               or

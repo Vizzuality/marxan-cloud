@@ -7,7 +7,7 @@ import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
-import { antimeridianBbox, nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo/bbox';
 
 import { TileRequest } from '@marxan/tiles';
 
@@ -49,9 +49,7 @@ export class FeatureService {
     let whereQuery = `feature_id = '${id}'`;
 
     if (bbox) {
-      const {westBbox, eastBbox} = antimeridianBbox(nominatim2bbox(
-        bbox,
-      ));
+      const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
       whereQuery += `AND
       (st_intersects(
         st_intersection(st_makeenvelope(${eastBbox}, 4326),
