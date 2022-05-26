@@ -9,7 +9,7 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { EntityManager } from 'typeorm';
+import { DeepPartial, EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   LegacyProjectImportPieceProcessor,
@@ -134,7 +134,6 @@ export class FeaturesLegacyProjectPieceImporter
     );
 
     await this.apiEntityManager.transaction(async (apiEm) => {
-      const featureIdByClassName: Record<string, string> = {};
       const insertValues = specDatRows.map((feature) => {
         if (feature.target) {
           throw new Error(
@@ -172,7 +171,7 @@ export class FeaturesLegacyProjectPieceImporter
         ProjectsPuEntity,
       );
 
-      const featuresDataInsertValues: any = [];
+      const featuresDataInsertValues: DeepPartial<GeoFeatureGeometry>[] = [];
 
       await Promise.all(
         insertValues.map(async (feature) => {
