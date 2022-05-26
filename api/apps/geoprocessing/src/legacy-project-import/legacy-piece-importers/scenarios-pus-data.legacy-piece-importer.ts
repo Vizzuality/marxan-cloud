@@ -85,10 +85,6 @@ export class ScenarioPusDataLegacyProjectPieceImporter
         scenarioPuDataIdByPuid[row.id] = id;
         const projectPuId = projectPuIdByPuid[row.id];
 
-        console.log(row.status);
-        console.log(toLockEnum[row.status!]);
-        console.log('===');
-
         return {
           id,
           projectPuId,

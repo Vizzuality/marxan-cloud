@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { number } from 'fp-ts';
-import { Either, right, left } from 'fp-ts/lib/Either';
+import { Either, left, right } from 'fp-ts/lib/Either';
 import { DatFileReader, ValidationCheck } from './dat-file.reader';
 
 type ReadRow = {
@@ -38,7 +37,9 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
         errorMessage: 'Negative puid',
       },
       {
-        result: cost !== undefined && typeof cost !== 'number',
+        result:
+          cost !== undefined &&
+          (typeof cost !== 'number' || Number.isNaN(cost)),
         errorMessage: 'Invalid non number cost',
       },
       {
@@ -50,11 +51,15 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
         errorMessage: `Invalid status value: ${status}`,
       },
       {
-        result: xloc !== undefined && typeof xloc === 'number',
+        result:
+          xloc !== undefined &&
+          (typeof xloc !== 'number' || Number.isNaN(xloc)),
         errorMessage: 'Invalid non number xloc',
       },
       {
-        result: yloc !== undefined && typeof yloc === 'number',
+        result:
+          yloc !== undefined &&
+          (typeof yloc !== 'number' || Number.isNaN(yloc)),
         errorMessage: 'Invalid non number yloc',
       },
     ];
