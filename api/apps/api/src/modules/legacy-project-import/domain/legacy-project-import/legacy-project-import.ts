@@ -309,4 +309,10 @@ export class LegacyProjectImport extends AggregateRoot {
 
     return right(deletedFile);
   }
+
+  getPiecesWithErrorsOrWarnings(): LegacyProjectImportComponent[] {
+    return this.pieces.filter(
+      (piece) => piece.hasWarnings() || piece.hasErrors(),
+    );
+  }
 }

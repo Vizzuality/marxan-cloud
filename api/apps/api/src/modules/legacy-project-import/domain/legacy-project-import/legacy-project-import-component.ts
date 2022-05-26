@@ -43,6 +43,14 @@ export class LegacyProjectImportComponent {
     return this.status.hasFailed();
   }
 
+  hasWarnings() {
+    return Boolean(this.warnings.length);
+  }
+
+  hasErrors() {
+    return Boolean(this.errors.length);
+  }
+
   complete(warnings: string[] = []) {
     this.status = this.status.markAsCompleted();
     this.warnings.push(...warnings);
