@@ -33,7 +33,7 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
         errorMessage: 'Invalid non integer puid',
       },
       {
-        result: id < 0,
+        result: Number.isInteger(id) && id < 0,
         errorMessage: 'Negative puid',
       },
       {
