@@ -70,6 +70,15 @@ describe(PlanningGridLegacyProjectPieceImporter, () => {
       .ThenAnInvalidShapefileDataErrorShouldBeThrown();
   });
 
+  it(`fails if shapefile contains geometries with duplicate puids`, async () => {
+    const job = fixtures.GivenJobInput();
+    fixtures.GivenShapefileWithDuplicatePuids();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADuplicatePuidsErrorShouldBeThrown();
+  });
+
   it(`fails if shapefile contains geometries with non numeric puids`, async () => {
     const job = fixtures.GivenJobInput();
     fixtures.GivenShapefileWithNonNumericPuids();
@@ -243,6 +252,16 @@ const getFixtures = async () => {
 
       fakeShapefileService.geojson = invalidGeojson;
     },
+    GivenShapefileWithDuplicatePuids: () => {
+      const [feature] = validGeojson.features;
+
+      const invalidGeojson = {
+        ...validGeojson,
+        features: [feature, feature],
+      };
+
+      fakeShapefileService.geojson = invalidGeojson;
+    },
     GivenInvalidShapefileType: () => {
       const invalidGeojson: Feature = {
         type: 'Feature',
@@ -265,6 +284,11 @@ const getFixtures = async () => {
         ThenAnInvalidShapefileDataErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
             /invalid shapefile data/gi,
+          );
+        },
+        ThenADuplicatePuidsErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /shapefile contains geometries with the same puid/gi,
           );
         },
         ThenPlanningGridShouldBeImported: async () => {
