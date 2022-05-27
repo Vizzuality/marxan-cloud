@@ -300,8 +300,8 @@ resource "kubernetes_deployment" "api_deployment" {
 
             success_threshold     = 1
             timeout_seconds       = 5
-            initial_delay_seconds = 30
-            period_seconds        = 15
+            initial_delay_seconds = 60
+            period_seconds        = 60
           }
         }
       }

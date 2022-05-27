@@ -102,11 +102,12 @@ module "log_analytics_workspace" {
   name                = var.project_name
   location            = var.location
   resource_group_name = data.azurerm_resource_group.resource_group.name
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }
 
 module "firewall" {
@@ -121,11 +122,13 @@ module "firewall" {
   subnet_id                    = module.network.firewall_subnet_id
   log_analytics_workspace_id   = module.log_analytics_workspace.id
   log_analytics_retention_days = 30
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+      Test="Eric Testings"
+    },
+  )
 }
 
 module "routetable" {
@@ -142,11 +145,12 @@ module "routetable" {
       virtual_network_name = module.network.aks_vnet_name
     }
   }
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }
 
 module "redis_private_dns_zone" {
@@ -176,11 +180,12 @@ module "redis_private_endpoint" {
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }
 
 module "mail_host_dns_records" {

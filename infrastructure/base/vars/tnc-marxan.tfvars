@@ -1,6 +1,0 @@
-project_name             = "marxan"
-location                 = "West Europe"
-github_production_branch = "main"
-github_staging_branch    = "staging"
-github_org               = "tnc-css"
-github_repo              = "marxan-cloud"

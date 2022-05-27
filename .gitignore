@@ -28,3 +28,5 @@ node_modules/
 infrastructure/tncvars.md
 infrastructure/tncnotes.md
 tnc-marxan-full.tfvars
+pod-output.yml
+tf-db-deployment.log
