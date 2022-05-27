@@ -70,7 +70,17 @@ import {
   StartLegacyProjectImportError,
   StartLegacyProjectImportResult,
 } from '../legacy-project-import/application/start-legacy-project-import.command';
-import { string } from 'fp-ts';
+import { RunLegacyProjectImport } from '../legacy-project-import/application/run-legacy-project-import.command';
+import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
+import {
+  AddFileToLegacyProjectImport,
+  AddFileToLegacyProjectImportHandlerErrors,
+} from '../legacy-project-import/application/add-file-to-legacy-project-import.command';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
+import {
+  DeleteFileFromLegacyProjectImport,
+  DeleteFileFromLegacyProjectImportHandlerErrors,
+} from '../legacy-project-import/application/delete-file-from-legacy-project-import.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -463,6 +473,51 @@ export class ProjectsService {
 
     return this.commandBus.execute(
       new StartLegacyProjectImport(projectName, new UserId(userId)),
+    );
+  }
+
+  async addFileToLegacyProjectImport(
+    projectId: string,
+    file: Express.Multer.File,
+    fileType: LegacyProjectImportFileType,
+    userIdentifier: string,
+  ): Promise<
+    Either<AddFileToLegacyProjectImportHandlerErrors, LegacyProjectImportFileId>
+  > {
+    const resourceId = new ResourceId(projectId);
+    const userId = new UserId(userIdentifier);
+
+    return this.commandBus.execute(
+      new AddFileToLegacyProjectImport(
+        resourceId,
+        file.buffer,
+        fileType,
+        userId,
+      ),
+    );
+  }
+
+  async deleteFileFromLegacyProjectImport(
+    projectId: string,
+    fileId: string,
+    userIdentifier: string,
+  ): Promise<Either<DeleteFileFromLegacyProjectImportHandlerErrors, true>> {
+    const resourceId = new ResourceId(projectId);
+    const legacyProjectImportFileId = new LegacyProjectImportFileId(fileId);
+    const userId = new UserId(userIdentifier);
+
+    return this.commandBus.execute(
+      new DeleteFileFromLegacyProjectImport(
+        resourceId,
+        legacyProjectImportFileId,
+        userId,
+      ),
+    );
+  }
+
+  async runLegacyProject(projectId: string, userId: string) {
+    return this.commandBus.execute(
+      new RunLegacyProjectImport(new ResourceId(projectId), new UserId(userId)),
     );
   }
 

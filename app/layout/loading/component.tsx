@@ -21,7 +21,7 @@ export const Loading: React.FC<LoadingProps> = ({ loading }: LoadingProps) => {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className={cx({
-            'fixed z-50 w-full h-full': true,
+            'fixed z-60 w-full h-full': true,
           })}
         >
           <div

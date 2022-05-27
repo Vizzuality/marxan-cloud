@@ -5,6 +5,7 @@ import {
   LegacyProjectImportFileType,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { AllLegacyProjectImportPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
@@ -25,17 +26,11 @@ export const legacyProjectImportComponentAlreadyCompleted = Symbol(
 export const legacyProjectImportComponentAlreadyFailed = Symbol(
   `legacy project import component already failed`,
 );
-export const legacyProjectImportIsNotAcceptingFiles = Symbol(
-  `legacy project import file is not accepting files`,
-);
-export const legacyProjectImportDuplicateFile = Symbol(
-  `legacy project import already has this file`,
-);
-export const legacyProjectImportDuplicateFileType = Symbol(
-  `legacy project import already has this file type`,
-);
 export const legacyProjectImportMissingRequiredFile = Symbol(
   `legacy project import missing required file`,
+);
+export const legacyProjectImportAlreadyStarted = Symbol(
+  `legacy project import already started`,
 );
 
 export type CompleteLegacyProjectImportPieceSuccess = true;
@@ -46,12 +41,14 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentNotFound
   | typeof legacyProjectImportComponentAlreadyFailed;
 
-export type AddFileToLegacyProjectImportErrors =
-  | typeof legacyProjectImportIsNotAcceptingFiles
-  | typeof legacyProjectImportDuplicateFile
-  | typeof legacyProjectImportDuplicateFileType;
+export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
+export type DeleteFileFromLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
+
+export type RunLegacyProjectImportErrors =
+  | typeof legacyProjectImportAlreadyStarted
+  | GenerateLegacyProjectImportPiecesErrors;
 
 export class LegacyProjectImport extends AggregateRoot {
   private constructor(
@@ -123,6 +120,10 @@ export class LegacyProjectImport extends AggregateRoot {
       .some((piece) => piece.hasFailed());
   }
 
+  private importProcessAlreadyStarted() {
+    return !this.isAcceptingFiles;
+  }
+
   public areRequiredFilesUploaded(): boolean {
     const requiredFilesTypes = [
       LegacyProjectImportFileType.PlanningGridShapefile,
@@ -169,7 +170,10 @@ export class LegacyProjectImport extends AggregateRoot {
     return right(pieces);
   }
 
-  start(): Either<GenerateLegacyProjectImportPiecesErrors, true> {
+  run(): Either<RunLegacyProjectImportErrors, true> {
+    if (this.importProcessAlreadyStarted())
+      return left(legacyProjectImportAlreadyStarted);
+
     this.isAcceptingFiles = false;
     const piecesOrError = this.generatePieces();
 
@@ -271,28 +275,39 @@ export class LegacyProjectImport extends AggregateRoot {
   addFile(
     file: LegacyProjectImportFile,
   ): Either<AddFileToLegacyProjectImportErrors, true> {
-    if (!this.isAcceptingFiles) {
-      return left(legacyProjectImportIsNotAcceptingFiles);
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
     }
 
-    const fileTypeAlreadyPresent = this.files.some(
+    const sameFileTypeFileIndex = this.files.findIndex(
       (el) => el.type === file.type,
     );
 
-    if (fileTypeAlreadyPresent) {
-      return left(legacyProjectImportDuplicateFileType);
-    }
-
-    const duplicateArchiveLocation = this.files.some(
-      (el) => el.location === file.location,
-    );
-
-    if (duplicateArchiveLocation) {
-      return left(legacyProjectImportDuplicateFile);
+    if (sameFileTypeFileIndex !== -1) {
+      this.files.splice(sameFileTypeFileIndex, 1);
     }
 
     this.files.push(file);
 
     return right(true);
+  }
+
+  deleteFile(
+    fileId: LegacyProjectImportFileId,
+  ): Either<
+    DeleteFileFromLegacyProjectImportErrors,
+    LegacyProjectImportFile | undefined
+  > {
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
+    }
+
+    const fileIndex = this.files.findIndex((file) => file.id.equals(fileId));
+
+    if (fileIndex === -1) return right(undefined);
+
+    const [deletedFile] = this.files.splice(fileIndex, 1);
+
+    return right(deletedFile);
   }
 }

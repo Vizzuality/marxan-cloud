@@ -22,6 +22,10 @@ export function ensureFolderExists(path: string): void {
   }
 }
 
+export type StoreFileOptions = {
+  override: boolean;
+};
+
 /**
  * Stores the given file in the given path
  *
@@ -31,10 +35,11 @@ export function ensureFolderExists(path: string): void {
 export async function storeFile(
   path: string,
   stream: Readable,
+  opts: StoreFileOptions = { override: false },
 ): Promise<Either<StoreFileError, string>> {
   const fileExists = existsSync(path);
 
-  if (fileExists) {
+  if (fileExists && !opts.override) {
     return left(fileAlreadyExists);
   }
 

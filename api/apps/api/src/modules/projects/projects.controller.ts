@@ -123,8 +123,22 @@ import {
   unfinishedExport,
 } from '../clone/export/application/get-archive.query';
 import {
+  DeleteFileFromLegacyProjectImportResponseDto,
+  RunLegacyProjectImportResponseDto,
   StartLegacyProjectImportBodyDto,
   StartLegacyProjectImportResponseDto,
+} from './dto/legacy-project-import.dto';
+import {
+  legacyProjectImportAlreadyStarted,
+  legacyProjectImportMissingRequiredFile,
+} from '../legacy-project-import/domain/legacy-project-import/legacy-project-import';
+import {
+  legacyProjectImportNotFound,
+  legacyProjectImportSaveError,
+} from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import {
+  AddFileToLegacyProjectImportBodyDto,
+  AddFileToLegacyProjectImportResponseDto,
 } from './dto/legacy-project-import.dto';
 
 @UseGuards(JwtAuthGuard)
@@ -185,7 +199,7 @@ export class ProjectsController {
     summary: 'Starts a legacy marxan project import process',
   })
   @ApiOkResponse({ type: StartLegacyProjectImportResponseDto })
-  @Post('legacy-project-import/start')
+  @Post('import/legacy')
   async importLegacyProject(
     @Body() dto: StartLegacyProjectImportBodyDto,
     @Req() req: RequestWithAuthenticatedUser,
@@ -208,6 +222,122 @@ export class ProjectsController {
       projectId: result.right.projectId.value,
       scenarioId: result.right.scenarioId.value,
     };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Runs a legacy project import',
+    summary: 'Runs a legacy project import',
+  })
+  @ApiOkResponse({ type: RunLegacyProjectImportResponseDto })
+  @Post('import/legacy/:projectId')
+  async runLegacyProject(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<RunLegacyProjectImportResponseDto> {
+    const result = await this.projectsService.runLegacyProject(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        case legacyProjectImportMissingRequiredFile:
+          throw new BadRequestException(
+            'missing required files for running a legacy project import',
+          );
+        case legacyProjectImportAlreadyStarted:
+          throw new BadRequestException(
+            'a run has already being made on this legacy project import',
+          );
+        case legacyProjectImportSaveError:
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { projectId };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Adds a file to a legacy project import',
+    summary: 'Adds a file to a legacy project import',
+  })
+  @Post('import/legacy/:projectId/data-file')
+  @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
+  async addFileToLegacyProjectImport(
+    @Body() dto: AddFileToLegacyProjectImportBodyDto,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<AddFileToLegacyProjectImportResponseDto> {
+    const result = await this.projectsService.addFileToLegacyProjectImport(
+      projectId,
+      file,
+      dto.fileType,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        case legacyProjectImportAlreadyStarted:
+          throw new BadRequestException(
+            `Legacy project import with project ID ${projectId} has already started`,
+          );
+        case legacyProjectImportSaveError:
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { projectId, fileId: result.right.value };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Deletes a file from a legacy project import',
+    summary: 'Deletes a file from a legacy project import',
+  })
+  @Delete('import/legacy/:projectId/data-file/:dataFileId')
+  @ApiOkResponse({ type: DeleteFileFromLegacyProjectImportResponseDto })
+  async deleteFileFromLegacyProjectImport(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('dataFileId', ParseUUIDPipe) dataFileId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<DeleteFileFromLegacyProjectImportResponseDto> {
+    const result = await this.projectsService.deleteFileFromLegacyProjectImport(
+      projectId,
+      dataFileId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        case legacyProjectImportAlreadyStarted:
+          throw new BadRequestException(
+            `Legacy project import with project ID ${projectId} has already started`,
+          );
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { projectId };
   }
 
   @ImplementsAcl()

@@ -5,19 +5,18 @@ import { useRouter } from 'next/router';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
-import { useScenarioPU } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/solutions/solution-frequency-page/map';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selection-frequency-page/map';
 
 import LegendItem from 'components/map/legend/item/component';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 
-export interface SolutionFrequencyPageProps {
+export interface SelectionFrequencyPageProps {
 
 }
 
-export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () => {
+export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -64,21 +63,16 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
     }).filter((a) => a.selected).map((a) => a.name);
   }, [protectedAreasData]);
 
-  const {
-    data: PUData,
-    isFetched: PUDataIsFetched,
-  } = useScenarioPU(sid);
-
   const LEGEND = useMemo(() => {
     return {
       id: 'frequency',
-      name: 'Solution frequency',
+      name: 'Selection frequency',
       items: LEGEND_LAYERS.frequency().items,
     };
   }, []);
 
   const reportDataIsFetched = projectDataIsFetched && projectUsersDataIsFetched
-    && protectedAreasDataIsFetched && PUDataIsFetched;
+    && protectedAreasDataIsFetched;
 
   return (
     reportDataIsFetched && (
@@ -91,14 +85,8 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
               <p>{contributors.join(', ')}</p>
             </div>
             <div>
-              <p className="font-semibold">Protected Areas:</p>
+              <p className="font-semibold">Protected Areas [1]:</p>
               <p>{protectedAreas.join(', ')}</p>
-            </div>
-
-            <div>
-              <p className="font-semibold">No. of planning units</p>
-              <p>{`In the solution: ${PUData.included.length || 0}`}</p>
-              <p>{`Not included in the solution: ${PUData.excluded.length || 0}`}</p>
             </div>
           </div>
 
@@ -114,17 +102,37 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
             <p className="font-semibold">BLM</p>
             <p>{scenarioData.metadata.marxanInputParameterFile.BLM || null}</p>
           </div> */}
-          <div className="py-5 border-t border-gray-500 mr-14">
-            <LegendItem
-              {...LEGEND}
-              key="frequency"
-              className="block"
-              theme="light"
-            >
-              <LegendTypeGradient
-                items={LEGEND.items}
-              />
-            </LegendItem>
+          <div>
+            <div className="py-5 border-t border-gray-500 mr-14">
+              <LegendItem
+                {...LEGEND}
+                key="frequency"
+                className="block"
+                theme="light"
+              >
+                <LegendTypeGradient
+                  items={LEGEND.items}
+                />
+              </LegendItem>
+            </div>
+            <div className="mt-5">
+              <p className="text-xxs">
+                [1] The IUCN Protected Area Categories is a global standard that classifies sites
+                according to their conservation objectives. It is not a compulsory non-hierarchical
+                standard nor is applied by IUCN globally. It is for government agencies or other
+                institutions to use, which means that in some countries there might not be any
+                categories assigned yet. For more information about this standard, see:
+                <a
+                  className="underline"
+                  href="https://www.iucn.org/theme/protected-areas/about/protected-area-categories"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {' '}
+                  https://www.iucn.org/theme/protected-areas/about/protected-area-categories
+                </a>
+              </p>
+            </div>
           </div>
 
         </section>
@@ -136,4 +144,4 @@ export const SolutionFrequencyPage: React.FC<SolutionFrequencyPageProps> = () =>
   );
 };
 
-export default SolutionFrequencyPage;
+export default SelectionFrequencyPage;

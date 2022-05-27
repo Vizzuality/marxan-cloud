@@ -153,6 +153,7 @@ const getFixtures = async () => {
     LegacyProjectImportFileType.PuvsprDat,
     LegacyProjectImportFileType.SpecDat,
   ].map((kind) => ({
+    id: v4(),
     location: `/${legacyProjectImportId.value}/${kind}`,
     type: kind,
   }));

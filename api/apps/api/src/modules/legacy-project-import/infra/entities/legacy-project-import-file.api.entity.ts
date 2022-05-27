@@ -1,4 +1,3 @@
-import { ArchiveLocation } from '@marxan/cloning/domain/archive-location';
 import {
   LegacyProjectImportFile,
   LegacyProjectImportFileSnapshot,
@@ -12,6 +11,9 @@ export class LegacyProjectImportFileEntity {
   @PrimaryColumn({ type: 'text', name: 'location' })
   location!: string;
 
+  @Column({ type: 'uuid', unique: true })
+  id!: string;
+
   @Column({ type: 'enum', name: 'type', enum: LegacyProjectImportFileType })
   type!: LegacyProjectImportFileType;
 
@@ -21,6 +23,9 @@ export class LegacyProjectImportFileEntity {
   @ManyToOne(
     () => LegacyProjectImportEntity,
     (legacyProjectImport) => legacyProjectImport.files,
+    {
+      orphanedRowAction: 'delete',
+    },
   )
   @JoinColumn({
     name: 'legacy_project_import_id',
@@ -32,6 +37,7 @@ export class LegacyProjectImportFileEntity {
     snapshot: LegacyProjectImportFileSnapshot,
   ): LegacyProjectImportFileEntity {
     const importComponentLocation = new LegacyProjectImportFileEntity();
+    importComponentLocation.id = snapshot.id;
     importComponentLocation.location = snapshot.location;
     importComponentLocation.type = snapshot.type;
 
@@ -39,9 +45,10 @@ export class LegacyProjectImportFileEntity {
   }
 
   toDomain(): LegacyProjectImportFile {
-    return new LegacyProjectImportFile(
-      this.type,
-      new ArchiveLocation(this.location),
-    );
+    return LegacyProjectImportFile.fromSnapshot({
+      id: this.id,
+      location: this.location,
+      type: this.type,
+    });
   }
 }

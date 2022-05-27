@@ -1,31 +1,27 @@
-import { SaveFileError } from '@marxan/cloning-files-repository';
 import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
-import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
 import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
 import { forbiddenError } from '../../access-control';
-import { AddFileToLegacyProjectImportErrors } from '../domain/legacy-project-import/legacy-project-import';
+import { DeleteFileFromLegacyProjectImportErrors } from '../domain/legacy-project-import/legacy-project-import';
 import {
   LegacyProjectImportRepositoryFindErrors,
   LegacyProjectImportRepositorySaveErrors,
 } from '../domain/legacy-project-import/legacy-project-import.repository';
 
-export type AddFileToLegacyProjectImportHandlerErrors =
+export type DeleteFileFromLegacyProjectImportHandlerErrors =
+  | typeof forbiddenError
   | LegacyProjectImportRepositoryFindErrors
   | LegacyProjectImportRepositorySaveErrors
-  | AddFileToLegacyProjectImportErrors
-  | SaveFileError
-  | typeof forbiddenError;
+  | DeleteFileFromLegacyProjectImportErrors;
 
-export class AddFileToLegacyProjectImport extends Command<
-  Either<AddFileToLegacyProjectImportHandlerErrors, LegacyProjectImportFileId>
+export class DeleteFileFromLegacyProjectImport extends Command<
+  Either<DeleteFileFromLegacyProjectImportHandlerErrors, true>
 > {
   constructor(
     public readonly projectId: ResourceId,
-    public readonly file: Buffer,
-    public readonly type: LegacyProjectImportFileType,
+    public readonly fileId: LegacyProjectImportFileId,
     public readonly userId: UserId,
   ) {
     super();
