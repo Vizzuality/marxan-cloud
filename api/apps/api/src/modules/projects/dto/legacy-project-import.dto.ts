@@ -14,6 +14,7 @@ export class StartLegacyProjectImportBodyDto {
   })
   @IsString()
   projectName!: string;
+  solutionsAreLocked!: boolean;
 }
 
 export class StartLegacyProjectImportResponseDto {
