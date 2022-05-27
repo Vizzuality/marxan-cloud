@@ -15,7 +15,6 @@ import { TimeUserEntityMetadata } from '../../types/time-user-entity-metadata';
 import { BaseServiceResource } from '../../types/resource.interface';
 import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 import { ScenarioBlm } from '@marxan-api/modules/blm/values/repositories/scenario-blm/scenario-blm.api.entity';
-import { boolean } from 'fp-ts';
 
 export const scenarioResource: BaseServiceResource = {
   className: 'Scenario',
@@ -78,8 +77,8 @@ export class Scenario extends TimeUserEntityMetadata {
   @OneToOne(() => ScenarioBlm)
   scenarioBlm!: ScenarioBlm;
 
-  @Column('boolean')
-  solutionsAreLocked?: boolean;
+  @Column('boolean', { default: false })
+  solutionsAreLocked!: boolean;
 
   /**
    * The project to which this scenario belongs.

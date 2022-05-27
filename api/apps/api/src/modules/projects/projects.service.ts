@@ -458,6 +458,7 @@ export class ProjectsService {
   async startLegacyProjectImport(
     projectName: string,
     userId: string,
+    solutionsAreLocked: boolean,
   ): Promise<
     Either<
       typeof forbiddenError | StartLegacyProjectImportError,
@@ -473,7 +474,11 @@ export class ProjectsService {
     }
 
     return this.commandBus.execute(
-      new StartLegacyProjectImport(projectName, new UserId(userId)),
+      new StartLegacyProjectImport(
+        projectName,
+        new UserId(userId),
+        solutionsAreLocked,
+      ),
     );
   }
 

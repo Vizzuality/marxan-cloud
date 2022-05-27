@@ -208,6 +208,7 @@ export class ProjectsController {
     const result = await this.projectsService.startLegacyProjectImport(
       dto.projectName,
       req.user.id,
+      dto.solutionsAreLocked,
     );
 
     if (isLeft(result)) {
