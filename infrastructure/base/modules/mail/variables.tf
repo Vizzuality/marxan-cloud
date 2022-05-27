@@ -27,3 +27,8 @@ variable "dkim_value" {
   type        = string
   description = "The value of the DNS TXT record for Sparkpost DKIM"
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}

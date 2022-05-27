@@ -5,11 +5,12 @@ resource "azurerm_dns_cname_record" "sparkpost_cname_record" {
   name                = var.cname_name
   record              = var.cname_value
 
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }
 
 resource "azurerm_dns_txt_record" "sparkpost_dkim_txt_record" {
@@ -21,9 +22,10 @@ resource "azurerm_dns_txt_record" "sparkpost_dkim_txt_record" {
     value =var.dkim_value
   }
 
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }

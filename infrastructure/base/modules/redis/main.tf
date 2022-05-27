@@ -10,6 +10,13 @@ resource "azurerm_redis_cache" "marxan" {
   public_network_access_enabled = false
   redis_version                 = var.redis_version
 
+  tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
+
   redis_configuration {
   }
 }

@@ -95,6 +95,12 @@ module "redis" {
   project_name                   = var.project_name
   subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.kubernetes.cluster_id
+  project_tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }
 
 module "log_analytics_workspace" {
@@ -126,7 +132,7 @@ module "firewall" {
     var.project_tags,
     {
       Environment = "PRD-STG"
-      Test="Eric Testings"
+      Test        = "Eric Testings"
     },
   )
 }
@@ -198,4 +204,11 @@ module "mail_host_dns_records" {
 
   dkim_name  = var.sparkpost_dns_dkim_name
   dkim_value = var.sparkpost_dns_dkim_value
+
+  project_tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD-STG"
+    },
+  )
 }
