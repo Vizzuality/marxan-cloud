@@ -4,8 +4,6 @@ import { COLORS } from 'hooks/map/constants';
 
 import Icon from 'components/icon';
 
-import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
-import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
 export interface SelectedSolutionProps {
@@ -24,12 +22,11 @@ export interface SelectedSolutionProps {
 }
 
 export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
-  best = false, values, settings, onChangeVisibility,
+  best = false, values,
 }: SelectedSolutionProps) => {
   const {
     runId, scoreValue, costValue, missingValues, planningUnits,
   } = values;
-  const { visibility = true } = settings || {};
 
   return (
     <div className="w-full">
@@ -50,14 +47,6 @@ export const SelectedSolution: React.FC<SelectedSolutionProps> = ({
             </div>
           )}
         </div>
-        <button
-          type="button"
-          className="flex items-center justify-between flex-shrink-0 px-2 py-1 text-xs text-white border border-transparent focus:border-white rounded-4xl"
-          onClick={onChangeVisibility}
-        >
-          {visibility ? 'View on map' : 'Hide from map'}
-          <Icon icon={visibility ? SHOW_SVG : HIDE_SVG} className="w-5 h-6 ml-3" />
-        </button>
       </div>
       <div className="grid grid-cols-2 pt-5 pr-32 text-sm text-white gap-y-6 gap-x-5">
         <div className="flex pl-2.5 text-white border-l-2 border-blue-700 space-x-2">

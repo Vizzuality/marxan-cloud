@@ -49,12 +49,16 @@ export class LegacyProjectImportFilesLocalRepository
 
     ensureFolderExists(path);
 
-    return storeFile(path, stream);
+    return storeFile(path, stream, { override: true });
   }
 
   async deleteFolder(id: string): Promise<void> {
     const path = this.getStorageRootPath(id);
 
+    rmSync(path, { recursive: true, force: true });
+  }
+
+  async deleteFile(path: string): Promise<void> {
     rmSync(path, { recursive: true, force: true });
   }
 }

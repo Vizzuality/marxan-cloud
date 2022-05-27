@@ -1,13 +1,13 @@
+import { forbiddenError } from '@marxan-api/modules/access-control';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
-import { ResourceId } from '@marxan/cloning/domain';
 import {
   CommandHandler,
   EventPublisher,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { isLeft, right } from 'fp-ts/Either';
+import { isLeft, right, left } from 'fp-ts/Either';
 import { Repository } from 'typeorm';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import {
@@ -27,6 +27,7 @@ export class RunLegacyProjectImportHandler
 
   async execute({
     projectId,
+    userId,
   }: RunLegacyProjectImport): Promise<RunLegacyProjectImportResponse> {
     const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
       projectId,
@@ -38,9 +39,11 @@ export class RunLegacyProjectImportHandler
       legacyProjectImportOrError.right,
     );
 
-    const { ownerId: userId } = legacyProjectImport.toSnapshot();
+    const { ownerId } = legacyProjectImport.toSnapshot();
 
-    const result = legacyProjectImport.start();
+    if (userId.value !== ownerId) return left(forbiddenError);
+
+    const result = legacyProjectImport.run();
 
     if (isLeft(result)) return result;
 
@@ -52,7 +55,7 @@ export class RunLegacyProjectImportHandler
       return legacyProjectImportSaveError;
 
     await this.usersRepo.save({
-      userId,
+      userId: ownerId,
       projectId: projectId.value,
       roleName: ProjectRoles.project_owner,
     });

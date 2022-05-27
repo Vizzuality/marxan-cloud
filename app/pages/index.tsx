@@ -35,7 +35,9 @@ const Home: React.FC = () => {
         twitterCard="summary"
         twitterSite="@Marxan_Planning"
       />
-      <main className="overflow-x-hidden overflow-y-auto">
+      <main
+        className="overflow-x-hidden overflow-y-auto"
+      >
         <Header className="absolute" size="lg" theme="transparent" />
         <Intro />
         <Support />

@@ -173,7 +173,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
       </Controls>
 
       {/* Legend */}
-      <div className="absolute w-full max-w-xs bottom-6 right-5">
+      <div className="absolute w-full max-w-xs bottom-16 right-5">
         <Legend
           open={open}
           className="w-full"
