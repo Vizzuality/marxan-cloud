@@ -124,11 +124,14 @@ const getFixtures = async () => {
     events.push(event);
   });
 
-  const startLegacyProjectImport = (name: string = 'Legacy project') =>
+  const startLegacyProjectImport = (
+    name: string = 'Legacy project',
+    solutionsAreLocked: boolean = false,
+  ) =>
     request(app.getHttpServer())
       .post(`/api/v1/projects/import/legacy`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ projectName: name })
+      .send({ projectName: name, solutionsAreLocked })
       .expect(201);
 
   const runLegacyProjectImport = (projectId: string) =>
@@ -216,7 +219,7 @@ const getFixtures = async () => {
       );
     },
     WhenInvokingStartEndpoint: async (name: string) => {
-      const result = await startLegacyProjectImport(name);
+      const result = await startLegacyProjectImport(name, false);
 
       expect(result.body.projectId).toBeDefined();
 
