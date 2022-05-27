@@ -140,8 +140,9 @@ export class Project extends TimeUserEntityMetadata {
   @Column('enum', {
     name: 'sources',
     enum: ProjectSourcesEnum,
+    default: ProjectSourcesEnum.marxanCloud,
   })
-  sources?: string;
+  sources!: ProjectSourcesEnum;
 
   /**
    * JSONB storage for non-relational attributes
