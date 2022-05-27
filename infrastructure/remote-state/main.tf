@@ -21,13 +21,9 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name     = var.project_resource_group
-  location = var.location
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  name         = var.project_resource_group
+  location     = var.location
+  tags = merge(var.project_tags, { Environment = "PRD-STG" }, )
 }
 
 resource "azurerm_storage_account" "storage_account" {
@@ -36,11 +32,7 @@ resource "azurerm_storage_account" "storage_account" {
   location                 = azurerm_resource_group.resource_group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags = merge(var.project_tags, { Environment = "PRD-STG" }, )
 }
 
 resource "azurerm_storage_container" "storage_container_tf_state" {

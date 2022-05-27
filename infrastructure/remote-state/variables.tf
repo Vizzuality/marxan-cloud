@@ -12,3 +12,8 @@ variable "project_resource_group" {
   type        = string
   description = "Azure resource group to use for the project."
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}
