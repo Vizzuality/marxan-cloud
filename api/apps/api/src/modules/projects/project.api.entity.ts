@@ -31,6 +31,11 @@ export const projectResource: BaseServiceResource = {
   entitiesAllowedAsIncludes: ['scenarios', 'users'],
 };
 
+export enum ProjectSourcesEnum {
+  marxanCloud = 'marxan_cloud',
+  legacyImport = 'legacy_import',
+}
+
 @Entity('projects')
 export class Project extends TimeUserEntityMetadata {
   @ApiProperty()
@@ -130,6 +135,13 @@ export class Project extends TimeUserEntityMetadata {
   @ApiProperty()
   @OneToOne(() => ProjectBlm)
   projectBlm!: ProjectBlm;
+
+  @ApiProperty()
+  @Column('enum', {
+    name: 'sources',
+    enum: ProjectSourcesEnum,
+  })
+  sources?: string;
 
   /**
    * JSONB storage for non-relational attributes
