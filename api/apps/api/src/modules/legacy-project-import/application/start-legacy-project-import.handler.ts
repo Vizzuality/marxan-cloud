@@ -1,5 +1,8 @@
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import {
+  Project,
+  ProjectSourcesEnum,
+} from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ResourceId } from '@marxan/cloning/domain';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
@@ -33,13 +36,14 @@ export class StartLegacyProjectImportHandler
         take: 1,
       });
       if (!randomOrganization)
-        throw new Error('cant find an existing organiztion');
+        throw new Error('cant find an existing organization');
 
       const randomOrganizationId = randomOrganization.id;
 
       const project = await this.projectRepo.save({
         name,
         organizationId: randomOrganizationId,
+        sources: ProjectSourcesEnum.legacyImport,
       });
 
       const scenario = await this.scenarioRepo.save({
