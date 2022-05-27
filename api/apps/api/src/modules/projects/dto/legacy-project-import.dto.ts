@@ -1,6 +1,11 @@
-import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
+import {
+  LegacyProjectImportFileType,
+  LegacyProjectImportPiece,
+} from '@marxan/legacy-project-import';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString } from 'class-validator';
+import { LegacyProjectImportComponentReport } from '../../legacy-project-import/application/get-legacy-project-import-errors.query';
+import { LegacyProjectImportComponentStatuses } from '../../legacy-project-import/domain/legacy-project-import/legacy-project-import-component-status';
 
 export class StartLegacyProjectImportBodyDto {
   @ApiProperty({
@@ -70,4 +75,21 @@ export class DeleteFileFromLegacyProjectImportResponseDto {
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
   })
   projectId!: string;
+}
+
+export class GetLegacyProjectImportErrorsResponseDto {
+  @ApiProperty({
+    description: 'Errors and warnings of each piece',
+    example: [
+      {
+        componentId: '6fbec34e-04a7-4131-be14-c245f2435a6c',
+        kind: LegacyProjectImportPiece.ScenarioPusData,
+        status: LegacyProjectImportComponentStatuses.Failed,
+        errors: ['pu.dat file invalid content'],
+        warnings: [],
+      },
+    ],
+    isArray: true,
+  })
+  errorsAndWarnings!: LegacyProjectImportComponentReport[];
 }
