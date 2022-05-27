@@ -246,6 +246,7 @@ async function getFixtures() {
         type: ScenarioType.marxanWithZones,
         users: [],
         ranAtLeastOnce: false,
+        solutionsAreLocked: false,
       };
     },
     withInputParameters() {
