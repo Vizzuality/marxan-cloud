@@ -71,12 +71,6 @@ export const Item: React.FC<ItemProps> = ({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div
-        className={classnames({
-          'absolute top-0 left-0 w-5 h-5 transform rotate-45 -translate-x-1/2 -translate-y-1/2': true,
-          'bg-red-500': isNotMet,
-        })}
-      />
       <div className="flex justify-between">
         <div className="pt-1 mr-4 overflow-hidden text-sm flex-shrink-1 overflow-ellipsis whitespace-nowrap font-heading">
           {name}
