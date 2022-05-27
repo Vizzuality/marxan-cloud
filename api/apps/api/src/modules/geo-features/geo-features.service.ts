@@ -28,7 +28,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 import { GeoFeaturesRequestInfo } from './geo-features-request-info';
-import { antimeridianBbox } from '@marxan/utils/geo/bbox';
+import { antimeridianBbox } from '@marxan/utils/geo';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
