@@ -68,6 +68,27 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
       .ThenAPuDatReadOperationErrorShouldBeThrown();
   });
 
+  it('fails when pu.dat file contains duplicate puids', async () => {
+    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const job = fixtures.GivenJobInput({ fileLocation: location });
+    fixtures.GivenPuDatFileWithDuplicatePuids();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADuplicatePuidsErrorShouldBeThrown();
+  });
+
+  it('fails when pu.dat file does not contain some projects pu data', async () => {
+    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const job = fixtures.GivenJobInput({ fileLocation: location });
+    await fixtures.GivenValidPuDatFile();
+    fixtures.GivenPuDatLacksProjectPuDataRows();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenAMissingPlanningUnitsDataErrorShouldBeThrown();
+  });
+
   it('reports warnings when pu.dat contains unknown puids', async () => {
     const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
     const job = fixtures.GivenJobInput({ fileLocation: location });
@@ -220,6 +241,30 @@ const getFixtures = async () => {
       });
       fakePuDatReader.readOperationResult = right(puDatRows);
     },
+    GivenPuDatLacksProjectPuDataRows: () => {
+      fakePuDatReader.readOperationResult = right(
+        puDatRows.slice(0, amountOfPlanningUnits - 5),
+      );
+    },
+    GivenPuDatFileWithDuplicatePuids: () => {
+      puDatRows.push(
+        {
+          id: 1,
+          cost: 1000,
+          status: 0,
+          xloc: 12,
+          yloc: 21,
+        },
+        {
+          id: 1,
+          cost: 2000,
+          status: 0,
+          xloc: 10,
+          yloc: 20,
+        },
+      );
+      fakePuDatReader.readOperationResult = right(puDatRows);
+    },
     GivenInvalidPuDatFile: () => {
       fakePuDatReader.readOperationResult = left(readOperationError);
     },
@@ -237,6 +282,16 @@ const getFixtures = async () => {
         },
         ThenAPuDatReadOperationErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(readOperationError);
+        },
+        ThenADuplicatePuidsErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /pu.dat file contains rows with the same puid/gi,
+          );
+        },
+        ThenAMissingPlanningUnitsDataErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /pu.dat file is missing planning units data/gi,
+          );
         },
         ThenScenarioPusDataShouldBeImported: async (
           expectedWarnings: string[] = [],

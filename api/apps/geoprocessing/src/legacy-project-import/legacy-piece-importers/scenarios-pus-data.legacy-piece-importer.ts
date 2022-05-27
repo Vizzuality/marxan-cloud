@@ -58,10 +58,10 @@ export class ScenarioPusDataLegacyProjectPieceImporter
 
   private async getProjectPusMap(
     repo: Repository<ProjectsPuEntity>,
-    rows: PuDatRow[],
+    projectId: string,
   ): Promise<Record<number, string>> {
     const projectPus = await repo.find({
-      where: { puid: In(rows.map((pu) => pu.id)) },
+      where: { projectId },
     });
     const projectPuIdByPuid: Record<number, string> = {};
     projectPus.forEach((pu) => {
@@ -122,6 +122,35 @@ export class ScenarioPusDataLegacyProjectPieceImporter
     return scenarioPuDataIdByPuid;
   }
 
+  private checkPuidsUniqueness(rows: PuDatRow[]): number[] {
+    const duplicatePuids = new Set<number>();
+    const knownPuids: Record<number, true> = {};
+
+    rows.forEach((row) => {
+      const { id } = row;
+
+      const knownPuid = knownPuids[id];
+
+      if (knownPuid) duplicatePuids.add(id);
+      else knownPuids[id] = true;
+    });
+
+    return Array.from(duplicatePuids);
+  }
+
+  private checkThatEveryProjectPuIsInPuDatRows(
+    projectPuIdByPuid: Record<number, string>,
+    rows: PuDatRow[],
+  ): number[] {
+    const projectPusPuids = new Set<number>(
+      Object.keys(projectPuIdByPuid).map((id) => parseInt(id)),
+    );
+
+    rows.forEach((row) => projectPusPuids.delete(row.id));
+
+    return Array.from(projectPusPuids);
+  }
+
   async run(
     input: LegacyProjectImportJobInput,
   ): Promise<LegacyProjectImportJobOutput> {
@@ -129,19 +158,23 @@ export class ScenarioPusDataLegacyProjectPieceImporter
       (file) => file.type === LegacyProjectImportFileType.PuDat,
     );
 
-    if (!puDatFile) {
+    if (!puDatFile)
       this.logAndThrow('pu.dat file not found inside input files array');
-    }
 
     const readable = await this.filesRepo.get(puDatFile.location);
-    if (isLeft(readable)) {
+    if (isLeft(readable))
       this.logAndThrow('pu.dat file not found in files repo');
-    }
 
     const rowsOrError = await this.puDatReader.readFile(readable.right);
-    if (isLeft(rowsOrError)) {
-      this.logAndThrow(rowsOrError.left);
-    }
+    if (isLeft(rowsOrError)) this.logAndThrow(rowsOrError.left);
+
+    const duplicatePuids = this.checkPuidsUniqueness(rowsOrError.right);
+    if (duplicatePuids.length)
+      this.logAndThrow(
+        `pu.dat file contains rows with the same puid. Duplicate puids: ${duplicatePuids.join(
+          ', ',
+        )}`,
+      );
 
     const notFoundPuids: number[] = [];
 
@@ -150,14 +183,24 @@ export class ScenarioPusDataLegacyProjectPieceImporter
       const projectsPuRepo = em.getRepository(ProjectsPuEntity);
       const scenariosPuDataRepo = em.getRepository(ScenariosPuPaDataGeo);
       const scenariosPuCostDataRepo = em.getRepository(ScenariosPuCostDataGeo);
+      const projectPuIdByPuid = await this.getProjectPusMap(
+        projectsPuRepo,
+        input.projectId,
+      );
+
+      const puidsNotPresentInPuDat = this.checkThatEveryProjectPuIsInPuDatRows(
+        projectPuIdByPuid,
+        rowsOrError.right,
+      );
+      if (puidsNotPresentInPuDat.length)
+        this.logAndThrow(
+          `pu.dat file is missing planning units data. Missing puids: ${puidsNotPresentInPuDat.join(
+            ', ',
+          )}`,
+        );
 
       await Promise.all(
         chunk(rowsOrError.right, chunkSize).map(async (chunk) => {
-          const projectPuIdByPuid = await this.getProjectPusMap(
-            projectsPuRepo,
-            chunk,
-          );
-
           const notFound = this.getNotFoundPuids(chunk, projectPuIdByPuid);
           notFoundPuids.push(...notFound);
 
