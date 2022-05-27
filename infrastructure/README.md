@@ -183,3 +183,17 @@ create extension IF NOT EXISTS postgis_topology;
 
 You may need to manually restart application pods once the PostgreSQL users and databases are in place, and verify
 that they connect successfully.
+
+## Verbosity
+
+To enable error logging in Windows, export the TF_LOG environment variable to `DEBUG`:
+
+```powershell
+$env:TF_LOG="DEBUG"
+```
+
+And to redirect the output in Windows, use this:
+
+```powershell
+$env:TF_LOG_PATH="~\Documents\logs\tf-db-deployment.log"
+```
