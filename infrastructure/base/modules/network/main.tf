@@ -54,6 +54,8 @@ resource "azurerm_network_security_group" "bastion_nsg" {
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
 
+  tags = merge(var.project_tags, { Environment = "PRD-STG", Security="Port 22 locked down to VPN Cidrs and the known GitHub Action IP ranges (CI/CD)" }, )
+
   # Allow SSH traffic in from Internet to public subnet.
   security_rule {
     name                       = "allow-ssh-all"

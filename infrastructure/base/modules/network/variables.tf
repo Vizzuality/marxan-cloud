@@ -11,3 +11,8 @@ variable "vpn_cidrs" {
   type        = list(string)
   description = "Comma separated list of CIDRs for the TNC VPN"
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}

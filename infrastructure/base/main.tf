@@ -20,6 +20,7 @@ module "network" {
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
   vpn_cidrs      = concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4)
+  project_tags   = var.project_tags
 }
 
 module "dns" {
