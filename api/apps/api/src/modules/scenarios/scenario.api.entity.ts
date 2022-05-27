@@ -77,7 +77,7 @@ export class Scenario extends TimeUserEntityMetadata {
   @OneToOne(() => ScenarioBlm)
   scenarioBlm!: ScenarioBlm;
 
-  @Column('boolean', { default: false })
+  @Column('boolean', { name: 'solutions_are_locked', default: false })
   solutionsAreLocked!: boolean;
 
   /**
