@@ -91,7 +91,7 @@ it('returns errors and warnings of a legacy project import', async () => {
 
   const errors = ['shapefile was not found in files repo'];
 
-  await fixtures.GivenSomePieceFailed(errors);
+  await fixtures.GivenFirstBatchFailed(errors);
 
   const result = await fixtures.WhenGettingErrorsAndWarningsOfALegacyProjectImport();
 
@@ -196,7 +196,7 @@ const getFixtures = async () => {
         }),
       );
     },
-    GivenSomePieceFailed: async (errors: string[] = []) => {
+    GivenFirstBatchFailed: async (errors: string[] = []) => {
       await runLegacyProjectImport(projectId);
 
       const event = await eventBusTestUtils.waitUntilEventIsPublished(
@@ -235,14 +235,10 @@ const getFixtures = async () => {
     WhenUploadingAFileForLegacyProjectImport: async (
       fileType: LegacyProjectImportFileType,
     ) => {
-      console.log('before saving file');
-
       const filePath = await saveFile(
         join(__dirname, fileType),
         Readable.from('test file'),
       );
-
-      console.log('after saving file');
 
       files.push(filePath);
 
