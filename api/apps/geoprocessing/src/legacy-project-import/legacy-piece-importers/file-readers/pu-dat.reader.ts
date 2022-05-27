@@ -3,7 +3,7 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 import { DatFileReader, ValidationCheck } from './dat-file.reader';
 
 type ReadRow = {
-  id: string;
+  id?: string;
   cost?: string;
   status?: '0' | '1' | '2';
   xloc?: string;
@@ -74,6 +74,10 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
   }
 
   transform({ id, cost, status, xloc, yloc }: ReadRow): PuDatRow {
+    if (id === undefined) {
+      throw new Error('Id column not found');
+    }
+
     return {
       id: parseInt(id),
       cost: cost ? parseFloat(cost) : undefined,

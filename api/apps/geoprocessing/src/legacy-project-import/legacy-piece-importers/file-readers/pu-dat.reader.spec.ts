@@ -16,6 +16,12 @@ it('reads successfully a valid pu.dat file', async () => {
   fixtures.ThenPuDatRowsAreSuccessfullyRead(result);
 });
 
+it('fails when pu.dat does not contain puids', async () => {
+  const file = fixtures.GivenPuDatFileWithoutIdColumn();
+  const result = await fixtures.WhenExecutingPuDatReader(file);
+  fixtures.ThenPuDatReadOperationFails(result, /id column not found/gi);
+});
+
 it('fails when pu.dat contains non integer puids', async () => {
   const file = fixtures.GivenAnInvalidPuDatFile({ id: 'invalid puid' });
   const result = await fixtures.WhenExecutingPuDatReader(file);
@@ -95,6 +101,12 @@ const getFixtures = async () => {
       }\t${yloc ?? 1}`;
 
       return Readable.from(headers + row);
+    },
+    GivenPuDatFileWithoutIdColumn: () => {
+      const wrongHeaders = 'cost\tstatus\txloc\tyloc\n';
+      const row = `100\t0\t1\t1`;
+
+      return Readable.from(wrongHeaders + row);
     },
     WhenExecutingPuDatReader: (
       readable: Readable,
