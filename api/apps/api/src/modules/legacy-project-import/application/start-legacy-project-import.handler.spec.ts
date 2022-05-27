@@ -118,7 +118,7 @@ const getFixtures = async () => {
     },
     WhenStartingLegacyProjectImport: () => {
       return sut.execute(
-        new StartLegacyProjectImport('random project name', ownerId),
+        new StartLegacyProjectImport('random project name', ownerId, false),
       );
     },
     ThenAStartingLegacyProjectIsNotCreated: async (
