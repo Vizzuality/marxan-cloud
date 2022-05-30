@@ -5,7 +5,7 @@ export const projectCustomFeaturesRelativePath = 'custom-features.json';
 
 // @debt JobStatus is a duplicated type as it is declared here and in
 // api/src/modules/scenarios/scenario.api.entity.ts
-enum JobStatus {
+export enum JobStatus {
   draft = 'draft',
   created = 'created',
   running = 'running',
