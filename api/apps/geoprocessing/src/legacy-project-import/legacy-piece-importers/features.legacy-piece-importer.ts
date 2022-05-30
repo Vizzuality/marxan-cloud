@@ -15,24 +15,11 @@ import {
   LegacyProjectImportPieceProcessor,
   LegacyProjectImportPieceProcessorProvider,
 } from '../pieces/legacy-project-import-piece-processor';
-import * as fastCsv from 'fast-csv';
-import { Readable } from 'stream';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { chunk } from 'lodash';
-
-type SpecDataEntry = {
-  id: string;
-  prop: string;
-  name?: string;
-  target?: string;
-};
-
-type PuvsprDataEntry = {
-  species: string;
-  pu: string;
-  amount: string;
-};
+import { SpecDatReader } from './file-readers/spec-dat.reader';
+import { PuvsprDatReader } from './file-readers/puvspr-dat.reader';
 
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
@@ -40,6 +27,8 @@ export class FeaturesLegacyProjectPieceImporter
   implements LegacyProjectImportPieceProcessor {
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
+    private readonly specDatReader: SpecDatReader,
+    private readonly puvsprDatReader: PuvsprDatReader,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
@@ -53,42 +42,6 @@ export class FeaturesLegacyProjectPieceImporter
     return piece === LegacyProjectImportPiece.Features;
   }
 
-  async handleSpecDatFile(file: Readable): Promise<SpecDataEntry[]> {
-    const itemsArray: any = [];
-
-    await new Promise((resolve, reject) => {
-      file
-        .pipe(
-          fastCsv.parse({ headers: true, delimiter: '\t', objectMode: true }),
-        )
-        .on('error', (error) => console.log(error))
-        .on('data', (data) => itemsArray.push(data))
-        .on('end', () => {
-          resolve(itemsArray);
-        });
-    });
-
-    return itemsArray;
-  }
-
-  async handlePuvsprDatFile(file: Readable): Promise<PuvsprDataEntry[]> {
-    const itemsArray: any = [];
-
-    await new Promise((resolve, reject) => {
-      file
-        .pipe(
-          fastCsv.parse({ headers: true, delimiter: '\t', objectMode: true }),
-        )
-        .on('error', (error) => console.log(error))
-        .on('data', (data) => itemsArray.push(data))
-        .on('end', () => {
-          resolve(itemsArray);
-        });
-    });
-
-    return itemsArray;
-  }
-
   async run(
     input: LegacyProjectImportJobInput,
   ): Promise<LegacyProjectImportJobOutput> {
@@ -99,7 +52,7 @@ export class FeaturesLegacyProjectPieceImporter
     );
 
     if (!specFeaturesFileOrError) {
-      throw new Error('Shapefile not found inside input file array');
+      throw new Error('spec.dat not found inside input file array');
     }
 
     const specFileReadableOrError = await this.filesRepo.get(
@@ -110,16 +63,20 @@ export class FeaturesLegacyProjectPieceImporter
       throw new Error('The spec.dat file provided is malformed or missing.');
     }
 
-    const specDatRows = await this.handleSpecDatFile(
+    const specDatRowsOrError = await this.specDatReader.readFile(
       specFileReadableOrError.right,
     );
+
+    if (isLeft(specDatRowsOrError)) throw new Error(specDatRowsOrError.left);
+
+    const specDatRows = specDatRowsOrError.right;
 
     const puvsprFeaturesFileOrError = files.find(
       (file) => file.type === LegacyProjectImportFileType.SpecDat,
     );
 
     if (!puvsprFeaturesFileOrError) {
-      throw new Error('Shapefile not found inside input file array');
+      throw new Error('puvspr.dat not found inside input file array');
     }
 
     const puvsprFileReadableOrError = await this.filesRepo.get(
@@ -129,21 +86,17 @@ export class FeaturesLegacyProjectPieceImporter
     if (isLeft(puvsprFileReadableOrError)) {
       throw new Error('The puvspr.dat file provided is malformed or missing.');
     }
-    const puvsprDatRows = await this.handlePuvsprDatFile(
+    const puvsprDatRowsOrError = await this.puvsprDatReader.readFile(
       puvsprFileReadableOrError.right,
     );
 
+    if (isLeft(puvsprDatRowsOrError))
+      throw new Error(puvsprDatRowsOrError.left);
+
+    const puvsprDatRows = puvsprDatRowsOrError.right;
+
     await this.apiEntityManager.transaction(async (apiEm) => {
       const insertValues = specDatRows.map((feature) => {
-        if (feature.target) {
-          throw new Error(
-            'Target is not supported, please translate target to prop value',
-          );
-        }
-
-        if (!feature.name) {
-          throw new Error('Name column in spec.dat is compulsory. Try again');
-        }
         const featureId = v4();
 
         return {
@@ -176,7 +129,7 @@ export class FeaturesLegacyProjectPieceImporter
       await Promise.all(
         insertValues.map(async (feature) => {
           const filteredPuvspr = puvsprDatRows.filter(
-            (row) => row.species === feature.id,
+            (row) => row.species === feature.featureIntegerId,
           );
 
           await Promise.all(

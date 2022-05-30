@@ -210,19 +210,23 @@ const getFixtures = async () => {
     },
     GivenSpecDatFileWithoutColumn: (columnToRemove: string) => {
       let columnToRemoveIndex = -1;
-      const wrongHeaders = headers
-        .split('\t')
-        .filter((column, index) => {
-          columnToRemoveIndex = index;
-          return column !== columnToRemove;
-        })
-        .join('\t');
+      const wrongHeaders =
+        headers
+          .replace('\n', '')
+          .split('\t')
+          .filter((column, index) => {
+            if (column === columnToRemove) {
+              columnToRemoveIndex = index;
+              return false;
+            }
+            return true;
+          })
+          .join('\t') + '\n';
 
-      let row = getValidRow();
-      if (columnToRemoveIndex !== -1)
-        row = row.split('\t').splice(columnToRemoveIndex, 1).join('\t');
+      let row = getValidRow().split('\t');
+      if (columnToRemoveIndex !== -1) row.splice(columnToRemoveIndex, 1);
 
-      return Readable.from(wrongHeaders + row);
+      return Readable.from(wrongHeaders + row.join('\t'));
     },
     GivenSpecDatFileWithTargetColumn: () => {
       const wrongHeaders = headers.replace('\n', '') + '\ttarget\n';
