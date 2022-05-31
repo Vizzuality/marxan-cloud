@@ -23,7 +23,7 @@ export class PuvsprDatService {
       amount: number;
     }[] = await this.connection.query(
       `
-        select pu.scenario_id as scenario_id, puid as pu_id, feature_id, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410)) as amount
+        select pu.scenario_id as scenario_id, puid as pu_id, feature_id, COALESCE(sfd.amount_from_legacy_project, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410))) as amount
         from
         (
             select st_union(the_geom) as the_geom, min(sfd.feature_id) as feature_id
