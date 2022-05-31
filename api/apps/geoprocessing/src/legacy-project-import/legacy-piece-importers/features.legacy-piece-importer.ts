@@ -9,7 +9,7 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { DeepPartial, EntityManager, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   LegacyProjectImportPieceProcessor,
@@ -26,7 +26,6 @@ import {
   PuvrsprDatRow,
   PuvsprDatReader,
 } from './file-readers/puvspr-dat.reader';
-import { Geometry } from 'geojson';
 import { FeatureTag } from '@marxan/features';
 import { JobStatus } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 
@@ -51,8 +50,6 @@ export class FeaturesLegacyProjectPieceImporter
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    @InjectRepository(ProjectsPuEntity)
-    private readonly projectPusRepo: Repository<ProjectsPuEntity>,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(FeaturesLegacyProjectPieceImporter.name);
@@ -114,6 +111,7 @@ export class FeaturesLegacyProjectPieceImporter
           properties: {
             name: feature.feature_class_name,
             featureId: feature.featureIntegerId,
+            puid: filteredRow.pu,
           },
         });
       });
