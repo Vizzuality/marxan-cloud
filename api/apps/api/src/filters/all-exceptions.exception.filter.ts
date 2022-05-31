@@ -32,6 +32,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
+        : exception.name === 'PayloadTooLargeError'
+        ? HttpStatus.PAYLOAD_TOO_LARGE
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     /**
