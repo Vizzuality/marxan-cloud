@@ -8,7 +8,10 @@ import {
   SpecDatRow,
 } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/spec-dat.reader';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   LegacyProjectImportFilesMemoryRepository,
@@ -156,7 +159,7 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     });
     await fixtures.GivenProjectExist();
     fixtures.GivenValidSpecDatFile();
-    await fixtures.GivenValidPuvsprDatFile();
+    fixtures.GivenValidPuvsprDatFile();
 
     await fixtures
       .WhenPieceImporterIsInvoked(job)
@@ -204,6 +207,7 @@ const getFixtures = async () => {
   const organizationId = v4();
   const projectId = v4();
   const scenarioId = v4();
+  const amountOfFeatures = 4;
   const amountOfPlanningUnits = 4;
 
   const sut = sandbox.get(FeaturesLegacyProjectPieceImporter);
@@ -226,8 +230,23 @@ const getFixtures = async () => {
   const readOperationError = (file: LegacyProjectImportFileType) =>
     `error reading ${file} file`;
 
-  const getfeaturesWithPuids = () => {
-    const [firstFeature, secondFeature, thirdFeature, fourthFeature] = Array(4)
+  const findProjectFeaturesIds = async (): Promise<string[]> => {
+    const result: {
+      id: string;
+    }[] = await apiEntityManager
+      .createQueryBuilder()
+      .select('id')
+      .from('features', 'f')
+      .where('project_id = :projectId', { projectId })
+      .execute();
+
+    return result.map(({ id }) => id);
+  };
+
+  const getfeaturesWithPuids = (pus: ProjectsPuEntity[]) => {
+    const [firstFeature, secondFeature, thirdFeature, fourthFeature] = Array(
+      amountOfFeatures,
+    )
       .fill('')
       .map<{ id: number; name: string; prop: number; puids: number[] }>(
         (_, index) => ({
@@ -237,32 +256,30 @@ const getFixtures = async () => {
           puids: [],
         }),
       );
-
-    firstFeature.puids.push(...[1, 2]);
-    secondFeature.puids.push(2);
-    thirdFeature.puids.push(...[1, 2, 3, 4]);
-    fourthFeature.puids.push(...[3, 4]);
+    const puids = pus.map(({ puid }) => puid);
+    firstFeature.puids.push(...[puids[0], puids[amountOfPlanningUnits - 1]]);
+    secondFeature.puids.push(puids[amountOfPlanningUnits - 1]);
+    thirdFeature.puids.push(...puids);
+    fourthFeature.puids.push(puids[0]);
 
     return [firstFeature, secondFeature, thirdFeature, fourthFeature];
   };
+
+  const pus = await GivenProjectPus(
+    geoEntityManager,
+    projectId,
+    amountOfPlanningUnits,
+  );
 
   return {
     cleanUp: async () => {
       await DeleteProjectPus(geoEntityManager, projectId);
 
-      const features: {
-        id: string;
-      }[] = await apiEntityManager
-        .createQueryBuilder()
-        .select('id')
-        .from('features', 'f')
-        .where('project_id = :projectId', { projectId })
-        .execute();
+      const featuresIds = await findProjectFeaturesIds();
 
-      const featuresIds = features.map(({ id }) => id);
       await DeleteFeatures(apiEntityManager, featuresIds);
 
-      await featuresDataRepo.delete({ id: In(featuresIds) });
+      await featuresDataRepo.delete({ featureId: In(featuresIds) });
 
       await DeleteProjectAndOrganization(
         apiEntityManager,
@@ -318,7 +335,7 @@ const getFixtures = async () => {
       return result.right;
     },
     GivenValidSpecDatFile: () => {
-      const specRows = getfeaturesWithPuids().map(
+      const specRows = getfeaturesWithPuids(pus).map(
         ({ puids, ...feature }) => feature,
       );
       fakeSpecDatReader.readOperationResult = right(specRows);
@@ -328,13 +345,8 @@ const getFixtures = async () => {
         readOperationError(specDatFileType),
       );
     },
-    GivenValidPuvsprDatFile: async () => {
-      const pus = await GivenProjectPus(
-        geoEntityManager,
-        projectId,
-        amountOfPlanningUnits,
-      );
-      const featuresWithPuids = getfeaturesWithPuids();
+    GivenValidPuvsprDatFile: () => {
+      const featuresWithPuids = getfeaturesWithPuids(pus);
 
       const puvsprRows = featuresWithPuids.flatMap(({ id, puids }) => {
         return puids.map((puid) => ({
@@ -387,6 +399,23 @@ const getFixtures = async () => {
           const result = await sut.run(input);
 
           expect(result).toBeDefined();
+
+          const insertedFeaturesIds = await findProjectFeaturesIds();
+
+          expect(insertedFeaturesIds).toHaveLength(amountOfFeatures);
+
+          const amountOfFeaturesData = getfeaturesWithPuids(pus).reduce<number>(
+            (prev, { puids }) => {
+              const featurePuids = puids.length;
+              return prev + featurePuids;
+            },
+            0,
+          );
+          const insertedFeaturesData = await featuresDataRepo.find({
+            featureId: In(insertedFeaturesIds),
+          });
+
+          expect(insertedFeaturesData).toHaveLength(amountOfFeaturesData);
         },
       };
     },

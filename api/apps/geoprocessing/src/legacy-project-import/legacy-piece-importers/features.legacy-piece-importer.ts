@@ -15,7 +15,10 @@ import {
   LegacyProjectImportPieceProcessor,
   LegacyProjectImportPieceProcessorProvider,
 } from '../pieces/legacy-project-import-piece-processor';
-import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { chunk } from 'lodash';
 import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
@@ -57,14 +60,22 @@ export class FeaturesLegacyProjectPieceImporter
 
   private async getProjectPusGeomsMap(
     projectId: string,
-  ): Promise<Record<number, Geometry>> {
-    const projectPus = await this.projectPusRepo.find({
-      where: { projectId },
-      relations: ['puGeom'],
-    });
-    const projectPuIdByPuid: Record<number, Geometry> = {};
-    projectPus.forEach((pu) => {
-      projectPuIdByPuid[pu.puid] = pu.puGeom.theGeom;
+  ): Promise<Record<number, string>> {
+    const projectPus: {
+      puid: number;
+      theGeom: string;
+    }[] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select(['puid'])
+      .addSelect('pugs.the_geom', 'theGeom')
+      .from(ProjectsPuEntity, 'ppus')
+      .innerJoin(PlanningUnitsGeom, 'pugs', 'pugs.id = ppus.geom_id')
+      .where('ppus.project_id = :projectId', { projectId })
+      .execute();
+
+    const projectPuIdByPuid: Record<number, string> = {};
+    projectPus.forEach(({ puid, theGeom }) => {
+      projectPuIdByPuid[puid] = theGeom;
     });
 
     return projectPuIdByPuid;
@@ -73,9 +84,14 @@ export class FeaturesLegacyProjectPieceImporter
   private getFeaturesDataInsertValues(
     features: FeaturesData[],
     puvsprDatRows: PuvrsprDatRow[],
-    projectPusGeomsMap: Record<number, Geometry>,
+    projectPusGeomsMap: Record<number, string>,
   ) {
-    const featuresDataInsertValues: DeepPartial<GeoFeatureGeometry>[] = [];
+    const featuresDataInsertValues: {
+      id: string;
+      featureId: string;
+      theGeom: string;
+      properties: Record<string, string | number>;
+    }[] = [];
     const nonExistingPus: number[] = [];
 
     features.forEach(async (feature) => {
@@ -205,7 +221,6 @@ export class FeaturesLegacyProjectPieceImporter
               .execute(),
         ),
       );
-
       const {
         featuresDataInsertValues,
         nonExistingPus,
@@ -224,7 +239,11 @@ export class FeaturesLegacyProjectPieceImporter
             .createQueryBuilder()
             .insert()
             .into(GeoFeatureGeometry)
-            .values(values)
+            .values(
+              values.map(({ theGeom, ...feature }) => {
+                return { theGeom: () => `'${theGeom}'`, ...feature };
+              }),
+            )
             .execute(),
         ),
       );
