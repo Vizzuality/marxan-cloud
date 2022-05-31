@@ -66,6 +66,7 @@ export class FeatureService {
 
   /**
    * @todo get attributes from Entity, based on user selection
+   * @todo simplification level based on zoom level
    */
   public findTile(
     tileSpecification: TileSpecification,
@@ -73,7 +74,7 @@ export class FeatureService {
   ): Promise<Buffer> {
     const { z, x, y, id } = tileSpecification;
     const attributes = 'feature_id, properties';
-    const table = `(select (st_dump(the_geom)).geom as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
+    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, 0.1) as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
     const customQuery = this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({
       z,
@@ -84,4 +85,5 @@ export class FeatureService {
       attributes,
     });
   }
+
 }
