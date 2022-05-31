@@ -47,9 +47,15 @@ variable "container_registry_name" {
 variable "key_vault_access_users" {
   type        = list(string)
   description = "The names of the users to grant access to the secrets"
+  default = [ ] # if this is not here, terraform apply will fail. Why?
 }
 
 variable "key_vault_name_prefix" {
   type        = string
   description = "The prefix to use for the key vault names. KV names must be globally unique."
+}
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
 }

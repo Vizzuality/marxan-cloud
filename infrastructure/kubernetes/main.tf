@@ -79,6 +79,12 @@ module "key_vault_production" {
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
   key_vault_name_prefix  = var.key_vault_name_prefix
+  project_tags = merge(
+    var.project_tags,
+    {
+      Environment = "PRD"
+    },
+  )
 }
 
 module "k8s_api_database_production" {
@@ -214,6 +220,12 @@ module "key_vault_staging" {
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
   key_vault_name_prefix  = var.key_vault_name_prefix
+  project_tags = merge(
+    var.project_tags,
+    {
+      Environment = "STG"
+    },
+  )
 }
 
 module "k8s_api_database_staging" {

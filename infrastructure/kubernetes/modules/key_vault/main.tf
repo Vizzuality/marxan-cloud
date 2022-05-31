@@ -5,18 +5,22 @@ data "azuread_users" "users" {
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  name                       = "${title(var.key_vault_name_prefix)}${title(var.namespace)}"
+  name                       = "${title(var.key_vault_name_prefix)}${title(var.namespace)}" # This is the kv name. (eg: TncMarxanKvProduction,TncMarxanKvStaging)
   location                   = var.resource_group.location
   resource_group_name        = var.resource_group.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "standard"
   soft_delete_retention_days = 7
 
+  tags = var.project_tags
+
   dynamic "access_policy" {
     for_each = distinct(concat([data.azurerm_client_config.current.object_id], data.azuread_users.users.object_ids))
     content {
       tenant_id = data.azurerm_client_config.current.tenant_id
+      #object_id = data.azurerm_client_config.current.object_id # didn't work
       object_id = access_policy.value
+      #application_id = data.azurerm_client_config.current.client_id
 
       secret_permissions = [
         "Set",
