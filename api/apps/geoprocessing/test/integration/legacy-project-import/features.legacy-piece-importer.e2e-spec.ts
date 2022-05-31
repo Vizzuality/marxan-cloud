@@ -243,6 +243,8 @@ const getFixtures = async () => {
     return result.map(({ id }) => id);
   };
 
+  const nonExistingPuid = 1000;
+
   const getfeaturesWithPuids = (pus: ProjectsPuEntity[]) => {
     const [firstFeature, secondFeature, thirdFeature, fourthFeature] = Array(
       amountOfFeatures,
@@ -260,7 +262,7 @@ const getFixtures = async () => {
     firstFeature.puids.push(...[puids[0], puids[amountOfPlanningUnits - 1]]);
     secondFeature.puids.push(puids[amountOfPlanningUnits - 1]);
     thirdFeature.puids.push(...puids);
-    fourthFeature.puids.push(puids[0]);
+    fourthFeature.puids.push(puids[0], nonExistingPuid);
 
     return [firstFeature, secondFeature, thirdFeature, fourthFeature];
   };
@@ -400,22 +402,24 @@ const getFixtures = async () => {
 
           expect(result).toBeDefined();
 
+          expect(result.warnings).toHaveLength(1);
+          expect(result.warnings![0]).toContain(nonExistingPuid);
+
           const insertedFeaturesIds = await findProjectFeaturesIds();
 
           expect(insertedFeaturesIds).toHaveLength(amountOfFeatures);
 
-          const amountOfFeaturesData = getfeaturesWithPuids(pus).reduce<number>(
-            (prev, { puids }) => {
-              const featurePuids = puids.length;
-              return prev + featurePuids;
-            },
-            0,
-          );
+          const amountOfNonExistingPuids = 1;
+          const amountOfFeaturesData = getfeaturesWithPuids(pus).flatMap(
+            (pu) => pu.puids,
+          ).length;
           const insertedFeaturesData = await featuresDataRepo.find({
             featureId: In(insertedFeaturesIds),
           });
 
-          expect(insertedFeaturesData).toHaveLength(amountOfFeaturesData);
+          expect(insertedFeaturesData).toHaveLength(
+            amountOfFeaturesData - amountOfNonExistingPuids,
+          );
         },
       };
     },

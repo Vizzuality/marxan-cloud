@@ -1,5 +1,12 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { JobStatus } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
+import { FeatureTag } from '@marxan/features';
+import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
+import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportFileType,
   LegacyProjectImportJobInput,
@@ -7,8 +14,9 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
@@ -16,18 +24,10 @@ import {
   LegacyProjectImportPieceProcessorProvider,
 } from '../pieces/legacy-project-import-piece-processor';
 import {
-  PlanningUnitsGeom,
-  ProjectsPuEntity,
-} from '@marxan-jobs/planning-unit-geometry';
-import { GeoFeatureGeometry } from '@marxan/geofeatures';
-import { chunk } from 'lodash';
-import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
-import {
   PuvrsprDatRow,
   PuvsprDatReader,
 } from './file-readers/puvspr-dat.reader';
-import { FeatureTag } from '@marxan/features';
-import { JobStatus } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
+import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
 
 type FeaturesData = Omit<SpecDatRow, 'id'> & {
   id: string;
@@ -88,6 +88,7 @@ export class FeaturesLegacyProjectPieceImporter
       featureId: string;
       theGeom: string;
       properties: Record<string, string | number>;
+      source: GeometrySource;
     }[] = [];
     const nonExistingPus: number[] = [];
 
@@ -113,6 +114,7 @@ export class FeaturesLegacyProjectPieceImporter
             featureId: feature.featureIntegerId,
             puid: filteredRow.pu,
           },
+          source: GeometrySource.user_imported,
         });
       });
     });
@@ -133,17 +135,15 @@ export class FeaturesLegacyProjectPieceImporter
       (file) => file.type === LegacyProjectImportFileType.SpecDat,
     );
 
-    if (!specFeaturesFileOrError) {
+    if (!specFeaturesFileOrError)
       throw new Error('spec.dat file not found inside input file array');
-    }
 
     const specFileReadableOrError = await this.filesRepo.get(
       specFeaturesFileOrError.location,
     );
 
-    if (isLeft(specFileReadableOrError)) {
+    if (isLeft(specFileReadableOrError))
       throw new Error('spec.dat file not found in files repo');
-    }
 
     const specDatRowsOrError = await this.specDatReader.readFile(
       specFileReadableOrError.right,
@@ -157,17 +157,16 @@ export class FeaturesLegacyProjectPieceImporter
       (file) => file.type === LegacyProjectImportFileType.PuvsprDat,
     );
 
-    if (!puvsprFeaturesFileOrError) {
+    if (!puvsprFeaturesFileOrError)
       throw new Error('puvspr.dat file not found inside input file array');
-    }
 
     const puvsprFileReadableOrError = await this.filesRepo.get(
       puvsprFeaturesFileOrError.location,
     );
 
-    if (isLeft(puvsprFileReadableOrError)) {
+    if (isLeft(puvsprFileReadableOrError))
       throw new Error('The puvspr.dat file not found in files repo');
-    }
+
     const puvsprDatRowsOrError = await this.puvsprDatReader.readFile(
       puvsprFileReadableOrError.right,
     );
@@ -179,74 +178,74 @@ export class FeaturesLegacyProjectPieceImporter
 
     const projectPusGeomsMap = await this.getProjectPusGeomsMap(projectId);
 
-    await this.apiEntityManager.transaction(async (apiEm) => {
-      const featuresInsertValues = specDatRows.map((feature) => {
-        const featureId = v4();
+    const nonExistingPus = await this.apiEntityManager.transaction(
+      async (apiEm) => {
+        const featuresInsertValues = specDatRows.map((feature) => {
+          const featureId = v4();
 
-        return {
-          ...feature,
-          project_id: projectId,
-          featureIntegerId: feature.id,
-          id: featureId,
-          feature_class_name: feature.name,
-          //Should we set these to others value?
-          tag: FeatureTag.Species,
-          creation_status: JobStatus.created,
-        };
-      });
+          return {
+            ...feature,
+            project_id: projectId,
+            featureIntegerId: feature.id,
+            id: featureId,
+            feature_class_name: feature.name,
+            tag: FeatureTag.Species,
+            creation_status: JobStatus.created,
+          };
+        });
 
-      await Promise.all(
-        featuresInsertValues.map(
-          ({
-            id,
-            feature_class_name,
-            project_id,
-            tag,
-            creation_status,
-            ...rest
-          }) =>
-            apiEm
+        await Promise.all(
+          featuresInsertValues.map(
+            ({ id, feature_class_name, project_id, tag, creation_status }) =>
+              apiEm
+                .createQueryBuilder()
+                .insert()
+                .into('features')
+                .values({
+                  id,
+                  feature_class_name,
+                  project_id,
+                  tag,
+                  creation_status,
+                })
+                .execute(),
+          ),
+        );
+
+        const {
+          featuresDataInsertValues,
+          nonExistingPus,
+        } = this.getFeaturesDataInsertValues(
+          featuresInsertValues,
+          puvsprDatRows,
+          projectPusGeomsMap,
+        );
+
+        const chunkSize = 1000;
+        await Promise.all(
+          chunk(featuresDataInsertValues, chunkSize).map((values) =>
+            this.geoprocessingEntityManager
               .createQueryBuilder()
               .insert()
-              .into('features')
-              .values({
-                id,
-                feature_class_name,
-                project_id,
-                tag,
-                creation_status,
-              })
+              .into(GeoFeatureGeometry)
+              .values(
+                values.map(({ theGeom, ...feature }) => {
+                  return { theGeom: () => `'${theGeom}'`, ...feature };
+                }),
+              )
               .execute(),
-        ),
-      );
-      const {
-        featuresDataInsertValues,
-        nonExistingPus,
-      } = this.getFeaturesDataInsertValues(
-        featuresInsertValues,
-        puvsprDatRows,
-        projectPusGeomsMap,
-      );
+          ),
+        );
 
-      //TODO What should we do with noxExistingPus
+        return nonExistingPus;
+      },
+    );
 
-      const chunkSize = 1000;
-      await Promise.all(
-        chunk(featuresDataInsertValues, chunkSize).map((values) =>
-          this.geoprocessingEntityManager
-            .createQueryBuilder()
-            .insert()
-            .into(GeoFeatureGeometry)
-            .values(
-              values.map(({ theGeom, ...feature }) => {
-                return { theGeom: () => `'${theGeom}'`, ...feature };
-              }),
-            )
-            .execute(),
-        ),
-      );
-    });
-
-    return input;
+    return {
+      ...input,
+      warnings: nonExistingPus.length
+        ? [`puvspr.dat contains unknown puids: ${nonExistingPus.join(', ')}`]
+        : undefined,
+    };
   }
 }
