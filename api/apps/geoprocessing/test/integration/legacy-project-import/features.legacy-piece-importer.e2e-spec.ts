@@ -140,6 +140,46 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       .ThenADatFileReadOperationErrorShouldBeThrown(puvsprDatFileType);
   });
 
+  it('fails if spec.dat file contains duplicate feature ids', async () => {
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.SpecDat,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenSpecDatFileWithDuplicateFeatureIds();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADuplicateFeatureIdsErrorShouldBeThrown();
+  });
+
+  it('fails if spec.dat file contains duplicate feature names', async () => {
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.SpecDat,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenSpecDatFileWithDuplicateFeatureNames();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADuplicateFeatureNamesErrorShouldBeThrown();
+  });
+
   it('imports successfully scenario pus data and scenario pus cost data', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
@@ -347,6 +387,18 @@ const getFixtures = async () => {
       );
       fakeSpecDatReader.readOperationResult = right(specRows);
     },
+    GivenSpecDatFileWithDuplicateFeatureIds: () => {
+      fakeSpecDatReader.readOperationResult = right([
+        { id: 1, prop: 0.1, name: 'first' },
+        { id: 1, prop: 0.5, name: 'second' },
+      ]);
+    },
+    GivenSpecDatFileWithDuplicateFeatureNames: () => {
+      fakeSpecDatReader.readOperationResult = right([
+        { id: 1, prop: 0.1, name: 'first' },
+        { id: 2, prop: 0.5, name: 'first' },
+      ]);
+    },
     GivenInvalidSpecDatFile: () => {
       fakeSpecDatReader.readOperationResult = left(
         readOperationError(specDatFileType),
@@ -392,14 +444,14 @@ const getFixtures = async () => {
             readOperationError(file),
           );
         },
-        ThenADuplicatePuidsErrorShouldBeThrown: async () => {
+        ThenADuplicateFeatureIdsErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /pu.dat file contains rows with the same puid/gi,
+            /spec.dat contains duplicate feature ids/gi,
           );
         },
-        ThenAMissingPlanningUnitsDataErrorShouldBeThrown: async () => {
+        ThenADuplicateFeatureNamesErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /pu.dat file is missing planning units data/gi,
+            /spec.dat contains duplicate feature names/gi,
           );
         },
         ThenFeatureAndFeaturesDataShouldBeImported: async () => {
