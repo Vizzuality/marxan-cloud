@@ -37,7 +37,12 @@ export class PuvsprDatService {
             inner join projects_pu ppu on pug.id = ppu.geom_id
             inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
             where spd.scenario_id = $1 order by ppu.puid asc
-        ) pu
+        ) pu,
+        (
+          select amount_from_legacy_project
+          from scenario_features_data sfd
+          where sfd.scenario_id = $1
+        ) sfd
         where pu.scenario_id = $1 and species.the_geom && pu.the_geom
         order by puid, feature_id asc;
       `,
