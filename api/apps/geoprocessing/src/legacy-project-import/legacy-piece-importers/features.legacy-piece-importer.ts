@@ -27,15 +27,12 @@ import {
   PuvrsprDatRow,
   PuvsprDatReader,
 } from './file-readers/puvspr-dat.reader';
-import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
+import { SpecDatReader } from './file-readers/spec-dat.reader';
 
-type FeaturesData = Omit<SpecDatRow, 'id'> & {
+type FeaturesData = {
   id: string;
-  project_id: string;
   featureIntegerId: number;
   feature_class_name: string;
-  tag: string;
-  creation_status: JobStatus;
 };
 
 @Injectable()
@@ -186,45 +183,45 @@ export class FeaturesLegacyProjectPieceImporter
 
     const projectPusGeomsMap = await this.getProjectPusGeomsMap(projectId);
 
+    const featureUuidByNumericId: Record<number, string> = {};
     const nonExistingPus = await this.apiEntityManager.transaction(
       async (apiEm) => {
         const featuresInsertValues = specDatRows.map((feature) => {
           const featureId = v4();
+          featureUuidByNumericId[feature.id] = featureId;
 
           return {
-            ...feature,
             project_id: projectId,
-            featureIntegerId: feature.id,
             id: featureId,
             feature_class_name: feature.name,
             tag: FeatureTag.Species,
             creation_status: JobStatus.created,
+            created_by: input.ownerId,
           };
         });
 
         await Promise.all(
-          featuresInsertValues.map(
-            ({ id, feature_class_name, project_id, tag, creation_status }) =>
-              apiEm
-                .createQueryBuilder()
-                .insert()
-                .into('features')
-                .values({
-                  id,
-                  feature_class_name,
-                  project_id,
-                  tag,
-                  creation_status,
-                })
-                .execute(),
+          featuresInsertValues.map((value) =>
+            apiEm
+              .createQueryBuilder()
+              .insert()
+              .into('features')
+              .values(value)
+              .execute(),
           ),
         );
+
+        const featuresData = specDatRows.map((row) => ({
+          id: featureUuidByNumericId[row.id],
+          featureIntegerId: row.id,
+          feature_class_name: row.name,
+        }));
 
         const {
           featuresDataInsertValues,
           nonExistingPus,
         } = this.getFeaturesDataInsertValues(
-          featuresInsertValues,
+          featuresData,
           puvsprDatRows,
           projectPusGeomsMap,
         );

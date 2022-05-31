@@ -8,10 +8,7 @@ import {
   SpecDatRow,
 } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/spec-dat.reader';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import {
-  PlanningUnitsGeom,
-  ProjectsPuEntity,
-} from '@marxan-jobs/planning-unit-geometry';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   LegacyProjectImportFilesMemoryRepository,
@@ -20,7 +17,6 @@ import {
   LegacyProjectImportJobInput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -37,8 +33,10 @@ import {
   DeleteFeatures,
   DeleteProjectAndOrganization,
   DeleteProjectPus,
+  DeleteUser,
   GivenProjectExists,
   GivenProjectPus,
+  GivenUserExists,
 } from '../cloning/fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -146,6 +144,7 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
+    await fixtures.GivenUserExists();
     const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
       specDatFileType,
     );
@@ -207,6 +206,7 @@ const getFixtures = async () => {
   const organizationId = v4();
   const projectId = v4();
   const scenarioId = v4();
+  const ownerId = v4();
   const amountOfFeatures = 4;
   const amountOfPlanningUnits = 4;
 
@@ -288,7 +288,11 @@ const getFixtures = async () => {
         projectId,
         organizationId,
       );
+
+      await DeleteUser(apiEntityManager, ownerId);
     },
+    GivenUserExists: () =>
+      GivenUserExists(apiEntityManager, ownerId, projectId),
     GivenJobInput: ({
       specDatFileLocation,
       puvsprDatFileLocation,
@@ -318,6 +322,7 @@ const getFixtures = async () => {
         pieceId: v4(),
         projectId,
         scenarioId,
+        ownerId,
       };
     },
     GivenProjectExist: async () =>

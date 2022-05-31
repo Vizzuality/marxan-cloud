@@ -204,6 +204,7 @@ const getFixtures = async () => {
         pieceId: v4(),
         projectId,
         scenarioId,
+        ownerId: v4(),
       };
     },
     GivenUser: () => {},
