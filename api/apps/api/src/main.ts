@@ -2,7 +2,7 @@ import { bootstrapSetUp } from '@marxan-api/bootstrap-app';
 import { addSwagger } from '@marxan-api/add-swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { json, NextFunction, Request, Response } from 'express';
+import { json } from 'express';
 import { complexGeometry } from './modules/uploads';
 import * as cookieParser from 'cookie-parser';
 
@@ -25,15 +25,6 @@ export async function bootstrap() {
   );
   // For everything else, stick to the default
   app.use(json({ limit: '100kb' }));
-  app.use(
-    (err: ErrorEvent, req: Request, res: Response, next: NextFunction) => {
-      if (err.type === 'entity.too.large') {
-        res.status(400).send('Body size too large!');
-      } else {
-        next();
-      }
-    },
-  );
 
   app.use(cookieParser());
 
