@@ -43,6 +43,12 @@ it('fails when spec.dat contains target colum', async () => {
   );
 });
 
+it('fails when spec.dat contains empty names', async () => {
+  const file = fixtures.GivenAnInvalidSpecDatFile({ name: '' });
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenSpecDatReadOperationFails(result, /invalid empty name/gi);
+});
+
 it('fails when spec.dat contains non integer feature ids', async () => {
   const file = fixtures.GivenAnInvalidSpecDatFile({ id: 'invalid id' });
   const result = await fixtures.WhenExecutingSpecDatReader(file);

@@ -29,6 +29,7 @@ export type SpecDatRow = {
 export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
   validateData({
     id,
+    name,
     prop,
     spf,
     target2,
@@ -42,6 +43,10 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
       isNumber(value) && Number.isInteger(value);
 
     const checks: ValidationCheck[] = [
+      {
+        result: name.length === 0,
+        errorMessage: 'Invalid empty name',
+      },
       {
         result: !isInteger(id),
         errorMessage: 'Invalid non integer feature id',
