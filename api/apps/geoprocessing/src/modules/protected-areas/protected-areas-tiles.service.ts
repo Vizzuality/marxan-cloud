@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brackets, Repository } from 'typeorm';
-import { nominatim2bbox, antimeridianBbox } from '@marxan/utils/geo/bbox';
+import { nominatim2bbox, antimeridianBbox } from '@marxan/utils/geo';
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { ProtectedArea } from '@marxan/protected-areas';

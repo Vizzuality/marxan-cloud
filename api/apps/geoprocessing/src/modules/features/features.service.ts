@@ -7,7 +7,7 @@ import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
-import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo/bbox';
+import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
 
 import { TileRequest } from '@marxan/tiles';
 

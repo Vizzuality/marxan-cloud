@@ -1,5 +1,5 @@
 import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
-import { nominatim2bbox, antimeridianBbox } from '@marxan/utils/geo/bbox';
+import { nominatim2bbox, antimeridianBbox } from '@marxan/utils/geo';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { TileRequest } from '@marxan/tiles';
 import { Inject, Injectable, Logger } from '@nestjs/common';

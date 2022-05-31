@@ -10,7 +10,7 @@ import { GeoFeature } from './geo-feature.api.entity';
 import { GeoFeaturePropertySet } from './geo-feature.geo.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { BBox } from 'geojson';
-import { antimeridianBbox } from '@marxan/utils/geo/bbox';
+import { antimeridianBbox } from '@marxan/utils/geo';
 
 @Injectable()
 export class GeoFeaturePropertySetService {
