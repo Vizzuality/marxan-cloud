@@ -12,6 +12,7 @@ import { omit } from 'lodash';
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Response } from 'express';
 import { AppConfig } from '../utils/config.utils';
+import { HttpError } from 'http-errors';
 
 /**
  * Catch-all exception filter. Output error data to logs, and send it as
@@ -24,7 +25,11 @@ import { AppConfig } from '../utils/config.utils';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger();
 
-  catch(exception: Error, host: ArgumentsHost) {
+  private isHttpError(exception: Error | HttpError): exception is HttpError {
+    return exception instanceof HttpError;
+  }
+
+  catch(exception: Error | HttpError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response: Response = ctx.getResponse();
     const request = ctx.getRequest();
@@ -32,8 +37,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
-        : exception.name === 'PayloadTooLargeError'
-        ? HttpStatus.PAYLOAD_TOO_LARGE
+        : this.isHttpError(exception)
+        ? exception.statusCode
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     /**
