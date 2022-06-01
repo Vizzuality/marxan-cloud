@@ -15,13 +15,18 @@ import { defaultSrid } from '@marxan/utils/geo';
 export enum AdminLevel {
   Country = 'country',
   Adm1 = 'adm_1',
-  Amd2 = 'adm_2',
+  Adm2 = 'adm_2',
+  Eez = 'eez',
 }
 
 export const adminAreaTableName = 'admin_regions' as const;
 // property names, not db names in indexes: https://github.com/typeorm/typeorm/issues/930
 @Entity(adminAreaTableName)
-@Index('admin_regions_l012_ids', ['gid0', 'gid1', 'gid2', 'level'])
+@Index('admin_regions_l012_ids', ['gid0', 'gid1', 'gid2', 'mrgidEez', 'level'])
+@Index('unique_eez_regions', ['mrgidEez', 'level'], {
+  unique: true,
+  where: "level = 'eez'::adm_level",
+})
 @Index('unique_l2_regions', ['gid2', 'level'], {
   unique: true,
   where: "level = 'adm_2'::adm_level",
@@ -70,6 +75,14 @@ export class AdminArea {
   @ApiPropertyOptional()
   @Column('character varying', { name: 'name_2', nullable: true })
   name2?: string | null;
+
+  @ApiPropertyOptional()
+  @Column('character varying', { name: 'pol_type', nullable: true })
+  polType?: string | null;
+
+  @ApiPropertyOptional()
+  @Column('integer', { name: 'mrgid_eez', nullable: true })
+  mrgidEez?: BigInteger | null;
 
   @ApiPropertyOptional()
   @Column('character varying', {
