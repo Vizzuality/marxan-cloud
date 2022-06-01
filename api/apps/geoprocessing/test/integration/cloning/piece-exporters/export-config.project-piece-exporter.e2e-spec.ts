@@ -96,7 +96,7 @@ const getFixtures = async () => {
   const getExpectedContent = (
     options: FixtureOptions,
   ): ProjectExportConfigContent => {
-    let scenarios: Record<string, ClonePiece[]> = {};
+    const scenarios: Record<string, ClonePiece[]> = {};
     if (options.projectWithScenario)
       scenarios[scenarioId] = [ClonePiece.ScenarioMetadata];
     return {
