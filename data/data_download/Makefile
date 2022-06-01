@@ -8,7 +8,7 @@ seed-gadm:
 	@time $(MAKE) -C ./gadm_3.6 import
 
 seed-eez:
-	@echo "Starting seeding gadm data... "
+	@echo "Starting seeding EEZ data... "
 	@time $(MAKE) -C ./eez import
 
 seed-wdpa:
