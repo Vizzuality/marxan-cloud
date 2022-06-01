@@ -25,7 +25,7 @@ import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger();
 
-  private isHttpError(exception: Error | HttpError): exception is HttpError {
+  private isHttpError(exception: Error): exception is HttpError {
     return exception instanceof HttpError;
   }
 
