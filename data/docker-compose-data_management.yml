@@ -6,6 +6,7 @@ services:
         dockerfile: Dockerfile
     volumes:
     - './data/seed/gadm_3.6/:/gadm_3.6/data/'
+    - './data/seed/eez/:/eez/data/'
     - './data/seed/wdpa/:/wdpa/data/'
     - './data/seed/iucn/:/iucn/data/'
     - './data/seed/world_terrestrial_ecosystems/:/world_terrestrial_ecosystems/data/'

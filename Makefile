@@ -115,7 +115,8 @@ generate-geo-test-data: extract-geo-test-data
 # This will delete all existing data and create tables/views/etc. through the migrations that
 # run when starting up the API service.
 # if you want to test or run an individual pipe please do like this:
-# docker-compose --project-name marxan-cloud -f ./data/docker-compose-data_management.yml run marxan-seed-data make seed-eez
+# docker-compose -p marxan-cloud -f ./data/docker-compose-data_management.yml up --no-start --build marxan-seed-data marxan-seed-data
+# docker-compose -p marxan-cloud -f ./data/docker-compose-data_management.yml run marxan-seed-data make seed-eez
 # Also, be sure to create a user before importing the geodata, otherwise it will fail with an
 # unrelated error message
 seed-geodb-data:
