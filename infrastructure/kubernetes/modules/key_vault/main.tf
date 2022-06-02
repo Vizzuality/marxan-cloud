@@ -15,20 +15,21 @@ resource "azurerm_key_vault" "key_vault" {
   tags = var.project_tags
 
   dynamic "access_policy" {
-    for_each = distinct(concat([data.azurerm_client_config.current.object_id], data.azuread_users.users.object_ids))
+    for_each = distinct(concat(data.azuread_users.users.object_ids, [data.azurerm_client_config.current.object_id]))
     content {
       tenant_id = data.azurerm_client_config.current.tenant_id
-      #object_id = data.azurerm_client_config.current.object_id # didn't work
       object_id = access_policy.value
-      #application_id = data.azurerm_client_config.current.client_id
 
       secret_permissions = [
         "Set",
         "Get",
         "List",
-        "Delete",
-        "Purge",
-        "Recover"
+        "Delete"
+      ]
+
+      certificate_permissions = [
+        "List",
+        "ManageContacts"
       ]
     }
   }

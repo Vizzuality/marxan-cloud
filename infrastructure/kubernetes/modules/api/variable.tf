@@ -18,7 +18,6 @@ variable "k8s_cluster_ca_certificate" {
   type        = string
 }
 
-
 variable "image" {
   type        = string
   description = "The dockerhub image reference to deploy"
