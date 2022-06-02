@@ -62,6 +62,7 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
       typeof value === 'number' && !Number.isNaN(value);
     const isInteger = (value: unknown) =>
       isNumber(value) && Number.isInteger(value);
+    const isDefined = (value: unknown) => value !== undefined && value !== null;
 
     const checks: ValidationCheck[] = [
       {
@@ -100,43 +101,44 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
         errorMessage: 'Negative target value',
       },
       {
-        result: !isNumber(spf),
+        result: isDefined(spf) && !isNumber(spf),
         errorMessage: 'Non number spf value',
       },
       {
-        result: isNumber(spf) && spf < 0,
+        result: isDefined(spf) && isNumber(spf) && spf < 0,
         errorMessage: 'Negative spf value',
       },
       {
-        result: !isNumber(target2),
+        result: isDefined(target2) && !isNumber(target2),
         errorMessage: 'Non number target2 value',
       },
       {
-        result: isNumber(target2) && target2 < 0,
+        result: isDefined(target2) && isNumber(target2) && target2 < 0,
         errorMessage: 'Negative target2 value',
       },
       {
-        result: !isNumber(targetocc),
+        result: isDefined(targetocc) && !isNumber(targetocc),
         errorMessage: 'Non number targetocc value',
       },
       {
-        result: isNumber(targetocc) && targetocc < 0,
+        result: isDefined(targetocc) && isNumber(targetocc) && targetocc < 0,
         errorMessage: 'Negative targetocc value',
       },
       {
-        result: !isNumber(sepnum),
+        result: isDefined(sepnum) && !isNumber(sepnum),
         errorMessage: 'Non number sepnum value',
       },
       {
-        result: isNumber(sepnum) && sepnum < 0,
+        result: isDefined(sepnum) && isNumber(sepnum) && sepnum < 0,
         errorMessage: 'Negative sepnum value',
       },
       {
-        result: !isNumber(sepdistance),
+        result: isDefined(sepdistance) && !isNumber(sepdistance),
         errorMessage: 'Non number sepdistance value',
       },
       {
-        result: isNumber(sepdistance) && sepdistance < 0,
+        result:
+          isDefined(sepdistance) && isNumber(sepdistance) && sepdistance < 0,
         errorMessage: 'Negative sepdistance value',
       },
     ];
