@@ -43,7 +43,7 @@ export class MarxanParametersDefaults {
   BESTSCORE = 0;
   NUMREPS = 10;
   NUMITNS = 1000000;
-  STARTTEMP = 1000000;
+  STARTTEMP = -1;
   COOLFAC = 0;
   NUMTEMP = 10000;
   COSTTHRESH = 0;
