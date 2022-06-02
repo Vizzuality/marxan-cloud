@@ -11,6 +11,7 @@ import { useAccessToken } from 'hooks/auth';
 import {
   useProjectPlanningAreaLayer,
   useLegend,
+  useBBOX,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
@@ -48,6 +49,10 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   } = useProject(pid);
   const { bbox } = projectData;
 
+  const BBOX = useBBOX({
+    bbox,
+  });
+
   const minZoom = 2;
   const maxZoom = 20;
   const [viewport, setViewport] = useState({});
@@ -69,11 +74,11 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

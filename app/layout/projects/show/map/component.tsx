@@ -21,6 +21,7 @@ import {
   usePUCompareLayer,
   usePUGridLayer,
   useProjectPlanningAreaLayer,
+  useBBOX,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -70,6 +71,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     // planningUnitGridShape,
     // planningUnitAreakm2,
   } = data;
+
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const {
     data: rawScenariosData,
@@ -166,11 +171,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

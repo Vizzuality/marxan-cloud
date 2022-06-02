@@ -189,3 +189,7 @@ export interface UseLegend {
     layerSettings?: Record<string, Record<string, unknown>>;
   };
 }
+
+export interface UseBbox {
+  bbox: number[];
+}

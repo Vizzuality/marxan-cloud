@@ -23,7 +23,11 @@ export type StartLegacyProjectImportResponse = Either<
 >;
 
 export class StartLegacyProjectImport extends Command<StartLegacyProjectImportResponse> {
-  constructor(public readonly name: string, public readonly ownerId: UserId) {
+  constructor(
+    public readonly name: string,
+    public readonly ownerId: UserId,
+    public readonly solutionsAreLocked: boolean,
+  ) {
     super();
   }
 }

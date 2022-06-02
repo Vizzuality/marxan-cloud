@@ -13,6 +13,7 @@ import {
 import { ScheduleDbCleanupForFailedLegacyProjectImportHandler } from './schedule-db-cleanup-for-failed-legacy-project-import.handler';
 import { LegacyProjectImportRepositoryModule } from './legacy-project-import.repository.module';
 import { ScheduleLegacyProjectImportPieceHandler } from './schedule-legacy-project-import-piece.handler';
+import { ImportLegacyProjectPieceEventsHandler } from './import-legacy-project-piece.events-handler';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ScheduleLegacyProjectImportPieceHandler } from './schedule-legacy-proje
     ScheduleDbCleanupForFailedLegacyProjectImportHandler,
     LegacyProjectImportPieceRequestedSaga,
     ScheduleLegacyProjectImportPieceHandler,
+    ImportLegacyProjectPieceEventsHandler,
     {
       provide: Logger,
       useClass: Logger,
