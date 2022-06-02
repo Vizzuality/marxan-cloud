@@ -62,7 +62,7 @@ describe(`when empty input is provided`, () => {
         "PROP": 0.5,
         "RANDSEED": -1,
         "RUNMODE": 1,
-        "STARTTEMP": 1000000,
+        "STARTTEMP": -1,
         "THRESHPEN1": 0,
         "THRESHPEN2": 0,
       }
