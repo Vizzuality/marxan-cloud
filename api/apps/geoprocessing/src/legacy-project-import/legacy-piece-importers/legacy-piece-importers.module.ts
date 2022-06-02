@@ -4,14 +4,29 @@ import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
 } from '@marxan/legacy-project-import';
+import {
+  ScenariosPuCostDataGeo,
+  ScenariosPuPaDataGeo,
+} from '@marxan/scenarios-planning-unit';
 import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../utils/config.utils';
+import { FileReadersModule } from './file-readers/file-readers.module';
+import { FeaturesLegacyProjectPieceImporter } from './features.legacy-piece-importer';
 import { PlanningGridLegacyProjectPieceImporter } from './planning-grid.legacy-piece-importer';
+import { ScenarioPusDataLegacyProjectPieceImporter } from './scenarios-pus-data.legacy-piece-importer';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProjectsPuEntity]), ShapefilesModule],
+  imports: [
+    TypeOrmModule.forFeature([
+      ProjectsPuEntity,
+      ScenariosPuPaDataGeo,
+      ScenariosPuCostDataGeo,
+    ]),
+    ShapefilesModule,
+    FileReadersModule,
+  ],
   providers: [
     Logger,
     {
@@ -29,6 +44,8 @@ import { PlanningGridLegacyProjectPieceImporter } from './planning-grid.legacy-p
       },
     },
     PlanningGridLegacyProjectPieceImporter,
+    ScenarioPusDataLegacyProjectPieceImporter,
+    FeaturesLegacyProjectPieceImporter,
   ],
 })
 export class LegacyPieceImportersModule {}

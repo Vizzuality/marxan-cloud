@@ -11,7 +11,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import validate from 'validate.js';
 
 import { useAccessToken } from 'hooks/auth';
-import { usePUGridLayer } from 'hooks/map';
+import { useBBOX, usePUGridLayer } from 'hooks/map';
 import { useOwnsProject } from 'hooks/permissions';
 import { useProjectsUsers, useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
@@ -80,6 +80,10 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
   const { data: projectData } = useProject(pid);
   const { bbox, isPublic } = projectData;
+
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const { data: projectsUsersData } = useProjectsUsers([pid]);
 
@@ -157,11 +161,11 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 10 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);

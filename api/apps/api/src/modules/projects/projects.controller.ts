@@ -124,6 +124,7 @@ import {
 } from '../clone/export/application/get-archive.query';
 import {
   DeleteFileFromLegacyProjectImportResponseDto,
+  GetLegacyProjectImportErrorsResponseDto,
   RunLegacyProjectImportResponseDto,
   StartLegacyProjectImportBodyDto,
   StartLegacyProjectImportResponseDto,
@@ -207,6 +208,7 @@ export class ProjectsController {
     const result = await this.projectsService.startLegacyProjectImport(
       dto.projectName,
       req.user.id,
+      dto.solutionsAreLocked,
     );
 
     if (isLeft(result)) {
@@ -261,6 +263,36 @@ export class ProjectsController {
     }
 
     return { projectId };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Returns legacy project import errors and warnings',
+    summary: 'Returns legacy project import errors and warnings',
+  })
+  @ApiOkResponse({ type: GetLegacyProjectImportErrorsResponseDto })
+  @Get('import/legacy/:projectId/validation-results')
+  async getLegacyProjectImportErrors(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<GetLegacyProjectImportErrorsResponseDto> {
+    const result = await this.projectsService.getLegacyProjectImportErrors(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { errorsAndWarnings: result.right };
   }
 
   @ImplementsAcl()

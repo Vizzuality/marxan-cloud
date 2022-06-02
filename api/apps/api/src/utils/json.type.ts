@@ -4,4 +4,4 @@ export interface JSONObject {
   [x: string]: JSONValue;
 }
 
-export interface JSONArray extends Array<JSONValue> {}
+export type JSONArray = Array<JSONValue>;

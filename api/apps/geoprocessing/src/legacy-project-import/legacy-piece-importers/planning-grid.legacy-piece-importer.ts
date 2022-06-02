@@ -186,6 +186,22 @@ export class PlanningGridLegacyProjectPieceImporter
       .execute();
   }
 
+  private checkPuidsUniqueness(geojson: ExpectedGeoJsonFormat): number[] {
+    const duplicatePuids = new Set<number>();
+    const knownPuids: Record<number, true> = {};
+
+    geojson.features.forEach((feature) => {
+      const { puid } = feature.properties;
+
+      const knownPuid = knownPuids[puid];
+
+      if (knownPuid) duplicatePuids.add(puid);
+      else knownPuids[puid] = true;
+    });
+
+    return Array.from(duplicatePuids);
+  }
+
   async run(
     input: LegacyProjectImportJobInput,
   ): Promise<LegacyProjectImportJobOutput> {
@@ -208,24 +224,38 @@ export class PlanningGridLegacyProjectPieceImporter
 
     const geojson = this.ensureShapefileValidity(data);
 
+    const duplicatePuids = this.checkPuidsUniqueness(geojson);
+    if (duplicatePuids.length) {
+      this.logAndThrow(
+        `Shapefile contains geometries with the same puid. Duplicate puids: ${duplicatePuids.join(
+          ', ',
+        )}`,
+      );
+    }
+
     await this.geoEntityManager.transaction(async (em) => {
-      const planningAreaId = v4();
+      try {
+        const planningAreaId = v4();
 
-      const geomIdsAndPuids = await this.insertGeometries(em, geojson);
+        const geomIdsAndPuids = await this.insertGeometries(em, geojson);
 
-      await this.insertProjectPus(
-        em,
-        geomIdsAndPuids,
-        input.projectId,
-        planningAreaId,
-      );
-      const bbox = await this.insertPlanningArea(
-        em,
-        planningAreaId,
-        input.projectId,
-      );
+        await this.insertProjectPus(
+          em,
+          geomIdsAndPuids,
+          input.projectId,
+          planningAreaId,
+        );
+        const bbox = await this.insertPlanningArea(
+          em,
+          planningAreaId,
+          input.projectId,
+        );
 
-      await this.updateProject(input.projectId, planningAreaId, bbox);
+        await this.updateProject(input.projectId, planningAreaId, bbox);
+      } catch (err) {
+        this.logger.error(err);
+        this.logAndThrow('Error inserting data in database');
+      }
     });
 
     return input;

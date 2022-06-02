@@ -81,6 +81,7 @@ import {
   DeleteFileFromLegacyProjectImport,
   DeleteFileFromLegacyProjectImportHandlerErrors,
 } from '../legacy-project-import/application/delete-file-from-legacy-project-import.command';
+import { GetLegacyProjectImportErrors } from '../legacy-project-import/application/get-legacy-project-import-errors.query';
 
 export { validationFailed } from '../planning-areas';
 
@@ -457,6 +458,7 @@ export class ProjectsService {
   async startLegacyProjectImport(
     projectName: string,
     userId: string,
+    solutionsAreLocked: boolean,
   ): Promise<
     Either<
       typeof forbiddenError | StartLegacyProjectImportError,
@@ -472,7 +474,11 @@ export class ProjectsService {
     }
 
     return this.commandBus.execute(
-      new StartLegacyProjectImport(projectName, new UserId(userId)),
+      new StartLegacyProjectImport(
+        projectName,
+        new UserId(userId),
+        solutionsAreLocked,
+      ),
     );
   }
 
@@ -518,6 +524,15 @@ export class ProjectsService {
   async runLegacyProject(projectId: string, userId: string) {
     return this.commandBus.execute(
       new RunLegacyProjectImport(new ResourceId(projectId), new UserId(userId)),
+    );
+  }
+
+  async getLegacyProjectImportErrors(projectId: string, userId: string) {
+    return this.queryBus.execute(
+      new GetLegacyProjectImportErrors(
+        new ResourceId(projectId),
+        new UserId(userId),
+      ),
     );
   }
 

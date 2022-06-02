@@ -11,6 +11,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
 import {
+  useBBOX,
   usePUGridLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
@@ -40,6 +41,9 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     data = {},
   } = useProject(pid);
   const { bbox } = data;
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const {
     data: scenarioData,
@@ -74,11 +78,11 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
