@@ -1,8 +1,8 @@
 import { FileReadersModule } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/file-readers.module';
 import { InputLegacyProjectPieceImporter } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/input.legacy-piece-importer';
-import { GeoLegacyProjectImportFilesRepositoryModule } from '@marxan-geoprocessing/modules/legacy-project-import-files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
+  LegacyProjectImportFilesMemoryRepository,
   LegacyProjectImportFilesRepository,
   LegacyProjectImportFileType,
   LegacyProjectImportJobInput,
@@ -82,10 +82,13 @@ const getFixtures = async () => {
         logging: false,
       }),
       FileReadersModule,
-      GeoLegacyProjectImportFilesRepositoryModule,
     ],
     providers: [
       InputLegacyProjectPieceImporter,
+      {
+        provide: LegacyProjectImportFilesRepository,
+        useClass: LegacyProjectImportFilesMemoryRepository,
+      },
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
@@ -102,7 +105,7 @@ const getFixtures = async () => {
   );
 
   const fileType = LegacyProjectImportFileType.InputDat;
-  let expectedMetadata = classToPlain(new MarxanParameters());
+  let expectedInputParameterFile = classToPlain(new MarxanParameters());
 
   const saveFile = async (fileContent: string) => {
     const result = await filesRepo.saveFile(
@@ -159,7 +162,10 @@ const getFixtures = async () => {
         BESTSCORE: 100,
         BLM: 200,
       };
-      expectedMetadata = { ...expectedMetadata, ...validVariableValues };
+      expectedInputParameterFile = {
+        ...expectedInputParameterFile,
+        ...validVariableValues,
+      };
 
       return saveFile('BESTSCORE 100/nBLM 200');
     },
@@ -198,7 +204,9 @@ const getFixtures = async () => {
             .where('id = :scenarioId', { scenarioId })
             .execute();
 
-          expect(scenario.metadata).toEqual(expectedMetadata);
+          expect(scenario.metadata).toEqual({
+            marxanInputParameterFile: expectedInputParameterFile,
+          });
         },
       };
     },

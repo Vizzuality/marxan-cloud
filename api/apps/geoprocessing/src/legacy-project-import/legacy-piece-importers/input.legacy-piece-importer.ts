@@ -72,10 +72,24 @@ export class InputLegacyProjectPieceImporter
 
     const marxanInputParameters = marxanInputParametersOrError.right;
 
+    const [metadata] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('metadata')
+      .from('scenarios', 's')
+      .where('id = :scenarioId', { scenarioId })
+      .execute();
+
+    const updatedMetadata = {
+      scenarioEditingMetadata: metadata?.scenarioEditingMetadata ?? undefined,
+      marxanInputParameterFile: marxanInputParameters,
+    };
+
     await this.apiEntityManager
       .createQueryBuilder()
       .update('scenarios', {
-        metadata: JSON.stringify(marxanInputParameters),
+        metadata: JSON.stringify({
+          ...updatedMetadata,
+        }),
       })
       .where('id = :scenarioId', { scenarioId })
       .execute();
