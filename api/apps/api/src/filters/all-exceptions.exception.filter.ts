@@ -29,7 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     return exception instanceof HttpError;
   }
 
-  catch(exception: Error | HttpError, host: ArgumentsHost) {
+  catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response: Response = ctx.getResponse();
     const request = ctx.getRequest();
