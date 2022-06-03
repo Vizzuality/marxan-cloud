@@ -22,7 +22,7 @@ it('reads successfully a valid input.dat file', async () => {
 });
 
 it('fails when input.dat file contains invalid values for variables', async () => {
-  const file = fixtures.GivenAnInvalidPuDatFile();
+  const file = fixtures.GivenAnInvalidInputDatFile();
   const result = await fixtures.WhenExecutingInputDatReader(file);
   fixtures.ThenInputDatReadOperationFails(result);
 });
@@ -46,17 +46,15 @@ const getFixtures = async () => {
   return {
     GivenAValidInputDatFile: () =>
       Readable.from(
-        Buffer.from(
-          'Skip comments in input/n' +
-            '.dat file/n' +
-            Object.entries(file)
-              .map(([key, value]) => `${key} ${value}`)
-              .join('/n'),
-        ),
+        'Skip comments in input/n' +
+          '.dat file/n' +
+          Object.entries(file)
+            .map(([key, value]) => `${key} ${value}`)
+            .join('/n'),
       ),
-    GivenAnInvalidPuDatFile: () => {
+    GivenAnInvalidInputDatFile: () => {
       fakeMarxanInput.failFromOperation = true;
-      return Readable.from(Buffer.from(''));
+      return Readable.from('');
     },
     WhenExecutingInputDatReader: (readable: Readable) => sut.readFile(readable),
     ThenInputDatRowsAreSuccessfullyRead: (output: ReadFileResult) => {
