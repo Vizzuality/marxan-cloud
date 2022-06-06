@@ -102,7 +102,7 @@ export class ScenarioFeaturesData {
 
   @Column({
     name: 'amount_from_legacy_project',
-    type: 'int',
+    type: 'double precision',
   })
   amountFromLegacyProject?: number | null;
 
