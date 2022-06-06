@@ -23,10 +23,20 @@ export class PuvsprDatService {
       amount: number;
     }[] = await this.connection.query(
       `
-        select pu.scenario_id as scenario_id, puid as pu_id, feature_id, COALESCE(sfd.amount_from_legacy_project, ST_Area(ST_Transform(st_intersection(species.the_geom, pu.the_geom),3410))) as amount
+        select
+          pu.scenario_id as scenario_id,
+          puid as pu_id,
+          feature_id,
+          COALESCE(
+            species.amount_from_legacy_project,
+            ST_Area(ST_Transform(ST_Intersection(species.the_geom, pu.the_geom),3410))
+          ) as amount
         from
         (
-            select st_union(the_geom) as the_geom, min(sfd.feature_id) as feature_id
+            select
+              st_union(the_geom) as the_geom,
+              min(sfd.feature_id) as feature_id,
+              min(sfd.amount_from_legacy_project) as amount_from_legacy_project
             from scenario_features_data sfd
             inner join features_data fd on sfd.feature_class_id = fd.id where sfd.scenario_id = $1
             group by fd.feature_id
@@ -37,12 +47,7 @@ export class PuvsprDatService {
             inner join projects_pu ppu on pug.id = ppu.geom_id
             inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
             where spd.scenario_id = $1 order by ppu.puid asc
-        ) pu,
-        (
-          select amount_from_legacy_project
-          from scenario_features_data sfd
-          where sfd.scenario_id = $1
-        ) sfd
+        ) pu
         where pu.scenario_id = $1 and species.the_geom && pu.the_geom
         order by puid, feature_id asc;
       `,
