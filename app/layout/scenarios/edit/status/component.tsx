@@ -77,7 +77,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
     }
   }, [ACTIONS_DONE, JOB_DONE, isLockMe]);
 
-  const onTryAgain = useCallback(() => {
+  const onCloseFailure = useCallback(() => {
     if (isLockMe) {
       ACTIONS_FAILURE[JOB_FAILURE.kind]();
     }
@@ -149,9 +149,9 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
               <Button
                 theme="primary-alt"
                 size="base"
-                onClick={onTryAgain}
+                onClick={onCloseFailure}
               >
-                Try again
+                Close
               </Button>
             </div>
           </div>
