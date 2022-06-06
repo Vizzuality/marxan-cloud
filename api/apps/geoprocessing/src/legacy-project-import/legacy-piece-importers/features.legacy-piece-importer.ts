@@ -36,6 +36,7 @@ type FeaturesData = {
 };
 
 export const specDatFeatureIdPropertyKey = 'specDatFeatureId';
+export const specDatPuidPropertyKey = 'puid';
 
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
@@ -120,7 +121,7 @@ export class FeaturesLegacyProjectPieceImporter
           properties: {
             name: feature.feature_class_name,
             [specDatFeatureIdPropertyKey]: feature.specDatFeatureId,
-            puid: filteredRow.pu,
+            [specDatPuidPropertyKey]: filteredRow.pu,
           },
           source: GeometrySource.user_imported,
         });
