@@ -250,5 +250,8 @@
       "@marxan/domain-ids/(.*)": "<rootDir>/libs/domain-ids/src/$1",
       "@marxan/domain-ids": "<rootDir>/libs/domain-ids/src"
     }
+  },
+  "volta": {
+    "node": "14.18.3"
   }
 }
