@@ -80,12 +80,12 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     const file = files.find((file) => file.type === type);
 
     if (!file)
-      throw new Error(`${type} file not found inside input file array`);
+      this.logAndThrow(`${type} file not found inside input file array`);
 
     const readableOrError = await this.filesRepo.get(file.location);
 
     if (isLeft(readableOrError))
-      throw new Error(`${type} file not found in files repo`);
+      this.logAndThrow(`${type} file not found in files repo`);
 
     return readableOrError.right;
   }
@@ -346,8 +346,10 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       puvsprDatReadable,
     );
 
-    if (isLeft(specRowsOrError)) throw new Error(specRowsOrError.left);
-    if (isLeft(puvsprRowsOrError)) throw new Error(puvsprRowsOrError.left);
+    if (isLeft(specRowsOrError))
+      this.logAndThrow(`Error in spec.dat file: ${specRowsOrError.left}`);
+    if (isLeft(puvsprRowsOrError))
+      this.logAndThrow(`Error in puvspr.dat file: ${puvsprRowsOrError.left}`);
 
     const notFoundFeatureIds = this.getFeaturesInPuvsprNotInSpec(
       specRowsOrError.right,
