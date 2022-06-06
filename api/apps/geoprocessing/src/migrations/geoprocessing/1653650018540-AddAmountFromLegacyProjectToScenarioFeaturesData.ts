@@ -5,7 +5,7 @@ export class AddAmountFromLegacyProjectToScenarioFeaturesData1653916456540
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       ALTER TABLE scenario_features_data
-        ADD COLUMN amount_from_legacy_project int;
+        ADD COLUMN amount_from_legacy_project double precision;
     `);
   }
 
