@@ -1,12 +1,12 @@
 import React, { useCallback, useState } from 'react';
 
-import { PLANNING_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { COMPANY_LOGO_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
-import { bytesToMegabytes } from 'utils/units';
+import { bytesToKilobytes } from 'utils/units';
 
 import { useToasts } from 'hooks/toast';
 
@@ -64,7 +64,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
     // It'll display the max size in bytes which the average user may not understand.
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
-        ? { error, message: `File is larger than ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB` }
+        ? { error, message: `File is larger than ${bytesToKilobytes(COMPANY_LOGO_UPLOADER_MAX_SIZE)} KB` }
         : error;
     });
 
@@ -103,7 +103,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
-    maxSize: PLANNING_AREA_UPLOADER_MAX_SIZE,
+    maxSize: COMPANY_LOGO_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
   });
@@ -128,7 +128,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                 aria-label="remove"
                 id="cancel-shapefile-btn"
                 type="button"
-                className="flex flex-shrink-0 items-center justify-center w-5 h-5 border border-white rounded-full group bg-black"
+                className="flex items-center justify-center flex-shrink-0 w-5 h-5 bg-black border border-white rounded-full group"
                 onClick={() => {
                   onUploadRemove(form);
                   setOpened(false);
@@ -197,9 +197,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                                       List of supported file formats:
                                     </h4>
                                     <ul>
-                                      Zipped: .shp (zipped shapefiles must include
-                                      <br />
-                                      .shp, .shx, .dbf, and .prj files)
+                                      .jpg and .png files
                                     </ul>
                                   </span>
                                 </InfoButton>
@@ -228,7 +226,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
                                   to upload
                                 </p>
 
-                                <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB`}</p>
+                                <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToKilobytes(COMPANY_LOGO_UPLOADER_MAX_SIZE)} KB`}</p>
 
                                 <Loading
                                   visible={loading}
