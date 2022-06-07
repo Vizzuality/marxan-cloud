@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { DatFileReader, ValidationCheck } from './dat-file.reader';
+import { isRight } from 'fp-ts/lib/These';
+import { Readable } from 'stream';
+import {
+  DatFileReader,
+  DefaultDatFileDelimiter,
+  ValidationCheck,
+} from './dat-file.reader';
 
 type ReadRow = {
   id?: string;
@@ -65,10 +71,6 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
     const isDefined = (value: unknown) => value !== undefined && value !== null;
 
     const checks: ValidationCheck[] = [
-      {
-        result: name.length === 0,
-        errorMessage: 'Invalid empty name',
-      },
       {
         result: !isInteger(id),
         errorMessage: 'Invalid non integer feature id',
@@ -167,10 +169,6 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
       throw new Error('Id column is required');
     }
 
-    if (name === undefined) {
-      throw new Error('Name column is required');
-    }
-
     const propAndTargetUndefined = prop === undefined && target === undefined;
     const propAndTargetDefined = prop !== undefined && target !== undefined;
 
@@ -180,7 +178,7 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
 
     const values = {
       id: parseInt(id),
-      name,
+      name: name ?? '',
       sepdistance: sepdistance ? parseFloat(sepdistance) : undefined,
       sepnum: sepnum ? parseFloat(sepnum) : undefined,
       spf: spf ? parseFloat(spf) : undefined,
@@ -203,5 +201,33 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
     }
 
     throw new Error('Unreachable code');
+  }
+
+  async readFile(
+    file: Readable,
+    delimiter = DefaultDatFileDelimiter,
+  ): Promise<Either<string, SpecDatRow[]>> {
+    const result = await super.readFile(file, delimiter);
+
+    if (isRight(result)) {
+      let unnamedFeaturesCount = 0;
+      const rows = result.right.map((row) => {
+        let name = row.name;
+
+        if (name === '') {
+          unnamedFeaturesCount = unnamedFeaturesCount + 1;
+          name = `Unnamed feature ${unnamedFeaturesCount}`;
+        }
+
+        return {
+          ...row,
+          name,
+        };
+      });
+
+      return right(rows);
+    }
+
+    return result;
   }
 }

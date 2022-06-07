@@ -16,16 +16,16 @@ it('reads successfully a valid spec.dat file', async () => {
   fixtures.ThenSpecDatRowsAreSuccessfullyRead(result);
 });
 
+it('gives default names to unnamed features', async () => {
+  const file = fixtures.GivenSpecDatFileWithoutNameColumn();
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenFeaturesShouldHaveDefaultNames(result);
+});
+
 it('fails when spec.dat does not contain ids', async () => {
   const file = fixtures.GivenSpecDatFileWithoutIdColumn();
   const result = await fixtures.WhenExecutingSpecDatReader(file);
   fixtures.ThenSpecDatReadOperationFails(result, /id column is required/gi);
-});
-
-it('fails when spec.dat does not contain name column', async () => {
-  const file = fixtures.GivenSpecDatFileWithoutNameColumn();
-  const result = await fixtures.WhenExecutingSpecDatReader(file);
-  fixtures.ThenSpecDatReadOperationFails(result, /name column is required/gi);
 });
 
 it('fails when spec.dat does not contain prop nor target', async () => {
@@ -44,12 +44,6 @@ it('fails when spec.dat contains prop and target', async () => {
     result,
     /prop and target column should be exclusively defined/gi,
   );
-});
-
-it('fails when spec.dat contains empty names', async () => {
-  const file = fixtures.GivenAnInvalidSpecDatFile({ name: '' });
-  const result = await fixtures.WhenExecutingSpecDatReader(file);
-  fixtures.ThenSpecDatReadOperationFails(result, /invalid empty name/gi);
 });
 
 it('fails when spec.dat contains non integer feature ids', async () => {
@@ -274,6 +268,15 @@ const getFixtures = async () => {
       if (isLeft(output)) throw new Error('Expected right result, got left');
 
       expect(output.right).toHaveLength(amountOfRows);
+    },
+    ThenFeaturesShouldHaveDefaultNames: (
+      output: Either<string, SpecDatRow[]>,
+    ) => {
+      if (isLeft(output)) throw new Error('Expected right result, got left');
+
+      const [first] = output.right;
+
+      expect(first.name).toEqual('Unnamed feature 1');
     },
     ThenSpecDatReadOperationFails: (
       output: Either<string, SpecDatRow[]>,
