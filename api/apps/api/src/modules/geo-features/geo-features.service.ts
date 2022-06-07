@@ -168,7 +168,9 @@ export class GeoFeaturesService extends AppBaseService<
      *
      */
     if (projectId && info?.params?.bbox) {
-      const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(info.params.bbox));
+      const { westBbox, eastBbox } = antimeridianBbox(
+        nominatim2bbox(info.params.bbox),
+      );
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
         .select('"geoFeatureGeometries"."feature_id"', 'featureId')
