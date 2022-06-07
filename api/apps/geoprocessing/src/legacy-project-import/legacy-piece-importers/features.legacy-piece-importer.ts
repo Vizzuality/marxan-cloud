@@ -55,6 +55,15 @@ export class FeaturesLegacyProjectPieceImporter
     this.logger.setContext(FeaturesLegacyProjectPieceImporter.name);
   }
 
+  isSupported(piece: LegacyProjectImportPiece): boolean {
+    return piece === LegacyProjectImportPiece.Features;
+  }
+
+  private logAndThrow(message: string): never {
+    this.logger.error(message);
+    throw new Error(message);
+  }
+
   private async getProjectPusGeomsMap(
     projectId: string,
   ): Promise<Record<number, string>> {
@@ -122,10 +131,6 @@ export class FeaturesLegacyProjectPieceImporter
     return { featuresDataInsertValues, nonExistingPus };
   }
 
-  isSupported(piece: LegacyProjectImportPiece): boolean {
-    return piece === LegacyProjectImportPiece.Features;
-  }
-
   async run(
     input: LegacyProjectImportJobInput,
   ): Promise<LegacyProjectImportJobOutput> {
@@ -136,20 +141,21 @@ export class FeaturesLegacyProjectPieceImporter
     );
 
     if (!specFeaturesFileOrError)
-      throw new Error('spec.dat file not found inside input file array');
+      this.logAndThrow('spec.dat file not found inside input file array');
 
     const specFileReadableOrError = await this.filesRepo.get(
       specFeaturesFileOrError.location,
     );
 
     if (isLeft(specFileReadableOrError))
-      throw new Error('spec.dat file not found in files repo');
+      this.logAndThrow('spec.dat file not found in files repo');
 
     const specDatRowsOrError = await this.specDatReader.readFile(
       specFileReadableOrError.right,
     );
 
-    if (isLeft(specDatRowsOrError)) throw new Error(specDatRowsOrError.left);
+    if (isLeft(specDatRowsOrError))
+      this.logAndThrow(`Error in spec.dat file: ${specDatRowsOrError.left}`);
 
     const specDatRows = specDatRowsOrError.right;
 
@@ -158,21 +164,23 @@ export class FeaturesLegacyProjectPieceImporter
     );
 
     if (!puvsprFeaturesFileOrError)
-      throw new Error('puvspr.dat file not found inside input file array');
+      this.logAndThrow('puvspr.dat file not found inside input file array');
 
     const puvsprFileReadableOrError = await this.filesRepo.get(
       puvsprFeaturesFileOrError.location,
     );
 
     if (isLeft(puvsprFileReadableOrError))
-      throw new Error('The puvspr.dat file not found in files repo');
+      this.logAndThrow('puvspr.dat file not found in files repo');
 
     const puvsprDatRowsOrError = await this.puvsprDatReader.readFile(
       puvsprFileReadableOrError.right,
     );
 
     if (isLeft(puvsprDatRowsOrError))
-      throw new Error(puvsprDatRowsOrError.left);
+      this.logAndThrow(
+        `Error in puvspr.dat file: ${puvsprDatRowsOrError.left}`,
+      );
 
     const puvsprDatRows = puvsprDatRowsOrError.right;
 
