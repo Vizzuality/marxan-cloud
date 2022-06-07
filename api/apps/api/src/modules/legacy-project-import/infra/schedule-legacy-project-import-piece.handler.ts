@@ -55,6 +55,7 @@ export class ScheduleLegacyProjectImportPieceHandler
       pieces,
       files,
       scenarioId,
+      ownerId,
     } = legacyProjectImportInstance.toSnapshot();
 
     const component = pieces.find((piece) => piece.id === componentId.value);
@@ -75,6 +76,7 @@ export class ScheduleLegacyProjectImportPieceHandler
       scenarioId,
       piece,
       pieceId,
+      ownerId,
     });
 
     if (!job) {

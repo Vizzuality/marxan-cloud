@@ -16,30 +16,33 @@ it('reads successfully a valid spec.dat file', async () => {
   fixtures.ThenSpecDatRowsAreSuccessfullyRead(result);
 });
 
+it('gives default names to unnamed features', async () => {
+  const file = fixtures.GivenSpecDatFileWithoutNameColumn();
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenFeaturesShouldHaveDefaultNames(result);
+});
+
 it('fails when spec.dat does not contain ids', async () => {
-  const file = fixtures.GivenSpecDatFileWithoutColumn('id');
+  const file = fixtures.GivenSpecDatFileWithoutIdColumn();
   const result = await fixtures.WhenExecutingSpecDatReader(file);
   fixtures.ThenSpecDatReadOperationFails(result, /id column is required/gi);
 });
 
-it('fails when spec.dat does not contain name column', async () => {
-  const file = fixtures.GivenSpecDatFileWithoutColumn('name');
-  const result = await fixtures.WhenExecutingSpecDatReader(file);
-  fixtures.ThenSpecDatReadOperationFails(result, /name column is required/gi);
-});
-
-it('fails when spec.dat does not contain prop', async () => {
-  const file = fixtures.GivenSpecDatFileWithoutColumn('prop');
-  const result = await fixtures.WhenExecutingSpecDatReader(file);
-  fixtures.ThenSpecDatReadOperationFails(result, /prop column is required/gi);
-});
-
-it('fails when spec.dat contains target colum', async () => {
-  const file = fixtures.GivenSpecDatFileWithTargetColumn();
+it('fails when spec.dat does not contain prop nor target', async () => {
+  const file = fixtures.GivenSpecDatFileWithoutPropAndTargetColumn();
   const result = await fixtures.WhenExecutingSpecDatReader(file);
   fixtures.ThenSpecDatReadOperationFails(
     result,
-    /target column is not supported/gi,
+    /prop and target column should be exclusively defined/gi,
+  );
+});
+
+it('fails when spec.dat contains prop and target', async () => {
+  const file = fixtures.GivenSpecDatFileWithPropAndTargetColumn();
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenSpecDatReadOperationFails(
+    result,
+    /prop and target column should be exclusively defined/gi,
   );
 });
 
@@ -53,6 +56,18 @@ it('fails when spec.dat contains negative feature ids', async () => {
   const file = fixtures.GivenAnInvalidSpecDatFile({ id: -12 });
   const result = await fixtures.WhenExecutingSpecDatReader(file);
   fixtures.ThenSpecDatReadOperationFails(result, /negative feature id/gi);
+});
+
+it('fails when spec.dat contains non integer feature target values', async () => {
+  const file = fixtures.GivenAnInvalidSpecDatFile({ target: 'foo' }, false);
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenSpecDatReadOperationFails(result, /non integer target value/gi);
+});
+
+it('fails when spec.dat contains negative target values', async () => {
+  const file = fixtures.GivenAnInvalidSpecDatFile({ target: -12 }, false);
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenSpecDatReadOperationFails(result, /negative target value/gi);
 });
 
 it('fails when spec.dat contains non number prop values', async () => {
@@ -179,60 +194,68 @@ const getFixtures = async () => {
 
       return Readable.from(headers + rows.join('\n'));
     },
-    GivenAnInvalidSpecDatFile: ({
-      id,
-      prop,
-      spf,
-      target2,
-      targetocc,
-      name,
-      sepnum,
-      sepdistance,
-    }: {
-      id?: any;
-      prop?: any;
-      spf?: any;
-      target2?: any;
-      targetocc?: any;
-      name?: any;
-      sepnum?: any;
-      sepdistance?: any;
-    }) => {
-      const headers =
-        'id\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance\n';
-      const row = `${id ?? 0}\t${prop ?? '0.3'}\t${spf ?? 1}\t${
-        target2 ?? 1
-      }\t${targetocc ?? 1}\t${name ?? 'name'}\t${sepnum ?? 1}\t${
-        sepdistance ?? 1
-      }`;
+    GivenAnInvalidSpecDatFile: (
+      {
+        id,
+        prop,
+        target,
+        spf,
+        target2,
+        targetocc,
+        name,
+        sepnum,
+        sepdistance,
+      }: {
+        id?: any;
+        prop?: any;
+        target?: any;
+        spf?: any;
+        target2?: any;
+        targetocc?: any;
+        name?: any;
+        sepnum?: any;
+        sepdistance?: any;
+      },
+      propColumn = true,
+    ) => {
+      const headers = `id\t${
+        propColumn ? 'prop' : 'target'
+      }\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance\n`;
+      const row = `${id ?? 0}\t${
+        propColumn ? prop ?? '0.3' : target ?? '200'
+      }\t${spf ?? 1}\t${target2 ?? 1}\t${targetocc ?? 1}\t${name ?? 'name'}\t${
+        sepnum ?? 1
+      }\t${sepdistance ?? 1}`;
 
       return Readable.from(headers + row);
     },
-    GivenSpecDatFileWithoutColumn: (columnToRemove: string) => {
-      let columnToRemoveIndex = -1;
-      const wrongHeaders =
-        headers
-          .replace('\n', '')
-          .split('\t')
-          .filter((column, index) => {
-            if (column === columnToRemove) {
-              columnToRemoveIndex = index;
-              return false;
-            }
-            return true;
-          })
-          .join('\t') + '\n';
+    GivenSpecDatFileWithoutIdColumn: () => {
+      const headers =
+        'prop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance\n';
+      const row = `0.3\t1\t100\t10000\tname\t1\t1`;
 
-      let row = getValidRow().split('\t');
-      if (columnToRemoveIndex !== -1) row.splice(columnToRemoveIndex, 1);
-
-      return Readable.from(wrongHeaders + row.join('\t'));
+      return Readable.from(headers + row);
     },
-    GivenSpecDatFileWithTargetColumn: () => {
-      const wrongHeaders = headers.replace('\n', '') + '\ttarget\n';
-      const row = getValidRow() + '\t10000';
+    GivenSpecDatFileWithoutNameColumn: () => {
+      const headers =
+        'id\tprop\tspf\ttarget2\ttargetocc\tsepnum\tsepdistance\n';
+      const row = `1\t0.3\t1\t100\t10000\t1\t1`;
 
-      return Readable.from(wrongHeaders + row);
+      return Readable.from(headers + row);
+    },
+    GivenSpecDatFileWithoutPropAndTargetColumn: () => {
+      const headers =
+        'id\tname\tspf\ttarget2\ttargetocc\tsepnum\tsepdistance\n';
+      const row = `1\tname\t1\t100\t10000\t1\t1`;
+
+      return Readable.from(headers + row);
+    },
+    GivenSpecDatFileWithPropAndTargetColumn: () => {
+      const headers =
+        'id\tname\tprop\ttarget\tspf\ttarget2\ttargetocc\tsepnum\tsepdistance\n';
+      const row = `1\tname\t0.1\t100\t1\t100\t10000\t1\t1`;
+
+      return Readable.from(headers + row);
     },
     WhenExecutingSpecDatReader: (
       readable: Readable,
@@ -245,6 +268,15 @@ const getFixtures = async () => {
       if (isLeft(output)) throw new Error('Expected right result, got left');
 
       expect(output.right).toHaveLength(amountOfRows);
+    },
+    ThenFeaturesShouldHaveDefaultNames: (
+      output: Either<string, SpecDatRow[]>,
+    ) => {
+      if (isLeft(output)) throw new Error('Expected right result, got left');
+
+      const [first] = output.right;
+
+      expect(first.name).toEqual('Unnamed feature 1');
     },
     ThenSpecDatReadOperationFails: (
       output: Either<string, SpecDatRow[]>,

@@ -75,8 +75,9 @@ export function DeleteUser(em: EntityManager, userId: string) {
   return em
     .createQueryBuilder()
     .delete()
-    .from('user')
-    .where('id = :userId', { userId });
+    .from('users')
+    .where('id = :userId', { userId })
+    .execute();
 }
 
 export function GivenOrganizationExists(

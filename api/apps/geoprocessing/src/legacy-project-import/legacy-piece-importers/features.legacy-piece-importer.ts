@@ -29,14 +29,14 @@ import {
 } from './file-readers/puvspr-dat.reader';
 import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
 
-type FeaturesData = Omit<SpecDatRow, 'id'> & {
+type FeaturesData = {
   id: string;
-  project_id: string;
-  featureIntegerId: number;
+  specDatFeatureId: number;
   feature_class_name: string;
-  tag: string;
-  creation_status: JobStatus;
 };
+
+export const specDatFeatureIdPropertyKey = 'specDatFeatureId';
+export const specDatPuidPropertyKey = 'puid';
 
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
@@ -103,7 +103,7 @@ export class FeaturesLegacyProjectPieceImporter
 
     features.forEach(async (feature) => {
       const filteredPuvspr = puvsprDatRows.filter(
-        (row) => row.species === feature.featureIntegerId,
+        (row) => row.species === feature.specDatFeatureId,
       );
 
       filteredPuvspr.forEach((filteredRow) => {
@@ -120,8 +120,8 @@ export class FeaturesLegacyProjectPieceImporter
           theGeom: geometry,
           properties: {
             name: feature.feature_class_name,
-            featureId: feature.featureIntegerId,
-            puid: filteredRow.pu,
+            [specDatFeatureIdPropertyKey]: feature.specDatFeatureId,
+            [specDatPuidPropertyKey]: filteredRow.pu,
           },
           source: GeometrySource.user_imported,
         });
@@ -129,6 +129,38 @@ export class FeaturesLegacyProjectPieceImporter
     });
 
     return { featuresDataInsertValues, nonExistingPus };
+  }
+
+  private getDuplicateFeatureIds(rows: SpecDatRow[]) {
+    const duplicateIds = new Set<number>();
+    const knownIds: Record<number, true> = {};
+
+    rows.forEach((row) => {
+      const { id } = row;
+
+      const knownPuid = knownIds[id];
+
+      if (knownPuid) duplicateIds.add(id);
+      else knownIds[id] = true;
+    });
+
+    return Array.from(duplicateIds);
+  }
+
+  private getDuplicateFeatureNames(rows: SpecDatRow[]) {
+    const duplicateNames = new Set<string>();
+    const knownNames: Record<string, true> = {};
+
+    rows.forEach((row) => {
+      const { name } = row;
+
+      const knownPuid = knownNames[name];
+
+      if (knownPuid) duplicateNames.add(name);
+      else knownNames[name] = true;
+    });
+
+    return Array.from(duplicateNames);
   }
 
   async run(
@@ -182,49 +214,67 @@ export class FeaturesLegacyProjectPieceImporter
         `Error in puvspr.dat file: ${puvsprDatRowsOrError.left}`,
       );
 
+    const duplicateFeatureIds = this.getDuplicateFeatureIds(specDatRows);
+    if (duplicateFeatureIds.length) {
+      throw new Error(
+        `spec.dat contains duplicate feature ids: ${duplicateFeatureIds.join(
+          ', ',
+        )}`,
+      );
+    }
+
+    const duplicateFeatureNames = this.getDuplicateFeatureNames(specDatRows);
+    if (duplicateFeatureNames.length) {
+      throw new Error(
+        `spec.dat contains duplicate feature names: ${duplicateFeatureNames.join(
+          ', ',
+        )}`,
+      );
+    }
+
     const puvsprDatRows = puvsprDatRowsOrError.right;
 
     const projectPusGeomsMap = await this.getProjectPusGeomsMap(projectId);
 
+    const featureUuidByNumericId: Record<number, string> = {};
     const nonExistingPus = await this.apiEntityManager.transaction(
       async (apiEm) => {
         const featuresInsertValues = specDatRows.map((feature) => {
           const featureId = v4();
+          featureUuidByNumericId[feature.id] = featureId;
 
           return {
-            ...feature,
             project_id: projectId,
-            featureIntegerId: feature.id,
             id: featureId,
             feature_class_name: feature.name,
             tag: FeatureTag.Species,
             creation_status: JobStatus.created,
+            created_by: input.ownerId,
           };
         });
 
         await Promise.all(
-          featuresInsertValues.map(
-            ({ id, feature_class_name, project_id, tag, creation_status }) =>
-              apiEm
-                .createQueryBuilder()
-                .insert()
-                .into('features')
-                .values({
-                  id,
-                  feature_class_name,
-                  project_id,
-                  tag,
-                  creation_status,
-                })
-                .execute(),
+          featuresInsertValues.map((value) =>
+            apiEm
+              .createQueryBuilder()
+              .insert()
+              .into('features')
+              .values(value)
+              .execute(),
           ),
         );
+
+        const featuresData = specDatRows.map((row) => ({
+          id: featureUuidByNumericId[row.id],
+          specDatFeatureId: row.id,
+          feature_class_name: row.name,
+        }));
 
         const {
           featuresDataInsertValues,
           nonExistingPus,
         } = this.getFeaturesDataInsertValues(
-          featuresInsertValues,
+          featuresData,
           puvsprDatRows,
           projectPusGeomsMap,
         );

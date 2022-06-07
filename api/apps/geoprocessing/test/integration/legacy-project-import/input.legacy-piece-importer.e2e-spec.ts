@@ -97,6 +97,7 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const organizationId = v4();
+  const ownerId = v4();
 
   const sut = sandbox.get(InputLegacyProjectPieceImporter);
   const filesRepo = sandbox.get(LegacyProjectImportFilesRepository);
@@ -148,6 +149,7 @@ const getFixtures = async () => {
         pieceId: v4(),
         projectId,
         scenarioId,
+        ownerId,
       };
     },
     GivenProjectWithScenarioExist: async () =>

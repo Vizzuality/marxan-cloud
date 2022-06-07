@@ -4,6 +4,8 @@ import { Readable } from 'stream';
 
 export type ValidationCheck = { result: boolean; errorMessage: string };
 
+export const DefaultDatFileDelimiter = '\t';
+
 export abstract class DatFileReader<I, O> {
   abstract validateData(data: O): Either<string, true>;
 
@@ -11,7 +13,7 @@ export abstract class DatFileReader<I, O> {
 
   async readFile(
     file: Readable,
-    delimiter = '\t',
+    delimiter = DefaultDatFileDelimiter,
   ): Promise<Either<string, O[]>> {
     const result: O[] = [];
     const errors: string[] = [];

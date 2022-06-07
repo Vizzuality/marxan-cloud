@@ -21,6 +21,7 @@ import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
+  DeleteUser,
   GivenProjectExists,
   GivenScenarioExists,
   GivenUserExists,
@@ -145,6 +146,8 @@ const getFixtures = async () => {
         projectId,
         organizationId,
       );
+
+      await DeleteUser(entityManager, userId);
     },
     GivenUser: () => GivenUserExists(entityManager, userId, projectId),
     GivenProject: () => {
