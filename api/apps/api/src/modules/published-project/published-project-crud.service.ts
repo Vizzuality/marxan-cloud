@@ -146,6 +146,12 @@ export class PublishedProjectCrudService extends AppBaseService<
       return entitiesAndCount;
     }
 
+    const extendedEntitiesFromGetById: PublishedProject[] = await Promise.all(
+      entitiesAndCount[0].map(
+        async (entity) => await this.extendGetByIdResult(entity),
+      ),
+    );
+
     const allOwnersOfAllProjectsPlusEmail = await this.usersProjectsRepo.query(
       `
       select up.project_id, up.user_id, u.email
@@ -160,7 +166,7 @@ export class PublishedProjectCrudService extends AppBaseService<
       (item) => item.project_id,
     );
 
-    const extendedEntities: PublishedProject[] = entitiesAndCount[0].map(
+    const finalExtendedEntities: PublishedProject[] = extendedEntitiesFromGetById.map(
       (entity) => ({
         ...entity,
         ownerEmails: ownersPerProject[entity.id].map((item) => ({
@@ -170,6 +176,6 @@ export class PublishedProjectCrudService extends AppBaseService<
       }),
     );
 
-    return [extendedEntities, entitiesAndCount[1]];
+    return [finalExtendedEntities, entitiesAndCount[1]];
   }
 }
