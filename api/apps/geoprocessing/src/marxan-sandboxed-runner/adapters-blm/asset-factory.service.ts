@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { writeFileSync } from 'fs-extra';
 import { Workspace } from '../ports/workspace';
 import { Assets } from './blm-input-files';
@@ -28,8 +28,17 @@ export class AssetFactory {
      * permissions not being retained, but copies files successfully
      * nevertheless) seems more robust overall (until we can rely on `cp` being
      * available in the base image, of course).
+     *
+     * execSync() will throw an exception even if it copies files successfully,
+     * because of EPERM, so we mask the exception here (if there is a genuine
+     * error, the process will fail anyway as the Marxan solver will exit with
+     * non-zero status).
      */
-    execSync(`cp -a -f ${from.workingDirectory}/* ${to.workingDirectory}`);
+    try {
+      execSync(`cp -a -f ${from.workingDirectory}/* ${to.workingDirectory}`);
+    } catch(e) {
+      Logger.error(e);
+    }
 
     const inputDat = this.getInputDat(assets);
     if (!inputDat) throw new Error('No URL for input.dat found');
