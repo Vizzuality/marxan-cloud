@@ -15,6 +15,14 @@ export class PuvsprDatService {
      * by partition (we need to get the grid shape from the parent project); use
      * && operator instead of st_intersects() for bbox-based calculation of
      * intersections.
+     *
+     * @TODO Calculate `amount` correctly from `amount_from_legacy_project`. The
+     * initial implementation is simply a placeholder so that we can use
+     * `amount_from_legacy_projects` in legacy project piece importers.
+     *
+     * @TODO Refactor this to precompute the whole puvspr.dat data at feature
+     * upload time (for user-supplied features) or the first time a feature is
+     * selected via a feature specification (for platform-wide features).
      */
     const rows: {
       scenario_id: string;
@@ -36,6 +44,8 @@ export class PuvsprDatService {
             select
               st_union(the_geom) as the_geom,
               min(sfd.feature_id) as feature_id,
+              -- @todo Replace use of arbitrary aggregate function with proper
+              -- implementation.
               min(sfd.amount_from_legacy_project) as amount_from_legacy_project
             from scenario_features_data sfd
             inner join features_data fd on sfd.feature_class_id = fd.id where sfd.scenario_id = $1
