@@ -6,12 +6,12 @@ terraform {
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "2.22.0"
+      version = "2.17.0"
     }
 
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.11.0"
+      version = "~> 2.8.0"
     }
 
     helm = {

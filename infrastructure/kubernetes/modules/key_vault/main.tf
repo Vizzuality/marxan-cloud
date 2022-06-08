@@ -4,6 +4,20 @@ data "azuread_users" "users" {
   user_principal_names = var.key_vault_access_users
 }
 
+# data "external" "account_info" {
+#   program = [
+#     "az",
+#     "identity",
+#     "show",
+#     "--resource-group",
+#     var.resource_group,
+#     "--name",
+#     var.user_assigned_ident_name,
+#     "--query",
+#     "{principal_id:principalId}",
+#   ]
+# }
+
 resource "azurerm_key_vault" "key_vault" {
   name                       = "${title(var.key_vault_name_prefix)}${title(var.namespace)}" # This is the kv name. (eg: TncMarxanKvProduction,TncMarxanKvStaging)
   location                   = var.resource_group.location
@@ -15,7 +29,7 @@ resource "azurerm_key_vault" "key_vault" {
   tags = var.project_tags
 
   dynamic "access_policy" {
-    for_each = distinct(concat(data.azuread_users.users.object_ids, [data.azurerm_client_config.current.object_id]))
+    for_each = distinct(concat(data.azuread_users.users.object_ids, [data.azurerm_client_config.current.client_id]))
     content {
       tenant_id = data.azurerm_client_config.current.tenant_id
       object_id = access_policy.value
@@ -24,12 +38,9 @@ resource "azurerm_key_vault" "key_vault" {
         "Set",
         "Get",
         "List",
-        "Delete"
-      ]
-
-      certificate_permissions = [
-        "List",
-        "ManageContacts"
+        "Delete",
+        "Purge",
+        "Recover"
       ]
     }
   }

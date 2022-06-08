@@ -11,8 +11,7 @@ data "azurerm_resource_group" "resource_group" {
   name = var.project_resource_group
 }
 
-data "azurerm_subscription" "subscription" {
-}
+data "azurerm_subscription" "subscription" {}
 
 data "terraform_remote_state" "core" {
   backend = "azurerm"
