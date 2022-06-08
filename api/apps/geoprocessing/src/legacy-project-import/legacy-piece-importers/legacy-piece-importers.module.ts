@@ -1,4 +1,6 @@
+import { GeoLegacyProjectImportFilesRepositoryModule } from '@marxan-geoprocessing/modules/legacy-project-import-files-repository';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { ScenarioFeaturesData } from '@marxan/features';
 import {
   ScenariosPuCostDataGeo,
   ScenariosPuPaDataGeo,
@@ -6,13 +8,13 @@ import {
 import { ShapefilesModule } from '@marxan/shapefile-converter';
 import { HttpModule, Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FileReadersModule } from './file-readers/file-readers.module';
+import { GeoFeatureGeometry } from '../../../../../libs/geofeatures/src';
+import { FeaturesSpecificationLegacyProjectPieceImporter } from './features-specification.legacy-piece-importer';
 import { FeaturesLegacyProjectPieceImporter } from './features.legacy-piece-importer';
+import { FileReadersModule } from './file-readers/file-readers.module';
+import { InputLegacyProjectPieceImporter } from './input.legacy-piece-importer';
 import { PlanningGridLegacyProjectPieceImporter } from './planning-grid.legacy-piece-importer';
 import { ScenarioPusDataLegacyProjectPieceImporter } from './scenarios-pus-data.legacy-piece-importer';
-import { InputLegacyProjectPieceImporter } from './input.legacy-piece-importer';
-import { GeoLegacyProjectImportFilesRepositoryModule } from '@marxan-geoprocessing/modules/legacy-project-import-files-repository';
-import { FeaturesSpecificationLegacyProjectPieceImporter } from './features-specification.legacy-piece-importer';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { FeaturesSpecificationLegacyProjectPieceImporter } from './features-spec
       ProjectsPuEntity,
       ScenariosPuPaDataGeo,
       ScenariosPuCostDataGeo,
+      GeoFeatureGeometry,
+      ScenarioFeaturesData,
     ]),
     ShapefilesModule,
     FileReadersModule,

@@ -11,9 +11,10 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
-import { EntityManager, In } from 'typeorm';
+import { chunk } from 'lodash';
+import { EntityManager, In, Repository } from 'typeorm';
 import { AppConfig } from '../../utils/config.utils';
 import {
   LegacyProjectImportPieceProcessor,
@@ -54,8 +55,10 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     private readonly puvsprDatReader: PuvsprDatReader,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    @InjectEntityManager(geoprocessingConnections.default)
-    private readonly geoprocessingEntityManager: EntityManager,
+    @InjectRepository(GeoFeatureGeometry)
+    private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
+    @InjectRepository(ScenarioFeaturesData)
+    private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
     private readonly logger: Logger,
     private readonly httpService: HttpService,
   ) {
@@ -148,10 +151,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
   ): Promise<FeatureIdByIntegerId> {
     const featureIds = await this.getProjectFeaturesIds(projectId);
     const featureIdByIntegerId: FeatureIdByIntegerId = {};
-    const featureDataRepo = this.geoprocessingEntityManager.getRepository(
-      GeoFeatureGeometry,
-    );
-    const featuresData = await featureDataRepo.find({
+    const featuresData = await this.featuresDataRepo.find({
       where: { featureId: In(featureIds) },
     });
 
@@ -189,7 +189,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
   ): Promise<Either<string, true>> {
     const timeout = left('specification timeout');
     const failure = left('specification failed');
-    const intervalSeconds = 1;
+    const intervalSeconds = 3;
     let triesLeft = retries;
 
     return new Promise<Either<string, true>>((resolve) => {
@@ -239,19 +239,22 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
           'api.url',
         )}/api/v1/projects/import/legacy/${projectId}/specification`,
         {
-          features: specRows.map((row) => ({
-            featureId: featureIdByIntegerId[row.id],
-            kind: 'plain',
-            marxanSettings: {
-              fpf: row.spf,
-              prop: row.prop,
-            },
-          })),
+          features: specRows
+            .filter((row) => Boolean(featureIdByIntegerId[row.id]))
+            .map((row) => ({
+              featureId: featureIdByIntegerId[row.id],
+              kind: 'plain',
+              marxanSettings: {
+                fpf: row.spf,
+                prop: row.prop,
+              },
+            })),
         },
         {
           headers: {
             'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
           },
+          validateStatus: () => true,
         },
       )
       .toPromise();
@@ -277,16 +280,13 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     puvsprRows: PuvrsprDatRow[],
     scenarioId: string,
   ): Promise<void> {
-    const sfdRepo = this.geoprocessingEntityManager.getRepository(
-      ScenarioFeaturesData,
-    );
-    const scenarioFeaturesData = await sfdRepo.find({
-      select: ['id', 'featureData'],
-      where: {
-        scenarioId,
+    const scenarioFeaturesData: ScenarioFeaturesData[] = await this.scenarioFeaturesDataRepo.find(
+      {
+        select: ['id', 'featureData'],
+        where: { scenarioId },
+        relations: ['featureData'],
       },
-      relations: ['featureData'],
-    });
+    );
     const amountsByIntegerIdAndPuid: Record<string, number> = {};
     const propertiesByIntegerId: Record<number, PropSpecDatRow> = {};
 
@@ -319,12 +319,17 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
         target2,
         targetocc,
         sepnum,
-        // TODO Update amountFromLegacyProject
-        // amountFromLegacyProject: amount
+        amountFromLegacyProject: amount,
       };
     });
 
-    await sfdRepo.save(updateValues);
+    const chunkSize = 250;
+
+    await Promise.all(
+      chunk(updateValues, chunkSize).map((values) =>
+        this.scenarioFeaturesDataRepo.save(values),
+      ),
+    );
   }
 
   async run(
