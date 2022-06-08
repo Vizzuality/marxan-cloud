@@ -119,7 +119,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
     ...!!getInitialSelected && {
       initialSelectedItems: getInitialSelected,
     },
-    itemToString: (item) => item.label, // How the selected options is announced to screen readers
+    itemToString: (item) => {
+      if (typeof item.label === 'string') {
+        return item.label;
+      }
+      return `${item.value}`;
+    }, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
       if (
@@ -144,7 +149,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
     closeMenu,
   } = useSelect<SelectOptionProps>({
     items: getOptions,
-    itemToString: (item) => item.label, // How the selected options is announced to screen readers
+    itemToString: (item) => {
+      if (typeof item.label === 'string') {
+        return item.label;
+      }
+      return `${item.value}`;
+    }, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { type, changes } = actionAndChanges;
       const { selectedItem: option } = changes;

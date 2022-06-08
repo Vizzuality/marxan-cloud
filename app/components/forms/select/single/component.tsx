@@ -102,7 +102,12 @@ export const SingleSelect: React.FC<SelectProps> = ({
     ...typeof initialValues !== 'undefined' && {
       initialSelectedItem: getInitialSelected,
     },
-    itemToString: (item) => item.label, // How the selected options is announced to screen readers
+    itemToString: (item) => {
+      if (typeof item.label === 'string') {
+        return item.label;
+      }
+      return `${item.value}`;
+    }, // How the selected options is announced to screen readers
     stateReducer: (st, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
 

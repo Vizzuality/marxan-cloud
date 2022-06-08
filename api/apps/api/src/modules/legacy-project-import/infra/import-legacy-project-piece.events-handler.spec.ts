@@ -97,6 +97,7 @@ const getFixtures = async () => {
         scenarioId,
         pieceId,
         piece: LegacyProjectImportPiece.PlanningGrid,
+        ownerId: v4(),
       };
     },
     WhenJobFinishes: async (input: LegacyProjectImportJobInput) => {

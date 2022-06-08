@@ -100,6 +100,12 @@ export class ScenarioFeaturesData {
   })
   featureId!: number;
 
+  @Column({
+    name: 'amount_from_legacy_project',
+    type: 'double precision',
+  })
+  amountFromLegacyProject?: number | null;
+
   @ApiProperty({
     description: `0-100 (%) value of target protection coverage of all available species.`,
   })

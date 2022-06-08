@@ -1,4 +1,3 @@
-import { FeaturesLegacyProjectPieceImporter } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/features.legacy-piece-importer';
 import {
   PuvrsprDatRow,
   PuvsprDatReader,
@@ -8,8 +7,13 @@ import {
   SpecDatRow,
 } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/spec-dat.reader';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
-import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
+import { API_EVENT_KINDS } from '@marxan/api-events';
+import { ScenarioFeaturesData } from '@marxan/features';
+import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import {
   LegacyProjectImportFilesMemoryRepository,
   LegacyProjectImportFilesRepository,
@@ -18,7 +22,7 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
+import { HttpService, HttpStatus, Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -29,6 +33,11 @@ import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
+import { FeaturesSpecificationLegacyProjectPieceImporter } from '../../../src/legacy-project-import/legacy-piece-importers/features-specification.legacy-piece-importer';
+import {
+  specDatFeatureIdPropertyKey,
+  specDatPuidPropertyKey,
+} from '../../../src/legacy-project-import/legacy-piece-importers/features.legacy-piece-importer';
 import {
   DeleteFeatures,
   DeleteProjectAndOrganization,
@@ -41,7 +50,7 @@ import {
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-describe(FeaturesLegacyProjectPieceImporter, () => {
+describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
   beforeEach(async () => {
     fixtures = await getFixtures();
   }, 10_000);
@@ -50,7 +59,7 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     await fixtures?.cleanUp();
   });
 
-  it('fails when spec.dat is missing in files array', async () => {
+  it('fails when spec.dat file is missing in files array', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const job = fixtures.GivenJobInput({});
 
@@ -72,10 +81,19 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
 
   it('fails when read operation on spec.dat fails', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const location = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
       specDatFileType,
     );
-    const job = fixtures.GivenJobInput({ specDatFileLocation: location });
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      puvsprDatFileType,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
     fixtures.GivenInvalidSpecDatFile();
 
     await fixtures
@@ -83,15 +101,15 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       .ThenADatFileReadOperationErrorShouldBeThrown(specDatFileType);
   });
 
-  it('fails when puvspr.dat is missing in files array', async () => {
+  it('fails when puvspr.dat file is missing in files array', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
     const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
       specDatFileType,
     );
+
     const job = fixtures.GivenJobInput({ specDatFileLocation });
-    fixtures.GivenValidSpecDatFile();
 
     await fixtures
       .WhenPieceImporterIsInvoked(job)
@@ -110,7 +128,6 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       specDatFileLocation,
       puvsprDatFileLocation: 'wrong location',
     });
-    fixtures.GivenValidSpecDatFile();
 
     await fixtures
       .WhenPieceImporterIsInvoked(job)
@@ -140,51 +157,10 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       .ThenADatFileReadOperationErrorShouldBeThrown(puvsprDatFileType);
   });
 
-  it('fails if spec.dat file contains duplicate feature ids', async () => {
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.PuvsprDat,
-    );
-
-    const job = fixtures.GivenJobInput({
-      specDatFileLocation,
-      puvsprDatFileLocation,
-    });
-    fixtures.GivenSpecDatFileWithDuplicateFeatureIds();
-    fixtures.GivenValidPuvsprDatFile();
-
-    await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .ThenADuplicateFeatureIdsErrorShouldBeThrown();
-  });
-
-  it('fails if spec.dat file contains duplicate feature names', async () => {
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      LegacyProjectImportFileType.PuvsprDat,
-    );
-
-    const job = fixtures.GivenJobInput({
-      specDatFileLocation,
-      puvsprDatFileLocation,
-    });
-    fixtures.GivenSpecDatFileWithDuplicateFeatureNames();
-    fixtures.GivenValidPuvsprDatFile();
-
-    await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .ThenADuplicateFeatureNamesErrorShouldBeThrown();
-  });
-
-  it('imports successfully scenario pus data and scenario pus cost data', async () => {
+  it(`fails when specification request returns a code different to ${HttpStatus.CREATED}`, async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    await fixtures.GivenUserExists();
     const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
       specDatFileType,
     );
@@ -196,13 +172,143 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       specDatFileLocation,
       puvsprDatFileLocation,
     });
-    await fixtures.GivenProjectExist();
+    fixtures.GivenValidSpecDatFile();
+    fixtures.GivenValidPuvsprDatFile();
+
+    fixtures.GivenSpecificationRequestWillFail();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenASpecificationRequestErrorShouldBeThrown();
+  });
+
+  it(`fails when specification async job fails`, async () => {
+    const specDatFileType = LegacyProjectImportFileType.SpecDat;
+    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      specDatFileType,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      puvsprDatFileType,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
     fixtures.GivenValidSpecDatFile();
     fixtures.GivenValidPuvsprDatFile();
 
     await fixtures
       .WhenPieceImporterIsInvoked(job)
-      .ThenFeatureAndFeaturesDataShouldBeImported();
+      .AndSpecificationProcessFails()
+      .ThenASpecificationDidntFinishErrorShouldBeThrown();
+  });
+
+  it(`fails when specification async job timeouts`, async () => {
+    const specDatFileType = LegacyProjectImportFileType.SpecDat;
+    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      specDatFileType,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      puvsprDatFileType,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenValidSpecDatFile();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .AndSpecificationProcessTimeouts()
+      .ThenASpecificationDidntFinishErrorShouldBeThrown();
+  }, 20_000);
+
+  it(`fails if features data records does not contain required properties`, async () => {
+    const specDatFileType = LegacyProjectImportFileType.SpecDat;
+    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      specDatFileType,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      puvsprDatFileType,
+    );
+
+    await fixtures.GivenProjectExist();
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenValidSpecDatFile();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures.GivenFeaturesData({ includeRequiredProperties: false });
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .AndSpecificationProcessSucceeds()
+      .ThenAMissingRequiredPropertiesErrorShouldBeThrown();
+  });
+
+  it('fails if puvspr.dat contains features not present in spec.dat', async () => {
+    const specDatFileType = LegacyProjectImportFileType.SpecDat;
+    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      specDatFileType,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      puvsprDatFileType,
+    );
+
+    await fixtures.GivenProjectExist();
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenValidSpecDatFile();
+    fixtures.GivenPuvsprDatFileWithUnknownFeature();
+
+    await fixtures.GivenFeaturesData();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .AndSpecificationProcessSucceeds()
+      .ThenPuvsprContainsUnknownFeaturesErrorShouldBeThrown();
+  });
+
+  it('imports successfully scenario features data', async () => {
+    const specDatFileType = LegacyProjectImportFileType.SpecDat;
+    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      specDatFileType,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      puvsprDatFileType,
+    );
+
+    await fixtures.GivenProjectExist();
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenValidSpecDatFile();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures.GivenFeaturesData();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .AndSpecificationProcessSucceeds()
+      .ThenScenarioFeaturesDataShouldBeImported();
   });
 });
 
@@ -215,7 +321,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature(
-        [ProjectsPuEntity, GeoFeatureGeometry],
+        [GeoFeatureGeometry, ScenarioFeaturesData, PlanningUnitsGeom],
         geoprocessingConnections.default,
       ),
       TypeOrmModule.forRoot({
@@ -225,7 +331,7 @@ const getFixtures = async () => {
       }),
     ],
     providers: [
-      FeaturesLegacyProjectPieceImporter,
+      FeaturesSpecificationLegacyProjectPieceImporter,
       {
         provide: LegacyProjectImportFilesRepository,
         useClass: LegacyProjectImportFilesMemoryRepository,
@@ -238,6 +344,10 @@ const getFixtures = async () => {
         provide: PuvsprDatReader,
         useClass: FakePuvsprDatReader,
       },
+      {
+        provide: HttpService,
+        useClass: FakeHttpService,
+      },
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
@@ -247,13 +357,17 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   const ownerId = v4();
+  const specificationId = v4();
+
   const amountOfFeatures = 4;
   const amountOfPlanningUnits = 4;
 
-  const sut = sandbox.get(FeaturesLegacyProjectPieceImporter);
+  const sut = sandbox.get(FeaturesSpecificationLegacyProjectPieceImporter);
   const filesRepo = sandbox.get(LegacyProjectImportFilesRepository);
   const fakeSpecDatReader: FakeSpecDatReader = sandbox.get(SpecDatReader);
   const fakePuvsprDatReader: FakePuvsprDatReader = sandbox.get(PuvsprDatReader);
+  const fakeHttpService: FakeHttpService = sandbox.get(HttpService);
+
   const apiEntityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
@@ -263,27 +377,22 @@ const getFixtures = async () => {
   const featuresDataRepo = sandbox.get<Repository<GeoFeatureGeometry>>(
     getRepositoryToken(GeoFeatureGeometry),
   );
+  const scenarioFeaturesDataRepo = sandbox.get<
+    Repository<ScenarioFeaturesData>
+  >(getRepositoryToken(ScenarioFeaturesData));
+  const planningUnitsGeomRepo = sandbox.get<Repository<PlanningUnitsGeom>>(
+    getRepositoryToken(PlanningUnitsGeom),
+  );
 
   const specDatFileType = LegacyProjectImportFileType.SpecDat;
   const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
+  let featuresData: GeoFeatureGeometry[] = [];
+
   const readOperationError = (file: LegacyProjectImportFileType) =>
     `error reading ${file} file`;
 
-  const findProjectFeaturesIds = async (): Promise<string[]> => {
-    const result: {
-      id: string;
-    }[] = await apiEntityManager
-      .createQueryBuilder()
-      .select('id')
-      .from('features', 'f')
-      .where('project_id = :projectId', { projectId })
-      .execute();
-
-    return result.map(({ id }) => id);
-  };
-
-  const nonExistingPuid = 1000;
+  const featuresIds: string[] = [];
 
   const getfeaturesWithPuids = (pus: ProjectsPuEntity[]) => {
     const [firstFeature, secondFeature, thirdFeature, fourthFeature] = Array(
@@ -299,10 +408,10 @@ const getFixtures = async () => {
         }),
       );
     const puids = pus.map(({ puid }) => puid);
-    firstFeature.puids.push(...[puids[0], puids[amountOfPlanningUnits - 1]]);
-    secondFeature.puids.push(puids[amountOfPlanningUnits - 1]);
-    thirdFeature.puids.push(...puids);
-    fourthFeature.puids.push(puids[0], nonExistingPuid);
+    firstFeature.puids.push(puids[0]);
+    secondFeature.puids.push(puids[1]);
+    thirdFeature.puids.push(puids[2]);
+    fourthFeature.puids.push(puids[3]);
 
     return [firstFeature, secondFeature, thirdFeature, fourthFeature];
   };
@@ -313,15 +422,46 @@ const getFixtures = async () => {
     amountOfPlanningUnits,
   );
 
+  const insertApiEvent = async (kind: API_EVENT_KINDS): Promise<void> => {
+    await apiEntityManager
+      .createQueryBuilder()
+      .insert()
+      .into('api_events')
+      .values({ kind, topic: scenarioId, data: {} })
+      .execute();
+  };
+
+  const insertScenarioFeaturesData = async (): Promise<void> => {
+    await insertApiEvent(
+      API_EVENT_KINDS.scenario__specification__finished__v1__alpha1,
+    );
+
+    await scenarioFeaturesDataRepo.save(
+      featuresData.map((fd) => ({
+        featureDataId: fd.id,
+        scenarioId,
+        specificationId,
+        totalArea: 100,
+        fpf: 1,
+        prop: 0.5,
+      })),
+    );
+  };
+
   return {
     cleanUp: async () => {
       await DeleteProjectPus(geoEntityManager, projectId);
 
-      const featuresIds = await findProjectFeaturesIds();
-
       await DeleteFeatures(apiEntityManager, featuresIds);
 
       await featuresDataRepo.delete({ featureId: In(featuresIds) });
+
+      await apiEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from('api_events')
+        .where('topic = :topic', { topic: scenarioId })
+        .execute();
 
       await DeleteProjectAndOrganization(
         apiEntityManager,
@@ -331,8 +471,6 @@ const getFixtures = async () => {
 
       await DeleteUser(apiEntityManager, ownerId);
     },
-    GivenUserExists: () =>
-      GivenUserExists(apiEntityManager, ownerId, projectId),
     GivenJobInput: ({
       specDatFileLocation,
       puvsprDatFileLocation,
@@ -357,7 +495,7 @@ const getFixtures = async () => {
         });
 
       return {
-        piece: LegacyProjectImportPiece.Features,
+        piece: LegacyProjectImportPiece.FeaturesSpecification,
         files,
         pieceId: v4(),
         projectId,
@@ -365,8 +503,10 @@ const getFixtures = async () => {
         ownerId,
       };
     },
-    GivenProjectExist: async () =>
-      GivenProjectExists(apiEntityManager, projectId, organizationId),
+    GivenProjectExist: async () => {
+      await GivenUserExists(apiEntityManager, ownerId, projectId);
+      return GivenProjectExists(apiEntityManager, projectId, organizationId);
+    },
     GivenDatFileIsAvailableInFilesRepository: async (
       file: LegacyProjectImportFileType,
     ) => {
@@ -416,9 +556,98 @@ const getFixtures = async () => {
       });
       fakePuvsprDatReader.readOperationResult = right(puvsprRows);
     },
+    GivenPuvsprDatFileWithUnknownFeature: () => {
+      const featuresWithPuids = getfeaturesWithPuids(pus);
+
+      const puvsprRows = featuresWithPuids.flatMap(({ id, puids }) => {
+        return puids.map((puid) => ({
+          species: id,
+          amount: 0.3,
+          pu: puid,
+        }));
+      });
+      fakePuvsprDatReader.readOperationResult = right([
+        ...puvsprRows,
+        { species: 1000, amount: 20, pu: puvsprRows[0].pu },
+      ]);
+    },
     GivenInvalidPuvsprDatFile: () => {
       fakePuvsprDatReader.readOperationResult = left(
         readOperationError(puvsprDatFileType),
+      );
+    },
+    GivenSpecificationRequestWillFail: () => {
+      fakeHttpService.status = HttpStatus.BAD_REQUEST;
+    },
+    GivenFeaturesData: async (
+      {
+        includeRequiredProperties,
+      }: {
+        includeRequiredProperties: boolean;
+      } = { includeRequiredProperties: true },
+    ) => {
+      const specRowsOrError = await fakeSpecDatReader.readFile();
+      const puvsprRowsOrError = await fakePuvsprDatReader.readFile();
+      if (isLeft(puvsprRowsOrError) || isLeft(specRowsOrError))
+        throw new Error('Unexpected error obtaining spec and/or puvspr rows');
+
+      const featureIdsMap: Record<number, string> = {};
+
+      await Promise.all(
+        specRowsOrError.right.map((feature) => {
+          const id = v4();
+          featureIdsMap[feature.id] = id;
+
+          return apiEntityManager
+            .createQueryBuilder()
+            .insert()
+            .into('features')
+            .values({
+              id,
+              feature_class_name: feature.name,
+              project_id: projectId,
+              tag: 'species',
+              creation_status: 'created',
+            })
+            .execute();
+        }),
+      );
+
+      featuresIds.push(...Object.values(featureIdsMap));
+
+      const geometries = await planningUnitsGeomRepo.find({
+        select: ['id', 'theGeom'],
+        where: {
+          id: In(pus.map((pu) => pu.geomId)),
+        },
+      });
+
+      featuresData = await featuresDataRepo.save(
+        puvsprRowsOrError.right.map((row) => {
+          const featurePu = pus.find((pu) => pu.puid === row.pu);
+          if (!featurePu) {
+            throw new Error(`Planning unit with ${row.pu} puid not found`);
+          }
+          const geometry = geometries.find(
+            (geom) => geom.id === featurePu.geomId,
+          );
+          if (!geometry) {
+            throw new Error(`Geometry with ${featurePu.geomId} id not found`);
+          }
+
+          return {
+            id: v4(),
+            properties: includeRequiredProperties
+              ? {
+                  [specDatFeatureIdPropertyKey]: row.species,
+                  [specDatPuidPropertyKey]: featurePu.puid,
+                }
+              : {},
+            source: GeometrySource.user_imported,
+            featureId: featureIdsMap[row.species],
+            theGeom: geometry.theGeom,
+          };
+        }),
       );
     },
     WhenPieceImporterIsInvoked: (input: LegacyProjectImportJobInput) => {
@@ -444,39 +673,70 @@ const getFixtures = async () => {
             readOperationError(file),
           );
         },
-        ThenADuplicateFeatureIdsErrorShouldBeThrown: async () => {
+        ThenASpecificationRequestErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /spec.dat contains duplicate feature ids/gi,
+            /specification launch request failed/gi,
           );
         },
-        ThenADuplicateFeatureNamesErrorShouldBeThrown: async () => {
-          await expect(sut.run(input)).rejects.toThrow(
-            /spec.dat contains duplicate feature names/gi,
-          );
+        AndSpecificationProcessFails: () => {
+          return {
+            ThenASpecificationDidntFinishErrorShouldBeThrown: async () => {
+              await insertApiEvent(
+                API_EVENT_KINDS.scenario__specification__failed__v1__alpha1,
+              );
+              await expect(sut.run(input)).rejects.toThrow(
+                /specification didn't finish: specification failed/gi,
+              );
+            },
+          };
         },
-        ThenFeatureAndFeaturesDataShouldBeImported: async () => {
-          const result = await sut.run(input);
+        AndSpecificationProcessTimeouts: () => {
+          return {
+            ThenASpecificationDidntFinishErrorShouldBeThrown: async () => {
+              await expect(sut.run(input)).rejects.toThrow(
+                /specification didn't finish: specification timeout/gi,
+              );
+            },
+          };
+        },
+        AndSpecificationProcessSucceeds: () => {
+          return {
+            ThenAMissingRequiredPropertiesErrorShouldBeThrown: async () => {
+              await insertScenarioFeaturesData();
+              await expect(sut.run(input)).rejects.toThrow(
+                /scenario features data properties does not contain required properties/gi,
+              );
+            },
+            ThenPuvsprContainsUnknownFeaturesErrorShouldBeThrown: async () => {
+              await insertScenarioFeaturesData();
+              await expect(sut.run(input)).rejects.toThrow(
+                /puvspr.dat contains feature ids not found in spec.dat/gi,
+              );
+            },
+            ThenScenarioFeaturesDataShouldBeImported: async () => {
+              await insertScenarioFeaturesData();
+              const result = await sut.run(input);
+              expect(result).toBeDefined();
 
-          expect(result).toBeDefined();
+              const puvsprRowsOrError = await fakePuvsprDatReader.readFile();
+              if (isLeft(puvsprRowsOrError))
+                throw new Error('Unexpected error obtaining puvspr rows');
 
-          expect(result.warnings).toHaveLength(1);
-          expect(result.warnings![0]).toContain(nonExistingPuid);
+              const scenarioFeaturesIds = await scenarioFeaturesDataRepo.find({
+                where: { scenarioId },
+              });
 
-          const insertedFeaturesIds = await findProjectFeaturesIds();
+              expect(scenarioFeaturesIds).toHaveLength(
+                puvsprRowsOrError.right.length,
+              );
 
-          expect(insertedFeaturesIds).toHaveLength(amountOfFeatures);
-
-          const amountOfNonExistingPuids = 1;
-          const amountOfFeaturesData = getfeaturesWithPuids(pus).flatMap(
-            (pu) => pu.puids,
-          ).length;
-          const insertedFeaturesData = await featuresDataRepo.find({
-            featureId: In(insertedFeaturesIds),
-          });
-
-          expect(insertedFeaturesData).toHaveLength(
-            amountOfFeaturesData - amountOfNonExistingPuids,
-          );
+              expect(
+                scenarioFeaturesIds.every(
+                  (row) => row.specificationId === specificationId,
+                ),
+              ).toBe(true);
+            },
+          };
         },
       };
     },
@@ -500,5 +760,17 @@ class FakePuvsprDatReader {
 
   async readFile(): Promise<Either<string, PuvrsprDatRow[]>> {
     return this.readOperationResult;
+  }
+}
+
+class FakeHttpService {
+  public status = HttpStatus.CREATED;
+
+  post() {
+    return {
+      toPromise: async () => ({
+        status: this.status,
+      }),
+    };
   }
 }

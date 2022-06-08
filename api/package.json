@@ -118,6 +118,7 @@
     "@types/faker": "^5.1.5",
     "@types/fs-extra": "9.0.11",
     "@types/geojson": "7946.0.7",
+    "@types/http-errors": "^1.8.2",
     "@types/http-proxy": "^1.17.5",
     "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.167",
@@ -249,5 +250,8 @@
       "@marxan/domain-ids/(.*)": "<rootDir>/libs/domain-ids/src/$1",
       "@marxan/domain-ids": "<rootDir>/libs/domain-ids/src"
     }
+  },
+  "volta": {
+    "node": "14.18.3"
   }
 }
