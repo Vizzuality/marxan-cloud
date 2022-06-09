@@ -21,6 +21,14 @@ describe(`when piece of data has incorrect values`, () => {
   });
 });
 
+describe(`when piece of data has unknown values`, () => {
+  it(`ignores unknown values`, async () => {
+    await expect(
+      fixtures.resolvesTo(fixtures.withUnknownFeatureIdsOutput().pipe(sut)),
+    ).resolves.toEqual([]);
+  });
+});
+
 describe(`when every piece of data is valid`, () => {
   it(`should return parsed data`, async () => {
     const results = await fixtures.resolvesTo(
@@ -90,6 +98,10 @@ const getFixtures = async () => {
         id: `4242a3d3-0433-4f1b-b264-685f6461abcf`,
         prop: 0.5,
       },
+      7: {
+        id: `invalid-uuid`,
+        prop: 0.5,
+      },
     }),
     withValidOutput: () =>
       stream.Readable.from(
@@ -101,6 +113,15 @@ const getFixtures = async () => {
         },
       ),
     withInvalidOutput: () =>
+      stream.Readable.from(
+        `,7,VALUE_7,string-value-1,string-value-2,string-value-3,string-value-4,string-value-5,string-value-6,,string-value-7`.split(
+          `\n`,
+        ),
+        {
+          objectMode: true,
+        },
+      ),
+    withUnknownFeatureIdsOutput: () =>
       stream.Readable.from(
         `,a,VALUE_6,string-value-1,string-value-2,string-value-3,string-value-4,string-value-5,string-value-6,,string-value-7`.split(
           `\n`,
