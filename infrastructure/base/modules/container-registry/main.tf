@@ -14,6 +14,10 @@ resource "azurerm_container_registry" "acr" {
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location
   sku                 = "Basic"
+
+  identity {
+    type = "SystemAssigned"
+  }
 }
 
 resource "azuread_application" "github-actions-access" {
