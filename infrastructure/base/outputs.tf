@@ -11,6 +11,7 @@ output "k8s_cluster_name" {
 output "k8s_cluster_hostname" {
   value       = module.kubernetes.cluster_hostname
   description = "AKS cluster hostname"
+  sensitive = true
 }
 
 output "kube_config" {

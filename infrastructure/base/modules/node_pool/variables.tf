@@ -31,7 +31,7 @@ variable "min_node_count" {
 
 variable "max_node_count" {
   type        = number
-  default     = 8
+  default     = 12
   description = "The maximum number of machines in this pool"
 }
 
