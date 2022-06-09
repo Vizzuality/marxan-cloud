@@ -3,11 +3,12 @@ import { UserId } from '@marxan/domain-ids';
 import { LegacyProjectImportPiece } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
-import { isLeft } from 'fp-ts/lib/Either';
+import { isLeft, isRight } from 'fp-ts/lib/Either';
 import { v4, validate, version } from 'uuid';
 import { forbiddenError } from '../../access-control';
 import { LegacyProjectImport } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentStatuses } from '../domain/legacy-project-import/legacy-project-import-component-status';
+import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
 import {
   legacyProjectImportNotFound,
   LegacyProjectImportRepository,
@@ -129,7 +130,8 @@ const getFixtures = async () => {
             ? LegacyProjectImportComponentStatuses.Failed
             : LegacyProjectImportComponentStatuses.Completed,
         })),
-        isAcceptingFiles: false,
+        status: LegacyProjectImportStatuses.Failed,
+        toBeRemoved: false,
       });
 
       await repo.save(legacyProjectImport);
@@ -187,6 +189,8 @@ const getFixtures = async () => {
         },
         ThenLegacyProjectImportNotFoundErrorShouldBeReturned: async () => {
           const result = await sut.execute(query);
+
+          expect(result).toMatchObject({ left: legacyProjectImportNotFound });
         },
         ThenForbiddenErrorShouldBeReturned: async () => {
           const result = await sut.execute(query);

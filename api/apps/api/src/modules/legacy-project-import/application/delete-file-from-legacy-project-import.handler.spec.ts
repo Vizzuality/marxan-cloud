@@ -18,6 +18,7 @@ import {
   legacyProjectImportAlreadyStarted,
 } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentSnapshot } from '../domain/legacy-project-import/legacy-project-import-component.snapshot';
+import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
 import {
   legacyProjectImportNotFound,
   LegacyProjectImportRepository,
@@ -180,7 +181,10 @@ const getFixtures = async () => {
         ownerId: ownerId.value,
         files,
         pieces,
-        isAcceptingFiles,
+        status: isAcceptingFiles
+          ? LegacyProjectImportStatuses.AceptingFiles
+          : LegacyProjectImportStatuses.Running,
+        toBeRemoved: false,
       });
 
       await repo.save(legacyProjectImport);
