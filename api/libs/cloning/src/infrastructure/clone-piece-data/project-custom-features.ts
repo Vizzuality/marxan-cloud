@@ -9,6 +9,7 @@ export enum JobStatus {
   draft = 'draft',
   created = 'created',
   running = 'running',
+  canceled = 'canceled',
   done = 'done',
   failure = 'failure',
 }

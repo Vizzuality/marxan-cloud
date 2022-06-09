@@ -2,17 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Required } from 'utility-types';
-import { JobStatus as Status } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { assertDefined, isDefined } from '@marxan/utils';
 import { ScenarioJobStatus } from './job-status.view.api.entity';
 import { JobType } from './jobs.enum';
 import { ProjectJobStatus } from '@marxan-api/modules/projects/job-status/project-status.view.api.entity';
-
-export { Status };
+import { ApiEventJobStatus } from './api-event-job-status.enum';
 
 export interface Job {
   kind: JobType;
-  status: Status;
+  status: ApiEventJobStatus;
   isoDate?: string;
 }
 
