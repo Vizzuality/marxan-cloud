@@ -35,8 +35,16 @@ export class OutputLineToDataTransformer extends Transform<
       targetMet,
       mpm,
     ] = chunk.split(',');
-    const featureScenarioId: string | undefined = this.idMap[+featureId]?.id;
-    const totalArea = Number(target) * (1 / this.idMap[+featureId]?.prop ?? 1);
+
+    const mapValue = this.idMap[+featureId];
+
+    if (!mapValue) {
+      callback(null, undefined);
+      return;
+    }
+
+    const featureScenarioId: string | undefined = mapValue.id;
+    const totalArea = Number(target) * (1 / mapValue.prop ?? 1);
     const data: ScenarioFeatureRunData = plainToClass<
       ScenarioFeatureRunData,
       ScenarioFeatureRunData
@@ -53,7 +61,7 @@ export class OutputLineToDataTransformer extends Transform<
       runId: +runId,
     });
 
-    const errors = await validateSync(data);
+    const errors = validateSync(data);
     if (errors.length > 0) {
       return callback(
         new Error(
