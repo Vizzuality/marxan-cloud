@@ -85,8 +85,8 @@ const getFixtures = async () => {
   const projectId = v4();
   const scenarioId = v4();
   let customProtectedAreaId: string = v4();
-  let commonProtectedAreasWdpaids: number[] = [];
-  let commonProtectedAreasIds: string[] = [];
+  const commonProtectedAreasWdpaids: number[] = [];
+  const commonProtectedAreasIds: string[] = [];
   const organizationId = v4();
   const sut = sandbox.get(ScenarioProtectedAreasPieceExporter);
   const apiEntityManager: EntityManager = sandbox.get(

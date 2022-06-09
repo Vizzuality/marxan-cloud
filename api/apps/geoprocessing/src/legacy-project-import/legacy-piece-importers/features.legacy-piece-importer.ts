@@ -29,14 +29,14 @@ import {
 } from './file-readers/puvspr-dat.reader';
 import { SpecDatReader, SpecDatRow } from './file-readers/spec-dat.reader';
 
-type FeaturesData = Omit<SpecDatRow, 'id'> & {
+type FeaturesData = {
   id: string;
-  project_id: string;
-  featureIntegerId: number;
+  specDatFeatureId: number;
   feature_class_name: string;
-  tag: string;
-  creation_status: JobStatus;
 };
+
+export const specDatFeatureIdPropertyKey = 'specDatFeatureId';
+export const specDatPuidPropertyKey = 'puid';
 
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
@@ -53,6 +53,15 @@ export class FeaturesLegacyProjectPieceImporter
     private readonly logger: Logger,
   ) {
     this.logger.setContext(FeaturesLegacyProjectPieceImporter.name);
+  }
+
+  isSupported(piece: LegacyProjectImportPiece): boolean {
+    return piece === LegacyProjectImportPiece.Features;
+  }
+
+  private logAndThrow(message: string): never {
+    this.logger.error(message);
+    throw new Error(message);
   }
 
   private async getProjectPusGeomsMap(
@@ -94,7 +103,7 @@ export class FeaturesLegacyProjectPieceImporter
 
     features.forEach(async (feature) => {
       const filteredPuvspr = puvsprDatRows.filter(
-        (row) => row.species === feature.featureIntegerId,
+        (row) => row.species === feature.specDatFeatureId,
       );
 
       filteredPuvspr.forEach((filteredRow) => {
@@ -111,8 +120,8 @@ export class FeaturesLegacyProjectPieceImporter
           theGeom: geometry,
           properties: {
             name: feature.feature_class_name,
-            featureId: feature.featureIntegerId,
-            puid: filteredRow.pu,
+            [specDatFeatureIdPropertyKey]: feature.specDatFeatureId,
+            [specDatPuidPropertyKey]: filteredRow.pu,
           },
           source: GeometrySource.user_imported,
         });
@@ -122,8 +131,36 @@ export class FeaturesLegacyProjectPieceImporter
     return { featuresDataInsertValues, nonExistingPus };
   }
 
-  isSupported(piece: LegacyProjectImportPiece): boolean {
-    return piece === LegacyProjectImportPiece.Features;
+  private getDuplicateFeatureIds(rows: SpecDatRow[]) {
+    const duplicateIds = new Set<number>();
+    const knownIds: Record<number, true> = {};
+
+    rows.forEach((row) => {
+      const { id } = row;
+
+      const knownPuid = knownIds[id];
+
+      if (knownPuid) duplicateIds.add(id);
+      else knownIds[id] = true;
+    });
+
+    return Array.from(duplicateIds);
+  }
+
+  private getDuplicateFeatureNames(rows: SpecDatRow[]) {
+    const duplicateNames = new Set<string>();
+    const knownNames: Record<string, true> = {};
+
+    rows.forEach((row) => {
+      const { name } = row;
+
+      const knownPuid = knownNames[name];
+
+      if (knownPuid) duplicateNames.add(name);
+      else knownNames[name] = true;
+    });
+
+    return Array.from(duplicateNames);
   }
 
   async run(
@@ -136,20 +173,21 @@ export class FeaturesLegacyProjectPieceImporter
     );
 
     if (!specFeaturesFileOrError)
-      throw new Error('spec.dat file not found inside input file array');
+      this.logAndThrow('spec.dat file not found inside input file array');
 
     const specFileReadableOrError = await this.filesRepo.get(
       specFeaturesFileOrError.location,
     );
 
     if (isLeft(specFileReadableOrError))
-      throw new Error('spec.dat file not found in files repo');
+      this.logAndThrow('spec.dat file not found in files repo');
 
     const specDatRowsOrError = await this.specDatReader.readFile(
       specFileReadableOrError.right,
     );
 
-    if (isLeft(specDatRowsOrError)) throw new Error(specDatRowsOrError.left);
+    if (isLeft(specDatRowsOrError))
+      this.logAndThrow(`Error in spec.dat file: ${specDatRowsOrError.left}`);
 
     const specDatRows = specDatRowsOrError.right;
 
@@ -158,65 +196,85 @@ export class FeaturesLegacyProjectPieceImporter
     );
 
     if (!puvsprFeaturesFileOrError)
-      throw new Error('puvspr.dat file not found inside input file array');
+      this.logAndThrow('puvspr.dat file not found inside input file array');
 
     const puvsprFileReadableOrError = await this.filesRepo.get(
       puvsprFeaturesFileOrError.location,
     );
 
     if (isLeft(puvsprFileReadableOrError))
-      throw new Error('The puvspr.dat file not found in files repo');
+      this.logAndThrow('puvspr.dat file not found in files repo');
 
     const puvsprDatRowsOrError = await this.puvsprDatReader.readFile(
       puvsprFileReadableOrError.right,
     );
 
     if (isLeft(puvsprDatRowsOrError))
-      throw new Error(puvsprDatRowsOrError.left);
+      this.logAndThrow(
+        `Error in puvspr.dat file: ${puvsprDatRowsOrError.left}`,
+      );
+
+    const duplicateFeatureIds = this.getDuplicateFeatureIds(specDatRows);
+    if (duplicateFeatureIds.length) {
+      throw new Error(
+        `spec.dat contains duplicate feature ids: ${duplicateFeatureIds.join(
+          ', ',
+        )}`,
+      );
+    }
+
+    const duplicateFeatureNames = this.getDuplicateFeatureNames(specDatRows);
+    if (duplicateFeatureNames.length) {
+      throw new Error(
+        `spec.dat contains duplicate feature names: ${duplicateFeatureNames.join(
+          ', ',
+        )}`,
+      );
+    }
 
     const puvsprDatRows = puvsprDatRowsOrError.right;
 
     const projectPusGeomsMap = await this.getProjectPusGeomsMap(projectId);
 
+    const featureUuidByNumericId: Record<number, string> = {};
     const nonExistingPus = await this.apiEntityManager.transaction(
       async (apiEm) => {
         const featuresInsertValues = specDatRows.map((feature) => {
           const featureId = v4();
+          featureUuidByNumericId[feature.id] = featureId;
 
           return {
-            ...feature,
             project_id: projectId,
-            featureIntegerId: feature.id,
             id: featureId,
             feature_class_name: feature.name,
             tag: FeatureTag.Species,
             creation_status: JobStatus.created,
+            created_by: input.ownerId,
           };
         });
 
         await Promise.all(
-          featuresInsertValues.map(
-            ({ id, feature_class_name, project_id, tag, creation_status }) =>
-              apiEm
-                .createQueryBuilder()
-                .insert()
-                .into('features')
-                .values({
-                  id,
-                  feature_class_name,
-                  project_id,
-                  tag,
-                  creation_status,
-                })
-                .execute(),
+          featuresInsertValues.map((value) =>
+            apiEm
+              .createQueryBuilder()
+              .insert()
+              .into('features')
+              .values(value)
+              .execute(),
           ),
         );
+
+        const featuresData = specDatRows.map((row) => ({
+          id: featureUuidByNumericId[row.id],
+          specDatFeatureId: row.id,
+          feature_class_name: row.name,
+        }));
 
         const {
           featuresDataInsertValues,
           nonExistingPus,
         } = this.getFeaturesDataInsertValues(
-          featuresInsertValues,
+          featuresData,
           puvsprDatRows,
           projectPusGeomsMap,
         );

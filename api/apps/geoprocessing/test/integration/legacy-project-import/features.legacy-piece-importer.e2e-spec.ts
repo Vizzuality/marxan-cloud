@@ -8,10 +8,7 @@ import {
   SpecDatRow,
 } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/spec-dat.reader';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import {
-  PlanningUnitsGeom,
-  ProjectsPuEntity,
-} from '@marxan-jobs/planning-unit-geometry';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   LegacyProjectImportFilesMemoryRepository,
@@ -20,7 +17,6 @@ import {
   LegacyProjectImportJobInput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
@@ -37,8 +33,10 @@ import {
   DeleteFeatures,
   DeleteProjectAndOrganization,
   DeleteProjectPus,
+  DeleteUser,
   GivenProjectExists,
   GivenProjectPus,
+  GivenUserExists,
 } from '../cloning/fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -142,10 +140,51 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       .ThenADatFileReadOperationErrorShouldBeThrown(puvsprDatFileType);
   });
 
+  it('fails if spec.dat file contains duplicate feature ids', async () => {
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.SpecDat,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenSpecDatFileWithDuplicateFeatureIds();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADuplicateFeatureIdsErrorShouldBeThrown();
+  });
+
+  it('fails if spec.dat file contains duplicate feature names', async () => {
+    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.SpecDat,
+    );
+    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const job = fixtures.GivenJobInput({
+      specDatFileLocation,
+      puvsprDatFileLocation,
+    });
+    fixtures.GivenSpecDatFileWithDuplicateFeatureNames();
+    fixtures.GivenValidPuvsprDatFile();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADuplicateFeatureNamesErrorShouldBeThrown();
+  });
+
   it('imports successfully scenario pus data and scenario pus cost data', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
+    await fixtures.GivenUserExists();
     const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
       specDatFileType,
     );
@@ -207,6 +246,7 @@ const getFixtures = async () => {
   const organizationId = v4();
   const projectId = v4();
   const scenarioId = v4();
+  const ownerId = v4();
   const amountOfFeatures = 4;
   const amountOfPlanningUnits = 4;
 
@@ -288,7 +328,11 @@ const getFixtures = async () => {
         projectId,
         organizationId,
       );
+
+      await DeleteUser(apiEntityManager, ownerId);
     },
+    GivenUserExists: () =>
+      GivenUserExists(apiEntityManager, ownerId, projectId),
     GivenJobInput: ({
       specDatFileLocation,
       puvsprDatFileLocation,
@@ -318,6 +362,7 @@ const getFixtures = async () => {
         pieceId: v4(),
         projectId,
         scenarioId,
+        ownerId,
       };
     },
     GivenProjectExist: async () =>
@@ -341,6 +386,18 @@ const getFixtures = async () => {
         ({ puids, ...feature }) => feature,
       );
       fakeSpecDatReader.readOperationResult = right(specRows);
+    },
+    GivenSpecDatFileWithDuplicateFeatureIds: () => {
+      fakeSpecDatReader.readOperationResult = right([
+        { id: 1, prop: 0.1, name: 'first' },
+        { id: 1, prop: 0.5, name: 'second' },
+      ]);
+    },
+    GivenSpecDatFileWithDuplicateFeatureNames: () => {
+      fakeSpecDatReader.readOperationResult = right([
+        { id: 1, prop: 0.1, name: 'first' },
+        { id: 2, prop: 0.5, name: 'first' },
+      ]);
     },
     GivenInvalidSpecDatFile: () => {
       fakeSpecDatReader.readOperationResult = left(
@@ -387,14 +444,14 @@ const getFixtures = async () => {
             readOperationError(file),
           );
         },
-        ThenADuplicatePuidsErrorShouldBeThrown: async () => {
+        ThenADuplicateFeatureIdsErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /pu.dat file contains rows with the same puid/gi,
+            /spec.dat contains duplicate feature ids/gi,
           );
         },
-        ThenAMissingPlanningUnitsDataErrorShouldBeThrown: async () => {
+        ThenADuplicateFeatureNamesErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(
-            /pu.dat file is missing planning units data/gi,
+            /spec.dat contains duplicate feature names/gi,
           );
         },
         ThenFeatureAndFeaturesDataShouldBeImported: async () => {

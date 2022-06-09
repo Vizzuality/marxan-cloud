@@ -149,6 +149,7 @@ export class LegacyProjectImport extends AggregateRoot {
       LegacyProjectImportComponent.newOne(
         LegacyProjectImportPiece.PlanningGrid,
       ),
+      LegacyProjectImportComponent.newOne(LegacyProjectImportPiece.Input),
       LegacyProjectImportComponent.newOne(
         LegacyProjectImportPiece.ScenarioPusData,
       ),

@@ -4,6 +4,7 @@ export enum LegacyProjectImportPiece {
   ScenarioPusData = 'scenario-pus-data',
   FeaturesSpecification = 'features-specification',
   Solutions = 'solutions',
+  Input = 'input',
 }
 
 export class LegacyProjectImportPieceOrderResolver {
@@ -13,6 +14,7 @@ export class LegacyProjectImportPieceOrderResolver {
   > = {
     // TODO Establish proper order for pieces
     [LegacyProjectImportPiece.PlanningGrid]: 0,
+    [LegacyProjectImportPiece.Input]: 0,
     [LegacyProjectImportPiece.Features]: 1,
     [LegacyProjectImportPiece.ScenarioPusData]: 1,
     [LegacyProjectImportPiece.FeaturesSpecification]: 2,

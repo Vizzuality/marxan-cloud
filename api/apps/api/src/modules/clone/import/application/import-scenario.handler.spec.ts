@@ -187,7 +187,7 @@ class FakeScenarioRepository {
 
 class FakeExportRepository implements ExportRepository {
   public returnUnfinishedExport = false;
-  public importResourceId: string = '';
+  public importResourceId = '';
 
   async save(exportInstance: Export): Promise<Either<SaveError, Success>> {
     throw new Error('Method not implemented.');

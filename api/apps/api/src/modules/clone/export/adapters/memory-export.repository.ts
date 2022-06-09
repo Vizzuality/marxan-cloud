@@ -28,7 +28,7 @@ export class MemoryExportRepo implements ExportRepository {
 
   async findLatestExportsFor(
     projectId: string,
-    limit: number = 5,
+    limit = 5,
     options?: {
       isStandalone?: boolean;
       isFinished?: boolean;

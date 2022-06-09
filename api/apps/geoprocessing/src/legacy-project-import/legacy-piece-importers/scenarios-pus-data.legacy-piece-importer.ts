@@ -166,7 +166,8 @@ export class ScenarioPusDataLegacyProjectPieceImporter
       this.logAndThrow('pu.dat file not found in files repo');
 
     const rowsOrError = await this.puDatReader.readFile(readable.right);
-    if (isLeft(rowsOrError)) this.logAndThrow(rowsOrError.left);
+    if (isLeft(rowsOrError))
+      this.logAndThrow(`Error in pu.dat file: ${rowsOrError.left}`);
 
     const duplicatePuids = this.checkPuidsUniqueness(rowsOrError.right);
     if (duplicatePuids.length)

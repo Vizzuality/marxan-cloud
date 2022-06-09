@@ -7,7 +7,7 @@ import { IsArray, IsNumber, IsString, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { BBox } from 'geojson';
-import { nominatim2bbox } from '@marxan-geoprocessing/utils/bbox.utils';
+import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
 
 import { TileRequest } from '@marxan/tiles';
 
@@ -49,15 +49,24 @@ export class FeatureService {
     let whereQuery = `feature_id = '${id}'`;
 
     if (bbox) {
-      whereQuery += `AND st_intersects(ST_MakeEnvelope(${nominatim2bbox(
-        bbox,
-      )}, 4326), the_geom)`;
+      const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
+      whereQuery += `AND
+      (st_intersects(
+        st_intersection(st_makeenvelope(${eastBbox}, 4326),
+        ST_MakeEnvelope(0, -90, 180, 90, 4326)),
+      the_geom
+      ) or st_intersects(
+      st_intersection(st_makeenvelope(${westBbox}, 4326),
+      ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
+      the_geom
+      ))`;
     }
     return whereQuery;
   }
 
   /**
    * @todo get attributes from Entity, based on user selection
+   * @todo simplification level based on zoom level
    */
   public findTile(
     tileSpecification: TileSpecification,
@@ -65,7 +74,7 @@ export class FeatureService {
   ): Promise<Buffer> {
     const { z, x, y, id } = tileSpecification;
     const attributes = 'feature_id, properties';
-    const table = `(select (st_dump(the_geom)).geom as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
+    const table = `(select ST_RemoveRepeatedPoints((st_dump(the_geom)).geom, 0.1) as the_geom, properties, feature_id from "${this.featuresRepository.metadata.tableName}")`;
     const customQuery = this.buildFeaturesWhereQuery(id, bbox);
     return this.tileService.getTile({
       z,
