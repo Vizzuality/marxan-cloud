@@ -44,8 +44,8 @@ export class PuvsprDatReader extends DatFileReader<ReadRow, PuvrsprDatRow> {
         errorMessage: 'Non number amount value',
       },
       {
-        result: isNumber(amount) && (amount < 0 || amount > 1),
-        errorMessage: 'amount values should between [0, 1]',
+        result: isNumber(amount) && amount < 0,
+        errorMessage: 'Negative amount value',
       },
     ];
 

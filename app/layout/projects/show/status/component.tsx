@@ -81,7 +81,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
     }
   }, [ACTIONS_DONE, JOB_DONE]);
 
-  const onTryAgain = useCallback(() => {
+  const onCloseFailure = useCallback(() => {
     if (ACTIONS_FAILURE[JOB_FAILURE.kind]) {
       ACTIONS_FAILURE[JOB_FAILURE.kind]();
     } else {
@@ -147,9 +147,9 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
               <Button
                 theme="primary-alt"
                 size="base"
-                onClick={onTryAgain}
+                onClick={onCloseFailure}
               >
-                Try again
+                Close
               </Button>
             </div>
           </div>

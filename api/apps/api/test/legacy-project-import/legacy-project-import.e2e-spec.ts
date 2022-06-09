@@ -1,3 +1,4 @@
+import { LegacyProjectImportComponentId } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-component.id';
 import { ResourceId } from '@marxan/cloning/domain';
 import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -95,7 +96,7 @@ it('returns errors and warnings of a legacy project import', async () => {
 
   const result = await fixtures.WhenGettingErrorsAndWarningsOfALegacyProjectImport();
 
-  fixtures.ThenLegacyProjectImportErrorsAreReported(result, errors);
+  await fixtures.ThenLegacyProjectImportErrorsAreReported(result, errors);
 });
 
 const getFixtures = async () => {
@@ -146,6 +147,15 @@ const getFixtures = async () => {
     if (isLeft(result)) throw new Error('Legacy project import not found');
 
     return result.right;
+  };
+
+  const getFirstBatchPieces = async (projectId: string) => {
+    const legacyProjectImport = await getLegacyProjectImport(projectId);
+    const legacyProjectImportSnapshot = legacyProjectImport.toSnapshot();
+    const firstBatchOrder = 0;
+    return legacyProjectImportSnapshot.pieces.filter(
+      (piece) => piece.order === firstBatchOrder,
+    );
   };
 
   return {
@@ -205,12 +215,17 @@ const getFixtures = async () => {
       const event = await eventBusTestUtils.waitUntilEventIsPublished(
         LegacyProjectImportPieceRequested,
       );
+      const firstBatchPieces = await getFirstBatchPieces(projectId);
 
-      await commandBus.execute(
-        new MarkLegacyProjectImportPieceAsFailed(
-          event.projectId,
-          event.componentId,
-          errors,
+      await Promise.all(
+        firstBatchPieces.map((piece) =>
+          commandBus.execute(
+            new MarkLegacyProjectImportPieceAsFailed(
+              event.projectId,
+              new LegacyProjectImportComponentId(piece.id),
+              errors,
+            ),
+          ),
         ),
       );
 
@@ -325,13 +340,16 @@ const getFixtures = async () => {
 
       expect(files.some((file) => file.id === fileId)).toBe(false);
     },
-    ThenLegacyProjectImportErrorsAreReported: (
+    ThenLegacyProjectImportErrorsAreReported: async (
       queryResult: GetLegacyProjectImportErrorsResponseDto,
       expectedErrors: string[],
     ) => {
-      const [report] = queryResult.errorsAndWarnings;
+      const [report1, report2] = queryResult.errorsAndWarnings;
+      const failedPices = await getFirstBatchPieces(projectId);
 
-      expect(report.errors.sort()).toEqual(expectedErrors.sort());
+      expect(queryResult.errorsAndWarnings).toHaveLength(failedPices.length);
+      expect(report1.errors.sort()).toEqual(expectedErrors.sort());
+      expect(report2.errors.sort()).toEqual(expectedErrors.sort());
     },
   };
 };

@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { DatFileReader, ValidationCheck } from './dat-file.reader';
+import { isRight } from 'fp-ts/lib/These';
+import { Readable } from 'stream';
+import {
+  DatFileReader,
+  DefaultDatFileDelimiter,
+  ValidationCheck,
+} from './dat-file.reader';
 
 type ReadRow = {
   id?: string;
@@ -14,9 +20,8 @@ type ReadRow = {
   sepdistance?: string;
 };
 
-export type SpecDatRow = {
+type CommonColumns = {
   id: number;
-  prop: number;
   spf?: number;
   target2?: number;
   targetocc?: number;
@@ -25,21 +30,45 @@ export type SpecDatRow = {
   sepdistance?: number;
 };
 
+export type PropSpecDatRow = CommonColumns & {
+  prop: number;
+};
+
+export type TargetSpecDatRow = CommonColumns & {
+  target: number;
+};
+
+export type SpecDatRow = PropSpecDatRow | TargetSpecDatRow;
+
+type Prop = { prop: number };
+type Target = { target: number };
+type PropOrTarget = Prop | Target;
+
 @Injectable()
 export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
+  isPropRow(row: PropOrTarget): row is Prop {
+    return (row as Prop).prop !== undefined;
+  }
+
+  isTargetRow(row: PropOrTarget): row is Target {
+    return (row as Target).target !== undefined;
+  }
+
   validateData({
     id,
-    prop,
+    name,
     spf,
     target2,
     targetocc,
     sepnum,
     sepdistance,
+    ...propOrTarget
   }: SpecDatRow): Either<string, true> {
     const isNumber = (value: unknown): value is number =>
       typeof value === 'number' && !Number.isNaN(value);
     const isInteger = (value: unknown) =>
       isNumber(value) && Number.isInteger(value);
+    const isDefined = (value: unknown) => value !== undefined && value !== null;
 
     const checks: ValidationCheck[] = [
       {
@@ -51,51 +80,67 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
         errorMessage: 'Negative feature id',
       },
       {
-        result: !isNumber(prop),
+        result: this.isPropRow(propOrTarget) && !isNumber(propOrTarget.prop),
         errorMessage: 'Non number prop value',
       },
       {
-        result: isNumber(prop) && (prop < 0 || prop > 1),
+        result:
+          this.isPropRow(propOrTarget) &&
+          isNumber(propOrTarget.prop) &&
+          (propOrTarget.prop < 0 || propOrTarget.prop > 1),
         errorMessage: 'Prop values should between [0, 1]',
       },
       {
-        result: !isNumber(spf),
+        result:
+          this.isTargetRow(propOrTarget) && !isInteger(propOrTarget.target),
+        errorMessage: 'Non integer target value',
+      },
+      {
+        result:
+          this.isTargetRow(propOrTarget) &&
+          isInteger(propOrTarget.target) &&
+          propOrTarget.target < 0,
+        errorMessage: 'Negative target value',
+      },
+      {
+        result: isDefined(spf) && !isNumber(spf),
         errorMessage: 'Non number spf value',
       },
       {
-        result: isNumber(spf) && spf < 0,
+        result: isDefined(spf) && isNumber(spf) && spf < 0,
         errorMessage: 'Negative spf value',
       },
       {
-        result: !isNumber(target2),
+        result: isDefined(target2) && !isNumber(target2),
         errorMessage: 'Non number target2 value',
       },
       {
-        result: isNumber(target2) && target2 < 0,
+        result: isDefined(target2) && isNumber(target2) && target2 < 0,
         errorMessage: 'Negative target2 value',
       },
       {
-        result: !isNumber(targetocc),
+        result: isDefined(targetocc) && !isNumber(targetocc),
         errorMessage: 'Non number targetocc value',
       },
       {
-        result: isNumber(targetocc) && targetocc < 0,
+        result: isDefined(targetocc) && isNumber(targetocc) && targetocc < 0,
         errorMessage: 'Negative targetocc value',
       },
       {
-        result: !isNumber(sepnum),
+        result: isDefined(sepnum) && !isNumber(sepnum),
         errorMessage: 'Non number sepnum value',
       },
       {
-        result: isNumber(sepnum) && sepnum < 0,
+        result: isDefined(sepnum) && isNumber(sepnum) && sepnum < 0,
         errorMessage: 'Negative sepnum value',
       },
       {
-        result: !isNumber(sepdistance),
+        result: isDefined(sepdistance) && !isNumber(sepdistance),
         errorMessage: 'Non number sepdistance value',
       },
       {
-        result: isNumber(sepdistance) && sepdistance < 0,
+        result:
+          isDefined(sepdistance) && isNumber(sepdistance) && sepdistance < 0,
         errorMessage: 'Negative sepdistance value',
       },
     ];
@@ -112,39 +157,77 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
   transform({
     id,
     name,
-    prop,
     sepdistance,
     sepnum,
     spf,
     target2,
-    target,
     targetocc,
+    prop,
+    target,
   }: ReadRow): SpecDatRow {
     if (id === undefined) {
       throw new Error('Id column is required');
     }
 
-    if (name === undefined) {
-      throw new Error('Name column is required');
+    const propAndTargetUndefined = prop === undefined && target === undefined;
+    const propAndTargetDefined = prop !== undefined && target !== undefined;
+
+    if (propAndTargetUndefined || propAndTargetDefined) {
+      throw new Error('Prop and target column should be exclusively defined');
     }
 
-    if (prop === undefined) {
-      throw new Error('Prop column is required');
-    }
-
-    if (target !== undefined) {
-      throw new Error(`Target column is not supported, translate it to prop`);
-    }
-
-    return {
+    const values = {
       id: parseInt(id),
-      name,
-      prop: parseFloat(prop),
+      name: name ?? '',
       sepdistance: sepdistance ? parseFloat(sepdistance) : undefined,
       sepnum: sepnum ? parseFloat(sepnum) : undefined,
       spf: spf ? parseFloat(spf) : undefined,
       target2: target2 ? parseFloat(target2) : undefined,
       targetocc: targetocc ? parseFloat(targetocc) : undefined,
     };
+
+    if (target !== undefined) {
+      return {
+        ...values,
+        target: parseInt(target),
+      };
+    }
+
+    if (prop !== undefined) {
+      return {
+        ...values,
+        prop: parseFloat(prop),
+      };
+    }
+
+    throw new Error('Unreachable code');
+  }
+
+  async readFile(
+    file: Readable,
+    delimiter = DefaultDatFileDelimiter,
+  ): Promise<Either<string, SpecDatRow[]>> {
+    const result = await super.readFile(file, delimiter);
+
+    if (isRight(result)) {
+      let unnamedFeaturesCount = 0;
+      const rows = result.right.map((row) => {
+        let name = row.name;
+
+        if (name === '') {
+          unnamedFeaturesCount = unnamedFeaturesCount + 1;
+          name = `Unnamed feature ${unnamedFeaturesCount}`;
+        }
+
+        return {
+          ...row,
+          name,
+        };
+      });
+
+      return right(rows);
+    }
+
+    return result;
   }
 }

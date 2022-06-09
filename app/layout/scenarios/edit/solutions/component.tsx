@@ -20,6 +20,9 @@ import ScheduleScenario from 'layout/scenarios/edit/solutions/schedule';
 import Sections from 'layout/sections';
 
 import Select from 'components/forms/select';
+import Icon from 'components/icon';
+
+import STAR_SVG from 'svgs/ui/star.svg?sprite';
 
 import { ScenariosSidebarShowSolutionsProps } from './types';
 
@@ -71,10 +74,22 @@ export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutio
 
     return allSolutionsData.map((s) => ({
       id: s.id,
-      label: `Run number ${s.runId}`,
+      label: (
+        <div className="flex items-center space-x-2">
+          <span>
+            Run number
+            {' '}
+            {s.runId}
+          </span>
+
+          {s.id === bestSolutionData?.id && (
+            <Icon icon={STAR_SVG} className="w-2.5 h-2.5 ml-3 text-blue-400" />
+          )}
+        </div>
+      ),
       value: s.runId,
     }));
-  }, [allSolutionsData]);
+  }, [allSolutionsData, bestSolutionData]);
 
   // CALLBACKS
   const onChangeSection = useCallback((s) => {

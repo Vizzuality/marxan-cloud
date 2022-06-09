@@ -19,3 +19,7 @@ export const blmFormat = (blm: number): string => {
 export const bytesToMegabytes = (bytes: number): number => {
   return bytes / 1048576;
 };
+
+export const bytesToKilobytes = (bytes: number): number => {
+  return bytes / 1048.576;
+};

@@ -77,22 +77,10 @@ it('fails when puvspr.dat contains non number amount values', async () => {
   fixtures.ThenPuvsprDatReadOperationFails(result, /non number amount value/gi);
 });
 
-it('fails when puvspr.dat contains amount values greater than one', async () => {
-  const file = fixtures.GivenAnInvalidPuvsprDatFile({ amount: 2 });
+it('fails when puvspr.dat contains negative amount values', async () => {
+  const file = fixtures.GivenAnInvalidPuvsprDatFile({ amount: -20 });
   const result = await fixtures.WhenExecutingPuvsprDatReader(file);
-  fixtures.ThenPuvsprDatReadOperationFails(
-    result,
-    /amount values should between/gi,
-  );
-});
-
-it('fails when puvspr.dat contains amount values lower than zero', async () => {
-  const file = fixtures.GivenAnInvalidPuvsprDatFile({ amount: -1 });
-  const result = await fixtures.WhenExecutingPuvsprDatReader(file);
-  fixtures.ThenPuvsprDatReadOperationFails(
-    result,
-    /amount values should between/gi,
-  );
+  fixtures.ThenPuvsprDatReadOperationFails(result, /negative amount value/gi);
 });
 
 const getFixtures = async () => {
@@ -126,7 +114,7 @@ const getFixtures = async () => {
       pu?: any;
       amount?: any;
     }) => {
-      const row = `${species ?? 0}\t${pu ?? 1}\t${amount ?? '0.3'}`;
+      const row = `${species ?? 0}\t${pu ?? 1}\t${amount ?? '30000'}`;
       return Readable.from(headers + row);
     },
     GivenPuvsprDatFileWithoutColumn: (columnToRemove: string) => {

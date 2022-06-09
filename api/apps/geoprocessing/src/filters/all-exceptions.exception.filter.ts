@@ -11,6 +11,7 @@ import { omit } from 'lodash';
 
 import * as JSONAPISerializer from 'jsonapi-serializer';
 import { Response } from 'express';
+import { HttpError } from 'http-errors';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 /**
@@ -24,6 +25,10 @@ import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger();
 
+  private isHttpError(exception: Error): exception is HttpError {
+    return exception instanceof HttpError;
+  }
+
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response: Response = ctx.getResponse();
@@ -32,6 +37,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
+        : this.isHttpError(exception)
+        ? exception.statusCode
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
     /**
