@@ -15,7 +15,7 @@ resource "azurerm_key_vault" "key_vault" {
   tags = var.project_tags
 
   dynamic "access_policy" {
-    for_each = distinct(concat(data.azuread_users.users.object_ids, [data.azurerm_client_config.current.object_id]))
+    for_each = distinct(concat([data.azurerm_client_config.current.object_id], data.azuread_users.users.object_ids))
     content {
       tenant_id = data.azurerm_client_config.current.tenant_id
       object_id = access_policy.value

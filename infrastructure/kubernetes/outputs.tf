@@ -13,7 +13,3 @@ output "staging_client_url" {
 output "staging_api_url" {
   value = "https://api.staging.${var.domain}"
 }
-
-output current_client_config {
-    value = module.key_vault_staging.current_client_config
-}
