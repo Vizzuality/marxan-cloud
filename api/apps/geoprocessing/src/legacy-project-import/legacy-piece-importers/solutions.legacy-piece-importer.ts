@@ -125,6 +125,7 @@ export class SolutionsLegacyProjectPieceImporter
   }
 
   private async insertOutputScenariosSummaries(
+    em: EntityManager,
     outputSumPath: string,
     planningUnitsState: PlanningUnitsSelectionState,
     scenarioId: string,
@@ -137,7 +138,7 @@ export class SolutionsLegacyProjectPieceImporter
       planningUnitsState,
     );
 
-    await this.apiEntityManager.save(
+    await em.save(
       ScenariosOutputResultsApiEntity,
       results.map(({ score, cost, ...runSummary }) => ({
         ...runSummary,
@@ -146,6 +147,20 @@ export class SolutionsLegacyProjectPieceImporter
         scenarioId,
       })),
     );
+  }
+
+  private async updateScenario(
+    em: EntityManager,
+    scenarioId: string,
+  ): Promise<void> {
+    await em
+      .createQueryBuilder()
+      .update('scenarios')
+      .set({
+        ran_at_least_once: true,
+      })
+      .where('id = :scenarioId', { scenarioId })
+      .execute();
   }
 
   async run(
@@ -215,11 +230,15 @@ export class SolutionsLegacyProjectPieceImporter
       await this.insertOutputScenarioFeaturesData(em, scenarioFeatureRunData);
       await this.insertOutputScenariosPuData(em, planningUnitsState);
 
-      await this.insertOutputScenariosSummaries(
-        outputSumPath,
-        planningUnitsState,
-        scenarioId,
-      );
+      await this.apiEntityManager.transaction(async (apiEm) => {
+        await this.insertOutputScenariosSummaries(
+          apiEm,
+          outputSumPath,
+          planningUnitsState,
+          scenarioId,
+        );
+        await this.updateScenario(apiEm, scenarioId);
+      });
     });
 
     return input;
