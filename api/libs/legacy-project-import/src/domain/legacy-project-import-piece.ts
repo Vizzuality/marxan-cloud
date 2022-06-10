@@ -18,7 +18,7 @@ export class LegacyProjectImportPieceOrderResolver {
     [LegacyProjectImportPiece.Features]: 1,
     [LegacyProjectImportPiece.ScenarioPusData]: 1,
     [LegacyProjectImportPiece.FeaturesSpecification]: 2,
-    [LegacyProjectImportPiece.Solutions]: 2,
+    [LegacyProjectImportPiece.Solutions]: 3,
   };
 
   static resolveFor(
