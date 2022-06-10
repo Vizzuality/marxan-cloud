@@ -169,7 +169,7 @@ const getFixtures = async () => {
 
       const legacyProjectImportSnapshot = legacyProjectImport.toSnapshot();
       expect(legacyProjectImportSnapshot.status).toEqual(
-        LegacyProjectImportStatuses.AceptingFiles,
+        LegacyProjectImportStatuses.AcceptingFiles,
       );
       expect(legacyProjectImportSnapshot.ownerId).toEqual(ownerId.value);
       expect(legacyProjectImportSnapshot.files).toEqual([]);

@@ -1,5 +1,5 @@
 export enum LegacyProjectImportStatuses {
-  AceptingFiles = 'accepting',
+  AcceptingFiles = 'accepting',
   Running = 'running',
   Canceled = 'canceled',
   Completed = 'completed',
@@ -9,41 +9,49 @@ export enum LegacyProjectImportStatuses {
 export class LegacyProjectImportStatus {
   static create(): LegacyProjectImportStatus {
     return new LegacyProjectImportStatus(
-      LegacyProjectImportStatuses.AceptingFiles,
+      LegacyProjectImportStatuses.AcceptingFiles,
     );
   }
 
-  constructor(private readonly status: LegacyProjectImportStatuses) {}
+  static fromSnapshot(status: LegacyProjectImportStatuses) {
+    return new LegacyProjectImportStatus(status);
+  }
+  private constructor(private readonly status: LegacyProjectImportStatuses) {}
 
   markAsRunning(): LegacyProjectImportStatus {
-    if (
-      this.status === LegacyProjectImportStatuses.Failed ||
-      this.status === LegacyProjectImportStatuses.Completed
-    )
-      throw new Error('Import process already done once ');
+    if (this.status !== LegacyProjectImportStatuses.AcceptingFiles)
+      throw new Error('invalid transition when mark as running');
     return new LegacyProjectImportStatus(LegacyProjectImportStatuses.Running);
   }
 
   markAsCompleted(): LegacyProjectImportStatus {
-    if (this.status === LegacyProjectImportStatuses.Failed)
-      throw new Error('Import process has already failed');
+    if (this.status !== LegacyProjectImportStatuses.Running)
+      throw new Error('invalid transition when mark as completed');
 
     return new LegacyProjectImportStatus(LegacyProjectImportStatuses.Completed);
   }
 
   markAsFailed(): LegacyProjectImportStatus {
-    if (this.status === LegacyProjectImportStatuses.Completed)
-      throw new Error('Import process has already been completed');
+    if (this.status !== LegacyProjectImportStatuses.Running)
+      throw new Error('invalid transition when mark as running');
 
     return new LegacyProjectImportStatus(LegacyProjectImportStatuses.Failed);
   }
 
   markAsCanceled(): LegacyProjectImportStatus {
-    return new LegacyProjectImportStatus(LegacyProjectImportStatuses.Canceled);
+    if (
+      this.status === LegacyProjectImportStatuses.Running ||
+      this.status === LegacyProjectImportStatuses.AcceptingFiles
+    )
+      return new LegacyProjectImportStatus(
+        LegacyProjectImportStatuses.Canceled,
+      );
+
+    throw new Error('invalid transition when mark as running');
   }
 
   isAcceptingFiles() {
-    return this.status === LegacyProjectImportStatuses.AceptingFiles;
+    return this.status === LegacyProjectImportStatuses.AcceptingFiles;
   }
 
   isRunning() {

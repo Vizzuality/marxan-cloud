@@ -20,7 +20,7 @@ import { Test } from '@nestjs/testing';
 import { isLeft } from 'fp-ts/lib/These';
 import { v4 } from 'uuid';
 import { AllLegacyProjectImportPiecesImported } from '../domain/events/all-legacy-project-import-pieces-imported.event';
-import { HaltLegacyProjectImport } from '../domain/events/halt-legacy-project-import.events';
+import { LegacyProjectImportCanceled } from '../domain/events/legacy-project-import-canceled.events';
 import { LegacyProjectImportBatchFailed } from '../domain/events/legacy-project-import-batch-failed.event';
 import { LegacyProjectImportPieceImported } from '../domain/events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../domain/events/legacy-project-import-piece-requested.event';
@@ -496,7 +496,7 @@ const getFixtures = async () => {
         projectId,
       });
       expect(haltLegacyProjectImportEvent).toBeInstanceOf(
-        HaltLegacyProjectImport,
+        LegacyProjectImportCanceled,
       );
     },
     ThenLegacyProjectImportBatchFailedEventIsEmitted: (

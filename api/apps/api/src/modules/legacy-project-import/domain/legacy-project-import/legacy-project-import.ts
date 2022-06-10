@@ -9,7 +9,7 @@ import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { AllLegacyProjectImportPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
-import { HaltLegacyProjectImport } from '../events/halt-legacy-project-import.events';
+import { LegacyProjectImportCanceled } from '../events/legacy-project-import-canceled.events';
 import { LegacyProjectImportBatchFailed } from '../events/legacy-project-import-batch-failed.event';
 import { LegacyProjectImportPieceImported } from '../events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../events/legacy-project-import-piece-requested.event';
@@ -80,7 +80,7 @@ export class LegacyProjectImport extends AggregateRoot {
       new ResourceId(snapshot.projectId),
       new ResourceId(snapshot.scenarioId),
       new UserId(snapshot.ownerId),
-      new LegacyProjectImportStatus(snapshot.status),
+      LegacyProjectImportStatus.fromSnapshot(snapshot.status),
       snapshot.pieces.map(LegacyProjectImportComponent.fromSnapshot),
       snapshot.files.map(LegacyProjectImportFile.fromSnapshot),
       snapshot.toBeRemoved,
@@ -258,7 +258,7 @@ export class LegacyProjectImport extends AggregateRoot {
 
     if (hasThisBatchFinished && haltImportProcess) {
       this.status = this.status.markAsCanceled();
-      this.apply(new HaltLegacyProjectImport(this.projectId));
+      this.apply(new LegacyProjectImportCanceled(this.projectId));
       return right(true);
     }
     if (hasThisBatchFinished && isThisTheLastBatch) {

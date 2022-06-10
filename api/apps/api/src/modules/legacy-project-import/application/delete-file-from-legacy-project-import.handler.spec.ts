@@ -182,7 +182,7 @@ const getFixtures = async () => {
         files,
         pieces,
         status: isAcceptingFiles
-          ? LegacyProjectImportStatuses.AceptingFiles
+          ? LegacyProjectImportStatuses.AcceptingFiles
           : LegacyProjectImportStatuses.Running,
         toBeRemoved: false,
       });

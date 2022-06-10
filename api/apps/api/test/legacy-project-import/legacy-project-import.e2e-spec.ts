@@ -288,7 +288,7 @@ const getFixtures = async () => {
 
       const { status } = legacyProjectImport.toSnapshot();
 
-      expect(status).toBe(LegacyProjectImportStatuses.AceptingFiles);
+      expect(status).toBe(LegacyProjectImportStatuses.AcceptingFiles);
 
       const project = await projectRepo.findOne(projectId);
 

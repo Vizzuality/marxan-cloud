@@ -52,7 +52,7 @@ it('cancels a running legacy project import', async () => {
 it('cancels a not started legacy project import', async () => {
   const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested(
     {
-      status: LegacyProjectImportStatuses.AceptingFiles,
+      status: LegacyProjectImportStatuses.AcceptingFiles,
       files: [],
       pieces: [],
     },
