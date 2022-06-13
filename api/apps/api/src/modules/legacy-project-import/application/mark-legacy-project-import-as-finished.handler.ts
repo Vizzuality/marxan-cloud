@@ -1,3 +1,5 @@
+import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
+import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
@@ -7,7 +9,9 @@ import {
   CommandHandler,
   IInferredCommandHandler,
 } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
+import { Repository } from 'typeorm';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as-failed.command';
 import { MarkLegacyProjectImportAsFinished } from './mark-legacy-project-import-as-finished.command';
@@ -19,6 +23,8 @@ export class MarkLegacyProjectImportAsFinishedHandler
     private readonly apiEvents: ApiEventsService,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly commandBus: CommandBus,
+    @InjectRepository(UsersProjectsApiEntity)
+    private readonly usersRepo: Repository<UsersProjectsApiEntity>,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(MarkLegacyProjectImportAsFinishedHandler.name);
@@ -60,6 +66,12 @@ export class MarkLegacyProjectImportAsFinishedHandler
         scenarioId,
         ownerId,
       },
+    });
+
+    await this.usersRepo.save({
+      userId: ownerId,
+      projectId: projectId.value,
+      roleName: ProjectRoles.project_owner,
     });
   }
 }
