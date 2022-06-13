@@ -19,6 +19,7 @@ import {
   legacyProjectImportAlreadyStarted,
   legacyProjectImportMissingRequiredFile,
 } from '../domain/legacy-project-import/legacy-project-import';
+import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
 import {
   legacyProjectImportNotFound,
   LegacyProjectImportRepository,
@@ -247,7 +248,9 @@ const getFixtures = async () => {
       expect(legacyProjectImport.areRequiredFilesUploaded()).toEqual(true);
 
       const legacyProjectImportSnapshot = legacyProjectImport.toSnapshot();
-      expect(legacyProjectImportSnapshot.isAcceptingFiles).toEqual(false);
+      expect(legacyProjectImportSnapshot.status).toEqual(
+        LegacyProjectImportStatuses.Running,
+      );
       expect(legacyProjectImportSnapshot.ownerId).toEqual(ownerId.value);
       expect(legacyProjectImportSnapshot.files).toEqual(
         allRequiredFiles.map((file) => file.toSnapshot()),
@@ -255,6 +258,7 @@ const getFixtures = async () => {
       expect(legacyProjectImportSnapshot.pieces).not.toHaveLength(0);
       expect(legacyProjectImportSnapshot.projectId).toEqual(projectId);
       expect(legacyProjectImportSnapshot.scenarioId).toEqual(scenarioId);
+      expect(legacyProjectImportSnapshot.toBeRemoved).toEqual(false);
     },
   };
 };

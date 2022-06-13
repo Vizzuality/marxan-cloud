@@ -1,7 +1,6 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 import { isDefined } from '@marxan/utils';
 import { JobType } from '@marxan-api/modules/projects/job-status/jobs.enum';
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import {
   ApiEvent,
   KnownEventsData,
@@ -9,6 +8,7 @@ import {
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ScenarioEvents } from '@marxan/api-events/api-event-kinds.enum';
 import { ValuesType } from 'utility-types';
+import { ApiEventJobStatus } from './api-event-job-status.enum';
 
 @ViewEntity({
   expression: `
@@ -41,7 +41,7 @@ export class ScenarioJobStatus {
   @ViewColumn()
   kind!: Extract<API_EVENT_KINDS, `scenario.${string}`>;
 
-  get jobStatus(): JobStatus | undefined {
+  get jobStatus(): ApiEventJobStatus | undefined {
     // I didn't use CASE ... THEN in the SQL as I wanted to enforce the compiler check on the mapping
     return eventToJobStatusMapping[this.kind];
   }
@@ -77,94 +77,114 @@ export class ScenarioJobStatus {
   }
 }
 
-const eventToJobStatusMapping: Record<ValuesType<ScenarioEvents>, JobStatus> = {
+const eventToJobStatusMapping: Record<
+  ValuesType<ScenarioEvents>,
+  ApiEventJobStatus
+> = {
   [API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1]:
-    JobStatus.failure,
-  [API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1]: JobStatus.done,
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1]:
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__costSurface__shapeConversionFailed__v1_alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__costSurface__shapeConverted__v1_alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__costSurface__submitted__v1_alpha1]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__progress__v1__alpha1]: JobStatus.running,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__run__progress__v1__alpha1]:
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__planningUnitsInclusion__submitted__v1__alpha1]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__submitted__v1__alpha1]: JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__finished__v1__alpha1]: JobStatus.running,
-  [API_EVENT_KINDS.scenario__run__failed__v1__alpha1]: JobStatus.failure,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__run__submitted__v1__alpha1]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__run__finished__v1__alpha1]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__run__failed__v1__alpha1]:
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__run__outputSaveFailed__v1__alpha1]:
-    JobStatus.failure,
-  [API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1]: JobStatus.done,
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1]:
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__geofeatureCopy__submitted__v1__alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__geofeatureCopy__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__geofeatureCopy__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__geofeatureSplit__submitted__v1__alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__geofeatureSplit__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__geofeatureSplit__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__geofeatureStratification__submitted__v1__alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__geofeatureStratification__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__geofeatureStratification__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__specification__submitted__v1__alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__specification__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__specification__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__submitted__v1__alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__featuresWithPuIntersection__submitted__v1__alpha1]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__featuresWithPuIntersection__failed__v1__alpha1]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__protectedAreas__submitted__v1__alpha]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__calibration__submitted_v1_alpha1]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1]: JobStatus.failure,
-  [API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1]: JobStatus.done,
-  [API_EVENT_KINDS.scenario__export__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.scenario__export__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.scenario__export__submitted__v1__alpha]: JobStatus.running,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.scenario__export__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.scenario__export__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.scenario__export__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__export__piece__failed__v1__alpha]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__export__piece__finished__v1__alpha]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__export__piece__submitted__v1__alpha]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__import__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.scenario__import__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.scenario__import__submitted__v1__alpha]: JobStatus.running,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__import__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.scenario__import__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.scenario__import__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.scenario__import__piece__failed__v1__alpha]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.scenario__import__piece__finished__v1__alpha]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.scenario__import__piece__submitted__v1__alpha]:
-    JobStatus.running,
-  [API_EVENT_KINDS.scenario__clone__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.scenario__clone__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.scenario__clone__submitted__v1__alpha]: JobStatus.running,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.scenario__clone__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.scenario__clone__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.scenario__clone__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
 };

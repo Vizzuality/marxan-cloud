@@ -130,6 +130,7 @@ import {
   StartLegacyProjectImportResponseDto,
 } from './dto/legacy-project-import.dto';
 import {
+  legacyProjectImportAlreadyFinished,
   legacyProjectImportAlreadyStarted,
   legacyProjectImportMissingRequiredFile,
 } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import';
@@ -224,6 +225,41 @@ export class ProjectsController {
       projectId: result.right.projectId.value,
       scenarioId: result.right.scenarioId.value,
     };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Cancel a legacy project import',
+    summary: 'Cancel a legacy project import',
+  })
+  @ApiOkResponse({ type: RunLegacyProjectImportResponseDto })
+  @Post('import/legacy/:projectId/cancel')
+  async cancelLegacyProject(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<RunLegacyProjectImportResponseDto> {
+    const result = await this.projectsService.cancelLegacyProject(
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        case legacyProjectImportNotFound:
+          throw new NotFoundException();
+        case legacyProjectImportAlreadyFinished:
+          throw new BadRequestException(
+            `legacy project import with ${projectId} has already finished`,
+          );
+        case legacyProjectImportSaveError:
+        default:
+          throw new InternalServerErrorException();
+      }
+    }
+
+    return { projectId };
   }
 
   @ImplementsAcl()

@@ -20,12 +20,15 @@ import { Test } from '@nestjs/testing';
 import { isLeft } from 'fp-ts/lib/These';
 import { v4 } from 'uuid';
 import { AllLegacyProjectImportPiecesImported } from '../domain/events/all-legacy-project-import-pieces-imported.event';
+import { LegacyProjectImportCanceled } from '../domain/events/legacy-project-import-canceled.events';
+import { LegacyProjectImportBatchFailed } from '../domain/events/legacy-project-import-batch-failed.event';
 import { LegacyProjectImportPieceImported } from '../domain/events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../domain/events/legacy-project-import-piece-requested.event';
 import { LegacyProjectImport } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponentStatuses } from '../domain/legacy-project-import/legacy-project-import-component-status';
 import { LegacyProjectImportComponentId } from '../domain/legacy-project-import/legacy-project-import-component.id';
 import { LegacyProjectImportComponentSnapshot } from '../domain/legacy-project-import/legacy-project-import-component.snapshot';
+import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
 import {
   legacyProjectImportNotFound,
   LegacyProjectImportRepository,
@@ -78,6 +81,38 @@ it('advances to next batch and emits LegacyProjectImportPieceRequested events fo
     legacyProjectImport,
     nextBatchOrder,
   );
+  await fixtures.ThenLegacyProjectImportStatusIsStillRunning(resourceId);
+});
+
+it('fails to advances to next batch and emits HaltLegacyProjectImport event when user cancels the proccess ', async () => {
+  const legacyProjectImport = await fixtures.GivenLegacyProjectImportWasRequested();
+  await fixtures.GivenUserCancelsALegacyProjectImport(legacyProjectImport);
+
+  const { projectId } = legacyProjectImport.toSnapshot();
+  const resourceId = new ResourceId(projectId);
+  const currentBatchOrder = 0;
+
+  const completedPieces = await fixtures.WhenABatchIsCompleted(
+    legacyProjectImport,
+    currentBatchOrder,
+  );
+  await fixtures.ThenBatchComponentsAreFinished(resourceId, completedPieces);
+  fixtures.ThenHaltLegacyProjectImportEventIsEmitted(resourceId);
+  await fixtures.ThenLegacyProjectImportStatusIsCanceled(resourceId);
+});
+
+it('emits a LegacyProjectImportBatchFailed event when completing the last piece in a batch with failed pieces', async () => {
+  const {
+    projectId,
+    submittedPiece,
+  } = await fixtures.GivenLegacyProjectImportWithAFailedPiece();
+
+  const componentId = new LegacyProjectImportComponentId(submittedPiece.id);
+
+  await fixtures.WhenAPieceIsCompleted(projectId, componentId, []);
+  await fixtures.ThenComponentIsFinished(projectId, componentId, []);
+  fixtures.ThenLegacyProjectImportBatchFailedEventIsEmitted(projectId);
+  await fixtures.ThenLegacyProjectImportStatusIsFailed(projectId);
 });
 
 it('emits a AllLegacyProjectImportPiecesImported event if all components are finished', async () => {
@@ -93,6 +128,9 @@ it('emits a AllLegacyProjectImportPiecesImported event if all components are fin
   await fixtures.WhenABatchIsCompleted(legacyProjectImport, lastBatchOrder);
 
   fixtures.ThenAllLegacyProjectImportPiecesImportedEventIsEmitted(resourceId);
+  await fixtures.ThenLegacyProjectImportStatusIsCompleted(
+    new ResourceId(projectId),
+  );
 });
 
 it('sends a MarkLegacyProjectImportAsFailed command if import instance is not found', async () => {
@@ -208,6 +246,14 @@ const getFixtures = async () => {
     },
     {
       id: v4(),
+      kind: LegacyProjectImportPiece.ScenarioPusData,
+      status: LegacyProjectImportComponentStatuses.Submitted,
+      order: 0,
+      errors: [],
+      warnings: [],
+    },
+    {
+      id: v4(),
       kind: LegacyProjectImportPiece.Features,
       status: LegacyProjectImportComponentStatuses.Submitted,
       order: 1,
@@ -238,16 +284,51 @@ const getFixtures = async () => {
         ownerId: ownerId.value,
         files,
         pieces,
-        isAcceptingFiles: false,
+        status: LegacyProjectImportStatuses.Running,
+        toBeRemoved: false,
       });
 
       await repo.save(legacyProjectImport);
 
       return legacyProjectImport;
     },
+    GivenLegacyProjectImportWithAFailedPiece: async () => {
+      const [firstPiece, submittedPiece] = defaultPieces.filter(
+        (piece) => piece.order === 0,
+      );
+      const failedPiece = {
+        ...firstPiece,
+        status: LegacyProjectImportComponentStatuses.Failed,
+      };
+
+      const legacyProjectImport = LegacyProjectImport.fromSnapshot({
+        id: v4(),
+        scenarioId: scenarioId.value,
+        projectId: projectId.value,
+        ownerId: ownerId.value,
+        files: defaultFiles,
+        pieces: [failedPiece, submittedPiece],
+        status: LegacyProjectImportStatuses.Running,
+        toBeRemoved: false,
+      });
+
+      await repo.save(legacyProjectImport);
+
+      return { projectId, submittedPiece };
+    },
     GivenNoneImportWasRequested: async (projectId: ResourceId) => {
       const result = await repo.find(projectId);
       expect(result).toMatchObject({ left: legacyProjectImportNotFound });
+    },
+    GivenUserCancelsALegacyProjectImport: async (
+      legacyProjectImport: LegacyProjectImport,
+    ) => {
+      const canceledLegacyProjectImport = LegacyProjectImport.fromSnapshot({
+        ...legacyProjectImport.toSnapshot(),
+        toBeRemoved: true,
+      });
+
+      await repo.save(canceledLegacyProjectImport);
     },
     WhenAPieceIsCompleted: async (
       projectId: ResourceId,
@@ -270,16 +351,14 @@ const getFixtures = async () => {
 
       const resourceId = new ResourceId(projectId);
 
-      await Promise.all(
-        piecesToComplete.map((piece) =>
-          sut.execute(
-            new CompleteLegacyProjectImportPiece(
-              resourceId,
-              new LegacyProjectImportComponentId(piece.id),
-            ),
+      for (const piece of piecesToComplete) {
+        await sut.execute(
+          new CompleteLegacyProjectImportPiece(
+            resourceId,
+            new LegacyProjectImportComponentId(piece.id),
           ),
-        ),
-      );
+        );
+      }
 
       const updatedLegacyProjectImportOrError = await getLegacyProjectImport(
         resourceId,
@@ -310,6 +389,36 @@ const getFixtures = async () => {
           LegacyProjectImportComponentId.create(),
         ),
       );
+    },
+    ThenLegacyProjectImportStatusIsStillRunning: async (
+      projectId: ResourceId,
+    ) => {
+      const legacyProjectImport = await getLegacyProjectImport(projectId);
+
+      const { status } = legacyProjectImport.toSnapshot();
+
+      expect(status).toEqual(LegacyProjectImportStatuses.Running);
+    },
+    ThenLegacyProjectImportStatusIsCompleted: async (projectId: ResourceId) => {
+      const legacyProjectImport = await getLegacyProjectImport(projectId);
+
+      const { status } = legacyProjectImport.toSnapshot();
+
+      expect(status).toEqual(LegacyProjectImportStatuses.Completed);
+    },
+    ThenLegacyProjectImportStatusIsFailed: async (projectId: ResourceId) => {
+      const legacyProjectImport = await getLegacyProjectImport(projectId);
+
+      const { status } = legacyProjectImport.toSnapshot();
+
+      expect(status).toEqual(LegacyProjectImportStatuses.Failed);
+    },
+    ThenLegacyProjectImportStatusIsCanceled: async (projectId: ResourceId) => {
+      const legacyProjectImport = await getLegacyProjectImport(projectId);
+
+      const { status } = legacyProjectImport.toSnapshot();
+
+      expect(status).toEqual(LegacyProjectImportStatuses.Canceled);
     },
     ThenComponentIsFinished: async (
       projectId: ResourceId,
@@ -379,6 +488,29 @@ const getFixtures = async () => {
       );
 
       expect(allNextBatchPiecesImportRequestEvents).toBe(true);
+    },
+    ThenHaltLegacyProjectImportEventIsEmitted: (projectId: ResourceId) => {
+      const lastEventPosition = events.length - 1;
+      const haltLegacyProjectImportEvent = events[lastEventPosition];
+      expect(haltLegacyProjectImportEvent).toMatchObject({
+        projectId,
+      });
+      expect(haltLegacyProjectImportEvent).toBeInstanceOf(
+        LegacyProjectImportCanceled,
+      );
+    },
+    ThenLegacyProjectImportBatchFailedEventIsEmitted: (
+      projectId: ResourceId,
+    ) => {
+      const lastEventPosition = events.length - 1;
+      const importBatchFailedEvent = events[lastEventPosition];
+      expect(importBatchFailedEvent).toMatchObject({
+        projectId,
+        batchNumber: 0,
+      });
+      expect(importBatchFailedEvent).toBeInstanceOf(
+        LegacyProjectImportBatchFailed,
+      );
     },
     ThenAllLegacyProjectImportPiecesImportedEventIsEmitted: (
       projectId: ResourceId,

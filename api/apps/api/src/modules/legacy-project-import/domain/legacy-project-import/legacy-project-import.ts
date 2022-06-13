@@ -9,12 +9,14 @@ import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { AllLegacyProjectImportPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
+import { LegacyProjectImportCanceled } from '../events/legacy-project-import-canceled.events';
 import { LegacyProjectImportBatchFailed } from '../events/legacy-project-import-batch-failed.event';
 import { LegacyProjectImportPieceImported } from '../events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../events/legacy-project-import-piece-requested.event';
 import { LegacyProjectImportRequested } from '../events/legacy-project-import-requested.event';
 import { LegacyProjectImportComponent } from './legacy-project-import-component';
 import { LegacyProjectImportComponentId } from './legacy-project-import-component.id';
+import { LegacyProjectImportStatus } from './legacy-project-import-status';
 import { LegacyProjectImportId } from './legacy-project-import.id';
 import { LegacyProjectImportSnapshot } from './legacy-project-import.snapshot';
 export const legacyProjectImportComponentNotFound = Symbol(
@@ -31,6 +33,10 @@ export const legacyProjectImportMissingRequiredFile = Symbol(
 );
 export const legacyProjectImportAlreadyStarted = Symbol(
   `legacy project import already started`,
+);
+
+export const legacyProjectImportAlreadyFinished = Symbol(
+  `legacy project import already finished`,
 );
 
 export type CompleteLegacyProjectImportPieceSuccess = true;
@@ -50,15 +56,18 @@ export type RunLegacyProjectImportErrors =
   | typeof legacyProjectImportAlreadyStarted
   | GenerateLegacyProjectImportPiecesErrors;
 
+export type HaltLegacyProjectImportErros = typeof legacyProjectImportAlreadyFinished;
+
 export class LegacyProjectImport extends AggregateRoot {
   private constructor(
     readonly id: LegacyProjectImportId,
     private readonly projectId: ResourceId,
     private readonly scenarioId: ResourceId,
     private readonly ownerId: UserId,
-    private isAcceptingFiles: boolean = true,
+    private status: LegacyProjectImportStatus = LegacyProjectImportStatus.create(),
     private pieces: LegacyProjectImportComponent[] = [],
     private readonly files: LegacyProjectImportFile[] = [],
+    private toBeRemoved: boolean = false,
   ) {
     super();
   }
@@ -71,9 +80,10 @@ export class LegacyProjectImport extends AggregateRoot {
       new ResourceId(snapshot.projectId),
       new ResourceId(snapshot.scenarioId),
       new UserId(snapshot.ownerId),
-      snapshot.isAcceptingFiles,
+      LegacyProjectImportStatus.fromSnapshot(snapshot.status),
       snapshot.pieces.map(LegacyProjectImportComponent.fromSnapshot),
       snapshot.files.map(LegacyProjectImportFile.fromSnapshot),
+      snapshot.toBeRemoved,
     );
   }
 
@@ -120,8 +130,8 @@ export class LegacyProjectImport extends AggregateRoot {
       .some((piece) => piece.hasFailed());
   }
 
-  private importProcessAlreadyStarted() {
-    return !this.isAcceptingFiles;
+  public importProcessAlreadyStarted() {
+    return !this.status.isAcceptingFiles();
   }
 
   public areRequiredFilesUploaded(): boolean {
@@ -175,7 +185,7 @@ export class LegacyProjectImport extends AggregateRoot {
     if (this.importProcessAlreadyStarted())
       return left(legacyProjectImportAlreadyStarted);
 
-    this.isAcceptingFiles = false;
+    this.status = this.status.markAsRunning();
     const piecesOrError = this.generatePieces();
 
     if (isLeft(piecesOrError)) return piecesOrError;
@@ -203,6 +213,7 @@ export class LegacyProjectImport extends AggregateRoot {
     const hasThisBatchFailed = this.hasBatchFailed(piece.order);
 
     if (hasThisBatchFinished && hasThisBatchFailed) {
+      this.status = this.status.markAsFailed();
       this.apply(
         new LegacyProjectImportBatchFailed(this.projectId, piece.order),
       );
@@ -232,8 +243,10 @@ export class LegacyProjectImport extends AggregateRoot {
     const isThisTheLastBatch = this.isLastBatch(pieceToComplete.order);
     const hasThisBatchFinished = this.hasBatchFinished(pieceToComplete.order);
     const hasThisBatchFailed = this.hasBatchFailed(pieceToComplete.order);
+    const haltImportProcess = this.toBeRemoved;
 
     if (hasThisBatchFinished && hasThisBatchFailed) {
+      this.status = this.status.markAsFailed();
       this.apply(
         new LegacyProjectImportBatchFailed(
           this.projectId,
@@ -243,8 +256,15 @@ export class LegacyProjectImport extends AggregateRoot {
       return right(true);
     }
 
-    if (isThisTheLastBatch && hasThisBatchFinished)
+    if (hasThisBatchFinished && haltImportProcess) {
+      this.status = this.status.markAsCanceled();
+      this.apply(new LegacyProjectImportCanceled(this.projectId));
+      return right(true);
+    }
+    if (hasThisBatchFinished && isThisTheLastBatch) {
+      this.status = this.status.markAsCompleted();
       this.apply(new AllLegacyProjectImportPiecesImported(this.projectId));
+    }
     if (isThisTheLastBatch || !hasThisBatchFinished) return right(true);
 
     const nextBatch = this.pieces.filter(
@@ -266,9 +286,10 @@ export class LegacyProjectImport extends AggregateRoot {
       projectId: this.projectId.value,
       scenarioId: this.scenarioId.value,
       ownerId: this.ownerId.value,
-      isAcceptingFiles: this.isAcceptingFiles,
+      status: this.status.toSnapshot(),
       pieces: this.pieces.map((piece) => piece.toSnapshot()),
       files: this.files.map((file) => file.toSnapshot()),
+      toBeRemoved: this.toBeRemoved,
     };
   }
 
@@ -315,5 +336,17 @@ export class LegacyProjectImport extends AggregateRoot {
     return this.pieces.filter(
       (piece) => piece.hasWarnings() || piece.hasErrors(),
     );
+  }
+
+  haltLegacyProjectImport() {
+    if (this.status.hasFailed() || this.status.hasCompleted())
+      return left(legacyProjectImportAlreadyFinished);
+
+    if (this.status.isAcceptingFiles()) {
+      this.status = this.status.markAsCanceled();
+    }
+
+    this.toBeRemoved = true;
+    return right(true);
   }
 }

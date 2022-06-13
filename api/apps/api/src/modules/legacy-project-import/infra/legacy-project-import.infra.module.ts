@@ -15,6 +15,7 @@ import { LegacyProjectImportController } from './legacy-project-import.controlle
 import { LegacyProjectImportRepositoryModule } from './legacy-project-import.repository.module';
 import { ScheduleDbCleanupForFailedLegacyProjectImportHandler } from './schedule-db-cleanup-for-failed-legacy-project-import.handler';
 import { ScheduleLegacyProjectImportPieceHandler } from './schedule-legacy-project-import-piece.handler';
+import { LegacyProjectImportCanceledSaga } from './legacy-project-import-canceled.saga';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ScheduleLegacyProjectImportPieceHandler } from './schedule-legacy-proje
     LegacyProjectImportPieceRequestedSaga,
     ScheduleLegacyProjectImportPieceHandler,
     ImportLegacyProjectPieceEventsHandler,
+    LegacyProjectImportCanceledSaga,
     {
       provide: Logger,
       useClass: Logger,

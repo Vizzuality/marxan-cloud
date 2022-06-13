@@ -1,3 +1,4 @@
+import { LegacyProjectImportStatuses } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-status';
 import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import {
@@ -158,7 +159,8 @@ const getFixtures = async () => {
     type: kind,
   }));
 
-  const expectedIsAcceptingFiles = false;
+  const expectedStatus = LegacyProjectImportStatuses.Running;
+  const expectedToBeRemoved = false;
 
   return {
     cleanup: async () => {
@@ -176,7 +178,8 @@ const getFixtures = async () => {
       const legacyProjectImport = LegacyProjectImport.fromSnapshot({
         id: legacyProjectImportId.value,
         files,
-        isAcceptingFiles: expectedIsAcceptingFiles,
+        status: expectedStatus,
+        toBeRemoved: expectedToBeRemoved,
         ownerId: ownerId.value,
         pieces,
         projectId: projectId.value,
@@ -236,7 +239,8 @@ const getFixtures = async () => {
     }) => {
       const snapshot = legacyProjectImport.toSnapshot();
       expect(snapshot.id).toBe(legacyProjectImportId.value);
-      expect(snapshot.isAcceptingFiles).toBe(expectedIsAcceptingFiles);
+      expect(snapshot.status).toBe(expectedStatus);
+      expect(snapshot.toBeRemoved).toEqual(expectedToBeRemoved);
       expect(snapshot.ownerId).toBe(ownerId.value);
       expect(snapshot.projectId).toBe(projectId.value);
       expect(snapshot.scenarioId).toBe(scenarioId);

@@ -13,6 +13,7 @@ import { MarkLegacyProjectImportPieceAsFailed } from '../application/mark-legacy
 import { LegacyProjectImport } from '../domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportComponent } from '../domain/legacy-project-import/legacy-project-import-component';
 import { LegacyProjectImportComponentId } from '../domain/legacy-project-import/legacy-project-import-component.id';
+import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
 import { LegacyProjectImportRepository } from '../domain/legacy-project-import/legacy-project-import.repository';
 import { LegacyProjectImportMemoryRepository } from './legacy-project-import-memory.repository';
 import { importLegacyProjectPieceQueueToken } from './legacy-project-import-queue.provider';
@@ -165,9 +166,10 @@ const getFixtures = async () => {
         projectId: projectId.value,
         scenarioId: scenarioId.value,
         ownerId: ownerId.value,
-        isAcceptingFiles: false,
+        status: LegacyProjectImportStatuses.Running,
         pieces: [legacyProjectImportComponent.toSnapshot()],
         files: [],
+        toBeRemoved: false,
       });
 
       await repo.save(legacyProjectImport);
