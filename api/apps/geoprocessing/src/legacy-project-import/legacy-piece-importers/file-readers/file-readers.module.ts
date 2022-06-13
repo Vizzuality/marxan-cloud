@@ -16,6 +16,12 @@ import { SpecDatReader } from './spec-dat.reader';
     MarxanInput,
     { provide: DatFileDelimiterFinder, useClass: DatFileCommaOrTabFinder },
   ],
-  exports: [PuDatReader, SpecDatReader, PuvsprDatReader, InputDatReader],
+  exports: [
+    PuDatReader,
+    SpecDatReader,
+    PuvsprDatReader,
+    InputDatReader,
+    DatFileDelimiterFinder,
+  ],
 })
 export class FileReadersModule {}
