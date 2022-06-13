@@ -1,5 +1,10 @@
 import { FeaturesLegacyProjectPieceImporter } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/features.legacy-piece-importer';
 import {
+  DatFileDelimiterFinder,
+  invalidDelimiter,
+} from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/dat-file.delimiter-finder';
+import { DatFileDelimiterFinderFake } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/dat-file.delimiter-finder.fake';
+import {
   PuvrsprDatRow,
   PuvsprDatReader,
 } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/puvspr-dat.reader';
@@ -68,6 +73,19 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
     await fixtures
       .WhenPieceImporterIsInvoked(job)
       .ThenADatFileNotFoundInFilesRepoErrorShouldBeThrown(specDatFileType);
+  });
+
+  it('fails when invalid delimiter is used on spec.dat', async () => {
+    const specDatFileType = LegacyProjectImportFileType.SpecDat;
+    const location = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+      specDatFileType,
+    );
+    const job = fixtures.GivenJobInput({ specDatFileLocation: location });
+    fixtures.GivenSpecDatFileWithInvalidDelimiter();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenADatFileInvalidDelimiterErrorShouldBeThrown(specDatFileType);
   });
 
   it('fails when read operation on spec.dat fails', async () => {
@@ -238,6 +256,10 @@ const getFixtures = async () => {
         provide: PuvsprDatReader,
         useClass: FakePuvsprDatReader,
       },
+      {
+        provide: DatFileDelimiterFinder,
+        useClass: DatFileDelimiterFinderFake,
+      },
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
@@ -254,6 +276,9 @@ const getFixtures = async () => {
   const filesRepo = sandbox.get(LegacyProjectImportFilesRepository);
   const fakeSpecDatReader: FakeSpecDatReader = sandbox.get(SpecDatReader);
   const fakePuvsprDatReader: FakePuvsprDatReader = sandbox.get(PuvsprDatReader);
+  const fakeDatFileDelimiterFinder: DatFileDelimiterFinderFake = sandbox.get(
+    DatFileDelimiterFinder,
+  );
   const apiEntityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
@@ -269,6 +294,8 @@ const getFixtures = async () => {
 
   const readOperationError = (file: LegacyProjectImportFileType) =>
     `error reading ${file} file`;
+  const invalidDelimiterError = (file: LegacyProjectImportFileType) =>
+    `Invalid delimiter in ${file} file. Use either comma or tabulator as your file delimiter.`;
 
   const findProjectFeaturesIds = async (): Promise<string[]> => {
     const result: {
@@ -399,6 +426,9 @@ const getFixtures = async () => {
         { id: 2, prop: 0.5, name: 'first' },
       ]);
     },
+    GivenSpecDatFileWithInvalidDelimiter: () => {
+      fakeDatFileDelimiterFinder.delimiterFound = left(invalidDelimiter);
+    },
     GivenInvalidSpecDatFile: () => {
       fakeSpecDatReader.readOperationResult = left(
         readOperationError(specDatFileType),
@@ -435,6 +465,13 @@ const getFixtures = async () => {
         ) => {
           await expect(sut.run(input)).rejects.toThrow(
             new RegExp(`${file} file not found in files repo`, 'gi'),
+          );
+        },
+        ThenADatFileInvalidDelimiterErrorShouldBeThrown: async (
+          file: LegacyProjectImportFileType,
+        ) => {
+          await expect(sut.run(input)).rejects.toThrow(
+            invalidDelimiterError(file),
           );
         },
         ThenADatFileReadOperationErrorShouldBeThrown: async (

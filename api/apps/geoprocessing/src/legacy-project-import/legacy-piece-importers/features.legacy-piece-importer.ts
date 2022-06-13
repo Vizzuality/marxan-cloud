@@ -7,6 +7,7 @@ import { JobStatus } from '@marxan/cloning/infrastructure/clone-piece-data/proje
 import { FeatureTag } from '@marxan/features';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import {
+  LegacyProjectImportFileSnapshot,
   LegacyProjectImportFilesRepository,
   LegacyProjectImportFileType,
   LegacyProjectImportJobInput,
@@ -23,6 +24,7 @@ import {
   LegacyProjectImportPieceProcessor,
   LegacyProjectImportPieceProcessorProvider,
 } from '../pieces/legacy-project-import-piece-processor';
+import { DatFileDelimiterFinder } from './file-readers/dat-file.delimiter-finder';
 import {
   PuvrsprDatRow,
   PuvsprDatReader,
@@ -46,6 +48,7 @@ export class FeaturesLegacyProjectPieceImporter
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly specDatReader: SpecDatReader,
     private readonly puvsprDatReader: PuvsprDatReader,
+    private readonly datFileDelimiterFinder: DatFileDelimiterFinder,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
@@ -62,6 +65,81 @@ export class FeaturesLegacyProjectPieceImporter
   private logAndThrow(message: string): never {
     this.logger.error(message);
     throw new Error(message);
+  }
+
+  private async getFileReadable(
+    files: LegacyProjectImportFileSnapshot[],
+    type: LegacyProjectImportFileType,
+  ) {
+    const file = files.find((file) => file.type === type);
+
+    if (!file)
+      this.logAndThrow(`${type} file not found inside input file array`);
+
+    const readableOrError = await this.filesRepo.get(file.location);
+
+    if (isLeft(readableOrError))
+      this.logAndThrow(`${type} file not found in files repo`);
+
+    return readableOrError.right;
+  }
+
+  private async getSpecDatData(files: LegacyProjectImportFileSnapshot[]) {
+    const fisrtLineReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.SpecDat,
+    );
+
+    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
+      fisrtLineReadable,
+    );
+    if (isLeft(delimiterOrError))
+      this.logAndThrow(
+        `Invalid delimiter in spec.dat file. Use either comma or tabulator as your file delimiter.`,
+      );
+
+    const fileReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.SpecDat,
+    );
+
+    const rowsOrError = await this.specDatReader.readFile(
+      fileReadable,
+      delimiterOrError.right,
+    );
+    if (isLeft(rowsOrError))
+      this.logAndThrow(`Error in spec.dat file: ${rowsOrError.left}`);
+
+    return rowsOrError.right;
+  }
+
+  private async getPuvsprDatData(files: LegacyProjectImportFileSnapshot[]) {
+    const fisrtLineReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
+      fisrtLineReadable,
+    );
+    if (isLeft(delimiterOrError))
+      this.logAndThrow(
+        `Invalid delimiter in puvspr.dat file. Use either comma or tabulator as your file delimiter.`,
+      );
+
+    const fileReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const rowsOrError = await this.puvsprDatReader.readFile(
+      fileReadable,
+      delimiterOrError.right,
+    );
+    if (isLeft(rowsOrError))
+      this.logAndThrow(`Error in puvspr.dat file: ${rowsOrError.left}`);
+
+    return rowsOrError.right;
   }
 
   private async getProjectPusGeomsMap(
@@ -168,51 +246,9 @@ export class FeaturesLegacyProjectPieceImporter
   ): Promise<LegacyProjectImportJobOutput> {
     const { files, projectId } = input;
 
-    const specFeaturesFileOrError = files.find(
-      (file) => file.type === LegacyProjectImportFileType.SpecDat,
-    );
+    const specDatRows = await this.getSpecDatData(files);
 
-    if (!specFeaturesFileOrError)
-      this.logAndThrow('spec.dat file not found inside input file array');
-
-    const specFileReadableOrError = await this.filesRepo.get(
-      specFeaturesFileOrError.location,
-    );
-
-    if (isLeft(specFileReadableOrError))
-      this.logAndThrow('spec.dat file not found in files repo');
-
-    const specDatRowsOrError = await this.specDatReader.readFile(
-      specFileReadableOrError.right,
-    );
-
-    if (isLeft(specDatRowsOrError))
-      this.logAndThrow(`Error in spec.dat file: ${specDatRowsOrError.left}`);
-
-    const specDatRows = specDatRowsOrError.right;
-
-    const puvsprFeaturesFileOrError = files.find(
-      (file) => file.type === LegacyProjectImportFileType.PuvsprDat,
-    );
-
-    if (!puvsprFeaturesFileOrError)
-      this.logAndThrow('puvspr.dat file not found inside input file array');
-
-    const puvsprFileReadableOrError = await this.filesRepo.get(
-      puvsprFeaturesFileOrError.location,
-    );
-
-    if (isLeft(puvsprFileReadableOrError))
-      this.logAndThrow('puvspr.dat file not found in files repo');
-
-    const puvsprDatRowsOrError = await this.puvsprDatReader.readFile(
-      puvsprFileReadableOrError.right,
-    );
-
-    if (isLeft(puvsprDatRowsOrError))
-      this.logAndThrow(
-        `Error in puvspr.dat file: ${puvsprDatRowsOrError.left}`,
-      );
+    const puvsprDatRows = await this.getPuvsprDatData(files);
 
     const duplicateFeatureIds = this.getDuplicateFeatureIds(specDatRows);
     if (duplicateFeatureIds.length) {
@@ -231,8 +267,6 @@ export class FeaturesLegacyProjectPieceImporter
         )}`,
       );
     }
-
-    const puvsprDatRows = puvsprDatRowsOrError.right;
 
     const projectPusGeomsMap = await this.getProjectPusGeomsMap(projectId);
 
