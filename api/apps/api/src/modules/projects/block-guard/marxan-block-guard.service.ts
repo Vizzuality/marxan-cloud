@@ -1,3 +1,4 @@
+import { LegacyProjectImportChecker } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
 import { BlockGuard } from '@marxan-api/modules/projects/block-guard/block-guard.service';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
@@ -17,6 +18,7 @@ export class MarxanBlockGuard implements BlockGuard {
   constructor(
     private readonly projectChecker: ProjectChecker,
     private readonly scenarioChecker: ScenarioChecker,
+    private readonly legacyProjectImportChecker: LegacyProjectImportChecker,
     @InjectRepository(Scenario)
     private readonly scenarioRepo: Repository<Scenario>,
     @InjectRepository(Project)
@@ -37,11 +39,13 @@ export class MarxanBlockGuard implements BlockGuard {
       hasPendingImports,
       hasPendingBlmCalibration,
       hasPendingMarxanRun,
+      hasImportedLegacyProject,
     ] = await Promise.all([
       this.projectChecker.hasPendingExports(projectId),
       this.projectChecker.hasPendingImports(projectId),
       this.projectChecker.hasPendingBlmCalibration(projectId),
       this.projectChecker.hasPendingMarxanRun(projectId),
+      this.legacyProjectImportChecker.hasImportedLegacyProjectImport(projectId),
     ]);
 
     if (isRight(hasPendingExports) && hasPendingExports.right)
@@ -63,6 +67,10 @@ export class MarxanBlockGuard implements BlockGuard {
       throw new BadRequestException(
         `Project ${projectId} editing is blocked because of pending marxan run`,
       );
+    if (isRight(hasImportedLegacyProject) && !hasImportedLegacyProject.right)
+      throw new BadRequestException(
+        `Project ${projectId} editing is blocked because of pending legacy project import`,
+      );
   }
 
   async ensureThatScenarioIsNotBlocked(scenarioId: string): Promise<void> {
@@ -81,6 +89,7 @@ export class MarxanBlockGuard implements BlockGuard {
       hasPendingImports,
       projectHasPendingExports,
       projectHasPendingImports,
+      hasImportedLegacyProject,
     ] = await Promise.all([
       this.scenarioChecker.hasPendingBlmCalibration(scenarioId),
       this.scenarioChecker.hasPendingMarxanRun(scenarioId),
@@ -88,6 +97,9 @@ export class MarxanBlockGuard implements BlockGuard {
       this.scenarioChecker.hasPendingImport(scenarioId),
       this.projectChecker.hasPendingExports(scenario.projectId),
       this.projectChecker.hasPendingImports(scenario.projectId),
+      this.legacyProjectImportChecker.hasImportedLegacyProjectImport(
+        scenario.projectId,
+      ),
     ]);
 
     if (isRight(hasPendingExports) && hasPendingExports.right)
@@ -118,6 +130,10 @@ export class MarxanBlockGuard implements BlockGuard {
     if (isRight(projectHasPendingImports) && projectHasPendingImports.right)
       throw new BadRequestException(
         `Scenario ${scenarioId} editing is blocked because of project pending import`,
+      );
+    if (isRight(hasImportedLegacyProject) && !hasImportedLegacyProject.right)
+      throw new BadRequestException(
+        `Scenario ${scenarioId} editing is blocked because of pending legacy project import`,
       );
   }
 }

@@ -12,6 +12,12 @@ import { v4 } from 'uuid';
 import { ProjectCheckerFake } from '../../../../test/utils/project-checker.service-fake';
 import { Project } from '../project.api.entity';
 import { NotFoundException } from '@nestjs/common';
+import { LegacyProjectImportChecker } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
+import { LegacyProjectImportCheckerFake } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service-fake';
+import { LegacyProjectImportRepository } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import { LegacyProjectImportMemoryRepository } from '@marxan-api/modules/legacy-project-import/infra/legacy-project-import-memory.repository';
+import { LegacyProjectImport } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import';
+import { LegacyProjectImportStatuses } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-status';
 
 describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -33,7 +39,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given project has an ongoing export`, async () => {
-    const [projectId] = fixtures.GivenProjectWasCreated();
+    const [projectId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingExport(projectId);
 
@@ -43,7 +49,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given project has a scenario with an ongoing export`, async () => {
-    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingExport(scenarioId);
 
@@ -53,7 +59,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given project has an ongoing import`, async () => {
-    const [projectId] = fixtures.GivenProjectWasCreated();
+    const [projectId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingImport(projectId);
 
@@ -63,7 +69,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given project has a scenario with an ongoing import`, async () => {
-    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingImport(scenarioId);
 
@@ -73,7 +79,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given project has a scenario with an ongoing blm calibration`, async () => {
-    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingBlmCalibration(scenarioId);
 
@@ -83,7 +89,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given project has a scenario with an ongoing marxan run`, async () => {
-    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingMarxanRun(scenarioId);
 
@@ -92,8 +98,18 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
       .ThenAPendingMarxanRunErrorIsThrown();
   });
 
+  it(`throws an exception if the given project has not imported the legacy project import`, async () => {
+    const [projectId] = await fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAnOngoingLegacyProjectImport(projectId);
+
+    await fixtures
+      .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
+      .ThenAPendingLegacyProjectImportErrorIsThrown();
+  });
+
   it(`does nothing if the given project is not blocked`, async () => {
-    const [projectId] = fixtures.GivenProjectWasCreated();
+    const [projectId] = await fixtures.GivenProjectWasCreated();
 
     await fixtures
       .WhenCheckingWhetherTheProjectCanBeEdited(projectId)
@@ -121,7 +137,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given scenario has an ongoing export`, async () => {
-    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [_, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingExport(scenarioId);
 
@@ -131,7 +147,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given scenario's parent project has an ongoing export`, async () => {
-    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingExport(projectId);
 
@@ -141,7 +157,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given scenario has an ongoing import`, async () => {
-    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [_, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingImport(scenarioId);
 
@@ -151,7 +167,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given scenario's parent project has an ongoing import`, async () => {
-    const [projectId, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingImport(projectId);
 
@@ -161,7 +177,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given scenario has an ongoing blm calibration`, async () => {
-    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [_, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingBlmCalibration(scenarioId);
 
@@ -171,7 +187,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
   });
 
   it(`throws an exception if the given scenario has an ongoing marxan run`, async () => {
-    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [_, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAScenarioWithAnOngoingMarxanRun(scenarioId);
 
@@ -180,8 +196,18 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
       .ThenAPendingMarxanRunErrorIsThrown();
   });
 
+  it(`throws an exception if the given scenario's parent project has not imported the legacy project import`, async () => {
+    const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
+
+    fixtures.WhenProjectHasAnOngoingLegacyProjectImport(projectId);
+
+    await fixtures
+      .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
+      .ThenAPendingLegacyProjectImportErrorIsThrown();
+  });
+
   it(`does nothing if the given scenario is not blocked`, async () => {
-    const [_, scenarioId] = fixtures.GivenProjectWasCreated();
+    const [_, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     await fixtures
       .WhenCheckingWhetherTheScenarioCanBeEdited(scenarioId)
@@ -211,6 +237,10 @@ const getFixtures = async () => {
         useClass: ScenarioCheckerFake,
       },
       {
+        provide: LegacyProjectImportChecker,
+        useClass: LegacyProjectImportCheckerFake,
+      },
+      {
         provide: BlockGuard,
         useClass: MarxanBlockGuard,
       },
@@ -222,19 +252,28 @@ const getFixtures = async () => {
         provide: getRepositoryToken(Scenario),
         useValue: fakeScenariosRepo,
       },
+      {
+        provide: LegacyProjectImportRepository,
+        useClass: LegacyProjectImportMemoryRepository,
+      },
     ],
   }).compile();
   await sandbox.init();
   const projectChecker = sandbox.get(ProjectChecker) as ProjectCheckerFake;
   const scenarioChecker = sandbox.get(ScenarioChecker) as ScenarioCheckerFake;
+  const repo = sandbox.get(LegacyProjectImportRepository);
+  const legacyProjectImportChecker: LegacyProjectImportCheckerFake = sandbox.get(
+    LegacyProjectImportChecker,
+  );
   const blockGuard = sandbox.get(BlockGuard);
 
   return {
     cleanup: () => {
       projectChecker.clear();
       scenarioChecker.clear();
+      legacyProjectImportChecker.clear();
     },
-    GivenProjectWasCreated: () => {
+    GivenProjectWasCreated: async () => {
       const projectId = v4();
       const scenarioId = v4();
       fakeProjectsRepo.findOne.mockResolvedValue({
@@ -245,6 +284,18 @@ const getFixtures = async () => {
         id: scenarioId,
         projectId,
       } as Scenario);
+      await repo.save(
+        LegacyProjectImport.fromSnapshot({
+          id: v4(),
+          files: [],
+          ownerId: v4(),
+          pieces: [],
+          projectId,
+          scenarioId,
+          status: LegacyProjectImportStatuses.AcceptingFiles,
+          toBeRemoved: false,
+        }),
+      );
 
       return [projectId, scenarioId];
     },
@@ -268,6 +319,9 @@ const getFixtures = async () => {
     WhenProjectHasAnOngoingImport: (projectId: string) => {
       projectChecker.addPendingImportForProject(projectId);
     },
+    WhenProjectHasAnOngoingLegacyProjectImport: (projectId: string) => {
+      legacyProjectImportChecker.addPendingLegacyProjecImport(projectId);
+    },
     WhenCheckingWhetherTheProjectCanBeEdited: (projectId: string) => {
       return {
         ThenAPendingExportErrorIsThrown: async () => {
@@ -289,6 +343,11 @@ const getFixtures = async () => {
           await expect(
             blockGuard.ensureThatProjectIsNotBlocked(projectId),
           ).rejects.toThrow(/pending marxan run/gi);
+        },
+        ThenAPendingLegacyProjectImportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatProjectIsNotBlocked(projectId),
+          ).rejects.toThrow(/pending legacy project import/gi);
         },
         ThenANotFoundExceptionIsThrown: async () => {
           await expect(
@@ -343,6 +402,11 @@ const getFixtures = async () => {
           await expect(
             blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
           ).rejects.toThrow(/scenario.+pending marxan run/gi);
+        },
+        ThenAPendingLegacyProjectImportErrorIsThrown: async () => {
+          await expect(
+            blockGuard.ensureThatScenarioIsNotBlocked(scenarioId),
+          ).rejects.toThrow(/scenario.+pending legacy project import/gi);
         },
       };
     },
