@@ -11,8 +11,10 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
 import { bytesToMegabytes } from 'utils/units';
 
+import { useMe } from 'hooks/me';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -40,7 +42,9 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
+
   const { addToast } = useToasts();
+  const plausible = usePlausible();
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -50,6 +54,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     setJob,
   } = scenarioSlice.actions;
 
+  const { user } = useMe();
   const editable = useCanEditScenario(pid, sid);
   const downloadMutation = useDownloadCostSurface({});
   const uploadMutation = useUploadCostSurface({
@@ -103,6 +108,15 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         });
 
         console.info('Cost surface uploaded', g);
+
+        plausible('Upload cost surface', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+            projectId: `${pid}`,
+            scenarioId: `${sid}`,
+          },
+        });
       },
       onError: ({ response }) => {
         const { errors } = response.data;
