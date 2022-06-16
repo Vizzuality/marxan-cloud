@@ -83,6 +83,10 @@ import {
 } from '../legacy-project-import/application/delete-file-from-legacy-project-import.command';
 import { GetLegacyProjectImportErrors } from '../legacy-project-import/application/get-legacy-project-import-errors.query';
 import { CancelLegacyProjectImport } from '../legacy-project-import/application/cancel-legacy-project-import.command';
+import {
+  DeleteProject,
+  DeleteProjectFailed,
+} from './delete-project/delete-project.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -442,13 +446,14 @@ export class ProjectsService {
   async remove(
     projectId: string,
     userId: string,
-  ): Promise<Either<Permit, void>> {
+  ): Promise<Either<Permit | DeleteProjectFailed, true>> {
     await this.blockGuard.ensureThatProjectIsNotBlocked(projectId);
 
     if (!(await this.projectAclService.canDeleteProject(userId, projectId))) {
       return left(false);
     }
-    return right(await this.projectsCrud.remove(projectId));
+
+    return this.commandBus.execute(new DeleteProject(projectId));
   }
 
   async getJobStatusFor(projectId: string, info: ProjectsRequest) {

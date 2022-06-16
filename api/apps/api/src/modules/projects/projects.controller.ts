@@ -142,6 +142,7 @@ import {
   AddFileToLegacyProjectImportBodyDto,
   AddFileToLegacyProjectImportResponseDto,
 } from './dto/legacy-project-import.dto';
+import { deleteProjectFailed } from './delete-project/delete-project.command';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -468,9 +469,14 @@ export class ProjectsController {
     const result = await this.projectsService.remove(id, req.user.id);
 
     if (isLeft(result)) {
-      throw new ForbiddenException();
+      switch (result.left) {
+        case deleteProjectFailed:
+          throw new InternalServerErrorException();
+        case false:
+          throw new ForbiddenException();
+      }
     }
-    return result.right;
+    return;
   }
 
   @IsMissingAclImplementation()
