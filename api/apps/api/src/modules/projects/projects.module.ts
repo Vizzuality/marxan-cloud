@@ -41,6 +41,7 @@ import { ExportComponentLocationEntity } from '../clone/export/adapters/entities
 import { ExportRepository } from '../clone/export/application/export-repository.port';
 import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export.repository';
 import { LegacyProjectImportModule } from '../legacy-project-import/legacy-project-import.module';
+import { DeleteProjectModule } from './delete-project/delete-project.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { LegacyProjectImportModule } from '../legacy-project-import/legacy-proje
     AccessControlModule,
     BlockGuardModule,
     ProjectCheckerModule,
+    DeleteProjectModule,
   ],
   providers: [
     ProjectsCrudService,
