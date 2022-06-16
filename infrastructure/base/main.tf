@@ -96,12 +96,7 @@ module "redis" {
   project_name                   = var.project_name
   subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.kubernetes.cluster_id
-  project_tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "log_analytics_workspace" {
@@ -109,12 +104,7 @@ module "log_analytics_workspace" {
   name                = var.project_name
   location            = var.location
   resource_group_name = data.azurerm_resource_group.resource_group.name
-  tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  project_tags        = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "firewall" {
@@ -129,13 +119,7 @@ module "firewall" {
   subnet_id                    = module.network.firewall_subnet_id
   log_analytics_workspace_id   = module.log_analytics_workspace.id
   log_analytics_retention_days = 30
-  tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-      Test        = "Eric Testings"
-    },
-  )
+  project_tags                 = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "routetable" {
@@ -152,12 +136,7 @@ module "routetable" {
       virtual_network_name = module.network.aks_vnet_name
     }
   }
-  tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "redis_private_dns_zone" {
@@ -187,12 +166,7 @@ module "redis_private_endpoint" {
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
-  tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "mail_host_dns_records" {
@@ -206,10 +180,5 @@ module "mail_host_dns_records" {
   dkim_name  = var.sparkpost_dns_dkim_name
   dkim_value = var.sparkpost_dns_dkim_value
 
-  project_tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
 }

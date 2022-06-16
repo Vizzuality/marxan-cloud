@@ -21,12 +21,66 @@ resource "azurerm_key_vault" "key_vault" {
       object_id = access_policy.value
 
       secret_permissions = [
-        "Set",
+        "Backup",
+        "Delete",
         "Get",
         "List",
-        "Delete",
         "Purge",
-        "Recover"
+        "Recover",
+        "Restore",
+        "Set"
+      ]
+
+      certificate_permissions = [
+        "Backup",
+        "Create",
+        "Delete",
+        "DeleteIssuers",
+        "Get",
+        "GetIssuers",
+        "Import",
+        "List",
+        "ListIssuers",
+        "ManageContacts",
+        "ManageIssuers",
+        "Purge",
+        "Recover",
+        "Restore",
+        "SetIssuers",
+        "Update"
+      ]
+
+
+      key_permissions = [
+        "Backup",
+        "Create",
+        "Decrypt",
+        "Delete",
+        "Encrypt",
+        "Get",
+        "Import",
+        "List",
+        "Purge",
+        "Recover",
+        "Restore",
+        "Sign",
+        "UnwrapKey",
+        "Update",
+        "Verify",
+        "WrapKey"
+      ]
+
+      storage_permissions = [
+        "Backup",
+        "Delete",
+        "Get",
+        "List",
+        "Purge",
+        "Recover",
+        "Restore",
+        "Set",
+        "Update",
+        "RegenerateKey"
       ]
     }
   }
