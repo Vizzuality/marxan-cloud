@@ -12,6 +12,8 @@ import {
 import { Project } from '../projects/project.api.entity';
 import { Scenario } from '../scenarios/scenario.api.entity';
 import { BaseServiceResource } from '../../types/resource.interface';
+import { IsEnum } from 'class-validator';
+import { Backgrounds, Levels } from '../authentication/dto/sign-up.dto';
 
 export const userResource: BaseServiceResource = {
   className: 'User',
@@ -42,6 +44,16 @@ export class User {
   @ApiPropertyOptional()
   @Column('character varying')
   lname?: string | null;
+
+  @ApiPropertyOptional()
+  @Column('character varying')
+  @IsEnum(Backgrounds)
+  background?: Backgrounds;
+
+  @ApiPropertyOptional()
+  @Column('character varying')
+  @IsEnum(Levels)
+  level?: Levels;
 
   /**
    * User avatar, stored as data url.
