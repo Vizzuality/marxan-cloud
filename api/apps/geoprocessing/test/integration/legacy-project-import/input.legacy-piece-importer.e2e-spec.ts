@@ -192,7 +192,7 @@ const getFixtures = async () => {
         ...validVariableValues,
       };
 
-      return saveFile('BESTSCORE 100/nBLM 200');
+      return saveFile('BESTSCORE 100\nBLM 200');
     },
     GivenInvalidInputDatFile: () => {
       const invalidVariableValues = 'BESTSCORE invalidBestScore';

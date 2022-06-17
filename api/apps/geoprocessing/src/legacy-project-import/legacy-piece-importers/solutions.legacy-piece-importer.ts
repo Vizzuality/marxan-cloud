@@ -226,7 +226,7 @@ export class SolutionsLegacyProjectPieceImporter
     );
     const outputSumPath = `${outputFolder}/${outputSumFileName}.${outputSumFileNameExtension}`;
 
-    this.geoEntityManager.transaction(async (em) => {
+    await this.geoEntityManager.transaction(async (em) => {
       await this.insertOutputScenarioFeaturesData(em, scenarioFeatureRunData);
       await this.insertOutputScenariosPuData(em, planningUnitsState);
 

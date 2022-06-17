@@ -40,17 +40,26 @@ const getFixtures = async () => {
   const sut = sandbox.get(InputDatReader);
   const fakeMarxanInput: FakeMarxanInput = sandbox.get(MarxanInput);
 
-  const inputDatVariables: MarxanParameters = { BLM: 1, BESTSCORE: 2 };
-  const file = { ...inputDatVariables, RandomName: 2, blm: 4 };
+  const inputDatVariables: MarxanParameters = {
+    BLM: 1,
+    BESTSCORE: 2,
+    THRESHPEN1: 14.5,
+  };
+  const file = {
+    ...inputDatVariables,
+    RandomName: 2,
+    blm: 4,
+    VARIABLE1: 'invalid',
+  };
 
   return {
     GivenAValidInputDatFile: () =>
       Readable.from(
-        'Skip comments in input/n' +
-          '.dat file/n' +
+        'Skip comments in input\n' +
+          '.dat file\n' +
           Object.entries(file)
             .map(([key, value]) => `${key} ${value}`)
-            .join('/n'),
+            .join('\n'),
       ),
     GivenAnInvalidInputDatFile: () => {
       fakeMarxanInput.failFromOperation = true;
