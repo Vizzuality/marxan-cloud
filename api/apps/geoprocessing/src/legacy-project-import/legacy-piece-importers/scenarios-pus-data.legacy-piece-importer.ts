@@ -58,10 +58,10 @@ export class ScenarioPusDataLegacyProjectPieceImporter
   }
 
   private async getPuDatData(fileLocation: string) {
-    const fisrtLineReadable = await this.getPuDatReabale(fileLocation);
+    const firstLineReadable = await this.getPuDatReabale(fileLocation);
 
     const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      fisrtLineReadable,
+      firstLineReadable,
     );
     if (isLeft(delimiterOrError))
       this.logAndThrow(

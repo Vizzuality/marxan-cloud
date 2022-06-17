@@ -96,13 +96,13 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
   }
 
   private async getSpecDatData(files: LegacyProjectImportFileSnapshot[]) {
-    const fisrtLineReadable = await this.getFileReadable(
+    const firstLineReadable = await this.getFileReadable(
       files,
       LegacyProjectImportFileType.SpecDat,
     );
 
     const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      fisrtLineReadable,
+      firstLineReadable,
     );
     if (isLeft(delimiterOrError))
       this.logAndThrow(
@@ -125,13 +125,13 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
   }
 
   private async getPuvsprDatData(files: LegacyProjectImportFileSnapshot[]) {
-    const fisrtLineReadable = await this.getFileReadable(
+    const firstLineReadable = await this.getFileReadable(
       files,
       LegacyProjectImportFileType.PuvsprDat,
     );
 
     const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
-      fisrtLineReadable,
+      firstLineReadable,
     );
     if (isLeft(delimiterOrError))
       this.logAndThrow(

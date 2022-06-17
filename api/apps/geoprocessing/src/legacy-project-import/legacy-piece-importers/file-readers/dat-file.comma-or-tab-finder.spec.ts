@@ -16,19 +16,19 @@ beforeEach(async () => {
 
 it('fails when dat file uses invalid delimiter', async () => {
   const fileLocation = fixtures.GivenADatFileWithInvalidDelimiter();
-  const result = await fixtures.WhenGettingDaDelimiter(fileLocation);
+  const result = await fixtures.WhenGettingDatDelimiter(fileLocation);
   fixtures.ThenDatFileFindDelimiterOperationFails(result);
 });
 
 it('succes when dat file uses comma delimiter', async () => {
   const fileLocation = fixtures.GivenAValidDatFileWithCommas();
-  const result = await fixtures.WhenGettingDaDelimiter(fileLocation);
+  const result = await fixtures.WhenGettingDatDelimiter(fileLocation);
   fixtures.ThenDatDelimiterIsSuccessfullyFound(result, ',');
 });
 
 it('succes when dat file uses tab delimiter', async () => {
   const fileLocation = fixtures.GivenAValidDatFileWithTabs();
-  const result = await fixtures.WhenGettingDaDelimiter(fileLocation);
+  const result = await fixtures.WhenGettingDatDelimiter(fileLocation);
   fixtures.ThenDatDelimiterIsSuccessfullyFound(result, '\t');
 });
 
@@ -67,7 +67,7 @@ const getFixtures = async () => {
 
       return Readable.from(invalidDelimiterHeader + rows.join('\n'));
     },
-    WhenGettingDaDelimiter: (file: Readable) => {
+    WhenGettingDatDelimiter: (file: Readable) => {
       return sut.findDelimiter(file);
     },
     ThenDatDelimiterIsSuccessfullyFound: (
