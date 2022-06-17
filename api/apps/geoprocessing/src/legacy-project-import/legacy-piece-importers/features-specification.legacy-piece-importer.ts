@@ -24,6 +24,7 @@ import {
   specDatFeatureIdPropertyKey,
   specDatPuidPropertyKey,
 } from './features.legacy-piece-importer';
+import { DatFileDelimiterFinder } from './file-readers/dat-file.delimiter-finder';
 import {
   PuvrsprDatRow,
   PuvsprDatReader,
@@ -53,6 +54,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly specDatReader: SpecDatReader,
     private readonly puvsprDatReader: PuvsprDatReader,
+    private readonly datFileDelimiterFinder: DatFileDelimiterFinder,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectRepository(GeoFeatureGeometry)
@@ -91,6 +93,64 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       this.logAndThrow(`${type} file not found in files repo`);
 
     return readableOrError.right;
+  }
+
+  private async getSpecDatData(files: LegacyProjectImportFileSnapshot[]) {
+    const firstLineReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.SpecDat,
+    );
+
+    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
+      firstLineReadable,
+    );
+    if (isLeft(delimiterOrError))
+      this.logAndThrow(
+        `Invalid delimiter in spec.dat file. Use either comma or tabulator as your file delimiter.`,
+      );
+
+    const fileReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.SpecDat,
+    );
+
+    const rowsOrError = await this.specDatReader.readFile(
+      fileReadable,
+      delimiterOrError.right,
+    );
+    if (isLeft(rowsOrError))
+      this.logAndThrow(`Error in spec.dat file: ${rowsOrError.left}`);
+
+    return rowsOrError.right;
+  }
+
+  private async getPuvsprDatData(files: LegacyProjectImportFileSnapshot[]) {
+    const firstLineReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
+      firstLineReadable,
+    );
+    if (isLeft(delimiterOrError))
+      this.logAndThrow(
+        `Invalid delimiter in puvspr.dat file. Use either comma or tabulator as your file delimiter.`,
+      );
+
+    const fileReadable = await this.getFileReadable(
+      files,
+      LegacyProjectImportFileType.PuvsprDat,
+    );
+
+    const rowsOrError = await this.puvsprDatReader.readFile(
+      fileReadable,
+      delimiterOrError.right,
+    );
+    if (isLeft(rowsOrError))
+      this.logAndThrow(`Error in puvspr.dat file: ${rowsOrError.left}`);
+
+    return rowsOrError.right;
   }
 
   private getFeaturesInPuvsprNotInSpec(
@@ -337,28 +397,12 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
   ): Promise<LegacyProjectImportJobOutput> {
     const { files, projectId, scenarioId } = input;
 
-    const specDatReadable = await this.getFileReadable(
-      files,
-      LegacyProjectImportFileType.SpecDat,
-    );
-    const puvsprDatReadable = await this.getFileReadable(
-      files,
-      LegacyProjectImportFileType.PuvsprDat,
-    );
-
-    const specRowsOrError = await this.specDatReader.readFile(specDatReadable);
-    const puvsprRowsOrError = await this.puvsprDatReader.readFile(
-      puvsprDatReadable,
-    );
-
-    if (isLeft(specRowsOrError))
-      this.logAndThrow(`Error in spec.dat file: ${specRowsOrError.left}`);
-    if (isLeft(puvsprRowsOrError))
-      this.logAndThrow(`Error in puvspr.dat file: ${puvsprRowsOrError.left}`);
+    const specRowsOrError = await this.getSpecDatData(files);
+    const puvsprRowsOrError = await this.getPuvsprDatData(files);
 
     const notFoundFeatureIds = this.getFeaturesInPuvsprNotInSpec(
-      specRowsOrError.right,
-      puvsprRowsOrError.right,
+      specRowsOrError,
+      puvsprRowsOrError,
     );
 
     if (notFoundFeatureIds.length) {
@@ -369,14 +413,11 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       );
     }
 
-    const specRows = this.getPropSpecRows(
-      specRowsOrError.right,
-      puvsprRowsOrError.right,
-    );
+    const specRows = this.getPropSpecRows(specRowsOrError, puvsprRowsOrError);
     await this.runSpecification(specRows, projectId, scenarioId);
     await this.updateScenarioFeaturesData(
       specRows,
-      puvsprRowsOrError.right,
+      puvsprRowsOrError,
       scenarioId,
     );
 
