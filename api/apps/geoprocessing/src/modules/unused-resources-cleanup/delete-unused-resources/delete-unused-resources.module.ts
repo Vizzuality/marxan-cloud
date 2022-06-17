@@ -36,4 +36,4 @@ import { DeleteScenarioUnsusedReosurces } from './delete-scenario-unused-resourc
   providers: [DeleteProjectUnsusedReosurces, DeleteScenarioUnsusedReosurces],
   exports: [DeleteProjectUnsusedReosurces, DeleteScenarioUnsusedReosurces],
 })
-export class UnusedResourcesCleanUpModule {}
+export class DeleteUnusedResourcesModule {}
