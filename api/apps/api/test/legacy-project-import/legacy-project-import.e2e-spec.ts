@@ -1,4 +1,5 @@
 import { LegacyProjectImportComponentId } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-component.id';
+import { LegacyProjectImportStatuses } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-status';
 import { ResourceId } from '@marxan/cloning/domain';
 import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -285,9 +286,9 @@ const getFixtures = async () => {
     ThenALegacyProjectImportIsCreated: async (projectName: string) => {
       const legacyProjectImport = await getLegacyProjectImport(projectId);
 
-      const { isAcceptingFiles } = legacyProjectImport.toSnapshot();
+      const { status } = legacyProjectImport.toSnapshot();
 
-      expect(isAcceptingFiles).toBe(true);
+      expect(status).toBe(LegacyProjectImportStatuses.AcceptingFiles);
 
       const project = await projectRepo.findOne(projectId);
 
@@ -308,9 +309,9 @@ const getFixtures = async () => {
     ThenLegacyProjectImportRunStarted: async () => {
       const legacyProjectImport = await getLegacyProjectImport(projectId);
 
-      const { pieces, isAcceptingFiles } = legacyProjectImport.toSnapshot();
+      const { pieces, status } = legacyProjectImport.toSnapshot();
 
-      expect(isAcceptingFiles).toBe(false);
+      expect(status).toBe(LegacyProjectImportStatuses.Running);
 
       const firstBatchOrder = Math.min(...pieces.map((piece) => piece.order));
 

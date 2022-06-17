@@ -94,6 +94,15 @@ it('fails when spec.dat contains prop values lower than zero', async () => {
   );
 });
 
+it('fails when spec.dat contains prop values equal to zero', async () => {
+  const file = fixtures.GivenAnInvalidSpecDatFile({ prop: 0 });
+  const result = await fixtures.WhenExecutingSpecDatReader(file);
+  fixtures.ThenSpecDatReadOperationFails(
+    result,
+    /prop values should between/gi,
+  );
+});
+
 it('fails when spec.dat contains non integer spf values', async () => {
   const file = fixtures.GivenAnInvalidSpecDatFile({ spf: 'invalid spf' });
   const result = await fixtures.WhenExecutingSpecDatReader(file);
@@ -182,7 +191,7 @@ const getFixtures = async () => {
   const amountOfRows = 100;
 
   const getValidRow = (index: number = 0) =>
-    `${index}\t${index / amountOfRows}\t${
+    `${index}\t${(index + 1) / amountOfRows}\t${
       index / 10
     }\t${index}\t${index}\t${index}\t${index * 2}\t${index + 4}`;
 

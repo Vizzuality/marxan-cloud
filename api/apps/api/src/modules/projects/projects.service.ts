@@ -82,6 +82,7 @@ import {
   DeleteFileFromLegacyProjectImportHandlerErrors,
 } from '../legacy-project-import/application/delete-file-from-legacy-project-import.command';
 import { GetLegacyProjectImportErrors } from '../legacy-project-import/application/get-legacy-project-import-errors.query';
+import { CancelLegacyProjectImport } from '../legacy-project-import/application/cancel-legacy-project-import.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -517,6 +518,15 @@ export class ProjectsService {
         resourceId,
         legacyProjectImportFileId,
         userId,
+      ),
+    );
+  }
+
+  async cancelLegacyProject(projectId: string, userId: string) {
+    return this.commandBus.execute(
+      new CancelLegacyProjectImport(
+        new ResourceId(projectId),
+        new UserId(userId),
       ),
     );
   }

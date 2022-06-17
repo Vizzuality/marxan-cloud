@@ -17,7 +17,7 @@ export const COLORS = {
   },
   wdpa: '#00F',
   features: '#6F53F7',
-  highlightFeatures: '#37297B',
+  highlightFeatures: '#BE6BFF',
   include: '#0F0',
   exclude: '#F00',
   cost: [

@@ -10,7 +10,7 @@ Cloud platform. Each microservice lives in a top-level folder.
 
 Services are packaged as Docker images.
 
-Microservices are set up to be run with or without Docker Compose for local
+Microservices are set up to be run with or without Docker Compose for local 
 development - see the sections below for more details.
 
 The recommended setup for new developers is to run all the backend services (api
@@ -79,19 +79,19 @@ the required database services.
 
 The docker build process may take a few minutes, depending on your hardware,
 software and internet connection. Once completed, the applications will start,
-and you should be able to access the Marxan site on `localhost`, on the port
+and you should be able to access the Marxan site on `localhost`, on the port 
 specified as `APP_SERVICE_PORT`.
 
 ## Running Marxan natively
 
-Make sure you have installed and configured all the [dependencies](#Dependencies)
+Make sure you have installed and configured all the [dependencies](#Dependencies) 
 locally. PostgreSQL (with PostGIS) and Redis need to be up and running.
 
 ### Running API and Geoprocessing services
 
 When running the API and Geoprocessing services without relying on Docker
 Compose for container orchestration, be sure to review and set the correct
-[environment variables](./ENV_VARS.md) before executing the application.
+[environment variables](./ENV_VARS.md) before executing the application. 
 The `env.default` file and the `docker-compose` configuration files may give
 you some example values that work for docker-based executions, and that may
 be useful when implementing your native execution configuration.
@@ -100,9 +100,9 @@ The included Makefile has some useful build targets (commands) specifically
 targeted at native execution (prefixed with `native-`) that you'll find helpful.
 Refer to the Makefile inline documentation for more details.
 
-If you'd like to run the application directly using Yarn, you can find a
+If you'd like to run the application directly using Yarn, you can find a 
 `package.json` inside the `/app` folder with dependencies and commands for both
-applications. After installing the nodejs dependencies, this is how you can
+applications. After installing the nodejs dependencies, this is how you can 
 start either application:
 
 ```bash
@@ -174,10 +174,10 @@ run tests using a database whose data you don't want to lose.
 
 ## Seed data
 
-All fresh installations of Marxan (be it locally for development or in a cloud
+All fresh installations of Marxan (be it locally for development or in a cloud 
 provider for production) start off with empty databases, that need to be populated
 with seed data before the Marxan platform is fully functional. The seed data you'll
-want to import will depend on the goal of the installation you are currently setting
+want to import will depend on the goal of the installation you are currently setting 
 up.
 
 Please make sure to wait for all of the backend services (api, geoprocessing and
@@ -198,7 +198,7 @@ for each deployment
 ### User data
 
 User data is necessary for all types of Marxan installations, but different user data
-import processes will best fit different use cases.
+import processes will best fit different use cases. 
 
 There are two ways to create user accounts:
 
@@ -219,11 +219,11 @@ make native-seed-api-init-data
 ```
 
 The first option will allow you to create a custom user, and is targeted at
-environments where user accounts are meaningful - for example, production. To
+environments where user accounts are meaningful - for example, production. To 
 execute this on a cloud hosted version of Marxan, you should run the command
 above on the VM instance/docker container running the `api` application.
 
-In contrast, the second approach will batch-create several users with insecure
+In contrast, the second approach will batch-create several users with insecure 
 passwords and generic details, and it's only suited for development, testing
 or otherwise ephemeral environments.
 
@@ -231,9 +231,9 @@ or otherwise ephemeral environments.
 
 Importing the initial geographic data executes a long-running data ETL pipeline
 that imports large amounts of data from publicly available datasets onto Marxan's
-PostgreSQL server - using both `api` and `geoprocessing` databases.
+PostgreSQL server - using both `api` and `geoprocessing` databases. 
 
-**Note**: The geographic data import process assumes the
+**Note**: The geographic data import process assumes the 
 presence of at least a user in the database. If none exists, the process will fail
 with non-descriptive error, so be sure to import [User data](#user-data) first.
 
@@ -244,8 +244,8 @@ the following make task, which runs a dockerized version of the tool:
 make seed-geodb-data
 ```
 
-*Note* this process can complete successfully and exit with code 0,
-but have errors in the output logs. This is expected, and said log errors can be
+*Note* this process can complete successfully and exit with code 0, 
+but have errors in the output logs. This is expected, and said log errors can be 
 ignored.
 
 The actual implementation can be found in the `/data` folder
@@ -257,20 +257,20 @@ production-grade instances of Marxan.
 Please note that this full DB set up will require at least 16GB of RAM and 40GB
 of disk space in order to carry out some of these tasks (GADM and WDPA data
 import pipelines). Also, the number of CPU cores will impact the time needed to
-seed a new instance with the complete GADM and WDPA datasets, which will be 1h+
+seed a new instance with the complete GADM and WDPA datasets, which will be 1h+ 
 on ideal hardware.
 
 To execute this on a cloud hosted version of Marxan, you have a couple of options:
-- Run the import process locally on local running PostgreSQL servers, then export
+- Run the import process locally on local running PostgreSQL servers, then export 
 the resulting `.sql` locally and import it remotely.
 - Run the import process locally, while having it connect directly to the remote
 `api` and `geoprocessing` databases using kubectl port forwarding. You may need
-to modify the container's
+to modify the container's 
 [network mode](https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode)
-to "host" for this to work.
+to "host" for this to work. 
 
 While geographic data is technically necessary on all Marxan environments,
-there is a faster alternative to import equivalent data on development/test
+there is a faster alternative to import equivalent data on development/test 
 environments, which is discussed in the next section.
 
 #### Test data
@@ -288,7 +288,7 @@ make native-seed-api-init-data
 ```
 
 These commands will:
-- Import generic user data (equivalent to `seed-api-init-data`/`native-seed-api-init-data`
+- Import generic user data (equivalent to `seed-api-init-data`/`native-seed-api-init-data` 
 described above)
 - Import a precomputed, subset of the geographical data
 - Create sample/test Marxan resources, like organizations, scenarios, etc.
@@ -357,13 +357,13 @@ Infrastructure code and documentation can be found under `/infrastructure`
 
 ### CI/CD
 
-[CI/CD](https://www.redhat.com/en/topics/devops/what-is-ci-cd) is handled with
-[GitHub Actions](https://github.com/features/actions). More details can be found
-by reviewing the actual content of the `.github/workflows` folder but, in a nutshell,
+[CI/CD](https://www.redhat.com/en/topics/devops/what-is-ci-cd) is handled with 
+[GitHub Actions](https://github.com/features/actions). More details can be found 
+by reviewing the actual content of the `.github/workflows` folder but, in a nutshell, 
 GitHub Action will automatically run tests on code pushed as part of a Pull Request.
 
 For code merged to key branches (currently `main` and `develop`), once tests run
-successfully, [Docker](https://www.docker.com/) images are built and pushed to a
+successfully, [Docker](https://www.docker.com/) images are built and pushed to a 
 private [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/).
 
 The GitHub Actions workflows currently configured requires a few [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets)

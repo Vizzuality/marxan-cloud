@@ -6,7 +6,7 @@ import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 
-import LOGO_BLACK from 'svgs/logo-black.svg';
+import LOGO_BLACK from 'images/logo-black.png';
 
 export interface ScenariosReportHeaderProps {
   title: string;

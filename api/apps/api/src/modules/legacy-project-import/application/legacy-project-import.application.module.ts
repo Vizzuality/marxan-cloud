@@ -16,12 +16,14 @@ import { SpecificationModule } from '../../scenarios/specification';
 import { LegacyProjectImportRepositoryModule } from '../infra/legacy-project-import.repository.module';
 import { AddFileToLegacyProjectImportHandler } from './add-file-to-legacy-project-import.handler';
 import { AllLegacyProjectImportPiecesImportedSaga } from './all-legacy-project-import-pieces-imported.saga';
+import { CancelLegacyProjectImportHandler } from './cancel-legacy-project-import.handler';
 import { CompleteLegacyProjectImportPieceHandler } from './complete-legacy-project-import-piece.handler';
 import { DeleteFileFromLegacyProjectImportHandler } from './delete-file-from-legacy-project-import.handler';
 import { GetLegacyProjectImportErrorsHandler } from './get-legacy-project-import-errors.handler';
 import { LaunchLegacyProjectImportSpecificationHandler } from './launch-legacy-project-import-specification.handler';
 import { LegacyProjectImportRequestedSaga } from './legacy-project-import-requested.saga';
 import { MarkLegacyProjectImportAsSubmittedHandler } from './mark-legacy-project-as-submitted.handler';
+import { MarkLegacyProjectImportAsCanceledHandler } from './mark-legacy-project-import-as-canceled.handler';
 import { MarkLegacyProjectImportAsFailedHandler } from './mark-legacy-project-import-as-failed.handler';
 import { MarkLegacyProjectImportAsFinishedHandler } from './mark-legacy-project-import-as-finished.handler';
 import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
@@ -69,6 +71,8 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
     CompleteLegacyProjectImportPieceHandler,
     GetLegacyProjectImportErrorsHandler,
     LaunchLegacyProjectImportSpecificationHandler,
+    CancelLegacyProjectImportHandler,
+    MarkLegacyProjectImportAsCanceledHandler,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })

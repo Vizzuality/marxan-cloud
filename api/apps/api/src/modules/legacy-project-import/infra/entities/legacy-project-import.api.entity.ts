@@ -4,11 +4,13 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
 } from 'typeorm';
 import { Project } from '../../../projects/project.api.entity';
 import { User } from '../../../users/user.api.entity';
 import { LegacyProjectImport } from '../../domain/legacy-project-import/legacy-project-import';
+import { LegacyProjectImportStatuses } from '../../domain/legacy-project-import/legacy-project-import-status';
 import { LegacyProjectImportSnapshot } from '../../domain/legacy-project-import/legacy-project-import.snapshot';
 import { LegacyProjectImportComponentEntity } from './legacy-project-import-component.api.entity';
 import { LegacyProjectImportFileEntity } from './legacy-project-import-file.api.entity';
@@ -27,11 +29,14 @@ export class LegacyProjectImportEntity {
   @Column({ type: 'uuid', name: 'owner_id' })
   ownerId!: string;
 
+  @Column({ type: 'enum', name: 'status', enum: LegacyProjectImportStatuses })
+  status!: LegacyProjectImportStatuses;
+
   @Column({
     type: 'boolean',
-    name: 'is_accepting_files',
+    name: 'to_be_removed',
   })
-  isAcceptingFiles!: boolean;
+  toBeRemoved!: boolean;
 
   @OneToMany(
     () => LegacyProjectImportComponentEntity,
@@ -58,7 +63,7 @@ export class LegacyProjectImportEntity {
   })
   owner!: User;
 
-  @ManyToOne(() => Project, (project) => project.id)
+  @OneToOne(() => Project, (project) => project.id)
   @JoinColumn({
     name: 'project_id',
     referencedColumnName: 'id',
@@ -73,13 +78,14 @@ export class LegacyProjectImportEntity {
       LegacyProjectImportFileEntity.fromSnapshot,
     );
     legacyProjectImport.id = snapshot.id;
-    legacyProjectImport.isAcceptingFiles = snapshot.isAcceptingFiles;
+    legacyProjectImport.status = snapshot.status;
     legacyProjectImport.ownerId = snapshot.ownerId;
     legacyProjectImport.pieces = snapshot.pieces.map(
       LegacyProjectImportComponentEntity.fromSnapshot,
     );
     legacyProjectImport.projectId = snapshot.projectId;
     legacyProjectImport.scenarioId = snapshot.scenarioId;
+    legacyProjectImport.toBeRemoved = snapshot.toBeRemoved;
 
     return legacyProjectImport;
   }
@@ -88,11 +94,12 @@ export class LegacyProjectImportEntity {
     return LegacyProjectImport.fromSnapshot({
       id: this.id,
       files: this.files.map((file) => file.toDomain().toSnapshot()),
-      isAcceptingFiles: this.isAcceptingFiles,
+      status: this.status,
       ownerId: this.ownerId,
       pieces: this.pieces.map((piece) => piece.toDomain().toSnapshot()),
       projectId: this.projectId,
       scenarioId: this.scenarioId,
+      toBeRemoved: this.toBeRemoved,
     });
   }
 }

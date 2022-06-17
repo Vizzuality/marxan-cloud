@@ -1,21 +1,33 @@
 import React, { useCallback } from 'react';
+
 import cx from 'classnames';
-
-import Icon from 'components/icon';
-
 import { motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
 
 import { useHelp } from 'hooks/help';
+import { useMe } from 'hooks/me';
+
+import Icon from 'components/icon';
 
 import HELP_SVG from 'svgs/ui/help.svg?sprite';
 
 export const HelpButton = () => {
   const { active, onActive } = useHelp();
+  const plausible = usePlausible();
+  const { user } = useMe();
 
   const onToggleActive = useCallback((e) => {
     e.preventDefault();
     onActive(!active);
-  }, [active, onActive]);
+    if (active) {
+      plausible('Activate help guide', {
+        props: {
+          userId: `${user.id}`,
+          userEmail: `${user.email}`,
+        },
+      });
+    }
+  }, [active, onActive, plausible, user.id, user.email]);
 
   return (
     <div>
