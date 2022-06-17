@@ -29,7 +29,7 @@ export class DeleteProjectHandler
   async execute({ projectId }: DeleteProject): Promise<DeleteProjectResponse> {
     try {
       const [project] = await this.projectRepo.find({
-        where: { projectId },
+        where: { id: projectId },
         relations: ['scenarios'],
       });
 
