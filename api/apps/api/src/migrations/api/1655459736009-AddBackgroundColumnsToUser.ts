@@ -21,8 +21,8 @@ export class AddBackgroundColumnsToUser1655459736009
         );
 
         ALTER TABLE users
-            ADD COLUMN background background_options nullable,
-            ADD COLUMN level level_options nullable;
+            ADD COLUMN background background_options,
+            ADD COLUMN level level_options;
       `);
   }
 
