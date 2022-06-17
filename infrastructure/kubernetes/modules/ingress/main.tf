@@ -66,11 +66,7 @@ resource "azurerm_dns_a_record" "client_dns_record" {
   resource_group_name = var.resource_group.name
   ttl                 = 300
   records             = [kubernetes_ingress_v1.ingress.status[0].load_balancer[0].ingress[0].ip]
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags                = var.project_tags
 }
 
 resource "azurerm_dns_a_record" "api_dns_record" {
@@ -79,9 +75,5 @@ resource "azurerm_dns_a_record" "api_dns_record" {
   resource_group_name = var.resource_group.name
   ttl                 = 300
   records             = [kubernetes_ingress_v1.ingress.status[0].load_balancer[0].ingress[0].ip]
-  tags = {
-    Environment = "PRD-STG"
-    CreatedBy   = "Eric Coffman (ecoffman@tnc.org)"
-    Manager     = "Zach Ferdana (zferdana@tnc.org)"
-  }
+  tags                = var.project_tags
 }

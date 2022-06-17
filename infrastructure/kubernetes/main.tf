@@ -210,6 +210,7 @@ module "ingress_production" {
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
+  project_tags               = merge(var.project_tags, { Environment = "PRD" })
 }
 
 #endregion
@@ -354,5 +355,6 @@ module "ingress_staging" {
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
   domain_prefix              = "staging"
+  project_tags               = merge(var.project_tags, { Environment = "STG" })
 }
 #endregion
