@@ -12,13 +12,17 @@ export class AllPiecesImportedSaga {
   finalizeArchive = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(AllPiecesImported),
-      mergeMap(({ importId, resourceId, resourceKind, isCloning }) => {
-        if (isCloning)
+      mergeMap(
+        ({ importId, exportId, resourceId, resourceKind, isCloning }) => {
+          if (isCloning)
+            return of(
+              new MarkCloneAsFinished(exportId, resourceId, resourceKind),
+              new MarkImportAsFinished(importId, resourceId, resourceKind),
+            );
           return of(
-            new MarkImportAsFinished(importId),
-            new MarkCloneAsFinished(resourceId, resourceKind),
+            new MarkImportAsFinished(importId, resourceId, resourceKind),
           );
-        return of(new MarkImportAsFinished(importId));
-      }),
+        },
+      ),
     );
 }

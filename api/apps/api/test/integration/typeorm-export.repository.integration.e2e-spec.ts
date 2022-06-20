@@ -6,7 +6,10 @@ import {
   ExportId,
   ExportSnapshot,
 } from '@marxan-api/modules/clone/export/domain';
+import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
+import { Import, ImportId } from '@marxan-api/modules/clone/import/domain';
 import {
+  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ComponentLocation,
@@ -82,6 +85,15 @@ describe('Typeorm export repository', () => {
       tenLatestExports,
     );
   });
+
+  it('should delete an import when export is deleted', async () => {
+    const {
+      exportId,
+      importId,
+    } = await fixtures.GivenExportWithImportWasRequested();
+    await fixtures.WhenExportIsDeleted(exportId, importId);
+    await fixtures.ThenExportAndImportDoesNotExist(exportId, importId);
+  });
 });
 
 const getFixtures = async () => {
@@ -93,6 +105,7 @@ const getFixtures = async () => {
 
   const app = await bootstrapApplication();
   const repo = app.get<ExportRepository>(ExportRepository);
+  const importRepo = app.get(ImportRepository);
 
   const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const ownerId = await GivenUserExists(app, 'aa');
@@ -241,6 +254,38 @@ const getFixtures = async () => {
         await repository.save(exportInstance);
       });
     },
+    GivenExportWithImportWasRequested: async () => {
+      resourceId = ResourceId.create();
+      const cloning = true;
+      const foreignExport = false;
+      const exportInstance = Export.newOne(
+        resourceId,
+        ResourceKind.Project,
+        new UserId(ownerId),
+        [],
+        cloning,
+        foreignExport,
+      );
+      exportId = exportInstance.id;
+      await repo.save(exportInstance);
+
+      const importResourceId = ResourceId.create();
+      const archiveLocation = new ArchiveLocation('/tmp/file.zip');
+      const importInstance = Import.newOne(
+        importResourceId,
+        ResourceKind.Project,
+        importResourceId,
+        new UserId(ownerId),
+        archiveLocation,
+        [],
+        cloning,
+        exportId,
+      );
+      const importId = importInstance.importId;
+      await importRepo.save(importInstance);
+
+      return { exportId, importId };
+    },
     WhenAComponentIsCompleted: async () => {
       const componentLocation = new ComponentLocation(
         componentLocationUri,
@@ -287,6 +332,17 @@ const getFixtures = async () => {
           isStandalone: true,
         }),
       };
+    },
+    WhenExportIsDeleted: async (exportId: ExportId, importId?: ImportId) => {
+      const savedExport = await repo.find(exportId);
+      expect(savedExport).toBeDefined();
+
+      if (importId) {
+        const savedImport = await importRepo.find(importId);
+        expect(savedImport).toBeDefined();
+      }
+
+      return repo.delete(exportId);
     },
     ThenExportDataShouldBeOk: async ({
       exportData,
@@ -360,6 +416,18 @@ const getFixtures = async () => {
             exportInstance.toSnapshot().exportPieces.length === 1,
         ),
       ).toEqual(true);
+    },
+    ThenExportAndImportDoesNotExist: async (
+      exportId: ExportId,
+      importId?: ImportId,
+    ) => {
+      const deletedExport = await repo.find(exportId);
+      expect(deletedExport).toBeUndefined();
+
+      if (importId) {
+        const deletedImport = await importRepo.find(importId);
+        expect(deletedImport).toBeUndefined();
+      }
     },
   };
 };

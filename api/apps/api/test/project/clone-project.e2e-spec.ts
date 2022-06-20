@@ -7,7 +7,11 @@ import { ExportRepository } from '@marxan-api/modules/clone/export/application/e
 import { Export, ExportId } from '@marxan-api/modules/clone/export/domain';
 import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { CompleteImportPiece } from '@marxan-api/modules/clone/import/application/complete-import-piece.command';
-import { AllPiecesImported } from '@marxan-api/modules/clone/import/domain';
+import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
+import {
+  AllPiecesImported,
+  ImportId,
+} from '@marxan-api/modules/clone/import/domain';
 import { SchedulePieceImport } from '@marxan-api/modules/clone/infra/import/schedule-piece-import.command';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -51,8 +55,8 @@ test('should permit cloning a project', async () => {
   await fixtures.GivenProjectWasCreated();
   await fixtures.GivenCloneWasRequested();
 
-  await fixtures.WhenImportIsReady();
-  await fixtures.ThenImportIsCompleted();
+  const imporId = await fixtures.WhenImportIsReady();
+  await fixtures.ThenImportIsCompleted(imporId);
 });
 
 export const getFixtures = async () => {
@@ -61,6 +65,7 @@ export const getFixtures = async () => {
   eventBusTestUtils.startInspectingEvents();
   const commandBus = app.get(CommandBus);
   const exportRepo = app.get(ExportRepository);
+  const importRepo = app.get(ImportRepository);
   const apiEvents = app.get(ApiEventsService);
   const fileRepo = app.get(CloningFilesRepository);
   const userProjectsRepo = app.get<Repository<UsersProjectsApiEntity>>(
@@ -183,9 +188,12 @@ export const getFixtures = async () => {
       });
     },
     WhenImportIsReady: async () => {
-      return eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
+      const allPiecesImportedEvent = await eventBusTestUtils.waitUntilEventIsPublished(
+        AllPiecesImported,
+      );
+      return allPiecesImportedEvent.importId;
     },
-    ThenImportIsCompleted: async () => {
+    ThenImportIsCompleted: async (importId: ImportId) => {
       return new Promise<void>((resolve, reject) => {
         const findApiEventInterval = setInterval(async () => {
           try {
@@ -201,6 +209,15 @@ export const getFixtures = async () => {
               topic: clonedProjectId,
               kind: API_EVENT_KINDS.project__clone__finished__v1__alpha,
             });
+
+            const deletedExport = await exportRepo.find(exportId);
+            const deletedImport = await importRepo.find(importId);
+
+            if (!deletedExport || !deletedImport)
+              throw new Error(
+                'export and import rows are not deleted when cloning a project success',
+              );
+
             clearInterval(findApiEventInterval);
             resolve();
           } catch (error) {}

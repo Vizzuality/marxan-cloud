@@ -15,6 +15,7 @@ import { PieceImported } from '../events/piece-imported.event';
 import { ImportComponent } from './import-component';
 import { ImportId } from './import.id';
 import { ImportSnapshot } from './import.snapshot';
+import { ExportId } from '@marxan-api/modules/clone/export';
 
 export const componentNotFound = Symbol(`component not found`);
 export const componentAlreadyCompleted = Symbol(`component already completed`);
@@ -38,6 +39,7 @@ export class Import extends AggregateRoot {
     private readonly archiveLocation: ArchiveLocation,
     private readonly pieces: ImportComponent[],
     private readonly isCloning: boolean,
+    private readonly exportId: ExportId,
     private readonly resourceName?: string,
   ) {
     super();
@@ -68,6 +70,7 @@ export class Import extends AggregateRoot {
       new ArchiveLocation(snapshot.archiveLocation),
       snapshot.importPieces.map(ImportComponent.fromSnapshot),
       snapshot.isCloning,
+      new ExportId(snapshot.exporttId),
       snapshot.resourceName,
     );
   }
@@ -80,6 +83,7 @@ export class Import extends AggregateRoot {
     archiveLocation: ArchiveLocation,
     pieces: ImportComponent[],
     isCloning: boolean,
+    exportId: ExportId,
     resourceName?: string,
   ): Import {
     const id = ImportId.create();
@@ -92,6 +96,7 @@ export class Import extends AggregateRoot {
       archiveLocation,
       pieces,
       isCloning,
+      exportId,
       resourceName,
     );
 
@@ -178,6 +183,7 @@ export class Import extends AggregateRoot {
       this.apply(
         new AllPiecesImported(
           this.importId,
+          this.exportId,
           this.resourceId,
           this.resourceKind,
           this.isCloning,
@@ -206,6 +212,7 @@ export class Import extends AggregateRoot {
       projectId: this.projectId.value,
       ownerId: this.ownerId.value,
       isCloning: this.isCloning,
+      exporttId: this.exportId.value,
       resourceName: this.resourceName,
     };
   }

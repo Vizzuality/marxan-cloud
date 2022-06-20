@@ -11,6 +11,8 @@ export abstract class ExportRepository {
 
   abstract find(exportId: ExportId): Promise<Export | undefined>;
 
+  abstract delete(exportId: ExportId): Promise<void>;
+
   abstract findLatestExportsFor(
     projectId: string,
     limit: number,
