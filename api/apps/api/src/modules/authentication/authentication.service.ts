@@ -119,6 +119,7 @@ export class AuthenticationService {
     user.lname = signupDto.lname;
     user.background = signupDto.background;
     user.level = signupDto.level;
+    user.country = signupDto.country;
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );

@@ -55,6 +55,10 @@ export class User {
   @IsEnum(Levels)
   level?: Levels;
 
+  @ApiPropertyOptional()
+  @Column('character varying')
+  country?: string;
+
   /**
    * User avatar, stored as data url.
    *
