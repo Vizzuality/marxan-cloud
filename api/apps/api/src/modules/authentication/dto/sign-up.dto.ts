@@ -62,4 +62,9 @@ export class SignUpDto {
   @IsEnum(Levels)
   @ApiPropertyOptional()
   level?: Levels;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional()
+  country?: string;
 }
