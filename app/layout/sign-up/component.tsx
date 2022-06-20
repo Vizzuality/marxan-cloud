@@ -31,7 +31,7 @@ import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 import USER_SVG from 'svgs/ui/user.svg?sprite';
 
-import { WORK_OPTIONS } from './constants';
+import { BACKGROUND_OPTIONS, ACADEMIC_LEVEL_OPTIONS, APPLIED_LEVEL_OPTIONS } from './constants';
 
 export interface SignUpProps {
 
@@ -135,20 +135,41 @@ export const SignUp: React.FC<SignUpProps> = () => {
                   </FieldRFF>
                 </div>
 
-                {/* WORK */}
+                {/* BACKGROUND */}
                 <div className="mt-5">
                   <FieldRFF
-                    name="work"
+                    name="background"
                     validate={composeValidators([{ presence: true }])}
                   >
                     {(fprops) => (
-                      <Field id="login-work" {...fprops} className="w-full rounded-none">
+                      <Field id="login-background" {...fprops} className="w-full">
                         <Label theme="light" className="mb-3 uppercase">What is the nature of your work with Marxan?</Label>
                         <Select
                           theme="light-square"
                           size="base"
                           placeholder="Select..."
-                          options={WORK_OPTIONS}
+                          options={BACKGROUND_OPTIONS}
+                          onChange={fprops.input.onChange}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
+                {/* LEVEL */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="level"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="login-level" {...fprops} className="w-full">
+                        <Select
+                          theme="light-square"
+                          size="base"
+                          placeholder="Select..."
+                          options={props.values.work === 'academic' ? ACADEMIC_LEVEL_OPTIONS : APPLIED_LEVEL_OPTIONS}
+                          onChange={fprops.input.onChange}
                         />
                       </Field>
                     )}
