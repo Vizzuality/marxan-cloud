@@ -168,7 +168,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                           theme="light-square"
                           size="base"
                           placeholder="Select..."
-                          options={props.values.work === 'academic' ? ACADEMIC_LEVEL_OPTIONS : APPLIED_LEVEL_OPTIONS}
+                          options={props.values.work === 'academic_research' ? ACADEMIC_LEVEL_OPTIONS : APPLIED_LEVEL_OPTIONS}
                           onChange={fprops.input.onChange}
                         />
                       </Field>

@@ -1,11 +1,11 @@
 export const BACKGROUND_OPTIONS = [
   {
     label: 'Academic research/science',
-    value: 'academic',
+    value: 'academic_research',
   },
   {
     label: 'Applied conservation planning',
-    value: 'applied',
+    value: 'conservation_planning',
   },
 ];
 
@@ -39,7 +39,7 @@ export const APPLIED_LEVEL_OPTIONS = [
   },
   {
     label: 'Private sector',
-    value: 'private-sector',
+    value: 'private_sector',
   },
   {
     label: 'Government',
