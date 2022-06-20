@@ -47,7 +47,6 @@ export class DeleteProjectUnsusedReosurces
       .execute();
 
     await this.planningAreasRepo.delete({ projectId });
-    //should we delete protected areas?
     await this.protectedAreasRepo.delete({ projectId });
     await this.featuresDataRepo.delete({
       featureId: In(data.projectCustomFeaturesIds),
