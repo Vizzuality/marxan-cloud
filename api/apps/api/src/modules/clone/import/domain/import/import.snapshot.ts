@@ -10,5 +10,6 @@ export interface ImportSnapshot {
   projectId: string;
   ownerId: string;
   isCloning: boolean;
+  exporttId: string;
   resourceName?: string;
 }

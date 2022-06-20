@@ -1,3 +1,7 @@
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
+import { ExportAdaptersModule } from '@marxan-api/modules/clone/export/adapters/export-adapters.module';
+import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
+import { Export } from '@marxan-api/modules/clone/export/domain';
 import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
 import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
@@ -79,15 +83,28 @@ const getFixtures = async () => {
       }),
       TypeOrmModule.forFeature([User]),
       ImportAdaptersModule,
+      ExportAdaptersModule,
     ],
   }).compile();
 
-  const repo = testingModule.get<ImportRepository>(ImportRepository);
+  const importRepo = testingModule.get<ImportRepository>(ImportRepository);
+  const exportRepo = testingModule.get(ExportRepository);
+
   const userRepo = testingModule.get<Repository<User>>(
     getRepositoryToken(User),
   );
 
   const passwordHash = await hash('supersecretpassword', 10);
+  const exportResourceId = ResourceId.create();
+
+  const exportInstance = Export.newOne(
+    exportResourceId,
+    ResourceKind.Project,
+    ownerId,
+    [],
+    true,
+    false,
+  );
 
   await userRepo.save({
     id: ownerId.value,
@@ -95,17 +112,19 @@ const getFixtures = async () => {
     passwordHash,
   });
 
+  await exportRepo.save(exportInstance);
+
   return {
     cleanup: async () => {
       const connection = testingModule.get<Connection>(Connection);
-      const importRepo = connection.getRepository(ImportEntity);
-      await importRepo.delete({});
+      const exportRepo = connection.getRepository(ExportEntity);
+      await exportRepo.delete({});
       await userRepo.delete({ id: ownerId.value });
       await testingModule.close();
     },
     GivenImportWasRequested: async () => {
-      importResourceId = ResourceId.create();
-      const isCloning = false;
+      importResourceId = exportInstance.importResourceId!;
+      const isCloning = true;
       const projectId = importResourceId;
       componentId = ComponentId.create();
       archiveLocation = new ArchiveLocation('/tmp/file.zip');
@@ -129,13 +148,14 @@ const getFixtures = async () => {
           }),
         ],
         isCloning,
+        exportInstance.id,
       );
       importId = importInstance.importId;
-      await repo.save(importInstance);
+      await importRepo.save(importInstance);
     },
     GivenImportWithMultipleComponentsWasRequested: async () => {
-      importResourceId = ResourceId.create();
-      const isCloning = false;
+      importResourceId = exportInstance.importResourceId!;
+      const isCloning = true;
       const projectId = importResourceId;
 
       archiveLocation = new ArchiveLocation('/tmp/file.zip');
@@ -161,26 +181,27 @@ const getFixtures = async () => {
         archiveLocation,
         components,
         isCloning,
+        exportInstance.id,
       );
       importId = importInstance.importId;
-      await repo.transaction(async (repository) => {
+      await importRepo.transaction(async (repository) => {
         await repository.save(importInstance);
       });
     },
     WhenAComponentIsCompleted: async () => {
-      const importInstance = (await repo.find(importId)) as Import;
+      const importInstance = (await importRepo.find(importId)) as Import;
       expect(importInstance).toBeDefined();
 
       importInstance.completePiece(componentId);
-      await repo.save(importInstance);
+      await importRepo.save(importInstance);
     },
     WhenAllComponentsAreCompletedConcurrentlyWithTransactions: async () => {
-      const importInstance = (await repo.find(importId)) as Import;
+      const importInstance = (await importRepo.find(importId)) as Import;
       expect(importInstance).toBeDefined();
 
       await Promise.all(
         importInstance.toSnapshot().importPieces.map((piece) =>
-          repo.transaction(async (repository) => {
+          importRepo.transaction(async (repository) => {
             importInstance.completePiece(new ComponentId(piece.id));
             await repository.save(importInstance);
           }),
@@ -188,7 +209,7 @@ const getFixtures = async () => {
       );
     },
     WhenReadingTheSavedImportFromRepository: async () => {
-      return await repo.find(importId);
+      return await importRepo.find(importId);
     },
     ThenImportDataShouldBeOk: async ({
       importData,
@@ -202,7 +223,8 @@ const getFixtures = async () => {
       expect(importSnapshot.id).toBe(importId.value);
       expect(importSnapshot.resourceKind).toBe(ResourceKind.Project);
       expect(importSnapshot.resourceId).toBe(importResourceId.value);
-      expect(importSnapshot.isCloning).toBe(false);
+      expect(importSnapshot.isCloning).toBe(true);
+      expect(importSnapshot.exporttId).toEqual(exportInstance.id.value);
 
       expect(importSnapshot.importPieces).toHaveLength(1);
 
