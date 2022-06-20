@@ -70,7 +70,7 @@ export class Import extends AggregateRoot {
       new ArchiveLocation(snapshot.archiveLocation),
       snapshot.importPieces.map(ImportComponent.fromSnapshot),
       snapshot.isCloning,
-      new ExportId(snapshot.exporttId),
+      new ExportId(snapshot.exportId),
       snapshot.resourceName,
     );
   }
@@ -212,7 +212,7 @@ export class Import extends AggregateRoot {
       projectId: this.projectId.value,
       ownerId: this.ownerId.value,
       isCloning: this.isCloning,
-      exporttId: this.exportId.value,
+      exportId: this.exportId.value,
       resourceName: this.resourceName,
     };
   }

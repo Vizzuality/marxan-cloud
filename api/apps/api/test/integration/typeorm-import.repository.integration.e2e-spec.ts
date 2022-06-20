@@ -224,7 +224,7 @@ const getFixtures = async () => {
       expect(importSnapshot.resourceKind).toBe(ResourceKind.Project);
       expect(importSnapshot.resourceId).toBe(importResourceId.value);
       expect(importSnapshot.isCloning).toBe(true);
-      expect(importSnapshot.exporttId).toEqual(exportInstance.id.value);
+      expect(importSnapshot.exportId).toEqual(exportInstance.id.value);
 
       expect(importSnapshot.importPieces).toHaveLength(1);
 

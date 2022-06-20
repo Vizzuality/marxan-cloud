@@ -53,7 +53,7 @@ export class ImportEntity {
   isCloning!: boolean;
 
   @Column({ type: 'uuid', name: 'export_id' })
-  exporttId!: string;
+  exportId!: string;
 
   @OneToMany(() => ImportComponentEntity, (component) => component.import, {
     cascade: true,
@@ -93,7 +93,7 @@ export class ImportEntity {
     );
     entity.ownerId = snapshot.ownerId;
     entity.isCloning = snapshot.isCloning;
-    entity.exporttId = snapshot.exporttId;
+    entity.exportId = snapshot.exportId;
     entity.resourceName = snapshot.resourceName;
 
     return entity;
@@ -109,7 +109,7 @@ export class ImportEntity {
       importPieces: this.components.map((component) => component.toSnapshot()),
       ownerId: this.ownerId,
       isCloning: this.isCloning,
-      exporttId: this.exporttId,
+      exportId: this.exportId,
       resourceName: this.resourceName,
     });
   }
