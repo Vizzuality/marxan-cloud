@@ -18,6 +18,7 @@ import Checkbox from 'components/forms/checkbox';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
+import Select from 'components/forms/select';
 import {
   composeValidators,
   booleanValidator,
@@ -29,6 +30,8 @@ import AUTHENTICATION from 'services/authentication';
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 import USER_SVG from 'svgs/ui/user.svg?sprite';
+
+import { WORK_OPTIONS } from './constants';
 
 export interface SignUpProps {
 
@@ -112,6 +115,41 @@ export const SignUp: React.FC<SignUpProps> = () => {
                       <Field id="login-displayName" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">Name</Label>
                         <Input theme="light" icon={USER_SVG} />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
+                {/* COUNTRY */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="country"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="login-country" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">Country</Label>
+                        <Input theme="light" icon={USER_SVG} />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
+                {/* WORK */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="work"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="login-work" {...fprops} className="w-full rounded-none">
+                        <Label theme="light" className="mb-3 uppercase">What is the nature of your work with Marxan?</Label>
+                        <Select
+                          theme="light-square"
+                          size="base"
+                          placeholder="Select..."
+                          options={WORK_OPTIONS}
+                        />
                       </Field>
                     )}
                   </FieldRFF>
