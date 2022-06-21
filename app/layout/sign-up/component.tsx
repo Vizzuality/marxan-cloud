@@ -129,7 +129,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                     {(fprops) => (
                       <Field id="login-country" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">Country</Label>
-                        <Input theme="light" icon={USER_SVG} />
+                        <Input theme="light" />
                       </Field>
                     )}
                   </FieldRFF>
