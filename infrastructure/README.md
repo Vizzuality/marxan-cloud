@@ -164,7 +164,7 @@ The pod names are: `api-postgres-postgresql-0` and `geoprocessing-postgres-postg
 both the `staging` and `production` environments.
 - Create a database and a user with the corresponding credentials (see either the relevant
 [Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or the
-[Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)).
+[Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)). (This section needs to be flushed out and offer some trouble shooting advice.)
 ***Note***:
 this should already be done by Terraform (see secrets module ./modules/secrets/main.tf).
 - Enable the required database extensions. They must be executed by a user with elevated
