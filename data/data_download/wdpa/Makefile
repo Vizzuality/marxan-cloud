@@ -10,10 +10,6 @@ URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
 SIMP_FOLDER := data/wdpa/simp
 GEO_FOLDER := data/wdpa/geojson
 
-# @debt
-# need to add as the main admin user through auth and calling for it.
-MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" -c "select id from users limit 1")
-
 import: simp
 	for i in $(SIMP_FOLDER)/*.json; do \
 		ogr2ogr -makevalid -update -append \
@@ -22,7 +18,7 @@ import: simp
 		-t_srs EPSG:4326 -a_srs EPSG:4326 \
 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host=$$GEO_POSTGRES_HOST \
 		port=$$GEO_POSTGRES_PORT user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
-		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .json "$$i")\""; \
+		-sql "select *,'00000000-0000-0000-0000-000000000000' as created_by from \"$$(basename -s .json "$$i")\""; \
 	done;
 	rm -rf $(SIMP_FOLDER)
 
