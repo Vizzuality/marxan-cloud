@@ -15,13 +15,15 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { publishedProjectResource } from '@marxan-api/modules/published-project/published-project.resource';
 import { FetchSpecification } from 'nestjs-base-service';
 import { UsersService } from '../users/users.service';
-import { ExportId } from '../clone';
 import { ExportRepository } from '../clone/export/application/export-repository.port';
 import { Project } from '../projects/project.api.entity';
 import { UsersProjectsApiEntity } from '../access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '../access-control/projects-acl/dto/user-role-project.dto';
-import { groupBy } from 'lodash';
-import { exportHasFinished } from '@marxan-api/utils/published-export.utils';
+import { add, groupBy } from 'lodash';
+import {
+  addOwnerEmails,
+  removeExportIdsForUnfinishedExports,
+} from '@marxan-api/utils/published-export.utils';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -92,7 +94,10 @@ export class PublishedProjectCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: ProjectsRequest,
   ): Promise<PublishedProject> {
-    const processedEntity = await exportHasFinished([entity], this.exportRepo);
+    const processedEntity = await removeExportIdsForUnfinishedExports(
+      [entity],
+      this.exportRepo,
+    );
     return processedEntity[0];
   }
 
@@ -138,35 +143,14 @@ export class PublishedProjectCrudService extends AppBaseService<
       return entitiesAndCount;
     }
 
-    const extendedEntitiesFromGetById: PublishedProject[] = await exportHasFinished(
+    const extendedEntities: PublishedProject[] = await removeExportIdsForUnfinishedExports(
       entitiesAndCount[0],
       this.exportRepo,
+    ).then(
+      async (exportIdProcessedEntities) =>
+        await addOwnerEmails(exportIdProcessedEntities, this.usersProjectsRepo),
     );
 
-    const allOwnersOfAllProjectsPlusEmail = await this.usersProjectsRepo.query(
-      `
-      select up.project_id, up.user_id, u.email
-        from users_projects as up
-           left join users as u
-                on (u."id" = up.user_id)
-        where up.project_id IN (SELECT id FROM published_projects) AND up.role_id = $1;`,
-      [ProjectRoles.project_owner],
-    );
-    const ownersPerProject = groupBy(
-      allOwnersOfAllProjectsPlusEmail,
-      (item) => item.project_id,
-    );
-
-    const finalExtendedEntities: PublishedProject[] = extendedEntitiesFromGetById.map(
-      (entity) => ({
-        ...entity,
-        ownerEmails: ownersPerProject[entity.id].map((item) => ({
-          id: item.user_id,
-          email: item.email,
-        })),
-      }),
-    );
-
-    return [finalExtendedEntities, entitiesAndCount[1]];
+    return [extendedEntities, entitiesAndCount[1]];
   }
 }
