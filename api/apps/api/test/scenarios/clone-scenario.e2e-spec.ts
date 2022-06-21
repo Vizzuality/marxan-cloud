@@ -8,7 +8,10 @@ import { Export, ExportId } from '@marxan-api/modules/clone/export/domain';
 import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { CompleteImportPiece } from '@marxan-api/modules/clone/import/application/complete-import-piece.command';
 import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
-import { AllPiecesImported } from '@marxan-api/modules/clone/import/domain';
+import {
+  AllPiecesImported,
+  ImportId,
+} from '@marxan-api/modules/clone/import/domain';
 import { SchedulePieceImport } from '@marxan-api/modules/clone/infra/import/schedule-piece-import.command';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -57,8 +60,8 @@ test('should permit cloning a scenario for owner users', async () => {
   const response = await fixtures.WhenCloneIsRequestedBy();
   await fixtures.WhenSchedulePiecesCompletes(response);
 
-  await fixtures.WhenImportIsReady();
-  await fixtures.ThenImportIsCompleted();
+  const importId = await fixtures.WhenImportIsReady();
+  await fixtures.ThenImportIsCompleted(importId);
 });
 
 test('should permit cloning a scenario for contributor users ', async () => {
@@ -70,8 +73,8 @@ test('should permit cloning a scenario for contributor users ', async () => {
   });
   await fixtures.WhenSchedulePiecesCompletes(response);
 
-  await fixtures.WhenImportIsReady();
-  await fixtures.ThenImportIsCompleted();
+  const importId = await fixtures.WhenImportIsReady();
+  await fixtures.ThenImportIsCompleted(importId);
 });
 
 test('should forbid cloning a scenario for viewer users ', async () => {
@@ -252,9 +255,12 @@ export const getFixtures = async () => {
       });
     },
     WhenImportIsReady: async () => {
-      await eventBusTestUtils.waitUntilEventIsPublished(AllPiecesImported);
+      const allPiecesImportedEvent = await eventBusTestUtils.waitUntilEventIsPublished(
+        AllPiecesImported,
+      );
+      return allPiecesImportedEvent.importId;
     },
-    ThenImportIsCompleted: async () => {
+    ThenImportIsCompleted: async (importId: ImportId) => {
       return new Promise<void>((resolve, reject) => {
         const findApiEventInterval = setInterval(async () => {
           try {
@@ -270,6 +276,15 @@ export const getFixtures = async () => {
               topic: clonedScenarioId,
               kind: API_EVENT_KINDS.scenario__clone__finished__v1__alpha,
             });
+
+            const deletedExport = await exportRepo.find(exportId);
+            const deletedImport = await importRepo.find(importId);
+
+            if (deletedExport || deletedImport)
+              throw new Error(
+                'export and import rows must be deleted when cloning a scenario success',
+              );
+
             clearInterval(findApiEventInterval);
             resolve();
           } catch (error) {}

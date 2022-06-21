@@ -2,6 +2,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import { ExportRepository } from '../../export/application/export-repository.port';
 import { MarkCloneAsFinished } from './mark-clone-as-finished.command';
 
 @CommandHandler(MarkCloneAsFinished)
@@ -12,13 +13,20 @@ export class MarkCloneAsFinishedHandler
     scenario: API_EVENT_KINDS.scenario__clone__finished__v1__alpha,
   };
 
-  constructor(private readonly apiEvents: ApiEventsService) {}
+  constructor(
+    private readonly apiEvents: ApiEventsService,
+    private readonly exportRepository: ExportRepository,
+  ) {}
 
   async execute({
+    exportId,
     resourceId,
     resourceKind,
   }: MarkCloneAsFinished): Promise<void> {
     const kind = this.eventMapper[resourceKind];
+
+    if (resourceKind === ResourceKind.Scenario)
+      await this.exportRepository.delete(exportId);
 
     await this.apiEvents.createIfNotExists({
       kind,

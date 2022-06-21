@@ -219,6 +219,10 @@ class FakeExportRepository implements ExportRepository {
     return [];
   }
 
+  delete(exportId: ExportId): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {
     throw new Error('Method not implemented.');
   }

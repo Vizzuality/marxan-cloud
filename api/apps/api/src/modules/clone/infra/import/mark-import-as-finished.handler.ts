@@ -16,7 +16,6 @@ export class MarkImportAsFinishedHandler
 
   constructor(
     private readonly apiEvents: ApiEventsService,
-    private readonly importRepository: ImportRepository,
     private readonly logger: Logger,
   ) {
     this.logger.setContext(MarkImportAsFinishedHandler.name);
@@ -36,15 +35,11 @@ export class MarkImportAsFinishedHandler
     });
   }
 
-  async execute({ importId }: MarkImportAsFinished): Promise<void> {
-    const importInstance = await this.importRepository.find(importId);
-
-    if (!importInstance) {
-      this.logger.error(`Import with ID ${importId.value} not found`);
-      return;
-    }
-    const { resourceKind, resourceId } = importInstance.toSnapshot();
-
+  async execute({
+    importId,
+    resourceId,
+    resourceKind,
+  }: MarkImportAsFinished): Promise<void> {
     const kind = this.eventMapper[resourceKind];
 
     if (resourceKind === ResourceKind.Project) {
@@ -59,15 +54,15 @@ export class MarkImportAsFinishedHandler
        *   This check is made by ensuring that there is a api event of this type associated
        *   to the project
        */
-      await this.emitSyntheticEvents(resourceId);
+      await this.emitSyntheticEvents(resourceId.value);
     }
 
     await this.apiEvents.createIfNotExists({
       kind,
-      topic: resourceId,
+      topic: resourceId.value,
       data: {
         importId: importId.value,
-        resourceId,
+        resourceId: resourceId.value,
         resourceKind,
       },
     });

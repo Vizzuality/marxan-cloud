@@ -80,6 +80,7 @@ export class ImportProjectHandler
         archiveLocation,
         pieces,
         isCloning,
+        exportId,
         projectName,
       ),
     );

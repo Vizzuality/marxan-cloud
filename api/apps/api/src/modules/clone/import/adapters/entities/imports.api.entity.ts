@@ -1,3 +1,4 @@
+import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ResourceKind } from '@marxan/cloning/domain';
 import {
   Column,
@@ -51,6 +52,9 @@ export class ImportEntity {
   })
   isCloning!: boolean;
 
+  @Column({ type: 'uuid', name: 'export_id' })
+  exportId!: string;
+
   @OneToMany(() => ImportComponentEntity, (component) => component.import, {
     cascade: true,
   })
@@ -64,6 +68,15 @@ export class ImportEntity {
     referencedColumnName: 'id',
   })
   owner!: User;
+
+  @ManyToOne(() => ExportEntity, (originExport) => originExport.id, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    name: 'export_id',
+    referencedColumnName: 'id',
+  })
+  export!: ExportEntity;
 
   static fromAggregate(importAggregate: Import): ImportEntity {
     const snapshot = importAggregate.toSnapshot();
@@ -80,6 +93,7 @@ export class ImportEntity {
     );
     entity.ownerId = snapshot.ownerId;
     entity.isCloning = snapshot.isCloning;
+    entity.exportId = snapshot.exportId;
     entity.resourceName = snapshot.resourceName;
 
     return entity;
@@ -95,6 +109,7 @@ export class ImportEntity {
       importPieces: this.components.map((component) => component.toSnapshot()),
       ownerId: this.ownerId,
       isCloning: this.isCloning,
+      exportId: this.exportId,
       resourceName: this.resourceName,
     });
   }

@@ -72,6 +72,10 @@ export class TypeormExportRepository implements ExportRepository {
     return right(true);
   }
 
+  async delete(exportId: ExportId): Promise<void> {
+    await this.exportRepo.delete({ id: exportId.value });
+  }
+
   async findLatestExportsFor(
     projectId: string,
     limit: number,
