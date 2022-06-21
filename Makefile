@@ -93,8 +93,8 @@ seed-api-init-data:
 
 seed-geoapi-init-data:
 	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
-	cat api/apps/api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
-	cat api/apps/api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
 	docker-compose $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-features.sql
 	@for i in api/apps/api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
@@ -231,8 +231,8 @@ native-seed-api-init-data:
 
 native-seed-geoapi-init-data:
 	@echo "seeding dbs with initial geodata"
-	cat api/apps/api/test/fixtures/test-admin-data.sql | psql -U "${GEO_POSTGRES_USER}" -h "${GEO_POSTGRES_HOST}" ${GEO_POSTGRES_DB}; \
-	cat api/apps/api/test/fixtures/test-wdpa-data.sql | psql -U "${GEO_POSTGRES_USER}" -h "${GEO_POSTGRES_HOST}" ${GEO_POSTGRES_DB};
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | psql -U "${GEO_POSTGRES_USER}" -h "${GEO_POSTGRES_HOST}" ${GEO_POSTGRES_DB}; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | psql -U "${GEO_POSTGRES_USER}" -h "${GEO_POSTGRES_HOST}" ${GEO_POSTGRES_DB};
 	psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}" ${API_POSTGRES_DB} < api/apps/api/test/fixtures/test-features.sql
 	@for i in api/apps/api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
