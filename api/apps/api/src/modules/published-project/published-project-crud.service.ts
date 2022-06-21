@@ -21,6 +21,7 @@ import { Project } from '../projects/project.api.entity';
 import { UsersProjectsApiEntity } from '../access-control/projects-acl/entity/users-projects.api.entity';
 import { ProjectRoles } from '../access-control/projects-acl/dto/user-role-project.dto';
 import { groupBy } from 'lodash';
+import { exportHasFinished } from '@marxan-api/utils/published-export.utils';
 
 @Injectable()
 export class PublishedProjectCrudService extends AppBaseService<
@@ -91,17 +92,8 @@ export class PublishedProjectCrudService extends AppBaseService<
     _fetchSpecification?: FetchSpecification,
     _info?: ProjectsRequest,
   ): Promise<PublishedProject> {
-    const exportIdString = entity?.exportId;
-
-    if (exportIdString) {
-      const exportId = new ExportId(exportIdString);
-      const finalExport = await this.exportRepo.find(exportId);
-      if (!finalExport?.hasFinished()) {
-        delete entity.exportId;
-      }
-    }
-
-    return entity;
+    const processedEntity = await exportHasFinished([entity], this.exportRepo);
+    return processedEntity[0];
   }
 
   async extendFindAllQuery(
@@ -146,10 +138,9 @@ export class PublishedProjectCrudService extends AppBaseService<
       return entitiesAndCount;
     }
 
-    const extendedEntitiesFromGetById: PublishedProject[] = await Promise.all(
-      entitiesAndCount[0].map(
-        async (entity) => await this.extendGetByIdResult(entity),
-      ),
+    const extendedEntitiesFromGetById: PublishedProject[] = await exportHasFinished(
+      entitiesAndCount[0],
+      this.exportRepo,
     );
 
     const allOwnersOfAllProjectsPlusEmail = await this.usersProjectsRepo.query(
