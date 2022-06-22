@@ -112,7 +112,7 @@ generate-geo-test-data: extract-geo-test-data
 	rm -rf api/apps/api/test/fixtures/features && mv -f -u -Z data/data/processed/features api/apps/api/test/fixtures/features
 
 # Don't forget to run make clean-slate && make start-api before repopulating the
-# whole db This will delete all existing data and create tables/views/etc.
+# whole db. This will delete all existing data and create tables/views/etc.
 # through the migrations that run when starting up the API service.
 #
 # No users are needed for this seed operation, strictly speaking, as
