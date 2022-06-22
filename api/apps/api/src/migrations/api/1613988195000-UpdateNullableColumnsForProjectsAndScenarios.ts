@@ -6,13 +6,11 @@ export class UpdateNullableColumnsForProjectsAndScenarios1613988195000
     await queryRunner.query(`
 ALTER TABLE projects
   ADD COLUMN country_id varchar(3),
-  ADD COLUMN admin_region_id uuid,
-  ADD COLUMN extent geometry;
+  ADD COLUMN admin_region_id uuid;
 
 ALTER TABLE scenarios
   DROP COLUMN country_id,
-  DROP COLUMN admin_region_id,
-  DROP COLUMN extent;
+  DROP COLUMN admin_region_id;
 
 ALTER TABLE scenarios
   ALTER COLUMN number_of_runs DROP NOT NULL,
@@ -25,13 +23,11 @@ ALTER TABLE scenarios
     await queryRunner.query(`
 ALTER TABLE scenarios
   ADD COLUMN country_id varchar(3),
-  ADD COLUMN admin_region_id uuid,
-  ADD COLUMN extent geometry;
+  ADD COLUMN admin_region_id uuid;
   
 ALTER TABLE projects
   DROP COLUMN country_id,
-  DROP COLUMN admin_region_id,
-  DROP COLUMN extent;
+  DROP COLUMN admin_region_id;;
 
 ALTER TABLE scenarios
   ALTER COLUMN number_of_runs SET NULL,
