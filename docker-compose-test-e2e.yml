@@ -69,7 +69,7 @@ services:
   test-e2e-postgresql-api:
     build:
       context: ./postgresql
-      dockerfile: Dockerfile
+      dockerfile: apidb.Dockerfile
     container_name: marxan-test-e2e-postgresql-api
     volumes:
       - "./api/test/fixtures:/opt"
@@ -83,7 +83,7 @@ services:
   test-e2e-postgresql-geo-api:
     build:
       context: ./postgresql
-      dockerfile: Dockerfile
+      dockerfile: geodb.Dockerfile
     container_name: marxan-test-e2e-postgresql-geo-api
     ports:
       - "${POSTGRES_GEO_SERVICE_PORT}:5432"
