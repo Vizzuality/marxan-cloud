@@ -1,7 +1,12 @@
 .DEFAULT_GOAL := seed-data
 
+# Seed data for production/staging environments
+seed-data: seed-gadm seed-wdpa seed-ecosystems
 
-seed-data: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion seed-ecosystems
+# Seed data for development environments (includes IUCN species data and other
+# demo/test data for development convenience)
+seed-data-dev: seed-gadm seed-wdpa seed-demo-features-species seed-demo-features-bioregion seed-ecosystems
+
 seed-gadm:
 	@echo "Starting seeding gadm data... "
 	@time $(MAKE) -C ./gadm_3.6 import
