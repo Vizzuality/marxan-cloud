@@ -2,7 +2,6 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import {
-  ComponentLocationSnapshot,
   ResourceKind,
 } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -12,7 +11,6 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable, Transform } from 'stream';
 import { EntityManager } from 'typeorm';
-import { ParseOne } from 'unzipper';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
