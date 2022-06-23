@@ -47,7 +47,7 @@ details.
 
 - [NodeJS](https://nodejs.org/en/) v14.18 and v16.14
 - [Yarn](https://classic.yarnpkg.com/) v1
-- [PostgreSQL](https://www.postgresql.org/) v14
+- [PostgreSQL](https://www.postgresql.org/) v13
 - [Postgis](https://postgis.net/) v3
 - [Redis](https://redis.io/) v6
 - A [Sparkpost](https://www.sparkpost.com/) account
