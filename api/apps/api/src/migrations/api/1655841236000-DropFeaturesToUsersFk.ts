@@ -15,6 +15,6 @@ export class DropFeaturesToUsersFk1655841236000 implements MigrationInterface {
         FOREIGN KEY (created_by)
         REFERENCES users(id)
         ON DELETE SET NULL;
-    `)
+    `);
   }
 }

@@ -12,6 +12,6 @@ export class AddCountryColumnUsers1655731147185 implements MigrationInterface {
     await queryRunner.query(`
         ALTER TABLE users
             DROP COLUMN country;
-    `)
+    `);
   }
 }
