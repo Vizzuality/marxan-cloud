@@ -10,6 +10,7 @@ import Modal from 'components/modal';
 
 import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
 
+import LegacyUploadModal from './legacy-upload-modal';
 import UploadModal from './upload-modal';
 
 export interface ProjectsUploadBtnProps {
@@ -50,9 +51,17 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
         title="Publish to community"
         onDismiss={onDismiss}
       >
-        <UploadModal
-          onDismiss={onDismiss}
-        />
+        {uploadMode === 'default' && (
+          <UploadModal
+            onDismiss={onDismiss}
+          />
+        )}
+
+        {uploadMode === 'legacy' && (
+          <LegacyUploadModal
+            onDismiss={onDismiss}
+          />
+        )}
       </Modal>
     </>
 
