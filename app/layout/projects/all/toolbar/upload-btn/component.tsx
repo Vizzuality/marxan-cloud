@@ -23,8 +23,6 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
   const dispatch = useDispatch();
   const { uploadMode } = useSelector((state) => state['/projects/new']);
 
-  console.info({ uploadMode });
-
   const onDismiss = useCallback(() => {
     setModal(false);
     dispatch(setUploadMode('default'));

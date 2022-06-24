@@ -14,14 +14,14 @@ export const LegacyUploadModal: React.FC<LegacyUploadModalProps> = ({
 
   return (
     <div className="mt-3 mb-5">
-      {step === 1 && (
+      {step === 2 && (
         <CreateProject
           onDismiss={onDismiss}
           setStep={setStep}
         />
 
       )}
-      {step === 2 && (
+      {step === 1 && (
         <UploadFiles
           onDismiss={() => {
             onDismiss();
