@@ -27,6 +27,9 @@ import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { FetchSpecification } from 'nestjs-base-service';
 import { UsersRequest } from './user-requests-info';
+import { format, CsvFormatterStream, FormatterRow } from 'fast-csv';
+import { Stream } from 'stream';
+import { buildUsersInfoCsv } from '@marxan-api/utils/csv.utils';
 
 export const forbiddenError = Symbol(`unauthorized access`);
 export const badRequestError = Symbol(`operation not allowed`);
@@ -374,5 +377,22 @@ export class UsersService extends AppBaseService<
       }),
     );
     return right(void 0);
+  }
+
+  async getCsvData(
+    loggedUserId: string,
+  ): Promise<
+    Either<
+      typeof forbiddenError,
+      CsvFormatterStream<FormatterRow, FormatterRow>
+    >
+  > {
+    if (!(await this.isPlatformAdmin(loggedUserId))) {
+      return left(forbiddenError);
+    }
+
+    const csvStream = await buildUsersInfoCsv(this.repository);
+
+    return right(csvStream);
   }
 }
