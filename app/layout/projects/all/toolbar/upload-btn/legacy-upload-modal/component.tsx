@@ -13,15 +13,15 @@ export const LegacyUploadModal: React.FC<LegacyUploadModalProps> = ({
   const [step, setStep] = useState(1);
 
   return (
-    <div className="mt-3 mb-5">
-      {step === 2 && (
+    <div className="mt-3 mb-5 overflow-x-hidden overflow-y-auto">
+      {step === 1 && (
         <CreateProject
           onDismiss={onDismiss}
           setStep={setStep}
         />
 
       )}
-      {step === 1 && (
+      {step === 2 && (
         <UploadFiles
           onDismiss={() => {
             onDismiss();

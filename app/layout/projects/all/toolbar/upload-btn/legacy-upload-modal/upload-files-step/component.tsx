@@ -20,6 +20,8 @@ import Loading from 'components/loading';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
+import { LEGACY_FIELDS } from './constants';
+
 export interface UploadFilesStepProps {
   onDismiss: () => void;
   setStep: (step: number) => void;
@@ -51,6 +53,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
     // `file-too-large` backend error message is not friendly.
     // It'll display the max size in bytes which the average user may not understand.
     const errors = r.errors.map((error) => {
+      // TODO: Read mazSize per each field
       return error.code === 'file-too-large'
         ? { error, message: `File is larger than ${bytesToMegabytes(PROJECT_UPLOADER_MAX_SIZE)} MB` }
         : error;
@@ -131,6 +134,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
+    // TODO: Read mazSize per each field
     maxSize: PROJECT_UPLOADER_MAX_SIZE,
     onDropAccepted,
     onDropRejected,
@@ -150,92 +154,99 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
                 <h4 className="mb-5 text-lg text-black font-heading">Upload legacy project</h4>
 
                 <div className="space-y-5">
-                  {!successFile && (
-                    <FieldRFF name="file" validate={composeValidators([{ presence: true }])}>
-                      {(props) => (
-                        <div>
-                          <Label theme="light" className="uppercase" id="file">
-                            Project zip
-                          </Label>
+                  {LEGACY_FIELDS.map((f) => {
+                    return (
+                      <>
+                        {!successFile && (
+                          <FieldRFF name="file" validate={composeValidators([{ presence: true }])}>
+                            {(props) => (
+                              <div>
+                                <Label theme="light" className="uppercase" id="file">
+                                  {f.label}
+                                </Label>
 
-                          <div className="flex items-center my-2.5 space-x-3">
-                            <h5 className="text-xs text-gray-400">Supported formats</h5>
-                            <InfoButton
-                              size="s"
-                              theme="secondary"
-                            >
-                              <span className="text-xs">
-                                {' '}
-                                <h4 className="font-heading mb-2.5">
-                                  List of supported file formats:
-                                </h4>
-                                <ul>
-                                  Zipped: .zip
-                                </ul>
-                              </span>
-                            </InfoButton>
-                          </div>
+                                <div className="flex items-center my-2.5 space-x-3">
+                                  <h5 className="text-xs text-gray-400">Supported formats</h5>
+                                  <InfoButton
+                                    size="s"
+                                    theme="secondary"
+                                  >
+                                    <span className="text-xs">
+                                      {' '}
+                                      <h4 className="font-heading mb-2.5">
+                                        List of supported file formats:
+                                      </h4>
+                                      <ul>
+                                        {`Zipped: ${f.format}`}
+                                      </ul>
+                                    </span>
+                                  </InfoButton>
+                                </div>
 
-                          <div
-                            {...props}
-                            {...getRootProps()}
-                            className={cx({
-                              'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
-                              'bg-gray-500': isDragActive,
-                              'border-green-800': isDragAccept,
-                              'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
-                            })}
+                                <div
+                                  {...props}
+                                  {...getRootProps()}
+                                  className={cx({
+                                    'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                    'bg-gray-500': isDragActive,
+                                    'border-green-800': isDragAccept,
+                                    'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                                  })}
+                                >
+
+                                  <input {...getInputProps()} />
+
+                                  <p className="text-sm text-center text-gray-500">
+                                    {`Drag and drop your project ${f.format}`}
+                                    <br />
+                                    or
+                                    {' '}
+                                    <b>click here</b>
+                                    {' '}
+                                    to upload
+                                  </p>
+
+                                  <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(f.maxSize)} MB`}</p>
+                                </div>
+                              </div>
+                            )}
+                          </FieldRFF>
+                        )}
+
+                        {successFile && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                           >
+                            <div className="flex flex-col w-full space-y-3 cursor-pointer">
+                              <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                              <div className="flex items-center space-x-2">
+                                <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                                  <p className="text-sm text-black">{successFile.path}</p>
+                                </label>
+                                <button
+                                  id="cancel-shapefile-btn"
+                                  type="button"
+                                  className="flex items-center justify-center flex-shrink-0 w-5 h-5 border border-black rounded-full group hover:bg-black"
+                                  onClick={() => {
+                                    setSuccessFile(null);
+                                    onUploadRemove();
+                                  }}
+                                >
+                                  <Icon
+                                    className="w-1.5 h-1.5 text-black group-hover:text-white"
+                                    icon={CLOSE_SVG}
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </>
+                    );
+                  })}
 
-                            <input {...getInputProps()} />
-
-                            <p className="text-sm text-center text-gray-500">
-                              Drag and drop your project .zip
-                              <br />
-                              or
-                              {' '}
-                              <b>click here</b>
-                              {' '}
-                              to upload
-                            </p>
-
-                            <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PROJECT_UPLOADER_MAX_SIZE)} MB`}</p>
-                          </div>
-                        </div>
-                      )}
-                    </FieldRFF>
-                  )}
-
-                  {successFile && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                        <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
-                        <div className="flex items-center space-x-2">
-                          <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-                            <p className="text-sm text-black">{successFile.path}</p>
-                          </label>
-                          <button
-                            id="cancel-shapefile-btn"
-                            type="button"
-                            className="flex items-center justify-center flex-shrink-0 w-5 h-5 border border-black rounded-full group hover:bg-black"
-                            onClick={() => {
-                              setSuccessFile(null);
-                              onUploadRemove();
-                            }}
-                          >
-                            <Icon
-                              className="w-1.5 h-1.5 text-black group-hover:text-white"
-                              icon={CLOSE_SVG}
-                            />
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
                 </div>
 
                 <div className="flex justify-center mt-16 space-x-6">
