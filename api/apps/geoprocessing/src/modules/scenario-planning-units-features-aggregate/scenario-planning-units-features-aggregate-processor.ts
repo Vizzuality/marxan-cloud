@@ -18,7 +18,7 @@ WITH pu AS (
 species AS (
 	SELECT sfd.scenario_id,
 		   (st_dump(fd.the_geom)).geom AS the_geom,
-		   fd.feature_id
+		   sfd.api_feature_id as feature_id
 	FROM scenario_features_data sfd
 		inner JOIN features_data fd ON sfd.feature_class_id = fd.id and scenario_id = $1)
 UPDATE scenarios_pu_data

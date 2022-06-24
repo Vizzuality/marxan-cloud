@@ -52,28 +52,12 @@ export class ScenarioFeaturesService extends AppBaseService<
     entitiesAndCount: [any[], number],
   ): Promise<[any[], number]> {
     const scenarioFeaturesData = entitiesAndCount[0] as ScenarioFeaturesData[];
-    const featuresDataIds = scenarioFeaturesData.map(
-      (rsfd) => rsfd.featureDataId,
-    );
 
-    if (featuresDataIds.length === 0) {
+    if (scenarioFeaturesData.length === 0) {
       return entitiesAndCount;
     }
-    /**
-     * (geo)scenario_feature_data.featureClassId -> feature_data.id --feature_data.feature_id -> (api)feature.id
-     */
-    const featureRelations: Record<string, string> = {};
-    const featureData = await this.remoteFeature.find({
-      where: {
-        id: In(featuresDataIds),
-      },
-    });
 
-    featureData.forEach((fd) => {
-      featureRelations[fd.id] = fd.featureId;
-    });
-
-    const featureIds = featureData.map((fd) => fd.featureId);
+    const featureIds = scenarioFeaturesData.map((sfd) => sfd.apiFeatureId);
     const features = await this.features.find({
       where: {
         id: In(featureIds),
@@ -84,7 +68,7 @@ export class ScenarioFeaturesService extends AppBaseService<
       scenarioFeaturesData
         .map((sfd) => {
           const relatedFeature = features.find(
-            (f) => f.id === featureRelations[sfd.featureDataId],
+            (f) => f.id === sfd.apiFeatureId,
           );
 
           if (!relatedFeature) {

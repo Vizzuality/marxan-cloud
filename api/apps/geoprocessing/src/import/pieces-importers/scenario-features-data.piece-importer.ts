@@ -59,10 +59,16 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     return piece === ClonePiece.ScenarioFeaturesData;
   }
 
-  private getUniqueFeaturesNames(featuresData: FeatureDataElement[]): string[] {
+  private getUniqueFeaturesNames(
+    featuresData: FeatureDataElement[],
+    opts: { isCustom: boolean },
+  ): string[] {
     const uniqueNames = new Set<string>();
-    featuresData.forEach((feature) => {
-      uniqueNames.add(feature.featureClassName);
+    featuresData.forEach(({ apiFeature, featureDataFeature }) => {
+      if (apiFeature.isCustom === opts.isCustom)
+        uniqueNames.add(apiFeature.featureClassName);
+      if (featureDataFeature.isCustom === opts.isCustom)
+        uniqueNames.add(featureDataFeature.featureClassName);
     });
 
     return Array.from(uniqueNames);
@@ -137,31 +143,26 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
 
   private getFeatureIdsAndHashes(
     featuresData: FeatureDataElement[],
-    featureIdsByClassNameMap: FeatureIdByClassNameMap,
+    { customFeaturesMap, platformFeaturesMap }: FeatureIdByClassNameMaps,
   ): string[] {
-    return featuresData.map(
-      (feature) =>
-        `${featureIdsByClassNameMap[feature.featureClassName]}/${
-          feature.featureDataHash
-        }`,
-    );
+    return featuresData.map((feature) => {
+      const { isCustom, featureClassName } = feature.featureDataFeature;
+      const featureId = isCustom
+        ? customFeaturesMap[featureClassName]
+        : platformFeaturesMap[featureClassName];
+
+      return `${featureId}/${feature.featureDataHash}`;
+    });
   }
 
   private async getFeatureDataIdByFeatureIdAndHashMap(
-    fileContent: ScenarioFeaturesDataContent,
+    fileContent: FeatureDataElement[],
     featureIdsByClassNameMaps: FeatureIdByClassNameMaps,
   ): Promise<FeatureDataIdByFeatureIdAndHashMap> {
-    const featureIdAndHashes = [
-      ...this.getFeatureIdsAndHashes(
-        fileContent.customFeaturesData,
-        featureIdsByClassNameMaps.customFeaturesMap,
-      ),
-      ...this.getFeatureIdsAndHashes(
-        fileContent.platformFeaturesData,
-        featureIdsByClassNameMaps.platformFeaturesMap,
-      ),
-    ];
-
+    const featureIdAndHashes = this.getFeatureIdsAndHashes(
+      fileContent,
+      featureIdsByClassNameMaps,
+    );
     let featureData: FeatureDataSelectResult[] = [];
 
     if (featureIdAndHashes.length > 0) {
@@ -191,16 +192,34 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
 
   private getScenarioFeaturesDataInsertValues(
     featureData: FeatureDataElement[],
-    featureIdByClassNameMap: FeatureIdByClassNameMap,
+    { customFeaturesMap, platformFeaturesMap }: FeatureIdByClassNameMaps,
     featureDataIdByFeatureIdAndHashMap: FeatureDataIdByFeatureIdAndHashMap,
     scenarioId: string,
   ) {
     const outputScenariosFeatureData: DeepPartial<OutputScenariosFeaturesDataGeoEntity>[] = [];
     const insertValues = featureData.map(
-      ({ featureClassName, featureDataHash, outputFeaturesData, ...rest }) => {
-        const featureId = featureIdByClassNameMap[featureClassName];
+      ({
+        apiFeature,
+        featureDataFeature,
+        featureDataHash,
+        outputFeaturesData,
+        ...rest
+      }) => {
+        const featureDataFeatureName = featureDataFeature.featureClassName;
+        const featureDataFeatureId = featureDataFeature.isCustom
+          ? customFeaturesMap[featureDataFeatureName]
+          : platformFeaturesMap[featureDataFeatureName];
+
         const featureDataId =
-          featureDataIdByFeatureIdAndHashMap[`${featureId}/${featureDataHash}`];
+          featureDataIdByFeatureIdAndHashMap[
+            `${featureDataFeatureId}/${featureDataHash}`
+          ];
+
+        const apiFeatureName = apiFeature.featureClassName;
+        const apiFeatureId = apiFeature.isCustom
+          ? customFeaturesMap[apiFeatureName]
+          : platformFeaturesMap[apiFeatureName];
+
         const scenarioFeatureDataId = v4();
 
         if (outputFeaturesData.length > 0)
@@ -214,6 +233,7 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
         return {
           ...rest,
           featureDataId,
+          apiFeatureId,
           scenarioId,
           id: scenarioFeatureDataId,
         };
@@ -249,15 +269,16 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     const buffer = await readableToBuffer(readableOrError.right);
     const stringScenarioFeaturesDataOrError = buffer.toString();
 
-    const content: ScenarioFeaturesDataContent = JSON.parse(
+    const { featuresData }: ScenarioFeaturesDataContent = JSON.parse(
       stringScenarioFeaturesDataOrError,
     );
-    const customFeaturesName = this.getUniqueFeaturesNames(
-      content.customFeaturesData,
-    );
-    const platformFeaturesName = this.getUniqueFeaturesNames(
-      content.platformFeaturesData,
-    );
+
+    const customFeaturesName = this.getUniqueFeaturesNames(featuresData, {
+      isCustom: true,
+    });
+    const platformFeaturesName = this.getUniqueFeaturesNames(featuresData, {
+      isCustom: false,
+    });
 
     const featureIdByClassNameMaps = await this.getFeatureIdByClassNameMaps(
       projectId,
@@ -266,7 +287,7 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
     );
 
     const featureDataIdByFeatureIdAndHashMap = await this.getFeatureDataIdByFeatureIdAndHashMap(
-      content,
+      featuresData,
       featureIdByClassNameMaps,
     );
 
@@ -275,34 +296,20 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
       const outputScenariosFeatureDataRepo = em.getRepository(
         OutputScenariosFeaturesDataGeoEntity,
       );
-      const customFeaturesInsertValues = this.getScenarioFeaturesDataInsertValues(
-        content.customFeaturesData,
-        featureIdByClassNameMaps.customFeaturesMap,
+      const {
+        scenarioFeaturesData,
+        outputScenariosFeatureData,
+      } = this.getScenarioFeaturesDataInsertValues(
+        featuresData,
+        featureIdByClassNameMaps,
         featureDataIdByFeatureIdAndHashMap,
         scenarioId,
       );
-      const platformFeaturesInsertValues = this.getScenarioFeaturesDataInsertValues(
-        content.platformFeaturesData,
-        featureIdByClassNameMaps.platformFeaturesMap,
-        featureDataIdByFeatureIdAndHashMap,
-        scenarioId,
-      );
 
-      const scenarioFeaturesDataToInsert = customFeaturesInsertValues.scenarioFeaturesData.concat(
-        platformFeaturesInsertValues.scenarioFeaturesData,
-      );
-
-      const outputScenariosFeaturesDataToInsert = customFeaturesInsertValues.outputScenariosFeatureData.concat(
-        platformFeaturesInsertValues.outputScenariosFeatureData,
-      );
-
-      for (const data of chunk(scenarioFeaturesDataToInsert, CHUNK_SIZE)) {
+      for (const data of chunk(scenarioFeaturesData, CHUNK_SIZE)) {
         await scenarioFeaturesDataRepo.save(data);
       }
-      for (const data of chunk(
-        outputScenariosFeaturesDataToInsert,
-        CHUNK_SIZE,
-      )) {
+      for (const data of chunk(outputScenariosFeatureData, CHUNK_SIZE)) {
         await outputScenariosFeatureDataRepo.save(data);
       }
     });
