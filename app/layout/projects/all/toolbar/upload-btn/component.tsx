@@ -1,4 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import { setUploadMode } from 'store/slices/projects/new';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -14,6 +18,16 @@ export interface ProjectsUploadBtnProps {
 
 export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
   const [modal, setModal] = useState(false);
+
+  const dispatch = useDispatch();
+  const { uploadMode } = useSelector((state) => state['/projects/new']);
+
+  console.info({ uploadMode });
+
+  const onDismiss = useCallback(() => {
+    setModal(false);
+    dispatch(setUploadMode('default'));
+  }, [dispatch]);
 
   return (
     <>
@@ -34,10 +48,10 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
         open={modal}
         size="narrow"
         title="Publish to community"
-        onDismiss={() => setModal(false)}
+        onDismiss={onDismiss}
       >
         <UploadModal
-          onDismiss={() => setModal(false)}
+          onDismiss={onDismiss}
         />
       </Modal>
     </>
