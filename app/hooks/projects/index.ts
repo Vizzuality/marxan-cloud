@@ -43,6 +43,8 @@ import {
   UseImportProjectProps,
   UseSaveLegacyProjectProps,
   SaveLegacyProjectProps,
+  UseCancelUploadLegacyProjectProps,
+  CancelUploadLegacyProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -580,7 +582,6 @@ export function useSaveLegacyProject({
     method: 'POST',
   },
 }: UseSaveLegacyProjectProps) {
-  const queryClient = useQueryClient();
   const [session] = useSession();
 
   const saveLegacyProject = ({ data }: SaveLegacyProjectProps) => {
@@ -597,9 +598,35 @@ export function useSaveLegacyProject({
 
   return useMutation(saveLegacyProject, {
     onSuccess: (data: any, variables, context) => {
-      const { id } = data;
-      queryClient.invalidateQueries('projects');
-      queryClient.invalidateQueries(['projects', id]);
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useCancelUploadLegacyProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseCancelUploadLegacyProjectProps) {
+  const [session] = useSession();
+
+  const cancelUploadLegacyProject = ({ id }: CancelUploadLegacyProjectProps) => {
+    return PROJECTS.request({
+      method: 'POST',
+      url: `/import/legacy/${id}/cancel`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(cancelUploadLegacyProject, {
+    onSuccess: (data, variables, context) => {
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

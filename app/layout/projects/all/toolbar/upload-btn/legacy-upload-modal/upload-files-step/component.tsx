@@ -3,13 +3,15 @@ import React, { useCallback, useRef, useState } from 'react';
 import { PROJECT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { setLegacyProjectId } from 'store/slices/projects/new';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
-import { useImportProject } from 'hooks/projects';
+import { useCancelUploadLegacyProject, useImportProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -38,9 +40,23 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
   const [successFile, setSuccessFile] = useState(null);
 
   const { addToast } = useToasts();
+  const dispatch = useDispatch();
 
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
-  console.info({ legacyProjectId });
+
+  const cancelLegacyProjectMutation = useCancelUploadLegacyProject({});
+
+  const onCancelUploadLegacyProject = useCallback(() => {
+    cancelLegacyProjectMutation.mutate({ id: legacyProjectId }, {
+      onSuccess: () => {
+        dispatch(setLegacyProjectId(null));
+        console.info('Upload legacy project has been canceled');
+      },
+      onError: () => {
+        console.error('Scenario not canceled');
+      },
+    });
+  }, [cancelLegacyProjectMutation, dispatch, legacyProjectId]);
 
   const importMutation = useImportProject({});
 
@@ -257,7 +273,10 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
                   <Button
                     theme="secondary"
                     size="xl"
-                    onClick={() => setStep(1)}
+                    onClick={() => {
+                      setStep(1);
+                      onCancelUploadLegacyProject();
+                    }}
                   >
                     Back
                   </Button>

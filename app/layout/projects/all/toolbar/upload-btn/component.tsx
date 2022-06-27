@@ -56,9 +56,7 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
         )}
 
         {uploadMode === 'legacy' && (
-          <LegacyUploadModal
-            onDismiss={onDismiss}
-          />
+          <LegacyUploadModal onDismiss={onDismiss} />
         )}
       </Modal>
     </>

@@ -1,12 +1,12 @@
 export const LEGACY_FIELDS = [
   {
-    label: 'Planning Grid Shapefile',
+    label: 'Upload your planning unit shapefile',
     value: 'planning-grid-shapefile.zip',
     format: 'zip',
     maxSize: 1073741824,
   },
   {
-    label: 'Input Dat',
+    label: 'Upload your input database',
     value: 'input.dat',
     format: 'dat',
     maxSize: 1073741824,

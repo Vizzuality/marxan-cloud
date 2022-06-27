@@ -120,3 +120,12 @@ export interface SaveLegacyProjectProps {
   id?: string,
   data: any
 }
+
+// useCancelUploadLegacyProject
+export interface UseCancelUploadLegacyProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface CancelUploadLegacyProjectProps {
+  id?: string,
+}
