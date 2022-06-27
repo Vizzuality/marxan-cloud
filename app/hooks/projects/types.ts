@@ -110,3 +110,13 @@ export interface DownloadExportProps {
   pid: string,
   exportId: string
 }
+
+// useSaveLegacyProject
+export interface UseSaveLegacyProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SaveLegacyProjectProps {
+  id?: string,
+  data: any
+}

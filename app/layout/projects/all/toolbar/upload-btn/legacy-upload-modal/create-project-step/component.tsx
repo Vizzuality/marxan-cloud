@@ -1,6 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import { Form, Field as FieldRFF } from 'react-final-form';
+import { useDispatch } from 'react-redux';
+
+import { setLegacyProjectId } from 'store/slices/projects/new';
 
 import { useSaveLegacyProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -26,6 +29,7 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
   const [loading, setLoading] = useState(false);
 
   const { addToast } = useToasts();
+  const dispatch = useDispatch();
 
   const saveLegacyProjectMutation = useSaveLegacyProject({});
 
@@ -38,7 +42,8 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
     };
 
     saveLegacyProjectMutation.mutate({ data }, {
-      onSuccess: () => {
+      onSuccess: ({ data: { projectId, scenarioId } }) => {
+        dispatch(setLegacyProjectId(projectId));
         setLoading(false);
         addToast('success-create-legacy-project', (
           <>
@@ -49,7 +54,7 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
           level: 'success',
         });
         setStep(2);
-        console.info('Legacy project created');
+        console.info('Legacy project created', projectId, scenarioId);
       },
       onError: ({ response }) => {
         const { errors } = response.data;
@@ -72,6 +77,7 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
     });
   }, [
     addToast,
+    dispatch,
     saveLegacyProjectMutation,
     setStep,
   ]);

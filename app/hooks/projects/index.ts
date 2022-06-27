@@ -41,6 +41,8 @@ import {
   ExportProjectProps,
   ImportProjectProps,
   UseImportProjectProps,
+  UseSaveLegacyProjectProps,
+  SaveLegacyProjectProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -577,17 +579,18 @@ export function useSaveLegacyProject({
   requestConfig = {
     method: 'POST',
   },
-}: UseSaveProjectProps) {
+}: UseSaveLegacyProjectProps) {
   const queryClient = useQueryClient();
   const [session] = useSession();
 
-  const saveLegacyProject = ({ data }: SaveProjectProps) => {
+  const saveLegacyProject = ({ data }: SaveLegacyProjectProps) => {
     return PROJECTS.request({
       url: '/import/legacy',
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
+      transformResponse: (response) => JSON.parse(response),
       ...requestConfig,
     });
   };

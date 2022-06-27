@@ -3,6 +3,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { PROJECT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
+import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
@@ -37,6 +38,9 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
   const [successFile, setSuccessFile] = useState(null);
 
   const { addToast } = useToasts();
+
+  const { legacyProjectId } = useSelector((state) => state['/projects/new']);
+  console.info({ legacyProjectId });
 
   const importMutation = useImportProject({});
 

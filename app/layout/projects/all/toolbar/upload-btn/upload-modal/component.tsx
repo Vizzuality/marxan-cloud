@@ -259,7 +259,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     </motion.div>
                   )}
                 </div>
-                <p className="mt-2 text-xs text-gray-400">
+                <p className="mt-2 text-sm text-gray-400 lg:text-base">
                   If you have a legacy project and prefer to upload the files, please
                   {' '}
                   <button

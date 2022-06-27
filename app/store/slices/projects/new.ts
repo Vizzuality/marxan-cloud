@@ -8,6 +8,7 @@ interface ProjectShowStateProps {
   uploadingPlanningAreaId: string;
   uploadingGridId: string;
   uploadMode: string;
+  legacyProjectId: string;
 }
 
 const initialState = {
@@ -18,6 +19,7 @@ const initialState = {
   uploadingPlanningAreaId: null,
   uploadingGridId: null,
   uploadMode: 'default',
+  legacyProjectId: null,
 } as ProjectShowStateProps;
 
 const projectsNewSlice = createSlice({
@@ -45,6 +47,9 @@ const projectsNewSlice = createSlice({
     setUploadMode: (state, action: PayloadAction<string>) => {
       state.uploadMode = action.payload;
     },
+    setLegacyProjectId: (state, action: PayloadAction<string>) => {
+      state.legacyProjectId = action.payload;
+    },
   },
 });
 
@@ -56,5 +61,6 @@ export const {
   setUploadingPlanningAreaId,
   setUploadingGridId,
   setUploadMode,
+  setLegacyProjectId,
 } = projectsNewSlice.actions;
 export default projectsNewSlice.reducer;
