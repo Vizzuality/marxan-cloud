@@ -4,36 +4,29 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { fakeQueryBuilder } from '../../utils/__mocks__/fake-query-builder';
-import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import {
   getValidGeoFeature,
   getValidNonGeoData,
-  getValidRemoteFeatureData,
 } from './__mocks__/scenario-features.view-data';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let sut: ScenarioFeaturesService;
 let geoFeatureRepoMock: jest.Mocked<Repository<GeoFeature>>;
-let geoRemoteFeaturesRepoMock: jest.Mocked<Repository<RemoteFeaturesData>>;
 
 let fakeResultResolver: jest.Mock;
 
 beforeAll(async () => {
   fakeResultResolver = jest.fn();
   const geoFeatureToken = getRepositoryToken(GeoFeature);
-  const geoRemoteScenarioFeaturesRepoToken = getRepositoryToken(
+  const geoScenarioFeaturesRepoToken = getRepositoryToken(
     ScenarioFeaturesData,
-    DbConnections.geoprocessingDB,
-  );
-  const geoRemoteFeaturesRepoToken = getRepositoryToken(
-    RemoteFeaturesData,
     DbConnections.geoprocessingDB,
   );
   const sandbox = await Test.createTestingModule({
     providers: [
       {
-        provide: geoRemoteScenarioFeaturesRepoToken,
+        provide: geoScenarioFeaturesRepoToken,
         useValue: {
           metadata: {
             name: 'required-by-base-service-for-logging',
@@ -47,19 +40,12 @@ beforeAll(async () => {
           find: jest.fn(),
         },
       },
-      {
-        provide: geoRemoteFeaturesRepoToken,
-        useValue: {
-          find: jest.fn(),
-        },
-      },
       ScenarioFeaturesService,
     ],
   }).compile();
 
   sut = sandbox.get(ScenarioFeaturesService);
   geoFeatureRepoMock = sandbox.get(geoFeatureToken);
-  geoRemoteFeaturesRepoMock = sandbox.get(geoRemoteFeaturesRepoToken);
 });
 
 describe(`when looking for a scenario's features`, () => {
@@ -69,9 +55,6 @@ describe(`when looking for a scenario's features`, () => {
     // Asset
     fakeResultResolver.mockResolvedValue(getValidNonGeoData(scenarioId));
     geoFeatureRepoMock.find.mockResolvedValueOnce(getValidGeoFeature());
-    geoRemoteFeaturesRepoMock.find.mockResolvedValueOnce(
-      getValidRemoteFeatureData(),
-    );
     // Act
     result = await sut.findAll({
       filter: {
@@ -85,6 +68,7 @@ describe(`when looking for a scenario's features`, () => {
       Array [
         Array [
           Object {
+            "apiFeatureId": "meta-feature-uuid-1-criteria-met",
             "coverageTarget": 50,
             "coverageTargetArea": 10000,
             "currentArea": 12000,
@@ -103,6 +87,7 @@ describe(`when looking for a scenario's features`, () => {
             "totalArea": 20000,
           },
           Object {
+            "apiFeatureId": "meta-feature-uuid-1-criteria-failed",
             "coverageTarget": 50,
             "coverageTargetArea": 5000,
             "currentArea": 4000,

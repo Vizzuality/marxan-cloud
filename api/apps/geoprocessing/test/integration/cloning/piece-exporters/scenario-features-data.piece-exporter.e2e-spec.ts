@@ -182,8 +182,7 @@ const getFixtures = async () => {
           const content = await readSavedFile<ScenarioFeaturesDataContent>(
             savedStrem,
           );
-          expect(content.customFeaturesData).toEqual([]);
-          expect(content.platformFeaturesData).toEqual([]);
+          expect(content.featuresData).toEqual([]);
         },
         ThenAScenarioFeaturesDataFileIsSaved: async () => {
           const result = await sut.run(input);
@@ -195,22 +194,26 @@ const getFixtures = async () => {
             savedStrem,
           );
 
-          expect(content.customFeaturesData).toHaveLength(
-            amountOfCustomFeatures * recordsOfDataForEachFeature,
-          );
-          expect(content.platformFeaturesData).toHaveLength(
-            amountOfPlatformFeatures * recordsOfDataForEachFeature,
+          expect(content.featuresData).toHaveLength(
+            amountOfCustomFeatures * recordsOfDataForEachFeature +
+              amountOfPlatformFeatures * recordsOfDataForEachFeature,
           );
 
-          const data = [
-            ...content.customFeaturesData,
-            ...content.platformFeaturesData,
-          ];
+          const data = content.featuresData;
 
           expect(
             data.flatMap((record) => record.outputFeaturesData),
           ).toHaveLength(
             data.length * recordsOfOutputDataForEachScenarioFeaturesData,
+          );
+
+          expect(
+            data.every(
+              (sfd) =>
+                sfd.apiFeature.featureClassName ===
+                  sfd.featureDataFeature.featureClassName &&
+                sfd.apiFeature.isCustom === sfd.featureDataFeature.isCustom,
+            ),
           );
         },
       };

@@ -42,6 +42,7 @@ test(`returns full query with all parameters`, async () => {
   expect(fixPrettierQuirk(query.query)).toEqual(`
       with inserted_sfp as (
         insert into scenario_features_preparation as sfp (feature_class_id,
+                                                          api_feature_id,
                                                           scenario_id,
                                                           specification_id,
                                                           fpf,
@@ -51,6 +52,7 @@ test(`returns full query with all parameters`, async () => {
                                                           current_pa,
                                                           hash)
           select fd.id,
+                 fd.feature_id,
                  $1,
                  $2,
                  $3,
@@ -137,6 +139,7 @@ test(`returns full query with no wdpa`, async () => {
     `
       with inserted_sfp as (
         insert into scenario_features_preparation as sfp (feature_class_id,
+                                                          api_feature_id,
                                                           scenario_id,
                                                           specification_id,
                                                           fpf,
@@ -146,6 +149,7 @@ test(`returns full query with no wdpa`, async () => {
                                                           current_pa,
                                                           hash)
           select fd.id,
+                 fd.feature_id,
                  $1,
                  $2,
                  $3,
@@ -239,6 +243,7 @@ test(`returns full query with no planning area location`, async () => {
     `
       with inserted_sfp as (
         insert into scenario_features_preparation as sfp (feature_class_id,
+                                                          api_feature_id,
                                                           scenario_id,
                                                           specification_id,
                                                           fpf,
@@ -248,6 +253,7 @@ test(`returns full query with no planning area location`, async () => {
                                                           current_pa,
                                                           hash)
           select fd.id,
+                 fd.feature_id,
                  $1,
                  $2,
                  $3,

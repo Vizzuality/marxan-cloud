@@ -469,6 +469,7 @@ const getFixtures = async () => {
       featuresData.map((fd) => ({
         featureDataId: fd.id,
         scenarioId,
+        apiFeatureId: fd.featureId,
         specificationId,
         totalArea: 100,
         fpf: 1,
@@ -676,7 +677,7 @@ const getFixtures = async () => {
                 }
               : {},
             source: GeometrySource.user_imported,
-            featureId: featureIdsMap[row.species],
+            featureId: featureIdsMap[row.species] ?? v4(),
             theGeom: geometry.theGeom,
           };
         }),

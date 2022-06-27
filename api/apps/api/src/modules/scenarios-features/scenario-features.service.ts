@@ -9,7 +9,6 @@ import {
 
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
@@ -24,8 +23,6 @@ export class ScenarioFeaturesService extends AppBaseService<
   constructor(
     @InjectRepository(GeoFeature)
     private readonly features: Repository<GeoFeature>,
-    @InjectRepository(RemoteFeaturesData, DbConnections.geoprocessingDB)
-    private readonly remoteFeature: Repository<RemoteFeaturesData>,
     @InjectRepository(ScenarioFeaturesData, DbConnections.geoprocessingDB)
     private readonly remoteScenarioFeatures: Repository<ScenarioFeaturesData>,
   ) {
