@@ -5,6 +5,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { useAdminUsers, useDownloadUsersData } from 'hooks/admin';
 import { useToasts } from 'hooks/toast';
 
+import Button from 'components/button';
 import Search from 'components/search';
 import Table2 from 'components/table2';
 
@@ -113,18 +114,28 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
 
   return (
     <div className="space-y-5">
-      <div className="max-w-lg">
-        <Search
-          id="published-project-search"
-          defaultValue={search}
+      <div className="flex justify-between w-full">
+        <div className="max-w-lg">
+          <Search
+            id="published-project-search"
+            defaultValue={search}
+            size="base"
+            theme="light"
+            placeholder="Search by project name, planning area name..."
+            aria-label="Search"
+            onChange={onSearch}
+          />
+        </div>
+        <Button
+          theme="secondary"
           size="base"
-          theme="light"
-          placeholder="Search by project name, planning area name..."
-          aria-label="Search"
-          onChange={onSearch}
-        />
+          type="button"
+          onClick={onDownloadUsersData}
+        >
+          Download data
+
+        </Button>
       </div>
-      <button type="button" onClick={onDownloadUsersData}>Download data</button>
 
       <Table2
         data={adminUsersData}
