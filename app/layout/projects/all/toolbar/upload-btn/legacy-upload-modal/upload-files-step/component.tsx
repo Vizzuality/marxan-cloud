@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 
 import { PROJECT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
-import { Form, Field as FieldRFF } from 'react-final-form';
+import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setLegacyProjectId } from 'store/slices/projects/new';
@@ -15,8 +15,9 @@ import { useCancelUploadLegacyProject, useImportProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
+import Checkbox from 'components/forms/checkbox';
+import Field from 'components/forms/field';
 import Label from 'components/forms/label';
-import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
@@ -94,6 +95,8 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
   };
 
   const onUploadSubmit = useCallback((values) => {
+    const solutionsAreLocked = !!values.solutionsAreLocked;
+    console.info({ solutionsAreLocked });
     setLoading(true);
     const { file, name } = values;
 
@@ -163,7 +166,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
   return (
     <div className="mt-3 mb-5">
 
-      <Form
+      <FormRFF
         onSubmit={onUploadSubmit}
         render={({ form, handleSubmit }) => {
           formRef.current = form;
@@ -178,7 +181,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
                     return (
                       <>
                         {!successFile && (
-                          <FieldRFF name="file" validate={composeValidators([{ presence: true }])}>
+                          <FieldRFF name="file">
                             {(props) => (
                               <div>
                                 <Label theme="light" className="uppercase" id="file">
@@ -267,6 +270,24 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
                     );
                   })}
 
+                </div>
+
+                <div className="mt-7">
+                  <FieldRFF
+                    name="solutionsAreLocked"
+                    type="checkbox"
+                  >
+                    {(fprops) => (
+                      <Field className="flex mt-2" id="solutionsAreLocked" {...fprops}>
+                        <Checkbox theme="light" />
+                        <Label theme="light" className="ml-2 -mt-1 font-sans text-xs">
+                          Do you want to lock these results calculated outside of the
+                          Marxan MaPP platform?
+                        </Label>
+
+                      </Field>
+                    )}
+                  </FieldRFF>
                 </div>
 
                 <div className="flex justify-center mt-16 space-x-6">
