@@ -117,15 +117,32 @@ export interface UseSaveLegacyProjectProps {
 }
 
 export interface SaveLegacyProjectProps {
-  id?: string,
-  data: any
+  data: string[];
 }
 
-// useCancelUploadLegacyProject
-export interface UseCancelUploadLegacyProjectProps {
+// useCancelImportLegacyProject
+export interface UseCancelImportLegacyProjectProps {
   requestConfig?: AxiosRequestConfig
 }
 
-export interface CancelUploadLegacyProjectProps {
-  id?: string,
+export interface CancelImportLegacyProjectProps {
+  projectId: string,
+}
+
+// useUploadLegacyProjectFile
+export interface UseUploadLegacyProjectFileProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface UploadLegacyProjectFileProps {
+  projectId: string,
+  data: any,
+}
+// useImportLegacyProject
+export interface UseImportLegacyProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface ImportLegacyProjectProps {
+  projectId: string,
 }

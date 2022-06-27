@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setUploadMode, setLegacyProjectId } from 'store/slices/projects/new';
 
-import { useCancelUploadLegacyProject } from 'hooks/projects';
+import { useCancelImportLegacyProject } from 'hooks/projects';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
@@ -25,13 +25,13 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
   const dispatch = useDispatch();
   const { uploadMode, legacyProjectId } = useSelector((state) => state['/projects/new']);
 
-  const cancelLegacyProjectMutation = useCancelUploadLegacyProject({});
+  const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
-  const onCancelUploadLegacyProject = useCallback(() => {
-    cancelLegacyProjectMutation.mutate({ id: legacyProjectId }, {
+  const onCancelImportLegacyProject = useCallback(() => {
+    cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
       onSuccess: ({ data: { projectId } }) => {
         dispatch(setLegacyProjectId(null));
-        console.info('Upload legacy project has been canceled', projectId);
+        console.info('Import legacy project has been canceled', projectId);
       },
       onError: () => {
         console.error('Scenario not canceled');
@@ -42,8 +42,8 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
   const onDismiss = useCallback(() => {
     setModal(false);
     dispatch(setUploadMode('default'));
-    if (legacyProjectId) onCancelUploadLegacyProject();
-  }, [dispatch, legacyProjectId, onCancelUploadLegacyProject]);
+    if (legacyProjectId) onCancelImportLegacyProject();
+  }, [dispatch, legacyProjectId, onCancelImportLegacyProject]);
 
   return (
     <>

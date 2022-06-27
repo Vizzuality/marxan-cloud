@@ -43,8 +43,12 @@ import {
   UseImportProjectProps,
   UseSaveLegacyProjectProps,
   SaveLegacyProjectProps,
-  UseCancelUploadLegacyProjectProps,
-  CancelUploadLegacyProjectProps,
+  UseCancelImportLegacyProjectProps,
+  CancelImportLegacyProjectProps,
+  UseImportLegacyProjectProps,
+  ImportLegacyProjectProps,
+  UseUploadLegacyProjectFileProps,
+  UploadLegacyProjectFileProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -576,7 +580,11 @@ export function useDownloadExport({
   });
 }
 
-// LEGACY PROJECTS
+/**
+****************************************
+  LEGACY PROJECTS
+****************************************
+*/
 export function useSaveLegacyProject({
   requestConfig = {
     method: 'POST',
@@ -606,17 +614,17 @@ export function useSaveLegacyProject({
   });
 }
 
-export function useCancelUploadLegacyProject({
+export function useCancelImportLegacyProject({
   requestConfig = {
     method: 'POST',
   },
-}: UseCancelUploadLegacyProjectProps) {
+}: UseCancelImportLegacyProjectProps) {
   const [session] = useSession();
 
-  const cancelUploadLegacyProject = ({ id }: CancelUploadLegacyProjectProps) => {
+  const cancelImportLegacyProject = ({ projectId }: CancelImportLegacyProjectProps) => {
     return PROJECTS.request({
       method: 'POST',
-      url: `/import/legacy/${id}/cancel`,
+      url: `/import/legacy/${projectId}/cancel`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
       },
@@ -625,7 +633,65 @@ export function useCancelUploadLegacyProject({
     });
   };
 
-  return useMutation(cancelUploadLegacyProject, {
+  return useMutation(cancelImportLegacyProject, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadLegacyProjectFile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadLegacyProjectFileProps) {
+  const [session] = useSession();
+
+  const uploadLegacyProjectFile = ({ data, projectId }: UploadLegacyProjectFileProps) => {
+    return UPLOADS.request({
+      url: `import/legacy/${projectId}/data-file`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadLegacyProjectFile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useImportLegacyProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseImportLegacyProjectProps) {
+  const [session] = useSession();
+
+  const importLegacyProject = ({ projectId }: ImportLegacyProjectProps) => {
+    return PROJECTS.request({
+      method: 'POST',
+      url: `/import/legacy/${projectId}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(importLegacyProject, {
     onSuccess: (data, variables, context) => {
       console.info('Succces', data, variables, context);
     },

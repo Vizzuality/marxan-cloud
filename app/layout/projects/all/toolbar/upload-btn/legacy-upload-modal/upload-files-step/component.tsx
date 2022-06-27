@@ -11,7 +11,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
-import { useCancelUploadLegacyProject, useImportProject } from 'hooks/projects';
+import { useCancelImportLegacyProject, useImportProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -45,13 +45,13 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
 
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
 
-  const cancelLegacyProjectMutation = useCancelUploadLegacyProject({});
+  const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
-  const onCancelUploadLegacyProject = useCallback(() => {
-    cancelLegacyProjectMutation.mutate({ id: legacyProjectId }, {
+  const onCancelImportLegacyProject = useCallback(() => {
+    cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
       onSuccess: () => {
         dispatch(setLegacyProjectId(null));
-        console.info('Upload legacy project has been canceled');
+        console.info('Import legacy project has been canceled');
       },
       onError: () => {
         console.error('Scenario not canceled');
@@ -94,7 +94,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
     });
   };
 
-  const onUploadSubmit = useCallback((values) => {
+  const onImportSubmit = useCallback((values) => {
     const solutionsAreLocked = !!values.solutionsAreLocked;
     console.info({ solutionsAreLocked });
     setLoading(true);
@@ -167,7 +167,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
     <div className="mt-3 mb-5">
 
       <FormRFF
-        onSubmit={onUploadSubmit}
+        onSubmit={onImportSubmit}
         render={({ form, handleSubmit }) => {
           formRef.current = form;
 
@@ -373,7 +373,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
                     size="xl"
                     onClick={() => {
                       setStep(1);
-                      onCancelUploadLegacyProject();
+                      onCancelImportLegacyProject();
                     }}
                   >
                     Back
