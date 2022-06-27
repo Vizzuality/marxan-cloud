@@ -77,6 +77,9 @@ will largely be functional like a native Marxan MaPP project.
 
 - a+c (planning unit grid and output db)
 
+**This combination is _not_ supported in the current version of the MarxanCloud
+platform. Input files are _always_ required.**
+
 In this use case, no further editing of the imported project will
 be allowed, and it won't be possible to create new scenarios from the imported
 base data.
@@ -87,7 +90,11 @@ some of the maps where no suitable data is available to plot them.
 The project's solutions will be available as an archived historical artifact for
 reference.
 
-- a+c+d+e (planning unit grid, output db, and all feature data)
+- a+c+d+e (planning unit grid, output db, all feature data and cost surface
+  data)
+
+**This combination is _not_ supported in the current version of the MarxanCloud
+platform. Input files are _always_ required.**
 
 In this use case, for example users may wish to showcase an archived historical
 project. No further editing of the imported project will be allowed and it won't
