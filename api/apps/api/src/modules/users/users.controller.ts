@@ -52,7 +52,6 @@ import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { isLeft } from 'fp-ts/lib/Either';
-import { Writable } from 'utility-types';
 import { Response } from 'express';
 import { Stream } from 'stream';
 

@@ -19,17 +19,8 @@ export const buildUsersInfoCsv = async (
     .select(columnsAndCsvHeaders)
     .stream();
 
-  const csvHeaders = [
-    'fname',
-    'lname',
-    'email',
-    'country',
-    'background',
-    'level',
-  ];
-
   const csvHeaderStream = format({
-    headers: csvHeaders,
+    headers: columnsAndCsvHeaders,
     writeHeaders: true,
     includeEndRowDelimiter: true,
   });
