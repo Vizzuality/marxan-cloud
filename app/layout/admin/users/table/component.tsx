@@ -2,7 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { useDebouncedCallback } from 'use-debounce';
 
-import { useAdminUsers } from 'hooks/admin';
+import { useAdminUsers, useDownloadUsersData } from 'hooks/admin';
+import { useToasts } from 'hooks/toast';
 
 import Search from 'components/search';
 import Table2 from 'components/table2';
@@ -18,6 +19,8 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState({ id: 'displayName', direction: 'desc' });
   const [search, setSearch] = useState<string>();
+
+  const { addToast } = useToasts();
 
   const {
     data: adminUsersData = [],
@@ -87,6 +90,27 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     setSearch(v);
   }, 250);
 
+  const downloadUsersMutation = useDownloadUsersData({});
+  const onDownloadUsersData = useCallback(() => {
+    downloadUsersMutation.mutate({}, {
+      onSuccess: () => {
+
+      },
+      onError: () => {
+        addToast('download-error', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              Data not downloaded
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [downloadUsersMutation, addToast]);
+
   return (
     <div className="space-y-5">
       <div className="max-w-lg">
@@ -100,6 +124,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
           onChange={onSearch}
         />
       </div>
+      <button type="button" onClick={onDownloadUsersData}>Download data</button>
 
       <Table2
         data={adminUsersData}
