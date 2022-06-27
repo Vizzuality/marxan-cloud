@@ -293,8 +293,6 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       projectId,
     );
 
-    console.log('running specification');
-
     const { status } = await this.httpService
       .post(
         `${AppConfig.get<string>(
