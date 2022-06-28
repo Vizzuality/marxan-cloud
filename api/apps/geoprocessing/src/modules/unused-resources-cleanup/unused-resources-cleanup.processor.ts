@@ -6,14 +6,14 @@ import {
   UnusedScenarioResourcesCleanupJobInput,
 } from '@marxan/unused-resources-cleanup';
 import { Injectable } from '@nestjs/common';
-import { DeleteProjectUnsusedReosurces } from './delete-unused-resources/delete-project-unused-resources';
-import { DeleteScenarioUnsusedReosurces } from './delete-unused-resources/delete-scenario-unused-resources';
+import { DeleteProjectUnusedResources } from './delete-unused-resources/delete-project-unused-resources';
+import { DeleteScenarioUnusedResources } from './delete-unused-resources/delete-scenario-unused-resources';
 
 @Injectable()
 export class UnusedResourcesCleanupProcessor {
   constructor(
-    private readonly deleteProjectUnsusedReosurces: DeleteProjectUnsusedReosurces,
-    private readonly deleteScenarioUnsusedReosurces: DeleteScenarioUnsusedReosurces,
+    private readonly deleteProjectUnusedResources: DeleteProjectUnusedResources,
+    private readonly deleteScenarioUnusedResources: DeleteScenarioUnusedResources,
   ) {}
 
   private async cleanProjectAndScenariosResources({
@@ -22,18 +22,18 @@ export class UnusedResourcesCleanupProcessor {
     projectCustomFeaturesIds,
   }: UnusedProjectResourcesCleanupJobInput) {
     if (scenarioIds.length === 0)
-      return this.deleteProjectUnsusedReosurces.removeUnusedResources(
+      return this.deleteProjectUnusedResources.removeUnusedResources(
         projectId,
         { projectCustomFeaturesIds },
       );
 
     await Promise.all(
       scenarioIds.map((scenarioId) =>
-        this.deleteScenarioUnsusedReosurces.removeUnusedResources(scenarioId),
+        this.deleteScenarioUnusedResources.removeUnusedResources(scenarioId),
       ),
     );
 
-    return this.deleteProjectUnsusedReosurces.removeUnusedResources(projectId, {
+    return this.deleteProjectUnusedResources.removeUnusedResources(projectId, {
       projectCustomFeaturesIds,
     });
   }
@@ -44,7 +44,7 @@ export class UnusedResourcesCleanupProcessor {
     const isScenarioCleanUp = isUnusedScenarioResourcesCleanupJobInput(input);
 
     if (isScenarioCleanUp) {
-      await this.deleteScenarioUnsusedReosurces.removeUnusedResources(
+      await this.deleteScenarioUnusedResources.removeUnusedResources(
         (input as UnusedScenarioResourcesCleanupJobInput).scenarioId,
       );
       return input;
