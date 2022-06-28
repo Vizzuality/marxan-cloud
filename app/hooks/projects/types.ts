@@ -117,7 +117,10 @@ export interface UseSaveLegacyProjectProps {
 }
 
 export interface SaveLegacyProjectProps {
-  data: string[];
+  data: {
+    projectName: string;
+    solutionsAreLocked: boolean;
+  };
 }
 
 // useCancelImportLegacyProject

@@ -38,7 +38,7 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
     // TODO: Add description to payload when endpoiny accepts it.
     const data = {
       projectName: values.name,
-      solutionsAreLocked: true,
+      solutionsAreLocked: false,
     };
 
     saveLegacyProjectMutation.mutate({ data }, {
