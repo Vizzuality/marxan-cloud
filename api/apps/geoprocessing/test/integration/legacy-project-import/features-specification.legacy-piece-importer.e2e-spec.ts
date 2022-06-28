@@ -248,7 +248,7 @@ describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
       .WhenPieceImporterIsInvoked(job)
       .AndSpecificationProcessTimeouts()
       .ThenASpecificationDidntFinishErrorShouldBeThrown();
-  }, 40_000);
+  }, 70_000);
 
   it(`fails if features data records does not contain required properties`, async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
