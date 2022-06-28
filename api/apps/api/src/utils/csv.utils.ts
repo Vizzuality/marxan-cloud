@@ -3,6 +3,7 @@ import { CsvFormatterStream, format, FormatterRow } from 'fast-csv';
 import { Repository } from 'typeorm';
 
 const columnsAndCsvHeaders = [
+  'display_name',
   'fname',
   'lname',
   'email',
