@@ -157,9 +157,9 @@ dedicated API endpoint.
   Input Parameter File (input.dat)_) should be validated to be of the correct
   type.
 
-- Additionally, `BLM` and `NUMREPS` should be validated for their value as for
-  existing validations (for `BLM`) and for consistency (`NUMREPS` should have a
-  sensible upper bound).
+- All the values supplied should be validated through `MarxanParameters`.
+
+- Defaults for missing keys should be set via `MarxanParametersDefaults`.
 
 #### Validation of `pu.dat` files
 
@@ -176,9 +176,13 @@ dedicated API endpoint.
 
 - Validation according to section 5.3.2 of the Marxan Manual.
 
-- Only `prop` is supported: if `target` is set for any of the rows, an error
-  should be reported to API consumers, advising to repeat the upload after
-  translating `target` to `prop`.
+- Either `prop` or `target` are supported, in line with the Marxan Manual. If
+  both are set for any of the rows, an error should be reported to API
+  consumers.
+
+- If `target` is supplied, it is then internally translated to `prop` as
+  `prop(feature) = target / sum(puvspr amount for the feature across all
+  planning units))`.
 
 - The `name` property should be enforced as compulsory (it is not compulsory per
   se according to the Marxan manual, but it will be needed in order to set
@@ -188,8 +192,23 @@ dedicated API endpoint.
 
 - Validation according to section 5.3.4 of the Marxan Manual.
 
-- `amount` is assumed to be extent of the feature within the PU in the
-  EPSG:3410 SRID units
+- `amount` is assumed to be either:
+
+  - the extent of the feature within the PU in the EPSG:3410 SRID units, **if**
+    the user supplies `prop` for the matching feature in `spec.dat`
+  - a count, **if** the user supplies `target` for the matching feature in
+    `spec.dat`; there is no need to care about units of measurement here,
+    although we assume that the measurement unit is consistent across all the
+    PUs for each feature in `puvspr.dat` and that it matches the unit used for
+    the `target` value in `spec.dat` for the matching feature
+
+- the original `amount` is recorded in a distinct column
+  (`(geodb)scenario_features_data.amount_from_legacy_project`) as this is
+  later used when generating `puvspr.dat` files for the Marxan workspace
+  when running Marxan (`PuvsprDatService.getPuvsprDatContent()`), rather
+  than calculating `amount` as the intersection area between feature and
+  planning unit, for each planning unit, as would be done for projects
+  created within the Marxan Cloud platform.
 
 ### Validation of Output files
 
