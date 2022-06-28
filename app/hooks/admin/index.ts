@@ -8,7 +8,6 @@ import {
 import { useSession } from 'next-auth/client';
 
 import ADMIN from 'services/admin';
-import DOWNLOADS from 'services/downloads';
 // import TEST from 'services/test';
 
 import {
@@ -24,7 +23,6 @@ import {
   UseSaveAdminPublishedProjectProps,
   UseSaveAdminUserProps,
   UseSaveBlockUserProps,
-  UseDownloadUsersDataProps,
 } from './types';
 
 /**
@@ -377,44 +375,6 @@ export function useSaveAdminPublishedProject({
     },
     onError: (error, variables, context) => {
       // An error happened!
-      console.info('Error', error, variables, context);
-    },
-  });
-}
-
-export function useDownloadUsersData({
-  requestConfig = {
-    method: 'GET',
-  },
-}: UseDownloadUsersDataProps) {
-  const [session] = useSession();
-
-  const downloadUsersData = () => {
-    return DOWNLOADS.request({
-      url: '/users/csv',
-      responseType: 'arraybuffer',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-        'Content-Type': 'application/zip',
-      },
-      ...requestConfig,
-    });
-  };
-
-  return useMutation(downloadUsersData, {
-    onSuccess: (data: any, variables, context) => {
-      const { data: blob } = data;
-
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'users.csv');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      console.info('Success', data, variables, context);
-    },
-    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

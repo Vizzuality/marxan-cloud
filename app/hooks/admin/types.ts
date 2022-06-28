@@ -55,7 +55,3 @@ export interface SaveAdminPublishedProjectProps {
   data?: any;
   status: string;
 }
-
-export interface UseDownloadUsersDataProps {
-  requestConfig?: AxiosRequestConfig
-}

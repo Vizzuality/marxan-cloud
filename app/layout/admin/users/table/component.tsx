@@ -1,13 +1,17 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { format } from 'date-fns';
+import { useSession } from 'next-auth/client';
 import { useDebouncedCallback } from 'use-debounce';
 
-import { useAdminUsers, useDownloadUsersData } from 'hooks/admin';
+import { useAdminUsers } from 'hooks/admin';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Search from 'components/search';
 import Table2 from 'components/table2';
+
+import DOWNLOADS from 'services/downloads';
 
 import CellAdmin from './cells/admin';
 import CellBlock from './cells/block';
@@ -91,26 +95,40 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     setSearch(v);
   }, 250);
 
-  const downloadUsersMutation = useDownloadUsersData({});
-  const onDownloadUsersData = useCallback(() => {
-    downloadUsersMutation.mutate({}, {
-      onSuccess: () => {
+  const [session] = useSession();
 
-      },
-      onError: () => {
-        addToast('download-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              Data not downloaded
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
+  const onDownloadUsersData = useCallback(async () => {
+    const { data: blob, status } = await DOWNLOADS.request({
+      url: '/users/csv',
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
       },
     });
-  }, [downloadUsersMutation, addToast]);
+
+    const url = window.URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `users-${format(Date.now(), 'MM/dd/yyyy hh:mm:ss')}.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    if (status !== 200) {
+      addToast('download-error', (
+        <>
+          <h2 className="font-medium">Error!</h2>
+          <ul className="text-sm">
+            Data not downloaded
+          </ul>
+        </>
+      ), {
+        level: 'error',
+      });
+    }
+  }, [addToast, session]);
 
   return (
     <div className="space-y-5">
