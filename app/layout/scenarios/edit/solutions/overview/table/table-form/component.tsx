@@ -175,13 +175,14 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           {!noSolutionResults && (
             <div className="flex items-center justify-between space-x-8">
               <div className="flex items-center">
+
                 <Checkbox
                   theme="light"
                   id="checkbox-5-dif-solutions"
                   className="block w-4 h-4 text-green-300 form-checkbox-dark"
                   onChange={(event) => setMostDifSolutions(event.target.checked)}
                 />
-                <Label className="mx-2 text-sm text-gray-700">
+                <Label id="checkbox-5-dif-solutions" className="mx-2 text-sm text-gray-700 cursor-pointer hover:underline">
                   View 5 most different solutions
                 </Label>
 
