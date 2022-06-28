@@ -21,14 +21,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 
-import {
-  Project,
-  projectResource,
-  ProjectResultSingular,
-} from './project.api.entity';
+import { projectResource, ProjectResultSingular } from './project.api.entity';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiForbiddenResponse,
