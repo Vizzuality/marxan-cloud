@@ -28,6 +28,7 @@ import Loading from 'components/loading';
 import AUTHENTICATION from 'services/authentication';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
+import LOCATION_SVG from 'svgs/ui/location.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 import USER_SVG from 'svgs/ui/user.svg?sprite';
 
@@ -129,7 +130,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                     {(fprops) => (
                       <Field id="login-country" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">Country</Label>
-                        <Input theme="light" />
+                        <Input theme="light" icon={LOCATION_SVG} />
                       </Field>
                     )}
                   </FieldRFF>
