@@ -29,7 +29,7 @@ variable "subnets_to_associate" {
   default     = {}
 }
 
-variable "tags" {
-  description = "(Optional) Specifies the tags of the storage account"
-  default     = {}
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
 }

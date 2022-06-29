@@ -59,3 +59,8 @@ variable "tags" {
 variable "private_dns" {
   default = {}
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}

@@ -13,7 +13,7 @@ resource "azurerm_private_endpoint" "private_endpoint" {
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
-  tags                = var.tags
+  tags                = merge(var.project_tags, { Environment = "PRD-STG" })
 
   private_service_connection {
     name                           = "${var.name}Connection"

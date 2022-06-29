@@ -18,9 +18,9 @@ variable "location" {
   description = "Azure Location in which the resources will be created"
 }
 
-variable "bastion_ssh_public_key" {
-  type        = string
-  description = "Public SSH key to add to the bastion host"
+variable "bastion_ssh_public_keys" {
+  type        = list
+  description = "Public SSH keys to add to the bastion host"
 }
 
 variable "domain" {

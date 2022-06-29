@@ -19,7 +19,7 @@ module "network" {
   source         = "./modules/network"
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
-  vpn_cidrs      = concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4)
+  vpn_cidrs      = [] #concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4) # Remove for Vizzuality access
   project_tags   = var.project_tags
 }
 
@@ -33,7 +33,7 @@ module "bastion" {
   source                  = "./modules/bastion"
   resource_group          = data.azurerm_resource_group.resource_group
   project_name            = var.project_name
-  bastion_ssh_public_keys = [var.bastion_ssh_public_key]
+  bastion_ssh_public_keys = var.bastion_ssh_public_keys
   bastion_subnet_id       = module.network.bastion_subnet_id
   dns_zone                = module.dns.dns_zone
 }

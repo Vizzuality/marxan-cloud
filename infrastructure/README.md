@@ -151,7 +151,6 @@ your local port.
 
 You should now be able to use `kubectl` to access your AKS cluster.
 
-
 ## Configuring PostgreSQL
 
 The included Terraform code sets up a PostgreSQL database server in the AKS cluster but, as it cannot reach it once

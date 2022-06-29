@@ -24,7 +24,7 @@ resource "azurerm_route_table" "rt" {
   name                = var.route_table_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  tags                = var.tags
+  tags                = merge(var.project_tags, { Environment = "PRD-STG" })
 
   route {
     name                   = "kubenetfw_fw_r"
