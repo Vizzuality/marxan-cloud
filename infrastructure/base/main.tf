@@ -94,6 +94,7 @@ module "redis" {
   source                         = "./modules/redis"
   resource_group                 = data.azurerm_resource_group.resource_group
   project_name                   = var.project_name
+  redis_instance_name            = var.redis_instance_name
   subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.kubernetes.cluster_id
   project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
