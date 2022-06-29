@@ -148,4 +148,5 @@ export interface UseImportLegacyProjectProps {
 
 export interface ImportLegacyProjectProps {
   projectId: string,
+  data: any,
 }

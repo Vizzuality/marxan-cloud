@@ -11,7 +11,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
-import { useCancelImportLegacyProject, useImportProject } from 'hooks/projects';
+import { useCancelImportLegacyProject, useImportLegacyProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -26,15 +26,15 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 import { LEGACY_FIELDS } from './constants';
 
-export interface UploadFilesStepProps {
+export interface UploadFilesProps {
   onDismiss: () => void;
   setStep: (step: number) => void;
 }
 
-export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
+export const UploadFiles: React.FC<UploadFilesProps> = ({
   onDismiss,
   setStep,
-}: UploadFilesStepProps) => {
+}: UploadFilesProps) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -59,7 +59,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
     });
   }, [cancelLegacyProjectMutation, dispatch, legacyProjectId]);
 
-  const importMutation = useImportProject({});
+  const importMutation = useImportLegacyProject({});
 
   const onDropAccepted = async (acceptedFiles) => {
     const f = acceptedFiles[0];
@@ -104,7 +104,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
     data.append('projectName', name);
     data.append('file', file);
 
-    importMutation.mutate({ data }, {
+    importMutation.mutate({ data, projectId: legacyProjectId }, {
       onSuccess: () => {
         setLoading(false);
         addToast('success-upload-project', (
@@ -141,6 +141,7 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
   }, [
     addToast,
     importMutation,
+    legacyProjectId,
     onDismiss,
     setStep,
   ]);
@@ -385,4 +386,4 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
   );
 };
 
-export default UploadFilesStep;
+export default UploadFiles;

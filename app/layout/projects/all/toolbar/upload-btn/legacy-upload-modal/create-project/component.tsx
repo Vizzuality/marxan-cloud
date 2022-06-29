@@ -16,15 +16,15 @@ import Textarea from 'components/forms/textarea';
 import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
 
-export interface CreateProjectStepProps {
+export interface CreateProjectProps {
   onDismiss: () => void;
   setStep: (step: number) => void;
 }
 
-export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
+export const CreateProject: React.FC<CreateProjectProps> = ({
   onDismiss,
   setStep,
-}: CreateProjectStepProps) => {
+}: CreateProjectProps) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -160,4 +160,4 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
   );
 };
 
-export default CreateProjectStep;
+export default CreateProject;

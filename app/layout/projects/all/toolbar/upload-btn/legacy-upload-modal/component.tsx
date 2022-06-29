@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import CreateProject from './create-project-step';
-import UploadFiles from './upload-files-step';
+import CreateProject from './create-project';
+import UploadFiles from './upload-files';
 
 export interface LegacyUploadModalProps {
   onDismiss: () => void;
