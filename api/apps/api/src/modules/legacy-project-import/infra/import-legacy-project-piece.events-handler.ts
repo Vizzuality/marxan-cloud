@@ -13,7 +13,7 @@ import {
 } from '@marxan/legacy-project-import';
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { CompleteLegacyProjectImportPiece } from '../application/complete-import-legacy-project-piece.command';
+import { CompleteLegacyProjectImportPiece } from '../application/complete-legacy-project-import-piece.command';
 import { MarkLegacyProjectImportPieceAsFailed } from '../application/mark-legacy-project-import-piece-as-failed.command';
 import { LegacyProjectImportComponentId } from '../domain/legacy-project-import/legacy-project-import-component.id';
 import { importLegacyProjectPieceEventsFactoryToken } from './legacy-project-import-queue.provider';
@@ -99,13 +99,16 @@ export class ImportLegacyProjectPieceEventsHandler
   private async failed(event: EventData<LegacyProjectImportJobInput, unknown>) {
     const { pieceId, projectId } = await event.data;
 
+    const result = await event.result;
+    const errors: string[] = [];
+
+    if (typeof result === 'string') errors.push(result);
+
     await this.commandBus.execute(
       new MarkLegacyProjectImportPieceAsFailed(
         new ResourceId(projectId),
         new LegacyProjectImportComponentId(pieceId),
-        // TODO Obtain actual errors and/or warnings
-        [],
-        [],
+        errors,
       ),
     );
   }

@@ -106,6 +106,30 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
             userEmail: `${user.email}`,
           },
         });
+        if (data.planningUnitGridShape === 'from_shapefile') {
+          plausible('Create project with planing unit shapefile', {
+            props: {
+              userId: `${user.id}`,
+              userEmail: `${user.email}`,
+            },
+          });
+        }
+        if (!data.countryId && data.planningUnitGridShape !== 'from_shapefile') {
+          plausible('Create project with planing region shapefile', {
+            props: {
+              userId: `${user.id}`,
+              userEmail: `${user.email}`,
+            },
+          });
+        }
+        if (data.countryId) {
+          plausible('Create project without shapefile', {
+            props: {
+              userId: `${user.id}`,
+              userEmail: `${user.email}`,
+            },
+          });
+        }
       },
       onError: () => {
         addToast('error-project-creation', (

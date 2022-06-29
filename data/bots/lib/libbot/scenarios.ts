@@ -77,6 +77,25 @@ export class Scenarios {
     return result;
   }
 
+  async getMarxanInputParameterMetadata(scenarioId: string) {
+    const opStart = Process.hrtime();
+
+    const result = await this.baseHttpClient.get(
+      `/scenarios/${scenarioId}?fields=metadata`,
+    )
+      .then(getJsonApiDataFromResponse)
+      .then((result) => result.marxanInputParameterFile)
+      .catch(logError);
+
+    logInfo(
+      `Marxan input parameter metadata was fetched in ${
+        tookMs(Process.hrtime(opStart))
+      }ms.`,
+    );
+    logDebug(`Marxan input parameter metadata:\n${Deno.inspect(result)}`);
+    return result;
+  }
+
   async setNumberOfRuns(scenarioId: string, numberOfRuns: number = 100) {
     await this.baseHttpClient.patch(`/scenarios/${scenarioId}`, {
       numberOfRuns,

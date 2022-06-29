@@ -69,6 +69,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
 
   const query = useInfiniteQuery(['all-features', projectId, JSON.stringify(options)], fetchFeatures, {
     retry: false,
+    refetchOnWindowFocus: false,
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
       const { data: { meta } } = lastPage;
@@ -121,7 +122,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
               label: k,
               values: properties[k].map((v) => ({ id: v, name: v })),
             };
-          }): [];
+          }) : [];
 
           splitFeaturesOptions = splitSelected ? splitOptions
             .find((s) => s.key === splitSelected).values

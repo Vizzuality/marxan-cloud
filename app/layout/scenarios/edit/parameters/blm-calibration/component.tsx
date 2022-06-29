@@ -6,7 +6,9 @@ import { useRouter } from 'next/router';
 
 import { format } from 'd3';
 import { motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
 
+import { useMe } from 'hooks/me';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenarioCalibrationRange, useScenarioCalibrationRange } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -36,9 +38,11 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
   const { pid, sid } = query;
 
   const { addToast } = useToasts();
+  const plausible = usePlausible();
 
   const saveScenarioCalibrationRange = useSaveScenarioCalibrationRange({});
   const editable = useCanEditScenario(pid, sid);
+  const { user } = useMe();
 
   const { data: calibrationRange } = useScenarioCalibrationRange(sid);
   const minBlmValue = 0;
@@ -64,6 +68,14 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
           level: 'success',
         });
         console.info('Calibration range sent succesfully');
+        plausible('Calibrate BLM', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+            projectId: `${pid}`,
+            scenarioId: `${sid}`,
+          },
+        });
       },
       onError: () => {
         setLoading(false);
@@ -79,7 +91,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
         console.error('Scenario calibration could not be sent');
       },
     });
-  }, [addToast, saveScenarioCalibrationRange, sid]);
+  }, [addToast, saveScenarioCalibrationRange, sid, pid, plausible, user.id, user.email]);
 
   const INITIAL_VALUES = {
     blmCalibrationFrom: calibrationRange ? calibrationRange[0] : null,
@@ -138,7 +150,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
                     iconClassName="w-10 h-10 text-primary-500"
                   />
 
-                  <div className="flex justify-between space-x-10">
+                  <div className="grid justify-between w-full grid-cols-2 gap-x-10">
                     <div className="flex items-center flex-grow flex-shrink-0">
                       <Label theme="dark" className="mr-3 text-xs uppercase">From</Label>
                       <div className="flex flex-col items-end flex-grow">

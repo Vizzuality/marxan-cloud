@@ -31,7 +31,6 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
         <HelpBeacon
           id="project-search"
           title="Quick search"
-          subtitle="Project list"
           content={(
             <div>
               Find your projects by typing in keywords.
@@ -56,14 +55,11 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
           <HelpBeacon
             id="project-new"
             title="Create new project"
-            subtitle="Project list"
             content={(
               <div>
-                Creating a project is the first step to be able to
-                perform a Marxan analysis.
-                Under a project you can create multiple alternative scenarios that
-                share the same planning region.
-
+                Creating a project is the first step to starting a planning analysis.
+                Within a project you can create multiple Marxan scenarios that share
+                the same planning region.
               </div>
             )}
           >
@@ -84,7 +80,6 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
           <HelpBeacon
             id="project-upload"
             title="Upload project"
-            subtitle="Project list"
             content={(
               <div>
                 You can upload an existing Marxan project.

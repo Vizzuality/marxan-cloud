@@ -4,8 +4,6 @@ import { useRouter } from 'next/router';
 
 import { useCanEditProject } from 'hooks/permissions';
 
-import ComingSoon from 'layout/help/coming-soon';
-
 import Button from 'components/button';
 
 export interface ItemSettingsProps {
@@ -29,17 +27,15 @@ export const Item: React.FC<ItemSettingsProps> = ({
       {children}
 
       <div className="flex justify-end w-full space-x-1 mt-2.5">
-        <ComingSoon>
-          <Button
-            className="flex-shrink-0"
-            size="s"
-            theme="secondary"
-            disabled={!editable}
-            onClick={onDuplicate}
-          >
-            Duplicate
-          </Button>
-        </ComingSoon>
+        <Button
+          className="flex-shrink-0"
+          size="s"
+          theme="secondary"
+          disabled={!editable}
+          onClick={onDuplicate}
+        >
+          Duplicate
+        </Button>
 
         <Button
           className="flex-shrink-0"

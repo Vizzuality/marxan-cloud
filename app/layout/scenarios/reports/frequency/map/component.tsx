@@ -11,6 +11,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
 import {
+  useBBOX,
   usePUGridLayer,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
@@ -24,6 +25,9 @@ export interface ScreenshotBLMMapProps {
 export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
   id,
 }: ScreenshotBLMMapProps) => {
+  const [cache] = useState<number>(Date.now());
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
+
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
@@ -36,6 +40,9 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     data = {},
   } = useProject(pid);
   const { bbox } = data;
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -43,7 +50,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
   const [bounds, setBounds] = useState(null);
 
   const PUGridLayer = usePUGridLayer({
-    cache: Date.now(),
+    cache,
     active: true,
     sid: sid ? `${sid}` : null,
     include: 'results',
@@ -54,11 +61,11 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -76,9 +83,15 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     return null;
   };
 
-  const handleMapLoad = () => {
-    dispatch(setMaps({ [id]: true }));
-  };
+  // const handleMapLoad = () => {
+  //   dispatch(setMaps({ [id]: true }));
+  // };
+
+  useEffect(() => {
+    if (mapTilesLoaded) {
+      dispatch(setMaps({ [id]: true }));
+    }
+  }, [id, dispatch, mapTilesLoaded]);
 
   return (
     <>
@@ -101,7 +114,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
           mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}
           mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
           onMapViewportChange={handleViewportChange}
-          onMapLoad={handleMapLoad}
+          onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
           transformRequest={handleTransformRequest}
           preserveDrawingBuffer
           preventStyleDiffing

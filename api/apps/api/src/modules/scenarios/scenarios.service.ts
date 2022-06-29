@@ -3,7 +3,6 @@ import {
   HttpService,
   Injectable,
   InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
@@ -112,7 +111,6 @@ import {
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { EntityManager } from 'typeorm';
-import { blmImageMock } from './__mock__/blm-image-mock';
 import { UserId } from '@marxan/domain-ids';
 
 /** @debt move to own module */
@@ -127,6 +125,9 @@ export type ProjectNotReady = typeof projectNotReady;
 export const bestSolutionNotFound = Symbol('best solution not found');
 
 export const projectDoesntExist = Symbol(`project doesn't exist`);
+export const lockedSolutions = Symbol(
+  `solutions from this scenario are locked`,
+);
 export type ProjectDoesntExist = typeof projectDoesntExist;
 
 export type SubmitProtectedAreaError =
@@ -540,7 +541,8 @@ export class ScenariosService {
       | typeof forbiddenError
       | typeof noLockInPlace
       | typeof lockedByAnotherUser
-      | typeof scenarioNotFound,
+      | typeof scenarioNotFound
+      | typeof lockedSolutions,
       void
     >
   > {
@@ -549,6 +551,10 @@ export class ScenariosService {
     });
 
     if (isLeft(scenario)) return scenario;
+
+    if (scenario.right.solutionsAreLocked) {
+      return left(lockedSolutions);
+    }
 
     const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
       userId,

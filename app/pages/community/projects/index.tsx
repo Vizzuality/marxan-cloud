@@ -17,7 +17,7 @@ export const getServerSideProps = withUser();
 const CommunityProjects: React.FC = () => {
   const { asPath } = useRouter();
 
-  const DESCRIPTION_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+  const DESCRIPTION_TEXT = 'Marxan trainings and real-world examples are here for your exploration! Learn how others use Marxan for research and planning. Select a project to copy into your account for see how others set targets, build scenaris and create Marxan plans around the world.';
   const TITLE_TEXT = 'Explore public projects and take them to your account.';
 
   return (

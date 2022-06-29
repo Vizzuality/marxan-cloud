@@ -47,6 +47,10 @@ export interface MapProps extends InteractiveMapProps {
 
   /** A function that exposes the viewport */
   onMapViewportChange?: (viewport: Partial<ViewportProps>) => void;
+
+  /** A function that exposes if current tiles on the viewport are loaded */
+  onMapTilesLoaded?: (loaded: boolean) => void;
+
 }
 
 const DEFAULT_VIEWPORT = {
@@ -64,6 +68,7 @@ export const Map = ({
   onMapReady,
   onMapLoad,
   onMapViewportChange,
+  onMapTilesLoaded,
   dragPan,
   dragRotate,
   scrollZoom,
@@ -81,6 +86,7 @@ export const Map = ({
    */
   const mapRef = useRef(null);
   const mapContainerRef = useRef(null);
+  const mapTilesInterevalRef = useRef(null);
 
   /**
    * STATE
@@ -92,6 +98,7 @@ export const Map = ({
   const [flying, setFlight] = useState(false);
   const [ready, setReady] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   /**
    * CALLBACKS
@@ -191,6 +198,14 @@ export const Map = ({
   }, [ready, bounds, handleFitBounds]);
 
   useEffect(() => {
+    if (loaded && ready) {
+      mapTilesInterevalRef.current = setInterval(() => {
+        setMapTilesLoaded(mapRef.current.areTilesLoaded());
+      }, 250);
+    }
+  }, [ready, loaded]);
+
+  useEffect(() => {
     setViewport((prevViewportState) => ({
       ...prevViewportState,
       ...viewport,
@@ -202,6 +217,20 @@ export const Map = ({
       mapContainerRef.current.querySelector('.mapboxgl-control-container').style.display = 'none';
     }
   }, [screenshot]);
+
+  useEffect(() => {
+    if (onMapTilesLoaded) {
+      onMapTilesLoaded(mapTilesLoaded);
+    }
+  }, [mapTilesLoaded, onMapTilesLoaded]);
+
+  useEffect(() => {
+    return () => {
+      if (mapTilesInterevalRef.current) {
+        clearInterval(mapTilesInterevalRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div
@@ -238,7 +267,7 @@ export const Map = ({
         getCursor={getCursor || handleGetCursor}
         transitionInterpolator={new FlyToInterpolator()}
         transitionEasing={easeCubic}
-        attributionControl={false}
+        // attributionControl={false}
       >
         {ready
           && loaded

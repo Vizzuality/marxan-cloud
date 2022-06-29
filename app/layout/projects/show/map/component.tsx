@@ -21,6 +21,7 @@ import {
   usePUCompareLayer,
   usePUGridLayer,
   useProjectPlanningAreaLayer,
+  useBBOX,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
@@ -32,6 +33,7 @@ import Loading from 'components/loading';
 import Map from 'components/map';
 import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
 import Legend from 'components/map/legend';
 import LegendItem from 'components/map/legend/item';
@@ -55,6 +57,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [viewport, setViewport] = useState({});
   const [bounds, setBounds] = useState(null);
   const [mapInteractive, setMapInteractive] = useState(false);
+  const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
   const { pid } = query;
@@ -68,6 +71,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     // planningUnitGridShape,
     // planningUnitAreakm2,
   } = data;
+
+  const BBOX = useBBOX({
+    bbox,
+  });
 
   const {
     data: rawScenariosData,
@@ -164,11 +171,11 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   useEffect(() => {
     setBounds({
-      bbox,
+      bbox: BBOX,
       options: { padding: 50 },
       viewportOptions: { transitionDuration: 0 },
     });
-  }, [bbox]);
+  }, [BBOX]);
 
   const handleViewportChange = useCallback((vw) => {
     setViewport(vw);
@@ -302,6 +309,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                 mapStyle="mapbox://styles/marxan/ckn4fr7d71qg817kgd9vuom4s"
                 onMapViewportChange={handleViewportChange}
                 onMapLoad={() => setMapInteractive(true)}
+                onMapTilesLoaded={(loaded) => setMapTilesLoaded(loaded)}
                 transformRequest={handleTransformRequest}
                 onClick={(e) => {
                   if (e && e.features) {
@@ -324,6 +332,10 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </HelpBeacon>
 
           <Controls>
+            <LoadingControl
+              loading={!mapTilesLoaded}
+            />
+
             <ZoomControl
               viewport={{
                 ...viewport,
@@ -345,7 +357,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </Controls>
 
           {/* Legend */}
-          <div className="absolute w-full max-w-xs bottom-6 right-5">
+          <div className="absolute w-full max-w-xs bottom-16 right-5">
             <Legend
               open={open}
               className="w-full"

@@ -50,8 +50,8 @@ export class QueueEventsAdapter<
     queueEvents.on(`completed`, ({ jobId }, eventId) =>
       this.handleFinished(jobId, eventId),
     );
-    queueEvents.on(`failed`, ({ jobId }, eventId) =>
-      this.handleFailed(jobId, eventId),
+    queueEvents.on(`failed`, ({ jobId, failedReason }, eventId) =>
+      this.handleFailed(jobId, eventId, failedReason),
     );
   }
 
@@ -84,7 +84,11 @@ export class QueueEventsAdapter<
     });
   }
 
-  private async handleFailed(jobId: string, eventId: string) {
+  private async handleFailed(
+    jobId: string,
+    eventId: string,
+    failedReason: string,
+  ) {
     const lazyDataGetter = this.createLazyDataGetter();
     const eventDto = await this.eventFactory.createFailedEvent({
       jobId,
@@ -107,7 +111,7 @@ export class QueueEventsAdapter<
         return lazyDataGetter(jobId);
       },
       get result() {
-        return Promise.resolve(undefined);
+        return Promise.resolve(failedReason);
       },
     });
   }

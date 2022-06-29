@@ -8,6 +8,7 @@ import { useProjectsUsers } from 'hooks/project-users';
 import {
   useProjects, useDeleteProject, useDuplicateProject,
 } from 'hooks/projects';
+import { useScenariosStatusOnce } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import HelpBeacon from 'layout/help/beacon';
@@ -32,6 +33,20 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
 
   const { addToast } = useToasts();
 
+  const areRunningJobs = useCallback((d) => {
+    const { jobs = [], scenarios = [] } = d || {};
+
+    const JOBS = [
+      ...jobs,
+      ...scenarios.map((scenario) => (scenario.jobs || [])).flat(),
+    ];
+
+    return JOBS.some((job) => job.status === 'running');
+  }, []);
+
+  // STATUS
+  const projectStatusMutation = useScenariosStatusOnce({});
+
   // DOWNLOAD
   const [downloadProject, setDownloadProject] = useState(null);
 
@@ -47,50 +62,82 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
   const deleteMutation = useDeleteProject({});
 
   const onDuplicate = useCallback((projectId, projectName, scenarios) => {
-    duplicateProjectMutation.mutate({
-      id: projectId,
-      data: {
-        scenarioIds: scenarios.map((s) => s.id),
-      },
+    projectStatusMutation.mutate({
+      pId: projectId,
     }, {
-      onSuccess: ({ data: { data: s } }) => {
-        addToast('success-duplicate-project', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">
-              Project
-              {' '}
-              {projectName}
-              {' '}
-              duplicated
-            </p>
-          </>
-        ), {
-          level: 'success',
-        });
+      onSuccess: (d) => {
+        if (d?.data) {
+          const running = areRunningJobs(d.data);
 
-        console.info('Project duplicated succesfully', s);
+          if (!running) {
+            duplicateProjectMutation.mutate({
+              id: projectId,
+              data: {
+                scenarioIds: scenarios.map((s) => s.id),
+              },
+            }, {
+              onSuccess: ({ data: { data: s } }) => {
+                addToast('success-duplicate-project', (
+                  <>
+                    <h2 className="font-medium">Success!</h2>
+                    <p className="text-sm">
+                      Project
+                      {' '}
+                      {projectName}
+                      {' '}
+                      duplicated
+                    </p>
+                  </>
+                ), {
+                  level: 'success',
+                });
+
+                console.info('Project duplicated succesfully', s);
+              },
+              onError: () => {
+                addToast('error-duplicate-project', (
+                  <>
+                    <h2 className="font-medium">Error!</h2>
+                    <p className="text-sm">
+                      Project
+                      {' '}
+                      {projectName}
+                      {' '}
+                      not duplicated
+                    </p>
+                  </>
+                ), {
+                  level: 'error',
+                });
+
+                console.error('Project not duplicated');
+              },
+            });
+          }
+
+          if (running) {
+            addToast('error-duplicate-project', (
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">
+                  Project
+                  {' '}
+                  {projectName}
+                  {' '}
+                  has running project or scenario jobs. Please wait for them to finish.
+                </p>
+              </>
+            ), {
+              level: 'error',
+            });
+          }
+        }
       },
       onError: () => {
-        addToast('error-duplicate-project', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Project
-              {' '}
-              {projectName}
-              {' '}
-              not duplicated
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
 
-        console.error('Project not duplicated');
       },
     });
-  }, [addToast, duplicateProjectMutation]);
+  }, [addToast, duplicateProjectMutation, projectStatusMutation, areRunningJobs]);
 
   const onDelete = useCallback(() => {
     deleteMutation.mutate({ id: deleteProject.id }, {
@@ -136,7 +183,6 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
           <HelpBeacon
             id="project-list"
             title="Project list"
-            subtitle="project list"
             content={(
               <div>
                 You can see all your projects listed here.

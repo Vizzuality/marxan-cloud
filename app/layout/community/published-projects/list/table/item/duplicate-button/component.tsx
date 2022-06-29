@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 
 import classnames from 'classnames';
+import { usePlausible } from 'next-plausible';
 
 import { useMe } from 'hooks/me';
 import { useDuplicatePublishedProject } from 'hooks/published-projects';
@@ -26,7 +27,9 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
 }: DuplicateButtonProps) => {
   const { user } = useMe();
   const [duplicating, setDuplicating] = useState(false);
+
   const { addToast } = useToasts();
+  const plausible = usePlausible();
 
   const duplicateProjectMutation = useDuplicatePublishedProject({
     requestConfig: {
@@ -56,6 +59,14 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
         });
 
         console.info('Project duplicated succesfully', s);
+
+        plausible('Duplicate public project', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+            projectName: `${name}`,
+          },
+        });
       },
       onError: () => {
         setDuplicating(false);
@@ -77,7 +88,7 @@ export const DuplicateButton: React.FC<DuplicateButtonProps> = ({
         console.error('Project not duplicated');
       },
     });
-  }, [exportId, addToast, duplicateProjectMutation, name]);
+  }, [exportId, addToast, duplicateProjectMutation, name, plausible, user?.email, user?.id]);
 
   return (
     <Tooltip

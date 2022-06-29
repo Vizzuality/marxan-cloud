@@ -23,6 +23,7 @@ import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
+  DeleteUser,
   GivenOrganizationExists,
   GivenProjectExists,
   GivenUserExists,
@@ -152,6 +153,8 @@ const getFixtures = async () => {
         projectId,
         organizationId,
       );
+
+      await DeleteUser(entityManager, userId);
     },
     GivenJobInput: (
       archiveLocation: ArchiveLocation,

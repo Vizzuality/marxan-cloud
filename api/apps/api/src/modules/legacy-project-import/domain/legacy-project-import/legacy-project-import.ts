@@ -1,19 +1,22 @@
-import { ArchiveLocation, ResourceId } from '@marxan/cloning/domain';
+import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import {
   LegacyProjectImportFile,
   LegacyProjectImportFileType,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
+import { LegacyProjectImportFileId } from '@marxan/legacy-project-import/domain/legacy-project-import-file.id';
 import { AggregateRoot } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/Either';
-import { AllLegacyProjectPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
+import { AllLegacyProjectImportPiecesImported } from '../events/all-legacy-project-import-pieces-imported.event';
+import { LegacyProjectImportCanceled } from '../events/legacy-project-import-canceled.events';
 import { LegacyProjectImportBatchFailed } from '../events/legacy-project-import-batch-failed.event';
 import { LegacyProjectImportPieceImported } from '../events/legacy-project-import-piece-imported.event';
 import { LegacyProjectImportPieceRequested } from '../events/legacy-project-import-piece-requested.event';
 import { LegacyProjectImportRequested } from '../events/legacy-project-import-requested.event';
 import { LegacyProjectImportComponent } from './legacy-project-import-component';
 import { LegacyProjectImportComponentId } from './legacy-project-import-component.id';
+import { LegacyProjectImportStatus } from './legacy-project-import-status';
 import { LegacyProjectImportId } from './legacy-project-import.id';
 import { LegacyProjectImportSnapshot } from './legacy-project-import.snapshot';
 export const legacyProjectImportComponentNotFound = Symbol(
@@ -25,14 +28,15 @@ export const legacyProjectImportComponentAlreadyCompleted = Symbol(
 export const legacyProjectImportComponentAlreadyFailed = Symbol(
   `legacy project import component already failed`,
 );
-export const legacyProjectImportDuplicateFile = Symbol(
-  `legacy project import already has this file`,
-);
-export const legacyProjectImportDuplicateFileType = Symbol(
-  `legacy project import already has this file type`,
-);
 export const legacyProjectImportMissingRequiredFile = Symbol(
   `legacy project import missing required file`,
+);
+export const legacyProjectImportAlreadyStarted = Symbol(
+  `legacy project import already started`,
+);
+
+export const legacyProjectImportAlreadyFinished = Symbol(
+  `legacy project import already finished`,
 );
 
 export type CompleteLegacyProjectImportPieceSuccess = true;
@@ -43,11 +47,16 @@ export type MarkLegacyProjectImportPieceAsFailedErrors =
   | typeof legacyProjectImportComponentNotFound
   | typeof legacyProjectImportComponentAlreadyFailed;
 
-export type AddFileToLegacyProjectImportErrors =
-  | typeof legacyProjectImportDuplicateFile
-  | typeof legacyProjectImportDuplicateFileType;
+export type AddFileToLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
+export type DeleteFileFromLegacyProjectImportErrors = typeof legacyProjectImportAlreadyStarted;
 
 export type GenerateLegacyProjectImportPiecesErrors = typeof legacyProjectImportMissingRequiredFile;
+
+export type RunLegacyProjectImportErrors =
+  | typeof legacyProjectImportAlreadyStarted
+  | GenerateLegacyProjectImportPiecesErrors;
+
+export type HaltLegacyProjectImportErros = typeof legacyProjectImportAlreadyFinished;
 
 export class LegacyProjectImport extends AggregateRoot {
   private constructor(
@@ -55,9 +64,10 @@ export class LegacyProjectImport extends AggregateRoot {
     private readonly projectId: ResourceId,
     private readonly scenarioId: ResourceId,
     private readonly ownerId: UserId,
-    private isAcceptingFiles: boolean = true,
+    private status: LegacyProjectImportStatus = LegacyProjectImportStatus.create(),
     private pieces: LegacyProjectImportComponent[] = [],
     private readonly files: LegacyProjectImportFile[] = [],
+    private toBeRemoved: boolean = false,
   ) {
     super();
   }
@@ -70,9 +80,10 @@ export class LegacyProjectImport extends AggregateRoot {
       new ResourceId(snapshot.projectId),
       new ResourceId(snapshot.scenarioId),
       new UserId(snapshot.ownerId),
-      snapshot.isAcceptingFiles,
+      LegacyProjectImportStatus.fromSnapshot(snapshot.status),
       snapshot.pieces.map(LegacyProjectImportComponent.fromSnapshot),
       snapshot.files.map(LegacyProjectImportFile.fromSnapshot),
+      snapshot.toBeRemoved,
     );
   }
 
@@ -97,7 +108,9 @@ export class LegacyProjectImport extends AggregateRoot {
     for (const component of this.pieces.filter(
       (pc) => pc.order === firstBatchOrder,
     )) {
-      this.apply(new LegacyProjectImportPieceRequested(this.id, component.id));
+      this.apply(
+        new LegacyProjectImportPieceRequested(this.projectId, component.id),
+      );
     }
   }
 
@@ -115,6 +128,10 @@ export class LegacyProjectImport extends AggregateRoot {
     return this.pieces
       .filter((piece) => piece.order === order)
       .some((piece) => piece.hasFailed());
+  }
+
+  public importProcessAlreadyStarted() {
+    return !this.status.isAcceptingFiles();
   }
 
   public areRequiredFilesUploaded(): boolean {
@@ -142,6 +159,7 @@ export class LegacyProjectImport extends AggregateRoot {
       LegacyProjectImportComponent.newOne(
         LegacyProjectImportPiece.PlanningGrid,
       ),
+      LegacyProjectImportComponent.newOne(LegacyProjectImportPiece.Input),
       LegacyProjectImportComponent.newOne(
         LegacyProjectImportPiece.ScenarioPusData,
       ),
@@ -163,15 +181,18 @@ export class LegacyProjectImport extends AggregateRoot {
     return right(pieces);
   }
 
-  start(): Either<GenerateLegacyProjectImportPiecesErrors, true> {
-    this.isAcceptingFiles = false;
+  run(): Either<RunLegacyProjectImportErrors, true> {
+    if (this.importProcessAlreadyStarted())
+      return left(legacyProjectImportAlreadyStarted);
+
+    this.status = this.status.markAsRunning();
     const piecesOrError = this.generatePieces();
 
     if (isLeft(piecesOrError)) return piecesOrError;
 
     this.pieces = piecesOrError.right;
 
-    this.apply(new LegacyProjectImportRequested(this.id, this.projectId));
+    this.apply(new LegacyProjectImportRequested(this.projectId));
     this.requestFirstBatch();
 
     return right(true);
@@ -179,19 +200,23 @@ export class LegacyProjectImport extends AggregateRoot {
 
   markPieceAsFailed(
     pieceId: LegacyProjectImportComponentId,
+    errors: string[] = [],
   ): Either<MarkLegacyProjectImportPieceAsFailedErrors, true> {
     const piece = this.pieces.find((pc) => pc.id.value === pieceId.value);
     if (!piece) return left(legacyProjectImportComponentNotFound);
     if (piece.hasFailed())
       return left(legacyProjectImportComponentAlreadyFailed);
 
-    piece.markAsFailed();
+    piece.markAsFailed(errors);
 
     const hasThisBatchFinished = this.hasBatchFinished(piece.order);
     const hasThisBatchFailed = this.hasBatchFailed(piece.order);
 
     if (hasThisBatchFinished && hasThisBatchFailed) {
-      this.apply(new LegacyProjectImportBatchFailed(this.id, piece.order));
+      this.status = this.status.markAsFailed();
+      this.apply(
+        new LegacyProjectImportBatchFailed(this.projectId, piece.order),
+      );
     }
 
     return right(true);
@@ -199,6 +224,7 @@ export class LegacyProjectImport extends AggregateRoot {
 
   completePiece(
     pieceId: LegacyProjectImportComponentId,
+    warnings?: string[],
   ): Either<
     CompleteLegacyProjectImportPieceErrors,
     CompleteLegacyProjectImportPieceSuccess
@@ -210,23 +236,35 @@ export class LegacyProjectImport extends AggregateRoot {
     if (pieceToComplete.isReady())
       return left(legacyProjectImportComponentAlreadyCompleted);
 
-    this.apply(new LegacyProjectImportPieceImported(this.id, pieceId));
+    this.apply(new LegacyProjectImportPieceImported(this.projectId, pieceId));
 
-    pieceToComplete.complete();
+    pieceToComplete.complete(warnings);
 
     const isThisTheLastBatch = this.isLastBatch(pieceToComplete.order);
     const hasThisBatchFinished = this.hasBatchFinished(pieceToComplete.order);
     const hasThisBatchFailed = this.hasBatchFailed(pieceToComplete.order);
+    const haltImportProcess = this.toBeRemoved;
 
     if (hasThisBatchFinished && hasThisBatchFailed) {
+      this.status = this.status.markAsFailed();
       this.apply(
-        new LegacyProjectImportBatchFailed(this.id, pieceToComplete.order),
+        new LegacyProjectImportBatchFailed(
+          this.projectId,
+          pieceToComplete.order,
+        ),
       );
       return right(true);
     }
 
-    if (isThisTheLastBatch && hasThisBatchFinished)
-      this.apply(new AllLegacyProjectPiecesImported(this.id, this.projectId));
+    if (hasThisBatchFinished && haltImportProcess) {
+      this.status = this.status.markAsCanceled();
+      this.apply(new LegacyProjectImportCanceled(this.projectId));
+      return right(true);
+    }
+    if (hasThisBatchFinished && isThisTheLastBatch) {
+      this.status = this.status.markAsCompleted();
+      this.apply(new AllLegacyProjectImportPiecesImported(this.projectId));
+    }
     if (isThisTheLastBatch || !hasThisBatchFinished) return right(true);
 
     const nextBatch = this.pieces.filter(
@@ -234,7 +272,9 @@ export class LegacyProjectImport extends AggregateRoot {
     );
 
     for (const component of nextBatch) {
-      this.apply(new LegacyProjectImportPieceRequested(this.id, component.id));
+      this.apply(
+        new LegacyProjectImportPieceRequested(this.projectId, component.id),
+      );
     }
 
     return right(true);
@@ -246,33 +286,67 @@ export class LegacyProjectImport extends AggregateRoot {
       projectId: this.projectId.value,
       scenarioId: this.scenarioId.value,
       ownerId: this.ownerId.value,
-      isAcceptingFiles: this.isAcceptingFiles,
+      status: this.status.toSnapshot(),
       pieces: this.pieces.map((piece) => piece.toSnapshot()),
       files: this.files.map((file) => file.toSnapshot()),
+      toBeRemoved: this.toBeRemoved,
     };
   }
 
   addFile(
     file: LegacyProjectImportFile,
   ): Either<AddFileToLegacyProjectImportErrors, true> {
-    const fileTypeAlreadyPresent = this.files.some(
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
+    }
+
+    const sameFileTypeFileIndex = this.files.findIndex(
       (el) => el.type === file.type,
     );
 
-    if (fileTypeAlreadyPresent) {
-      return left(legacyProjectImportDuplicateFileType);
-    }
-
-    const duplicateArchiveLocation = this.files.some(
-      (el) => el.location === file.location,
-    );
-
-    if (duplicateArchiveLocation) {
-      return left(legacyProjectImportDuplicateFile);
+    if (sameFileTypeFileIndex !== -1) {
+      this.files.splice(sameFileTypeFileIndex, 1);
     }
 
     this.files.push(file);
 
+    return right(true);
+  }
+
+  deleteFile(
+    fileId: LegacyProjectImportFileId,
+  ): Either<
+    DeleteFileFromLegacyProjectImportErrors,
+    LegacyProjectImportFile | undefined
+  > {
+    if (this.importProcessAlreadyStarted()) {
+      return left(legacyProjectImportAlreadyStarted);
+    }
+
+    const fileIndex = this.files.findIndex((file) => file.id.equals(fileId));
+
+    if (fileIndex === -1) return right(undefined);
+
+    const [deletedFile] = this.files.splice(fileIndex, 1);
+
+    return right(deletedFile);
+  }
+
+  getPiecesWithErrorsOrWarnings(): LegacyProjectImportComponent[] {
+    return this.pieces.filter(
+      (piece) => piece.hasWarnings() || piece.hasErrors(),
+    );
+  }
+
+  haltLegacyProjectImport() {
+    if (this.status.hasFailed() || this.status.hasCompleted())
+      return left(legacyProjectImportAlreadyFinished);
+
+    if (this.status.isAcceptingFiles()) {
+      this.status = this.status.markAsCanceled();
+    }
+
+    this.toBeRemoved = true;
     return right(true);
   }
 }

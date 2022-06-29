@@ -102,7 +102,7 @@ describe(`when getting input.dat`, () => {
       CLUMPTYPE 0
       ITIMPTYPE 0
       MISSLEVEL 1
-      STARTTEMP 1000000
+      STARTTEMP -1
       COSTTHRESH 0
       THRESHPEN1 0
       THRESHPEN2 0
@@ -153,7 +153,7 @@ describe(`when getting input.dat`, () => {
       CLUMPTYPE 0
       ITIMPTYPE 0
       MISSLEVEL 1
-      STARTTEMP 1000000
+      STARTTEMP -1
       COSTTHRESH 0
       THRESHPEN1 0
       THRESHPEN2 0
@@ -204,7 +204,7 @@ describe(`when getting input.dat`, () => {
       CLUMPTYPE 0
       ITIMPTYPE 0
       MISSLEVEL 1
-      STARTTEMP 1000000
+      STARTTEMP -1
       COSTTHRESH 0
       THRESHPEN1 0
       THRESHPEN2 0

@@ -39,7 +39,7 @@ const MODIFIERS = [
 export interface HelpBeaconProps {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   content: ReactNode;
   children: ReactElement;
   placement?: Placement;

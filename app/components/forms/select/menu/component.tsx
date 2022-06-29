@@ -1,4 +1,5 @@
 import React from 'react';
+
 import cx from 'classnames';
 
 import THEME from 'components/forms/select/constants/theme';

@@ -32,6 +32,7 @@ export class PlanningAreas extends FileUploader {
   private async uploadFromFile(
     shapefile: PlanningAreaShapefile,
   ): Promise<string> {
+    logInfo(`Uploading custom ${shapefile.kind} shapefile...`);
     const opStart = Process.hrtime();
 
     const data = new Blob([await Deno.readFile(shapefile.localFilePath)]);
@@ -68,14 +69,14 @@ export class PlanningAreas extends FileUploader {
   }
 
   async setFromShapefile(localFilePath: string): Promise<string> {
-    return this.uploadFromFile({
+    return await this.uploadFromFile({
       kind: PlanningAreaShapefileKind.planningArea,
       localFilePath,
     });
   }
 
   async setFromGridShapefile(localFilePath: string): Promise<string> {
-    return this.uploadFromFile({
+    return await this.uploadFromFile({
       kind: PlanningAreaShapefileKind.planningGrid,
       localFilePath,
     });

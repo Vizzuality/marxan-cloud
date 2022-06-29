@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Either, left, right } from 'fp-ts/Either';
-
 import { InjectRepository } from '@nestjs/typeorm';
+import { Either, left, right } from 'fp-ts/Either';
 import { Repository } from 'typeorm';
-import { ProjectBlm } from './project-blm.api.entity';
+import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 import {
   alreadyCreated,
   CreateFailure,
@@ -12,6 +11,7 @@ import {
   projectNotFound,
   SaveFailure,
 } from '../../blm-repos';
+import { ProjectBlm } from './project-blm.api.entity';
 
 @Injectable()
 export class TypeormProjectBlmRepository extends ProjectBlmRepo {
@@ -33,11 +33,11 @@ export class TypeormProjectBlmRepository extends ProjectBlmRepo {
   ): Promise<Either<CreateFailure, true>> {
     if (await this.repository.findOne(projectId)) return left(alreadyCreated);
 
-    const projectBlm = await this.repository.create();
+    const projectBlm = this.repository.create();
     projectBlm.id = projectId;
     projectBlm.defaults = defaults;
     projectBlm.values = [];
-    projectBlm.range = [0.001, 100];
+    projectBlm.range = defaultBlmRange;
     await this.repository.save(projectBlm);
 
     return right(true);

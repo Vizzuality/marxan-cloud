@@ -21,15 +21,12 @@ import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 
-import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
 import SolutionsTableForm from './table/table-form/component';
 import { ScenariosSolutionsOverviewProps } from './types';
 
-export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProps> = ({
-  onChangeSection,
-}: ScenariosSolutionsOverviewProps) => {
+export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProps> = () => {
   const { query } = useRouter();
   const { sid } = query;
   const [PDFLoader, setPDFLoader] = useState<boolean>(false);
@@ -132,27 +129,13 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
   return (
     <motion.div
       key="solutions-overview"
-      className="flex flex-col items-start justify-start flex-grow min-h-0 overflow-hidden"
+      className="flex flex-col items-start justify-start"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header>
-        <button
-          aria-label="return"
-          type="button"
-          className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
-          onClick={() => {
-            onChangeSection(null);
-          }}
-        >
-          <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Solutions Overview</h4>
-        </button>
-      </header>
-
-      <div className="flex flex-col flex-grow w-full min-h-0 overflow-hidden">
-        <div className="px-0.5 overflow-x-visible overflow-y-auto">
+      <div className="w-full">
+        <div className="px-0.5">
           <div className="relative flex flex-col w-full mt-1 text-sm">
             <Loading
               visible={solutionIsLoading}

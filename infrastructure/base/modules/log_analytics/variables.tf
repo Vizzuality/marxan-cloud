@@ -46,3 +46,8 @@ variable "retention_in_days" {
   type        = number
   default     = 30
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}

@@ -39,7 +39,7 @@ export interface SelectProps extends
 }
 
 export interface SelectOptionProps {
-  label: string;
+  label: string | ReactNode;
   value: string | number;
   disabled?: boolean;
   enabled?: boolean;

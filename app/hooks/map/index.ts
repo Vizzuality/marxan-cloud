@@ -20,6 +20,7 @@ import {
   UseLegend,
   UseGridPreviewLayer,
   UseScenarioBLMLayer,
+  UseBbox,
 } from './types';
 
 /**
@@ -1012,7 +1013,11 @@ export function useScenarioBlmLayer({
   }, [active, sId, blm, cache]);
 }
 
-// Legend
+/**
+ *******************************************************************
+ * LEGEND
+ *******************************************************************
+ */
 export function useLegend({
   layers, options = {},
 }: UseLegend) {
@@ -1037,4 +1042,29 @@ export function useLegend({
       })
       .filter((l) => !!l);
   }, [layers, options]);
+}
+
+/**
+ *******************************************************************
+ * UTILS
+ *******************************************************************
+ */
+export function useBBOX({
+  bbox,
+}: UseBbox) {
+  return useMemo(() => {
+    if (bbox) {
+      if (bbox[0] < bbox[1]) {
+        return [
+          bbox[0] + 360,
+          bbox[1],
+          bbox[2],
+          bbox[3],
+        ];
+      }
+      return bbox;
+    }
+
+    return null;
+  }, [bbox]);
 }

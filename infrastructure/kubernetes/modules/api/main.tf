@@ -320,5 +320,3 @@ resource "kubernetes_deployment" "api_deployment" {
     }
   }
 }
-
-

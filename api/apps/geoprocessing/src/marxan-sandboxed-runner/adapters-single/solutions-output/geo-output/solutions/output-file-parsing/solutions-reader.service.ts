@@ -24,8 +24,10 @@ export class SolutionsReaderService {
   async from(
     outputsDirectory: string,
     scenarioId: string,
+    extension: 'csv' | 'txt' | 'dat' = 'csv',
   ): Promise<TypedEmitter<SolutionsEvents>> {
-    const solutionsFile = outputsDirectory + `/output_solutionsmatrix.csv`;
+    const solutionsFile =
+      outputsDirectory + `/output_solutionsmatrix.${extension}`;
     const planningUnits = await this.scenarioPuData.findAndCount({
       where: {
         scenarioId,

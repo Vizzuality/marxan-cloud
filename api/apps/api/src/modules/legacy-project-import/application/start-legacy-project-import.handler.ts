@@ -1,5 +1,8 @@
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import {
+  Project,
+  ProjectSourcesEnum,
+} from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ResourceId } from '@marxan/cloning/domain';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
@@ -27,24 +30,31 @@ export class StartLegacyProjectImportHandler
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
   ) {}
 
-  private async createShells(name: string) {
+  private async createShells(
+    name: string,
+    ownerId: string,
+    solutionsAreLocked: boolean,
+  ) {
     try {
       const [randomOrganization] = await this.organizationRepo.find({
         take: 1,
       });
       if (!randomOrganization)
-        throw new Error('cant find an existing organiztion');
+        throw new Error('cant find an existing organization');
 
       const randomOrganizationId = randomOrganization.id;
 
       const project = await this.projectRepo.save({
         name,
         organizationId: randomOrganizationId,
+        sources: ProjectSourcesEnum.legacyImport,
+        createdBy: ownerId,
       });
 
       const scenario = await this.scenarioRepo.save({
         name,
         projectId: project.id,
+        solutionsAreLocked,
       });
 
       return right({
@@ -59,8 +69,13 @@ export class StartLegacyProjectImportHandler
   async execute({
     name,
     ownerId,
+    solutionsAreLocked,
   }: StartLegacyProjectImport): Promise<StartLegacyProjectImportResponse> {
-    const shellsOrError = await this.createShells(name);
+    const shellsOrError = await this.createShells(
+      name,
+      ownerId.value,
+      solutionsAreLocked,
+    );
 
     if (isLeft(shellsOrError)) return shellsOrError;
 

@@ -11,6 +11,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { isLeft, isRight, Right } from 'fp-ts/Either';
 
 import { v4 } from 'uuid';
+import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
 
 import {
   legacyProjectImportNotFound,
@@ -118,7 +119,7 @@ const getFixtures = async () => {
     },
     WhenStartingLegacyProjectImport: () => {
       return sut.execute(
-        new StartLegacyProjectImport('random project name', ownerId),
+        new StartLegacyProjectImport('random project name', ownerId, false),
       );
     },
     ThenAStartingLegacyProjectIsNotCreated: async (
@@ -167,12 +168,15 @@ const getFixtures = async () => {
       expect(legacyProjectImport.areRequiredFilesUploaded()).toEqual(false);
 
       const legacyProjectImportSnapshot = legacyProjectImport.toSnapshot();
-      expect(legacyProjectImportSnapshot.isAcceptingFiles).toEqual(true);
+      expect(legacyProjectImportSnapshot.status).toEqual(
+        LegacyProjectImportStatuses.AcceptingFiles,
+      );
       expect(legacyProjectImportSnapshot.ownerId).toEqual(ownerId.value);
       expect(legacyProjectImportSnapshot.files).toEqual([]);
       expect(legacyProjectImportSnapshot.pieces).toEqual([]);
       expect(legacyProjectImportSnapshot.projectId).toEqual(projectShellId);
       expect(legacyProjectImportSnapshot.scenarioId).toEqual(scenarioShellId);
+      expect(legacyProjectImportSnapshot.toBeRemoved).toEqual(false);
     },
   };
 };

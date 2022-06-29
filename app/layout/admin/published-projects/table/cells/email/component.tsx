@@ -14,7 +14,14 @@ export const CellEmail: React.FC<CellEmailProps> = ({
       {value.map((owner) => {
         const { id, email } = owner;
         return (
-          <div key={id}>{email}</div>
+          <div key={id}>
+            <a
+              className="break-all hover:underline"
+              href={`mailto:${email}`}
+            >
+              {email}
+            </a>
+          </div>
         );
       })}
     </div>

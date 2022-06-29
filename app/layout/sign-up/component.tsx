@@ -156,7 +156,34 @@ export const SignUp: React.FC<SignUpProps> = () => {
                     {(fprops) => (
                       <Field className="flex mt-2" id="form-checkbox" {...fprops}>
                         <Checkbox theme="light" />
-                        <Label theme="light" className="pr-20 ml-2 -mt-1 font-sans text-sm">I accept the Terms of service and privacy policy</Label>
+                        <Label theme="light" className="ml-2 -mt-1 font-sans text-xs">
+                          This site is managed by The Nature Conservancy.
+                          <br />
+                          By submitting your information, you agree
+                          to The Nature Conservancy’s
+                          {' '}
+                          <a
+                            className="underline hover:no-underline"
+                            href="https://www.nature.org/en-us/about-us/who-we-are/accountability/terms-of-use"
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            Terms of Service
+                          </a>
+                          {' '}
+                          and
+                          {' '}
+                          <a
+                            className="underline hover:no-underline"
+                            href="https://www.nature.org/en-us/about-us/who-we-are/accountability/privacy-policy"
+                            rel="noreferrer"
+                            target="_blank"
+                          >
+                            Privacy Statement.
+                          </a>
+
+                        </Label>
+
                       </Field>
                     )}
                   </FieldRFF>

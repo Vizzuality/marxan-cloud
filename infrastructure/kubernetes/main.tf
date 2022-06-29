@@ -1,24 +1,23 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan"        // var.project_name
-    storage_account_name = "marxan"        // var.project_name
+    resource_group_name  = "marxan-rg"     // var.project_resource_group
+    storage_account_name = "marxansa"      // ${var.project_name}sa
     container_name       = "marxantfstate" // ${var.project_name}tfstate
     key                  = "kubernetes.tfstate"
   }
 }
 
 data "azurerm_resource_group" "resource_group" {
-  name = var.project_name
+  name = var.project_resource_group
 }
 
-data "azurerm_subscription" "subscription" {
-}
+data "azurerm_subscription" "subscription" {}
 
 data "terraform_remote_state" "core" {
   backend = "azurerm"
-  config  = {
-    resource_group_name  = "marxan"        // var.project_name
-    storage_account_name = "marxan"        // var.project_name
+  config = {
+    resource_group_name  = "marxan-rg"     // var.project_name
+    storage_account_name = "marxansa"      // var.project_name
     container_name       = "marxantfstate" // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
@@ -73,15 +72,16 @@ module "k8s_storage" {
   cloning_storage_class      = local.cloning_storage_class
 }
 
-####
-# Production
-####
+#region Production
+
 module "key_vault_production" {
   source                 = "./modules/key_vault"
   namespace              = "production"
   resource_group         = data.azurerm_resource_group.resource_group
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
+  key_vault_name_prefix  = var.key_vault_name_prefix
+  project_tags           = merge(var.project_tags, { Environment = "PRD" })
 }
 
 module "k8s_api_database_production" {
@@ -210,18 +210,21 @@ module "ingress_production" {
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
+  project_tags               = merge(var.project_tags, { Environment = "PRD" })
 }
 
+#endregion
 
-####
-# Staging
-####
+#region Staging
+
 module "key_vault_staging" {
   source                 = "./modules/key_vault"
   namespace              = "staging"
   resource_group         = data.azurerm_resource_group.resource_group
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
+  key_vault_name_prefix  = var.key_vault_name_prefix
+  project_tags           = merge(var.project_tags, { Environment = "STG" })
 }
 
 module "k8s_api_database_staging" {
@@ -352,4 +355,6 @@ module "ingress_staging" {
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
   domain_prefix              = "staging"
+  project_tags               = merge(var.project_tags, { Environment = "STG" })
 }
+#endregion

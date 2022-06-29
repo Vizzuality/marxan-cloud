@@ -25,19 +25,19 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRe
   }, [onActive, onDismiss, user]);
 
   return (
-    <div className="flex flex-col items-center justify-center py-10 space-y-10">
+    <div className="flex flex-col items-center justify-center py-10 space-y-6">
 
-      <h2 className="text-lg font-medium text-center text-gray-600 font-heading">First things first...</h2>
+      <h2 className="font-medium text-center text-gray-600 text-m font-heading">First things first...</h2>
 
-      <Icon icon={GUIDE_REQUEST_SVG} className="w-40" />
+      <Icon icon={GUIDE_REQUEST_SVG} className="w-28" />
       <div className="w-72">
-        <p className="text-lg text-center text-gray-600 font-heading">Would you like to get some guidance on Marxan&apos;s workflow?</p>
+        <p className="text-center text-gray-600 text-m font-heading">Would you like to get some guidance on Marxan&apos;s workflow?</p>
       </div>
       <div className="flex space-x-4 w-72">
 
         <Button
           theme="tertiary"
-          size="lg"
+          size="base"
           type="submit"
           className="w-full"
           onClick={() => handleActiveRequestGuide(false)}
@@ -47,7 +47,7 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRe
 
         <Button
           theme="primary"
-          size="lg"
+          size="base"
           type="submit"
           className="w-full"
           onClick={() => handleActiveRequestGuide(true)}

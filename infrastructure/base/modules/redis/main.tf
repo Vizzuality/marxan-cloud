@@ -1,5 +1,5 @@
 resource "azurerm_redis_cache" "marxan" {
-  name                          = var.project_name
+  name                          = "${var.project_name}-tnc-redis"
   location                      = var.resource_group.location
   resource_group_name           = var.resource_group.name
   capacity                      = var.redis_cache_capacity
@@ -9,6 +9,7 @@ resource "azurerm_redis_cache" "marxan" {
   minimum_tls_version           = "1.2"
   public_network_access_enabled = false
   redis_version                 = var.redis_version
+  tags                          = merge(var.project_tags, { Environment = "PRD-STG" })
 
   redis_configuration {
   }

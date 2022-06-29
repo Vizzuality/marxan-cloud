@@ -11,8 +11,10 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
+import { usePlausible } from 'next-plausible';
 import { bytesToMegabytes } from 'utils/units';
 
+import { useMe } from 'hooks/me';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useDownloadCostSurface, useUploadCostSurface } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -40,7 +42,9 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
+
   const { addToast } = useToasts();
+  const plausible = usePlausible();
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -50,6 +54,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     setJob,
   } = scenarioSlice.actions;
 
+  const { user } = useMe();
   const editable = useCanEditScenario(pid, sid);
   const downloadMutation = useDownloadCostSurface({});
   const uploadMutation = useUploadCostSurface({
@@ -103,6 +108,15 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         });
 
         console.info('Cost surface uploaded', g);
+
+        plausible('Upload cost surface', {
+          props: {
+            userId: `${user.id}`,
+            userEmail: `${user.email}`,
+            projectId: `${pid}`,
+            scenarioId: `${sid}`,
+          },
+        });
       },
       onError: ({ response }) => {
         const { errors } = response.data;
@@ -201,35 +215,21 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
             <div className="space-y-2">
               <p>
-                In conservation planning, cost data reflects how much a
-                planning unit costs to include into a
-                conservation network. Typically, it reflects the
-                actual price of a parcel of land.
+                Marxan aims to minimize socio-economic impacts and conflicts between uses through
+                what is called the “cost” surface. In conservation planning, cost data may reflect
+                acquisition, management, or opportunity costs ($), but may also reflect non-monetary
+                impacts. Proxies are commonly used in absence of fine-scale socio-economic
+                information. A default value for cost will be the planning unit area but you can
+                upload your cost surface.
               </p>
               <p>
-                However, cost
-                information is usually scarce and often the cost
-                surface is used to reflect any variety of
-                socioeconomic factors,
-                which if minimized, might help the conservation
-                plan be implemented more effectively and reduce
-                conflicts with other uses.
-              </p>
-              <p>
-                For example, here you can see 2 examples of
-                cost surfaces in terrestrial and marine environments:
+                In the examples below, we illustrate how distance from a city, road or port can be
+                used as a proxy cost surface. In these examples, areas with many competing
+                activities will make a planning unit cost more than areas further away with
+                less competition for access.
               </p>
               <img src={COST_SEA_IMG} alt="Cost sea" />
               <img src={COST_LAND_IMG} alt="Cost Land" />
-              <p>
-                The default value for cost will be the planning
-                unit area but you can upload a cost
-                surface. Once you upload a cost surface,
-                it will be intersected with your planning unit
-                grid to get one cost value per planning unit.
-                This will be the cost that Marxan will use for
-                each planning unit.
-              </p>
             </div>
 
           </div>
@@ -262,132 +262,132 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
           {editable && (
             <div className="mt-3 mb-5">
               {!successFile && (
-              <Uploader
-                caption="Upload cost surface"
-                open={opened}
-                onOpen={() => setOpened(true)}
-                onClose={() => setOpened(false)}
-              >
-                <Form
-                  onSubmit={onUploadSubmit}
-                  render={({ handleSubmit }) => {
-                    return (
-                      <form onSubmit={handleSubmit}>
-                        <div className="p-9">
-                          <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+                <Uploader
+                  caption="Upload cost surface"
+                  open={opened}
+                  onOpen={() => setOpened(true)}
+                  onClose={() => setOpened(false)}
+                >
+                  <Form
+                    onSubmit={onUploadSubmit}
+                    render={({ handleSubmit }) => {
+                      return (
+                        <form onSubmit={handleSubmit}>
+                          <div className="p-9">
+                            <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
-                          {!successFile && (
-                          <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
-                            {(props) => (
-                              <div>
-                                <div className="flex items-center mb-2.5 space-x-3">
-                                  <h5 className="text-xs text-gray-400">Supported formats</h5>
-                                  <InfoButton
-                                    size="s"
-                                    theme="secondary"
-                                  >
-                                    <span className="text-xs">
-                                      {' '}
-                                      <h4 className="font-heading mb-2.5">
-                                        List of supported file formats:
-                                      </h4>
-                                      <ul>
-                                        Zipped: .shp (zipped shapefiles must include
+                            {!successFile && (
+                              <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
+                                {(props) => (
+                                  <div>
+                                    <div className="flex items-center mb-2.5 space-x-3">
+                                      <h5 className="text-xs text-gray-400">Supported formats</h5>
+                                      <InfoButton
+                                        size="s"
+                                        theme="secondary"
+                                      >
+                                        <span className="text-xs">
+                                          {' '}
+                                          <h4 className="font-heading mb-2.5">
+                                            List of supported file formats:
+                                          </h4>
+                                          <ul>
+                                            Zipped: .shp (zipped shapefiles must include
+                                            <br />
+                                            .shp, .shx, .dbf, and .prj files)
+                                          </ul>
+                                        </span>
+                                      </InfoButton>
+                                    </div>
+
+                                    <div
+                                      {...props}
+                                      {...getRootProps()}
+                                      className={cx({
+                                        'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                        'bg-gray-500': isDragActive,
+                                        'border-green-800': isDragAccept,
+                                        'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                                      })}
+                                    >
+
+                                      <input {...getInputProps()} />
+
+                                      <p className="text-sm text-center text-gray-500">
+                                        Drag and drop your polygon data file
                                         <br />
-                                        .shp, .shx, .dbf, and .prj files)
-                                      </ul>
-                                    </span>
-                                  </InfoButton>
-                                </div>
+                                        or
+                                        {' '}
+                                        <b>click here</b>
+                                        {' '}
+                                        to upload
+                                      </p>
 
-                                <div
-                                  {...props}
-                                  {...getRootProps()}
-                                  className={cx({
-                                    'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
-                                    'bg-gray-500': isDragActive,
-                                    'border-green-800': isDragAccept,
-                                    'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
-                                  })}
-                                >
+                                      <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`}</p>
 
-                                  <input {...getInputProps()} />
+                                      <Loading
+                                        visible={loading}
+                                        className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                        iconClassName="w-5 h-5 text-primary-500"
+                                      />
 
-                                  <p className="text-sm text-center text-gray-500">
-                                    Drag and drop your polygon data file
-                                    <br />
-                                    or
-                                    {' '}
-                                    <b>click here</b>
-                                    {' '}
-                                    to upload
-                                  </p>
-
-                                  <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`}</p>
-
-                                  <Loading
-                                    visible={loading}
-                                    className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
-                                    iconClassName="w-5 h-5 text-primary-500"
-                                  />
-
-                                </div>
-                              </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </Field>
                             )}
-                          </Field>
-                          )}
 
-                          {successFile && (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                            >
-                              <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                                <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
-                                <div className="flex items-center space-x-2">
-                                  <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-                                    <p className="text-sm text-black">{successFile.name}</p>
-                                  </label>
-                                  <button
-                                    id="cancel-shapefile-btn"
-                                    type="button"
-                                    className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
-                                    onClick={onUploadRemove}
-                                  >
-                                    <Icon
-                                      className="w-1.5 h-1.5 text-black group-hover:text-white"
-                                      icon={CLOSE_SVG}
-                                    />
-                                  </button>
+                            {successFile && (
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                              >
+                                <div className="flex flex-col w-full space-y-3 cursor-pointer">
+                                  <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                                  <div className="flex items-center space-x-2">
+                                    <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                                      <p className="text-sm text-black">{successFile.name}</p>
+                                    </label>
+                                    <button
+                                      id="cancel-shapefile-btn"
+                                      type="button"
+                                      className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
+                                      onClick={onUploadRemove}
+                                    >
+                                      <Icon
+                                        className="w-1.5 h-1.5 text-black group-hover:text-white"
+                                        icon={CLOSE_SVG}
+                                      />
+                                    </button>
+                                  </div>
                                 </div>
-                              </div>
-                            </motion.div>
-                          )}
+                              </motion.div>
+                            )}
 
-                          <div className="flex justify-center mt-16 space-x-6">
-                            <Button
-                              theme="secondary"
-                              size="xl"
-                              onClick={() => setOpened(false)}
-                            >
-                              Cancel
-                            </Button>
+                            <div className="flex justify-center mt-16 space-x-6">
+                              <Button
+                                theme="secondary"
+                                size="xl"
+                                onClick={() => setOpened(false)}
+                              >
+                                Cancel
+                              </Button>
 
-                            <Button
-                              theme="primary"
-                              size="xl"
-                              type="submit"
-                            >
-                              Save
-                            </Button>
+                              <Button
+                                theme="primary"
+                                size="xl"
+                                type="submit"
+                              >
+                                Save
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      </form>
-                    );
-                  }}
-                />
-              </Uploader>
+                        </form>
+                      );
+                    }}
+                  />
+                </Uploader>
               )}
 
               {successFile && (

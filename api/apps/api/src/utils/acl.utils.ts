@@ -46,6 +46,7 @@ import {
   bestSolutionNotFound,
   projectDoesntExist,
   projectNotReady,
+  lockedSolutions,
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
@@ -84,6 +85,7 @@ interface ErrorHandlerOptions {
 export const mapAclDomainToHttpError = (
   errorToCheck:
     | GetScenarioFailure
+    | typeof lockedSolutions
     | typeof forbiddenError
     | typeof lastOwner
     | typeof transactionFailed
@@ -257,6 +259,10 @@ export const mapAclDomainToHttpError = (
     case projectIsNotPublished:
       return new ForbiddenException(
         `Trying to clone project export with ID ${options?.exportId} which is not a published project`,
+      );
+    case lockedSolutions:
+      return new BadRequestException(
+        `Scenario ${options?.scenarioId} solutions are locked.`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

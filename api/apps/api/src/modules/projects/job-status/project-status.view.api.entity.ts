@@ -1,9 +1,9 @@
 import { ViewColumn, ViewEntity } from 'typeorm';
 import { JobType } from '@marxan-api/modules/projects/job-status/jobs.enum';
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ApiEvent } from '@marxan-api/modules/api-events/api-event.api.entity';
 import { API_EVENT_KINDS, ProjectEvents } from '@marxan/api-events';
 import { ValuesType } from 'utility-types';
+import { ApiEventJobStatus } from './api-event-job-status.enum';
 
 @ViewEntity({
   expression: `
@@ -32,7 +32,7 @@ export class ProjectJobStatus {
   @ViewColumn()
   kind!: Extract<API_EVENT_KINDS, `project.${string}`>;
 
-  get jobStatus(): JobStatus | undefined {
+  get jobStatus(): ApiEventJobStatus | undefined {
     return eventToJobStatusMapping[this.kind];
   }
 
@@ -48,44 +48,61 @@ export class ProjectJobStatus {
   timestamp!: Date;
 }
 
-const eventToJobStatusMapping: Record<ValuesType<ProjectEvents>, JobStatus> = {
-  [API_EVENT_KINDS.project__grid__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.project__grid__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.project__grid__submitted__v1__alpha]: JobStatus.running,
+const eventToJobStatusMapping: Record<
+  ValuesType<ProjectEvents>,
+  ApiEventJobStatus
+> = {
+  [API_EVENT_KINDS.project__grid__failed__v1__alpha]: ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__grid__finished__v1__alpha]: ApiEventJobStatus.done,
+  [API_EVENT_KINDS.project__grid__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.project__planningUnits__submitted__v1__alpha]:
-    JobStatus.running,
-  [API_EVENT_KINDS.project__planningUnits__finished__v1__alpha]: JobStatus.done,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.project__planningUnits__finished__v1__alpha]:
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.project__planningUnits__failed__v1__alpha]:
-    JobStatus.failure,
-  [API_EVENT_KINDS.project__export__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.project__export__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.project__export__submitted__v1__alpha]: JobStatus.running,
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__export__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__export__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.project__export__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.project__export__piece__failed__v1__alpha]:
-    JobStatus.failure,
-  [API_EVENT_KINDS.project__export__piece__finished__v1__alpha]: JobStatus.done,
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__export__piece__finished__v1__alpha]:
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.project__export__piece__submitted__v1__alpha]:
-    JobStatus.running,
-  [API_EVENT_KINDS.project__import__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.project__import__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.project__import__submitted__v1__alpha]: JobStatus.running,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.project__import__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__import__finished__v1__alpha]:
+    ApiEventJobStatus.done,
+  [API_EVENT_KINDS.project__import__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.project__import__piece__failed__v1__alpha]:
-    JobStatus.failure,
-  [API_EVENT_KINDS.project__import__piece__finished__v1__alpha]: JobStatus.done,
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__import__piece__finished__v1__alpha]:
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.project__import__piece__submitted__v1__alpha]:
-    JobStatus.running,
-  [API_EVENT_KINDS.project__clone__failed__v1__alpha]: JobStatus.failure,
-  [API_EVENT_KINDS.project__clone__finished__v1__alpha]: JobStatus.done,
-  [API_EVENT_KINDS.project__clone__submitted__v1__alpha]: JobStatus.running,
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.project__clone__failed__v1__alpha]:
+    ApiEventJobStatus.failure,
+  [API_EVENT_KINDS.project__clone__finished__v1__alpha]: ApiEventJobStatus.done,
+  [API_EVENT_KINDS.project__clone__submitted__v1__alpha]:
+    ApiEventJobStatus.running,
+  [API_EVENT_KINDS.project__legacy__import__canceled__v1__alpha]:
+    ApiEventJobStatus.canceled,
   [API_EVENT_KINDS.project__legacy__import__failed__v1__alpha]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.project__legacy__import__finished__v1__alpha]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.project__legacy__import__submitted__v1__alpha]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
   [API_EVENT_KINDS.project__legacy__import__piece__failed__v1__alpha]:
-    JobStatus.failure,
+    ApiEventJobStatus.failure,
   [API_EVENT_KINDS.project__legacy__import__piece__finished__v1__alpha]:
-    JobStatus.done,
+    ApiEventJobStatus.done,
   [API_EVENT_KINDS.project__legacy__import__piece__submitted__v1__alpha]:
-    JobStatus.running,
+    ApiEventJobStatus.running,
 };

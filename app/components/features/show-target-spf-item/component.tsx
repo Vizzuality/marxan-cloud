@@ -50,16 +50,12 @@ export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
                   <h4 className="font-heading text-lg mb-2.5">What is a target?</h4>
                   <div className="space-y-2">
                     <p>
-                      This value represents how much you want to conserve of a particular
-                      feature. In an ideal conservation, land or sea use plan,
-                      all your features meet their targets.
-                    </p>
-                    <p>
-                      You can set a default
-                      value for all of your features
-                      or you can set individual the targets separately for each feature.
-                      You can set your targets to 100% if you want the whole extent of
-                      your feature to be included in the solution.
+                      Targets reflect the minimum value of each feature that needs to be in the
+                      solution to achieve your objectives. You can set targets for features that
+                      come in a variety of formats, such as the percent of a feature’s range
+                      ( e.g. 30% of its distribution), or the number of individuals given you have
+                      abundance data (e.g. 500 individuals). See additional resources for best
+                      practice on target-setting in Marxan.
                     </p>
                   </div>
                 </div>

@@ -1,23 +1,26 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan"        // var.project_name
-    storage_account_name = "marxan"        // var.project_name
+    resource_group_name  = "marxan-rg"     // var.project_resource_group
+    storage_account_name = "marxansa"      // ${var.project_name}sa
     container_name       = "marxantfstate" // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
 }
 
 data "azurerm_resource_group" "resource_group" {
-  name = var.project_name
+  name = var.project_resource_group
 }
 
-data "azurerm_subscription" "subscription" {
-}
+data "azurerm_subscription" "subscription" {}
+
+data "github_ip_ranges" "latest" {}
 
 module "network" {
   source         = "./modules/network"
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
+  vpn_cidrs      = [] #concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4) # Remove for Vizzuality access
+  project_tags   = var.project_tags
 }
 
 module "dns" {
@@ -30,7 +33,7 @@ module "bastion" {
   source                  = "./modules/bastion"
   resource_group          = data.azurerm_resource_group.resource_group
   project_name            = var.project_name
-  bastion_ssh_public_keys = [var.bastion_ssh_public_key]
+  bastion_ssh_public_keys = var.bastion_ssh_public_keys
   bastion_subnet_id       = module.network.bastion_subnet_id
   dns_zone                = module.dns.dns_zone
 }
@@ -93,6 +96,7 @@ module "redis" {
   project_name                   = var.project_name
   subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.kubernetes.cluster_id
+  project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "log_analytics_workspace" {
@@ -100,6 +104,7 @@ module "log_analytics_workspace" {
   name                = var.project_name
   location            = var.location
   resource_group_name = data.azurerm_resource_group.resource_group.name
+  project_tags        = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "firewall" {
@@ -114,6 +119,7 @@ module "firewall" {
   subnet_id                    = module.network.firewall_subnet_id
   log_analytics_workspace_id   = module.log_analytics_workspace.id
   log_analytics_retention_days = 30
+  project_tags                 = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "routetable" {
@@ -130,6 +136,7 @@ module "routetable" {
       virtual_network_name = module.network.aks_vnet_name
     }
   }
+  project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "redis_private_dns_zone" {
@@ -159,4 +166,19 @@ module "redis_private_endpoint" {
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
+  project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
+}
+
+module "mail_host_dns_records" {
+  source         = "./modules/mail"
+  resource_group = data.azurerm_resource_group.resource_group
+  dns_zone       = module.dns.dns_zone
+
+  cname_name  = var.sparkpost_dns_cname_name
+  cname_value = var.sparkpost_dns_cname_value
+
+  dkim_name  = var.sparkpost_dns_dkim_name
+  dkim_value = var.sparkpost_dns_dkim_value
+
+  project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
 }
