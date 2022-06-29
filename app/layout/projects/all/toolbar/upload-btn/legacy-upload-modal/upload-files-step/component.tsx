@@ -260,28 +260,10 @@ export const UploadFilesStep: React.FC<UploadFilesStepProps> = ({
                         {!successFile && (
                           <FieldRFF name="file">
                             {(props) => (
-                              <div>
+                              <div className="space-y-2.5">
                                 <Label theme="light" className="uppercase" id="file">
                                   {f.label}
                                 </Label>
-
-                                <div className="flex items-center my-2.5 space-x-3">
-                                  <h5 className="text-xs text-gray-400">Supported formats</h5>
-                                  <InfoButton
-                                    size="s"
-                                    theme="secondary"
-                                  >
-                                    <span className="text-xs">
-                                      {' '}
-                                      <h4 className="font-heading mb-2.5">
-                                        List of supported file formats:
-                                      </h4>
-                                      <ul>
-                                        {`Zipped: ${f.format}`}
-                                      </ul>
-                                    </span>
-                                  </InfoButton>
-                                </div>
 
                                 <div
                                   {...props}

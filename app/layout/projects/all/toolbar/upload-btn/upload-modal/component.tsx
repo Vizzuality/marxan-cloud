@@ -259,17 +259,16 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     </motion.div>
                   )}
                 </div>
-                <p className="mt-2 text-sm text-gray-400 lg:text-base">
+                <p className="mt-4 text-sm text-gray-400 lg:text-base">
                   If you have a legacy project and prefer to upload the files, please
                   {' '}
                   <button
                     type="button"
-                    className="font-semibold cursor-pointer hover:underline"
+                    className="font-semibold underline cursor-pointer hover:no-underline"
                     onClick={onSetLegacyUpload}
                   >
                     click here
                   </button>
-                  .
                 </p>
                 <div className="flex justify-center mt-16 space-x-6">
                   <Button
