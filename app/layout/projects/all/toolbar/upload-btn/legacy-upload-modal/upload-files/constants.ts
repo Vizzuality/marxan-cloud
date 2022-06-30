@@ -10,12 +10,12 @@ export const LEGACY_FIELDS = [
     maxSize: 1073741824,
   },
   {
-    label: 'PU Dat',
+    label: 'Upload cost surface data',
     format: 'dat',
     maxSize: 1073741824,
   },
   {
-    label: 'Spec Dat',
+    label: 'Upload your feature data',
     format: 'dat',
     maxSize: 1073741824,
   },
@@ -25,7 +25,7 @@ export const LEGACY_FIELDS = [
     maxSize: 1073741824,
   },
   {
-    label: 'Output',
+    label: 'Upload your output databases (optional)',
     format: 'zip',
     maxSize: 1073741824,
   },
