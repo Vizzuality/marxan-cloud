@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { setLegacyProjectId, setImportSubmit } from 'store/slices/projects/new';
 
-import { useCancelImportLegacyProject, useImportLegacyProject } from 'hooks/projects';
+import { useCancelImportLegacyProject, useLegacyProjectValidationResults, useImportLegacyProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -36,6 +36,11 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
 
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
+  const { data: validationResults } = useLegacyProjectValidationResults({
+    projectId: legacyProjectId,
+  });
+
+  console.info('validationResults--->', validationResults);
 
   const onCancelImportLegacyProject = useCallback(() => {
     cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {

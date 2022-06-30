@@ -706,6 +706,31 @@ export function useCancelUploadLegacyProjectFile({
   });
 }
 
+export function useLegacyProjectValidationResults({ projectId }) {
+  const [session] = useSession();
+
+  const query = useQuery(['legacy-validation-results', projectId], async () => PROJECTS.request({
+    method: 'GET',
+    url: `/import/legacy/${projectId}/validation-results`,
+    headers: {
+      Authorization: `Bearer ${session.accessToken}`,
+    },
+  }).then((response) => {
+    return response.data;
+  }), {
+    enabled: !!projectId,
+  });
+
+  const { data } = query;
+
+  return useMemo(() => {
+    return {
+      ...query,
+      data: data?.data,
+    };
+  }, [query, data?.data]);
+}
+
 export function useImportLegacyProject({
   requestConfig = {
     method: 'POST',
