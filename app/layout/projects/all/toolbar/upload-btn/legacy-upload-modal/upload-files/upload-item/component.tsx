@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
-import { useUploadLegacyProjectFile } from 'hooks/projects';
+import { useUploadLegacyProjectFile, useCancelUploadLegacyProjectFile } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Label from 'components/forms/label';
@@ -32,12 +32,14 @@ export const UploadItem: React.FC<UploadItemProps> = ({
   const formRef = useRef(null);
 
   const [successFile, setSuccessFile] = useState(null);
+  const [dataFileId, setDataFileId] = useState(null);
 
   const { addToast } = useToasts();
 
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
 
   const uploadLegacyProjectFileMutation = useUploadLegacyProjectFile({});
+  const cancelUploadLegacyProjectFileMutation = useCancelUploadLegacyProjectFile({});
 
   // ADD DATA FILE
   const onDropAccepted = async (acceptedFiles) => {
@@ -49,7 +51,8 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     data.append('fileType', f.fileType);
     data.append('file', fl);
     uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
-      onSuccess: () => {
+      onSuccess: ({ data: { fileId } }) => {
+        setDataFileId(fileId);
         addToast('success-upload-legacy-data-file', (
           <>
             <h2 className="font-medium">Success!</h2>
@@ -107,7 +110,15 @@ export const UploadItem: React.FC<UploadItemProps> = ({
 
   const onUploadRemove = useCallback(() => {
     setSuccessFile(null);
-  }, []);
+    cancelUploadLegacyProjectFileMutation.mutate({ projectId: legacyProjectId, dataFileId }, {
+      onSuccess: ({ data: { projectId } }) => {
+        console.info('Upload legacy project data file has been canceled', projectId);
+      },
+      onError: () => {
+        console.error('Upload legacy project data file has not been canceled');
+      },
+    });
+  }, [cancelUploadLegacyProjectFileMutation, dataFileId, legacyProjectId]);
 
   const {
     getRootProps,

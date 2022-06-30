@@ -49,6 +49,8 @@ import {
   ImportLegacyProjectProps,
   UseUploadLegacyProjectFileProps,
   UploadLegacyProjectFileProps,
+  UseCancelUploadLegacyProjectFileProps,
+  CancelUploadLegacyProjectFileProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -664,6 +666,38 @@ export function useUploadLegacyProjectFile({
 
   return useMutation(uploadLegacyProjectFile, {
     onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useCancelUploadLegacyProjectFile({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseCancelUploadLegacyProjectFileProps) {
+  const [session] = useSession();
+
+  const cancelUploadLegacyProjectFile = ({
+    dataFileId,
+    projectId,
+  }: CancelUploadLegacyProjectFileProps) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/import/legacy/${projectId}/data-file/${dataFileId}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(cancelUploadLegacyProjectFile, {
+    onSuccess: (data, variables, context) => {
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

@@ -141,6 +141,7 @@ export interface UploadLegacyProjectFileProps {
   projectId: string,
   data: any,
 }
+
 // useImportLegacyProject
 export interface UseImportLegacyProjectProps {
   requestConfig?: AxiosRequestConfig
@@ -148,4 +149,14 @@ export interface UseImportLegacyProjectProps {
 
 export interface ImportLegacyProjectProps {
   projectId: string,
+}
+
+// useCancelUploadLegacyProjectFile
+export interface UseCancelUploadLegacyProjectFileProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface CancelUploadLegacyProjectFileProps {
+  projectId: string,
+  dataFileId: string,
 }
