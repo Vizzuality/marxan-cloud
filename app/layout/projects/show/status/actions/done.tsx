@@ -73,11 +73,38 @@ export const useProjectActionsDone = () => {
     });
   }, [pid, projectMutation, addToast, queryClient]);
 
+  const onLegacyImportDone = useCallback((JOB_REF) => {
+    projectMutation.mutate({
+      id: `${pid}`,
+      data: {
+        metadata: {
+          cache: new Date().getTime(),
+        },
+      },
+    }, {
+      onSuccess: () => {
+        JOB_REF.current = null;
+        queryClient.invalidateQueries('projects');
+        queryClient.invalidateQueries(['scenarios', pid]);
+      },
+      onError: () => {
+        addToast('onDone', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
+  }, [pid, projectMutation, addToast, queryClient]);
+
   return {
     default: onDone,
     planningUnits: onDone,
     export: onDone,
     import: onCloneImportDone,
     clone: onCloneImportDone,
+    legacy: onLegacyImportDone,
   };
 };

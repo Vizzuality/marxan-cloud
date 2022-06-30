@@ -3,7 +3,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setLegacyProjectId } from 'store/slices/projects/new';
+import { setLegacyProjectId, setImportSubmit } from 'store/slices/projects/new';
 
 import { useCancelImportLegacyProject, useImportLegacyProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -52,11 +52,13 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   const importLegacyMutation = useImportLegacyProject({});
 
   const onImportSubmit = useCallback((values) => {
+    dispatch(setImportSubmit(true));
     const solutionsAreLocked = !!values.solutionsAreLocked;
     const data = { solutionsAreLocked };
+    console.info(data);
     setLoading(true);
 
-    importLegacyMutation.mutate({ data, projectId: legacyProjectId }, {
+    importLegacyMutation.mutate({ projectId: legacyProjectId }, {
       onSuccess: () => {
         setLoading(false);
         addToast('success-import-legacy-project', (
@@ -69,10 +71,11 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
         });
         onDismiss();
         setStep(2);
-        console.info('Project uploaded');
+        console.info('Legacy project uploaded');
       },
       onError: ({ response }) => {
         const { errors } = response.data;
+        console.info(errors);
 
         setLoading(false);
 
@@ -80,9 +83,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
           <>
             <h2 className="font-medium">Error!</h2>
             <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
+              <p className="text-sm">Legacy project has not been imported</p>
             </ul>
           </>
         ), {
@@ -92,6 +93,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     });
   }, [
     addToast,
+    dispatch,
     importLegacyMutation,
     legacyProjectId,
     onDismiss,

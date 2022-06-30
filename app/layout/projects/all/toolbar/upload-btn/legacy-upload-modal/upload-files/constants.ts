@@ -1,32 +1,38 @@
 export const LEGACY_FIELDS = [
   {
-    label: 'Upload your planning unit shapefile',
+    label: 'planning unit shapefile',
     format: 'zip',
+    fileType: 'planning-grid-shapefile.zip',
     maxSize: 1073741824,
   },
   {
-    label: 'Upload your input database',
+    label: 'input database',
     format: 'dat',
+    fileType: 'input.dat',
     maxSize: 1073741824,
   },
   {
-    label: 'Upload cost surface data',
+    label: 'cost surface data',
     format: 'dat',
+    fileType: 'pu.dat',
     maxSize: 1073741824,
   },
   {
-    label: 'Upload your feature data',
+    label: 'eature data',
     format: 'dat',
+    fileType: 'spec.dat',
     maxSize: 1073741824,
   },
   {
     label: 'Puvs pr Dat',
     format: 'dat',
+    fileType: 'puvspr.dat',
     maxSize: 1073741824,
   },
   {
-    label: 'Upload your output databases (optional)',
+    label: 'output databases (optional)',
     format: 'zip',
+    fileType: 'output.zip',
     maxSize: 1073741824,
   },
 ];

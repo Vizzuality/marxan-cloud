@@ -22,6 +22,7 @@ export interface UploadItemProps {
     label: string;
     maxSize: number;
     format: string;
+    fileType: string;
   };
 }
 
@@ -44,6 +45,38 @@ export const UploadItem: React.FC<UploadItemProps> = ({
 
     setSuccessFile(fl);
     formRef.current.change('file', fl);
+    const data = new FormData();
+    data.append('fileType', f.fileType);
+    data.append('file', fl);
+    uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
+      onSuccess: () => {
+        addToast('success-upload-legacy-data-file', (
+          <>
+            <h2 className="font-medium">Success!</h2>
+            <p className="text-sm">Data file uploaded</p>
+          </>
+        ), {
+          level: 'success',
+        });
+        console.info('Data file uploaded');
+      },
+      onError: ({ response }) => {
+        const { errors } = response.data;
+
+        addToast('error-upload-legacy-data-file', (
+          <>
+            <h2 className="font-medium">Error!</h2>
+            <ul className="text-sm">
+              {errors.map((e) => (
+                <li key={`${e.status}`}>{e.title}</li>
+              ))}
+            </ul>
+          </>
+        ), {
+          level: 'error',
+        });
+      },
+    });
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -72,45 +105,11 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     });
   };
 
-  const onImportSubmit = useCallback((values) => {
-    const { file, name } = values;
-
-    const data = new FormData();
-    data.append('projectName', name);
-    data.append('file', file);
-    uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
-      onSuccess: () => {
-        addToast('success-upload-legacy-data-file', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Data file uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        console.info('Project uploaded');
-      },
-      onError: ({ response }) => {
-        const { errors } = response.data;
-
-        addToast('error-upload-legacy-data-file', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+  const onUploadSubmit = useCallback((values) => {
+    const { name } = values;
+    console.log(name);
   }, [
-    addToast,
-    uploadLegacyProjectFileMutation,
-    legacyProjectId,
+
   ]);
 
   const onUploadRemove = useCallback(() => {
@@ -133,7 +132,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
 
   return (
     <FormRFF
-      onSubmit={onImportSubmit}
+      onSubmit={onUploadSubmit}
       render={({ form, handleSubmit }) => {
         formRef.current = form;
 
@@ -144,7 +143,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                 {(props) => (
                   <div className="space-y-2.5">
                     <Label theme="light" className="uppercase" id="file">
-                      {f.label}
+                      {`Upload your ${f.label}`}
                     </Label>
 
                     <div
@@ -184,7 +183,11 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                 exit={{ opacity: 0 }}
               >
                 <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                  <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                  <h5 className="text-xs text-black uppercase">
+                    Uploaded
+                    {' '}
+                    {f.label}
+                  </h5>
                   <div className="flex items-center space-x-2">
                     <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
                       <p className="text-sm text-black">{successFile.path}</p>

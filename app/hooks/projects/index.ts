@@ -652,7 +652,7 @@ export function useUploadLegacyProjectFile({
 
   const uploadLegacyProjectFile = ({ data, projectId }: UploadLegacyProjectFileProps) => {
     return UPLOADS.request({
-      url: `import/legacy/${projectId}/data-file`,
+      url: `projects/import/legacy/${projectId}/data-file`,
       data,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
