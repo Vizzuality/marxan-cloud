@@ -69,7 +69,6 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
         ), {
           level: 'success',
         });
-        setStep(2);
         onDismiss();
         console.info('Legacy project uploaded');
       },
@@ -97,7 +96,6 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     importLegacyMutation,
     legacyProjectId,
     onDismiss,
-    setStep,
   ]);
 
   return (

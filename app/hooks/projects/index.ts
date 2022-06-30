@@ -678,6 +678,7 @@ export function useImportLegacyProject({
   },
 }: UseImportLegacyProjectProps) {
   const [session] = useSession();
+  const queryClient = useQueryClient();
 
   const importLegacyProject = ({ projectId }: ImportLegacyProjectProps) => {
     return PROJECTS.request({
@@ -693,6 +694,7 @@ export function useImportLegacyProject({
 
   return useMutation(importLegacyProject, {
     onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

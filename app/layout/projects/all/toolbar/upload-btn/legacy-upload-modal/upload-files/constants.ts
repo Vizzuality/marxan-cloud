@@ -18,7 +18,7 @@ export const LEGACY_FIELDS = [
     maxSize: 1073741824,
   },
   {
-    label: 'eature data',
+    label: 'feature data',
     format: 'dat',
     fileType: 'spec.dat',
     maxSize: 1073741824,

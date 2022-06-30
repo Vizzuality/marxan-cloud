@@ -53,12 +53,12 @@ export const UploadItem: React.FC<UploadItemProps> = ({
         addToast('success-upload-legacy-data-file', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Data file uploaded</p>
+            <p className="text-sm">{`${successFile.path} uploaded`}</p>
           </>
         ), {
           level: 'success',
         });
-        console.info('Data file uploaded');
+        console.info(`${successFile.path} uploaded`);
       },
       onError: ({ response }) => {
         const { errors } = response.data;
@@ -105,13 +105,6 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     });
   };
 
-  const onUploadSubmit = useCallback((values) => {
-    const { name } = values;
-    console.log(name);
-  }, [
-
-  ]);
-
   const onUploadRemove = useCallback(() => {
     setSuccessFile(null);
   }, []);
@@ -132,7 +125,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
 
   return (
     <FormRFF
-      onSubmit={onUploadSubmit}
+      onSubmit={() => { }}
       render={({ form, handleSubmit }) => {
         formRef.current = form;
 
