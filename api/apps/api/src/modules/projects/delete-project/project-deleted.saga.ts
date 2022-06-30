@@ -9,7 +9,7 @@ import { ScheduleCleanupForProjectUnusedResources } from './schedule-project-unu
 @Injectable()
 export class ProjectDeletedSaga {
   @Saga()
-  calculateBlmDefaults = (events$: Observable<any>): Observable<ICommand> =>
+  projectDeletedDefault = (events$: Observable<any>): Observable<ICommand> =>
     events$.pipe(
       ofType(ProjectDeleted),
       map(
