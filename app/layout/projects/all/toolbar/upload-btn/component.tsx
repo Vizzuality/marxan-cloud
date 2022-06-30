@@ -24,7 +24,6 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
 
   const dispatch = useDispatch();
   const { uploadMode, legacyProjectId, importSubmit } = useSelector((state) => state['/projects/new']);
-  console.log('---IMPORT SUBMIT FIRST', importSubmit);
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
   const onCancelImportLegacyProject = useCallback(() => {
@@ -39,12 +38,11 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
     });
   }, [dispatch, legacyProjectId, cancelLegacyProjectMutation]);
 
-  const onDismiss = useCallback(() => {
-    console.log('---IMPORT SUBMIT', importSubmit);
+  const onDismiss = () => {
     setModal(false);
     dispatch(setUploadMode('default'));
     if (legacyProjectId && !importSubmit) onCancelImportLegacyProject();
-  }, [dispatch, importSubmit, legacyProjectId, onCancelImportLegacyProject]);
+  };
 
   return (
     <>

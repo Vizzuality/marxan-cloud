@@ -31,8 +31,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   const [loading, setLoading] = useState(false);
 
   const { addToast } = useToasts();
-  const dispatch = useDispatch();
 
+  const dispatch = useDispatch();
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
 
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
@@ -69,8 +69,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
         ), {
           level: 'success',
         });
-        onDismiss();
         setStep(2);
+        onDismiss();
         console.info('Legacy project uploaded');
       },
       onError: ({ response }) => {
