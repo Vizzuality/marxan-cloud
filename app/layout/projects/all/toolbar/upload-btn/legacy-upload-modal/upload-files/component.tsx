@@ -191,7 +191,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                 <div className="space-y-5">
                   {LEGACY_FIELDS.map((f) => {
                     return (
-                      <UploadItem key={f.label} file={f} />
+                      <UploadItem key={f.label} f={f} />
                     );
                   })}
 

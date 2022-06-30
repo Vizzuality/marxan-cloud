@@ -9,7 +9,7 @@ import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { bytesToMegabytes } from 'utils/units';
 
-import { useImportLegacyProject } from 'hooks/projects';
+import { useUploadLegacyProjectFile } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
 import Label from 'components/forms/label';
@@ -18,7 +18,7 @@ import Icon from 'components/icon';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface UploadItemProps {
-  file: {
+  f: {
     label: string;
     maxSize: number;
     format: string;
@@ -26,7 +26,7 @@ export interface UploadItemProps {
 }
 
 export const UploadItem: React.FC<UploadItemProps> = ({
-  file,
+  f,
 }: UploadItemProps) => {
   const formRef = useRef(null);
 
@@ -36,20 +36,14 @@ export const UploadItem: React.FC<UploadItemProps> = ({
 
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
 
-  const importLegacyMutation = useImportLegacyProject({});
+  const uploadLegacyProjectFileMutation = useUploadLegacyProjectFile({});
 
   // ADD DATA FILE
   const onDropAccepted = async (acceptedFiles) => {
-    const f = acceptedFiles[0];
+    const fl = acceptedFiles[0];
 
-    setSuccessFile(f);
-    formRef.current.change('file', f);
-
-    // const { file, name } = values;
-
-    // const data = new FormData();
-    // data.append('projectName', name);
-    // data.append('file', file);
+    setSuccessFile(fl);
+    formRef.current.change('file', fl);
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -78,17 +72,18 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     });
   };
 
-  // SUBMIT FORM - IMPORT LEGACY
   const onImportSubmit = useCallback((values) => {
-    const solutionsAreLocked = !!values.solutionsAreLocked;
-    const data = { solutionsAreLocked };
+    const { file, name } = values;
 
-    importLegacyMutation.mutate({ data, projectId: legacyProjectId }, {
+    const data = new FormData();
+    data.append('projectName', name);
+    data.append('file', file);
+    uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
       onSuccess: () => {
-        addToast('success-upload-project', (
+        addToast('success-upload-legacy-data-file', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Project uploaded</p>
+            <p className="text-sm">Data file uploaded</p>
           </>
         ), {
           level: 'success',
@@ -98,7 +93,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
       onError: ({ response }) => {
         const { errors } = response.data;
 
-        addToast('error-upload-project', (
+        addToast('error-upload-legacy-data-file', (
           <>
             <h2 className="font-medium">Error!</h2>
             <ul className="text-sm">
@@ -114,7 +109,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     });
   }, [
     addToast,
-    importLegacyMutation,
+    uploadLegacyProjectFileMutation,
     legacyProjectId,
   ]);
 
@@ -149,7 +144,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                 {(props) => (
                   <div className="space-y-2.5">
                     <Label theme="light" className="uppercase" id="file">
-                      {file.label}
+                      {f.label}
                     </Label>
 
                     <div
@@ -166,7 +161,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                       <input {...getInputProps()} />
 
                       <p className="text-sm text-center text-gray-500">
-                        {`Drag and drop your project ${file.format}`}
+                        {`Drag and drop your project ${f.format}`}
                         <br />
                         or
                         {' '}
@@ -175,7 +170,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                         to upload
                       </p>
 
-                      <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(file.maxSize)} MB`}</p>
+                      <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(f.maxSize)} MB`}</p>
                     </div>
                   </div>
                 )}
