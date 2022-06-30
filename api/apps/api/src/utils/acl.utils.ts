@@ -30,6 +30,7 @@ import {
   updateFailure,
 } from '@marxan-api/modules/scenarios/blm-calibration/change-scenario-blm-range.command';
 import { blmCreationFailure } from '@marxan-api/modules/scenarios/blm-calibration/create-initial-scenario-blm.command';
+import { deleteScenarioFailed } from '@marxan-api/modules/scenarios/delete-scenario/delete-scenario.command';
 import {
   inputZipNotYetAvailable,
   metadataNotFound as inputMetadataNotFound,
@@ -124,6 +125,7 @@ export const mapAclDomainToHttpError = (
     | typeof exportIsNotStandalone
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished
+    | typeof deleteScenarioFailed
     | ImportProjectError,
   options?: ErrorHandlerOptions,
 ) => {
@@ -263,6 +265,10 @@ export const mapAclDomainToHttpError = (
     case lockedSolutions:
       return new BadRequestException(
         `Scenario ${options?.scenarioId} solutions are locked.`,
+      );
+    case deleteScenarioFailed:
+      return new BadRequestException(
+        `Scenario ${options?.scenarioId} and associated resources could not be deleted.`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

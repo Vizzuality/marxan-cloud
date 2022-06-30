@@ -112,6 +112,10 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { EntityManager } from 'typeorm';
 import { UserId } from '@marxan/domain-ids';
+import {
+  DeleteScenario as DeleteScenarioUnusedResources,
+  deleteScenarioFailed,
+} from './delete-scenario/delete-scenario.command';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -221,8 +225,9 @@ export class ScenariosService {
       | typeof forbiddenError
       | typeof lockedByAnotherUser
       | typeof noLockInPlace
-      | typeof scenarioNotFound,
-      void
+      | typeof scenarioNotFound
+      | typeof deleteScenarioFailed,
+      true
     >
   > {
     if (await this.givenScenarioDoesNotExist(scenarioId))
@@ -236,7 +241,9 @@ export class ScenariosService {
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
-    return right(await this.crudService.remove(scenarioId));
+    return this.commandBus.execute(
+      new DeleteScenarioUnusedResources(scenarioId),
+    );
   }
 
   async create(
