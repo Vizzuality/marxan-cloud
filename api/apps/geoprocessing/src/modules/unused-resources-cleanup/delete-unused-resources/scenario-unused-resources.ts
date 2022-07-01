@@ -3,17 +3,16 @@ import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
-import { DeleteUnusedResources } from '@marxan/unused-resources-cleanup';
+import { UnusedResources } from '@marxan/unused-resources-cleanup';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-// WHY THIS TYPE? why is this used as a type for DeletedUnusedResources?
-type DeleteScenarioUnusedResourcesData = { projectCustomFeaturesIds: string[] };
+type ScenarioUnusedResourcesData = Record<string, unknown>;
 
 @Injectable()
-export class DeleteScenarioUnusedResources
-  implements DeleteUnusedResources<DeleteScenarioUnusedResourcesData> {
+export class ScenarioUnusedResources
+  implements UnusedResources<ScenarioUnusedResourcesData> {
   constructor(
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,

@@ -1,4 +1,4 @@
-export { DeleteUnusedResources } from './delete-unused-resources.port';
+export { UnusedResources } from './delete-unused-resources.port';
 export { unusedResourcesCleanupQueueName } from './unused-resources-cleanup-queue-name';
 export {
   isUnusedScenarioResourcesCleanupJobInput,

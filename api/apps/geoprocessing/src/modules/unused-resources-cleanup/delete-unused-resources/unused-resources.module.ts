@@ -16,8 +16,8 @@ import {
 } from '@marxan/scenarios-planning-unit';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DeleteProjectUnusedResources } from './delete-project-unused-resources';
-import { DeleteScenarioUnusedResources } from './delete-scenario-unused-resources';
+import { ProjectUnusedResources } from './project-unused-resources';
+import { ScenarioUnusedResources } from './scenario-unused-resources';
 
 @Module({
   imports: [
@@ -39,7 +39,7 @@ import { DeleteScenarioUnusedResources } from './delete-scenario-unused-resource
       geoprocessingConnections.default,
     ),
   ],
-  providers: [DeleteProjectUnusedResources, DeleteScenarioUnusedResources],
-  exports: [DeleteProjectUnusedResources, DeleteScenarioUnusedResources],
+  providers: [ProjectUnusedResources, ScenarioUnusedResources],
+  exports: [ProjectUnusedResources, ScenarioUnusedResources],
 })
-export class DeleteUnusedResourcesModule {}
+export class UnusedResourcesModule {}
