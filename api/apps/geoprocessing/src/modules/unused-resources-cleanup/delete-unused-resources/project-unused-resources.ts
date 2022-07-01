@@ -4,16 +4,16 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { ProtectedArea } from '@marxan/protected-areas';
-import { DeleteUnusedResources } from '@marxan/unused-resources-cleanup';
+import { UnusedResources } from '@marxan/unused-resources-cleanup';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
 
-type DeleteProjectUnusedResourcesData = { projectCustomFeaturesIds: string[] };
+type ProjectUnusedResourcesData = { projectCustomFeaturesIds: string[] };
 
 @Injectable()
-export class DeleteProjectUnusedResources
-  implements DeleteUnusedResources<DeleteProjectUnusedResourcesData> {
+export class ProjectUnusedResources
+  implements UnusedResources<ProjectUnusedResourcesData> {
   constructor(
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
@@ -28,7 +28,7 @@ export class DeleteProjectUnusedResources
   ) {}
   async removeUnusedResources(
     projectId: string,
-    data: DeleteProjectUnusedResourcesData,
+    data: ProjectUnusedResourcesData,
   ): Promise<void> {
     await this.apiEntityManager
       .createQueryBuilder()

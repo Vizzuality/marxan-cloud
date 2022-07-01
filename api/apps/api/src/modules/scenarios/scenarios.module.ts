@@ -51,6 +51,7 @@ import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios
 import { LockService } from '../access-control/scenarios-acl/locks/lock.service';
 import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 import { WebshotModule } from '@marxan/webshot';
+import { DeleteScenarioModule } from './delete-scenario/delete-scenario.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { WebshotModule } from '@marxan/webshot';
     BlmCalibrationModule,
     AccessControlModule,
     forwardRef(() => WebshotModule),
+    DeleteScenarioModule,
   ],
   providers: [
     ScenariosService,
