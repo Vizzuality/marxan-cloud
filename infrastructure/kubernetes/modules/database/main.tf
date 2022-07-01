@@ -20,7 +20,7 @@ resource "helm_release" "postgres" {
   name       = "${var.name}-postgres"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "postgresql"
-  version    = "9.4.1"
+  version    = "11.6.12"
 
   namespace = var.namespace
 
@@ -29,18 +29,23 @@ resource "helm_release" "postgres" {
   ]
 
   set {
-    name  = "postgresqlUsername"
+    name  = "auth.username"
     value = sensitive(local.postgres_secret_json.username)
   }
 
   set {
-    name  = "postgresqlPostgresPassword"
+    name  = "auth.password"
     value = sensitive(local.postgres_secret_json.password)
   }
 
   set {
-    name  = "existingSecret"
+    name  = "auth.existingSecret"
     value = "${var.name}-postgres-secret"
+  }
+
+  set {
+    name  = "auth.secretKeys.adminPasswordKey"
+    value = "postgresql-password"
   }
 
   set {
