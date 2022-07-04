@@ -311,7 +311,7 @@ const getFixtures = async () => {
 
       const getSpecifications = (
         featureId: string,
-        featuresNamerCalculated: FeatureNumberCalculated[],
+        featuresNumberCalculated: FeatureNumberCalculated[],
         active = false,
         candidate = false,
       ): ScenarioFeaturesSpecificationContent => ({
@@ -335,7 +335,7 @@ const getFixtures = async () => {
             baseFeature: featureId,
             againstFeature: null,
             featuresDetermined: false,
-            features: featuresNamerCalculated,
+            features: featuresNumberCalculated,
             selectSubSets: null,
             splitByProperty: null,
             operation: 'copy' as FeaturesConfig['operation'],
@@ -343,7 +343,7 @@ const getFixtures = async () => {
           {
             againstFeature: featureId,
             baseFeature: featureId,
-            features: featuresNamerCalculated,
+            features: featuresNumberCalculated,
             featuresDetermined: true,
             operation: 'stratification' as FeaturesConfig['operation'],
             splitByProperty: 'property',

@@ -11,7 +11,8 @@ export type OutputFeatureDataElement = {
 };
 
 export type FeatureDataElement = {
-  featureClassName: string;
+  apiFeature: { isCustom: boolean; featureClassName: string };
+  featureDataFeature: { isCustom: boolean; featureClassName: string };
   featureDataHash: string;
   totalArea: number;
   currentArea: number;
@@ -28,6 +29,5 @@ export type FeatureDataElement = {
 };
 
 export type ScenarioFeaturesDataContent = {
-  customFeaturesData: FeatureDataElement[];
-  platformFeaturesData: FeatureDataElement[];
+  featuresData: FeatureDataElement[];
 };

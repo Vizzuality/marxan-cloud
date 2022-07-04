@@ -31,6 +31,7 @@ export class MoveDataFromPreparationHandler
         `
           insert into scenario_features_data as sfd (id,
                                                      feature_class_id,
+                                                     api_feature_id,
                                                      scenario_id,
                                                      total_area,
                                                      current_pa,
@@ -45,6 +46,7 @@ export class MoveDataFromPreparationHandler
                                                      specification_id)
           select id,
                  feature_class_id,
+                 api_feature_id,
                  scenario_id,
                  total_area,
                  current_pa,

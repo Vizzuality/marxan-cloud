@@ -51,6 +51,7 @@ export class CopyQuery {
     const query = `
       with inserted_sfp as (
         insert into scenario_features_preparation as sfp (feature_class_id,
+                                                          api_feature_id,
                                                           scenario_id,
                                                           specification_id,
                                                           fpf,
@@ -60,6 +61,7 @@ export class CopyQuery {
                                                           current_pa,
                                                           hash)
           select fd.id,
+                 fd.feature_id,
                  ${fields.scenarioId},
                  ${fields.specificationId},
                  ${fields.fpf},

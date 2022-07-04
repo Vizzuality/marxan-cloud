@@ -13,7 +13,6 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../api-events/api-events.module';
-import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { CreateFeaturesSaga } from './create-features.saga';
 import { CreateFeaturesHandler } from './create-features.handler';
 import { CopyDataProvider, CopyOperation, CopyQuery } from './copy';
@@ -39,7 +38,6 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
         ScenarioFeaturesData,
         ScenarioFeaturesGapData,
         ScenarioFeaturesOutputGapData,
-        RemoteFeaturesData,
       ],
       DbConnections.geoprocessingDB,
     ),
