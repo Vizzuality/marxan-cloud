@@ -113,7 +113,7 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { EntityManager } from 'typeorm';
 import { UserId } from '@marxan/domain-ids';
 import {
-  DeleteScenario as ScenarioUnusedResources,
+  DeleteScenario as DeleteScenarioUnusedResources,
   deleteScenarioFailed,
 } from './delete-scenario/delete-scenario.command';
 
@@ -243,7 +243,7 @@ export class ScenariosService {
     }
 
     return await this.commandBus.execute(
-      new ScenarioUnusedResources(scenarioId),
+      new DeleteScenarioUnusedResources(scenarioId),
     );
   }
 
