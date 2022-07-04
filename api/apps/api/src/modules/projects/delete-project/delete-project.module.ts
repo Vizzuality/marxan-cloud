@@ -7,7 +7,7 @@ import { Project } from '../project.api.entity';
 import { DeleteProjectHandler } from './delete-project.handler';
 import { ProjectDeletedSaga } from './project-deleted.saga';
 import { ScheduleCleanupForProjectUnusedResourcesHandler } from './schedule-project-unused-resources-cleanup.handler';
-import { unusedResourcesCleanupQueueProvider } from '../../../../../../libs/unused-resources-cleanup/src/unused-resources-cleanup-queue.provider';
+import { unusedResourcesCleanupQueueProvider } from '@marxan/unused-resources-cleanup/unused-resources-cleanup-queue.provider';
 
 @Module({
   imports: [

@@ -3,7 +3,7 @@ import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { ScheduleCleanupForProjectUnusedResources } from './schedule-project-unused-resources-cleanup.command';
-import { unusedResourcesCleanupQueueToken } from '../../../../../../libs/unused-resources-cleanup/src/unused-resources-cleanup-queue.provider';
+import { unusedResourcesCleanupQueueToken } from '@marxan/unused-resources-cleanup/unused-resources-cleanup-queue.provider';
 
 @CommandHandler(ScheduleCleanupForProjectUnusedResources)
 export class ScheduleCleanupForProjectUnusedResourcesHandler

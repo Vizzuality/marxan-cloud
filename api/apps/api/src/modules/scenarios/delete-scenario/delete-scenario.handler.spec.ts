@@ -38,7 +38,7 @@ it('fails to delete a scenario ', async () => {
 
   const result = await fixtures.WhenAScenarioIsDeleted(scenarioId);
 
-  fixtures.ThenDeleteScenarioFailedIsReturned(result);
+  fixtures.WhenAScenarioDeletionIsRequestedAndFails(result);
   await fixtures.ThenScenarioIsNotDeleted(scenarioId);
   fixtures.ThenNoEventIsEmitted(scenarioId);
 });
@@ -92,7 +92,7 @@ const getFixtures = async () => {
 
       expect(result.right).toEqual(true);
     },
-    ThenDeleteScenarioFailedIsReturned: (result: DeleteScenarioResponse) => {
+    WhenAScenarioDeletionIsRequestedAndFails: (result: DeleteScenarioResponse) => {
       if (isRight(result)) throw new Error('got right expected left');
 
       expect(result.left).toEqual(deleteScenarioFailed);
