@@ -3,7 +3,7 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsEnum, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { LegacyProjectImportComponentReport } from '../../legacy-project-import/application/get-legacy-project-import-errors.query';
 import { LegacyProjectImportComponentStatuses } from '../../legacy-project-import/domain/legacy-project-import/legacy-project-import-component-status';
 
@@ -16,11 +16,11 @@ export class StartLegacyProjectImportBodyDto {
   projectName!: string;
 
   @ApiProperty({
-    description:
-      'Flag to let the user lock solutions while legacy import is processed',
+    description: 'description of the project',
+    example: 'legacy project import description',
   })
-  @IsBoolean()
-  solutionsAreLocked!: boolean;
+  @IsString()
+  description!: string;
 }
 
 export class StartLegacyProjectImportResponseDto {
@@ -66,6 +66,17 @@ export class AddFileToLegacyProjectImportResponseDto {
     example: '6fbec34e-04a7-4131-be14-c245f2435a6c',
   })
   fileId!: string;
+}
+
+export class RunLegacyProjectImportBodyDto {
+  @ApiProperty({
+    description:
+      'This flag is used for locking solution when importing a legacy project import',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  solutionsAreLocked: boolean = false;
 }
 
 export class RunLegacyProjectImportResponseDto {

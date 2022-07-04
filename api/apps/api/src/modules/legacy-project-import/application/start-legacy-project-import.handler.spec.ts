@@ -1,5 +1,8 @@
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
-import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import {
+  Project,
+  ProjectSourcesEnum,
+} from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ResourceId } from '@marxan/cloning/domain';
 
@@ -9,6 +12,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { isLeft, isRight, Right } from 'fp-ts/Either';
+import { DeepPartial } from 'typeorm';
 
 import { v4 } from 'uuid';
 import { LegacyProjectImportStatuses } from '../domain/legacy-project-import/legacy-project-import-status';
@@ -89,11 +93,20 @@ const getFixtures = async () => {
   const randomOrganizationId = v4();
   const projectShellId = v4();
   const scenarioShellId = v4();
+  let saveProjectData: DeepPartial<Project>;
 
   const sut = sandbox.get(StartLegacyProjectImportHandler);
   const repo: LegacyProjectImportMemoryRepository = sandbox.get(
     LegacyProjectImportRepository,
   );
+
+  const expectedSaveProjectData: DeepPartial<Project> = {
+    name: 'random project name',
+    description: 'random description',
+    organizationId: randomOrganizationId,
+    sources: ProjectSourcesEnum.legacyImport,
+    createdBy: ownerId.value,
+  };
 
   return {
     GivenProjectAndScenarioShells: () => {
@@ -102,7 +115,10 @@ const getFixtures = async () => {
           id: randomOrganizationId,
         },
       ]);
-      saveProjectMock.mockResolvedValue({ id: projectShellId });
+      saveProjectMock.mockImplementation((data: DeepPartial<Project>) => {
+        saveProjectData = data;
+        return { id: projectShellId };
+      });
       saveScenarioMock.mockResolvedValue({ id: scenarioShellId });
     },
     GivenNoProjectShell: () => {
@@ -119,7 +135,11 @@ const getFixtures = async () => {
     },
     WhenStartingLegacyProjectImport: () => {
       return sut.execute(
-        new StartLegacyProjectImport('random project name', ownerId, false),
+        new StartLegacyProjectImport(
+          'random project name',
+          ownerId,
+          'random description',
+        ),
       );
     },
     ThenAStartingLegacyProjectIsNotCreated: async (
@@ -156,6 +176,8 @@ const getFixtures = async () => {
       const { projectId, scenarioId } = result.right;
       expect(projectId.value).toEqual(projectShellId);
       expect(scenarioId.value).toEqual(scenarioShellId);
+
+      expect(saveProjectData).toEqual(expectedSaveProjectData);
 
       const savedLegacyProjectImport = await repo.find(
         new ResourceId(projectShellId),

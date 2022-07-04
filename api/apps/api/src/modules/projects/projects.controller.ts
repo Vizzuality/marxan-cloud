@@ -125,6 +125,7 @@ import {
 import {
   DeleteFileFromLegacyProjectImportResponseDto,
   GetLegacyProjectImportErrorsResponseDto,
+  RunLegacyProjectImportBodyDto,
   RunLegacyProjectImportResponseDto,
   StartLegacyProjectImportBodyDto,
   StartLegacyProjectImportResponseDto,
@@ -143,6 +144,7 @@ import {
   AddFileToLegacyProjectImportResponseDto,
 } from './dto/legacy-project-import.dto';
 import { deleteProjectFailed } from './delete-project/delete-project.command';
+import { updateSolutionsAreLockFailed } from '../legacy-project-import/application/update-solutions-are-locked-to-legacy-project-import.command';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -210,7 +212,7 @@ export class ProjectsController {
     const result = await this.projectsService.startLegacyProjectImport(
       dto.projectName,
       req.user.id,
-      dto.solutionsAreLocked,
+      dto.description,
     );
 
     if (isLeft(result)) {
@@ -272,10 +274,12 @@ export class ProjectsController {
   @Post('import/legacy/:projectId')
   async runLegacyProject(
     @Param('projectId') projectId: string,
+    @Body() dto: RunLegacyProjectImportBodyDto,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<RunLegacyProjectImportResponseDto> {
     const result = await this.projectsService.runLegacyProject(
       projectId,
+      dto.solutionsAreLocked,
       req.user.id,
     );
 
@@ -294,6 +298,7 @@ export class ProjectsController {
             'a run has already being made on this legacy project import',
           );
         case legacyProjectImportSaveError:
+        case updateSolutionsAreLockFailed:
         default:
           throw new InternalServerErrorException();
       }

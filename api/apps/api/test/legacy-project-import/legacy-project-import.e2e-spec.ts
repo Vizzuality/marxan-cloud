@@ -1,5 +1,6 @@
 import { LegacyProjectImportComponentId } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-component.id';
 import { LegacyProjectImportStatuses } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import-status';
+import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ResourceId } from '@marxan/cloning/domain';
 import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -53,10 +54,14 @@ afterEach(async () => {
 
 it('starts a legacy project import', async () => {
   const projectName = 'Legacy project name';
+  const projectDescription = 'Legacy project import desc';
 
-  await fixtures.WhenInvokingStartEndpoint(projectName);
+  await fixtures.WhenInvokingStartEndpoint(projectName, projectDescription);
 
-  await fixtures.ThenALegacyProjectImportIsCreated(projectName);
+  await fixtures.ThenALegacyProjectImportIsCreated(
+    projectName,
+    projectDescription,
+  );
 });
 
 it('accepts files for a legacy project import', async () => {
@@ -76,6 +81,16 @@ it('runs a legacy project import once required files are uploaded', async () => 
   await fixtures.WhenRunningALegacyProjectImport();
 
   await fixtures.ThenLegacyProjectImportRunStarted();
+});
+
+it('runs a legacy project import once required files are uploaded and locks solutions', async () => {
+  const opts = { solutionsAreLocked: true };
+  await fixtures.GivenLegacyProjectImportWasStarted();
+  await fixtures.GivenAllRequiredFilesWereUploaded();
+
+  await fixtures.WhenRunningALegacyProjectImport(opts);
+
+  await fixtures.ThenLegacyProjectImportRunStarted(opts);
 });
 
 it('deletes files from a legacy project import', async () => {
@@ -113,6 +128,9 @@ const getFixtures = async () => {
   const projectRepo = app.get<Repository<Project>>(
     getRepositoryToken(Project, apiConnections.default.name),
   );
+  const scenarioRepo = app.get<Repository<Scenario>>(
+    getRepositoryToken(Scenario, apiConnections.default.name),
+  );
 
   const eventBus = app.get(EventBus);
   const commandBus = app.get(CommandBus);
@@ -128,19 +146,25 @@ const getFixtures = async () => {
 
   const startLegacyProjectImport = (
     name: string = 'Legacy project',
-    solutionsAreLocked: boolean = false,
+    description: string = 'random desc',
   ) =>
     request(app.getHttpServer())
       .post(`/api/v1/projects/import/legacy`)
       .set('Authorization', `Bearer ${token}`)
-      .send({ projectName: name, solutionsAreLocked })
+      .send({ projectName: name, description })
       .expect(201);
 
-  const runLegacyProjectImport = (projectId: string) =>
-    request(app.getHttpServer())
+  const runLegacyProjectImport = (
+    projectId: string,
+    opts: { solutionsAreLocked: boolean } = { solutionsAreLocked: false },
+  ) => {
+    const send = opts.solutionsAreLocked ? { solutionsAreLocked: true } : {};
+    return request(app.getHttpServer())
       .post(`/api/v1/projects/import/legacy/${projectId}`)
       .set('Authorization', `Bearer ${token}`)
+      .send(send)
       .expect(201);
+  };
 
   const getLegacyProjectImport = async (projectId: string) => {
     const result = await repo.find(new ResourceId(projectId));
@@ -234,8 +258,8 @@ const getFixtures = async () => {
         LegacyProjectImportBatchFailed,
       );
     },
-    WhenInvokingStartEndpoint: async (name: string) => {
-      const result = await startLegacyProjectImport(name, false);
+    WhenInvokingStartEndpoint: async (name: string, description: string) => {
+      const result = await startLegacyProjectImport(name, description);
 
       expect(result.body.projectId).toBeDefined();
 
@@ -271,8 +295,10 @@ const getFixtures = async () => {
       expect(result.body.projectId).toBeDefined();
       expect(result.body.fileId).toBeDefined();
     },
-    WhenRunningALegacyProjectImport: async () => {
-      const result = await runLegacyProjectImport(projectId);
+    WhenRunningALegacyProjectImport: async (
+      opts: { solutionsAreLocked: boolean } = { solutionsAreLocked: false },
+    ) => {
+      const result = await runLegacyProjectImport(projectId, opts);
       expect(result.body.projectId).toBeDefined();
     },
     WhenGettingErrorsAndWarningsOfALegacyProjectImport: async (): Promise<GetLegacyProjectImportErrorsResponseDto> => {
@@ -283,17 +309,24 @@ const getFixtures = async () => {
 
       return result.body;
     },
-    ThenALegacyProjectImportIsCreated: async (projectName: string) => {
+    ThenALegacyProjectImportIsCreated: async (
+      projectName: string,
+      projectDescription: string,
+    ) => {
       const legacyProjectImport = await getLegacyProjectImport(projectId);
 
-      const { status } = legacyProjectImport.toSnapshot();
+      const { status, scenarioId } = legacyProjectImport.toSnapshot();
 
       expect(status).toBe(LegacyProjectImportStatuses.AcceptingFiles);
 
       const project = await projectRepo.findOne(projectId);
-
       expect(project).toBeDefined();
       expect(project!.name).toEqual(projectName);
+      expect(project!.description).toEqual(projectDescription);
+
+      const scenario = await scenarioRepo.findOne(scenarioId);
+      expect(scenario).toBeDefined();
+      expect(scenario!.solutionsAreLocked).toEqual(false);
     },
     ThenLegacyProjectImportContainsUploadedFile: async (
       fileType: LegacyProjectImportFileType,
@@ -306,10 +339,16 @@ const getFixtures = async () => {
       const [file] = files;
       expect(file.type).toEqual(fileType);
     },
-    ThenLegacyProjectImportRunStarted: async () => {
+    ThenLegacyProjectImportRunStarted: async (
+      opts: { solutionsAreLocked: boolean } = { solutionsAreLocked: false },
+    ) => {
       const legacyProjectImport = await getLegacyProjectImport(projectId);
 
-      const { pieces, status } = legacyProjectImport.toSnapshot();
+      const { pieces, status, scenarioId } = legacyProjectImport.toSnapshot();
+
+      const scenario = await scenarioRepo.findOne(scenarioId);
+      expect(scenario).toBeDefined();
+      expect(scenario!.solutionsAreLocked).toEqual(opts.solutionsAreLocked);
 
       expect(status).toBe(LegacyProjectImportStatuses.Running);
 

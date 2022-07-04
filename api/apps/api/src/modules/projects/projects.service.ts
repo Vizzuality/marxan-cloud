@@ -70,7 +70,10 @@ import {
   StartLegacyProjectImportError,
   StartLegacyProjectImportResult,
 } from '../legacy-project-import/application/start-legacy-project-import.command';
-import { RunLegacyProjectImport } from '../legacy-project-import/application/run-legacy-project-import.command';
+import {
+  RunLegacyProjectImport,
+  RunLegacyProjectImportError,
+} from '../legacy-project-import/application/run-legacy-project-import.command';
 import { LegacyProjectImportFileType } from '@marxan/legacy-project-import';
 import {
   AddFileToLegacyProjectImport,
@@ -87,6 +90,10 @@ import {
   DeleteProject,
   DeleteProjectFailed,
 } from './delete-project/delete-project.command';
+import {
+  UpdateSolutionsAreLocked,
+  UpdateSolutionsAreLockedError,
+} from '../legacy-project-import/application/update-solutions-are-locked-to-legacy-project-import.command';
 
 export { validationFailed } from '../planning-areas';
 
@@ -464,7 +471,7 @@ export class ProjectsService {
   async startLegacyProjectImport(
     projectName: string,
     userId: string,
-    solutionsAreLocked: boolean,
+    description: string,
   ): Promise<
     Either<
       typeof forbiddenError | StartLegacyProjectImportError,
@@ -483,7 +490,7 @@ export class ProjectsService {
       new StartLegacyProjectImport(
         projectName,
         new UserId(userId),
-        solutionsAreLocked,
+        description,
       ),
     );
   }
@@ -536,7 +543,21 @@ export class ProjectsService {
     );
   }
 
-  async runLegacyProject(projectId: string, userId: string) {
+  async runLegacyProject(
+    projectId: string,
+    solutionsAreLocked: boolean,
+    userId: string,
+  ): Promise<
+    Either<UpdateSolutionsAreLockedError | RunLegacyProjectImportError, true>
+  > {
+    const updateSolutionsAreLocked = await this.commandBus.execute(
+      new UpdateSolutionsAreLocked(
+        new ResourceId(projectId),
+        solutionsAreLocked,
+      ),
+    );
+    if (isLeft(updateSolutionsAreLocked)) return updateSolutionsAreLocked;
+
     return this.commandBus.execute(
       new RunLegacyProjectImport(new ResourceId(projectId), new UserId(userId)),
     );
