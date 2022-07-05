@@ -284,6 +284,7 @@ export class FeaturesLegacyProjectPieceImporter
             tag: FeatureTag.Species,
             creation_status: JobStatus.created,
             created_by: input.ownerId,
+            is_legacy: true,
           };
         });
 

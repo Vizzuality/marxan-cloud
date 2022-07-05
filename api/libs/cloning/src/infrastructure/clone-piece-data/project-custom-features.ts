@@ -29,6 +29,7 @@ export type ProjectCustomFeature = {
   tag: FeatureTag;
   creation_status: JobStatus;
   list_property_keys: string[];
+  is_legacy: boolean;
   data: FeatureData[];
 };
 
