@@ -715,10 +715,12 @@ export function useLegacyProjectValidationResults({ projectId }) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
+    transformResponse: (response) => JSON.parse(response),
   }).then((response) => {
     return response.data;
   }), {
     enabled: !!projectId,
+    refetchInterval: 2500,
   });
 
   const { data } = query;
@@ -726,9 +728,9 @@ export function useLegacyProjectValidationResults({ projectId }) {
   return useMemo(() => {
     return {
       ...query,
-      data: data?.data,
+      data: data?.errorsAndWarnings,
     };
-  }, [query, data?.data]);
+  }, [query, data?.errorsAndWarnings]);
 }
 
 export function useImportLegacyProject({

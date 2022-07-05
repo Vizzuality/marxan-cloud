@@ -1,4 +1,6 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 
 import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,6 +31,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 }: UploadFilesProps) => {
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [importLegacyErrors, setImportLegacyErrors] = useState(null);
 
   const { addToast } = useToasts();
 
@@ -40,7 +43,19 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     projectId: legacyProjectId,
   });
 
-  console.info('validationResults--->', validationResults);
+  const importLegacyMutation = useImportLegacyProject({});
+
+  useEffect(() => {
+    if (validationResults && validationResults.length) {
+      const errors = validationResults.filter((vr) => vr.status === 'failed').map((vr) => vr.errors);
+      setImportLegacyErrors(errors);
+      const $scrollToElement = document.getElementById('upload-modal');
+      window.scrollTo({
+        top: $scrollToElement.offsetTop,
+        behavior: 'smooth',
+      });
+    } return null;
+  }, [validationResults]);
 
   const onCancelImportLegacyProject = useCallback(() => {
     cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
@@ -53,8 +68,6 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
       },
     });
   }, [cancelLegacyProjectMutation, dispatch, legacyProjectId]);
-
-  const importLegacyMutation = useImportLegacyProject({});
 
   const onImportSubmit = useCallback((values) => {
     dispatch(setImportSubmit(true));
@@ -74,7 +87,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
         ), {
           level: 'success',
         });
-        onDismiss();
+        if (!importLegacyErrors && importLegacyErrors.length === 0) onDismiss();
+
         console.info('Legacy project uploaded');
       },
       onError: ({ response }) => {
@@ -99,6 +113,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     addToast,
     dispatch,
     importLegacyMutation,
+    importLegacyErrors,
     legacyProjectId,
     onDismiss,
   ]);
@@ -113,7 +128,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
           return (
             <form onSubmit={handleSubmit}>
-              <div className="p-9">
+              <div className="p-9" id="upload-modal">
 
                 <div className="flex space-x-2">
                   <h4 className="mb-5 text-lg text-black font-heading">Upload legacy project</h4>
@@ -192,7 +207,11 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                     </div>
                   </InfoButton>
                 </div>
-
+                {importLegacyErrors && !!importLegacyErrors.length && (
+                  <div>
+                    {importLegacyErrors.map((e) => <p key={e} className="text-xs text-red-500">{e}</p>)}
+                  </div>
+                )}
                 <div className="space-y-5">
                   {LEGACY_FIELDS.map((f) => {
                     return (
