@@ -14,6 +14,7 @@ interface ScenarioEditStateProps {
   // FEATURES
   features: Record<string, any>;
   featureHoverId: string;
+  highlightSelectedFeatures: string[];
   preHighlightFeatures: string[];
   postHighlightFeatures: string[];
 
@@ -59,6 +60,7 @@ const initialState = {
   // FEATURES
   features: [],
   featureHoverId: null,
+  highlightSelectedFeatures: [],
   preHighlightFeatures: [],
   postHighlightFeatures: [],
 
@@ -116,6 +118,9 @@ export function getScenarioEditSlice(id) {
       },
       setFeatureHoverId: (state, action: PayloadAction<string>) => {
         state.featureHoverId = action.payload;
+      },
+      setHighlightSelectedFeatures: (state, action: PayloadAction<string[]>) => {
+        state.highlightSelectedFeatures = action.payload;
       },
       setPreHighlightFeatures: (state, action: PayloadAction<string[]>) => {
         state.preHighlightFeatures = action.payload;

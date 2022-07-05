@@ -45,15 +45,13 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
   const importLegacyMutation = useImportLegacyProject({});
 
+  const ref = useRef(null);
+
   useEffect(() => {
     if (validationResults && validationResults.length) {
       const errors = validationResults.filter((vr) => vr.status === 'failed').map((vr) => vr.errors);
       setImportLegacyErrors(errors);
-      const $scrollToElement = document.getElementById('upload-modal');
-      window.scrollTo({
-        top: $scrollToElement.offsetTop,
-        behavior: 'smooth',
-      });
+      ref?.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     } return null;
   }, [validationResults]);
 
@@ -119,7 +117,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   ]);
 
   return (
-    <div className="mt-3 mb-5">
+    <div className="mt-3 mb-5" ref={ref}>
 
       <FormRFF
         onSubmit={onImportSubmit}
@@ -128,7 +126,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
           return (
             <form onSubmit={handleSubmit}>
-              <div className="p-9" id="upload-modal">
+              <div className="p-9">
 
                 <div className="flex space-x-2">
                   <h4 className="mb-5 text-lg text-black font-heading">Upload legacy project</h4>
