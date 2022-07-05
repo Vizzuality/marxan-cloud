@@ -39,13 +39,7 @@ describe(ComputeArea, () => {
 const getFixtures = async () => {
   const computeMarxanAmountPerPlanningUnitMock = jest.fn();
   const sandbox = await Test.createTestingModule({
-    imports: [
-      TypeOrmModule.forRoot({
-        ...apiConnections.default,
-        keepConnectionAlive: true,
-      }),
-      TypeOrmModule.forFeature([]),
-    ],
+    imports: [],
     providers: [
       {
         provide: LegacyProjectImportRepository,
