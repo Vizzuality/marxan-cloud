@@ -24,3 +24,10 @@ node_modules/
 /**/.terraform/
 /**/terraform.tfstate
 /**/terraform.tfstate.backup
+
+infrastructure/kubernetes/vars/*.tfvars
+infrastructure/base/vars/*.tfvars
+infrastructure/remote-state/vars/*.tfvars
+!infrastructure/kubernetes/vars/terraform.tfvars
+!infrastructure/base/vars/terraform.tfvars
+!infrastructure/remote-state/vars/terraform.tfvars
