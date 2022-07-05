@@ -18,9 +18,9 @@ variable "location" {
   description = "Azure Location in which the resources will be created"
 }
 
-variable "bastion_ssh_public_key" {
-  type        = string
-  description = "Public SSH key to add to the bastion host"
+variable "bastion_ssh_public_keys" {
+  type        = list(any)
+  description = "Public SSH keys to add to the bastion host"
 }
 
 variable "domain" {
@@ -50,19 +50,19 @@ variable "github_production_branch" {
 
 variable "vpn_cidrs" {
   type        = list(string)
-  description = "Comma separated list of CIDRs for the TNC VPN"
+  description = "Comma separated list of VPN CIDRs"
 }
 
 variable "sparkpost_dns_cname_name" {
   type        = string
   description = "The name of the DNS CNAME record for Sparkpost"
-  default = "mail"
+  default     = "mail"
 }
 
 variable "sparkpost_dns_cname_value" {
   type        = string
   description = "value of the DNS CNAME record for Sparkpost"
-  default = "sparkpostmail.com"
+  default     = "sparkpostmail.com"
 }
 
 variable "sparkpost_dns_dkim_name" {
@@ -78,4 +78,9 @@ variable "sparkpost_dns_dkim_value" {
 variable "project_tags" {
   description = "Project resource tags"
   type        = map(string)
+}
+
+variable "redis_instance_name" {
+  description = " Globally unique Redis instance name"
+  type        = string
 }
