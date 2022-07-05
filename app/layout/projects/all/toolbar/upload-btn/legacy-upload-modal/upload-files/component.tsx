@@ -50,6 +50,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   useEffect(() => {
     if (validationResults && validationResults.length) {
       const errors = validationResults.filter((vr) => vr.status === 'failed').map((vr) => vr.errors);
+      setLoading(false);
       setImportLegacyErrors(errors);
       ref?.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
     } return null;
@@ -76,11 +77,10 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
     importLegacyMutation.mutate({ projectId: legacyProjectId }, {
       onSuccess: () => {
-        setLoading(false);
         addToast('success-import-legacy-project', (
           <>
             <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Legacy project has been imported</p>
+            <p className="text-sm">Legacy project import has started</p>
           </>
         ), {
           level: 'success',
