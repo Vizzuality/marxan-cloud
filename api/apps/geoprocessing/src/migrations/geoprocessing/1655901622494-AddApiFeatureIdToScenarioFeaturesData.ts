@@ -10,12 +10,11 @@ export class AddApiFeatureIdToScenarioFeaturesData1653916456540
 
     await queryRunner.query(`
       update scenario_features_data 
-      set api_feature_id = (
-        select fd.feature_id 
+      set api_feature_id = fd.feature_id 
         from scenario_features_data sfd 
         inner join features_data fd on fd.id = sfd.feature_class_id 
-        );
-      `);
+        where sfd.id = scenario_features_data.id;
+    `);
 
     await queryRunner.query(
       `
