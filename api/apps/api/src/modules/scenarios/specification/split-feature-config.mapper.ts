@@ -9,7 +9,7 @@ export class SplitFeatureConfigMapper {
   ): SingleSplitConfigFeatureValue[] {
     const subsets = input.selectSubSets;
     return subsets
-      ? subsets.map<SingleSplitConfigFeatureValue>((subset) => ({
+      ? subsets.map((subset) => ({
           baseFeatureId: input.baseFeatureId,
           operation: input.operation,
           splitByProperty: input.splitByProperty,

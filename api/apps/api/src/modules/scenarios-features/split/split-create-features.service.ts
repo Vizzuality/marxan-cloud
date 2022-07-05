@@ -3,16 +3,16 @@ import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SplitFeatureConfigMapper } from '@marxan-api/modules/scenarios/specification/split-feature-config.mapper';
 import { FeatureConfigSplit } from '@marxan-api/modules/specification';
 import { FeatureTag } from '@marxan/features';
-import {
-  SingleConfigFeatureValueHasher,
-  SingleSplitConfigFeatureValue,
-  SingleSplitConfigFeatureValueStripped,
-} from '@marxan/features-hash';
 import { isDefined } from '@marxan/utils';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
+import { SingleConfigFeatureValueHasher } from '@marxan-api/modules/features-hash/single-config-feature-value.hasher';
+import {
+  SingleSplitConfigFeatureValue,
+  SingleSplitConfigFeatureValueStripped,
+} from '@marxan/features-hash';
 
 type SelectFeaturesByHashResult = {
   id: string;

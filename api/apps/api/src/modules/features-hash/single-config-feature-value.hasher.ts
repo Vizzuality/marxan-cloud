@@ -1,10 +1,12 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { StripSingleSplitConfigFeatureValue } from '@marxan-api/modules/features-hash/strip-single-split-config-feature-value.service';
+import { Injectable } from '@nestjs/common';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { SingleConfigFeatureValue } from './single-config-feature-value';
-import { SingleConfigFeatureValueStripped } from './single-config-feature-value.stripped';
-import { StripSingleSplitConfigFeatureValue } from './strip-single-split-config-feature-value.service';
-
-export const entityManagerToken = Symbol('entity manager token');
+import {
+  SingleConfigFeatureValue,
+  SingleConfigFeatureValueStripped,
+} from '@marxan/features-hash';
 
 export type HashAndStrippedConfigFeature = {
   hash: string;
@@ -14,7 +16,7 @@ export type HashAndStrippedConfigFeature = {
 @Injectable()
 export class SingleConfigFeatureValueHasher {
   constructor(
-    @Inject(entityManagerToken)
+    @InjectEntityManager(DbConnections.default)
     private readonly entityManger: EntityManager,
     private readonly stripSplitConfigFeature: StripSingleSplitConfigFeatureValue,
   ) {}

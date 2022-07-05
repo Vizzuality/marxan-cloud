@@ -1,9 +1,11 @@
+import {
+  SingleSplitConfigFeatureValue,
+  SingleSplitConfigFeatureValueStripped,
+} from '@marxan/features-hash';
 import { SpecificationOperation } from '@marxan/specification';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
-import { SingleSplitConfigFeatureValue } from './single-config-feature-value';
-import { SingleSplitConfigFeatureValueStripped } from './single-config-feature-value.stripped';
 import { StripSingleSplitConfigFeatureValue } from './strip-single-split-config-feature-value.service';
 
 describe(StripSingleSplitConfigFeatureValue, () => {

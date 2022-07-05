@@ -1,3 +1,4 @@
+import { SingleConfigFeatureValueHasher } from '@marxan-api/modules/features-hash/single-config-feature-value.hasher';
 import { CreateGeoFeatureSetDTO } from '@marxan-api/modules/geo-features/dto/create.geo-feature-set.dto';
 import {
   SpecForGeoFeatureWithGeoprocessing,
@@ -11,10 +12,7 @@ import {
 } from '@marxan-api/modules/specification/application/specification-input';
 import { SpecificationRepository } from '@marxan-api/modules/specification/application/specification.repository';
 import { Specification } from '@marxan-api/modules/specification/domain';
-import {
-  SingleConfigFeatureValueHasher,
-  SingleSplitConfigFeatureValue,
-} from '@marxan/features-hash';
+import { SingleSplitConfigFeatureValue } from '@marxan/features-hash';
 import { PuvsprCalculationsService } from '@marxan/puvspr-calculations';
 import { SpecificationOperation } from '@marxan/specification';
 import { Injectable } from '@nestjs/common';

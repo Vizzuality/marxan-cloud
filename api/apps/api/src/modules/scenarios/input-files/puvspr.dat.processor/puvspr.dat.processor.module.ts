@@ -3,7 +3,6 @@ import { ScenarioSpecificationAdaptersModule } from '@marxan-api/modules/scenari
 import { SpecificationAdaptersModule } from '@marxan-api/modules/specification/adapters/specification-adapters.module';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FeatureHashModule } from '@marxan/features-hash';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
 import { Module } from '@nestjs/common';
@@ -15,11 +14,12 @@ import { PuvrsprDatFactory } from './puvspr.dat.factory';
 import { PuvsprDatLegacyProject } from './puvspr.dat.legacy-project';
 import { PuvsprDatMarxanProject } from './puvspr.dat.marxan-project';
 import { PuvsprDatProcessor } from './puvspr.dat.processor';
+import { FeatureHashModule } from '@marxan-api/modules/features-hash/features-hash.module';
 
 @Module({
   imports: [
     PuvsprCalculationsModule.for(DbConnections.geoprocessingDB),
-    FeatureHashModule.for(),
+    FeatureHashModule,
     TypeOrmModule.forFeature([Scenario, GeoFeature]),
     TypeOrmModule.forFeature(
       [ScenarioFeaturesData, GeoFeatureGeometry],

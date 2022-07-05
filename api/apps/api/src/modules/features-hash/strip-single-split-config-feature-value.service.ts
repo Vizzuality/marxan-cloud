@@ -1,5 +1,5 @@
+import { SingleSplitConfigFeatureValue } from '@marxan/features-hash';
 import { Injectable } from '@nestjs/common';
-import { SingleSplitConfigFeatureValue } from './single-config-feature-value';
 
 @Injectable()
 export class StripSingleSplitConfigFeatureValue {

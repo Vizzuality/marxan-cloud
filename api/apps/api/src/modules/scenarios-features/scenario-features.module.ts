@@ -31,7 +31,7 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
 import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
 import { SplitCreateFeatures } from './split/split-create-features.service';
 import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
-import { FeatureHashModule } from '@marxan/features-hash';
+import { FeatureHashModule } from '../features-hash/features-hash.module';
 
 @Module({
   imports: [
@@ -45,7 +45,7 @@ import { FeatureHashModule } from '@marxan/features-hash';
       ],
       DbConnections.geoprocessingDB,
     ),
-    FeatureHashModule.for(),
+    FeatureHashModule,
     PuvsprCalculationsModule.for(DbConnections.geoprocessingDB),
     ProjectsModule,
     ApiEventsModule,

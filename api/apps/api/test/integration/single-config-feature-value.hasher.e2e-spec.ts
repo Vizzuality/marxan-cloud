@@ -1,16 +1,15 @@
-import { apiConnections } from '@marxan-api/ormconfig';
-import { FeatureHashModule } from '@marxan/features-hash';
-import {
-  HashAndStrippedConfigFeature,
-  SingleConfigFeatureValue,
-  SingleConfigFeatureValueHasher,
-  SingleSplitConfigFeatureValue,
-} from '@marxan/features-hash';
 import { SpecificationOperation } from '@marxan/specification';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Test } from '@nestjs/testing';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
+import {
+  HashAndStrippedConfigFeature,
+  SingleConfigFeatureValueHasher,
+} from '@marxan-api/modules/features-hash/single-config-feature-value.hasher';
+import { bootstrapApplication } from '../utils/api-application';
+import {
+  SingleConfigFeatureValue,
+  SingleSplitConfigFeatureValue,
+} from '@marxan/features-hash';
 
 describe(SingleConfigFeatureValueHasher, () => {
   let fixtures: FixtureType<typeof getFixtures>;
@@ -62,21 +61,9 @@ describe(SingleConfigFeatureValueHasher, () => {
 });
 
 const getFixtures = async () => {
-  const sandbox = await Test.createTestingModule({
-    imports: [
-      TypeOrmModule.forRoot({
-        ...apiConnections.default,
-        keepConnectionAlive: true,
-      }),
-      TypeOrmModule.forFeature([]),
-      FeatureHashModule.for(apiConnections.default.name),
-    ],
-    providers: [],
-  }).compile();
+  const app = await bootstrapApplication();
 
-  await sandbox.init();
-
-  const sut = sandbox.get(SingleConfigFeatureValueHasher);
+  const sut = app.get(SingleConfigFeatureValueHasher);
 
   const subsetValue = 'random value';
   const baseFeatureId = v4();
