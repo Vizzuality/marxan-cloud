@@ -99,6 +99,9 @@ const getFixtures = async () => {
   const entityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
+  const geoEntityManager = sandbox.get<EntityManager>(
+    getEntityManagerToken(geoprocessingConnections.default.name),
+  );
   const planningAreaRepo = sandbox.get<Repository<PlanningArea>>(
     getRepositoryToken(PlanningArea, geoprocessingConnections.default.name),
   );
@@ -147,7 +150,7 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidCustomPlanningAreaFile: async () => {
-      const [geom] = await GenerateRandomGeometries(entityManager, 1, true);
+      const [geom] = await GenerateRandomGeometries(geoEntityManager, 1, true);
 
       const validCustomPlanningAreaFile: PlanningAreaCustomContent = {
         puAreaKm2: 100,

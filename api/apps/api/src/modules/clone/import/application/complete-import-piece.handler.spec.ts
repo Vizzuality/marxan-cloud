@@ -19,6 +19,7 @@ import {
 } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
+import { ExportId } from '../../export';
 import { MarkImportAsFailed } from '../../infra/import/mark-import-as-failed.command';
 import { MemoryImportRepository } from '../adapters/memory-import.repository.adapter';
 import {
@@ -149,6 +150,7 @@ const getFixtures = async () => {
   return {
     GivenImportWasRequested: async () => {
       const importResourceId = ResourceId.create();
+      const exportId = ExportId.create();
       const isCloning = false;
       const projectId = importResourceId;
       const pieces = [
@@ -164,6 +166,7 @@ const getFixtures = async () => {
         new ArchiveLocation('/tmp/location.zip'),
         pieces,
         isCloning,
+        exportId,
       );
 
       await repo.save(importInstance);

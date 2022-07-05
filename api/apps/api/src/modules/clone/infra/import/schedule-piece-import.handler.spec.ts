@@ -12,6 +12,7 @@ import { Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
+import { ExportId } from '../../export';
 import { MemoryImportRepository } from '../../import/adapters/memory-import.repository.adapter';
 import { ImportRepository } from '../../import/application/import.repository.port';
 import { Import, ImportComponent, ImportId } from '../../import/domain';
@@ -129,6 +130,7 @@ const getFixtures = async () => {
       const importResourceId = ResourceId.create();
       const isCloning = false;
       const projectId = importResourceId;
+      const exportId = ExportId.create();
       const importComponent = ImportComponent.newOne(
         projectId,
         ClonePiece.ProjectMetadata,
@@ -143,6 +145,7 @@ const getFixtures = async () => {
         new ArchiveLocation('/tmp/foo.zip'),
         [importComponent],
         isCloning,
+        exportId,
       );
       await importRepo.save(importInstance);
 

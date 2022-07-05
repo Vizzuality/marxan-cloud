@@ -1,4 +1,6 @@
-import React, { MouseEventHandler, useMemo, useRef } from 'react';
+import React, {
+  MouseEventHandler, useEffect, useMemo, useRef, useState,
+} from 'react';
 
 import { useNumberFormatter } from '@react-aria/i18n';
 import classnames from 'classnames';
@@ -33,6 +35,7 @@ export const Item: React.FC<ItemProps> = ({
   name, current, target, className, highlighted, muted, onMouseEnter, onMouseLeave, onHighlight,
 }: ItemProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
+  const [chartEl, setChartEl] = useState(null);
   const percentFormatter = useNumberFormatter({ style: 'percent' });
 
   const isNotMet = useMemo(() => {
@@ -40,9 +43,9 @@ export const Item: React.FC<ItemProps> = ({
   }, [current, target]);
 
   const metStyles = useMemo(() => {
-    if (chartRef.current) {
+    if (chartEl) {
       const tWidth = 85 / 2;
-      const { width } = chartRef.current.getBoundingClientRect();
+      const { width } = chartEl.getBoundingClientRect();
 
       const middle = width * current.percent > tWidth && (width * current.percent < width - tWidth);
       const left = width * current.percent < tWidth;
@@ -57,7 +60,11 @@ export const Item: React.FC<ItemProps> = ({
     return {
       '-translate-x-1/2': true,
     };
-  }, [current]);
+  }, [current, chartEl]);
+
+  useEffect(() => {
+    setChartEl(chartRef.current);
+  }, [chartEl]);
 
   return (
     <div

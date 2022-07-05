@@ -72,24 +72,29 @@ export class InputLegacyProjectPieceImporter
 
     const marxanInputParameters = marxanInputParametersOrError.right;
 
-    const [metadata] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('metadata')
-      .from('scenarios', 's')
-      .where('id = :scenarioId', { scenarioId })
-      .execute();
+    const legacyProjectImportIncludesSolutions = files.some(
+      (file) => file.type === LegacyProjectImportFileType.Output,
+    );
 
-    const updatedMetadata = {
-      scenarioEditingMetadata: metadata?.scenarioEditingMetadata ?? undefined,
+    const scenarioMetadata = {
+      scenarioEditingMetadata: {
+        tab: 'planning-unit',
+        subtab: null,
+        status: {
+          'planning-unit': 'draft',
+          features: 'draft',
+          parameters: 'draft',
+          solutions: legacyProjectImportIncludesSolutions ? 'draft' : 'empty',
+        },
+        lastJobCheck: new Date().getTime(),
+      },
       marxanInputParameterFile: marxanInputParameters,
     };
 
     await this.apiEntityManager
       .createQueryBuilder()
       .update('scenarios', {
-        metadata: JSON.stringify({
-          ...updatedMetadata,
-        }),
+        metadata: JSON.stringify(scenarioMetadata),
       })
       .where('id = :scenarioId', { scenarioId })
       .execute();

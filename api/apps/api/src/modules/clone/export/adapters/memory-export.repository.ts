@@ -26,6 +26,10 @@ export class MemoryExportRepo implements ExportRepository {
     return right(true);
   }
 
+  async delete(exportId: ExportId): Promise<void> {
+    delete this.#memory[exportId.value];
+  }
+
   async findLatestExportsFor(
     projectId: string,
     limit = 5,

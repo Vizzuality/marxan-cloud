@@ -192,17 +192,23 @@ const getFixtures = async () => {
       );
 
       scenarioFeaturesDataFile = {
-        customFeaturesData: [
+        featuresData: [
           {
             currentArea: 100,
-            featureClassName: `unexisting-feature-${projectId}`,
+            apiFeature: {
+              featureClassName: `unexisting-feature-${projectId}`,
+              isCustom: true,
+            },
+            featureDataFeature: {
+              featureClassName: `unexisting-feature-${projectId}`,
+              isCustom: true,
+            },
             featureDataHash: 'dfab2cf607d4f2dbbf2fbf18b8a73414',
             featureId: 123456,
             outputFeaturesData: [],
             totalArea: 100,
           },
         ],
-        platformFeaturesData: [],
       };
 
       const exportId = v4();
@@ -256,9 +262,17 @@ const getFixtures = async () => {
           feature_id: string;
         }[],
         nameByIdMap: Record<string, string>,
+        opts: { isCustom: boolean },
       ) =>
         featuresData.flatMap((data, index) => ({
-          featureClassName: nameByIdMap[data.feature_id],
+          apiFeature: {
+            featureClassName: nameByIdMap[data.feature_id],
+            isCustom: opts.isCustom,
+          },
+          featureDataFeature: {
+            featureClassName: nameByIdMap[data.feature_id],
+            isCustom: opts.isCustom,
+          },
           featureDataHash: data.hash,
           totalArea: 100,
           currentArea: 100,
@@ -274,14 +288,16 @@ const getFixtures = async () => {
         }));
 
       scenarioFeaturesDataFile = {
-        customFeaturesData: getFeatureDataElements(
-          customFeaturesData,
-          customFeatureNameById,
-        ),
-        platformFeaturesData: getFeatureDataElements(
-          platformFeaturesData,
-          platformFeatureNameById,
-        ),
+        featuresData: [
+          ...getFeatureDataElements(customFeaturesData, customFeatureNameById, {
+            isCustom: true,
+          }),
+          ...getFeatureDataElements(
+            platformFeaturesData,
+            platformFeatureNameById,
+            { isCustom: false },
+          ),
+        ],
       };
 
       const exportId = v4();
@@ -313,6 +329,7 @@ const getFixtures = async () => {
 
           const scenarioFeaturesData = await scenarioFeaturesDataRepo.find({
             where: { scenarioId },
+            relations: ['featureData'],
           });
           const outputScenarioFeaturesData = await outputScenarioFeaturesDataRepo.find(
             {
@@ -331,6 +348,14 @@ const getFixtures = async () => {
           expect(scenarioFeaturesData).toHaveLength(
             expectedAmountOfScenarioFeaturesDataRecords,
           );
+
+          expect(
+            scenarioFeaturesData.every(
+              ({ featureData, apiFeatureId }) =>
+                featureData.featureId === apiFeatureId,
+            ),
+          ).toEqual(true);
+
           const [scenarioFeatureData] = scenarioFeaturesData;
           expect(validate(scenarioFeatureData.featureDataId)).toBe(true);
           expect(scenarioFeatureData.scenarioId).toBe(scenarioId);

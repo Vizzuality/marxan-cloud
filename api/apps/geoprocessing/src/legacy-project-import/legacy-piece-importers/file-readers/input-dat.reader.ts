@@ -46,7 +46,7 @@ export class InputDatReader {
   private filterCommentsInInputFile(words: string[]) {
     //valid line must only have 2 words separated by one space and
     //variable name must be in capital letters
-    return words.length === 2 && /^[A-Z]*$/.test(words[0]);
+    return words.length === 2 && /^[A-Z0-9]*$/.test(words[0]);
   }
 
   private isKeyInInputDatFile(
@@ -80,7 +80,8 @@ export class InputDatReader {
     const stringInputDatFile = buffer.toString();
 
     const inputLines = stringInputDatFile
-      .split('/n')
+      .split('\n')
+      .filter((line) => line !== '')
       .map((inputLine) => inputLine.split(' '));
 
     const possibleInputLineVariables = inputLines.filter((wordsInLine) =>

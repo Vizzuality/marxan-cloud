@@ -1,4 +1,9 @@
 import {
+  DatFileDelimiterFinder,
+  invalidDelimiter,
+} from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/dat-file.delimiter-finder';
+import { DatFileDelimiterFinderFake } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/dat-file.delimiter-finder.fake';
+import {
   PuDatReader,
   PuDatRow,
 } from '@marxan-geoprocessing/legacy-project-import/legacy-piece-importers/file-readers/pu-dat.reader';
@@ -56,6 +61,16 @@ describe(ScenarioPusDataLegacyProjectPieceImporter, () => {
     await fixtures
       .WhenPieceImporterIsInvoked(job)
       .ThenAPuDatFileNotFoundInFilesRepoErrorShouldBeThrown();
+  });
+
+  it('fails when invalid delimiter is used on pu.dat', async () => {
+    const location = await fixtures.GivenPuDatIsAvailableInLegacyProjectImportFilesRepository();
+    const job = fixtures.GivenJobInput({ fileLocation: location });
+    fixtures.GivenSpecDatFileWithInvalidDelimiter();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenAPuDatFileInvalidDelimiterErrorShouldBeThrown();
   });
 
   it('fails when read operation on pu.dat fails', async () => {
@@ -136,6 +151,10 @@ const getFixtures = async () => {
         provide: PuDatReader,
         useClass: FakePuDatReader,
       },
+      {
+        provide: DatFileDelimiterFinder,
+        useClass: DatFileDelimiterFinderFake,
+      },
       { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
@@ -147,6 +166,9 @@ const getFixtures = async () => {
   const sut = sandbox.get(ScenarioPusDataLegacyProjectPieceImporter);
   const filesRepo = sandbox.get(LegacyProjectImportFilesRepository);
   const fakePuDatReader: FakePuDatReader = sandbox.get(PuDatReader);
+  const fakeDatFileDelimiterFinder: DatFileDelimiterFinderFake = sandbox.get(
+    DatFileDelimiterFinder,
+  );
   const geoEntityManager = sandbox.get<EntityManager>(
     getEntityManagerToken(geoprocessingConnections.default.name),
   );
@@ -266,6 +288,9 @@ const getFixtures = async () => {
       );
       fakePuDatReader.readOperationResult = right(puDatRows);
     },
+    GivenSpecDatFileWithInvalidDelimiter: () => {
+      fakeDatFileDelimiterFinder.delimiterFound = left(invalidDelimiter);
+    },
     GivenInvalidPuDatFile: () => {
       fakePuDatReader.readOperationResult = left(readOperationError);
     },
@@ -280,6 +305,11 @@ const getFixtures = async () => {
           await expect(sut.run(input)).rejects.toThrow(
             /pu.dat file not found in files repo/gi,
           );
+        },
+        ThenAPuDatFileInvalidDelimiterErrorShouldBeThrown: async () => {
+          const invalidDelimiterError =
+            'Invalid delimiter in pu.dat file. Use either comma or tabulator as your file delimiter.';
+          await expect(sut.run(input)).rejects.toThrow(invalidDelimiterError);
         },
         ThenAPuDatReadOperationErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(readOperationError);

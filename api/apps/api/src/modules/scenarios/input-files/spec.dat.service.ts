@@ -28,9 +28,8 @@ export class SpecDatService {
       with grouped_feature as (
         select min(sfd.feature_id) as min_feature_id
         from public.scenario_features_data as sfd
-               inner join features_data fd on fd.id = sfd.feature_class_id
         where sfd.scenario_id = $1
-        group by fd.feature_id
+        group by sfd.api_feature_id
       )
       select
         feature_id as "featureId",
@@ -50,7 +49,7 @@ export class SpecDatService {
         sepnum as "sepNum",
         metadata
       from grouped_feature
-      left join scenario_features_data as sfd on feature_id = grouped_feature.min_feature_id
+      left join scenario_features_data as sfd on feature_id = grouped_feature.min_feature_id AND sfd.scenario_id = $1
       order by feature_id
     `,
       [scenarioId],

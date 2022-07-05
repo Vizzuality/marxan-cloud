@@ -35,7 +35,6 @@ export class InitialDataMetadataEntities1611329857558
         "name" varchar,
         "project_id" uuid NOT NULL REFERENCES "projects" ("id"),
         "country_id" varchar(3) NOT NULL,
-        "extent" geometry NOT NULL,
         "wdpa_filter" jsonb default NULL,
         "wdpa_threshold" int CHECK (wdpa_threshold BETWEEN 0 AND 100),
         "admin_region_id" uuid,

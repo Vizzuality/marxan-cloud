@@ -1,15 +1,17 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class DropExtentInProject1623166932364 implements MigrationInterface {
+export class AddCountryColumnUsers1655731147185 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      ALTER TABLE projects DROP COLUMN extent;
+        ALTER TABLE users
+            ADD COLUMN country varchar;
     `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      ALTER TABLE projects ADD COLUMN extent geometry;
+        ALTER TABLE users
+            DROP COLUMN country;
     `);
   }
 }

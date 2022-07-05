@@ -277,6 +277,7 @@ const getFixtures = async () => {
               coverageTarget: 0,
               coverageTargetArea: 1000,
               featureDataId: feature.id,
+              apiFeatureId: featureId,
               currentArea: 200,
               fpf: 1,
               met: 1,

@@ -32,11 +32,13 @@ they may need some adaptation to run on Windows systems.
 In a nutshell, the Marxan solution is composed by the following components:
 - A frontend application accessible through the browser - the `app`
 - A public, backend API - the `api`
-- A geoprocessing-focused service used by the `api` - the `geoprocessing api/application`
-- An HTML-to-PDF service - the `webshot` service
+- A geoprocessing-focused service used by the `api` - the `geoprocessing
+  api/application`
+- An HTML-to-PDF/HTML-to-PNG service - the `webshot` service
 
-Besides these 4, there are other components that may be used in one-off situations,
-like seeding source data (see `/data`), testing (`/e2e-product-testing`) and others.
+Besides these 4, there are other components that may be used in one-off
+situations, like seeding source data (see `/data`), testing
+(`/e2e-product-testing`) and others.
 
 See [ARCHITECTURE_infrastructure.md](./docs/ARCHITECTURE_infrastructure.md) for
 details.
@@ -65,8 +67,9 @@ Before attempting to use the following steps, be sure to:
 - Install Docker (19.03+):
 - Install [Docker Compose](https://docs.docker.com/compose/install/)
 - Create an `.env` at the root of the repository, defining all the required
-   [environment variables](./ENV_VARS.md). In most cases, for variables other
-   than secrets, the defaults in `env.default` may just work - your mileage may vary.
+  [environment variables](./ENV_VARS.md). In most cases, for variables other
+  than secrets, the defaults in `env.default` may just work - your mileage may
+  vary.
 
 The PostgreSQL credentials are used to create a database user when the
 PostgreSQL container is started for the first time. PostgreSQL data is persisted
@@ -84,8 +87,9 @@ specified as `APP_SERVICE_PORT`.
 
 ## Running Marxan natively
 
-Make sure you have installed and configured all the [dependencies](#Dependencies) 
-locally. PostgreSQL (with PostGIS) and Redis need to be up and running.
+Make sure you have installed and configured all the
+[dependencies](#Dependencies) locally. PostgreSQL (with PostGIS) and Redis need
+to be up and running.
 
 ### Running API and Geoprocessing services
 
@@ -116,8 +120,12 @@ yarn start geoprocessing
 ### Running the Frontend application
 
 The Frontend application can be found in `/app`. Be sure to populate the
-`.env` file according to the [app documentation](./app/README.md), as well as
-install the necessary nodejs packages. To start the application, run:
+`spp/.env` file (note: this is an `.env` file distinct from the top-level `.env`
+file which is used to configure backend microservices and data processing
+pipelines) according to the [app documentation](./app/README.md), as well as
+install the necessary nodejs packages.
+
+To start the application, run:
 
 ```bash
 yarn dev
@@ -134,6 +142,10 @@ the necessary nodejs packages, you can start it by running:
 ```bash
 yarn start:dev
 ```
+
+Due to upstream packaging of the Chrome browser used by the Webshot service, it
+may not be possible to run the webshot service in `aarch64` environments (such
+as MacOS on Apple silicon).
 
 ### Setting up test seed data
 
@@ -174,31 +186,36 @@ run tests using a database whose data you don't want to lose.
 
 ## Seed data
 
-All fresh installations of Marxan (be it locally for development or in a cloud 
-provider for production) start off with empty databases, that need to be populated
-with seed data before the Marxan platform is fully functional. The seed data you'll
-want to import will depend on the goal of the installation you are currently setting 
-up.
+All fresh installations of Marxan (be it locally for development or in a cloud
+provider for production) start off with empty databases, that need to be
+populated with seed data before the Marxan platform is fully functional. The
+seed data you'll want to import will depend on the goal of the installation you
+are currently setting up.
 
 Please make sure to wait for all of the backend services (api, geoprocessing and
-webshot) to fully start as database migrations will be run while the services
+webshot) to fully start, as database migrations will be run while the services
 are started: attempting to import seed data before migrations have run fully
 will result in errors.
 
 There are three types of seed data available with the application:
 
-- User data: user accounts
-- Geographic data: complex geographic data, like GADM or WDPA
+- Geographic data: platform-wide spatial data for admin boundaries (GADM),
+  protected areas (WDPA) and conservation features, such as the World
+  Terrestrial Ecosystems database. These datasets should be available in every
+  Marxan instance.
+- User data: user accounts, intended only for development instances and for
+  e2e/unit tests; these must not be imported in production-grade environments.
 - Test data: intended only for environments where development or e2e/unit tests
- execution takes place, and must not be imported in production-grade environments.
+  execution takes place, and must not be imported in production-grade
+  environments.
 
-Please review the following sections carefully to determine which best fits your needs
-for each deployment
+Please review the following sections carefully to determine which best fits your
+needs for each deployment
 
 ### User data
 
-User data is necessary for all types of Marxan installations, but different user data
-import processes will best fit different use cases. 
+User data is necessary for all types of Marxan installations, but different user
+data import processes will best fit different use cases.
 
 There are two ways to create user accounts:
 
@@ -230,23 +247,24 @@ or otherwise ephemeral environments.
 ### Geographic data
 
 Importing the initial geographic data executes a long-running data ETL pipeline
-that imports large amounts of data from publicly available datasets onto Marxan's
-PostgreSQL server - using both `api` and `geoprocessing` databases. 
+that imports large amounts of data from publicly available datasets onto
+Marxan's PostgreSQL server - using both `api` and `geoprocessing` databases.
 
-**Note**: The geographic data import process assumes the 
-presence of at least a user in the database. If none exists, the process will fail
-with non-descriptive error, so be sure to import [User data](#user-data) first.
+First, either set up a new Marxan instance from scratch, or reset an existing
+one to a clean-slate status (`make clean-slate && make start-api`) - this allows
+to import spatial data into a clean database, avoiding that any user-uploaded
+data may end up in seed data.
 
-The easiest way to execute this data import process is using
-the following make task, which runs a dockerized version of the tool:
+Once a clean Marxan instance is running, the easiest way to execute the spatial
+data import process is using the following `make` task, which runs a dockerized
+version of the tool:
 
 ``` bash
 make seed-geodb-data
 ```
 
-*Note* this process can complete successfully and exit with code 0, 
-but have errors in the output logs. This is expected, and said log errors can be 
-ignored.
+*Note* this process can complete successfully and exit with code 0, but have
+errors in the output logs. This is expected, and said log errors can be ignored.
 
 The actual implementation can be found in the `/data` folder
 
@@ -260,25 +278,27 @@ import pipelines). Also, the number of CPU cores will impact the time needed to
 seed a new instance with the complete GADM and WDPA datasets, which will be 1h+ 
 on ideal hardware.
 
-To execute this on a cloud hosted version of Marxan, you have a couple of options:
-- Run the import process locally on local running PostgreSQL servers, then export 
-the resulting `.sql` locally and import it remotely.
-- Run the import process locally, while having it connect directly to the remote
-`api` and `geoprocessing` databases using kubectl port forwarding. You may need
-to modify the container's 
-[network mode](https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode)
-to "host" for this to work. 
+To execute this on a cloud hosted version of Marxan, you have a couple of
+options:
 
-While geographic data is technically necessary on all Marxan environments,
-there is a faster alternative to import equivalent data on development/test 
+- Run the import process locally on local running PostgreSQL servers, then
+  export the resulting `.sql` locally and import it remotely.
+- Run the import process locally, while having it connect directly to the remote
+  `api` and `geoprocessing` databases using `kubectl` to set up port forwarding.
+  You may need to modify the container's [network
+  mode](https://docs.docker.com/compose/compose-file/compose-file-v3/#network_mode)
+  to `host` for this to work.
+
+While geographic data is technically necessary on all Marxan environments, there
+is a faster alternative to import equivalent data on development/test
 environments, which is discussed in the next section.
 
 #### Test data
 
-Test data includes both user and geographical data described above, as well as
-extra data necessary to run certain types of automated tests. This data is meant
-for development/testing environments only, and should not be imported in production
-environments.
+Test data includes both user data and (a small subset of) the geographical data
+described above, as well as extra data necessary to run certain types of
+automated tests. This data is meant for development/testing environments only,
+and should not be imported in production environments.
 
 ```bash
 // For Marxan running on Docker
@@ -288,9 +308,9 @@ make native-seed-api-init-data
 ```
 
 These commands will:
-- Import generic user data (equivalent to `seed-api-init-data`/`native-seed-api-init-data` 
-described above)
-- Import a precomputed, subset of the geographical data
+- Import generic user data (equivalent to
+  `seed-api-init-data`/`native-seed-api-init-data` described above)
+- Import a precomputed subset of the geographical data
 - Create sample/test Marxan resources, like organizations, scenarios, etc.
 
 ## Maintenance
@@ -320,7 +340,8 @@ make generate-content-dumps && make upload-dump-data
 ```
 
 Other developers can then benefit from the pre-prepared data seeds when
-populating new development instances after their initial setup:
+populating new development instances after their initial setup, by running the
+following command on a clean Marxan instance:
 
 ``` bash
 make restore-dumps

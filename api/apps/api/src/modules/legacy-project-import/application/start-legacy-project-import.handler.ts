@@ -33,7 +33,7 @@ export class StartLegacyProjectImportHandler
   private async createShells(
     name: string,
     ownerId: string,
-    solutionsAreLocked: boolean,
+    description: string,
   ) {
     try {
       const [randomOrganization] = await this.organizationRepo.find({
@@ -49,12 +49,12 @@ export class StartLegacyProjectImportHandler
         organizationId: randomOrganizationId,
         sources: ProjectSourcesEnum.legacyImport,
         createdBy: ownerId,
+        description,
       });
 
       const scenario = await this.scenarioRepo.save({
         name,
         projectId: project.id,
-        solutionsAreLocked,
       });
 
       return right({
@@ -69,12 +69,12 @@ export class StartLegacyProjectImportHandler
   async execute({
     name,
     ownerId,
-    solutionsAreLocked,
+    description,
   }: StartLegacyProjectImport): Promise<StartLegacyProjectImportResponse> {
     const shellsOrError = await this.createShells(
       name,
       ownerId.value,
-      solutionsAreLocked,
+      description,
     );
 
     if (isLeft(shellsOrError)) return shellsOrError;

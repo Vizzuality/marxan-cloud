@@ -71,6 +71,16 @@ describe(InputLegacyProjectPieceImporter, () => {
       .WhenPieceImporterIsInvoked(job)
       .ThenScenarioMetadataDataShouldBeUpdated();
   });
+
+  it('updates successfully scenario metadata when job has solution files', async () => {
+    const fileLocation = await fixtures.GivenValidInputDatFile();
+    const job = fixtures.GivenJobInput({ fileLocation, withSolutions: true });
+    await fixtures.GivenProjectWithScenarioExist();
+
+    await fixtures
+      .WhenPieceImporterIsInvoked(job)
+      .ThenScenarioMetadataDataShouldBeUpdated({ withSolutions: true });
+  });
 });
 
 const getFixtures = async () => {
@@ -129,23 +139,36 @@ const getFixtures = async () => {
     GivenJobInput: (
       {
         missingInputDatFile,
+        withSolutions,
         fileLocation,
       }: {
         missingInputDatFile?: boolean;
+        withSolutions?: boolean;
         fileLocation?: string;
-      } = { missingInputDatFile: false, fileLocation: 'foo/input.dat' },
+      } = {
+        missingInputDatFile: false,
+        withSolutions: false,
+        fileLocation: 'foo/input.dat',
+      },
     ): LegacyProjectImportJobInput => {
+      const files = [
+        {
+          id: v4(),
+          location: fileLocation ?? '',
+          type: fileType,
+        },
+      ];
+
+      if (withSolutions)
+        files.push({
+          id: v4(),
+          location: '',
+          type: LegacyProjectImportFileType.Output,
+        });
+
       return {
         piece: LegacyProjectImportPiece.Input,
-        files: missingInputDatFile
-          ? []
-          : [
-              {
-                id: v4(),
-                location: fileLocation ?? '',
-                type: fileType,
-              },
-            ],
+        files: missingInputDatFile ? [] : files,
         pieceId: v4(),
         projectId,
         scenarioId,
@@ -169,7 +192,7 @@ const getFixtures = async () => {
         ...validVariableValues,
       };
 
-      return saveFile('BESTSCORE 100/nBLM 200');
+      return saveFile('BESTSCORE 100\nBLM 200');
     },
     GivenInvalidInputDatFile: () => {
       const invalidVariableValues = 'BESTSCORE invalidBestScore';
@@ -192,7 +215,11 @@ const getFixtures = async () => {
             /invalid variables values in input.dat file/gi,
           );
         },
-        ThenScenarioMetadataDataShouldBeUpdated: async () => {
+        ThenScenarioMetadataDataShouldBeUpdated: async (
+          { withSolutions }: { withSolutions: boolean } = {
+            withSolutions: false,
+          },
+        ) => {
           const result = await sut.run(input);
 
           expect(result).toBeDefined();
@@ -208,6 +235,17 @@ const getFixtures = async () => {
 
           expect(scenario.metadata).toEqual({
             marxanInputParameterFile: expectedInputParameterFile,
+            scenarioEditingMetadata: {
+              tab: 'planning-unit',
+              subtab: null,
+              status: {
+                'planning-unit': 'draft',
+                features: 'draft',
+                parameters: 'draft',
+                solutions: withSolutions ? 'draft' : 'empty',
+              },
+              lastJobCheck: expect.any(Number),
+            },
           });
         },
       };

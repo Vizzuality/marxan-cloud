@@ -99,7 +99,7 @@ services:
   postgresql-api:
     build:
       context: ./postgresql
-      dockerfile: Dockerfile
+      dockerfile: apidb.Dockerfile
     container_name: marxan-postgresql-api
     ports:
       - "${POSTGRES_API_SERVICE_PORT}:5432"
@@ -115,7 +115,7 @@ services:
   postgresql-geo-api:
     build:
       context: ./postgresql
-      dockerfile: Dockerfile
+      dockerfile: geodb.Dockerfile
       shm_size: 16gb
     shm_size: 16gb
     container_name: marxan-postgresql-geo-api

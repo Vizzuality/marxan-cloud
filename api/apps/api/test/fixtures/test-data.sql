@@ -41,7 +41,6 @@ VALUES
 ('Example scenario 1 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 30, 100, 1, (SELECT id FROM users WHERE email = 'aa@example.com') ),
 ('Example scenario 2 Project 2 Org 2', (select id from projects where name = 'Example Project 2 Org 2'), 'marxan', 50, 100, 1, (SELECT id FROM users WHERE email = 'aa@example.com') );
 
-
 INSERT INTO platform_admins
 (user_id)
 VALUES
