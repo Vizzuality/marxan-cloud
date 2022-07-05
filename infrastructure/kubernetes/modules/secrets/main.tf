@@ -17,12 +17,12 @@ locals {
 
 resource "random_password" "postgresql_api_user_generator" {
   length  = 24
-  special = true
+  special = false
 }
 
 resource "random_password" "postgresql_geoprocessing_user_generator" {
   length  = 24
-  special = true
+  special = false
 }
 
 resource "random_password" "jwt_secret" {
