@@ -128,8 +128,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
             <form onSubmit={handleSubmit}>
               <div className="p-9">
 
-                <div className="flex space-x-2">
-                  <h4 className="mb-5 text-lg text-black font-heading">Upload legacy project</h4>
+                <div className="flex mb-2 space-x-2">
+                  <h4 className="text-lg text-black font-heading">Upload legacy project</h4>
                   <InfoButton
                     theme="primary"
                   >
@@ -204,9 +204,11 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                       </p>
                     </div>
                   </InfoButton>
+
                 </div>
+                <p className="mb-5 text-sm text-black">To import a legacy project, please, add the files requested below. </p>
                 {importLegacyErrors && !!importLegacyErrors.length && (
-                  <div>
+                  <div className="flex flex-col mb-6 space-y-2">
                     {importLegacyErrors.map((e) => <p key={e} className="text-xs text-red-500">{e}</p>)}
                   </div>
                 )}
@@ -216,7 +218,6 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                       <UploadItem key={f.label} f={f} />
                     );
                   })}
-
                 </div>
 
                 <div className="mt-7">

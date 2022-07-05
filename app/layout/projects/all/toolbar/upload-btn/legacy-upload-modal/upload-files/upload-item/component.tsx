@@ -23,6 +23,7 @@ export interface UploadItemProps {
     maxSize: number;
     format: string;
     fileType: string;
+    optional: boolean;
   };
 }
 
@@ -147,7 +148,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                 {(props) => (
                   <div className="space-y-2.5">
                     <Label theme="light" className="uppercase" id="file">
-                      {`Upload your ${f.label}`}
+                      {`Upload your ${f.label} (${f.fileType}) ${f.optional ? '(optional)' : ''}`}
                     </Label>
 
                     <div
