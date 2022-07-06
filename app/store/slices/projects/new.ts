@@ -19,7 +19,7 @@ const initialState = {
   uploadingPlanningArea: null,
   uploadingPlanningAreaId: null,
   uploadingGridId: null,
-  uploadMode: 'default',
+  uploadMode: null,
   legacyProjectId: null,
   importSubmit: false,
 } as ProjectShowStateProps;

@@ -3,9 +3,6 @@ import React, { useCallback, useRef, useState } from 'react';
 import { PROJECT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
-import { useDispatch } from 'react-redux';
-
-import { setUploadMode } from 'store/slices/projects/new';
 
 import cx from 'classnames';
 import { motion } from 'framer-motion';
@@ -35,8 +32,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   const formRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [successFile, setSuccessFile] = useState(null);
-
-  const dispatch = useDispatch();
 
   const { addToast } = useToasts();
 
@@ -125,10 +120,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   const onUploadRemove = useCallback(() => {
     setSuccessFile(null);
   }, []);
-
-  const onSetLegacyUpload = useCallback(() => {
-    dispatch(setUploadMode('legacy'));
-  }, [dispatch]);
 
   const {
     getRootProps,
@@ -259,17 +250,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     </motion.div>
                   )}
                 </div>
-                <p className="mt-4 text-sm text-gray-400 lg:text-base">
-                  If you have a legacy project and prefer to upload the files, please
-                  {' '}
-                  <button
-                    type="button"
-                    className="font-semibold underline cursor-pointer hover:no-underline"
-                    onClick={onSetLegacyUpload}
-                  >
-                    click here
-                  </button>
-                </p>
                 <div className="flex justify-center mt-16 space-x-6">
                   <Button
                     theme="secondary"
