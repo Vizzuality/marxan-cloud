@@ -258,6 +258,18 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     setSubTab,
   ]);
 
+  const toggleSeeOnMap = useCallback((id) => {
+    console.log('id to see', id);
+    // const newHighlightFeatures = [...preHighlightFeatures];
+    // if (!newHighlightFeatures.includes(id)) {
+    //   newHighlightFeatures.push(id);
+    // } else {
+    //   const i = newHighlightFeatures.indexOf(id);
+    //   newHighlightFeatures.splice(i, 1);
+    // }
+    // dispatch(setPreHighlightFeatures(newHighlightFeatures));
+  }, [/* dispatch, setPreHighlightFeatures, preHighlightFeatures */]);
+
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
     return (
@@ -329,6 +341,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                               onMouseLeave={() => {
                                 onLeave();
                               }}
+                              onSeeOnMap={() => toggleSeeOnMap(item.id)}
                             />
 
                           </div>

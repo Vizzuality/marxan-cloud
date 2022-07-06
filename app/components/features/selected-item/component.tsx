@@ -51,6 +51,7 @@ export interface ItemProps {
   onRemove?: (value) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  onSeeOnMap?: () => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -74,6 +75,7 @@ export const Item: React.FC<ItemProps> = ({
   onRemove,
   onMouseEnter,
   onMouseLeave,
+  onSeeOnMap,
 }: ItemProps) => {
   const {
     split,
@@ -137,9 +139,17 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="text-sm font-heading">{name}</h2>
 
+          <Button
+            className="flex-shrink-0 text-xs"
+            theme="secondary"
+            size="xs"
+            onClick={onSeeOnMap}
+          >
+            See on map
+          </Button>
           {editable && (
             <Button
-              className="flex-shrink-0 text-xs"
+              className="flex-shrink-0 ml-2 text-xs"
               theme="secondary"
               size="xs"
               onClick={() => onRemove && onRemove(id)}
