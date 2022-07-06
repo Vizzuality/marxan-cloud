@@ -148,7 +148,13 @@ export const UploadItem: React.FC<UploadItemProps> = ({
                 {(props) => (
                   <div className="space-y-2.5">
                     <Label theme="light" className="uppercase" id="file">
-                      {`Upload your ${f.label} (${f.fileType}) ${f.optional ? '(optional)' : ''}`}
+                      {`Upload your ${f.label}`}
+                      {' '}
+                      <span className="lowercase">
+                        {`(${f.fileType})`}
+                      </span>
+                      {' '}
+                      {`${f.optional ? '(optional)' : ''}`}
                     </Label>
 
                     <div

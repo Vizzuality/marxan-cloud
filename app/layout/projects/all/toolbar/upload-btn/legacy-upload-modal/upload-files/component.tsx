@@ -228,7 +228,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                     {(fprops) => (
                       <Field className="flex mt-2" id="solutionsAreLocked" {...fprops}>
                         <Checkbox theme="light" />
-                        <Label theme="light" className="ml-2 -mt-1 font-sans text-xs">
+                        <Label theme="light" className="ml-2 -mt-1 font-sans text-sm">
                           Do you want to lock these results calculated outside of the
                           Marxan MaPP platform?
                         </Label>
