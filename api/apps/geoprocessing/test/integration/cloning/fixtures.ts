@@ -400,6 +400,7 @@ export async function GivenFeatures(
   platformFeaturesAmount: number,
   customFeaturesAmount: number,
   projectId: string,
+  isLegacy: boolean = false,
 ) {
   const customFeatures = Array(customFeaturesAmount)
     .fill(0)
@@ -409,6 +410,7 @@ export async function GivenFeatures(
       tag: 'species',
       creation_status: 'done',
       project_id: projectId,
+      is_legacy: isLegacy,
     }));
   const platformFeatures = Array(platformFeaturesAmount)
     .fill(0)

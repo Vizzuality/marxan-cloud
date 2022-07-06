@@ -47,7 +47,6 @@ export class TypeOrmPuvsprCalculationsRepository
     results: FeatureAmountPerPlanningUnit[],
   ) {
     const repo = this.geoEntityManager.getRepository(PuvsprCalculationsEntity);
-    console.log('saving');
     await repo.save(
       results.map(({ amount, puid, featureId }) => ({
         projectId,
