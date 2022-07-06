@@ -51,6 +51,7 @@ export interface ItemProps {
   onRemove?: (value) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  isShown?: boolean;
   onSeeOnMap?: () => void;
 }
 
@@ -75,6 +76,8 @@ export const Item: React.FC<ItemProps> = ({
   onRemove,
   onMouseEnter,
   onMouseLeave,
+
+  isShown,
   onSeeOnMap,
 }: ItemProps) => {
   const {
@@ -141,7 +144,7 @@ export const Item: React.FC<ItemProps> = ({
 
           <Button
             className="flex-shrink-0 text-xs"
-            theme="secondary"
+            theme={isShown ? 'tertiary' : 'secondary'}
             size="xs"
             onClick={onSeeOnMap}
           >

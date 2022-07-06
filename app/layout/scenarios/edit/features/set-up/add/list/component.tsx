@@ -4,7 +4,7 @@ import React, {
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -37,7 +37,10 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatures, setFeatureHoverId, setSubTab } = scenarioSlice.actions;
+  const {
+    setFeatures, setFeatureHoverId, setSubTab, setSelectedFeatures,
+  } = scenarioSlice.actions;
+  const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
 
@@ -259,16 +262,22 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
   ]);
 
   const toggleSeeOnMap = useCallback((id) => {
-    console.log('id to see', id);
-    // const newHighlightFeatures = [...preHighlightFeatures];
-    // if (!newHighlightFeatures.includes(id)) {
-    //   newHighlightFeatures.push(id);
-    // } else {
-    //   const i = newHighlightFeatures.indexOf(id);
-    //   newHighlightFeatures.splice(i, 1);
-    // }
-    // dispatch(setPreHighlightFeatures(newHighlightFeatures));
-  }, [/* dispatch, setPreHighlightFeatures, preHighlightFeatures */]);
+    const newSelectedFeatures = [...selectedFeatures];
+    if (!newSelectedFeatures.includes(id)) {
+      newSelectedFeatures.push(id);
+    } else {
+      const i = newSelectedFeatures.indexOf(id);
+      newSelectedFeatures.splice(i, 1);
+    }
+    dispatch(setSelectedFeatures(newSelectedFeatures));
+  }, [dispatch, setSelectedFeatures, selectedFeatures]);
+
+  const isShown = useCallback((id) => {
+    if (!selectedFeatures.includes(id)) {
+      return false;
+    }
+    return true;
+  }, [selectedFeatures]);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
@@ -341,6 +350,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                               onMouseLeave={() => {
                                 onLeave();
                               }}
+                              isShown={isShown(item.id)}
                               onSeeOnMap={() => toggleSeeOnMap(item.id)}
                             />
 
