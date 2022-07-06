@@ -19,7 +19,7 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it(`hasImportedLegacyProjectImport() should return legacyProjectImportdoesntExist if the project is not a legacy project`, async () => {
+it(`isLegacyProjectImportCompletedFor() should return legacyProjectImportdoesntExist if the project does not have a legacy project import`, async () => {
   const res = fixtures.GivenProjectIsNotALegacyProject();
 
   const result = await fixtures.WhenHasImportedLegacyProjectMethodIsCalled(res);
@@ -32,11 +32,9 @@ it.each(
     (kind) => kind !== LegacyProjectImportStatuses.Completed,
   ),
 )(
-  `hasImportedLegacyProjectImport() should return false if given legacy project import has status %s`,
+  `isLegacyProjectImportCompletedFor() should return false if given project has a legacy project import with status %s`,
   async (kind) => {
-    const id = await fixtures.GivenLegacyProjectImport(
-      LegacyProjectImportStatuses.AcceptingFiles,
-    );
+    const id = await fixtures.GivenLegacyProjectImport(kind);
 
     const result = await fixtures.WhenHasImportedLegacyProjectMethodIsCalled(
       id,
@@ -46,7 +44,7 @@ it.each(
   },
 );
 
-it(`hasImportedLegacyProjectImport() should return true if given legacy project import has already imported`, async () => {
+it(`isLegacyProjectImportCompletedFor() should return true if given project has an already completed legacy project import`, async () => {
   const id = await fixtures.GivenLegacyProjectImport(
     LegacyProjectImportStatuses.Completed,
   );
@@ -93,7 +91,7 @@ async function getFixtures() {
       return projectId;
     },
     WhenHasImportedLegacyProjectMethodIsCalled: (projectId: string) => {
-      return sut.hasImportedLegacyProjectImport(projectId);
+      return sut.isLegacyProjectImportCompletedFor(projectId);
     },
     ThenLegacyProjectImportDoesntExistIsReturned: (
       result: Either<LegacyProjectImportDoesntExist, boolean>,

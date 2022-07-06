@@ -14,7 +14,7 @@ export class MarxanLegacyProjectImportChecker
   constructor(
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
   ) {}
-  async hasImportedLegacyProjectImport(
+  async isLegacyProjectImportCompletedFor(
     projectId: string,
   ): Promise<Either<LegacyProjectImportDoesntExist, boolean>> {
     const legacyProjectImport = await this.legacyProjectImportRepo.find(

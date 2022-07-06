@@ -98,7 +98,7 @@ describe('MarxanBlockGuard - ensureThatProjectIsNotBlocked', () => {
       .ThenAPendingMarxanRunErrorIsThrown();
   });
 
-  it(`throws an exception if the given project has not imported the legacy project import`, async () => {
+  it(`while a legacy project import process is ongoing, the project should be marked as non-editable`, async () => {
     const [projectId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingLegacyProjectImport(projectId);
@@ -196,7 +196,7 @@ describe('MarxanBlockGuard - ensureThatScenarioIsNotBlocked', () => {
       .ThenAPendingMarxanRunErrorIsThrown();
   });
 
-  it(`throws an exception if the given scenario's parent project has not imported the legacy project import`, async () => {
+  it(`while a legacy project import process is ongoing, scenarios within the project should be marked as non-editable`, async () => {
     const [projectId, scenarioId] = await fixtures.GivenProjectWasCreated();
 
     fixtures.WhenProjectHasAnOngoingLegacyProjectImport(projectId);

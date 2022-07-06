@@ -45,7 +45,9 @@ export class MarxanBlockGuard implements BlockGuard {
       this.projectChecker.hasPendingImports(projectId),
       this.projectChecker.hasPendingBlmCalibration(projectId),
       this.projectChecker.hasPendingMarxanRun(projectId),
-      this.legacyProjectImportChecker.hasImportedLegacyProjectImport(projectId),
+      this.legacyProjectImportChecker.isLegacyProjectImportCompletedFor(
+        projectId,
+      ),
     ]);
 
     if (isRight(hasPendingExports) && hasPendingExports.right)
@@ -97,7 +99,7 @@ export class MarxanBlockGuard implements BlockGuard {
       this.scenarioChecker.hasPendingImport(scenarioId),
       this.projectChecker.hasPendingExports(scenario.projectId),
       this.projectChecker.hasPendingImports(scenario.projectId),
-      this.legacyProjectImportChecker.hasImportedLegacyProjectImport(
+      this.legacyProjectImportChecker.isLegacyProjectImportCompletedFor(
         scenario.projectId,
       ),
     ]);

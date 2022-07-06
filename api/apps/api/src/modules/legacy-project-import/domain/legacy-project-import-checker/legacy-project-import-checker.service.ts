@@ -6,7 +6,7 @@ export const legacyProjectImportDoesntExist = Symbol(
 export type LegacyProjectImportDoesntExist = typeof legacyProjectImportDoesntExist;
 
 export abstract class LegacyProjectImportChecker {
-  abstract hasImportedLegacyProjectImport(
+  abstract isLegacyProjectImportCompletedFor(
     projectId: string,
   ): Promise<Either<LegacyProjectImportDoesntExist, boolean>>;
 }
