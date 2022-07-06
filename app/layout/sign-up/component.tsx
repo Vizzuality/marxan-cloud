@@ -96,7 +96,6 @@ export const SignUp: React.FC<SignUpProps> = () => {
         >
           {(props) => (
             <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
-
               <div className="w-full max-w-xs">
                 <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Get Started!</h2>
 
@@ -169,7 +168,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                           theme="light-square"
                           size="base"
                           placeholder="Select..."
-                          options={props.values.work === 'academic_research' ? ACADEMIC_LEVEL_OPTIONS : APPLIED_LEVEL_OPTIONS}
+                          options={props.values.background === 'academic_research' ? ACADEMIC_LEVEL_OPTIONS : APPLIED_LEVEL_OPTIONS}
                           onChange={fprops.input.onChange}
                         />
                       </Field>
