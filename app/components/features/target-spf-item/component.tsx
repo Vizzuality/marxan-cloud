@@ -71,7 +71,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         >
           {isAllTargets ? 'Set target and SPF in all features' : name}
         </span>
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col ml-2 space-y-2">
           {!isAllTargets && (
             <Button
               className="flex-shrink-0 text-xs"

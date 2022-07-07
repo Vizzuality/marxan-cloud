@@ -85,7 +85,10 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
         ), {
           level: 'success',
         });
-        if (!importLegacyErrors && importLegacyErrors.length === 0) onDismiss();
+        if (!importLegacyErrors && importLegacyErrors.length === 0) {
+          setLoading(false);
+          onDismiss();
+        }
 
         console.info('Legacy project uploaded');
       },

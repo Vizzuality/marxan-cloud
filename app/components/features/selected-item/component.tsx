@@ -142,7 +142,7 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="text-sm font-heading">{name}</h2>
 
-          <div className="flex">
+          <div className="flex flex-col ml-2 space-y-2">
             <Button
               className="flex-shrink-0 text-xs"
               theme={isShown ? 'tertiary' : 'secondary'}
@@ -153,7 +153,7 @@ export const Item: React.FC<ItemProps> = ({
             </Button>
             {editable && (
               <Button
-                className="flex-shrink-0 ml-2 text-xs"
+                className="flex-shrink-0 text-xs"
                 theme="secondary"
                 size="xs"
                 onClick={() => onRemove && onRemove(id)}

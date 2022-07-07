@@ -267,8 +267,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     features: selectedFeaturesData,
     cache,
     active: tab === ScenarioSidebarTabs.FEATURES
-      && (subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS
-    /* || subtab !== ScenarioSidebarSubTabs.FEATURES_TARGET */),
+      && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
     bbox,
     options: {
       featuresRecipe,
