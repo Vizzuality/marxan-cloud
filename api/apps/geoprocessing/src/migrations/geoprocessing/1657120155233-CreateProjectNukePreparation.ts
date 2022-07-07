@@ -5,7 +5,7 @@ export class CreateProjectNukePreparation1657182655233
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         CREATE TABLE project_nuke_preparation (
-            project_id uuid PRIMARY KEY,
+            project_id uuid PRIMARY KEY
           );`);
   }
 

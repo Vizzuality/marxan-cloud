@@ -7,5 +7,6 @@ import { UnusedResourcesCleanupWorker } from './unused-resources-cleanup.worker'
 @Module({
   imports: [WorkerModule, UnusedResourcesModule],
   providers: [UnusedResourcesCleanupWorker, UnusedResourcesCleanupProcessor],
+  exports: [UnusedResourcesModule],
 })
 export class UnusedResourcesCleanUpModule {}

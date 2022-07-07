@@ -16,6 +16,7 @@ import {
 } from '@marxan/scenarios-planning-unit';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UnusedResourcesCleanUpModule } from '../unused-resources-cleanup/unused-resources-cleanup.module';
 import { CleanupTasksService } from './cleanup-tasks.service';
 
 @Module({
@@ -37,6 +38,7 @@ import { CleanupTasksService } from './cleanup-tasks.service';
       ],
       geoprocessingConnections.default,
     ),
+    UnusedResourcesCleanUpModule,
   ],
   providers: [CleanupTasksService],
   exports: [CleanupTasksService],
