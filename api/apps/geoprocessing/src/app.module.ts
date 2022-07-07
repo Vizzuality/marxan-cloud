@@ -22,6 +22,7 @@ import { ImportModule } from '@marxan-geoprocessing/import/import.module';
 import { PingController } from '@marxan-geoprocessing/modules/ping/ping.controller';
 import { LegacyProjectImportModule } from './legacy-project-import/legacy-project-import.module';
 import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup/unused-resources-cleanup.module';
+import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup
     LegacyProjectImportModule,
     UnusedResourcesCleanUpModule,
     ScheduleModule.forRoot(),
+    CleanupTasksModule,
   ],
   controllers: [AppController, PingController],
   providers: [AppService],
