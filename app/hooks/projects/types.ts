@@ -119,7 +119,6 @@ export interface UseSaveLegacyProjectProps {
 export interface SaveLegacyProjectProps {
   data: {
     projectName: string;
-    solutionsAreLocked: boolean;
   };
 }
 
