@@ -10,8 +10,8 @@ export const UPLOAD_PROJECT_TYPES = [
       height: 20,
     },
     title: 'Upload project',
-    subtitle: 'Prioritizes for a single action (e.g. a protected area network)',
-    disclaimer: 'If just starting out, we recommend Marxan to help you familiarize yourself with the process.',
+    subtitle: 'Use this option to upload a project created within this application',
+    disclaimer: '',
     disabled: false,
   },
   {
@@ -22,8 +22,8 @@ export const UPLOAD_PROJECT_TYPES = [
       height: 20,
     },
     title: 'Upload legacy project',
-    subtitle: 'Prioritizes for multiple actions simultaneously (e.g. protected areas, community-use, and sustainable use zones).',
-    disclaimer: 'This approach is more data and process intensive.',
+    subtitle: 'Use this option to upload projects created with different Marxan application',
+    disclaimer: '',
     disabled: false,
   },
 ];
