@@ -5,7 +5,7 @@ export class CreateScenarioNukePreparation1657182662302
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         CREATE TABLE scenario_nuke_preparation (
-            scenario_id uuid PRIMARY KEY,
+            scenario_id uuid PRIMARY KEY
           );`);
   }
 
