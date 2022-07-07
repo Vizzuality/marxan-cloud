@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
@@ -278,6 +278,13 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     }
     return true;
   }, [selectedFeatures]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(setSelectedFeatures([]));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
