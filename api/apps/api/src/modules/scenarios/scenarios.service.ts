@@ -8,7 +8,7 @@ import {
 import { FetchSpecification } from 'nestjs-base-service';
 import { classToClass } from 'class-transformer';
 import * as stream from 'stream';
-import { Either, isLeft, left, right } from 'fp-ts/Either';
+import { Either, isLeft, isRight, left, right } from 'fp-ts/Either';
 import { pick } from 'lodash';
 import { MarxanInput, MarxanParameters } from '@marxan/marxan-input';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -116,6 +116,7 @@ import {
   DeleteScenario as DeleteScenarioUnusedResources,
   deleteScenarioFailed,
 } from './delete-scenario/delete-scenario.command';
+import { LegacyProjectImportChecker } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -174,6 +175,7 @@ export class ScenariosService {
     private readonly costService: CostRangeService,
     private readonly blockGuard: BlockGuard,
     private readonly projectChecker: ProjectChecker,
+    private readonly legacyProjectChecker: LegacyProjectImportChecker,
     private readonly protectedArea: ProtectedAreaService,
     private readonly queryBus: QueryBus,
     private readonly commandBus: CommandBus,
@@ -281,6 +283,13 @@ export class ScenariosService {
         return left(projectNotReady);
       }
     }
+    const isLegacyProjectCompleted = await this.legacyProjectChecker.isLegacyProjectImportCompletedFor(
+      input.projectId,
+    );
+
+    if (isRight(isLegacyProjectCompleted) && !isLegacyProjectCompleted.right)
+      return left(projectNotReady);
+
     const scenario = await this.crudService.create(validatedMetadata, info);
     const blmCreationResult = await this.commandBus.execute(
       new CreateInitialScenarioBlm(scenario.id, scenario.projectId),
