@@ -20,9 +20,11 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   fpf,
   id,
   editable,
+  isShown,
   onRemove,
   onChangeTarget,
   onChangeFPF,
+  onSeeOnMap,
 }: TargetSPFItemProps) => {
   const inputRef = useRef<HTMLInputElement>();
   const [targetValue, setTargetValue] = useState((target || defaultTarget) / 100);
@@ -69,16 +71,28 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         >
           {isAllTargets ? 'Set target and SPF in all features' : name}
         </span>
-        {!isAllTargets && editable && (
-          <Button
-            className="flex-shrink-0 text-xs"
-            theme="secondary"
-            size="xs"
-            onClick={() => onRemove && onRemove(id)}
-          >
-            Remove
-          </Button>
-        )}
+        <div className="flex flex-col space-y-2">
+          {!isAllTargets && (
+            <Button
+              className="flex-shrink-0 text-xs"
+              theme={isShown ? 'tertiary' : 'secondary'}
+              size="xs"
+              onClick={onSeeOnMap}
+            >
+              See on map
+            </Button>
+          )}
+          {!isAllTargets && editable && (
+            <Button
+              className="flex-shrink-0 text-xs"
+              theme="secondary"
+              size="xs"
+              onClick={() => onRemove && onRemove(id)}
+            >
+              Remove
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex">
         <div className="relative flex-col w-full pr-4">

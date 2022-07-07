@@ -142,24 +142,26 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="text-sm font-heading">{name}</h2>
 
-          <Button
-            className="flex-shrink-0 text-xs"
-            theme={isShown ? 'tertiary' : 'secondary'}
-            size="xs"
-            onClick={onSeeOnMap}
-          >
-            See on map
-          </Button>
-          {editable && (
+          <div className="flex">
             <Button
-              className="flex-shrink-0 ml-2 text-xs"
-              theme="secondary"
+              className="flex-shrink-0 text-xs"
+              theme={isShown ? 'tertiary' : 'secondary'}
               size="xs"
-              onClick={() => onRemove && onRemove(id)}
+              onClick={onSeeOnMap}
             >
-              Remove
+              See on map
             </Button>
-          )}
+            {editable && (
+              <Button
+                className="flex-shrink-0 ml-2 text-xs"
+                theme="secondary"
+                size="xs"
+                onClick={() => onRemove && onRemove(id)}
+              >
+                Remove
+              </Button>
+            )}
+          </div>
         </div>
 
         {type === 'bioregional' && split && (
