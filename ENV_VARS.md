@@ -48,10 +48,11 @@ applications.
   the Express daemon of the API service will listen. If running the API on the 
   same host as the Geoprocessing application, you need to modify at least one 
   of the two, so they don't conflict.
-* `NETWORK_CORS_ORIGINS` (comma-separated list of whitelisted app origins for
-  requests from the in-browser frontend app to the API, required except when
-  accessing the frontend app on the default URL defined in
-  `api/apps/api/config/default.json`, via the `network.cors.origins` config key)
+* `NETWORK_CORS_ORIGINS` (comma-separated list of string origin URLs, optional,
+  default is an empty list): whitelisted app origins for requests from the
+  in-browser frontend app to the API, required except when accessing the
+  frontend app on the default URL defined in `api/apps/api/config/default.json`,
+  via the `network.cors.origins` config key
 * `CLONING_SIGNING_SECRET` (base64-encoded string, required): this is a
   base64-encoded representation of a PEM-format RSA private key; the key must be
   created without a passphrase, for example via a command such as `openssl

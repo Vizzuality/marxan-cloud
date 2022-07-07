@@ -1,3 +1,4 @@
+import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
@@ -9,11 +10,14 @@ import {
 } from '@marxan/marxan-output';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { ProtectedArea } from '@marxan/protected-areas';
-import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
+import {
+  ScenariosPlanningUnitGeoEntity,
+  ScenariosPuPaDataGeo,
+} from '@marxan/scenarios-planning-unit';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DeleteProjectUnsusedReosurces } from './delete-project-unused-resources';
-import { DeleteScenarioUnsusedReosurces } from './delete-scenario-unused-resources';
+import { ProjectUnusedResources } from './project-unused-resources';
+import { ScenarioUnusedResources } from './scenario-unused-resources';
 
 @Module({
   imports: [
@@ -21,7 +25,9 @@ import { DeleteScenarioUnsusedReosurces } from './delete-scenario-unused-resourc
     TypeOrmModule.forFeature(
       [
         BlmFinalResultEntity,
+        BlmPartialResultEntity,
         ScenariosPuPaDataGeo,
+        ScenariosPlanningUnitGeoEntity,
         OutputScenariosPuDataGeoEntity,
         PlanningArea,
         ProtectedArea,
@@ -33,7 +39,7 @@ import { DeleteScenarioUnsusedReosurces } from './delete-scenario-unused-resourc
       geoprocessingConnections.default,
     ),
   ],
-  providers: [DeleteProjectUnsusedReosurces, DeleteScenarioUnsusedReosurces],
-  exports: [DeleteProjectUnsusedReosurces, DeleteScenarioUnsusedReosurces],
+  providers: [ProjectUnusedResources, ScenarioUnusedResources],
+  exports: [ProjectUnusedResources, ScenarioUnusedResources],
 })
-export class DeleteUnusedResourcesModule {}
+export class UnusedResourcesModule {}
