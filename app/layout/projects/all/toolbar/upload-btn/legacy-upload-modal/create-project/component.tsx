@@ -35,10 +35,9 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
 
   const onCreateProjectSubmit = useCallback((values) => {
     setLoading(true);
-    // TODO: Add description to payload when endpoiny accepts it.
     const data = {
       projectName: values.name,
-      solutionsAreLocked: false,
+      description: values.description,
     };
 
     saveLegacyProjectMutation.mutate({ data }, {
@@ -111,12 +110,12 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
                     )}
                   </FieldRFF>
                   <FieldRFF
-                    name="decription"
+                    name="description"
                   >
                     {(fprops) => (
-                      <Field id="decription" {...fprops}>
+                      <Field id="description" {...fprops}>
                         <div className="flex items-center mb-3 space-x-2">
-                          <Label theme="light" className="uppercase" id="decription">
+                          <Label theme="light" className="uppercase" id="description">
                             Description
                           </Label>
                         </div>
