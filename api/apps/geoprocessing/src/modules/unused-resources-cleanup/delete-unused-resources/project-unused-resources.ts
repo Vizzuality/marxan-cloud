@@ -9,7 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
 
-type ProjectUnusedResourcesData = { projectCustomFeaturesIds: string[] };
+export type ProjectUnusedResourcesData = { projectCustomFeaturesIds: string[] };
 
 @Injectable()
 export class ProjectUnusedResources

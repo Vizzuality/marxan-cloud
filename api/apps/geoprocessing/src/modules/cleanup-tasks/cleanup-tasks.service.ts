@@ -5,15 +5,25 @@ import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { CleanupTasks } from './cleanup-tasks';
 import { chunk } from 'lodash';
-import { ProjectUnusedResources } from '../unused-resources-cleanup/delete-unused-resources/project-unused-resources';
+import {
+  ProjectUnusedResources,
+  ProjectUnusedResourcesData,
+} from '../unused-resources-cleanup/delete-unused-resources/project-unused-resources';
 import { ScenarioUnusedResources } from '../unused-resources-cleanup/delete-unused-resources/scenario-unused-resources';
 
 const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
 interface entitiesWithProjectId {
   project_id: string;
 }
+interface entitiesWithProjectIdAndProjectCustomFeatures {
+  projectId: string;
+  data: ProjectUnusedResourcesData;
+}
 interface entitiesWithScenarioId {
   scenario_id: string;
+}
+interface projectCustomFeatureObject {
+  id: string;
 }
 
 @Injectable()
@@ -29,6 +39,7 @@ export class CleanupTasksService implements CleanupTasks {
   ) {}
 
   async nukeProjectsDanglingData() {
+    // Find all existing projects in API DB and return an array of their IDs
     const projectIds = await this.apiEntityManager
       .createQueryBuilder()
       .from('projects', 'p')
@@ -39,11 +50,14 @@ export class CleanupTasksService implements CleanupTasks {
         throw new Error(error);
       });
 
+    // Start cleaning up process inside transaction
     await this.geoEntityManager.transaction(async (entityManager) => {
+      // Truncate table to be sure that not any projectId is inside before operation
       await this.geoEntityManager.query(
         `TRUNCATE TABLE project_nuke_preparation`,
       );
 
+      // Set batches to insert ids in intermediate table for processing
       for (const [, summaryChunks] of chunk(
         projectIds,
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
@@ -56,6 +70,8 @@ export class CleanupTasksService implements CleanupTasks {
         );
       }
 
+      // For every related entity, we look for non-matching ids inside entity table
+      // and compare it with intermediate projectId table
       const missingProjectIdsFromPlanningAreas: entitiesWithProjectId[] = await this.geoEntityManager.query(
         `SELECT pa.project_id
         FROM planning_areas pa
@@ -75,19 +91,43 @@ export class CleanupTasksService implements CleanupTasks {
         WHERE pnp.project_id IS NULL`,
       );
 
-      const notMatchingProjectIds: string[] = [];
+      const notMatchingProjectIds: any[] = [];
 
       notMatchingProjectIds.push(
-        ...missingProjectIdsFromPlanningAreas.map((p) => p.project_id),
-        ...missingProjectIdsFromProtectedAreas.map((p) => p.project_id),
-        ...missingProjectIdsFromProjectsPlanningUnits.map((p) => p.project_id),
+        ...missingProjectIdsFromPlanningAreas,
+        ...missingProjectIdsFromProtectedAreas,
+        ...missingProjectIdsFromProjectsPlanningUnits,
       );
 
-      await notMatchingProjectIds.map(async (projectId) => {
-        await this.projectUnusedResources.removeUnusedResources(projectId, {
-          projectCustomFeaturesIds: [''],
-        });
-        return projectId;
+      // Look for ProjectCustomFeatures in api to also delete them
+      const notMatchingProjectsIdWithCustomFeaturesPerProject: entitiesWithProjectIdAndProjectCustomFeatures[] = await Promise.all(
+        notMatchingProjectIds.map(async (p: entitiesWithProjectId) => {
+          const projectCustomFeaturesIds = await this.apiEntityManager
+            .createQueryBuilder()
+            .from('features', 'f')
+            .select(['id'])
+            .where('project.id = :projectId', { projectId: p.project_id })
+            .getRawMany()
+            .then((result) =>
+              result.map((i: projectCustomFeatureObject) => i.id),
+            )
+            .catch((error) => {
+              throw new Error(error);
+            });
+          return {
+            projectId: p.project_id,
+            data: { projectCustomFeaturesIds },
+          };
+        }),
+      );
+
+      // Uses unused resources cleanup service to finish cleaning for every mismatch in projectId array
+      await notMatchingProjectsIdWithCustomFeaturesPerProject.map(async (p) => {
+        await this.projectUnusedResources.removeUnusedResources(
+          p.projectId,
+          p.data,
+        );
+        return p;
       });
 
       await this.geoEntityManager.query(
@@ -106,8 +146,6 @@ export class CleanupTasksService implements CleanupTasks {
       .catch((error) => {
         throw new Error(error);
       });
-
-    //   await this.scenarioPuDataRepo.delete({ scenarioId });
 
     await this.geoEntityManager.transaction(async (entityManager) => {
       await this.geoEntityManager.query(
@@ -159,6 +197,8 @@ export class CleanupTasksService implements CleanupTasks {
 
       const notMatchingScenarioIds: string[] = [];
 
+      // As opposed to Project cleanup, scenarios are flattened to their ids
+      // so the map just uses them to remove unused resources
       notMatchingScenarioIds.push(
         ...missingScenarioIdsFromScenarioFeaturesData.map((p) => p.scenario_id),
         ...missingScenarioIdsFromBlmFinalResults.map((p) => p.scenario_id),
