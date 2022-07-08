@@ -87,6 +87,10 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
                   >
                     <button type="button" onClick={() => onSetUploadMode(u.id)}>
                       <div className="h-full p-5">
+                        <div className="flex items-center justify-center w-16 h-16 transition-all bg-gray-100 rounded-3xl group-hover:bg-primary-500">
+                          <Icon icon={u.icon} style={u.iconStyles} />
+                        </div>
+
                         <div className="mt-8 text-left text-black">
                           <h3 className="text-lg font-medium font-heading">{u.title}</h3>
                           <h4 className="mt-5">{u.subtitle}</h4>
