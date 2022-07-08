@@ -9,7 +9,7 @@ import { ScenarioFeaturesGapData } from './scenario-features-gap-data.geo.entity
       amount,
       occurrences,
       run_id,
-      fd.feature_id,
+      sfd.api_feature_id as feature_id,
       sfd.scenario_id,
       osfd.total_area,
       sfd.prop as coverage_target

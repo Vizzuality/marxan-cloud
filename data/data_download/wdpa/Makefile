@@ -3,10 +3,15 @@ SHELL=/bin/bash
 MAKEFLAGS := --jobs=$(shell nproc)
 MAKEFLAGS += --output-sync=target
 
-URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
-		-H 'content-type: application/json;charset=UTF-8' \
-		--data-raw '{"domain":"general","format":"shp","token":"wdpa","id":51216}' \
-		--compressed | jq '.url')
+# This get the URL for the latest WDPA data from the Protected Planet servers. However, right now,
+# this returns an URL that then 404's. So we are hardcoding the URL for now. In turn, this URL is
+# from a temporary dev bucket, that it will be deleted at some point. If you have issues with WDPA data
+# try restoring this first, and see how it goes.
+# URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
+#		-H 'content-type: application/json;charset=UTF-8' \
+#		--data-raw '{"domain":"general","format":"shp","token":"wdpa","id":51216}' \
+#		--compressed | jq '.url')
+URL := 'https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/data//wdpa/wdpa/wdpa.zip'
 SIMP_FOLDER := data/wdpa/simp
 GEO_FOLDER := data/wdpa/geojson
 

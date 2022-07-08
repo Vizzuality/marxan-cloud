@@ -1,5 +1,9 @@
-import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
-import { SingleRunAdapterModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
+import {
+  MarxanSandboxRunnerService
+} from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
+import {
+  SingleRunAdapterModule
+} from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
 import {
@@ -22,7 +26,8 @@ import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { bootstrapApplication, delay } from '../../utils';
-import { Geometry } from 'geojson';
+
+const TEST_TIMEOUT_MULTIPLIER = 35000;
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 
@@ -50,7 +55,7 @@ describe(`given input data is delayed`, () => {
 
     await delay(1000);
     fixtures.WhenKillingMarxanRun();
-  }, 30000);
+  }, TEST_TIMEOUT_MULTIPLIER);
 });
 
 describe(`given input data is available`, () => {
@@ -61,7 +66,7 @@ describe(`given input data is available`, () => {
     fixtures.GivenInputFilesAreAvailable(500);
     await fixtures.GivenScenarioDataExists();
     await fixtures.GivenScenarioPuDataExists();
-  }, 60000 * 2);
+  }, TEST_TIMEOUT_MULTIPLIER * 4);
   test(
     `marxan run during binary execution`,
     async () => {
@@ -70,7 +75,7 @@ describe(`given input data is available`, () => {
       await fixtures.ThenOutputScenarioPuDataWasPersisted();
       fixtures.ThenProgressWasReported();
     },
-    60000 * 15,
+    TEST_TIMEOUT_MULTIPLIER * 30,
   );
 
   test(`cancelling marxan run`, async (done) => {
@@ -88,12 +93,12 @@ describe(`given input data is available`, () => {
 
     await delay(1000);
     fixtures.WhenKillingMarxanRun();
-  }, 30000);
+  }, TEST_TIMEOUT_MULTIPLIER);
 });
 
 afterEach(async () => {
   await fixtures.cleanup();
-}, 50000);
+}, TEST_TIMEOUT_MULTIPLIER*2);
 
 const NUMBER_OF_FEATURES_IN_SAMPLE = 59;
 const NUMBER_OF_PU_IN_SAMPLE = 12178;
@@ -225,6 +230,7 @@ const getFixtures = async () => {
               coverageTarget: 0,
               coverageTargetArea: 1000,
               featureDataId: feature.id,
+              apiFeatureId: featureId,
               currentArea: 200,
               fpf: 1,
               met: 1,
@@ -304,5 +310,5 @@ const resources = [
 const resourceResponse = (resourceAddress: string) =>
   readFileSync(
     process.cwd() +
-      `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
+    `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
   );

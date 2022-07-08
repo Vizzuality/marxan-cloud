@@ -571,6 +571,26 @@ describe('UsersModule (e2e)', () => {
         .send({ userIds: [adminUserId] });
       expect(WhenBlockingOneself.status).toEqual(400);
     });
+
+    test('A platform admin should be able to download csv data from users', async () => {
+      const WhenDownloadingCsvData = await request(app.getHttpServer())
+        .get(`/api/v1/users/csv`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenDownloadingCsvData.status).toEqual(200);
+      expect(WhenDownloadingCsvData.headers['content-type']).toBe(
+        'text/csv; charset=utf-8',
+      );
+    });
+
+    test('A non admin user should not be able to download csv data from users', async () => {
+      const WhenDownloadingCsvData = await request(app.getHttpServer())
+        .get(`/api/v1/users/csv`)
+        .set('Authorization', `Bearer ${nonAdminToken}`);
+      expect(WhenDownloadingCsvData.status).toEqual(403);
+      expect(WhenDownloadingCsvData.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+    });
   });
 
   describe('Users - Find by email', () => {

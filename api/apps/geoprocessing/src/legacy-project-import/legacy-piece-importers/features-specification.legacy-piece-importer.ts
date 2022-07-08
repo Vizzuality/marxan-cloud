@@ -245,7 +245,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
   private async waitUntilSpecificationEnds(
     scenarioId: string,
-    retries = 10,
+    retries = 20,
   ): Promise<Either<string, true>> {
     const timeout = left('specification timeout');
     const failure = left('specification failed');

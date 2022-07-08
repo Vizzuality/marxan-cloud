@@ -4,9 +4,14 @@ import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { E2E_CONFIG } from '../e2e.config';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import * as request from 'supertest';
+import { CqrsModule } from '@nestjs/cqrs';
+import { EventBusTestUtils } from '../utils/event-bus.test.utils';
+import { ProjectDeleted } from '@marxan-api/modules/projects/events/project-deleted.event';
 
 export const getFixtures = async () => {
-  const app = await bootstrapApplication();
+  const app = await bootstrapApplication([CqrsModule], [EventBusTestUtils]);
+  const eventBusTestUtils = app.get(EventBusTestUtils);
+  eventBusTestUtils.startInspectingEvents();
   const token = await GivenUserIsLoggedIn(app);
   const notIncludedUserToken = await GivenUserIsLoggedIn(app, 'bb');
   const organizationId = (
@@ -24,6 +29,7 @@ export const getFixtures = async () => {
         token,
         organizationId,
       );
+      eventBusTestUtils.stopInspectingEvents();
       await app.close();
     },
     GivenProjectWasCreated: async () => {
@@ -52,6 +58,17 @@ export const getFixtures = async () => {
     },
     ThenForbiddenIsReturned: (response: request.Response) => {
       expect(response.status).toEqual(403);
+    },
+    ThenProjectDeleteEventHasBeenSent: async () => {
+      const event = await eventBusTestUtils.waitUntilEventIsPublished(
+        ProjectDeleted,
+      );
+
+      expect(event).toMatchObject({
+        projectId,
+        scenarioIds: [],
+        projectCustomFeaturesIds: [],
+      });
     },
   };
 };

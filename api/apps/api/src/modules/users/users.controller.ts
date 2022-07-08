@@ -5,6 +5,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  Header,
   NotFoundException,
   Param,
   ParseUUIDPipe,
@@ -12,6 +13,7 @@ import {
   Post,
   Query,
   Request,
+  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -28,6 +30,7 @@ import {
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiProduces,
   ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -49,6 +52,8 @@ import { UpdateUserPasswordDTO } from './dto/update.user-password';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import { PlatformAdminEntity } from './platform-admin/admin.api.entity';
 import { isLeft } from 'fp-ts/lib/Either';
+import { Response } from 'express';
+import { Stream } from 'stream';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -281,6 +286,7 @@ export class UsersController {
       }
     }
   }
+
   @ApiOperation({
     description: 'Unblock user by Id.',
   })
@@ -306,6 +312,35 @@ export class UsersController {
           throw _exhaustiveCheck;
       }
     }
+  }
+
+  @ApiOperation({
+    description: 'Download CSV with user demographics and other info.',
+  })
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get('csv')
+  @ApiProduces('text/csv')
+  @Header('Content-Type', 'text/csv')
+  @Header('Content-Disposition', 'attachment; filename=user-details.csv')
+  async getCsvData(
+    @Request() req: RequestWithAuthenticatedUser,
+    @Res() res: Response,
+  ): Promise<Stream> {
+    const result = await this.service.getCsvData(req.user.id);
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case forbiddenError:
+          throw new ForbiddenException();
+        default:
+          const _exhaustiveCheck: never = result.left;
+          throw _exhaustiveCheck;
+      }
+    }
+
+    return result.right.pipe(res);
   }
 
   @ApiOperation({

@@ -29,6 +29,7 @@ import { MarkLegacyProjectImportAsFinishedHandler } from './mark-legacy-project-
 import { MarkLegacyProjectImportPieceAsFailedHandler } from './mark-legacy-project-import-piece-as-failed.handler';
 import { RunLegacyProjectImportHandler } from './run-legacy-project-import.handler';
 import { StartLegacyProjectImportHandler } from './start-legacy-project-import.handler';
+import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-to-legacy-project-import.handler';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { StartLegacyProjectImportHandler } from './start-legacy-project-import.h
     LaunchLegacyProjectImportSpecificationHandler,
     CancelLegacyProjectImportHandler,
     MarkLegacyProjectImportAsCanceledHandler,
+    UpdateSolutionsAreLockedHandler,
     { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })

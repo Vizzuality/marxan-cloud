@@ -17,6 +17,8 @@ test(`deleting a project should work`, async () => {
   await fixtures.WhenProjectIsDeleted();
 
   await fixtures.ThenProjectIsNotFound();
+
+  fixtures.ThenProjectDeleteEventHasBeenSent();
 });
 
 test(`deleting a project does not work if user is not in project`, async () => {

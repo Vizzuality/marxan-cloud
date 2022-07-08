@@ -85,6 +85,8 @@
       "@marxan/legacy-project-import/*": ["libs/legacy-project-import/src/*"],
       "@marxan/cloning": ["libs/cloning/src"],
       "@marxan/cloning/*": ["libs/cloning/src/*"],
+      "@marxan/unused-resources-cleanup": ["libs/unused-resources-cleanup/src"],
+      "@marxan/unused-resources-cleanup/*": ["libs/unused-resources-cleanup/src/*"],
       "@marxan/code-guide": ["libs/code-guide/src"],
       "@marxan/code-guide/*": ["libs/code-guide/src/*"],
       "@marxan/webshot": ["libs/webshot/src"],

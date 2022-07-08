@@ -30,14 +30,18 @@ type OutputScenarioFeaturesDataSelectResult = OutputFeatureDataElement & {
   featureScenarioId: string;
 };
 
-type FeatureDataElementWithFeatureId = FeatureDataElement & {
+type FeatureDataElementWithFeatureId = Omit<
+  FeatureDataElement,
+  'apiFeature' | 'featureDataFeature'
+> & {
   sfdId: string;
   apiFeatureId: string;
+  featureDataFeatureId: string;
 };
 
 type FeatureDataElementWithIsCustom = FeatureDataElementWithFeatureId & {
-  isCustom: boolean;
-  featureClassName: string;
+  apiFeature: { isCustom: boolean; featureClassName: string };
+  featureDataFeature: { isCustom: boolean; featureClassName: string };
 };
 
 @Injectable()
@@ -65,7 +69,8 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
       .filter((sfd) => sfd.featureData.featureId)
       .map((sfd) => ({
         sfdId: sfd.id,
-        apiFeatureId: sfd.featureData.featureId!,
+        apiFeatureId: sfd.apiFeatureId,
+        featureDataFeatureId: sfd.featureData.featureId!,
         currentArea: sfd.currentArea,
         featureDataHash: sfd.featureData.hash,
         featureId: sfd.featureId,
@@ -78,7 +83,6 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         target2: sfd.target2,
         target: sfd.target,
         targetocc: sfd.targetocc,
-        featureClassName: '',
         outputFeaturesData: [],
       }));
   }
@@ -96,17 +100,30 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
     });
 
     return featuresDataWithFeatureId.map((el) => {
-      const featureProperties = featurePropertiesById[el.apiFeatureId];
+      const apiFeatureProperties = featurePropertiesById[el.apiFeatureId];
+      const featureDataFeatureProperties =
+        featurePropertiesById[el.featureDataFeatureId];
 
-      if (!featureProperties)
+      if (!apiFeatureProperties)
         throw new Error(
           `Feature properties not found for feature with id ${el.apiFeatureId}`,
         );
 
+      if (!featureDataFeatureProperties)
+        throw new Error(
+          `Feature properties not found for feature with id ${el.featureDataFeatureId}`,
+        );
       return {
         ...el,
-        isCustom: featureProperties.is_custom,
-        featureClassName: featureProperties.feature_class_name,
+        apiFeature: {
+          isCustom: apiFeatureProperties.is_custom,
+          featureClassName: apiFeatureProperties.feature_class_name ?? '',
+        },
+        featureDataFeature: {
+          isCustom: featureDataFeatureProperties.is_custom,
+          featureClassName:
+            featureDataFeatureProperties.feature_class_name ?? '',
+        },
       };
     });
   }
@@ -115,17 +132,14 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
     scenarioFeaturesDataWithIsCustom: FeatureDataElementWithIsCustom[],
     outputScenariosFeaturesData: OutputScenarioFeaturesDataSelectResult[],
   ): ScenarioFeaturesDataContent {
-    const customFeaturesData: FeatureDataElement[] = [];
-    const platformFeaturesData: FeatureDataElement[] = [];
+    const featuresData: FeatureDataElement[] = [];
 
     scenarioFeaturesDataWithIsCustom.forEach(
-      ({ sfdId, isCustom, apiFeatureId, ...sfd }) => {
+      ({ sfdId, apiFeatureId, featureDataFeatureId, ...sfd }) => {
         const outputData = outputScenariosFeaturesData.filter(
           (el) => el.featureScenarioId === sfdId,
         );
-
-        const array = isCustom ? customFeaturesData : platformFeaturesData;
-        array.push({
+        featuresData.push({
           ...sfd,
           outputFeaturesData: outputData.map(
             ({ featureScenarioId, ...rest }) => ({
@@ -137,8 +151,7 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
     );
 
     return {
-      customFeaturesData,
-      platformFeaturesData,
+      featuresData,
     };
   }
 
@@ -176,7 +189,10 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
     );
     const featuresIds = [
       ...new Set<string>(
-        scenarioFeaturesDataWithFeatureId.map((sfd) => sfd.apiFeatureId),
+        scenarioFeaturesDataWithFeatureId.flatMap((sfd) => [
+          sfd.apiFeatureId,
+          sfd.featureDataFeatureId,
+        ]),
       ),
     ];
 

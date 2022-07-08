@@ -36,7 +36,7 @@ export class AssetFactory {
      */
     try {
       execSync(`cp -a -f ${from.workingDirectory}/* ${to.workingDirectory}`);
-    } catch(e) {
+    } catch (e) {
       Logger.error(e);
     }
 

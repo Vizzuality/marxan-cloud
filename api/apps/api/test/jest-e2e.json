@@ -73,6 +73,8 @@
     "@marxan/cloning": "<rootDir>/../../../libs/cloning/src",
     "@marxan/legacy-project-import/(.*)": "<rootDir>/../../../libs/legacy-project-import/src/$1",
     "@marxan/legacy-project-import": "<rootDir>/../../../libs/legacy-project-import/src",
+    "@marxan/unused-resources-cleanup/(.*)": "<rootDir>/../../../libs/unused-resources-cleanup/src/$1",
+    "@marxan/unused-resources-cleanup": "<rootDir>/../../../libs/unused-resources-cleanup/src",
     "@marxan/webshot/(.*)": "<rootDir>../../../libs/webshot/src/$1",
     "@marxan/webshot": "<rootDir>../../../libs/webshot/src",
     "@marxan/geofeatures/(.*)": "<rootDir>/../../../libs/geofeatures/src/$1",

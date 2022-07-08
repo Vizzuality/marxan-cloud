@@ -504,6 +504,7 @@ export async function GivenScenarioFeaturesData(
     id: v4(),
     featureDataId: data.id,
     scenarioId,
+    apiFeatureId: data.feature_id,
     featureId: opts.startingIndex + index + 1,
   }));
 

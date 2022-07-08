@@ -1,4 +1,3 @@
-import { RemoteFeaturesData } from '../entities/remote-features-data.geo.entity';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { FeatureTag } from '@marxan/features/domain';
 import { GeoFeature } from '../../geo-features/geo-feature.api.entity';
@@ -19,6 +18,7 @@ type RawRemoteScenarioFeaturesData = Pick<
   | 'totalArea'
   | 'currentArea'
   | 'target2'
+  | 'apiFeatureId'
 >;
 
 export const getValidNonGeoData = (
@@ -34,6 +34,7 @@ export const getValidNonGeoData = (
       currentArea: 12000,
       totalArea: 20000,
       target2: 0,
+      apiFeatureId: metaFeatureIdMet,
     },
     {
       id: 'some-another-id',
@@ -44,20 +45,10 @@ export const getValidNonGeoData = (
       currentArea: 4000,
       totalArea: 10000,
       target2: 0,
+      apiFeatureId: metaFeatureIdFailed,
     },
   ],
   2,
-];
-
-export const getValidRemoteFeatureData = (): RemoteFeaturesData[] => [
-  {
-    featureId: metaFeatureIdFailed,
-    id: featureIdFailed,
-  },
-  {
-    featureId: metaFeatureIdMet,
-    id: featureIdMet,
-  },
 ];
 
 export const getValidGeoFeature = (): GeoFeature[] => {
