@@ -107,7 +107,10 @@ Secrets with the corresponding values:
 
 Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
 and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
-the Frontend app docker image.
+the Frontend app docker image. The secrets that need to be added to Github actions are named as `<ENV VAR name>_<environment>` 
+so, for example, to account for the `NEXT_PUBLIC_API_URL` frontend env var, you need to define both `NEXT_PUBLIC_API_URL_STAGING`
+and `NEXT_PUBLIC_API_URL_PRODUCTION`. Note that these values are passed onto the built docker images and used in the actual
+deployed applications.
 
 ## How to deploy
 
