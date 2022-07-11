@@ -58,6 +58,6 @@
     }
   },
   "cleanupCronJobSettings": {
-    "interval": "0 0-23/6 * * *"
+    "interval": "CLEANUP_CRON_INTERVAL"
   }
 }
