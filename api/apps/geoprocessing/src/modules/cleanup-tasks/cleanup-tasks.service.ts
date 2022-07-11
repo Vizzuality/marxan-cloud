@@ -1,31 +1,16 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { CleanupTasks } from './cleanup-tasks';
 import { chunk } from 'lodash';
-import {
-  ProjectUnusedResources,
-  ProjectUnusedResourcesData,
-} from '../unused-resources-cleanup/delete-unused-resources/project-unused-resources';
-import { ScenarioUnusedResources } from '../unused-resources-cleanup/delete-unused-resources/scenario-unused-resources';
+import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 
 const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
-interface entitiesWithProjectId {
-  project_id: string;
-}
-interface entitiesWithProjectIdAndProjectCustomFeatures {
-  projectId: string;
-  data: ProjectUnusedResourcesData;
-}
-interface entitiesWithScenarioId {
-  scenario_id: string;
-}
-interface projectCustomFeatureObject {
-  id: string;
-}
-
+const cronJobInterval: string = AppConfig.get(
+  'cleanupCronJobSettings.interval',
+);
 @Injectable()
 export class CleanupTasksService implements CleanupTasks {
   private readonly logger = new Logger(CleanupTasksService.name);
@@ -34,11 +19,9 @@ export class CleanupTasksService implements CleanupTasks {
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly geoEntityManager: EntityManager,
-    private readonly projectUnusedResources: ProjectUnusedResources,
-    private readonly scenarioUnusedResources: ScenarioUnusedResources,
   ) {}
 
-  async nukeProjectsDanglingData() {
+  async cleanupProjectsDanglingData() {
     // Find all existing projects in API DB and return an array of their IDs
     const projectIds = await this.apiEntityManager
       .createQueryBuilder()
@@ -54,7 +37,7 @@ export class CleanupTasksService implements CleanupTasks {
     await this.geoEntityManager.transaction(async (entityManager) => {
       // Truncate table to be sure that not any projectId is inside before operation
       await this.geoEntityManager.query(
-        `TRUNCATE TABLE project_nuke_preparation`,
+        `TRUNCATE TABLE project_nuke_preparation;`,
       );
 
       // Set batches to insert ids in intermediate table for processing
@@ -71,72 +54,43 @@ export class CleanupTasksService implements CleanupTasks {
       }
 
       // For every related entity, we look for non-matching ids inside entity table
-      // and compare it with intermediate projectId table
-      const missingProjectIdsFromPlanningAreas: entitiesWithProjectId[] = await this.geoEntityManager.query(
-        `SELECT pa.project_id
-        FROM planning_areas pa
-        LEFT JOIN project_nuke_preparation pnp ON pnp.project_id = pa.project_id
-        WHERE pnp.project_id IS NULL`,
+      // and compare it with intermediate projectId table to delete records that are not there
+      await this.geoEntityManager.query(
+        `DELETE FROM planning_areas pa
+        WHERE pa.project_id IS NOT NULL
+        AND pa.project_id NOT IN (
+          SELECT pgcp.project_id FROM project_geodata_cleanup_preparation pgcp
+        );`,
       );
-      const missingProjectIdsFromProtectedAreas: entitiesWithProjectId[] = await this.geoEntityManager.query(
-        `SELECT wdpa.project_id
-        FROM wdpa
-        LEFT JOIN project_nuke_preparation pnp ON pnp.project_id = wdpa.project_id
-        WHERE pnp.project_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM wdpa
+        WHERE wdpa.project_id IS NOT NULL
+        AND wdpa.project_id NOT IN (
+          SELECT pgcp.project_id FROM project_geodata_cleanup_preparation pgcp
+        );`,
       );
-      const missingProjectIdsFromProjectsPlanningUnits: entitiesWithProjectId[] = await this.geoEntityManager.query(
-        `SELECT ppu.project_id
-        FROM projects_pu ppu
-        LEFT JOIN project_nuke_preparation pnp ON pnp.project_id = ppu.project_id
-        WHERE pnp.project_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM projects_pu ppu
+        WHERE ppu.project_id IS NOT NULL
+        AND ppu.project_id NOT IN (
+          SELECT pgcp.project_id FROM project_geodata_cleanup_preparation pgcp
+        );`,
       );
-
-      const notMatchingProjectIds: any[] = [];
-
-      notMatchingProjectIds.push(
-        ...missingProjectIdsFromPlanningAreas,
-        ...missingProjectIdsFromProtectedAreas,
-        ...missingProjectIdsFromProjectsPlanningUnits,
+      await this.apiEntityManager.query(
+        `DELETE FROM features_data fd
+        WHERE fd.project_id IS NOT NULL
+        AND fd.project_id NOT IN (
+          SELECT p.id FROM projects
+        );`,
       );
-
-      // Look for ProjectCustomFeatures in api to also delete them
-      const notMatchingProjectsIdWithCustomFeaturesPerProject: entitiesWithProjectIdAndProjectCustomFeatures[] = await Promise.all(
-        notMatchingProjectIds.map(async (p: entitiesWithProjectId) => {
-          const projectCustomFeaturesIds = await this.apiEntityManager
-            .createQueryBuilder()
-            .from('features', 'f')
-            .select(['id'])
-            .where('project.id = :projectId', { projectId: p.project_id })
-            .getRawMany()
-            .then((result) =>
-              result.map((i: projectCustomFeatureObject) => i.id),
-            )
-            .catch((error) => {
-              throw new Error(error);
-            });
-          return {
-            projectId: p.project_id,
-            data: { projectCustomFeaturesIds },
-          };
-        }),
-      );
-
-      // Uses unused resources cleanup service to finish cleaning for every mismatch in projectId array
-      await notMatchingProjectsIdWithCustomFeaturesPerProject.map(async (p) => {
-        await this.projectUnusedResources.removeUnusedResources(
-          p.projectId,
-          p.data,
-        );
-        return p;
-      });
 
       await this.geoEntityManager.query(
-        `TRUNCATE TABLE project_nuke_preparation`,
+        `TRUNCATE TABLE project_nuke_preparation;`,
       );
     });
   }
 
-  async nukeScenariosDanglingData() {
+  async cleanupScenariosDanglingData() {
     const scenarioIds = await this.apiEntityManager
       .createQueryBuilder()
       .from('scenarios', 'p')
@@ -149,7 +103,7 @@ export class CleanupTasksService implements CleanupTasks {
 
     await this.geoEntityManager.transaction(async (entityManager) => {
       await this.geoEntityManager.query(
-        `TRUNCATE TABLE scenario_nuke_preparation`,
+        `TRUNCATE TABLE scenario_geodata_cleanup_preparation;`,
       );
 
       for (const [, summaryChunks] of chunk(
@@ -157,76 +111,62 @@ export class CleanupTasksService implements CleanupTasks {
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
         await entityManager.insert(
-          'scenario_nuke_preparation',
+          'scenario_geodata_cleanup_preparation',
           summaryChunks.map((chunk: string) => ({
             scenario_id: chunk,
           })),
         );
       }
 
-      const missingScenarioIdsFromScenarioFeaturesData: entitiesWithScenarioId[] = await this.geoEntityManager.query(
-        `SELECT sfd.scenario_id
-          FROM scenario_features_data sfd
-          LEFT JOIN scenario_nuke_preparation snp ON snp.scenario_id = sfd.scenario_id
-          WHERE snp.scenario_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM scenario_features_data sfd
+        WHERE sfd.scenario_id IS NOT NULL
+        AND sfd.scenario_id NOT IN (
+          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
+        );`,
       );
-      const missingScenarioIdsFromBlmFinalResults: entitiesWithScenarioId[] = await this.geoEntityManager.query(
-        `SELECT bfr.scenario_id
-          FROM blm_final_results bfr
-          LEFT JOIN scenario_nuke_preparation snp ON snp.scenario_id = bfr.scenario_id
-          WHERE snp.scenario_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM blm_final_results bfr
+        WHERE bfr.scenario_id IS NOT NULL
+        AND bfr.scenario_id NOT IN (
+          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
+        );`,
       );
-      const missingScenarioIdsFromBlmPartialResults: entitiesWithScenarioId[] = await this.geoEntityManager.query(
-        `SELECT bpr.scenario_id
-          FROM blm_final_results bpr
-          LEFT JOIN scenario_nuke_preparation snp ON snp.scenario_id = bpr.scenario_id
-          WHERE snp.scenario_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM blm_partial_results bpr
+        WHERE bpr.scenario_id IS NOT NULL
+        AND bpr.scenario_id NOT IN (
+          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
+        );`,
       );
-      const missingScenarioIdsFromMarxanExecutionMetadata: entitiesWithScenarioId[] = await this.geoEntityManager.query(
-        `SELECT mem.scenarioId
-          FROM marxan_execution_metadata mem
-          LEFT JOIN scenario_nuke_preparation snp ON snp.scenario_id = mem.scenarioId
-          WHERE snp.scenario_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM marxan_execution_metadata mem
+        WHERE mem.scenarioId IS NOT NULL
+        AND mem.scenarioId NOT IN (
+          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
+        );`,
       );
-      const missingScenarioIdsFromScenariosPuData: entitiesWithScenarioId[] = await this.geoEntityManager.query(
-        `SELECT spd.scenario_id
-          FROM scenarios_pu_data spd
-          LEFT JOIN scenario_nuke_preparation snp ON snp.scenario_id = spd.scenario_id
-          WHERE snp.scenario_id IS NULL`,
+      await this.geoEntityManager.query(
+        `DELETE FROM scenarios_pu_data spd
+        WHERE spd.scenario_id IS NOT NULL
+        AND spd.scenario_id NOT IN (
+          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
+        );`,
       );
-
-      const notMatchingScenarioIds: string[] = [];
-
-      // As opposed to Project cleanup, scenarios are flattened to their ids
-      // so the map just uses them to remove unused resources
-      notMatchingScenarioIds.push(
-        ...missingScenarioIdsFromScenarioFeaturesData.map((p) => p.scenario_id),
-        ...missingScenarioIdsFromBlmFinalResults.map((p) => p.scenario_id),
-        ...missingScenarioIdsFromBlmPartialResults.map((p) => p.scenario_id),
-        ...missingScenarioIdsFromMarxanExecutionMetadata.map(
-          (p) => p.scenario_id,
-        ),
-        ...missingScenarioIdsFromScenariosPuData.map((p) => p.scenario_id),
-      );
-
-      await notMatchingScenarioIds.map(async (scenarioId) => {
-        await this.scenarioUnusedResources.removeUnusedResources(scenarioId);
-        return scenarioId;
-      });
 
       await this.geoEntityManager.query(
-        `TRUNCATE TABLE scenario_nuke_preparation`,
+        `TRUNCATE TABLE scenario_geodata_cleanup_preparation;`,
       );
     });
   }
 
-  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
+  @Cron(cronJobInterval)
   async handleCron() {
     this.logger.debug(
       'Preparing to clean dangling geo data for projects/scenarios',
     );
 
-    await this.nukeProjectsDanglingData();
-    await this.nukeScenariosDanglingData();
+    await this.cleanupProjectsDanglingData();
+    await this.cleanupScenariosDanglingData();
   }
 }
