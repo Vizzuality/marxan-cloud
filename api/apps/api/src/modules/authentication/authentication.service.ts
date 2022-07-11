@@ -23,6 +23,8 @@ import { v4 } from 'uuid';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 import { Mailer } from '@marxan-api/modules/authentication/password-recovery/mailer';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { EventBus } from '@nestjs/cqrs';
+import { UserLoggedIn } from './user-logged-in.event';
 
 /**
  * Access token for the app: key user data and access token
@@ -79,6 +81,7 @@ export class AuthenticationService {
     private readonly issuedAuthnTokensRepository: Repository<IssuedAuthnToken>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly mailer: Mailer,
+    private readonly eventBus: EventBus,
   ) {}
 
   /**
@@ -273,6 +276,8 @@ export class AuthenticationService {
     };
 
     await this.purgeExpiredIssuedTokens();
+
+    this.eventBus.publish(new UserLoggedIn(user.id));
 
     return {
       user: UsersService.getSanitizedUserMetadata(user),
