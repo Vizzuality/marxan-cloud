@@ -639,7 +639,6 @@ const getFixtures = async () => {
               id,
               feature_class_name: feature.name,
               project_id: projectId,
-              tag: 'species',
               creation_status: 'created',
             })
             .execute();

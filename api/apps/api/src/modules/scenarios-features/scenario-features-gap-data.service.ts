@@ -177,7 +177,6 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
         'coverageTarget',
         'featureClassName',
         'name',
-        'tag',
         'description',
       ],
       keyForAttribute: 'camelCase',
@@ -191,7 +190,6 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     return {
       ...base,
       featureClassName: assign.featureClassName ?? undefined,
-      tag: assign.tag,
       name: assign.alias ?? undefined, // `null`
       description: assign.description ?? undefined,
     };

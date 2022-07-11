@@ -4,7 +4,6 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { JobStatus } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
-import { FeatureTag } from '@marxan/features';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import {
   LegacyProjectImportFileSnapshot,
@@ -281,7 +280,6 @@ export class FeaturesLegacyProjectPieceImporter
             project_id: projectId,
             id: featureId,
             feature_class_name: feature.name,
-            tag: FeatureTag.Species,
             creation_status: JobStatus.created,
             created_by: input.ownerId,
           };

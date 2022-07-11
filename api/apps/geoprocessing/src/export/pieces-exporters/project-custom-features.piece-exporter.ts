@@ -6,7 +6,6 @@ import {
   ProjectCustomFeature,
   ProjectCustomFeaturesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
-import { FeatureTag } from '@marxan/features';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeometrySource } from '@marxan/geofeatures';
 import { Injectable, Logger } from '@nestjs/common';
@@ -28,7 +27,6 @@ type ProjectCustomFeaturesSelectResult = {
   description: string;
   property_name: string;
   intersection: string[];
-  tag: FeatureTag;
   creation_status: CreationStatus;
   list_property_keys: string[];
 };
@@ -72,7 +70,6 @@ export class ProjectCustomFeaturesPieceExporter
         'description',
         'property_name',
         'intersection',
-        'tag',
         'creation_status',
         'list_property_keys',
       ])

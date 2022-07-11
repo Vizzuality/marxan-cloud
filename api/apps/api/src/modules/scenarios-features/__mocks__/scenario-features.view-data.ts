@@ -1,5 +1,4 @@
 import { ScenarioFeaturesData } from '@marxan/features';
-import { FeatureTag } from '@marxan/features/domain';
 import { GeoFeature } from '../../geo-features/geo-feature.api.entity';
 
 const featureIdMet = `feature-uuid-1-criteria-met`;
@@ -56,13 +55,11 @@ export const getValidGeoFeature = (): GeoFeature[] => {
   entity1.id = metaFeatureIdMet;
   entity1.alias = 'feature-alias-1';
   entity1.description = 'feature-desc-1';
-  entity1.tag = FeatureTag.Bioregional;
 
   const entity2 = new GeoFeature();
   entity2.id = metaFeatureIdFailed;
   entity2.alias = 'feature-alias-2';
   entity2.description = 'feature-desc-2';
-  entity2.tag = FeatureTag.Species;
 
   return [entity1, entity2];
 };

@@ -47,7 +47,6 @@ describe(`when user is logged in`, () => {
               "met": 110.94,
               "metArea": 49461858904.37,
               "onTarget": true,
-              "tag": "species",
               "totalArea": 44582822387.74,
             },
             Object {
@@ -56,7 +55,6 @@ describe(`when user is logged in`, () => {
               "met": 0,
               "metArea": 0,
               "onTarget": false,
-              "tag": "species",
               "totalArea": 2369906750.34,
             },
             Object {
@@ -65,7 +63,6 @@ describe(`when user is logged in`, () => {
               "met": 0,
               "metArea": 0,
               "onTarget": false,
-              "tag": "species",
               "totalArea": 7556941342.9,
             },
             Object {
@@ -74,7 +71,6 @@ describe(`when user is logged in`, () => {
               "met": 237.02,
               "metArea": 41436305173.17,
               "onTarget": true,
-              "tag": "species",
               "totalArea": 17482394162.77,
             },
             Object {
@@ -83,7 +79,6 @@ describe(`when user is logged in`, () => {
               "met": 105.34,
               "metArea": 49461858904.37,
               "onTarget": true,
-              "tag": "species",
               "totalArea": 46952729138.08,
             },
             Object {
@@ -92,7 +87,6 @@ describe(`when user is logged in`, () => {
               "met": 163.6,
               "metArea": 47131396118.24,
               "onTarget": true,
-              "tag": "species",
               "totalArea": 28809765713.5,
             },
             Object {
@@ -101,7 +95,6 @@ describe(`when user is logged in`, () => {
               "met": 12.84,
               "metArea": 2330463199.05,
               "onTarget": false,
-              "tag": "species",
               "totalArea": 18142963424.57,
             },
           ]

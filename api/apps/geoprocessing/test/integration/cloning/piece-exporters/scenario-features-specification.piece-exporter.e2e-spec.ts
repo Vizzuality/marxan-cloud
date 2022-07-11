@@ -32,7 +32,6 @@ let fixtures: FixtureType<typeof getFixtures>;
 type Features = {
   id: string;
   feature_class_name: string;
-  tag: string;
   creation_status: string;
   project_id: string | null;
 };
