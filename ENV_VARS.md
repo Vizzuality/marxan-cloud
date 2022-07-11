@@ -92,6 +92,10 @@ applications.
   on which the Express daemon of the Geoprocessing service will listen.
   If running the API on the same host as the Geoprocessing application, you 
   need to modify at least one.
+* `CLEANUP_CRON_INTERVAL` (string, optional, default is 0 0-23/6 * * *):
+  String in cron notation for the interval of time where the cleanup will 
+  trigger. The default value is every 6 hours.
+
 
 ### PostgreSQL service - Geoprocessing database
 
