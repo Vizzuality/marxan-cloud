@@ -222,9 +222,7 @@ export class ScenarioPusDataLegacyProjectPieceImporter
       );
       if (puidsNotPresentInPuDat.length)
         this.logAndThrow(
-          `pu.dat file is missing planning units data. Missing puids: ${puidsNotPresentInPuDat.join(
-            ', ',
-          )}`,
+          `pu.dat file is missing planning units data. There are ${puidsNotPresentInPuDat.length} missing puids.`,
         );
 
       await Promise.all(
