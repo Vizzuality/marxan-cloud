@@ -23,7 +23,6 @@ export interface ItemProps {
   className?: string;
   name: string;
   description: string;
-  type: 'bioregional' | 'species';
 
   // SPLIT
   splitSelected?: string;
@@ -57,7 +56,6 @@ export const Item: React.FC<ItemProps> = ({
   id,
   name,
   className,
-  type,
 
   splitSelected,
   splitOptions = [],
@@ -130,8 +128,7 @@ export const Item: React.FC<ItemProps> = ({
       <header
         className={cx({
           'px-4 py-2 border-l-4': true,
-          'border-green-300': type === 'bioregional',
-          'border-yellow-300': type === 'species',
+          'border-purple-500': true,
         })}
       >
         <div className="flex items-start justify-between">
@@ -149,10 +146,10 @@ export const Item: React.FC<ItemProps> = ({
           )}
         </div>
 
-        {type === 'bioregional' && split && (
+        {split && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
-              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
+              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-purple-300" />
               <h4 className="ml-2 text-xs text-white uppercase">
                 You can
                 {' '}
@@ -194,7 +191,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         )}
 
-        {type === 'species' && editable && strat && (
+        {editable && strat && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
@@ -263,7 +260,7 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {type === 'bioregional' && splitSelected && split && (
+      {splitSelected && split && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length
@@ -299,7 +296,7 @@ export const Item: React.FC<ItemProps> = ({
         </ul>
       )}
 
-      {type === 'species' && intersectFeaturesSelected && !!intersectFeaturesSelected.length && strat && (
+      {intersectFeaturesSelected && !!intersectFeaturesSelected.length && strat && (
         <ul className="pl-3">
           {intersectFeaturesSelected.map((f) => {
             return (
