@@ -9,7 +9,6 @@ import Wrapper from 'layout/wrapper';
 import BANNER_1_IMG from 'images/home/banner/banner-1.png';
 import BANNER_2_IMG from 'images/home/banner/banner-2.png';
 import BANNER_3_IMG from 'images/home/banner/banner-3.png';
-import BANNER_BACKGROUND from 'images/home/banner/banner-background.png';
 
 export interface HomeBannerProps {
 
@@ -64,13 +63,6 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
               }}
             >
               <div className="relative grid justify-between w-full grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-y-0 md:gap-x-6">
-                <div
-                  className="absolute hidden w-full h-full bg-no-repeat opacity-50 -top-10 md:-top-20 -left-10 md:-left-18 bg-gradient-to-b from-current to-transparent lg:block"
-                  style={{
-                    backgroundImage: `url(${BANNER_BACKGROUND})`,
-                    backgroundSize: '34%',
-                  }}
-                />
                 <img alt="Scenario features example" src={BANNER_1_IMG} />
                 <img alt="Scenario map layers example" src={BANNER_2_IMG} />
                 <img alt="Scenarios tags examples" src={BANNER_3_IMG} className="md:pt-12" />
