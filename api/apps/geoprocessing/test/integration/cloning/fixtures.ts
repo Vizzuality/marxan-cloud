@@ -407,7 +407,6 @@ export async function GivenFeatures(
     .map((_, index) => ({
       id: v4(),
       feature_class_name: `custom-${projectId}-${index + 1}`,
-      tag: 'species',
       creation_status: 'done',
       project_id: projectId,
       is_legacy: isLegacy,
@@ -417,7 +416,6 @@ export async function GivenFeatures(
     .map((_, index) => ({
       id: v4(),
       feature_class_name: `platform-${projectId}-${index + 1}`,
-      tag: 'species',
       creation_status: 'created',
       project_id: null,
     }));

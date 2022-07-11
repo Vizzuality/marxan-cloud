@@ -8,7 +8,6 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { BaseServiceResource } from '@marxan-api/types/resource.interface';
-import { FeatureTag } from '@marxan/features/domain';
 import { JobStatus } from '../scenarios/scenario.api.entity';
 import { Project } from '../projects/project.api.entity';
 import { User } from '../users/user.api.entity';
@@ -62,10 +61,6 @@ export class GeoFeature extends BaseEntity {
   @ApiPropertyOptional()
   @Column('uuid')
   intersection?: string[];
-
-  @ApiProperty()
-  @Column('varchar')
-  tag!: FeatureTag;
 
   @Column('varchar', { name: 'creation_status' })
   creationStatus?: JobStatus;

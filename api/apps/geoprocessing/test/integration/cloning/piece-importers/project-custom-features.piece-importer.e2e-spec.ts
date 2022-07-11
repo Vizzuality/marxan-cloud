@@ -12,7 +12,6 @@ import {
   ProjectCustomFeature,
   ProjectCustomFeaturesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
-import { FeatureTag } from '@marxan/features';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -195,7 +194,6 @@ const getFixtures = async () => {
           .map((_, featureIndex) => ({
             alias: '',
             feature_class_name: `${projectId}-${featureIndex + 1}`,
-            tag: FeatureTag.Species,
             creation_status: 'created' as ProjectCustomFeature['creation_status'],
             description: '',
             intersection: [],

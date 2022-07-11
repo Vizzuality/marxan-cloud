@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, ViewEntity } from 'typeorm';
-import { FeatureTag } from './domain';
 
 @ViewEntity('scenario_features_gap_data', {
   expression: `
@@ -64,11 +63,6 @@ export class ScenarioFeaturesGapData {
   // Properties added via extend
   @ApiPropertyOptional()
   featureClassName?: string | null;
-
-  @ApiProperty({
-    enum: FeatureTag,
-  })
-  tag!: FeatureTag;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,
