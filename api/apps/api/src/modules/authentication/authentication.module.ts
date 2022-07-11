@@ -34,6 +34,7 @@ import {
 import { PasswordRecoveryService } from './password-recovery/password-recovery.service';
 import { PasswordRecoveryToken } from './password-recovery/password-recovery-token.api.entity';
 import { PasswordRecoveryController } from './password-recovery/password-recovery.controller';
+import { CqrsModule } from '@nestjs/cqrs';
 
 export const logger = new Logger('Authentication');
 
@@ -48,6 +49,7 @@ export const logger = new Logger('Authentication');
       signOptions: { expiresIn: AppConfig.get('auth.jwt.expiresIn', '2h') },
     }),
     TypeOrmModule.forFeature([User, IssuedAuthnToken, PasswordRecoveryToken]),
+    CqrsModule,
   ],
   providers: [
     AuthenticationService,
