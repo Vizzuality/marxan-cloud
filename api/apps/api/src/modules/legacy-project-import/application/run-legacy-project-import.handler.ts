@@ -1,5 +1,4 @@
 import { forbiddenError } from '@marxan-api/modules/access-control';
-import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import {
   CommandHandler,
@@ -53,12 +52,6 @@ export class RunLegacyProjectImportHandler
 
     if (isLeft(legacyProjectImportSaveError))
       return legacyProjectImportSaveError;
-
-    await this.usersRepo.save({
-      userId: ownerId,
-      projectId: projectId.value,
-      roleName: ProjectRoles.project_owner,
-    });
 
     legacyProjectImport.commit();
 

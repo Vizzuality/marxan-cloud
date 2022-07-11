@@ -1,7 +1,6 @@
 import { forwardRef, HttpModule, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
-
 import { MarxanInput } from '@marxan/marxan-input/marxan-input';
 import { ScenariosController } from './scenarios.controller';
 import { Scenario } from './scenario.api.entity';
@@ -33,7 +32,6 @@ import { ScenarioPlanningUnitSerializer } from './dto/scenario-planning-unit.ser
 import { ScenarioPlanningUnitsService } from './planning-units/scenario-planning-units.service';
 import { ScenarioPlanningUnitsLinkerService } from './planning-units/scenario-planning-units-linker-service';
 import { AdminAreasModule } from '../admin-areas/admin-areas.module';
-
 import { SpecificationModule } from './specification';
 import { ScenarioFeaturesGapDataSerializer } from './dto/scenario-feature-gap-data.serializer';
 import { ScenarioFeaturesOutputGapDataSerializer } from './dto/scenario-feature-output-gap-data.serializer';
@@ -52,6 +50,7 @@ import { LockService } from '../access-control/scenarios-acl/locks/lock.service'
 import { IssuedAuthnToken } from '../authentication/issued-authn-token.api.entity';
 import { WebshotModule } from '@marxan/webshot';
 import { DeleteScenarioModule } from './delete-scenario/delete-scenario.module';
+import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.module';
 
 @Module({
   imports: [
@@ -73,6 +72,7 @@ import { DeleteScenarioModule } from './delete-scenario/delete-scenario.module';
     ),
     BlockGuardModule,
     ProjectCheckerModule,
+    LegacyProjectImportCheckerModule,
     PlanningAreasModule,
     UsersModule,
     ScenarioFeaturesModule,

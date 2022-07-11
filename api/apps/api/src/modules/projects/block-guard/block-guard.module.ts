@@ -8,11 +8,13 @@ import { PlanningAreasModule } from '@marxan-api/modules/planning-areas';
 import { MarxanBlockGuard } from '@marxan-api/modules/projects/block-guard/marxan-block-guard.service';
 import { ScenarioCheckerModule } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.module';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { LegacyProjectImportCheckerModule } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.module';
 
 @Module({
   imports: [
     ProjectCheckerModule,
     ScenarioCheckerModule,
+    LegacyProjectImportCheckerModule,
     PlanningAreasModule,
     ApiEventsModule,
     TypeOrmModule.forFeature([Project, Scenario]),
