@@ -26,7 +26,7 @@ export interface UploadFilesProps {
 }
 
 export const UploadFiles: React.FC<UploadFilesProps> = ({
-  onDismiss,
+  // onDismiss,
   setStep,
 }: UploadFilesProps) => {
   const formRef = useRef(null);
@@ -72,10 +72,9 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     dispatch(setImportSubmit(true));
     const solutionsAreLocked = !!values.solutionsAreLocked;
     const data = { solutionsAreLocked };
-    console.info(data);
     setLoading(true);
 
-    importLegacyMutation.mutate({ projectId: legacyProjectId }, {
+    importLegacyMutation.mutate({ projectId: legacyProjectId, data }, {
       onSuccess: () => {
         addToast('success-import-legacy-project', (
           <>
@@ -85,11 +84,9 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
         ), {
           level: 'success',
         });
-        if (!importLegacyErrors && importLegacyErrors.length === 0) {
-          setLoading(false);
-          onDismiss();
-        }
 
+        setLoading(false);
+        // onDismiss();
         console.info('Legacy project uploaded');
       },
       onError: ({ response }) => {
@@ -114,9 +111,9 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     addToast,
     dispatch,
     importLegacyMutation,
-    importLegacyErrors,
+
     legacyProjectId,
-    onDismiss,
+    // onDismiss,
   ]);
 
   return (

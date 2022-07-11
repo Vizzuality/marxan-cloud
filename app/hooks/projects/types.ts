@@ -119,6 +119,7 @@ export interface UseSaveLegacyProjectProps {
 export interface SaveLegacyProjectProps {
   data: {
     projectName: string;
+    description: string;
   };
 }
 
@@ -138,7 +139,7 @@ export interface UseUploadLegacyProjectFileProps {
 
 export interface UploadLegacyProjectFileProps {
   projectId: string,
-  data: any,
+  data: unknown,
 }
 
 // useImportLegacyProject
@@ -148,6 +149,7 @@ export interface UseImportLegacyProjectProps {
 
 export interface ImportLegacyProjectProps {
   projectId: string,
+  data: unknown;
 }
 
 // useCancelUploadLegacyProjectFile

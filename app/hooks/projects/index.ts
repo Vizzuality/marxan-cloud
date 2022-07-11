@@ -741,9 +741,10 @@ export function useImportLegacyProject({
   const [session] = useSession();
   const queryClient = useQueryClient();
 
-  const importLegacyProject = ({ projectId }: ImportLegacyProjectProps) => {
+  const importLegacyProject = ({ projectId, data }: ImportLegacyProjectProps) => {
     return PROJECTS.request({
       method: 'POST',
+      data,
       url: `/import/legacy/${projectId}`,
       headers: {
         Authorization: `Bearer ${session.accessToken}`,

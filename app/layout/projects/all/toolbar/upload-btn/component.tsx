@@ -26,6 +26,7 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
   const [modal, setModal] = useState(false);
 
   const dispatch = useDispatch();
+
   const { uploadMode, legacyProjectId, importSubmit } = useSelector((state) => state['/projects/new']);
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
