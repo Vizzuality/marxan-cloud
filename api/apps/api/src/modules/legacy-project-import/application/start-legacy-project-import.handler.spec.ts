@@ -36,7 +36,14 @@ beforeEach(async () => {
   fixtures = await getFixtures();
 });
 
-it(`creates a start legacy project import`, async () => {
+it(`creates a start legacy project import with description`, async () => {
+  const description = 'random description';
+  fixtures.GivenProjectAndScenarioShells();
+  const result = await fixtures.WhenStartingLegacyProjectImport(description);
+  await fixtures.ThenAStartingLegacyProjectImportIsCreated(result, description);
+});
+
+it(`creates a start legacy project import with out description`, async () => {
   fixtures.GivenProjectAndScenarioShells();
   const result = await fixtures.WhenStartingLegacyProjectImport();
   await fixtures.ThenAStartingLegacyProjectImportIsCreated(result);
@@ -100,13 +107,15 @@ const getFixtures = async () => {
     LegacyProjectImportRepository,
   );
 
-  const expectedSaveProjectData: DeepPartial<Project> = {
+  const expectedSaveProjectData: (
+    description?: string,
+  ) => DeepPartial<Project> = (description?: string) => ({
     name: 'random project name',
-    description: 'random description',
+    description: description,
     organizationId: randomOrganizationId,
     sources: ProjectSourcesEnum.legacyImport,
     createdBy: ownerId.value,
-  };
+  });
 
   return {
     GivenProjectAndScenarioShells: () => {
@@ -133,12 +142,12 @@ const getFixtures = async () => {
     GivenSavingALegacyProjectImportFails: () => {
       repo.saveFailure = true;
     },
-    WhenStartingLegacyProjectImport: () => {
+    WhenStartingLegacyProjectImport: (description?: string) => {
       return sut.execute(
         new StartLegacyProjectImport(
           'random project name',
           ownerId,
-          'random description',
+          description,
         ),
       );
     },
@@ -168,6 +177,7 @@ const getFixtures = async () => {
     },
     ThenAStartingLegacyProjectImportIsCreated: async (
       result: StartLegacyProjectImportResponse,
+      description?: string,
     ) => {
       expect(result).toBeDefined();
       if (isLeft(result))
@@ -177,7 +187,7 @@ const getFixtures = async () => {
       expect(projectId.value).toEqual(projectShellId);
       expect(scenarioId.value).toEqual(scenarioShellId);
 
-      expect(saveProjectData).toEqual(expectedSaveProjectData);
+      expect(saveProjectData).toEqual(expectedSaveProjectData(description));
 
       const savedLegacyProjectImport = await repo.find(
         new ResourceId(projectShellId),
