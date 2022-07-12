@@ -7,11 +7,13 @@ import { GarbageCollectAsyncJobsHandler } from './garbage-collect-async-jobs.han
 import { UsersProjectsApiEntity } from '../access-control/projects-acl/entity/users-projects.api.entity';
 import { UsersScenariosApiEntity } from '../access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { UserLoggedInSaga } from './user-logged-in.saga';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([UsersProjectsApiEntity, UsersScenariosApiEntity]),
     AsyncJobsModule,
+    CqrsModule,
   ],
   providers: [
     UserLoggedInSaga,
@@ -20,5 +22,6 @@ import { UserLoggedInSaga } from './user-logged-in.saga';
     ScenarioAsyncJobsGarbageCollector,
     GarbageCollectAsyncJobsHandler,
   ],
+  exports: [UserLoggedInSaga],
 })
 export class AsyncJobsGarbageCollectorModule {}
