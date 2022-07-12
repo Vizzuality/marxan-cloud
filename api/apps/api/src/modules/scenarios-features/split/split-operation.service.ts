@@ -7,16 +7,12 @@ import { FeatureConfigSplit } from '@marxan-api/modules/specification';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { SplitDataProvider } from './split-data.provider';
 import { SplitQuery } from './split-query.service';
-import { SplitCreateFeatures } from './split-create-features.service';
-import { ComputeArea } from '../compute-area.service';
 
 @Injectable()
 export class SplitOperation {
   constructor(
-    private readonly splitCreateFeatures: SplitCreateFeatures,
     private readonly splitDataProvider: SplitDataProvider,
     private readonly splitQuery: SplitQuery,
-    private readonly computeArea: ComputeArea,
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly geoEntityManager: EntityManager,
     private readonly events: ApiEventsService,
@@ -40,11 +36,6 @@ export class SplitOperation {
         scenarioId: data.scenarioId,
       });
 
-      const features = await this.splitCreateFeatures.createSplitFeatures(
-        data.input,
-        project.id,
-      );
-
       const { parameters, query } = this.splitQuery.prepareQuery(
         data.input,
         data.scenarioId,
@@ -58,11 +49,6 @@ export class SplitOperation {
         parameters,
       );
 
-      await this.computeAmountPerFeature(
-        features.map(({ id }) => id),
-        project.id,
-        data.scenarioId,
-      );
       await this.events.create({
         topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureSplit__finished__v1__alpha1,
@@ -75,21 +61,5 @@ export class SplitOperation {
       });
       throw error;
     }
-  }
-
-  private async computeAmountPerFeature(
-    featuresIds: string[],
-    projectId: string,
-    scenarioId: string,
-  ) {
-    return Promise.all(
-      featuresIds.map((featureId) =>
-        this.computeArea.computeAreaPerPanningUnitOfFeature(
-          projectId,
-          scenarioId,
-          featureId,
-        ),
-      ),
-    );
   }
 }

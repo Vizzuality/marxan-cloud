@@ -29,7 +29,6 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { ComputeArea } from './compute-area.service';
 import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
 import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
-import { SplitCreateFeatures } from './split/split-create-features.service';
 import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
 import { FeatureHashModule } from '../features-hash/features-hash.module';
 
@@ -65,7 +64,6 @@ import { FeatureHashModule } from '../features-hash/features-hash.module';
     ComputeArea,
     SplitQuery,
     SplitDataProvider,
-    SplitCreateFeatures,
     SplitOperation,
     StratificationQuery,
     StratificationDataProvider,
