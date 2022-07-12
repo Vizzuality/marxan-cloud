@@ -9,7 +9,6 @@ interface ProjectShowStateProps {
   uploadingGridId: string;
   uploadMode: string;
   legacyProjectId: string;
-  importSubmit: boolean;
 }
 
 const initialState = {
@@ -21,7 +20,6 @@ const initialState = {
   uploadingGridId: null,
   uploadMode: null,
   legacyProjectId: null,
-  importSubmit: false,
 } as ProjectShowStateProps;
 
 const projectsNewSlice = createSlice({
@@ -52,9 +50,6 @@ const projectsNewSlice = createSlice({
     setLegacyProjectId: (state, action: PayloadAction<string>) => {
       state.legacyProjectId = action.payload;
     },
-    setImportSubmit: (state, action: PayloadAction<boolean>) => {
-      state.importSubmit = action.payload;
-    },
   },
 });
 
@@ -67,6 +62,5 @@ export const {
   setUploadingGridId,
   setUploadMode,
   setLegacyProjectId,
-  setImportSubmit,
 } = projectsNewSlice.actions;
 export default projectsNewSlice.reducer;

@@ -51,18 +51,10 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     const data = new FormData();
     data.append('fileType', f.fileType);
     data.append('file', fl);
+
     uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
       onSuccess: ({ data: { fileId } }) => {
         setDataFileId(fileId);
-        addToast('success-upload-legacy-data-file', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">{`${successFile.path} uploaded`}</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        console.info(`${successFile.path} uploaded`);
       },
       onError: ({ response }) => {
         const { errors } = response.data;

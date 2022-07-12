@@ -26,5 +26,5 @@ export interface ModalProps {
    * Callback executed when the modal is dismissed by clicking on the overlay, the close button or
    * pressing the escape key
    */
-  onDismiss: () => void;
+  onDismiss: (options?: any) => void;
 }

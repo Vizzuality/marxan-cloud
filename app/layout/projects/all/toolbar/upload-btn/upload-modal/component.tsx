@@ -23,7 +23,7 @@ import Loading from 'components/loading';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface UploadModalProps {
-  onDismiss: () => void;
+  onDismiss: (notCancel?: boolean) => void;
 }
 
 export const UploadModal: React.FC<UploadModalProps> = ({

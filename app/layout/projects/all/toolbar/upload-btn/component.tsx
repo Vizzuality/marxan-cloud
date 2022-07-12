@@ -27,11 +27,10 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
 
   const dispatch = useDispatch();
 
-  const { uploadMode, legacyProjectId, importSubmit } = useSelector((state) => state['/projects/new']);
+  const { uploadMode, legacyProjectId } = useSelector((state) => state['/projects/new']);
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
   const onCancelImportLegacyProject = useCallback(() => {
-    // TODO: id importSubmit cancel
     cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
       onSuccess: ({ data: { projectId } }) => {
         dispatch(setLegacyProjectId(null));
@@ -43,11 +42,12 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
     });
   }, [dispatch, legacyProjectId, cancelLegacyProjectMutation]);
 
-  const onDismiss = () => {
+  const onDismiss = useCallback((notCancel) => {
     setModal(false);
     dispatch(setUploadMode(null));
-    if (legacyProjectId && !importSubmit) onCancelImportLegacyProject();
-  };
+
+    if (legacyProjectId && !notCancel) onCancelImportLegacyProject();
+  }, [legacyProjectId, onCancelImportLegacyProject, dispatch]);
 
   const onSetUploadMode = useCallback((id) => {
     dispatch(setUploadMode(id));

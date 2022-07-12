@@ -4,7 +4,7 @@ import CreateProject from './create-project';
 import UploadFiles from './upload-files';
 
 export interface LegacyUploadModalProps {
-  onDismiss: () => void;
+  onDismiss: (notCancel?: boolean) => void;
 }
 
 export const LegacyUploadModal: React.FC<LegacyUploadModalProps> = ({
@@ -16,15 +16,17 @@ export const LegacyUploadModal: React.FC<LegacyUploadModalProps> = ({
     <div className="mt-3 mb-5 overflow-x-hidden overflow-y-auto">
       {step === 1 && (
         <CreateProject
-          onDismiss={onDismiss}
+          onDismiss={(notCancel) => {
+            onDismiss(notCancel);
+          }}
           setStep={setStep}
         />
 
       )}
       {step === 2 && (
         <UploadFiles
-          onDismiss={() => {
-            onDismiss();
+          onDismiss={(notCancel) => {
+            onDismiss(notCancel);
             setStep(1);
           }}
           setStep={setStep}

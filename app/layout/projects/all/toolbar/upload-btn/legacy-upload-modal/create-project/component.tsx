@@ -17,7 +17,7 @@ import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
 
 export interface CreateProjectProps {
-  onDismiss: () => void;
+  onDismiss: (notCancel?: boolean) => void;
   setStep: (step: number) => void;
 }
 

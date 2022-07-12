@@ -5,7 +5,7 @@ import React, {
 import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { setLegacyProjectId, setImportSubmit } from 'store/slices/projects/new';
+import { setLegacyProjectId } from 'store/slices/projects/new';
 
 import { useCancelImportLegacyProject, useLegacyProjectValidationResults, useImportLegacyProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -21,7 +21,7 @@ import { LEGACY_FIELDS } from './constants';
 import UploadItem from './upload-item';
 
 export interface UploadFilesProps {
-  onDismiss: () => void;
+  onDismiss: (notCancel?: boolean) => void;
   setStep: (step: number) => void;
 }
 
@@ -58,31 +58,31 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   }, [cancelLegacyProjectMutation, dispatch, legacyProjectId]);
 
   const onImportSubmit = useCallback((values) => {
-    dispatch(setImportSubmit(true));
     const solutionsAreLocked = !!values.solutionsAreLocked;
     const data = { solutionsAreLocked };
+
     setLoading(true);
 
     importLegacyMutation.mutate({ projectId: legacyProjectId, data }, {
       onSuccess: () => {
         legacyProjectValidationResultsMutation.mutate({ projectId: legacyProjectId }, {
           onSuccess: ({ errorsAndWarnings }) => {
-            addToast('success-import-legacy-project', (
-              <>
-                <h2 className="font-medium">Success!</h2>
-                <p className="text-sm">Legacy project import has been done</p>
-              </>
-            ), {
-              level: 'success',
-            });
-
             if (errorsAndWarnings && errorsAndWarnings.length) {
               const errors = errorsAndWarnings.filter((vr) => vr.status === 'failed').map((vr) => vr.errors);
               setLoading(false);
               setImportLegacyErrors(errors);
               ref?.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
             } else {
-              onDismiss();
+              addToast('success-import-legacy-project', (
+                <>
+                  <h2 className="font-medium">Success!</h2>
+                  <p className="text-sm">Legacy project import has been done</p>
+                </>
+              ), {
+                level: 'success',
+              });
+
+              onDismiss(true);
               console.info('Legacy project uploaded');
             }
             setLoading(false);
@@ -116,7 +116,6 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     legacyProjectId,
     addToast,
     onDismiss,
-    dispatch,
     importLegacyMutation,
     legacyProjectValidationResultsMutation,
   ]);
