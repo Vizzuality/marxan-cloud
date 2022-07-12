@@ -34,7 +34,7 @@ import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
-  @Throttle(10, 60)
+  @Throttle(5, 60)
   @UseGuards(LocalAuthGuard)
   @ApiOperation({
     description: 'Sign user in, issuing a JWT token.',
