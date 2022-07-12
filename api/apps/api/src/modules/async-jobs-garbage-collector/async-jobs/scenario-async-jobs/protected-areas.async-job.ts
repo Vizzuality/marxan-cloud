@@ -26,7 +26,7 @@ export class ProtectedAreasAsyncJob extends AsyncJob {
     ];
   }
   getFailedAsyncJobState(): ProtectedAreasApiEvents {
-    return API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha;
+    return API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha;
   }
   getMaxHoursForAsyncJob(): number {
     return 8;

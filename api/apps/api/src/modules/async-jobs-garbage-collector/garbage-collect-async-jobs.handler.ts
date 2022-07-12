@@ -1,8 +1,13 @@
-import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import {
+  CommandHandler,
+  EventBus,
+  IInferredCommandHandler,
+} from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersProjectsApiEntity } from '../access-control/projects-acl/entity/users-projects.api.entity';
 import { UsersScenariosApiEntity } from '../access-control/scenarios-acl/entity/users-scenarios.api.entity';
+import { AsyncJobsGarbageCollectorFinished } from './async-jobs-garbage-collector-finished.event';
 import { GarbageCollectAsyncJobs } from './garbage-collect-async-jobs.command';
 import { ProjectAsyncJobsGarbageCollector } from './project-async-jobs.garbage-collector';
 import { ScenarioAsyncJobsGarbageCollector } from './scenario-async-jobs.garbage-collector';
@@ -17,6 +22,7 @@ export class GarbageCollectAsyncJobsHandler
     private readonly usersScenariosRepo: Repository<UsersScenariosApiEntity>,
     private readonly projectAsyncJobs: ProjectAsyncJobsGarbageCollector,
     private readonly scenarioAsyncJobs: ScenarioAsyncJobsGarbageCollector,
+    private readonly eventBus: EventBus,
   ) {}
 
   async execute({ userId }: GarbageCollectAsyncJobs) {
@@ -33,6 +39,8 @@ export class GarbageCollectAsyncJobsHandler
         this.scenarioAsyncJobs.sendFailedApiEventsForStuckAsyncJobs(scenarioId),
       ),
     );
+
+    this.eventBus.publish(new AsyncJobsGarbageCollectorFinished(userId));
   }
 
   private async getProjectsIdsOf(userId: string) {
