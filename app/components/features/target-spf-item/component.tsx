@@ -6,6 +6,11 @@ import Button from 'components/button';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Slider from 'components/forms/slider';
+import Icon from 'components/icon';
+import Tooltip from 'components/tooltip';
+
+import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
+import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
 import { TargetSPFItemProps, Type } from './types';
 
@@ -73,14 +78,29 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         </span>
         <div className="flex flex-col ml-2 space-y-2">
           {!isAllTargets && (
-            <Button
-              className="flex-shrink-0 text-xs"
-              theme={isShown ? 'tertiary' : 'secondary'}
-              size="xs"
-              onClick={onSeeOnMap}
+            <Tooltip
+              arrow
+              placement="top"
+              content={(
+                <div
+                  className="p-2 text-gray-500 bg-white rounded"
+                >
+                  See on map
+                </div>
+              )}
             >
-              See on map
-            </Button>
+              <button
+                aria-label="manage-see-on-map"
+                type="button"
+                onClick={onSeeOnMap}
+                className={cx({
+                  'text-white w-5 h-5 flex justify-center items-center': true,
+                  'text-gray-300': !isShown,
+                })}
+              >
+                <Icon className="w-4 h-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
+              </button>
+            </Tooltip>
           )}
           {!isAllTargets && editable && (
             <Button
