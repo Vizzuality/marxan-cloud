@@ -7,12 +7,11 @@ import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Slider from 'components/forms/slider';
 
-import { TargetSPFItemProps, Type } from './types';
+import { TargetSPFItemProps } from './types';
 
 export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
   className,
   isAllTargets,
-  type,
   name,
   defaultTarget = 50,
   defaultFPF = 1,
@@ -55,10 +54,8 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
     >
       <div
         className={cx({
-          'absolute left-0 top-0 h-full w-1': true,
-          'bg-green-300': type === Type.BIOREGIONAL,
-          'bg-yellow-300': type === Type.SPECIES,
-          'bg-gradient-to-b from-green-300 to-yellow-300': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
+          'absolute left-0 top-0 h-full w-1 ': true,
+          'bg-purple-500': !isAllTargets,
         })}
       />
       <div className="flex items-start justify-between pb-2 pr-2">

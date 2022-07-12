@@ -1,11 +1,12 @@
 import React, { MutableRefObject } from 'react';
+
+import { useInView } from 'react-intersection-observer';
+
 import cx from 'classnames';
 
 import Button from 'components/button';
-import Tag from 'components/tag';
 import InfoButton from 'components/info-button';
-
-import { useInView } from 'react-intersection-observer';
+import Tag from 'components/tag';
 
 export interface ItemProps {
   id: string | number;
