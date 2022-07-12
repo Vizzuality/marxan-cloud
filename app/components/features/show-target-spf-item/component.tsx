@@ -6,11 +6,10 @@ import { format } from 'd3';
 import Label from 'components/forms/label';
 import InfoButton from 'components/info-button';
 
-import { ShowTargetSPFItemProps, Type } from './types';
+import { ShowTargetSPFItemProps } from './types';
 
 export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
   className,
-  type,
   name,
   target = 0,
   fpf,
@@ -28,9 +27,7 @@ export const TargetSPFItem: React.FC<ShowTargetSPFItemProps> = ({
       <div
         className={cx({
           'absolute left-0 top-0 h-full w-1': true,
-          'bg-green-300': type === Type.BIOREGIONAL,
-          'bg-yellow-300': type === Type.SPECIES,
-          'bg-gradient-to-b from-green-300 to-yellow-300': type === Type.BIOREGIONAL_AND_SPECIES, // temporary color
+          'bg-purple-500': true,
         })}
       />
       <div className="flex items-start justify-between pb-4 pr-2">

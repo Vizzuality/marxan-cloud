@@ -3,7 +3,7 @@ import React from 'react';
 import { Story } from '@storybook/react/types-6-0';
 
 import ShowTargetSPFItem from './component';
-import { ShowTargetSPFItemProps, Type } from './types';
+import { ShowTargetSPFItemProps } from './types';
 
 export default {
   title: 'Components/Features/ShowTargetSPF-Item',
@@ -21,7 +21,6 @@ Default.args = {
   isAllTargets: false,
   target: 17,
   fpf: 1,
-  type: Type.BIOREGIONAL,
   name: 'Inland water',
 };
 
