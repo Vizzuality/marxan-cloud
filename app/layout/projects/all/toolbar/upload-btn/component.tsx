@@ -31,6 +31,7 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
 
   const onCancelImportLegacyProject = useCallback(() => {
+    // TODO: id importSubmit cancel
     cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
       onSuccess: ({ data: { projectId } }) => {
         dispatch(setLegacyProjectId(null));

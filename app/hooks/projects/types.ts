@@ -161,3 +161,12 @@ export interface CancelUploadLegacyProjectFileProps {
   projectId: string,
   dataFileId: string,
 }
+
+// UseLegacyProjectValidationResults
+export interface UseLegacyProjectValidationResultsProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface LegacyProjectValidationResultsProps {
+  projectId: string,
+}

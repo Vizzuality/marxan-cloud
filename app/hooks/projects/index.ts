@@ -51,6 +51,8 @@ import {
   UploadLegacyProjectFileProps,
   UseCancelUploadLegacyProjectFileProps,
   CancelUploadLegacyProjectFileProps,
+  UseLegacyProjectValidationResultsProps,
+  LegacyProjectValidationResultsProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -706,31 +708,37 @@ export function useCancelUploadLegacyProjectFile({
   });
 }
 
-export function useLegacyProjectValidationResults({ projectId }) {
-  const [session] = useSession();
-
-  const query = useQuery(['legacy-validation-results', projectId], async () => PROJECTS.request({
+export function useLegacyProjectValidationResults({
+  requestConfig = {
     method: 'GET',
-    url: `/import/legacy/${projectId}/validation-results`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
+  },
+}: UseLegacyProjectValidationResultsProps) {
+  const [session] = useSession();
+  const queryClient = useQueryClient();
+
+  const getLegacyProjectValidationResults = ({
+    projectId,
+  }: LegacyProjectValidationResultsProps) => {
+    return PROJECTS.request({
+      url: `/import/legacy/${projectId}/validation-results`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    }).then((response) => response.data);
+  };
+
+  return useMutation(getLegacyProjectValidationResults, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
     },
-    transformResponse: (response) => JSON.parse(response),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!projectId,
-    refetchInterval: 2500,
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
   });
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.errorsAndWarnings,
-    };
-  }, [query, data?.errorsAndWarnings]);
 }
 
 export function useImportLegacyProject({
