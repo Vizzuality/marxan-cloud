@@ -15,6 +15,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 
@@ -33,6 +34,7 @@ import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
+  @Throttle(10, 60)
   @UseGuards(LocalAuthGuard)
   @ApiOperation({
     description: 'Sign user in, issuing a JWT token.',
