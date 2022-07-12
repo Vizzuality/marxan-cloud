@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -25,6 +26,8 @@ import { Mailer } from '@marxan-api/modules/authentication/password-recovery/mai
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { EventBus } from '@nestjs/cqrs';
 import { UserLoggedIn } from './user-logged-in.event';
+import { passwordEntropyValidation } from '@marxan-api/utils/passwordValidation.utils';
+import { isLeft } from 'fp-ts/lib/These';
 
 /**
  * Access token for the app: key user data and access token
@@ -114,6 +117,10 @@ export class AuthenticationService {
    * @todo Allow to set all of a user's data on signup, if needed.
    */
   async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
+    const passwordCheck = passwordEntropyValidation(signupDto.password);
+    if (isLeft(passwordCheck)) {
+      throw new ForbiddenException(passwordCheck.left);
+    }
     const user = new User();
     user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
@@ -163,6 +170,10 @@ export class AuthenticationService {
    * Create a new user from the signup data provided via the CLI. Skips account confirmation
    */
   async createCLIUser(signupDto: SignUpDto): Promise<Partial<User>> {
+    const passwordCheck = passwordEntropyValidation(signupDto.password);
+    if (isLeft(passwordCheck)) {
+      throw new ForbiddenException(passwordCheck.left);
+    }
     const user = new User();
     user.displayName = signupDto.displayName;
     user.fname = signupDto.fname;
