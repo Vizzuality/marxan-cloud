@@ -71,6 +71,7 @@
     "express": "^4.17.1",
     "faker": "^5.1.0",
     "fast-csv": "^4.3.6",
+    "fast-password-entropy": "^1.1.1",
     "fp-ts": "2.10.5",
     "geojson": "0.5.0",
     "helmet": "^4.3.1",
