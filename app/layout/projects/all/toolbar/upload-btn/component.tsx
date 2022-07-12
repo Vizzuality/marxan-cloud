@@ -47,6 +47,7 @@ export const ProjectsUploadBtn: React.FC<ProjectsUploadBtnProps> = () => {
     dispatch(setUploadMode(null));
 
     if (legacyProjectId && !notCancel) onCancelImportLegacyProject();
+    dispatch(setLegacyProjectId(null));
   }, [legacyProjectId, onCancelImportLegacyProject, dispatch]);
 
   const onSetUploadMode = useCallback((id) => {

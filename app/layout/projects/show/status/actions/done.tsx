@@ -6,7 +6,11 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
+import { ScenarioSidebarTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
 import { useSaveProject } from 'hooks/projects';
+import { useScenarios, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 export const useProjectActionsDone = () => {
@@ -16,6 +20,18 @@ export const useProjectActionsDone = () => {
   const queryClient = useQueryClient();
 
   const { addToast } = useToasts();
+
+  const { data: scenariosData } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+  });
+
+  const scenarioMutation = useSaveScenario({
+    requestConfig: {
+      method: 'PATCH',
+    },
+  });
 
   const projectMutation = useSaveProject({
     requestConfig: {
@@ -86,6 +102,45 @@ export const useProjectActionsDone = () => {
         JOB_REF.current = null;
         queryClient.invalidateQueries('projects');
         queryClient.invalidateQueries(['scenarios', pid]);
+
+        // Save metadata from scenario to prevent changing the tab whe you first load the scenario
+        const [scenario] = scenariosData;
+        const { id: sid } = scenario;
+
+        // Let's talk with backend because this is something that should do the BE in the async jobs
+        scenarioMutation.mutate({
+          id: `${sid}`,
+          data: {
+            metadata: mergeScenarioStatusMetaData({
+              scenarioEditingMetadata: {
+                status: {
+                  'planning-unit': 'draft',
+                  features: 'draft',
+                  parameters: 'draft',
+                  solutions: 'draft',
+                },
+                tab: ScenarioSidebarTabs.SOLUTIONS,
+                subtab: null,
+              },
+            }, {
+              tab: ScenarioSidebarTabs.SOLUTIONS,
+              subtab: null,
+            }),
+          },
+        }, {
+          onSuccess: () => {
+
+          },
+          onError: () => {
+            addToast('onRunError', (
+              <>
+                <h2 className="font-medium">Error!</h2>
+              </>
+            ), {
+              level: 'error',
+            });
+          },
+        });
       },
       onError: () => {
         addToast('onDone', (
@@ -97,7 +152,7 @@ export const useProjectActionsDone = () => {
         });
       },
     });
-  }, [pid, projectMutation, addToast, queryClient]);
+  }, [pid, projectMutation, scenarioMutation, addToast, queryClient, scenariosData]);
 
   return {
     default: onDone,
