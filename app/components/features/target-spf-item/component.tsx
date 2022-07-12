@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import cx from 'classnames';
 
-import Button from 'components/button';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import Slider from 'components/forms/slider';
@@ -10,6 +9,7 @@ import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
+import REMOVE_SVG from 'svgs/ui/remove.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
 import { TargetSPFItemProps, Type } from './types';
@@ -76,7 +76,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
         >
           {isAllTargets ? 'Set target and SPF in all features' : name}
         </span>
-        <div className="flex flex-col ml-2 space-y-2">
+        <div className="flex mr-3 space-x-2">
           {!isAllTargets && (
             <Tooltip
               arrow
@@ -103,14 +103,26 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
             </Tooltip>
           )}
           {!isAllTargets && editable && (
-            <Button
-              className="flex-shrink-0 text-xs"
-              theme="secondary"
-              size="xs"
-              onClick={() => onRemove && onRemove(id)}
+            <Tooltip
+              arrow
+              placement="top"
+              content={(
+                <div
+                  className="p-2 text-gray-500 bg-white rounded"
+                >
+                  Remove
+                </div>
+              )}
             >
-              Remove
-            </Button>
+              <button
+                aria-label="manage-see-on-map"
+                type="button"
+                onClick={() => onRemove && onRemove(id)}
+                className="flex items-center justify-center w-5 h-5 text-white"
+              >
+                <Icon className="w-4 h-4" icon={REMOVE_SVG} />
+              </button>
+            </Tooltip>
           )}
         </div>
       </div>

@@ -18,6 +18,7 @@ import STRAT_3_IMG from 'images/info-buttons/img_strat_3.png';
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+import REMOVE_SVG from 'svgs/ui/remove.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
@@ -145,8 +146,7 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="text-sm font-heading">{name}</h2>
 
-          <div className="flex flex-col ml-2 space-y-2">
-
+          <div className="flex mr-3 space-x-2">
             <Tooltip
               arrow
               placement="top"
@@ -171,14 +171,26 @@ export const Item: React.FC<ItemProps> = ({
               </button>
             </Tooltip>
             {editable && (
-              <Button
-                className="flex-shrink-0 text-xs"
-                theme="secondary"
-                size="xs"
-                onClick={() => onRemove && onRemove(id)}
+              <Tooltip
+                arrow
+                placement="top"
+                content={(
+                  <div
+                    className="p-2 text-gray-500 bg-white rounded"
+                  >
+                    Remove
+                  </div>
+                )}
               >
-                Remove
-              </Button>
+                <button
+                  aria-label="manage-see-on-map"
+                  type="button"
+                  onClick={() => onRemove && onRemove(id)}
+                  className="flex items-center justify-center w-5 h-5 text-white"
+                >
+                  <Icon className="w-4 h-4" icon={REMOVE_SVG} />
+                </button>
+              </Tooltip>
             )}
           </div>
         </div>
