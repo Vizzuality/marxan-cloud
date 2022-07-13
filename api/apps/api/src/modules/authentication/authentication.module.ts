@@ -2,6 +2,8 @@ import { forwardRef, Logger, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 
 import { UsersModule } from '@marxan-api/modules/users/users.module';
@@ -75,6 +77,10 @@ export const logger = new Logger('Authentication');
       useClass: TypeORMRecoveryTokenRepository,
     },
     PasswordRecoveryService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
   controllers: [AuthenticationController, PasswordRecoveryController],
   exports: [AuthenticationService],
