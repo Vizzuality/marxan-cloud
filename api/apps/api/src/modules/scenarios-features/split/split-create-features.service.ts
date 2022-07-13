@@ -182,7 +182,11 @@ export class SplitCreateFeatures {
       },
     );
 
-    await this.featuresRepo.save(features);
+    await Promise.all(
+      features.map((feature) => {
+        return this.featuresRepo.save(feature);
+      }),
+    );
 
     return res;
   }
