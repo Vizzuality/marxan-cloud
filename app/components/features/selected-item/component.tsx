@@ -139,7 +139,7 @@ export const Item: React.FC<ItemProps> = ({
           <h2 className="text-sm font-heading">{name}</h2>
 
           <div className="flex mr-3 space-x-2">
-            {split && !!OPTIONS.length && (
+            {editable && split && !!OPTIONS.length && (
               <Tooltip
                 arrow
                 placement="top"
@@ -173,7 +173,7 @@ export const Item: React.FC<ItemProps> = ({
                 <div
                   className="p-2 text-gray-500 bg-white rounded"
                 >
-                  See on map
+                  {isShown ? 'Remove from map' : 'See on map'}
                 </div>
               )}
             >
