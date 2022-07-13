@@ -97,7 +97,7 @@ const getFixtures = async () => {
       return featureId;
     },
     WhenComputing: (projectId: string, scenarioId: string, featureId: string) =>
-      sut.computeAreaPerPanningUnitOfFeature(projectId, scenarioId, featureId),
+      sut.computeAreaPerPlanningUnitOfFeature(projectId, scenarioId, featureId),
     ThenComputationsHasBeenSaved: async (
       projectId: string,
       featureId: string,

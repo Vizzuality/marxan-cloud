@@ -50,8 +50,8 @@ export class PuvsprDatService {
       'species\tpu\tamount\n' +
       rows
         .map(
-          ({ specieId, puid, amount }) =>
-            `${specieId}\t${puid}\t${amount.toFixed(6)}`,
+          ({ speciesId, puid, amount }) =>
+            `${speciesId}\t${puid}\t${amount.toFixed(6)}`,
         )
         .join('\n')
     );

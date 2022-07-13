@@ -14,7 +14,7 @@ export class ComputeArea {
     private readonly puvsprCalculations: PuvsprCalculationsService,
     private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
   ) {}
-  public async computeAreaPerPanningUnitOfFeature(
+  public async computeAreaPerPlanningUnitOfFeature(
     projectId: string,
     scenarioId: string,
     featureId: string,

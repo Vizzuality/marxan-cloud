@@ -97,17 +97,17 @@ const getFixtures = async () => {
       expect(hash.length).toBeGreaterThan(0);
     },
     ThenSingleSplitConfigFeatureValueAreTheSame: (
-      fisrtResult: HashAndStrippedConfigFeature,
+      firstResult: HashAndStrippedConfigFeature,
       secondResult: HashAndStrippedConfigFeature,
     ) => {
-      expect(fisrtResult).toEqual(secondResult);
+      expect(firstResult).toEqual(secondResult);
     },
     ThenSingleSplitConfigFeatureValueAreDifferent: (
-      fisrtResult: HashAndStrippedConfigFeature,
+      firstResult: HashAndStrippedConfigFeature,
       secondResult: HashAndStrippedConfigFeature,
     ) => {
-      expect(fisrtResult.hash).not.toEqual(secondResult.hash);
-      expect(fisrtResult.canonical).not.toEqual(secondResult.canonical);
+      expect(firstResult.hash).not.toEqual(secondResult.hash);
+      expect(firstResult.canonical).not.toEqual(secondResult.canonical);
     },
   };
 };

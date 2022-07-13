@@ -16,13 +16,13 @@ export class PuvsprCalculationsService {
     scenarioId: string,
   ): Promise<
     {
-      specieId: number;
+      speciesId: number;
       featureId: string;
     }[]
   > {
     return this.geoEntityManager
       .createQueryBuilder()
-      .select('min(sfd.feature_id)', 'specieId')
+      .select('min(sfd.feature_id)', 'speciesId')
       .addSelect('sfd.api_feature_id', 'featureId')
       .from(ScenarioFeaturesData, 'sfd')
       .where('sfd.api_feature_id IN (:...featureIds)', {
@@ -42,10 +42,6 @@ export class PuvsprCalculationsService {
      * by partition (we need to get the grid shape from the parent project); use
      * && operator instead of st_intersects() for bbox-based calculation of
      * intersections.
-     *
-     * @TODO Calculate `amount` correctly from `amount_from_legacy_project`. The
-     * initial implementation is simply a placeholder so that we can use
-     * `amount_from_legacy_projects` in legacy project piece importers.
      */
     const rows: {
       featureid: string;
@@ -96,10 +92,6 @@ export class PuvsprCalculationsService {
      * by partition (we need to get the grid shape from the parent project); use
      * && operator instead of st_intersects() for bbox-based calculation of
      * intersections.
-     *
-     * @TODO Calculate `amount` correctly from `amount_from_legacy_project`. The
-     * initial implementation is simply a placeholder so that we can use
-     * `amount_from_legacy_projects` in legacy project piece importers.
      */
     const rows: {
       puid: number;
