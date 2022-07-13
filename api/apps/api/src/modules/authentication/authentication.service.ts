@@ -24,8 +24,8 @@ import { v4 } from 'uuid';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 import { Mailer } from '@marxan-api/modules/authentication/password-recovery/mailer';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { passwordEntropyValidation } from '@marxan-api/utils/passwordValidation.utils';
-import { isLeft } from 'fp-ts/lib/These';
+import { isStringEntropyHigherThan } from '@marxan-api/utils/passwordValidation.utils';
+import { isLeft } from 'fp-ts/lib/Either';
 
 /**
  * Access token for the app: key user data and access token
@@ -69,6 +69,10 @@ export interface JwtDataPayload {
   exp: number;
 }
 
+/**
+ * Entropy threshold for password validation.
+ */
+const entropyThreshold = 80;
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
@@ -114,7 +118,10 @@ export class AuthenticationService {
    * @todo Allow to set all of a user's data on signup, if needed.
    */
   async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
-    const passwordCheck = passwordEntropyValidation(signupDto.password);
+    const passwordCheck = isStringEntropyHigherThan(
+      entropyThreshold,
+      signupDto.password,
+    );
     if (isLeft(passwordCheck)) {
       throw new ForbiddenException(passwordCheck.left);
     }
@@ -167,7 +174,10 @@ export class AuthenticationService {
    * Create a new user from the signup data provided via the CLI. Skips account confirmation
    */
   async createCLIUser(signupDto: SignUpDto): Promise<Partial<User>> {
-    const passwordCheck = passwordEntropyValidation(signupDto.password);
+    const passwordCheck = isStringEntropyHigherThan(
+      entropyThreshold,
+      signupDto.password,
+    );
     if (isLeft(passwordCheck)) {
       throw new ForbiddenException(passwordCheck.left);
     }
