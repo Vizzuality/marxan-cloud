@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { geoprocessingConnections } from './ormconfig';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -21,6 +22,7 @@ import { ImportModule } from '@marxan-geoprocessing/import/import.module';
 import { PingController } from '@marxan-geoprocessing/modules/ping/ping.controller';
 import { LegacyProjectImportModule } from './legacy-project-import/legacy-project-import.module';
 import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup/unused-resources-cleanup.module';
+import { CleanupTasksModule } from './modules/cleanup-tasks/cleanup-tasks.module';
 
 @Module({
   imports: [
@@ -50,6 +52,8 @@ import { UnusedResourcesCleanUpModule } from './modules/unused-resources-cleanup
     ImportModule,
     LegacyProjectImportModule,
     UnusedResourcesCleanUpModule,
+    ScheduleModule.forRoot(),
+    CleanupTasksModule,
   ],
   controllers: [AppController, PingController],
   providers: [AppService],

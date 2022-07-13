@@ -56,5 +56,8 @@
         "maxAgeForOrphanUploads": "UPLOADS_PLANNING_AREAS_MAX_AGE"
       }
     }
+  },
+  "cleanupCronJobSettings": {
+    "interval": "CLEANUP_CRON_INTERVAL"
   }
 }

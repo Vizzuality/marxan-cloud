@@ -471,7 +471,7 @@ export class ProjectsService {
   async startLegacyProjectImport(
     projectName: string,
     userId: string,
-    description: string,
+    description?: string,
   ): Promise<
     Either<
       typeof forbiddenError | StartLegacyProjectImportError,

@@ -19,8 +19,9 @@ export class StartLegacyProjectImportBodyDto {
     description: 'description of the project',
     example: 'legacy project import description',
   })
+  @IsOptional()
   @IsString()
-  description!: string;
+  description?: string;
 }
 
 export class StartLegacyProjectImportResponseDto {

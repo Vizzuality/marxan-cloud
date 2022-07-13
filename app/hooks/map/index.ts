@@ -262,8 +262,12 @@ export function useFeaturePreviewLayers({
 }: UseFeaturePreviewLayers) {
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
-    const FEATURES = [...features];
-    const { featuresRecipe = [], featureHoverId, settings = {} } = options;
+
+    const {
+      featuresRecipe = [], featureHoverId, selectedFeatures = [], settings = {},
+    } = options;
+
+    const FEATURES = [...features].filter((ft) => selectedFeatures.includes(ft.id as string));
 
     const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
     if (currentFeatureHoverIndex > -1) {
@@ -280,6 +284,7 @@ export function useFeaturePreviewLayers({
       opacity: BioregionalOpacity,
       visibility: BioregionalVisibility = true,
     } = BioregionalSettings;
+
     const {
       opacity: SpeciesOpacity,
       visibility: SpeciesVisibility = true,

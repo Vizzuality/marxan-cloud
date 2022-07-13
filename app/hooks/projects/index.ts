@@ -41,6 +41,18 @@ import {
   ExportProjectProps,
   ImportProjectProps,
   UseImportProjectProps,
+  UseSaveLegacyProjectProps,
+  SaveLegacyProjectProps,
+  UseCancelImportLegacyProjectProps,
+  CancelImportLegacyProjectProps,
+  UseImportLegacyProjectProps,
+  ImportLegacyProjectProps,
+  UseUploadLegacyProjectFileProps,
+  UploadLegacyProjectFileProps,
+  UseCancelUploadLegacyProjectFileProps,
+  CancelUploadLegacyProjectFileProps,
+  UseLegacyProjectValidationResultsProps,
+  LegacyProjectValidationResultsProps,
 } from './types';
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
@@ -565,6 +577,195 @@ export function useDownloadExport({
       link.click();
       link.remove();
       console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+/**
+****************************************
+  LEGACY PROJECTS
+****************************************
+*/
+export function useSaveLegacyProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseSaveLegacyProjectProps) {
+  const [session] = useSession();
+
+  const saveLegacyProject = ({ data }: SaveLegacyProjectProps) => {
+    return PROJECTS.request({
+      url: '/import/legacy',
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(saveLegacyProject, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useCancelImportLegacyProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseCancelImportLegacyProjectProps) {
+  const [session] = useSession();
+
+  const cancelImportLegacyProject = ({ projectId }: CancelImportLegacyProjectProps) => {
+    return PROJECTS.request({
+      method: 'POST',
+      url: `/import/legacy/${projectId}/cancel`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(cancelImportLegacyProject, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useUploadLegacyProjectFile({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseUploadLegacyProjectFileProps) {
+  const [session] = useSession();
+
+  const uploadLegacyProjectFile = ({ data, projectId }: UploadLegacyProjectFileProps) => {
+    return UPLOADS.request({
+      url: `projects/import/legacy/${projectId}/data-file`,
+      data,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(uploadLegacyProjectFile, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useCancelUploadLegacyProjectFile({
+  requestConfig = {
+    method: 'DELETE',
+  },
+}: UseCancelUploadLegacyProjectFileProps) {
+  const [session] = useSession();
+
+  const cancelUploadLegacyProjectFile = ({
+    dataFileId,
+    projectId,
+  }: CancelUploadLegacyProjectFileProps) => {
+    return PROJECTS.request({
+      method: 'DELETE',
+      url: `/import/legacy/${projectId}/data-file/${dataFileId}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(cancelUploadLegacyProjectFile, {
+    onSuccess: (data, variables, context) => {
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useLegacyProjectValidationResults({
+  requestConfig = {
+    method: 'GET',
+  },
+}: UseLegacyProjectValidationResultsProps) {
+  const [session] = useSession();
+  const queryClient = useQueryClient();
+
+  const getLegacyProjectValidationResults = ({
+    projectId,
+  }: LegacyProjectValidationResultsProps) => {
+    return PROJECTS.request({
+      url: `/import/legacy/${projectId}/validation-results`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'multipart/form-data',
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    }).then((response) => response.data);
+  };
+
+  return useMutation(getLegacyProjectValidationResults, {
+    onSuccess: (data: any, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useImportLegacyProject({
+  requestConfig = {
+    method: 'POST',
+  },
+}: UseImportLegacyProjectProps) {
+  const [session] = useSession();
+  const queryClient = useQueryClient();
+
+  const importLegacyProject = ({ projectId, data }: ImportLegacyProjectProps) => {
+    return PROJECTS.request({
+      method: 'POST',
+      data,
+      url: `/import/legacy/${projectId}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (response) => JSON.parse(response),
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(importLegacyProject, {
+    onSuccess: (data, variables, context) => {
+      queryClient.invalidateQueries('projects');
+      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
