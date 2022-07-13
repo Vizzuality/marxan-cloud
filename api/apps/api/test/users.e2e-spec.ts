@@ -181,6 +181,28 @@ describe('UsersModule (e2e)', () => {
         .send(loginDto)
         .expect(HttpStatus.CREATED);
     });
+
+    test('The API should show a 429: Too many request error if multiple attempts at login are done in a short space of time', async () => {
+      const requestsArray = await Promise.all([
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ ...loginDto, password: 'abcde1' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ ...loginDto, password: 'abcde2' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ ...loginDto, password: 'abcde3' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ ...loginDto, password: 'abcde4' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ ...loginDto, password: 'abcde5' }),
+      ]);
+      const tooManyRequest = requestsArray.find((r) => r.status === 429);
+      expect(tooManyRequest).toBeDefined();
+    });
   });
 
   describe('Users - metadata', () => {
