@@ -12,6 +12,7 @@ import { FeatureTag } from '@marxan/features/domain';
 import { JobStatus } from '../scenarios/scenario.api.entity';
 import { Project } from '../projects/project.api.entity';
 import { User } from '../users/user.api.entity';
+import { SingleConfigFeatureValueStripped } from '@marxan/features-hash';
 
 export const geoFeatureResource: BaseServiceResource = {
   className: 'GeoFeature',
@@ -98,6 +99,15 @@ export class GeoFeature extends BaseEntity {
   @ApiPropertyOptional()
   @Column('boolean', { name: 'is_custom' })
   isCustom?: boolean;
+
+  @Column('boolean', { name: 'is_legacy' })
+  isLegacy!: boolean;
+
+  @Column('jsonb', { name: 'from_geoprocessing_ops', nullable: true })
+  fromGeoprocessingOps?: SingleConfigFeatureValueStripped;
+
+  @Column('text', { name: 'geoprocessing_ops_hash', nullable: true })
+  geoprocessingOpsHash?: string;
 }
 
 export class JSONAPIGeoFeaturesData {

@@ -83,6 +83,9 @@ export const getFixtures = async () => {
           creationStatus: `done`,
           projectId,
           isCustom: true,
+          isLegacy: false,
+          fromGeoprocessingOps: null,
+          geoprocessingOpsHash: null,
         },
       ]);
       expect(

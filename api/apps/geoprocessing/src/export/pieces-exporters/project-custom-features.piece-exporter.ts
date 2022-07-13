@@ -31,6 +31,7 @@ type ProjectCustomFeaturesSelectResult = {
   tag: FeatureTag;
   creation_status: CreationStatus;
   list_property_keys: string[];
+  is_legacy: boolean;
 };
 
 type FeaturesDataSelectResult = {
@@ -75,6 +76,7 @@ export class ProjectCustomFeaturesPieceExporter
         'tag',
         'creation_status',
         'list_property_keys',
+        'is_legacy',
       ])
       .from('features', 'f')
       .where('project_id = :projectId', { projectId: input.resourceId })

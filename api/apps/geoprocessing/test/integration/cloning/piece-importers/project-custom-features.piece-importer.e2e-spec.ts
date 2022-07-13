@@ -67,6 +67,17 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
       .WhenPieceImporterIsInvoked(input)
       .ThenCustomFeaturesShouldBeAddedToProject();
   });
+
+  it('imports project leagcy features', async () => {
+    const archiveLocation = await fixtures.GivenValidProjectCustomFeaturesFile({
+      isLegacy: true,
+    });
+    await fixtures.GivenProject();
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenCustomFeaturesShouldBeAddedToProject({ isLegacy: true });
+  });
 });
 
 const getFixtures = async () => {
@@ -169,7 +180,9 @@ const getFixtures = async () => {
     GivenNoProjectCustomFeaturesFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectCustomFeaturesFile: async () => {
+    GivenValidProjectCustomFeaturesFile: async (
+      opts: { isLegacy: boolean } = { isLegacy: false },
+    ) => {
       const geometries = await GenerateRandomGeometries(
         geoEntityManager,
         amountOfCustomFeatures * recordsOfDataForEachCustomFeature,
@@ -188,6 +201,7 @@ const getFixtures = async () => {
             intersection: [],
             list_property_keys: [],
             property_name: '',
+            is_legacy: opts.isLegacy,
             data: Array(recordsOfDataForEachCustomFeature)
               .fill(0)
               .map((_, dataIndex) => ({
@@ -224,19 +238,25 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenCustomFeaturesShouldBeAddedToProject: async () => {
+        ThenCustomFeaturesShouldBeAddedToProject: async (
+          opts: { isLegacy: boolean } = { isLegacy: false },
+        ) => {
           await sut.run(input);
 
           const customFeatures: {
             id: string;
+            isLegacy: boolean;
           }[] = await apiEntityManager
             .createQueryBuilder()
             .select('id')
+            .addSelect('is_legacy', 'isLegacy')
             .from('features', 'f')
             .where('project_id = :projectId', { projectId })
             .execute();
 
-          console.log(customFeatures);
+          expect(
+            customFeatures.every(({ isLegacy }) => isLegacy === opts.isLegacy),
+          );
 
           const featuresData = await featuresDataRepo.find({
             featureId: In(customFeatures.map((feature) => feature.id)),

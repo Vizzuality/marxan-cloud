@@ -34,7 +34,6 @@ export class SplitOperation {
         planningAreaLocation,
       } = await this.splitDataProvider.prepareData({
         scenarioId: data.scenarioId,
-        input: data.input,
       });
 
       const { parameters, query } = this.splitQuery.prepareQuery(
@@ -49,6 +48,7 @@ export class SplitOperation {
         query,
         parameters,
       );
+
       await this.events.create({
         topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureSplit__finished__v1__alpha1,
