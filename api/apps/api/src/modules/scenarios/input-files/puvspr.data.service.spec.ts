@@ -57,17 +57,17 @@ describe(`when there is data available`, () => {
     puvsprDatProcessor.mockImplementationOnce(async () => [
       {
         amount: 1000.0,
-        specieId: 'feature-1',
+        speciesId: 'feature-1',
         puid: 'pu-1,',
       },
       {
         amount: 0.001,
-        specieId: 'feature-1',
+        speciesId: 'feature-1',
         puid: 'pu-2,',
       },
       {
         amount: 99.995,
-        specieId: 'feature-1',
+        speciesId: 'feature-1',
         puid: 'pu-3,',
       },
     ]);
