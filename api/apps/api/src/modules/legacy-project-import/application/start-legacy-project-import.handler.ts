@@ -52,8 +52,9 @@ export class StartLegacyProjectImportHandler
         description,
       });
 
+      const scenarioName = name + ' - scenario';
       const scenario = await this.scenarioRepo.save({
-        name,
+        name: scenarioName,
         projectId: project.id,
       });
 
