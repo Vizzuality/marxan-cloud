@@ -78,7 +78,7 @@ export class InputLegacyProjectPieceImporter
 
     const scenarioMetadata = {
       scenarioEditingMetadata: {
-        tab: 'planning-unit',
+        tab: legacyProjectImportIncludesSolutions ? 'solutions' : 'parameters',
         subtab: null,
         status: {
           'planning-unit': 'draft',
