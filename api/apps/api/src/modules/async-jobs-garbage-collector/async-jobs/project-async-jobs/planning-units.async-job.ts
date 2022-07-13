@@ -19,7 +19,7 @@ export class PlanningUnitsAsyncJob extends AsyncJob {
       API_EVENT_KINDS.project__planningUnits__failed__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): PlanningUnitsApiEvents[] {
+  getEndAsyncJobStates(): PlanningUnitsApiEvents[] {
     return [
       API_EVENT_KINDS.project__planningUnits__finished__v1__alpha,
       API_EVENT_KINDS.project__planningUnits__failed__v1__alpha,

@@ -19,7 +19,7 @@ export class GridAsyncJob extends AsyncJob {
       API_EVENT_KINDS.project__grid__failed__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): GridApiEvents[] {
+  getEndAsyncJobStates(): GridApiEvents[] {
     return [
       API_EVENT_KINDS.project__grid__finished__v1__alpha,
       API_EVENT_KINDS.project__grid__failed__v1__alpha,

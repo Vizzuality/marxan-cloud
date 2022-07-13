@@ -19,7 +19,7 @@ export class SpecificationAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__specification__finished__v1__alpha1,
     ];
   }
-  getEndAsynJobStates(): SpecificationApiEvents[] {
+  getEndAsyncJobStates(): SpecificationApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__specification__failed__v1__alpha1,
       API_EVENT_KINDS.scenario__specification__finished__v1__alpha1,

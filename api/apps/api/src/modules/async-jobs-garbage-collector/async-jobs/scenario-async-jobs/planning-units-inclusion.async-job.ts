@@ -22,7 +22,7 @@ export class PlanningUnitsInclusionAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,
     ];
   }
-  getEndAsynJobStates(): PlanningUnitsInclusionApiEvents[] {
+  getEndAsyncJobStates(): PlanningUnitsInclusionApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__planningUnitsInclusion__failed__v1__alpha1,
       API_EVENT_KINDS.scenario__planningUnitsInclusion__finished__v1__alpha1,

@@ -21,7 +21,7 @@ export class CostSurfaceAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,
     ];
   }
-  getEndAsynJobStates(): CostSurfaceApiEvents[] {
+  getEndAsyncJobStates(): CostSurfaceApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__costSurface__costUpdateFailed__v1_alpha1,
       API_EVENT_KINDS.scenario__costSurface__finished__v1_alpha1,

@@ -19,7 +19,7 @@ export class CalibrationAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1,
     ];
   }
-  getEndAsynJobStates(): CalibrationApiEvents[] {
+  getEndAsyncJobStates(): CalibrationApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__calibration__finished_v1_alpha1,
       API_EVENT_KINDS.scenario__calibration__failed_v1_alpha1,

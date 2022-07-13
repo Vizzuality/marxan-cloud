@@ -19,7 +19,7 @@ export class ProtectedAreasAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): ProtectedAreasApiEvents[] {
+  getEndAsyncJobStates(): ProtectedAreasApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__protectedAreas__finished__v1__alpha,
       API_EVENT_KINDS.scenario__protectedAreas__failed__v1__alpha,

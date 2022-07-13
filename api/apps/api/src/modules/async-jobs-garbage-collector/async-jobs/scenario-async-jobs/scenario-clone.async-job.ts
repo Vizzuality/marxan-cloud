@@ -19,7 +19,7 @@ export class ScenarioCloneAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__clone__failed__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): ScenarioCloneApiEvents[] {
+  getEndAsyncJobStates(): ScenarioCloneApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__clone__finished__v1__alpha,
       API_EVENT_KINDS.scenario__clone__failed__v1__alpha,

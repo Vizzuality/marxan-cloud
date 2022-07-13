@@ -19,7 +19,7 @@ export class ProjectImportAsyncJob extends AsyncJob {
       API_EVENT_KINDS.project__import__failed__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): ProjectImportApiEvents[] {
+  getEndAsyncJobStates(): ProjectImportApiEvents[] {
     return [
       API_EVENT_KINDS.project__import__finished__v1__alpha,
       API_EVENT_KINDS.project__import__failed__v1__alpha,

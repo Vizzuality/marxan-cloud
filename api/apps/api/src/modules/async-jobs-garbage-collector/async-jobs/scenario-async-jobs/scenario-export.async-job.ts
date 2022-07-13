@@ -19,7 +19,7 @@ export class ScenarioExportAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__export__failed__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): ScenarioExportApiEvents[] {
+  getEndAsyncJobStates(): ScenarioExportApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__export__finished__v1__alpha,
       API_EVENT_KINDS.scenario__export__failed__v1__alpha,
