@@ -22,7 +22,7 @@ export class FeaturesWithPuIntersectionAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1,
     ];
   }
-  getEndAsynJobStates(): FeaturesWithPuIntersectionApiEvents[] {
+  getEndAsyncJobStates(): FeaturesWithPuIntersectionApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__featuresWithPuIntersection__failed__v1__alpha1,
       API_EVENT_KINDS.scenario__featuresWithPuIntersection__finished__v1__alpha1,

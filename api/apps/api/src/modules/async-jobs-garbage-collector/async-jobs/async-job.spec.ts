@@ -122,7 +122,7 @@ class AsyncJobFake extends AsyncJob {
   protected getAllAsyncJobStates(): API_EVENT_KINDS[] {
     return this.allAsyncJobStates;
   }
-  protected getEndAsynJobStates(): API_EVENT_KINDS[] {
+  protected getEndAsyncJobStates(): API_EVENT_KINDS[] {
     return this.endAsyncJobStates;
   }
   protected getFailedAsyncJobState(

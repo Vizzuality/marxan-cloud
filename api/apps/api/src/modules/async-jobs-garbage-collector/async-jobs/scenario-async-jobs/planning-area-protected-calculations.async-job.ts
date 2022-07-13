@@ -22,7 +22,7 @@ export class PlanningAreaProtectedCalculationAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1,
     ];
   }
-  getEndAsynJobStates(): ProtectedAreasApiEvents[] {
+  getEndAsyncJobStates(): ProtectedAreasApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__finished__v1__alpha1,
       API_EVENT_KINDS.scenario__planningAreaProtectedCalculation__failed__v1__alpha1,

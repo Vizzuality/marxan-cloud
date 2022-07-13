@@ -22,7 +22,7 @@ export class RunAsyncJob extends AsyncJob {
       API_EVENT_KINDS.scenario__run__finished__v1__alpha1,
     ];
   }
-  getEndAsynJobStates(): RunApiEvents[] {
+  getEndAsyncJobStates(): RunApiEvents[] {
     return [
       API_EVENT_KINDS.scenario__run__failed__v1__alpha1,
       API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,

@@ -20,7 +20,7 @@ export class LegacyImportAsyncJob extends AsyncJob {
       API_EVENT_KINDS.project__legacy__import__submitted__v1__alpha,
     ];
   }
-  getEndAsynJobStates(): LegacyImportApiEvents[] {
+  getEndAsyncJobStates(): LegacyImportApiEvents[] {
     return [
       API_EVENT_KINDS.project__legacy__import__canceled__v1__alpha,
       API_EVENT_KINDS.project__legacy__import__failed__v1__alpha,

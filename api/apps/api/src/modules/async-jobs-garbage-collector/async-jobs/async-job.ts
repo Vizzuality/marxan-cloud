@@ -11,7 +11,7 @@ export abstract class AsyncJob {
 
   protected abstract getAllAsyncJobStates(): API_EVENT_KINDS[];
 
-  protected abstract getEndAsynJobStates(): API_EVENT_KINDS[];
+  protected abstract getEndAsyncJobStates(): API_EVENT_KINDS[];
 
   protected abstract getFailedAsyncJobState(
     stuckState: API_EVENT_KINDS,
@@ -27,9 +27,9 @@ export abstract class AsyncJob {
 
     if (!latestApiEvent) return;
 
-    const hasAsyncJobFinsihed = this.hasAsyncJobFinsihed(latestApiEvent);
+    const hasAsyncJobFinished = this.hasAsyncJobFinished(latestApiEvent);
 
-    if (hasAsyncJobFinsihed) return;
+    if (hasAsyncJobFinished) return;
 
     const isAsyncJobStuck = this.isAsyncJobStuck(latestApiEvent);
 
@@ -55,8 +55,8 @@ export abstract class AsyncJob {
     }
   }
 
-  private hasAsyncJobFinsihed(latestApiEvent: ApiEventByTopicAndKind) {
-    return this.getEndAsynJobStates().includes(latestApiEvent.kind);
+  private hasAsyncJobFinished(latestApiEvent: ApiEventByTopicAndKind) {
+    return this.getEndAsyncJobStates().includes(latestApiEvent.kind);
   }
   private isAsyncJobStuck(latestApiEvent: ApiEventByTopicAndKind) {
     const maxTime = this.getMaxTimeForAsyncJob();
