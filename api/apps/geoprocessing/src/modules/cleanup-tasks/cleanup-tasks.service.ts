@@ -37,7 +37,7 @@ export class CleanupTasksService implements CleanupTasks {
     await this.geoEntityManager.transaction(async (entityManager) => {
       // Truncate table to be sure that not any projectId is inside before operation
       await this.geoEntityManager.query(
-        `TRUNCATE TABLE project_nuke_preparation;`,
+        `TRUNCATE TABLE project_geodata_cleanup_preparation;`,
       );
 
       // Set batches to insert ids in intermediate table for processing
@@ -46,7 +46,7 @@ export class CleanupTasksService implements CleanupTasks {
         CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
       ).entries()) {
         await entityManager.insert(
-          'project_nuke_preparation',
+          'project_geodata_cleanup_preparation',
           summaryChunks.map((chunk: string) => ({
             project_id: chunk,
           })),
@@ -85,7 +85,7 @@ export class CleanupTasksService implements CleanupTasks {
       );
 
       await this.geoEntityManager.query(
-        `TRUNCATE TABLE project_nuke_preparation;`,
+        `TRUNCATE TABLE project_geodata_cleanup_preparation;`,
       );
     });
   }
