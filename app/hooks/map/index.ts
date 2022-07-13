@@ -264,15 +264,10 @@ export function useFeaturePreviewLayers({
     if (!active || !bbox || !features) return [];
 
     const {
-      featuresRecipe = [], featureHoverId, selectedFeatures = [], settings = {},
+      featuresRecipe = [], selectedFeatures = [], settings = {},
     } = options;
 
     const FEATURES = [...features].filter((ft) => selectedFeatures.includes(ft.id as string));
-
-    const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
-    if (currentFeatureHoverIndex > -1) {
-      FEATURES.splice(0, 0, FEATURES.splice(currentFeatureHoverIndex, 1)[0]);
-    }
 
     // Layer settings
     const {
@@ -309,7 +304,7 @@ export function useFeaturePreviewLayers({
         const getLayerOpacity = () => {
           if (type === 'bioregional') return BioregionalOpacity;
           if (type === 'species') return SpeciesOpacity;
-          return 0.5;
+          return 1;
         };
 
         const F = featuresRecipe.find((fr) => fr.id === id) || f;
@@ -336,8 +331,8 @@ export function useFeaturePreviewLayers({
                   visibility: getLayerVisibility(type),
                 },
                 paint: {
-                  'fill-color': featureHoverId === id ? COLORS[type].hover : COLORS[type].default,
-                  'fill-opacity': featureHoverId === id ? 1 : 0.5 * getLayerOpacity(),
+                  'fill-color': COLORS[type].default,
+                  'fill-opacity': 0.5 * getLayerOpacity(),
                 },
               },
               {

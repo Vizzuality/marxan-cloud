@@ -27,6 +27,7 @@ export interface ItemProps {
   className?: string;
   name: string;
   description: string;
+  type?: string;
 
   // SPLIT
   splitSelected?: string;
