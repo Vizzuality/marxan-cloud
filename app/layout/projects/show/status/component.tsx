@@ -36,6 +36,7 @@ export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
 
   const { data: projectData } = useProject(pid);
   const { data: scenarioStatusData } = useScenariosStatus(pid);
+
   const { jobs = [] } = scenarioStatusData || {};
 
   // Jobs

@@ -3,6 +3,7 @@ export const TEXTS_RUNNING = {
   export: () => 'Exporting project...',
   clone: () => 'Cloning project...',
   import: () => 'Importing project...',
+  legacy: () => 'Importing legacy project...',
 };
 
 export const TEXTS_FAILURE = {
@@ -10,4 +11,5 @@ export const TEXTS_FAILURE = {
   export: () => 'Fail Exporting project',
   clone: () => 'Fail cloning project',
   import: () => 'Fail importing project',
+  legacy: () => 'Fail importing legacy project',
 };

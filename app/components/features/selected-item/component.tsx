@@ -9,13 +9,17 @@ import Checkbox from 'components/forms/checkbox';
 import Select from 'components/forms/select';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import Tooltip from 'components/tooltip';
 
 import STRAT_1_IMG from 'images/info-buttons/img_strat_1.png';
 import STRAT_2_IMG from 'images/info-buttons/img_strat_2.png';
 import STRAT_3_IMG from 'images/info-buttons/img_strat_3.png';
 
+import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+import REMOVE_SVG from 'svgs/ui/remove.svg?sprite';
+import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 import SPLIT_SVG from 'svgs/ui/split.svg?sprite';
 
 export interface ItemProps {
@@ -51,6 +55,8 @@ export interface ItemProps {
   onRemove?: (value) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
+  isShown?: boolean;
+  onSeeOnMap?: () => void;
 }
 
 export const Item: React.FC<ItemProps> = ({
@@ -74,6 +80,9 @@ export const Item: React.FC<ItemProps> = ({
   onRemove,
   onMouseEnter,
   onMouseLeave,
+
+  isShown,
+  onSeeOnMap,
 }: ItemProps) => {
   const {
     split,
@@ -137,16 +146,53 @@ export const Item: React.FC<ItemProps> = ({
         <div className="flex items-start justify-between">
           <h2 className="text-sm font-heading">{name}</h2>
 
-          {editable && (
-            <Button
-              className="flex-shrink-0 text-xs"
-              theme="secondary"
-              size="xs"
-              onClick={() => onRemove && onRemove(id)}
+          <div className="flex mr-3 space-x-2">
+            <Tooltip
+              arrow
+              placement="top"
+              content={(
+                <div
+                  className="p-2 text-gray-500 bg-white rounded"
+                >
+                  See on map
+                </div>
+              )}
             >
-              Remove
-            </Button>
-          )}
+              <button
+                aria-label="manage-see-on-map"
+                type="button"
+                onClick={onSeeOnMap}
+                className={cx({
+                  'text-white w-5 h-5 flex justify-center items-center': true,
+                  'text-gray-300': !isShown,
+                })}
+              >
+                <Icon className="w-4 h-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
+              </button>
+            </Tooltip>
+            {editable && (
+              <Tooltip
+                arrow
+                placement="top"
+                content={(
+                  <div
+                    className="p-2 text-gray-500 bg-white rounded"
+                  >
+                    Remove
+                  </div>
+                )}
+              >
+                <button
+                  aria-label="manage-see-on-map"
+                  type="button"
+                  onClick={() => onRemove && onRemove(id)}
+                  className="flex items-center justify-center w-5 h-5 text-white"
+                >
+                  <Icon className="w-4 h-4" icon={REMOVE_SVG} />
+                </button>
+              </Tooltip>
+            )}
+          </div>
         </div>
 
         {type === 'bioregional' && split && (

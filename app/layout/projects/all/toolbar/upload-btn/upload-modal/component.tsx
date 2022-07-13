@@ -23,7 +23,7 @@ import Loading from 'components/loading';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface UploadModalProps {
-  onDismiss: () => void;
+  onDismiss: (notCancel?: boolean) => void;
 }
 
 export const UploadModal: React.FC<UploadModalProps> = ({
@@ -250,7 +250,6 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                     </motion.div>
                   )}
                 </div>
-
                 <div className="flex justify-center mt-16 space-x-6">
                   <Button
                     theme="secondary"

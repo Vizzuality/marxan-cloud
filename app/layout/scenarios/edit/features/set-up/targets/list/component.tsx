@@ -1,8 +1,13 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
+
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
@@ -30,8 +35,17 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
   const [submitting, setSubmitting] = useState(false);
   const [confirmationTarget, setConfirmationTarget] = useState(null);
   const [confirmationFPF, setConfirmationFPF] = useState(null);
+
   const { query } = useRouter();
   const { pid, sid } = query;
+
+  const dispatch = useDispatch();
+
+  const scenarioSlice = getScenarioEditSlice(sid);
+  const {
+    setSelectedFeatures,
+  } = scenarioSlice.actions;
+  const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
@@ -219,6 +233,31 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
     saveScenarioMutation,
   ]);
 
+  const toggleSeeOnMap = useCallback((id) => {
+    const newSelectedFeatures = [...selectedFeatures];
+    if (!newSelectedFeatures.includes(id)) {
+      newSelectedFeatures.push(id);
+    } else {
+      const i = newSelectedFeatures.indexOf(id);
+      newSelectedFeatures.splice(i, 1);
+    }
+    dispatch(setSelectedFeatures(newSelectedFeatures));
+  }, [dispatch, setSelectedFeatures, selectedFeatures]);
+
+  const isShown = useCallback((id) => {
+    if (!selectedFeatures.includes(id)) {
+      return false;
+    }
+    return true;
+  }, [selectedFeatures]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(setSelectedFeatures([]));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Render
   if (targetedFeaturesIsFetching && !targetedFeaturesIsFetched) {
     return (
@@ -313,6 +352,8 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                               onRemove={() => {
                                 onRemove(item.id, input);
                               }}
+                              isShown={isShown(item.id)}
+                              onSeeOnMap={() => toggleSeeOnMap(item.id)}
                             />
                           </div>
                         );
