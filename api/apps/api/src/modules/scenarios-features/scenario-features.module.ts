@@ -31,6 +31,7 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
 import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
 import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
 import { FeatureHashModule } from '../features-hash/features-hash.module';
+import { SplitCreateFeatures } from './split/split-create-features.service';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { FeatureHashModule } from '../features-hash/features-hash.module';
     CopyDataProvider,
     CopyOperation,
     ComputeArea,
+    SplitCreateFeatures,
     SplitQuery,
     SplitDataProvider,
     SplitOperation,
