@@ -212,18 +212,19 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
         };
       });
 
-      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-        splitSelected = geoprocessingOperations[0].splitByProperty;
+      if (geoprocessingOperations && !!geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
+        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
+        splitSelected = geoprocessingOperation.splitByProperty;
 
         splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
           .find((s) => s.key === splitSelected).values
-          .map((v) => ({ label: v.name, value: v.id }))
+          .map((v) => ({ label: v.name, value: `${v.id}` }))
           : [];
 
-        splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
+        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
           return {
             ...s,
-            id: s.value,
+            id: `${s.value}`,
             name: s.value,
           };
         });
@@ -345,14 +346,16 @@ export function useTargetedFeatures(
       });
 
       if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-        splitSelected = geoprocessingOperations[0].splitByProperty;
+        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
+
+        splitSelected = geoprocessingOperation.splitByProperty;
 
         splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
           .find((s) => s.key === splitSelected).values
           .map((v) => ({ label: v.name, value: v.id }))
           : [];
 
-        splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
+        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
           return {
             ...s,
             id: s.value,

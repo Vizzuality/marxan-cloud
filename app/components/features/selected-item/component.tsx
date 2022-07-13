@@ -77,7 +77,7 @@ export const Item: React.FC<ItemProps> = ({
   isShown,
   onSeeOnMap,
 }: ItemProps) => {
-  const [splitOpen, setSplitOpen] = useState(false);
+  const [splitOpen, setSplitOpen] = useState(!!splitSelected);
 
   const {
     split,
@@ -95,7 +95,7 @@ export const Item: React.FC<ItemProps> = ({
   const onSplitFeaturesChanged = useCallback(
     (e) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
-      const index = newSplitFeaturesSelected.findIndex((s) => s.id === e.currentTarget.value);
+      const index = newSplitFeaturesSelected.findIndex((s) => `${s.id}` === `${e.currentTarget.value}`);
 
       if (index > -1) {
         newSplitFeaturesSelected.splice(index, 1);
@@ -157,8 +157,8 @@ export const Item: React.FC<ItemProps> = ({
                   onClick={() => setSplitOpen(!splitOpen)}
                   className={cx({
                     'flex items-center justify-center w-5 h-5 ': true,
-                    'text-white': !splitFeaturesSelected.length,
-                    'text-purple-500': !!splitFeaturesSelected.length,
+                    'text-white': !splitSelected,
+                    'text-purple-500': !!splitSelected,
                   })}
                 >
                   <Icon icon={SPLIT_SVG} className="w-4 h-4" />
@@ -215,7 +215,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         </div>
 
-        {split && splitOpen && (
+        {split && (splitSelected || splitOpen) && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <h4 className="text-white uppercase text-xxs">
@@ -333,7 +333,7 @@ export const Item: React.FC<ItemProps> = ({
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length
-              || splitFeaturesSelected.map((s) => `${s.id}`).includes(`${f.value}`);
+              || !!splitFeaturesSelected.find((s) => `${f.value}` === `${s.id}`);
 
             return (
               <li

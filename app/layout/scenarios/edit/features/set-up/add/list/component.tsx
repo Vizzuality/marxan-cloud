@@ -138,7 +138,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     const { splitOptions } = feature;
     const splitFeaturesOptions = key ? splitOptions
       .find((s) => s.key === key).values
-      .map((v) => ({ label: v.name, value: v.id }))
+      .map((v) => ({ label: v.name, value: `${v.id}` }))
       : [];
 
     features[featureIndex] = {

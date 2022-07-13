@@ -120,14 +120,17 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
       data: {
         status: 'draft',
         features: selectedFeaturesData.map((feature) => {
-          const { marxanSettings, geoprocessingOperations } = feature;
+          const initialFeature = initialSelectedFeatures.find((f) => f.id === feature.id) || {};
+          const { marxanSettings, geoprocessingOperations } = initialFeature;
 
           return {
             featureId: feature.id,
             kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
-            marxanSettings: marxanSettings || {
-              fpf: 1,
-              prop: 0.5,
+            ...(!geoprocessingOperations) && {
+              marxanSettings: marxanSettings || {
+                fpf: 1,
+                prop: 0.5,
+              },
             },
             ...!!geoprocessingOperations && { geoprocessingOperations },
           };
@@ -159,6 +162,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
     });
   }, [sid,
     metadata,
+    initialSelectedFeatures,
     allFeaturesData,
     selectedFeaturesMutation,
     saveScenarioMutation,
