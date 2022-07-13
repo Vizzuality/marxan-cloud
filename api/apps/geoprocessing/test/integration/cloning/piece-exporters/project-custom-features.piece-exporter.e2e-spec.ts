@@ -171,10 +171,19 @@ const getFixtures = async () => {
             savedStrem,
           );
           expect(content.features).toHaveLength(amountOfCustomFeatures);
-          const { feature_class_name, data, is_legacy } = content.features[0];
-          expect(feature_class_name).toEqual(`custom-${projectId}-1`);
-          expect(is_legacy).toEqual(opts.isLegacy);
-          expect(data).toHaveLength(recordsOfDataForEachCustomFeature);
+          const featuresExported = content.features;
+          const expectedFeatureNames = Array(amountOfCustomFeatures)
+            .fill(0)
+            .map((_, index) => `custom-${projectId}-${index}`);
+
+          expect(
+            featuresExported.every(
+              ({ is_legacy, data, feature_class_name }) =>
+                is_legacy === opts.isLegacy &&
+                data.length === recordsOfDataForEachCustomFeature &&
+                expectedFeatureNames.includes(feature_class_name),
+            ),
+          );
         },
       };
     },
