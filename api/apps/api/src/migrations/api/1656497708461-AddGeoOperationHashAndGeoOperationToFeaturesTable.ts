@@ -26,12 +26,12 @@ export class AddGeoOperationHashAndGeoOperation1656497708461
 
     await queryRunner.query(`
         ALTER TABLE features
-            DROP COLUMN from_geoprocessing_ops;
+            DROP COLUMN geoprocessing_ops_hash;
     `);
 
     await queryRunner.query(`
         ALTER TABLE features
-            DROP COLUMN geoprocessing_ops_hash;
+            DROP COLUMN from_geoprocessing_ops;
     `);
   }
 }
