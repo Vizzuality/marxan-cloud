@@ -21,13 +21,13 @@ export class ProjectAsyncJobsGarbageCollector
     private readonly projectImportAsyncJob: ProjectImportAsyncJob,
   ) {}
   public async sendFailedApiEventsForStuckAsyncJobs(projectId: string) {
-    await Promise.all([
-      this.gridAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId),
-      this.legacyImportAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId),
-      this.planningUnitsAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId),
-      this.projectCloneAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId),
-      this.projectExportAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId),
-      this.projectImportAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId),
-    ]);
+    await this.gridAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId);
+    await this.legacyImportAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      projectId,
+    );
+    this.planningUnitsAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId);
+    this.projectCloneAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId);
+    this.projectExportAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId);
+    this.projectImportAsyncJob.sendFailedApiEventForStuckAsyncJob(projectId);
   }
 }

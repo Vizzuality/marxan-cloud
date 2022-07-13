@@ -31,30 +31,36 @@ export class ScenarioAsyncJobsGarbageCollector
     private readonly specificationAsyncJob: SpecificationAsyncJob,
   ) {}
   public async sendFailedApiEventsForStuckAsyncJobs(scenarioId: string) {
-    await Promise.all([
-      this.calibrationAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId),
-      this.costSurfaceAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId),
-      this.featuresWithPuIntersectionAsyncJob.sendFailedApiEventForStuckAsyncJob(
-        scenarioId,
-      ),
-      this.planningAreaProtectedCalculationAsyncJob.sendFailedApiEventForStuckAsyncJob(
-        scenarioId,
-      ),
-      this.planningUnitsInclusionAsyncJob.sendFailedApiEventForStuckAsyncJob(
-        scenarioId,
-      ),
-      this.protectedAreasAsyncJob.sendFailedApiEventForStuckAsyncJob(
-        scenarioId,
-      ),
-      this.runAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId),
-      this.scenarioCloneAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId),
-      this.scenarioExportAsyncJob.sendFailedApiEventForStuckAsyncJob(
-        scenarioId,
-      ),
-      this.scenarioImportAsyncJob.sendFailedApiEventForStuckAsyncJob(
-        scenarioId,
-      ),
-      this.specificationAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId),
-    ]);
+    await this.calibrationAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.costSurfaceAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.featuresWithPuIntersectionAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.planningAreaProtectedCalculationAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.planningUnitsInclusionAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.protectedAreasAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.runAsyncJob.sendFailedApiEventForStuckAsyncJob(scenarioId);
+    await this.scenarioCloneAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.scenarioExportAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.scenarioImportAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
+    await this.specificationAsyncJob.sendFailedApiEventForStuckAsyncJob(
+      scenarioId,
+    );
   }
 }

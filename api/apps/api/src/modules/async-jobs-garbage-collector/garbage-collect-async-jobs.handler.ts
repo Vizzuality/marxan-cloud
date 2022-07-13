@@ -27,18 +27,18 @@ export class GarbageCollectAsyncJobsHandler
 
   async execute({ userId }: GarbageCollectAsyncJobs) {
     const projectsIds = await this.getProjectsIdsOf(userId);
-    await Promise.all(
-      projectsIds.map((projectId) =>
-        this.projectAsyncJobs.sendFailedApiEventsForStuckAsyncJobs(projectId),
-      ),
-    );
+    for (const projectId of projectsIds) {
+      await this.projectAsyncJobs.sendFailedApiEventsForStuckAsyncJobs(
+        projectId,
+      );
+    }
 
     const scenariosIds = await this.getScenariosIdsOf(userId);
-    await Promise.all(
-      scenariosIds.map((scenarioId) =>
-        this.scenarioAsyncJobs.sendFailedApiEventsForStuckAsyncJobs(scenarioId),
-      ),
-    );
+    for (const scenarioId of scenariosIds) {
+      await this.scenarioAsyncJobs.sendFailedApiEventsForStuckAsyncJobs(
+        scenarioId,
+      );
+    }
 
     this.eventBus.publish(new AsyncJobsGarbageCollectorFinished(userId));
   }
