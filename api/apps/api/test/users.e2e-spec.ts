@@ -105,6 +105,16 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
     });
 
+    test('A user should not be able to create an account using a weak password', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send({
+          ...signUpDto,
+          password: 'abcdef',
+        })
+        .expect(HttpStatus.FORBIDDEN);
+    });
+
     test('A user should not be able to create an account using an email address already in use', async () => {
       /**
        * We should handle this explicitly in the API - until then, this should
