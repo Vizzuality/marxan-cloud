@@ -4,7 +4,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@marxan-api/modules/authentication/authentication.module';
@@ -20,7 +20,7 @@ import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from '@marxan-api/modules/organizations/organizations.module';
 import { FetchSpecificationMiddleware } from 'nestjs-base-service';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
 import { ApiEventsModule } from '@marxan-api/modules/api-events/api-events.module';
@@ -76,7 +76,7 @@ import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-co
     AsyncJobsGarbageCollectorModule,
     ThrottlerModule.forRoot({
       ttl: 60,
-      limit: 10,
+      limit: 25,
     }),
   ],
   controllers: [AppController, PingController],
@@ -85,10 +85,6 @@ import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-co
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
-    },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
     },
   ],
 })
