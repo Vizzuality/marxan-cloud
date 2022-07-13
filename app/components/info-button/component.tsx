@@ -43,6 +43,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
   theme = 'primary',
 }: InfoButtonProps) => (
   <Tooltip
+    animation
     arrow
     placement="right-start"
     trigger="click"

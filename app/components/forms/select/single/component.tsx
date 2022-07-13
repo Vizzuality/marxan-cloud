@@ -161,7 +161,9 @@ export const SingleSelect: React.FC<SelectProps> = ({
     }
   }, [isOpen, update]);
 
-  const selectedItems = selectedItem ? [selectedItem] : [];
+  const selectedItems = useMemo(() => {
+    return selectedItem ? [selectedItem] : [];
+  }, [selectedItem]);
 
   return (
     <div

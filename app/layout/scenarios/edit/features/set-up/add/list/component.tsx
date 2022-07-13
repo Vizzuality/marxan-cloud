@@ -11,7 +11,6 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import cx from 'classnames';
-import { useDebouncedCallback } from 'use-debounce';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
@@ -38,7 +37,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const {
-    setFeatures, setFeatureHoverId, setSubTab, setSelectedFeatures,
+    setFeatures, setSubTab, setSelectedFeatures,
   } = scenarioSlice.actions;
   const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
@@ -209,14 +208,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     });
   }, [sid, metadata, getFeaturesRecipe, selectedFeaturesMutation, saveScenarioMutation]);
 
-  const onEnter = useDebouncedCallback((id) => {
-    dispatch(setFeatureHoverId(id));
-  }, 500);
-
-  const onLeave = useDebouncedCallback(() => {
-    dispatch(setFeatureHoverId(null));
-  }, 500);
-
   const onSubmit = useCallback((values) => {
     const { features } = values;
     const data = getFeaturesRecipe(features);
@@ -350,12 +341,6 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                               }}
                               onRemove={() => {
                                 onRemove(item.id, input);
-                              }}
-                              onMouseEnter={() => {
-                                onEnter(item.id);
-                              }}
-                              onMouseLeave={() => {
-                                onLeave();
                               }}
                               isShown={isShown(item.id)}
                               onSeeOnMap={() => toggleSeeOnMap(item.id)}
