@@ -25,7 +25,7 @@ import { SplitFeatureConfigMapper } from '../../specification/split-feature-conf
 import { PuvrsprDatFactory } from './puvspr.dat.factory';
 
 export type PuvrsprDatRow = {
-  specieId: number;
+  speciesId: number;
   amount: number;
   puid: number;
 };
@@ -48,7 +48,7 @@ export class PuvsprDatProcessor {
     isLegacy: boolean,
     scenarioId: string,
     projectId: string,
-  ) {
+  ): Promise<PuvrsprDatRow[]> {
     const specificationOrError = await this.getSpecification(scenarioId);
 
     if (isLeft(specificationOrError)) return [];
@@ -69,13 +69,13 @@ export class PuvsprDatProcessor {
       featuresIds,
     );
 
-    return featuresIdsWithSpeciesId.flatMap(({ featureId, specieId }) => {
+    return featuresIdsWithSpeciesId.flatMap(({ featureId, speciesId }) => {
       const amountPerPlanningUnitOfFeature = featuresAmountPerPlanningUnit.filter(
         (row) => row.featureId === featureId,
       );
 
       return amountPerPlanningUnitOfFeature.map(({ amount, puid }) => ({
-        specieId,
+        speciesId,
         amount,
         puid,
       }));
@@ -102,7 +102,7 @@ export class PuvsprDatProcessor {
     return specification ? right(specification) : left(false);
   }
 
-  private proccesFeature(
+  private processFeature(
     feature: SpecForPlainGeoFeature | SpecForGeoFeatureWithGeoprocessing,
   ) {
     const res = this.geoFeatureMapper.toFeatureConfig(feature)[0];
@@ -121,7 +121,7 @@ export class PuvsprDatProcessor {
     );
 
     const featureConfigs = featuresSpecification.features.map((feature) =>
-      this.proccesFeature(feature),
+      this.processFeature(feature),
     );
 
     const copyFeatureIds = this.getCopyFeatureIds(featureConfigs);

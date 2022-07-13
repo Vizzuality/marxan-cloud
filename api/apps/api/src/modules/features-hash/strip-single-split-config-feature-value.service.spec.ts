@@ -16,7 +16,7 @@ describe(StripSingleSplitConfigFeatureValue, () => {
   it('strips single split feature value ', () => {
     const singleSplitFeatureValue = fixtures.GivenSingleSplitConfigFeatureValue();
 
-    const result = fixtures.WhenStrippingSingleSplitConfifFeatureValue(
+    const result = fixtures.WhenStrippingSingleSplitConfigFeatureValue(
       singleSplitFeatureValue,
     );
 
@@ -28,7 +28,7 @@ describe(StripSingleSplitConfigFeatureValue, () => {
       { withSubset: false },
     );
 
-    const result = fixtures.WhenStrippingSingleSplitConfifFeatureValue(
+    const result = fixtures.WhenStrippingSingleSplitConfigFeatureValue(
       singleSplitFeatureValue,
     );
 
@@ -67,7 +67,7 @@ const getFixtures = async () => {
         withSubset: boolean;
       } = { withSubset: true },
     ) => singleSplitConfigFeatureValue(opts.withSubset),
-    WhenStrippingSingleSplitConfifFeatureValue: (
+    WhenStrippingSingleSplitConfigFeatureValue: (
       input: SingleSplitConfigFeatureValue,
     ) => sut.execute(input),
     ThenSingleSplitConfigFeatureIsStripped(

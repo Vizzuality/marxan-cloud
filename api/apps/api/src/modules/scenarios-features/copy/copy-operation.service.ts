@@ -46,7 +46,7 @@ export class CopyOperation {
         parameters,
       );
 
-      await this.computeArea.computeAreaPerPanningUnitOfFeature(
+      await this.computeArea.computeAreaPerPlanningUnitOfFeature(
         project.id,
         data.scenarioId,
         data.input.baseFeatureId,
