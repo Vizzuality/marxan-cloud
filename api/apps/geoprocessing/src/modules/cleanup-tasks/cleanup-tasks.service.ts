@@ -160,6 +160,47 @@ export class CleanupTasksService implements CleanupTasks {
     });
   }
 
+  async cleanupFeaturesDanglingData() {
+    const featureIds = await this.apiEntityManager
+      .createQueryBuilder()
+      .from('features', 'f')
+      .select(['id'])
+      .getRawMany()
+      .then((result) => result.map((i) => i.id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    await this.geoEntityManager.transaction(async (entityManager) => {
+      await this.geoEntityManager.query(
+        `TRUNCATE TABLE features_data_cleanup_preparation;`,
+      );
+
+      for (const [, summaryChunks] of chunk(
+        featureIds,
+        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+      ).entries()) {
+        await entityManager.insert(
+          'features_data_cleanup_preparation',
+          summaryChunks.map((chunk: string) => ({
+            id: chunk,
+          })),
+        );
+      }
+
+      await this.geoEntityManager.query(
+        `DELETE FROM features_data fa
+        WHERE fa.feature_id NOT IN (
+          SELECT fdcp.id FROM features_data_cleanup_preparation fdcp
+        );`,
+      );
+
+      await this.geoEntityManager.query(
+        `TRUNCATE TABLE features_data_cleanup_preparation;`,
+      );
+    });
+  }
+
   @Cron(cronJobInterval)
   async handleCron() {
     this.logger.debug(
@@ -168,5 +209,6 @@ export class CleanupTasksService implements CleanupTasks {
 
     await this.cleanupProjectsDanglingData();
     await this.cleanupScenariosDanglingData();
+    await this.cleanupFeaturesDanglingData();
   }
 }
