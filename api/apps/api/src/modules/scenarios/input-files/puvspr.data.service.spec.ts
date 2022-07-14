@@ -58,17 +58,17 @@ describe(`when there is data available`, () => {
       {
         amount: 1000.0,
         speciesId: 'feature-1',
-        puid: 'pu-1,',
+        puId: 'pu-1,',
       },
       {
         amount: 0.001,
         speciesId: 'feature-1',
-        puid: 'pu-2,',
+        puId: 'pu-2,',
       },
       {
         amount: 99.995,
         speciesId: 'feature-1',
-        puid: 'pu-3,',
+        puId: 'pu-3,',
       },
     ]);
   });
