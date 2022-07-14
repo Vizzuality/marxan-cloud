@@ -27,7 +27,7 @@ import { PuvrsprDatFactory } from './puvspr.dat.factory';
 export type PuvrsprDatRow = {
   speciesId: number;
   amount: number;
-  puid: number;
+  puId: number;
 };
 
 @Injectable()
@@ -74,10 +74,10 @@ export class PuvsprDatProcessor {
         (row) => row.featureId === featureId,
       );
 
-      return amountPerPlanningUnitOfFeature.map(({ amount, puid }) => ({
+      return amountPerPlanningUnitOfFeature.map(({ amount, puId }) => ({
         speciesId,
         amount,
-        puid,
+        puId,
       }));
     });
   }

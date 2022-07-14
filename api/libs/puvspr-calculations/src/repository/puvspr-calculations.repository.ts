@@ -1,7 +1,7 @@
-export type FeatureAmountPerPlanningUnit = {
+export type FeatureAmountPerProjectPlanningUnit = {
   featureId: string;
   amount: number;
-  puid: number;
+  projectPuId: string;
 };
 
 export abstract class PuvsprCalculationsRepository {
@@ -13,14 +13,14 @@ export abstract class PuvsprCalculationsRepository {
   abstract getAmountPerPlanningUnitAndFeature(
     projectId: string,
     featureIds: string[],
-  ): Promise<FeatureAmountPerPlanningUnit[]>;
+  ): Promise<FeatureAmountPerProjectPlanningUnit[]>;
 
   abstract saveAmountPerPlanningUnitAndFeature(
     projectId: string,
-    results: FeatureAmountPerPlanningUnit[],
+    results: FeatureAmountPerProjectPlanningUnit[],
   ): Promise<void>;
 
   abstract getAmountPerPlanningUnitAndFeatureInProject(
     projectId: string,
-  ): Promise<FeatureAmountPerPlanningUnit[]>;
+  ): Promise<FeatureAmountPerProjectPlanningUnit[]>;
 }

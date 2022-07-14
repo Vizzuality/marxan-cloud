@@ -3,7 +3,7 @@ import { PuvsprCalculationsService } from '@marxan/puvspr-calculations';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
-import { PuvsprDat } from './puvsrpr.dat';
+import { FeatureAmountPerPlanningUnitId, PuvsprDat } from './puvsrpr.dat';
 
 @Injectable()
 export class PuvsprDatLegacyProject implements PuvsprDat {
@@ -16,7 +16,7 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
     projectId: string,
     scenarioId: string,
     featureIds: string[],
-  ) {
+  ): Promise<FeatureAmountPerPlanningUnitId[]> {
     const {
       legacyFeatureIds,
       marxanFeatureIds,
@@ -60,8 +60,8 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
   private async computeLegacyFeatures(
     featureIds: string[],
     scenarioId: string,
-  ) {
-    const result = await Promise.all(
+  ): Promise<FeatureAmountPerPlanningUnitId[]> {
+    const legacyFeaturesComputations = await Promise.all(
       featureIds.map((featureId) =>
         this.puvsprCalculations.computeLegacyAmountPerPlanningUnit(
           featureId,
@@ -69,14 +69,18 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
         ),
       ),
     );
-    return result.flat();
+    return legacyFeaturesComputations.flatMap((legacyFeatureComputed) => {
+      return legacyFeatureComputed.map(({ amount, featureId, puId }) => {
+        return { amount, featureId, puId };
+      });
+    });
   }
 
   private async computeMarxanFeatures(
     featureIds: string[],
     scenarioId: string,
-  ) {
-    const result = await Promise.all(
+  ): Promise<FeatureAmountPerPlanningUnitId[]> {
+    const marxanFeaturesComputations = await Promise.all(
       featureIds.map((featureId) =>
         this.puvsprCalculations.computeMarxanAmountPerPlanningUnit(
           featureId,
@@ -84,6 +88,10 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
         ),
       ),
     );
-    return result.flat();
+    return marxanFeaturesComputations.flatMap((marxanFeatureComputed) => {
+      return marxanFeatureComputed.map(({ amount, featureId, puId }) => {
+        return { amount, featureId, puId };
+      });
+    });
   }
 }

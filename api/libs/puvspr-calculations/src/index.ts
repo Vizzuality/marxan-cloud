@@ -2,7 +2,7 @@ export { TypeOrmPuvsprCalculationsRepository } from './repository/typeorm-puvspr
 export { MemoryPuvsprCalculationsRepository } from './repository/memory-puvspr-calculations.repository';
 export {
   PuvsprCalculationsRepository,
-  FeatureAmountPerPlanningUnit,
+  FeatureAmountPerProjectPlanningUnit,
 } from './repository/puvspr-calculations.repository';
 export { PuvsprCalculationsEntity } from './puvspr-calculations.geo.entity';
 export { PuvsprCalculationsService } from './puvspr-calculations.service';

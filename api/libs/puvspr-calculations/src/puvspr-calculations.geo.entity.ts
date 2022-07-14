@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('puvspr_calculations')
 export class PuvsprCalculationsEntity {
@@ -11,9 +18,18 @@ export class PuvsprCalculationsEntity {
   @Column('uuid', { name: 'feature_id' })
   featureId!: string;
 
-  @Column('integer', { name: 'pu_id' })
-  puid!: number;
-
   @Column('double precision')
   amount!: number;
+
+  @Column('uuid', { name: 'project_pu_id' })
+  projectPuId!: string;
+
+  @ManyToOne(() => ProjectsPuEntity, (projectPu) => projectPu.id, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({
+    referencedColumnName: 'id',
+    name: 'project_pu_id',
+  })
+  projectPu!: ProjectsPuEntity;
 }

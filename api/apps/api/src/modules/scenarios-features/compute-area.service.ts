@@ -37,7 +37,13 @@ export class ComputeArea {
 
     return this.puvsprCalculationsRepo.saveAmountPerPlanningUnitAndFeature(
       projectId,
-      amountPerPlanningUnitOfFeature,
+      amountPerPlanningUnitOfFeature.map(
+        ({ featureId, projectPuId, amount }) => ({
+          featureId,
+          projectPuId,
+          amount,
+        }),
+      ),
     );
   }
 
