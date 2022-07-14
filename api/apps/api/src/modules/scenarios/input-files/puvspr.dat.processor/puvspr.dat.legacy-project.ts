@@ -1,16 +1,16 @@
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { PuvsprCalculationsService } from '@marxan/puvspr-calculations';
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
 import { FeatureAmountPerPlanningUnitId, PuvsprDat } from './puvsrpr.dat';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, In } from 'typeorm';
 
 @Injectable()
 export class PuvsprDatLegacyProject implements PuvsprDat {
   constructor(
     private readonly puvsprCalculations: PuvsprCalculationsService,
-    @InjectEntityManager()
-    private readonly apiEntityManager: EntityManager,
+    @InjectRepository(GeoFeature)
+    private readonly featuresRepo: Repository<GeoFeature>,
   ) {}
   public async getAmountPerPlanningUnitAndFeature(
     projectId: string,
@@ -39,20 +39,14 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
     if (!featureIds.length)
       return { legacyFeatureIds: [], marxanFeatureIds: [] };
 
-    const legacyFeatures: {
-      id: string;
-    }[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('id')
-      .from(GeoFeature, 'features')
-      .where('is_legacy = true')
-      .andWhere('id IN (:...featureIds)', { featureIds })
-      .execute();
+    const features = await this.featuresRepo.find({ id: In(featureIds) });
 
-    const legacyFeatureIds = legacyFeatures.map(({ id }) => id);
-    const marxanFeatureIds = featureIds.filter(
-      (id) => !legacyFeatureIds.includes(id),
-    );
+    const legacyFeatureIds = features
+      .filter(({ isLegacy }) => isLegacy)
+      .map(({ id }) => id);
+    const marxanFeatureIds = features
+      .filter(({ isLegacy }) => !isLegacy)
+      .map(({ id }) => id);
 
     return { legacyFeatureIds, marxanFeatureIds };
   }
