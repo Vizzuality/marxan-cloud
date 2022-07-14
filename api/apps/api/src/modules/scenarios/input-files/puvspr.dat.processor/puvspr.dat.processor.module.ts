@@ -15,6 +15,7 @@ import { PuvsprDatLegacyProject } from './puvspr.dat.legacy-project';
 import { PuvsprDatMarxanProject } from './puvspr.dat.marxan-project';
 import { PuvsprDatProcessor } from './puvspr.dat.processor';
 import { FeatureHashModule } from '@marxan-api/modules/features-hash/features-hash.module';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { FeatureHashModule } from '@marxan-api/modules/features-hash/features-ha
     FeatureHashModule,
     TypeOrmModule.forFeature([Scenario, GeoFeature]),
     TypeOrmModule.forFeature(
-      [ScenarioFeaturesData, GeoFeatureGeometry],
+      [ScenarioFeaturesData, GeoFeatureGeometry, ProjectsPuEntity],
       DbConnections.geoprocessingDB,
     ),
     ScenarioSpecificationAdaptersModule,

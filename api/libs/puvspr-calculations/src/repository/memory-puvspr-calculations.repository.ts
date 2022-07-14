@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import {
-  FeatureAmountPerPlanningUnit,
+  FeatureAmountPerProjectPlanningUnit,
   PuvsprCalculationsRepository,
 } from './puvspr-calculations.repository';
 
 @Injectable()
 export class MemoryPuvsprCalculationsRepository
   implements PuvsprCalculationsRepository {
-  public memory: Record<string, FeatureAmountPerPlanningUnit[]> = {};
+  public memory: Record<string, FeatureAmountPerProjectPlanningUnit[]> = {};
   async areAmountPerPlanningUnitAndFeatureSaved(
     projectId: string,
     featureId: string,
@@ -22,7 +22,7 @@ export class MemoryPuvsprCalculationsRepository
   async getAmountPerPlanningUnitAndFeature(
     projectId: string,
     featureIds: string[],
-  ): Promise<FeatureAmountPerPlanningUnit[]> {
+  ): Promise<FeatureAmountPerProjectPlanningUnit[]> {
     const featureAmountsPerPlanningUnit = this.memory[projectId];
 
     if (!featureAmountsPerPlanningUnit) return [];
@@ -33,13 +33,13 @@ export class MemoryPuvsprCalculationsRepository
   }
   async saveAmountPerPlanningUnitAndFeature(
     projectId: string,
-    results: FeatureAmountPerPlanningUnit[],
+    results: FeatureAmountPerProjectPlanningUnit[],
   ): Promise<void> {
     this.memory[projectId] = results;
   }
   async getAmountPerPlanningUnitAndFeatureInProject(
     projectId: string,
-  ): Promise<FeatureAmountPerPlanningUnit[]> {
+  ): Promise<FeatureAmountPerProjectPlanningUnit[]> {
     return this.memory[projectId];
   }
 }

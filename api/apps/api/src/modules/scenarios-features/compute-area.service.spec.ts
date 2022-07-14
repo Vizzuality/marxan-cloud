@@ -8,7 +8,6 @@ import {
 } from '@marxan/puvspr-calculations';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
 import { LegacyProjectImport } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import';
 import { LegacyProjectImportRepository } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
@@ -69,7 +68,7 @@ const getFixtures = async () => {
     PuvsprCalculationsRepository,
   );
 
-  const expectedPuid = 1;
+  const expectedPuid = v4();
   const expectedAmount = 20;
   return {
     GivenProject: () => {
@@ -91,7 +90,14 @@ const getFixtures = async () => {
     GivenNoComputationHasBeenSaved: () => {
       const featureId = v4();
       computeMarxanAmountPerPlanningUnitMock.mockImplementation(async () => {
-        return [{ featureId, puid: expectedPuid, amount: expectedAmount }];
+        return [
+          {
+            featureId,
+            projectPuId: expectedPuid,
+            amount: expectedAmount,
+            puId: 1,
+          },
+        ];
       });
 
       return featureId;
@@ -110,7 +116,7 @@ const getFixtures = async () => {
       expect(savedCalculations).toBeDefined();
       expect(savedCalculations[0]).toEqual({
         amount: expectedAmount,
-        puid: expectedPuid,
+        projectPuId: expectedPuid,
         featureId,
       });
     },

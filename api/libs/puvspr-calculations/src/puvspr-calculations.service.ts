@@ -1,8 +1,13 @@
 import { ScenarioFeaturesData } from '@marxan/features';
 import { Inject, Injectable } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
+import { FeatureAmountPerProjectPlanningUnit } from './repository/puvspr-calculations.repository';
 
 export const geoEntityManagerToken = Symbol('geo entity manager token');
+
+export type ComputeFeatureAmountPerPlanningUnit = FeatureAmountPerProjectPlanningUnit & {
+  puId: number;
+};
 
 @Injectable()
 export class PuvsprCalculationsService {
@@ -36,7 +41,7 @@ export class PuvsprCalculationsService {
   public async computeMarxanAmountPerPlanningUnit(
     featureId: string,
     scenarioId: string,
-  ) {
+  ): Promise<ComputeFeatureAmountPerPlanningUnit[]> {
     /**
      * @TODO further performance savings: limiting scans to planning_units_geom
      * by partition (we need to get the grid shape from the parent project); use
@@ -46,6 +51,7 @@ export class PuvsprCalculationsService {
     const rows: {
       featureid: string;
       puid: number;
+      projectpuid: string;
       amount: number;
     }[] = await this.geoEntityManager.query(
       `
@@ -53,6 +59,7 @@ export class PuvsprCalculationsService {
           ( select
             $2 as featureId,
             pu.puid as puid,
+            pu.id as projectpuid,
             ST_Area(ST_Transform(ST_Intersection(species.the_geom, pu.the_geom),3410)) as amount
           from
           (
@@ -64,7 +71,7 @@ export class PuvsprCalculationsService {
               group by sfp.api_feature_id
           ) species,
           (
-              select the_geom, ppu.puid as puid, spd.scenario_id
+              select the_geom, ppu.puid as puid, ppu.id as id, spd.scenario_id
               from planning_units_geom pug
               inner join projects_pu ppu on pug.id = ppu.geom_id
               inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
@@ -77,16 +84,18 @@ export class PuvsprCalculationsService {
       [scenarioId, featureId],
     );
 
-    return rows.map(({ featureid, ...rest }) => ({
+    return rows.map(({ featureid, projectpuid, puid, amount }) => ({
       featureId: featureid,
-      ...rest,
+      puId: puid,
+      projectPuId: projectpuid,
+      amount,
     }));
   }
 
   public async computeLegacyAmountPerPlanningUnit(
     featureId: string,
     scenarioId: string,
-  ) {
+  ): Promise<ComputeFeatureAmountPerPlanningUnit[]> {
     /**
      * @TODO further performance savings: limiting scans to planning_units_geom
      * by partition (we need to get the grid shape from the parent project); use
@@ -95,6 +104,7 @@ export class PuvsprCalculationsService {
      */
     const rows: {
       puid: number;
+      projectpuid: string;
       featureid: string;
       amount: number;
     }[] = await this.geoEntityManager.query(
@@ -102,6 +112,7 @@ export class PuvsprCalculationsService {
           WITH all_amount_per_planning_unit as 
           ( select
             pu.puid as puid,
+            pu.id as projectpuid,
             $2 as featureid,
             species.amount_from_legacy_project as amount
           from
@@ -114,7 +125,7 @@ export class PuvsprCalculationsService {
               AND sfd.api_feature_id = $2
           ) species,
           (
-              select the_geom, ppu.puid as puid, spd.scenario_id
+              select the_geom, ppu.puid as puid, ppu.id as id, spd.scenario_id
               from planning_units_geom pug
               inner join projects_pu ppu on pug.id = ppu.geom_id
               inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
@@ -127,9 +138,11 @@ export class PuvsprCalculationsService {
       [scenarioId, featureId],
     );
 
-    return rows.map(({ featureid, ...rest }) => ({
+    return rows.map(({ featureid, projectpuid, puid, amount }) => ({
       featureId: featureid,
-      ...rest,
+      puId: puid,
+      projectPuId: projectpuid,
+      amount,
     }));
   }
 }

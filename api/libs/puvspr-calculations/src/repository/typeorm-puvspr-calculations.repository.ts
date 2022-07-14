@@ -3,7 +3,7 @@ import { EntityManager } from 'typeorm';
 import { PuvsprCalculationsEntity } from '../puvspr-calculations.geo.entity';
 import { geoEntityManagerToken } from '../puvspr-calculations.service';
 import {
-  FeatureAmountPerPlanningUnit,
+  FeatureAmountPerProjectPlanningUnit,
   PuvsprCalculationsRepository,
 } from './puvspr-calculations.repository';
 
@@ -16,11 +16,11 @@ export class TypeOrmPuvsprCalculationsRepository
   ) {}
   async getAmountPerPlanningUnitAndFeatureInProject(
     projectId: string,
-  ): Promise<FeatureAmountPerPlanningUnit[]> {
+  ): Promise<FeatureAmountPerProjectPlanningUnit[]> {
     return this.geoEntityManager
       .createQueryBuilder()
       .select('amount')
-      .addSelect('pu_id', 'puid')
+      .addSelect('project_pu_id', 'projectPuId')
       .addSelect('feature_id', 'featureId')
       .from(PuvsprCalculationsEntity, 'puvspr')
       .where('project_id = :projectId', { projectId })
@@ -30,11 +30,11 @@ export class TypeOrmPuvsprCalculationsRepository
   public async getAmountPerPlanningUnitAndFeature(
     projectId: string,
     featureIds: string[],
-  ): Promise<FeatureAmountPerPlanningUnit[]> {
+  ): Promise<FeatureAmountPerProjectPlanningUnit[]> {
     return this.geoEntityManager
       .createQueryBuilder()
       .select('amount')
-      .addSelect('pu_id', 'puid')
+      .addSelect('project_pu_id', 'projectPuId')
       .addSelect('feature_id', 'featureId')
       .from(PuvsprCalculationsEntity, 'puvspr')
       .where('project_id = :projectId', { projectId })
@@ -44,15 +44,15 @@ export class TypeOrmPuvsprCalculationsRepository
 
   public async saveAmountPerPlanningUnitAndFeature(
     projectId: string,
-    results: FeatureAmountPerPlanningUnit[],
+    results: FeatureAmountPerProjectPlanningUnit[],
   ) {
     const repo = this.geoEntityManager.getRepository(PuvsprCalculationsEntity);
     await repo.save(
-      results.map(({ amount, puid, featureId }) => ({
+      results.map(({ amount, projectPuId, featureId }) => ({
         projectId,
         featureId,
         amount,
-        puid,
+        projectPuId,
       })),
     );
   }
