@@ -13,8 +13,7 @@
     "username": null,
     "password": null,
     "database": null,
-    "logging": "error",
-    "sslMode": false
+    "logging": "error"
   },
   "postgresGeoApi": {
     "url": null,
@@ -24,8 +23,7 @@
     "password": null,
     "database": null,
     "runMigrationsOnStartup": false,
-    "logging": "error",
-    "sslMode": false
+    "logging": "error"
   },
   "api": {
     "url": "http://api:3000"

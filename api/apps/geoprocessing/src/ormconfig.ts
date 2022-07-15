@@ -24,7 +24,7 @@ export const geoprocessingConnections: {
     port: AppConfig.get('postgresGeoApi.port'),
     host: AppConfig.get('postgresGeoApi.host'),
     database: AppConfig.get('postgresGeoApi.database'),
-    ssl: AppConfig.get('postgresGeoApi.sslMode'),
+    ssl: false,
     entities: [
       path.join(__dirname, '/modules/**/*.geo.entity.{ts,js}'),
       path.join(__dirname, '/marxan-sandboxed-runner/**/*.geo.entity.{ts,js}'),
@@ -56,7 +56,7 @@ export const geoprocessingConnections: {
     port: AppConfig.get('postgresApi.port'),
     host: AppConfig.get('postgresApi.host'),
     database: AppConfig.get('postgresApi.database'),
-    ssl: AppConfig.get('postgresApi.sslMode'),
+    ssl: false,
     entities: [
       __dirname + '/modules/**/*.api.entity.{ts,js}',
       path.join(__dirname, '../../../libs/**/*.api.entity.{ts,js}'),
