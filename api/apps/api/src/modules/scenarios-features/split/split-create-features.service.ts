@@ -60,6 +60,7 @@ export class SplitCreateFeatures {
       notCreatedFeatues,
     } = await this.getCreatedAndNotCreatedFeatures(
       singleSplitFeaturesWithHashes,
+      projectId,
     );
 
     const newFeaturesCreated = await this.createFeatures(
@@ -109,24 +110,25 @@ export class SplitCreateFeatures {
 
   private async getCreatedAndNotCreatedFeatures(
     singleSplitFeaturesWithHashes: HashCanonicalAndSingleSplitConfigFeature[],
+    projectId: string,
   ) {
     if (!singleSplitFeaturesWithHashes.length)
       return { notCreatedFeatues: [], createdFeatures: [] };
 
     const hashes = singleSplitFeaturesWithHashes.map(({ hash }) => hash);
 
-    const featuresWithHashesFound = await this.featuresRepo.find({
-      where: { geoprocessingOpsHash: In(hashes) },
+    const featuresWithHashesFoundInProject = await this.featuresRepo.find({
+      where: { geoprocessingOpsHash: In(hashes), projectId },
     });
 
-    if (!featuresWithHashesFound.length)
+    if (!featuresWithHashesFoundInProject.length)
       return {
         notCreatedFeatues: singleSplitFeaturesWithHashes,
         createdFeatures: [],
       };
 
     const featureIdByHash: Record<string, string> = this.getFeatureIdByHash(
-      featuresWithHashesFound,
+      featuresWithHashesFoundInProject,
     );
 
     const notCreatedFeatues = singleSplitFeaturesWithHashes.filter(
