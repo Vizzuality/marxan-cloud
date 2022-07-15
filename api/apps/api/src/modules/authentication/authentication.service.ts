@@ -74,7 +74,7 @@ export interface JwtDataPayload {
 /**
  * Entropy threshold for password validation.
  */
-const entropyThreshold = 80;
+export const entropyThreshold = 80;
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
