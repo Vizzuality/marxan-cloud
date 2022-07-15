@@ -2,7 +2,6 @@ import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.ent
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SplitFeatureConfigMapper } from '@marxan-api/modules/scenarios/specification/split-feature-config.mapper';
 import { FeatureConfigSplit } from '@marxan-api/modules/specification';
-import { FeatureTag } from '@marxan/features';
 import { isDefined } from '@marxan/utils';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -56,20 +55,20 @@ export class SplitCreateFeatures {
     );
 
     const {
-      createdFeatures,
-      notCreatedFeatues,
-    } = await this.getCreatedAndNotCreatedFeatures(
+      featuresAlreadyExisting,
+      featuresToBeCreated,
+    } = await this.checkIfFeaturesMatchingGivenHashesInProjectExist(
       singleSplitFeaturesWithHashes,
       projectId,
     );
 
     const newFeaturesCreated = await this.createFeatures(
-      notCreatedFeatues,
+      featuresToBeCreated,
       baseFeature,
       projectId,
     );
 
-    return createdFeatures.concat(newFeaturesCreated);
+    return featuresAlreadyExisting.concat(newFeaturesCreated);
   }
 
   private async isBaseFeatureADerivedFeature(input: FeatureConfigSplit) {
@@ -108,12 +107,12 @@ export class SplitCreateFeatures {
     return { singleSplitFeature, ...hashAndStrippedFeature };
   }
 
-  private async getCreatedAndNotCreatedFeatures(
+  private async checkIfFeaturesMatchingGivenHashesInProjectExist(
     singleSplitFeaturesWithHashes: HashCanonicalAndSingleSplitConfigFeature[],
     projectId: string,
   ) {
     if (!singleSplitFeaturesWithHashes.length)
-      return { notCreatedFeatues: [], createdFeatures: [] };
+      return { featuresToBeCreated: [], featuresAlreadyExisting: [] };
 
     const hashes = singleSplitFeaturesWithHashes.map(({ hash }) => hash);
 
@@ -123,25 +122,25 @@ export class SplitCreateFeatures {
 
     if (!featuresWithHashesFoundInProject.length)
       return {
-        notCreatedFeatues: singleSplitFeaturesWithHashes,
-        createdFeatures: [],
+        featuresToBeCreated: singleSplitFeaturesWithHashes,
+        featuresAlreadyExisting: [],
       };
 
     const featureIdByHash: Record<string, string> = this.getFeatureIdByHash(
       featuresWithHashesFoundInProject,
     );
 
-    const notCreatedFeatues = singleSplitFeaturesWithHashes.filter(
+    const featuresToBeCreated = singleSplitFeaturesWithHashes.filter(
       ({ hash }) => !featureIdByHash[hash],
     );
 
-    const createdFeatures = singleSplitFeaturesWithHashes
+    const featuresAlreadyExisting = singleSplitFeaturesWithHashes
       .filter(({ hash }) => isDefined(featureIdByHash[hash]))
       .map(({ singleSplitFeature, hash }) => {
         return { id: featureIdByHash[hash], singleSplitFeature };
       });
 
-    return { notCreatedFeatues, createdFeatures };
+    return { featuresToBeCreated, featuresAlreadyExisting };
   }
 
   private getFeatureIdByHash(featuresWithHashesFound: GeoFeature[]) {
@@ -177,7 +176,6 @@ export class SplitCreateFeatures {
           id: featureId,
           projectId,
           featureClassName: featureName,
-          tag: FeatureTag.Species,
           creationStatus: JobStatus.created,
           fromGeoprocessingOps: canonical,
         };

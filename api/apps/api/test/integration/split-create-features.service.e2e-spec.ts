@@ -9,7 +9,6 @@ import { FeatureSubSet, SpecificationOperation } from '@marxan/specification';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { IsNull, Not, Repository } from 'typeorm';
-import { FeatureTag } from '@marxan/features';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { SingleSplitConfigFeatureValue } from '@marxan/features-hash';
 
@@ -23,20 +22,20 @@ afterEach(async () => {
   await fixtures.cleanup();
 });
 
-it('fails to create split features when basefeature does not exists', async () => {
+it('fails to create split features when basefeature does not exist', async () => {
   const splitByProperty = 'random property';
   const projectId = await fixtures.GivenProjectExist();
-  const featureId = await fixtures.GivenBaseFeatureDoesNotExists();
+  const featureId = await fixtures.GivenBaseFeatureDoesNotExist();
   const splitFeatureConfig = fixtures.GivenSplitFeatureConfig(
     featureId,
     splitByProperty,
   );
   await fixtures
     .WhenCreatingSplitFeatures(splitFeatureConfig, projectId)
-    .ThenBaseFeatureDoesNotExistsErrorIsThrow();
+    .ThenBaseFeatureDoesNotExistErrorIsThrow();
 });
 
-it('fails to create split features when basefeature is a derived feture', async () => {
+it('fails to create split features when basefeature is a derived feature', async () => {
   const splitByProperty = 'random property';
   const projectId = await fixtures.GivenProjectExist();
   const feature = await fixtures.GivenBaseFeatureIsADerivedFeature();
@@ -46,7 +45,7 @@ it('fails to create split features when basefeature is a derived feture', async 
   );
   await fixtures
     .WhenCreatingSplitFeatures(splitFeatureConfig, projectId)
-    .ThenBaseFeatureIsADerivedFeatureErrorIsThrow();
+    .ThenBaseFeatureIsADerivedFeatureErrorIsThrown();
 });
 
 it('creates split features', async () => {
@@ -138,7 +137,6 @@ async function getFixtures() {
       const feature = await featuresRepo.save({
         id: v4(),
         featureClassName: 'base feature',
-        tag: FeatureTag.Species,
         creationStatus: JobStatus.created,
       });
       baseFeatureId = feature.id;
@@ -148,7 +146,6 @@ async function getFixtures() {
       const feature = await featuresRepo.save({
         id: v4(),
         featureClassName: 'base feature',
-        tag: FeatureTag.Species,
         creationStatus: JobStatus.created,
         fromGeoprocessingOps: {
           baseFeatureId: v4(),
@@ -159,7 +156,7 @@ async function getFixtures() {
       baseFeatureId = feature.id;
       return feature;
     },
-    GivenBaseFeatureDoesNotExists: async () => {
+    GivenBaseFeatureDoesNotExist: async () => {
       return v4();
     },
 
@@ -183,12 +180,12 @@ async function getFixtures() {
         projectId,
       );
       return {
-        ThenBaseFeatureDoesNotExistsErrorIsThrow: async () => {
+        ThenBaseFeatureDoesNotExistErrorIsThrow: async () => {
           await expect(createSplitFeatures).rejects.toThrow(
             /did not find base feature/,
           );
         },
-        ThenBaseFeatureIsADerivedFeatureErrorIsThrow: async () => {
+        ThenBaseFeatureIsADerivedFeatureErrorIsThrown: async () => {
           await expect(createSplitFeatures).rejects.toThrow(
             /trying to split an already derived feature/,
           );

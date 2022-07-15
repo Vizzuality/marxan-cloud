@@ -84,7 +84,7 @@ export class SplitOperation {
   ) {
     return Promise.all(
       featuresIds.map((featureId) =>
-        this.computeArea.computeAreaPerPanningUnitOfFeature(
+        this.computeArea.computeAreaPerPlanningUnitOfFeature(
           projectId,
           scenarioId,
           featureId,
