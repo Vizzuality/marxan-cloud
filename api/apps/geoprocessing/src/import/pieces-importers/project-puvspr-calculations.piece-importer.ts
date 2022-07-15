@@ -1,4 +1,5 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ResourceKind } from '@marxan/cloning/domain';
@@ -11,9 +12,9 @@ import { PuvsprCalculationsEntity } from '@marxan/puvspr-calculations';
 import { SpecificationOperation } from '@marxan/specification';
 import { readableToBuffer } from '@marxan/utils';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import {
   ImportPieceProcessor,
   PieceImportProvider,
@@ -30,6 +31,8 @@ export class ProjectPuvsprCalculationsPieceImporter
   implements ImportPieceProcessor {
   constructor(
     private readonly fileRepository: CloningFilesRepository,
+    @InjectRepository(ProjectsPuEntity)
+    private readonly projectPusRepo: Repository<ProjectsPuEntity>,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
@@ -134,12 +137,19 @@ export class ProjectPuvsprCalculationsPieceImporter
       platformFeaturesNames,
     );
 
+    const projectPusByPuid = await this.getProjectPusByPuid(projectId);
+
     return puvsprCalculations.map(({ isCustom, featureName, amount, puid }) => {
       const featureId = isCustom
         ? customFeaturesMap[featureName]
         : platformFeaturesMap[featureName];
 
-      return { amount, puid, featureId, projectId: projectId };
+      return {
+        amount,
+        projectPuId: projectPusByPuid[puid],
+        featureId,
+        projectId: projectId,
+      };
     });
   }
 
@@ -188,6 +198,18 @@ export class ProjectPuvsprCalculationsPieceImporter
       prev[feature_class_name] = id;
       return prev;
     }, res);
+  }
+
+  private async getProjectPusByPuid(projectId: string) {
+    const projectPus = await this.projectPusRepo.find({ projectId });
+    const projectPusById: Record<number, string> = {};
+
+    projectPus.reduce((prev, { id, puid }) => {
+      prev[puid] = id;
+      return prev;
+    }, projectPusById);
+
+    return projectPusById;
   }
 
   private async parseProjectFeaturesGeoOperations(

@@ -1,5 +1,6 @@
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ScenarioFeaturesData } from '@marxan/features';
 import {
   MarxanExecutionMetadataGeoEntity,
@@ -35,6 +36,7 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
     TypeOrmModule.forFeature(
       [
+        ProjectsPuEntity,
         ScenarioFeaturesData,
         OutputScenariosFeaturesDataGeoEntity,
         MarxanExecutionMetadataGeoEntity,

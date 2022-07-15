@@ -5,14 +5,10 @@ import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import {
-  getEntityManagerToken,
-  getRepositoryToken,
-  TypeOrmModule,
-} from '@nestjs/typeorm';
+import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
@@ -24,7 +20,6 @@ import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/c
 import { ProjectPuvsprCalculationsPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-puvspr-calculations.piece-exporter';
 import { ProjectPuvsprCalculationsContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-puvspr-calculations';
 import {
-  PuvsprCalculationsEntity,
   PuvsprCalculationsModule,
   PuvsprCalculationsRepository,
 } from '@marxan/puvspr-calculations';
@@ -34,11 +29,12 @@ import {
   SingleSplitConfigFeatureValueStripped,
 } from '@marxan/features-hash';
 import { SpecificationOperation } from '@marxan/specification';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { DeleteProjectPus, GivenProjectPus } from '../fixtures';
 
 type FeatureData = {
   id: string;
   feature_class_name: string;
-  tag: string;
   creation_status: string;
   project_id: string | null;
   from_geoprocessing_ops?: SingleSplitConfigFeatureValueStripped;
@@ -140,7 +136,7 @@ const getFixtures = async () => {
         keepConnectionAlive: true,
         logging: false,
       }),
-      TypeOrmModule.forFeature([]),
+      TypeOrmModule.forFeature([ProjectsPuEntity]),
       GeoCloningFilesRepositoryModule,
       PuvsprCalculationsModule.for(geoprocessingConnections.default.name!),
     ],
@@ -167,7 +163,9 @@ const getFixtures = async () => {
   const amountOfPlatformFeatures = 1;
   const amountOfPuvsrCalculationsPerFeature = 3;
   const expectedAmountPerPu = 20;
+
   let featureIds: string[] = [];
+  let projectPus: ProjectsPuEntity[];
 
   return {
     cleanUp: async () => {
@@ -184,11 +182,7 @@ const getFixtures = async () => {
           .where('id IN (:...featureIds)', { featureIds })
           .execute();
 
-      const puvsprCalculationsRepo: Repository<PuvsprCalculationsEntity> = sandbox.get(
-        getRepositoryToken(PuvsprCalculationsEntity),
-      );
-
-      await puvsprCalculationsRepo.delete({});
+      await DeleteProjectPus(geoEntityManager, projectId);
     },
     GivenAProjectPuvsprCalculationsExportJob: (): ExportJobInput => {
       return {
@@ -233,7 +227,6 @@ const getFixtures = async () => {
       const derivedFeature = {
         id: derivedFeatureId,
         feature_class_name: 'derived-feature',
-        tag: 'species',
         creation_status: 'created',
         project_id: projectId,
         from_geoprocessing_ops: geoOperation,
@@ -249,12 +242,17 @@ const getFixtures = async () => {
     },
     GivenNoDerivedFeaturesForProject: () => {},
     GivenProjectHasPuvsprCalculations: async (featureId: string) => {
+      projectPus = await GivenProjectPus(
+        geoEntityManager,
+        projectId,
+        amountOfPuvsrCalculationsPerFeature,
+      );
       const puvsprCalculations = Array(amountOfPuvsrCalculationsPerFeature)
         .fill(0)
         .map((_, index) => ({
           amount: expectedAmountPerPu,
           featureId,
-          puid: index,
+          projectPuId: projectPus[index].id,
         }));
       return puvsprCalculationsRepo.saveAmountPerPlanningUnitAndFeature(
         projectId,
@@ -289,10 +287,11 @@ const getFixtures = async () => {
           );
           expect(
             content.puvsprCalculations.every(
-              ({ amount, featureName, isCustom }) =>
+              ({ amount, featureName, isCustom, puid }) =>
                 amount === expectedAmountPerPu &&
                 featureName === feature.feature_class_name &&
-                isCustom === isDefined(feature.project_id),
+                isCustom === isDefined(feature.project_id) &&
+                puid <= amountOfPuvsrCalculationsPerFeature,
             ),
           ).toEqual(true);
           expect(content.puvsprCalculations).toHaveLength(

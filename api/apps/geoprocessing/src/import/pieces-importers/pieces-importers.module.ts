@@ -1,5 +1,6 @@
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { PuvsprCalculationsEntity } from '@marxan/puvspr-calculations';
 import { Logger, Module, Scope } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,7 +27,7 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
       [ScenariosOutputResultsApiEntity],
       geoprocessingConnections.apiDB,
     ),
-    TypeOrmModule.forFeature([PuvsprCalculationsEntity]),
+    TypeOrmModule.forFeature([PuvsprCalculationsEntity, ProjectsPuEntity]),
   ],
   providers: [
     ProjectMetadataPieceImporter,

@@ -22,8 +22,10 @@ import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import {
   DeleteProjectAndOrganization,
+  DeleteProjectPus,
   GivenFeatures,
   GivenProjectExists,
+  GivenProjectPus,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { ProjectPuvsprCalculationsPieceImporter } from '@marxan-geoprocessing/import/pieces-importers/project-puvspr-calculations.piece-importer';
@@ -35,6 +37,7 @@ import {
   PuvsprCalculationsModule,
   PuvsprCalculationsRepository,
 } from '@marxan/puvspr-calculations';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -86,7 +89,7 @@ const getFixtures = async () => {
         logging: false,
       }),
       TypeOrmModule.forFeature(
-        [PuvsprCalculationsEntity],
+        [PuvsprCalculationsEntity, ProjectsPuEntity],
         geoprocessingConnections.default,
       ),
       GeoCloningFilesRepositoryModule,
@@ -111,6 +114,9 @@ const getFixtures = async () => {
   const sut = sandbox.get(ProjectPuvsprCalculationsPieceImporter);
   const fileRepository = sandbox.get(CloningFilesRepository);
   const puvsprCalculationsRepo = sandbox.get(PuvsprCalculationsRepository);
+  const projectPusRepo: Repository<ProjectsPuEntity> = sandbox.get(
+    getRepositoryToken(ProjectsPuEntity),
+  );
 
   const amountOfPuvsprCalculations = 5;
   let featureIds: string[] = [];
@@ -160,11 +166,7 @@ const getFixtures = async () => {
           .where('id IN (:...featureIds)', { featureIds })
           .execute();
 
-      const puvsprCalculationsRepo: Repository<PuvsprCalculationsEntity> = sandbox.get(
-        getRepositoryToken(PuvsprCalculationsEntity),
-      );
-
-      await puvsprCalculationsRepo.delete({});
+      await DeleteProjectPus(geoEntityManager, projectId);
     },
     GivenProject: () =>
       GivenProjectExists(apiEntityManager, projectId, organizationId),
@@ -205,6 +207,11 @@ const getFixtures = async () => {
         1,
         projectId,
       );
+      const projectPus = await GivenProjectPus(
+        geoEntityManager,
+        projectId,
+        amountOfPuvsprCalculations,
+      );
       const basePlatformFeature = platformFeatures[0];
       featureIds = [basePlatformFeature.id];
       const importedSplitDerivedFeature = customFeatures[0];
@@ -226,7 +233,7 @@ const getFixtures = async () => {
             amount: 200,
             featureName: basePlatformFeature.feature_class_name,
             isCustom: false,
-            puid: index,
+            puid: projectPus[index].puid,
           })),
       };
 
@@ -267,6 +274,8 @@ const getFixtures = async () => {
             projectId,
           );
           expect(projectPuvsprCalculations).toEqual([]);
+          const projectPus = await projectPusRepo.find({ projectId });
+          expect(projectPus).toHaveLength(amountOfPuvsprCalculations);
 
           await sut.run(input);
 

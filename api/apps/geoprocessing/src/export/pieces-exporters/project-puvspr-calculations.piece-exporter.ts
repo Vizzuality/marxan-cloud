@@ -1,4 +1,5 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
@@ -6,15 +7,15 @@ import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/c
 import { ProjectPuvsprCalculationsContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-puvspr-calculations';
 import { SingleConfigFeatureValueStripped } from '@marxan/features-hash';
 import {
-  FeatureAmountPerPlanningUnit,
+  FeatureAmountPerProjectPlanningUnit,
   PuvsprCalculationsRepository,
 } from '@marxan/puvspr-calculations';
 import { SpecificationOperation } from '@marxan/specification';
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import {
   ExportPieceProcessor,
   PieceExportProvider,
@@ -40,6 +41,8 @@ export class ProjectPuvsprCalculationsPieceExporter
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     private readonly puvsprCalculationsRepo: PuvsprCalculationsRepository,
+    @InjectRepository(ProjectsPuEntity)
+    private readonly projectPusRepo: Repository<ProjectsPuEntity>,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     private readonly logger: Logger,
@@ -61,15 +64,9 @@ export class ProjectPuvsprCalculationsPieceExporter
       projectId,
     );
 
-    const featureIds = featureAmountPerPlanningUnit.map(
-      ({ featureId }) => featureId,
-    );
-
-    const featuresById = await this.getFeaturesById(featureIds);
-
-    const featuresAmountPerPlanningUnitParsed = this.parseFeatureAmountPerPlanningUnit(
+    const featuresAmountPerPlanningUnitParsed = await this.parseFeatureAmountPerPlanningUnit(
       featureAmountPerPlanningUnit,
-      featuresById,
+      projectId,
     );
 
     const projectFeaturesGeoOperations = await this.getProjectFeaturesGeoOperations(
@@ -103,6 +100,31 @@ export class ProjectPuvsprCalculationsPieceExporter
     };
   }
 
+  private async parseFeatureAmountPerPlanningUnit(
+    featureAmountPerPlanningUnit: FeatureAmountPerProjectPlanningUnit[],
+    projectId: string,
+  ) {
+    const featureIds = featureAmountPerPlanningUnit.map(
+      ({ featureId }) => featureId,
+    );
+
+    const featuresById = await this.getFeaturesById(featureIds);
+
+    const projectPusById = await this.getProjectPusById(projectId);
+
+    return featureAmountPerPlanningUnit.map(
+      ({ featureId, amount, projectPuId }) => {
+        const feature = featuresById[featureId];
+        return {
+          amount,
+          puid: projectPusById[projectPuId],
+          featureName: feature.featureName,
+          isCustom: feature.isCustom,
+        };
+      },
+    );
+  }
+
   private async getFeaturesById(featureIds: string[]) {
     const result: FeatureByIdMap = {};
 
@@ -123,18 +145,16 @@ export class ProjectPuvsprCalculationsPieceExporter
     }, result);
   }
 
-  private parseFeatureAmountPerPlanningUnit(
-    featureAmountPerPlanningUnit: FeatureAmountPerPlanningUnit[],
-    featuresByIdMap: FeatureByIdMap,
-  ) {
-    return featureAmountPerPlanningUnit.map(({ featureId, ...rest }) => {
-      const feature = featuresByIdMap[featureId];
-      return {
-        ...rest,
-        featureName: feature.featureName,
-        isCustom: feature.isCustom,
-      };
-    });
+  private async getProjectPusById(projectId: string) {
+    const projectPus = await this.projectPusRepo.find({ projectId });
+    const projectPusById: Record<string, number> = {};
+
+    projectPus.reduce((prev, { id, puid }) => {
+      prev[id] = puid;
+      return prev;
+    }, projectPusById);
+
+    return projectPusById;
   }
 
   private async getProjectFeaturesGeoOperations(projectId: string) {
