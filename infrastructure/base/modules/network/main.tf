@@ -104,6 +104,30 @@ resource "azurerm_subnet" "aks_subnet" {
   ]
 }
 
+###
+# SQL subnet
+###
+resource "azurerm_subnet" "sql_subnet" {
+  name                 = "${var.project_name}-sql-subnet"
+  resource_group_name  = var.resource_group.name
+  virtual_network_name = azurerm_virtual_network.aks_vnet.name
+  address_prefixes     = ["10.0.16.0/21"]
+
+  service_endpoints = [
+    "Microsoft.Storage"
+  ]
+
+  delegation {
+    name = "fs"
+    service_delegation {
+      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
+}
+
 # Create network security group and SSH rule for AKS subnet.
 resource "azurerm_network_security_group" "aks_nsg" {
   name                = "${var.project_name}-aks-nsg"
