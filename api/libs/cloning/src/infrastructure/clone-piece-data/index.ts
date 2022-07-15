@@ -12,6 +12,7 @@ import { planningUnitsGridGeoJSONRelativePath } from './planning-units-grid-geoj
 import { projectCustomFeaturesRelativePath } from './project-custom-features';
 import { projectCustomProtectedAreasRelativePath } from './project-custom-protected-areas';
 import { projectMetadataRelativePath } from './project-metadata';
+import { projectPuvsprCalculationsRelativePath } from './project-puvspr-calculations';
 import { scenarioFeaturesDataRelativePath } from './scenario-features-data';
 import { featuresSpecificationRelativePath } from './scenario-features-specification';
 import { scenarioInputFolderRelativePath } from './scenario-input-folder';
@@ -61,6 +62,7 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ProjectCustomProtectedAreas]: 1,
   [ClonePiece.ProjectCustomFeatures]: 1,
   //
+  [ClonePiece.ProjectPuvsprCalculations]: 2,
   [ClonePiece.ScenarioProtectedAreas]: 2,
   [ClonePiece.ScenarioPlanningUnitsData]: 2,
   [ClonePiece.ScenarioFeaturesData]: 2,
@@ -89,6 +91,8 @@ export class ClonePieceRelativePathResolver {
     [ClonePiece.ProjectCustomProtectedAreas]: () =>
       projectCustomProtectedAreasRelativePath,
     [ClonePiece.ProjectCustomFeatures]: () => projectCustomFeaturesRelativePath,
+    [ClonePiece.ProjectPuvsprCalculations]: () =>
+      projectPuvsprCalculationsRelativePath,
     [ClonePiece.FeaturesSpecification]: ClonePieceRelativePathResolver.scenarioPieceRelativePathResolver(
       featuresSpecificationRelativePath,
     ),
