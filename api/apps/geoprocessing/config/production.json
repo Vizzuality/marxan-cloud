@@ -4,11 +4,5 @@
   },
   "webshot": {
     "url": "http://webshot:30003"
-  },
-  "postgresApi": {
-    "sslMode": true
-  },
-  "postgresGeoApi": {
-    "sslMode": true
   }
 }
