@@ -165,6 +165,16 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name = "API_POSTGRES_SSL_MODE"
+            value = true
+          }
+
+          env {
+            name = "GEO_POSTGRES_SSL_MODE"
+            value = true
+          }
+
+          env {
             name = "API_AUTH_JWT_SECRET"
             value_from {
               secret_key_ref {

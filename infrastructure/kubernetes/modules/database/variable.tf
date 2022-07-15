@@ -40,7 +40,18 @@ variable "key_vault_id" {
   description = "Azure key vault id"
 }
 
-variable "container_registry_name" {
-  type        = string
-  description = "Name for the Azure CR. Must be globally unique"
+variable "sql_server_name" {
+  type = string
+}
+
+variable "sql_server_username" {
+  type = string
+}
+
+variable "sql_server_password" {
+  type = string
+}
+
+variable "bastion_host" {
+  type = string
 }

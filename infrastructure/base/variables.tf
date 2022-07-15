@@ -42,3 +42,29 @@ variable "github_production_branch" {
   type        = string
   description = "Name of the Github branch for the staging deployment code"
 }
+
+variable "key_vault_access_users" {
+  type = list(string)
+  description = "The names of the users to grant access to the secrets"
+  default = []
+}
+
+variable "production_db_instance_size" {
+  type        = string
+  description = "Azure SQL instance type for the production database"
+}
+
+variable "production_db_storage_size" {
+  type        = number
+  description = "Azure SQL instance storage size for the production database"
+}
+
+variable "staging_db_instance_size" {
+  type        = string
+  description = "Azure SQL instance type for the staging database"
+}
+
+variable "staging_db_storage_size" {
+  type        = number
+  description = "Azure SQL instance storage size for the staging database"
+}

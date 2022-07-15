@@ -95,7 +95,10 @@ module "k8s_api_database_production" {
   namespace                  = "production"
   name                       = "api"
   key_vault_id               = module.key_vault_production.key_vault_id
-  container_registry_name    = var.container_registry_name
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
+  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
+  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_production_username
+  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_production_password
 }
 
 module "k8s_geoprocessing_database_production" {
@@ -109,7 +112,10 @@ module "k8s_geoprocessing_database_production" {
   namespace                  = "production"
   name                       = "geoprocessing"
   key_vault_id               = module.key_vault_production.key_vault_id
-  container_registry_name    = var.container_registry_name
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
+  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
+  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_production_username
+  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_production_password
 }
 
 module "storage_pvc_production" {
@@ -183,20 +189,28 @@ module "webshot_production" {
 }
 
 module "production_secrets" {
-  source                     = "./modules/secrets"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  project_name               = var.project_name
-  namespace                  = "production"
-  name                       = "api"
-  key_vault_id               = module.key_vault_production.key_vault_id
-  redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
-  redis_password             = data.terraform_remote_state.core.outputs.redis_password
-  redis_port                 = data.terraform_remote_state.core.outputs.redis_port
-  sparkpost_api_key          = var.sparkpost_api_key
-  api_url                    = "api.${var.domain}"
+  source                          = "./modules/secrets"
+  k8s_host                        = local.k8s_host
+  k8s_client_certificate          = local.k8s_client_certificate
+  k8s_client_key                  = local.k8s_client_key
+  k8s_cluster_ca_certificate      = local.k8s_cluster_ca_certificate
+  project_name                    = var.project_name
+  namespace                       = "production"
+  name                            = "api"
+  key_vault_id                    = module.key_vault_production.key_vault_id
+  redis_host                      = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                  = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                      = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key               = var.sparkpost_api_key
+  api_url                         = "api.${var.domain}"
+  postgres_api_database           = module.k8s_api_database_production.postgresql_database
+  postgres_api_username           = module.k8s_api_database_production.postgresql_username
+  postgres_api_password           = module.k8s_api_database_production.postgresql_password
+  postgres_api_hostname           = module.k8s_api_database_production.postgresql_hostname
+  postgres_geoprocessing_database = module.k8s_geoprocessing_database_production.postgresql_database
+  postgres_geoprocessing_username = module.k8s_geoprocessing_database_production.postgresql_username
+  postgres_geoprocessing_password = module.k8s_geoprocessing_database_production.postgresql_password
+  postgres_geoprocessing_hostname = module.k8s_geoprocessing_database_production.postgresql_hostname
 }
 
 module "ingress_production" {
@@ -235,7 +249,10 @@ module "k8s_api_database_staging" {
   namespace                  = "staging"
   name                       = "api"
   key_vault_id               = module.key_vault_staging.key_vault_id
-  container_registry_name    = var.container_registry_name
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
+  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
+  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_staging_username
+  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_staging_password
 }
 
 module "k8s_geoprocessing_database_staging" {
@@ -249,7 +266,10 @@ module "k8s_geoprocessing_database_staging" {
   namespace                  = "staging"
   name                       = "geoprocessing"
   key_vault_id               = module.key_vault_staging.key_vault_id
-  container_registry_name    = var.container_registry_name
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
+  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
+  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_staging_username
+  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_staging_password
 }
 
 module "storage_pvc_staging" {
@@ -324,20 +344,28 @@ module "webshot_staging" {
 }
 
 module "staging_secrets" {
-  source                     = "./modules/secrets"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  project_name               = var.project_name
-  namespace                  = "staging"
-  name                       = "api"
-  key_vault_id               = module.key_vault_staging.key_vault_id
-  redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
-  redis_password             = data.terraform_remote_state.core.outputs.redis_password
-  redis_port                 = data.terraform_remote_state.core.outputs.redis_port
-  sparkpost_api_key          = var.sparkpost_api_key
-  api_url                    = "api.staging.${var.domain}"
+  source                          = "./modules/secrets"
+  k8s_host                        = local.k8s_host
+  k8s_client_certificate          = local.k8s_client_certificate
+  k8s_client_key                  = local.k8s_client_key
+  k8s_cluster_ca_certificate      = local.k8s_cluster_ca_certificate
+  project_name                    = var.project_name
+  namespace                       = "staging"
+  name                            = "api"
+  key_vault_id                    = module.key_vault_staging.key_vault_id
+  redis_host                      = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                  = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                      = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key               = var.sparkpost_api_key
+  api_url                         = "api.staging.${var.domain}"
+  postgres_api_database           = module.k8s_api_database_staging.postgresql_database
+  postgres_api_username           = module.k8s_api_database_staging.postgresql_username
+  postgres_api_password           = module.k8s_api_database_staging.postgresql_password
+  postgres_api_hostname           = module.k8s_api_database_staging.postgresql_hostname
+  postgres_geoprocessing_database = module.k8s_geoprocessing_database_staging.postgresql_database
+  postgres_geoprocessing_username = module.k8s_geoprocessing_database_staging.postgresql_username
+  postgres_geoprocessing_password = module.k8s_geoprocessing_database_staging.postgresql_password
+  postgres_geoprocessing_hostname = module.k8s_geoprocessing_database_staging.postgresql_hostname
 }
 
 module "ingress_staging" {

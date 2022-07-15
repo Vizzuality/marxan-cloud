@@ -46,10 +46,10 @@ module "container_registry" {
 }
 
 module "kubernetes" {
-  source         = "./modules/kubernetes"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  aks_subnet_id  = module.network.aks_subnet_id
+  source                   = "./modules/kubernetes"
+  resource_group           = data.azurerm_resource_group.resource_group
+  project_name             = var.project_name
+  aks_subnet_id            = module.network.aks_subnet_id
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = module.network.core_vnet_id
     (module.network.aks_vnet_name)  = module.network.aks_vnet_id
@@ -69,7 +69,7 @@ module "data_node_pool" {
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
-  node_labels = {
+  node_labels    = {
     type : "data"
   }
 }
@@ -82,17 +82,9 @@ module "app_node_pool" {
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
   vm_size        = "Standard_F4s_v2"
-  node_labels = {
+  node_labels    = {
     type : "app"
   }
-}
-
-module "redis" {
-  source                         = "./modules/redis"
-  resource_group                 = data.azurerm_resource_group.resource_group
-  project_name                   = var.project_name
-  subnet_id                      = module.network.aks_subnet_id
-  private_connection_resource_id = module.kubernetes.cluster_id
 }
 
 module "log_analytics_workspace" {
@@ -117,12 +109,12 @@ module "firewall" {
 }
 
 module "routetable" {
-  source              = "./modules/route_table"
-  resource_group_name = data.azurerm_resource_group.resource_group.name
-  location            = var.location
-  route_table_name    = "${var.project_name}RouteTable"
-  route_name          = "${var.project_name}RouteToAzureFirewall"
-  firewall_private_ip = module.firewall.private_ip_address
+  source               = "./modules/route_table"
+  resource_group_name  = data.azurerm_resource_group.resource_group.name
+  location             = var.location
+  route_table_name     = "${var.project_name}RouteTable"
+  route_name           = "${var.project_name}RouteToAzureFirewall"
+  firewall_private_ip  = module.firewall.private_ip_address
   subnets_to_associate = {
     (module.network.aks_subnet_name) = {
       subscription_id      = data.azurerm_subscription.subscription.subscription_id
@@ -132,10 +124,11 @@ module "routetable" {
   }
 }
 
+### Redis
 module "redis_private_dns_zone" {
-  source         = "./modules/private_dns_zone"
-  name           = "redis.cache.windows.net"
-  resource_group = data.azurerm_resource_group.resource_group
+  source                   = "./modules/private_dns_zone"
+  name                     = "redis.cache.windows.net"
+  resource_group           = data.azurerm_resource_group.resource_group
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = {
       subscription_id     = data.azurerm_subscription.subscription.subscription_id
@@ -148,6 +141,14 @@ module "redis_private_dns_zone" {
   }
 }
 
+module "redis" {
+  source                         = "./modules/redis"
+  resource_group                 = data.azurerm_resource_group.resource_group
+  project_name                   = var.project_name
+  subnet_id                      = module.network.aks_subnet_id
+  private_connection_resource_id = module.kubernetes.cluster_id
+}
+
 module "redis_private_endpoint" {
   source                         = "./modules/private_endpoint"
   name                           = "${var.project_name}RedisPrivateEndpoint"
@@ -158,5 +159,51 @@ module "redis_private_endpoint" {
   is_manual_connection           = false
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
-  private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
+  private_dns_zone_group_ids     = [module.redis_private_dns_zone.dns_zone_id]
+}
+
+### Database
+module "sql_server_key_vault" {
+  source                 = "./modules/key_vault"
+  resource_group         = data.azurerm_resource_group.resource_group
+  project_name           = var.project_name
+  key_vault_access_users = var.key_vault_access_users
+}
+
+module "sql_server_production" {
+  source              = "./modules/database"
+  resource_group      = data.azurerm_resource_group.resource_group
+  project_name        = "${var.project_name}-production"
+  subnet_id           = module.network.sql_subnet_id
+  private_dns_zone_id = module.sql_server_private_dns_zone.dns_zone_id
+  key_vault_id        = module.sql_server_key_vault.key_vault_id
+  instance_size       = var.production_db_instance_size
+  storage_size        = var.production_db_storage_size
+}
+
+module "sql_server_staging" {
+  source              = "./modules/database"
+  resource_group      = data.azurerm_resource_group.resource_group
+  project_name        = "${var.project_name}-staging"
+  subnet_id           = module.network.sql_subnet_id
+  private_dns_zone_id = module.sql_server_private_dns_zone.dns_zone_id
+  key_vault_id        = module.sql_server_key_vault.key_vault_id
+  instance_size       = var.staging_db_instance_size
+  storage_size        = var.staging_db_storage_size
+}
+
+module "sql_server_private_dns_zone" {
+  source                   = "./modules/private_dns_zone"
+  name                     = "${var.project_name}.postgres.database.azure.com"
+  resource_group           = data.azurerm_resource_group.resource_group
+  virtual_networks_to_link = {
+    (module.network.core_vnet_name) = {
+      subscription_id     = data.azurerm_subscription.subscription.subscription_id
+      resource_group_name = data.azurerm_resource_group.resource_group.name
+    }
+    (module.network.aks_vnet_name) = {
+      subscription_id     = data.azurerm_subscription.subscription.subscription_id
+      resource_group_name = data.azurerm_resource_group.resource_group.name
+    }
+  }
 }
