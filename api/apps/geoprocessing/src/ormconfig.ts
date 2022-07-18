@@ -46,6 +46,9 @@ export const geoprocessingConnections: {
     cli: {
       migrationsDir: 'apps/geoprocessing/src/migrations/geoprocessing',
     },
+    extra: {
+      max: AppConfig.get<number>('postgresGeoApi.maxClientsInPool', 10),
+    }
   },
   apiDB: {
     name: 'apiDB',

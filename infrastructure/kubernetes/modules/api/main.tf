@@ -289,6 +289,11 @@ resource "kubernetes_deployment" "api_deployment" {
             value = var.api_postgres_logging
           }
 
+          env {
+            name  = "GEO_POSTGRES_MAX_CLIENTS_IN_POOL"
+            value = var.postgres_geodb_max_clients_in_pool
+          }
+
           resources {
             limits = {
               cpu    = "1"

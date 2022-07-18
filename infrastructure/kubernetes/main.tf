@@ -118,16 +118,17 @@ module "storage_pvc_production" {
 module "api_production" {
   count = var.deploy_production ? 1 : 0
 
-  source                     = "./modules/api"
-  namespace                  = "production"
-  image                      = "${var.container_registry_name}.azurecr.io/marxan-api:production"
-  deployment_name            = "api"
-  application_base_url       = "https://${var.domain}"
-  network_cors_origins       = "https://${var.domain},http://localhost:3000"
-  http_logging_morgan_format = ""
-  api_postgres_logging       = "error"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  source                             = "./modules/api"
+  namespace                          = "production"
+  image                              = "${var.container_registry_name}.azurecr.io/marxan-api:production"
+  deployment_name                    = "api"
+  application_base_url               = "https://${var.domain}"
+  network_cors_origins               = "https://${var.domain},http://localhost:3000"
+  http_logging_morgan_format         = ""
+  api_postgres_logging               = "error"
+  temp_data_pvc_name                 = local.temp_data_pvc_name
+  cloning_pvc_name                   = local.cloning_pvc_name
+  postgres_geodb_max_clients_in_pool = 24
 }
 
 module "geoprocessing_production" {
@@ -268,16 +269,17 @@ module "storage_pvc_staging" {
 }
 
 module "api_staging" {
-  source                     = "./modules/api"
-  namespace                  = "staging"
-  image                      = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
-  deployment_name            = "api"
-  application_base_url       = "https://staging.${var.domain}"
-  network_cors_origins       = "https://staging.${var.domain},http://localhost:3000"
-  http_logging_morgan_format = "short"
-  api_postgres_logging       = "query"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  source                             = "./modules/api"
+  namespace                          = "staging"
+  image                              = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
+  deployment_name                    = "api"
+  application_base_url               = "https://staging.${var.domain}"
+  network_cors_origins               = "https://staging.${var.domain},http://localhost:3000"
+  http_logging_morgan_format         = "short"
+  api_postgres_logging               = "query"
+  temp_data_pvc_name                 = local.temp_data_pvc_name
+  cloning_pvc_name                   = local.cloning_pvc_name
+  postgres_geodb_max_clients_in_pool = 10
 }
 
 module "geoprocessing_staging" {
