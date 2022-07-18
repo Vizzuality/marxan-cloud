@@ -34,34 +34,17 @@ data "kubernetes_service" "postgresql" {
   }
 }
 
-provider "postgresql" {
-  host      = module.db_tunnel.host
-  port      = module.db_tunnel.port
-  username  = var.sql_server_username
-  password  = var.sql_server_password
-  sslmode   = "require"
-  superuser = false
-}
-
-module db_tunnel {
-  # You can also retrieve this module from the terraform registry
-  source  = "flaupretre/tunnel/ssh"
-  version = "1.8.0"
-
-  target_host = data.azurerm_postgresql_flexible_server.marxan.fqdn
-  target_port = 5432
-
-  gateway_host = var.bastion_host
-  gateway_user = "ubuntu"
-}
-
 resource "postgresql_role" "my_role" {
+  provider = postgresql
+
   name     = local.username
   login    = true
   password = local.password
 }
 
 resource "postgresql_grant" "db_grant" {
+  provider = postgresql
+
   database    = local.database
   role        = local.username
   object_type = "database"
@@ -74,21 +57,29 @@ resource "postgresql_grant" "db_grant" {
 }
 
 resource "postgresql_extension" "marxan_postgis" {
+  provider = postgresql
+
   database = local.database
   name     = "postgis"
 }
 
 resource "postgresql_extension" "marxan_pgcrypto" {
+  provider = postgresql
+
   database = local.database
   name     = "pgcrypto"
 }
 
 resource "postgresql_extension" "marxan_plpgsql" {
+  provider = postgresql
+
   database = local.database
   name     = "plpgsql"
 }
 
 resource "postgresql_extension" "marxan_postgis_raster" {
+  provider = postgresql
+
   database = local.database
   name     = "postgis_raster"
 
@@ -98,6 +89,8 @@ resource "postgresql_extension" "marxan_postgis_raster" {
 }
 
 resource "postgresql_extension" "marxan_postgis_topology" {
+  provider = postgresql
+
   database = local.database
   name     = "postgis_topology"
 

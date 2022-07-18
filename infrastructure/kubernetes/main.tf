@@ -77,6 +77,8 @@ module "k8s_storage" {
 # Production
 ####
 module "key_vault_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                 = "./modules/key_vault"
   namespace              = "production"
   resource_group         = data.azurerm_resource_group.resource_group
@@ -85,6 +87,8 @@ module "key_vault_production" {
 }
 
 module "k8s_api_database_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/database"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -94,14 +98,17 @@ module "k8s_api_database_production" {
   project_name               = var.project_name
   namespace                  = "production"
   name                       = "api"
-  key_vault_id               = module.key_vault_production.key_vault_id
+  key_vault_id               = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
   sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
-  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
-  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_production_username
-  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_production_password
+
+  providers = {
+    postgresql = postgres.db_tunnel_production
+  }
 }
 
 module "k8s_geoprocessing_database_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/database"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -111,14 +118,17 @@ module "k8s_geoprocessing_database_production" {
   project_name               = var.project_name
   namespace                  = "production"
   name                       = "geoprocessing"
-  key_vault_id               = module.key_vault_production.key_vault_id
+  key_vault_id               = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
   sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
-  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
-  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_production_username
-  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_production_password
+
+  providers = {
+    postgresql = postgres.db_tunnel_production
+  }
 }
 
 module "storage_pvc_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/volumes"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -134,6 +144,8 @@ module "storage_pvc_production" {
 }
 
 module "api_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/api"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -151,6 +163,8 @@ module "api_production" {
 }
 
 module "geoprocessing_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/geoprocessing"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -165,6 +179,8 @@ module "geoprocessing_production" {
 }
 
 module "client_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/client"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -178,6 +194,8 @@ module "client_production" {
 }
 
 module "webshot_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/webshot"
   k8s_host                   = local.k8s_host
   k8s_client_certificate     = local.k8s_client_certificate
@@ -189,6 +207,8 @@ module "webshot_production" {
 }
 
 module "production_secrets" {
+  count = var.deploy_production ? 1 : 0
+
   source                          = "./modules/secrets"
   k8s_host                        = local.k8s_host
   k8s_client_certificate          = local.k8s_client_certificate
@@ -197,23 +217,25 @@ module "production_secrets" {
   project_name                    = var.project_name
   namespace                       = "production"
   name                            = "api"
-  key_vault_id                    = module.key_vault_production.key_vault_id
+  key_vault_id                    = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
   redis_host                      = data.terraform_remote_state.core.outputs.redis_hostname
   redis_password                  = data.terraform_remote_state.core.outputs.redis_password
   redis_port                      = data.terraform_remote_state.core.outputs.redis_port
   sparkpost_api_key               = var.sparkpost_api_key
   api_url                         = "api.${var.domain}"
-  postgres_api_database           = module.k8s_api_database_production.postgresql_database
-  postgres_api_username           = module.k8s_api_database_production.postgresql_username
-  postgres_api_password           = module.k8s_api_database_production.postgresql_password
-  postgres_api_hostname           = module.k8s_api_database_production.postgresql_hostname
-  postgres_geoprocessing_database = module.k8s_geoprocessing_database_production.postgresql_database
-  postgres_geoprocessing_username = module.k8s_geoprocessing_database_production.postgresql_username
-  postgres_geoprocessing_password = module.k8s_geoprocessing_database_production.postgresql_password
-  postgres_geoprocessing_hostname = module.k8s_geoprocessing_database_production.postgresql_hostname
+  postgres_api_database           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
+  postgres_api_username           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
+  postgres_api_password           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
+  postgres_api_hostname           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
+  postgres_geoprocessing_database = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
+  postgres_geoprocessing_username = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
+  postgres_geoprocessing_password = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
+  postgres_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
 }
 
 module "ingress_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/ingress"
   namespace                  = "production"
   k8s_host                   = local.k8s_host
@@ -224,6 +246,26 @@ module "ingress_production" {
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
+}
+
+data "azurerm_postgresql_flexible_server" "marxan_production" {
+  count = var.deploy_production ? 1 : 0
+  name                = lookup(data.terraform_remote_state.core.outputs, "sql_server_production_name", null)
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+module db_tunnel_production {
+  count = var.deploy_production ? 1 : 0
+
+  # You can also retrieve this module from the terraform registry
+  source  = "flaupretre/tunnel/ssh"
+  version = "1.8.0"
+
+  target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production, "fqdn", null)
+  target_port = 5432
+
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
+  gateway_user = "ubuntu"
 }
 
 
@@ -250,9 +292,10 @@ module "k8s_api_database_staging" {
   name                       = "api"
   key_vault_id               = module.key_vault_staging.key_vault_id
   sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
-  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
-  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_staging_username
-  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_staging_password
+
+  providers = {
+    postgresql = postgres.db_tunnel_staging
+  }
 }
 
 module "k8s_geoprocessing_database_staging" {
@@ -267,9 +310,10 @@ module "k8s_geoprocessing_database_staging" {
   name                       = "geoprocessing"
   key_vault_id               = module.key_vault_staging.key_vault_id
   sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
-  bastion_host               = data.terraform_remote_state.core.outputs.bastion_public_ip
-  sql_server_username        = data.terraform_remote_state.core.outputs.sql_server_staging_username
-  sql_server_password        = data.terraform_remote_state.core.outputs.sql_server_staging_password
+
+  providers = {
+    postgresql = postgres.db_tunnel_staging
+  }
 }
 
 module "storage_pvc_staging" {
@@ -380,4 +424,21 @@ module "ingress_staging" {
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
   domain_prefix              = "staging"
+}
+
+data "azurerm_postgresql_flexible_server" "marxan_staging" {
+  name                = data.terraform_remote_state.core.outputs.sql_server_staging_name
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+module db_tunnel_staging {
+  # You can also retrieve this module from the terraform registry
+  source  = "flaupretre/tunnel/ssh"
+  version = "1.8.0"
+
+  target_host = data.azurerm_postgresql_flexible_server.marxan_staging.fqdn
+  target_port = 5432
+
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
+  gateway_user = "ubuntu"
 }

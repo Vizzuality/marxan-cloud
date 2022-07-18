@@ -171,6 +171,8 @@ module "sql_server_key_vault" {
 }
 
 module "sql_server_production" {
+  count = var.deploy_production ? 1 : 0
+
   source              = "./modules/database"
   resource_group      = data.azurerm_resource_group.resource_group
   project_name        = "${var.project_name}-production"

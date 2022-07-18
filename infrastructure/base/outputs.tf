@@ -62,20 +62,20 @@ output "redis_password" {
 }
 
 output "sql_server_production_name" {
-  value = module.sql_server_production.sql_server_name
+  value = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_name : null
 }
 
 output "sql_server_production_hostname" {
-  value = module.sql_server_production.sql_server_url
+  value = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_url : null
 }
 
 output "sql_server_production_username" {
-  value     = module.sql_server_production.sql_server_username
+  value     = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_username : null
   sensitive = true
 }
 
 output "sql_server_production_password" {
-  value     = module.sql_server_production.sql_server_password
+  value     = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_password : null
   sensitive = true
 }
 

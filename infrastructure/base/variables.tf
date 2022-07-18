@@ -49,6 +49,11 @@ variable "key_vault_access_users" {
   default = []
 }
 
+variable "deploy_production" {
+  type        = bool
+  description = "If the production deployment should be created"
+}
+
 variable "production_db_instance_size" {
   type        = string
   description = "Azure SQL instance type for the production database"
