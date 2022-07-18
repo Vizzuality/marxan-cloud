@@ -34,7 +34,8 @@
     "database": null,
     "runMigrationsOnStartup": false,
     "logging": "error",
-    "sslMode": false
+    "sslMode": false,
+    "maxClientsInPool": 10
   },
   "api": {
     "url": "http://api:3000",

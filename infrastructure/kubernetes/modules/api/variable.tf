@@ -42,3 +42,9 @@ variable "cloning_pvc_name" {
   type        = string
   description = "Name of the PVC to use for backend storage for cloning"
 }
+
+variable "postgres_geodb_max_clients_in_pool" {
+  type        = number
+  description = "Value for the GEO_POSTGRES_MAX_CLIENTS_IN_POOL env var: maximum number of clients on TypeORM's connection pool for the geoprocessing database"
+  default     = 10
+}

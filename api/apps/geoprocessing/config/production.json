@@ -1,4 +1,7 @@
 {
+  "postgresGeoApi": {
+    "maxClientsInPool": 24
+  },
   "api": {
     "url": "http://api:30001"
   },
