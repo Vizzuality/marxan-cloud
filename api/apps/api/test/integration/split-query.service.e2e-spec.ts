@@ -257,9 +257,12 @@ async function getFixtures() {
 
       const scenarioFeaturePreparation = scenarioFeaturesPreparationInserted[0];
 
+      const subset = splitFeature.singleSplitFeature.subset;
       expect(scenarioFeaturePreparation).toEqual({
         api_feature_id: splitFeature.id,
-        ...splitFeature.singleSplitFeature.subset,
+        fpf: subset ? subset.fpf : null,
+        prop: subset ? subset.prop : null,
+        target: subset ? subset.target : null,
       });
     },
     ThenNoSplitFeatureIsLinked: async (linkingQueryAndParams: {
