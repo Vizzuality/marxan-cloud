@@ -9,7 +9,8 @@ github_production_branch = "main"
 github_staging_branch    = "staging"
 key_vault_access_users  = ["tiago.garcia_vizzuality.com#EXT#", "andrea.rota_vizzuality.com#EXT#"]
 
-production_db_instance_size = "GP_Standard_D32d_v4"
+deploy_production           = true
+production_db_instance_size = "GP_Standard_D32ds_v4"
 production_db_storage_size = 4194304
 
 staging_db_instance_size = "GP_Standard_D4ds_v4"
