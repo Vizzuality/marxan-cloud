@@ -40,26 +40,31 @@ export class SplitOperation {
         scenarioId: data.scenarioId,
       });
 
-      const features = await this.splitCreateFeatures.createSplitFeatures(
+      const singleSplitFeaturesWithId = await this.splitCreateFeatures.createSplitFeatures(
         data.input,
         project.id,
       );
 
-      const { parameters, query } = this.splitQuery.prepareQuery(
-        data.input,
-        data.scenarioId,
-        data.specificationId,
-        planningAreaLocation,
-        protectedAreaFilterByIds,
-        project,
-      );
-      const ids: { id: string }[] = await this.geoEntityManager.query(
-        query,
-        parameters,
-      );
+      const scenarioFeaturePreparationIds: { id: string }[] = [];
+
+      for (const singleSplitFeatureWithId of singleSplitFeaturesWithId) {
+        const { parameters, query } = this.splitQuery.prepareQuery(
+          singleSplitFeatureWithId,
+          data.scenarioId,
+          data.specificationId,
+          planningAreaLocation,
+          protectedAreaFilterByIds,
+          project,
+        );
+        const ids: { id: string }[] = await this.geoEntityManager.query(
+          query,
+          parameters,
+        );
+        scenarioFeaturePreparationIds.push(...ids);
+      }
 
       await this.computeAmountPerFeature(
-        features.map(({ id }) => id),
+        singleSplitFeaturesWithId.map(({ id }) => id),
         project.id,
         data.scenarioId,
       );
@@ -67,7 +72,7 @@ export class SplitOperation {
         topic: data.scenarioId,
         kind: API_EVENT_KINDS.scenario__geofeatureSplit__finished__v1__alpha1,
       });
-      return ids;
+      return scenarioFeaturePreparationIds;
     } catch (error) {
       await this.events.create({
         topic: data.scenarioId,
