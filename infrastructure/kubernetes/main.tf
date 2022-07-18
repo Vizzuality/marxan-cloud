@@ -35,10 +35,6 @@ data "azurerm_dns_zone" "dns_zone" {
 }
 
 locals {
-  k8s_host                   = "${trim(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.host, "443")}${var.port}"
-  k8s_client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_certificate)
-  k8s_client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
-  k8s_cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
   temp_data_storage_class    = "azurefile-csi-temp-data"
   temp_data_pvc_name         = "shared-temp-data-storage"
   cloning_storage_class      = "azurefile-csi-cloning-data"
@@ -48,27 +44,15 @@ locals {
 module "k8s_namespaces" {
   source                     = "./modules/k8s_namespaces"
   namespaces                 = ["production", "staging"]
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
 }
 
 module "cert_manager" {
   source                     = "./modules/cert_manager"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   email                      = var.cert_email
 }
 
 module "k8s_storage" {
   source                     = "./modules/storage"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   temp_data_storage_class    = local.temp_data_storage_class
   cloning_storage_class      = local.cloning_storage_class
 }
@@ -90,10 +74,6 @@ module "k8s_api_database_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "production"
@@ -110,10 +90,6 @@ module "k8s_geoprocessing_database_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "production"
@@ -130,10 +106,6 @@ module "storage_pvc_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/volumes"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   temp_data_storage_class    = local.temp_data_storage_class
   temp_data_pvc_name         = local.temp_data_pvc_name
@@ -147,10 +119,6 @@ module "api_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/api"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-api:production"
   deployment_name            = "api"
@@ -166,10 +134,6 @@ module "geoprocessing_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/geoprocessing"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
   deployment_name            = "geoprocessing"
@@ -182,10 +146,6 @@ module "client_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/client"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-client:production"
   deployment_name            = "client"
@@ -197,10 +157,6 @@ module "webshot_production" {
   count = var.deploy_production ? 1 : 0
 
   source                     = "./modules/webshot"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:production"
   deployment_name            = "webshot"
@@ -210,10 +166,6 @@ module "production_secrets" {
   count = var.deploy_production ? 1 : 0
 
   source                          = "./modules/secrets"
-  k8s_host                        = local.k8s_host
-  k8s_client_certificate          = local.k8s_client_certificate
-  k8s_client_key                  = local.k8s_client_key
-  k8s_cluster_ca_certificate      = local.k8s_cluster_ca_certificate
   project_name                    = var.project_name
   namespace                       = "production"
   name                            = "api"
@@ -238,10 +190,6 @@ module "ingress_production" {
 
   source                     = "./modules/ingress"
   namespace                  = "production"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
@@ -282,10 +230,6 @@ module "key_vault_staging" {
 
 module "k8s_api_database_staging" {
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "staging"
@@ -300,10 +244,6 @@ module "k8s_api_database_staging" {
 
 module "k8s_geoprocessing_database_staging" {
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "staging"
@@ -318,10 +258,6 @@ module "k8s_geoprocessing_database_staging" {
 
 module "storage_pvc_staging" {
   source                     = "./modules/volumes"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   temp_data_storage_class    = local.temp_data_storage_class
   temp_data_pvc_name         = local.temp_data_pvc_name
@@ -333,10 +269,6 @@ module "storage_pvc_staging" {
 
 module "api_staging" {
   source                     = "./modules/api"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
   deployment_name            = "api"
@@ -350,10 +282,6 @@ module "api_staging" {
 
 module "geoprocessing_staging" {
   source                     = "./modules/geoprocessing"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
   deployment_name            = "geoprocessing"
@@ -365,10 +293,6 @@ module "geoprocessing_staging" {
 
 module "client_staging" {
   source                     = "./modules/client"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-client:staging"
   deployment_name            = "client"
@@ -378,10 +302,6 @@ module "client_staging" {
 
 module "webshot_staging" {
   source                     = "./modules/webshot"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:staging"
   deployment_name            = "webshot"
@@ -389,10 +309,6 @@ module "webshot_staging" {
 
 module "staging_secrets" {
   source                          = "./modules/secrets"
-  k8s_host                        = local.k8s_host
-  k8s_client_certificate          = local.k8s_client_certificate
-  k8s_client_key                  = local.k8s_client_key
-  k8s_cluster_ca_certificate      = local.k8s_cluster_ca_certificate
   project_name                    = var.project_name
   namespace                       = "staging"
   name                            = "api"
@@ -415,10 +331,6 @@ module "staging_secrets" {
 module "ingress_staging" {
   source                     = "./modules/ingress"
   namespace                  = "staging"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
