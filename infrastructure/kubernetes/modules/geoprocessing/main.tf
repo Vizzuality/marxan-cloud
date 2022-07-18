@@ -125,6 +125,16 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           }
 
           env {
+            name = "API_POSTGRES_SSL_MODE"
+            value = true
+          }
+
+          env {
+            name = "GEO_POSTGRES_SSL_MODE"
+            value = true
+          }
+
+          env {
             name = "GEO_POSTGRES_HOST"
             value_from {
               secret_key_ref {

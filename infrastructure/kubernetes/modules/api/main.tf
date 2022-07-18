@@ -165,6 +165,16 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name = "API_POSTGRES_SSL_MODE"
+            value = true
+          }
+
+          env {
+            name = "GEO_POSTGRES_SSL_MODE"
+            value = true
+          }
+
+          env {
             name = "API_AUTH_JWT_SECRET"
             value_from {
               secret_key_ref {
@@ -277,6 +287,11 @@ resource "kubernetes_deployment" "api_deployment" {
           env {
             name  = "API_POSTGRES_LOGGING"
             value = var.api_postgres_logging
+          }
+
+          env {
+            name  = "GEO_POSTGRES_MAX_CLIENTS_IN_POOL"
+            value = var.postgres_geodb_max_clients_in_pool
           }
 
           resources {

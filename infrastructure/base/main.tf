@@ -166,7 +166,7 @@ module "redis_private_endpoint" {
   is_manual_connection           = false
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
-  private_dns_zone_group_ids     = [module.redis_private_dns_zone.id]
+  private_dns_zone_group_ids     = [module.redis_private_dns_zone.dns_zone_id]
   project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
@@ -182,4 +182,53 @@ module "mail_host_dns_records" {
   dkim_value = var.sparkpost_dns_dkim_value
 
   project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
+}
+
+
+### Database
+module "sql_server_key_vault" {
+  source                 = "./modules/key_vault"
+  resource_group         = data.azurerm_resource_group.resource_group
+  project_name           = var.project_name
+  key_vault_access_users = var.key_vault_access_users
+}
+
+module "sql_server_production" {
+  count = var.deploy_production ? 1 : 0
+
+  source              = "./modules/database"
+  resource_group      = data.azurerm_resource_group.resource_group
+  project_name        = "${var.project_name}-production"
+  subnet_id           = module.network.sql_subnet_id
+  private_dns_zone_id = module.sql_server_private_dns_zone.dns_zone_id
+  key_vault_id        = module.sql_server_key_vault.key_vault_id
+  instance_size       = var.production_db_instance_size
+  storage_size        = var.production_db_storage_size
+}
+
+module "sql_server_staging" {
+  source              = "./modules/database"
+  resource_group      = data.azurerm_resource_group.resource_group
+  project_name        = "${var.project_name}-staging"
+  subnet_id           = module.network.sql_subnet_id
+  private_dns_zone_id = module.sql_server_private_dns_zone.dns_zone_id
+  key_vault_id        = module.sql_server_key_vault.key_vault_id
+  instance_size       = var.staging_db_instance_size
+  storage_size        = var.staging_db_storage_size
+}
+
+module "sql_server_private_dns_zone" {
+  source                   = "./modules/private_dns_zone"
+  name                     = "${var.project_name}.postgres.database.azure.com"
+  resource_group           = data.azurerm_resource_group.resource_group
+  virtual_networks_to_link = {
+    (module.network.core_vnet_name) = {
+      subscription_id     = data.azurerm_subscription.subscription.subscription_id
+      resource_group_name = data.azurerm_resource_group.resource_group.name
+    }
+    (module.network.aks_vnet_name) = {
+      subscription_id     = data.azurerm_subscription.subscription.subscription_id
+      resource_group_name = data.azurerm_resource_group.resource_group.name
+    }
+  }
 }

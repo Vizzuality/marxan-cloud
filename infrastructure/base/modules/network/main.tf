@@ -58,13 +58,13 @@ resource "azurerm_network_security_group" "bastion_nsg" {
 
   # Allow SSH traffic in from Internet to public subnet.
   security_rule {
-    name                   = "allow-ssh-all"
-    priority               = 100
-    direction              = "Inbound"
-    access                 = "Allow"
-    protocol               = "Tcp"
-    source_port_range      = "*"
-    destination_port_range = "22"
+    name                       = "allow-ssh-all"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
     source_address_prefix      = "*" # source_address_prefixes    = var.vpn_cidrs # Removed for Vizzuality access
     destination_address_prefix = "*"
   }
@@ -104,6 +104,30 @@ resource "azurerm_subnet" "aks_subnet" {
     "Microsoft.ContainerRegistry",
     "Microsoft.Storage"
   ]
+}
+
+###
+# SQL subnet
+###
+resource "azurerm_subnet" "sql_subnet" {
+  name                 = "${var.project_name}-sql-subnet"
+  resource_group_name  = var.resource_group.name
+  virtual_network_name = azurerm_virtual_network.aks_vnet.name
+  address_prefixes     = ["10.0.16.0/21"]
+
+  service_endpoints = [
+    "Microsoft.Storage"
+  ]
+
+  delegation {
+    name = "fs"
+    service_delegation {
+      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action",
+      ]
+    }
+  }
 }
 
 # Create network security group and SSH rule for AKS subnet.

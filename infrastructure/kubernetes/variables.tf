@@ -64,3 +64,8 @@ variable "project_tags" {
   description = "Project resource tags"
   type        = map(string)
 }
+
+variable "deploy_production" {
+  type        = bool
+  description = "If the production deployment should be created"
+}
