@@ -38,6 +38,7 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { CloneModule } from './modules/clone';
 import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-repository/api-cloning-file-repository.module';
 import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-collector';
+import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-co
     CloneModule,
     AsyncJobsGarbageCollectorModule,
     ThrottlerModule.forRoot(),
+    ExportCleanupModule,
   ],
   controllers: [AppController, PingController],
   providers: [
