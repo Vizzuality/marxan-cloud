@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setLegacyProjectId } from 'store/slices/projects/new';
 
 import { useCancelImportLegacyProject, useLegacyProjectValidationResults, useImportLegacyProject } from 'hooks/projects';
+import { useScenariosStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -44,6 +45,13 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   const importLegacyMutation = useImportLegacyProject({});
 
   const ref = useRef(null);
+
+  const { data: scenarioStatusData } = useScenariosStatus(legacyProjectId);
+  const { jobs = [] } = scenarioStatusData || {};
+
+  const legacyRunning = jobs.find((j) => j.kind === 'legacy')?.status === 'running';
+  const legacyDone = jobs.find((j) => j.kind === 'legacy')?.status === 'done';
+  console.info('legacyRunning', legacyRunning, 'legacyDone', legacyDone);
 
   const onCancelImportLegacyProject = useCallback(() => {
     cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
@@ -82,10 +90,12 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                 level: 'success',
               });
 
-              onDismiss(true);
-              console.info('Legacy project uploaded');
+              if (legacyDone) {
+                onDismiss(true);
+                console.info('Legacy project uploaded');
+                setLoading(false);
+              }
             }
-            setLoading(false);
           },
           onError: ({ response }) => {
             const { errors } = response.data;
@@ -118,6 +128,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
     onDismiss,
     importLegacyMutation,
     legacyProjectValidationResultsMutation,
+    legacyDone,
   ]);
 
   return (
