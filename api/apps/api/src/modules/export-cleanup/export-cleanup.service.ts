@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ExportCleanup } from './export-cleanup';
@@ -7,9 +7,6 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { execSync } from 'child_process';
 
-const cronJobInterval: string = AppConfig.get(
-  'cleanupCronJobSettings.interval',
-);
 const validityIntervalInHours = AppConfig.get<string>(
   'storage.cloningFileStorage.artifactValidityInHours',
 );
@@ -45,7 +42,7 @@ export class ExportCleanupService implements ExportCleanup {
     return uniqueExpiredExportIds;
   }
 
-  @Cron(cronJobInterval)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleCron() {
     this.logger.debug(
       'Preparing to clean dangling import/export data for projects/scenarios',
