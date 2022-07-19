@@ -33,6 +33,13 @@ export class SpecForPlainGeoFeatureWithFeatureMetadata extends SpecForPlainGeoFe
   metadata!: GeoFeature;
 }
 
+/**
+ * Stratification operations are not accepted right now, in case an stratification operation
+ * is submitted in geoprocessingOperations array, the validation will fail. Despite that,
+ * the signature for geoprocessingOperations array still contains Stratification operations,
+ * this is due to the fact that we don't want to remove the work already done for stratification
+ * operations
+ */
 export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
   @Equals('withGeoprocessing')
   kind!: 'withGeoprocessing';
@@ -46,10 +53,7 @@ export class SpecForGeoFeatureWithGeoprocessing extends SpecForGeofeature {
     keepDiscriminatorProperty: true,
     discriminator: {
       property: 'kind',
-      subTypes: [
-        { value: GeoprocessingOpSplitV1, name: 'split/v1' },
-        { value: GeoprocessingOpStratificationV1, name: 'stratification/v1' },
-      ],
+      subTypes: [{ value: GeoprocessingOpSplitV1, name: 'split/v1' }],
     },
   })
   @ApiPropertyOptional()
