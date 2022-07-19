@@ -5,7 +5,6 @@ import { EntityManager } from 'typeorm';
 import { ExportCleanup } from './export-cleanup';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-
 const validityIntervalInHours = AppConfig.get<string>(
   'storage.cloningFileStorage.artifactValidityInHours',
 );
