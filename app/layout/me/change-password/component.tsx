@@ -7,12 +7,14 @@ import { signOut } from 'next-auth/client';
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
+import PasswordStrength from 'layout/sign-up/password-strenght';
+
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
 import {
-  composeValidators,
+  composeValidators, passwordStrengthValidator,
 } from 'components/forms/validations';
 import Loading from 'components/loading';
 
@@ -116,7 +118,7 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
                 <div className="mt-5">
                   <FieldRFF
                     name="newPassword"
-                    validate={composeValidators([{ presence: true }])}
+                    validate={composeValidators([passwordStrengthValidator])}
                   >
                     {(fprops) => (
                       <Field id="profile-new-password" {...fprops}>
@@ -125,6 +127,11 @@ export const ChangePassword: React.FC<ChangePasswordProps> = () => {
                       </Field>
                     )}
                   </FieldRFF>
+
+                  <PasswordStrength
+                    password={props.values.newPassword}
+                  />
+
                 </div>
 
                 {/* CONFIRM NEW PASSWORD */}
