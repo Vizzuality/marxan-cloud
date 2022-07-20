@@ -38,7 +38,7 @@ export class SplitCreateFeatures {
   public async createSplitFeatures(
     input: FeatureConfigSplit,
     projectId: string,
-  ) {
+  ): Promise<SingleSplitConfigFeatureValueWithId[]> {
     const baseFeatureOrError = await this.isBaseFeatureADerivedFeature(input);
 
     if (isLeft(baseFeatureOrError))

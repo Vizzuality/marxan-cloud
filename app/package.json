@@ -59,6 +59,7 @@
     "date-fns": "^2.19.0",
     "deck.gl": "7.3.6",
     "downshift": "^6.0.15",
+    "fast-password-entropy": "^1.1.1",
     "final-form": "^4.20.1",
     "framer-motion": "^3.9.1",
     "fuse.js": "^6.4.6",
