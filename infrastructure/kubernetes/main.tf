@@ -34,30 +34,31 @@ data "azurerm_dns_zone" "dns_zone" {
 }
 
 locals {
-  temp_data_storage_class = "azurefile-csi-temp-data"
-  temp_data_pvc_name      = "shared-temp-data-storage"
-  cloning_storage_class   = "azurefile-csi-cloning-data"
-  cloning_pvc_name        = "shared-cloning-storage"
+  temp_data_storage_class    = "azurefile-csi-temp-data"
+  temp_data_pvc_name         = "shared-temp-data-storage"
+  cloning_storage_class      = "azurefile-csi-cloning-data"
+  cloning_pvc_name           = "shared-cloning-storage"
 }
 
 module "k8s_namespaces" {
-  source     = "./modules/k8s_namespaces"
-  namespaces = ["production", "staging"]
+  source                     = "./modules/k8s_namespaces"
+  namespaces                 = ["production", "staging"]
 }
 
 module "cert_manager" {
-  source = "./modules/cert_manager"
-  email  = var.cert_email
+  source                     = "./modules/cert_manager"
+  email                      = var.cert_email
 }
 
 module "k8s_storage" {
-  source                  = "./modules/storage"
-  temp_data_storage_class = local.temp_data_storage_class
-  cloning_storage_class   = local.cloning_storage_class
+  source                     = "./modules/storage"
+  temp_data_storage_class    = local.temp_data_storage_class
+  cloning_storage_class      = local.cloning_storage_class
 }
 
-#region Production
-
+####
+# Production
+####
 module "key_vault_production" {
   count = var.deploy_production ? 1 : 0
 
@@ -73,13 +74,13 @@ module "key_vault_production" {
 module "k8s_api_database_production" {
   count = var.deploy_production ? 1 : 0
 
-  source          = "./modules/database"
-  resource_group  = data.azurerm_resource_group.resource_group
-  project_name    = var.project_name
-  namespace       = "production"
-  name            = "api"
-  key_vault_id    = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
-  sql_server_name = data.terraform_remote_state.core.outputs.sql_server_production_name
+  source                     = "./modules/database"
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "production"
+  name                       = "api"
+  key_vault_id               = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
 
   providers = {
     postgresql = postgres.db_tunnel_production
@@ -89,13 +90,13 @@ module "k8s_api_database_production" {
 module "k8s_geoprocessing_database_production" {
   count = var.deploy_production ? 1 : 0
 
-  source          = "./modules/database"
-  resource_group  = data.azurerm_resource_group.resource_group
-  project_name    = var.project_name
-  namespace       = "production"
-  name            = "geoprocessing"
-  key_vault_id    = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
-  sql_server_name = data.terraform_remote_state.core.outputs.sql_server_production_name
+  source                     = "./modules/database"
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "production"
+  name                       = "geoprocessing"
+  key_vault_id               = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
 
   providers = {
     postgresql = postgres.db_tunnel_production
@@ -105,14 +106,14 @@ module "k8s_geoprocessing_database_production" {
 module "storage_pvc_production" {
   count = var.deploy_production ? 1 : 0
 
-  source                  = "./modules/volumes"
-  namespace               = "production"
-  temp_data_storage_class = local.temp_data_storage_class
-  temp_data_pvc_name      = local.temp_data_pvc_name
-  temp_data_storage_size  = var.temp_data_storage_size
-  cloning_storage_class   = local.cloning_storage_class
-  cloning_pvc_name        = local.cloning_pvc_name
-  cloning_storage_size    = var.cloning_storage_size
+  source                     = "./modules/volumes"
+  namespace                  = "production"
+  temp_data_storage_class    = local.temp_data_storage_class
+  temp_data_pvc_name         = local.temp_data_pvc_name
+  temp_data_storage_size     = var.temp_data_storage_size
+  cloning_storage_class      = local.cloning_storage_class
+  cloning_pvc_name           = local.cloning_pvc_name
+  cloning_storage_size       = var.cloning_storage_size
 }
 
 module "api_production" {
@@ -134,33 +135,33 @@ module "api_production" {
 module "geoprocessing_production" {
   count = var.deploy_production ? 1 : 0
 
-  source               = "./modules/geoprocessing"
-  namespace            = "production"
-  image                = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
-  deployment_name      = "geoprocessing"
-  geo_postgres_logging = "error"
-  temp_data_pvc_name   = local.temp_data_pvc_name
-  cloning_pvc_name     = local.cloning_pvc_name
+  source                     = "./modules/geoprocessing"
+  namespace                  = "production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
+  deployment_name            = "geoprocessing"
+  geo_postgres_logging       = "error"
+  temp_data_pvc_name         = local.temp_data_pvc_name
+  cloning_pvc_name           = local.cloning_pvc_name
 }
 
 module "client_production" {
   count = var.deploy_production ? 1 : 0
 
-  source          = "./modules/client"
-  namespace       = "production"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-client:production"
-  deployment_name = "client"
-  site_url        = "https://${data.terraform_remote_state.core.outputs.dns_zone_name}"
-  api_url         = "https://api.${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  source                     = "./modules/client"
+  namespace                  = "production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-client:production"
+  deployment_name            = "client"
+  site_url                   = "https://${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  api_url                    = "https://api.${data.terraform_remote_state.core.outputs.dns_zone_name}"
 }
 
 module "webshot_production" {
   count = var.deploy_production ? 1 : 0
 
-  source          = "./modules/webshot"
-  namespace       = "production"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-webshot:production"
-  deployment_name = "webshot"
+  source                     = "./modules/webshot"
+  namespace                  = "production"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:production"
+  deployment_name            = "webshot"
 }
 
 module "production_secrets" {
@@ -189,22 +190,21 @@ module "production_secrets" {
 module "ingress_production" {
   count = var.deploy_production ? 1 : 0
 
-  source         = "./modules/ingress"
-  namespace      = "production"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  dns_zone       = data.azurerm_dns_zone.dns_zone
-  domain         = var.domain
-  project_tags   = var.project_tags
+  source                     = "./modules/ingress"
+  namespace                  = "production"
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  dns_zone                   = data.azurerm_dns_zone.dns_zone
+  domain                     = var.domain
 }
 
 data "azurerm_postgresql_flexible_server" "marxan_production" {
-  count               = var.deploy_production ? 1 : 0
+  count = var.deploy_production ? 1 : 0
   name                = lookup(data.terraform_remote_state.core.outputs, "sql_server_production_name", null)
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
 
-module "db_tunnel_production" {
+module db_tunnel_production {
   count = var.deploy_production ? 1 : 0
 
   # You can also retrieve this module from the terraform registry
@@ -218,10 +218,10 @@ module "db_tunnel_production" {
   gateway_user = "ubuntu"
 }
 
-#endregion
 
-#region Staging
-
+####
+# Staging
+####
 module "key_vault_staging" {
   source                 = "./modules/key_vault"
   namespace              = "staging"
@@ -233,13 +233,13 @@ module "key_vault_staging" {
 }
 
 module "k8s_api_database_staging" {
-  source          = "./modules/database"
-  resource_group  = data.azurerm_resource_group.resource_group
-  project_name    = var.project_name
-  namespace       = "staging"
-  name            = "api"
-  key_vault_id    = module.key_vault_staging.key_vault_id
-  sql_server_name = data.terraform_remote_state.core.outputs.sql_server_staging_name
+  source                     = "./modules/database"
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "staging"
+  name                       = "api"
+  key_vault_id               = module.key_vault_staging.key_vault_id
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
 
   providers = {
     postgresql = postgres.db_tunnel_staging
@@ -247,13 +247,13 @@ module "k8s_api_database_staging" {
 }
 
 module "k8s_geoprocessing_database_staging" {
-  source          = "./modules/database"
-  resource_group  = data.azurerm_resource_group.resource_group
-  project_name    = var.project_name
-  namespace       = "staging"
-  name            = "geoprocessing"
-  key_vault_id    = module.key_vault_staging.key_vault_id
-  sql_server_name = data.terraform_remote_state.core.outputs.sql_server_staging_name
+  source                     = "./modules/database"
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  namespace                  = "staging"
+  name                       = "geoprocessing"
+  key_vault_id               = module.key_vault_staging.key_vault_id
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
 
   providers = {
     postgresql = postgres.db_tunnel_staging
@@ -261,14 +261,14 @@ module "k8s_geoprocessing_database_staging" {
 }
 
 module "storage_pvc_staging" {
-  source                  = "./modules/volumes"
-  namespace               = "staging"
-  temp_data_storage_class = local.temp_data_storage_class
-  temp_data_pvc_name      = local.temp_data_pvc_name
-  temp_data_storage_size  = var.temp_data_storage_size
-  cloning_storage_class   = local.cloning_storage_class
-  cloning_pvc_name        = local.cloning_pvc_name
-  cloning_storage_size    = var.cloning_storage_size
+  source                     = "./modules/volumes"
+  namespace                  = "staging"
+  temp_data_storage_class    = local.temp_data_storage_class
+  temp_data_pvc_name         = local.temp_data_pvc_name
+  temp_data_storage_size     = var.temp_data_storage_size
+  cloning_storage_class      = local.cloning_storage_class
+  cloning_pvc_name           = local.cloning_pvc_name
+  cloning_storage_size       = var.cloning_storage_size
 }
 
 module "api_staging" {
@@ -286,30 +286,30 @@ module "api_staging" {
 }
 
 module "geoprocessing_staging" {
-  source                    = "./modules/geoprocessing"
-  namespace                 = "staging"
-  image                     = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
-  deployment_name           = "geoprocessing"
-  cleanup_temporary_folders = "false"
-  geo_postgres_logging      = "query"
-  temp_data_pvc_name        = local.temp_data_pvc_name
-  cloning_pvc_name          = local.cloning_pvc_name
+  source                     = "./modules/geoprocessing"
+  namespace                  = "staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
+  deployment_name            = "geoprocessing"
+  cleanup_temporary_folders  = "false"
+  geo_postgres_logging       = "query"
+  temp_data_pvc_name         = local.temp_data_pvc_name
+  cloning_pvc_name           = local.cloning_pvc_name
 }
 
 module "client_staging" {
-  source          = "./modules/client"
-  namespace       = "staging"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-client:staging"
-  deployment_name = "client"
-  site_url        = "https://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
-  api_url         = "https://api.staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  source                     = "./modules/client"
+  namespace                  = "staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-client:staging"
+  deployment_name            = "client"
+  site_url                   = "https://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
+  api_url                    = "https://api.staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
 }
 
 module "webshot_staging" {
-  source          = "./modules/webshot"
-  namespace       = "staging"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-webshot:staging"
-  deployment_name = "webshot"
+  source                     = "./modules/webshot"
+  namespace                  = "staging"
+  image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:staging"
+  deployment_name            = "webshot"
 }
 
 module "staging_secrets" {
@@ -334,14 +334,13 @@ module "staging_secrets" {
 }
 
 module "ingress_staging" {
-  source         = "./modules/ingress"
-  namespace      = "staging"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  dns_zone       = data.azurerm_dns_zone.dns_zone
-  domain         = var.domain
-  domain_prefix  = "staging"
-  project_tags   = var.project_tags
+  source                     = "./modules/ingress"
+  namespace                  = "staging"
+  resource_group             = data.azurerm_resource_group.resource_group
+  project_name               = var.project_name
+  dns_zone                   = data.azurerm_dns_zone.dns_zone
+  domain                     = var.domain
+  domain_prefix              = "staging"
 }
 
 data "azurerm_postgresql_flexible_server" "marxan_staging" {
@@ -349,7 +348,7 @@ data "azurerm_postgresql_flexible_server" "marxan_staging" {
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
 
-module "db_tunnel_staging" {
+module db_tunnel_staging {
   # You can also retrieve this module from the terraform registry
   source  = "flaupretre/tunnel/ssh"
   version = "1.8.0"
@@ -360,5 +359,3 @@ module "db_tunnel_staging" {
   gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
   gateway_user = "ubuntu"
 }
-
-#endregion

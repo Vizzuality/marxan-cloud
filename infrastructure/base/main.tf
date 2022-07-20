@@ -49,10 +49,10 @@ module "container_registry" {
 }
 
 module "kubernetes" {
-  source         = "./modules/kubernetes"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  aks_subnet_id  = module.network.aks_subnet_id
+  source                   = "./modules/kubernetes"
+  resource_group           = data.azurerm_resource_group.resource_group
+  project_name             = var.project_name
+  aks_subnet_id            = module.network.aks_subnet_id
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = module.network.core_vnet_id
     (module.network.aks_vnet_name)  = module.network.aks_vnet_id
@@ -72,7 +72,7 @@ module "data_node_pool" {
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
-  node_labels = {
+  node_labels    = {
     type : "data"
   }
 }
@@ -85,19 +85,9 @@ module "app_node_pool" {
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
   vm_size        = "Standard_F4s_v2"
-  node_labels = {
+  node_labels    = {
     type : "app"
   }
-}
-
-module "redis" {
-  source                         = "./modules/redis"
-  resource_group                 = data.azurerm_resource_group.resource_group
-  project_name                   = var.project_name
-  redis_instance_name            = var.redis_instance_name
-  subnet_id                      = module.network.aks_subnet_id
-  private_connection_resource_id = module.kubernetes.cluster_id
-  project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
 module "log_analytics_workspace" {
@@ -124,12 +114,12 @@ module "firewall" {
 }
 
 module "routetable" {
-  source              = "./modules/route_table"
-  resource_group_name = data.azurerm_resource_group.resource_group.name
-  location            = var.location
-  route_table_name    = "${var.project_name}RouteTable"
-  route_name          = "${var.project_name}RouteToAzureFirewall"
-  firewall_private_ip = module.firewall.private_ip_address
+  source               = "./modules/route_table"
+  resource_group_name  = data.azurerm_resource_group.resource_group.name
+  location             = var.location
+  route_table_name     = "${var.project_name}RouteTable"
+  route_name           = "${var.project_name}RouteToAzureFirewall"
+  firewall_private_ip  = module.firewall.private_ip_address
   subnets_to_associate = {
     (module.network.aks_subnet_name) = {
       subscription_id      = data.azurerm_subscription.subscription.subscription_id
@@ -140,10 +130,11 @@ module "routetable" {
   project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
 }
 
+### Redis
 module "redis_private_dns_zone" {
-  source         = "./modules/private_dns_zone"
-  name           = "redis.cache.windows.net"
-  resource_group = data.azurerm_resource_group.resource_group
+  source                   = "./modules/private_dns_zone"
+  name                     = "redis.cache.windows.net"
+  resource_group           = data.azurerm_resource_group.resource_group
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = {
       subscription_id     = data.azurerm_subscription.subscription.subscription_id
@@ -154,6 +145,14 @@ module "redis_private_dns_zone" {
       resource_group_name = data.azurerm_resource_group.resource_group.name
     }
   }
+}
+
+module "redis" {
+  source                         = "./modules/redis"
+  resource_group                 = data.azurerm_resource_group.resource_group
+  project_name                   = var.project_name
+  subnet_id                      = module.network.aks_subnet_id
+  private_connection_resource_id = module.kubernetes.cluster_id
 }
 
 module "redis_private_endpoint" {
@@ -167,23 +166,7 @@ module "redis_private_endpoint" {
   subresource_name               = "redisCache"
   private_dns_zone_group_name    = "RedisPrivateDnsZoneGroup"
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.dns_zone_id]
-  project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
 }
-
-module "mail_host_dns_records" {
-  source         = "./modules/mail"
-  resource_group = data.azurerm_resource_group.resource_group
-  dns_zone       = module.dns.dns_zone
-
-  cname_name  = var.sparkpost_dns_cname_name
-  cname_value = var.sparkpost_dns_cname_value
-
-  dkim_name  = var.sparkpost_dns_dkim_name
-  dkim_value = var.sparkpost_dns_dkim_value
-
-  project_tags = merge(var.project_tags, { Environment = "PRD-STG" })
-}
-
 
 ### Database
 module "sql_server_key_vault" {

@@ -48,6 +48,38 @@ variable "github_production_branch" {
   description = "Name of the Github branch for the staging deployment code"
 }
 
+variable "key_vault_access_users" {
+  type = list(string)
+  description = "The names of the users to grant access to the secrets"
+  default = []
+}
+
+variable "deploy_production" {
+  type        = bool
+  description = "If the production deployment should be created"
+}
+
+variable "production_db_instance_size" {
+  type        = string
+  description = "Azure SQL instance type for the production database"
+}
+
+variable "production_db_storage_size" {
+  type        = number
+  description = "Azure SQL instance storage size for the production database"
+}
+
+variable "staging_db_instance_size" {
+  type        = string
+  description = "Azure SQL instance type for the staging database"
+}
+
+variable "staging_db_storage_size" {
+  type        = number
+  description = "Azure SQL instance storage size for the staging database"
+}
+
+
 variable "vpn_cidrs" {
   type        = list(string)
   description = "Comma separated list of VPN CIDRs"
@@ -83,35 +115,4 @@ variable "project_tags" {
 variable "redis_instance_name" {
   description = " Globally unique Redis instance name"
   type        = string
-}
-
-variable "key_vault_access_users" {
-  type = list(string)
-  description = "The names of the users to grant access to the secrets"
-  default = []
-}
-
-variable "deploy_production" {
-  type        = bool
-  description = "If the production deployment should be created"
-}
-
-variable "production_db_instance_size" {
-  type        = string
-  description = "Azure SQL instance type for the production database"
-}
-
-variable "production_db_storage_size" {
-  type        = number
-  description = "Azure SQL instance storage size for the production database"
-}
-
-variable "staging_db_instance_size" {
-  type        = string
-  description = "Azure SQL instance type for the staging database"
-}
-
-variable "staging_db_storage_size" {
-  type        = number
-  description = "Azure SQL instance storage size for the staging database"
 }
