@@ -74,10 +74,7 @@ import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-co
     ApiCloningFilesRepositoryModule,
     CloneModule,
     AsyncJobsGarbageCollectorModule,
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 25,
-    }),
+    ThrottlerModule.forRoot(),
   ],
   controllers: [AppController, PingController],
   providers: [
