@@ -27,6 +27,7 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { UserAccountValidationDTO } from './dto/user-account.validation.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('/auth')
 @ApiTags('Authentication')
@@ -34,6 +35,8 @@ export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @UseGuards(LocalAuthGuard)
+  @UseGuards(ThrottlerGuard)
+  @Throttle(25, 60)
   @ApiOperation({
     description: 'Sign user in, issuing a JWT token.',
     summary: 'Sign user in',
