@@ -69,8 +69,3 @@ variable "deploy_production" {
   type        = bool
   description = "If the production deployment should be created"
 }
-
-variable "deploy_production" {
-  type        = bool
-  description = "If the production deployment should be created"
-}
