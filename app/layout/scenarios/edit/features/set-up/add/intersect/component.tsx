@@ -40,9 +40,6 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
-    filters: {
-      tag: 'bioregional',
-    },
   });
 
   const INITIAL_VALUES = useMemo(() => {

@@ -19,7 +19,6 @@ import Button from 'components/button';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
-import Radio from 'components/forms/radio';
 import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
@@ -98,12 +97,11 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
 
   const onUploadSubmit = useCallback((values) => {
     setLoading(true);
-    const { file, name, type } = values;
+    const { file, name } = values;
 
     const data = new FormData();
     data.append('file', file);
     data.append('name', name);
-    data.append('type', type);
 
     uploadFeaturesShapefileMutation.mutate({ data, id: `${pid}` }, {
       onSuccess: () => {
@@ -190,45 +188,6 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                       <Field id="form-name" {...fprops}>
                         <Label theme="light" className="mb-3 uppercase">Name</Label>
                         <Input theme="light" />
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
-
-                <div>
-                  <Label theme="light" className="mb-3 uppercase">Type</Label>
-                  <FieldRFF
-                    name="type"
-                    type="radio"
-                    value="species"
-                    validate={composeValidators([{ presence: true }])}
-                  >
-                    {(fprops) => (
-                      <Field
-                        className="flex mt-2"
-                        id="type-species"
-                        {...fprops}
-                      >
-                        <Radio theme="light" />
-                        <Label theme="light" className="ml-2">Species</Label>
-                      </Field>
-                    )}
-                  </FieldRFF>
-
-                  <FieldRFF
-                    name="type"
-                    type="radio"
-                    value="bioregional"
-                    validate={composeValidators([{ presence: true }])}
-                  >
-                    {(fprops) => (
-                      <Field
-                        className="flex mt-2"
-                        id="type-bioregional"
-                        {...fprops}
-                      >
-                        <Radio theme="light" />
-                        <Label theme="light" className="ml-2">Bioregional</Label>
                       </Field>
                     )}
                   </FieldRFF>

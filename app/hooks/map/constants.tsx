@@ -7,14 +7,18 @@ import SQUARE_SVG from 'svgs/map/square.svg?sprite';
 
 export const COLORS = {
   primary: '#00BFFF',
-  species: {
+  'features-preview': {
     default: '#FFCC00',
     hover: '#FF9900',
   },
-  bioregional: {
-    default: '#03E7D1',
-    hover: '#03FDD1',
-  },
+  // species: {
+  //   default: '#FFCC00',
+  //   hover: '#FF9900',
+  // },
+  // bioregional: {
+  //   default: '#03E7D1',
+  //   hover: '#03FDD1',
+  // },
   wdpa: '#00F',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
@@ -113,20 +117,10 @@ export const LEGEND_LAYERS = {
     },
   }),
 
-  // Species
-  bioregional: () => ({
-    id: 'bioregional',
-    name: 'Bioregion',
-    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.bioregional.default }} />,
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-  }),
-  species: () => ({
-    id: 'species',
-    name: 'Species',
-    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS.species.default }} />,
+  'features-preview': () => ({
+    id: 'features-preview',
+    name: 'Features preview',
+    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS['features-preview'].default }} />,
     settingsManager: {
       opacity: true,
       visibility: true,
