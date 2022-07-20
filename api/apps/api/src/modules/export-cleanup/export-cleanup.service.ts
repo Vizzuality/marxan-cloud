@@ -11,6 +11,10 @@ const validityIntervalInHours = AppConfig.get<string>(
   'storage.cloningFileStorage.artifactValidityInHours',
 );
 
+const tmpStoragePath = AppConfig.get<string>(
+  'storage.sharedFileStorage.localPath',
+);
+
 @Injectable()
 export class ExportCleanupService implements ExportCleanup {
   private readonly logger = new Logger(ExportCleanupService.name);
@@ -44,6 +48,9 @@ export class ExportCleanupService implements ExportCleanup {
     );
 
     const validResourcesIds = await this.identifyValidResources();
-    writeFileSync('../../../../bin/', JSON.stringify(validResourcesIds));
+    writeFileSync(
+      `${tmpStoragePath}/valid-uuids.list`,
+      JSON.stringify(validResourcesIds),
+    );
   }
 }
