@@ -17,6 +17,7 @@ RUN yarn install --frozen-lockfile
 COPY --chown=$USER:$USER nodemon.json tsconfig.json tsconfig.build.json nest-cli.json ./
 # @debt we should do this only for images used for tests
 COPY --chown=$USER:$USER apps ./apps
+COPY --chown=$USER:$USER bin ./bin
 COPY --chown=$USER:$USER libs ./libs
 
 RUN mkdir -p /opt/marxan-project-cloning
