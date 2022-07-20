@@ -1,12 +1,10 @@
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
-import {
-  Project,
-  ProjectSourcesEnum,
-} from '@marxan-api/modules/projects/project.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ResourceId } from '@marxan/cloning/domain';
 
 import { UserId } from '@marxan/domain-ids';
+import { ProjectSourcesEnum } from '@marxan/projects';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';

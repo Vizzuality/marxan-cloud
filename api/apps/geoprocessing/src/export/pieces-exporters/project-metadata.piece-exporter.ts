@@ -14,6 +14,7 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import { ProjectSourcesEnum } from '@marxan/projects';
 
 type SelectProjectBlmResult = {
   defaults: number[];
@@ -46,9 +47,16 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       description: string;
       planning_unit_grid_shape: PlanningUnitGridShape;
       metadata: Record<string, unknown> | null;
+      sources: ProjectSourcesEnum;
     }[] = await this.entityManager
       .createQueryBuilder()
-      .select(['name', 'description', 'planning_unit_grid_shape', 'metadata'])
+      .select([
+        'name',
+        'description',
+        'planning_unit_grid_shape',
+        'metadata',
+        'sources',
+      ])
       .from('projects', 'p')
       .where('id = :projectId', { projectId })
       .execute();
@@ -80,6 +88,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       planningUnitGridShape: projectData.planning_unit_grid_shape,
       blmRange,
       metadata: projectData.metadata ?? undefined,
+      sources: projectData.sources,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
