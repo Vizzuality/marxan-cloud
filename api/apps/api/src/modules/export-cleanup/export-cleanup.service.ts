@@ -5,6 +5,8 @@ import { EntityManager } from 'typeorm';
 import { ExportCleanup } from './export-cleanup';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { writeFileSync } from 'fs';
+
 const validityIntervalInHours = AppConfig.get<string>(
   'storage.cloningFileStorage.artifactValidityInHours',
 );
@@ -42,5 +44,6 @@ export class ExportCleanupService implements ExportCleanup {
     );
 
     const validResourcesIds = await this.identifyValidResources();
+    writeFileSync('../../../../bin/', JSON.stringify(validResourcesIds));
   }
 }
