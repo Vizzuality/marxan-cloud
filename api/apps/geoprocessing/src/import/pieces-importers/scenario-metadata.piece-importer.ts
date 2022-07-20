@@ -48,6 +48,7 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         type: values.type,
         status: values.status,
         created_by: ownerId,
+        solutions_are_locked: values.solutionsAreLocked,
       })
       .where('id = :scenarioId', { scenarioId })
       .execute();
@@ -76,6 +77,7 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
         type: values.type,
         status: values.status,
         created_by: ownerId,
+        solutions_are_locked: values.solutionsAreLocked,
       })
       .execute();
   }

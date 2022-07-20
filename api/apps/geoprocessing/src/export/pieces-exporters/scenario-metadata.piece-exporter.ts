@@ -21,6 +21,7 @@ type SelectScenarioResult = {
   number_of_runs?: number;
   metadata?: ScenarioMetadataContent['metadata'];
   ran_at_least_once: boolean;
+  solutions_are_locked: boolean;
   status: ScenarioMetadataContent['status'] | null;
   type: string;
 };
@@ -63,6 +64,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
         'type',
         'status',
         'ran_at_least_once',
+        'solutions_are_locked',
       ])
       .from('scenarios', 's')
       .where('s.id = :scenarioId', { scenarioId })
@@ -97,6 +99,7 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       numberOfRuns: scenario.number_of_runs,
       blmRange,
       ranAtLeastOnce: scenario.ran_at_least_once,
+      solutionsAreLocked: scenario.solutions_are_locked,
       type: scenario.type,
       status: scenario.status ?? undefined,
     };
