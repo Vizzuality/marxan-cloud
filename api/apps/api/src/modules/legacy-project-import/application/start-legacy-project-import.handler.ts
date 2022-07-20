@@ -33,7 +33,7 @@ export class StartLegacyProjectImportHandler
   private async createShells(
     name: string,
     ownerId: string,
-    description: string,
+    description?: string,
   ) {
     try {
       const [randomOrganization] = await this.organizationRepo.find({
@@ -52,8 +52,9 @@ export class StartLegacyProjectImportHandler
         description,
       });
 
+      const scenarioName = name + ' - scenario';
       const scenario = await this.scenarioRepo.save({
-        name,
+        name: scenarioName,
         projectId: project.id,
       });
 

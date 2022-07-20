@@ -3,19 +3,27 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
 
 ## Env variables
 
-`NEXT_PUBLIC_URL`: Canonical url of the app. Will be used for meta tags and
-social media shares. Not needed in Vercel deploys.
+- `NEXT_PUBLIC_URL`: Canonical url of the app. Will be used for meta tags and
+  social media shares. Not needed in Vercel deploys.
 
-`NEXT_PUBLIC_API_URL`: URL of the API. Depending on the environment we will use
-different urls. For now, https://marxan49.westeurope.cloudapp.azure.com is the
-one we use as PROD in frontend.
+- `NEXT_PUBLIC_API_URL`: URL of the API. Depending on the environment we will
+  use different urls. For now, https://marxan49.westeurope.cloudapp.azure.com is
+  the one we use as PROD in frontend.
 
-`NEXTAUTH_URL`: Needed by the next-auth library for [handling auth requests and
-callbacks](https://next-auth.js.org/configuration/options#nextauth_url). Set the
-environment variable to the canonical URL of your site. Not needed in Vercel
-deploys.
+- `NEXTAUTH_URL`: Needed by the next-auth library for [handling auth requests
+  and callbacks](https://next-auth.js.org/configuration/options#nextauth_url).
+  Set the environment variable to the canonical URL of your site. Not needed in
+  Vercel deploys.
 
-`NEXT_PUBLIC_MAPBOX_API_TOKEN`: Mapbox token. It MUST be TNC mapbox token.
+- `NEXT_PUBLIC_MAPBOX_API_TOKEN`: Mapbox token. It MUST be TNC mapbox token.
+
+- `NEXT_PUBLIC_FEATURE_FLAGS` (comma-separated list of feature flag strings,
+  optional, default is an empty list): list features here in order to _enable_
+  them in the frontend app; features available behind feature flags are:
+  - `split`: make _split_ functionality available for conservation features in
+    the frontend app
+  - `strat`: make _stratification_ functionality available for conservation
+    features in the frontend app
 
 ## Getting Started
 

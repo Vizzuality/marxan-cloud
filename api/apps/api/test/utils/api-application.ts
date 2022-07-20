@@ -1,4 +1,5 @@
 import { AppModule } from '@marxan-api/app.module';
+import { UserLoggedInSaga } from '@marxan-api/modules/async-jobs-garbage-collector';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { QueueBuilder } from '@marxan-api/modules/queue/queue.builder';
 import {
@@ -38,7 +39,7 @@ const defaultOverrides: Overrides = {
       implementation: FakeScenarioCalibrationRepo,
     },
   ],
-  values: [],
+  values: [{ provider: UserLoggedInSaga, implementation: {} }],
   factories: [],
 };
 

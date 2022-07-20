@@ -134,6 +134,10 @@ export class LegacyProjectImport extends AggregateRoot {
     return !this.status.isAcceptingFiles();
   }
 
+  public hasImportedLegacyProject() {
+    return this.status.hasCompleted();
+  }
+
   public areRequiredFilesUploaded(): boolean {
     const requiredFilesTypes = [
       LegacyProjectImportFileType.PlanningGridShapefile,

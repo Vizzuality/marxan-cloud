@@ -1,11 +1,17 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import { format } from 'date-fns';
+import { useSession } from 'next-auth/client';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { useAdminUsers } from 'hooks/admin';
+import { useToasts } from 'hooks/toast';
 
+import Button from 'components/button';
 import Search from 'components/search';
 import Table2 from 'components/table2';
+
+import DOWNLOADS from 'services/downloads';
 
 import CellAdmin from './cells/admin';
 import CellBlock from './cells/block';
@@ -18,6 +24,8 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState({ id: 'displayName', direction: 'desc' });
   const [search, setSearch] = useState<string>();
+
+  const { addToast } = useToasts();
 
   const {
     data: adminUsersData = [],
@@ -87,18 +95,64 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     setSearch(v);
   }, 250);
 
+  const [session] = useSession();
+
+  const onDownloadUsersData = useCallback(async () => {
+    const { data: blob, status } = await DOWNLOADS.request({
+      url: '/users/csv',
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+    });
+
+    const url = window.URL.createObjectURL(new Blob([blob]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `users-${format(Date.now(), 'MM/dd/yyyy hh:mm:ss')}.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    if (status !== 200) {
+      addToast('download-error', (
+        <>
+          <h2 className="font-medium">Error!</h2>
+          <ul className="text-sm">
+            Data not downloaded
+          </ul>
+        </>
+      ), {
+        level: 'error',
+      });
+    }
+  }, [addToast, session]);
+
   return (
     <div className="space-y-5">
-      <div className="max-w-lg">
-        <Search
-          id="published-project-search"
-          defaultValue={search}
+      <div className="flex justify-between w-full">
+        <div className="max-w-lg">
+          <Search
+            id="published-project-search"
+            defaultValue={search}
+            size="base"
+            theme="light"
+            placeholder="Search by project name, planning area name..."
+            aria-label="Search"
+            onChange={onSearch}
+          />
+        </div>
+        <Button
+          theme="secondary"
           size="base"
-          theme="light"
-          placeholder="Search by project name, planning area name..."
-          aria-label="Search"
-          onChange={onSearch}
-        />
+          type="button"
+          onClick={onDownloadUsersData}
+        >
+          Download data
+
+        </Button>
       </div>
 
       <Table2

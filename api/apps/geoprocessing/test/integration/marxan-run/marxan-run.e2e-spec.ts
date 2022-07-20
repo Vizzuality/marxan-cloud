@@ -10,7 +10,7 @@ import {
   PlanningUnitsGeom,
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
-import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
+import { ScenarioFeaturesData } from '@marxan/features';
 import {
   ExecutionResult,
   MarxanExecutionMetadataGeoEntity,
@@ -234,7 +234,6 @@ const getFixtures = async () => {
               currentArea: 200,
               fpf: 1,
               met: 1,
-              tag: FeatureTag.Bioregional,
               target: 300,
               metArea: 200,
               onTarget: false,
