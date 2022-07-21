@@ -19,31 +19,21 @@ export class ExportCleanupService implements ExportCleanup {
   ) {}
 
   async identifyValidResources() {
-    const validProjectExportsIdsQuery = `
-      SELECT e.id FROM exports e
+    const validExportIds = await this.apiEntityManager.query(
+      `
+      SELECT DISTINCT e.id FROM exports e
         WHERE e.resource_kind = 'project' AND 
-        (AGE(NOW(), e.created_at) <  INTERVAL $1 HOUR OR
-        e.resource_id IN (SELECT id FROM published_projects));
-    `;
-
-    const validProjectExportsIds = await this.apiEntityManager.query(
-      validProjectExportsIdsQuery,
-      [validityIntervalInHours],
+        (AGE(NOW(), e.created_at) < $1 OR
+        e.resource_id IN (SELECT id FROM published_projects))
+      UNION
+      SELECT DISTINCT e.id FROM exports e
+        WHERE e.resource_kind = 'scenario'
+      ORDER BY id;
+      `,
+      [`${validityIntervalInHours} hours`],
     );
 
-    const validScenarioExportsIds = await this.apiEntityManager.query(`
-      SELECT e.id FROM exports e
-        WHERE e.resource_kind = 'scenario';
-    `);
-
-    const uniqueValidExportIds: string[] = [
-      ...validProjectExportsIds,
-      validScenarioExportsIds,
-    ]
-      .filter((item, pos, self) => self.indexOf(item) == pos)
-      .sort();
-
-    return uniqueValidExportIds;
+    return validExportIds;
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
