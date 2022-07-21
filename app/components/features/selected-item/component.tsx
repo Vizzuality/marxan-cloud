@@ -133,7 +133,7 @@ export const Item: React.FC<ItemProps> = ({
       <header
         className={cx({
           'px-4 py-2 border-l-4': true,
-          'border-purple-500': true,
+          'border-yellow-400': true,
         })}
       >
         <div className="flex items-start justify-between">
@@ -159,7 +159,7 @@ export const Item: React.FC<ItemProps> = ({
                   className={cx({
                     'flex items-center justify-center w-5 h-5 ': true,
                     'text-white': !splitSelected,
-                    'text-purple-500': !!splitSelected,
+                    'text-yellow-400': !!splitSelected,
                   })}
                 >
                   <Icon icon={SPLIT_SVG} className="w-4 h-4" />
@@ -341,14 +341,14 @@ export const Item: React.FC<ItemProps> = ({
                 key={`${f.value}`}
                 className="flex items-center pr-2.5 py-2 mt-0.5 relative"
               >
-                <div className="absolute top-0 left-0 block w-px h-full bg-purple-300" />
+                <div className="absolute top-0 left-0 block w-px h-full bg-yellow-200" />
                 <div className="relative flex text-xs font-heading">
                   <div className="ml-2.5">
                     <Checkbox
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="block w-4 h-4 text-purple-300 form-checkbox-dark"
+                      className="block w-4 h-4 text-yellow-200 form-checkbox-dark"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>
