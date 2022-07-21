@@ -1,7 +1,7 @@
 data "azurerm_client_config" "current" {}
 
 data "azuread_users" "users" {
-  mail_nicknames = var.key_vault_access_users
+  user_principal_names = var.key_vault_access_users
 }
 
 resource "azurerm_key_vault" "key_vault" {
