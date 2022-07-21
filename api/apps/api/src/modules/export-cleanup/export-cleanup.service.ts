@@ -18,27 +18,32 @@ export class ExportCleanupService implements ExportCleanup {
     private readonly apiEntityManager: EntityManager,
   ) {}
 
-  async identifyExpiredResources() {
-    const expiredProjectExportsIds = await this.apiEntityManager.query(`
+  async identifyValidResources() {
+    const validProjectExportsIdsQuery = `
       SELECT e.id FROM exports e
         WHERE e.resource_kind = 'project' AND 
-        (AGE(NOW(), e.created_at) <  INTERVAL ${validityIntervalInHours} HOUR OR
-        e.resource_id NOT IN (SELECT id FROM published_projects));
-    `);
+        (AGE(NOW(), e.created_at) <  INTERVAL $1 HOUR OR
+        e.resource_id IN (SELECT id FROM published_projects));
+    `;
 
-    const expiredScenarioExportsIds = await this.apiEntityManager.query(`
+    const validProjectExportsIds = await this.apiEntityManager.query(
+      validProjectExportsIdsQuery,
+      [validityIntervalInHours],
+    );
+
+    const validScenarioExportsIds = await this.apiEntityManager.query(`
       SELECT e.id FROM exports e
         WHERE e.resource_kind = 'scenario';
     `);
 
-    const uniqueExpiredExportIds: string[] = [
-      ...expiredProjectExportsIds,
-      expiredScenarioExportsIds,
+    const uniqueValidExportIds: string[] = [
+      ...validProjectExportsIds,
+      validScenarioExportsIds,
     ]
       .filter((item, pos, self) => self.indexOf(item) == pos)
       .sort();
 
-    return uniqueExpiredExportIds;
+    return uniqueValidExportIds;
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
@@ -47,6 +52,6 @@ export class ExportCleanupService implements ExportCleanup {
       'Preparing to clean dangling import/export data for projects/scenarios',
     );
 
-    const expiredResourcesIds = await this.identifyExpiredResources();
+    const validResourcesIds = await this.identifyValidResources();
   }
 }
