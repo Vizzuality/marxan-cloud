@@ -60,6 +60,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   useEffect(() => {
     if (legacyDone) {
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['scenarios', legacyProjectId]);
       onDismiss(true);
       setLoading(false);
       addToast('success-import-legacy-project', (
@@ -72,6 +73,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
       });
     }
   }, [
+    legacyProjectId,
     legacyDone,
     queryClient,
     addToast,
