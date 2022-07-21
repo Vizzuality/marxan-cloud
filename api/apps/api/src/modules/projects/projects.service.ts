@@ -94,6 +94,12 @@ import {
   UpdateSolutionsAreLocked,
   UpdateSolutionsAreLockedError,
 } from '../legacy-project-import/application/update-solutions-are-locked-to-legacy-project-import.command';
+import { SetProjectBlm } from './blm/set-project-blm';
+import {
+  blmCreationFailure,
+  CreateInitialScenarioBlm,
+} from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
+import { LegacyProjectImportRepository } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
 
 export { validationFailed } from '../planning-areas';
 
@@ -125,6 +131,7 @@ export class ProjectsService {
     private readonly projectAclService: ProjectAccessControl,
     private readonly blockGuard: BlockGuard,
     private readonly exportRepository: ExportRepository,
+    private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
   ) {}
 
   async findAllGeoFeatures(
@@ -548,8 +555,21 @@ export class ProjectsService {
     solutionsAreLocked: boolean,
     userId: string,
   ): Promise<
-    Either<UpdateSolutionsAreLockedError | RunLegacyProjectImportError, true>
+    Either<
+      | UpdateSolutionsAreLockedError
+      | RunLegacyProjectImportError
+      | typeof blmCreationFailure,
+      true
+    >
   > {
+    const legacyProjectImportOrError = await this.legacyProjectImportRepository.find(
+      new ResourceId(projectId),
+    );
+
+    if (isLeft(legacyProjectImportOrError)) return legacyProjectImportOrError;
+
+    const { scenarioId } = legacyProjectImportOrError.right.toSnapshot();
+
     const updateSolutionsAreLocked = await this.commandBus.execute(
       new UpdateSolutionsAreLocked(
         new ResourceId(projectId),
@@ -557,6 +577,14 @@ export class ProjectsService {
       ),
     );
     if (isLeft(updateSolutionsAreLocked)) return updateSolutionsAreLocked;
+
+    await this.commandBus.execute(new SetProjectBlm(projectId));
+
+    const setScenarioBlmValuesOrError = await this.commandBus.execute(
+      new CreateInitialScenarioBlm(scenarioId, projectId),
+    );
+
+    if (isLeft(setScenarioBlmValuesOrError)) return setScenarioBlmValuesOrError;
 
     return this.commandBus.execute(
       new RunLegacyProjectImport(new ResourceId(projectId), new UserId(userId)),
