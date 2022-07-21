@@ -90,7 +90,7 @@ export class SplitQuery {
           and fpkv.key = ${fields.splitByProperty}
           ${
             fields.filterByValue
-              ? `and fpkv.value = (select to_jsonb(${fields.filterByValue}::text))`
+              ? `and trim('"' FROM fpkv.value::text) = trim('"' FROM ${fields.filterByValue}::text)`
               : ``
           }
       )
