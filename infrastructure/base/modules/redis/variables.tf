@@ -44,8 +44,3 @@ variable "project_tags" {
   description = "Project resource tags"
   type        = map(string)
 }
-
-variable "redis_instance_name" {
-  description = " Globally unique Redis instance name"
-  type        = string
-}

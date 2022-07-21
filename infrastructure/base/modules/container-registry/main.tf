@@ -10,7 +10,7 @@
 # For the time being, that's not possible.
 
 resource "azurerm_container_registry" "acr" {
-  name                = var.container_registry_name
+  name                = replace(var.container_registry_name, "-", "")
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location
   sku                 = "Basic"

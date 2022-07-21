@@ -1,5 +1,5 @@
 resource "azurerm_redis_cache" "marxan" {
-  name                          = var.redis_instance_name
+  name                          = var.project_name
   location                      = var.resource_group.location
   resource_group_name           = var.resource_group.name
   capacity                      = var.redis_cache_capacity

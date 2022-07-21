@@ -1,24 +1,24 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan-rg"     // var.project_resource_group
-    storage_account_name = "marxansa"      // ${var.project_name}sa
+    resource_group_name  = "marxan-rg"     // var.resource_group_name
+    storage_account_name = "marxansa"      // var.storage_account_name
     container_name       = "marxantfstate" // ${var.project_name}tfstate
-    key                  = "kubernetes.tfstate"
+    key                  = "infrastructure.tfstate"
   }
 }
 
 data "azurerm_resource_group" "resource_group" {
-  name = var.project_resource_group
+  name = var.resource_group_name
 }
 
 data "azurerm_subscription" "subscription" {}
 
 data "terraform_remote_state" "core" {
   backend = "azurerm"
-  config = {
-    resource_group_name  = "marxan-rg"     // var.project_name
-    storage_account_name = "marxansa"      // var.project_name
-    container_name       = "marxantfstate" // ${var.project_name}tfstate
+  config  = {
+    resource_group_name  = var.resource_group_name   // var.resource_group_name
+    storage_account_name = "marxansa"                // var.storage_account_name
+    container_name       = "marxantfstate"           // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
 }

@@ -1,25 +1,29 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan-rg"     // var.project_resource_group
-    storage_account_name = "marxansa"      // ${var.project_name}sa
-    container_name       = "marxantfstate" // ${var.project_name}tfstate
+    resource_group_name  = "marxan-rg"     // var.resource_group_name
+    storage_account_name = "marxansa"      // var.storage_account_name
+    container_name       = "marxan-tnctfstate" // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
 }
 
 data "azurerm_resource_group" "resource_group" {
-  name = var.project_resource_group
+  name = var.resource_group_name
 }
 
 data "azurerm_subscription" "subscription" {}
 
 data "github_ip_ranges" "latest" {}
 
+locals {
+  vpn_cidrs = length(var.vpn_cidrs) > 0 ? concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4) : []
+}
+
 module "network" {
   source         = "./modules/network"
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
-  vpn_cidrs      = [] #concat(var.vpn_cidrs, data.github_ip_ranges.latest.actions_ipv4) # Remove for Vizzuality access
+  vpn_cidrs      = local.vpn_cidrs
   project_tags   = var.project_tags
 }
 
@@ -41,7 +45,7 @@ module "bastion" {
 module "container_registry" {
   source                   = "./modules/container-registry"
   resource_group           = data.azurerm_resource_group.resource_group
-  container_registry_name  = var.container_registry_name
+  container_registry_name  = var.project_name
   github_org               = var.github_org
   github_repo              = var.github_repo
   github_production_branch = var.github_production_branch
@@ -93,7 +97,7 @@ module "app_node_pool" {
 module "log_analytics_workspace" {
   source              = "./modules/log_analytics"
   name                = var.project_name
-  location            = var.location
+  location            = data.azurerm_resource_group.resource_group.location
   resource_group_name = data.azurerm_resource_group.resource_group.name
   project_tags        = merge(var.project_tags, { Environment = "PRD-STG" })
 }
@@ -104,7 +108,7 @@ module "firewall" {
   resource_group_name          = data.azurerm_resource_group.resource_group.name
   zones                        = ["1", "2", "3"]
   threat_intel_mode            = "Alert"
-  location                     = var.location
+  location                     = data.azurerm_resource_group.resource_group.location
   sku_tier                     = "Standard"
   pip_name                     = "${var.project_name}PublicIp"
   subnet_id                    = module.network.firewall_subnet_id
@@ -116,7 +120,7 @@ module "firewall" {
 module "routetable" {
   source              = "./modules/route_table"
   resource_group_name = data.azurerm_resource_group.resource_group.name
-  location            = var.location
+  location            = data.azurerm_resource_group.resource_group.location
   route_table_name    = "${var.project_name}RouteTable"
   route_name          = "${var.project_name}RouteToAzureFirewall"
   firewall_private_ip = module.firewall.private_ip_address
@@ -150,7 +154,6 @@ module "redis" {
   source                         = "./modules/redis"
   resource_group                 = data.azurerm_resource_group.resource_group
   project_name                   = var.project_name
-  redis_instance_name            = var.redis_instance_name
   subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.kubernetes.cluster_id
   project_tags                   = merge(var.project_tags, { Environment = "PRD-STG" })
@@ -159,7 +162,7 @@ module "redis" {
 module "redis_private_endpoint" {
   source                         = "./modules/private_endpoint"
   name                           = "${var.project_name}RedisPrivateEndpoint"
-  location                       = var.location
+  location                       = data.azurerm_resource_group.resource_group.location
   resource_group_name            = data.azurerm_resource_group.resource_group.name
   subnet_id                      = module.network.aks_subnet_id
   private_connection_resource_id = module.redis.id

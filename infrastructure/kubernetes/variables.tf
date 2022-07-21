@@ -3,9 +3,14 @@ variable "project_name" {
   description = "The name of the project. Used in naming most of the resources in the infrastructure."
 }
 
-variable "project_resource_group" {
+variable "resource_group_name" {
   type        = string
   description = "Azure resource group to use for the project."
+}
+
+variable "storage_account_name" {
+  type        = string
+  description = "Azure service account to use for the project."
 }
 
 variable "location" {
