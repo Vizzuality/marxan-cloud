@@ -11,14 +11,6 @@ export const COLORS = {
     default: '#FFCC00',
     hover: '#FF9900',
   },
-  // species: {
-  //   default: '#FFCC00',
-  //   hover: '#FF9900',
-  // },
-  // bioregional: {
-  //   default: '#03E7D1',
-  //   hover: '#03FDD1',
-  // },
   wdpa: '#00F',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
