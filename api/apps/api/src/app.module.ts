@@ -39,6 +39,7 @@ import { CloneModule } from './modules/clone';
 import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-repository/api-cloning-file-repository.module';
 import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-collector';
 import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.mod
     AsyncJobsGarbageCollectorModule,
     ThrottlerModule.forRoot(),
     ExportCleanupModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, PingController],
   providers: [
