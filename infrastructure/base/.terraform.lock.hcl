@@ -6,6 +6,7 @@ provider "registry.terraform.io/hashicorp/azuread" {
   constraints = "2.17.0"
   hashes = [
     "h1:dGinWMva8i0h0jfu0swLeNIEmTpzpy5aO4PKbEuTreM=",
+    "h1:qbL1ZtDoKz3rqqb3a0Ek7Gc505VPp2wTpXvwNl7SO8o=",
     "zh:073246ab0ef51f7299673dfc1d83993d6c7bcf2b464e6f091dc44d91c420ced1",
     "zh:3d970f01c97b1cc3b0887b7cdb333d42d8c8cfc53440d03febdacca08a4e42cc",
     "zh:4d0ef888081569e0f39ba6f65d044fb27c6fbcc6fd00745a906435d14423ec47",
@@ -25,6 +26,7 @@ provider "registry.terraform.io/hashicorp/azurerm" {
   constraints = "3.13.0"
   hashes = [
     "h1:B47S8ZrRGfgsJbgDctRqVgGqN3DYUpOPfHYs4Y2bGCY=",
+    "h1:TwU9VxwLkQ3oq9vCpXdS+jhjpVcreT+z4zzKE2SCU3E=",
     "zh:18ea578ac352576617622b15fdc7e55db774c5b60fbca7d93da45d06d481023a",
     "zh:1a7dd9ddada3d313f142a4672bd270fd6d23dfc6f5df3439b9d3a32fa4fc3e14",
     "zh:3b461f72f11d37a5bc88a7784864b7373c1f93052abfe1436d37458c4bc7d9e4",
@@ -43,6 +45,7 @@ provider "registry.terraform.io/hashicorp/azurerm" {
 provider "registry.terraform.io/hashicorp/github" {
   version = "4.27.1"
   hashes = [
+    "h1:KH5oga8E+euCslop6VoOwU43LBzHZSpy7yFmJf8z3NA=",
     "h1:kzj2iMt694WJLDMR2eF5v41+WxFCUeLs+RAvxJhDXAw=",
     "zh:1c26bf35192f41bb29d055f7658ea1b815e7c1ef368339dc8802c8817fcc6b63",
     "zh:29532a3768a29ca5b2ea5108b298405187cea64e6294bfe19e4a37114bf38e29",
@@ -65,6 +68,7 @@ provider "registry.terraform.io/hashicorp/random" {
   version = "3.3.2"
   hashes = [
     "h1:H5V+7iXol/EHB2+BUMzGlpIiCOdV74H8YjzCxnSAWcg=",
+    "h1:rGCyrtzi+H9apmpwzMSJ4xNra7veNM7y6JRkBhO68wM=",
     "zh:038293aebfede983e45ee55c328e3fde82ae2e5719c9bd233c324cfacc437f9c",
     "zh:07eaeab03a723d83ac1cc218f3a59fceb7bbf301b38e89a26807d1c93c81cef8",
     "zh:427611a4ce9d856b1c73bea986d841a969e4c2799c8ac7c18798d0cc42b78d32",
@@ -84,6 +88,7 @@ provider "registry.terraform.io/hashicorp/template" {
   version = "2.2.0"
   hashes = [
     "h1:94qn780bi1qjrbC3uQtjJh3Wkfwd5+tTtJHOb7KTg9w=",
+    "h1:LN84cu+BZpVRvYlCzrbPfCRDaIelSyEx/W9Iwwgbnn4=",
     "zh:01702196f0a0492ec07917db7aaa595843d8f171dc195f4c988d2ffca2a06386",
     "zh:09aae3da826ba3d7df69efeb25d146a1de0d03e951d35019a0f80e4f58c89b53",
     "zh:09ba83c0625b6fe0a954da6fbd0c355ac0b7f07f86c91a2a97849140fea49603",
