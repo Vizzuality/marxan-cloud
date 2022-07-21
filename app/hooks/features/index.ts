@@ -93,8 +93,6 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           alias,
           featureClassName,
           description,
-          tag,
-          source,
           properties = {},
           splitSelected,
           splitFeaturesSelected,
@@ -132,8 +130,6 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           id,
           name: alias || featureClassName,
           description,
-          tag,
-          source,
 
           splitSelected,
           splitOptions,

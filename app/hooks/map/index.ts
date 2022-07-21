@@ -264,48 +264,23 @@ export function useFeaturePreviewLayers({
     if (!active || !bbox || !features) return [];
 
     const {
-      featuresRecipe = [], selectedFeatures = [], settings = {},
+      featuresRecipe = [], selectedFeatures = [],
     } = options;
 
     const FEATURES = [...features].filter((ft) => selectedFeatures.includes(ft.id as string));
 
-    // Layer settings
-    const {
-      bioregional: BioregionalSettings = {},
-      species: SpeciesSettings = {},
-    } = settings;
+    const { opacity = 1, visibility = true } = options || {};
 
-    const {
-      opacity: BioregionalOpacity,
-      visibility: BioregionalVisibility = true,
-    } = BioregionalSettings;
-
-    const {
-      opacity: SpeciesOpacity,
-      visibility: SpeciesVisibility = true,
-    } = SpeciesSettings;
-
-    const Types = {
-      bioregional: BioregionalVisibility,
-      species: SpeciesVisibility,
-    };
-
-    const getLayerVisibility = (type) => {
-      if (Types[type]) {
-        return 'visible';
+    const getLayerVisibility = () => {
+      if (!visibility) {
+        return 'none';
       }
-      return 'none';
+      return 'visible';
     };
 
     return FEATURES
       .map((f) => {
-        const { id, type } = f;
-
-        const getLayerOpacity = () => {
-          if (type === 'bioregional') return BioregionalOpacity;
-          if (type === 'species') return SpeciesOpacity;
-          return 1;
-        };
+        const { id } = f;
 
         const F = featuresRecipe.find((fr) => fr.id === id) || f;
 
@@ -328,11 +303,11 @@ export function useFeaturePreviewLayers({
                   ],
                 },
                 layout: {
-                  visibility: getLayerVisibility(type),
+                  visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': COLORS[type].default,
-                  'fill-opacity': 0.5 * getLayerOpacity(),
+                  'fill-color': COLORS['features-preview'].default,
+                  'fill-opacity': opacity,
                 },
               },
               {
@@ -345,11 +320,11 @@ export function useFeaturePreviewLayers({
                   ],
                 },
                 layout: {
-                  visibility: getLayerVisibility(type),
+                  visibility: getLayerVisibility(),
                 },
                 paint: {
                   'line-color': '#000',
-                  'line-opacity': getLayerOpacity(),
+                  'line-opacity': opacity,
                 },
               },
             ],
