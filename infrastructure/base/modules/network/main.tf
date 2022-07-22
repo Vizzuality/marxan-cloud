@@ -54,7 +54,7 @@ resource "azurerm_network_security_group" "bastion_nsg" {
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
 
-  tags = var.project_tags
+  tags = merge(var.project_tags, { Security = "Port 22 locked down to VPN CIDRs and the known GitHub Action CIDRs. GitHUb CIDRs are included for CI/CD purposes." }, )
 
   # Allow SSH traffic in from Internet to public subnet.
   security_rule {

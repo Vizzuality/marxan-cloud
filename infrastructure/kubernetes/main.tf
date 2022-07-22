@@ -1,8 +1,8 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan"     // var.resource_group_name
-    storage_account_name = "marxan"      // var.storage_account_name
-    container_name       = "marxantfstate" // ${var.project_name}tfstate
+    resource_group_name  = "marxan-rg"     // var.resource_group_name
+    storage_account_name = "marxansa"      // var.storage_account_name
+    container_name       = "marxan-tnctfstate" // ${var.project_name}tfstate
     key                  = "kubernetes.tfstate"
   }
 }
