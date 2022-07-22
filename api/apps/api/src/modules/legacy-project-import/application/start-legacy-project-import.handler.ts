@@ -56,7 +56,6 @@ export class StartLegacyProjectImportHandler
       const scenario = await this.scenarioRepo.save({
         name: scenarioName,
         projectId: project.id,
-        solutionsAreLocked,
       });
 
       return right({

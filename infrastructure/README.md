@@ -13,7 +13,7 @@ resources. Note that these requirements are for this particular deployment strat
 of the Marxan application itself - which can be deployed to other infrastructures.
 
 Before proceeding, be sure you are familiar with all of these tools, as these instructions
-will skip over the basics, and assume you are conformable using all of them.
+will skip over the basics, and assume you are conformable using all of them. 
 
 - [Microsoft Azure](https://azure.microsoft.com)
 - [Terraform](https://www.terraform.io/)
@@ -25,13 +25,13 @@ will skip over the basics, and assume you are conformable using all of them.
 - [Github Actions](https://github.com/features/actions)
 - [Bastion host](https://en.wikipedia.org/wiki/Bastion_host) pattern
 - An SSH client capable of establishing [SSH Tunnels](https://www.ssh.com/academy/ssh/tunneling/example)
-- DNS management
+- DNS management 
 - A purchased domain
 
 Of the above, the following need to be set up prior to following the instructions in this document:
 
 - An Azure account with a user with enough permissions to create a
-[Resource Group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/overview),
+[Resource Group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/overview), 
 [Apps and Service Principals](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals),
 as well as multiple other resources in Azure.
 - Azure CLI, Kubectl and an SSH client capable of establishing SSH Tunnels need to be installed locally.
@@ -46,7 +46,7 @@ quotas.
 ## Structure
 
 This project has 3 main sections, each of which with a folder named after it. Each of these sections has a
-Terraform project, that logically depends on their predecessors. There is a 4th component to this architecture,
+Terraform project, that logically depends on their predecessors. There is a 4th component to this architecture, 
 which is handled by Github Actions
 
 #### Remote state
@@ -57,7 +57,7 @@ to store the Terraform remote state.
 
 #### Base
 
-Contains multiple Azure resources needed for running Marxan on an
+Contains multiple Azure resources needed for running Marxan on an 
 [AKS cluster](https://azure.microsoft.com/en-us/services/kubernetes-service/).
 
 These resources include, but are not limited to:
@@ -122,9 +122,10 @@ Deploying the included Terraform project is done in steps:
 - Configure network access to the AKS cluster and have a tunnel to AKS up and running (more on this [below](#network-access-to-azure-resources))
 - Terraform `apply` the `Kubernetes` project.
 
+
 ## Network access to Azure resources
 
-For security reasons, most cloud resources are private, meaning they are attached to a private
+For security reasons, most cloud resources are private, meaning they are attached to a private 
 [virtual network](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-overview),
 and thus inaccessible from the internet. If you need access to these resources (for example, to configure
 Kubernetes, either directly or through Terraform), there is a [Bastion host](https://en.wikipedia.org/wiki/Bastion_host)

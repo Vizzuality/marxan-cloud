@@ -226,9 +226,6 @@ module "db_tunnel_production" {
   gateway_user = "ubuntu"
 }
 
-#endregion
-
-#region Staging
 
 #Staging
 
@@ -378,4 +375,3 @@ module "db_tunnel_staging" {
   gateway_host = data.terraform_remote_state.core.outputs.bastion_hostname
   gateway_user = "ubuntu"
 }
-#endregion
