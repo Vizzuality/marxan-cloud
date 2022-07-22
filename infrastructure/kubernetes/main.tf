@@ -215,9 +215,7 @@ data "azurerm_postgresql_flexible_server" "marxan_production" {
 module "db_tunnel_production" {
   count = var.deploy_production ? 1 : 0
 
-  # You can also retrieve this module from the terraform registry
-  source  = "flaupretre/tunnel/ssh"
-  version = "1.8.0"
+  source  = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
 
   target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production[0], "fqdn", null)
   target_port = 5432
@@ -365,9 +363,7 @@ data "azurerm_postgresql_flexible_server" "marxan_staging" {
 }
 
 module "db_tunnel_staging" {
-  # You can also retrieve this module from the terraform registry
-  source  = "flaupretre/tunnel/ssh"
-  version = "1.8.0"
+  source  = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
 
   target_host = data.azurerm_postgresql_flexible_server.marxan_staging.fqdn
   target_port = 5432

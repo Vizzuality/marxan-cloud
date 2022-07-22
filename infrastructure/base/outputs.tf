@@ -8,9 +8,9 @@ output "k8s_cluster_name" {
   description = "AKS cluster name"
 }
 
-output "k8s_cluster_hostname" {
-  value       = module.kubernetes.cluster_hostname
-  description = "AKS cluster hostname"
+output "k8s_cluster_private_fqdn" {
+  value       = module.kubernetes.cluster_private_fqdn
+  description = "AKS cluster FQDN"
   sensitive   = true
 }
 

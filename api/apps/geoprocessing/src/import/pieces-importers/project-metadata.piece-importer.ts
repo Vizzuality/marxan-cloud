@@ -58,6 +58,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         planning_unit_grid_shape: data.planningUnitGridShape,
         metadata: data.metadata,
         created_by: ownerId,
+        sources: data.sources,
       })
       .execute();
 
@@ -94,6 +95,7 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         planning_unit_grid_shape: data.planningUnitGridShape,
         metadata: data.metadata,
         created_by: ownerId,
+        sources: data.sources,
       })
       .where('id = :projectId', { projectId })
       .execute();

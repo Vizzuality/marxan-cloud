@@ -63,7 +63,8 @@
       "localPath": "/tmp/storage"
     },
     "cloningFileStorage": {
-      "localPath": "/opt/marxan-project-cloning"
+      "localPath": "/opt/marxan-project-cloning",
+      "artifactValidityInHours": 168
     }
   },
   "marxan": {

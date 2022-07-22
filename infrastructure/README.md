@@ -67,10 +67,16 @@ These resources include, but are not limited to:
 - A Bastion host
 - An [Azure DNS](https://azure.microsoft.com/en-us/services/dns/)
 - An [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/) to store Docker images.
+- [Github Actions](https://github.com/features/actions) secrets.
 
 The output values include access data for some of the resources above.
 
 When the 'base' is applied, Terraform will create a couple of service principals and so, az cli logged in user must have privileges to do so. When you don't have the privileges, you will get an error that looks like this: `ApplicationsClient.BaseClient.Patch(): unexpected status 403 with OData error: Authorization_RequestDenied: Insufficient privileges to complete the operation`.
+
+**Important note:** due to [this bug](https://github.com/integrations/terraform-provider-github/issues/667), when running
+Terraform commands for the base project, you need to have the `GITHUB_OWNER` and `GITHUB_TOKEN` environment variables set.
+- `GITHUB_OWNER`: the name of the user/organization that owns the project on Github (`vizzuality`, `tnc-css`, etc)
+- `GITHUB_TOKEN`: a [Github Access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 #### Kubernetes
 
@@ -82,8 +88,12 @@ new resources:
 - HTTPS certificate manager
 - PostgreSQL database (as a Helm chart)
 
-*Notice:* when first applying this project, you may get an `Error: Invalid index` message from the ingress/load balancer
-component. That is expected, and applying the same plan a 2nd time should succeed.
+**Important note:** this project has a deep dependency graph that's not fully mapped out, meaning you may need to run `terraform apply`
+multiple times for the resources to be fully provisioned. If you get an error when applying, simply try again, and odds
+are more resources will be provisioned. Repeat until you get a successful apply, or until you get recurring error outputs.
+Also be aware that, for this project to apply, the Github Actions pipeline for each key branch (`staging` and `main`) 
+must successfully run up to the point where images are pushed to the registry - said registry images are needed to deploy 
+the services on kubernetes, which is done by this plan.
 
 #### Github Actions
 
@@ -92,7 +102,7 @@ to redeploy Kubernetes pods once that happens. Said Github Actions depend on spe
 for reference. Said secrets are automatically created by the `base` Terraform project, and do not need to be created manually.
 
 - `AZURE_AKS_CLUSTER_NAME`: The name of the AKS cluster. Get from `Base`'s `k8s_cluster_name`
-- `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_hostname`
+- `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_private_fqdn`
 - `AZURE_CLIENT_ID`: The hostname for the Azure ACT. Get from `Base`'s `container_registry_client_id`
 - `AZURE_RESOURCE_GROUP`: The AKS Resource Group name. Specified by you when setting up the infrastructure.
 - `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`

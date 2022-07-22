@@ -77,10 +77,6 @@ export const logger = new Logger('Authentication');
       useClass: TypeORMRecoveryTokenRepository,
     },
     PasswordRecoveryService,
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
   ],
   controllers: [AuthenticationController, PasswordRecoveryController],
   exports: [AuthenticationService],

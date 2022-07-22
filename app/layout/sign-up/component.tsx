@@ -22,6 +22,7 @@ import Select from 'components/forms/select';
 import {
   composeValidators,
   booleanValidator,
+  passwordStrengthValidator,
 } from 'components/forms/validations';
 import Loading from 'components/loading';
 
@@ -33,6 +34,7 @@ import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 import USER_SVG from 'svgs/ui/user.svg?sprite';
 
 import { BACKGROUND_OPTIONS, ACADEMIC_LEVEL_OPTIONS, APPLIED_LEVEL_OPTIONS } from './constants';
+import PasswordStrenght from './password-strenght';
 
 export interface SignUpProps {
 
@@ -195,7 +197,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                 <div className="mt-5">
                   <FieldRFF
                     name="password"
-                    validate={composeValidators([{ presence: true }])}
+                    validate={composeValidators([passwordStrengthValidator])}
                   >
                     {(fprops) => (
                       <Field id="login-password" {...fprops}>
@@ -204,6 +206,10 @@ export const SignUp: React.FC<SignUpProps> = () => {
                       </Field>
                     )}
                   </FieldRFF>
+
+                  <PasswordStrenght
+                    password={props.values.password}
+                  />
                 </div>
 
                 <div className="mt-7">

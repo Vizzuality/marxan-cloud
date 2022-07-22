@@ -27,7 +27,10 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { UserAccountValidationDTO } from './dto/user-account.validation.dto';
 import { LocalAuthGuard } from './local-auth.guard';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+import { SkipThrottle, Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
+@UseGuards(ThrottlerGuard)
+@Throttle(25, 60)
 @Controller('/auth')
 @ApiTags('Authentication')
 export class AuthenticationController {
@@ -53,6 +56,7 @@ export class AuthenticationController {
 
   @IsMissingAclImplementation()
   @UseGuards(JwtAuthGuard)
+  @SkipThrottle()
   @ApiOperation({
     description:
       'Sign user out of all their current sessions by invalidating all the JWT tokens issued to them',
@@ -95,6 +99,7 @@ export class AuthenticationController {
    */
   @IsMissingAclImplementation()
   @UseGuards(JwtAuthGuard)
+  @SkipThrottle()
   @Post('refresh-token')
   @ApiOperation({
     description:

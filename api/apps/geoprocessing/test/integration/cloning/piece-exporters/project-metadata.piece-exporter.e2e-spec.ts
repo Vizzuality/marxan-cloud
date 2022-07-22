@@ -19,6 +19,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { ProjectSourcesEnum } from '@marxan/projects';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -39,20 +40,31 @@ describe(ProjectMetadataPieceExporter, () => {
   });
 
   it('fails when project blm range is not found', async () => {
-    await fixtures.GivenProjectExist();
+    await fixtures.GivenProjectExist(ProjectSourcesEnum.marxanCloud);
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenAProjectBlmExistErrorShouldBeThrown();
   });
 
-  it('saves file succesfully when project is found', async () => {
+  it('saves file succesfully when marxan project is found', async () => {
+    const marxanSource = ProjectSourcesEnum.marxanCloud;
     const input = fixtures.GivenAProjectMetadataExportJob();
-    await fixtures.GivenProjectExist();
+    await fixtures.GivenProjectExist(marxanSource);
     await fixtures.GivenProjectBlmRangeExist();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenProjectMetadataFileIsSaved();
+      .ThenProjectMetadataFileIsSaved(marxanSource);
+  });
+
+  it('saves file succesfully when legacy project is found', async () => {
+    const legacySource = ProjectSourcesEnum.legacyImport;
+    const input = fixtures.GivenAProjectMetadataExportJob();
+    await fixtures.GivenProjectExist(legacySource);
+    await fixtures.GivenProjectBlmRangeExist();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenProjectMetadataFileIsSaved(legacySource);
   });
 });
 
@@ -82,7 +94,9 @@ const getFixtures = async () => {
   const fileRepository = sandbox.get(CloningFilesRepository);
   const metadata = { foo: 'bar' };
 
-  const expectedContent: ProjectMetadataContent = {
+  const expectedContent: (
+    sources: ProjectSourcesEnum,
+  ) => ProjectMetadataContent = (sources: ProjectSourcesEnum) => ({
     name: `test project - ${projectId}`,
     planningUnitGridShape: PlanningUnitGridShape.Square,
     blmRange: {
@@ -91,7 +105,8 @@ const getFixtures = async () => {
       values: [],
     },
     metadata,
-  };
+    sources,
+  });
 
   return {
     cleanUp: async () => {
@@ -113,9 +128,10 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Project,
       };
     },
-    GivenProjectExist: async () => {
+    GivenProjectExist: async (sources: ProjectSourcesEnum) => {
       return GivenProjectExists(apiEntityManager, projectId, organizationId, {
         metadata,
+        sources,
       });
     },
     GivenProjectBlmRangeExist: async () => {
@@ -139,7 +155,7 @@ const getFixtures = async () => {
         ThenAProjectBlmExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(/blm.*does not exist/gi);
         },
-        ThenProjectMetadataFileIsSaved: async () => {
+        ThenProjectMetadataFileIsSaved: async (sources: ProjectSourcesEnum) => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
@@ -148,7 +164,7 @@ const getFixtures = async () => {
           const content = await readSavedFile<ProjectMetadataContent>(
             savedStrem,
           );
-          expect(content).toMatchObject(expectedContent);
+          expect(content).toMatchObject(expectedContent(sources));
         },
       };
     },

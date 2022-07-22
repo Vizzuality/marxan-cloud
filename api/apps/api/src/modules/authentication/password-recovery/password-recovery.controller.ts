@@ -6,6 +6,7 @@ import {
   Headers,
   UnauthorizedException,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiHeader,
@@ -17,6 +18,7 @@ import {
 import { IsEmail } from 'class-validator';
 import { IsPassword } from '@marxan-api/modules/users/dto/is-password.decorator';
 import { PasswordRecoveryService } from './password-recovery.service';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 class PasswordRecoveryRequestDto {
   @IsEmail()
@@ -30,6 +32,8 @@ class SetPasswordDto {
   passwordConfirm!: string;
 }
 
+@UseGuards(ThrottlerGuard)
+@Throttle(25, 60)
 @Controller(`${apiGlobalPrefixes.v1}/users/me`)
 @ApiTags('Authentication')
 export class PasswordRecoveryController {

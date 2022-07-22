@@ -9,15 +9,9 @@ export interface GeoFeatureShapefile {
   localFilePath: string;
 }
 
-export enum FeatureTags {
-  bioregional = "bioregional",
-  species = "species",
-}
-
 export interface GeoFeatureMetadata {
   name: string;
   fileName: string;
-  type: FeatureTags;
   description?: string;
   intersectWith?: string;
 }
@@ -44,7 +38,6 @@ export class GeoFeatureShapefiles extends FileUploader {
       headers: [["Authorization", `Bearer ${this.currentJwt}`]],
       extraFields: [
         { key: "name", value: shapefile.metadata.name },
-        { key: "type", value: shapefile.metadata.type },
         // @todo properly handle description when it is available
         // { key: 'description', value: shapefile.metadata.description },
       ],

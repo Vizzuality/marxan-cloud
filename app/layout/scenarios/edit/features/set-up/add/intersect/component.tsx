@@ -40,9 +40,6 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
-    filters: {
-      tag: 'bioregional',
-    },
   });
 
   const INITIAL_VALUES = useMemo(() => {
@@ -196,11 +193,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
         return (
           <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
             <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">
-              Interesect with
-              {' '}
-              <span className="px-1 bg-green-300">bioregional</span>
-              {' '}
-              features
+              Interesect with features
             </h2>
             <Toolbar search={search} onSearch={onSearch} />
 

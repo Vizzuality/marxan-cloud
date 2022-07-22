@@ -53,6 +53,16 @@ describe(ScenarioMetadataPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenScenarioMetadataFileIsSaved();
   });
+
+  it('saves file succesfully when the scenario with solutions locked is found', async () => {
+    const solutionsAreLocked = true;
+    const input = fixtures.GivenAScenarioMetadataExportJob();
+    await fixtures.GivenScenarioExist(solutionsAreLocked);
+    await fixtures.GivenScenarioBlmRangeExist();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenScenarioMetadataFileIsSaved(solutionsAreLocked);
+  });
 });
 
 const getFixtures = async () => {
@@ -80,7 +90,9 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB),
   );
   const fileRepository = sandbox.get(CloningFilesRepository);
-  const expectedContent: ScenarioMetadataContent = {
+  const expectedContent: (
+    solutionsAreLocked: boolean,
+  ) => ScenarioMetadataContent = (solutionsAreLocked: boolean) => ({
     name: `test scenario - ${scenarioId}`,
     description: 'desc',
     blm: 1,
@@ -92,8 +104,9 @@ const getFixtures = async () => {
       values: [],
     },
     ranAtLeastOnce: false,
+    solutionsAreLocked,
     type: 'marxan',
-  };
+  });
 
   return {
     cleanUp: async () => {
@@ -115,7 +128,7 @@ const getFixtures = async () => {
         resourceKind: ResourceKind.Scenario,
       };
     },
-    GivenScenarioExist: async () => {
+    GivenScenarioExist: async (solutionsAreLocked = false) => {
       return GivenScenarioExists(
         apiEntityManager,
         scenarioId,
@@ -126,6 +139,7 @@ const getFixtures = async () => {
           blm: 1,
           number_of_runs: 6,
           metadata: { marxanInputParameterFile: { meta: '1' } },
+          solutions_are_locked: solutionsAreLocked,
         },
       );
     },
@@ -150,7 +164,7 @@ const getFixtures = async () => {
         ThenAScenarioBlmExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(/blm.*does not exist/gi);
         },
-        ThenScenarioMetadataFileIsSaved: async () => {
+        ThenScenarioMetadataFileIsSaved: async (solutionsAreLocked = false) => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
@@ -159,7 +173,7 @@ const getFixtures = async () => {
           const content = await readSavedFile<ScenarioMetadataContent>(
             savedStrem,
           );
-          expect(content).toEqual(expectedContent);
+          expect(content).toEqual(expectedContent(solutionsAreLocked));
         },
       };
     },
