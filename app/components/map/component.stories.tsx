@@ -1,15 +1,15 @@
 import React, { useCallback, useState } from 'react';
-import { Story } from '@storybook/react/types-6-0';
 
+import { Story } from '@storybook/react/types-6-0';
 // Layer manager
-import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import CartoProvider from '@vizzuality/layer-manager-provider-carto';
+import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 // Controls
 import Controls from 'components/map/controls';
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import ZoomControl from 'components/map/controls/zoom';
 
 // Map
 import Map, { MapProps } from './component';

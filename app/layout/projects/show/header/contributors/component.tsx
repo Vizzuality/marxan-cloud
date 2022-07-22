@@ -100,6 +100,7 @@ export const Contributors: React.FC<ContributorsProps> = () => {
               )}
 
               <Tooltip
+                animation
                 placement="bottom-end"
                 interactive
                 popup

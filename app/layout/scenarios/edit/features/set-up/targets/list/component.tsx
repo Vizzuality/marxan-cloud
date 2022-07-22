@@ -163,23 +163,28 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
             kind,
             geoprocessingOperations: geoprocessingOperations.map((go) => {
               const { splits } = go;
-              console.info(values);
 
               return {
                 ...go,
-                splits: splits.map((s) => {
-                  const { target, fpf = 1 } = features.find((f) => {
-                    return f.parentId === featureId && f.value === s.value;
-                  });
+                splits: splits
+                  .filter((s) => {
+                    return features.find((f) => {
+                      return f.parentId === featureId && f.value === s.value;
+                    });
+                  })
+                  .map((s) => {
+                    const { target, fpf = 1 } = features.find((f) => {
+                      return f.parentId === featureId && f.value === s.value;
+                    });
 
-                  return {
-                    ...s,
-                    marxanSettings: {
-                      prop: target / 100 || 0.5,
-                      fpf,
-                    },
-                  };
-                }),
+                    return {
+                      ...s,
+                      marxanSettings: {
+                        prop: target / 100 || 0.5,
+                        fpf,
+                      },
+                    };
+                  }),
               };
             }),
 

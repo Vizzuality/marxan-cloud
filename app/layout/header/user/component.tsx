@@ -40,6 +40,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
 
   return (
     <Tooltip
+      animation
       placement="bottom-end"
       interactive
       popup

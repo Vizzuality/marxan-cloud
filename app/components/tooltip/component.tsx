@@ -20,6 +20,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   maxHeight,
   onHide,
   onMount,
+  animation,
   ...props
 }: TooltipProps) => {
   const tooltipRef = useRef(null);
@@ -62,8 +63,10 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
         return (
           <motion.div
-            style={{
-              scale, opacity,
+            {...animation && {
+              style: {
+                scale, opacity,
+              },
             }}
             {...attrs}
           >
@@ -99,7 +102,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
           </motion.div>
         );
       }}
-      animation
+      animation={animation}
       onMount={handleMount}
       onHide={handleHide}
     >
