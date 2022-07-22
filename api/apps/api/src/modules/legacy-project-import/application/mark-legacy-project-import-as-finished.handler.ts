@@ -97,6 +97,8 @@ export class MarkLegacyProjectImportAsFinishedHandler
       scenarioId,
     );
 
+    await this.emitSyntheticEvents(projectId.value);
+
     await this.apiEvents.createIfNotExists({
       kind,
       topic,
@@ -111,6 +113,30 @@ export class MarkLegacyProjectImportAsFinishedHandler
       userId: ownerId,
       projectId: projectId.value,
       roleName: ProjectRoles.project_owner,
+    });
+  }
+
+  /**
+   * Since some use cases depend on api events, we have to create "synthetic"
+   * events when importing legacy projects. For the time being, these are the
+   * events needed:
+   *
+   * - project__planningUnits__finished__v1__alpha: To be able to create a scenario
+   *   it is required to have processed the planning units grid of the project.
+   *   This check is made by ensuring that there is a api event of this type associated
+   *   to the project
+   */
+  private async emitSyntheticEvents(projectId: string): Promise<void> {
+    const kind = API_EVENT_KINDS.project__planningUnits__finished__v1__alpha;
+
+    await this.apiEvents.createIfNotExists({
+      topic: projectId,
+      kind,
+      data: {
+        kind,
+        projectId,
+        syntheticEvent: true,
+      },
     });
   }
 }
