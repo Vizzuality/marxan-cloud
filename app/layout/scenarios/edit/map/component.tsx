@@ -114,11 +114,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
-  const isSpecies = useMemo(() => selectedFeaturesData.filter((f) => f.type === 'species').filter(({ id }) => selectedFeatures.includes(id)).length > 0,
-    [selectedFeaturesData, selectedFeatures]);
-
-  const isBioregional = useMemo(() => selectedFeaturesData.filter((f) => f.type === 'bioregional').filter(({ id }) => selectedFeatures.includes(id)).length > 0,
-    [selectedFeaturesData, selectedFeatures]);
+  const previewFeatureIsSelected = useMemo(() => selectedFeaturesData.filter(({
+    id,
+  }) => selectedFeatures.includes(id)).length > 0,
+  [selectedFeaturesData, selectedFeatures]);
 
   const {
     data: costSurfaceRangeData,
@@ -180,7 +179,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return ['cost'];
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out'];
 
-    if (tab === ScenarioSidebarTabs.FEATURES && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && subtab !== null) return ['wdpa-percentage', 'features'];
+    if (tab === ScenarioSidebarTabs.FEATURES && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS && subtab !== null) return ['wdpa-percentage', 'features-preview'];
     if (tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) return ['features'];
     if (tab === ScenarioSidebarTabs.FEATURES && subtab === null) return ['wdpa-percentage'];
 
@@ -206,8 +205,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) {
       return [
         ...protectedCategories.length ? ['wdpa-percentage'] : [],
-        !!isBioregional && 'bioregional',
-        !!isSpecies && 'species',
+        !!previewFeatureIsSelected && 'features-preview',
         'pugrid',
       ];
     }
@@ -232,8 +230,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     tab,
     subtab,
     protectedAreas,
-    isSpecies,
-    isBioregional,
+    previewFeatureIsSelected,
     preHighlightFeatures.length,
     postHighlightFeatures.length,
   ]);
@@ -273,10 +270,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       featuresRecipe,
       featureHoverId,
       selectedFeatures,
-      settings: {
-        bioregional: layerSettings.bioregional,
-        species: layerSettings.species,
-      },
+      ...layerSettings['features-preview'],
     },
   });
 

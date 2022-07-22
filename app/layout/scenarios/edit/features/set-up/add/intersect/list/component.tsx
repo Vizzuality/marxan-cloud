@@ -37,9 +37,6 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
-    filters: {
-      tag: 'bioregional',
-    },
   });
 
   const scrollRef = useBottomScrollListener(

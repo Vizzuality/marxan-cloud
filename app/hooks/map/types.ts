@@ -80,20 +80,8 @@ export interface UseFeaturePreviewLayers {
     featuresRecipe?: Record<string, any>[],
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
-    settings?: {
-      bioregional?: {
-        opacity?: number;
-        visibility?: boolean;
-      },
-      species?: {
-        opacity?: number;
-        visibility?: boolean;
-      },
-      features?: {
-        opacity?: number;
-        visibility?: boolean;
-      }
-    }
+    opacity?: number;
+    visibility?: boolean;
   };
 }
 

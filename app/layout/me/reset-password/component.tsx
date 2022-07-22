@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { useResetPassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';
 
+import PasswordStrength from 'layout/sign-up/password-strenght';
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
@@ -92,31 +93,40 @@ export const ResetPasswordPassword: React.FC<ResetPasswordPasswordProps> = () =>
                 />
 
                 <div className="flex flex-col space-y-12">
-                  <FieldRFF
-                    name="password"
-                    validate={composeValidators([{ presence: true }])}
-                  >
-                    {(fprops) => (
-                      <Field id="password" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">New Password</Label>
-                        <Input theme="light" type="password" />
-                      </Field>
-                    )}
-                  </FieldRFF>
-                  <FieldRFF
-                    name="passwordConfirm"
-                    validate={composeValidators([
-                      { presence: true },
-                      equalPasswordValidator,
-                    ])}
-                  >
-                    {(fprops) => (
-                      <Field id="password-confirm" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">Confirm Password</Label>
-                        <Input theme="light" type="password" />
-                      </Field>
-                    )}
-                  </FieldRFF>
+                  <div>
+                    <FieldRFF
+                      name="password"
+                      validate={composeValidators([{ presence: true }])}
+                    >
+                      {(fprops) => (
+                        <Field id="password" {...fprops}>
+                          <Label theme="light" className="mb-3 uppercase">New Password</Label>
+                          <Input theme="light" type="password" />
+                        </Field>
+                      )}
+                    </FieldRFF>
+
+                    <PasswordStrength
+                      password={props.values.password}
+                    />
+
+                  </div>
+                  <div>
+                    <FieldRFF
+                      name="passwordConfirm"
+                      validate={composeValidators([
+                        { presence: true },
+                        equalPasswordValidator,
+                      ])}
+                    >
+                      {(fprops) => (
+                        <Field id="password-confirm" {...fprops}>
+                          <Label theme="light" className="mb-3 uppercase">Confirm Password</Label>
+                          <Input theme="light" type="password" />
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
 
                   <Button theme="primary" size="lg" type="submit" disabled={submitting} className="w-full">
                     Change password

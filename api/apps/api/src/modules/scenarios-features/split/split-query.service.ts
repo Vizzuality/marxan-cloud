@@ -1,24 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { isDefined } from '@marxan/utils';
-import { FeatureConfigSplit } from '@marxan-api/modules/specification';
+import { antimeridianBbox, isDefined, nominatim2bbox } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { SingleSplitConfigFeatureValueWithId } from './split-create-features.service';
 
 @Injectable()
 export class SplitQuery {
   prepareQuery(
-    input: FeatureConfigSplit,
+    {
+      id: apiFeatureId,
+      singleSplitFeature,
+    }: SingleSplitConfigFeatureValueWithId,
     scenarioId: string,
     specificationId: string,
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
   ) {
+    const subset = singleSplitFeature.subset;
+    const { westBbox, eastBbox } = antimeridianBbox(
+      nominatim2bbox(project.bbox),
+    );
     const parameters: (string | number)[] = [];
     const fields = {
-      filterByValues: (input.selectSubSets ?? []).map(
-        (s) => `$${parameters.push(s.value)}`,
-      ),
-      splitByProperty: `$${parameters.push(input.splitByProperty)}`,
+      filterByValue: subset ? `$${parameters.push(subset.value)}` : undefined,
+      fpf: subset && subset.fpf ? `$${parameters.push(subset.fpf)}` : 'NULL',
+      prop: subset && subset.prop ? `$${parameters.push(subset.prop)}` : 'NULL',
+      target:
+        subset && subset.target ? `$${parameters.push(subset.target)}` : 'NULL',
+      splitByProperty: `$${parameters.push(
+        singleSplitFeature.splitByProperty,
+      )}`,
       scenarioId: `$${parameters.push(scenarioId)}`,
       specificationId: `$${parameters.push(specificationId)}`,
       planningAreaId: isDefined(planningAreaLocation)
@@ -32,12 +43,19 @@ export class SplitQuery {
           : undefined,
       protectedArea:
         protectedAreaFilterByIds.length > 0 ? 'protected.area' : 'NULL',
-      featureId: `$${parameters.push(input.baseFeatureId)}`,
-      bbox: [
-        `$${parameters.push(project.bbox[0])}`,
-        `$${parameters.push(project.bbox[2])}`,
-        `$${parameters.push(project.bbox[1])}`,
-        `$${parameters.push(project.bbox[3])}`,
+      baseFeatureId: `$${parameters.push(singleSplitFeature.baseFeatureId)}`,
+      apiFeatureId: `$${parameters.push(apiFeatureId)}`,
+      westBbox: [
+        `$${parameters.push(westBbox[0])}`,
+        `$${parameters.push(westBbox[1])}`,
+        `$${parameters.push(westBbox[2])}`,
+        `$${parameters.push(westBbox[3])}`,
+      ],
+      eastBbox: [
+        `$${parameters.push(eastBbox[0])}`,
+        `$${parameters.push(eastBbox[1])}`,
+        `$${parameters.push(eastBbox[2])}`,
+        `$${parameters.push(eastBbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
         ? `st_area(st_intersection(pa.the_geom, fd.the_geom))`
@@ -53,9 +71,9 @@ export class SplitQuery {
       ? `left join ${planningAreaLocation.tableName} as pa on pa.id = ${fields.planningAreaId}`
       : ``;
 
-    const hasSubSetFilter = (input.selectSubSets ?? []).length > 0;
     const query = `
       insert into scenario_features_preparation as sfp (feature_class_id,
+                                                        api_feature_id,
                                                         scenario_id,
                                                         specification_id,
                                                         fpf,
@@ -64,51 +82,37 @@ export class SplitQuery {
                                                         total_area,
                                                         current_pa)
       WITH split as (
-        WITH subsets as (
-          select value as sub_value, target, fpf, prop
-          from json_to_recordset('${JSON.stringify(
-            input.selectSubSets ?? [],
-          )}') as x(value varchar, target float8, fpf float8,
-                    prop float8)
-        )
         SELECT distinct fpkv.feature_data_id,
                         fpkv.key,
-                        fpkv.value,
-                        subsets.fpf,
-                        subsets.prop,
-                        subsets.target
+                        fpkv.value
         from feature_properties_kv fpkv
-               left join subsets
-                         on trim('"' FROM fpkv.value::TEXT) = trim('"' FROM subsets
-                           .sub_value::text)
-        where fpkv.feature_id = ${fields.featureId}
-          and fpkv.key = ${fields.splitByProperty} ${
-      hasSubSetFilter
-        ? `and fpkv.value IN(${fields.filterByValues
-            .map((e) => `(select to_jsonb(${e}::text))`)
-            .join(',')})`
-        : ``
-    }
+          where fpkv.feature_id = ${fields.baseFeatureId}
+          and fpkv.key = ${fields.splitByProperty}
+          ${
+            fields.filterByValue
+              ? `and trim('"' FROM fpkv.value::text) = trim('"' FROM ${fields.filterByValue}::text)`
+              : ``
+          }
       )
       select fd.id,
+            ${fields.apiFeatureId},
              ${fields.scenarioId},
              ${fields.specificationId},
-             split.fpf,
-             split.target,
-             split.prop,
+             ${fields.fpf},
+             ${fields.target},
+             ${fields.prop},
              ${fields.totalArea},
              ${fields.protectedArea}
       from split
              join features_data as fd
                   on (split.feature_data_id = fd.id)
         ${planningAreaJoin} ${protectedAreaJoin}
-      where st_intersects(st_makeenvelope( ${fields.bbox[0]}
-          , ${fields.bbox[1]}
-          , ${fields.bbox[2]}
-          , ${fields.bbox[3]}
-          , 4326
-        )
-          , fd.the_geom)
+        where st_intersects(ST_MakeEnvelope(${fields.westBbox
+          .map((coordinate) => coordinate)
+          .join(',')}, 4326), fd.the_geom)
+        or st_intersects(ST_MakeEnvelope(${fields.eastBbox
+          .map((coordinate) => coordinate)
+          .join(',')}, 4326), fd.the_geom)
         returning sfp.id as id;
     `;
     return { parameters, query };

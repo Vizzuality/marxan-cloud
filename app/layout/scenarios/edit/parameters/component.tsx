@@ -60,7 +60,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const { data: projectData } = useProject(pid);
 
   const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
+  const { metadata, solutionsAreLocked } = scenarioData || {};
   const { marxanInputParameterFile: runSettings, scenarioEditingMetadata } = metadata || {};
 
   const saveScenarioMutation = useSaveScenario({
@@ -230,6 +230,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
                 <Button
                   theme="spacial"
                   size="lg"
+                  disabled={solutionsAreLocked}
                   onClick={onRunScenario}
                 >
                   Run scenario

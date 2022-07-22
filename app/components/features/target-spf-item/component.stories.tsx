@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import TargetSPFItem from './component';
-import { TargetSPFItemProps, Type } from './types';
+import { TargetSPFItemProps } from './types';
 
 export default {
   title: 'Components/Features/TargetSPF-Item',
@@ -19,7 +21,6 @@ Default.args = {
   isAllTargets: false,
   target: 0.17,
   fpf: 1,
-  type: Type.BIOREGIONAL,
   surface: '30 km²',
   name: 'Inland water',
   onRemove: (value) => console.info('Remove: ', value),

@@ -93,9 +93,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
           alias,
           featureClassName,
           description,
-          tag,
-          source,
-          properties,
+          properties = {},
           splitSelected,
           splitFeaturesSelected,
         } = d;
@@ -103,39 +101,35 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
         let splitOptions = [];
         let splitFeaturesOptions = [];
 
-        if (tag === 'bioregional') {
-          /**
-           * @todo Checking whether `properties` is defined here is just a
-           * workaround to avoid an error when processing `bioregional`
-           * features, which would prevent progressing through the stop of
-           * configuring features for a scenario until this code is reviewed.
-           * Without much knowledge of the flow for feature data, I see that
-           * short-circuiting the `map()` below and therefore setting
-           * `splitOptions = []` still results in properties being shown in the
-           * dropdowns used for splitting features, but since `properties` is
-           * always undefined (from what I can see), we may need to adapt the
-           * API payload or how we process it here.
-           */
-          splitOptions = properties ? Object.keys(properties).map((k) => {
-            return {
-              key: k,
-              label: k,
-              values: properties[k].map((v) => ({ id: v, name: v })),
-            };
-          }) : [];
+        /**
+         * @todo Checking whether `properties` is defined here is just a
+         * workaround to avoid an error when processing `bioregional`
+         * features, which would prevent progressing through the stop of
+         * configuring features for a scenario until this code is reviewed.
+         * Without much knowledge of the flow for feature data, I see that
+         * short-circuiting the `map()` below and therefore setting
+         * `splitOptions = []` still results in properties being shown in the
+         * dropdowns used for splitting features, but since `properties` is
+         * always undefined (from what I can see), we may need to adapt the
+         * API payload or how we process it here.
+         */
+        splitOptions = properties ? Object.keys(properties).map((k) => {
+          return {
+            key: k,
+            label: k,
+            values: properties[k].map((v) => ({ id: v, name: v })),
+          };
+        }) : [];
 
-          splitFeaturesOptions = splitSelected ? splitOptions
-            .find((s) => s.key === splitSelected).values
-            .map((v) => ({ label: v.name, value: v.id }))
-            : [];
-        }
+        splitFeaturesOptions = splitSelected ? splitOptions
+          .find((s) => s.key === splitSelected).values
+          .map((v) => ({ label: v.name, value: v.id }))
+          : [];
 
         return {
           id,
           name: alias || featureClassName,
           description,
-          tag,
-          source,
 
           splitSelected,
           splitOptions,
@@ -206,48 +200,45 @@ export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, 
       let splitSelected;
       let splitFeaturesSelected = [];
 
-      if (tag === 'bioregional') {
-        splitOptions = Object.keys(properties).map((k) => {
+      splitOptions = Object.keys(properties).map((k) => {
+        return {
+          key: k,
+          label: k,
+          values: properties[k].map((v) => ({ id: v, name: v })),
+        };
+      });
+
+      if (geoprocessingOperations && !!geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
+        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
+        splitSelected = geoprocessingOperation.splitByProperty;
+
+        splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
+          .find((s) => s.key === splitSelected).values
+          .map((v) => ({ label: v.name, value: `${v.id}` }))
+          : [];
+
+        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
           return {
-            key: k,
-            label: k,
-            values: properties[k].map((v) => ({ id: v, name: v })),
+            ...s,
+            id: `${s.value}`,
+            name: s.value,
           };
         });
-
-        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-          splitSelected = geoprocessingOperations[0].splitByProperty;
-
-          splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
-            .find((s) => s.key === splitSelected).values
-            .map((v) => ({ label: v.name, value: v.id }))
-            : [];
-
-          splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
-            return {
-              ...s,
-              id: s.value,
-              name: s.value,
-            };
-          });
-        }
       }
 
       let intersectFeaturesSelected = [];
 
-      if (tag === 'species') {
-        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
-          intersectFeaturesSelected = flatten(geoprocessingOperations
-            .map((ifs) => {
-              return ifs.splits.map((v) => {
-                return {
-                  ...v,
-                  label: v.value,
-                  value: v.value,
-                };
-              });
-            }));
-        }
+      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
+        intersectFeaturesSelected = flatten(geoprocessingOperations
+          .map((ifs) => {
+            return ifs.splits.map((v) => {
+              return {
+                ...v,
+                label: v.value,
+                value: v.value,
+              };
+            });
+          }));
       }
 
       return {
@@ -342,48 +333,46 @@ export function useTargetedFeatures(
       let splitSelected;
       let splitFeaturesSelected = [];
 
-      if (tag === 'bioregional') {
-        splitOptions = Object.keys(properties).map((k) => {
+      splitOptions = Object.keys(properties).map((k) => {
+        return {
+          key: k,
+          label: k,
+          values: properties[k].map((v) => ({ id: v, name: v })),
+        };
+      });
+
+      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
+        const geoprocessingOperation = geoprocessingOperations.find((g) => g.kind === 'split/v1');
+
+        splitSelected = geoprocessingOperation.splitByProperty;
+
+        splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
+          .find((s) => s.key === splitSelected).values
+          .map((v) => ({ label: v.name, value: v.id }))
+          : [];
+
+        splitFeaturesSelected = geoprocessingOperation.splits.map((s) => {
           return {
-            key: k,
-            label: k,
-            values: properties[k].map((v) => ({ id: v, name: v })),
+            ...s,
+            id: s.value,
+            name: s.value,
           };
         });
-
-        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'split/v1')) {
-          splitSelected = geoprocessingOperations[0].splitByProperty;
-
-          splitFeaturesOptions = splitOptions.length && splitSelected ? splitOptions
-            .find((s) => s.key === splitSelected).values
-            .map((v) => ({ label: v.name, value: v.id }))
-            : [];
-
-          splitFeaturesSelected = geoprocessingOperations[0].splits.map((s) => {
-            return {
-              ...s,
-              id: s.value,
-              name: s.value,
-            };
-          });
-        }
       }
 
       let intersectFeaturesSelected = [];
 
-      if (tag === 'species') {
-        if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
-          intersectFeaturesSelected = flatten(geoprocessingOperations
-            .map((ifs) => {
-              return ifs.splits.map((v) => {
-                return {
-                  ...v,
-                  label: v.value,
-                  value: v.value,
-                };
-              });
-            }));
-        }
+      if (geoprocessingOperations && geoprocessingOperations.find((g) => g.kind === 'stratification/v1')) {
+        intersectFeaturesSelected = flatten(geoprocessingOperations
+          .map((ifs) => {
+            return ifs.splits.map((v) => {
+              return {
+                ...v,
+                label: v.value,
+                value: v.value,
+              };
+            });
+          }));
       }
 
       return {
@@ -438,7 +427,6 @@ export function useTargetedFeatures(
             ...sf,
             id: `${id}-${sfId}`,
             parentId: id,
-            type: 'bioregional',
             name: `${name} / ${sfName}`,
             splitted: true,
             ...!!sfMarxanSettings && {
@@ -461,7 +449,6 @@ export function useTargetedFeatures(
             ...ifs,
             id: `${id}-${ifId}`,
             parentId: id,
-            type: 'bioregional-and-species',
             name: `${name} / ${ifName}`,
             splitted: true,
             ...!!ifMarxanSettings && {

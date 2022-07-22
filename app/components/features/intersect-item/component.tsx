@@ -15,7 +15,6 @@ export interface ItemProps {
   className?: string;
   name: string;
   description: string;
-  tag: 'bioregional' | 'species';
 
   selected?: boolean;
   onSelected?: (selected: boolean) => void;
@@ -49,7 +48,6 @@ export const Item: React.FC<ItemProps> = ({
   id,
   name,
   className,
-  tag,
 
   selected,
   onSelected,
@@ -136,7 +134,7 @@ export const Item: React.FC<ItemProps> = ({
           <h2 className="mt-1 text-sm font-heading">{name}</h2>
         </div>
 
-        {tag === 'bioregional' && selected && (
+        {selected && (
           <div>
             <div className="flex items-center mt-3 tracking-wide font-heading">
               <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
@@ -165,7 +163,7 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {tag === 'bioregional' && splitSelected && selected && (
+      {splitSelected && selected && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length

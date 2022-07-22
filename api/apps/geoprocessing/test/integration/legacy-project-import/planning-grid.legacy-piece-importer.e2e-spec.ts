@@ -10,6 +10,7 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -31,6 +32,7 @@ import {
 type ProjectSelectResult = {
   planning_area_geometry_id: string;
   bbox: string;
+  planning_unit_grid_shape: PlanningUnitGridShape;
 };
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -306,6 +308,9 @@ const getFixtures = async () => {
 
           expect(project.bbox).toBeDefined();
           expect(project.planning_area_geometry_id).toBeDefined();
+          expect(project.planning_unit_grid_shape).toBe(
+            PlanningUnitGridShape.FromShapefile,
+          );
 
           const expectedLength = validGeojson.features.length;
 
