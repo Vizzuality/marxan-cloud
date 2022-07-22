@@ -1,12 +1,12 @@
 locals {
   database = "${var.name}-${var.namespace}"
   username = "${var.name}-${var.namespace}"
-  password = random_password.postgresql_admin_generator.result
+  password = random_password.postgresql_user_password_generator.result
 }
 
-resource "random_password" "postgresql_admin_generator" {
+resource "random_password" "postgresql_user_password_generator" {
   length  = 24
-  special = true
+  special = false
 }
 
 resource "azurerm_key_vault_secret" "postgresql" {
@@ -27,19 +27,16 @@ resource "azurerm_postgresql_flexible_server_database" "database" {
   charset   = "utf8"
 }
 
-data "kubernetes_service" "postgresql" {
-  metadata {
-    namespace = var.namespace
-    name      = "${var.name}-postgresql"
-  }
-}
-
 resource "postgresql_role" "my_role" {
   provider = postgresql
 
   name     = local.username
   login    = true
   password = local.password
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
 }
 
 resource "postgresql_grant" "db_grant" {
@@ -61,6 +58,10 @@ resource "postgresql_extension" "marxan_postgis" {
 
   database = local.database
   name     = "postgis"
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
 }
 
 resource "postgresql_extension" "marxan_pgcrypto" {
@@ -68,6 +69,10 @@ resource "postgresql_extension" "marxan_pgcrypto" {
 
   database = local.database
   name     = "pgcrypto"
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
 }
 
 resource "postgresql_extension" "marxan_plpgsql" {
@@ -75,6 +80,10 @@ resource "postgresql_extension" "marxan_plpgsql" {
 
   database = local.database
   name     = "plpgsql"
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
 }
 
 resource "postgresql_extension" "marxan_postgis_raster" {
@@ -84,7 +93,8 @@ resource "postgresql_extension" "marxan_postgis_raster" {
   name     = "postgis_raster"
 
   depends_on = [
-    postgresql_extension.marxan_postgis
+    postgresql_extension.marxan_postgis,
+    azurerm_postgresql_flexible_server_database.database
   ]
 }
 
@@ -95,6 +105,7 @@ resource "postgresql_extension" "marxan_postgis_topology" {
   name     = "postgis_topology"
 
   depends_on = [
-    postgresql_extension.marxan_postgis
+    postgresql_extension.marxan_postgis,
+    azurerm_postgresql_flexible_server_database.database
   ]
 }

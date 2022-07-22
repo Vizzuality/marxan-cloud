@@ -54,6 +54,8 @@ resource "azurerm_network_security_group" "bastion_nsg" {
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
 
+  tags = var.project_tags
+
   # Allow SSH traffic in from Internet to public subnet.
   security_rule {
     name                       = "allow-ssh-all"
@@ -63,7 +65,7 @@ resource "azurerm_network_security_group" "bastion_nsg" {
     protocol                   = "Tcp"
     source_port_range          = "*"
     destination_port_range     = "22"
-    source_address_prefix      = "*"
+    source_address_prefix      = "*" # source_address_prefixes    = var.vpn_cidrs # Removed for Vizzuality access
     destination_address_prefix = "*"
   }
 }

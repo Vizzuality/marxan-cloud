@@ -39,3 +39,8 @@ variable "subnet_id" {
 variable "private_connection_resource_id" {
   type = string
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}
