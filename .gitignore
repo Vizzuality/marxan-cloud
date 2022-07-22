@@ -25,14 +25,6 @@ node_modules/
 /**/terraform.tfstate
 /**/terraform.tfstate.backup
 
-infrastructure/tncvars.md
-infrastructure/tncnotes.md
-tnc-marxan-full.tfvars
-pod-output.yml
-tf-db-deployment.log
-errorlogs.txt
-kubernetes.tfstate.json
-
 infrastructure/kubernetes/vars/*.tfvars
 infrastructure/base/vars/*.tfvars
 infrastructure/remote-state/vars/*.tfvars
