@@ -90,7 +90,7 @@ to redeploy Kubernetes pods once that happens. Said Github Actions depend on spe
 for reference. Said secrets are automatically created by the `base` Terraform project, and do not need to be created manually.
 
 - `AZURE_AKS_CLUSTER_NAME`: The name of the AKS cluster. Get from `Base`'s `k8s_cluster_name`
-- `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_hostname`
+- `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_private_fqdn`
 - `AZURE_CLIENT_ID`: The hostname for the Azure ACT. Get from `Base`'s `container_registry_client_id`
 - `AZURE_RESOURCE_GROUP`: The AKS Resource Group name. Specified by you when setting up the infrastructure.
 - `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
