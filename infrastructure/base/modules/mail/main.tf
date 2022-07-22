@@ -14,7 +14,7 @@ resource "azurerm_dns_txt_record" "sparkpost_dkim_txt_record" {
   ttl                 = 300
   name                = var.dkim_name
   record {
-    value =var.dkim_value
+    value = var.dkim_value
   }
 
   tags = var.project_tags
