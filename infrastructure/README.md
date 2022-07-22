@@ -67,8 +67,14 @@ These resources include, but are not limited to:
 - A Bastion host
 - An [Azure DNS](https://azure.microsoft.com/en-us/services/dns/)
 - An [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/) to store Docker images.
+- [Github Actions](https://github.com/features/actions) secrets.
 
 The output values include access data for some of the resources above.
+
+**Important note:** due to [this bug](https://github.com/integrations/terraform-provider-github/issues/667), when running
+Terraform commands for the base project, you need to have the `GITHUB_OWNER` and `GITHUB_TOKEN` environment variables set.
+- `GITHUB_OWNER`: the name of the user/organization that owns the project on Github (`vizzuality`, `tnc-css`, etc)
+- `GITHUB_TOKEN`: a [Github Access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 #### Kubernetes
 
@@ -80,8 +86,12 @@ new resources:
 - HTTPS certificate manager
 - PostgreSQL database (as a Helm chart)
 
-*Notice:* when first applying this project, you may get an `Error: Invalid index` message from the ingress/load balancer
-component. That is expected, and applying the same plan a 2nd time should succeed.
+**Important note:** this project has a deep dependency graph that's not fully mapped out, meaning you may need to run `terraform apply`
+multiple times for the resources to be fully provisioned. If you get an error when applying, simply try again, and odds
+are more resources will be provisioned. Repeat until you get a successful apply, or until you get recurring error outputs.
+Also be aware that, for this project to apply, the Github Actions pipeline for each key branch (`staging` and `main`) 
+must successfully run up to the point where images are pushed to the registry - said registry images are needed to deploy 
+the services on kubernetes, which is done by this plan.
 
 #### Github Actions
 
