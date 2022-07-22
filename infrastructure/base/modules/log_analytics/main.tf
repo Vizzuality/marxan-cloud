@@ -21,7 +21,7 @@ resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
   resource_group_name = var.resource_group_name
   sku                 = var.sku
   retention_in_days   = var.retention_in_days != "" ? var.retention_in_days : null
-  tags                = merge(var.project_tags, { Environment = "PRD-STG" })
+  tags                = var.project_tags
 
   lifecycle {
     ignore_changes = [

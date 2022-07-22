@@ -14,7 +14,7 @@ resource "azurerm_public_ip" "pip" {
   location            = var.location
   allocation_method   = "Static"
   sku                 = "Standard"
-  tags                = merge(var.project_tags, { Environment = "PRD-STG" })
+  tags                = var.project_tags
 
   zones = [1, 2, 3]
   lifecycle {
@@ -33,7 +33,7 @@ resource "azurerm_firewall" "firewall" {
   sku_tier            = var.sku_tier
   firewall_policy_id  = azurerm_firewall_policy.policy.id
   sku_name            = "AZFW_VNet"
-  tags                = merge(var.project_tags, { Environment = "PRD-STG" })
+  tags                = var.project_tags
 
   ip_configuration {
     name                 = "fw_ip_config"

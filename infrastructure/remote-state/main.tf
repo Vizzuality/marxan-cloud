@@ -23,7 +23,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "resource_group" {
   name     = var.resource_group_name
   location = var.location
-  tags     = merge(var.project_tags, { Environment = "PRD-STG" })
+  tags     = var.project_tags
 }
 
 resource "azurerm_storage_account" "storage_account" {
@@ -32,7 +32,7 @@ resource "azurerm_storage_account" "storage_account" {
   location                 = azurerm_resource_group.resource_group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  tags                     = merge(var.project_tags, { Environment = "PRD-STG" })
+  tags                     = var.project_tags
 }
 
 resource "azurerm_storage_container" "storage_container_tf_state" {
