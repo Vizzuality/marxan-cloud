@@ -53,10 +53,10 @@ module "container_registry" {
 }
 
 module "kubernetes" {
-  source         = "./modules/kubernetes"
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  aks_subnet_id  = module.network.aks_subnet_id
+  source                   = "./modules/kubernetes"
+  resource_group           = data.azurerm_resource_group.resource_group
+  project_name             = var.project_name
+  aks_subnet_id            = module.network.aks_subnet_id
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = module.network.core_vnet_id
     (module.network.aks_vnet_name)  = module.network.aks_vnet_id
@@ -76,7 +76,7 @@ module "data_node_pool" {
   resource_group = data.azurerm_resource_group.resource_group
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
-  node_labels = {
+  node_labels    = {
     type : "data"
   }
 }
@@ -89,9 +89,28 @@ module "app_node_pool" {
   project_name   = var.project_name
   subnet_id      = module.network.aks_subnet_id
   vm_size        = "Standard_F4s_v2"
-  node_labels = {
+  node_labels    = {
     type : "app"
   }
+}
+
+module "github_secrets" {
+  source                  = "./modules/github_secrets"
+  aks_cluster_name        = module.kubernetes.cluster_name
+  aks_host                = module.kubernetes.cluster_hostname
+  bastion_host            = module.bastion.bastion_hostname
+  bastion_ssh_private_key = module.bastion.bastion_private_key
+  bastion_user            = module.bastion.bastion_user
+  client_id               = module.container_registry.azure_client_id
+  registry_login_server   = module.container_registry.azurerm_container_registry_login_server
+  registry_password       = module.container_registry.azuread_application_password
+  registry_username       = module.container_registry.azure_client_id
+  repo_name               = var.github_repo
+  resource_group_name     = data.azurerm_resource_group.resource_group.name
+  subscription_id         = data.azurerm_subscription.subscription.subscription_id
+  tenant_id               = data.azurerm_subscription.subscription.tenant_id
+  mapbox_api_token        = var.mapbox_api_token
+  domain                  = var.domain
 }
 
 module "log_analytics_workspace" {
@@ -118,12 +137,12 @@ module "firewall" {
 }
 
 module "routetable" {
-  source              = "./modules/route_table"
-  resource_group_name = data.azurerm_resource_group.resource_group.name
-  location            = data.azurerm_resource_group.resource_group.location
-  route_table_name    = "${var.project_name}RouteTable"
-  route_name          = "${var.project_name}RouteToAzureFirewall"
-  firewall_private_ip = module.firewall.private_ip_address
+  source               = "./modules/route_table"
+  resource_group_name  = data.azurerm_resource_group.resource_group.name
+  location             = data.azurerm_resource_group.resource_group.location
+  route_table_name     = "${var.project_name}RouteTable"
+  route_name           = "${var.project_name}RouteToAzureFirewall"
+  firewall_private_ip  = module.firewall.private_ip_address
   subnets_to_associate = {
     (module.network.aks_subnet_name) = {
       subscription_id      = data.azurerm_subscription.subscription.subscription_id
@@ -135,9 +154,9 @@ module "routetable" {
 }
 
 module "redis_private_dns_zone" {
-  source         = "./modules/private_dns_zone"
-  name           = "redis.cache.windows.net"
-  resource_group = data.azurerm_resource_group.resource_group
+  source                   = "./modules/private_dns_zone"
+  name                     = "redis.cache.windows.net"
+  resource_group           = data.azurerm_resource_group.resource_group
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = {
       subscription_id     = data.azurerm_subscription.subscription.subscription_id

@@ -106,3 +106,8 @@ variable "project_tags" {
   description = "Project resource tags"
   type        = map(string)
 }
+
+variable "mapbox_api_token" {
+  type        = string
+  description = "Mapbox API token"
+}

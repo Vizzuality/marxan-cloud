@@ -2,8 +2,8 @@ terraform {
   backend "azurerm" {
     resource_group_name  = "marxan-rg"     // var.resource_group_name
     storage_account_name = "marxansa"      // var.storage_account_name
-    container_name       = "marxantfstate" // ${var.project_name}tfstate
-    key                  = "infrastructure.tfstate"
+    container_name       = "marxan-tnctfstate" // ${var.project_name}tfstate
+    key                  = "kubernetes.tfstate"
   }
 }
 
@@ -16,9 +16,9 @@ data "azurerm_subscription" "subscription" {}
 data "terraform_remote_state" "core" {
   backend = "azurerm"
   config  = {
-    resource_group_name  = var.resource_group_name   // var.resource_group_name
-    storage_account_name = "marxansa"                // var.storage_account_name
-    container_name       = "marxantfstate"           // ${var.project_name}tfstate
+    resource_group_name  = var.resource_group_name
+    storage_account_name = var.storage_account_name
+    container_name       = "${var.project_name}tfstate"
     key                  = "infrastructure.tfstate"
   }
 }
@@ -56,7 +56,7 @@ module "k8s_storage" {
   cloning_storage_class   = local.cloning_storage_class
 }
 
-#region Production
+#Production
 
 module "key_vault_production" {
   count = var.deploy_production ? 1 : 0
@@ -120,7 +120,7 @@ module "api_production" {
 
   source                             = "./modules/api"
   namespace                          = "production"
-  image                              = "${var.container_registry_name}.azurecr.io/marxan-api:production"
+  image                              = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-api:production"
   deployment_name                    = "api"
   application_base_url               = "https://${var.domain}"
   network_cors_origins               = "https://${var.domain},http://localhost:3000"
@@ -129,6 +129,10 @@ module "api_production" {
   temp_data_pvc_name                 = local.temp_data_pvc_name
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 24
+
+  depends_on = [
+    module.k8s_api_database_production
+  ]
 }
 
 module "geoprocessing_production" {
@@ -136,11 +140,15 @@ module "geoprocessing_production" {
 
   source               = "./modules/geoprocessing"
   namespace            = "production"
-  image                = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
+  image                = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:production"
   deployment_name      = "geoprocessing"
   geo_postgres_logging = "error"
   temp_data_pvc_name   = local.temp_data_pvc_name
   cloning_pvc_name     = local.cloning_pvc_name
+
+  depends_on = [
+    module.k8s_geoprocessing_database_production
+  ]
 }
 
 module "client_production" {
@@ -148,7 +156,7 @@ module "client_production" {
 
   source          = "./modules/client"
   namespace       = "production"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-client:production"
+  image           = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-client:production"
   deployment_name = "client"
   site_url        = "https://${data.terraform_remote_state.core.outputs.dns_zone_name}"
   api_url         = "https://api.${data.terraform_remote_state.core.outputs.dns_zone_name}"
@@ -159,7 +167,7 @@ module "webshot_production" {
 
   source          = "./modules/webshot"
   namespace       = "production"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-webshot:production"
+  image           = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-webshot:production"
   deployment_name = "webshot"
 }
 
@@ -211,16 +219,15 @@ module "db_tunnel_production" {
   source  = "flaupretre/tunnel/ssh"
   version = "1.8.0"
 
-  target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production, "fqdn", null)
+  target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production[0], "fqdn", null)
   target_port = 5432
 
-  gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_hostname
   gateway_user = "ubuntu"
 }
 
-#endregion
 
-#region Staging
+#Staging
 
 module "key_vault_staging" {
   source                 = "./modules/key_vault"
@@ -274,7 +281,7 @@ module "storage_pvc_staging" {
 module "api_staging" {
   source                             = "./modules/api"
   namespace                          = "staging"
-  image                              = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
+  image                              = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-api:staging"
   deployment_name                    = "api"
   application_base_url               = "https://staging.${var.domain}"
   network_cors_origins               = "https://staging.${var.domain},http://localhost:3000"
@@ -283,23 +290,31 @@ module "api_staging" {
   temp_data_pvc_name                 = local.temp_data_pvc_name
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 10
+
+  depends_on = [
+    module.k8s_api_database_staging
+  ]
 }
 
 module "geoprocessing_staging" {
   source                    = "./modules/geoprocessing"
   namespace                 = "staging"
-  image                     = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
+  image                     = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:staging"
   deployment_name           = "geoprocessing"
   cleanup_temporary_folders = "false"
   geo_postgres_logging      = "query"
   temp_data_pvc_name        = local.temp_data_pvc_name
   cloning_pvc_name          = local.cloning_pvc_name
+
+  depends_on = [
+    module.k8s_geoprocessing_database_staging
+  ]
 }
 
 module "client_staging" {
   source          = "./modules/client"
   namespace       = "staging"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-client:staging"
+  image           = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-client:staging"
   deployment_name = "client"
   site_url        = "https://staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
   api_url         = "https://api.staging.${data.terraform_remote_state.core.outputs.dns_zone_name}"
@@ -308,7 +323,7 @@ module "client_staging" {
 module "webshot_staging" {
   source          = "./modules/webshot"
   namespace       = "staging"
-  image           = "${var.container_registry_name}.azurecr.io/marxan-webshot:staging"
+  image           = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-webshot:staging"
   deployment_name = "webshot"
 }
 
@@ -357,8 +372,6 @@ module "db_tunnel_staging" {
   target_host = data.azurerm_postgresql_flexible_server.marxan_staging.fqdn
   target_port = 5432
 
-  gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_hostname
   gateway_user = "ubuntu"
 }
-
-#endregion

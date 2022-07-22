@@ -13,11 +13,6 @@ variable "storage_account_name" {
   description = "Azure service account to use for the project."
 }
 
-variable "location" {
-  type        = string
-  description = "Azure Location in which the resources will be created"
-}
-
 variable "port" {
   type        = number
   default     = 443
@@ -47,11 +42,6 @@ variable "temp_data_storage_size" {
 variable "cloning_storage_size" {
   type        = string
   description = "Size of the backend storage claim for project cloning"
-}
-
-variable "container_registry_name" {
-  type        = string
-  description = "Name for the Azure CR. Must be globally unique"
 }
 
 variable "key_vault_access_users" {

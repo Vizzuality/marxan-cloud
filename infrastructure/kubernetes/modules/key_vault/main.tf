@@ -4,8 +4,13 @@ data "azuread_users" "users" {
   user_principal_names = var.key_vault_access_users
 }
 
+resource "random_string" "random" {
+  length           = 6
+  special          = false
+}
+
 resource "azurerm_key_vault" "key_vault" {
-  name                       = "${title(var.key_vault_name_prefix)}${title(var.namespace)}" # This is the kv name. (eg: TncMarxanKvProduction,TncMarxanKvStaging)
+  name                       = "${title(var.key_vault_name_prefix)}${title(substr(var.namespace, 0, 4))}${random_string.random.result}" # This is the kv name. (eg: TncMarxanKvProdAbCdEf,TncMarxanKvStag123456)
   location                   = var.resource_group.location
   resource_group_name        = var.resource_group.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id

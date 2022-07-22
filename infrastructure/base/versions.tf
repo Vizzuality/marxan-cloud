@@ -12,6 +12,11 @@ terraform {
     template = {
       source = "hashicorp/template"
     }
+
+    github = {
+      source  = "integrations/github"
+      version = "4.27.1"
+    }
   }
   required_version = "1.2.4"
 }
@@ -22,4 +27,10 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = true
     }
   }
+}
+
+# https://github.com/integrations/terraform-provider-github/issues/667#issuecomment-1182340862
+provider "github" {
+  #  token = var.github_token
+  #  owner = "tnc-css"
 }

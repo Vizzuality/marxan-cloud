@@ -88,8 +88,8 @@ component. That is expected, and applying the same plan a 2nd time should succee
 #### Github Actions
 
 As part of this infrastructure, Github Actions are used to automatically build and push Docker images to Azure ACR, and
-to redeploy Kubernetes pods once that happens. To be able to do so, you need to specify the following Github Actions
-Secrets with the corresponding values:
+to redeploy Kubernetes pods once that happens. Said Github Actions depend on specific Github Secrets, that are listed below
+for reference. Said secrets are automatically created by the `base` Terraform project, and do not need to be created manually.
 
 - `AZURE_AKS_CLUSTER_NAME`: The name of the AKS cluster. Get from `Base`'s `k8s_cluster_name`
 - `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_hostname`
@@ -105,12 +105,12 @@ Secrets with the corresponding values:
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
 - `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 
-Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
-and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
-the Frontend app docker image. The secrets that need to be added to Github actions are named as `<ENV VAR name>_<environment>` 
-so, for example, to account for the `NEXT_PUBLIC_API_URL` frontend env var, you need to define both `NEXT_PUBLIC_API_URL_STAGING`
-and `NEXT_PUBLIC_API_URL_PRODUCTION`. Note that these values are passed onto the built docker images and used in the actual
-deployed applications.
+Additional Github Actions Secrets are needed, as required by the [frontend application](../app/README.md#env-variables)
+and used by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
+the Frontend app docker image. These secrets are named as `<ENV VAR name>_<environment>` so, for example, to account for
+the `NEXT_PUBLIC_API_URL` frontend env var, both `NEXT_PUBLIC_API_URL_STAGING` and `NEXT_PUBLIC_API_URL_PRODUCTION` need
+to be defined. Note that these values are passed onto the built docker images and used in the actual deployed applications.
+The Terraform `base` project already accounts for the `production` and `staging` frontend secrets.
 
 ## How to deploy
 
@@ -153,38 +153,6 @@ to use a different port when reaching the AKS cluster (append `:<port number>` t
 your local port.
 
 You should now be able to use `kubectl` to access your AKS cluster.
-
-## Configuring PostgreSQL
-
-The included Terraform code sets up a PostgreSQL database server in the AKS cluster but, as it cannot reach it once
-it's set up, it won't create the necessary databases and users for the Marxan application to run, as well as enable
-PostGIS. This has to be done manually:
-
-- Use `kubectl` to open a terminal in the pod that is running the target PostgreSQL server.
-You can do this by running: `kubectl exec --namespace <namespace> -it <pod name> -- /bin/sh`.
-The pod names are: `api-postgres-postgresql-0` and `geoprocessing-postgres-postgresql-0` for
-both the `staging` and `production` environments.
-- Create a database and a user with the corresponding credentials (see either the relevant
-[Kubernetes Secret](https://kubernetes.io/docs/concepts/configuration/secret/) or the
-[Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/)). (This section needs to be flushed out and offer some trouble shooting advice.)
-***Note***:
-this should already be done by Terraform (see secrets module ./modules/secrets/main.tf).
-- Enable the required database extensions. They must be executed by a user with elevated
-privileges initially for the migrations to succeed. Execute the following sql commands:
-
-```sql
-create extension IF NOT EXISTS pgcrypto;
-create extension IF NOT EXISTS tablefunc;
-create extension IF NOT EXISTS plpgsql;
-create extension IF NOT EXISTS postgis;
-create extension IF NOT EXISTS postgis_raster;
-create extension IF NOT EXISTS postgis_topology;
-```
-- Make sure the user has full access to the associated database.
-- Repeat for each database used by the project.
-
-You may need to manually restart application pods once the PostgreSQL users and databases are in place, and verify
-that they connect successfully.
 
 ## Verbosity
 
