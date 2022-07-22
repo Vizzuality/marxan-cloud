@@ -1,9 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ScenarioFeaturesService } from './scenario-features.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
-
 import {
   ScenarioFeaturesData,
   ScenarioFeaturesGapData,
@@ -28,6 +26,12 @@ import {
   StratificationQuery,
 } from './stratification';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
+import { ComputeArea } from './compute-area.service';
+import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
+import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
+import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
+import { FeatureHashModule } from '../features-hash/features-hash.module';
+import { SplitCreateFeatures } from './split/split-create-features.service';
 
 @Module({
   imports: [
@@ -41,10 +45,13 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
       ],
       DbConnections.geoprocessingDB,
     ),
+    FeatureHashModule,
+    PuvsprCalculationsModule.for(DbConnections.geoprocessingDB),
     ProjectsModule,
     ApiEventsModule,
     IntersectWithPuModule,
     AccessControlModule,
+    LegacyProjectImportRepositoryModule,
   ],
   providers: [
     ScenarioFeaturesService,
@@ -55,6 +62,8 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
     CopyQuery,
     CopyDataProvider,
     CopyOperation,
+    ComputeArea,
+    SplitCreateFeatures,
     SplitQuery,
     SplitDataProvider,
     SplitOperation,
@@ -63,6 +72,7 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
     StratificationOperation,
     MoveDataFromPreparationSaga,
     MoveDataFromPreparationHandler,
+    SplitFeatureConfigMapper,
   ],
   exports: [
     ScenarioFeaturesService,

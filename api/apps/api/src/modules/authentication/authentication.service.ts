@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   forwardRef,
   Inject,
   Injectable,
@@ -23,6 +24,10 @@ import { v4 } from 'uuid';
 import * as ApiEventsUserData from '@marxan-api/modules/api-events/dto/apiEvents.user.data.dto';
 import { Mailer } from '@marxan-api/modules/authentication/password-recovery/mailer';
 import { API_EVENT_KINDS } from '@marxan/api-events';
+import { EventBus } from '@nestjs/cqrs';
+import { UserLoggedIn } from './user-logged-in.event';
+import { isStringEntropyHigherThan } from '@marxan-api/utils/passwordValidation.utils';
+import { isLeft } from 'fp-ts/lib/Either';
 
 /**
  * Access token for the app: key user data and access token
@@ -66,6 +71,10 @@ export interface JwtDataPayload {
   exp: number;
 }
 
+/**
+ * Entropy threshold for password validation.
+ */
+export const entropyThreshold = 80;
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
@@ -79,6 +88,7 @@ export class AuthenticationService {
     private readonly issuedAuthnTokensRepository: Repository<IssuedAuthnToken>,
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly mailer: Mailer,
+    private readonly eventBus: EventBus,
   ) {}
 
   /**
@@ -111,6 +121,13 @@ export class AuthenticationService {
    * @todo Allow to set all of a user's data on signup, if needed.
    */
   async createUser(signupDto: SignUpDto): Promise<Partial<User>> {
+    const passwordCheck = isStringEntropyHigherThan(
+      entropyThreshold,
+      signupDto.password,
+    );
+    if (isLeft(passwordCheck)) {
+      throw new ForbiddenException(passwordCheck.left);
+    }
     const user = new User();
     user.displayName = signupDto.displayName;
     user.passwordHash = await hash(signupDto.password, 10);
@@ -160,6 +177,13 @@ export class AuthenticationService {
    * Create a new user from the signup data provided via the CLI. Skips account confirmation
    */
   async createCLIUser(signupDto: SignUpDto): Promise<Partial<User>> {
+    const passwordCheck = isStringEntropyHigherThan(
+      entropyThreshold,
+      signupDto.password,
+    );
+    if (isLeft(passwordCheck)) {
+      throw new ForbiddenException(passwordCheck.left);
+    }
     const user = new User();
     user.displayName = signupDto.displayName;
     user.fname = signupDto.fname;
@@ -273,6 +297,8 @@ export class AuthenticationService {
     };
 
     await this.purgeExpiredIssuedTokens();
+
+    this.eventBus.publish(new UserLoggedIn(user.id));
 
     return {
       user: UsersService.getSanitizedUserMetadata(user),

@@ -1,73 +1,57 @@
-import { Connection } from 'typeorm';
+import { LegacyProjectImportRepository } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import { ResourceId } from '@marxan/cloning/domain';
+import { assertDefined } from '@marxan/utils';
 import { Injectable } from '@nestjs/common';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { InjectConnection } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { isRight } from 'fp-ts/lib/Either';
+import { Repository } from 'typeorm';
+import { Scenario } from '../scenario.api.entity';
+import {
+  PuvrsprDatRow,
+  PuvsprDatProcessor,
+} from './puvspr.dat.processor/puvspr.dat.processor';
+
 @Injectable()
 export class PuvsprDatService {
   constructor(
-    @InjectConnection(DbConnections.geoprocessingDB)
-    private readonly connection: Connection,
+    @InjectRepository(Scenario)
+    private readonly scenarioRepo: Repository<Scenario>,
+    private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
+    private readonly puvsprDatProcessor: PuvsprDatProcessor,
   ) {}
 
-  async getPuvsprDatContent(scenarioId: string): Promise<string> {
-    /**
-     * @TODO further performance savings: limiting scans to planning_units_geom
-     * by partition (we need to get the grid shape from the parent project); use
-     * && operator instead of st_intersects() for bbox-based calculation of
-     * intersections.
-     *
-     * @TODO Calculate `amount` correctly from `amount_from_legacy_project`. The
-     * initial implementation is simply a placeholder so that we can use
-     * `amount_from_legacy_projects` in legacy project piece importers.
-     *
-     * @TODO Refactor this to precompute the whole puvspr.dat data at feature
-     * upload time (for user-supplied features) or the first time a feature is
-     * selected via a feature specification (for platform-wide features).
-     */
-    const rows: {
-      scenario_id: string;
-      pu_id: number;
-      feature_id: number;
-      amount: number;
-    }[] = await this.connection.query(
-      `
-        select
-          pu.scenario_id as scenario_id,
-          puid as pu_id,
-          feature_id,
-          COALESCE(
-            species.amount_from_legacy_project,
-            ST_Area(ST_Transform(ST_Intersection(species.the_geom, pu.the_geom),3410))
-          ) as amount
-        from
-        (
-            select
-              st_union(the_geom) as the_geom,
-              min(sfd.feature_id) as feature_id,
-              -- @todo Replace use of arbitrary aggregate function with proper
-              -- implementation.
-              min(sfd.amount_from_legacy_project) as amount_from_legacy_project
-            from scenario_features_data sfd
-            inner join features_data fd on sfd.feature_class_id = fd.id where sfd.scenario_id = $1
-            group by fd.feature_id
-        ) species,
-        (
-            select the_geom, ppu.puid, spd.scenario_id
-            from planning_units_geom pug
-            inner join projects_pu ppu on pug.id = ppu.geom_id
-            inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
-            where spd.scenario_id = $1 order by ppu.puid asc
-        ) pu
-        where pu.scenario_id = $1 and species.the_geom && pu.the_geom
-        order by puid, feature_id asc;
-      `,
-      [scenarioId],
+  public async getPuvsprDatContent(scenarioId: string): Promise<string> {
+    const [scenario] = await this.scenarioRepo.find({ id: scenarioId });
+    assertDefined(scenario);
+
+    const projectId = scenario.projectId;
+
+    const isLegacyProject = await this.isLegacyProject(projectId);
+
+    const puvsprRows = await this.puvsprDatProcessor.getPuvsprDatRows(
+      isLegacyProject,
+      scenarioId,
+      projectId,
     );
+
+    return this.getFileContent(puvsprRows);
+  }
+
+  private async isLegacyProject(projectId: string) {
+    const legacyProjectImportOrError = await this.legacyProjectImportRepo.find(
+      new ResourceId(projectId),
+    );
+
+    return isRight(legacyProjectImportOrError);
+  }
+
+  private getFileContent(rows: PuvrsprDatRow[]) {
     return (
       'species\tpu\tamount\n' +
       rows
         .map(
-          (row) => `${row.feature_id}\t${row.pu_id}\t${row.amount.toFixed(6)}`,
+          ({ speciesId, puId, amount }) =>
+            `${speciesId}\t${puId}\t${amount.toFixed(6)}`,
         )
         .join('\n')
     );

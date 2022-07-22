@@ -1,13 +1,15 @@
 import React, {
-  useCallback, useRef, useState,
+  useCallback, useEffect, useRef, useState,
 } from 'react';
 
 import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
+import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { setLegacyProjectId } from 'store/slices/projects/new';
 
 import { useCancelImportLegacyProject, useLegacyProjectValidationResults, useImportLegacyProject } from 'hooks/projects';
+import { useScenariosStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
@@ -38,12 +40,69 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   const dispatch = useDispatch();
   const { legacyProjectId } = useSelector((state) => state['/projects/new']);
 
+  const queryClient = useQueryClient();
+
   const cancelLegacyProjectMutation = useCancelImportLegacyProject({});
   const legacyProjectValidationResultsMutation = useLegacyProjectValidationResults({});
 
   const importLegacyMutation = useImportLegacyProject({});
 
   const ref = useRef(null);
+
+  const {
+    data: scenarioStatusData,
+    isError: scenarioStatusDataIsError,
+  } = useScenariosStatus(legacyProjectId);
+  const { jobs = [] } = scenarioStatusData || {};
+  const legacyFailure = jobs.find((j) => j.kind === 'legacy')?.status === 'failure';
+  const legacyDone = jobs.find((j) => j.kind === 'legacy')?.status === 'done';
+
+  useEffect(() => {
+    if (legacyDone) {
+      queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['scenarios', legacyProjectId]);
+      onDismiss(true);
+      setLoading(false);
+      addToast('success-import-legacy-project', (
+        <>
+          <h2 className="font-medium">Success!</h2>
+          <p className="text-sm">Legacy project import has been done</p>
+        </>
+      ), {
+        level: 'success',
+      });
+    }
+  }, [
+    legacyProjectId,
+    legacyDone,
+    queryClient,
+    addToast,
+    onDismiss,
+  ]);
+
+  useEffect(() => {
+    if (legacyFailure || scenarioStatusDataIsError) {
+      legacyProjectValidationResultsMutation.mutate({ projectId: legacyProjectId }, {
+        onSuccess: ({ errorsAndWarnings }) => {
+          if (errorsAndWarnings && errorsAndWarnings.length) {
+            const errors = errorsAndWarnings.filter((vr) => vr.status === 'failed').map((vr) => vr.errors);
+            setLoading(false);
+            setImportLegacyErrors(errors);
+            ref?.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+          }
+        },
+        onError: ({ response }) => {
+          const { errors } = response.data;
+          console.info(errors);
+          setLoading(false);
+        },
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    legacyFailure,
+    scenarioStatusDataIsError,
+  ]);
 
   const onCancelImportLegacyProject = useCallback(() => {
     cancelLegacyProjectMutation.mutate({ projectId: legacyProjectId }, {
@@ -65,34 +124,6 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
     importLegacyMutation.mutate({ projectId: legacyProjectId, data }, {
       onSuccess: () => {
-        legacyProjectValidationResultsMutation.mutate({ projectId: legacyProjectId }, {
-          onSuccess: ({ errorsAndWarnings }) => {
-            if (errorsAndWarnings && errorsAndWarnings.length) {
-              const errors = errorsAndWarnings.filter((vr) => vr.status === 'failed').map((vr) => vr.errors);
-              setLoading(false);
-              setImportLegacyErrors(errors);
-              ref?.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-            } else {
-              addToast('success-import-legacy-project', (
-                <>
-                  <h2 className="font-medium">Success!</h2>
-                  <p className="text-sm">Legacy project import has been done</p>
-                </>
-              ), {
-                level: 'success',
-              });
-
-              onDismiss(true);
-              console.info('Legacy project uploaded');
-            }
-            setLoading(false);
-          },
-          onError: ({ response }) => {
-            const { errors } = response.data;
-            console.info(errors);
-            setLoading(false);
-          },
-        });
       },
       onError: ({ response }) => {
         const { errors } = response.data;
@@ -115,9 +146,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
   }, [
     legacyProjectId,
     addToast,
-    onDismiss,
     importLegacyMutation,
-    legacyProjectValidationResultsMutation,
   ]);
 
   return (

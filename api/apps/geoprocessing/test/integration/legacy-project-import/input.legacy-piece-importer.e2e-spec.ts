@@ -236,7 +236,7 @@ const getFixtures = async () => {
           expect(scenario.metadata).toEqual({
             marxanInputParameterFile: expectedInputParameterFile,
             scenarioEditingMetadata: {
-              tab: 'planning-unit',
+              tab: withSolutions ? 'solutions' : 'parameters',
               subtab: null,
               status: {
                 'planning-unit': 'draft',

@@ -11,7 +11,7 @@ output "k8s_cluster_name" {
 output "k8s_cluster_hostname" {
   value       = module.kubernetes.cluster_hostname
   description = "AKS cluster hostname"
-  sensitive = true
+  sensitive   = true
 }
 
 output "kube_config" {
@@ -58,6 +58,42 @@ output "redis_port" {
 
 output "redis_password" {
   value     = module.redis.redis_password
+  sensitive = true
+}
+
+output "sql_server_production_name" {
+  value = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_name : null
+}
+
+output "sql_server_production_hostname" {
+  value = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_url : null
+}
+
+output "sql_server_production_username" {
+  value     = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_username : null
+  sensitive = true
+}
+
+output "sql_server_production_password" {
+  value     = length(module.sql_server_production) > 0 ? module.sql_server_production[0].sql_server_password : null
+  sensitive = true
+}
+
+output "sql_server_staging_name" {
+  value = module.sql_server_staging.sql_server_name
+}
+
+output "sql_server_staging_hostname" {
+  value = module.sql_server_staging.sql_server_url
+}
+
+output "sql_server_staging_username" {
+  value     = module.sql_server_staging.sql_server_username
+  sensitive = true
+}
+
+output "sql_server_staging_password" {
+  value     = module.sql_server_staging.sql_server_password
   sensitive = true
 }
 

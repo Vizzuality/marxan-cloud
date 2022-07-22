@@ -11,6 +11,7 @@ export type ScenarioMetadataContent = {
   blmRange: BlmRange;
   status?: ProjectCustomFeature['creation_status'];
   ranAtLeastOnce: boolean;
+  solutionsAreLocked: boolean;
   type: string;
 };
 

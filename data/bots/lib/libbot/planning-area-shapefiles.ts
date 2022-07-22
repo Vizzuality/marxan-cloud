@@ -3,6 +3,7 @@ import { BotHttpClient } from "./marxan-bot.ts";
 import { FileUploader } from "./shapefile-uploader.ts";
 import { logDebug, logError, logInfo } from "./logger.ts";
 import { tookMs } from "./util/perf.ts";
+import { HttpUtils } from "./util/http.ts";
 
 enum PlanningAreaShapefileKind {
   planningArea = "planningArea",
@@ -44,7 +45,7 @@ export class PlanningAreas extends FileUploader {
       headers: [["Authorization", `Bearer ${this.currentJwt}`]],
     })
       .then((response) => {
-        if (!this.isResponseSuccessful(response.status)) {
+        if (!HttpUtils.isResponseSuccessful(response.status)) {
           throw new Error(
             `Failed to upload planning area shapefile: ${response.status}`,
           );
@@ -62,10 +63,6 @@ export class PlanningAreas extends FileUploader {
     );
     logDebug(`Planning area id: ${planningAreaId}`);
     return planningAreaId;
-  }
-
-  isResponseSuccessful(statusCode: number): boolean {
-    return statusCode >= 200 && statusCode < 400;
   }
 
   async setFromShapefile(localFilePath: string): Promise<string> {

@@ -35,10 +35,6 @@ data "azurerm_dns_zone" "dns_zone" {
 }
 
 locals {
-  k8s_host                   = "${trim(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.host, "443")}${var.port}"
-  k8s_client_certificate     = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_certificate)
-  k8s_client_key             = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.client_key)
-  k8s_cluster_ca_certificate = base64decode(data.azurerm_kubernetes_cluster.k8s_cluster.kube_config.0.cluster_ca_certificate)
   temp_data_storage_class    = "azurefile-csi-temp-data"
   temp_data_pvc_name         = "shared-temp-data-storage"
   cloning_storage_class      = "azurefile-csi-cloning-data"
@@ -48,27 +44,15 @@ locals {
 module "k8s_namespaces" {
   source                     = "./modules/k8s_namespaces"
   namespaces                 = ["production", "staging"]
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
 }
 
 module "cert_manager" {
   source                     = "./modules/cert_manager"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   email                      = var.cert_email
 }
 
 module "k8s_storage" {
   source                     = "./modules/storage"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   temp_data_storage_class    = local.temp_data_storage_class
   cloning_storage_class      = local.cloning_storage_class
 }
@@ -77,6 +61,8 @@ module "k8s_storage" {
 # Production
 ####
 module "key_vault_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                 = "./modules/key_vault"
   namespace              = "production"
   resource_group         = data.azurerm_resource_group.resource_group
@@ -85,39 +71,41 @@ module "key_vault_production" {
 }
 
 module "k8s_api_database_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "production"
   name                       = "api"
-  key_vault_id               = module.key_vault_production.key_vault_id
-  container_registry_name    = var.container_registry_name
+  key_vault_id               = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
+
+  providers = {
+    postgresql = postgres.db_tunnel_production
+  }
 }
 
 module "k8s_geoprocessing_database_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "production"
   name                       = "geoprocessing"
-  key_vault_id               = module.key_vault_production.key_vault_id
-  container_registry_name    = var.container_registry_name
+  key_vault_id               = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_production_name
+
+  providers = {
+    postgresql = postgres.db_tunnel_production
+  }
 }
 
 module "storage_pvc_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/volumes"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   temp_data_storage_class    = local.temp_data_storage_class
   temp_data_pvc_name         = local.temp_data_pvc_name
@@ -128,28 +116,25 @@ module "storage_pvc_production" {
 }
 
 module "api_production" {
-  source                     = "./modules/api"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  namespace                  = "production"
-  image                      = "${var.container_registry_name}.azurecr.io/marxan-api:production"
-  deployment_name            = "api"
-  application_base_url       = "https://${var.domain}"
-  network_cors_origins       = "https://${var.domain},http://localhost:3000"
-  http_logging_morgan_format = ""
-  api_postgres_logging       = "error"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  count = var.deploy_production ? 1 : 0
+
+  source                             = "./modules/api"
+  namespace                          = "production"
+  image                              = "${var.container_registry_name}.azurecr.io/marxan-api:production"
+  deployment_name                    = "api"
+  application_base_url               = "https://${var.domain}"
+  network_cors_origins               = "https://${var.domain},http://localhost:3000"
+  http_logging_morgan_format         = ""
+  api_postgres_logging               = "error"
+  temp_data_pvc_name                 = local.temp_data_pvc_name
+  cloning_pvc_name                   = local.cloning_pvc_name
+  postgres_geodb_max_clients_in_pool = 24
 }
 
 module "geoprocessing_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/geoprocessing"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:production"
   deployment_name            = "geoprocessing"
@@ -159,11 +144,9 @@ module "geoprocessing_production" {
 }
 
 module "client_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/client"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-client:production"
   deployment_name            = "client"
@@ -172,44 +155,66 @@ module "client_production" {
 }
 
 module "webshot_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/webshot"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "production"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:production"
   deployment_name            = "webshot"
 }
 
 module "production_secrets" {
-  source                     = "./modules/secrets"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  project_name               = var.project_name
-  namespace                  = "production"
-  name                       = "api"
-  key_vault_id               = module.key_vault_production.key_vault_id
-  redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
-  redis_password             = data.terraform_remote_state.core.outputs.redis_password
-  redis_port                 = data.terraform_remote_state.core.outputs.redis_port
-  sparkpost_api_key          = var.sparkpost_api_key
-  api_url                    = "api.${var.domain}"
+  count = var.deploy_production ? 1 : 0
+
+  source                          = "./modules/secrets"
+  project_name                    = var.project_name
+  namespace                       = "production"
+  name                            = "api"
+  key_vault_id                    = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  redis_host                      = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                  = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                      = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key               = var.sparkpost_api_key
+  api_url                         = "api.${var.domain}"
+  postgres_api_database           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
+  postgres_api_username           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
+  postgres_api_password           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
+  postgres_api_hostname           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
+  postgres_geoprocessing_database = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
+  postgres_geoprocessing_username = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
+  postgres_geoprocessing_password = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
+  postgres_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
 }
 
 module "ingress_production" {
+  count = var.deploy_production ? 1 : 0
+
   source                     = "./modules/ingress"
   namespace                  = "production"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
+}
+
+data "azurerm_postgresql_flexible_server" "marxan_production" {
+  count = var.deploy_production ? 1 : 0
+  name                = lookup(data.terraform_remote_state.core.outputs, "sql_server_production_name", null)
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+module db_tunnel_production {
+  count = var.deploy_production ? 1 : 0
+
+  # You can also retrieve this module from the terraform registry
+  source  = "flaupretre/tunnel/ssh"
+  version = "1.8.0"
+
+  target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production, "fqdn", null)
+  target_port = 5432
+
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
+  gateway_user = "ubuntu"
 }
 
 
@@ -226,38 +231,34 @@ module "key_vault_staging" {
 
 module "k8s_api_database_staging" {
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "staging"
   name                       = "api"
   key_vault_id               = module.key_vault_staging.key_vault_id
-  container_registry_name    = var.container_registry_name
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
+
+  providers = {
+    postgresql = postgres.db_tunnel_staging
+  }
 }
 
 module "k8s_geoprocessing_database_staging" {
   source                     = "./modules/database"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   namespace                  = "staging"
   name                       = "geoprocessing"
   key_vault_id               = module.key_vault_staging.key_vault_id
-  container_registry_name    = var.container_registry_name
+  sql_server_name            = data.terraform_remote_state.core.outputs.sql_server_staging_name
+
+  providers = {
+    postgresql = postgres.db_tunnel_staging
+  }
 }
 
 module "storage_pvc_staging" {
   source                     = "./modules/volumes"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   temp_data_storage_class    = local.temp_data_storage_class
   temp_data_pvc_name         = local.temp_data_pvc_name
@@ -268,28 +269,21 @@ module "storage_pvc_staging" {
 }
 
 module "api_staging" {
-  source                     = "./modules/api"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  namespace                  = "staging"
-  image                      = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
-  deployment_name            = "api"
-  application_base_url       = "https://staging.${var.domain}"
-  network_cors_origins       = "https://staging.${var.domain},http://localhost:3000"
-  http_logging_morgan_format = "short"
-  api_postgres_logging       = "query"
-  temp_data_pvc_name         = local.temp_data_pvc_name
-  cloning_pvc_name           = local.cloning_pvc_name
+  source                             = "./modules/api"
+  namespace                          = "staging"
+  image                              = "${var.container_registry_name}.azurecr.io/marxan-api:staging"
+  deployment_name                    = "api"
+  application_base_url               = "https://staging.${var.domain}"
+  network_cors_origins               = "https://staging.${var.domain},http://localhost:3000"
+  http_logging_morgan_format         = "short"
+  api_postgres_logging               = "query"
+  temp_data_pvc_name                 = local.temp_data_pvc_name
+  cloning_pvc_name                   = local.cloning_pvc_name
+  postgres_geodb_max_clients_in_pool = 10
 }
 
 module "geoprocessing_staging" {
   source                     = "./modules/geoprocessing"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-geoprocessing:staging"
   deployment_name            = "geoprocessing"
@@ -301,10 +295,6 @@ module "geoprocessing_staging" {
 
 module "client_staging" {
   source                     = "./modules/client"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-client:staging"
   deployment_name            = "client"
@@ -314,42 +304,55 @@ module "client_staging" {
 
 module "webshot_staging" {
   source                     = "./modules/webshot"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   namespace                  = "staging"
   image                      = "${var.container_registry_name}.azurecr.io/marxan-webshot:staging"
   deployment_name            = "webshot"
 }
 
 module "staging_secrets" {
-  source                     = "./modules/secrets"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
-  project_name               = var.project_name
-  namespace                  = "staging"
-  name                       = "api"
-  key_vault_id               = module.key_vault_staging.key_vault_id
-  redis_host                 = data.terraform_remote_state.core.outputs.redis_hostname
-  redis_password             = data.terraform_remote_state.core.outputs.redis_password
-  redis_port                 = data.terraform_remote_state.core.outputs.redis_port
-  sparkpost_api_key          = var.sparkpost_api_key
-  api_url                    = "api.staging.${var.domain}"
+  source                          = "./modules/secrets"
+  project_name                    = var.project_name
+  namespace                       = "staging"
+  name                            = "api"
+  key_vault_id                    = module.key_vault_staging.key_vault_id
+  redis_host                      = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                  = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                      = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key               = var.sparkpost_api_key
+  api_url                         = "api.staging.${var.domain}"
+  postgres_api_database           = module.k8s_api_database_staging.postgresql_database
+  postgres_api_username           = module.k8s_api_database_staging.postgresql_username
+  postgres_api_password           = module.k8s_api_database_staging.postgresql_password
+  postgres_api_hostname           = module.k8s_api_database_staging.postgresql_hostname
+  postgres_geoprocessing_database = module.k8s_geoprocessing_database_staging.postgresql_database
+  postgres_geoprocessing_username = module.k8s_geoprocessing_database_staging.postgresql_username
+  postgres_geoprocessing_password = module.k8s_geoprocessing_database_staging.postgresql_password
+  postgres_geoprocessing_hostname = module.k8s_geoprocessing_database_staging.postgresql_hostname
 }
 
 module "ingress_staging" {
   source                     = "./modules/ingress"
   namespace                  = "staging"
-  k8s_host                   = local.k8s_host
-  k8s_client_certificate     = local.k8s_client_certificate
-  k8s_client_key             = local.k8s_client_key
-  k8s_cluster_ca_certificate = local.k8s_cluster_ca_certificate
   resource_group             = data.azurerm_resource_group.resource_group
   project_name               = var.project_name
   dns_zone                   = data.azurerm_dns_zone.dns_zone
   domain                     = var.domain
   domain_prefix              = "staging"
+}
+
+data "azurerm_postgresql_flexible_server" "marxan_staging" {
+  name                = data.terraform_remote_state.core.outputs.sql_server_staging_name
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
+module db_tunnel_staging {
+  # You can also retrieve this module from the terraform registry
+  source  = "flaupretre/tunnel/ssh"
+  version = "1.8.0"
+
+  target_host = data.azurerm_postgresql_flexible_server.marxan_staging.fqdn
+  target_port = 5432
+
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_public_ip
+  gateway_user = "ubuntu"
 }

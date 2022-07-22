@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { Either, left, right } from 'fp-ts/Either';
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Either, isLeft, left, right } from 'fp-ts/Either';
 import { isDefined } from '@marxan/utils';
 import { UserService } from './user.service';
 import { Mailer } from './mailer';
 import { TokenFactory } from './token.factory';
 import { Token } from './token';
 import { RecoveryTokenRepository } from './recovery-token.repository';
+import { isStringEntropyHigherThan } from '@marxan-api/utils/passwordValidation.utils';
+import { entropyThreshold } from '../authentication.service';
 
 export const tokenInvalid = Symbol('token invalid');
 type TokenInvalid = typeof tokenInvalid;
@@ -42,6 +44,13 @@ export class PasswordRecoveryService {
       return left(tokenInvalid);
     }
     const userId = token.userId;
+    const passwordCheck = isStringEntropyHigherThan(
+      entropyThreshold,
+      newPassword,
+    );
+    if (isLeft(passwordCheck)) {
+      throw new ForbiddenException(passwordCheck.left);
+    }
 
     await this.users.setUserPassword(userId, newPassword);
     await this.users.logoutUser(userId);

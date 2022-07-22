@@ -1,41 +1,48 @@
-import { Repository } from 'typeorm';
-import { getConnectionToken } from '@nestjs/typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test } from '@nestjs/testing';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
-
 import { PuvsprDatService } from './puvspr.dat.service';
-
-interface PuvsprRow {
-  scenarioId: string;
-  puId: string;
-  featureId: string;
-  amount: number;
-}
+import { Scenario } from '../scenario.api.entity';
+import { LegacyProjectImportRepository } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import { LegacyProjectImportMemoryRepository } from '@marxan-api/modules/legacy-project-import/infra/legacy-project-import-memory.repository';
+import { PuvsprDatProcessor } from './puvspr.dat.processor/puvspr.dat.processor';
+import { v4 } from 'uuid';
 
 let sut: PuvsprDatService;
-let dataRepo: jest.Mocked<Repository<PuvsprRow>>;
+let puvsprDatProcessor = jest.fn();
+let scenarioRepo = jest.fn();
 
 beforeEach(async () => {
-  const token = getConnectionToken(DbConnections.geoprocessingDB);
   const sandbox = await Test.createTestingModule({
     providers: [
       PuvsprDatService,
       {
-        provide: token,
-        useValue: {
-          query: jest.fn(),
-        } as any,
+        provide: getRepositoryToken(Scenario),
+        useValue: { find: scenarioRepo },
+      },
+      {
+        provide: LegacyProjectImportRepository,
+        useClass: LegacyProjectImportMemoryRepository,
+      },
+      {
+        provide: PuvsprDatProcessor,
+        useValue: { getPuvsprDatRows: puvsprDatProcessor },
       },
     ],
   }).compile();
 
   sut = sandbox.get(PuvsprDatService);
-  dataRepo = sandbox.get(token);
+
+  scenarioRepo.mockImplementation(async () => [
+    {
+      id: v4(),
+      projectId: v4(),
+    },
+  ]);
 });
 
 describe(`when there are no rows`, () => {
   beforeEach(() => {
-    dataRepo.query.mockImplementationOnce(async () => []);
+    puvsprDatProcessor.mockImplementationOnce(async () => []);
   });
 
   it(`should return headers only`, async () => {
@@ -47,24 +54,21 @@ describe(`when there are no rows`, () => {
 
 describe(`when there is data available`, () => {
   beforeEach(() => {
-    dataRepo.query.mockImplementationOnce(async () => [
+    puvsprDatProcessor.mockImplementationOnce(async () => [
       {
         amount: 1000.0,
-        scenario_id: 'scenarioId',
-        feature_id: 'feature-1',
-        pu_id: 'pu-1,',
+        speciesId: 'feature-1',
+        puId: 'pu-1,',
       },
       {
         amount: 0.001,
-        scenario_id: 'scenarioId',
-        feature_id: 'feature-1',
-        pu_id: 'pu-2,',
+        speciesId: 'feature-1',
+        puId: 'pu-2,',
       },
       {
         amount: 99.995,
-        scenario_id: 'scenarioId',
-        feature_id: 'feature-1',
-        pu_id: 'pu-3,',
+        speciesId: 'feature-1',
+        puId: 'pu-3,',
       },
     ]);
   });

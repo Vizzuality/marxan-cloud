@@ -22,7 +22,8 @@
     "password": null,
     "database": null,
     "runMigrationsOnStartup": false,
-    "logging": "error"
+    "logging": "error",
+    "sslMode": false
   },
   "postgresGeoApi": {
     "url": null,
@@ -32,7 +33,9 @@
     "password": null,
     "database": null,
     "runMigrationsOnStartup": false,
-    "logging": "error"
+    "logging": "error",
+    "sslMode": false,
+    "maxClientsInPool": 10
   },
   "api": {
     "url": "http://api:3000",
@@ -60,7 +63,8 @@
       "localPath": "/tmp/storage"
     },
     "cloningFileStorage": {
-      "localPath": "/opt/marxan-project-cloning"
+      "localPath": "/opt/marxan-project-cloning",
+      "artifactValidityInHours": 168
     }
   },
   "marxan": {

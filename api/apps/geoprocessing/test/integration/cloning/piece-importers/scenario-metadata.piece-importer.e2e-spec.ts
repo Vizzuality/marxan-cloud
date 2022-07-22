@@ -33,6 +33,7 @@ interface ScenarioSelectResult {
   number_of_runs: number;
   blm: number;
   ran_at_least_once: boolean;
+  solutions_are_locked: boolean;
   type: string;
   created_by: string;
 }
@@ -77,6 +78,21 @@ describe(ScenarioMetadataPieceImporter, () => {
       .ThenScenarioMetadataShouldBeImported();
   });
 
+  it('imports scenario metadata creating a new scenario with solutions locked (project import process)', async () => {
+    const resourceKind = ResourceKind.Project;
+    const solutionsAreLocked = true;
+    await fixtures.GivenProject();
+    await fixtures.GivenUser();
+
+    const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
+      resourceKind,
+    );
+    const input = fixtures.GivenJobInput(archiveLocation, resourceKind);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenScenarioMetadataShouldBeImported();
+  });
+
   it('imports scenario metadata updating an existing scenario (scenario cloning process)', async () => {
     const resourceKind = ResourceKind.Scenario;
     await fixtures.GivenScenario();
@@ -92,6 +108,25 @@ describe(ScenarioMetadataPieceImporter, () => {
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenScenarioMetadataShouldBeImported();
+  });
+
+  it('imports scenario metadata updating an existing scenario with solutions locked (scenario cloning process)', async () => {
+    const resourceKind = ResourceKind.Scenario;
+    const solutionsAreLocked = true;
+    await fixtures.GivenScenario();
+    await fixtures.GivenUser();
+
+    const archiveLocation = await fixtures.GivenValidScenarioMetadataFile(
+      resourceKind,
+      solutionsAreLocked,
+    );
+    const input = fixtures.GivenJobInput(
+      archiveLocation,
+      ResourceKind.Scenario,
+    );
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenScenarioMetadataShouldBeImported(solutionsAreLocked);
   });
 });
 
@@ -125,7 +160,9 @@ const getFixtures = async () => {
     getEntityManagerToken(geoprocessingConnections.apiDB.name),
   );
 
-  const validScenarioMetadataFileContent: ScenarioMetadataContent = {
+  const validScenarioMetadataFileContent: (
+    solutionsAreLocked: boolean,
+  ) => ScenarioMetadataContent = (solutionsAreLocked = false) => ({
     name: `test scenario - ${scenarioId}`,
     description: 'scenario description',
     blm: 10,
@@ -136,8 +173,9 @@ const getFixtures = async () => {
       values: [],
     },
     ranAtLeastOnce: true,
+    solutionsAreLocked,
     type: 'marxan',
-  };
+  });
 
   return {
     cleanUp: async () => {
@@ -195,7 +233,10 @@ const getFixtures = async () => {
     GivenNoScenarioMetadataFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidScenarioMetadataFile: async (resourceKind: ResourceKind) => {
+    GivenValidScenarioMetadataFile: async (
+      resourceKind: ResourceKind,
+      solutionsAreLocked = false,
+    ) => {
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ScenarioMetadata,
         { kind: resourceKind, scenarioId: oldScenarioId },
@@ -205,7 +246,9 @@ const getFixtures = async () => {
 
       const uriOrError = await fileRepository.saveCloningFile(
         exportId,
-        Readable.from(JSON.stringify(validScenarioMetadataFileContent)),
+        Readable.from(
+          JSON.stringify(validScenarioMetadataFileContent(solutionsAreLocked)),
+        ),
         relativePath,
       );
 
@@ -222,7 +265,9 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenScenarioMetadataShouldBeImported: async () => {
+        ThenScenarioMetadataShouldBeImported: async (
+          solutionsAreLocked = false,
+        ) => {
           await sut.run(input);
 
           const [scenario]: [
@@ -234,18 +279,22 @@ const getFixtures = async () => {
             .where('id = :scenarioId', { scenarioId })
             .execute();
 
-          expect(scenario.name).toEqual(validScenarioMetadataFileContent.name);
-          expect(scenario.description).toEqual(
-            validScenarioMetadataFileContent.description,
+          const validScenarioMetadataContent = validScenarioMetadataFileContent(
+            solutionsAreLocked,
           );
-          expect(scenario.blm).toEqual(validScenarioMetadataFileContent.blm);
+          expect(scenario.name).toEqual(validScenarioMetadataContent.name);
+          expect(scenario.description).toEqual(
+            validScenarioMetadataContent.description,
+          );
+          expect(scenario.blm).toEqual(validScenarioMetadataContent.blm);
           expect(scenario.number_of_runs).toEqual(
-            validScenarioMetadataFileContent.numberOfRuns,
+            validScenarioMetadataContent.numberOfRuns,
           );
           expect(scenario.ran_at_least_once).toEqual(
-            validScenarioMetadataFileContent.ranAtLeastOnce,
+            validScenarioMetadataContent.ranAtLeastOnce,
           );
-          expect(scenario.type).toEqual(validScenarioMetadataFileContent.type);
+          expect(scenario.solutions_are_locked).toEqual(solutionsAreLocked);
+          expect(scenario.type).toEqual(validScenarioMetadataContent.type);
           expect(scenario.created_by).toEqual(userId);
 
           const [blmRange]: [
@@ -257,9 +306,7 @@ const getFixtures = async () => {
             .where('id = :scenarioId', { scenarioId })
             .execute();
 
-          expect(blmRange).toMatchObject(
-            validScenarioMetadataFileContent.blmRange,
-          );
+          expect(blmRange).toMatchObject(validScenarioMetadataContent.blmRange);
         },
       };
     },

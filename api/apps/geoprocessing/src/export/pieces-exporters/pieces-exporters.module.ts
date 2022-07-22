@@ -1,10 +1,12 @@
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ScenarioFeaturesData } from '@marxan/features';
 import {
   MarxanExecutionMetadataGeoEntity,
   OutputScenariosFeaturesDataGeoEntity,
 } from '@marxan/marxan-output';
+import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
 import { HttpModule, Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportConfigProjectPieceExporter } from './export-config.project-piece-exporter';
@@ -18,6 +20,7 @@ import { PlanningUnitsGridPieceExporter } from './planning-units-grid.piece-expo
 import { ProjectCustomFeaturesPieceExporter } from './project-custom-features.piece-exporter';
 import { ProjectCustomProtectedAreasPieceExporter } from './project-custom-protected-areas.piece-exporter';
 import { ProjectMetadataPieceExporter } from './project-metadata.piece-exporter';
+import { ProjectPuvsprCalculationsPieceExporter } from './project-puvspr-calculations.piece-exporter';
 import { ScenarioFeaturesDataPieceExporter } from './scenario-features-data.piece-exporter';
 import { ScenarioFeaturesSpecificationPieceExporter } from './scenario-features-specification.piece-exporter';
 import { ScenarioInputFolderPieceExporter } from './scenario-input-folder.piece-exporter';
@@ -33,12 +36,14 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
     TypeOrmModule.forFeature([], geoprocessingConnections.apiDB),
     TypeOrmModule.forFeature(
       [
+        ProjectsPuEntity,
         ScenarioFeaturesData,
         OutputScenariosFeaturesDataGeoEntity,
         MarxanExecutionMetadataGeoEntity,
       ],
       geoprocessingConnections.default,
     ),
+    PuvsprCalculationsModule.for(geoprocessingConnections.default.name!),
     HttpModule,
   ],
   providers: [
@@ -61,6 +66,7 @@ import { ScenarioRunResultsPieceExporter } from './scenario-run-results.piece-ex
     ScenarioOutputFolderPieceExporter,
     ScenarioFeaturesSpecificationPieceExporter,
     MarxanExecutionMetadataPieceExporter,
+    ProjectPuvsprCalculationsPieceExporter,
     Logger,
   ],
 })

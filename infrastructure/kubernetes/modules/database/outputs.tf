@@ -1,4 +1,19 @@
-#output "postgresql_service_port" {
-#  value       = data.kubernetes_service.postgresql.spec[0].port[0].node_port
-#  description = "PostgreSQL k8s service public port"
-#}
+output "postgresql_hostname" {
+  value       = data.azurerm_postgresql_flexible_server.marxan.fqdn
+  description = "PostgreSQL server hostname"
+}
+
+output "postgresql_username" {
+  value       = local.username
+  description = "PostgreSQL database username"
+}
+
+output "postgresql_password" {
+  value       = local.password
+  description = "PostgreSQL database password"
+}
+
+output "postgresql_database" {
+  value       = local.database
+  description = "PostgreSQL database name"
+}

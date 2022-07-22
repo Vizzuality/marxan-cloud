@@ -37,8 +37,14 @@ test(`setting a new password`, async () => {
   const resetToken = await fixtures.givenAUserRequestedPasswordReset(
     'user@email.com',
   );
-  await service.changePassword(resetToken, 'newPassword');
-  fixtures.ThenNewUserPasswordIs('user@email.com', 'newPassword');
+  await service.changePassword(
+    resetToken,
+    'newComplexPasswordToFulfillTheEntropyValidation',
+  );
+  fixtures.ThenNewUserPasswordIs(
+    'user@email.com',
+    'newComplexPasswordToFulfillTheEntropyValidation',
+  );
   fixtures.ThenNewPasswordConfirmationIsSend(`user@email.com`);
   fixtures.ThenUserIsLoggedOut(`user@email.com`);
 });
@@ -82,9 +88,18 @@ test(`using a token twice`, async () => {
   const resetToken = await fixtures.givenAUserRequestedPasswordReset(
     'user@email.com',
   );
-  await service.changePassword(resetToken, 'newPassword');
-  const result = await service.changePassword(resetToken, 'newPassword2');
-  fixtures.ThenNewUserPasswordIs('user@email.com', 'newPassword');
+  await service.changePassword(
+    resetToken,
+    'newComplexPasswordToFulfillTheEntropyValidation',
+  );
+  const result = await service.changePassword(
+    resetToken,
+    'newComplexPasswordToFulfillTheEntropyValidation2',
+  );
+  fixtures.ThenNewUserPasswordIs(
+    'user@email.com',
+    'newComplexPasswordToFulfillTheEntropyValidation',
+  );
   expect(result).toStrictEqual(left(tokenInvalid));
 });
 

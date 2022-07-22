@@ -400,22 +400,22 @@ export async function GivenFeatures(
   platformFeaturesAmount: number,
   customFeaturesAmount: number,
   projectId: string,
+  isLegacy: boolean = false,
 ) {
   const customFeatures = Array(customFeaturesAmount)
     .fill(0)
     .map((_, index) => ({
       id: v4(),
       feature_class_name: `custom-${projectId}-${index + 1}`,
-      tag: 'species',
       creation_status: 'done',
       project_id: projectId,
+      is_legacy: isLegacy,
     }));
   const platformFeatures = Array(platformFeaturesAmount)
     .fill(0)
     .map((_, index) => ({
       id: v4(),
       feature_class_name: `platform-${projectId}-${index + 1}`,
-      tag: 'species',
       creation_status: 'created',
       project_id: null,
     }));

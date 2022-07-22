@@ -7,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { GeoFeatureGeometry } from '../../geofeatures/src';
-import { FeatureTag } from './domain';
 
 @Entity(`scenario_features_data`)
 export class ScenarioFeaturesData {
@@ -133,12 +132,6 @@ export class ScenarioFeaturesData {
     description: `Shorthand value if current \`met\` is good enough compared to \`target\`.`,
   })
   onTarget!: boolean;
-
-  // what we expose with Extend
-  @ApiProperty({
-    enum: FeatureTag,
-  })
-  tag!: FeatureTag;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,

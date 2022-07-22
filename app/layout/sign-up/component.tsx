@@ -18,17 +18,23 @@ import Checkbox from 'components/forms/checkbox';
 import Field from 'components/forms/field';
 import Input from 'components/forms/input';
 import Label from 'components/forms/label';
+import Select from 'components/forms/select';
 import {
   composeValidators,
   booleanValidator,
+  passwordStrengthValidator,
 } from 'components/forms/validations';
 import Loading from 'components/loading';
 
 import AUTHENTICATION from 'services/authentication';
 
 import EMAIL_SVG from 'svgs/ui/email.svg?sprite';
+import LOCATION_SVG from 'svgs/ui/location.svg?sprite';
 import PASSWORD_SVG from 'svgs/ui/password.svg?sprite';
 import USER_SVG from 'svgs/ui/user.svg?sprite';
+
+import { BACKGROUND_OPTIONS, ACADEMIC_LEVEL_OPTIONS, APPLIED_LEVEL_OPTIONS } from './constants';
+import PasswordStrenght from './password-strenght';
 
 export interface SignUpProps {
 
@@ -92,7 +98,6 @@ export const SignUp: React.FC<SignUpProps> = () => {
         >
           {(props) => (
             <form onSubmit={props.handleSubmit} autoComplete="off" className="relative flex items-center justify-center h-full">
-
               <div className="w-full max-w-xs">
                 <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Get Started!</h2>
 
@@ -117,6 +122,62 @@ export const SignUp: React.FC<SignUpProps> = () => {
                   </FieldRFF>
                 </div>
 
+                {/* COUNTRY */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="country"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="login-country" {...fprops}>
+                        <Label theme="light" className="mb-3 uppercase">Country</Label>
+                        <Input theme="light" icon={LOCATION_SVG} />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
+                {/* BACKGROUND */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="background"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="login-background" {...fprops} className="w-full">
+                        <Label theme="light" className="mb-3 uppercase">What is the nature of your work with Marxan?</Label>
+                        <Select
+                          theme="light-square"
+                          size="base"
+                          placeholder="Select..."
+                          options={BACKGROUND_OPTIONS}
+                          onChange={fprops.input.onChange}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
+                {/* LEVEL */}
+                <div className="mt-5">
+                  <FieldRFF
+                    name="level"
+                    validate={composeValidators([{ presence: true }])}
+                  >
+                    {(fprops) => (
+                      <Field id="login-level" {...fprops} className="w-full">
+                        <Select
+                          theme="light-square"
+                          size="base"
+                          placeholder="Select..."
+                          options={props.values.background === 'academic_research' ? ACADEMIC_LEVEL_OPTIONS : APPLIED_LEVEL_OPTIONS}
+                          onChange={fprops.input.onChange}
+                        />
+                      </Field>
+                    )}
+                  </FieldRFF>
+                </div>
+
                 {/* EMAIL */}
                 <div className="mt-5">
                   <FieldRFF
@@ -136,7 +197,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                 <div className="mt-5">
                   <FieldRFF
                     name="password"
-                    validate={composeValidators([{ presence: true }])}
+                    validate={composeValidators([passwordStrengthValidator])}
                   >
                     {(fprops) => (
                       <Field id="login-password" {...fprops}>
@@ -145,6 +206,10 @@ export const SignUp: React.FC<SignUpProps> = () => {
                       </Field>
                     )}
                   </FieldRFF>
+
+                  <PasswordStrenght
+                    password={props.values.password}
+                  />
                 </div>
 
                 <div className="mt-7">

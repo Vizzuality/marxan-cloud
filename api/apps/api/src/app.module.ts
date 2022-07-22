@@ -4,6 +4,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from '@marxan-api/modules/authentication/authentication.module';
@@ -36,6 +37,9 @@ import { BlmValuesModule } from '@marxan-api/modules/blm';
 import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { CloneModule } from './modules/clone';
 import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-repository/api-cloning-file-repository.module';
+import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-collector';
+import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -71,6 +75,10 @@ import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-reposito
     AccessControlModule,
     ApiCloningFilesRepositoryModule,
     CloneModule,
+    AsyncJobsGarbageCollectorModule,
+    ThrottlerModule.forRoot(),
+    ExportCleanupModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, PingController],
   providers: [

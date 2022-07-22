@@ -36,7 +36,6 @@ const geoFeatureFilterKeyNames = [
   'description',
   'source',
   'propertyName',
-  'tag',
   'projectId',
 ] as const;
 type GeoFeatureFilterKeys = keyof Pick<
@@ -87,7 +86,6 @@ export class GeoFeaturesService extends AppBaseService<
         'source',
         'propertyName',
         'intersection',
-        'tag',
         'properties',
         'isCustom',
       ],
@@ -160,7 +158,6 @@ export class GeoFeaturesService extends AppBaseService<
      * at some point, per project]
      * 2 move api.features into geo.features_data ...
      * 3 which also fixes issues with:
-     *    * searching via tag
      *    * searching via name
      *    * pagination
      *    * searching within one query (table) and single db
@@ -227,12 +224,6 @@ export class GeoFeaturesService extends AppBaseService<
       );
     }
 
-    if (info.params?.featureTag) {
-      queryFilteredByPublicOrProjectSpecificFeatures.andWhere(
-        `${this.alias}.tag = :tag`,
-        { tag: info.params.featureTag },
-      );
-    }
     return queryFilteredByPublicOrProjectSpecificFeatures;
   }
 
@@ -363,7 +354,6 @@ export class GeoFeaturesService extends AppBaseService<
         id: v4(),
         featureClassName: data.name,
         description: data.description,
-        tag: data.type,
         projectId,
         creationStatus: JobStatus.done,
       }),

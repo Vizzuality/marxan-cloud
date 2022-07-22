@@ -2,6 +2,8 @@ import { forwardRef, Logger, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 
 import { UsersModule } from '@marxan-api/modules/users/users.module';
@@ -34,6 +36,7 @@ import {
 import { PasswordRecoveryService } from './password-recovery/password-recovery.service';
 import { PasswordRecoveryToken } from './password-recovery/password-recovery-token.api.entity';
 import { PasswordRecoveryController } from './password-recovery/password-recovery.controller';
+import { CqrsModule } from '@nestjs/cqrs';
 
 export const logger = new Logger('Authentication');
 
@@ -48,6 +51,7 @@ export const logger = new Logger('Authentication');
       signOptions: { expiresIn: AppConfig.get('auth.jwt.expiresIn', '2h') },
     }),
     TypeOrmModule.forFeature([User, IssuedAuthnToken, PasswordRecoveryToken]),
+    CqrsModule,
   ],
   providers: [
     AuthenticationService,

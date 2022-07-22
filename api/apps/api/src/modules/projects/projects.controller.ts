@@ -70,7 +70,6 @@ import { ShapefileService } from '@marxan/shapefile-converter';
 import { isFeatureCollection } from '@marxan/utils';
 import { asyncJobTag } from '@marxan-api/dto/async-job-tag';
 import { inlineJobTag } from '@marxan-api/dto/inline-job-tag';
-import { FeatureTags } from '@marxan-api/modules/geo-features/geo-feature-set.api.entity';
 import { UpdateProjectBlmRangeDTO } from '@marxan-api/modules/projects/dto/update-project-blm-range.dto';
 import { invalidRange } from '@marxan-api/modules/projects/blm';
 import {
@@ -172,7 +171,6 @@ export class ProjectsController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') featureClassAndAliasFilter?: string,
-    @Query('tag') featureTag?: FeatureTags,
   ): Promise<GeoFeatureResult> {
     const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
@@ -181,7 +179,6 @@ export class ProjectsController {
         params: {
           projectId: projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
-          featureTag,
         },
       },
     );

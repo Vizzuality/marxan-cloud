@@ -1,5 +1,4 @@
-import { FeatureTag } from '../../../../features/src';
-import { GeometrySource } from '../../../../geofeatures/src';
+import { GeometrySource } from '@marxan/geofeatures';
 
 export const projectCustomFeaturesRelativePath = 'custom-features.json';
 
@@ -26,9 +25,9 @@ export type ProjectCustomFeature = {
   description: string;
   property_name: string;
   intersection: string[];
-  tag: FeatureTag;
   creation_status: JobStatus;
   list_property_keys: string[];
+  is_legacy: boolean;
   data: FeatureData[];
 };
 

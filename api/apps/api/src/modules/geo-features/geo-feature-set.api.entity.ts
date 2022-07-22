@@ -12,11 +12,6 @@ export const geoFeatureResource: BaseServiceResource = {
   moduleControllerPrefix: 'geo-features',
 };
 
-export enum FeatureTags {
-  bioregional = 'bioregional',
-  species = 'species',
-}
-
 export interface GeoFeatureCategory {
   key: string;
   distinctValues: string[];

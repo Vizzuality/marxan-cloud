@@ -50,3 +50,8 @@ variable "key_vault_access_users" {
   description = "The names of the users to grant access to the secrets"
   default = []
 }
+
+variable "deploy_production" {
+  type        = bool
+  description = "If the production deployment should be created"
+}

@@ -1,24 +1,3 @@
-variable "k8s_host" {
-  description = "Hostname of the k8s cluster"
-  type        = string
-}
-
-variable "k8s_client_certificate" {
-  description = "Client certificate for the k8s cluster"
-  type        = string
-}
-
-variable "k8s_client_key" {
-  description = "Client key for the k8s cluster"
-  type        = string
-}
-
-variable "k8s_cluster_ca_certificate" {
-  description = "Cluster CA certificate for the k8s cluster"
-  type        = string
-}
-
-
 variable "image" {
   type        = string
   description = "The dockerhub image reference to deploy"
@@ -62,4 +41,10 @@ variable "temp_data_pvc_name" {
 variable "cloning_pvc_name" {
   type        = string
   description = "Name of the PVC to use for backend storage for cloning"
+}
+
+variable "postgres_geodb_max_clients_in_pool" {
+  type        = number
+  description = "Value for the GEO_POSTGRES_MAX_CLIENTS_IN_POOL env var: maximum number of clients on TypeORM's connection pool for the geoprocessing database"
+  default     = 10
 }
