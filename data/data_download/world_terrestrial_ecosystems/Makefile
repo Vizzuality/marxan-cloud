@@ -13,8 +13,8 @@ import: data/ecosystems/World_Ecosystems_simp.geojson
 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host=$$GEO_POSTGRES_HOST \
 		port=$$GEO_POSTGRES_PORT user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD" "$<";\
 	feature_id=`psql -X -A -q -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" \
-		-c "insert into features (feature_class_name, alias, list_property_keys, property_name, tag, creation_status, created_by)  \
-		VALUES ('$${table_name}', 'World terrestrial ecoregions','[\"dn\", \"w_ecosystm\"]'::jsonb,'w_ecosystm', 'bioregional','created','00000000-0000-0000-0000-000000000000') RETURNING id;"`; \
+		-c "insert into features (feature_class_name, alias, list_property_keys, property_name, creation_status, created_by)  \
+		VALUES ('$${table_name}', 'World terrestrial ecoregions','[\"dn\", \"w_ecosystm\"]'::jsonb,'w_ecosystm', 'created','00000000-0000-0000-0000-000000000000') RETURNING id;"`; \
 	psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@$$GEO_POSTGRES_HOST:$$GEO_POSTGRES_PORT/$$GEO_POSTGRES_DB" \
 	-c "insert into features_data(the_geom, properties, source, feature_id) \
 		(SELECT (st_dump(the_geom)).geom as the_geom, row_to_json(t)::jsonb - '{the_geom}'::text[] as properties, 'ecoregions' as source, '$$feature_id' as feature_id from (select * from \"$${table_name}_feature\") t); \
