@@ -324,7 +324,7 @@ export function useFeaturePreviewLayers({
                 },
                 paint: {
                   'line-color': '#000',
-                  'line-opacity': opacity,
+                  'line-opacity': 0.5 * opacity,
                 },
               },
             ],
