@@ -109,15 +109,26 @@ export const LEGEND_LAYERS = {
     },
   }),
 
-  'features-preview': () => ({
-    id: 'features-preview',
-    name: 'Features preview',
-    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS['features-preview'].default }} />,
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-  }),
+  'features-preview': (options) => {
+    const { items } = options;
+
+    return {
+      id: 'features-preview',
+      name: 'Features preview',
+      icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS['features-preview'].default }} />,
+      type: 'basic',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: items.map((i) => {
+        return {
+          value: i.name,
+          color: '#FFCC00',
+        };
+      }),
+    };
+  },
   features: () => ({
     id: 'features',
     name: 'Features',

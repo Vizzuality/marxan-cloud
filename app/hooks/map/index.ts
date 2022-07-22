@@ -997,8 +997,7 @@ export function useLegend({
   layers, options = {},
 }: UseLegend) {
   return useMemo(() => {
-    const { layerSettings = {} } = options;
-    // TODO: Add legend with feature preview name
+    const { layerSettings = {}, items = [] } = options;
 
     return layers
       .map((l) => {
@@ -1009,6 +1008,7 @@ export function useLegend({
             ...L({
               ...options,
               ...layerSettings[l],
+              ...items,
             }),
             settings: layerSettings[l],
           };
