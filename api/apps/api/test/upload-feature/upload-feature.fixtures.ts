@@ -24,7 +24,6 @@ export const getFixtures = async () => {
     },
   );
   const customFeatureName = `User custom feature ${Date.now()}`;
-  const customFeatureTag = `bioregional`;
   const customFeatureDesc = `User custom feature desc`;
 
   const geoFeaturesApiRepo: Repository<GeoFeature> = app.get(
@@ -59,7 +58,6 @@ export const getFixtures = async () => {
         .attach(`file`, __dirname + `/wetlands.zip`)
         .field({
           name: customFeatureName,
-          type: customFeatureTag,
           description: customFeatureDesc,
         }),
     ThenGeoFeaturesAreCreated: async (result: request.Response) => {
@@ -79,10 +77,12 @@ export const getFixtures = async () => {
           alias: null,
           propertyName: null,
           intersection: null,
-          tag: customFeatureTag,
           creationStatus: `done`,
           projectId,
           isCustom: true,
+          isLegacy: false,
+          fromGeoprocessingOps: null,
+          geoprocessingOpsHash: null,
         },
       ]);
       expect(

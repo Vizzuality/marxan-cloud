@@ -1,10 +1,10 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 
 import { Form as FormRFF, FormSpy as FormSpyRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
@@ -37,7 +37,10 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
   const { pid, sid } = query;
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setFeatures, setFeatureHoverId, setSubTab } = scenarioSlice.actions;
+  const {
+    setFeatures, setFeatureHoverId, setSubTab, setSelectedFeatures,
+  } = scenarioSlice.actions;
+  const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
 
@@ -258,6 +261,31 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
     setSubTab,
   ]);
 
+  const toggleSeeOnMap = useCallback((id) => {
+    const newSelectedFeatures = [...selectedFeatures];
+    if (!newSelectedFeatures.includes(id)) {
+      newSelectedFeatures.push(id);
+    } else {
+      const i = newSelectedFeatures.indexOf(id);
+      newSelectedFeatures.splice(i, 1);
+    }
+    dispatch(setSelectedFeatures(newSelectedFeatures));
+  }, [dispatch, setSelectedFeatures, selectedFeatures]);
+
+  const isShown = useCallback((id) => {
+    if (!selectedFeatures.includes(id)) {
+      return false;
+    }
+    return true;
+  }, [selectedFeatures]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(setSelectedFeatures([]));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Render
   if (selectedFeaturesIsFetching && !selectedFeaturesIsFetched) {
     return (
@@ -329,6 +357,8 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                               onMouseLeave={() => {
                                 onLeave();
                               }}
+                              isShown={isShown(item.id)}
+                              onSeeOnMap={() => toggleSeeOnMap(item.id)}
                             />
 
                           </div>

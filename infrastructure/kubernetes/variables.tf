@@ -3,14 +3,14 @@ variable "project_name" {
   description = "The name of the project. Used in naming most of the resources in the infrastructure."
 }
 
-variable "project_resource_group" {
+variable "resource_group_name" {
   type        = string
   description = "Azure resource group to use for the project."
 }
 
-variable "location" {
+variable "storage_account_name" {
   type        = string
-  description = "Azure Location in which the resources will be created"
+  description = "Azure service account to use for the project."
 }
 
 variable "port" {
@@ -44,11 +44,6 @@ variable "cloning_storage_size" {
   description = "Size of the backend storage claim for project cloning"
 }
 
-variable "container_registry_name" {
-  type        = string
-  description = "Name for the Azure CR. Must be globally unique"
-}
-
 variable "key_vault_access_users" {
   type        = list(string)
   description = "The names of the users to grant access to the secrets"
@@ -63,4 +58,9 @@ variable "key_vault_name_prefix" {
 variable "project_tags" {
   description = "Project resource tags"
   type        = map(string)
+}
+
+variable "deploy_production" {
+  type        = bool
+  description = "If the production deployment should be created"
 }

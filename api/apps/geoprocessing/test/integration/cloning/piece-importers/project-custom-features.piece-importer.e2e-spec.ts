@@ -12,7 +12,6 @@ import {
   ProjectCustomFeature,
   ProjectCustomFeaturesContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
-import { FeatureTag } from '@marxan/features';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Logger } from '@nestjs/common';
@@ -66,6 +65,17 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
     await fixtures
       .WhenPieceImporterIsInvoked(input)
       .ThenCustomFeaturesShouldBeAddedToProject();
+  });
+
+  it('imports project leagcy features', async () => {
+    const archiveLocation = await fixtures.GivenValidProjectCustomFeaturesFile({
+      isLegacy: true,
+    });
+    await fixtures.GivenProject();
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenCustomFeaturesShouldBeAddedToProject({ isLegacy: true });
   });
 });
 
@@ -169,7 +179,9 @@ const getFixtures = async () => {
     GivenNoProjectCustomFeaturesFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectCustomFeaturesFile: async () => {
+    GivenValidProjectCustomFeaturesFile: async (
+      opts: { isLegacy: boolean } = { isLegacy: false },
+    ) => {
       const geometries = await GenerateRandomGeometries(
         geoEntityManager,
         amountOfCustomFeatures * recordsOfDataForEachCustomFeature,
@@ -182,12 +194,12 @@ const getFixtures = async () => {
           .map((_, featureIndex) => ({
             alias: '',
             feature_class_name: `${projectId}-${featureIndex + 1}`,
-            tag: FeatureTag.Species,
             creation_status: 'created' as ProjectCustomFeature['creation_status'],
             description: '',
             intersection: [],
             list_property_keys: [],
             property_name: '',
+            is_legacy: opts.isLegacy,
             data: Array(recordsOfDataForEachCustomFeature)
               .fill(0)
               .map((_, dataIndex) => ({
@@ -224,19 +236,25 @@ const getFixtures = async () => {
             /File with piece data for/gi,
           );
         },
-        ThenCustomFeaturesShouldBeAddedToProject: async () => {
+        ThenCustomFeaturesShouldBeAddedToProject: async (
+          opts: { isLegacy: boolean } = { isLegacy: false },
+        ) => {
           await sut.run(input);
 
           const customFeatures: {
             id: string;
+            isLegacy: boolean;
           }[] = await apiEntityManager
             .createQueryBuilder()
             .select('id')
+            .addSelect('is_legacy', 'isLegacy')
             .from('features', 'f')
             .where('project_id = :projectId', { projectId })
             .execute();
 
-          console.log(customFeatures);
+          expect(
+            customFeatures.every(({ isLegacy }) => isLegacy === opts.isLegacy),
+          );
 
           const featuresData = await featuresDataRepo.find({
             featureId: In(customFeatures.map((feature) => feature.id)),

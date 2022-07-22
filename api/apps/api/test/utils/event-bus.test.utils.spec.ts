@@ -1,7 +1,6 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
-import { delay } from '../../../geoprocessing/test/utils';
 import { EventBusTestUtils } from './event-bus.test.utils';
 
 class FirstEventType implements IEvent {
@@ -78,7 +77,7 @@ const getFixtures = async () => {
         new Promise<void>(async (resolve) => {
           eventBus.publish(new SecondEventType('Wrong event class'));
 
-          await delay(500);
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           eventBus.publish(new FirstEventType('Expected event class'));
 
@@ -97,13 +96,13 @@ const getFixtures = async () => {
         new Promise<void>(async (resolve) => {
           eventBus.publish(new SecondEventType('Wrong event class'));
 
-          await delay(500);
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           eventBus.publish(
             new FirstEventType('Expected event class but wrong id'),
           );
 
-          await delay(500);
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
           eventBus.publish(new FirstEventType('Foo'));
 

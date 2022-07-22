@@ -9,7 +9,6 @@ import {
 
 import { GeoFeature } from '../geo-features/geo-feature.api.entity';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { RemoteFeaturesData } from './entities/remote-features-data.geo.entity';
 import { UserSearchCriteria } from './search-criteria';
 import { AppConfig } from '../../utils/config.utils';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
@@ -24,8 +23,6 @@ export class ScenarioFeaturesService extends AppBaseService<
   constructor(
     @InjectRepository(GeoFeature)
     private readonly features: Repository<GeoFeature>,
-    @InjectRepository(RemoteFeaturesData, DbConnections.geoprocessingDB)
-    private readonly remoteFeature: Repository<RemoteFeaturesData>,
     @InjectRepository(ScenarioFeaturesData, DbConnections.geoprocessingDB)
     private readonly remoteScenarioFeatures: Repository<ScenarioFeaturesData>,
   ) {
@@ -52,28 +49,12 @@ export class ScenarioFeaturesService extends AppBaseService<
     entitiesAndCount: [any[], number],
   ): Promise<[any[], number]> {
     const scenarioFeaturesData = entitiesAndCount[0] as ScenarioFeaturesData[];
-    const featuresDataIds = scenarioFeaturesData.map(
-      (rsfd) => rsfd.featureDataId,
-    );
 
-    if (featuresDataIds.length === 0) {
+    if (scenarioFeaturesData.length === 0) {
       return entitiesAndCount;
     }
-    /**
-     * (geo)scenario_feature_data.featureClassId -> feature_data.id --feature_data.feature_id -> (api)feature.id
-     */
-    const featureRelations: Record<string, string> = {};
-    const featureData = await this.remoteFeature.find({
-      where: {
-        id: In(featuresDataIds),
-      },
-    });
 
-    featureData.forEach((fd) => {
-      featureRelations[fd.id] = fd.featureId;
-    });
-
-    const featureIds = featureData.map((fd) => fd.featureId);
+    const featureIds = scenarioFeaturesData.map((sfd) => sfd.apiFeatureId);
     const features = await this.features.find({
       where: {
         id: In(featureIds),
@@ -84,7 +65,7 @@ export class ScenarioFeaturesService extends AppBaseService<
       scenarioFeaturesData
         .map((sfd) => {
           const relatedFeature = features.find(
-            (f) => f.id === featureRelations[sfd.featureDataId],
+            (f) => f.id === sfd.apiFeatureId,
           );
 
           if (!relatedFeature) {
@@ -103,7 +84,6 @@ export class ScenarioFeaturesService extends AppBaseService<
       attributes: [
         'description',
         'name',
-        'tag',
         'onTarget',
         'metArea',
         'met',
@@ -131,7 +111,6 @@ export class ScenarioFeaturesService extends AppBaseService<
       coverageTarget: +(base?.target ?? 0).toFixed(2),
       coverageTargetArea: +((totalArea * (base?.target ?? 0)) / 100).toFixed(2),
       totalArea: +totalArea.toFixed(2),
-      tag: assign.tag,
       name: assign.alias ?? undefined, // `null`
       description: assign.description ?? undefined,
     };

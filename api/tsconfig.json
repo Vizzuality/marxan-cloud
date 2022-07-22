@@ -55,6 +55,8 @@
       "@marxan/scenario-run-queue/*": ["libs/scenario-run-queue/src/*"],
       "@marxan/features": ["libs/features/src"],
       "@marxan/features/*": ["libs/features/src/*"],
+      "@marxan/features-hash": ["libs/features-hash/src"],
+      "@marxan/features-hash/*": ["libs/features-hash/src/*"],
       "@marxan/geofeature-calculations": ["libs/geofeature-calculations/src"],
       "@marxan/geofeature-calculations/*": [
         "libs/geofeature-calculations/src/*"
@@ -67,6 +69,8 @@
       "@marxan/planning-units-grid/*": ["libs/planning-units-grid/src/*"],
       "@marxan/protected-areas": ["libs/protected-areas/src"],
       "@marxan/protected-areas/*": ["libs/protected-areas/src/*"],
+      "@marxan/puvspr-calculations": ["libs/puvspr-calculations/src"],
+      "@marxan/puvspr-calculations/*": ["libs/puvspr-calculations/src/*"],
       "@marxan/specification": ["libs/specification/src"],
       "@marxan/specification/*": ["libs/specification/src/*"],
       "@marxan/tiles": ["libs/tiles/src"],
@@ -85,6 +89,8 @@
       "@marxan/legacy-project-import/*": ["libs/legacy-project-import/src/*"],
       "@marxan/cloning": ["libs/cloning/src"],
       "@marxan/cloning/*": ["libs/cloning/src/*"],
+      "@marxan/unused-resources-cleanup": ["libs/unused-resources-cleanup/src"],
+      "@marxan/unused-resources-cleanup/*": ["libs/unused-resources-cleanup/src/*"],
       "@marxan/code-guide": ["libs/code-guide/src"],
       "@marxan/code-guide/*": ["libs/code-guide/src/*"],
       "@marxan/webshot": ["libs/webshot/src"],

@@ -1,8 +1,7 @@
 locals {
-  postgres_secret_json = {
-    username = "postgres"
-    password = random_password.postgresql_admin_generator.result
-  }
+  database = "${var.name}-${var.namespace}"
+  username = "${var.name}-${var.namespace}"
+  password = random_password.postgresql_admin_generator.result
 }
 
 resource "random_password" "postgresql_admin_generator" {
@@ -12,58 +11,101 @@ resource "random_password" "postgresql_admin_generator" {
 
 resource "azurerm_key_vault_secret" "postgresql" {
   name         = "Postgres${title(var.name)}AdminPassword"
-  value        = jsonencode(local.postgres_secret_json)
+  value        = jsonencode({ username = local.username, password = local.password })
   key_vault_id = var.key_vault_id
 }
 
-resource "helm_release" "postgres" {
-  name       = "${var.name}-postgres"
-  repository = "https://charts.bitnami.com/bitnami"
-  chart      = "postgresql"
-  version    = "9.4.1"
+data "azurerm_postgresql_flexible_server" "marxan" {
+  name                = var.sql_server_name
+  resource_group_name = var.resource_group.name
+}
 
-  namespace = var.namespace
+resource "azurerm_postgresql_flexible_server_database" "database" {
+  name      = local.database
+  server_id = data.azurerm_postgresql_flexible_server.marxan.id
+  collation = "en_US.utf8"
+  charset   = "utf8"
+}
 
-  values = [
-    file("${path.module}/values.yaml")
+resource "postgresql_role" "my_role" {
+  provider = postgresql
+
+  name     = local.username
+  login    = true
+  password = local.password
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
   ]
-
-  set {
-    name  = "postgresqlUsername"
-    value = sensitive(local.postgres_secret_json.username)
-  }
-
-  set {
-    name  = "postgresqlPostgresPassword"
-    value = sensitive(local.postgres_secret_json.password)
-  }
-
-  set {
-    name  = "existingSecret"
-    value = "${var.name}-postgres-secret"
-  }
-
-  set {
-    name  = "image.registry"
-    value = "${var.container_registry_name}.azurecr.io"
-  }
 }
 
-resource "kubernetes_secret" "postgres-secret" {
-  metadata {
-    name      = "${var.name}-postgres-secret"
-    namespace = var.namespace
-  }
+resource "postgresql_grant" "db_grant" {
+  provider = postgresql
 
-  data = {
-    postgresql-password          = sensitive(local.postgres_secret_json.password)
-    postgresql-postgres-password = sensitive(local.postgres_secret_json.password)
-  }
+  database    = local.database
+  role        = local.username
+  object_type = "database"
+  privileges  = ["ALL"]
+
+  depends_on = [
+    postgresql_role.my_role,
+    azurerm_postgresql_flexible_server_database.database
+  ]
 }
 
-data "kubernetes_service" "postgresql" {
-  metadata {
-    namespace = var.namespace
-    name      = "${var.name}-postgresql"
-  }
+resource "postgresql_extension" "marxan_postgis" {
+  provider = postgresql
+
+  database = local.database
+  name     = "postgis"
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
+resource "postgresql_extension" "marxan_pgcrypto" {
+  provider = postgresql
+
+  database = local.database
+  name     = "pgcrypto"
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
+resource "postgresql_extension" "marxan_plpgsql" {
+  provider = postgresql
+
+  database = local.database
+  name     = "plpgsql"
+
+  depends_on = [
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
+resource "postgresql_extension" "marxan_postgis_raster" {
+  provider = postgresql
+
+  database = local.database
+  name     = "postgis_raster"
+
+  depends_on = [
+    postgresql_extension.marxan_postgis,
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
+resource "postgresql_extension" "marxan_postgis_topology" {
+  provider = postgresql
+
+  database = local.database
+  name     = "postgis_topology"
+
+  depends_on = [
+    postgresql_extension.marxan_postgis,
+    azurerm_postgresql_flexible_server_database.database
+  ]
 }

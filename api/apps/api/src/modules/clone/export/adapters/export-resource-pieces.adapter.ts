@@ -56,6 +56,7 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
       ExportComponent.newOne(id, ClonePiece.PlanningUnitsGridGeojson),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomProtectedAreas),
       ExportComponent.newOne(id, ClonePiece.ProjectCustomFeatures),
+      ExportComponent.newOne(id, ClonePiece.ProjectPuvsprCalculations),
       ...scenarioPieces,
     ];
 

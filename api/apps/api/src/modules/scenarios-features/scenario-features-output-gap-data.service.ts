@@ -159,25 +159,19 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
 
     /**
      * (pseudo)FKs across dbs:
-     * (geo)scenario_feature_data.featureClassId -> (geo)feature_data.id
-     * (geo)feature_data.feature_id -> (api)feature.id
+     * (geo)scenario_feature_data.api_feature_id -> (api)feature.id
      */
-    const featureRelations: Record<string, string> = {};
     const featureMetadata = await this.features.find({
       where: {
         id: In(featureIds),
       },
     });
 
-    featureMetadata.forEach((fd) => {
-      featureRelations[fd.id] = fd.id;
-    });
-
     return [
       scenarioFeaturesData
         .map((sfd) => {
           const relatedFeature = featureMetadata.find(
-            (f) => f.id === featureRelations[sfd.featureId],
+            (f) => f.id === sfd.featureId,
           );
 
           if (!relatedFeature) {
@@ -209,7 +203,6 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
         'coverageTarget',
         'featureClassName',
         'name',
-        'tag',
         'description',
       ],
       keyForAttribute: 'camelCase',
@@ -223,7 +216,6 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     return {
       ...base,
       featureClassName: assign.featureClassName ?? undefined,
-      tag: assign.tag,
       name: assign.alias ?? undefined, // `null`
       description: assign.description ?? undefined,
     };

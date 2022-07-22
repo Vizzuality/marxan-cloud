@@ -1,23 +1,3 @@
-variable "k8s_host" {
-  description = "Hostname of the k8s cluster"
-  type        = string
-}
-
-variable "k8s_client_certificate" {
-  description = "Client certificate for the k8s cluster"
-  type        = string
-}
-
-variable "k8s_client_key" {
-  description = "Client key for the k8s cluster"
-  type        = string
-}
-
-variable "k8s_cluster_ca_certificate" {
-  description = "Cluster CA certificate for the k8s cluster"
-  type        = string
-}
-
 variable "name" {
   description = "The name of the secret"
 }
@@ -55,4 +35,36 @@ variable "sparkpost_api_key" {
 variable "api_url" {
   type        = string
   description = "The URL for the Marxan API server"
+}
+
+variable "postgres_geoprocessing_hostname" {
+  description = "The postgres geoprocessing database hostname"
+}
+
+variable "postgres_geoprocessing_username" {
+  description = "The postgres geoprocessing database username"
+}
+
+variable "postgres_geoprocessing_password" {
+  description = "The postgres geoprocessing database password"
+}
+
+variable "postgres_geoprocessing_database" {
+  description = "The postgres geoprocessing database name"
+}
+
+variable "postgres_api_hostname" {
+  description = "The postgres api database hostname"
+}
+
+variable "postgres_api_username" {
+  description = "The postgres api database username"
+}
+
+variable "postgres_api_password" {
+  description = "The postgres api database password"
+}
+
+variable "postgres_api_database" {
+  description = "The postgres api database name"
 }

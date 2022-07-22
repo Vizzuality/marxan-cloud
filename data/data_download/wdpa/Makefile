@@ -3,16 +3,17 @@ SHELL=/bin/bash
 MAKEFLAGS := --jobs=$(shell nproc)
 MAKEFLAGS += --output-sync=target
 
-URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
-		-H 'content-type: application/json;charset=UTF-8' \
-		--data-raw '{"domain":"general","format":"shp","token":"wdpa","id":51216}' \
-		--compressed | jq '.url')
+# This get the URL for the latest WDPA data from the Protected Planet servers. However, right now,
+# this returns an URL that then 404's. So we are hardcoding the URL for now. In turn, this URL is
+# from a temporary dev bucket, that it will be deleted at some point. If you have issues with WDPA data
+# try restoring this first, and see how it goes.
+# URL := $(shell curl -sS 'https://www.protectedplanet.net/downloads' \
+#		-H 'content-type: application/json;charset=UTF-8' \
+#		--data-raw '{"domain":"general","format":"shp","token":"wdpa","id":51216}' \
+#		--compressed | jq '.url')
+URL := 'https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/data//wdpa/wdpa/wdpa.zip'
 SIMP_FOLDER := data/wdpa/simp
 GEO_FOLDER := data/wdpa/geojson
-
-# @debt
-# need to add as the main admin user through auth and calling for it.
-MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" -c "select id from users limit 1")
 
 import: simp
 	for i in $(SIMP_FOLDER)/*.json; do \
@@ -22,7 +23,7 @@ import: simp
 		-t_srs EPSG:4326 -a_srs EPSG:4326 \
 		-f PostgreSQL PG:"dbname=$$GEO_POSTGRES_DB host=$$GEO_POSTGRES_HOST \
 		port=$$GEO_POSTGRES_PORT user=$$GEO_POSTGRES_USER password=$$GEO_POSTGRES_PASSWORD schemas=myshapefiles" "$$i" \
-		-sql "select *,'$(MarxanUser)' as created_by from \"$$(basename -s .json "$$i")\""; \
+		-sql "select *,'00000000-0000-0000-0000-000000000000' as created_by from \"$$(basename -s .json "$$i")\""; \
 	done;
 	rm -rf $(SIMP_FOLDER)
 

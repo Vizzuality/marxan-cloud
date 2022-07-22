@@ -29,13 +29,11 @@ export interface HeaderProps {
 const SIZE = {
   base: {
     logo: {
-      width: 116,
       height: 47,
     },
   },
   lg: {
     logo: {
-      width: 148,
       height: 60,
     },
   },

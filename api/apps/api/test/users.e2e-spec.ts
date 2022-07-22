@@ -105,6 +105,16 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
     });
 
+    test('A user should not be able to create an account using a weak password', async () => {
+      await request(app.getHttpServer())
+        .post('/auth/sign-up')
+        .send({
+          ...signUpDto,
+          password: 'abcdef',
+        })
+        .expect(HttpStatus.FORBIDDEN);
+    });
+
     test('A user should not be able to create an account using an email address already in use', async () => {
       /**
        * We should handle this explicitly in the API - until then, this should
@@ -571,6 +581,26 @@ describe('UsersModule (e2e)', () => {
         .send({ userIds: [adminUserId] });
       expect(WhenBlockingOneself.status).toEqual(400);
     });
+
+    test('A platform admin should be able to download csv data from users', async () => {
+      const WhenDownloadingCsvData = await request(app.getHttpServer())
+        .get(`/api/v1/users/csv`)
+        .set('Authorization', `Bearer ${adminToken}`);
+      expect(WhenDownloadingCsvData.status).toEqual(200);
+      expect(WhenDownloadingCsvData.headers['content-type']).toBe(
+        'text/csv; charset=utf-8',
+      );
+    });
+
+    test('A non admin user should not be able to download csv data from users', async () => {
+      const WhenDownloadingCsvData = await request(app.getHttpServer())
+        .get(`/api/v1/users/csv`)
+        .set('Authorization', `Bearer ${nonAdminToken}`);
+      expect(WhenDownloadingCsvData.status).toEqual(403);
+      expect(WhenDownloadingCsvData.headers['content-type']).toBe(
+        'application/json; charset=utf-8',
+      );
+    });
   });
 
   describe('Users - Find by email', () => {
@@ -607,6 +637,32 @@ describe('UsersModule (e2e)', () => {
         .get('/api/v1/users/by-email/aa@example')
         .set('Authorization', `Bearer ${adminToken}`);
       expect(WhenSearchingUserByFullMail.status).toEqual(400);
+    });
+  });
+
+  describe('', () => {
+    test('The API should show a 429: Too many request error if multiple attempts at login are done in a short space of time', async () => {
+      const requestsArray = await Promise.all([
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ username: 'aa@example.com', password: 'abcde1' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ username: 'aa@example.com', password: 'abcde2' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ username: 'aa@example.com', password: 'abcde3' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ username: 'aa@example.com', password: 'abcde4' }),
+        await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({ username: 'aa@example.com', password: 'abcde5' }),
+      ]);
+      const tooManyRequest = requestsArray.find(
+        (r) => r.status === HttpStatus.TOO_MANY_REQUESTS,
+      );
+      expect(tooManyRequest).toBeDefined();
     });
   });
 });

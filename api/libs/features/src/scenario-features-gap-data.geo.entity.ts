@@ -1,19 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Column, ViewEntity } from 'typeorm';
-import { FeatureTag } from './domain';
 
 @ViewEntity('scenario_features_gap_data', {
   expression: `
   with gap_data as (
     select
-      fd.feature_id,
+      sfd.api_feature_id as feature_id,
       scenario_id,
       sum(total_area) total_area,
       sum(current_pa) met_area,
       min(prop) as coverage_target
     from scenario_features_data sfd 
     inner join features_data fd on sfd.feature_class_id=fd.id 
-    group by fd.feature_id, feature_class_id, scenario_id)
+    group by sfd.api_feature_id, feature_class_id, scenario_id)
   select
     scenario_id,
     feature_id,
@@ -64,11 +63,6 @@ export class ScenarioFeaturesGapData {
   // Properties added via extend
   @ApiPropertyOptional()
   featureClassName?: string | null;
-
-  @ApiProperty({
-    enum: FeatureTag,
-  })
-  tag!: FeatureTag;
 
   @ApiPropertyOptional({
     description: `Name of the feature, for example \`Lion in Deserts\`.`,

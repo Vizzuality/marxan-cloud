@@ -50,6 +50,15 @@ describe(ProjectCustomFeaturesPieceExporter, () => {
       .WhenPieceExporterIsInvoked(input)
       .ThenAProjectCustomFeaturesFileIsSaved();
   });
+
+  it('saves succesfully features data when the project has legacy feature', async () => {
+    const input = fixtures.GivenAProjectCustomFeaturesExportJob();
+    await fixtures.GivenProjectExist();
+    await fixtures.GivenCustomFeaturesForProject({ isLegacy: true });
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenAProjectCustomFeaturesFileIsSaved({ isLegacy: true });
+  });
 });
 
 const getFixtures = async () => {
@@ -120,12 +129,15 @@ const getFixtures = async () => {
       return GivenProjectExists(apiEntityManager, projectId, organizationId);
     },
     GivenNoCustomFeaturesForProject: () => {},
-    GivenCustomFeaturesForProject: async () => {
+    GivenCustomFeaturesForProject: async (
+      opts: { isLegacy: boolean } = { isLegacy: false },
+    ) => {
       const { customFeatures } = await GivenFeatures(
         apiEntityManager,
         0,
         amountOfCustomFeatures,
         projectId,
+        opts.isLegacy,
       );
       featureIds = customFeatures.map((feature) => feature.id);
       await GivenFeaturesData(
@@ -147,7 +159,9 @@ const getFixtures = async () => {
           );
           expect(content.features).toEqual([]);
         },
-        ThenAProjectCustomFeaturesFileIsSaved: async () => {
+        ThenAProjectCustomFeaturesFileIsSaved: async (
+          opts: { isLegacy: boolean } = { isLegacy: false },
+        ) => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
           expect((file as Right<Readable>).right).toBeDefined();
@@ -157,9 +171,19 @@ const getFixtures = async () => {
             savedStrem,
           );
           expect(content.features).toHaveLength(amountOfCustomFeatures);
-          const { feature_class_name, data } = content.features[0];
-          expect(feature_class_name).toEqual(`custom-${projectId}-1`);
-          expect(data).toHaveLength(recordsOfDataForEachCustomFeature);
+          const featuresExported = content.features;
+          const expectedFeatureNames = Array(amountOfCustomFeatures)
+            .fill(0)
+            .map((_, index) => `custom-${projectId}-${index}`);
+
+          expect(
+            featuresExported.every(
+              ({ is_legacy, data, feature_class_name }) =>
+                is_legacy === opts.isLegacy &&
+                data.length === recordsOfDataForEachCustomFeature &&
+                expectedFeatureNames.includes(feature_class_name),
+            ),
+          );
         },
       };
     },

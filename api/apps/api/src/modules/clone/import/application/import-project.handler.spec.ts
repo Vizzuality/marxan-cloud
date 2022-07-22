@@ -1,11 +1,9 @@
 import {
-  ArchiveLocation,
   ClonePiece,
   ComponentId,
   ResourceId,
   ResourceKind,
 } from '@marxan/cloning/domain';
-import { ExportConfigContent } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
@@ -27,11 +25,7 @@ import {
   PieceImportRequested,
 } from '../domain';
 import { ImportComponentStatuses } from '../domain/import/import-component-status';
-import { ExportConfigReader } from './export-config-reader';
-import {
-  ImportProject,
-  ImportProjectCommandResult,
-} from './import-project.command';
+import { ImportProject } from './import-project.command';
 import { ImportProjectHandler } from './import-project.handler';
 import { ImportResourcePieces } from './import-resource-pieces.port';
 import { ImportRepository, Success } from './import.repository.port';
@@ -221,6 +215,10 @@ class FakeExportRepository implements ExportRepository {
     },
   ): Promise<Export[]> {
     return [];
+  }
+
+  delete(exportId: ExportId): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
   transaction<T>(code: (repo: ExportRepository) => Promise<T>): Promise<T> {

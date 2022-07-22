@@ -9,7 +9,7 @@ import {
   ProjectsPuEntity,
 } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
-import { FeatureTag, ScenarioFeaturesData } from '@marxan/features';
+import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import {
   ExecutionResult,
@@ -277,10 +277,10 @@ const getFixtures = async () => {
               coverageTarget: 0,
               coverageTargetArea: 1000,
               featureDataId: feature.id,
+              apiFeatureId: featureId,
               currentArea: 200,
               fpf: 1,
               met: 1,
-              tag: FeatureTag.Bioregional,
               target: 300,
               metArea: 200,
               onTarget: false,

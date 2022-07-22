@@ -1,7 +1,5 @@
 .PHONY: import
 
-MarxanUser:=$(shell psql -X -A -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" -c "select id from users limit 1")
-
 import: data/demo_data_features/features_demos
 	@for i in $</*.shp; do \
 		echo "start processing $$i "; \
@@ -22,7 +20,7 @@ import: data/demo_data_features/features_demos
 		echo "getting the feature_id..."; \
 		feature_id=`psql -X -A -q -t "postgresql://$$API_POSTGRES_USER:$$API_POSTGRES_PASSWORD@$$API_POSTGRES_HOST:$$API_POSTGRES_PORT/$$API_POSTGRES_DB" \
  			-c "insert into features (feature_class_name, alias, list_property_keys, property_name, tag, creation_status, created_by)  \
- 			VALUES ('demo_$${table_name}', '$${spec_name}','$$list_properties'::jsonb, '$$default_property', 'bioregional','created','$(MarxanUser)') RETURNING id;"`; \
+			VALUES ('demo_$${table_name}', '$${spec_name}','$$list_properties'::jsonb, '$$default_property', 'bioregional','created','00000000-0000-0000-0000-000000000000') RETURNING id;"`; \
 		echo "inserting in feature data..."; \
 		psql "postgresql://$$GEO_POSTGRES_USER:$$GEO_POSTGRES_PASSWORD@$$GEO_POSTGRES_HOST:$$GEO_POSTGRES_PORT/$$GEO_POSTGRES_DB" \
 		-c "insert into features_data(the_geom, properties, source, feature_id) \

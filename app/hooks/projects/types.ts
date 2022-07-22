@@ -110,3 +110,63 @@ export interface DownloadExportProps {
   pid: string,
   exportId: string
 }
+
+// useSaveLegacyProject
+export interface UseSaveLegacyProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface SaveLegacyProjectProps {
+  data: {
+    projectName: string;
+    description: string;
+  };
+}
+
+// useCancelImportLegacyProject
+export interface UseCancelImportLegacyProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface CancelImportLegacyProjectProps {
+  projectId: string,
+}
+
+// useUploadLegacyProjectFile
+export interface UseUploadLegacyProjectFileProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface UploadLegacyProjectFileProps {
+  projectId: string,
+  data: unknown,
+}
+
+// useImportLegacyProject
+export interface UseImportLegacyProjectProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface ImportLegacyProjectProps {
+  projectId: string,
+  data: unknown;
+}
+
+// useCancelUploadLegacyProjectFile
+export interface UseCancelUploadLegacyProjectFileProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface CancelUploadLegacyProjectFileProps {
+  projectId: string,
+  dataFileId: string,
+}
+
+// UseLegacyProjectValidationResults
+export interface UseLegacyProjectValidationResultsProps {
+  requestConfig?: AxiosRequestConfig
+}
+
+export interface LegacyProjectValidationResultsProps {
+  projectId: string,
+}

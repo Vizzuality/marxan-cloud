@@ -26,7 +26,7 @@ export class StartLegacyProjectImport extends Command<StartLegacyProjectImportRe
   constructor(
     public readonly name: string,
     public readonly ownerId: UserId,
-    public readonly solutionsAreLocked: boolean,
+    public readonly description?: string,
   ) {
     super();
   }

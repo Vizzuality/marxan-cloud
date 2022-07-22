@@ -19,6 +19,15 @@ export class TypeormScenarioCalibrationRepository
   async getScenarioCalibrationResults(
     scenarioId: string,
   ): Promise<CalibrationRunResult[]> {
-    return this.repository.find({ where: { scenarioId } });
+    return this.repository.find({
+      where: { scenarioId },
+      select: [
+        'scenarioId',
+        'blmValue',
+        'cost',
+        'boundaryLength',
+        'protected_pu_ids',
+      ],
+    });
   }
 }

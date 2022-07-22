@@ -7,12 +7,14 @@ import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.serv
 import { FeatureConfigCopy } from '@marxan-api/modules/specification';
 import { CopyQuery } from './copy-query.service';
 import { CopyDataProvider } from './copy-data-provider.service';
+import { ComputeArea } from '../compute-area.service';
 
 @Injectable()
 export class CopyOperation {
   constructor(
     private readonly copyQuery: CopyQuery,
     private readonly copyDataProvider: CopyDataProvider,
+    private readonly computeArea: ComputeArea,
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly geoEntityManager: EntityManager,
     private readonly events: ApiEventsService,
@@ -42,6 +44,12 @@ export class CopyOperation {
       const ids: { id: string }[] = await this.geoEntityManager.query(
         query,
         parameters,
+      );
+
+      await this.computeArea.computeAreaPerPlanningUnitOfFeature(
+        project.id,
+        data.scenarioId,
+        data.input.baseFeatureId,
       );
       await this.events.create({
         topic: data.scenarioId,

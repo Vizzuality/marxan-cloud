@@ -8,6 +8,9 @@ export class ScenarioFeaturesPreparation {
   @Column({ name: 'feature_class_id' })
   featuresDataId!: string;
 
+  @Column({ name: 'api_feature_id' })
+  apiFeatureId!: string;
+
   @Column({ name: 'scenario_id' })
   scenarioId!: string;
 

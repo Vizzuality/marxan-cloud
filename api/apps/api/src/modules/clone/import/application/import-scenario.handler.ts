@@ -88,6 +88,7 @@ export class ImportScenarioHandler
         archiveLocation,
         pieces,
         isCloning,
+        exportId,
       ),
     );
 

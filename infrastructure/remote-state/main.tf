@@ -2,14 +2,14 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.9.0"
+      version = "3.13.0"
     }
 
     template = {
       source = "hashicorp/template"
     }
   }
-  required_version = "1.1.3"
+  required_version = "1.2.4"
 }
 
 provider "azurerm" {
@@ -21,18 +21,18 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "resource_group" {
-  name         = var.project_resource_group
-  location     = var.location
-  tags = merge(var.project_tags, { Environment = "PRD-STG" }, )
+  name     = var.resource_group_name
+  location = var.location
+  tags     = var.project_tags
 }
 
 resource "azurerm_storage_account" "storage_account" {
-  name                     = "${var.project_name}sa"
+  name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.resource_group.name
   location                 = azurerm_resource_group.resource_group.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  tags = merge(var.project_tags, { Environment = "PRD-STG" }, )
+  tags                     = var.project_tags
 }
 
 resource "azurerm_storage_container" "storage_container_tf_state" {

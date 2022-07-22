@@ -3,6 +3,7 @@ export enum ClonePiece {
   ProjectMetadata = 'project-metadata',
   ProjectCustomProtectedAreas = 'project-custom-protected-areas',
   ProjectCustomFeatures = 'project-custom-features',
+  ProjectPuvsprCalculations = 'project-puvspr-calculations',
   PlanningAreaGAdm = 'planning-area-gadm',
   PlanningAreaCustom = 'planning-area-custom',
   PlanningUnitsGrid = 'planning-units-grid',

@@ -73,7 +73,14 @@ export const getFixtures = async () => {
       );
 
       expect(customFeature.length).toEqual(1);
-      expect(features.length).toEqual(17);
+      /**
+       * Note: this was expected toEqual(17) originally; when switching from
+       * PostgreSQL 14+PostGIS 3.1 to PostgreSQL 13+PostGIS 3.2 (to match the
+       * versions available in Azure Database for PostgreSQL - Flexible Server),
+       * processing of the features leads to a count of 18 features (this is
+       * due, specifically, to the PostGIS 3.1->3.2 part of the down-up-grade).
+       */
+      expect(features.length).toEqual(18);
 
       /**
        * TODO maybe:

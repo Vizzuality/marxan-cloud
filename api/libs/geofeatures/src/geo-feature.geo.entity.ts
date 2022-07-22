@@ -26,6 +26,6 @@ export class GeoFeatureGeometry {
   featureId?: string;
 
   @ApiProperty()
-  @Column('text', { name: 'hash', nullable: false })
+  @Column({ name: 'hash', insert: false, update: false })
   hash!: string;
 }

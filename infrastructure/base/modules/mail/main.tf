@@ -5,12 +5,7 @@ resource "azurerm_dns_cname_record" "sparkpost_cname_record" {
   name                = var.cname_name
   record              = var.cname_value
 
-  tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  tags = var.project_tags
 }
 
 resource "azurerm_dns_txt_record" "sparkpost_dkim_txt_record" {
@@ -19,13 +14,8 @@ resource "azurerm_dns_txt_record" "sparkpost_dkim_txt_record" {
   ttl                 = 300
   name                = var.dkim_name
   record {
-    value =var.dkim_value
+    value = var.dkim_value
   }
 
-  tags = merge(
-    var.project_tags,
-    {
-      Environment = "PRD-STG"
-    },
-  )
+  tags = var.project_tags
 }

@@ -22,6 +22,7 @@ import {
   LegacyProjectImportPieceProcessor,
   LegacyProjectImportPieceProcessorProvider,
 } from '../pieces/legacy-project-import-piece-processor';
+import { DatFileDelimiterFinder } from './file-readers/dat-file.delimiter-finder';
 import { PuDatReader, PuDatRow } from './file-readers/pu-dat.reader';
 
 @Injectable()
@@ -31,6 +32,7 @@ export class ScenarioPusDataLegacyProjectPieceImporter
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly puDatReader: PuDatReader,
+    private readonly datFileDelimiterFinder: DatFileDelimiterFinder,
     @InjectEntityManager(geoprocessingConnections.default.name)
     private readonly geoEntityManager: EntityManager,
     private readonly logger: Logger,
@@ -45,6 +47,37 @@ export class ScenarioPusDataLegacyProjectPieceImporter
   private logAndThrow(message: string): never {
     this.logger.error(message);
     throw new Error(message);
+  }
+
+  private async getPuDatReabale(fileLocation: string) {
+    const readable = await this.filesRepo.get(fileLocation);
+    if (isLeft(readable))
+      this.logAndThrow('pu.dat file not found in files repo');
+
+    return readable.right;
+  }
+
+  private async getPuDatData(fileLocation: string) {
+    const firstLineReadable = await this.getPuDatReabale(fileLocation);
+
+    const delimiterOrError = await this.datFileDelimiterFinder.findDelimiter(
+      firstLineReadable,
+    );
+    if (isLeft(delimiterOrError))
+      this.logAndThrow(
+        'Invalid delimiter in pu.dat file. Use either comma or tabulator as your file delimiter.',
+      );
+
+    const fileReadable = await this.getPuDatReabale(fileLocation);
+
+    const rowsOrError = await this.puDatReader.readFile(
+      fileReadable,
+      delimiterOrError.right,
+    );
+    if (isLeft(rowsOrError))
+      this.logAndThrow(`Error in pu.dat file: ${rowsOrError.left}`);
+
+    return rowsOrError.right;
   }
 
   private getNotFoundPuids(
@@ -161,15 +194,9 @@ export class ScenarioPusDataLegacyProjectPieceImporter
     if (!puDatFile)
       this.logAndThrow('pu.dat file not found inside input files array');
 
-    const readable = await this.filesRepo.get(puDatFile.location);
-    if (isLeft(readable))
-      this.logAndThrow('pu.dat file not found in files repo');
+    const rowsOrError = await this.getPuDatData(puDatFile.location);
 
-    const rowsOrError = await this.puDatReader.readFile(readable.right);
-    if (isLeft(rowsOrError))
-      this.logAndThrow(`Error in pu.dat file: ${rowsOrError.left}`);
-
-    const duplicatePuids = this.checkPuidsUniqueness(rowsOrError.right);
+    const duplicatePuids = this.checkPuidsUniqueness(rowsOrError);
     if (duplicatePuids.length)
       this.logAndThrow(
         `pu.dat file contains rows with the same puid. Duplicate puids: ${duplicatePuids.join(
@@ -191,17 +218,15 @@ export class ScenarioPusDataLegacyProjectPieceImporter
 
       const puidsNotPresentInPuDat = this.checkThatEveryProjectPuIsInPuDatRows(
         projectPuIdByPuid,
-        rowsOrError.right,
+        rowsOrError,
       );
       if (puidsNotPresentInPuDat.length)
         this.logAndThrow(
-          `pu.dat file is missing planning units data. Missing puids: ${puidsNotPresentInPuDat.join(
-            ', ',
-          )}`,
+          `pu.dat file is missing planning units data. There are ${puidsNotPresentInPuDat.length} missing puids.`,
         );
 
       await Promise.all(
-        chunk(rowsOrError.right, chunkSize).map(async (chunk) => {
+        chunk(rowsOrError, chunkSize).map(async (chunk) => {
           const notFound = this.getNotFoundPuids(chunk, projectPuIdByPuid);
           notFoundPuids.push(...notFound);
 
