@@ -77,7 +77,7 @@ export class CleanupTasksService implements CleanupTasks {
         );`,
       );
       await this.apiEntityManager.query(
-        `DELETE FROM features_data fd
+        `DELETE FROM features fd
         WHERE fd.project_id IS NOT NULL
         AND fd.project_id NOT IN (
           SELECT p.id FROM projects
