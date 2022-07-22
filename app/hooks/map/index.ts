@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { COLORS, LEGEND_LAYERS } from './constants';
+import { COLORS, LEGEND_LAYERS, FEATURES_PREVIEW_RAMP } from './constants';
 import {
   UseGeoJSONLayer,
 
@@ -279,7 +279,7 @@ export function useFeaturePreviewLayers({
     };
 
     return FEATURES
-      .map((f) => {
+      .map((f, index) => {
         const { id } = f;
 
         const F = featuresRecipe.find((fr) => fr.id === id) || f;
@@ -306,7 +306,7 @@ export function useFeaturePreviewLayers({
                   visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': COLORS['features-preview'].default,
+                  'fill-color': FEATURES_PREVIEW_RAMP(selectedFeatures)[index],
                   'fill-opacity': opacity,
                 },
               },
