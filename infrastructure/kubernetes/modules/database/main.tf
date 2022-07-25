@@ -9,12 +9,6 @@ resource "random_password" "postgresql_user_password_generator" {
   special = false
 }
 
-resource "azurerm_key_vault_secret" "postgresql" {
-  name         = "Postgres${title(var.name)}AdminPassword"
-  value        = jsonencode({ username = local.username, password = local.password })
-  key_vault_id = var.key_vault_id
-}
-
 data "azurerm_postgresql_flexible_server" "marxan" {
   name                = var.sql_server_name
   resource_group_name = var.resource_group.name

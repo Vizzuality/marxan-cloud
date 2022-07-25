@@ -16,10 +16,6 @@ variable "namespace" {
   description = "The k8s namespace in which to deploy resources"
 }
 
-variable "key_vault_id" {
-  description = "Azure key vault id"
-}
-
 variable "sql_server_name" {
   type = string
 }
