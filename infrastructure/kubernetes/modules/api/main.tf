@@ -220,6 +220,11 @@ resource "kubernetes_deployment" "api_deployment" {
           }
 
           env {
+            name = "SPARKPOST_ORIGIN"
+            value = "https://api.eu.sparkpost.com:443"
+          }
+
+          env {
             name = "REDIS_HOST"
             value_from {
               secret_key_ref {
@@ -335,5 +340,3 @@ resource "kubernetes_deployment" "api_deployment" {
     }
   }
 }
-
-

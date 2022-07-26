@@ -8,6 +8,15 @@ terraform {
   required_version = ">= 0.14.9"
 }
 
+/* azurerm_client_config
+Use this data source to access the configuration of the AzureRM provider.
+Attributes Reference
+
+    client_id is set to the Azure Client ID (Application Object ID).
+    tenant_id is set to the Azure Tenant ID.
+    subscription_id is set to the Azure Subscription ID.
+    object_id is set to the Azure Object ID.
+*/
 data "azurerm_client_config" "current" {
 }
 
@@ -15,7 +24,7 @@ resource "azurerm_route_table" "rt" {
   name                = var.route_table_name
   location            = var.location
   resource_group_name = var.resource_group_name
-  tags                = var.tags
+  tags                = var.project_tags
 
   route {
     name                   = "kubenetfw_fw_r"

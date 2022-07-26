@@ -9,6 +9,7 @@ resource "azurerm_redis_cache" "marxan" {
   minimum_tls_version           = "1.2"
   public_network_access_enabled = false
   redis_version                 = var.redis_version
+  tags                          = var.project_tags
 
   redis_configuration {
   }

@@ -42,6 +42,7 @@ import { ExportRepository } from '../clone/export/application/export-repository.
 import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export.repository';
 import { LegacyProjectImportModule } from '../legacy-project-import/legacy-project-import.module';
 import { DeleteProjectModule } from './delete-project/delete-project.module';
+import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
 
 @Module({
   imports: [
@@ -77,6 +78,7 @@ import { DeleteProjectModule } from './delete-project/delete-project.module';
     BlockGuardModule,
     ProjectCheckerModule,
     DeleteProjectModule,
+    LegacyProjectImportRepositoryModule,
   ],
   providers: [
     ProjectsCrudService,

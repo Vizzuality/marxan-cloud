@@ -41,6 +41,11 @@ variable "tags" {
   default     = {}
 }
 
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}
+
 variable "retention_in_days" {
   description = " (Optional) Specifies the workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730."
   type        = number

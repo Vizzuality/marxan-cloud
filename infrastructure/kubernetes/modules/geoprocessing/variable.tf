@@ -13,7 +13,6 @@ variable "namespace" {
   description = "The k8s namespace to use"
 }
 
-
 variable "geo_postgres_logging" {
   type        = string
   description = "Value for the GEO_POSTGRES_LOGGING env var"

@@ -23,6 +23,11 @@ resource "azurerm_network_interface" "bastion_nic" {
   }
 }
 
+resource "tls_private_key" "ssh_private_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
 locals {
   admin_user = "ubuntu"
 }
@@ -40,7 +45,7 @@ resource "azurerm_linux_virtual_machine" "bastion" {
   disable_password_authentication = true
 
   dynamic "admin_ssh_key" {
-    for_each = var.bastion_ssh_public_keys
+    for_each = concat(var.bastion_ssh_public_keys, [tls_private_key.ssh_private_key.public_key_openssh])
     content {
       username   = local.admin_user
       public_key = admin_ssh_key.value

@@ -67,8 +67,14 @@ These resources include, but are not limited to:
 - A Bastion host
 - An [Azure DNS](https://azure.microsoft.com/en-us/services/dns/)
 - An [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/) to store Docker images.
+- [Github Actions](https://github.com/features/actions) secrets.
 
 The output values include access data for some of the resources above.
+
+**Important note:** due to [this bug](https://github.com/integrations/terraform-provider-github/issues/667), when running
+Terraform commands for the base project, you need to have the `GITHUB_OWNER` and `GITHUB_TOKEN` environment variables set.
+- `GITHUB_OWNER`: the name of the user/organization that owns the project on Github (`vizzuality`, `tnc-css`, etc)
+- `GITHUB_TOKEN`: a [Github Access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 #### Kubernetes
 
@@ -80,47 +86,48 @@ new resources:
 - HTTPS certificate manager
 - PostgreSQL database (as a Helm chart)
 
-*Notice:* when first applying this project, you may get an `Error: Invalid index` message from the ingress/load balancer
-component. That is expected, and applying the same plan a 2nd time should succeed.
+**Important note:** this project has a deep dependency graph that's not fully mapped out, meaning you may need to run `terraform apply`
+multiple times for the resources to be fully provisioned. If you get an error when applying, simply try again, and odds
+are more resources will be provisioned. Repeat until you get a successful apply, or until you get recurring error outputs.
+Also be aware that, for this project to apply, the Github Actions pipeline for each key branch (`staging` and `main`) 
+must successfully run up to the point where images are pushed to the registry - said registry images are needed to deploy 
+the services on kubernetes, which is done by this plan.
 
 #### Github Actions
 
 As part of this infrastructure, Github Actions are used to automatically build and push Docker images to Azure ACR, and
-to redeploy Kubernetes pods once that happens. To be able to do so, you need to specify the following Github Actions
-Secrets with the corresponding values:
+to redeploy Kubernetes pods once that happens. Said Github Actions depend on specific Github Secrets, that are listed below
+for reference. Said secrets are automatically created by the `base` Terraform project, and do not need to be created manually.
 
 - `AZURE_AKS_CLUSTER_NAME`: The name of the AKS cluster. Get from `Base`'s `k8s_cluster_name`
-- `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_hostname`
+- `AZURE_AKS_HOST`: The AKS cluster hostname (without port or protocol). Get from `Base`'s `k8s_cluster_private_fqdn`
 - `AZURE_CLIENT_ID`: The hostname for the Azure ACT. Get from `Base`'s `container_registry_client_id`
 - `AZURE_RESOURCE_GROUP`: The AKS Resource Group name. Specified by you when setting up the infrastructure.
 - `AZURE_SUBSCRIPTION_ID`: The Azure Subscription Id. Get from `Base`'s `azure_subscription_id`
 - `AZURE_TENANT_ID`: The Azure Tenant Id. Get from `Base`'s `azure_tenant_id`
 - `BASTION_HOST`: The hostname for the bastion machine. Get from `Base`'s `bastion_hostname`
-- `BASTION_USER`: By default this will be `ubuntu` if using the initial user
-  created on bastion host instantiation. It is configurable in case
-  infrastructure admins wish to configure a different user on the bastion host
-  or the default distro user is renamed.
+- `BASTION_USER`: By default this will be `ubuntu` if using the initial user created on bastion host instantiation. It is configurable in case infrastructure admins wish to configure a different user on the bastion host or the default distro user is renamed.
 - `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 - `REGISTRY_LOGIN_SERVER`: The hostname for the Azure ACR. Get from `Base`'s `container_registry_hostname`
 - `REGISTRY_USERNAME`: The username for the Azure ACR. Get from `Base`'s `container_registry_client_id`
 - `REGISTRY_PASSWORD`: The password to access the Azure. Get from `Base`'s `container_registry_password`
+- `BASTION_SSH_PRIVATE_KEY`: The ssh private key to access the bastion host. Get it by connection to the bastion host using SSH, and generating a new public/private SSH key pair.
 
-Additional Github Actions Secrets need to be set, as required by the [frontend application](../app/README.md#env-variables)
-and injected by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
-the Frontend app docker image. The secrets that need to be added to Github actions are named as `<ENV VAR name>_<environment>` 
-so, for example, to account for the `NEXT_PUBLIC_API_URL` frontend env var, you need to define both `NEXT_PUBLIC_API_URL_STAGING`
-and `NEXT_PUBLIC_API_URL_PRODUCTION`. Note that these values are passed onto the built docker images and used in the actual
-deployed applications.
+Additional Github Actions Secrets are needed, as required by the [frontend application](../app/README.md#env-variables)
+and used by the corresponding [Github workflow](../.github/workflows/publish-marxan-docker-images.yml) that builds
+the Frontend app docker image. These secrets are named as `<ENV VAR name>_<environment>` so, for example, to account for
+the `NEXT_PUBLIC_API_URL` frontend env var, both `NEXT_PUBLIC_API_URL_STAGING` and `NEXT_PUBLIC_API_URL_PRODUCTION` need
+to be defined. Note that these values are passed onto the built docker images and used in the actual deployed applications.
+The Terraform `base` project already accounts for the `production` and `staging` frontend secrets.
 
 ## How to deploy
 
 Deploying the included Terraform project is done in steps:
 - Terraform `apply` the `Remote State` project.
 - Terraform `apply` the `Base` project.
-- Modify your DNS Registar configuration to use the just created Azure DNS zone as a name server.
+- Modify your DNS Registrar configuration to use the just created Azure DNS zone as a name server.
 - Configure your local `kubectl` (you can use [this](https://docs.microsoft.com/en-us/cli/azure/aks?view=azure-cli-latest#az-aks-get-credentials))
-- Configure network access to the AKS cluster and have a tunnel to AKS up and running 
-(more on this [below](#network-access-to-azure-resources))
+- Configure network access to the AKS cluster and have a tunnel to AKS up and running (more on this [below](#network-access-to-azure-resources))
 - Terraform `apply` the `Kubernetes` project.
 
 
@@ -146,11 +153,11 @@ Since access to the Azure AKS cluster is done through HTTPS, we need not only an
 to match the hostname, so that the certificate can be validated successfully. There are a number of ways to tackle
 this, but one of them is as follows:
 
-- Modify your hosts file (`/etc/hosts` on linux) to resolve the Kubernetes hostname to `127.0.0.1`
+- Modify your hosts file (`/etc/hosts` on linux or `C:\Windows\System32\drivers\etc\hosts` on Windows) to resolve the Kubernetes hostname to `127.0.0.1`.
+That is, add `127.0.0.1 ********.marxan.privatelink.********.azmk8s.io` to your hosts file.
 - Modify your `kubectl` [configuration file](https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/) 
-to use a different port when reaching the AKS cluster (append `:<port number>` to the cluster hostname).
+to use a different port when reaching the AKS cluster (append `:<port number>` to the cluster hostname). The config file is at `~/.kube/config`.
 - Create an [SSH tunnel](#network-access-to-azure-resources) to that hostname, using the above specified port as
 your local port.
 
 You should now be able to use `kubectl` to access your AKS cluster.
-

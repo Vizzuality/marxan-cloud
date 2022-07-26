@@ -62,3 +62,8 @@ variable "log_analytics_retention_days" {
   type        = number
   default     = 7
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}

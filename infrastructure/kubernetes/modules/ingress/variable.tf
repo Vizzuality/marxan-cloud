@@ -25,3 +25,8 @@ variable "domain_prefix" {
   default     = null
   description = "The prefix added to the base domain"
 }
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
+}

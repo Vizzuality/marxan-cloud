@@ -43,7 +43,7 @@ resource "azurerm_role_assignment" "attach_acr" {
 }
 
 resource "azurerm_private_dns_zone" "private_dns_zone" {
-  name                = "${var.project_name}.privatelink.westeurope.azmk8s.io"
+  name                = "${replace(var.project_name, "-", "")}.privatelink.${lower(replace(var.resource_group.location, " ", ""))}.azmk8s.io"
   resource_group_name = var.resource_group.name
 }
 
@@ -55,7 +55,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "link" {
   private_dns_zone_name = azurerm_private_dns_zone.private_dns_zone.name
   virtual_network_id    = each.value
 }
-
 
 resource "azurerm_kubernetes_cluster" "k8s_cluster" {
   name                = var.project_name

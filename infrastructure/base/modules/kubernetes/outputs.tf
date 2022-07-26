@@ -16,6 +16,6 @@ output "cluster_name" {
   value = azurerm_kubernetes_cluster.k8s_cluster.name
 }
 
-output "cluster_hostname" {
-  value = azurerm_kubernetes_cluster.k8s_cluster.kube_config[0].host
+output "cluster_private_fqdn" {
+  value = azurerm_kubernetes_cluster.k8s_cluster.private_fqdn
 }

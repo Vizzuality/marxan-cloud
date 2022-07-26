@@ -1,11 +1,11 @@
 data "azurerm_client_config" "current" {}
 
 data "azuread_users" "users" {
-  mail_nicknames = var.key_vault_access_users
+  user_principal_names = var.key_vault_access_users
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  name                       = "${title(var.project_name)}SqlServerKeyVault"
+  name                       = "${title(replace(var.project_name, "-", ""))}SqlServer"
   location                   = var.resource_group.location
   resource_group_name        = var.resource_group.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id

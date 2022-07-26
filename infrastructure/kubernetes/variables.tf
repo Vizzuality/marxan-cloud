@@ -3,9 +3,14 @@ variable "project_name" {
   description = "The name of the project. Used in naming most of the resources in the infrastructure."
 }
 
-variable "location" {
+variable "resource_group_name" {
   type        = string
-  description = "Azure Location in which the resources will be created"
+  description = "Azure resource group to use for the project."
+}
+
+variable "storage_account_name" {
+  type        = string
+  description = "Azure service account to use for the project."
 }
 
 variable "port" {
@@ -17,7 +22,6 @@ variable "port" {
 variable "cert_email" {
   type        = string
   description = "Email address to use for cert renovation warnings"
-  default     = "cert@marxan.com"
 }
 
 variable "domain" {
@@ -40,15 +44,20 @@ variable "cloning_storage_size" {
   description = "Size of the backend storage claim for project cloning"
 }
 
-variable "container_registry_name" {
-  type        = string
-  description = "Name for the Azure CR. Must be globally unique"
+variable "key_vault_access_users" {
+  type        = list(string)
+  description = "The names of the users to grant access to the secrets"
+  default = [ ] # if this is not here, terraform apply will fail. Why?
 }
 
-variable "key_vault_access_users" {
-  type = list(string)
-  description = "The names of the users to grant access to the secrets"
-  default = []
+variable "key_vault_name_prefix" {
+  type        = string
+  description = "The prefix to use for the key vault names. KV names must be globally unique."
+}
+
+variable "project_tags" {
+  description = "Project resource tags"
+  type        = map(string)
 }
 
 variable "deploy_production" {

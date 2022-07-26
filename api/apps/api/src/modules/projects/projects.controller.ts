@@ -139,6 +139,7 @@ import {
 } from './dto/legacy-project-import.dto';
 import { deleteProjectFailed } from './delete-project/delete-project.command';
 import { updateSolutionsAreLockFailed } from '../legacy-project-import/application/update-solutions-are-locked-to-legacy-project-import.command';
+import { blmCreationFailure } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -291,6 +292,7 @@ export class ProjectsController {
           );
         case legacyProjectImportSaveError:
         case updateSolutionsAreLockFailed:
+        case blmCreationFailure:
         default:
           throw new InternalServerErrorException();
       }
