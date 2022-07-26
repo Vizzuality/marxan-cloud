@@ -32,6 +32,11 @@ terraform {
       source  = "cyrilgdn/postgresql"
       version = "1.16.0"
     }
+
+    sparkpost = {
+      source  = "SurveyMonkey/sparkpost"
+      version = "0.2.2"
+    }
   }
   required_version = "1.2.4"
 }
@@ -43,6 +48,11 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = true
     }
   }
+}
+
+provider "sparkpost" {
+  api_key  = var.sparkpost_api_key
+  base_url = var.sparkpost_base_url
 }
 
 provider "helm" {
