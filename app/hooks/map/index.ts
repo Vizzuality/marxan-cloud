@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 
-import { COLORS, LEGEND_LAYERS, FEATURES_PREVIEW_RAMP } from './constants';
+import chroma from 'chroma-js';
+
+import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseGeoJSONLayer,
 
@@ -306,7 +308,7 @@ export function useFeaturePreviewLayers({
                   visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': FEATURES_PREVIEW_RAMP(selectedFeatures)[index],
+                  'fill-color': chroma.scale(['#e0e681', '#FFF']).mode('lch').colors(selectedFeatures.length)[index],
                   'fill-opacity': opacity,
                 },
               },

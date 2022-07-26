@@ -1,5 +1,7 @@
 import React from 'react';
 
+import chroma from 'chroma-js';
+
 import Icon from 'components/icon';
 
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
@@ -10,56 +12,6 @@ export const COLORS = {
   'features-preview': {
     default: '#FFCC00',
     hover: '#FF9900',
-    items: {
-      '#e0e681': ['00'],
-      '#e1e479': ['01', '10', '11'],
-      '#e3e271': [
-        '02', '03', '04', '05',
-        '12', '13', '14', '15',
-      ],
-      '#e4df69': [
-        '06', '07', '08', '09', '010',
-        '16', '17', '18', '19', '110',
-      ],
-      '#e6dd61': [
-        '20', '30', '40', '50',
-        '21', '31', '41', '51',
-      ],
-      '#e8da58': [
-        '60', '70', '80', '90', '100',
-        '61', '71', '81', '91', '101',
-      ],
-      '#ebd84f': [
-        '22', '23', '24', '25',
-        '32', '33', '34', '35',
-        '42', '43', '44', '45',
-        '52', '53', '54', '55',
-      ],
-      '#edd546': [
-        '26', '27', '28', '29', '210',
-        '36', '37', '38', '39', '310',
-        '46', '47', '48', '49', '410',
-        '56', '57', '58', '59', '510',
-      ],
-      '#efd23d': [
-        '62', '63', '64', '65',
-        '72', '73', '74', '75',
-        '82', '83', '84', '85',
-        '92', '93', '94', '95',
-        '102', '103', '104', '105',
-      ],
-      '#f5cc27': [
-        '66', '67', '68', '69', '610',
-        '76', '77', '78', '79', '710',
-        '86', '87', '88', '89', '810',
-        '96', '97', '98',
-        '106', '107', '108',
-      ],
-      '#FFF': [
-        '99', '910',
-        '109', '1010',
-      ],
-    },
   },
   wdpa: '#00F',
   features: '#6F53F7',
@@ -128,27 +80,6 @@ export const COLORS = {
   },
 };
 
-export const FEATURES_PREVIEW_RAMP = (features) => {
-  const COLOR_NUMBER = features.length;
-  const colors = [...Array((COLOR_NUMBER + 1) * (COLOR_NUMBER + 1)).keys()];
-
-  return colors
-    .map((c, i) => {
-      const position = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
-      const color = Object.keys(COLORS['features-preview'].items)
-        .reduce((acc, k) => {
-          if (COLORS['features-preview'].items[k].includes(position) && !acc) {
-            return k;
-          }
-
-          return acc;
-        }, '');
-
-      return color;
-    })
-    .flat();
-};
-
 export const LEGEND_LAYERS = {
   pugrid: () => ({
     id: 'pugrid',
@@ -194,7 +125,7 @@ export const LEGEND_LAYERS = {
       items: items.map((item, i) => {
         return {
           value: item.name,
-          color: FEATURES_PREVIEW_RAMP(items)[i],
+          color: chroma.scale(['#e0e681', '#FFF']).mode('lch').colors(items.length)[i],
         };
       }),
     };
