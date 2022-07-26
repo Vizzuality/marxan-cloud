@@ -48,3 +48,8 @@ variable "postgres_geodb_max_clients_in_pool" {
   description = "Value for the GEO_POSTGRES_MAX_CLIENTS_IN_POOL env var: maximum number of clients on TypeORM's connection pool for the geoprocessing database"
   default     = 10
 }
+
+variable "sparkpost_base_url" {
+  type = string
+  description = "Sparkpost API base url"
+}

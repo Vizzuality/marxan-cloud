@@ -56,6 +56,10 @@ module "k8s_storage" {
   cloning_storage_class   = local.cloning_storage_class
 }
 
+module "email_templates" {
+  source            = "./modules/email-templates"
+}
+
 #Production
 
 module "key_vault_production" {
@@ -129,6 +133,7 @@ module "api_production" {
   temp_data_pvc_name                 = local.temp_data_pvc_name
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 24
+  sparkpost_base_url                 = var.sparkpost_base_url
 
   depends_on = [
     module.k8s_api_database_production
@@ -215,7 +220,7 @@ data "azurerm_postgresql_flexible_server" "marxan_production" {
 module "db_tunnel_production" {
   count = var.deploy_production ? 1 : 0
 
-  source  = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
+  source = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
 
   target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production[0], "fqdn", null)
   target_port = 5432
@@ -288,6 +293,7 @@ module "api_staging" {
   temp_data_pvc_name                 = local.temp_data_pvc_name
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 10
+  sparkpost_base_url                 = var.sparkpost_base_url
 
   depends_on = [
     module.k8s_api_database_staging
@@ -363,7 +369,7 @@ data "azurerm_postgresql_flexible_server" "marxan_staging" {
 }
 
 module "db_tunnel_staging" {
-  source  = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
+  source = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
 
   target_host = data.azurerm_postgresql_flexible_server.marxan_staging.fqdn
   target_port = 5432

@@ -30,8 +30,14 @@ variable "domain" {
 }
 
 variable "sparkpost_api_key" {
-  type        = string
-  description = "The API key for Sparkpost"
+  type = string
+  description = "Sparkpost API key"
+}
+
+variable "sparkpost_base_url" {
+  type = string
+  description = "Sparkpost API base url"
+  default = "https://api.sparkpost.com"
 }
 
 variable "temp_data_storage_size" {

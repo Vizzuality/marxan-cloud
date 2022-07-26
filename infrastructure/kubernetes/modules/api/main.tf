@@ -221,7 +221,7 @@ resource "kubernetes_deployment" "api_deployment" {
 
           env {
             name = "SPARKPOST_ORIGIN"
-            value = "https://api.eu.sparkpost.com:443"
+            value = var.sparkpost_base_url
           }
 
           env {
