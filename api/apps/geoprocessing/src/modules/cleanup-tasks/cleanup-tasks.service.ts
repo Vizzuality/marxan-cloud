@@ -80,7 +80,7 @@ export class CleanupTasksService implements CleanupTasks {
         `DELETE FROM features fd
         WHERE fd.project_id IS NOT NULL
         AND fd.project_id NOT IN (
-          SELECT p.id FROM projects
+          SELECT p.id FROM projects p
         );`,
       );
 
