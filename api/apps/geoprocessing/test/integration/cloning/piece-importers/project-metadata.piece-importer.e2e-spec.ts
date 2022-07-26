@@ -29,6 +29,7 @@ import {
   GivenUserExists,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { ProjectSourcesEnum } from '@marxan/projects';
 
 interface ProjectSelectResult {
   name: string;
@@ -36,6 +37,7 @@ interface ProjectSelectResult {
   planning_unit_grid_shape: PlanningUnitGridShape;
   metadata: Record<string, unknown> | null;
   created_by: string;
+  sources: ProjectSourcesEnum;
 }
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -64,40 +66,80 @@ describe(ProjectMetadataPieceImporter, () => {
       .ThenADataNotAvailableErrorShouldBeThrown();
   });
 
-  it('imports project metadata creating a new project (isolated import process)', async () => {
+  it('imports project metadata creating a new marxan project (isolated import process)', async () => {
+    const marxanSource = ProjectSourcesEnum.marxanCloud;
     // Piece importer picks a random organization
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
+      marxanSource,
+    );
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenProjectMetadataShouldBeImported();
+      .ThenProjectMetadataShouldBeImported(marxanSource);
   });
 
-  it('imports project metadata creating a new project (isolated import process) with resource name', async () => {
+  it('imports project metadata creating a new legacy project (isolated import process)', async () => {
+    const legacySource = ProjectSourcesEnum.legacyImport;
+    // Piece importer picks a random organization
+    await fixtures.GivenOrganization();
+    await fixtures.GivenUser();
+
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
+      legacySource,
+    );
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenProjectMetadataShouldBeImported(legacySource);
+  });
+
+  it('imports project metadata creating a new marxan project (isolated import process) with resource name', async () => {
+    const marxanSource = ProjectSourcesEnum.marxanCloud;
     // Piece importer picks a random organization
     await fixtures.GivenOrganization();
     await fixtures.GivenUser();
 
     const resourceName = 'custom project name!!';
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
+      marxanSource,
+    );
     const input = fixtures.GivenJobInput(archiveLocation, resourceName);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenProjectMetadataShouldBeImported({ withResourceName: resourceName });
+      .ThenProjectMetadataShouldBeImported(marxanSource, {
+        withResourceName: resourceName,
+      });
   });
 
-  it('imports project metadata updating a existing project (cloning import process)', async () => {
+  it('imports project metadata updating a existing marxan project (cloning import process)', async () => {
+    const marxanSource = ProjectSourcesEnum.marxanCloud;
     await fixtures.GivenUser();
     await fixtures.GivenProject();
 
-    const archiveLocation = await fixtures.GivenValidProjectMetadataFile();
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
+      marxanSource,
+    );
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenProjectMetadataShouldBeImported();
+      .ThenProjectMetadataShouldBeImported(marxanSource);
+  });
+
+  it('imports project metadata updating a existing legacy project (cloning import process)', async () => {
+    const legacySource = ProjectSourcesEnum.legacyImport;
+    await fixtures.GivenUser();
+    await fixtures.GivenProject();
+
+    const archiveLocation = await fixtures.GivenValidProjectMetadataFile(
+      legacySource,
+    );
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenProjectMetadataShouldBeImported(legacySource);
   });
 });
 
@@ -134,7 +176,9 @@ const getFixtures = async () => {
 
   const expectedMetadata = { foo: 'bar' };
 
-  const validProjectMetadataFileContent: ProjectMetadataContent = {
+  const validProjectMetadataFileContent: (
+    sources: ProjectSourcesEnum,
+  ) => ProjectMetadataContent = (sources: ProjectSourcesEnum) => ({
     name: projectName,
     description: 'project description',
     planningUnitGridShape: PlanningUnitGridShape.Hexagon,
@@ -144,7 +188,8 @@ const getFixtures = async () => {
       values: [],
     },
     metadata: expectedMetadata,
-  };
+    sources,
+  });
 
   return {
     cleanUp: async () => {
@@ -199,7 +244,7 @@ const getFixtures = async () => {
     GivenNoProjectMetadataFileIsAvailable: () => {
       return new ArchiveLocation('not found');
     },
-    GivenValidProjectMetadataFile: async () => {
+    GivenValidProjectMetadataFile: async (sources: ProjectSourcesEnum) => {
       const exportId = v4();
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
         ClonePiece.ProjectMetadata,
@@ -207,7 +252,7 @@ const getFixtures = async () => {
 
       const uriOrError = await fileRepository.saveCloningFile(
         exportId,
-        Readable.from(JSON.stringify(validProjectMetadataFileContent)),
+        Readable.from(JSON.stringify(validProjectMetadataFileContent(sources))),
         relativePath,
       );
 
@@ -225,6 +270,7 @@ const getFixtures = async () => {
           );
         },
         ThenProjectMetadataShouldBeImported: async (
+          sources: ProjectSourcesEnum,
           { withResourceName }: { withResourceName?: string } = {
             withResourceName: undefined,
           },
@@ -240,15 +286,16 @@ const getFixtures = async () => {
             .where('id = :projectId', { projectId })
             .execute();
 
+          const validFileContent = validProjectMetadataFileContent(sources);
+
           expect(project.name).toEqual(withResourceName ?? copyProjectName);
-          expect(project.description).toEqual(
-            validProjectMetadataFileContent.description,
-          );
+          expect(project.description).toEqual(validFileContent.description);
           expect(project.planning_unit_grid_shape).toEqual(
-            validProjectMetadataFileContent.planningUnitGridShape,
+            validFileContent.planningUnitGridShape,
           );
           expect(project.metadata).toMatchObject(expectedMetadata);
           expect(project.created_by).toEqual(userId);
+          expect(project.sources).toEqual(sources);
 
           const [blmRange]: [
             BlmRange,
@@ -259,9 +306,7 @@ const getFixtures = async () => {
             .where('id = :projectId', { projectId })
             .execute();
 
-          expect(blmRange).toMatchObject(
-            validProjectMetadataFileContent.blmRange,
-          );
+          expect(blmRange).toMatchObject(validFileContent.blmRange);
         },
       };
     },

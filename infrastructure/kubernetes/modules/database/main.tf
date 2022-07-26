@@ -1,18 +1,12 @@
 locals {
   database = "${var.name}-${var.namespace}"
   username = "${var.name}-${var.namespace}"
-  password = random_password.postgresql_admin_generator.result
+  password = random_password.postgresql_user_password_generator.result
 }
 
-resource "random_password" "postgresql_admin_generator" {
+resource "random_password" "postgresql_user_password_generator" {
   length  = 24
-  special = true
-}
-
-resource "azurerm_key_vault_secret" "postgresql" {
-  name         = "Postgres${title(var.name)}AdminPassword"
-  value        = jsonencode({ username = local.username, password = local.password })
-  key_vault_id = var.key_vault_id
+  special = false
 }
 
 data "azurerm_postgresql_flexible_server" "marxan" {

@@ -179,6 +179,7 @@ export class PlanningGridLegacyProjectPieceImporter
       .createQueryBuilder()
       .update('projects')
       .set({
+        planning_unit_grid_shape: PlanningUnitGridShape.FromShapefile,
         planning_area_geometry_id: planningAreaId,
         bbox: JSON.stringify(bbox),
       })

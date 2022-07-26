@@ -21,6 +21,7 @@ import {
   signatureFileRelativePath,
 } from '@marxan/cloning/infrastructure/clone-piece-data/manifest-file';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
+import { ProjectSourcesEnum } from '@marxan/projects';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { HttpStatus } from '@nestjs/common';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
@@ -141,6 +142,7 @@ export const getFixtures = async () => {
           range: [0, 100],
           values: [],
         },
+        sources: ProjectSourcesEnum.marxanCloud,
       };
 
       await cloningFilesRepo.saveCloningFile(

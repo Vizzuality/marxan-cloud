@@ -97,7 +97,7 @@ module "app_node_pool" {
 module "github_secrets" {
   source                  = "./modules/github_secrets"
   aks_cluster_name        = module.kubernetes.cluster_name
-  aks_host                = module.kubernetes.cluster_hostname
+  aks_host                = module.kubernetes.cluster_private_fqdn
   bastion_host            = module.bastion.bastion_hostname
   bastion_ssh_private_key = module.bastion.bastion_private_key
   bastion_user            = module.bastion.bastion_user

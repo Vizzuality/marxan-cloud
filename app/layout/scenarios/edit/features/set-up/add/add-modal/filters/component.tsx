@@ -3,7 +3,6 @@ import React, { useCallback, useMemo } from 'react';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import Button from 'components/button';
-import Checkbox from 'components/forms/checkbox';
 import Label from 'components/forms/label';
 import Radio from 'components/forms/radio';
 
@@ -14,11 +13,6 @@ export interface ScenarioFeaturesAddFiltersProps {
   onChangeSort: (sort: string) => void;
   onDismiss?: () => void;
 }
-
-const TAGS = [
-  { id: 'species', label: 'species' },
-  { id: 'bioregional', label: 'bioregional' },
-];
 
 const SORT = [
   { id: 'alias', label: 'Alphabetical' },
@@ -66,29 +60,6 @@ export const ScenarioFeaturesAddFilters: React.FC<ScenarioFeaturesAddFiltersProp
           <h2 className="pl-8 mb-5 text-lg pr-28 font-heading">Filters</h2>
 
           <div className="flex flex-col px-8 space-y-5">
-            <div>
-              <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Filter by type</h3>
-              <div className="flex flex-col space-y-2">
-                {TAGS.map(({ id, label }) => {
-                  return (
-                    <FieldRFF
-                      key={id}
-                      name="tag"
-                      type="checkbox"
-                      value={id}
-                    >
-                      {(fprops) => (
-                        <div className="flex space-x-2">
-                          <Checkbox theme="light" id={`tag-${id}`} {...fprops.input} />
-                          <Label theme="light" id={`tag-${id}`} className="ml-2">{label}</Label>
-                        </div>
-                      )}
-                    </FieldRFF>
-                  );
-                })}
-              </div>
-            </div>
-
             <div>
               <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Order by</h3>
               <div className="flex flex-col space-y-2">

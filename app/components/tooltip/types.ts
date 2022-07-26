@@ -8,4 +8,5 @@ export interface TooltipProps extends TippyProps {
   children: ReactElement;
   maxHeight?: number | string;
   popup?: boolean;
+  animation?: boolean;
 }

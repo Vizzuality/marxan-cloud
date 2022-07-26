@@ -1,3 +1,4 @@
+import stringEntropy from 'fast-password-entropy';
 import type { FieldValidator, FieldState } from 'final-form';
 import validate from 'validate.js';
 
@@ -35,6 +36,18 @@ export const booleanValidator = (value) => {
 
 export const arrayValidator = (value) => {
   if (!value || !value.length) return 'Error';
+
+  return undefined;
+};
+
+export const passwordStrengthValidator = (value) => {
+  if (!value || !value.length) return 'Error';
+
+  const entropy = stringEntropy(value);
+
+  if (entropy < 80) {
+    return 'Error';
+  }
 
   return undefined;
 };

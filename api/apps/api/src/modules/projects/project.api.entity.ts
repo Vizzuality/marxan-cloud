@@ -21,6 +21,7 @@ import { JsonApiAsyncJobMeta } from '@marxan-api/dto/async-job.dto';
 import { ProjectBlm } from '@marxan-api/modules/blm/values/repositories/project-blm/project-blm.api.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { PublishedProject } from '../published-project/entities/published-project.api.entity';
+import { ProjectSourcesEnum } from '@marxan/projects';
 
 export const projectResource: BaseServiceResource = {
   className: 'Project',
@@ -30,11 +31,6 @@ export const projectResource: BaseServiceResource = {
   },
   entitiesAllowedAsIncludes: ['scenarios', 'users'],
 };
-
-export enum ProjectSourcesEnum {
-  marxanCloud = 'marxan_cloud',
-  legacyImport = 'legacy_import',
-}
 
 @Entity('projects')
 export class Project extends TimeUserEntityMetadata {

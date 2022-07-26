@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import cx from 'classnames';
 
@@ -27,7 +27,7 @@ export interface ItemProps {
   className?: string;
   name: string;
   description: string;
-  type: 'bioregional' | 'species';
+  type?: string;
 
   // SPLIT
   splitSelected?: string;
@@ -53,8 +53,6 @@ export interface ItemProps {
   }[];
   onIntersectSelected?: (id: string) => void;
   onRemove?: (value) => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
   isShown?: boolean;
   onSeeOnMap?: () => void;
 }
@@ -63,14 +61,13 @@ export const Item: React.FC<ItemProps> = ({
   id,
   name,
   className,
-  type,
 
   splitSelected,
   splitOptions = [],
   editable,
   onSplitSelected,
 
-  splitFeaturesSelected,
+  splitFeaturesSelected = [],
   splitFeaturesOptions = [],
   onSplitFeaturesSelected,
 
@@ -78,12 +75,11 @@ export const Item: React.FC<ItemProps> = ({
 
   onIntersectSelected,
   onRemove,
-  onMouseEnter,
-  onMouseLeave,
-
   isShown,
   onSeeOnMap,
 }: ItemProps) => {
+  const [splitOpen, setSplitOpen] = useState(!!splitSelected);
+
   const {
     split,
     strat,
@@ -100,7 +96,7 @@ export const Item: React.FC<ItemProps> = ({
   const onSplitFeaturesChanged = useCallback(
     (e) => {
       const newSplitFeaturesSelected = [...splitFeaturesSelected];
-      const index = newSplitFeaturesSelected.findIndex((s) => s.id === e.currentTarget.value);
+      const index = newSplitFeaturesSelected.findIndex((s) => `${s.id}` === `${e.currentTarget.value}`);
 
       if (index > -1) {
         newSplitFeaturesSelected.splice(index, 1);
@@ -133,20 +129,44 @@ export const Item: React.FC<ItemProps> = ({
         'bg-gray-700 text-white': true,
         [className]: !!className,
       })}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
     >
       <header
         className={cx({
           'px-4 py-2 border-l-4': true,
-          'border-green-300': type === 'bioregional',
-          'border-yellow-300': type === 'species',
+          'border-yellow-400': true,
         })}
       >
         <div className="flex items-start justify-between">
           <h2 className="text-sm font-heading">{name}</h2>
 
           <div className="flex mr-3 space-x-2">
+            {editable && split && !!OPTIONS.length && (
+              <Tooltip
+                arrow
+                placement="top"
+                content={(
+                  <div
+                    className="p-2 text-gray-500 bg-white rounded"
+                  >
+                    Split
+                  </div>
+                )}
+              >
+                <button
+                  aria-label="manage-see-on-map"
+                  type="button"
+                  onClick={() => setSplitOpen(!splitOpen)}
+                  className={cx({
+                    'flex items-center justify-center w-5 h-5 ': true,
+                    'text-white': !splitSelected,
+                    'text-yellow-400': !!splitSelected,
+                  })}
+                >
+                  <Icon icon={SPLIT_SVG} className="w-4 h-4" />
+                </button>
+              </Tooltip>
+            )}
+
             <Tooltip
               arrow
               placement="top"
@@ -154,7 +174,7 @@ export const Item: React.FC<ItemProps> = ({
                 <div
                   className="p-2 text-gray-500 bg-white rounded"
                 >
-                  See on map
+                  {isShown ? 'Remove from map' : 'See on map'}
                 </div>
               )}
             >
@@ -170,6 +190,7 @@ export const Item: React.FC<ItemProps> = ({
                 <Icon className="w-4 h-4" icon={isShown ? SHOW_SVG : HIDE_SVG} />
               </button>
             </Tooltip>
+
             {editable && (
               <Tooltip
                 arrow
@@ -195,18 +216,19 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         </div>
 
-        {type === 'bioregional' && split && (
+        {split && (splitSelected || splitOpen) && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
-              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
-              <h4 className="ml-2 text-xs text-white uppercase">
+              <h4 className="text-white uppercase text-xxs">
                 You can
                 {' '}
                 <strong>split</strong>
                 {' '}
                 this feature into categories
               </h4>
-              <InfoButton>
+              <InfoButton
+                size="s"
+              >
                 <span>
                   <h4 className="font-heading text-lg mb-2.5">Split a feature</h4>
                   <div className="space-y-2">
@@ -240,7 +262,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         )}
 
-        {type === 'species' && editable && strat && (
+        {editable && strat && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <Icon icon={INTERSECT_SVG} className="w-5 h-5 text-yellow-300" />
@@ -295,7 +317,6 @@ export const Item: React.FC<ItemProps> = ({
                 size="s"
                 onClick={() => {
                   onIntersectChanged(id);
-                  onMouseLeave();
                 }}
               >
                 <div className="flex items-center">
@@ -309,25 +330,25 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {type === 'bioregional' && splitSelected && split && (
+      {splitSelected && split && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length
-              || splitFeaturesSelected.map((s) => s.id).includes(`${f.value}`);
+              || !!splitFeaturesSelected.find((s) => `${f.value}` === `${s.id}`);
 
             return (
               <li
                 key={`${f.value}`}
                 className="flex items-center pr-2.5 py-2 mt-0.5 relative"
               >
-                <div className="absolute top-0 left-0 block w-px h-full bg-green-300" />
+                <div className="absolute top-0 left-0 block w-px h-full bg-yellow-200" />
                 <div className="relative flex text-xs font-heading">
                   <div className="ml-2.5">
                     <Checkbox
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="block w-4 h-4 text-green-300 form-checkbox-dark"
+                      className="block w-4 h-4 text-yellow-200 form-checkbox-dark"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>
@@ -345,7 +366,7 @@ export const Item: React.FC<ItemProps> = ({
         </ul>
       )}
 
-      {type === 'species' && intersectFeaturesSelected && !!intersectFeaturesSelected.length && strat && (
+      {intersectFeaturesSelected && !!intersectFeaturesSelected.length && strat && (
         <ul className="pl-3">
           {intersectFeaturesSelected.map((f) => {
             return (

@@ -264,53 +264,23 @@ export function useFeaturePreviewLayers({
     if (!active || !bbox || !features) return [];
 
     const {
-      featuresRecipe = [], featureHoverId, selectedFeatures = [], settings = {},
+      featuresRecipe = [], selectedFeatures = [],
     } = options;
 
     const FEATURES = [...features].filter((ft) => selectedFeatures.includes(ft.id as string));
 
-    const currentFeatureHoverIndex = FEATURES.findIndex((f) => f.id === featureHoverId);
-    if (currentFeatureHoverIndex > -1) {
-      FEATURES.splice(0, 0, FEATURES.splice(currentFeatureHoverIndex, 1)[0]);
-    }
+    const { opacity = 1, visibility = true } = options || {};
 
-    // Layer settings
-    const {
-      bioregional: BioregionalSettings = {},
-      species: SpeciesSettings = {},
-    } = settings;
-
-    const {
-      opacity: BioregionalOpacity,
-      visibility: BioregionalVisibility = true,
-    } = BioregionalSettings;
-
-    const {
-      opacity: SpeciesOpacity,
-      visibility: SpeciesVisibility = true,
-    } = SpeciesSettings;
-
-    const Types = {
-      bioregional: BioregionalVisibility,
-      species: SpeciesVisibility,
-    };
-
-    const getLayerVisibility = (type) => {
-      if (Types[type]) {
-        return 'visible';
+    const getLayerVisibility = () => {
+      if (!visibility) {
+        return 'none';
       }
-      return 'none';
+      return 'visible';
     };
 
     return FEATURES
       .map((f) => {
-        const { id, type } = f;
-
-        const getLayerOpacity = () => {
-          if (type === 'bioregional') return BioregionalOpacity;
-          if (type === 'species') return SpeciesOpacity;
-          return 0.5;
-        };
+        const { id } = f;
 
         const F = featuresRecipe.find((fr) => fr.id === id) || f;
 
@@ -333,11 +303,11 @@ export function useFeaturePreviewLayers({
                   ],
                 },
                 layout: {
-                  visibility: getLayerVisibility(type),
+                  visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': featureHoverId === id ? COLORS[type].hover : COLORS[type].default,
-                  'fill-opacity': featureHoverId === id ? 1 : 0.5 * getLayerOpacity(),
+                  'fill-color': COLORS['features-preview'].default,
+                  'fill-opacity': opacity,
                 },
               },
               {
@@ -350,11 +320,11 @@ export function useFeaturePreviewLayers({
                   ],
                 },
                 layout: {
-                  visibility: getLayerVisibility(type),
+                  visibility: getLayerVisibility(),
                 },
                 paint: {
                   'line-color': '#000',
-                  'line-opacity': getLayerOpacity(),
+                  'line-opacity': 0.5 * opacity,
                 },
               },
             ],

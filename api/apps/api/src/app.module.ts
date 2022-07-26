@@ -38,6 +38,8 @@ import { AccessControlModule } from '@marxan-api/modules/access-control';
 import { CloneModule } from './modules/clone';
 import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-repository/api-cloning-file-repository.module';
 import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-collector';
+import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -74,10 +76,9 @@ import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-co
     ApiCloningFilesRepositoryModule,
     CloneModule,
     AsyncJobsGarbageCollectorModule,
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 25,
-    }),
+    ThrottlerModule.forRoot(),
+    ExportCleanupModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController, PingController],
   providers: [
