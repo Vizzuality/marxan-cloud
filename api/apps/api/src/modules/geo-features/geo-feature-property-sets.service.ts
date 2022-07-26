@@ -10,7 +10,7 @@ import { GeoFeature } from './geo-feature.api.entity';
 import { GeoFeaturePropertySet } from './geo-feature.geo.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { BBox } from 'geojson';
-import { antimeridianBbox } from '@marxan/utils/geo';
+import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
 
 @Injectable()
 export class GeoFeaturePropertySetService {
@@ -33,20 +33,17 @@ export class GeoFeaturePropertySetService {
       .where(`propertySets.featureId IN (:...ids)`, { ids: geoFeatureIds });
 
     if (withinBBox) {
-      const { westBbox, eastBbox } = antimeridianBbox([
-        withinBBox[1],
-        withinBBox[3],
-        withinBBox[0],
-        withinBBox[2],
-      ]);
+      const { westBbox, eastBbox } = antimeridianBbox(
+        nominatim2bbox(withinBBox),
+      );
       query.andWhere(
         `(st_intersects(
-            st_intersection(st_makeenvelope(:...westBbox, 4326),
+            st_intersection(st_makeenvelope(:...eastBbox, 4326),
                                   ST_MakeEnvelope(0, -90, 180, 90, 4326)),
           "propertySets".bbox)
           or
           st_intersects(
-            st_intersection(st_makeenvelope(:...eastBbox, 4326),
+            st_intersection(st_makeenvelope(:...westBbox, 4326),
                                   ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
             "propertySets".bbox))`,
         {
