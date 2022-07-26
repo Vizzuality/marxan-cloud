@@ -1,8 +1,9 @@
 resource "sparkpost_template" "reset-password" {
-  content_from_email     = "{{fromEmail}}"
-  content_from_name      = "{{fromName}}"
-  content_subject        = "Recover password"
-  name                   = "Recover password"
+  template_id            = "marxan-reset-password"
+  content_from_email     = "no-reply@${var.domain}"
+  content_from_name      = "MaPP - Marxan Mapping App"
+  content_subject        = "Forgot your password?"
+  name                   = "Marxan Forgot Password"
   options_click_tracking = true
   options_open_tracking  = true
   options_transactional  = false
@@ -11,10 +12,11 @@ resource "sparkpost_template" "reset-password" {
 }
 
 resource "sparkpost_template" "reset-password-confirmation" {
-  content_from_email     = "{{fromEmail}}"
-  content_from_name      = "{{fromName}}"
-  content_subject        = "Confirm user"
-  name                   = "Confirm user"
+  template_id            = "confirmation-password-changed"
+  content_from_email     = "no-reply@${var.domain}"
+  content_from_name      = "MaPP - Marxan Mapping App"
+  content_subject        = "Your password was updated"
+  name                   = "Marxan Reset Password"
   options_click_tracking = true
   options_open_tracking  = true
   options_transactional  = false
@@ -23,10 +25,11 @@ resource "sparkpost_template" "reset-password-confirmation" {
 }
 
 resource "sparkpost_template" "sign-up-confirmation" {
-  content_from_email     = "{{fromEmail}}"
-  content_from_name      = "{{fromName}}"
-  content_subject        = "Confirm user"
-  name                   = "Confirm user with password"
+  template_id            = "confirmation-account"
+  content_from_email     = "no-reply@${var.domain}"
+  content_from_name      = "MaPP - Marxan Mapping App"
+  content_subject        = "Welcome to Marxan!"
+  name                   = "Marxan Sign Up confirmation"
   options_click_tracking = true
   options_open_tracking  = true
   options_transactional  = false

@@ -16,11 +16,6 @@ variable "key_vault_access_users" {
   description = "The names of the users to grant access to the secrets"
 }
 
-variable "key_vault_name_prefix" {
-  type        = string
-  description = "The prefix to use for the key vault names. KV names must be globally unique."
-}
-
 variable "project_tags" {
   description = "Project resource tags"
   type        = map(string)
