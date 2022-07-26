@@ -11,9 +11,9 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 
 enum SparkpostTemplate {
-  PasswordChangedConfirmation = 'confirmation-password-changed',
-  PasswordRecovery = 'marxan-reset-password',
-  SignUpConfirmation = 'confirmation-account',
+  PasswordChangedConfirmation = 'confirmation-password-changed', // Marxan Reset Password - email-templates/templates/reset-password-confirmation.html
+  PasswordRecovery = 'marxan-reset-password',  // Marxan Forgot Password - email-templates/templates/reset-password.html
+  SignUpConfirmation = 'confirmation-account', // Marxan Sign Up confirmation - email-templates/templates/sign-up-confirmation.html
 }
 
 export abstract class Mailer {
