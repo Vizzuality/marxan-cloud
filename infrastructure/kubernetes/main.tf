@@ -57,7 +57,8 @@ module "k8s_storage" {
 }
 
 module "email_templates" {
-  source            = "./modules/email-templates"
+  source = "./modules/email-templates"
+  domain = var.email_domain
 }
 
 #Production
@@ -70,7 +71,6 @@ module "key_vault_production" {
   resource_group         = data.azurerm_resource_group.resource_group
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
-  key_vault_name_prefix  = var.key_vault_name_prefix
   project_tags           = merge(var.project_tags, { Environment = "PRD" })
 }
 
@@ -238,7 +238,6 @@ module "key_vault_staging" {
   resource_group         = data.azurerm_resource_group.resource_group
   project_name           = var.project_name
   key_vault_access_users = var.key_vault_access_users
-  key_vault_name_prefix  = var.key_vault_name_prefix
   project_tags           = merge(var.project_tags, { Environment = "STG" })
 }
 
