@@ -1013,6 +1013,9 @@ export function useDownloadScenarioReport({
   requestConfig = {
     method: 'POST',
   },
+  projectName,
+  scenarioName,
+  runId,
 }: UseDownloadScenarioReportProps) {
   const [session] = useSession();
 
@@ -1033,12 +1036,10 @@ export function useDownloadScenarioReport({
   return useMutation(downloadScenarioReport, {
     onSuccess: (data: any, variables, context) => {
       const { data: blob } = data;
-      const { sid } = variables;
-
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `solutions-report-${sid}.pdf`);
+      link.setAttribute('download', `project_${projectName}-scenario_${scenarioName}-run_${runId}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
