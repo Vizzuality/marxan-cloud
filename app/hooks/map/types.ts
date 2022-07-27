@@ -171,6 +171,7 @@ export interface UseLegend {
       min: number;
       max: number,
     };
+    items?:string[];
     puAction?: string;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
