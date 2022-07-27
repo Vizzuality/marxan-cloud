@@ -306,23 +306,6 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
   return useMemo(() => {
     return {
       ...query,
-      // data: data.map((d) => {
-      //   return {
-      //     title: d.title,
-      //     area: 'custom',
-      //     status: 'published',
-      //     owner: {
-      //       name: 'Miguel Barrenechea',
-      //       email: 'barrenechea.miguel@gmail.com',
-      //     },
-      //   };
-      // }),
-      // meta: {
-      //   page: 1,
-      //   totalPages: 20,
-      //   size: 5,
-      //   totalItems: 100,
-      // },
       data: data?.data.map((d) => {
         const { creators, ownerEmails } = d;
 

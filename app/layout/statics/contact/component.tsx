@@ -21,7 +21,7 @@ export const StaticContact: React.FC<StaticContactProps> = () => {
           </p>
           <div className="w-44">
             <Button
-              href="mailto:marxancloud@gmail.com"
+              href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
               size="lg"
               target="_blank"
               theme="transparent-black"

@@ -59,3 +59,7 @@ variable "domain" {
   description = "Domain where the app is publicly available"
 }
 
+variable "support_email" {
+  type = string
+  description = "Email address to which users can send support requests"
+}

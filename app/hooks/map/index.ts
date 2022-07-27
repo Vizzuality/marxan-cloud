@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import chroma from 'chroma-js';
+
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseGeoJSONLayer,
@@ -279,7 +281,7 @@ export function useFeaturePreviewLayers({
     };
 
     return FEATURES
-      .map((f) => {
+      .map((f, index) => {
         const { id } = f;
 
         const F = featuresRecipe.find((fr) => fr.id === id) || f;
@@ -306,7 +308,7 @@ export function useFeaturePreviewLayers({
                   visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': COLORS['features-preview'].default,
+                  'fill-color': chroma.scale(COLORS['features-preview'].ramp).mode('lch').colors(selectedFeatures.length)[index],
                   'fill-opacity': opacity,
                 },
               },
@@ -997,7 +999,7 @@ export function useLegend({
   layers, options = {},
 }: UseLegend) {
   return useMemo(() => {
-    const { layerSettings = {} } = options;
+    const { layerSettings = {}, items = [] } = options;
 
     return layers
       .map((l) => {
@@ -1008,6 +1010,7 @@ export function useLegend({
             ...L({
               ...options,
               ...layerSettings[l],
+              ...items,
             }),
             settings: layerSettings[l],
           };
