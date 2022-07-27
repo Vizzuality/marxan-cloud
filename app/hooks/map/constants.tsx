@@ -12,7 +12,7 @@ export const COLORS = {
   'features-preview': {
     default: '#FFCC00',
     hover: '#FF9900',
-    ramp: ['#e0e681', '3DF7B3', '#FFF'],
+    ramp: ['#C21701', '#3278B3', '3DF7B3', '#FFF'],
   },
   wdpa: '#00F',
   features: '#6F53F7',
@@ -117,7 +117,6 @@ export const LEGEND_LAYERS = {
     return {
       id: 'features-preview',
       name: 'Features preview',
-      icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS['features-preview'].default }} />,
       type: 'basic',
       settingsManager: {
         opacity: true,
