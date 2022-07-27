@@ -81,7 +81,7 @@ variable "vpn_cidrs" {
 }
 
 variable "support_email" {
-  type = string
+  type        = string
   description = "Email address to which users can send support requests"
 }
 
