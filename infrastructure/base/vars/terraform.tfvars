@@ -22,3 +22,5 @@ production_db_storage_size = 4194304
 
 staging_db_instance_size = "GP_Standard_D4ds_v4"
 staging_db_storage_size = 131072
+
+support_email               = "marxanadmin@tnc.org"

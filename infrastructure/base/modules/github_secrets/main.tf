@@ -76,6 +76,12 @@ resource "github_actions_secret" "mapbox_api_token" {
   plaintext_value  = var.mapbox_api_token
 }
 
+resource "github_actions_secret" "contact_email" {
+  repository       = var.repo_name
+  secret_name      = "NEXT_PUBLIC_CONTACT_EMAIL"
+  plaintext_value  = var.support_email
+}
+
 resource "github_actions_secret" "next_public_api_url_production" {
   repository       = var.repo_name
   secret_name      = "NEXT_PUBLIC_API_URL_PRODUCTION"

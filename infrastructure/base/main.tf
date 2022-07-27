@@ -111,6 +111,7 @@ module "github_secrets" {
   tenant_id               = data.azurerm_subscription.subscription.tenant_id
   mapbox_api_token        = var.mapbox_api_token
   domain                  = var.domain
+  support_email           = var.support_email
 }
 
 module "log_analytics_workspace" {
