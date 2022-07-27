@@ -76,7 +76,7 @@ export const HomeBeta: React.FC<HomeBetaProps> = () => {
               className="text-primary-500"
               target="_blank"
               rel="noopener noreferrer"
-              href="mailto:marxancloud@gmail.com"
+              href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
             >
               marxancloud@gmail.com
             </a>
