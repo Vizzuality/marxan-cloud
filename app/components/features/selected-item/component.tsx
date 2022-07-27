@@ -216,7 +216,7 @@ export const Item: React.FC<ItemProps> = ({
           </div>
         </div>
 
-        {split && (splitSelected || splitOpen) && (
+        {split && splitOpen && (
           <div>
             <div className="flex items-center mt-3 space-x-2 tracking-wide font-heading">
               <h4 className="text-white uppercase text-xxs">
@@ -330,7 +330,7 @@ export const Item: React.FC<ItemProps> = ({
         )}
       </header>
 
-      {splitSelected && split && (
+      {splitSelected && split && splitOpen && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
             const checked = !splitFeaturesSelected.length

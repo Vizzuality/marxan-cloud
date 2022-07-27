@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = () => {
                 or suggestions.
               </h3>
               <Button
-                href="mailto:marxancloud@gmail.com"
+                href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
                 size="lg"
                 target="_blank"
                 theme="secondary-alt"

@@ -119,6 +119,11 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   }) => selectedFeatures.includes(id)).length > 0,
   [selectedFeaturesData, selectedFeatures]);
 
+  const selectedPreviewFeatures = useMemo(() => selectedFeaturesData.filter(({
+    id,
+  }) => selectedFeatures.includes(id)).map(({ name, id }) => ({ name, id })),
+  [selectedFeaturesData, selectedFeatures]);
+
   const {
     data: costSurfaceRangeData,
   } = useCostSurfaceRange(sid);
@@ -323,6 +328,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         && subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD
         ? wdpaThreshold : scenarioData?.wdpaThreshold,
       cost: costSurfaceRangeData,
+      items: selectedPreviewFeatures,
       puAction,
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
@@ -493,6 +499,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       </Controls>
 
       {/* Legend */}
+
       <div className="absolute w-full max-w-xs bottom-16 right-5">
         <Legend
           open={open}

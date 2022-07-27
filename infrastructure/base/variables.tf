@@ -80,6 +80,11 @@ variable "vpn_cidrs" {
   default     = []
 }
 
+variable "support_email" {
+  type        = string
+  description = "Email address to which users can send support requests"
+}
+
 variable "sparkpost_dns_cname_name" {
   type        = string
   description = "The name of the DNS CNAME record for Sparkpost"

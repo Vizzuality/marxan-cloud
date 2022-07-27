@@ -43,7 +43,7 @@ export const CommunityInfo: React.FC<CommunityInfoProps> = () => {
           <div className="flex flex-col items-center w-full max-w-5xl py-16 mx-auto gap-x-36 ">
             <div className="flex flex-col w-96">
               <h4 className="mb-2">Reach out with comments or suggestions.</h4>
-              <a className="text-left text-blue-500 hover:underline" href="mailto:marxancloud@gmail.com" rel="noopener noreferrer" target="_blank">Contact us</a>
+              <a className="text-left text-blue-500 hover:underline" href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`} rel="noopener noreferrer" target="_blank">Contact us</a>
             </div>
           </div>
           <div className="flex flex-col items-center w-full max-w-5xl py-16 mx-auto border-t border-black gap-x-36 border-opacity-20">
