@@ -25,6 +25,8 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
   - `strat`: make _stratification_ functionality available for conservation
     features in the frontend app
 
+- `NEXT_PUBLIC_CONTACT_EMAIL`: Email address to be used for general contact inquiries.
+
 ## Getting Started
 
 First, run the development server:

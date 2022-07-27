@@ -27,20 +27,8 @@ export const Form = (): React.ReactNode => {
 
   return (
     <FormRFF
-      debug={() => {
-        // console.log(values);
-      }}
-      onSubmit={() => {
-        // console.info(values);
-      }}
-    // initialValues={{
-    //   name: 'Testing initial values',
-    //   email: 'barrenechea.miguel@gmail.com',
-    //   description: 'Lorem ipsum dolor sit amet',
-    //   checkbox: true,
-    //   'checkbox-group': ['option-1', 'option-2'],
-    //   'radio-group': 'option-1',
-    // }}
+      debug={() => {}}
+      onSubmit={() => {}}
     >
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
