@@ -32,7 +32,6 @@ COPY --chown=$USER:$USER components ./components
 COPY --chown=$USER:$USER constants ./constants
 COPY --chown=$USER:$USER cypress ./cypress
 COPY --chown=$USER:$USER docs ./docs
-COPY --chown=$USER:$USER email-templates ./email-templates
 COPY --chown=$USER:$USER hoc ./hoc
 COPY --chown=$USER:$USER hooks ./hooks
 COPY --chown=$USER:$USER images ./images

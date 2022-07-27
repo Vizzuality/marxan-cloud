@@ -31,6 +31,8 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
     const query = `
       with pu as (
         select spd.id,
+               spd.lock_status_set_by_user,
+               spd.lockin_status as original_lock,
                case
                  when spd.protected_area <> 0 and spd.protected_area is not null
                    then round(
@@ -44,15 +46,24 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
         where scenario_id = $1),
            pu_pa as (
              select pu.id,
+                    pu.lock_status_set_by_user,
+                    pu.original_lock,
                     (CASE pu.perc_protection >= $2
-                       WHEN true THEN 1
-                       else 0 end) as lockin_status
+                      WHEN true THEN 1
+                      else 0 end) as lockin_status
              from pu)
       UPDATE scenarios_pu_data
-      SET (lockin_status)      =
-            (SELECT lockin_status
+      SET lockin_status      =
+        (case
+          when ((select lock_status_set_by_user FROM pu_pa
+            WHERE scenarios_pu_data.id = pu_pa.id) is null)
+            then (SELECT lockin_status
              FROM pu_pa
-             WHERE scenarios_pu_data.id = pu_pa.id),
+             WHERE scenarios_pu_data.id = pu_pa.id)
+          else
+            (select original_lock from pu_pa
+              WHERE scenarios_pu_data.id = pu_pa.id)
+          end),
           protected_by_default =
             (CASE
                WHEN ((SELECT lockin_status
