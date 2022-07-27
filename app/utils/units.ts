@@ -23,3 +23,9 @@ export const bytesToMegabytes = (bytes: number): number => {
 export const bytesToKilobytes = (bytes: number): number => {
   return bytes / 1048.576;
 };
+
+export const formatFileName = (str) => {
+  return (` ${str}`).toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => {
+    return `_${chr}`;
+  }).substring(1);
+};
