@@ -59,6 +59,7 @@ module "k8s_storage" {
 module "email_templates" {
   source = "./modules/email-templates"
   domain = var.email_domain
+  support_email = var.support_email
 }
 
 #Production

@@ -34,6 +34,11 @@ variable "email_domain" {
   description = "The domain name from which to send emails"
 }
 
+variable "support_email" {
+  type = string
+  description = "Email address to which users can send support requests"
+}
+
 variable "sparkpost_api_key" {
   type        = string
   description = "Sparkpost API key"
