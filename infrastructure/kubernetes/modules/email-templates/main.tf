@@ -21,7 +21,9 @@ resource "sparkpost_template" "reset-password-confirmation" {
   options_open_tracking  = true
   options_transactional  = false
   published              = true
-  content_html           = file("${path.module}/templates/reset-password-confirmation.html")
+  content_html           = templatefile("${path.module}/templates/reset-password-confirmation.html", {
+    support_email : var.support_email
+  })
 }
 
 resource "sparkpost_template" "sign-up-confirmation" {
