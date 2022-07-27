@@ -130,6 +130,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.Unstated,
+        setByUser: false,
       },
     );
 
@@ -140,6 +141,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.LockedIn,
+        setByUser: false,
       },
     );
 
@@ -150,6 +152,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.LockedIn,
+        setByUser: true,
       },
     );
 
@@ -160,6 +163,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
       {
         lockStatus: LockStatus.LockedOut,
+        setByUser: true,
       },
     );
     return true;

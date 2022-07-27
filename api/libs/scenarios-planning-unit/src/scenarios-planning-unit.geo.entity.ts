@@ -64,6 +64,14 @@ export class ScenariosPlanningUnitGeoEntity {
   lockStatus?: LockStatus | null;
 
   @Column({
+    type: `boolean`,
+    nullable: false,
+    default: false,
+    name: `lock_status_set_by_user`,
+  })
+  setByUser?: boolean;
+
+  @Column({
     type: 'float8',
     nullable: true,
   })

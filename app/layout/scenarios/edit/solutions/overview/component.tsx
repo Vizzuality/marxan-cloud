@@ -7,8 +7,10 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
+import { formatFileName } from 'utils/units';
 
 // import { LEGEND_LAYERS } from 'hooks/map/constants';
+import { useProject } from 'hooks/projects';
 import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
@@ -28,7 +30,7 @@ import { ScenariosSolutionsOverviewProps } from './types';
 
 export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { pid, sid } = query;
   const [PDFLoader, setPDFLoader] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
   const { addToast } = useToasts();
@@ -39,6 +41,8 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
   const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const dispatch = useDispatch();
+
+  const { data: projectData } = useProject(pid);
 
   const {
     data: scenarioData,
@@ -58,7 +62,11 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     enabled: scenarioData?.ranAtLeastOnce,
   });
 
-  const downloadScenarioReportMutation = useDownloadScenarioReport({});
+  const downloadScenarioReportMutation = useDownloadScenarioReport({
+    projectName: formatFileName(projectData?.name) || '',
+    scenarioName: formatFileName(scenarioData?.name) || '',
+    runId: `${(selectedSolutionData || bestSolutionData).runId}`,
+  });
 
   const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
