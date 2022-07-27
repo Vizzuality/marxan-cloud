@@ -68,7 +68,10 @@ export class SparkPostMailer implements Mailer {
     data: Record<string, any> = {},
   ): Promise<void> {
     const recipient: Recipient = {
-      substitution_data: data,
+      substitution_data: {
+        ...data,
+        homepageUrl: AppConfig.get('application.baseUrl'),
+      },
       address: targetEmail,
     };
 

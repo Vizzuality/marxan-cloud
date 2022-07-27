@@ -191,3 +191,24 @@ provider "registry.terraform.io/hashicorp/tls" {
     "zh:f7931dda4377c6548e5fc7afddab03230ac9b42380908932542dea7661e0f078",
   ]
 }
+
+provider "registry.terraform.io/surveymonkey/sparkpost" {
+  version     = "0.2.2"
+  constraints = "0.2.2"
+  hashes = [
+    "h1:7uPlR5k/U90MUcQ/akrZKZUtJeV0aHUBL2C4wKCZHW4=",
+    "zh:0bc7bfe652d4c94404c9c792c1b26682f6993d3559a393f0782569f94caf21ab",
+    "zh:11e5e9df6a4cddd95cabb7153bd160607d5ff6be9d4b7d1436e7d4f2d8f334b8",
+    "zh:12f3c08692d3cf05be9b00ae876cc5564a3f475fd4c384f1bdafa381f027d523",
+    "zh:3449ac1f330cdcc2804e9be143148f0c93ead32af80a9e70bb9de2b3eb34d206",
+    "zh:3713dbe84703863cae56e753183c997e5d6c502b3b05ce433ff25ed87de3e924",
+    "zh:3add82a4674a199a3bfb4f60a50c8586efca0f930e3125dccbfbf9783cae9805",
+    "zh:3b6369b3c330f84bd3d4ce63534e53bb3c4c3ae8b3017022ef43d87c956d99a0",
+    "zh:6a138af4fdbb8e9b3786f5139fa7b69aed369b5dc0e50c78e8db34e58e081ad1",
+    "zh:6c38bec0e0743eeda16d918297030b0c7f61e0f07e740adb05502ace05876511",
+    "zh:7ea48c7838e503e76da836423251ddbe2413327031eb0cbbf87ab0d622cddb48",
+    "zh:9d248322d4d56c89ebbc864109aa56978d3cb7d9045d982c6e905a9a611099ab",
+    "zh:aa96a95befb633670f05d8fc10cb3ba3171d5ea035601b88d0eb2a16f39b4343",
+    "zh:adbdd27d43a986a812dd4c3a0507618855bed09b4b93ccaa3587bf09dc1c599a",
+  ]
+}
