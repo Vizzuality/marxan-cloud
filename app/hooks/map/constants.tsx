@@ -1,5 +1,7 @@
 import React from 'react';
 
+import chroma from 'chroma-js';
+
 import Icon from 'components/icon';
 
 import HEXAGON_SVG from 'svgs/map/hexagon.svg?sprite';
@@ -10,6 +12,7 @@ export const COLORS = {
   'features-preview': {
     default: '#FFCC00',
     hover: '#FF9900',
+    ramp: ['#C21701', '#3278B3', '3DF7B3', '#FFF'],
   },
   wdpa: '#00F',
   features: '#6F53F7',
@@ -109,15 +112,24 @@ export const LEGEND_LAYERS = {
     },
   }),
 
-  'features-preview': () => ({
-    id: 'features-preview',
-    name: 'Features preview',
-    icon: <Icon icon={SQUARE_SVG} className="w-3.5 h-3.5 mt-0.5 stroke-current stroke-2" style={{ color: COLORS['features-preview'].default }} />,
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-  }),
+  'features-preview': (options) => {
+    const { items } = options;
+    return {
+      id: 'features-preview',
+      name: 'Features preview',
+      type: 'basic',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      items: items.map((item, i) => {
+        return {
+          value: item.name,
+          color: chroma.scale(COLORS['features-preview'].ramp).mode('lch').colors(items.length)[i],
+        };
+      }),
+    };
+  },
   features: () => ({
     id: 'features',
     name: 'Features',
