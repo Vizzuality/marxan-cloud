@@ -12,6 +12,7 @@ export const COLORS = {
   'features-preview': {
     default: '#FFCC00',
     hover: '#FF9900',
+    ramp: ['#e0e681', '3DF7B3', '#FFF'],
   },
   wdpa: '#00F',
   features: '#6F53F7',
@@ -125,7 +126,7 @@ export const LEGEND_LAYERS = {
       items: items.map((item, i) => {
         return {
           value: item.name,
-          color: chroma.scale(['#e0e681', '#FFF']).mode('lch').colors(items.length)[i],
+          color: chroma.scale(COLORS['features-preview'].ramp).mode('lch').colors(items.length)[i],
         };
       }),
     };

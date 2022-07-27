@@ -308,7 +308,7 @@ export function useFeaturePreviewLayers({
                   visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': chroma.scale(['#e0e681', '#FFF']).mode('lch').colors(selectedFeatures.length)[index],
+                  'fill-color': chroma.scale(COLORS['features-preview'].ramp).mode('lch').colors(selectedFeatures.length)[index],
                   'fill-opacity': opacity,
                 },
               },
