@@ -3,7 +3,7 @@ import React, {
 } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import intersection from 'lodash/intersection';
 import isEqual from 'lodash/isEqual';
@@ -45,8 +45,6 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
   const dispatch = useDispatch();
-
-  const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const editable = useCanEditScenario(pid, sid);
   const { data: projectData } = useProject(pid);
@@ -330,9 +328,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                     <p className="py-4 text-sm text-center">or</p>
                   )}
 
-                  <FieldRFF
-                    name="uploadedProtectedArea"
-                  >
+                  <FieldRFF name="uploadedProtectedArea">
                     {(flprops) => {
                       return (
                         <ProtectedAreaUploader
@@ -343,12 +339,12 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                   </FieldRFF>
 
                   {areWDPAreasSelected && (
-                    <ProtectedAreasSelected
-                      form={form}
-                      options={WDPA_OPTIONS}
-                      title="Selected protected areas:"
-                      wdpaIucnCategories={values.wdpaIucnCategories}
-                    />
+                  <ProtectedAreasSelected
+                    form={form}
+                    options={WDPA_OPTIONS}
+                    title="Selected protected areas:"
+                    wdpaIucnCategories={values.wdpaIucnCategories}
+                  />
                   )}
 
                   {areProjectPAreasSelected && (
@@ -384,18 +380,16 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               </p>
             </div>
 
-            {!!wdpaCategories?.wdpaIucnCategories?.length && (
-              <div className="flex justify-center mt-5 space-x-2">
-                <Button
-                  theme="secondary-alt"
-                  size="lg"
-                  type="submit"
-                  className="relative px-20"
-                >
-                  Continue
-                </Button>
-              </div>
-            )}
+            <div className="flex justify-center mt-5 space-x-2">
+              <Button
+                theme="secondary-alt"
+                size="lg"
+                type="submit"
+                className="relative px-20"
+              >
+                Continue
+              </Button>
+            </div>
 
           </form>
         );
