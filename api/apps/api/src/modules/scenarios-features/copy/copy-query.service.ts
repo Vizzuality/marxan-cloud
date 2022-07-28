@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { isDefined } from '@marxan/utils';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { FeatureConfigCopy } from '@marxan-api/modules/specification';
+import { SingleSplitConfigFeatureValueStripped } from '@marxan/features-hash';
 
 type Fields = {
   specificationId: string;
@@ -13,6 +14,9 @@ type Fields = {
   scenarioId: string;
   fpf: string;
   featureId: string;
+  key: string | undefined;
+  value: string | undefined;
+  baseFeatureId: string | undefined;
   target: string;
   totalArea: string;
 };
@@ -21,6 +25,7 @@ type Joins = {
   md5HashJoin: string;
   protectedAreaJoin: string;
   planningAreaJoin: string;
+  featurePropertiesKvJoin: string;
 };
 
 type Input = Pick<
@@ -38,6 +43,7 @@ export class CopyQuery {
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
+    featureGeoOps: SingleSplitConfigFeatureValueStripped | null,
   ): {
     query: string;
     parameters: (string | number)[];
@@ -47,7 +53,9 @@ export class CopyQuery {
       planningAreaLocation,
       protectedAreaFilterByIds,
       project,
+      featureGeoOps,
     );
+    const isDerivedFeature = isDefined(fields.baseFeatureId);
     const query = `
       with inserted_sfp as (
         insert into scenario_features_preparation as sfp (feature_class_id,
@@ -61,7 +69,7 @@ export class CopyQuery {
                                                           current_pa,
                                                           hash)
           select fd.id,
-                 fd.feature_id,
+                 ${fields.featureId},
                  ${fields.scenarioId},
                  ${fields.specificationId},
                  ${fields.fpf},
@@ -71,10 +79,13 @@ export class CopyQuery {
                  coalesce(areas_cache.current_pa, ${fields.protectedArea}),
                  md5hash
           from features_data as fd
+          ${joins.featurePropertiesKvJoin}
           ${joins.planningAreaJoin}
           ${joins.md5HashJoin}
           left join areas_cache on areas_cache.hash = md5hash
-          where feature_id = ${fields.featureId}
+          where feature_id = ${
+            isDerivedFeature ? fields.baseFeatureId : fields.featureId
+          }
           and st_intersects(st_makeenvelope(
           ${fields.bbox[0]},
           ${fields.bbox[2]},
@@ -86,8 +97,7 @@ export class CopyQuery {
           select hash, total_area, current_pa from inserted_sfp
           on conflict do nothing
       )
-      select id from inserted_sfp
-    `;
+      select id from inserted_sfp`;
     return { parameters, query };
   }
 
@@ -100,6 +110,7 @@ export class CopyQuery {
     planningAreaLocation: { id: string; tableName: string } | undefined,
     protectedAreaFilterByIds: string[],
     project: Pick<Project, 'bbox'>,
+    featureGeoOps: SingleSplitConfigFeatureValueStripped | null,
   ) {
     const parameters: (string | number)[] = [];
     const usedFields: Partial<Fields> = {};
@@ -175,7 +186,25 @@ export class CopyQuery {
           ? `st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))`
           : `NULL`);
       },
+      get baseFeatureId() {
+        return (usedFields.baseFeatureId ??= isDefined(featureGeoOps)
+          ? `$${parameters.push(featureGeoOps.baseFeatureId)}`
+          : undefined);
+      },
+      get key() {
+        return (usedFields.key ??= isDefined(featureGeoOps)
+          ? `$${parameters.push(featureGeoOps.splitByProperty)}`
+          : undefined);
+      },
+      get value() {
+        return (usedFields.value ??=
+          isDefined(featureGeoOps) && isDefined(featureGeoOps.value)
+            ? `$${parameters.push(featureGeoOps.value)}`
+            : undefined);
+      },
     };
+    const baseFeatureAndKeyAreDefined =
+      isDefined(fields.baseFeatureId) && isDefined(fields.key);
     const usedJoins: Partial<Joins> = {};
     const joins: Joins = {
       get protectedAreaJoin() {
@@ -217,6 +246,23 @@ export class CopyQuery {
                 }
             ) as md5hash
     `);
+      },
+      get featurePropertiesKvJoin() {
+        return (usedJoins.featurePropertiesKvJoin ??=
+          isDefined(featureGeoOps) && baseFeatureAndKeyAreDefined
+            ? `inner join ( 
+            SELECT DISTINCT feature_data_id 
+            FROM feature_properties_kv fpkv
+            WHERE feature_id = ${fields.baseFeatureId}
+            and fpkv.key = ${fields.key}
+            ${
+              fields.value
+                ? `and trim('"' FROM fpkv.value::text) = trim('"' FROM ${fields.value}::text)`
+                : ``
+            }
+            ) sfpkv
+            ON sfpkv.feature_data_id = fd.id`
+            : ``);
       },
     };
     return { parameters, fields, joins };

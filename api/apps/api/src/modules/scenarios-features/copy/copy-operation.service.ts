@@ -34,12 +34,14 @@ export class CopyOperation {
         project,
         protectedAreaFilterByIds,
         planningAreaLocation,
+        featureGeoOps,
       } = await this.copyDataProvider.prepareData(data);
       const { parameters, query } = this.copyQuery.prepareStatement(
         data,
         planningAreaLocation,
         protectedAreaFilterByIds,
         project,
+        featureGeoOps,
       );
       const ids: { id: string }[] = await this.geoEntityManager.query(
         query,
