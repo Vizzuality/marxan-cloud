@@ -62,7 +62,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       <div
         className={cx({
           'absolute left-0 top-0 h-full w-1 ': true,
-          'bg-purple-500': !isAllTargets,
+          'bg-yellow-400': !isAllTargets,
         })}
       />
       <div className="flex items-start justify-between pb-2 pr-2">
