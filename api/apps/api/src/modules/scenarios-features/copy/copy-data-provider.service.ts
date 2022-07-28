@@ -5,6 +5,9 @@ import { assertDefined } from '@marxan/utils';
 import { ProjectsCrudService } from '@marxan-api/modules/projects/projects-crud.service';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { SingleConfigFeatureValueStripped } from '@marxan/features-hash';
+import { FeatureConfigCopy } from '@marxan-api/modules/specification';
 
 @Injectable()
 export class CopyDataProvider {
@@ -16,10 +19,12 @@ export class CopyDataProvider {
 
   async prepareData(data: {
     scenarioId: string;
+    input: FeatureConfigCopy;
   }): Promise<{
     protectedAreaFilterByIds: string[];
     planningAreaLocation: { id: string; tableName: string } | undefined;
     project: Project;
+    featureGeoOps: SingleConfigFeatureValueStripped | null;
   }> {
     const scenario = await this.apiEntityManager
       .getRepository(Scenario)
@@ -37,6 +42,21 @@ export class CopyDataProvider {
       countryId: project.countryId,
       planningAreaGeometryId: project.planningAreaGeometryId,
     });
-    return { project, protectedAreaFilterByIds, planningAreaLocation };
+
+    const [featureGeoOps]: {
+      fromGeoprocessingOps: SingleConfigFeatureValueStripped | null;
+    }[] = await this.apiEntityManager
+      .createQueryBuilder()
+      .select('from_geoprocessing_ops', 'fromGeoprocessingOps')
+      .from(GeoFeature, 'features')
+      .where('id = :featureId', { featureId: data.input.baseFeatureId })
+      .execute();
+
+    return {
+      project,
+      protectedAreaFilterByIds,
+      planningAreaLocation,
+      featureGeoOps: featureGeoOps.fromGeoprocessingOps,
+    };
   }
 }
