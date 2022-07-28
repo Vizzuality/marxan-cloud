@@ -3,7 +3,6 @@
 
 # env
 **/.env*
-!**/.env.sample
 
 # emacs/vim
 *#
