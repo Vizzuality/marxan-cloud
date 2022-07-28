@@ -9,7 +9,7 @@ output "postgresql_username" {
 }
 
 output "postgresql_password" {
-  value       = local.password
+  value       = random_password.postgresql_user_password_generator.result
   description = "PostgreSQL database password"
 }
 

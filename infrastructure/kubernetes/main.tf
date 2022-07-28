@@ -83,7 +83,6 @@ module "k8s_api_database_production" {
   project_name    = var.project_name
   namespace       = "production"
   name            = "api"
-  key_vault_id    = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
   sql_server_name = data.terraform_remote_state.core.outputs.sql_server_production_name
 
   providers = {
@@ -99,7 +98,6 @@ module "k8s_geoprocessing_database_production" {
   project_name    = var.project_name
   namespace       = "production"
   name            = "geoprocessing"
-  key_vault_id    = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
   sql_server_name = data.terraform_remote_state.core.outputs.sql_server_production_name
 
   providers = {
@@ -194,10 +192,10 @@ module "production_secrets" {
   postgres_api_username           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
   postgres_api_password           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
   postgres_api_hostname           = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
-  postgres_geoprocessing_database = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
-  postgres_geoprocessing_username = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
-  postgres_geoprocessing_password = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
-  postgres_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
+  postgres_geoprocessing_database = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_database : null
+  postgres_geoprocessing_username = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_username : null
+  postgres_geoprocessing_password = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_password : null
+  postgres_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_hostname : null
 }
 
 module "ingress_production" {
@@ -248,7 +246,6 @@ module "k8s_api_database_staging" {
   project_name    = var.project_name
   namespace       = "staging"
   name            = "api"
-  key_vault_id    = module.key_vault_staging.key_vault_id
   sql_server_name = data.terraform_remote_state.core.outputs.sql_server_staging_name
 
   providers = {
@@ -262,7 +259,6 @@ module "k8s_geoprocessing_database_staging" {
   project_name    = var.project_name
   namespace       = "staging"
   name            = "geoprocessing"
-  key_vault_id    = module.key_vault_staging.key_vault_id
   sql_server_name = data.terraform_remote_state.core.outputs.sql_server_staging_name
 
   providers = {
