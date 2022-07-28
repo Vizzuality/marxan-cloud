@@ -192,7 +192,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
-          className="flex flex-col justify-between flex-grow w-full px-6 overflow-auto"
+          className="flex flex-col justify-between flex-grow w-full overflow-auto px-9"
         >
           <Loading
             className="absolute top-0 left-0 z-10 flex items-center justify-center w-full h-full bg-white bg-opacity-50"
@@ -202,10 +202,10 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
           <FormSpy onChange={({ values: spyValues }) => setTmpValues(spyValues)} />
 
-          <h1 className="mb-5 text-xl font-medium text-black">
+          <h1 className="mb-2 text-xl font-medium text-black mt-9">
             Publish project to the community
           </h1>
-
+          <p className="mb-5 text-sm text-black">By publishing this project you allow other users to access all the information of the project. </p>
           <div className="mt-8">
             <FieldRFF
               name="name"

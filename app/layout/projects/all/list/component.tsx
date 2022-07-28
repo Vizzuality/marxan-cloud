@@ -2,6 +2,8 @@ import React, { useCallback, useState } from 'react';
 
 import { useSelector } from 'react-redux';
 
+import Link from 'next/link';
+
 import cx from 'classnames';
 
 import { useProjectsUsers } from 'hooks/project-users';
@@ -236,8 +238,23 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
         )}
 
         {isFetched && !data.length && (
-          <div className="text-white">
-            No projects found
+          <div className="flex items-center justify-center text-base text-white mt-28">
+            <p>
+              New to Marxan? You can start by creating your first project or by going to the
+              {' '}
+              <Link
+                href="/community"
+              >
+                <a
+                  href="/community/projects"
+                  className="font-semibold hover:underline text-primary-600"
+                >
+                  community page
+                </a>
+              </Link>
+              {' '}
+              and copying one existing project.
+            </p>
           </div>
         )}
       </div>
