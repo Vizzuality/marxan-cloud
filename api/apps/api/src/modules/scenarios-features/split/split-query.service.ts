@@ -58,19 +58,25 @@ export class SplitQuery {
         `$${parameters.push(eastBbox[3])}`,
       ],
       totalArea: isDefined(planningAreaLocation)
-        ? `st_area(st_intersection(pa.the_geom, fd.the_geom))`
+        ? `st_area(st_transform(st_intersection(pa.the_geom, fd.the_geom), 3410))`
         : `NULL`,
     };
-    const protectedAreaJoin = fields.protectedAreaIds
-      ? `cross join (
-                   select st_area(st_union(wdpa.the_geom)) as area
-                   from wdpa where wdpa.id in (${fields.protectedAreaIds})
-                 ) as protected`
-      : '';
     const planningAreaJoin = isDefined(planningAreaLocation)
       ? `left join ${planningAreaLocation.tableName} as pa on pa.id = ${fields.planningAreaId}`
       : ``;
-
+    const protectedArea = fields.protectedAreaIds
+      ? `st_area(
+          st_transform(
+            st_intersection(
+              st_intersection(pa.the_geom, fd.the_geom), 
+              (
+                select st_union(wdpa.the_geom) as area
+                from wdpa where  wdpa.id in (${fields.protectedAreaIds})
+              )
+            )
+          ,3410)
+        )`
+      : 'NULL';
     const query = `
       insert into scenario_features_preparation as sfp (feature_class_id,
                                                         api_feature_id,
@@ -102,11 +108,11 @@ export class SplitQuery {
              ${fields.target},
              ${fields.prop},
              ${fields.totalArea},
-             ${fields.protectedArea}
+             ${protectedArea}
       from split
              join features_data as fd
                   on (split.feature_data_id = fd.id)
-        ${planningAreaJoin} ${protectedAreaJoin}
+        ${planningAreaJoin} 
         where st_intersects(ST_MakeEnvelope(${fields.westBbox
           .map((coordinate) => coordinate)
           .join(',')}, 4326), fd.the_geom)
