@@ -238,9 +238,11 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
         )}
 
         {isFetched && !data.length && (
-          <div className="flex items-center justify-center text-base text-white mt-28">
-            <p>
-              New to Marxan? You can start by creating your first project or by going to the
+          <div className="flex items-center justify-center text-base leading-8 text-white mt-28">
+            <p className="text-center">
+              New to Marxan? You can start by creating your first project or by going to
+              <br />
+              the
               {' '}
               <Link
                 href="/community"
