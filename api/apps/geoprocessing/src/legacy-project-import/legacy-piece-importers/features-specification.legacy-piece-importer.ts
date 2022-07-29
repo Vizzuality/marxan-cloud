@@ -337,7 +337,6 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
   private async updateScenarioFeaturesData(
     specRows: PropSpecDatRow[],
-    puvsprRows: PuvrsprDatRow[],
     scenarioId: string,
   ): Promise<void> {
     const scenarioFeaturesData: ScenarioFeaturesData[] = await this.scenarioFeaturesDataRepo.find(
@@ -347,12 +346,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
         relations: ['featureData'],
       },
     );
-    const amountsByIntegerIdAndPuid: Record<string, number> = {};
     const propertiesByIntegerId: Record<number, PropSpecDatRow> = {};
 
-    puvsprRows.forEach((row) => {
-      amountsByIntegerIdAndPuid[`${row.species}-${row.pu}`] = row.amount;
-    });
     specRows.forEach((row) => {
       propertiesByIntegerId[row.id] = row;
     });
@@ -370,8 +365,6 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
         this.logAndThrow(
           'Scenario features data properties does not contain required properties',
         );
-
-      const amount = amountsByIntegerIdAndPuid[`${integerId}-${puid}`];
       const { target2, targetocc, sepnum } = propertiesByIntegerId[integerId];
 
       return {
@@ -379,7 +372,6 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
         target2,
         targetocc,
         sepnum,
-        amountFromLegacyProject: amount,
       };
     });
 
@@ -415,11 +407,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
     const specRows = this.getPropSpecRows(specRowsOrError, puvsprRowsOrError);
     await this.runSpecification(specRows, projectId, scenarioId);
-    await this.updateScenarioFeaturesData(
-      specRows,
-      puvsprRowsOrError,
-      scenarioId,
-    );
+    await this.updateScenarioFeaturesData(specRows, scenarioId);
 
     return input;
   }

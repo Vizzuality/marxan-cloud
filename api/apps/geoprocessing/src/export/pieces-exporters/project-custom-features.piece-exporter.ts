@@ -17,6 +17,7 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 type CreationStatus = ProjectCustomFeature['creation_status'];
 
@@ -37,6 +38,8 @@ type FeaturesDataSelectResult = {
   the_geom: string;
   properties: Record<string, string | number>;
   source: GeometrySource;
+  amount_from_legacy_project: number | null;
+  project_pu_id: string | null;
 };
 
 @Injectable()
@@ -81,15 +84,25 @@ export class ProjectCustomFeaturesPieceExporter
 
     const customFeaturesIds = customFeatures.map((feature) => feature.id);
     let customFeaturesData: FeaturesDataSelectResult[] = [];
+    let projectPusMap: Record<string, number> = {};
     if (customFeaturesIds.length > 0) {
       customFeaturesData = await this.geoprocessingEntityManager
         .createQueryBuilder()
-        .select(['feature_id', 'the_geom', 'properties', 'source'])
+        .select([
+          'feature_id',
+          'the_geom',
+          'properties',
+          'source',
+          'amount_from_legacy_project',
+          'project_pu_id',
+        ])
         .from('features_data', 'fd')
         .where('feature_id IN (:...customFeaturesIds)', {
           customFeaturesIds,
         })
         .execute();
+
+      projectPusMap = await this.getProjectPusMap(input.resourceId);
     }
 
     const fileContent: ProjectCustomFeaturesContent = {
@@ -97,7 +110,12 @@ export class ProjectCustomFeaturesPieceExporter
         ...feature,
         data: customFeaturesData
           .filter((data) => data.feature_id === id)
-          .map(({ feature_id, ...data }) => data),
+          .map(({ feature_id, project_pu_id, ...data }) => {
+            const puid = project_pu_id
+              ? projectPusMap[project_pu_id]
+              : undefined;
+            return { projectPuPuid: puid, ...data };
+          }),
       })),
     };
 
@@ -121,5 +139,26 @@ export class ProjectCustomFeaturesPieceExporter
       ...input,
       uris: [new ComponentLocation(outputFile.right, relativePath)],
     };
+  }
+
+  private async getProjectPusMap(
+    projectId: string,
+  ): Promise<Record<string, number>> {
+    const projectPus: {
+      id: string;
+      puid: number;
+    }[] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select(['id', 'puid'])
+      .from(ProjectsPuEntity, 'ppus')
+      .where('ppus.project_id = :projectId', { projectId })
+      .execute();
+
+    const projectPuIdByPuid: Record<string, number> = {};
+    projectPus.forEach(({ puid, id }) => {
+      projectPuIdByPuid[id] = puid;
+    });
+
+    return projectPuIdByPuid;
   }
 }

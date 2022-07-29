@@ -19,11 +19,11 @@ import { ioSettingsProvider } from './input-params/io-settings';
 import { InputParameterFileProvider } from './input-params/input-parameter-file.provider';
 import { InputFilesArchiverService } from './input-files-archiver.service';
 import { PuvsprDatProcessorModule } from './puvspr.dat.processor/puvspr.dat.processor.module';
-import { LegacyProjectImportRepositoryModule } from '@marxan-api/modules/legacy-project-import/infra/legacy-project-import.repository.module';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Scenario]),
+    TypeOrmModule.forFeature([Project, Scenario]),
     TypeOrmModule.forFeature(
       [
         PlanningUnitsGeom,
@@ -33,7 +33,6 @@ import { LegacyProjectImportRepositoryModule } from '@marxan-api/modules/legacy-
       ],
       DbConnections.geoprocessingDB,
     ),
-    LegacyProjectImportRepositoryModule,
     PuvsprDatProcessorModule,
   ],
   providers: [
