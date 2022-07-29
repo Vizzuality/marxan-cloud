@@ -118,20 +118,15 @@ export class PuvsprCalculationsService {
           from
           (
               select
-               the_geom as the_geom,
-               sfd.amount_from_legacy_project as amount_from_legacy_project
+               fd.project_pu_id as puid,
+               fd.amount_from_legacy_project as amount_from_legacy_project
               from scenario_features_data sfd
-              inner join features_data fd on sfd.feature_class_id = fd.id where sfd.scenario_id = $1
+              inner join features_data fd on 
+              sfd.feature_class_id = fd.id where sfd.scenario_id = $1
               AND sfd.api_feature_id = $2
-          ) species,
-          (
-              select the_geom, ppu.puid as puid, ppu.id as id, spd.scenario_id
-              from planning_units_geom pug
-              inner join projects_pu ppu on pug.id = ppu.geom_id
-              inner join scenarios_pu_data spd on ppu.id = spd.project_pu_id
-              where spd.scenario_id = $1 order by ppu.puid asc
-          ) pu
-          where ST_Equals(species.the_geom,pu.the_geom)
+          ) species
+          LEFT JOIN projects_pu pu
+          ON pu.id = species.puid
           )
           select * from all_amount_per_planning_unit where amount > 0  order by puid;
         `,

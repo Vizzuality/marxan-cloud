@@ -1,18 +1,20 @@
-import { LegacyProjectImportRepository } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
-import { ResourceId } from '@marxan/cloning/domain';
+import { ProjectSourcesEnum } from '@marxan/projects';
 import {
   PuvsprCalculationsRepository,
   PuvsprCalculationsService,
 } from '@marxan/puvspr-calculations';
 import { Injectable } from '@nestjs/common';
-import { isRight } from 'fp-ts/lib/Either';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Project } from '../projects/project.api.entity';
 
 @Injectable()
 export class ComputeArea {
   constructor(
     private readonly puvsprCalculationsRepo: PuvsprCalculationsRepository,
     private readonly puvsprCalculations: PuvsprCalculationsService,
-    private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
+    @InjectRepository(Project)
+    private readonly projectsRepo: Repository<Project>,
   ) {}
   public async computeAreaPerPlanningUnitOfFeature(
     projectId: string,
@@ -48,10 +50,10 @@ export class ComputeArea {
   }
 
   private async isLegacyProject(projectId: string) {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepo.find(
-      new ResourceId(projectId),
-    );
+    const [project] = await this.projectsRepo.find({
+      id: projectId,
+    });
 
-    return isRight(legacyProjectImportOrError);
+    return project.sources === ProjectSourcesEnum.legacyImport;
   }
 }

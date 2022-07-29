@@ -83,7 +83,6 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
         target2: sfd.target2,
         target: sfd.target,
         targetocc: sfd.targetocc,
-        amountFromLegacyProject: sfd.amountFromLegacyProject,
         outputFeaturesData: [],
       }));
   }

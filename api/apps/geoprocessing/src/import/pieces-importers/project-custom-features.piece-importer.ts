@@ -15,6 +15,7 @@ import {
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
 import { chunk } from 'lodash';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 @Injectable()
 @PieceImportProvider()
@@ -74,6 +75,8 @@ export class ProjectCustomFeaturesPieceImporter
 
     if (!features.length) return returnValue;
 
+    const projectPusMap = await this.getProjectPusMap(projectId);
+
     await this.apiEntityManager.transaction(async (apiEm) => {
       const featureIdByClassName: Record<string, string> = {};
       const insertValues = features.map(({ data, ...feature }) => {
@@ -106,11 +109,13 @@ export class ProjectCustomFeaturesPieceImporter
       );
 
       const featuresDataInsertValues = featuresData.map(
-        ({ feature_class_name, ...data }) => ({
+        ({ feature_class_name, projectPuPuid, ...data }) => ({
           theGeom: () => `'${data.the_geom}'`,
           properties: data.properties,
           source: data.source,
           featureId: featureIdByClassName[feature_class_name],
+          amountFromLegacyProject: data.amount_from_legacy_project,
+          projectPuId: projectPuPuid ? projectPusMap[projectPuPuid] : undefined,
         }),
       );
 
@@ -128,5 +133,26 @@ export class ProjectCustomFeaturesPieceImporter
     });
 
     return returnValue;
+  }
+
+  private async getProjectPusMap(
+    projectId: string,
+  ): Promise<Record<number, string>> {
+    const projectPus: {
+      id: string;
+      puid: number;
+    }[] = await this.geoprocessingEntityManager
+      .createQueryBuilder()
+      .select(['id', 'puid'])
+      .from(ProjectsPuEntity, 'ppus')
+      .where('ppus.project_id = :projectId', { projectId })
+      .execute();
+
+    const projectPuIdByPuid: Record<number, string> = {};
+    projectPus.forEach(({ puid, id }) => {
+      projectPuIdByPuid[puid] = id;
+    });
+
+    return projectPuIdByPuid;
   }
 }

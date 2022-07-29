@@ -143,22 +143,27 @@ export class FeaturesLegacyProjectPieceImporter
 
   private async getProjectPusGeomsMap(
     projectId: string,
-  ): Promise<Record<number, string>> {
+  ): Promise<Record<number, { theGeom: string; projectPuId: string }>> {
     const projectPus: {
+      id: string;
       puid: number;
       theGeom: string;
     }[] = await this.geoprocessingEntityManager
       .createQueryBuilder()
       .select(['puid'])
+      .addSelect('ppus.id', 'id')
       .addSelect('pugs.the_geom', 'theGeom')
       .from(ProjectsPuEntity, 'ppus')
       .innerJoin(PlanningUnitsGeom, 'pugs', 'pugs.id = ppus.geom_id')
       .where('ppus.project_id = :projectId', { projectId })
       .execute();
 
-    const projectPuIdByPuid: Record<number, string> = {};
-    projectPus.forEach(({ puid, theGeom }) => {
-      projectPuIdByPuid[puid] = theGeom;
+    const projectPuIdByPuid: Record<
+      number,
+      { theGeom: string; projectPuId: string }
+    > = {};
+    projectPus.forEach(({ puid, theGeom, id }) => {
+      projectPuIdByPuid[puid] = { theGeom, projectPuId: id };
     });
 
     return projectPuIdByPuid;
@@ -167,7 +172,10 @@ export class FeaturesLegacyProjectPieceImporter
   private getFeaturesDataInsertValues(
     features: FeaturesData[],
     puvsprDatRows: PuvrsprDatRow[],
-    projectPusGeomsMap: Record<number, string>,
+    projectPusGeomsMap: Record<
+      number,
+      { theGeom: string; projectPuId: string }
+    >,
   ) {
     const featuresDataInsertValues: {
       id: string;
@@ -175,6 +183,8 @@ export class FeaturesLegacyProjectPieceImporter
       theGeom: string;
       properties: Record<string, string | number>;
       source: GeometrySource;
+      amountFromLegacyProject: number;
+      projectPuId: string;
     }[] = [];
     const nonExistingPus: number[] = [];
 
@@ -184,9 +194,10 @@ export class FeaturesLegacyProjectPieceImporter
       );
 
       filteredPuvspr.forEach((filteredRow) => {
-        const geometry = projectPusGeomsMap[filteredRow.pu];
+        const { theGeom, projectPuId } = projectPusGeomsMap[filteredRow.pu];
+        const amountFromLegacyProject = filteredRow.amount;
 
-        if (!geometry) {
+        if (!theGeom) {
           nonExistingPus.push(filteredRow.pu);
           return;
         }
@@ -194,13 +205,15 @@ export class FeaturesLegacyProjectPieceImporter
         featuresDataInsertValues.push({
           id: v4(),
           featureId: feature.id,
-          theGeom: geometry,
+          theGeom,
           properties: {
             name: feature.feature_class_name,
             [specDatFeatureIdPropertyKey]: feature.specDatFeatureId,
             [specDatPuidPropertyKey]: filteredRow.pu,
           },
           source: GeometrySource.user_imported,
+          amountFromLegacyProject,
+          projectPuId,
         });
       });
     });

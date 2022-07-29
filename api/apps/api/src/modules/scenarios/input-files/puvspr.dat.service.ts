@@ -1,5 +1,5 @@
-import { LegacyProjectImportRepository } from '@marxan-api/modules/legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
-import { ResourceId } from '@marxan/cloning/domain';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { ProjectSourcesEnum } from '@marxan/projects';
 import { assertDefined } from '@marxan/utils';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,12 +16,15 @@ export class PuvsprDatService {
   constructor(
     @InjectRepository(Scenario)
     private readonly scenarioRepo: Repository<Scenario>,
-    private readonly legacyProjectImportRepo: LegacyProjectImportRepository,
+    @InjectRepository(Project)
+    private readonly projectsRepo: Repository<Project>,
     private readonly puvsprDatProcessor: PuvsprDatProcessor,
   ) {}
 
   public async getPuvsprDatContent(scenarioId: string): Promise<string> {
-    const [scenario] = await this.scenarioRepo.find({ id: scenarioId });
+    const [scenario] = await this.scenarioRepo.find({
+      where: { id: scenarioId },
+    });
     assertDefined(scenario);
 
     const projectId = scenario.projectId;
@@ -38,11 +41,9 @@ export class PuvsprDatService {
   }
 
   private async isLegacyProject(projectId: string) {
-    const legacyProjectImportOrError = await this.legacyProjectImportRepo.find(
-      new ResourceId(projectId),
-    );
-
-    return isRight(legacyProjectImportOrError);
+    const [project] = await this.projectsRepo.find({ id: projectId });
+    assertDefined(project);
+    return project.sources === ProjectSourcesEnum.legacyImport;
   }
 
   private getFileContent(rows: PuvrsprDatRow[]) {

@@ -32,11 +32,12 @@ import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
 import { SplitFeatureConfigMapper } from '../scenarios/specification/split-feature-config.mapper';
 import { FeatureHashModule } from '../features-hash/features-hash.module';
 import { SplitCreateFeatures } from './split/split-create-features.service';
+import { Project } from '../projects/project.api.entity';
 
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([GeoFeature]),
+    TypeOrmModule.forFeature([Project, GeoFeature]),
     TypeOrmModule.forFeature(
       [
         ScenarioFeaturesData,
@@ -51,7 +52,6 @@ import { SplitCreateFeatures } from './split/split-create-features.service';
     ApiEventsModule,
     IntersectWithPuModule,
     AccessControlModule,
-    LegacyProjectImportRepositoryModule,
   ],
   providers: [
     ScenarioFeaturesService,
