@@ -87,8 +87,8 @@ export class SpecDatReader extends DatFileReader<ReadRow, SpecDatRow> {
         result:
           this.isPropRow(propOrTarget) &&
           isNumber(propOrTarget.prop) &&
-          (propOrTarget.prop <= 0 || propOrTarget.prop > 1),
-        errorMessage: 'Prop values should between (0, 1]',
+          (propOrTarget.prop < 0 || propOrTarget.prop > 1),
+        errorMessage: 'Prop values should between [0, 1]',
       },
       {
         result:
