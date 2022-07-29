@@ -6,6 +6,8 @@ import { SpecDatReader, SpecDatRow } from './spec-dat.reader';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
+const generateRandomStrictlyNegativeNumber = () => (-1 * (1 - Math.random()));
+
 beforeEach(async () => {
   fixtures = await getFixtures();
 });
@@ -94,8 +96,8 @@ it('fails when spec.dat contains prop values lower than zero', async () => {
   );
 });
 
-it('fails when spec.dat contains prop values equal to zero', async () => {
-  const file = fixtures.GivenAnInvalidSpecDatFile({ prop: 0 });
+it('fails when spec.dat contains prop values lower than zero', async () => {
+  const file = fixtures.GivenAnInvalidSpecDatFile({ prop: generateRandomStrictlyNegativeNumber() });
   const result = await fixtures.WhenExecutingSpecDatReader(file);
   fixtures.ThenSpecDatReadOperationFails(
     result,
