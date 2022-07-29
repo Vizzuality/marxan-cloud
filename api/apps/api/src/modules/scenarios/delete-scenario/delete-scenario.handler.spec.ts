@@ -92,7 +92,9 @@ const getFixtures = async () => {
 
       expect(result.right).toEqual(true);
     },
-    WhenAScenarioDeletionIsRequestedAndFails: (result: DeleteScenarioResponse) => {
+    WhenAScenarioDeletionIsRequestedAndFails: (
+      result: DeleteScenarioResponse,
+    ) => {
       if (isRight(result)) throw new Error('got right expected left');
 
       expect(result.left).toEqual(deleteScenarioFailed);

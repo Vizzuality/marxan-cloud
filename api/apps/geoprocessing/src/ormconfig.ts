@@ -48,7 +48,7 @@ export const geoprocessingConnections: {
     },
     extra: {
       max: AppConfig.get<number>('postgresGeoApi.maxClientsInPool', 10),
-    }
+    },
   },
   apiDB: {
     name: 'apiDB',

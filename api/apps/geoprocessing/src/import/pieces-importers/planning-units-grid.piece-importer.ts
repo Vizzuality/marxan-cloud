@@ -1,9 +1,7 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
-import {
-  ResourceKind,
-} from '@marxan/cloning/domain';
+import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Injectable, Logger } from '@nestjs/common';
