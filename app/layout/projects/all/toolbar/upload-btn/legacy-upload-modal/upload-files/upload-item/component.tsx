@@ -1,6 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
 
-import { PROJECT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
 import { useSelector } from 'react-redux';
@@ -83,7 +82,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     const errors = r.errors.map((error) => {
       // TODO: Read mazSize per each field
       return error.code === 'file-too-large'
-        ? { error, message: `File is larger than ${bytesToMegabytes(PROJECT_UPLOADER_MAX_SIZE)} MB` }
+        ? { error, message: `File is larger than ${bytesToMegabytes(f.maxSize)} MB` }
         : error;
     });
 
@@ -121,8 +120,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     isDragReject,
   } = useDropzone({
     multiple: false,
-    // TODO: Read mazSize per each field
-    maxSize: PROJECT_UPLOADER_MAX_SIZE,
+    maxSize: f.maxSize,
     onDropAccepted,
     onDropRejected,
   });
