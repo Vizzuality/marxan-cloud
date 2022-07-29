@@ -6,7 +6,7 @@ export class RemoveFeatureTags1657544835000 implements MigrationInterface {
       ALTER TABLE features
         DROP COLUMN tag;
     `);
-  
+
     await queryRunner.query(`  
       DROP TYPE features_tags;
     `);

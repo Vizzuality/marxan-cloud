@@ -1,9 +1,5 @@
-import {
-  MarxanSandboxRunnerService
-} from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
-import {
-  SingleRunAdapterModule
-} from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
+import { MarxanSandboxRunnerService } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/marxan-sandbox-runner.service';
+import { SingleRunAdapterModule } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-single/single-run-adapter.module';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { sandboxRunnerToken } from '@marxan-geoprocessing/modules/scenarios/runs/tokens';
 import {
@@ -40,22 +36,26 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling marxan run during fetching assets`, async (done) => {
-    expect.assertions(1);
+  test(
+    `cancelling marxan run during fetching assets`,
+    async (done) => {
+      expect.assertions(1);
 
-    fixtures
-      .GivenBLMCalibrationIsRunning()
-      .then(() => {
-        done(`Shouldn't finish Marxan run.`);
-      })
-      .catch((error) => {
-        expect(error.signal).toEqual('SIGTERM');
-        done();
-      });
+      fixtures
+        .GivenBLMCalibrationIsRunning()
+        .then(() => {
+          done(`Shouldn't finish Marxan run.`);
+        })
+        .catch((error) => {
+          expect(error.signal).toEqual('SIGTERM');
+          done();
+        });
 
-    await delay(1000);
-    fixtures.WhenKillingMarxanRun();
-  }, TEST_TIMEOUT_MULTIPLIER);
+      await delay(1000);
+      fixtures.WhenKillingMarxanRun();
+    },
+    TEST_TIMEOUT_MULTIPLIER,
+  );
 });
 
 describe(`given input data is available`, () => {
@@ -78,27 +78,31 @@ describe(`given input data is available`, () => {
     TEST_TIMEOUT_MULTIPLIER * 30,
   );
 
-  test(`cancelling marxan run`, async (done) => {
-    expect.assertions(1);
+  test(
+    `cancelling marxan run`,
+    async (done) => {
+      expect.assertions(1);
 
-    fixtures
-      .GivenBLMCalibrationIsRunning()
-      .then(() => {
-        done(`Shouldn't finish Marxan run.`);
-      })
-      .catch((error) => {
-        expect(JSON.parse(error).signal).toEqual('SIGTERM');
-        done();
-      });
+      fixtures
+        .GivenBLMCalibrationIsRunning()
+        .then(() => {
+          done(`Shouldn't finish Marxan run.`);
+        })
+        .catch((error) => {
+          expect(JSON.parse(error).signal).toEqual('SIGTERM');
+          done();
+        });
 
-    await delay(1000);
-    fixtures.WhenKillingMarxanRun();
-  }, TEST_TIMEOUT_MULTIPLIER);
+      await delay(1000);
+      fixtures.WhenKillingMarxanRun();
+    },
+    TEST_TIMEOUT_MULTIPLIER,
+  );
 });
 
 afterEach(async () => {
   await fixtures.cleanup();
-}, TEST_TIMEOUT_MULTIPLIER*2);
+}, TEST_TIMEOUT_MULTIPLIER * 2);
 
 const NUMBER_OF_FEATURES_IN_SAMPLE = 59;
 const NUMBER_OF_PU_IN_SAMPLE = 12178;
@@ -309,5 +313,5 @@ const resources = [
 const resourceResponse = (resourceAddress: string) =>
   readFileSync(
     process.cwd() +
-    `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
+      `/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/${resourceAddress}`,
   );
