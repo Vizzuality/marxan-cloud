@@ -458,6 +458,7 @@ export function usePUGridLayer({
   return useMemo(() => {
     if (!active || !sid) return null;
     const {
+      wdpaIucnCategories = [],
       wdpaThreshold = 0,
       cost = {
         min: 0,
@@ -656,7 +657,7 @@ export function usePUGridLayer({
           ] : [],
 
           // PROTECTED AREAS
-          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null
+          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null && !!wdpaIucnCategories.length
             ? [
               {
                 type: 'fill',

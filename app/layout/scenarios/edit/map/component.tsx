@@ -199,7 +199,12 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const layers = useMemo(() => {
     const protectedCategories = protectedAreas || [];
 
-    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) return ['wdpa-percentage', 'pugrid'];
+    if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) {
+      return [
+        ...protectedCategories.length ? ['wdpa-percentage'] : [],
+        'pugrid',
+      ];
+    }
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.COST_SURFACE) return ['cost', 'pugrid'];
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS) return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
 
