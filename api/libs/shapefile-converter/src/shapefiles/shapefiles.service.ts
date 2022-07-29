@@ -7,6 +7,18 @@ import * as path from 'path';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mapshaper = require('mapshaper');
 
+export type ShapefileToGeoJsonOptions = {
+  /**
+   * `allow-overlaps` should used only when importing feature shapefiles, as
+   * overlaps must be allowed in order to allow to use split properly.
+   * Otherwise, (gis) features, aka shapefile geometry rows within a shapefile
+   * will be cropped in ways that are likely not going to be expected by users,
+   * in case they overlap.
+   */
+  allowOverlaps?: boolean;
+  cleanupTemporaryFolders?: boolean;
+};
+
 @Injectable()
 export class ShapefileService {
   private readonly logger: Logger = new Logger(ShapefileService.name);
@@ -16,7 +28,10 @@ export class ShapefileService {
 
   private async shapeFileToGeoJson(
     fileInfo: Pick<Express.Multer.File, 'path' | 'filename' | 'destination'>,
+    options?: ShapefileToGeoJsonOptions,
   ) {
+    const allowOverlaps = options?.allowOverlaps ? 'allow-overlaps' : '';
+
     if (
       !(await this.areRequiredShapefileFilesInFolder(
         fileInfo.path.replace('.zip', ''),
@@ -36,11 +51,11 @@ export class ShapefileService {
       `-i snap "${fileInfo.path.replace(
         '.zip',
         '',
-      )}/*.shp" -proj EPSG:4326 -clean rewind -info -o "${outputFile}"`,
+      )}/*.shp" -proj EPSG:4326 -clean rewind ${allowOverlaps} -info -o "${outputFile}"`,
     );
 
     const geoJsonBuffer = await readFile(outputFile);
-    await unlink(outputFile);
+    if (options?.cleanupTemporaryFolders) await unlink(outputFile);
 
     return JSON.parse(geoJsonBuffer.toString('utf-8'));
   }
@@ -71,7 +86,7 @@ export class ShapefileService {
    */
   async transformToGeoJson(
     shapeFile: Pick<Express.Multer.File, 'path' | 'filename' | 'destination'>,
-    config: { cleanupTemporaryFolders?: boolean } = {
+    options: ShapefileToGeoJsonOptions = {
       cleanupTemporaryFolders: true,
     },
   ): Promise<{
@@ -85,7 +100,7 @@ export class ShapefileService {
           shapeFile.destination,
         ),
       );
-      const geoJson = await this.shapeFileToGeoJson(shapeFile);
+      const geoJson = await this.shapeFileToGeoJson(shapeFile, options);
       if (!this.isGeoJsonTypeSupported(geoJson)) {
         throw new Error('Types not supported');
       }
@@ -97,7 +112,7 @@ export class ShapefileService {
       /**
        * Leave temporary folder on filesystem according to feature flag.
        */
-      if (config.cleanupTemporaryFolders) {
+      if (options.cleanupTemporaryFolders) {
         await this.fileService
           .deleteDataFromFS(shapeFile.path)
           .catch((error) => this.logger.error(error));
