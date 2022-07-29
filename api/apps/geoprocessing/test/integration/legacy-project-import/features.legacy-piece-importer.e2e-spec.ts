@@ -198,7 +198,7 @@ describe(FeaturesLegacyProjectPieceImporter, () => {
       .ThenADuplicateFeatureNamesErrorShouldBeThrown();
   });
 
-  it('imports successfully scenario pus data and scenario pus cost data', async () => {
+  it('imports successfully features and features data', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
@@ -334,6 +334,7 @@ const getFixtures = async () => {
     return [firstFeature, secondFeature, thirdFeature, fourthFeature];
   };
 
+  const expectedAmountFromLegacyProject = 100;
   const pus = await GivenProjectPus(
     geoEntityManager,
     projectId,
@@ -440,7 +441,7 @@ const getFixtures = async () => {
       const puvsprRows = featuresWithPuids.flatMap(({ id, puids }) => {
         return puids.map((puid) => ({
           species: id,
-          amount: 0.3,
+          amount: expectedAmountFromLegacyProject,
           pu: puid,
         }));
       });
@@ -514,6 +515,14 @@ const getFixtures = async () => {
           expect(insertedFeaturesData).toHaveLength(
             amountOfFeaturesData - amountOfNonExistingPuids,
           );
+          expect(
+            insertedFeaturesData.every(
+              ({ amountFromLegacyProject, projectPuId }) =>
+                amountFromLegacyProject === expectedAmountFromLegacyProject &&
+                projectPuId &&
+                pus.map(({ id }) => id).includes(projectPuId),
+            ),
+          ).toEqual(true);
         },
       };
     },
