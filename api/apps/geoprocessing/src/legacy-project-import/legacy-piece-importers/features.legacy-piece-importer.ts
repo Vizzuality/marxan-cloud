@@ -194,13 +194,15 @@ export class FeaturesLegacyProjectPieceImporter
       );
 
       filteredPuvspr.forEach((filteredRow) => {
-        const { theGeom, projectPuId } = projectPusGeomsMap[filteredRow.pu];
+        const geomAndPuId = projectPusGeomsMap[filteredRow.pu];
         const amountFromLegacyProject = filteredRow.amount;
 
-        if (!theGeom) {
+        if (!geomAndPuId) {
           nonExistingPus.push(filteredRow.pu);
           return;
         }
+
+        const { theGeom, projectPuId } = geomAndPuId;
 
         featuresDataInsertValues.push({
           id: v4(),

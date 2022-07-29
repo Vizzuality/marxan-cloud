@@ -136,7 +136,6 @@ const getFixtures = async () => {
   const amountOfPlatformFeatures = 2;
   const recordsOfDataForEachFeature = 3;
   const recordsOfOutputDataForEachScenarioFeaturesData = 2;
-  const expectedAmountFromLegacyProject = 135;
 
   return {
     cleanUp: async () => {
@@ -278,7 +277,6 @@ const getFixtures = async () => {
           totalArea: 100,
           currentArea: 100,
           featureId: index,
-          amountFromLegacyProject: expectedAmountFromLegacyProject,
           outputFeaturesData: Array(
             recordsOfOutputDataForEachScenarioFeaturesData,
           )
@@ -353,9 +351,8 @@ const getFixtures = async () => {
 
           expect(
             scenarioFeaturesData.every(
-              ({ featureData, apiFeatureId, amountFromLegacyProject }) =>
-                featureData.featureId === apiFeatureId &&
-                amountFromLegacyProject === expectedAmountFromLegacyProject,
+              ({ featureData, apiFeatureId }) =>
+                featureData.featureId === apiFeatureId,
             ),
           ).toEqual(true);
 
