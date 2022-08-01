@@ -27,10 +27,10 @@ export const uploadOptions: MulterOptions = {
     /**
      * If the environment variable FILE_UPLOADS_SIZE_LIMIT_MEBIBYTES is set,
      * use this as fileSize limit, otherwise fall back to hardcoded default
-     * (50MiB).
+     * (10MiB).
      */
     fileSize: (() =>
-      AppConfig.get<number>('fileUploads.limits.fileSize', 50 * 1024e2))(),
+      AppConfig.get<number>('fileUploads.limits.fileSize', 10 * 1024 ** 2))(),
   },
 };
 
