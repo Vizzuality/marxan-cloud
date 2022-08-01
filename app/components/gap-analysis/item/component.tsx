@@ -6,6 +6,7 @@ import { useNumberFormatter } from '@react-aria/i18n';
 import classnames from 'classnames';
 
 import Icon from 'components/icon';
+import Tooltip from 'components/tooltip';
 
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
@@ -79,9 +80,22 @@ export const Item: React.FC<ItemProps> = ({
       onMouseLeave={onMouseLeave}
     >
       <div className="flex justify-between">
-        <div className="pt-1 mr-4 overflow-hidden text-sm flex-shrink-1 overflow-ellipsis whitespace-nowrap font-heading">
-          {name}
-        </div>
+        <Tooltip
+          content={(
+            <div
+              className="p-2 text-gray-500 bg-white rounded"
+            >
+              {name}
+            </div>
+          )}
+          placement="top-start"
+          delay={[400, null]}
+          offset={[-10, -34]}
+        >
+          <div className="pt-1 mr-4 overflow-hidden text-sm flex-shrink-1 overflow-ellipsis whitespace-nowrap font-heading">
+            {name}
+          </div>
+        </Tooltip>
 
         <button
           type="button"

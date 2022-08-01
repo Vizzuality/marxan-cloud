@@ -67,7 +67,7 @@ export const TargetSPFItem: React.FC<TargetSPFItemProps> = ({
       />
       <div className="flex items-start justify-between pb-2 pr-2">
         <span className={cx({
-          'pr-5 text-sm font-medium font-heading': true,
+          'pr-10 text-sm font-medium font-heading': true,
           'w-4/5': !editable,
         })}
         >
