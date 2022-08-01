@@ -49,7 +49,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
           <button
             aria-label="return"
             type="button"
-            className="flex items-center w-full space-x-2 text-left focus:outline-none"
+            className="flex items-center space-x-2 text-left focus:outline-none"
             onClick={() => {
               dispatch(setSubTab(null));
             }}
