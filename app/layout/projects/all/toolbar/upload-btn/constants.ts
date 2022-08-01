@@ -22,7 +22,7 @@ export const UPLOAD_PROJECT_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Use this option to upload projects created with different Marxan application',
+    subtitle: 'Use this option to upload projects created with different Marxan applications',
     disclaimer: '',
     disabled: false,
   },

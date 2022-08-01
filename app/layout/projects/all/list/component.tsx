@@ -255,7 +255,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
                 </a>
               </Link>
               {' '}
-              and copying one existing project.
+              and copying an existing project.
             </p>
           </div>
         )}

@@ -168,7 +168,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                   >
                     <div>
                       <h4 className="font-heading text-lg mb-2.5">
-                        When uploading planning unit grid and input db
+                        When uploading planning unit grid and input database
                       </h4>
                       <p>
                         This may be the case when users are transitioning a legacy project to the
@@ -195,7 +195,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                       <br />
 
                       <h4 className="font-heading text-lg mb-2.5">
-                        When uploading planning unit grid, input db and output db
+                        When uploading planning unit grid, input database and output database
                       </h4>
                       <p>
                         This may be the case when users intend to upload a historical project to be
@@ -217,7 +217,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                       <br />
 
                       <h4 className="font-heading text-lg mb-2.5">
-                        When uploading planning unit grid, input db, output db and feature data
+                        When uploading planning unit grid, input database, output
+                        database and feature data
                       </h4>
                       <p>
                         This may be the case when users intend to transition to using Marxan MaPP

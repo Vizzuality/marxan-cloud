@@ -21,7 +21,7 @@ export const ConfirmSignUp: React.FC<ConfirmSignUpProps> = ({ setConfirm }:Confi
         <Icon icon={CHECK_EMAIL_SVG} className="w-28" />
 
         <div className="w-72">
-          <p className="text-lg text-center text-gray-600 font-heading">We have sent a link to confirmate your sign up...</p>
+          <p className="text-lg text-center text-gray-600 font-heading">We have sent a link to your email to confirm your account...</p>
         </div>
 
         <div className="flex pt-10 space-x-4 border-t border-gray-200 w-72">
