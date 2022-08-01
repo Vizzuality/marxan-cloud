@@ -91,11 +91,11 @@ export class InputParameterFileProvider {
       scenario.boundaryLengthModifier,
       scenario.numberOfRuns ?? this.marxanDefaults.NUMREPS,
       {
-        _CLOUD_SCENARIO: scenario.name,
+        _CLOUD_SCENARIO: scenario.name.toLocaleLowerCase(),
         _CLOUD_PROJECT:
-          scenario.project?.name ?? this.marxanDefaults._CLOUD_PROJECT,
+          scenario.project?.name.toLocaleLowerCase() ?? this.marxanDefaults._CLOUD_PROJECT,
         _CLOUD_ORGANIZATION:
-          scenario.project?.organization?.name ??
+          scenario.project?.organization?.name.toLocaleLowerCase() ??
           this.marxanDefaults._CLOUD_ORGANIZATION,
         _CLOUD_GENERATED_AT: new Date().toISOString(),
         VERBOSITY: this.marxanDefaults.VERBOSITY,

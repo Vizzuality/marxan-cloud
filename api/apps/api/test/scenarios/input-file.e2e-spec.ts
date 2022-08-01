@@ -65,9 +65,9 @@ describe(`when an owner updates scenario with input data`, () => {
       PUVSPRNAME puvspr.dat
       BOUNDNAME bound.dat
       OUTPUTDIR output
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Fresh Alaska array
+      _CLOUD_SCENARIO save the world species
+      _CLOUD_PROJECT humanity for living.
+      _CLOUD_ORGANIZATION fresh alaska array
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
       SCENNAME output
@@ -139,9 +139,9 @@ describe(`when a contributor updates scenario with input data`, () => {
       PUVSPRNAME puvspr.dat
       BOUNDNAME bound.dat
       OUTPUTDIR output
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Fresh Alaska array
+      _CLOUD_SCENARIO save the world species
+      _CLOUD_PROJECT humanity for living.
+      _CLOUD_ORGANIZATION fresh alaska array
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
       SCENNAME output

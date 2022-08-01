@@ -54,8 +54,8 @@ export class MarxanParametersDefaults {
   ITIMPTYPE = IterativeImprovementType.Normal;
   HEURTYPE = HeuristicType.Ignored;
   CLUMPTYPE = ClumpType.PartialDoNotCount;
-  _CLOUD_PROJECT = 'NA';
-  _CLOUD_ORGANIZATION = 'NA';
+  _CLOUD_PROJECT = 'n/a';
+  _CLOUD_ORGANIZATION = 'n/a';
   VERBOSITY = 2;
   SCENNAME = 'output';
   SAVESOLUTIONSMATRIX = 3;
