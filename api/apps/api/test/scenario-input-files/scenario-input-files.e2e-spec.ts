@@ -74,9 +74,9 @@ describe(`when getting input.dat`, () => {
       PUVSPRNAME puvspr.dat
       BOUNDNAME bound.dat
       OUTPUTDIR output
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Alaska
+      _CLOUD_SCENARIO save the world species
+      _CLOUD_PROJECT humanity for living.
+      _CLOUD_ORGANIZATION alaska
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
       SCENNAME output
@@ -125,9 +125,9 @@ describe(`when getting input.dat`, () => {
       PUVSPRNAME puvspr.dat
       BOUNDNAME bound.dat
       OUTPUTDIR output
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Alaska
+      _CLOUD_SCENARIO save the world species
+      _CLOUD_PROJECT humanity for living.
+      _CLOUD_ORGANIZATION alaska
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
       SCENNAME output
@@ -176,9 +176,9 @@ describe(`when getting input.dat`, () => {
       PUVSPRNAME puvspr.dat
       BOUNDNAME bound.dat
       OUTPUTDIR output
-      _CLOUD_SCENARIO Save the world species
-      _CLOUD_PROJECT Humanity for living.
-      _CLOUD_ORGANIZATION Alaska
+      _CLOUD_SCENARIO save the world species
+      _CLOUD_PROJECT humanity for living.
+      _CLOUD_ORGANIZATION alaska
       _CLOUD_GENERATED_AT __ISO_DATE__
       VERBOSITY 2
       SCENNAME output
