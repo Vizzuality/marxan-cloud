@@ -15,6 +15,7 @@ export interface SignUpConfirmationProps {
 export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
   const { push, query: { token: confirmToken, userId } } = useRouter();
   const [confirmedAccountToken, setConfirmedAccountToken] = useState(false);
+  const [isValidated, setIsValidated] = useState(false);
 
   const confirmAccount = useCallback(async () => {
     const data = { validationToken: confirmToken, sub: userId };
@@ -27,8 +28,10 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
         });
 
       setConfirmedAccountToken(true);
+      setIsValidated(true);
     } catch (error) {
       setConfirmedAccountToken(false);
+      setIsValidated(true);
       console.error(error);
     }
   }, [confirmToken, userId]);
@@ -40,7 +43,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
 
   return (
     <Wrapper>
-      {confirmedAccountToken && (
+      {confirmedAccountToken && isValidated && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="pb-5">
@@ -65,7 +68,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
         </div>
       )}
 
-      {!confirmedAccountToken && (
+      {!confirmedAccountToken && isValidated && (
         <div className="relative flex items-center justify-center h-full">
           <div className="w-full max-w-xs">
             <div className="flex flex-col items-center pb-5 space-y-20">
