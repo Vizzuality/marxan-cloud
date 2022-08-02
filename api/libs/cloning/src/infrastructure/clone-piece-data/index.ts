@@ -62,10 +62,10 @@ export const clonePieceImportOrder: Record<ClonePiece, number> = {
   [ClonePiece.ProjectCustomProtectedAreas]: 1,
   //
   [ClonePiece.ProjectCustomFeatures]: 2,
+  [ClonePiece.ScenarioProtectedAreas]: 2,
+  [ClonePiece.ScenarioPlanningUnitsData]: 2,
   //
   [ClonePiece.ProjectPuvsprCalculations]: 3,
-  [ClonePiece.ScenarioProtectedAreas]: 3,
-  [ClonePiece.ScenarioPlanningUnitsData]: 3,
   [ClonePiece.ScenarioFeaturesData]: 3,
   //
   [ClonePiece.ScenarioRunResults]: 4,
