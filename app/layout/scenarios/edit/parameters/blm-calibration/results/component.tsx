@@ -61,6 +61,16 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
     };
   }, [BLM]);
 
+  const CALIBRATION_CARDS_DATA = useMemo(() => {
+    const results = [...calibrationResultsData];
+    return results.sort((a, b) => a.blmValue - b.blmValue);
+  }, [calibrationResultsData]);
+
+  const CALIBRATION_CHART_DATA = useMemo(() => {
+    const results = [...calibrationResultsData];
+    return results.sort((a, b) => a.cost - b.cost);
+  }, [calibrationResultsData]);
+
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
@@ -219,7 +229,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                   </div>
 
                   <div className="grid grid-cols-3 gap-5 mt-10">
-                    {calibrationResultsData.map((result) => {
+                    {CALIBRATION_CARDS_DATA.map((result) => {
                       const selected = result.blmValue === values.blmCalibration;
 
                       return (
@@ -241,7 +251,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
 
                     <div className="w-full h-32">
                       <BlmChart
-                        data={calibrationResultsData.sort((a, b) => a.cost - b.cost)}
+                        data={CALIBRATION_CHART_DATA}
                         selected={values.blmCalibration}
                         onChange={(v) => {
                           form.change('blmCalibration', v);
