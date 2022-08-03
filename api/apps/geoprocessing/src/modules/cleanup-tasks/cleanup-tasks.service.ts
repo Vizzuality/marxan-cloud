@@ -6,11 +6,24 @@ import { EntityManager } from 'typeorm';
 import { CleanupTasks } from './cleanup-tasks';
 import { chunk } from 'lodash';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
+import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
+import { ProtectedArea } from '@marxan/protected-areas';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { ScenarioFeaturesData } from '@marxan/features';
+import { BlmFinalResultEntity } from '@marxan/blm-calibration';
+import { BlmPartialResultEntity } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-partial-results.geo.entity';
+import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 
 const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
 const cronJobInterval: string = AppConfig.get(
   'cleanupCronJobSettings.interval',
 );
+
+type ProjectIdsInUse = { project_id: string }[];
+type ScenarioIdsInUse = { scenario_id: string }[];
+type FeatureIdsInUse = { feature_id: string }[];
+
 @Injectable()
 export class CleanupTasksService implements CleanupTasks {
   private readonly logger = new Logger(CleanupTasksService.name);
@@ -21,194 +34,377 @@ export class CleanupTasksService implements CleanupTasks {
     private readonly geoEntityManager: EntityManager,
   ) {}
 
-  async cleanupProjectsDanglingData() {
-    // Find all existing projects in API DB and return an array of their IDs
-    const projectIds = await this.apiEntityManager
-      .createQueryBuilder()
-      .from('projects', 'p')
-      .select(['id'])
-      .getRawMany()
-      .then((result) => result.map((i) => i.id))
-      .catch((error) => {
-        throw new Error(error);
-      });
-
-    // Start cleaning up process inside transaction
-    await this.geoEntityManager.transaction(async (entityManager) => {
-      // Truncate table to be sure that not any projectId is inside before operation
-      await entityManager.query(
-        `TRUNCATE TABLE project_geodata_cleanup_preparation;`,
-      );
-
-      // Set batches to insert ids in intermediate table for processing
-      for (const [, summaryChunks] of chunk(
-        projectIds,
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
-      ).entries()) {
-        await entityManager.insert(
-          'project_geodata_cleanup_preparation',
-          summaryChunks.map((chunk: string) => ({
-            project_id: chunk,
-          })),
-        );
-      }
-
-      // For every related entity, we look for non-matching ids inside entity table
-      // and compare it with intermediate projectId table to delete records that are not there
-      await entityManager.query(
-        `DELETE FROM planning_areas pa
-        WHERE pa.project_id IS NOT NULL
-        AND pa.project_id NOT IN (
-          SELECT pgcp.project_id FROM project_geodata_cleanup_preparation pgcp
-        );`,
-      );
-      await entityManager.query(
-        `DELETE FROM wdpa
-        WHERE wdpa.project_id IS NOT NULL
-        AND wdpa.project_id NOT IN (
-          SELECT pgcp.project_id FROM project_geodata_cleanup_preparation pgcp
-        );`,
-      );
-      await entityManager.query(
-        `DELETE FROM projects_pu ppu
-        WHERE ppu.project_id IS NOT NULL
-        AND ppu.project_id NOT IN (
-          SELECT pgcp.project_id FROM project_geodata_cleanup_preparation pgcp
-        );`,
-      );
-      await this.apiEntityManager.query(
-        `DELETE FROM features fd
-        WHERE fd.project_id IS NOT NULL
-        AND fd.project_id NOT IN (
-          SELECT p.id FROM projects p
-        );`,
-      );
-
-      await entityManager.query(
-        `TRUNCATE TABLE project_geodata_cleanup_preparation;`,
-      );
-    });
-  }
-
-  async cleanupScenariosDanglingData() {
-    const scenarioIds = await this.apiEntityManager
-      .createQueryBuilder()
-      .from('scenarios', 'p')
-      .select(['id'])
-      .getRawMany()
-      .then((result) => result.map((i) => i.id))
-      .catch((error) => {
-        throw new Error(error);
-      });
-
-    await this.geoEntityManager.transaction(async (entityManager) => {
-      await entityManager.query(
-        `TRUNCATE TABLE scenario_geodata_cleanup_preparation;`,
-      );
-
-      for (const [, summaryChunks] of chunk(
-        scenarioIds,
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
-      ).entries()) {
-        await entityManager.insert(
-          'scenario_geodata_cleanup_preparation',
-          summaryChunks.map((chunk: string) => ({
-            scenario_id: chunk,
-          })),
-        );
-      }
-
-      await entityManager.query(
-        `DELETE FROM scenario_features_data sfd
-        WHERE sfd.scenario_id IS NOT NULL
-        AND sfd.scenario_id NOT IN (
-          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
-        );`,
-      );
-      await entityManager.query(
-        `DELETE FROM blm_final_results bfr
-        WHERE bfr.scenario_id IS NOT NULL
-        AND bfr.scenario_id NOT IN (
-          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
-        );`,
-      );
-      await entityManager.query(
-        `DELETE FROM blm_partial_results bpr
-        WHERE bpr.scenario_id IS NOT NULL
-        AND bpr.scenario_id NOT IN (
-          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
-        );`,
-      );
-      await entityManager.query(
-        `DELETE FROM marxan_execution_metadata mem
-        WHERE mem.scenarioId IS NOT NULL
-        AND mem.scenarioId NOT IN (
-          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
-        );`,
-      );
-      await entityManager.query(
-        `DELETE FROM scenarios_pu_data spd
-        WHERE spd.scenario_id IS NOT NULL
-        AND spd.scenario_id NOT IN (
-          SELECT sgcp.scenario_id FROM scenario_geodata_cleanup_preparation sgcp
-        );`,
-      );
-
-      await entityManager.query(
-        `TRUNCATE TABLE scenario_geodata_cleanup_preparation;`,
-      );
-    });
-  }
-
-  async cleanupFeaturesDanglingData() {
-    const featureIds = await this.apiEntityManager
-      .createQueryBuilder()
-      .from('features', 'f')
-      .select(['id'])
-      .getRawMany()
-      .then((result) => result.map((i) => i.id))
-      .catch((error) => {
-        throw new Error(error);
-      });
-
-    await this.geoEntityManager.transaction(async (entityManager) => {
-      await entityManager.query(
-        `TRUNCATE TABLE features_data_cleanup_preparation;`,
-      );
-
-      for (const [, summaryChunks] of chunk(
-        featureIds,
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
-      ).entries()) {
-        await entityManager.insert(
-          'features_data_cleanup_preparation',
-          summaryChunks.map((chunk: string) => ({
-            id: chunk,
-          })),
-        );
-      }
-
-      await entityManager.query(
-        `DELETE FROM features_data fa
-        WHERE fa.feature_id NOT IN (
-          SELECT fdcp.id FROM features_data_cleanup_preparation fdcp
-        );`,
-      );
-
-      await entityManager.query(
-        `TRUNCATE TABLE features_data_cleanup_preparation;`,
-      );
-    });
-  }
-
   @Cron(cronJobInterval)
   async handleCron() {
     this.logger.debug(
       'Preparing to clean dangling geo data for projects/scenarios',
     );
 
-    await this.cleanupProjectsDanglingData();
-    await this.cleanupScenariosDanglingData();
-    await this.cleanupFeaturesDanglingData();
+    const { apiProjectIds, geoProjectIds } = await this.getProjectIdsInUse();
+
+    const { apiScenarioIds, geoScenarioIds } = await this.getScenarioIdsInUse();
+
+    const { apiFeaturesIds, geoFeatureIds } = await this.getFeaturesIdsInUse();
+
+    await this.storeDanglingProjectIds(apiProjectIds, geoProjectIds);
+
+    await this.deleteDanglinProjectIdsInGeoDb();
+
+    await this.storeDanglingScenarioIds(apiScenarioIds, geoScenarioIds);
+
+    await this.deleteDanglinScenarioIdsInGeoDb();
+
+    await this.storeDanglingFeatureIds(apiFeaturesIds, geoFeatureIds);
+
+    await this.deleteDanglinFeatureIdsInGeoDb();
+  }
+
+  async getProjectIdsInUse() {
+    return this.apiEntityManager.transaction(async (apiTransactionManager) => {
+      const apiProjectIds: string[] = await apiTransactionManager
+        .createQueryBuilder()
+        .from('projects', 'p')
+        .select(['id'])
+        .setLock('pessimistic_write_or_fail')
+        .getRawMany()
+        .then((result) => result.map((i) => i.id))
+        .catch((error) => {
+          throw new Error(error);
+        });
+
+      const geoProjectIds = await this.getGeoProjectIdsInUse();
+
+      return { apiProjectIds, geoProjectIds };
+    });
+  }
+
+  async getScenarioIdsInUse() {
+    return this.apiEntityManager.transaction(async (apiTransactionManager) => {
+      const apiScenarioIds: string[] = await apiTransactionManager
+        .createQueryBuilder()
+        .from('scenarios', 's')
+        .select(['id'])
+        .setLock('pessimistic_write_or_fail')
+        .getRawMany()
+        .then((result) => result.map((i) => i.id))
+        .catch((error) => {
+          throw new Error(error);
+        });
+
+      const geoScenarioIds = await this.getGeoScenarioIdsInUse();
+
+      return { apiScenarioIds, geoScenarioIds };
+    });
+  }
+
+  async getFeaturesIdsInUse() {
+    return this.apiEntityManager.transaction(async (apiTransactionManager) => {
+      const apiFeaturesIds: string[] = await apiTransactionManager
+        .createQueryBuilder()
+        .from('features', 's')
+        .select(['id'])
+        .setLock('pessimistic_write_or_fail')
+        .getRawMany()
+        .then((result) => result.map((i) => i.id))
+        .catch((error) => {
+          throw new Error(error);
+        });
+
+      const geoFeatureIds = await this.getGeoFeatureIdsInUse();
+
+      return { apiFeaturesIds, geoFeatureIds };
+    });
+  }
+
+  async getGeoProjectIdsInUse() {
+    // For every related entity, we look for projectids inside entity table
+    const planningAreasProjectIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['project_id'])
+      .select('project_id')
+      .from(PlanningArea, 'pa')
+      .where('project_id IS NOT NULL')
+      .execute()
+      .then((result: ProjectIdsInUse) => result.map((i) => i.project_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    const protectedAreasProjectIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['project_id'])
+      .select('project_id')
+      .from(ProtectedArea, 'wdpa')
+      .where('project_id IS NOT NULL')
+      .execute()
+      .then((result: ProjectIdsInUse) => result.map((i) => i.project_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    const projectPusProjectIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['project_id'])
+      .select('project_id')
+      .from(ProjectsPuEntity, 'ppu')
+      .where('project_id IS NOT NULL')
+      .execute()
+      .then((result: ProjectIdsInUse) => result.map((i) => i.project_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    return planningAreasProjectIds.concat(
+      protectedAreasProjectIds,
+      projectPusProjectIds,
+    );
+  }
+
+  async getGeoScenarioIdsInUse() {
+    const scenarioFeatureDataScenarioIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['scenario_id'])
+      .select('scenario_id')
+      .from(ScenarioFeaturesData, 'sfd')
+      .where('scenario_id IS NOT NULL')
+      .execute()
+      .then((result: ScenarioIdsInUse) => result.map((i) => i.scenario_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    const blmFinalResultsScenarioIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['scenario_id'])
+      .select('scenario_id')
+      .from(BlmFinalResultEntity, 'bfr')
+      .execute()
+      .then((result: ScenarioIdsInUse) => result.map((i) => i.scenario_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    const blmPartialResultsScenarioIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['scenario_id'])
+      .select('scenario_id')
+      .from(BlmPartialResultEntity, 'bpr')
+      .execute()
+      .then((result: ScenarioIdsInUse) => result.map((i) => i.scenario_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    const marxanExecutionMetadaScenarioIds = await this.geoEntityManager
+      .query(
+        `SELECT DISTINCT ("scenarioId") scenario_id
+        FROM marxan_execution_metadata mem`,
+      )
+      .then((result: ScenarioIdsInUse) => result.map((i) => i.scenario_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    const scenarioPlanningUnitsScenarioIds = await this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['scenario_id'])
+      .select('scenario_id')
+      .from(ScenariosPlanningUnitGeoEntity, 'spu')
+      .execute()
+      .then((result: ScenarioIdsInUse) => result.map((i) => i.scenario_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    return scenarioFeatureDataScenarioIds.concat(
+      blmFinalResultsScenarioIds,
+      blmPartialResultsScenarioIds,
+      marxanExecutionMetadaScenarioIds,
+      scenarioPlanningUnitsScenarioIds,
+    );
+  }
+
+  async getGeoFeatureIdsInUse() {
+    return this.geoEntityManager
+      .createQueryBuilder()
+      .distinctOn(['feature_id'])
+      .select('feature_id')
+      .from(GeoFeatureGeometry, 'fd')
+      .where('feature_id IS NOT NULL')
+      .execute()
+      .then((result: FeatureIdsInUse) => result.map((i) => i.feature_id))
+      .catch((error) => {
+        throw new Error(error);
+      });
+  }
+
+  async storeDanglingProjectIds(
+    apiProjectIds: string[],
+    geoProjectIds: string[],
+  ) {
+    const danglingProjectIds = this.getGeoIdsInUseNotInApiIdsInUse(
+      apiProjectIds,
+      geoProjectIds,
+    );
+
+    await this.geoEntityManager
+      .createQueryBuilder()
+      .delete()
+      .from('dangling_projects')
+      .execute();
+
+    for (const projectIdsChuncks of chunk(
+      danglingProjectIds,
+      CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+    )) {
+      await this.geoEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into('dangling_projects')
+        .values(
+          projectIdsChuncks.map((projectId) => ({ project_id: projectId })),
+        )
+        .execute();
+    }
+  }
+
+  async storeDanglingScenarioIds(
+    apiScenarioIds: string[],
+    geoScenarioIds: string[],
+  ) {
+    const danglingScenarioIds = this.getGeoIdsInUseNotInApiIdsInUse(
+      apiScenarioIds,
+      geoScenarioIds,
+    );
+
+    await this.geoEntityManager
+      .createQueryBuilder()
+      .delete()
+      .from('dangling_scenarios')
+      .execute();
+
+    for (const scenarioIdsChuncks of chunk(
+      danglingScenarioIds,
+      CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+    )) {
+      await this.geoEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into('dangling_scenarios')
+        .values(
+          scenarioIdsChuncks.map((scenarioId) => ({ scenario_id: scenarioId })),
+        )
+        .execute();
+    }
+  }
+
+  async storeDanglingFeatureIds(
+    apiFeatureIds: string[],
+    geoFeatureIds: string[],
+  ) {
+    const danglingFeatureIds = this.getGeoIdsInUseNotInApiIdsInUse(
+      apiFeatureIds,
+      geoFeatureIds,
+    );
+
+    await this.geoEntityManager
+      .createQueryBuilder()
+      .delete()
+      .from('dangling_features')
+      .execute();
+
+    for (const featureIdsChuncks of chunk(
+      danglingFeatureIds,
+      CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+    )) {
+      await this.geoEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into('dangling_features')
+        .values(
+          featureIdsChuncks.map((featureId) => ({ feature_id: featureId })),
+        )
+        .execute();
+    }
+  }
+
+  async deleteDanglinProjectIdsInGeoDb() {
+    // For every related entity, we look for matching ids inside entity table
+    // and compare it with intermediate dangling_projects table to delete records
+    await this.geoEntityManager.query(
+      `DELETE FROM planning_areas pa
+        WHERE pa.project_id IN (
+          SELECT dp.project_id FROM dangling_projects dp
+        );`,
+    );
+    await this.geoEntityManager.query(
+      `DELETE FROM wdpa
+        WHERE wdpa.project_id IN (
+          SELECT dp.project_id FROM dangling_projects dp
+        );`,
+    );
+    await this.geoEntityManager.query(
+      `DELETE FROM projects_pu ppu
+        WHERE ppu.project_id IN (
+          SELECT dp.project_id FROM dangling_projects dp
+        );`,
+    );
+  }
+
+  async deleteDanglinScenarioIdsInGeoDb() {
+    // For every related entity, we look for matching ids inside entity table
+    // and compare it with intermediate dangling_scenarios table to delete records
+    await this.geoEntityManager.query(
+      `DELETE FROM scenario_features_data sfd
+      WHERE sfd.scenario_id IN (
+        SELECT ds.scenario_id FROM dangling_scenarios ds
+      );`,
+    );
+    await this.geoEntityManager.query(
+      `DELETE FROM blm_final_results bfr
+      WHERE bfr.scenario_id IN (
+        SELECT ds.scenario_id FROM dangling_scenarios ds
+      );`,
+    );
+    await this.geoEntityManager.query(
+      `DELETE FROM blm_partial_results bpr
+      WHERE bpr.scenario_id IN (
+        SELECT ds.scenario_id FROM dangling_scenarios ds
+      );`,
+    );
+    await this.geoEntityManager.query(
+      `DELETE FROM marxan_execution_metadata mem
+      WHERE "scenarioId"::uuid IN (
+      SELECT ds.scenario_id FROM dangling_scenarios ds
+      );`,
+    );
+    await this.geoEntityManager.query(
+      `DELETE FROM scenarios_pu_data spd
+      WHERE spd.scenario_id IN (
+        SELECT ds.scenario_id FROM dangling_scenarios ds
+      );`,
+    );
+  }
+
+  async deleteDanglinFeatureIdsInGeoDb() {
+    // For every related entity, we look for matching ids inside entity table
+    // and compare it with intermediate dangling_features table to delete records
+    await this.geoEntityManager.query(
+      `DELETE FROM features_data fa
+      WHERE fa.feature_id IN (
+        SELECT df.feature_id FROM dangling_features df
+      );`,
+    );
+  }
+
+  getGeoIdsInUseNotInApiIdsInUse(apiIds: string[], geoIds: string[]) {
+    const apiIdsSet = new Set(apiIds);
+    const geoIdsSet = new Set(geoIds);
+
+    const geoIdsNotInApiIds = [...geoIdsSet].filter(
+      (geoId) => !apiIdsSet.has(geoId),
+    );
+
+    return geoIdsNotInApiIds;
   }
 }
