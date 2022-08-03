@@ -23,6 +23,7 @@ import {
   UseGridPreviewLayer,
   UseScenarioBLMLayer,
   UseBbox,
+  UseTargetedPreviewLayers,
 } from './types';
 
 /**
@@ -269,7 +270,13 @@ export function useFeaturePreviewLayers({
       featuresRecipe = [], selectedFeatures = [],
     } = options;
 
-    const FEATURES = [...features].filter((ft) => selectedFeatures.includes(ft.id as string));
+    const FEATURES = [...features]
+      .filter((ft) => selectedFeatures.includes(ft.id as string))
+      .sort((a, b) => {
+        const aIndex = selectedFeatures.indexOf(a.id as string);
+        const bIndex = selectedFeatures.indexOf(b.id as string);
+        return bIndex - aIndex;
+      });
 
     const { opacity = 1, visibility = true } = options || {};
 
@@ -285,6 +292,10 @@ export function useFeaturePreviewLayers({
         const { id } = f;
 
         const F = featuresRecipe.find((fr) => fr.id === id) || f;
+
+        const COLOR = (selectedFeatures.length > COLORS['features-preview'].ramp.length)
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[selectedFeatures.length - 1 - index]
+          : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
 
         return {
           id: `feature-${id}-preview-layer-${cache}`,
@@ -308,7 +319,7 @@ export function useFeaturePreviewLayers({
                   visibility: getLayerVisibility(),
                 },
                 paint: {
-                  'fill-color': chroma.scale(COLORS['features-preview'].ramp).mode('lch').colors(selectedFeatures.length)[index],
+                  'fill-color': COLOR,
                   'fill-opacity': opacity,
                 },
               },
@@ -319,6 +330,95 @@ export function useFeaturePreviewLayers({
                   filter: [
                     'all',
                     ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+                  ],
+                },
+                layout: {
+                  visibility: getLayerVisibility(),
+                },
+                paint: {
+                  'line-color': '#000',
+                  'line-opacity': 0.5 * opacity,
+                },
+              },
+            ],
+          },
+        };
+      });
+  }, [active, bbox, features, cache, options]);
+}
+
+export function useTargetedPreviewLayers({
+  active, bbox, features, cache = 0, options = {},
+}: UseTargetedPreviewLayers) {
+  return useMemo(() => {
+    if (!active || !bbox || !features) return [];
+
+    const {
+      selectedFeatures = [],
+    } = options;
+
+    const FEATURES = [...features]
+      .filter((ft) => selectedFeatures.includes(ft.id as string))
+      .sort((a, b) => {
+        const aIndex = selectedFeatures.indexOf(a.id as string);
+        const bIndex = selectedFeatures.indexOf(b.id as string);
+        return bIndex - aIndex;
+      });
+
+    const { opacity = 1, visibility = true } = options || {};
+
+    const getLayerVisibility = () => {
+      if (!visibility) {
+        return 'none';
+      }
+      return 'visible';
+    };
+
+    return FEATURES
+      .map((f, index) => {
+        const {
+          id, parentId, splitted, value,
+        } = f;
+
+        const ID = splitted ? parentId : id;
+
+        const COLOR = (selectedFeatures.length > COLORS['features-preview'].ramp.length)
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[selectedFeatures.length - 1 - index]
+          : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
+
+        return {
+          id: `feature-${id}-preview-layer-${cache}`,
+          type: 'vector',
+          source: {
+            type: 'vector',
+            tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${ID}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+          },
+          render: {
+            layers: [
+              {
+                type: 'fill',
+                'source-layer': 'layer0',
+                ...f.splitSelected && {
+                  filter: [
+                    'all',
+                    ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
+                  ],
+                },
+                layout: {
+                  visibility: getLayerVisibility(),
+                },
+                paint: {
+                  'fill-color': COLOR,
+                  'fill-opacity': opacity,
+                },
+              },
+              {
+                type: 'line',
+                'source-layer': 'layer0',
+                ...f.splitSelected && {
+                  filter: [
+                    'all',
+                    ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
                   ],
                 },
                 layout: {
