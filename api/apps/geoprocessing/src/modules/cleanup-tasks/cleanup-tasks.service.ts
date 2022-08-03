@@ -386,7 +386,7 @@ export class CleanupTasksService implements CleanupTasks {
     );
   }
 
-  async deleteDanglinFeatureIdsInGeoDb() {
+  async deleteDanglingFeatureIdsInGeoDb() {
     // For every related entity, we look for matching ids inside entity table
     // and compare it with intermediate dangling_features table to delete records
     await this.geoEntityManager.query(
