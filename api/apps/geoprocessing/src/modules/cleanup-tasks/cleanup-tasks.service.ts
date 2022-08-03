@@ -56,7 +56,7 @@ export class CleanupTasksService implements CleanupTasks {
 
     await this.storeDanglingFeatureIds(apiFeaturesIds, geoFeatureIds);
 
-    await this.deleteDanglinFeatureIdsInGeoDb();
+    await this.deleteDanglingFeatureIdsInGeoDb();
   }
 
   async getProjectIdsInUse() {
