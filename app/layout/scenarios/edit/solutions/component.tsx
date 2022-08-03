@@ -36,7 +36,7 @@ export const SECTIONS = [
   {
     id: ScenarioSidebarSubTabs.POST_GAP_ANALYSIS,
     name: 'Target Achievement',
-    description: 'View the selected solution´s performance in achieveing the feature targets.',
+    description: 'View the selected solution´s performance in achieving the feature targets.',
   },
 ];
 

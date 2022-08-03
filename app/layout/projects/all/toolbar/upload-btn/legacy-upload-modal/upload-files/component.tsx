@@ -204,7 +204,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                       <br />
                       <ul className="pl-6 space-y-1 list-disc list-outside">
                         <li>
-                          dentical limitations to what was described in the previous use case will
+                          identical limitations to what was described in the previous use case will
                           apply (in case users wish to continue working on the project within the
                           Marxan MaPP platform);
                         </li>
