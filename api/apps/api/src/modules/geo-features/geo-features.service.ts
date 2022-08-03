@@ -152,17 +152,25 @@ export class GeoFeaturesService extends AppBaseService<
     // fetched features (so it may get public ones that are not within study area)
 
     /**
-     * potential solution but it may be messing much?
+     * potential solutions, but it may be messing much?
      *
-     * 1 keep searching over features_data (intersection) [could be cached
-     * at some point, per project]
-     * 2 move api.features into geo.features_data ...
-     * 3 which also fixes issues with:
+     * 0. store bbox of each feature
+     *    (st_envelope(st_union(features_data.the_geom)) for the feature's
+     *    geometries) in geodb to intersect faster
+     *
+     * 1. keep searching over features_data (intersection) [could be cached at
+     *    some point, per project]
+     *
+     * 2. move api.features into geo.features_data ...
+     *
+     * 3. which also fixes issues with:
      *    * searching via name
      *    * pagination
      *    * searching within one query (table) and single db
      *    * reduces unnecessary relations and system accidental complexity
      *
+     * 4. maybe use `where id = any(<array representation of list of ids from
+     *    geodb>)` to avoid exploding past PostgreSQL param count limit?
      */
     if (projectId && info?.params?.bbox) {
       const { westBbox, eastBbox } = antimeridianBbox(
@@ -204,6 +212,20 @@ export class GeoFeaturesService extends AppBaseService<
       } else {
         query.andWhere('false');
       }
+
+      /**
+       * Never include features that have been obtained by splitting (or, in the
+       * future, stratifying) other features - that is, features obtained
+       * through geoprocessing operations on "raw"/original features. In
+       * practice, this would be done nevertheless because we first get ids of
+       * features that fall within the bbox of the project's planning area and
+       * only ids of "raw"/original features are ever used in
+       * `(geodb)features_data.feature_id, but we add here this guard as a
+       * proper filter on the `(apidb).features` data alone, in case the
+       * filtering by bbox above is changed or replaced in any way that may
+       * affect the "implicit" exclusion of geoprocessed feature ids.
+       */
+      query.andWhere(`(${this.alias}.geoprocessingOpsHash IS NULL)`);
 
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
         `(${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL)`,
