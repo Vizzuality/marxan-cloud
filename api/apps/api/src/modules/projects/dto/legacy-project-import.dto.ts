@@ -77,7 +77,7 @@ export class RunLegacyProjectImportBodyDto {
   })
   @IsOptional()
   @IsBoolean()
-  solutionsAreLocked: boolean = false;
+  solutionsAreLocked = false;
 }
 
 export class RunLegacyProjectImportResponseDto {
