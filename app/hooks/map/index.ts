@@ -301,7 +301,7 @@ export function useFeaturePreviewLayers({
                 ...F.splitSelected && {
                   filter: [
                     'all',
-                    ['in', ['get', F.splitSelected], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+                    ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
                   ],
                 },
                 layout: {
@@ -318,7 +318,7 @@ export function useFeaturePreviewLayers({
                 ...F.splitSelected && {
                   filter: [
                     'all',
-                    ['in', ['get', F.splitSelected], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+                    ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
                   ],
                 },
                 layout: {
