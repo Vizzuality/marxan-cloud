@@ -161,12 +161,30 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
             <form onSubmit={handleSubmit}>
               <div className="p-9">
 
-                <div className="flex mb-2 space-x-2">
+                <div className="flex items-center mb-2 space-x-2">
                   <h4 className="text-lg text-black font-heading">Upload legacy project</h4>
                   <InfoButton
                     theme="primary"
                   >
                     <div>
+                      <h4 className="font-heading text-lg mb-2.5">
+                        When uploading planning unit shapefile
+                      </h4>
+                      <ul className="pl-6 space-y-1 list-disc list-outside">
+                        <li>Must have an attribute named exactly puid (all lowercase)</li>
+
+                        <li>Each planning unit must have a unique, numeric puid</li>
+
+                        <li>
+                          Each puid value must match exactly a puid in spec.dat
+                          (the two sets must be identical)
+                        </li>
+
+                        <li>Geometries must not overlap in any way</li>
+                      </ul>
+
+                      <br />
+
                       <h4 className="font-heading text-lg mb-2.5">
                         When uploading planning unit grid and input database
                       </h4>
@@ -236,16 +254,29 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                         protected area shapefile is uploaded in a cloned scenario) but the imported
                         legacy project will largely be functional like a native Marxan MaPP project.
                       </p>
+
+                      <br />
+                      <h4 className="font-heading text-lg mb-2.5">
+                        Cost surface
+                      </h4>
+                      <p>
+                        Please note, no cost layers can be uploaded in this version. The default
+                        cost of planning units will be their area. If you would like to upload
+                        a costing layer, you should use the Cost Surface option
+                        in the Planning unit tab
+                      </p>
                     </div>
                   </InfoButton>
 
                 </div>
                 <p className="mb-5 text-sm text-black">To import a legacy project, please, add the files requested below. </p>
+
                 {importLegacyErrors && !!importLegacyErrors.length && (
                   <div className="flex flex-col mb-6 space-y-2">
                     {importLegacyErrors.map((e) => <p key={e} className="text-xs text-red-500">{e}</p>)}
                   </div>
                 )}
+
                 <div className="space-y-5">
                   {LEGACY_FIELDS.map((f) => {
                     return (
