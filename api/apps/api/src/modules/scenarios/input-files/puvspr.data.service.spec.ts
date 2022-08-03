@@ -8,9 +8,9 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { ProjectSourcesEnum } from '@marxan/projects';
 
 let sut: PuvsprDatService;
-let puvsprDatProcessor = jest.fn();
-let scenarioRepo = jest.fn();
-let projectRepo = jest.fn();
+const puvsprDatProcessor = jest.fn();
+const scenarioRepo = jest.fn();
+const projectRepo = jest.fn();
 const projectId = v4();
 const scenarioId = v4();
 

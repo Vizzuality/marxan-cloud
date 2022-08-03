@@ -93,7 +93,8 @@ export class InputParameterFileProvider {
       {
         _CLOUD_SCENARIO: scenario.name.toLocaleLowerCase(),
         _CLOUD_PROJECT:
-          scenario.project?.name.toLocaleLowerCase() ?? this.marxanDefaults._CLOUD_PROJECT,
+          scenario.project?.name.toLocaleLowerCase() ??
+          this.marxanDefaults._CLOUD_PROJECT,
         _CLOUD_ORGANIZATION:
           scenario.project?.organization?.name.toLocaleLowerCase() ??
           this.marxanDefaults._CLOUD_ORGANIZATION,

@@ -94,7 +94,7 @@ const getFixtures = async () => {
   const headers = 'species\tpu\tamount\n';
   const amountOfRows = 100;
 
-  const getValidRow = (index: number = 0) =>
+  const getValidRow = (index = 0) =>
     `${index}\t${index}\t${index / amountOfRows}`;
 
   return {
@@ -132,7 +132,7 @@ const getFixtures = async () => {
           })
           .join('\t') + '\n';
 
-      let row = getValidRow().split('\t');
+      const row = getValidRow().split('\t');
       if (columnToRemoveIndex !== -1) row.splice(columnToRemoveIndex, 1);
 
       return Readable.from(wrongHeaders + row.join('\t'));

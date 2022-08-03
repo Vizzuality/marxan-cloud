@@ -145,8 +145,8 @@ const getFixtures = async () => {
   });
 
   const startLegacyProjectImport = (
-    name: string = 'Legacy project',
-    description: string = 'random desc',
+    name = 'Legacy project',
+    description = 'random desc',
   ) =>
     request(app.getHttpServer())
       .post(`/api/v1/projects/import/legacy`)

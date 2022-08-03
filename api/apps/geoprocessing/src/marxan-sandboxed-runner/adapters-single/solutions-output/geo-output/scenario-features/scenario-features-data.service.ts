@@ -29,7 +29,7 @@ export class ScenarioFeaturesDataService {
     outputDirectory: string,
     scenarioId: string,
     extension: 'csv' | 'txt' | 'dat' = 'csv',
-    legacyProjectImport: boolean = false,
+    legacyProjectImport = false,
   ): Promise<ScenarioFeatureRunData[]> {
     return new Promise(async (resolve, reject) => {
       const result: ScenarioFeatureRunData[] = [];

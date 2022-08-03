@@ -6,7 +6,7 @@ import { SpecDatReader, SpecDatRow } from './spec-dat.reader';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
-const generateRandomStrictlyNegativeNumber = () => (-1 * (1 - Math.random()));
+const generateRandomStrictlyNegativeNumber = () => -1 * (1 - Math.random());
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -97,7 +97,9 @@ it('fails when spec.dat contains prop values lower than zero', async () => {
 });
 
 it('fails when spec.dat contains prop values lower than zero', async () => {
-  const file = fixtures.GivenAnInvalidSpecDatFile({ prop: generateRandomStrictlyNegativeNumber() });
+  const file = fixtures.GivenAnInvalidSpecDatFile({
+    prop: generateRandomStrictlyNegativeNumber(),
+  });
   const result = await fixtures.WhenExecutingSpecDatReader(file);
   fixtures.ThenSpecDatReadOperationFails(
     result,
@@ -192,7 +194,7 @@ const getFixtures = async () => {
     'id\tprop\tspf\ttarget2\ttargetocc\tname\tsepnum\tsepdistance\n';
   const amountOfRows = 100;
 
-  const getValidRow = (index: number = 0) =>
+  const getValidRow = (index = 0) =>
     `${index}\t${(index + 1) / amountOfRows}\t${
       index / 10
     }\t${index}\t${index}\t${index}\t${index * 2}\t${index + 4}`;

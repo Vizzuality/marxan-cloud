@@ -400,7 +400,7 @@ export async function GivenFeatures(
   platformFeaturesAmount: number,
   customFeaturesAmount: number,
   projectId: string,
-  isLegacy: boolean = false,
+  isLegacy = false,
 ) {
   const customFeatures = Array(customFeaturesAmount)
     .fill(0)
