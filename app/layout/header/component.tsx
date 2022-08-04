@@ -6,7 +6,7 @@ import cx from 'classnames';
 
 import { useMe } from 'hooks/me';
 
-import Beta from 'layout/beta';
+// import Beta from 'layout/beta';
 import MyProjects from 'layout/header/my-projects';
 import Title from 'layout/header/title';
 import User from 'layout/header/user';
@@ -14,10 +14,10 @@ import Wrapper from 'layout/wrapper';
 
 import LinkButton from 'components/button';
 
-import LOGO_BETA from 'images/logo-beta.png';
+// import LOGO_SVG from 'images/logo-beta.png';
 
-import LOGO_BLACK from 'svgs/logo-black.svg';
-// import LOGO_SVG from 'svgs/logo.svg';
+import LOGO_BLACK_SVG from 'svgs/logo-black.svg';
+import LOGO_SVG from 'svgs/logo.svg';
 
 export interface HeaderProps {
   className?: string;
@@ -49,7 +49,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <Beta />
+      {/* <Beta /> */}
 
       <header
         className={cx({
@@ -67,7 +67,7 @@ export const Header: React.FC<HeaderProps> = ({
               <a href="/">
                 <img
                   alt="Marxan logo"
-                  src={theme === 'light' ? LOGO_BLACK : LOGO_BETA}
+                  src={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG}
                   style={SIZE[size].logo}
                 />
               </a>
