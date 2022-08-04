@@ -1,0 +1,13 @@
+#!/bin/sh
+
+cloning_storage_path="/opt/marxan-project-cloning"
+workspace="$(mktemp -d)"
+valid_export_ids_file="$workspace/valid-uuids.list"
+
+tee "$valid_export_ids_file" 1>/dev/null
+
+ls $cloning_storage_path | sort > "$workspace/all-uuids.list"
+
+comm -3 "$workspace/all-uuids.list" "$workspace/valid-uuids.list" | xargs rm -rf
+
+rm -rf $workspace
