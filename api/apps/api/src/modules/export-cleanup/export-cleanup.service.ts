@@ -1,18 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { ExportCleanup } from './export-cleanup';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { writeFileSync } from 'fs';
+import { spawn } from 'child_process';
 
 const validityIntervalInHours = AppConfig.get<string>(
   'storage.cloningFileStorage.artifactValidityInHours',
 );
 
-const tmpStoragePath = AppConfig.get<string>(
-  'storage.sharedFileStorage.localPath',
+const cronJobInterval: string = AppConfig.get(
+  'cleanupCronJobSettings.interval',
 );
 
 @Injectable()
@@ -24,6 +24,20 @@ export class ExportCleanupService implements ExportCleanup {
   ) {}
 
   async identifyValidResources() {
+    /**
+     * We consider as _valid_:
+     *
+     * - exports of projects that have been created less than
+     *   validityIntervalInHours ago
+     * - exports of published projects (these should be deleted only when a
+     *   project is unpublished)
+     * - exports of scenarios, because we should never leave them around for
+     *   later use/download - they cannot be downloaded and are only created in
+     *   order to allow cloning of a scenario, so as long as they get cleaned
+     *   up at the end of a scenario cloning operation, we should leave them
+     *   alone: if they are on disk, we should assume that they are used by
+     *   a scenario cloning operation which is in progress
+     */
     const validExportIds = await this.apiEntityManager.query(
       `
       SELECT DISTINCT e.id FROM exports e
@@ -36,21 +50,21 @@ export class ExportCleanupService implements ExportCleanup {
       ORDER BY id;
       `,
       [`${validityIntervalInHours} hours`],
-    );
+    )
+    .then((ids: { id: string }[]) => ids.map(i => i.id).join("\n"));
 
     return validExportIds;
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(cronJobInterval)
   async handleCron() {
-    this.logger.debug(
-      'Preparing to clean dangling import/export data for projects/scenarios',
+    this.logger.log(
+      'Preparing to clean expired/obsolete artifacts for project exports',
     );
 
     const validResourcesIds = await this.identifyValidResources();
-    writeFileSync(
-      `${tmpStoragePath}/valid-uuids.list`,
-      JSON.stringify(validResourcesIds),
-    );
+    const cleanupTask = spawn('/opt/marxan-api/bin/cleanup-obsolete-export-artifacts');
+    cleanupTask.stdin.write(validResourcesIds);
+    cleanupTask.stdin.end();
   }
 }
