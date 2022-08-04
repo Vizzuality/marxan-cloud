@@ -2,6 +2,13 @@ export interface TargetSPFItemProps {
   className?: string;
   isAllTargets: boolean;
   id: string;
+  parentId?: string;
+  splitted?: boolean;
+  splitSelected?: string;
+  splitFeaturesSelected?: {
+    id: string
+  }[];
+  value?: string;
   defaultTarget?: number;
   defaultFPF?: number;
   target?: number;

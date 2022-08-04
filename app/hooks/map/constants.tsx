@@ -12,7 +12,9 @@ export const COLORS = {
   'features-preview': {
     default: '#FFCC00',
     hover: '#FF9900',
-    ramp: ['#C21701', '#3278B3', '3DF7B3', '#FFF'],
+    ramp: [
+      '#4b5eef', '#f15100', '#31a904', '#2c18bd', '#bf3220', '#9d2e38', '#e5e001', '#f15100', '#f4af00', '#218134', '#775b32', '#cb9c00', '#294635', '#ba5da9', '#5c3b85', '#de4210',
+    ],
   },
   wdpa: '#00F',
   features: '#6F53F7',
@@ -114,6 +116,7 @@ export const LEGEND_LAYERS = {
 
   'features-preview': (options) => {
     const { items } = options;
+
     return {
       id: 'features-preview',
       name: 'Features preview',
@@ -123,9 +126,13 @@ export const LEGEND_LAYERS = {
         visibility: true,
       },
       items: items.map((item, i) => {
+        const COLOR = (items.length > COLORS['features-preview'].ramp.length)
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(items.length)[i]
+          : COLORS['features-preview'].ramp[i];
+
         return {
           value: item.name,
-          color: chroma.scale(COLORS['features-preview'].ramp).mode('lch').colors(items.length)[i],
+          color: COLOR,
         };
       }),
     };

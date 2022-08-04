@@ -1,4 +1,5 @@
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -76,6 +77,19 @@ export interface UseFeaturePreviewLayers {
   active?: boolean;
   bbox?: number[] | unknown;
   features?: SelectedItemProps[];
+  options?: {
+    featuresRecipe?: Record<string, any>[],
+    featureHoverId?: string;
+    selectedFeatures?: Array<string>;
+    opacity?: number;
+    visibility?: boolean;
+  };
+}
+export interface UseTargetedPreviewLayers {
+  cache?: number;
+  active?: boolean;
+  bbox?: number[] | unknown;
+  features?: TargetSPFItemProps[];
   options?: {
     featuresRecipe?: Record<string, any>[],
     featureHoverId?: string;

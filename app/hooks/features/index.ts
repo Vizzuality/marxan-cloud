@@ -313,7 +313,7 @@ export function useTargetedFeatures(
       features = [],
     } = parsedData;
 
-    parsedData = features.map((d): SelectedItemProps => {
+    parsedData = features.map((d) => {
       const {
         featureId,
         geoprocessingOperations,
@@ -409,55 +409,59 @@ export function useTargetedFeatures(
 
     parsedData = flatten(parsedData.map((s) => {
       const {
-        id, name, splitSelected, splitFeaturesSelected, intersectFeaturesSelected, marxanSettings,
+        id, name, splitSelected, splitFeaturesSelected, marxanSettings,
       } = s;
       const isSplitted = !!splitSelected;
-      const isIntersected = !!intersectFeaturesSelected?.length;
+      // const isIntersected = !!intersectFeaturesSelected?.length;
 
       // Generate splitted features to target
       if (isSplitted) {
-        return splitFeaturesSelected.map((sf) => {
-          const {
-            id: sfId,
-            name: sfName,
-            marxanSettings: sfMarxanSettings,
-          } = sf;
+        return splitFeaturesSelected
+          .sort((a, b) => a.name.localeCompare(b.name))
+          .map((sf) => {
+            const {
+              id: sfId,
+              name: sfName,
+              marxanSettings: sfMarxanSettings,
+            } = sf;
 
-          return {
-            ...sf,
-            id: `${id}-${sfId}`,
-            parentId: id,
-            name: `${name} / ${sfName}`,
-            splitted: true,
-            ...!!sfMarxanSettings && {
-              target: sfMarxanSettings.prop * 100,
-              fpf: sfMarxanSettings.fpf,
-            },
-          };
-        });
+            return {
+              ...sf,
+              id: `${id}-${sfId}`,
+              parentId: id,
+              name: `${name} / ${sfName}`,
+              splitted: true,
+              splitSelected,
+              splitFeaturesSelected,
+              ...!!sfMarxanSettings && {
+                target: sfMarxanSettings.prop * 100,
+                fpf: sfMarxanSettings.fpf,
+              },
+            };
+          });
       }
 
-      if (isIntersected) {
-        return flatten(intersectFeaturesSelected.map((ifs) => {
-          const {
-            value: ifId,
-            label: ifName,
-            marxanSettings: ifMarxanSettings,
-          } = ifs;
+      // if (isIntersected) {
+      //   return flatten(intersectFeaturesSelected.map((ifs) => {
+      //     const {
+      //       value: ifId,
+      //       label: ifName,
+      //       marxanSettings: ifMarxanSettings,
+      //     } = ifs;
 
-          return {
-            ...ifs,
-            id: `${id}-${ifId}`,
-            parentId: id,
-            name: `${name} / ${ifName}`,
-            splitted: true,
-            ...!!ifMarxanSettings && {
-              target: ifMarxanSettings.prop * 100,
-              fpf: ifMarxanSettings.fpf,
-            },
-          };
-        }));
-      }
+      //     return {
+      //       ...ifs,
+      //       id: `${id}-${ifId}`,
+      //       parentId: id,
+      //       name: `${name} / ${ifName}`,
+      //       splitted: true,
+      //       ...!!ifMarxanSettings && {
+      //         target: ifMarxanSettings.prop * 100,
+      //         fpf: ifMarxanSettings.fpf,
+      //       },
+      //     };
+      //   }));
+      // }
 
       return {
         ...s,

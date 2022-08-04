@@ -13,7 +13,7 @@ import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
 import { useAccessToken } from 'hooks/auth';
-import { useSelectedFeatures } from 'hooks/features';
+import { useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useAllGapAnalysis } from 'hooks/gap-analysis';
 import {
   // usePUGridPreviewLayer,
@@ -23,6 +23,7 @@ import {
   useFeaturePreviewLayers,
   useLegend,
   useBBOX,
+  useTargetedPreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
@@ -114,15 +115,47 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     data: selectedFeaturesData,
   } = useSelectedFeatures(sid, {});
 
-  const previewFeatureIsSelected = useMemo(() => selectedFeaturesData.filter(({
-    id,
-  }) => selectedFeatures.includes(id)).length > 0,
-  [selectedFeaturesData, selectedFeatures]);
+  const {
+    data: targetedFeaturesData,
+  } = useTargetedFeatures(sid, {});
 
-  const selectedPreviewFeatures = useMemo(() => selectedFeaturesData.filter(({
-    id,
-  }) => selectedFeatures.includes(id)).map(({ name, id }) => ({ name, id })),
-  [selectedFeaturesData, selectedFeatures]);
+  const previewFeatureIsSelected = useMemo(() => {
+    if (subtab === ScenarioSidebarSubTabs.FEATURES_ADD) {
+      return selectedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    }
+
+    if (subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) {
+      return targetedFeaturesData.filter(({ id }) => selectedFeatures.includes(id)).length > 0;
+    }
+
+    return [];
+  }, [subtab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
+
+  const selectedPreviewFeatures = useMemo(() => {
+    if (subtab === ScenarioSidebarSubTabs.FEATURES_ADD) {
+      return selectedFeaturesData
+        .filter(({ id }) => selectedFeatures.includes(id))
+        .map(({ name, id }) => ({ name, id }))
+        .sort((a, b) => {
+          const aIndex = selectedFeatures.indexOf(a.id as string);
+          const bIndex = selectedFeatures.indexOf(b.id as string);
+          return aIndex - bIndex;
+        });
+    }
+
+    if (subtab === ScenarioSidebarSubTabs.FEATURES_TARGET) {
+      return targetedFeaturesData
+        .filter(({ id }) => selectedFeatures.includes(id))
+        .map(({ name, id }) => ({ name, id }))
+        .sort((a, b) => {
+          const aIndex = selectedFeatures.indexOf(a.id as string);
+          const bIndex = selectedFeatures.indexOf(b.id as string);
+          return aIndex - bIndex;
+        });
+    }
+
+    return [];
+  }, [subtab, selectedFeaturesData, targetedFeaturesData, selectedFeatures]);
 
   const {
     data: costSurfaceRangeData,
@@ -273,8 +306,21 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   const FeaturePreviewLayers = useFeaturePreviewLayers({
     features: selectedFeaturesData,
     cache,
+    active: tab === ScenarioSidebarTabs.FEATURES && subtab === ScenarioSidebarSubTabs.FEATURES_ADD,
+    bbox,
+    options: {
+      featuresRecipe,
+      featureHoverId,
+      selectedFeatures,
+      ...layerSettings['features-preview'],
+    },
+  });
+
+  const TargetedPreviewLayers = useTargetedPreviewLayers({
+    features: targetedFeaturesData,
+    cache,
     active: tab === ScenarioSidebarTabs.FEATURES
-      && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS,
+            && subtab === ScenarioSidebarSubTabs.FEATURES_TARGET,
     bbox,
     options: {
       featuresRecipe,
@@ -323,6 +369,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     PUGridLayer,
     WDPApreviewLayer,
     ...FeaturePreviewLayers,
+    ...TargetedPreviewLayers,
   ].filter((l) => !!l);
 
   const LEGEND = useLegend({

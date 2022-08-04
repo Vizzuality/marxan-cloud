@@ -166,8 +166,10 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
       ...feature,
       splitFeaturesSelected: key,
     };
+
     onChange(features);
-  }, []);
+    dispatch(setFeatures(features));
+  }, [dispatch, setFeatures]);
 
   const onRemove = useCallback((id, input) => {
     const { value, onChange } = input;
