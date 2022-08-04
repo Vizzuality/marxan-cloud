@@ -15,6 +15,11 @@ const cronJobInterval: string = AppConfig.get(
   'cleanupCronJobSettings.interval',
 );
 
+const cleanupTemporaryFolders = AppConfig.getBoolean(
+  'storage.sharedFileStorage.cleanupTemporaryFolders',
+  true,
+);
+
 @Injectable()
 export class ExportCleanupService implements ExportCleanup {
   private readonly logger = new Logger(ExportCleanupService.name);
@@ -62,8 +67,9 @@ export class ExportCleanupService implements ExportCleanup {
       'Preparing to clean expired/obsolete artifacts for project exports',
     );
 
+    const cleanupArg = cleanupTemporaryFolders ? ['--cleanup-temporary-folders'] : [];
     const validResourcesIds = await this.identifyValidResources();
-    const cleanupTask = spawn('/opt/marxan-api/bin/cleanup-obsolete-export-artifacts');
+    const cleanupTask = spawn('/opt/marxan-api/bin/cleanup-obsolete-export-artifacts', cleanupArg);
     cleanupTask.stdin.write(validResourcesIds);
     cleanupTask.stdin.end();
   }
