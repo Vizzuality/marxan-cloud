@@ -129,12 +129,12 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
           name: name || featureClassName || 'Metadata name',
           current: {
             percent: met / 100,
-            value: format('.3s')(metArea / 1000),
+            value: format('.3s')(metArea / 1000000),
             unit: 'km2',
           },
           target: {
             percent: coverageTarget / 100,
-            value: format('.3s')(coverageTargetArea / 1000),
+            value: format('.3s')(coverageTargetArea / 1000000),
             unit: 'km2',
           },
         };
@@ -226,12 +226,12 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
           name: name || featureClassName || 'Metadata name',
           current: {
             percent: met / 100,
-            value: format('.3s')(metArea / 1000),
+            value: format('.3s')(metArea / 1000000),
             unit: 'km2',
           },
           target: {
             percent: coverageTarget / 100,
-            value: format('.3s')(coverageTargetArea / 1000),
+            value: format('.3s')(coverageTargetArea / 1000000),
             unit: 'km2',
           },
         };
