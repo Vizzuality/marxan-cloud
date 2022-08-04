@@ -98,5 +98,8 @@
   },
   "signUpConfirmation": {
     "tokenPrefix": "SIGNUP_CONFIRMATION_TOKEN_PREFIX"
+  },
+  "cleanupCronJobSettings": {
+    "interval": "CLEANUP_CRON_INTERVAL"
   }
 }
