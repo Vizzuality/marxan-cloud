@@ -12,11 +12,11 @@ const validityIntervalInHours = AppConfig.get<string>(
 );
 
 const cronJobInterval: string = AppConfig.get(
-  'cleanupCronJobSettings.interval',
+  'storage.cloningFileStorage.cleanupCronJobSettings.interval',
 );
 
 const cleanupTemporaryFolders = AppConfig.getBoolean(
-  'storage.sharedFileStorage.cleanupTemporaryFolders',
+  'storage.cloningFileStorage.cleanupTemporaryFolders',
   true,
 );
 

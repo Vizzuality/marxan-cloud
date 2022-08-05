@@ -58,7 +58,11 @@
       "cleanupTemporaryFolders": "BACKEND_CLEANUP_TEMPORARY_FOLDERS"
     },
     "cloningFileStorage": {
-      "localPath": "CLONING_FILE_STORAGE_LOCAL_PATH"
+      "localPath": "CLONING_FILE_STORAGE_LOCAL_PATH",
+      "cleanupTemporaryFolders": "BACKEND_CLEANUP_TEMPORARY_FOLDERS",
+      "cleanupCronJobSettings": {
+        "interval": "CLONING_STORAGE_CLEANUP_CRON_INTERVAL"
+      }
     }
   },
   "cloning": {
@@ -98,8 +102,5 @@
   },
   "signUpConfirmation": {
     "tokenPrefix": "SIGNUP_CONFIRMATION_TOKEN_PREFIX"
-  },
-  "cleanupCronJobSettings": {
-    "interval": "CLEANUP_CRON_INTERVAL"
   }
 }
