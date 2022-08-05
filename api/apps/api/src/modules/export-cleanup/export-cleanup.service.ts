@@ -43,8 +43,9 @@ export class ExportCleanupService implements ExportCleanup {
      *   alone: if they are on disk, we should assume that they are used by
      *   a scenario cloning operation which is in progress
      */
-    const validExportIds = await this.apiEntityManager.query(
-      `
+    const validExportIds = await this.apiEntityManager
+      .query(
+        `
       SELECT DISTINCT e.id FROM exports e
         WHERE e.resource_kind = 'project' AND 
         (AGE(NOW(), e.created_at) < $1 OR
@@ -54,9 +55,9 @@ export class ExportCleanupService implements ExportCleanup {
         WHERE e.resource_kind = 'scenario'
       ORDER BY id;
       `,
-      [`${validityIntervalInHours} hours`],
-    )
-    .then((ids: { id: string }[]) => ids.map(i => i.id).join("\n"));
+        [`${validityIntervalInHours} hours`],
+      )
+      .then((ids: { id: string }[]) => ids.map((i) => i.id).join('\n'));
 
     return validExportIds;
   }
@@ -67,9 +68,14 @@ export class ExportCleanupService implements ExportCleanup {
       'Preparing to clean expired/obsolete artifacts for project exports',
     );
 
-    const cleanupArg = cleanupTemporaryFolders ? ['--cleanup-temporary-folders'] : [];
+    const cleanupArg = cleanupTemporaryFolders
+      ? ['--cleanup-temporary-folders']
+      : [];
     const validResourcesIds = await this.identifyValidResources();
-    const cleanupTask = spawn('/opt/marxan-api/bin/cleanup-obsolete-export-artifacts', cleanupArg);
+    const cleanupTask = spawn(
+      '/opt/marxan-api/bin/cleanup-obsolete-export-artifacts',
+      cleanupArg,
+    );
     cleanupTask.stdin.write(validResourcesIds);
     cleanupTask.stdin.end();
   }
