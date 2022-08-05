@@ -188,7 +188,8 @@ export class GeoFeaturesService extends AppBaseService<
        * non-null `geoprocessing_ops_hash` value).
        */
       const publicOrProjectSpecificFeatures = await this.geoFeaturesRepository
-        .query(`
+        .query(
+          `
         SELECT id FROM features
           WHERE
             project_id IS NULL
@@ -200,8 +201,10 @@ export class GeoFeaturesService extends AppBaseService<
             project_id = $1
             AND
             geoprocessing_ops_hash IS NULL;
-        `, [ projectId ])
-        .then(result => result.map((i: { id: string}) => i.id));
+        `,
+          [projectId],
+        )
+        .then((result) => result.map((i: { id: string }) => i.id));
 
       /**
        * Then narrow down the list of features relevant to the project to those
