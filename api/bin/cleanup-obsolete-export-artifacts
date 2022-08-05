@@ -4,6 +4,10 @@ cloning_storage_path="/opt/marxan-project-cloning"
 workspace="$(mktemp -d)"
 valid_export_ids_file="$workspace/valid-uuids.list"
 
+# @debt In order for `comm` to work as we expect, its input files need to be
+# sorted. We do this via `sort` for `all-uuids.list` below, and via SQL for
+# the stdin input to this script: it would be preferable/safer/clearer to
+# use `sort` on the input we get here.
 tee "$valid_export_ids_file" 1>/dev/null
 
 ls $cloning_storage_path | sort > "$workspace/all-uuids.list"
