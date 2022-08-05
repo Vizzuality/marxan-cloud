@@ -121,10 +121,10 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
         .where(
           new Brackets((orBuilder) =>
             orBuilder
-              .where('feature_class_name like :phrase', {
+              .where('feature_class_name ilike :phrase', {
                 phrase: `%${info?.params?.searchPhrase}%`,
               })
-              .orWhere('alias like :phrase', {
+              .orWhere('alias ilike :phrase', {
                 phrase: `%${info?.params?.searchPhrase}%`,
               }),
           ),
