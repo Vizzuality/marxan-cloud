@@ -62,21 +62,27 @@ export class ExportCleanupService implements ExportCleanup {
     return validExportIds;
   }
 
-  @Cron(cronJobInterval)
-  async handleCron() {
-    this.logger.log(
-      'Preparing to clean expired/obsolete artifacts for project exports',
-    );
-
+  private cleanupDanglingExports(validResourcesIds: string) {
     const cleanupArg = cleanupTemporaryFolders
       ? ['--cleanup-temporary-folders']
       : [];
-    const validResourcesIds = await this.identifyValidResources();
+
     const cleanupTask = spawn(
       '/opt/marxan-api/bin/cleanup-obsolete-export-artifacts',
       cleanupArg,
     );
     cleanupTask.stdin.write(validResourcesIds);
     cleanupTask.stdin.end();
+  }
+
+  @Cron(cronJobInterval)
+  async handleCron() {
+    this.logger.log(
+      'Preparing to clean expired/obsolete artifacts for project exports',
+    );
+
+    const validResourcesIds = await this.identifyValidResources();
+
+    this.cleanupDanglingExports(validResourcesIds);
   }
 }
