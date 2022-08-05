@@ -725,7 +725,9 @@ export class ProjectsController {
   ): Promise<ShapefileUploadResponse> {
     await ensureShapefileHasRequiredFiles(shapefile);
 
-    const { data } = await this.shapefileService.transformToGeoJson(shapefile);
+    const { data } = await this.shapefileService.transformToGeoJson(shapefile, {
+      allowOverlaps: true,
+    });
 
     if (!isFeatureCollection(data)) {
       throw new BadRequestException(`Only FeatureCollection is supported.`);

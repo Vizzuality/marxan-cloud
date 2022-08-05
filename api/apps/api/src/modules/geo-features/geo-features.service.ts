@@ -138,24 +138,14 @@ export class GeoFeaturesService extends AppBaseService<
       (info?.params?.projectId as string) ??
       (fetchSpecification?.filter?.projectId as string);
 
-    // find over api.features may not be best, as pagination does reflect
-    // actual page/pageSize vs actual items
-
-    // making search via intersection of whole PA vs all features
-    // may not be best for performance... but ain't we doing it anyway?
-
-    // also, current approach may fail as we are using IDs directly (typeorm
-    // limits - what we cannot overcome unless we duplicate data or make a
-    // special "cache/view" (per project?)
-
-    // current query just 'attaches' 'like' clause in separation of previously
-    // fetched features (so it may get public ones that are not within study area)
-
     /**
-     * potential solutions, but it may be messing much?
+     * @debt Finding over api.features may not be best, as pagination does not
+     * reflect actual page/pageSize vs actual items
+     *
+     * Potential solutions (with caveat - they may require extensive refactor):
      *
      * 0. store bbox of each feature
-     *    (st_envelope(st_union(features_data.the_geom)) for the feature's
+     *    (`st_makeenvelope(st_union(features_data.the_geom))` for the feature's
      *    geometries) in geodb to intersect faster
      *
      * 1. keep searching over features_data (intersection) [could be cached at
@@ -163,24 +153,66 @@ export class GeoFeaturesService extends AppBaseService<
      *
      * 2. move api.features into geo.features_data ...
      *
-     * 3. which also fixes issues with:
+     * 3. which could also fix issues with:
      *    * searching via name
      *    * pagination
      *    * searching within one query (table) and single db
-     *    * reduces unnecessary relations and system accidental complexity
-     *
-     * 4. maybe use `where id = any(<array representation of list of ids from
-     *    geodb>)` to avoid exploding past PostgreSQL param count limit?
+     *    * unnecessary relations and system accidental complexity
      */
     if (projectId && info?.params?.bbox) {
       const { westBbox, eastBbox } = antimeridianBbox(
         nominatim2bbox(info.params.bbox),
       );
+      /**
+       * First get all feature ids that _may_ be relevant to the project
+       * (irrespective of whether they intersect the project's bbox, which we
+       * check later).
+       *
+       * Moreover, never include features that have been obtained by splitting
+       * (or, in the future, stratifying) other features - that is, features
+       * obtained through geoprocessing operations on "raw"/original features.
+       *
+       * In practice, this would be done nevertheless at this stage when only
+       * the `split` geoprocessing operation is actively supported, because only
+       * ids of "raw"/original features are ever used in
+       * `(geodb)features_data.feature_id (i.e. not ids of features obtained by
+       * splitting a "raw" feature), but we add here this guard as a proper
+       * filter on the `(apidb).features` data alone, in case the filtering by
+       * bbox below is changed or replaced in any way that may affect the
+       * "implicit" exclusion of geoprocessed feature ids.
+       *
+       * This filter will need to be revisited if/when enabling stratification,
+       * as that geoprocessing operation _will_ create new
+       * `(geodb)features_data` rows, which will likely reference the
+       * intersected feature stored in `(apidb)features` (which will have a
+       * non-null `geoprocessing_ops_hash` value).
+       */
+      const publicOrProjectSpecificFeatures = await this.geoFeaturesRepository
+        .query(`
+        SELECT id FROM features
+          WHERE
+            project_id IS NULL
+            AND
+            geoprocessing_ops_hash IS NULL
+        UNION
+        SELECT id FROM features
+          WHERE
+            project_id = $1
+            AND
+            geoprocessing_ops_hash IS NULL;
+        `, [ projectId ])
+        .then(result => result.map((i: { id: string}) => i.id));
+
+      /**
+       * Then narrow down the list of features relevant to the project to those
+       * that effectively intersect the project's bbox.
+       */
       const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
         .createQueryBuilder('geoFeatureGeometries')
         .select('"geoFeatureGeometries"."feature_id"', 'featureId')
         .distinctOn(['"geoFeatureGeometries"."feature_id"'])
-        .where(
+        .where(`feature_id IN (:...featureIds)`)
+        .andWhere(
           `(st_intersects(
             st_intersection(st_makeenvelope(:...eastBbox, 4326),
             ST_MakeEnvelope(0, -90, 180, 90, 4326)),
@@ -191,6 +223,7 @@ export class GeoFeaturesService extends AppBaseService<
           "geoFeatureGeometries".the_geom
       ))`,
           {
+            featureIds: publicOrProjectSpecificFeatures,
             westBbox: westBbox,
             eastBbox: eastBbox,
           },
@@ -212,20 +245,6 @@ export class GeoFeaturesService extends AppBaseService<
       } else {
         query.andWhere('false');
       }
-
-      /**
-       * Never include features that have been obtained by splitting (or, in the
-       * future, stratifying) other features - that is, features obtained
-       * through geoprocessing operations on "raw"/original features. In
-       * practice, this would be done nevertheless because we first get ids of
-       * features that fall within the bbox of the project's planning area and
-       * only ids of "raw"/original features are ever used in
-       * `(geodb)features_data.feature_id, but we add here this guard as a
-       * proper filter on the `(apidb).features` data alone, in case the
-       * filtering by bbox above is changed or replaced in any way that may
-       * affect the "implicit" exclusion of geoprocessed feature ids.
-       */
-      query.andWhere(`(${this.alias}.geoprocessingOpsHash IS NULL)`);
 
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
         `(${this.alias}.projectId = :projectId OR ${this.alias}.projectId IS NULL)`,
