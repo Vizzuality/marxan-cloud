@@ -38,10 +38,21 @@ export class ExportCleanupService implements ExportCleanup {
      *   project is unpublished)
      * - exports of scenarios, because we should never leave them around for
      *   later use/download - they cannot be downloaded and are only created in
-     *   order to allow cloning of a scenario, so as long as they get cleaned
-     *   up at the end of a scenario cloning operation, we should leave them
-     *   alone: if they are on disk, we should assume that they are used by
-     *   a scenario cloning operation which is in progress
+     *   order to allow cloning of a scenario, so as long as they get cleaned up
+     *   at the end of a scenario cloning operation, we should leave them alone:
+     *   if they are on disk, we should assume that they are used by a scenario
+     *   cloning operation which is in progress
+     *
+     * Moreover, in practice scenario ids are only picked up by the query below
+     * *while a scenario cloning operation is in progress*. `(apidb)exports`
+     * records for `resource_kind = 'scenario'` are deleted once a scenario
+     * cloning operation has finished. Therefore by including the `select` query
+     * part for scenarios, we make sure we don't ever mess with working
+     * folders/artifacts that belong to scenario cloning operations that are
+     * still in progress. Once a scenario cloning operation has finished, its
+     * `(apidb)exports` record is deleted from db, and we can safely remove its
+     * folder from the cloning volume, in case it is not cleaned up properly as
+     * part of the scenario cloning cleanup stage.
      */
     const validExportIds = await this.apiEntityManager
       .query(
@@ -75,6 +86,18 @@ export class ExportCleanupService implements ExportCleanup {
     cleanupTask.stdin.end();
   }
 
+  private async purgeExpiredProjectExportMetadata() {
+    return await this.apiEntityManager
+    .query(
+      `
+    DELETE FROM exports e
+      WHERE e.resource_kind = 'project' AND
+      (AGE(NOW(), e.created_at) > $1);
+    `,
+      [`${validityIntervalInHours} hours`],
+    )
+  }
+
   @Cron(cronJobInterval)
   async handleCron() {
     this.logger.log(
@@ -84,5 +107,6 @@ export class ExportCleanupService implements ExportCleanup {
     const validResourcesIds = await this.identifyValidResources();
 
     this.cleanupDanglingExports(validResourcesIds);
+    await this.purgeExpiredProjectExportMetadata();
   }
 }
