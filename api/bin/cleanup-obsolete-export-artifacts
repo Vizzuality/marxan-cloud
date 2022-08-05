@@ -11,4 +11,12 @@ ls $cloning_storage_path | sort > "$workspace/all-uuids.list"
 cd "$cloning_storage_path"
 comm -23 "$workspace/all-uuids.list" "$workspace/valid-uuids.list" | tee "$workspace/dangling-uuids.list" | xargs rm -rf
 
-rm -rf $workspace
+# Delete workspace if asked to do so, leave it around for inspection otherwise
+eval set -- `getopt --long cleanup-temporary-folders -o c -- "$@"`
+while [ $# -gt 0 ]
+do
+    case "$1" in
+    -c | --cleanup-temporary-folders)  rm -rf $workspace;;
+    esac
+    shift
+done
