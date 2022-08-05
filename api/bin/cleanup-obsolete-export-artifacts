@@ -8,6 +8,7 @@ tee "$valid_export_ids_file" 1>/dev/null
 
 ls $cloning_storage_path | sort > "$workspace/all-uuids.list"
 
-comm -3 "$workspace/all-uuids.list" "$workspace/valid-uuids.list" | xargs rm -rf
+cd "$cloning_storage_path"
+comm -23 "$workspace/all-uuids.list" "$workspace/valid-uuids.list" | tee "$workspace/dangling-uuids.list" | xargs rm -rf
 
 rm -rf $workspace
