@@ -245,7 +245,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
               the
               {' '}
               <Link
-                href="/community"
+                href="/community/projects"
               >
                 <a
                   href="/community/projects"
