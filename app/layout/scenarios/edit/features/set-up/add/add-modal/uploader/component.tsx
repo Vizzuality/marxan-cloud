@@ -177,7 +177,33 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
           return (
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
-                <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+                <div className="flex items-center mb-5 space-x-3">
+                  <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
+                  <InfoButton
+                    size="base"
+                    theme="primary"
+                  >
+                    <span className="text-xs">
+                      {' '}
+                      <h4 className="font-heading mb-2.5">
+                        When uploading shapefiles of conservation features, please make sure that:
+                      </h4>
+                      <ul className="pl-6 space-y-1 list-disc">
+                        <li>
+                          features that are not meant to be split must not contain any
+                          overlapping geometries;
+                        </li>
+                        <li>
+                          features that are meant for splitting can contain geometries that
+                          overlap but only between sub-features that will be obtained through
+                          splitting the uploaded feature, and they must not have any overlaps
+                          within the set of geometries that are meant to be part of a single
+                          sub-feature.
+                        </li>
+                      </ul>
+                    </span>
+                  </InfoButton>
+                </div>
 
                 <div>
                   <FieldRFF
