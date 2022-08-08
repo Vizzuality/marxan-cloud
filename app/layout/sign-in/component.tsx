@@ -125,7 +125,7 @@ export const SignIn: React.FC<SignInProps> = () => {
               </div>
 
               <div className="mt-5 text-sm text-center text-black">
-                Dont&apos;t have an account?
+                Don&apos;t have an account?
                 {' '}
                 <Link href="/auth/sign-up"><a href="/auth/sign-up" className="underline">Sign up</a></Link>
               </div>
