@@ -24,6 +24,7 @@ import {
   booleanValidator,
   passwordStrengthValidator,
 } from 'components/forms/validations';
+import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
 import AUTHENTICATION from 'services/authentication';
@@ -201,7 +202,20 @@ export const SignUp: React.FC<SignUpProps> = () => {
                   >
                     {(fprops) => (
                       <Field id="login-password" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">Password</Label>
+                        <div className="flex items-center mb-3 space-x-3">
+                          <Label theme="light" className="uppercase">
+                            Password
+                          </Label>
+                          <InfoButton theme="secondary" size="s">
+                            <span className="text-xs">
+                              <p>
+                                To sign-up, you need to create a strong password.
+                                The visual guidance below the password field should be
+                                green for the system to accept the password
+                              </p>
+                            </span>
+                          </InfoButton>
+                        </div>
                         <Input theme="light" type="password" icon={PASSWORD_SVG} />
                       </Field>
                     )}
