@@ -296,15 +296,44 @@ export const PlanningUnitUploading: React.FC<PlanningUnitUploadingProps> = ({
             onClick={() => onSelected('uploading')}
           >
             <header className="relative flex justify-between w-full">
-              <div
-                className={cx({
-                  'text-center': !selected,
-                  'text-left': selected,
-                })}
-              >
-                Upload shapefile
+              <div className="flex items-center mb-5 space-x-3">
+                <div
+                  className={cx({
+                    'text-center': !selected,
+                    'text-left': selected,
+                  })}
+                >
+                  Upload shapefile
+                </div>
+                <InfoButton
+                  size="base"
+                  theme="secondary"
+                >
+                  <span className="text-xs">
+                    {' '}
+                    <h4 className="font-heading mb-2.5">
+                      When uploading any shapefile, please make sure that:
+                    </h4>
+                    <ul className="pl-6 space-y-1 list-disc">
+                      <li>
+                        this is a single zip file that includes all the components of a single
+                        shapefile;
+                      </li>
+                      <li>
+                        all the components are added to the “root”/top-level of the zip
+                        file itself (that is, not within any folder within the zip file);
+                      </li>
+                      <li>
+                        user-defined shapefile attributes are only considered for shapefiles
+                        of features, while they are ignored for any other kind of shapefile
+                        (planning grid, lock-in/out, etc), so you may consider excluding any
+                        attributes from shapefiles other than for features, in order to keep
+                        the shapefile’s file size as small as possible.
+                      </li>
+                    </ul>
+                  </span>
+                </InfoButton>
               </div>
-
               {!selected && (
                 <Icon
                   className="absolute right-0 w-5 h-5 transform -translate-y-1/2 top-1/2"
@@ -332,18 +361,6 @@ export const PlanningUnitUploading: React.FC<PlanningUnitUploadingProps> = ({
                   >
                     Save
                   </Button>
-                  {/* <button
-                    type="button"
-                    className="flex items-center justify-center h-5 pl-5 pr-1 focus:outline-none"
-                    onClickCapture={() => {
-                      setSelected(null);
-                    }}
-                  >
-                    <Icon
-                      className="w-3 h-3 text-primary-500"
-                      icon={ARROW_UP_SVG}
-                    />
-                  </button> */}
                 </div>
               )}
             </header>
