@@ -21,9 +21,12 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 import IntersectFeatures from 'layout/scenarios/edit/features/set-up/add/intersect';
 
 import Button from 'components/button';
+import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/selected-item';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+
+import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
 export interface ScenariosFeaturesListProps {
 
@@ -32,6 +35,8 @@ export interface ScenariosFeaturesListProps {
 export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const [intersecting, setIntersecting] = useState(null);
+  const [deleteFeature, setDeleteFeature] = useState(null);
+
   const { query } = useRouter();
   const { pid, sid } = query;
 
@@ -203,9 +208,11 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
             setSubmitting(false);
           },
         });
+        setDeleteFeature(null);
       },
       onError: () => {
         setSubmitting(false);
+        setDeleteFeature(null);
       },
     });
   }, [sid, metadata, getFeaturesRecipe, selectedFeaturesMutation, saveScenarioMutation]);
@@ -341,11 +348,17 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
                               onIntersectSelected={(id) => {
                                 setIntersecting(id);
                               }}
-                              onRemove={() => {
-                                onRemove(item.id, input);
-                              }}
+                              onRemove={() => { setDeleteFeature(item); }}
                               isShown={isShown(item.id)}
                               onSeeOnMap={() => toggleSeeOnMap(item.id)}
+                            />
+                            <ConfirmationPrompt
+                              title={`Are you sure you want to remove "${deleteFeature?.name}" feature?`}
+                              icon={DELETE_WARNING_SVG}
+                              open={!!deleteFeature}
+                              onAccept={() => onRemove(deleteFeature?.id, input)}
+                              onRefuse={() => setDeleteFeature(null)}
+                              onDismiss={() => setDeleteFeature(null)}
                             />
 
                           </div>
