@@ -198,7 +198,22 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
                           overlap but only between sub-features that will be obtained through
                           splitting the uploaded feature, and they must not have any overlaps
                           within the set of geometries that are meant to be part of a single
-                          sub-feature.
+                          sub-feature;
+                        </li>
+                        <li>
+                          this is a single zip file that includes all the components of a single
+                          shapefile;
+                        </li>
+                        <li>
+                          all the components are added to the “root”/top-level of the zip
+                          file itself (that is, not within any folder within the zip file);
+                        </li>
+                        <li>
+                          user-defined shapefile attributes are only considered for shapefiles
+                          of features, while they are ignored for any other kind of shapefile
+                          (planning grid, lock-in/out, etc), so you may consider excluding any
+                          attributes from shapefiles other than for features, in order to keep
+                          the shapefile’s file size as small as possible.
                         </li>
                       </ul>
                     </span>
