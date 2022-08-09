@@ -309,7 +309,7 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
       data: data?.data.map((d) => {
         const { creators, ownerEmails } = d;
 
-        const mergeCreators = creators.map((c) => ({
+        const mergeCreators = creators?.map((c) => ({
           ...ownerEmails.find((o) => (o.id === c.id) && o),
           ...c,
         }));
