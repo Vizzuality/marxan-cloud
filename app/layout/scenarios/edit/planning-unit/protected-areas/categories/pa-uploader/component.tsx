@@ -188,7 +188,37 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
           return (
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
-                <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
+                <div className="flex items-center mb-5 space-x-3">
+                  <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
+                  <InfoButton
+                    size="base"
+                    theme="primary"
+                  >
+                    <span className="text-xs">
+                      {' '}
+                      <h4 className="font-heading mb-2.5">
+                        When uploading shapefiles of protected areas, please make sure that:
+                      </h4>
+                      <ul className="pl-6 space-y-1 list-disc">
+                        <li>
+                          this is a single zip file that includes all the components of a single
+                          shapefile;
+                        </li>
+                        <li>
+                          all the components are added to the “root”/top-level of the zip
+                          file itself (that is, not within any folder within the zip file);
+                        </li>
+                        <li>
+                          user-defined shapefile attributes are only considered for shapefiles
+                          of features, while they are ignored for any other kind of shapefile
+                          (planning grid, lock-in/out, etc), so you may consider excluding any
+                          attributes from shapefiles other than for features, in order to keep
+                          the shapefile’s file size as small as possible.
+                        </li>
+                      </ul>
+                    </span>
+                  </InfoButton>
+                </div>
                 <div>
                   <FieldRFF
                     name="name"
