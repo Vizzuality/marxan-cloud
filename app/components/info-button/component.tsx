@@ -33,12 +33,14 @@ const SIZE = {
 
 export interface InfoButtonProps {
   children: ReactElement;
+  className?: string;
   theme?: 'primary' | 'secondary'
   size?: 's' | 'base' | 'lg';
 }
 
 export const InfoButton: React.FC<InfoButtonProps> = ({
   children,
+  className,
   size = 'base',
   theme = 'primary',
 }: InfoButtonProps) => (
@@ -66,6 +68,7 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
         'flex flex-shrink-0 items-center justify-center transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
         [THEME[theme].button]: true,
         [SIZE.button[size]]: true,
+        [className]: !!className,
       })}
       type="button"
     >

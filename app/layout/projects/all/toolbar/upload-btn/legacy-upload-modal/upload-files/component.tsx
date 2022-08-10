@@ -154,7 +154,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
       <FormRFF
         onSubmit={onImportSubmit}
-        render={({ form, handleSubmit }) => {
+        render={({ form, values, handleSubmit }) => {
+          const solutionsAreIncluded = !!values?.output;
           formRef.current = form;
 
           return (
@@ -278,30 +279,55 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                 )}
 
                 <div className="space-y-5">
+
                   {LEGACY_FIELDS.map((f) => {
                     return (
-                      <UploadItem key={f.label} f={f} />
+                      <FieldRFF key={f.label} name={`${f.fileType}`}>
+                        {(fprops) => (
+                          <Field id={`${f.fileType}`} {...fprops}>
+                            <UploadItem f={f} {...fprops} />
+                          </Field>
+                        )}
+                      </FieldRFF>
                     );
                   })}
                 </div>
 
-                <div className="mt-7">
-                  <FieldRFF
-                    name="solutionsAreLocked"
-                    type="checkbox"
-                  >
-                    {(fprops) => (
-                      <Field className="flex mt-2" id="solutionsAreLocked" {...fprops}>
-                        <Checkbox theme="light" />
-                        <Label theme="light" className="ml-2 -mt-1 font-sans text-sm">
-                          Do you want to lock these results calculated outside of the
-                          Marxan MaPP platform?
-                        </Label>
+                {solutionsAreIncluded && (
+                  <div className="mt-7">
+                    <FieldRFF
+                      name="solutionsAreLocked"
+                      type="checkbox"
+                    >
+                      {(fprops) => (
+                        <Field className="flex mt-2" id="solutionsAreLocked" {...fprops}>
+                          <Checkbox theme="light" />
+                          <Label theme="light" className="ml-2 -mt-[1px] font-sans text-sm">
 
-                      </Field>
-                    )}
-                  </FieldRFF>
-                </div>
+                            Do you want to lock these results calculated outside of the
+                            Marxan MaPP platform?
+
+                            <InfoButton
+                              size="s"
+                              theme="secondary"
+                              className="inline-flex ml-2"
+                            >
+                              <div className="font-heading text-xs mb-2.5 flex flex-col space-y-2">
+                                <p>
+                                  Keep original solutions and block Marxan from overwriting them.
+                                </p>
+                                <p>
+                                  Note: This means you will be unable to run Marxan within the
+                                  Marxan MaPP platform for this project.
+                                </p>
+                              </div>
+                            </InfoButton>
+                          </Label>
+                        </Field>
+                      )}
+                    </FieldRFF>
+                  </div>
+                )}
 
                 <div className="flex justify-center mt-16 space-x-6">
                   <Button
@@ -314,6 +340,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                   >
                     Back
                   </Button>
+                  <div className="before:absolute before:bg-blue-500 after:flex after:bg-blue-300" />
 
                   <Button
                     theme="primary"
