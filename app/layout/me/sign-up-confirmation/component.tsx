@@ -50,7 +50,7 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
               <h2 className="mb-24 text-lg font-medium text-center text-gray-600 font-heading">
                 Welcome to Marxan!
                 <br />
-                You&apos;ve create an account
+                You&apos;ve created an account
               </h2>
             </div>
             <div className="mt-10">
