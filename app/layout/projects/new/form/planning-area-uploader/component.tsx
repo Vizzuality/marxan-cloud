@@ -196,7 +196,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="p-9">
-                    <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile A</h4>
+                    <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
 
                     {!successFile && (
                       <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
