@@ -1,7 +1,6 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useDropzone } from 'react-dropzone';
-import { Field as FieldRFF, Form as FormRFF } from 'react-final-form';
 import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
@@ -24,13 +23,18 @@ export interface UploadItemProps {
     fileType: string;
     optional: boolean;
   };
+  formRef: React.RefObject<HTMLFormElement>;
+  meta: {
+    error?: boolean;
+    touched?: boolean;
+  }
 }
 
 export const UploadItem: React.FC<UploadItemProps> = ({
   f,
+  formRef,
+  ...fprops
 }: UploadItemProps) => {
-  const formRef = useRef(null);
-
   const [successFile, setSuccessFile] = useState(null);
   const [dataFileId, setDataFileId] = useState(null);
 
@@ -126,95 +130,85 @@ export const UploadItem: React.FC<UploadItemProps> = ({
   });
 
   return (
-    <FormRFF
-      onSubmit={() => { }}
-      render={({ form, handleSubmit }) => {
-        formRef.current = form;
 
-        return (
-          <form onSubmit={handleSubmit}>
-            {!successFile && (
-              <FieldRFF name="file">
-                {(props) => (
-                  <div className="space-y-2.5">
-                    <Label theme="light" className="uppercase" id="file">
-                      {`Upload your ${f.label}`}
-                      {' '}
-                      <span className="lowercase">
-                        {`(${f.fileType})`}
-                      </span>
-                      {' '}
-                      {`${f.optional ? '(optional)' : ''}`}
-                    </Label>
+    <form onSubmit={() => { }}>
+      {!successFile && (
 
-                    <div
-                      {...props}
-                      {...getRootProps()}
-                      className={cx({
-                        'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
-                        'bg-gray-500': isDragActive,
-                        'border-green-800': isDragAccept,
-                        'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
-                      })}
-                    >
+      <div className="space-y-2.5">
+        <Label theme="light" className="uppercase" id={`${f.fileType}`}>
+          {`Upload your ${f.label}`}
+          {' '}
+          <span className="lowercase">
+            {`(${f.fileType})`}
+          </span>
+          {' '}
+          {`${f.optional ? '(optional)' : ''}`}
+        </Label>
 
-                      <input {...getInputProps()} />
+        <div
+          {...fprops}
+          {...getRootProps()}
+          className={cx({
+            'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+            'bg-gray-500': isDragActive,
+            'border-green-800': isDragAccept,
+            'border-red-800': isDragReject || (fprops?.meta?.error && fprops?.meta?.touched),
+          })}
+        >
 
-                      <p className="text-sm text-center text-gray-500">
-                        {`Drag and drop your project ${f.format}`}
-                        <br />
-                        or
-                        {' '}
-                        <b>click here</b>
-                        {' '}
-                        to upload
-                      </p>
+          <input {...getInputProps()} />
 
-                      <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(f.maxSize)} MB`}</p>
-                    </div>
-                  </div>
-                )}
-              </FieldRFF>
+          <p className="text-sm text-center text-gray-500">
+            {`Drag and drop your project ${f.format}`}
+            <br />
+            or
+            {' '}
+            <b>click here</b>
+            {' '}
+            to upload
+          </p>
 
-            )}
-            {successFile && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                  <h5 className="text-xs text-black uppercase">
-                    Uploaded
-                    {' '}
-                    {f.label}
-                  </h5>
-                  <div className="flex items-center space-x-2">
-                    <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-                      <p className="text-sm text-black">{successFile.path}</p>
-                    </label>
-                    <button
-                      id="cancel-shapefile-btn"
-                      type="button"
-                      className="flex items-center justify-center flex-shrink-0 w-5 h-5 border border-black rounded-full group hover:bg-black"
-                      onClick={() => {
-                        setSuccessFile(null);
-                        onUploadRemove();
-                      }}
-                    >
-                      <Icon
-                        className="w-1.5 h-1.5 text-black group-hover:text-white"
-                        icon={CLOSE_SVG}
-                      />
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </form>
-        );
-      }}
-    />
+          <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(f.maxSize)} MB`}</p>
+        </div>
+      </div>
+      )}
+
+      {successFile && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div className="flex flex-col w-full space-y-3 cursor-pointer">
+          <h5 className="text-xs text-black uppercase">
+            Uploaded
+            {' '}
+            {f.label}
+          </h5>
+          <div className="flex items-center space-x-2">
+            <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+              <p className="text-sm text-black">{successFile.path}</p>
+            </label>
+            <button
+              id="cancel-shapefile-btn"
+              type="button"
+              className="flex items-center justify-center flex-shrink-0 w-5 h-5 border border-black rounded-full group hover:bg-black"
+              onClick={() => {
+                setSuccessFile(null);
+                onUploadRemove();
+              }}
+            >
+              <Icon
+                className="w-1.5 h-1.5 text-black group-hover:text-white"
+                icon={CLOSE_SVG}
+              />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+      )}
+    </form>
+
   );
 };
 
