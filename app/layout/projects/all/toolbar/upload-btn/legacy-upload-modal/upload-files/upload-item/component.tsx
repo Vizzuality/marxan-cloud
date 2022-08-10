@@ -23,7 +23,7 @@ export interface UploadItemProps {
     fileType: string;
     optional: boolean;
   };
-  formRef: React.RefObject<HTMLFormElement>;
+  input?: any;
   meta: {
     error?: boolean;
     touched?: boolean;
@@ -32,7 +32,7 @@ export interface UploadItemProps {
 
 export const UploadItem: React.FC<UploadItemProps> = ({
   f,
-  formRef,
+  input,
   ...fprops
 }: UploadItemProps) => {
   const [successFile, setSuccessFile] = useState(null);
@@ -50,9 +50,10 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     const fl = acceptedFiles[0];
 
     setSuccessFile(fl);
-    formRef.current.change('file', fl);
+    input.onChange(fl);
+
     const data = new FormData();
-    data.append('fileType', f.fileType);
+    data.append('fileType', `${f.fileType}.${f.format}`);
     data.append('file', fl);
 
     uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
@@ -105,16 +106,17 @@ export const UploadItem: React.FC<UploadItemProps> = ({
   };
 
   const onUploadRemove = useCallback(() => {
-    setSuccessFile(null);
     cancelUploadLegacyProjectFileMutation.mutate({ projectId: legacyProjectId, dataFileId }, {
       onSuccess: ({ data: { projectId } }) => {
+        setSuccessFile(null);
+        input.onChange(null);
         console.info('Upload legacy project data file has been canceled', projectId);
       },
       onError: () => {
         console.error('Upload legacy project data file has not been canceled');
       },
     });
-  }, [cancelUploadLegacyProjectFileMutation, dataFileId, legacyProjectId]);
+  }, [input, cancelUploadLegacyProjectFileMutation, dataFileId, legacyProjectId]);
 
   const {
     getRootProps,
@@ -139,7 +141,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({
           {`Upload your ${f.label}`}
           {' '}
           <span className="lowercase">
-            {`(${f.fileType})`}
+            {`(${f.fileType}.${f.format})`}
           </span>
           {' '}
           {`${f.optional ? '(optional)' : ''}`}

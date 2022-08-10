@@ -154,9 +154,8 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
 
       <FormRFF
         onSubmit={onImportSubmit}
-        render={({ form, handleSubmit }) => {
-          const solutionsAreIncluded = !!form.getState().values?.file?.path;
-          console.log(form.getState());
+        render={({ form, values, handleSubmit }) => {
+          const solutionsAreIncluded = !!values?.output;
           formRef.current = form;
 
           return (
@@ -286,7 +285,7 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                       <FieldRFF key={f.label} name={`${f.fileType}`}>
                         {(fprops) => (
                           <Field id={`${f.fileType}`} {...fprops}>
-                            <UploadItem f={f} formRef={formRef} {...fprops} />
+                            <UploadItem f={f} {...fprops} />
                           </Field>
                         )}
                       </FieldRFF>
@@ -304,12 +303,14 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                         <Field className="flex mt-2" id="solutionsAreLocked" {...fprops}>
                           <Checkbox theme="light" />
                           <Label theme="light" className="ml-2 -mt-1 font-sans text-xs">
+
                             Do you want to lock these results calculated outside of the
                             Marxan MaPP platform?
 
                             <InfoButton
                               size="s"
                               theme="secondary"
+                              className="inline-flex ml-2"
                             >
                               <div className="font-heading text-xs mb-2.5 flex flex-col space-y-2">
                                 <p>
