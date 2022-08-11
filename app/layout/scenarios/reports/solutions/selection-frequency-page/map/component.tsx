@@ -77,7 +77,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     setViewport(vw);
   }, []);
 
-  const handleTransformRequest = (url) => {
+  const handleTransformRequest = useCallback((url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
         url,
@@ -86,8 +86,9 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
         },
       };
     }
+
     return null;
-  };
+  }, [accessToken]);
 
   // const handleMapLoad = () => {
   //   dispatch(setMaps({ [id]: true }));
@@ -106,6 +107,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
         style={{ height: '146.05mm' }}
       >
         <Map
+          key={accessToken}
           className="map-report"
           scrollZoom={false}
           touchZoom={false}

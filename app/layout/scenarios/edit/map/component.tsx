@@ -464,7 +464,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     cache,
   ]);
 
-  const handleTransformRequest = (url) => {
+  const handleTransformRequest = useCallback((url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
         url,
@@ -473,8 +473,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         },
       };
     }
+
     return null;
-  };
+  }, [accessToken]);
 
   const onChangeOpacity = useCallback((opacity, id) => {
     dispatch(setLayerSettings({
@@ -494,6 +495,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   return (
     <div className="relative w-full h-full overflow-hidden rounded-4xl">
       <Map
+        key={accessToken}
         bounds={bounds}
         width="100%"
         height="100%"
