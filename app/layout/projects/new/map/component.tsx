@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
-// Map
 import { useAccessToken } from 'hooks/auth';
 import {
   useGeoJsonLayer,
@@ -115,7 +114,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
     setBounds(b);
   }, []);
 
-  const handleTransformRequest = (url) => {
+  const handleTransformRequest = useCallback((url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
         url,
@@ -126,7 +125,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
     }
 
     return null;
-  };
+  }, [accessToken]);
 
   return (
     <div
@@ -134,6 +133,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       className="relative w-full h-full overflow-hidden rounded-r-3xl"
     >
       <Map
+        key={accessToken}
         bounds={bounds}
         width="100%"
         height="100%"

@@ -196,7 +196,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     setBounds(b);
   }, []);
 
-  const handleTransformRequest = (url) => {
+  const handleTransformRequest = useCallback((url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
         url,
@@ -207,7 +207,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     }
 
     return null;
-  };
+  }, [accessToken]);
 
   const onChangeScenario1 = useCallback((s) => {
     setSid1(s);
@@ -299,6 +299,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           >
             <div className="w-full h-full">
               <Map
+                key={accessToken}
                 bounds={bounds}
                 width="100%"
                 height="100%"

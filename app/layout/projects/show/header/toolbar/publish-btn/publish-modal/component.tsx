@@ -171,7 +171,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
     setViewport(vw);
   }, []);
 
-  const handleTransformRequest = (url) => {
+  const handleTransformRequest = useCallback((url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
         url,
@@ -180,8 +180,9 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
         },
       };
     }
+
     return null;
-  };
+  }, [accessToken]);
 
   return (
     <FormRFF
@@ -435,6 +436,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                     </Field>
                     <div className="flex-shrink-0 overflow-hidden h-44 w-44 rounded-3xl">
                       <Map
+                        key={accessToken}
                         bounds={bounds}
                         scrollZoom={false}
                         touchZoom={false}

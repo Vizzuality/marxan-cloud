@@ -71,7 +71,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     setViewport(vw);
   }, []);
 
-  const handleTransformRequest = (url) => {
+  const handleTransformRequest = useCallback((url) => {
     if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
       return {
         url,
@@ -80,8 +80,9 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
         },
       };
     }
+
     return null;
-  };
+  }, [accessToken]);
 
   // const handleMapLoad = () => {
   //   dispatch(setMaps({ [id]: true }));
@@ -99,6 +100,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
         className="relative w-full h-full overflow-hidden"
       >
         <Map
+          key={accessToken}
           className="map-report"
           scrollZoom={false}
           touchZoom={false}
