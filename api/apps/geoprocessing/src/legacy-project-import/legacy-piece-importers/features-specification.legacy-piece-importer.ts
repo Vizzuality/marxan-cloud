@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ScenarioFeaturesData } from '@marxan/features';
@@ -375,12 +376,18 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       };
     });
 
-    const chunkSize = 250;
-
     await Promise.all(
-      chunk(updateValues, chunkSize).map((values) =>
-        this.scenarioFeaturesDataRepo.save(values),
-      ),
+      /**
+       * @debt When refactoring all chunked operations to use a single
+       * constant (as part of MARXAN-1759) we kept the original chunk size of
+       * 250 here. Not sure if this occurrence should be sensitive to a chunk
+       * size smaller than the default one, but keeping as is for the time
+       * being.
+       */
+      chunk(
+        updateValues,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS / 4,
+      ).map((values) => this.scenarioFeaturesDataRepo.save(values)),
     );
   }
 

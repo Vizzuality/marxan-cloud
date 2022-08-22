@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
@@ -135,9 +136,11 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       };
     });
 
-    const chunkSize = 1000;
     await Promise.all(
-      chunk(insertMarxanRunResultsValues, chunkSize).map((values) =>
+      chunk(
+        insertMarxanRunResultsValues,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      ).map((values) =>
         em
           .createQueryBuilder()
           .insert()

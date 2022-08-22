@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import {
   LegacyProjectImportFilesRepository,
@@ -207,7 +208,6 @@ export class ScenarioPusDataLegacyProjectPieceImporter
     const notFoundPuids: number[] = [];
 
     await this.geoEntityManager.transaction(async (em) => {
-      const chunkSize = 2500;
       const projectsPuRepo = em.getRepository(ProjectsPuEntity);
       const scenariosPuDataRepo = em.getRepository(ScenariosPuPaDataGeo);
       const scenariosPuCostDataRepo = em.getRepository(ScenariosPuCostDataGeo);
@@ -226,23 +226,32 @@ export class ScenarioPusDataLegacyProjectPieceImporter
         );
 
       await Promise.all(
-        chunk(rowsOrError, chunkSize).map(async (chunk) => {
-          const notFound = this.getNotFoundPuids(chunk, projectPuIdByPuid);
-          notFoundPuids.push(...notFound);
+        /**
+         * @debt When refactoring all chunked operations to use a single
+         * constant (as part of MARXAN-1759) we kept the original chunk size of
+         * 2500 here. Not sure if this occurrence should be sensitive to a chunk
+         * size larger than the default one, but keeping as is for the time
+         * being.
+         */
+        chunk(rowsOrError, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS * 2.5).map(
+          async (chunk) => {
+            const notFound = this.getNotFoundPuids(chunk, projectPuIdByPuid);
+            notFoundPuids.push(...notFound);
 
-          const scenarioPuDataIdByPuid = await this.insertScenarioPuData(
-            scenariosPuDataRepo,
-            chunk,
-            projectPuIdByPuid,
-            input.scenarioId,
-          );
+            const scenarioPuDataIdByPuid = await this.insertScenarioPuData(
+              scenariosPuDataRepo,
+              chunk,
+              projectPuIdByPuid,
+              input.scenarioId,
+            );
 
-          await this.insertScenarioPuCostData(
-            scenariosPuCostDataRepo,
-            chunk,
-            scenarioPuDataIdByPuid,
-          );
-        }),
+            await this.insertScenarioPuCostData(
+              scenariosPuCostDataRepo,
+              chunk,
+              scenarioPuDataIdByPuid,
+            );
+          },
+        ),
       );
     });
     return {

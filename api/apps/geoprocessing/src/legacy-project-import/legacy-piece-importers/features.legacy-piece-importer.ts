@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
   PlanningUnitsGeom,
@@ -327,9 +328,11 @@ export class FeaturesLegacyProjectPieceImporter
           projectPusGeomsMap,
         );
 
-        const chunkSize = 1000;
         await Promise.all(
-          chunk(featuresDataInsertValues, chunkSize).map((values) =>
+          chunk(
+            featuresDataInsertValues,
+            CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+          ).map((values) =>
             this.geoprocessingEntityManager
               .createQueryBuilder()
               .insert()
