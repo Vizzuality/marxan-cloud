@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
@@ -75,37 +76,37 @@ export class ScenarioPlanningUnitsDataPieceImporter
         projectPuIdByPuid[pu.puid] = pu.id;
       });
 
-      const chunkSize = 1000;
-
       await Promise.all(
-        chunk(planningUnitsData, chunkSize).map(async (pusData) => {
-          const scenarioPuIdByPuid: Record<number, string> = {};
+        chunk(planningUnitsData, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+          async (pusData) => {
+            const scenarioPuIdByPuid: Record<number, string> = {};
 
-          await em.getRepository(ScenariosPuPaDataGeo).save(
-            pusData.map((puData) => {
-              const id = v4();
-              scenarioPuIdByPuid[puData.puid] = id;
-              return {
-                id,
-                featureList: puData.featureList,
-                projectPuId: projectPuIdByPuid[puData.puid],
-                lockStatus: toLockEnum[puData.lockinStatus ?? 0],
-                protectedArea: puData.protectedArea,
-                protectedByDefault: puData.protectedByDefault,
-                xloc: puData.xloc,
-                yloc: puData.yloc,
-                scenarioId,
-              };
-            }),
-          );
+            await em.getRepository(ScenariosPuPaDataGeo).save(
+              pusData.map((puData) => {
+                const id = v4();
+                scenarioPuIdByPuid[puData.puid] = id;
+                return {
+                  id,
+                  featureList: puData.featureList,
+                  projectPuId: projectPuIdByPuid[puData.puid],
+                  lockStatus: toLockEnum[puData.lockinStatus ?? 0],
+                  protectedArea: puData.protectedArea,
+                  protectedByDefault: puData.protectedByDefault,
+                  xloc: puData.xloc,
+                  yloc: puData.yloc,
+                  scenarioId,
+                };
+              }),
+            );
 
-          await em.getRepository(ScenariosPuCostDataGeo).save(
-            pusData.map((puData) => ({
-              cost: puData.cost,
-              scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
-            })),
-          );
-        }),
+            await em.getRepository(ScenariosPuCostDataGeo).save(
+              pusData.map((puData) => ({
+                cost: puData.cost,
+                scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
+              })),
+            );
+          },
+        ),
       );
     });
 

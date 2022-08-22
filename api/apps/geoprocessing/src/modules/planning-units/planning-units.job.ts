@@ -10,6 +10,7 @@ import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { chunk } from 'lodash';
 import { EntityManager } from 'typeorm';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 
 type CustomPlanningAreaJob = Required<
   Omit<
@@ -216,21 +217,24 @@ grid.geom
         const geometryIds = geometries.map((geom) => geom.id);
 
         const projectsPuRepo = em.getRepository(ProjectsPuEntity);
-        const chunkSize = 1000;
         await Promise.all(
-          chunk(geometryIds, chunkSize).map(async (ids, chunkIndex) => {
-            return projectsPuRepo.insert(
-              ids.map((id, index) => ({
-                geomId: id,
-                geomType: job.data.planningUnitGridShape,
-                puid: chunkIndex * chunkSize + (index + 1),
-                projectId: job.data.projectId,
-                planningAreaId: isCustomPlanningAreaJob(job.data)
-                  ? job.data.planningAreaId
-                  : undefined,
-              })),
-            );
-          }),
+          chunk(geometryIds, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+            async (ids, chunkIndex) => {
+              return projectsPuRepo.insert(
+                ids.map((id, index) => ({
+                  geomId: id,
+                  geomType: job.data.planningUnitGridShape,
+                  puid:
+                    chunkIndex * CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS +
+                    (index + 1),
+                  projectId: job.data.projectId,
+                  planningAreaId: isCustomPlanningAreaJob(job.data)
+                    ? job.data.planningAreaId
+                    : undefined,
+                })),
+              );
+            },
+          ),
         );
 
         return geometries;

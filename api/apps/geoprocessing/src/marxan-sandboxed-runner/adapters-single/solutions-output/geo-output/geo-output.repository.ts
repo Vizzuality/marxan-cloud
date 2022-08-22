@@ -15,6 +15,7 @@ import { readFileSync } from 'fs';
 import { ScenarioFeaturesDataService } from './scenario-features';
 import { RunDirectories } from '../run-directories';
 import { chunk } from 'lodash';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 
 @Injectable()
 export class GeoOutputRepository {
@@ -64,8 +65,6 @@ export class GeoOutputRepository {
       // and CPU time when assembling large queries with tens of thousands or
       // parameters, which makes non-chunked operations block the event loop
       // for unacceptable amounts of time here.
-
-      const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
       const CHUNK_SIZE_FOR_BATCH_SUMMARY = 1000;
 
       this.logger.debug(
@@ -75,7 +74,7 @@ export class GeoOutputRepository {
       );
       for (const [index, ospuChunk] of chunk(
         Object.keys(planningUnitsState.puSelectionState),
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
       ).entries()) {
         this.logger.debug(
           `Deleting chunk #${index} (${ospuChunk.length} items)...`,
@@ -90,7 +89,7 @@ export class GeoOutputRepository {
       );
       for (const [index, osfdChunk] of chunk(
         scenarioFeatureDataFromAllRuns,
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
       ).entries()) {
         this.logger.debug(
           `Deleting chunk #${index} (${osfdChunk.length} items)...`,
@@ -105,7 +104,7 @@ export class GeoOutputRepository {
       );
       for (const [index, osfdChunk] of chunk(
         scenarioFeatureDataFromAllRuns,
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
       ).entries()) {
         this.logger.debug(
           `Inserting chunk #${index} (${osfdChunk.length} items)...`,

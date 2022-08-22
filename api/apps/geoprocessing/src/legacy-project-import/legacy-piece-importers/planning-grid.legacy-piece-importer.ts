@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import {
   LegacyProjectImportFileType,
@@ -80,9 +81,10 @@ export class PlanningGridLegacyProjectPieceImporter
     em: EntityManager,
     data: ExpectedGeoJsonFormat,
   ): Promise<GeomIdAndPuid[]> {
-    const chunkSize = 1000;
     const result = await Promise.all(
-      chunk(data.features, chunkSize).map<Promise<GeomIdAndPuid[]>>((pus) =>
+      chunk(data.features, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map<
+        Promise<GeomIdAndPuid[]>
+      >((pus) =>
         em.query(
           /**
            * @debt Geometries insertion logic is duplicated in
@@ -134,7 +136,7 @@ export class PlanningGridLegacyProjectPieceImporter
         geomId: el.id,
         geomType: PlanningUnitGridShape.FromShapefile,
       })),
-      { chunk: 10000 },
+      { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS * 10 },
     );
   }
 

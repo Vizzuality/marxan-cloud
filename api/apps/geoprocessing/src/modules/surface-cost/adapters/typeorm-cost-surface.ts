@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { ScenariosPuCostDataGeo } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -13,22 +14,23 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
   ) {}
 
   async save(values: PlanningUnitCost[]): Promise<void> {
-    const chunkSize = 1000;
     await this.entityManager.transaction(async (em) => {
       await Promise.all(
-        chunk(values, chunkSize).map(async (rows) => {
-          const ids = rows.map((row) => row.id);
-          await em.delete(ScenariosPuCostDataGeo, {
-            scenariosPuDataId: In(ids),
-          });
-          await em.insert(
-            ScenariosPuCostDataGeo,
-            rows.map((row) => ({
-              cost: row.cost,
-              scenariosPuDataId: row.id,
-            })),
-          );
-        }),
+        chunk(values, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+          async (rows) => {
+            const ids = rows.map((row) => row.id);
+            await em.delete(ScenariosPuCostDataGeo, {
+              scenariosPuDataId: In(ids),
+            });
+            await em.insert(
+              ScenariosPuCostDataGeo,
+              rows.map((row) => ({
+                cost: row.cost,
+                scenariosPuDataId: row.id,
+              })),
+            );
+          },
+        ),
       );
     });
   }

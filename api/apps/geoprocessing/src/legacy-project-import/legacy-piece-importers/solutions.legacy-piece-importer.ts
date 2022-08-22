@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportFileType,
@@ -94,10 +95,8 @@ export class SolutionsLegacyProjectPieceImporter
     em: EntityManager,
     records: ScenarioFeatureRunData[],
   ): Promise<void> {
-    const chunkSize = 1000;
-
     await Promise.all(
-      chunk(records, chunkSize).map((values) =>
+      chunk(records, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map((values) =>
         em.insert(OutputScenariosFeaturesDataGeoEntity, values),
       ),
     );
@@ -107,20 +106,19 @@ export class SolutionsLegacyProjectPieceImporter
     em: EntityManager,
     planningUnitsState: PlanningUnitsSelectionState,
   ): Promise<void> {
-    const chunkSize = 1000;
-
     await Promise.all(
-      chunk(Object.entries(planningUnitsState.puSelectionState), chunkSize).map(
-        (ospuChunk) => {
-          const insertValues = ospuChunk.map(([scenarioPuId, data]) => ({
-            scenarioPuId,
-            values: data.values,
-            includedCount: data.usedCount,
-          }));
+      chunk(
+        Object.entries(planningUnitsState.puSelectionState),
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      ).map((ospuChunk) => {
+        const insertValues = ospuChunk.map(([scenarioPuId, data]) => ({
+          scenarioPuId,
+          values: data.values,
+          includedCount: data.usedCount,
+        }));
 
-          return em.insert(OutputScenariosPuDataGeoEntity, insertValues);
-        },
-      ),
+        return em.insert(OutputScenariosPuDataGeoEntity, insertValues);
+      }),
     );
   }
 

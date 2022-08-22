@@ -7,8 +7,7 @@ import {
 import { EntityManager, Repository } from 'typeorm';
 import { assertDefined } from '@marxan/utils';
 import { chunk } from 'lodash';
-
-const CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS = 1000;
+import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 
 @Injectable()
 export class OutputRepository {
@@ -34,7 +33,7 @@ export class OutputRepository {
       });
       for (const [, summaryChunks] of chunk(
         output,
-        CHUNK_SIZE_FOR_BATCH_DB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS,
       ).entries()) {
         await transaction.insert(
           ScenariosOutputResultsApiEntity,

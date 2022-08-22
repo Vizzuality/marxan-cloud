@@ -87,15 +87,14 @@ export class ExportCleanupService implements ExportCleanup {
   }
 
   private async purgeExpiredProjectExportMetadata() {
-    return await this.apiEntityManager
-    .query(
+    return await this.apiEntityManager.query(
       `
     DELETE FROM exports e
       WHERE e.resource_kind = 'project' AND
       (AGE(NOW(), e.created_at) > $1);
     `,
       [`${validityIntervalInHours} hours`],
-    )
+    );
   }
 
   @Cron(cronJobInterval)

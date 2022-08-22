@@ -10,6 +10,7 @@ import { SpecificationRepository } from '../application/specification.repository
 
 import { SpecificationApiEntity } from './specification.api.entity';
 import { SpecificationFeatureConfigApiEntity } from './specification-feature-config.api.entity';
+import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 
 @Injectable()
 export class DbSpecificationRepository implements SpecificationRepository {
@@ -58,7 +59,7 @@ export class DbSpecificationRepository implements SpecificationRepository {
         ),
       }),
       {
-        chunk: 10000,
+        chunk: CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS * 10,
       },
     );
     return;

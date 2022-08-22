@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -393,9 +394,11 @@ export class ScenarioFeaturesSpecificationPieceImporter
       await Promise.all(
         Object.keys(featureIdsBySpecificationId).flatMap((specificationId) => {
           const featureIds = featureIdsBySpecificationId[specificationId];
-          const chunkSize = 1000;
 
-          return chunk(featureIds, chunkSize).map((chunkFeatureIds) =>
+          return chunk(
+            featureIds,
+            CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+          ).map((chunkFeatureIds) =>
             scenarioFeaturesDataRepo.update(
               { scenarioId, featureId: In(chunkFeatureIds) },
               { specificationId },

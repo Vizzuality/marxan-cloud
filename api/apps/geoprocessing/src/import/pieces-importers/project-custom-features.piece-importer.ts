@@ -16,6 +16,7 @@ import {
 } from '../pieces/import-piece-processor';
 import { chunk } from 'lodash';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 
 @Injectable()
 @PieceImportProvider()
@@ -119,9 +120,11 @@ export class ProjectCustomFeaturesPieceImporter
         }),
       );
 
-      const chunkSize = 1000;
       await Promise.all(
-        chunk(featuresDataInsertValues, chunkSize).map((values) =>
+        chunk(
+          featuresDataInsertValues,
+          CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        ).map((values) =>
           this.geoprocessingEntityManager
             .createQueryBuilder()
             .insert()

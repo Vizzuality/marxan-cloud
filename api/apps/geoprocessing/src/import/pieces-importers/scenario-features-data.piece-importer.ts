@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -38,8 +39,6 @@ type FeatureSelectResult = {
   id: string;
   feature_class_name: string;
 };
-
-const CHUNK_SIZE = 1000;
 
 @Injectable()
 @PieceImportProvider()
@@ -167,16 +166,17 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
 
     if (featureIdAndHashes.length > 0) {
       const records = await Promise.all(
-        chunk(featureIdAndHashes, CHUNK_SIZE).map((idAndHashes) =>
-          this.geoEntityManager
-            .createQueryBuilder()
-            .select('id', 'featureDataId')
-            .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
-            .from(GeoFeatureGeometry, 'fd')
-            .where(`feature_id || '/' || hash IN (:...idAndHashes)`, {
-              idAndHashes,
-            })
-            .execute(),
+        chunk(featureIdAndHashes, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+          (idAndHashes) =>
+            this.geoEntityManager
+              .createQueryBuilder()
+              .select('id', 'featureDataId')
+              .addSelect(`feature_id || '/' || hash`, 'featureIdAndHash')
+              .from(GeoFeatureGeometry, 'fd')
+              .where(`feature_id || '/' || hash IN (:...idAndHashes)`, {
+                idAndHashes,
+              })
+              .execute(),
         ),
       );
       featureData = records.flat();
@@ -306,10 +306,16 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
         scenarioId,
       );
 
-      for (const data of chunk(scenarioFeaturesData, CHUNK_SIZE)) {
+      for (const data of chunk(
+        scenarioFeaturesData,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      )) {
         await scenarioFeaturesDataRepo.save(data);
       }
-      for (const data of chunk(outputScenariosFeatureData, CHUNK_SIZE)) {
+      for (const data of chunk(
+        outputScenariosFeatureData,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      )) {
         await outputScenariosFeatureDataRepo.save(data);
       }
     });
