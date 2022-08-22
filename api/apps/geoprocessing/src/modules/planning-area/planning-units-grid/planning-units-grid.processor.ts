@@ -1,3 +1,4 @@
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { SaveGeoJsonResult } from '@marxan/planning-area-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
@@ -56,6 +57,7 @@ export class PlanningUnitsGridProcessor {
             puid: index + 1,
             planningAreaId: planningAreaId,
           })),
+          { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS * 10 },
         );
 
         const [planningArea]: [
