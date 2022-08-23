@@ -19,7 +19,7 @@ on:
 jobs:
   wait_for_tests:
     name: Wait for tests to finish running
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Wait for API tests to run
         uses: fountainhead/action-wait-for-check@v1.0.0
@@ -40,7 +40,7 @@ jobs:
   push_api_to_registry:
     name: Push API Docker image to Azure Container Registry
     needs: wait_for_tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -68,7 +68,7 @@ jobs:
   push_geoprocessing_to_registry:
     name: Push Geoprocessing Docker image to Azure Container Registry
     needs: wait_for_tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -96,7 +96,7 @@ jobs:
   push_client_to_registry:
     name: Push Client Docker image to Azure Container Registry
     needs: wait_for_tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2

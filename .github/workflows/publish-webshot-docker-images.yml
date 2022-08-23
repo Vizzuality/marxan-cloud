@@ -19,7 +19,7 @@ on:
 jobs:
   push_webshot_to_registry:
     name: Push Webshot Docker image to Azure Container Registry
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2

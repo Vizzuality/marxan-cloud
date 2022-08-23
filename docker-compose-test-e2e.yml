@@ -1,5 +1,4 @@
-# GH Actions runners on Ubuntu 18.04 require an older (<= 3.6) Compose file version
-version: "3.6"
+version: "3.8"
 services:
   api:
     build:

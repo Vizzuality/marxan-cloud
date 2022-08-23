@@ -9,7 +9,7 @@ on:
 jobs:
   test-api-e2e:
     name: E2E tests - API
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     env:
       API_SERVICE_PORT: 3130
@@ -39,7 +39,7 @@ jobs:
         run: make test-e2e-api environment=ci
   test-geoprocessing-e2e:
     name: E2E tests - Geoprocessing
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 30
     env:
       API_SERVICE_PORT: 3130
@@ -69,7 +69,7 @@ jobs:
         run: make test-e2e-geoprocessing environment=ci
   test-api-unit:
     name: Unit tests - API
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - name: Checkout repository
@@ -78,7 +78,7 @@ jobs:
         run: make test-unit-api
   test-geo-unit:
     name: Unit tests - Geoprocessing
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - name: Checkout repository
