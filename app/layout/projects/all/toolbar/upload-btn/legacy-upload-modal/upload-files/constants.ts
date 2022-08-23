@@ -31,7 +31,7 @@ export const LEGACY_FIELDS = [
     label: 'planning unit versus conservation feature file',
     format: 'dat',
     fileType: 'puvspr',
-    maxSize: 1048576,
+    maxSize: 10485760,
     optional: false,
   },
   {
