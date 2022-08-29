@@ -318,7 +318,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                           />
 
                           <ConfirmationPrompt
-                            title={`Are you sure you want to change all features target to ${confirmationTarget?.v}?`}
+                            title={`Are you sure you want to change all feature targets to ${confirmationTarget?.v}?`}
                             description="The action cannot be reverted."
                             open={!!confirmationTarget}
                             onAccept={() => onChangeTargetAll(confirmationTarget)}
@@ -327,7 +327,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                           />
 
                           <ConfirmationPrompt
-                            title={`Are you sure you want to change all features SPF to ${confirmationFPF?.v}?`}
+                            title={`Are you sure you want to change all feature SPFs to ${confirmationFPF?.v}?`}
                             description="The action cannot be reverted."
                             open={!!confirmationFPF}
                             onAccept={() => onChangeFPFAll(confirmationFPF)}
