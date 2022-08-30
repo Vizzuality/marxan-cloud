@@ -5,8 +5,12 @@ import { format } from 'd3';
  * @returns blm formatted value
  */
 export const blmFormat = (blm: number): string => {
-  if (blm < 1) {
+  if (blm < 10) {
     return format(',.3~f')(blm);
+  }
+
+  if (blm < 100) {
+    return format(',.2~f')(blm);
   }
 
   return format(',.0~f')(blm);
