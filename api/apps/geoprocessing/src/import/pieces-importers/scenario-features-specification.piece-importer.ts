@@ -228,7 +228,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
     return features.map(({ featureId, calculated }) => {
       const feature = scenarioFeaturesDataByFeatureId[featureId];
       if (!feature)
-        throw new Error('cant find asociated scenario feature data');
+        throw new Error("can't find associated scenario feature data");
       return {
         calculated,
         featureId: feature.id,
