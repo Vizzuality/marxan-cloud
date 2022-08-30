@@ -50,7 +50,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
 
       return {
         ...acc,
-        [f.id]: scenarioParamters[f.id] || f.default,
+        [f.id]: typeof scenarioParamters[f.id] !== 'undefined' ? scenarioParamters[f.id] : f.default,
       };
     }, {});
   }, [scenarioData]);
