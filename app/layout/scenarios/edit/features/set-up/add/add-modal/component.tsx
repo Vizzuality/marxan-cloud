@@ -2,11 +2,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
-
-import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
@@ -38,14 +35,10 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState('featureClassName');
 
-  const dispatch = useDispatch();
   const { query } = useRouter();
   const { pid, sid } = query;
 
   const queryClient = useQueryClient();
-  const scenarioSlice = getScenarioEditSlice(sid);
-
-  const { setFeatures } = scenarioSlice.actions;
 
   const editable = useCanEditScenario(pid, sid);
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
@@ -63,7 +56,6 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   } = useSelectedFeatures(sid, {});
 
   const {
-    data: allFeaturesData,
     isFetched: allFeaturesIsFetched,
   } = useAllFeatures(pid, {
     search,
@@ -109,22 +101,19 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   }, []);
 
   const onSubmit = useCallback(({ selected }) => {
-    const selectedFeaturesData = allFeaturesData.filter((sf) => selected.includes(sf.id));
-
     setSubmitting(true);
-    dispatch(setFeatures(selectedFeaturesData));
 
     // Save current features then dismiss the modal
     selectedFeaturesMutation.mutate({
       id: `${sid}`,
       data: {
         status: 'draft',
-        features: selectedFeaturesData.map((feature) => {
-          const initialFeature = initialSelectedFeatures.find((f) => f.id === feature.id) || {};
+        features: selected.map((fId) => {
+          const initialFeature = initialSelectedFeatures.find((f) => f.id === fId) || {};
           const { marxanSettings, geoprocessingOperations } = initialFeature;
 
           return {
-            featureId: feature.id,
+            featureId: fId,
             kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
             ...(!geoprocessingOperations) && {
               marxanSettings: marxanSettings || {
@@ -163,11 +152,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   }, [sid,
     metadata,
     initialSelectedFeatures,
-    allFeaturesData,
     selectedFeaturesMutation,
     saveScenarioMutation,
-    setFeatures,
-    dispatch,
   ]);
 
   return (
