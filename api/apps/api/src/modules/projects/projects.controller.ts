@@ -1066,7 +1066,7 @@ export class ProjectsController {
         case invalidExportZipFile:
           throw new BadRequestException('Invalid export zip file');
         default:
-          throw new InternalServerErrorException();
+          throw new InternalServerErrorException(idsOrError.left);
       }
     }
 

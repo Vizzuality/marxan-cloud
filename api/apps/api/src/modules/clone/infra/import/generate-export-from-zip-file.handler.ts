@@ -87,6 +87,7 @@ export class GenerateExportFromZipFileHandler
         })
         .on('close', () => {
           if (error) {
+            this.logger.error(error);
             resolve(left(errorStoringCloningFile));
             return;
           }
@@ -94,6 +95,7 @@ export class GenerateExportFromZipFileHandler
           resolve(right(uris));
         })
         .on('error', () => {
+          this.logger.error(error);
           resolve(left(errorStoringCloningFile));
         });
     });
