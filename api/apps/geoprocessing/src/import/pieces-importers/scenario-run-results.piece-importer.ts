@@ -180,6 +180,7 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
         ...row,
         scenarioId,
       })),
+      { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS },
     );
   }
 }
