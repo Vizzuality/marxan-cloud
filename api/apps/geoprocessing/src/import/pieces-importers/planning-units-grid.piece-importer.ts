@@ -13,6 +13,7 @@ import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 
 type ProjectSelectResult = {
   geomType: PlanningUnitGridShape;
@@ -162,6 +163,7 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
                     puid: geom.puid,
                     geomId: geom.id,
                   })),
+                  { chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS },
                 );
 
                 callback();
