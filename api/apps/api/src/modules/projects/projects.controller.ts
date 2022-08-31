@@ -339,7 +339,7 @@ export class ProjectsController {
   @Post('import/legacy/:projectId/data-file')
   @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
+  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions().limits }))
   async addFileToLegacyProjectImport(
     @Body() dto: AddFileToLegacyProjectImportBodyDto,
     @Param('projectId', ParseUUIDPipe) projectId: string,

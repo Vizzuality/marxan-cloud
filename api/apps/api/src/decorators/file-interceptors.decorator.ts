@@ -26,7 +26,7 @@ export function GeometryFileInterceptor(kind: GeometryKind, fileName = 'file') {
     ...[
       UseInterceptors(
         FileInterceptor(fileName, {
-          ...uploadOptions,
+          ...uploadOptions(),
           limits,
         }),
       ),

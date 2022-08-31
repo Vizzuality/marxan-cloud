@@ -12,7 +12,9 @@ import { BadRequestException } from '@nestjs/common';
 /**
  * Options for Multer
  */
-export const uploadOptions: MulterOptions = {
+export const uploadOptions: (fileSize?: number) => MulterOptions = (
+  fileSize?: number,
+) => ({
   storage: multer.diskStorage({
     filename: (
       _req: any,
@@ -32,7 +34,7 @@ export const uploadOptions: MulterOptions = {
     fileSize: (() =>
       AppConfig.get<number>('fileUploads.limits.fileSize', 10 * 1024 ** 2))(),
   },
-};
+});
 
 /**
  *
