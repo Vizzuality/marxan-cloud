@@ -31,8 +31,8 @@ export class DatFileCommaOrTabFinder implements DatFileDelimiterFinder {
   }
 
   private commaOrTabDelimiter = (line: string) => {
-    const tabPattern = /[a-z]\t[a-z]+/;
-    const commaPattern = /[a-z],[a-z]+/;
+    const tabPattern = /[a-z\"\']\t[a-z\"\']+/;
+    const commaPattern = /[a-z\"\'],[a-z\"\']+/;
 
     const tabDelimiter = tabPattern.test(line);
     const commaDelimiter = commaPattern.test(line);

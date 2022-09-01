@@ -1,4 +1,5 @@
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
@@ -90,7 +91,14 @@ export class ProjectPuvsprCalculationsPieceImporter
 
     await this.geoEntityManager.transaction(async (em) => {
       const puvsprRepo = em.getRepository(PuvsprCalculationsEntity);
-      await puvsprRepo.save(parsedPuvsprCalculations);
+      try {
+        await puvsprRepo.save(parsedPuvsprCalculations, {
+          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        });
+      } catch (e) {
+        this.logger.error(e);
+        throw new Error('error while saving parsed puvspr calculations');
+      }
 
       await this.apiEntityManager.transaction(async (em) => {
         await Promise.all(

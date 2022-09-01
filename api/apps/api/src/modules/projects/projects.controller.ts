@@ -339,7 +339,7 @@ export class ProjectsController {
   @Post('import/legacy/:projectId/data-file')
   @ApiOkResponse({ type: AddFileToLegacyProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions.limits }))
+  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions().limits }))
   async addFileToLegacyProjectImport(
     @Body() dto: AddFileToLegacyProjectImportBodyDto,
     @Param('projectId', ParseUUIDPipe) projectId: string,
@@ -1037,7 +1037,14 @@ export class ProjectsController {
   @Post('import')
   @ApiOkResponse({ type: RequestProjectImportResponseDto })
   @ApiConsumes('multipart/form-data')
-  @UseInterceptors(FileInterceptor('file'))
+  /**
+   * Marxan Cloud archives can get rather big. Let's aim for a limit of 50MB for
+   * the time being. This may need to be raised in the future, but if doing so,
+   * the system should be diligently stress-tested to make sure we can actually
+   * handle bigger archives, which may came with their own set of additional
+   * challenges.
+   */
+  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }))
   async importProject(
     @Body() dto: RequestProjectImportBodyDto,
     @UploadedFile() file: Express.Multer.File,
@@ -1059,7 +1066,7 @@ export class ProjectsController {
         case invalidExportZipFile:
           throw new BadRequestException('Invalid export zip file');
         default:
-          throw new InternalServerErrorException();
+          throw new InternalServerErrorException(idsOrError.left);
       }
     }
 

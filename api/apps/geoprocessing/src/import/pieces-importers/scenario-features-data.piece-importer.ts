@@ -306,18 +306,12 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
         scenarioId,
       );
 
-      for (const data of chunk(
-        scenarioFeaturesData,
-        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-      )) {
-        await scenarioFeaturesDataRepo.save(data);
-      }
-      for (const data of chunk(
-        outputScenariosFeatureData,
-        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-      )) {
-        await outputScenariosFeatureDataRepo.save(data);
-      }
+      await scenarioFeaturesDataRepo.save(scenarioFeaturesData, {
+        chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      });
+      await outputScenariosFeatureDataRepo.save(outputScenariosFeatureData, {
+        chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      });
     });
 
     return {

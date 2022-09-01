@@ -23,6 +23,13 @@ export async function bootstrap() {
     '/api/v1/scenarios/*/planning-units',
     json({ limit: complexGeometry()?.fileSize }),
   );
+
+  // Feature specifications for legacy projects may be larger than the default
+  // payload size limit.
+  app.use(
+    '/api/v1/projects/import/legacy/*/specification',
+    json({ limit: '10MB' }),
+  );
   // For everything else, stick to the default
   app.use(json({ limit: '100kb' }));
 

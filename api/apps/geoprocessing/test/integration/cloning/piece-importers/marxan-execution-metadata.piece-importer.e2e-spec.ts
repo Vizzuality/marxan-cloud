@@ -104,7 +104,9 @@ describe(MarxanExecutionMetadataPieceImporter, () => {
       .ThenAnErrorShouldBeThrownWhileTryingToGetMetadataFolderFromFileRepo();
   });
 
-  it(`fails if marxan execution metadata input folder uri is not contained in uris array`, async () => {
+  // See notes in MarxanExecutionMetadataPieceImporter.run() - remove skip here
+  // if removing the temporary filter in the run() method.
+  it.skip(`fails if marxan execution metadata input folder uri is not contained in uris array`, async () => {
     const resourceKind = ResourceKind.Project;
     await fixtures.GivenMarxanExecutionMetadata();
     const {
@@ -122,7 +124,9 @@ describe(MarxanExecutionMetadataPieceImporter, () => {
       .ThenAMissingInputFolderUriErrorShouldBeThrown();
   });
 
-  it(`fails if marxan execution metadata output folder uri is not contained in uris array`, async () => {
+  // See notes in MarxanExecutionMetadataPieceImporter.run() - remove skip here
+  // if removing the temporary filter in the run() method.
+  it.skip(`fails if marxan execution metadata output folder uri is not contained in uris array`, async () => {
     const resourceKind = ResourceKind.Project;
     await fixtures.GivenMarxanExecutionMetadata();
     const {
