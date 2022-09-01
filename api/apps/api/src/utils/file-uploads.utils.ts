@@ -32,7 +32,7 @@ export const uploadOptions: (fileSize?: number) => MulterOptions = (
      * (10MiB).
      */
     fileSize: (() =>
-      AppConfig.get<number>('fileUploads.limits.fileSize', 10 * 1024 ** 2))(),
+      fileSize ?? AppConfig.get<number>('fileUploads.limits.fileSize', 10 * 1024 ** 2))(),
   },
 });
 
