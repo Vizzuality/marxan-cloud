@@ -168,7 +168,7 @@ export class MarxanExecutionMetadataPieceImporter
               );
             }
 
-            return inputZip && metadata.includesOutputFolder ? outputZip : true;
+            return inputZip && (metadata.includesOutputFolder ? outputZip : true);
           })
           .map((metadata) => {
             const inputZip = buffers[`${metadata.id}-input`];
