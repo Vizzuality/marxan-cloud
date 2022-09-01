@@ -1,8 +1,8 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "marxan"     // var.resource_group_name
-    storage_account_name = "marxan"      // var.storage_account_name
-    container_name       = "marxantfstate" // ${var.project_name}tfstate
+    resource_group_name  = "marxan-rg"     // var.resource_group_name
+    storage_account_name = "marxansa"      // var.storage_account_name
+    container_name       = "marxan-tnctfstate" // ${var.project_name}tfstate
     key                  = "infrastructure.tfstate"
   }
 }
@@ -192,6 +192,21 @@ module "redis_private_endpoint" {
   private_dns_zone_group_ids     = [module.redis_private_dns_zone.dns_zone_id]
   project_tags                   = var.project_tags
 }
+
+module "mail_host_dns_records" {
+  source         = "./modules/mail"
+  resource_group = data.azurerm_resource_group.resource_group
+  dns_zone       = module.dns.dns_zone
+
+  cname_name  = var.sparkpost_dns_cname_name
+  cname_value = var.sparkpost_dns_cname_value
+
+  dkim_name  = var.sparkpost_dns_dkim_name
+  dkim_value = var.sparkpost_dns_dkim_value
+
+  project_tags = var.project_tags
+}
+
 
 ### Database
 module "sql_server_key_vault" {
