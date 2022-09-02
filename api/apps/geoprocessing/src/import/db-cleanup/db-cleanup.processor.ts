@@ -49,8 +49,6 @@ export class DbCleanupProcessor {
       .execute();
 
     await this.geoEntityManager.transaction(async (geoTransactionManager) => {
-      geoTransactionManager.query("set local lock_timeout = '2s'");
-
       await geoTransactionManager.delete(BlmFinalResultEntity, { scenarioId });
 
       const scenarioPuData = await this.scenariosPuDataRepo.find({
@@ -100,8 +98,6 @@ export class DbCleanupProcessor {
       .execute();
 
     await this.geoEntityManager.transaction(async (geoTransactionManager) => {
-      geoTransactionManager.query("set local lock_timeout = '2s'");
-
       await geoTransactionManager.delete(PlanningArea, { projectId });
 
       await geoTransactionManager.delete(ProtectedArea, { projectId });
