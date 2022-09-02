@@ -35,22 +35,8 @@ export class DbCleanupProcessor {
     private readonly geoEntityManager: EntityManager,
     @InjectRepository(ProjectsPuEntity)
     private readonly projectsPuRepo: Repository<ProjectsPuEntity>,
-    @InjectRepository(BlmFinalResultEntity)
-    private readonly blmFinalResultRepo: Repository<BlmFinalResultEntity>,
     @InjectRepository(ScenariosPuPaDataGeo)
     private readonly scenariosPuDataRepo: Repository<ScenariosPuPaDataGeo>,
-    @InjectRepository(OutputScenariosPuDataGeoEntity)
-    private readonly outputScenariosPuDataRepo: Repository<OutputScenariosPuDataGeoEntity>,
-    @InjectRepository(PlanningArea)
-    private readonly planningAreasRepo: Repository<PlanningArea>,
-    @InjectRepository(ProtectedArea)
-    private readonly protectedAreasRepo: Repository<ProtectedArea>,
-    @InjectRepository(GeoFeatureGeometry)
-    private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
-    @InjectRepository(ScenarioFeaturesData)
-    private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
-    @InjectRepository(MarxanExecutionMetadataGeoEntity)
-    private readonly marxanExecutionMetadataRepo: Repository<MarxanExecutionMetadataGeoEntity>,
   ) {}
 
   private async cleanScenarioImport(scenarioId: string) {
