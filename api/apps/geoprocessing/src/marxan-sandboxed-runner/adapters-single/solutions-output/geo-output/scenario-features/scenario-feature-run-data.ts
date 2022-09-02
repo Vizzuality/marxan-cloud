@@ -18,7 +18,7 @@ export class ScenarioFeatureRunData
   totalArea?: number;
 
   @IsUUID()
-  featureScenarioId!: string;
+  scenarioFeaturesId!: string;
 
   @IsInt()
   @IsNumber()

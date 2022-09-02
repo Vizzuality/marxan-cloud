@@ -549,7 +549,7 @@ export async function GivenOutputScenarioFeaturesData(
             totalArea: 1000,
             ...outputScenarioFeaturesData,
             runId: index,
-            featureScenarioId: scenarioFeaturesDataId,
+            scenarioFeaturesId: scenarioFeaturesDataId,
           })),
       ),
     )

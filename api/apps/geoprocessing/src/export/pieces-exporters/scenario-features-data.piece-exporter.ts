@@ -27,7 +27,7 @@ type FeaturesSelectResult = {
 };
 
 type OutputScenarioFeaturesDataSelectResult = OutputFeatureDataElement & {
-  featureScenarioId: string;
+  scenarioFeaturesId: string;
 };
 
 type FeatureDataElementWithFeatureId = Omit<
@@ -137,12 +137,12 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
     scenarioFeaturesDataWithIsCustom.forEach(
       ({ sfdId, apiFeatureId, featureDataFeatureId, ...sfd }) => {
         const outputData = outputScenariosFeaturesData.filter(
-          (el) => el.featureScenarioId === sfdId,
+          (el) => el.scenarioFeaturesId === sfdId,
         );
         featuresData.push({
           ...sfd,
           outputFeaturesData: outputData.map(
-            ({ featureScenarioId, ...rest }) => ({
+            ({ scenarioFeaturesId, ...rest }) => ({
               ...rest,
             }),
           ),
@@ -172,12 +172,12 @@ export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
       .addSelect('osfd.target', 'target')
       .addSelect('osfd.mpm', 'mpm')
       .addSelect('osfd.total_area', 'totalArea')
-      .addSelect('osfd.feature_scenario_id', 'featureScenarioId')
+      .addSelect('osfd.scenario_features_id', 'scenarioFeaturesId')
       .from(ScenarioFeaturesData, 'sfd')
       .innerJoin(
         OutputScenariosFeaturesDataGeoEntity,
         'osfd',
-        'sfd.id = osfd.feature_scenario_id',
+        'sfd.id = osfd.scenario_features_id',
       )
       .where('sfd.scenario_id = :scenarioId', {
         scenarioId: input.resourceId,

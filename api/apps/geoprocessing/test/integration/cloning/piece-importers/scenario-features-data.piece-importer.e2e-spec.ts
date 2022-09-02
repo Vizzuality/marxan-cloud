@@ -334,7 +334,7 @@ const getFixtures = async () => {
           const outputScenarioFeaturesData = await outputScenarioFeaturesDataRepo.find(
             {
               where: {
-                featureScenarioId: In(
+                scenarioFeaturesId: In(
                   scenarioFeaturesData.map((data) => data.id),
                 ),
               },

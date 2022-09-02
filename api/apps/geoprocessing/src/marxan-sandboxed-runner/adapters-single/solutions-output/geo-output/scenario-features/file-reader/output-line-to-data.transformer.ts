@@ -43,14 +43,14 @@ export class OutputLineToDataTransformer extends Transform<
       return;
     }
 
-    const featureScenarioId: string | undefined = mapValue.id;
+    const scenarioFeaturesId: string | undefined = mapValue.id;
     const totalArea = Number(target) * (1 / mapValue.prop ?? 1);
     const data: ScenarioFeatureRunData = plainToClass<
       ScenarioFeatureRunData,
       ScenarioFeatureRunData
     >(ScenarioFeatureRunData, {
       amount: isDefined(amountHeld) ? +amountHeld : undefined,
-      featureScenarioId,
+      scenarioFeaturesId,
       totalArea,
       occurrences: isDefined(occurrencesHeld) ? +occurrencesHeld : undefined,
       mpm: isDefined(mpm) ? +mpm : undefined,

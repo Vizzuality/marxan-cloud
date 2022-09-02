@@ -7,9 +7,9 @@ export class OutputScenariosFeaturesDataGeoEntity {
 
   @Column({
     type: `uuid`,
-    name: `feature_scenario_id`,
+    name: `scenario_features_id`,
   })
-  featureScenarioId!: string;
+  scenarioFeaturesId!: string;
 
   @Column({
     type: `int`,
