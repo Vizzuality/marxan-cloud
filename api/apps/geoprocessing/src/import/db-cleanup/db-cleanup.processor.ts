@@ -1,3 +1,5 @@
+import { BlmFinalResultsRepository } from '@marxan-geoprocessing/marxan-sandboxed-runner/adapters-blm/blm-final-results.repository';
+import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/utils/chunk-size-for-batch-geodb-operations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { BlmFinalResultEntity } from '@marxan/blm-calibration';
 import { ResourceKind } from '@marxan/cloning/domain';
@@ -14,6 +16,7 @@ import { ProtectedArea } from '@marxan/protected-areas';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
+import { chunk } from 'lodash';
 import { EntityManager, In, Repository } from 'typeorm';
 import { geoprocessingConnections } from '../../ormconfig';
 
@@ -28,6 +31,8 @@ export class DbCleanupProcessor {
   constructor(
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
+    @InjectEntityManager(geoprocessingConnections.default)
+    private readonly geoEntityManager: EntityManager,
     @InjectRepository(ProjectsPuEntity)
     private readonly projectsPuRepo: Repository<ProjectsPuEntity>,
     @InjectRepository(BlmFinalResultEntity)
@@ -57,23 +62,27 @@ export class DbCleanupProcessor {
       .where('id = :scenarioId', { scenarioId })
       .execute();
 
-    await this.blmFinalResultRepo.delete({ scenarioId });
+    await this.geoEntityManager.transaction(async (geoTransactionManager) => {
+      geoTransactionManager.query("set local lock_timeout = '2s'");
 
-    const scenarioPuData = await this.scenariosPuDataRepo.find({
-      where: { scenarioId },
+      await geoTransactionManager.delete(BlmFinalResultEntity, { scenarioId });
+
+      const scenarioPuData = await this.scenariosPuDataRepo.find({
+        where: { scenarioId },
+      });
+
+      await geoTransactionManager.delete(OutputScenariosPuDataGeoEntity, {
+        scenarioPuId: In(scenarioPuData.map((pu) => pu.id)),
+      });
+
+      await geoTransactionManager.delete(ScenarioFeaturesData, { scenarioId });
+
+      await geoTransactionManager.delete(ScenariosPuPaDataGeo, { scenarioId });
+
+      await geoTransactionManager.delete(MarxanExecutionMetadataGeoEntity, {
+        scenarioId,
+      });
     });
-
-    await this.outputScenariosPuDataRepo.delete({
-      scenarioPuId: In(scenarioPuData.map((pu) => pu.id)),
-    });
-
-    await this.scenarioFeaturesDataRepo.delete({
-      scenarioId,
-    });
-
-    await this.scenariosPuDataRepo.delete({ scenarioId });
-
-    await this.marxanExecutionMetadataRepo.delete({ scenarioId });
   }
 
   private async cleanProjectImport(projectId: string) {
@@ -104,33 +113,55 @@ export class DbCleanupProcessor {
       .where('id = :projectId', { projectId })
       .execute();
 
-    await this.planningAreasRepo.delete({ projectId });
-    await this.protectedAreasRepo.delete({ projectId });
-    await this.featuresDataRepo.delete({
-      featureId: In(projectCustomFeatures.map((feature) => feature.id)),
+    await this.geoEntityManager.transaction(async (geoTransactionManager) => {
+      geoTransactionManager.query("set local lock_timeout = '2s'");
+
+      await geoTransactionManager.delete(PlanningArea, { projectId });
+
+      await geoTransactionManager.delete(ProtectedArea, { projectId });
+
+      await Promise.all(
+        chunk(
+          projectCustomFeatures.map((feature) => feature.id),
+          CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        ).map((chunkFeatureIds) =>
+          geoTransactionManager.delete(GeoFeatureGeometry, {
+            featureId: In(chunkFeatureIds),
+          }),
+        ),
+      );
+
+      if (projectHasScenarios) {
+        await geoTransactionManager.delete(BlmFinalResultEntity, {
+          scenarioId: In(scenarioIds),
+        });
+
+        const scenariosPuData = await this.scenariosPuDataRepo.find({
+          where: { scenarioId: In(scenarioIds) },
+        });
+
+        await Promise.all(
+          chunk(
+            scenariosPuData.map((pu) => pu.id),
+            CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+          ).map((scenarioPuDataIds) =>
+            geoTransactionManager.delete(OutputScenariosPuDataGeoEntity, {
+              featureId: In(scenarioPuDataIds),
+            }),
+          ),
+        );
+
+        await geoTransactionManager.delete(ScenarioFeaturesData, {
+          scenarioId: In(scenarioIds),
+        });
+
+        await geoTransactionManager.delete(MarxanExecutionMetadataGeoEntity, {
+          scenarioId: In(scenarioIds),
+        });
+      }
+
+      await this.projectsPuRepo.delete({ projectId });
     });
-
-    if (projectHasScenarios) {
-      await this.blmFinalResultRepo.delete({ scenarioId: In(scenarioIds) });
-
-      const scenariosPuData = await this.scenariosPuDataRepo.find({
-        where: { scenarioId: In(scenarioIds) },
-      });
-
-      await this.outputScenariosPuDataRepo.delete({
-        scenarioPuId: In(scenariosPuData.map((pu) => pu.id)),
-      });
-
-      await this.scenarioFeaturesDataRepo.delete({
-        scenarioId: In(scenarioIds),
-      });
-
-      await this.marxanExecutionMetadataRepo.delete({
-        scenarioId: In(scenarioIds),
-      });
-    }
-
-    await this.projectsPuRepo.delete({ projectId });
   }
 
   async run(
