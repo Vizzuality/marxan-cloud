@@ -305,108 +305,119 @@ export class ScenarioFeaturesSpecificationPieceImporter
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { projectId, pieceResourceId: scenarioId, uris, piece } = input;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [scenarioFeaturesSpecificationLocation] = uris;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [scenarioFeaturesSpecificationLocation] = uris;
+      const readableOrError = await this.fileRepository.get(
+        scenarioFeaturesSpecificationLocation.uri,
+      );
 
-    const readableOrError = await this.fileRepository.get(
-      scenarioFeaturesSpecificationLocation.uri,
-    );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioFeaturesSpecificationLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
 
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioFeaturesSpecificationLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+      const buffer = await readableToBuffer(readableOrError.right);
+      const specificationaOrError = buffer.toString();
 
-    const buffer = await readableToBuffer(readableOrError.right);
-    const specificationaOrError = buffer.toString();
+      const specifications: ScenarioFeaturesSpecificationContent[] = JSON.parse(
+        specificationaOrError,
+      );
+      if (!specifications.length)
+        return {
+          importId: input.importId,
+          componentId: input.componentId,
+          pieceResourceId: scenarioId,
+          projectId,
+          piece: input.piece,
+        };
 
-    const specifications: ScenarioFeaturesSpecificationContent[] = JSON.parse(
-      specificationaOrError,
-    );
-    if (!specifications.length)
-      return {
-        importId: input.importId,
-        componentId: input.componentId,
-        pieceResourceId: scenarioId,
+      const scenarioFeaturesData = await this.getScenarioFeaturesData(
+        scenarioId,
+      );
+
+      const scenarioFeaturesDataByFeatureId = this.getScenarioFeaturesDataByFeatureId(
+        scenarioFeaturesData,
+      );
+
+      const {
+        parsedSpecifications,
+        featureIdsBySpecificationId,
+      } = await this.parseFileContent(
+        specifications,
+        scenarioFeaturesDataByFeatureId,
         projectId,
-        piece: input.piece,
-      };
-
-    const scenarioFeaturesData = await this.getScenarioFeaturesData(scenarioId);
-
-    const scenarioFeaturesDataByFeatureId = this.getScenarioFeaturesDataByFeatureId(
-      scenarioFeaturesData,
-    );
-
-    const {
-      parsedSpecifications,
-      featureIdsBySpecificationId,
-    } = await this.parseFileContent(
-      specifications,
-      scenarioFeaturesDataByFeatureId,
-      projectId,
-    );
-
-    await this.apiEntityManager.transaction(async (apiEm) => {
-      const activeSpecification = parsedSpecifications.find(
-        (specification) => specification.activeSpecification,
-      );
-      const candidateSpecification = parsedSpecifications.find(
-        (specification) => specification.candidateSpecification,
       );
 
-      const activeSpecificationId = activeSpecification?.id;
-      const candidateSpecificationId = candidateSpecification?.id;
+      await this.apiEntityManager.transaction(async (apiEm) => {
+        const activeSpecification = parsedSpecifications.find(
+          (specification) => specification.activeSpecification,
+        );
+        const candidateSpecification = parsedSpecifications.find(
+          (specification) => specification.candidateSpecification,
+        );
 
-      await Promise.all(
-        parsedSpecifications.map(({ id, draft, raw }) =>
-          apiEm
-            .createQueryBuilder()
-            .insert()
-            .into('specifications')
-            .values({ id, scenario_id: scenarioId, draft, raw })
-            .execute(),
-        ),
-      );
+        const activeSpecificationId = activeSpecification?.id;
+        const candidateSpecificationId = candidateSpecification?.id;
 
-      await this.insertSpecificationFeaturesConfig(parsedSpecifications, apiEm);
+        await Promise.all(
+          parsedSpecifications.map(({ id, draft, raw }) =>
+            apiEm
+              .createQueryBuilder()
+              .insert()
+              .into('specifications')
+              .values({ id, scenario_id: scenarioId, draft, raw })
+              .execute(),
+          ),
+        );
 
-      await apiEm
-        .createQueryBuilder()
-        .update('scenarios')
-        .set({
-          active_specification_id: activeSpecificationId,
-          candidate_specification_id: candidateSpecificationId,
-        })
-        .where({ id: scenarioId })
-        .execute();
-    });
+        await this.insertSpecificationFeaturesConfig(
+          parsedSpecifications,
+          apiEm,
+        );
 
-    await this.geoprocessingEntityManager.transaction(async (em) => {
-      const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
+        await apiEm
+          .createQueryBuilder()
+          .update('scenarios')
+          .set({
+            active_specification_id: activeSpecificationId,
+            candidate_specification_id: candidateSpecificationId,
+          })
+          .where({ id: scenarioId })
+          .execute();
+      });
 
-      await Promise.all(
-        Object.keys(featureIdsBySpecificationId).flatMap((specificationId) => {
-          const featureIds = featureIdsBySpecificationId[specificationId];
+      await this.geoprocessingEntityManager.transaction(async (em) => {
+        const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
 
-          return chunk(
-            featureIds,
-            CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-          ).map((chunkFeatureIds) =>
-            scenarioFeaturesDataRepo.update(
-              { scenarioId, featureId: In(chunkFeatureIds) },
-              { specificationId },
-            ),
-          );
-        }),
-      );
-    });
+        await Promise.all(
+          Object.keys(featureIdsBySpecificationId).flatMap(
+            (specificationId) => {
+              const featureIds = featureIdsBySpecificationId[specificationId];
+
+              return chunk(
+                featureIds,
+                CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+              ).map((chunkFeatureIds) =>
+                scenarioFeaturesDataRepo.update(
+                  { scenarioId, featureId: In(chunkFeatureIds) },
+                  { specificationId },
+                ),
+              );
+            },
+          ),
+        );
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,
