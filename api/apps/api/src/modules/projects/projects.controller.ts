@@ -1044,7 +1044,9 @@ export class ProjectsController {
    * handle bigger archives, which may came with their own set of additional
    * challenges.
    */
-  @UseInterceptors(FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }))
+  @UseInterceptors(
+    FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }),
+  )
   async importProject(
     @Body() dto: RequestProjectImportBodyDto,
     @UploadedFile() file: Express.Multer.File,
