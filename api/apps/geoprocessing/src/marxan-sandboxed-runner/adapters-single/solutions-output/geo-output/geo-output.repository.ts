@@ -95,7 +95,7 @@ export class GeoOutputRepository {
           `Deleting chunk #${index} (${osfdChunk.length} items)...`,
         );
         await transaction.delete(OutputScenariosFeaturesDataGeoEntity, {
-          featureScenarioId: In(osfdChunk.map((e) => e.featureScenarioId)),
+          scenarioFeaturesId: In(osfdChunk.map((e) => e.scenarioFeaturesId)),
         });
       }
 

@@ -263,7 +263,7 @@ const getFixtures = async () => {
       expect(
         await featuresOutputRepo.count({
           where: {
-            featureScenarioId: In(scenarioFeatures),
+            scenarioFeaturesId: In(scenarioFeatures),
           },
         }),
       ).toEqual(NUMBER_OF_FEATURES_IN_SAMPLE * NUMBER_OF_RUNS);

@@ -6,7 +6,7 @@ exports[`when piece of data has incorrect values should throw 1`] = `
 => [NaN]. An instance of ScenarioFeatureRunData has failed the validation:
  - property totalArea has failed the following constraints: isNumber 
 => [NaN]. An instance of ScenarioFeatureRunData has failed the validation:
- - property featureScenarioId has failed the following constraints: isUuid 
+ - property scenarioFeaturesId has failed the following constraints: isUuid 
 => [invalid-uuid]. An instance of ScenarioFeatureRunData has failed the validation:
  - property occurrences has failed the following constraints: isNumber, isInt 
 => [NaN]. An instance of ScenarioFeatureRunData has failed the validation:

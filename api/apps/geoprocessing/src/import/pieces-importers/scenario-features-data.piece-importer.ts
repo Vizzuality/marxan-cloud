@@ -226,7 +226,7 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
           outputScenariosFeatureData.push(
             ...outputFeaturesData.map((record) => ({
               ...record,
-              featureScenarioId: scenarioFeatureDataId,
+              scenarioFeaturesId: scenarioFeatureDataId,
             })),
           );
 
