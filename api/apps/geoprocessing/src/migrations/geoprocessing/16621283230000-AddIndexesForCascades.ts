@@ -27,13 +27,8 @@ export class AddIndexesForCascades16621283230000 implements MigrationInterface {
       create index output_scenarios_features_data__scenario_features_data__idx on output_scenarios_features_data(scenario_features_id);
     `);
 
-    // and index in the table we are about to reference via a new fk, for
-    // indexed resolution of cascades
-    await queryRunner.query(`
-      create index output_scenarios_pu_data__scenarios_pu_data__idx on output_scenarios_pu_data(scenario_pu_id);
-    `);
-
-    // add missing fk, running some garbage collection first
+    // Run some garbage collection to make sure we can create then create a
+    // fk.
     await queryRunner.query(`
       delete from
         output_scenarios_pu_data
@@ -49,7 +44,10 @@ export class AddIndexesForCascades16621283230000 implements MigrationInterface {
           id
         from
           scenarios_pu_data);
+    `);
 
+    // Add missing fk.
+    await queryRunner.query(`
       alter table
         output_scenarios_pu_data
       add constraint
@@ -58,6 +56,12 @@ export class AddIndexesForCascades16621283230000 implements MigrationInterface {
       references
         scenarios_pu_data(id)
       on update cascade on delete cascade;
+    `);
+
+    // Add index to allow for indexed resolution of cascades on the new fk added
+    // just above.
+    await queryRunner.query(`
+      create index output_scenarios_pu_data__scenarios_pu_data__idx on output_scenarios_pu_data(scenario_pu_id);
     `);
 
     await queryRunner.query(`
