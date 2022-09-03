@@ -91,53 +91,58 @@ export class ScenarioProtectedAreasPieceImporter
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { projectId, pieceResourceId: scenarioId, uris, piece } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [scenarioProtectedAreasLocation] = uris;
+
+      const readableOrError = await this.fileRepository.get(
+        scenarioProtectedAreasLocation.uri,
+      );
+
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioProtectedAreasLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringScenarioProtectedAreasOrError = buffer.toString();
+
+      const {
+        threshold,
+        wdpa,
+        customProtectedAreas,
+      }: ScenarioProtectedAreasContent = JSON.parse(
+        stringScenarioProtectedAreasOrError,
+      );
+      const protectedAreasIds: string[] = [];
+
+      const wdpaProtectedAreasIds = await this.getWdpaProtectedAreasIds(wdpa);
+      const customProtectedAreasIds = await this.getCustomProtectedAreasIds(
+        customProtectedAreas,
+        projectId,
+      );
+
+      protectedAreasIds.push(...wdpaProtectedAreasIds);
+      protectedAreasIds.push(...customProtectedAreasIds);
+
+      await this.apiEntityManager
+        .createQueryBuilder()
+        .update('scenarios')
+        .set({
+          protected_area_filter_by_ids: JSON.stringify(protectedAreasIds),
+          wdpa_threshold: threshold,
+        })
+        .where('id = :scenarioId', { scenarioId })
+        .execute();
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
     }
-    const [scenarioProtectedAreasLocation] = uris;
-
-    const readableOrError = await this.fileRepository.get(
-      scenarioProtectedAreasLocation.uri,
-    );
-
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioProtectedAreasLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringScenarioProtectedAreasOrError = buffer.toString();
-
-    const {
-      threshold,
-      wdpa,
-      customProtectedAreas,
-    }: ScenarioProtectedAreasContent = JSON.parse(
-      stringScenarioProtectedAreasOrError,
-    );
-    const protectedAreasIds: string[] = [];
-
-    const wdpaProtectedAreasIds = await this.getWdpaProtectedAreasIds(wdpa);
-    const customProtectedAreasIds = await this.getCustomProtectedAreasIds(
-      customProtectedAreas,
-      projectId,
-    );
-
-    protectedAreasIds.push(...wdpaProtectedAreasIds);
-    protectedAreasIds.push(...customProtectedAreasIds);
-
-    await this.apiEntityManager
-      .createQueryBuilder()
-      .update('scenarios')
-      .set({
-        protected_area_filter_by_ids: JSON.stringify(protectedAreasIds),
-        wdpa_threshold: threshold,
-      })
-      .where('id = :scenarioId', { scenarioId })
-      .execute();
 
     return {
       importId: input.importId,

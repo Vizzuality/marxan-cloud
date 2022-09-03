@@ -53,67 +53,72 @@ export class ProjectPuvsprCalculationsPieceImporter
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, pieceResourceId, projectId, piece } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [puvsprCalculationsLocation] = uris;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [puvsprCalculationsLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      puvsprCalculationsLocation.uri,
-    );
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${puvsprCalculationsLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringPuvsprCalculationsOrError = buffer.toString();
-
-    const {
-      puvsprCalculations,
-      projectFeaturesGeoOperations,
-    }: ProjectPuvsprCalculationsContent = JSON.parse(
-      stringPuvsprCalculationsOrError,
-    );
-
-    const parsedPuvsprCalculations = await this.parsePuvsprCalculations(
-      puvsprCalculations,
-      projectId,
-    );
-
-    const parsedProjectFeaturesGeoOperations = await this.parseProjectFeaturesGeoOperations(
-      projectFeaturesGeoOperations,
-      projectId,
-    );
-
-    await this.geoEntityManager.transaction(async (em) => {
-      const puvsprRepo = em.getRepository(PuvsprCalculationsEntity);
-      try {
-        await puvsprRepo.save(parsedPuvsprCalculations, {
-          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-        });
-      } catch (e) {
-        this.logger.error(e);
-        throw new Error('error while saving parsed puvspr calculations');
+      const readableOrError = await this.fileRepository.get(
+        puvsprCalculationsLocation.uri,
+      );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${puvsprCalculationsLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
       }
 
-      await this.apiEntityManager.transaction(async (em) => {
-        await Promise.all(
-          parsedProjectFeaturesGeoOperations.map(
-            ({ featureId, geoOperation }) =>
-              em
-                .createQueryBuilder()
-                .update('features')
-                .set({ from_geoprocessing_ops: geoOperation })
-                .where('id = :featureId', { featureId })
-                .execute(),
-          ),
-        );
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringPuvsprCalculationsOrError = buffer.toString();
+
+      const {
+        puvsprCalculations,
+        projectFeaturesGeoOperations,
+      }: ProjectPuvsprCalculationsContent = JSON.parse(
+        stringPuvsprCalculationsOrError,
+      );
+
+      const parsedPuvsprCalculations = await this.parsePuvsprCalculations(
+        puvsprCalculations,
+        projectId,
+      );
+
+      const parsedProjectFeaturesGeoOperations = await this.parseProjectFeaturesGeoOperations(
+        projectFeaturesGeoOperations,
+        projectId,
+      );
+
+      await this.geoEntityManager.transaction(async (em) => {
+        const puvsprRepo = em.getRepository(PuvsprCalculationsEntity);
+        try {
+          await puvsprRepo.save(parsedPuvsprCalculations, {
+            chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+          });
+        } catch (e) {
+          this.logger.error(e);
+          throw new Error('error while saving parsed puvspr calculations');
+        }
+
+        await this.apiEntityManager.transaction(async (em) => {
+          await Promise.all(
+            parsedProjectFeaturesGeoOperations.map(
+              ({ featureId, geoOperation }) =>
+                em
+                  .createQueryBuilder()
+                  .update('features')
+                  .set({ from_geoprocessing_ops: geoOperation })
+                  .where('id = :featureId', { featureId })
+                  .execute(),
+            ),
+          );
+        });
       });
-    });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,

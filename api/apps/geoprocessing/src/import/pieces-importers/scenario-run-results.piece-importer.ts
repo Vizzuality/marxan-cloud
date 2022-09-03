@@ -56,44 +56,50 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, projectId, piece, pieceResourceId: scenarioId } = input;
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [scenarioRunResultsLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      scenarioRunResultsLocation.uri,
-    );
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioRunResultsLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringScenarioProtectedAreasOrError = buffer.toString();
-
-    const {
-      marxanRunResults,
-      blmResults,
-      outputSummaries,
-    }: ScenarioRunResultsContent = JSON.parse(
-      stringScenarioProtectedAreasOrError,
-    );
-
-    await this.geoprocessingEntityManager.transaction(async (em) => {
-      if (marxanRunResults.length)
-        await this.insertMarxanRunResults(scenarioId, marxanRunResults, em);
-
-      if (blmResults.length)
-        await this.insertBlmResults(scenarioId, blmResults, em);
-
-      if (outputSummaries.length) {
-        await this.insertOutputSummaries(scenarioId, outputSummaries);
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
       }
-    });
+      const [scenarioRunResultsLocation] = uris;
+
+      const readableOrError = await this.fileRepository.get(
+        scenarioRunResultsLocation.uri,
+      );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioRunResultsLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringScenarioProtectedAreasOrError = buffer.toString();
+
+      const {
+        marxanRunResults,
+        blmResults,
+        outputSummaries,
+      }: ScenarioRunResultsContent = JSON.parse(
+        stringScenarioProtectedAreasOrError,
+      );
+
+      await this.geoprocessingEntityManager.transaction(async (em) => {
+        if (marxanRunResults.length)
+          await this.insertMarxanRunResults(scenarioId, marxanRunResults, em);
+
+        if (blmResults.length)
+          await this.insertBlmResults(scenarioId, blmResults, em);
+
+        if (outputSummaries.length) {
+          await this.insertOutputSummaries(scenarioId, outputSummaries);
+        }
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,

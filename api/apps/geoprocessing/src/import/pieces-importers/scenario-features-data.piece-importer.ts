@@ -249,70 +249,75 @@ export class ScenarioFeaturesDataPieceImporter implements ImportPieceProcessor {
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { pieceResourceId: scenarioId, projectId, uris, piece } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [scenarioFeaturesDataLocation] = uris;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [scenarioFeaturesDataLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      scenarioFeaturesDataLocation.uri,
-    );
-
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioFeaturesDataLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringScenarioFeaturesDataOrError = buffer.toString();
-
-    const { featuresData }: ScenarioFeaturesDataContent = JSON.parse(
-      stringScenarioFeaturesDataOrError,
-    );
-
-    const customFeaturesName = this.getUniqueFeaturesNames(featuresData, {
-      isCustom: true,
-    });
-    const platformFeaturesName = this.getUniqueFeaturesNames(featuresData, {
-      isCustom: false,
-    });
-
-    const featureIdByClassNameMaps = await this.getFeatureIdByClassNameMaps(
-      projectId,
-      customFeaturesName,
-      platformFeaturesName,
-    );
-
-    const featureDataIdByFeatureIdAndHashMap = await this.getFeatureDataIdByFeatureIdAndHashMap(
-      featuresData,
-      featureIdByClassNameMaps,
-    );
-
-    await this.geoEntityManager.transaction(async (em) => {
-      const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
-      const outputScenariosFeatureDataRepo = em.getRepository(
-        OutputScenariosFeaturesDataGeoEntity,
+      const readableOrError = await this.fileRepository.get(
+        scenarioFeaturesDataLocation.uri,
       );
-      const {
-        scenarioFeaturesData,
-        outputScenariosFeatureData,
-      } = this.getScenarioFeaturesDataInsertValues(
+
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioFeaturesDataLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringScenarioFeaturesDataOrError = buffer.toString();
+
+      const { featuresData }: ScenarioFeaturesDataContent = JSON.parse(
+        stringScenarioFeaturesDataOrError,
+      );
+
+      const customFeaturesName = this.getUniqueFeaturesNames(featuresData, {
+        isCustom: true,
+      });
+      const platformFeaturesName = this.getUniqueFeaturesNames(featuresData, {
+        isCustom: false,
+      });
+
+      const featureIdByClassNameMaps = await this.getFeatureIdByClassNameMaps(
+        projectId,
+        customFeaturesName,
+        platformFeaturesName,
+      );
+
+      const featureDataIdByFeatureIdAndHashMap = await this.getFeatureDataIdByFeatureIdAndHashMap(
         featuresData,
         featureIdByClassNameMaps,
-        featureDataIdByFeatureIdAndHashMap,
-        scenarioId,
       );
 
-      await scenarioFeaturesDataRepo.save(scenarioFeaturesData, {
-        chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      await this.geoEntityManager.transaction(async (em) => {
+        const scenarioFeaturesDataRepo = em.getRepository(ScenarioFeaturesData);
+        const outputScenariosFeatureDataRepo = em.getRepository(
+          OutputScenariosFeaturesDataGeoEntity,
+        );
+        const {
+          scenarioFeaturesData,
+          outputScenariosFeatureData,
+        } = this.getScenarioFeaturesDataInsertValues(
+          featuresData,
+          featureIdByClassNameMaps,
+          featureDataIdByFeatureIdAndHashMap,
+          scenarioId,
+        );
+
+        await scenarioFeaturesDataRepo.save(scenarioFeaturesData, {
+          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        });
+        await outputScenariosFeatureDataRepo.save(outputScenariosFeatureData, {
+          chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        });
       });
-      await outputScenariosFeatureDataRepo.save(outputScenariosFeatureData, {
-        chunk: CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-      });
-    });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,

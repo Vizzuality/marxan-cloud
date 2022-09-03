@@ -91,50 +91,57 @@ export class ScenarioMetadataPieceImporter implements ImportPieceProcessor {
       resourceKind,
     } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [scenarioMetadataLocation] = uris;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [scenarioMetadataLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      scenarioMetadataLocation.uri,
-    );
+      const readableOrError = await this.fileRepository.get(
+        scenarioMetadataLocation.uri,
+      );
 
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioMetadataLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const specificationaOrError = buffer.toString();
-
-    const metadata: ScenarioMetadataContent = JSON.parse(specificationaOrError);
-
-    const scenarioCloning = resourceKind === ResourceKind.Scenario;
-
-    await this.entityManager.transaction(async (em) => {
-      if (scenarioCloning) {
-        await this.updateScenario(em, scenarioId, metadata, input.ownerId);
-      } else {
-        await this.createScenario(
-          em,
-          scenarioId,
-          projectId,
-          metadata,
-          input.ownerId,
-        );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioMetadataLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
       }
 
-      await em
-        .createQueryBuilder()
-        .insert()
-        .into('scenario_blms')
-        .values({ id: scenarioId, ...metadata.blmRange })
-        .execute();
-    });
+      const buffer = await readableToBuffer(readableOrError.right);
+      const specificationaOrError = buffer.toString();
+
+      const metadata: ScenarioMetadataContent = JSON.parse(
+        specificationaOrError,
+      );
+
+      const scenarioCloning = resourceKind === ResourceKind.Scenario;
+
+      await this.entityManager.transaction(async (em) => {
+        if (scenarioCloning) {
+          await this.updateScenario(em, scenarioId, metadata, input.ownerId);
+        } else {
+          await this.createScenario(
+            em,
+            scenarioId,
+            projectId,
+            metadata,
+            input.ownerId,
+          );
+        }
+
+        await em
+          .createQueryBuilder()
+          .insert()
+          .into('scenario_blms')
+          .values({ id: scenarioId, ...metadata.blmRange })
+          .execute();
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,

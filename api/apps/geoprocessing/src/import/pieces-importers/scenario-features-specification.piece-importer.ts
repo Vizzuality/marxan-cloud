@@ -305,6 +305,7 @@ export class ScenarioFeaturesSpecificationPieceImporter
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { projectId, pieceResourceId: scenarioId, uris, piece } = input;
+
     try {
       if (uris.length !== 1) {
         const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;

@@ -41,30 +41,36 @@ export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
 
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, pieceResourceId, projectId, piece } = input;
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [planningAreaCustomGridLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      planningAreaCustomGridLocation.uri,
-    );
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaCustomGridLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [planningAreaCustomGridLocation] = uris;
 
-    await this.geoprocessingEntityManager.transaction(
-      (transactionalEntityManager) =>
-        this.processGridFile(
-          readableOrError.right,
-          projectId,
-          transactionalEntityManager,
-        ),
-    );
+      const readableOrError = await this.fileRepository.get(
+        planningAreaCustomGridLocation.uri,
+      );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaCustomGridLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      await this.geoprocessingEntityManager.transaction(
+        (transactionalEntityManager) =>
+          this.processGridFile(
+            readableOrError.right,
+            projectId,
+            transactionalEntityManager,
+          ),
+      );
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,
