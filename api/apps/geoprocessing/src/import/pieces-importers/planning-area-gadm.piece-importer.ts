@@ -34,41 +34,46 @@ export class PlanningAreaGadmPieceImporter implements ImportPieceProcessor {
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, pieceResourceId, projectId, piece } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [planningAreaGadmLocation] = uris;
+
+      const readableOrError = await this.fileRepository.get(
+        planningAreaGadmLocation.uri,
+      );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaGadmLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringPlanningAreaGadmOrError = buffer.toString();
+
+      const planningAreaGadm: PlanningAreaGadmContent = JSON.parse(
+        stringPlanningAreaGadmOrError,
+      );
+
+      await this.entityManager
+        .createQueryBuilder()
+        .update(`projects`)
+        .set({
+          country_id: planningAreaGadm.country,
+          admin_area_l1_id: planningAreaGadm.l1,
+          admin_area_l2_id: planningAreaGadm.l2,
+          planning_unit_area_km2: planningAreaGadm.planningUnitAreakm2,
+          bbox: JSON.stringify(planningAreaGadm.bbox),
+        })
+        .where('id = :projectId', { projectId })
+        .execute();
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
     }
-    const [planningAreaGadmLocation] = uris;
-
-    const readableOrError = await this.fileRepository.get(
-      planningAreaGadmLocation.uri,
-    );
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${planningAreaGadmLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringPlanningAreaGadmOrError = buffer.toString();
-
-    const planningAreaGadm: PlanningAreaGadmContent = JSON.parse(
-      stringPlanningAreaGadmOrError,
-    );
-
-    await this.entityManager
-      .createQueryBuilder()
-      .update(`projects`)
-      .set({
-        country_id: planningAreaGadm.country,
-        admin_area_l1_id: planningAreaGadm.l1,
-        admin_area_l2_id: planningAreaGadm.l2,
-        planning_unit_area_km2: planningAreaGadm.planningUnitAreakm2,
-        bbox: JSON.stringify(planningAreaGadm.bbox),
-      })
-      .where('id = :projectId', { projectId })
-      .execute();
 
     return {
       importId: input.importId,

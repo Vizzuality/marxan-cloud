@@ -41,74 +41,81 @@ export class ScenarioPlanningUnitsDataPieceImporter
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { projectId, pieceResourceId: scenarioId, uris, piece } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [scenarioPlanningUnitsDataLocation] = uris;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [scenarioPlanningUnitsDataLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      scenarioPlanningUnitsDataLocation.uri,
-    );
-
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioPlanningUnitsDataLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringScenarioPlanningUnitsDataOrError = buffer.toString();
-
-    const { planningUnitsData }: ScenarioPlanningUnitsDataContent = JSON.parse(
-      stringScenarioPlanningUnitsDataOrError,
-    );
-    const projectPuIdByPuid: Record<number, string> = {};
-
-    await this.entityManager.transaction(async (em) => {
-      const projectsPuRepo = em.getRepository(ProjectsPuEntity);
-      const projectPus = await projectsPuRepo.find({
-        select: ['id', 'puid'],
-        where: { projectId },
-      });
-      projectPus.forEach((pu) => {
-        projectPuIdByPuid[pu.puid] = pu.id;
-      });
-
-      await Promise.all(
-        chunk(planningUnitsData, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
-          async (pusData) => {
-            const scenarioPuIdByPuid: Record<number, string> = {};
-
-            await em.getRepository(ScenariosPuPaDataGeo).save(
-              pusData.map((puData) => {
-                const id = v4();
-                scenarioPuIdByPuid[puData.puid] = id;
-                return {
-                  id,
-                  featureList: puData.featureList,
-                  projectPuId: projectPuIdByPuid[puData.puid],
-                  lockStatus: toLockEnum[puData.lockinStatus ?? 0],
-                  protectedArea: puData.protectedArea,
-                  protectedByDefault: puData.protectedByDefault,
-                  xloc: puData.xloc,
-                  yloc: puData.yloc,
-                  scenarioId,
-                };
-              }),
-            );
-
-            await em.getRepository(ScenariosPuCostDataGeo).save(
-              pusData.map((puData) => ({
-                cost: puData.cost,
-                scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
-              })),
-            );
-          },
-        ),
+      const readableOrError = await this.fileRepository.get(
+        scenarioPlanningUnitsDataLocation.uri,
       );
-    });
+
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${scenarioId} is not available at ${scenarioPlanningUnitsDataLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringScenarioPlanningUnitsDataOrError = buffer.toString();
+
+      const {
+        planningUnitsData,
+      }: ScenarioPlanningUnitsDataContent = JSON.parse(
+        stringScenarioPlanningUnitsDataOrError,
+      );
+      const projectPuIdByPuid: Record<number, string> = {};
+
+      await this.entityManager.transaction(async (em) => {
+        const projectsPuRepo = em.getRepository(ProjectsPuEntity);
+        const projectPus = await projectsPuRepo.find({
+          select: ['id', 'puid'],
+          where: { projectId },
+        });
+        projectPus.forEach((pu) => {
+          projectPuIdByPuid[pu.puid] = pu.id;
+        });
+
+        await Promise.all(
+          chunk(planningUnitsData, CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS).map(
+            async (pusData) => {
+              const scenarioPuIdByPuid: Record<number, string> = {};
+
+              await em.getRepository(ScenariosPuPaDataGeo).save(
+                pusData.map((puData) => {
+                  const id = v4();
+                  scenarioPuIdByPuid[puData.puid] = id;
+                  return {
+                    id,
+                    featureList: puData.featureList,
+                    projectPuId: projectPuIdByPuid[puData.puid],
+                    lockStatus: toLockEnum[puData.lockinStatus ?? 0],
+                    protectedArea: puData.protectedArea,
+                    protectedByDefault: puData.protectedByDefault,
+                    xloc: puData.xloc,
+                    yloc: puData.yloc,
+                    scenarioId,
+                  };
+                }),
+              );
+
+              await em.getRepository(ScenariosPuCostDataGeo).save(
+                pusData.map((puData) => ({
+                  cost: puData.cost,
+                  scenariosPuDataId: scenarioPuIdByPuid[puData.puid],
+                })),
+              );
+            },
+          ),
+        );
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,

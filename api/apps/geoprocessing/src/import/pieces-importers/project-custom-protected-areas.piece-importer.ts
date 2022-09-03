@@ -37,41 +37,47 @@ export class ProjectCustomProtectedAreasPieceImporter
   async run(input: ImportJobInput): Promise<ImportJobOutput> {
     const { uris, pieceResourceId, projectId, piece } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [customProjectProtectedAreasLocation] = uris;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [customProjectProtectedAreasLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      customProjectProtectedAreasLocation.uri,
-    );
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${customProjectProtectedAreasLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
+      const readableOrError = await this.fileRepository.get(
+        customProjectProtectedAreasLocation.uri,
+      );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${customProjectProtectedAreasLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
 
-    const buffer = await readableToBuffer(readableOrError.right);
-    const customProjectProtectedAreasrError = buffer.toString();
+      const buffer = await readableToBuffer(readableOrError.right);
+      const customProjectProtectedAreasrError = buffer.toString();
 
-    const customProjectProtectedAreas: ProjectCustomProtectedAreasContent[] = JSON.parse(
-      customProjectProtectedAreasrError,
-    );
+      const customProjectProtectedAreas: ProjectCustomProtectedAreasContent[] = JSON.parse(
+        customProjectProtectedAreasrError,
+      );
 
-    if (customProjectProtectedAreas.length) {
-      await this.geoprocessingEntityManager.transaction(async (em) => {
-        const insertValues = customProjectProtectedAreas.map((protectedArea) =>
-          this.parseCustomProjectProtectedAreas(protectedArea, projectId),
-        );
-        await em
-          .createQueryBuilder()
-          .insert()
-          .into(ProtectedArea)
-          .values(insertValues)
-          .execute();
-      });
+      if (customProjectProtectedAreas.length) {
+        await this.geoprocessingEntityManager.transaction(async (em) => {
+          const insertValues = customProjectProtectedAreas.map(
+            (protectedArea) =>
+              this.parseCustomProjectProtectedAreas(protectedArea, projectId),
+          );
+          await em
+            .createQueryBuilder()
+            .insert()
+            .into(ProtectedArea)
+            .values(insertValues)
+            .execute();
+        });
+      }
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
     }
 
     return {

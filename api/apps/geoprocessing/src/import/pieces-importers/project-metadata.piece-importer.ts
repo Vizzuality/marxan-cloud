@@ -122,60 +122,65 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
       resourceName,
     } = input;
 
-    if (uris.length !== 1) {
-      const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    const [projectMetadataLocation] = uris;
+    try {
+      if (uris.length !== 1) {
+        const errorMessage = `uris array has an unexpected amount of elements: ${uris.length}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      const [projectMetadataLocation] = uris;
 
-    const readableOrError = await this.fileRepository.get(
-      projectMetadataLocation.uri,
-    );
-    if (isLeft(readableOrError)) {
-      const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${projectMetadataLocation.uri}`;
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const buffer = await readableToBuffer(readableOrError.right);
-    const stringProjectMetadataOrError = buffer.toString();
-
-    // TODO As we don't handle organizations for the time being,
-    // the imported/cloned project is homed arbitrarily within an
-    // existing organization. Once proper handling of organizations
-    // is added, users may be able to specify within which organization
-    // an imported/cloned project should be created.
-    const organizationId = await this.getRandomOrganizationId();
-    const projectMetadata: ProjectMetadataContent = JSON.parse(
-      stringProjectMetadataOrError,
-    );
-
-    await this.entityManager.transaction(async (em) => {
-      const projectAlreadyCreated = await this.checkIfProjectExists(
-        em,
-        projectId,
+      const readableOrError = await this.fileRepository.get(
+        projectMetadataLocation.uri,
       );
-      if (projectAlreadyCreated) {
-        await this.updateProject(em, projectId, projectMetadata, ownerId);
-      } else {
-        await this.createProject(
-          em,
-          projectId,
-          organizationId,
-          projectMetadata,
-          ownerId,
-          resourceName,
-        );
+      if (isLeft(readableOrError)) {
+        const errorMessage = `File with piece data for ${piece}/${pieceResourceId} is not available at ${projectMetadataLocation.uri}`;
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
       }
 
-      await em
-        .createQueryBuilder()
-        .insert()
-        .into('project_blms')
-        .values({ id: projectId, ...projectMetadata.blmRange })
-        .execute();
-    });
+      const buffer = await readableToBuffer(readableOrError.right);
+      const stringProjectMetadataOrError = buffer.toString();
+
+      // TODO As we don't handle organizations for the time being,
+      // the imported/cloned project is homed arbitrarily within an
+      // existing organization. Once proper handling of organizations
+      // is added, users may be able to specify within which organization
+      // an imported/cloned project should be created.
+      const organizationId = await this.getRandomOrganizationId();
+      const projectMetadata: ProjectMetadataContent = JSON.parse(
+        stringProjectMetadataOrError,
+      );
+
+      await this.entityManager.transaction(async (em) => {
+        const projectAlreadyCreated = await this.checkIfProjectExists(
+          em,
+          projectId,
+        );
+        if (projectAlreadyCreated) {
+          await this.updateProject(em, projectId, projectMetadata, ownerId);
+        } else {
+          await this.createProject(
+            em,
+            projectId,
+            organizationId,
+            projectMetadata,
+            ownerId,
+            resourceName,
+          );
+        }
+
+        await em
+          .createQueryBuilder()
+          .insert()
+          .into('project_blms')
+          .values({ id: projectId, ...projectMetadata.blmRange })
+          .execute();
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw e;
+    }
 
     return {
       importId: input.importId,
