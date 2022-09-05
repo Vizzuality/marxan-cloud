@@ -246,11 +246,11 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
   private async waitUntilSpecificationEnds(
     scenarioId: string,
-    retries = 20,
+    retries = 240,
   ): Promise<Either<string, true>> {
     const timeout = left('specification timeout');
     const failure = left('specification failed');
-    const intervalSeconds = 3;
+    const intervalSeconds = 30;
     let triesLeft = retries;
 
     return new Promise<Either<string, true>>((resolve) => {
