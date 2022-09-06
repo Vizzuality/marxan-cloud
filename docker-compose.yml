@@ -6,6 +6,7 @@ services:
       dockerfile: api.Dockerfile
     ports:
       - "${API_SERVICE_PORT}:3000"
+      - "127.0.0.1:${API_DEBUG_INSPECT_PORT:-9230}:9229"
     container_name: marxan-api
     command: develop
     volumes:
@@ -57,6 +58,7 @@ services:
       dockerfile: geo.Dockerfile
     ports:
       - "${GEOPROCESSING_SERVICE_PORT}:3000"
+      - "127.0.0.1:${GEOPROCESSING_DEBUG_INSPECT_PORT:-9240}:9229"
     container_name: marxan-geoprocessing
     command: develop
     volumes:
