@@ -47,6 +47,8 @@ type ApiEventSelectResult = {
 
 type FeatureIdByIntegerId = Record<number, string>;
 
+export const retriesIntervalForSpecificationStatusInSeconds = 30;
+
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesSpecificationLegacyProjectPieceImporter
@@ -250,7 +252,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
   ): Promise<Either<string, true>> {
     const timeout = left('specification timeout');
     const failure = left('specification failed');
-    const intervalSeconds = 30;
+    const intervalSeconds = retriesIntervalForSpecificationStatusInSeconds;
     let triesLeft = retries;
 
     return new Promise<Either<string, true>>((resolve) => {
