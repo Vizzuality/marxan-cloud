@@ -29,6 +29,7 @@ services:
       - GEO_POSTGRES_DB
       - REDIS_HOST=marxan-redis
       - NODE_CONFIG_DIR=apps/api/config
+      - ENABLE_DEBUG_MODE=${ENABLE_DEBUG_MODE:-false}
     depends_on:
       - postgresql-api
       - postgresql-geo-api
@@ -79,6 +80,7 @@ services:
       - GEO_POSTGRES_DB
       - REDIS_HOST=marxan-redis
       - NODE_CONFIG_DIR=apps/geoprocessing/config
+      - ENABLE_DEBUG_MODE=${ENABLE_DEBUG_MODE:-false}
     depends_on:
       - postgresql-geo-api
       - postgresql-api
