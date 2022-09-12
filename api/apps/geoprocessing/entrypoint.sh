@@ -5,10 +5,10 @@ case "$1" in
     develop)
         if [ $ENABLE_DEBUG_MODE = "true" ]; then
             echo "Running Development Server with inspector"
-            exec yarn api:start:debug
+            exec yarn geoprocessing:start:debug
         else
             echo "Running Development Server"
-            exec yarn api:start:dev
+            exec yarn geoprocessing:start:dev
         fi
         ;;
     test-unit)
