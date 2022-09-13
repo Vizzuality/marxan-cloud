@@ -229,7 +229,7 @@ describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
       .ThenASpecificationDidntFinishErrorShouldBeThrown();
   }, timeoutForTestsThatNeedToCheckSpecificationJobStatus);
 
-  it(`fails when specification async job timeouts`, async () => {
+  it(`fails when specification async job times out`, async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
     const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
@@ -248,8 +248,8 @@ describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
     fixtures.GivenValidPuvsprDatFile();
 
     await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .AndSpecificationProcessTimeouts()
+      .WhenPieceImporterIsInvoked(job, 2)
+      .AndSpecificationProcessTimesOut()
       .ThenASpecificationDidntFinishErrorShouldBeThrown();
   }, timeoutForTestsThatNeedToCheckSpecificationJobStatus * 2);
 
@@ -685,7 +685,7 @@ const getFixtures = async () => {
         }),
       );
     },
-    WhenPieceImporterIsInvoked: (input: LegacyProjectImportJobInput) => {
+    WhenPieceImporterIsInvoked: (input: LegacyProjectImportJobInput, retries?: number) => {
       return {
         ThenADatFileNotFoundErrorShouldBeThrown: async (
           file: LegacyProjectImportFileType,
@@ -732,10 +732,10 @@ const getFixtures = async () => {
             },
           };
         },
-        AndSpecificationProcessTimeouts: () => {
+        AndSpecificationProcessTimesOut: () => {
           return {
             ThenASpecificationDidntFinishErrorShouldBeThrown: async () => {
-              await expect(sut.run(input)).rejects.toThrow(
+              await expect(sut.run(input, retries)).rejects.toThrow(
                 /specification didn't finish: specification timeout/gi,
               );
             },
