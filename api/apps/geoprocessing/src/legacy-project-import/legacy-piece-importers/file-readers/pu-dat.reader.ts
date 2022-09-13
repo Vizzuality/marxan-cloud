@@ -5,15 +5,35 @@ import { DatFileReader, ValidationCheck } from './dat-file.reader';
 type ReadRow = {
   id?: string;
   cost?: string;
-  status?: '0' | '1' | '2';
+  status?: '0' | '1' | '2' | '3';
   xloc?: string;
   yloc?: string;
 };
 
+enum MarxanPuLockStatus {
+  Unstated = 0,
+  InSeed = 1,
+  LockedIn = 2,
+  LockedOut = 3,
+}
+
+const marxanToInternalPuLockStatus = {
+  0: 0,
+  1: 0,
+  2: 1,
+  3: 2,
+};
+
+enum InternalPuLockStatus {
+  Unstated = 0,
+  LockedIn = 1,
+  LockedOut = 2,
+}
+
 export type PuDatRow = {
   id: number;
   cost?: number;
-  status?: 0 | 1 | 2;
+  status?: InternalPuLockStatus;
   xloc?: number;
   yloc?: number;
 };
@@ -47,7 +67,7 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
         errorMessage: 'Negative cost',
       },
       {
-        result: status !== undefined && ![0, 1, 2].includes(status),
+        result: status !== undefined && ![0, 1, 2, 3].includes(status),
         errorMessage: `Invalid status value: ${status}`,
       },
       {
@@ -81,9 +101,13 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
     return {
       id: parseInt(id),
       cost: cost ? parseFloat(cost) : undefined,
-      status: status ? (parseInt(status) as 0 | 1 | 2) : undefined,
+      status: status ? (this.mapMarxanToInternalStatus(parseInt(status)) as InternalPuLockStatus) : undefined,
       xloc: xloc ? parseFloat(xloc) : undefined,
       yloc: yloc ? parseFloat(yloc) : undefined,
     };
+  }
+
+  mapMarxanToInternalStatus(status: MarxanPuLockStatus): InternalPuLockStatus {
+    return marxanToInternalPuLockStatus[status];
   }
 }
