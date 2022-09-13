@@ -291,6 +291,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     specRows: PropSpecDatRow[],
     projectId: string,
     scenarioId: string,
+    retries?: number,
   ): Promise<void> {
     const featureIdByIntegerId = await this.getFeatureIdByIntegerIdMap(
       projectId,
@@ -330,6 +331,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
     const specificationResult = await this.waitUntilSpecificationEnds(
       scenarioId,
+      retries
     );
     if (isLeft(specificationResult)) {
       this.logAndThrow(
@@ -395,6 +397,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
   async run(
     input: LegacyProjectImportJobInput,
+    retries?: number,
   ): Promise<LegacyProjectImportJobOutput> {
     const { files, projectId, scenarioId } = input;
 
@@ -415,7 +418,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     }
 
     const specRows = this.getPropSpecRows(specRowsOrError, puvsprRowsOrError);
-    await this.runSpecification(specRows, projectId, scenarioId);
+    await this.runSpecification(specRows, projectId, scenarioId, retries);
     await this.updateScenarioFeaturesData(specRows, scenarioId);
 
     return input;
