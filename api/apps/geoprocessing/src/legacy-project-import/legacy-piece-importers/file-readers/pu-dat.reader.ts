@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Either, left, right } from 'fp-ts/lib/Either';
+import { isNil } from 'lodash';
 import { DatFileReader, ValidationCheck } from './dat-file.reader';
 
 type ReadRow = {
@@ -101,13 +102,22 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
     return {
       id: parseInt(id),
       cost: cost ? parseFloat(cost) : undefined,
-      status: status ? (this.mapMarxanToInternalStatus(parseInt(status)) as InternalPuLockStatus) : undefined,
+      status: !isNil(status) ? (this.mapMarxanToInternalStatus(parseInt(status)) as InternalPuLockStatus) : undefined,
       xloc: xloc ? parseFloat(xloc) : undefined,
       yloc: yloc ? parseFloat(yloc) : undefined,
     };
   }
 
-  mapMarxanToInternalStatus(status: MarxanPuLockStatus): InternalPuLockStatus {
-    return marxanToInternalPuLockStatus[status];
+  mapMarxanToInternalStatus(status: MarxanPuLockStatus): InternalPuLockStatus | undefined {
+    // Don't attempt to look up value mappings if value is undefined: we need
+    // to pass it through as is.
+    if(isNil(status)) {
+      return;
+    }
+
+    if(!isNil(marxanToInternalPuLockStatus[status])) {
+      return marxanToInternalPuLockStatus[status];
+    }
+    throw new Error(`Invalid status value: ${status}.`);
   }
 }
