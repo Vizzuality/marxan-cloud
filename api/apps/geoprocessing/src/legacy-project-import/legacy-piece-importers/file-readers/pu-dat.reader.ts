@@ -108,6 +108,18 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
     };
   }
 
+  /**
+   * Throwing an error when input status codes are unknown to the mapping we use
+   * equates to kind of _validating_ input, so in practice once values reach the
+   * relevant validation rule in the validateData() method above we will always
+   * have valid status codes. However, as noted in DatFileReader.readFile(),
+   * fast-csv always performs transformation first and validation next, so we
+   * have no easy option other than validating while transforming here, since we
+   * also need to pass through undefined input (source column may be empty), so
+   * we need to signal failed mappings explicitly as we can't "just" use
+   * undefined for this (which may arguably be an ok choice in a different
+   * context when a map lookup leads to no results).
+   */
   mapMarxanToInternalStatus(status: MarxanPuLockStatus): InternalPuLockStatus | undefined {
     // Don't attempt to look up value mappings if value is undefined: we need
     // to pass it through as is.
