@@ -115,7 +115,7 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
             <div className="pb-5">
               <h2 className="mb-5 text-lg font-medium text-center text-gray-600 font-heading">Check your email</h2>
               <Icon icon={CHECK_EMAIL_SVG} className="w-16 h-16 mx-auto mb-5 text-gray-500" />
-              <p className="mx-auto text-sm text-center text-gray-400" style={{ maxWidth: 300 }}>We have sent a password recover instructions to your email...</p>
+              <p className="mx-auto text-sm text-center text-gray-400" style={{ maxWidth: 300 }}>We have sent password recovery instructions to your email...</p>
             </div>
             <div className="pt-5">
               <p className="mx-auto mb-5 text-sm text-center text-gray-400" style={{ maxWidth: 300 }}>
