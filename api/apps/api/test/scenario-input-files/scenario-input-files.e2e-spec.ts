@@ -33,7 +33,7 @@ describe(`when getting input.zip`, () => {
 });
 
 describe(`when getting spec.dat`, () => {
-  const snapshotToMatch = `"id	target	prop	spf	target2	targetocc	sepnum	sepdistance"`;
+  const snapshotToMatch = `"id	target	prop	spf	target2	targetocc	name	sepnum	sepdistance"`;
 
   it(`as owner, should resolve text/*`, async () => {
     expect(
