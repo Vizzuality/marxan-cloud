@@ -20,6 +20,7 @@ export class SpecDataTsvFile {
   #optionalColumns = new Set<OptionalKeys<SpecDataEntry>>([
     'target2',
     'targetocc',
+    'name',
     'sepnum',
     'sepdistance',
   ]);
@@ -35,6 +36,7 @@ export class SpecDataTsvFile {
       | 'fpf'
       | 'target2'
       | 'targetocc'
+      | 'name'
       | 'sepNum'
       | 'metadata'
     >,
@@ -52,6 +54,7 @@ export class SpecDataTsvFile {
       spf: data.fpf?.toFixed(2),
       target2: data.target2?.toFixed(2),
       targetocc: data.targetocc?.toFixed(2),
+      name: data.name?.toString(),
       sepnum: data.sepNum?.toFixed(2),
       sepdistance: sepdistance,
     };
