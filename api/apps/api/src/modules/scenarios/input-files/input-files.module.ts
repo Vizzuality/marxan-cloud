@@ -20,10 +20,11 @@ import { InputParameterFileProvider } from './input-params/input-parameter-file.
 import { InputFilesArchiverService } from './input-files-archiver.service';
 import { PuvsprDatProcessorModule } from './puvspr.dat.processor/puvspr.dat.processor.module';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { apiConnections } from '@marxan-api/ormconfig';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Project, Scenario]),
+    TypeOrmModule.forFeature([Project, Scenario], apiConnections.default),
     TypeOrmModule.forFeature(
       [
         PlanningUnitsGeom,

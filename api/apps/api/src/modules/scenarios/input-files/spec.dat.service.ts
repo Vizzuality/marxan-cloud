@@ -6,7 +6,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { SpecDataTsvFile } from './spec-dat-tsv-file';
 import { apiConnections } from '@marxan-api/ormconfig';
 
-type ScenarioFeaturesDataForSpecDat = Pick<
+export type ScenarioFeaturesDataForSpecDat = Pick<
   ScenarioFeaturesData,
   | 'featureId'
   | 'target'
@@ -87,24 +87,28 @@ export class SpecDatService {
   async extendSpecDatContentWithFeatureNames(
     rows: ScenarioFeaturesDataForSpecDat[],
   ): Promise<ScenarioFeaturesDataForSpecDat[]> {
-    const scenarioFeatureNames: {
-      id: string;
-      featureClassName: string;
-    }[] = await this.apiEntityManager
-      .createQueryBuilder()
-      .select('id, feature_class_name as "featureClassName"')
-      .from('features', 'f')
-      .where('f.id in (:...featureIds)', {
-        featureIds: rows.map((row) => row.apiFeatureId),
-      })
-      .execute();
+    if (rows.length) {
+      const scenarioFeatureNames: {
+        id: string;
+        featureClassName: string;
+      }[] = await this.apiEntityManager
+        .createQueryBuilder()
+        .select('id, feature_class_name as "featureClassName"')
+        .from('features', 'f')
+        .where('f.id in (:...featureIds)', {
+          featureIds: rows.map((row) => row.apiFeatureId),
+        })
+        .execute();
 
-    const rowsWithFeatureNames = rows.map((row) => ({
-      name: scenarioFeatureNames.find((sfn) => sfn.id === row.apiFeatureId)
-        ?.featureClassName,
-      ...row,
-    }));
+      const rowsWithFeatureNames = rows.map((row) => ({
+        name: scenarioFeatureNames.find((sfn) => sfn.id === row.apiFeatureId)
+          ?.featureClassName,
+        ...row,
+      }));
 
-    return rowsWithFeatureNames;
+      return rowsWithFeatureNames;
+    } else {
+      return rows;
+    }
   }
 }
