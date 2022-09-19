@@ -278,29 +278,17 @@ export const UploadFiles: React.FC<UploadFilesProps> = ({
                   </div>
                 )}
 
-                <div className="relative space-y-5">
+                <div className="space-y-5">
 
                   {LEGACY_FIELDS.map((f) => {
                     return (
-                      <>
-                        {f.fileType === 'output' && (
-                          <InfoButton
-                            size="s"
-                            theme="secondary"
-                            className="absolute right-4"
-                          >
-                            <p className="text-xs">{f.info}</p>
-                          </InfoButton>
+                      <FieldRFF key={f.label} name={`${f.fileType}`}>
+                        {(fprops) => (
+                          <Field id={`${f.fileType}`} {...fprops}>
+                            <UploadItem f={f} {...fprops} />
+                          </Field>
                         )}
-                        <FieldRFF key={f.label} name={`${f.fileType}`}>
-                          {(fprops) => (
-                            <Field id={`${f.fileType}`} {...fprops}>
-                              <UploadItem f={f} {...fprops} />
-                            </Field>
-                          )}
-                        </FieldRFF>
-
-                      </>
+                      </FieldRFF>
                     );
                   })}
                 </div>
