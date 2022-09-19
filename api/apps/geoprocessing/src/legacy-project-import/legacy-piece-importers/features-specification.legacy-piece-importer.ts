@@ -331,7 +331,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
     const specificationResult = await this.waitUntilSpecificationEnds(
       scenarioId,
-      retries
+      retries,
     );
     if (isLeft(specificationResult)) {
       this.logAndThrow(

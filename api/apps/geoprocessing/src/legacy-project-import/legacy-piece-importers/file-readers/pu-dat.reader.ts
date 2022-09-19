@@ -102,7 +102,11 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
     return {
       id: parseInt(id),
       cost: cost ? parseFloat(cost) : undefined,
-      status: !isNil(status) ? (this.mapMarxanToInternalStatus(parseInt(status)) as InternalPuLockStatus) : undefined,
+      status: !isNil(status)
+        ? (this.mapMarxanToInternalStatus(
+            parseInt(status),
+          ) as InternalPuLockStatus)
+        : undefined,
       xloc: xloc ? parseFloat(xloc) : undefined,
       yloc: yloc ? parseFloat(yloc) : undefined,
     };
@@ -120,14 +124,16 @@ export class PuDatReader extends DatFileReader<ReadRow, PuDatRow> {
    * undefined for this (which may arguably be an ok choice in a different
    * context when a map lookup leads to no results).
    */
-  mapMarxanToInternalStatus(status: MarxanPuLockStatus): InternalPuLockStatus | undefined {
+  mapMarxanToInternalStatus(
+    status: MarxanPuLockStatus,
+  ): InternalPuLockStatus | undefined {
     // Don't attempt to look up value mappings if value is undefined: we need
     // to pass it through as is.
-    if(isNil(status)) {
+    if (isNil(status)) {
       return;
     }
 
-    if(!isNil(marxanToInternalPuLockStatus[status])) {
+    if (!isNil(marxanToInternalPuLockStatus[status])) {
       return marxanToInternalPuLockStatus[status];
     }
     throw new Error(`Invalid status value: ${status}.`);
