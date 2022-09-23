@@ -39,7 +39,7 @@ export class TypeormCostSurface implements CostSurfacePersistencePort {
     await this.entityManager.query(
       `
         INSERT INTO scenarios_pu_cost_data (scenarios_pu_data_id, cost)
-        SELECT spd.id, round(pug.area) / 1000000 as area
+        SELECT spd.id, round(pug.area / 1000000) as area
         FROM scenarios_pu_data spd
           INNER JOIN projects_pu ppu ON ppu.id = spd.project_pu_id
           INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
