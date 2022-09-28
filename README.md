@@ -332,7 +332,7 @@ This step is only needed when developing Python notebooks for Marxan.
 
 Run `make notebooks` to start the jupyterlab service.
 
-## Development workflow (TBD)
+## Development workflow
 
 We use a lightweight git flow workflow. `develop`, `main`, feature/bug fix
 branches, release branches (`release/vX.Y.Z-etc`).
