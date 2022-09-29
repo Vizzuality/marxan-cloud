@@ -1,4 +1,4 @@
-FROM node:14.19-alpine3.15
+FROM node:14.20-alpine3.16
 LABEL maintainer="hello@vizzuality.com"
 
 ARG NEXTAUTH_URL
