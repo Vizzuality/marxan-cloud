@@ -56,6 +56,7 @@ should be:
     with TNC's `staging` (for example, `tnc-staging`): this is so that
     downstream forks can keep a local branch that tracks upstream's `staging`,
     for extra checks, reference and so on.
+  - Tag the release candidate.
   - Push downstream's `tnc-staging` to `tnc/staging` (this will trigger CI and
     CD pipelines, with eventual deployment on TNC's staging cluster).
 
@@ -93,5 +94,6 @@ results.
   - Downstream, sync the upstream `tnc/production` branch to a downstream branch
     that is used to track TNC's `production` (for example, `tnc-production`).
   - Downstream, merge `tnc-staging` into `tnc-production`.
+  - Tag the release.
   - Push downstream's `tnc-production` to `tnc/production` (this will trigger CI
     and CD pipelines, with eventual deployment on TNC's production cluster).
