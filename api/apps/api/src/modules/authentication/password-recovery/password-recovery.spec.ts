@@ -136,6 +136,10 @@ async function getFixtures() {
       return this.db[email]?.id;
     }
 
+    async findActiveUserId(email: string): Promise<string | undefined> {
+      return this.db[email]?.id;
+    }
+
     async logoutUser(userId: string): Promise<void> {
       const user = this.findUser(userId);
       if (user) user.loggedIn = false;
