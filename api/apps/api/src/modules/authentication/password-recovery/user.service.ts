@@ -5,6 +5,8 @@ import { AuthenticationService } from '@marxan-api/modules/authentication/authen
 export abstract class UserService {
   abstract findUserId(email: string): Promise<string | undefined>;
 
+  abstract findActiveUserId(email: string): Promise<string | undefined>;
+
   abstract setUserPassword(userId: string, password: string): Promise<void>;
 
   abstract logoutUser(userId: string): Promise<void>;
@@ -20,6 +22,13 @@ export class UserServiceAdapter implements UserService {
   async findUserId(email: string): Promise<string | undefined> {
     const user = await this.usersService.findByEmail(email);
     return user?.id;
+  }
+
+  async findActiveUserId(email: string): Promise<string | undefined> {
+    const user = await this.usersService.findByEmail(email);
+    return user && user.isActive && !user.isBlocked && !user.isDeleted
+      ? user.id
+      : undefined;
   }
 
   async logoutUser(userId: string): Promise<void> {
