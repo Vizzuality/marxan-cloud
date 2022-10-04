@@ -129,6 +129,14 @@ export const ForgotPassword: React.FC<ForgotPasswordProps> = () => {
                   try another email address.
                 </span>
               </p>
+              <p className="mx-auto mb-5 text-sm text-center text-gray-400" style={{ maxWidth: 300 }}>
+                Please note that if you have not activated your account yet, by
+                following the link on the welcome email after signing up, you
+                will need to activate your account before trying to reset your
+                password. If you did not receive a confirmation email, please
+                check your spam folder. Activation links in welcome emails are
+                only valid for 24 hours.
+              </p>
             </div>
           </div>
         </div>
