@@ -6,6 +6,7 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
+import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
 import ProjectNewForm from 'layout/projects/new/form';
 import Protected from 'layout/protected';
@@ -28,7 +29,7 @@ const NewProjectsPage: React.FC = () => {
 
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
-
+        <DocumentationLink />
         <Help />
 
         <div className="flex flex-col py-2.5 overflow-hidden flex-grow">

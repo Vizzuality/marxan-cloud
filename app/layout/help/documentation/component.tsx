@@ -8,7 +8,6 @@ import DOCUMENTATION_SVG from 'svgs/ui/documentation.svg?sprite';
 export const DocumentationLink = () => {
   const [isHover, setIsHover] = useState(false);
   return (
-
     <a
       className="fixed z-50 p-2 right-1 bottom-28"
       href="https://marxansolutions.org"

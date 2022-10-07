@@ -16,6 +16,7 @@ import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
+import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 import SidebarEditFeatures from 'layout/scenarios/edit/features';
@@ -95,6 +96,7 @@ const EditScenarioPage: React.FC = () => {
 
       <MetaIcons />
 
+      <DocumentationLink />
       <Help />
 
       <main className="flex flex-col w-screen h-screen">
