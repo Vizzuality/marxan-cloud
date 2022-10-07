@@ -4,6 +4,7 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
+import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
 import ProjectsList from 'layout/projects/all/list';
 import ProjectsToolbar from 'layout/projects/all/toolbar';
@@ -27,6 +28,7 @@ const ProjectsPage: React.FC = () => {
         <ProjectsToolbar />
         <ProjectsList />
 
+        <DocumentationLink />
         <Help />
       </main>
     </Protected>
