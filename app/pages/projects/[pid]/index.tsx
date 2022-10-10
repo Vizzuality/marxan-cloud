@@ -5,6 +5,7 @@ import { withProject } from 'hoc/projects';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
+import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
 import ProjectHeader from 'layout/projects/show/header';
 import ProjectMap from 'layout/projects/show/map';
@@ -26,6 +27,7 @@ const ShowProjectsPage: React.FC = () => {
       <main className="flex flex-col w-screen h-screen">
         <Header size="base" />
 
+        <DocumentationLink />
         <Help />
 
         <ProjectStatus />
