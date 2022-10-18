@@ -12,6 +12,11 @@ terraform {
   required_version = "1.2.4"
 }
 
+data "azurerm_storage_account" "storage_account" {
+  name                = var.storage_account_name
+  resource_group_name = azurerm_resource_group.resource_group.name
+}
+
 provider "azurerm" {
   features {
     resource_group {
