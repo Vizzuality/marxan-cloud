@@ -9,7 +9,7 @@ terraform {
       source = "hashicorp/template"
     }
   }
-  required_version = "1.2.4"
+  required_version = "1.3.2"
 }
 
 data "azurerm_storage_account" "storage_account" {

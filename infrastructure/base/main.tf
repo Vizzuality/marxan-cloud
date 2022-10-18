@@ -255,3 +255,17 @@ module "sql_server_private_dns_zone" {
     }
   }
 }
+
+module "backup_storage_production" {
+  count = var.deploy_production ? 1 : 0
+
+  source                                 = "./modules/storage"
+  cloning_storage_backup_container       = "${var.project_name}-cloning-storage-backup-production"
+  cloning_storage_backup_storage_account = data.terraform_remote_state.core.outputs.storage_account_name
+}
+
+module "backup_storage_staging" {
+  source                                 = "./modules/storage"
+  cloning_storage_backup_container       = "${var.project_name}-cloning-storage-backup-staging"
+  cloning_storage_backup_storage_account = data.terraform_remote_state.core.outputs.storage_account_name
+}
