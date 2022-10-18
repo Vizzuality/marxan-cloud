@@ -75,12 +75,12 @@ resource "kubernetes_deployment" "geoprocessing_deployment" {
           args = ["start"]
 
           volume_mount {
-            mount_path  = "/tmp/storage"
+            mount_path  = var.temp_data_volume_mount_path
             name        = "shared-temp-data-storage"
           }
 
           volume_mount {
-            mount_path  = "/opt/marxan-project-cloning"
+            mount_path  = var.cloning_volume_mount_path
             name        = "shared-cloning-storage"
           }
 

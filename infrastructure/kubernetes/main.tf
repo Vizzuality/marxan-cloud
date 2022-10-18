@@ -34,10 +34,12 @@ data "azurerm_dns_zone" "dns_zone" {
 }
 
 locals {
-  temp_data_storage_class = "azurefile-csi-temp-data"
-  temp_data_pvc_name      = "shared-temp-data-storage"
-  cloning_storage_class   = "azurefile-csi-cloning-data"
-  cloning_pvc_name        = "shared-cloning-storage"
+  temp_data_storage_class     = "azurefile-csi-temp-data"
+  temp_data_pvc_name          = "shared-temp-data-storage"
+  temp_data_volume_mount_path = "/tmp/storage"
+  cloning_storage_class       = "azurefile-csi-cloning-data"
+  cloning_pvc_name            = "shared-cloning-storage"
+  cloning_volume_mount_path   = "/opt/marxan-project-cloning"
 }
 
 module "k8s_namespaces" {
