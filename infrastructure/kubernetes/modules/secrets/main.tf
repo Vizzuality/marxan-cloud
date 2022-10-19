@@ -42,6 +42,11 @@ resource "tls_private_key" "cloning_signing_secret" {
   rsa_bits  = 4096
 }
 
+resource "random_password" "cloning_storage_backup_restic_password" {
+  length           = 16
+  special          = true
+}
+
 resource "kubernetes_secret" "api_secret" {
   metadata {
     name      = "api"
@@ -71,6 +76,7 @@ resource "kubernetes_secret" "api_secret" {
     API_SERVICE_URL  = var.api_url
 
     AZURE_STORAGE_ACCOUNT_KEY              = sensitive(var.azure_storage_account_key)
+    CLONING_STORAGE_BACKUP_RESTIC_PASSWORD = sensitive(local.cloning_storage_backup_restic_password)
   }
 }
 

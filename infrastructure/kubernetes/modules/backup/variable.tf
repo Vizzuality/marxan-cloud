@@ -28,11 +28,6 @@ variable "restic_repository" {
   description = "azure:<container>/<path> URL of the backup destination"
 }
 
-variable "restic_password" {
-  type        = string
-  description = "Symmetric encryption password for the backed-up data"
-}
-
 variable "restic_forget_cli_parameters" {
   type        = string
   description = "CLI parameters instructing Restic on how to remove backup snapshots (see https://restic.readthedocs.io/en/stable/060_forget.html)"

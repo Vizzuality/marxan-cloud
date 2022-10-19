@@ -55,7 +55,7 @@ resource "kubernetes_cron_job_v1" "cloning_storage_backup_cronjob" {
             value_from {
               secret_key_ref {
                 name = "api"
-                key  = "RESTIC_PASSWORD"
+                key  = "CLONING_STORAGE_BACKUP_RESTIC_PASSWORD"
               }
             }
           }
