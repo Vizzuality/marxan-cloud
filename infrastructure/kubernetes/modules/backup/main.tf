@@ -36,7 +36,7 @@ resource "kubernetes_cron_job_v1" "cloning_storage_backup_cronjob" {
           }
 
           env {
-            name = "AZURE_ACCOUNT_NAME"
+            name  = "AZURE_ACCOUNT_NAME"
             value = var.azure_storage_account_name
           }
 
@@ -45,7 +45,7 @@ resource "kubernetes_cron_job_v1" "cloning_storage_backup_cronjob" {
             value_from {
               secret_key_ref {
                 name = "api"
-                key  = "AZURE_ACCOUNT_KEY"
+                key  = "AZURE_STORAGE_ACCOUNT_KEY"
               }
             }
           }

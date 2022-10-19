@@ -69,6 +69,8 @@ resource "kubernetes_secret" "api_secret" {
 
     SPARKPOST_APIKEY = var.sparkpost_api_key
     API_SERVICE_URL  = var.api_url
+
+    AZURE_STORAGE_ACCOUNT_KEY              = sensitive(var.azure_storage_account_key)
   }
 }
 
