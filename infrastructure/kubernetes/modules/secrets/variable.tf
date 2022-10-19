@@ -68,3 +68,7 @@ variable "postgres_api_password" {
 variable "postgres_api_database" {
   description = "The postgres api database name"
 }
+
+variable "azure_storage_account_key" {
+  description = "A key for the Azure storage account used for backups"
+}
