@@ -239,7 +239,7 @@ module "cloning_storage_backup_cronjob_production" {
   cloning_pvc_name                   = local.cloning_pvc_name
   backup_source                      = local.cloning_volume_mount_path
   azure_storage_account_name         = var.storage_account_name
-  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.storage_account_name}:/restic-backups/cloning-storage-production"
+  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container}:/restic-backups/cloning-storage-production"
   restic_forget_cli_parameters       = "--keep-daily 60 --keep-weekly 52"
   schedule                           = "15 23 * * *"
 }
@@ -397,7 +397,7 @@ module "cloning_storage_backup_cronjob_staging" {
   cloning_pvc_name                   = local.cloning_pvc_name
   backup_source                      = local.cloning_volume_mount_path
   azure_storage_account_name         = var.storage_account_name
-  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.storage_account_name}:/restic-backups/cloning-storage-staging"
+  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container}:/restic-backups/cloning-storage-staging"
   restic_forget_cli_parameters       = "--keep-daily 30 --keep-weekly 8"
   schedule                           = "15 6 * * *"
 }
