@@ -135,6 +135,8 @@ module "api_production" {
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 24
   sparkpost_base_url                 = var.sparkpost_base_url
+  temp_data_volume_mount_path        = local.temp_data_volume_mount_path
+  cloning_volume_mount_path          = local.cloning_volume_mount_path
 
   depends_on = [
     module.k8s_api_database_production
@@ -144,13 +146,15 @@ module "api_production" {
 module "geoprocessing_production" {
   count = var.deploy_production ? 1 : 0
 
-  source               = "./modules/geoprocessing"
-  namespace            = "production"
-  image                = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:production"
-  deployment_name      = "geoprocessing"
-  geo_postgres_logging = "error"
-  temp_data_pvc_name   = local.temp_data_pvc_name
-  cloning_pvc_name     = local.cloning_pvc_name
+  source                      = "./modules/geoprocessing"
+  namespace                   = "production"
+  image                       = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:production"
+  deployment_name             = "geoprocessing"
+  geo_postgres_logging        = "error"
+  temp_data_pvc_name          = local.temp_data_pvc_name
+  cloning_pvc_name            = local.cloning_pvc_name
+  temp_data_volume_mount_path = local.temp_data_volume_mount_path
+  cloning_volume_mount_path   = local.cloning_volume_mount_path
 
   depends_on = [
     module.k8s_geoprocessing_database_production
@@ -237,7 +241,7 @@ module "cloning_storage_backup_cronjob_production" {
   source                             = "./modules/backup"
   namespace                          = "production"
   cloning_pvc_name                   = local.cloning_pvc_name
-  backup_source                      = local.cloning_volume_mount_path
+  cloning_volume_mount_path          = local.cloning_volume_mount_path
   azure_storage_account_name         = var.storage_account_name
   restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container}:/restic-backups/cloning-storage-production"
   restic_forget_cli_parameters       = "--keep-daily 60 --keep-weekly 52"
@@ -306,6 +310,8 @@ module "api_staging" {
   cloning_pvc_name                   = local.cloning_pvc_name
   postgres_geodb_max_clients_in_pool = 10
   sparkpost_base_url                 = var.sparkpost_base_url
+  temp_data_volume_mount_path        = local.temp_data_volume_mount_path
+  cloning_volume_mount_path          = local.cloning_volume_mount_path
 
   depends_on = [
     module.k8s_api_database_staging
@@ -321,6 +327,8 @@ module "geoprocessing_staging" {
   geo_postgres_logging      = "query"
   temp_data_pvc_name        = local.temp_data_pvc_name
   cloning_pvc_name          = local.cloning_pvc_name
+  temp_data_volume_mount_path = local.temp_data_volume_mount_path
+  cloning_volume_mount_path   = local.cloning_volume_mount_path
 
   depends_on = [
     module.k8s_geoprocessing_database_staging
@@ -395,7 +403,7 @@ module "cloning_storage_backup_cronjob_staging" {
   source                             = "./modules/backup"
   namespace                          = "staging"
   cloning_pvc_name                   = local.cloning_pvc_name
-  backup_source                      = local.cloning_volume_mount_path
+  cloning_volume_mount_path          = local.cloning_volume_mount_path
   azure_storage_account_name         = var.storage_account_name
   restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container}:/restic-backups/cloning-storage-staging"
   restic_forget_cli_parameters       = "--keep-daily 30 --keep-weekly 8"

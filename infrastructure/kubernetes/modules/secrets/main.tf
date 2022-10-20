@@ -10,9 +10,10 @@ locals {
     database = var.postgres_geoprocessing_database
   }
 
-  api_auth_jwt_secret    = random_password.jwt_secret.result
-  x_auth_api_key         = random_password.x_auth_api_key.result
-  cloning_signing_secret = tls_private_key.cloning_signing_secret.private_key_pem
+  api_auth_jwt_secret                    = random_password.jwt_secret.result
+  x_auth_api_key                         = random_password.x_auth_api_key.result
+  cloning_signing_secret                 = tls_private_key.cloning_signing_secret.private_key_pem
+  cloning_storage_backup_restic_password = random_password.cloning_storage_backup_restic_password
 }
 
 resource "random_password" "jwt_secret" {

@@ -8,19 +8,14 @@ variable "cloning_pvc_name" {
   description = "Name of the PVC to use for backend storage for cloning"
 }
 
-variable "backup_source" {
+variable "cloning_volume_mount_path" {
   type        = string
-  description = "Path of the directory to back up"
+  description = "Mount path for the backend storage for cloning data"
 }
 
 variable "azure_storage_account_name" {
   type        = string
   description = "Azure storage account that holds the blob storage container used for backups"
-}
-
-variable "azure_storage_account_key" {
-  type        = string
-  description = "The storage account key to be used to connect to the storage container"
 }
 
 variable "restic_repository" {

@@ -261,11 +261,11 @@ module "backup_storage_production" {
 
   source                                 = "./modules/storage"
   cloning_storage_backup_container       = "${var.project_name}-cloning-storage-backup-production"
-  cloning_storage_backup_storage_account = data.terraform_remote_state.core.outputs.storage_account_name
+  cloning_storage_backup_storage_account = var.storage_account_name
 }
 
 module "backup_storage_staging" {
   source                                 = "./modules/storage"
   cloning_storage_backup_container       = "${var.project_name}-cloning-storage-backup-staging"
-  cloning_storage_backup_storage_account = data.terraform_remote_state.core.outputs.storage_account_name
+  cloning_storage_backup_storage_account = var.storage_account_name
 }
