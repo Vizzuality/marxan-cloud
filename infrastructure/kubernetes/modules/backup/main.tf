@@ -36,6 +36,7 @@ resource "kubernetes_cron_job_v1" "cloning_storage_backup_cronjob" {
               volume_mount {
                 mount_path  = var.cloning_volume_mount_path
                 name        = "shared-cloning-storage"
+                read_only   = true
               }
 
               env {
