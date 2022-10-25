@@ -13,6 +13,11 @@ data "azurerm_resource_group" "resource_group" {
 
 data "azurerm_subscription" "subscription" {}
 
+data "azurerm_storage_account" "storage_account" {
+  name                = var.storage_account_name
+  resource_group_name = var.resource_group_name
+}
+
 data "terraform_remote_state" "core" {
   backend = "azurerm"
   config  = {
@@ -202,7 +207,7 @@ module "production_secrets" {
   postgres_geoprocessing_username = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_username : null
   postgres_geoprocessing_password = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_password : null
   postgres_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_hostname : null
-  azure_storage_account_key       = data.terraform_remote_state.core.outputs.storage_account_primary_access_key
+  azure_storage_account_key       = data.azurerm_storage_account.storage_account.primary_access_key
 }
 
 module "ingress_production" {
@@ -243,7 +248,7 @@ module "cloning_storage_backup_cronjob_production" {
   cloning_pvc_name                   = local.cloning_pvc_name
   cloning_volume_mount_path          = local.cloning_volume_mount_path
   azure_storage_account_name         = var.storage_account_name
-  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container}:/restic-backups/cloning-storage-production"
+  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container_production}:/restic-backups/cloning-storage-production"
   restic_forget_cli_parameters       = "--keep-daily 60 --keep-weekly 52"
   schedule                           = "15 23 * * *"
 }
@@ -370,7 +375,7 @@ module "staging_secrets" {
   postgres_geoprocessing_username = module.k8s_geoprocessing_database_staging.postgresql_username
   postgres_geoprocessing_password = module.k8s_geoprocessing_database_staging.postgresql_password
   postgres_geoprocessing_hostname = module.k8s_geoprocessing_database_staging.postgresql_hostname
-  azure_storage_account_key       = data.terraform_remote_state.core.outputs.storage_account_primary_access_key
+  azure_storage_account_key       = data.azurerm_storage_account.storage_account.primary_access_key
 }
 
 module "ingress_staging" {
@@ -405,7 +410,7 @@ module "cloning_storage_backup_cronjob_staging" {
   cloning_pvc_name                   = local.cloning_pvc_name
   cloning_volume_mount_path          = local.cloning_volume_mount_path
   azure_storage_account_name         = var.storage_account_name
-  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container}:/restic-backups/cloning-storage-staging"
+  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container_staging}:/restic-backups/cloning-storage-staging"
   restic_forget_cli_parameters       = "--keep-daily 30 --keep-weekly 8"
   schedule                           = "15 6 * * *"
 }

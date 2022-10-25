@@ -100,3 +100,11 @@ output "sql_server_staging_password" {
 output "dns_zone_name" {
   value = module.dns.dns_zone.name
 }
+
+output "cloning_storage_backup_container_production" {
+  value     = length(module.backup_storage_production) > 0 ? module.backup_storage_production[0].cloning_storage_backup_container : null
+}
+
+output "cloning_storage_backup_container_staging" {
+  value = module.backup_storage_staging.cloning_storage_backup_container
+}
