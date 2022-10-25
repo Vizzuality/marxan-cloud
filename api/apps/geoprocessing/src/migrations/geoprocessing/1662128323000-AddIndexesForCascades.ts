@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddIndexesForCascades16621283230000 implements MigrationInterface {
+export class AddIndexesForCascades1662128323000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       create index scenarios_pu_data__project_pu_id__idx on scenarios_pu_data(project_pu_id);

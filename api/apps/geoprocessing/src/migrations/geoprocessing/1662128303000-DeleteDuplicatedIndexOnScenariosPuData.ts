@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class DeleteDuplicatedIndexOnScenariosPuData16621283030000
+export class DeleteDuplicatedIndexOnScenariosPuData1662128303000
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
