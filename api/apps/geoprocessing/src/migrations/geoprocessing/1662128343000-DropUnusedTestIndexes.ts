@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class DropUnusedTestIndexes16621283430000 implements MigrationInterface {
+export class DropUnusedTestIndexes1662128343000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     // As far as I can see we don't really rely on these indexes
     await queryRunner.query(`
