@@ -122,11 +122,13 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
           metArea,
           coverageTarget,
           coverageTargetArea,
+          onTarget,
         } = d;
 
         return {
           id,
           name: name || featureClassName || 'Metadata name',
+          onTarget,
           current: {
             percent: met / 100,
             value: format('.3s')(metArea / 1000000),
@@ -219,11 +221,13 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
           metArea,
           coverageTarget,
           coverageTargetArea,
+          onTarget,
         } = d;
 
         return {
           id,
           name: name || featureClassName || 'Metadata name',
+          onTarget,
           current: {
             percent: met / 100,
             value: format('.3s')(metArea / 1000000),

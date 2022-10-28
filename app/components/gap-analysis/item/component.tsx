@@ -24,6 +24,7 @@ export interface ItemProps {
     value: string;
     unit: string;
   }
+  onTarget: boolean;
   className?: string;
   highlighted?: boolean;
   onHighlight?: () => void;
@@ -33,15 +34,20 @@ export interface ItemProps {
 }
 
 export const Item: React.FC<ItemProps> = ({
-  name, current, target, className, highlighted, muted, onMouseEnter, onMouseLeave, onHighlight,
+  name,
+  current,
+  target,
+  className,
+  onTarget,
+  highlighted,
+  muted,
+  onMouseEnter,
+  onMouseLeave,
+  onHighlight,
 }: ItemProps) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const [chartEl, setChartEl] = useState(null);
   const percentFormatter = useNumberFormatter({ style: 'percent' });
-
-  const isNotMet = useMemo(() => {
-    return current.percent < target.percent;
-  }, [current, target]);
 
   const metStyles = useMemo(() => {
     if (chartEl) {
@@ -73,7 +79,7 @@ export const Item: React.FC<ItemProps> = ({
         'text-white px-4 pt-1 pb-4 border-l-4 transition-opacity duration-300 relative overflow-hidden': true,
         'opacity-20': muted,
         'border-purple-700': true,
-        'pb-8': isNotMet,
+        'pb-8': !onTarget,
         [className]: className !== undefined && className !== null,
       })}
       onMouseEnter={onMouseEnter}
@@ -143,7 +149,7 @@ export const Item: React.FC<ItemProps> = ({
           style={{ width: `${target.percent * 100}%` }}
         />
 
-        {(isNotMet && (
+        {(!onTarget && (
           <div
             className="absolute w-px h-4 transform -translate-y-1/2 bg-red-500 top-1/2"
             style={{
