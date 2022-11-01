@@ -57,11 +57,23 @@ resource "azurerm_private_dns_zone_virtual_network_link" "link" {
 }
 
 resource "azurerm_kubernetes_cluster" "k8s_cluster" {
-  name                = var.project_name
-  location            = var.resource_group.location
-  resource_group_name = var.resource_group.name
-  dns_prefix          = var.project_name
-  kubernetes_version  = var.kubernetes_version
+  name                      = var.project_name
+  location                  = var.resource_group.location
+  resource_group_name       = var.resource_group.name
+  dns_prefix                = var.project_name
+  kubernetes_version        = var.kubernetes_version
+  automatic_channel_upgrade = "patch"
+
+  maintenance_window {
+    allowed {
+      day   = "Sunday"
+      hours = [22, 23]
+    }
+    allowed {
+      day   = "Monday"
+      hours = [1, 2, 3, 4, 5]
+    }
+  }
 
   private_dns_zone_id = azurerm_private_dns_zone.private_dns_zone.id
 
@@ -101,5 +113,9 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
   identity {
     type         = "UserAssigned"
     identity_ids = [azurerm_user_assigned_identity.aks_identity.id]
+  }
+
+  lifecycle {
+    ignore_changes = [kubernetes_version]
   }
 }
