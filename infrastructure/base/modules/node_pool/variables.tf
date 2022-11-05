@@ -44,3 +44,7 @@ variable "node_labels" {
 variable "subnet_id" {
   type = string
 }
+
+variable "orchestrator_version" {
+  type = string
+}
