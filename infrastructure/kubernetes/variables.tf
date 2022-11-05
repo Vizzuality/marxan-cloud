@@ -35,7 +35,7 @@ variable "email_domain" {
 }
 
 variable "support_email" {
-  type = string
+  type        = string
   description = "Email address to which users can send support requests"
 }
 
@@ -75,4 +75,14 @@ variable "project_tags" {
 variable "deploy_production" {
   type        = bool
   description = "If the production deployment should be created"
+}
+
+variable "deploy_staging" {
+  type        = bool
+  description = "If the staging deployment should be created. Not fully implemented"
+  default     = true
+}
+
+variable "alert_email_addresses" {
+  description = "Key-value pair of name of email receiver and their email address. Used for sending ping test alert emails"
 }
