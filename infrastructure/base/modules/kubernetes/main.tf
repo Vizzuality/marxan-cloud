@@ -62,7 +62,7 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
   resource_group_name       = var.resource_group.name
   dns_prefix                = var.project_name
   kubernetes_version        = var.kubernetes_version
-  automatic_channel_upgrade = "patch"
+#  automatic_channel_upgrade = "patch"
 
   maintenance_window {
     allowed {
@@ -115,7 +115,7 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
     identity_ids = [azurerm_user_assigned_identity.aks_identity.id]
   }
 
-  lifecycle {
-    ignore_changes = [kubernetes_version]
-  }
+#  lifecycle {
+#    ignore_changes = [kubernetes_version]
+#  }
 }

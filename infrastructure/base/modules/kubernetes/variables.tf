@@ -10,7 +10,6 @@ variable "resource_group" {
 variable "kubernetes_version" {
   type        = string
   description = "Version of kubernetes to deploy"
-  default     = "1.22.6"
 }
 
 variable "gateway_subnet_id" {
