@@ -62,7 +62,7 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
   resource_group_name       = var.resource_group.name
   dns_prefix                = var.project_name
   kubernetes_version        = var.kubernetes_version
-#  automatic_channel_upgrade = "patch"
+  automatic_channel_upgrade = "patch"
 
   maintenance_window {
     allowed {
@@ -101,13 +101,14 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
 
 
   default_node_pool {
-    name                = "default"
-    node_count          = 1
-    vm_size             = "Standard_D2_v2"
-    vnet_subnet_id      = var.aks_subnet_id
-    enable_auto_scaling = var.enable_auto_scaling
-    min_count           = var.min_node_count
-    max_count           = var.max_node_count
+    name                 = "default"
+    node_count           = 1
+    vm_size              = "Standard_D2_v2"
+    vnet_subnet_id       = var.aks_subnet_id
+    enable_auto_scaling  = var.enable_auto_scaling
+    min_count            = var.min_node_count
+    max_count            = var.max_node_count
+    orchestrator_version = var.kubernetes_version
   }
 
   identity {
@@ -115,7 +116,7 @@ resource "azurerm_kubernetes_cluster" "k8s_cluster" {
     identity_ids = [azurerm_user_assigned_identity.aks_identity.id]
   }
 
-#  lifecycle {
-#    ignore_changes = [kubernetes_version]
-#  }
+  #  lifecycle {
+  #    ignore_changes = [kubernetes_version]
+  #  }
 }

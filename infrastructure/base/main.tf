@@ -71,26 +71,28 @@ module "kubernetes" {
 }
 
 module "data_node_pool" {
-  source         = "./modules/node_pool"
-  name           = "data"
-  aks_cluster_id = module.kubernetes.cluster_id
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  subnet_id      = module.network.aks_subnet_id
-  node_labels    = {
+  source               = "./modules/node_pool"
+  name                 = "data"
+  aks_cluster_id       = module.kubernetes.cluster_id
+  resource_group       = data.azurerm_resource_group.resource_group
+  project_name         = var.project_name
+  subnet_id            = module.network.aks_subnet_id
+  orchestrator_version = var.kubernetes_version
+  node_labels          = {
     type : "data"
   }
 }
 
 module "app_node_pool" {
-  source         = "./modules/node_pool"
-  name           = "app"
-  aks_cluster_id = module.kubernetes.cluster_id
-  resource_group = data.azurerm_resource_group.resource_group
-  project_name   = var.project_name
-  subnet_id      = module.network.aks_subnet_id
-  vm_size        = "Standard_F4s_v2"
-  node_labels    = {
+  source               = "./modules/node_pool"
+  name                 = "app"
+  aks_cluster_id       = module.kubernetes.cluster_id
+  resource_group       = data.azurerm_resource_group.resource_group
+  project_name         = var.project_name
+  subnet_id            = module.network.aks_subnet_id
+  vm_size              = "Standard_F4s_v2"
+  orchestrator_version = var.kubernetes_version
+  node_labels          = {
     type : "app"
   }
 }
