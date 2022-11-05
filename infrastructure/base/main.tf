@@ -57,6 +57,7 @@ module "kubernetes" {
   resource_group           = data.azurerm_resource_group.resource_group
   project_name             = var.project_name
   aks_subnet_id            = module.network.aks_subnet_id
+  kubernetes_version       = var.kubernetes_version
   virtual_networks_to_link = {
     (module.network.core_vnet_name) = module.network.core_vnet_id
     (module.network.aks_vnet_name)  = module.network.aks_vnet_id
