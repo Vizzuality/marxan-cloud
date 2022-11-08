@@ -78,7 +78,7 @@
     "geojson": "0.5.0",
     "helmet": "^4.3.1",
     "jsonapi-serializer": "^3.6.7",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "mapshaper": "0.5.91",
     "morgan": "^1.10.0",
     "ms": "2.1.3",
