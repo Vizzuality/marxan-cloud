@@ -116,3 +116,8 @@ variable "mapbox_api_token" {
   type        = string
   description = "Mapbox API token"
 }
+
+variable "kubernetes_version" {
+  type        = string
+  description = "Version of kubernetes to deploy"
+}

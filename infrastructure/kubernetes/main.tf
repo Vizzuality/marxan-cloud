@@ -64,8 +64,8 @@ module "k8s_storage" {
 }
 
 module "email_templates" {
-  source = "./modules/email-templates"
-  domain = var.email_domain
+  source        = "./modules/email-templates"
+  domain        = var.email_domain
   support_email = var.support_email
 }
 
@@ -243,14 +243,14 @@ module "db_tunnel_production" {
 module "cloning_storage_backup_cronjob_production" {
   count = var.deploy_production ? 1 : 0
 
-  source                             = "./modules/backup"
-  namespace                          = "production"
-  cloning_pvc_name                   = local.cloning_pvc_name
-  cloning_volume_mount_path          = local.cloning_volume_mount_path
-  azure_storage_account_name         = var.storage_account_name
-  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container_production}:/restic-backups/cloning-storage-production"
-  restic_forget_cli_parameters       = "--keep-daily 60 --keep-weekly 52"
-  schedule                           = "15 23 * * *"
+  source                       = "./modules/backup"
+  namespace                    = "production"
+  cloning_pvc_name             = local.cloning_pvc_name
+  cloning_volume_mount_path    = local.cloning_volume_mount_path
+  azure_storage_account_name   = var.storage_account_name
+  restic_repository            = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container_production}:/restic-backups/cloning-storage-production"
+  restic_forget_cli_parameters = "--keep-daily 60 --keep-weekly 52"
+  schedule                     = "15 23 * * *"
 }
 
 
@@ -324,14 +324,14 @@ module "api_staging" {
 }
 
 module "geoprocessing_staging" {
-  source                    = "./modules/geoprocessing"
-  namespace                 = "staging"
-  image                     = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:staging"
-  deployment_name           = "geoprocessing"
-  cleanup_temporary_folders = "false"
-  geo_postgres_logging      = "query"
-  temp_data_pvc_name        = local.temp_data_pvc_name
-  cloning_pvc_name          = local.cloning_pvc_name
+  source                      = "./modules/geoprocessing"
+  namespace                   = "staging"
+  image                       = "${data.terraform_remote_state.core.outputs.container_registry_hostname}/marxan-geoprocessing:staging"
+  deployment_name             = "geoprocessing"
+  cleanup_temporary_folders   = "false"
+  geo_postgres_logging        = "query"
+  temp_data_pvc_name          = local.temp_data_pvc_name
+  cloning_pvc_name            = local.cloning_pvc_name
   temp_data_volume_mount_path = local.temp_data_volume_mount_path
   cloning_volume_mount_path   = local.cloning_volume_mount_path
 
@@ -405,12 +405,36 @@ module "db_tunnel_staging" {
 }
 
 module "cloning_storage_backup_cronjob_staging" {
-  source                             = "./modules/backup"
-  namespace                          = "staging"
-  cloning_pvc_name                   = local.cloning_pvc_name
-  cloning_volume_mount_path          = local.cloning_volume_mount_path
-  azure_storage_account_name         = var.storage_account_name
-  restic_repository                  = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container_staging}:/restic-backups/cloning-storage-staging"
-  restic_forget_cli_parameters       = "--keep-daily 30 --keep-weekly 8"
-  schedule                           = "15 6 * * *"
+  source                       = "./modules/backup"
+  namespace                    = "staging"
+  cloning_pvc_name             = local.cloning_pvc_name
+  cloning_volume_mount_path    = local.cloning_volume_mount_path
+  azure_storage_account_name   = var.storage_account_name
+  restic_repository            = "azure:${data.terraform_remote_state.core.outputs.cloning_storage_backup_container_staging}:/restic-backups/cloning-storage-staging"
+  restic_forget_cli_parameters = "--keep-daily 30 --keep-weekly 8"
+  schedule                     = "15 6 * * *"
+}
+
+module "staging_ping_test" {
+  count = var.deploy_staging ? 1 : 0
+
+  source                = "./modules/ping_test"
+  namespace             = "staging"
+  resource_group        = data.azurerm_resource_group.resource_group
+  project_name          = var.project_name
+  location              = data.azurerm_resource_group.resource_group.location
+  domain                = "staging.${var.domain}"
+  alert_email_addresses = var.alert_email_addresses
+}
+
+module "production_ping_test" {
+  count = var.deploy_production ? 1 : 0
+
+  source                = "./modules/ping_test"
+  namespace             = "production"
+  resource_group        = data.azurerm_resource_group.resource_group
+  project_name          = var.project_name
+  location              = data.azurerm_resource_group.resource_group.location
+  domain                = var.domain
+  alert_email_addresses = var.alert_email_addresses
 }
