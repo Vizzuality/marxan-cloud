@@ -1,0 +1,44 @@
+@startuml "MarxanCloud"
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+' uncomment the following line and comment the first to use locally
+' !include C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define DEVICONS2 https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons2
+
+!include DEVICONS2/nestjs.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/react.puml
+!include DEVICONS/redis.puml
+
+' skinparam wrapWidth 200
+' skinparam maxMessageSize 200
+
+LAYOUT_LEFT_RIGHT()
+
+Container(app, "Frontend App", "", "","react")
+
+System_Boundary(c2, "Backend") {
+  Container(api, "API Service", "Typescript, NestJS", "Main API and gateway to backend data/metadata/processing", "nestjs")
+  Container(geoprocessing, "Geoprocessing Service", "Typescript, NestJS", "Coordinates geoprocessing tasks", "nestjs")
+  ContainerDb(redis, "Pub/Sub and async job queues", "Redis", "Async job queues", "redis" )
+
+  ContainerDb(postgresDB, "Database", "PostgreSQL 13", "Stores metadata", "postgresql" )
+  ContainerDb(postgresGeoDB, "GeoDatabase", "PostgreSQL 13 + Postgis 3", "Stores spatial data, performs spatial calculations", "postgresql" )
+}
+
+Lay_R(api, geoprocessing)
+Lay_U(c2, app)
+
+Rel_R(app, api, "Manages project and scenario state", "async, JSON/HTTPS")
+
+Rel(api, postgresDB, "Reads/Writes")
+Rel(api, postgresGeoDB, "Reads/Writes")
+
+Rel(api, geoprocessing, "Proxies requests")
+Rel(geoprocessing, postgresGeoDB, "Reads/Writes")
+
+Rel(api, redis, "Pushes jobs to queues")
+Rel(geoprocessing, redis, "Fetches jobs from queues and posts progress statuses")
+
+@enduml
+
