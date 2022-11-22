@@ -48,7 +48,7 @@ describe(`when empty input is provided`, () => {
   it(`should resolve to defaults`, () => {
     expect(sut.from({})).toMatchInlineSnapshot(`
       MarxanParameters {
-        "BESTSCORE": 0,
+        "BESTSCORE": -1,
         "BLM": 1,
         "CLUMPTYPE": 0,
         "COOLFAC": 0,
