@@ -2,21 +2,21 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.13.0"
+      version = "3.32.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "2.17.0"
+      version = "2.30.0"
     }
 
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.8.0"
+      version = "2.16.0"
     }
 
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.4.1"
+      version = "2.7.1"
     }
 
     template = {
@@ -25,12 +25,12 @@ terraform {
 
     kubectl = {
       source  = "gavinbunney/kubectl"
-      version = ">= 1.7.0"
+      version = "1.14.0"
     }
 
     postgresql = {
       source  = "cyrilgdn/postgresql"
-      version = "1.16.0"
+      version = "1.17.1"
     }
 
     sparkpost = {
@@ -38,7 +38,7 @@ terraform {
       version = "0.2.2"
     }
   }
-  required_version = "1.2.4"
+  required_version = "1.3.5"
 }
 
 

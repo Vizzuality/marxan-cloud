@@ -17,8 +17,8 @@ resource "azurerm_subnet" "firewall_subnet" {
   virtual_network_name = azurerm_virtual_network.core_vnet.name
   address_prefixes     = ["10.1.0.0/24"]
 
-  enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies  = false
+  private_link_service_network_policies_enabled = true
+  private_endpoint_network_policies_enabled     = false
 }
 
 ###
@@ -30,8 +30,8 @@ resource "azurerm_subnet" "bastion_subnet" {
   virtual_network_name = azurerm_virtual_network.core_vnet.name
   address_prefixes     = ["10.1.1.0/24"]
 
-  enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies  = false
+  private_link_service_network_policies_enabled = true
+  private_endpoint_network_policies_enabled     = false
 }
 
 
@@ -44,8 +44,8 @@ resource "azurerm_subnet" "app_gateway_subnet" {
   virtual_network_name = azurerm_virtual_network.core_vnet.name
   address_prefixes     = ["10.1.2.0/24"]
 
-  enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies  = false
+  private_link_service_network_policies_enabled = true
+  private_endpoint_network_policies_enabled     = false
 }
 
 # Create network security group and SSH rule for bastion subnet.
@@ -54,7 +54,9 @@ resource "azurerm_network_security_group" "bastion_nsg" {
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
 
-  tags = merge(var.project_tags, { Security = "Port 22 locked down to VPN CIDRs and the known GitHub Action CIDRs. GitHUb CIDRs are included for CI/CD purposes." }, )
+  tags = merge(var.project_tags, {
+    Security = "Port 22 locked down to VPN CIDRs and the known GitHub Action CIDRs. GitHUb CIDRs are included for CI/CD purposes."
+  }, )
 
   # Allow SSH traffic in from Internet to public subnet.
   security_rule {
@@ -96,8 +98,8 @@ resource "azurerm_subnet" "aks_subnet" {
   virtual_network_name = azurerm_virtual_network.aks_vnet.name
   address_prefixes     = ["10.0.8.0/21"]
 
-  enforce_private_link_endpoint_network_policies = true
-  enforce_private_link_service_network_policies  = false
+  private_link_service_network_policies_enabled = true
+  private_endpoint_network_policies_enabled     = false
 
   service_endpoints = [
     "Microsoft.ServiceBus",
@@ -122,7 +124,7 @@ resource "azurerm_subnet" "sql_subnet" {
   delegation {
     name = "fs"
     service_delegation {
-      name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      name    = "Microsoft.DBforPostgreSQL/flexibleServers"
       actions = [
         "Microsoft.Network/virtualNetworks/subnets/join/action",
       ]

@@ -16,7 +16,7 @@ Before proceeding, be sure you are familiar with all of these tools, as these in
 will skip over the basics, and assume you are conformable using all of them. 
 
 - [Microsoft Azure](https://azure.microsoft.com)
-- [Terraform](https://www.terraform.io/) v1.2.4
+- [Terraform](https://www.terraform.io/) v1.3.5
 - [Docker](https://www.docker.com/)
 - [Kubernetes](https://kubernetes.io/)
 - [Helm](https://helm.sh/)
