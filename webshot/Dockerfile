@@ -1,4 +1,4 @@
-FROM node:16.14.0
+FROM node:18.16.0
 LABEL maintainer="hello@vizzuality.com"
 
 ENV NAME marxan-webshot
