@@ -13,6 +13,10 @@
     -webkit-appearance: none;
     margin: 0;
   }
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
 
   input[type='search']::-webkit-search-decoration,
   input[type='search']::-webkit-search-cancel-button,
