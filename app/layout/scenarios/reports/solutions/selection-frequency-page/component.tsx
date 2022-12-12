@@ -67,7 +67,7 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
     return {
       id: 'frequency',
       name: 'Selection frequency',
-      items: LEGEND_LAYERS.frequency().items,
+      items: LEGEND_LAYERS.frequency({}).items,
     };
   }, []);
 

@@ -231,7 +231,7 @@ export const LEGEND_LAYERS = {
 
     return ({
       id: 'frequency',
-      name: `Frequency (${numberOfRuns} runs)`,
+      name: numberOfRuns ? `Frequency (${numberOfRuns} runs)` : 'Frequency',
       type: 'gradient',
       settingsManager: {
         opacity: true,
