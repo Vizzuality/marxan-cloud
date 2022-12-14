@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
+import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selection-frequency-page/map';
@@ -45,6 +46,10 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
     scenarioId: sid,
   });
 
+  const {
+    data: scenarioData,
+  } = useScenario(sid);
+
   const protectedAreas = useMemo(() => {
     return protectedAreasData?.sort((a, b) => {
       if (a.kind === 'project') return 1;
@@ -67,9 +72,13 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
     return {
       id: 'frequency',
       name: 'Selection frequency',
-      items: LEGEND_LAYERS.frequency({}).items,
+      items: LEGEND_LAYERS.frequency({
+        options: {
+          numberOfRuns: scenarioData?.numberOfRuns || 0,
+        },
+      }).items,
     };
-  }, []);
+  }, [scenarioData?.numberOfRuns]);
 
   const reportDataIsFetched = projectDataIsFetched && projectUsersDataIsFetched
     && protectedAreasDataIsFetched;
