@@ -48,6 +48,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
   const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const editable = useCanEditScenario(pid, sid);
+
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
   const saveScenarioMutation = useSaveScenario({
     requestConfig: {
@@ -173,7 +174,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                     });
                   })
                   .map((s) => {
-                    const { target, fpf = 1 } = features.find((f) => {
+                    const { target, fpf } = features.find((f) => {
                       return f.parentId === featureId && f.value === s.value;
                     });
 
@@ -321,7 +322,9 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                             title={`Are you sure you want to change all feature targets to ${confirmationTarget?.v}?`}
                             description="The action cannot be reverted."
                             open={!!confirmationTarget}
-                            onAccept={() => onChangeTargetAll(confirmationTarget)}
+                            onAccept={() => {
+                              onChangeTargetAll(confirmationTarget);
+                            }}
                             onRefuse={() => setConfirmationTarget(null)}
                             onDismiss={() => setConfirmationTarget(null)}
                           />
