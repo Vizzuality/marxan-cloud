@@ -30,7 +30,7 @@ terraform {
 
     postgresql = {
       source  = "cyrilgdn/postgresql"
-      version = "1.17.1"
+      version = "1.18.0"
     }
 
     sparkpost = {
@@ -91,12 +91,34 @@ provider "postgresql" {
 }
 
 provider "postgresql" {
+  alias = "db_tunnel_production_14"
+
+  host      = length(module.db_tunnel_production_14) > 0 ? module.db_tunnel_production_14[0].host : null
+  port      = length(module.db_tunnel_production_14) > 0 ? module.db_tunnel_production_14[0].port : null
+  username   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_14_username", null)
+  password   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_14_password", null)
+  sslmode   = "require"
+  superuser = false
+}
+
+provider "postgresql" {
   alias = "db_tunnel_staging"
 
   host      = module.db_tunnel_staging.host
   port      = module.db_tunnel_staging.port
   username  = data.terraform_remote_state.core.outputs.sql_server_staging_username
   password  = data.terraform_remote_state.core.outputs.sql_server_staging_password
+  sslmode   = "require"
+  superuser = false
+}
+
+provider "postgresql" {
+  alias = "db_tunnel_staging_14"
+
+  host      = module.db_tunnel_staging_14.host
+  port      = module.db_tunnel_staging_14.port
+  username  = data.terraform_remote_state.core.outputs.sql_server_staging_14_username
+  password  = data.terraform_remote_state.core.outputs.sql_server_staging_14_password
   sslmode   = "require"
   superuser = false
 }

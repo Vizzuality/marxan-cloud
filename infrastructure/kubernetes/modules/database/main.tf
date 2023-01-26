@@ -33,13 +33,78 @@ resource "postgresql_role" "my_role" {
   ]
 }
 
+resource "postgresql_grant" "postgres_user_db_grant" {
+  provider = postgresql
+
+  database    = local.database
+  role        = "postgres"
+  object_type = "database"
+  privileges  = [
+    "CONNECT",
+    "CREATE",
+    "TEMPORARY",
+  ]
+
+  depends_on = [
+    postgresql_role.my_role,
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
+resource "postgresql_grant" "postgres_user_table_grant" {
+  provider = postgresql
+
+  database    = local.database
+  role        = "postgres"
+  object_type = "table"
+  schema      = "public"
+  privileges  = [
+    "DELETE",
+    "INSERT",
+    "REFERENCES",
+    "SELECT",
+    "TRIGGER",
+    "TRUNCATE",
+    "UPDATE",
+
+  ]
+
+  depends_on = [
+    postgresql_role.my_role,
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
+resource "postgresql_grant" "postgres_user_sequence_grant" {
+  provider = postgresql
+
+  database    = local.database
+  role        = "postgres"
+  object_type = "sequence"
+  schema      = "public"
+  privileges  = [
+    "SELECT",
+    "UPDATE",
+    "USAGE",
+  ]
+
+  depends_on = [
+    postgresql_role.my_role,
+    azurerm_postgresql_flexible_server_database.database
+  ]
+}
+
 resource "postgresql_grant" "db_grant" {
   provider = postgresql
 
   database    = local.database
   role        = local.username
   object_type = "database"
-  privileges  = ["ALL"]
+  privileges  = [
+    "CONNECT",
+    "CREATE",
+    "TEMPORARY",
+  ]
 
   depends_on = [
     postgresql_role.my_role,
