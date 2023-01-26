@@ -9,6 +9,16 @@ locals {
     password = var.postgres_geoprocessing_password
     database = var.postgres_geoprocessing_database
   }
+  api_postgres_14_secret_json = {
+    username = var.postgres_14_api_username
+    password = var.postgres_14_api_password
+    database = var.postgres_14_api_database
+  }
+  geoprocessing_postgres_14_secret_json = {
+    username = var.postgres_14_geoprocessing_username
+    password = var.postgres_14_geoprocessing_password
+    database = var.postgres_14_geoprocessing_database
+  }
 
   api_auth_jwt_secret                    = random_password.jwt_secret.result
   x_auth_api_key                         = random_password.x_auth_api_key.result
@@ -34,7 +44,19 @@ resource "azurerm_key_vault_secret" "api_user_postgresql" {
 
 resource "azurerm_key_vault_secret" "geoprocessing_user_postgresql" {
   name         = "PostgresGeoprocessingUserPassword"
-  value        = jsonencode(local.api_postgres_secret_json)
+  value        = jsonencode(local.geoprocessing_postgres_secret_json)
+  key_vault_id = var.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "api_user_postgresql_14" {
+  name         = "Postgres14ApiUserPassword"
+  value        = jsonencode(local.api_postgres_14_secret_json)
+  key_vault_id = var.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "geoprocessing_user_postgresql_14" {
+  name         = "Postgres14GeoprocessingUserPassword"
+  value        = jsonencode(local.geoprocessing_postgres_14_secret_json)
   key_vault_id = var.key_vault_id
 }
 
@@ -68,6 +90,16 @@ resource "kubernetes_secret" "api_secret" {
     GEO_POSTGRES_USER     = sensitive(local.geoprocessing_postgres_secret_json.username)
     GEO_POSTGRES_PASSWORD = sensitive(local.geoprocessing_postgres_secret_json.password)
     GEO_POSTGRES_DB       = sensitive(local.geoprocessing_postgres_secret_json.database)
+
+    API_POSTGRES_14_HOST     = var.postgres_14_api_hostname
+    API_POSTGRES_14_USER     = sensitive(local.api_postgres_14_secret_json.username)
+    API_POSTGRES_14_PASSWORD = sensitive(local.api_postgres_14_secret_json.password)
+    API_POSTGRES_14_DB       = sensitive(local.api_postgres_14_secret_json.database)
+
+    GEO_POSTGRES_14_HOST     = var.postgres_14_geoprocessing_hostname
+    GEO_POSTGRES_14_USER     = sensitive(local.geoprocessing_postgres_14_secret_json.username)
+    GEO_POSTGRES_14_PASSWORD = sensitive(local.geoprocessing_postgres_14_secret_json.password)
+    GEO_POSTGRES_14_DB       = sensitive(local.geoprocessing_postgres_14_secret_json.database)
 
     REDIS_HOST     = var.redis_host
     REDIS_PASSWORD = var.redis_password

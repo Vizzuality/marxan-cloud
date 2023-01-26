@@ -10,7 +10,7 @@ terraform {
     }
     postgresql = {
       source  = "cyrilgdn/postgresql"
-      version = "1.17.1"
+      version = "1.18.0"
     }
   }
   required_version = "1.3.5"
