@@ -9,6 +9,17 @@ const nextConfig = {
 
     return config;
   },
+  async redirects() {
+    return [
+      ...process.env.MAINTENANCE === 'true' ? [
+        {
+          source: '/:path((?!maintenance$|_next/|fonts/|api/|manifest|favicon).*)',
+          destination: '/maintenance',
+          permanent: false,
+        },
+      ] : [],
+    ];
+  },
 };
 
 module.exports = withPlugins(
