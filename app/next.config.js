@@ -10,15 +10,23 @@ const nextConfig = {
     return config;
   },
   async redirects() {
-    return [
-      ...process.env.MAINTENANCE === 'true' ? [
-        {
-          source: '/:path((?!maintenance$|_next/|fonts/|api/|manifest|favicon).*)',
-          destination: '/maintenance',
-          permanent: false,
-        },
-      ] : [],
-    ];
+    const redirects = [];
+
+    if (process.env.ENABLE_MAINTENANCE_MODE === 'true') {
+      redirects.push({
+        source: '/:path((?!maintenance$|_next/|fonts/|api/|manifest|favicon).*)',
+        destination: '/maintenance',
+        permanent: false,
+      });
+    } else {
+      redirects.push({
+        source: '/maintenance',
+        destination: '/',
+        permanent: false,
+      });
+    }
+
+    return redirects;
   },
 };
 

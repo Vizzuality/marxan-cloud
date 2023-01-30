@@ -27,6 +27,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
 
 - `NEXT_PUBLIC_CONTACT_EMAIL`: Email address to be used for general contact inquiries.
 
+- `ENABLE_MAINTENANCE_MODE`: If set to "true", maintenance mode is enabled on the frontend application, displaying an
+informative message and blocking access to all site pages.
+
 ## Getting Started
 
 First, run the development server:
