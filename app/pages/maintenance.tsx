@@ -1,11 +1,11 @@
 import React from 'react';
 
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import Head from 'layout/head';
+import HeadLayout from 'layout/head';
 import Header from 'layout/header';
 import Intro from 'layout/maintenance/intro';
-import MetaIcons from 'layout/meta-icons';
 import MetaTags from 'layout/meta-tags';
 
 const Maintenance: React.FC = () => {
@@ -13,9 +13,11 @@ const Maintenance: React.FC = () => {
 
   return (
     <>
-      <Head title="Maintenance" />
+      <HeadLayout title="Maintenance" />
 
-      <MetaIcons />
+      <Head>
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+      </Head>
 
       <MetaTags
         name="Marxan conservation Solutions"
