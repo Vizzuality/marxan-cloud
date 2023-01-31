@@ -79,6 +79,24 @@ output "sql_server_production_password" {
   sensitive = true
 }
 
+output "sql_server_production_14_name" {
+  value = length(module.sql_server_production_14) > 0 ? module.sql_server_production_14[0].sql_server_name : null
+}
+
+output "sql_server_production_14_hostname" {
+  value = length(module.sql_server_production_14) > 0 ? module.sql_server_production_14[0].sql_server_url : null
+}
+
+output "sql_server_production_14_username" {
+  value     = length(module.sql_server_production_14) > 0 ? module.sql_server_production_14[0].sql_server_username : null
+  sensitive = true
+}
+
+output "sql_server_production_14_password" {
+  value     = length(module.sql_server_production_14) > 0 ? module.sql_server_production_14[0].sql_server_password : null
+  sensitive = true
+}
+
 output "sql_server_staging_name" {
   value = module.sql_server_staging.sql_server_name
 }
@@ -94,6 +112,24 @@ output "sql_server_staging_username" {
 
 output "sql_server_staging_password" {
   value     = module.sql_server_staging.sql_server_password
+  sensitive = true
+}
+
+output "sql_server_staging_14_name" {
+  value = module.sql_server_staging_14.sql_server_name
+}
+
+output "sql_server_staging_14_hostname" {
+  value = module.sql_server_staging_14.sql_server_url
+}
+
+output "sql_server_staging_14_username" {
+  value     = module.sql_server_staging_14.sql_server_username
+  sensitive = true
+}
+
+output "sql_server_staging_14_password" {
+  value     = module.sql_server_staging_14.sql_server_password
   sensitive = true
 }
 

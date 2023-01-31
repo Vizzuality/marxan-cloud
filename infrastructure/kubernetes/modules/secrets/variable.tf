@@ -69,6 +69,38 @@ variable "postgres_api_database" {
   description = "The postgres api database name"
 }
 
+variable "postgres_14_geoprocessing_hostname" {
+  description = "The postgres geoprocessing database hostname"
+}
+
+variable "postgres_14_geoprocessing_username" {
+  description = "The postgres geoprocessing database username"
+}
+
+variable "postgres_14_geoprocessing_password" {
+  description = "The postgres geoprocessing database password"
+}
+
+variable "postgres_14_geoprocessing_database" {
+  description = "The postgres geoprocessing database name"
+}
+
+variable "postgres_14_api_hostname" {
+  description = "The postgres api database hostname"
+}
+
+variable "postgres_14_api_username" {
+  description = "The postgres api database username"
+}
+
+variable "postgres_14_api_password" {
+  description = "The postgres api database password"
+}
+
+variable "postgres_14_api_database" {
+  description = "The postgres api database name"
+}
+
 variable "azure_storage_account_key" {
   description = "A key for the Azure storage account used for backups"
 }
