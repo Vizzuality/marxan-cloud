@@ -100,7 +100,7 @@ jobs:
 
   push_client_to_registry:
     name: Push Client Docker image to Azure Container Registry
-    if: ${{ github.event.inputs.enable_maintenance_mode == "true" }}
+    if: ${{ github.event.inputs.enable_maintenance_mode == 'true' }}
     needs: wait_for_tests
     runs-on: ubuntu-22.04
     steps:
