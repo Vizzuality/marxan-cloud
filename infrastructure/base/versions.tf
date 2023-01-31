@@ -2,11 +2,11 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.13.0"
+      version = "3.32.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "2.17.0"
+      version = "2.30.0"
     }
 
     template = {
@@ -15,10 +15,10 @@ terraform {
 
     github = {
       source  = "integrations/github"
-      version = "4.27.1"
+      version = "5.9.1"
     }
   }
-  required_version = "1.2.4"
+  required_version = "1.3.5"
 }
 
 provider "azurerm" {

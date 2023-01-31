@@ -38,7 +38,10 @@ import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { FeaturesSpecificationLegacyProjectPieceImporter } from '../../../src/legacy-project-import/legacy-piece-importers/features-specification.legacy-piece-importer';
+import {
+  FeaturesSpecificationLegacyProjectPieceImporter,
+  retriesIntervalForSpecificationStatusInSeconds,
+} from '../../../src/legacy-project-import/legacy-piece-importers/features-specification.legacy-piece-importer';
 import {
   specDatFeatureIdPropertyKey,
   specDatPuidPropertyKey,
@@ -54,6 +57,10 @@ import {
 } from '../cloning/fixtures';
 
 let fixtures: FixtureType<typeof getFixtures>;
+// needs to be comfortably > than the retries interval when polling for
+// status
+const timeoutForTestsThatNeedToCheckSpecificationJobStatus =
+  2 * retriesIntervalForSpecificationStatusInSeconds * 1000;
 
 describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
   beforeEach(async () => {
@@ -202,80 +209,92 @@ describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
       .ThenASpecificationRequestErrorShouldBeThrown();
   });
 
-  it(`fails when specification async job fails`, async () => {
-    const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+  it(
+    `fails when specification async job fails`,
+    async () => {
+      const specDatFileType = LegacyProjectImportFileType.SpecDat;
+      const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+      const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        specDatFileType,
+      );
+      const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
-    const job = fixtures.GivenJobInput({
-      specDatFileLocation,
-      puvsprDatFileLocation,
-    });
-    fixtures.GivenValidSpecDatFile();
-    fixtures.GivenValidPuvsprDatFile();
+      const job = fixtures.GivenJobInput({
+        specDatFileLocation,
+        puvsprDatFileLocation,
+      });
+      fixtures.GivenValidSpecDatFile();
+      fixtures.GivenValidPuvsprDatFile();
 
-    await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .AndSpecificationProcessFails()
-      .ThenASpecificationDidntFinishErrorShouldBeThrown();
-  });
+      await fixtures
+        .WhenPieceImporterIsInvoked(job)
+        .AndSpecificationProcessFails()
+        .ThenASpecificationDidntFinishErrorShouldBeThrown();
+    },
+    timeoutForTestsThatNeedToCheckSpecificationJobStatus,
+  );
 
-  it(`fails when specification async job timeouts`, async () => {
-    const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+  it(
+    `fails when specification async job times out`,
+    async () => {
+      const specDatFileType = LegacyProjectImportFileType.SpecDat;
+      const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+      const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        specDatFileType,
+      );
+      const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
-    const job = fixtures.GivenJobInput({
-      specDatFileLocation,
-      puvsprDatFileLocation,
-    });
-    fixtures.GivenValidSpecDatFile();
-    fixtures.GivenValidPuvsprDatFile();
+      const job = fixtures.GivenJobInput({
+        specDatFileLocation,
+        puvsprDatFileLocation,
+      });
+      fixtures.GivenValidSpecDatFile();
+      fixtures.GivenValidPuvsprDatFile();
 
-    await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .AndSpecificationProcessTimeouts()
-      .ThenASpecificationDidntFinishErrorShouldBeThrown();
-  }, 70_000);
+      await fixtures
+        .WhenPieceImporterIsInvoked(job, 2)
+        .AndSpecificationProcessTimesOut()
+        .ThenASpecificationDidntFinishErrorShouldBeThrown();
+    },
+    timeoutForTestsThatNeedToCheckSpecificationJobStatus * 2,
+  );
 
-  it(`fails if features data records does not contain required properties`, async () => {
-    const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+  it(
+    `fails if features data records does not contain required properties`,
+    async () => {
+      const specDatFileType = LegacyProjectImportFileType.SpecDat;
+      const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+      const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        specDatFileType,
+      );
+      const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
-    await fixtures.GivenProjectExist();
-    const job = fixtures.GivenJobInput({
-      specDatFileLocation,
-      puvsprDatFileLocation,
-    });
-    fixtures.GivenValidSpecDatFile();
-    fixtures.GivenValidPuvsprDatFile();
+      await fixtures.GivenProjectExist();
+      const job = fixtures.GivenJobInput({
+        specDatFileLocation,
+        puvsprDatFileLocation,
+      });
+      fixtures.GivenValidSpecDatFile();
+      fixtures.GivenValidPuvsprDatFile();
 
-    await fixtures.GivenFeaturesData({ includeRequiredProperties: false });
+      await fixtures.GivenFeaturesData({ includeRequiredProperties: false });
 
-    await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .AndSpecificationProcessSucceeds()
-      .ThenAMissingRequiredPropertiesErrorShouldBeThrown();
-  });
+      await fixtures
+        .WhenPieceImporterIsInvoked(job)
+        .AndSpecificationProcessSucceeds()
+        .ThenAMissingRequiredPropertiesErrorShouldBeThrown();
+    },
+    timeoutForTestsThatNeedToCheckSpecificationJobStatus,
+  );
 
   it('fails if puvspr.dat contains features not present in spec.dat', async () => {
     const specDatFileType = LegacyProjectImportFileType.SpecDat;
@@ -304,32 +323,36 @@ describe(FeaturesSpecificationLegacyProjectPieceImporter, () => {
       .ThenPuvsprContainsUnknownFeaturesErrorShouldBeThrown();
   });
 
-  it('imports successfully scenario features data', async () => {
-    const specDatFileType = LegacyProjectImportFileType.SpecDat;
-    const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
+  it(
+    'imports successfully scenario features data',
+    async () => {
+      const specDatFileType = LegacyProjectImportFileType.SpecDat;
+      const puvsprDatFileType = LegacyProjectImportFileType.PuvsprDat;
 
-    const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      specDatFileType,
-    );
-    const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
-      puvsprDatFileType,
-    );
+      const specDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        specDatFileType,
+      );
+      const puvsprDatFileLocation = await fixtures.GivenDatFileIsAvailableInFilesRepository(
+        puvsprDatFileType,
+      );
 
-    await fixtures.GivenProjectExist();
-    const job = fixtures.GivenJobInput({
-      specDatFileLocation,
-      puvsprDatFileLocation,
-    });
-    fixtures.GivenValidSpecDatFile();
-    fixtures.GivenValidPuvsprDatFile();
+      await fixtures.GivenProjectExist();
+      const job = fixtures.GivenJobInput({
+        specDatFileLocation,
+        puvsprDatFileLocation,
+      });
+      fixtures.GivenValidSpecDatFile();
+      fixtures.GivenValidPuvsprDatFile();
 
-    await fixtures.GivenFeaturesData();
+      await fixtures.GivenFeaturesData();
 
-    await fixtures
-      .WhenPieceImporterIsInvoked(job)
-      .AndSpecificationProcessSucceeds()
-      .ThenScenarioFeaturesDataShouldBeImported();
-  });
+      await fixtures
+        .WhenPieceImporterIsInvoked(job)
+        .AndSpecificationProcessSucceeds()
+        .ThenScenarioFeaturesDataShouldBeImported();
+    },
+    timeoutForTestsThatNeedToCheckSpecificationJobStatus,
+  );
 });
 
 const getFixtures = async () => {
@@ -682,7 +705,10 @@ const getFixtures = async () => {
         }),
       );
     },
-    WhenPieceImporterIsInvoked: (input: LegacyProjectImportJobInput) => {
+    WhenPieceImporterIsInvoked: (
+      input: LegacyProjectImportJobInput,
+      retries?: number,
+    ) => {
       return {
         ThenADatFileNotFoundErrorShouldBeThrown: async (
           file: LegacyProjectImportFileType,
@@ -729,10 +755,10 @@ const getFixtures = async () => {
             },
           };
         },
-        AndSpecificationProcessTimeouts: () => {
+        AndSpecificationProcessTimesOut: () => {
           return {
             ThenASpecificationDidntFinishErrorShouldBeThrown: async () => {
-              await expect(sut.run(input)).rejects.toThrow(
+              await expect(sut.run(input, retries)).rejects.toThrow(
                 /specification didn't finish: specification timeout/gi,
               );
             },

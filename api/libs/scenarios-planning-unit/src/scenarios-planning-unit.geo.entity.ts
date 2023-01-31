@@ -38,9 +38,20 @@ export class ScenariosPlanningUnitGeoEntity {
   })
   scenarioId!: string;
 
-  // TODO: debt: either 0|1|2|3 or null|1|2|3; currently DB allows nulls
-  // @Min(0)
-  // @Max(3)
+  /**
+   * @debt: either 0|1|2|3 or null|1|2|3; currently DB allows nulls
+   * @Min(0)
+   * @Max(3)
+   *
+   * Caveat/@debt: as a side-effect of a mistake in the Marxan solver's manual
+   * during early stages of this platform's development, values are stored as
+   * 0/null, 1 or 2 internally, but then used as 0, 2 and 3 when generating
+   * `pu.dat` files.
+   *
+   * Likewise, when importing legacy projects, we map back Marxan's values to
+   * our internal representation (squashing Marxan's 0 and 1 to 0 internally, as
+   * there is no use anywhere in the platform of the 1 status code).
+   */
   @Column({
     type: 'int',
     name: 'lockin_status',

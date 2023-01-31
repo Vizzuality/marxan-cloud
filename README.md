@@ -77,13 +77,30 @@ via a Docker volume.
 
 ### Running the Marxan Cloud platform
 
-Run `make start` to start all the 4 services needed to run Marxan, as well as
-the required database services.
+Run `make start-api` to start all the 4 services needed to run Marxan, as well
+as the required database services, in containers via Docker Compose.
 
 The docker build process may take a few minutes, depending on your hardware,
 software and internet connection. Once completed, the applications will start,
-and you should be able to access the Marxan site on `localhost`, on the port 
+and you should be able to access the Marxan site on `localhost`, on the port
 specified as `APP_SERVICE_PORT`.
+
+### Debugging via Node inspector
+
+To enable the Node inspector while running the MarxanCloud API services in
+containers, use `make debug-api` instead. Example configuration
+files for debugger setup in popular editors are provided in the
+`docs/developers/editors/` documentation folder.
+
+When enabled, the Node inspector will start listening on the default port
+`9229/tcp` both in the API and geoprocessing containers, and by default Docker
+will forward this port to port `9230/tcp` on the host for the API service, and
+to port `9240/tcp` for the geoprocessing service, where the inspector can be
+reached by clients.
+
+For security reasons (in case the host is, for example, a VM with a public IP
+address and without a firewall in front, for whatever reason), the inspector
+port will only be open on the loopback interface.
 
 ## Running Marxan natively
 
@@ -353,7 +370,7 @@ This step is only needed when developing Python notebooks for Marxan.
 
 Run `make notebooks` to start the jupyterlab service.
 
-## Development workflow (TBD)
+## Development workflow
 
 We use a lightweight git flow workflow. `develop`, `main`, feature/bug fix
 branches, release branches (`release/vX.Y.Z-etc`).

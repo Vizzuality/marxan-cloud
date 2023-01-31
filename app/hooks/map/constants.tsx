@@ -226,33 +226,37 @@ export const LEGEND_LAYERS = {
   },
 
   // SOLUTIONS
-  frequency: () => ({
-    id: 'frequency',
-    name: 'Frequency',
-    type: 'gradient',
-    settingsManager: {
-      opacity: true,
-      visibility: true,
-    },
-    items: [
-      {
-        color: COLORS.frequency[0],
-        value: '0',
+  frequency: (options) => {
+    const { numberOfRuns } = options;
+
+    return ({
+      id: 'frequency',
+      name: numberOfRuns ? `Frequency (${numberOfRuns} runs)` : 'Frequency',
+      type: 'gradient',
+      settingsManager: {
+        opacity: true,
+        visibility: true,
       },
-      {
-        color: COLORS.frequency[1],
-        value: null,
-      },
-      {
-        color: COLORS.frequency[2],
-        value: null,
-      },
-      {
-        color: COLORS.frequency[3],
-        value: '100',
-      },
-    ],
-  }),
+      items: [
+        {
+          color: COLORS.frequency[0],
+          value: '0',
+        },
+        {
+          color: COLORS.frequency[1],
+          value: null,
+        },
+        {
+          color: COLORS.frequency[2],
+          value: null,
+        },
+        {
+          color: COLORS.frequency[3],
+          value: '100',
+        },
+      ],
+    });
+  },
   solution: () => ({
     id: 'solution',
     name: 'Solution selected',

@@ -10,9 +10,10 @@ locals {
     database = var.postgres_geoprocessing_database
   }
 
-  api_auth_jwt_secret    = random_password.jwt_secret.result
-  x_auth_api_key         = random_password.x_auth_api_key.result
-  cloning_signing_secret = tls_private_key.cloning_signing_secret.private_key_pem
+  api_auth_jwt_secret                    = random_password.jwt_secret.result
+  x_auth_api_key                         = random_password.x_auth_api_key.result
+  cloning_signing_secret                 = tls_private_key.cloning_signing_secret.private_key_pem
+  cloning_storage_backup_restic_password = random_password.cloning_storage_backup_restic_password.result
 }
 
 resource "random_password" "jwt_secret" {
@@ -42,6 +43,11 @@ resource "tls_private_key" "cloning_signing_secret" {
   rsa_bits  = 4096
 }
 
+resource "random_password" "cloning_storage_backup_restic_password" {
+  length           = 16
+  special          = true
+}
+
 resource "kubernetes_secret" "api_secret" {
   metadata {
     name      = "api"
@@ -69,6 +75,9 @@ resource "kubernetes_secret" "api_secret" {
 
     SPARKPOST_APIKEY = var.sparkpost_api_key
     API_SERVICE_URL  = var.api_url
+
+    AZURE_STORAGE_ACCOUNT_KEY              = sensitive(var.azure_storage_account_key)
+    CLONING_STORAGE_BACKUP_RESTIC_PASSWORD = sensitive(local.cloning_storage_backup_restic_password)
   }
 }
 

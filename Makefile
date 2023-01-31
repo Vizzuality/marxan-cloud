@@ -40,6 +40,10 @@ test-commands:
 start-api:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing webshot
 
+# Start backend services in debug mode (listening on inspector port)
+debug-api:
+	ENABLE_DEBUG_MODE=true docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build api geoprocessing
+	
 # Start all the services.
 start:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} up --build

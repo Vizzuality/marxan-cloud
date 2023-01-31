@@ -55,8 +55,8 @@ export class ScenarioPlanningUnitsProtectedStatusCalculatorService {
       UPDATE scenarios_pu_data
       SET lockin_status      =
         (case
-          when ((select lock_status_set_by_user FROM pu_pa
-            WHERE scenarios_pu_data.id = pu_pa.id) is null)
+          when ((SELECT lock_status_set_by_user FROM pu_pa
+            WHERE scenarios_pu_data.id = pu_pa.id) IS false)
             then (SELECT lockin_status
              FROM pu_pa
              WHERE scenarios_pu_data.id = pu_pa.id)

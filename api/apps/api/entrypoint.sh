@@ -7,8 +7,13 @@ case "$1" in
         exec yarn run "$@"
         ;;
     develop)
-        echo "Running Development Server"
-        exec yarn api:start:dev
+        if [ $ENABLE_DEBUG_MODE = "true" ]; then
+            echo "Running Development Server with inspector"
+            exec yarn api:start:debug
+        else
+            echo "Running Development Server"
+            exec yarn api:start:dev
+        fi
         ;;
     test-unit)
         echo "Running Unit Tests"

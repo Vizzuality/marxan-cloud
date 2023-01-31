@@ -47,6 +47,8 @@ type ApiEventSelectResult = {
 
 type FeatureIdByIntegerId = Record<number, string>;
 
+export const retriesIntervalForSpecificationStatusInSeconds = 30;
+
 @Injectable()
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesSpecificationLegacyProjectPieceImporter
@@ -246,11 +248,11 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
   private async waitUntilSpecificationEnds(
     scenarioId: string,
-    retries = 20,
+    retries = 240,
   ): Promise<Either<string, true>> {
     const timeout = left('specification timeout');
     const failure = left('specification failed');
-    const intervalSeconds = 3;
+    const intervalSeconds = retriesIntervalForSpecificationStatusInSeconds;
     let triesLeft = retries;
 
     return new Promise<Either<string, true>>((resolve) => {
@@ -289,6 +291,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     specRows: PropSpecDatRow[],
     projectId: string,
     scenarioId: string,
+    retries?: number,
   ): Promise<void> {
     const featureIdByIntegerId = await this.getFeatureIdByIntegerIdMap(
       projectId,
@@ -328,6 +331,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
     const specificationResult = await this.waitUntilSpecificationEnds(
       scenarioId,
+      retries,
     );
     if (isLeft(specificationResult)) {
       this.logAndThrow(
@@ -393,6 +397,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
 
   async run(
     input: LegacyProjectImportJobInput,
+    retries?: number,
   ): Promise<LegacyProjectImportJobOutput> {
     const { files, projectId, scenarioId } = input;
 
@@ -413,7 +418,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     }
 
     const specRows = this.getPropSpecRows(specRowsOrError, puvsprRowsOrError);
-    await this.runSpecification(specRows, projectId, scenarioId);
+    await this.runSpecification(specRows, projectId, scenarioId, retries);
     await this.updateScenarioFeaturesData(specRows, scenarioId);
 
     return input;

@@ -35,7 +35,9 @@ export class ScenarioProtectedAreaCalculationProcessor
       job.data.protectedAreaFilterByIds! &&
       job.data.protectedAreaFilterByIds!.length > 0
         ? `where id IN ('${wdpaList}')`
-        : ``;
+        : // short-circuit to an empty set if no protected areas have been
+          // selected
+          `where id IS null`;
     const query = `
     with pu as (
       select spd.id, pug.the_geom, pug.area as pu_area

@@ -385,6 +385,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       puIncludedValue: puTmpIncludedValue,
       puExcludedValue: puTmpExcludedValue,
       runId: selectedSolution?.runId || bestSolution?.runId,
+      numberOfRuns: scenarioData?.numberOfRuns || 0,
       layerSettings,
     },
   });

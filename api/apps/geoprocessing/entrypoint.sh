@@ -3,8 +3,13 @@ set -e
 
 case "$1" in
     develop)
-        echo "Running Development Server"
-        exec yarn geoprocessing:start:dev
+        if [ $ENABLE_DEBUG_MODE = "true" ]; then
+            echo "Running Development Server with inspector"
+            exec yarn geoprocessing:start:debug
+        else
+            echo "Running Development Server"
+            exec yarn geoprocessing:start:dev
+        fi
         ;;
     test-unit)
         echo "Running Unit Tests"

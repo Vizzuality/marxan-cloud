@@ -5,6 +5,7 @@ import { withProject } from 'hoc/projects';
 
 import Header from 'layout/header';
 import Help from 'layout/help/button';
+import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
 import Protected from 'layout/protected';
 import ScenarioNewMap from 'layout/scenarios/new/map';
@@ -36,6 +37,7 @@ const NewScenarioPage: React.FC = () => {
           </Wrapper>
         </div>
 
+        <DocumentationLink />
         <Help />
       </main>
     </Protected>

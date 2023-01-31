@@ -26,10 +26,20 @@ variable "cleanup_temporary_folders" {
 
 variable "temp_data_pvc_name" {
   type        = string
-  description = "Name of the PVC to use for backend storage for temporary data"
+  description = "Name of the PVC to use for the backend storage for temporary data"
+}
+
+variable "temp_data_volume_mount_path" {
+  type        = string
+  description = "Mount path for the backend storage for cloning data"
 }
 
 variable "cloning_pvc_name" {
   type        = string
-  description = "Name of the PVC to use for backend storage for cloning"
+  description = "Name of the PVC to use for the backend storage for cloning data"
+}
+
+variable "cloning_volume_mount_path" {
+  type        = string
+  description = "Mount path for the backend storage for cloning data"
 }

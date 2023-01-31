@@ -24,6 +24,13 @@ export abstract class DatFileReader<I, O> {
         delimiter,
         ignoreEmpty: true,
       })
+        /**
+         * @caveat CsvParseStream.validate() and CsvParseStream.transform()
+         * actually simply _set_ a validation and transformation function,
+         * respectively, but don't attach validation and trasformation steps to
+         * the stream in the order of attachment: at least in fast-csv 4.3.6
+         * transformation is always performed first, and validation next.
+         */
         .validate((data: O, cb): void => {
           const isValidOrError = this.validateData(data);
           if (isLeft(isValidOrError)) {

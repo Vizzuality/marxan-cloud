@@ -33,7 +33,7 @@ describe(`when getting input.zip`, () => {
 });
 
 describe(`when getting spec.dat`, () => {
-  const snapshotToMatch = `"id	target	prop	spf	target2	targetocc	sepnum	sepdistance"`;
+  const snapshotToMatch = `"id	target	prop	spf	target2	targetocc	name	sepnum	sepdistance"`;
 
   it(`as owner, should resolve text/*`, async () => {
     expect(
@@ -98,7 +98,7 @@ describe(`when getting input.dat`, () => {
       RUNMODE 1
       HEURTYPE -1
       RANDSEED -1
-      BESTSCORE 0
+      BESTSCORE -1
       CLUMPTYPE 0
       ITIMPTYPE 0
       MISSLEVEL 1
@@ -149,7 +149,7 @@ describe(`when getting input.dat`, () => {
       RUNMODE 1
       HEURTYPE -1
       RANDSEED -1
-      BESTSCORE 0
+      BESTSCORE -1
       CLUMPTYPE 0
       ITIMPTYPE 0
       MISSLEVEL 1
@@ -200,7 +200,7 @@ describe(`when getting input.dat`, () => {
       RUNMODE 1
       HEURTYPE -1
       RANDSEED -1
-      BESTSCORE 0
+      BESTSCORE -1
       CLUMPTYPE 0
       ITIMPTYPE 0
       MISSLEVEL 1

@@ -1,29 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { ScenarioFeaturesData } from '@marxan/features';
-import { Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { SpecDataTsvFile } from './spec-dat-tsv-file';
+import { apiConnections } from '@marxan-api/ormconfig';
+
+export type ScenarioFeaturesDataForSpecDat = Pick<
+  ScenarioFeaturesData,
+  | 'featureId'
+  | 'target'
+  | 'prop'
+  | 'fpf'
+  | 'target2'
+  | 'targetocc'
+  | 'name'
+  | 'sepNum'
+  | 'metadata'
+  | 'apiFeatureId'
+>;
 
 @Injectable()
 export class SpecDatService {
   constructor(
     @InjectRepository(ScenarioFeaturesData, DbConnections.geoprocessingDB)
     private readonly scenarioFeaturesData: Repository<ScenarioFeaturesData>,
+    @InjectEntityManager(apiConnections.default)
+    private readonly apiEntityManager: EntityManager,
   ) {}
 
   async getSpecDatContent(scenarioId: string): Promise<string> {
-    const rows: Pick<
-      ScenarioFeaturesData,
-      | 'featureId'
-      | 'target'
-      | 'prop'
-      | 'fpf'
-      | 'target2'
-      | 'targetocc'
-      | 'sepNum'
-      | 'metadata'
-    >[] = await this.scenarioFeaturesData.query(
+    const rows: ScenarioFeaturesDataForSpecDat[] = await this.scenarioFeaturesData.query(
       `
       with grouped_feature as (
         select min(sfd.feature_id) as min_feature_id
@@ -46,6 +53,7 @@ export class SpecDatService {
         fpf,
         target2,
         targetocc,
+        api_feature_id as "apiFeatureId",
         sepnum as "sepNum",
         metadata
       from grouped_feature
@@ -55,11 +63,52 @@ export class SpecDatService {
       [scenarioId],
     );
 
+    /**
+     * Add feature names to exported data: mainly meant to be useful when users
+     * request a downloadable artifact for a project, and want to inspect or use
+     * offline the contents of the exported spec.dat file that we generate.
+     *
+     * Since db and processing overhead for this lookup is minimal, we do it in
+     * any case (even when generating spec.dat files to feed to the Marxan
+     * solver within the platform).
+     */
+    const rowsWithFeatureNames = await this.extendSpecDatContentWithFeatureNames(
+      rows,
+    );
+
     const specDatFile = new SpecDataTsvFile();
-    for (const row of rows) {
+    for (const row of rowsWithFeatureNames) {
       specDatFile.addRow(row);
     }
 
     return specDatFile.toString();
+  }
+
+  async extendSpecDatContentWithFeatureNames(
+    rows: ScenarioFeaturesDataForSpecDat[],
+  ): Promise<ScenarioFeaturesDataForSpecDat[]> {
+    if (rows.length) {
+      const scenarioFeatureNames: {
+        id: string;
+        featureClassName: string;
+      }[] = await this.apiEntityManager
+        .createQueryBuilder()
+        .select('id, feature_class_name as "featureClassName"')
+        .from('features', 'f')
+        .where('f.id in (:...featureIds)', {
+          featureIds: rows.map((row) => row.apiFeatureId),
+        })
+        .execute();
+
+      const rowsWithFeatureNames = rows.map((row) => ({
+        name: scenarioFeatureNames.find((sfn) => sfn.id === row.apiFeatureId)
+          ?.featureClassName,
+        ...row,
+      }));
+
+      return rowsWithFeatureNames;
+    } else {
+      return rows;
+    }
   }
 }

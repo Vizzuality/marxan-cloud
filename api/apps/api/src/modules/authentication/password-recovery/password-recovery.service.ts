@@ -22,7 +22,7 @@ export class PasswordRecoveryService {
   ) {}
 
   async resetPassword(email: string): Promise<void> {
-    const userId = await this.users.findUserId(email);
+    const userId = await this.users.findActiveUserId(email);
     if (!userId) {
       return;
     }

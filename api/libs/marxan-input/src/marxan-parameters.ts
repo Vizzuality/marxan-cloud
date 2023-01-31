@@ -40,7 +40,7 @@ export class MarxanParametersDefaults {
   BLM = 1;
   PROP = 0.5;
   RANDSEED = -1;
-  BESTSCORE = 0;
+  BESTSCORE = -1;
   NUMREPS = 10;
   NUMITNS = 1000000;
   STARTTEMP = -1;

@@ -190,6 +190,7 @@ export interface UseLegend {
     puIncludedValue?: string[];
     puExcludedValue?: string[];
     runId?: string;
+    numberOfRuns?: number;
     layerSettings?: Record<string, Record<string, unknown>>;
   };
 }

@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Marxan API",
+            "type": "node",
+            "request": "attach",
+            "restart": true,
+            "port": 9230, // @todo: make this configurable via environment variable
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}/api",
+            "remoteRoot": "/opt/marxan-api",
+            "outFiles": [
+                "!**/node_modules/**"
+            ],
+            "sourceMaps": true
+        },
+        {
+            "name": "Marxan Geoprocessing service",
+            "type": "node",
+            "request": "attach",
+            "restart": true,
+            "port": 9240, // @todo: make this configurable via environment variable
+            "address": "127.0.0.1",
+            "localRoot": "${workspaceFolder}/api",
+            "remoteRoot": "/opt/marxan-geoprocessing",
+            "outFiles": [
+                "!**/node_modules/**"
+            ],
+            "sourceMaps": true
+        }
+    ]
+}
