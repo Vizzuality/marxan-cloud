@@ -24,7 +24,7 @@ on:
 jobs:
   wait_for_tests:
     name: Wait for tests to finish running
-    if: ${{ github.event.inputs.enable_maintenance_mode == 'false' }}
+    if: ${{ github.event.inputs.enable_maintenance_mode != 'true' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for API tests to run
