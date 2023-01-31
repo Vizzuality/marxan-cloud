@@ -15,10 +15,16 @@ on:
       - 'app/**'
       - 'webshot/**'
   workflow_dispatch:
+    inputs:
+      enable_maintenance_mode:
+        type: boolean
+        description: If maintenance mode should be enabled
+        default: false
 
 jobs:
   wait_for_tests:
     name: Wait for tests to finish running
+    if: ${{ github.event.inputs.enable_maintenance_mode != 'true' }}
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for API tests to run
@@ -95,6 +101,7 @@ jobs:
 
   push_client_to_registry:
     name: Push Client Docker image to Azure Container Registry
+    if: ${{ github.event.inputs.enable_maintenance_mode == 'true' && always() || success() }}
     needs: wait_for_tests
     runs-on: ubuntu-22.04
     steps:
@@ -124,5 +131,6 @@ jobs:
             --build-arg NEXTAUTH_URL=${{ github.ref != 'refs/heads/main' && secrets.NEXTAUTH_URL_STAGING || secrets.NEXTAUTH_URL_PRODUCTION }} \
             --build-arg NEXT_PUBLIC_FEATURE_FLAGS=${{ github.ref != 'refs/heads/main' && secrets.NEXT_PUBLIC_FEATURE_FLAGS_STAGING || secrets.NEXT_PUBLIC_FEATURE_FLAGS_PRODUCTION }} \
             --build-arg NEXT_PUBLIC_MAPBOX_API_TOKEN=${{ secrets.NEXT_PUBLIC_MAPBOX_API_TOKEN }} \
+            --build-arg ENABLE_MAINTENANCE_MODE=${{ github.event.inputs.enable_maintenance_mode }} \
             --build-arg NEXT_PUBLIC_CONTACT_EMAIL=${{ secrets.NEXT_PUBLIC_CONTACT_EMAIL }}
           docker push -a ${{ secrets.REGISTRY_LOGIN_SERVER }}/marxan-client
