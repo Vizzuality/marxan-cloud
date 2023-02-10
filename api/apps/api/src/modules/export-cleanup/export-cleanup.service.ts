@@ -86,12 +86,25 @@ export class ExportCleanupService implements ExportCleanup {
     cleanupTask.stdin.end();
   }
 
+  /**
+   * Purge metadata from database, for exports of projects that are past the
+   * configured validity timespan, and that are not published.
+   *
+   * Exports of published projects need to be kept available indefinitely,
+   * unless the project gets unpublished, in which case the export's metadata
+   * and data can eventually be purged.
+   *
+   * @debt We should also delete exports for scenarios that belong to projects
+   * whose export has been or is being deleted: but see notes for
+   * `ExportCleanupService.identifyValidResources()` about caveats.
+   */
   private async purgeExpiredProjectExportMetadata() {
     return await this.apiEntityManager.query(
       `
     DELETE FROM exports e
       WHERE e.resource_kind = 'project' AND
-      (AGE(NOW(), e.created_at) > $1);
+      (AGE(NOW(), e.created_at) > $1)
+      AND e.resource_id NOT IN (SELECT id FROM published_projects);
     `,
       [`${validityIntervalInHours} hours`],
     );
