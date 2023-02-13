@@ -67,7 +67,7 @@
       "artifactValidityInHours": 168,
       "cleanupTemporaryFolders": true,
       "cleanupCronJobSettings": {
-        "interval": "0 0 1 1 *"
+        "interval": "23 5 * * *"
       }
     }
   },
