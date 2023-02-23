@@ -142,6 +142,36 @@ module "k8s_geoprocessing_database_production_14" {
   }
 }
 
+module "k8s_api_database_production_tulip" {
+  count = var.deploy_production ? 1 : 0
+
+  source          = "./modules/database"
+  resource_group  = data.azurerm_resource_group.resource_group
+  project_name    = var.project_name
+  namespace       = "production"
+  name            = "api"
+  sql_server_name = data.terraform_remote_state.core.outputs.sql_server_production_tulip_name
+
+  providers = {
+    postgresql = postgres.db_tunnel_production_tulip
+  }
+}
+
+module "k8s_geoprocessing_database_production_tulip" {
+  count = var.deploy_production ? 1 : 0
+
+  source          = "./modules/database"
+  resource_group  = data.azurerm_resource_group.resource_group
+  project_name    = var.project_name
+  namespace       = "production"
+  name            = "geoprocessing"
+  sql_server_name = data.terraform_remote_state.core.outputs.sql_server_production_tulip_name
+
+  providers = {
+    postgresql = postgres.db_tunnel_production_tulip
+  }
+}
+
 module "storage_pvc_production" {
   count = var.deploy_production ? 1 : 0
 
@@ -216,36 +246,72 @@ module "webshot_production" {
   deployment_name = "webshot"
 }
 
-module "production_secrets" {
+module "production_cloud_secrets" {
   count = var.deploy_production ? 1 : 0
 
-  source                             = "./modules/secrets"
-  project_name                       = var.project_name
-  namespace                          = "production"
-  name                               = "api"
-  key_vault_id                       = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
-  redis_host                         = data.terraform_remote_state.core.outputs.redis_hostname
-  redis_password                     = data.terraform_remote_state.core.outputs.redis_password
-  redis_port                         = data.terraform_remote_state.core.outputs.redis_port
-  sparkpost_api_key                  = var.sparkpost_api_key
-  api_url                            = "api.${var.domain}"
-  postgres_api_database              = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
-  postgres_api_username              = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
-  postgres_api_password              = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
-  postgres_api_hostname              = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
-  postgres_geoprocessing_database    = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_database : null
-  postgres_geoprocessing_username    = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_username : null
-  postgres_geoprocessing_password    = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_password : null
-  postgres_geoprocessing_hostname    = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_hostname : null
-  postgres_14_api_database           = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_database : null
-  postgres_14_api_username           = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_username : null
-  postgres_14_api_password           = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_password : null
-  postgres_14_api_hostname           = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_hostname : null
-  postgres_14_geoprocessing_database = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_database : null
-  postgres_14_geoprocessing_username = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_username : null
-  postgres_14_geoprocessing_password = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_password : null
-  postgres_14_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_hostname : null
-  azure_storage_account_key          = data.azurerm_storage_account.storage_account.primary_access_key
+  source                                = "./modules/cloud_secrets"
+  project_name                          = var.project_name
+  namespace                             = "production"
+  name                                  = "api"
+  key_vault_id                          = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  redis_host                            = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                        = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                            = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key                     = var.sparkpost_api_key
+  api_url                               = "api.${var.domain}"
+  postgres_api_database                 = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_database : null
+  postgres_api_username                 = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_username : null
+  postgres_api_password                 = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_password : null
+  postgres_api_hostname                 = length(module.k8s_api_database_production) > 0 ? module.k8s_api_database_production[0].postgresql_hostname : null
+  postgres_geoprocessing_database       = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_database : null
+  postgres_geoprocessing_username       = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_username : null
+  postgres_geoprocessing_password       = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_password : null
+  postgres_geoprocessing_hostname       = length(module.k8s_geoprocessing_database_production) > 0 ? module.k8s_geoprocessing_database_production[0].postgresql_hostname : null
+  postgres_14_api_database              = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_database : null
+  postgres_14_api_username              = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_username : null
+  postgres_14_api_password              = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_password : null
+  postgres_14_api_hostname              = length(module.k8s_api_database_production_14) > 0 ? module.k8s_api_database_production_14[0].postgresql_hostname : null
+  postgres_14_geoprocessing_database    = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_database : null
+  postgres_14_geoprocessing_username    = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_username : null
+  postgres_14_geoprocessing_password    = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_password : null
+  postgres_14_geoprocessing_hostname    = length(module.k8s_geoprocessing_database_production_14) > 0 ? module.k8s_geoprocessing_database_production_14[0].postgresql_hostname : null
+  postgres_tulip_api_database           = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_database : null
+  postgres_tulip_api_username           = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_username : null
+  postgres_tulip_api_password           = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_password : null
+  postgres_tulip_api_hostname           = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_hostname : null
+  postgres_tulip_geoprocessing_database = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_database : null
+  postgres_tulip_geoprocessing_username = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_username : null
+  postgres_tulip_geoprocessing_password = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_password : null
+  postgres_tulip_geoprocessing_hostname = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_hostname : null
+  azure_storage_account_key             = data.azurerm_storage_account.storage_account.primary_access_key
+}
+
+module "production_kubernetes_secrets" {
+  count = var.deploy_production ? 1 : 0
+
+  source                                 = "./modules/kubernetes_secrets"
+  project_name                           = var.project_name
+  namespace                              = "production"
+  name                                   = "api"
+  key_vault_id                           = length(module.key_vault_production) > 0 ? module.key_vault_production[0].key_vault_id : null
+  redis_host                             = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                         = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                             = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key                      = var.sparkpost_api_key
+  api_url                                = "api.${var.domain}"
+  postgres_api_database                  = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_database : null
+  postgres_api_username                  = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_username : null
+  postgres_api_password                  = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_password : null
+  postgres_api_hostname                  = length(module.k8s_api_database_production_tulip) > 0 ? module.k8s_api_database_production_tulip[0].postgresql_hostname : null
+  postgres_geoprocessing_database        = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_database : null
+  postgres_geoprocessing_username        = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_username : null
+  postgres_geoprocessing_password        = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_password : null
+  postgres_geoprocessing_hostname        = length(module.k8s_geoprocessing_database_production_tulip) > 0 ? module.k8s_geoprocessing_database_production_tulip[0].postgresql_hostname : null
+  azure_storage_account_key              = data.azurerm_storage_account.storage_account.primary_access_key
+  api_auth_jwt_secret                    = length(module.production_cloud_secrets) > 0 ? module.production_cloud_secrets[0].api_auth_jwt_secret : null
+  x_auth_api_key                         = length(module.production_cloud_secrets) > 0 ? module.production_cloud_secrets[0].x_auth_api_key : null
+  cloning_signing_secret                 = length(module.production_cloud_secrets) > 0 ? module.production_cloud_secrets[0].cloning_signing_secret : null
+  cloning_storage_backup_restic_password = length(module.production_cloud_secrets) > 0 ? module.production_cloud_secrets[0].cloning_storage_backup_restic_password : null
 }
 
 module "ingress_production" {
@@ -272,6 +338,12 @@ data "azurerm_postgresql_flexible_server" "marxan_production_14" {
   resource_group_name = data.azurerm_resource_group.resource_group.name
 }
 
+data "azurerm_postgresql_flexible_server" "marxan_production_tulip" {
+  count               = var.deploy_production ? 1 : 0
+  name                = lookup(data.terraform_remote_state.core.outputs, "sql_server_production_tulip_name", null)
+  resource_group_name = data.azurerm_resource_group.resource_group.name
+}
+
 module "db_tunnel_production" {
   count = var.deploy_production ? 1 : 0
 
@@ -290,6 +362,18 @@ module "db_tunnel_production_14" {
   source = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
 
   target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production_14[0], "fqdn", null)
+  target_port = 5432
+
+  gateway_host = data.terraform_remote_state.core.outputs.bastion_hostname
+  gateway_user = "ubuntu"
+}
+
+module "db_tunnel_production_tulip" {
+  count = var.deploy_production ? 1 : 0
+
+  source = "git::https://github.com/tiagojsag/terraform-ssh-tunnel.git?ref=feature/disable-strict-host-key-checking"
+
+  target_host = lookup(data.azurerm_postgresql_flexible_server.marxan_production_tulip[0], "fqdn", null)
   target_port = 5432
 
   gateway_host = data.terraform_remote_state.core.outputs.bastion_hostname
@@ -438,34 +522,68 @@ module "webshot_staging" {
   deployment_name = "webshot"
 }
 
-module "staging_secrets" {
-  source                             = "./modules/secrets"
-  project_name                       = var.project_name
-  namespace                          = "staging"
-  name                               = "api"
-  key_vault_id                       = module.key_vault_staging.key_vault_id
-  redis_host                         = data.terraform_remote_state.core.outputs.redis_hostname
-  redis_password                     = data.terraform_remote_state.core.outputs.redis_password
-  redis_port                         = data.terraform_remote_state.core.outputs.redis_port
-  sparkpost_api_key                  = var.sparkpost_api_key
-  api_url                            = "api.staging.${var.domain}"
-  postgres_api_database              = module.k8s_api_database_staging.postgresql_database
-  postgres_api_username              = module.k8s_api_database_staging.postgresql_username
-  postgres_api_password              = module.k8s_api_database_staging.postgresql_password
-  postgres_api_hostname              = module.k8s_api_database_staging.postgresql_hostname
-  postgres_geoprocessing_database    = module.k8s_geoprocessing_database_staging.postgresql_database
-  postgres_geoprocessing_username    = module.k8s_geoprocessing_database_staging.postgresql_username
-  postgres_geoprocessing_password    = module.k8s_geoprocessing_database_staging.postgresql_password
-  postgres_geoprocessing_hostname    = module.k8s_geoprocessing_database_staging.postgresql_hostname
-  postgres_14_api_database           = module.k8s_api_database_staging_14.postgresql_database
-  postgres_14_api_username           = module.k8s_api_database_staging_14.postgresql_username
-  postgres_14_api_password           = module.k8s_api_database_staging_14.postgresql_password
-  postgres_14_api_hostname           = module.k8s_api_database_staging_14.postgresql_hostname
-  postgres_14_geoprocessing_database = module.k8s_geoprocessing_database_staging_14.postgresql_database
-  postgres_14_geoprocessing_username = module.k8s_geoprocessing_database_staging_14.postgresql_username
-  postgres_14_geoprocessing_password = module.k8s_geoprocessing_database_staging_14.postgresql_password
-  postgres_14_geoprocessing_hostname = module.k8s_geoprocessing_database_staging_14.postgresql_hostname
-  azure_storage_account_key          = data.azurerm_storage_account.storage_account.primary_access_key
+module "staging_cloud_secrets" {
+  source                                = "./modules/cloud_secrets"
+  project_name                          = var.project_name
+  namespace                             = "staging"
+  name                                  = "api"
+  key_vault_id                          = module.key_vault_staging.key_vault_id
+  redis_host                            = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                        = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                            = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key                     = var.sparkpost_api_key
+  api_url                               = "api.staging.${var.domain}"
+  postgres_api_database                 = module.k8s_api_database_staging.postgresql_database
+  postgres_api_username                 = module.k8s_api_database_staging.postgresql_username
+  postgres_api_password                 = module.k8s_api_database_staging.postgresql_password
+  postgres_api_hostname                 = module.k8s_api_database_staging.postgresql_hostname
+  postgres_geoprocessing_database       = module.k8s_geoprocessing_database_staging.postgresql_database
+  postgres_geoprocessing_username       = module.k8s_geoprocessing_database_staging.postgresql_username
+  postgres_geoprocessing_password       = module.k8s_geoprocessing_database_staging.postgresql_password
+  postgres_geoprocessing_hostname       = module.k8s_geoprocessing_database_staging.postgresql_hostname
+  postgres_14_api_database              = module.k8s_api_database_staging_14.postgresql_database
+  postgres_14_api_username              = module.k8s_api_database_staging_14.postgresql_username
+  postgres_14_api_password              = module.k8s_api_database_staging_14.postgresql_password
+  postgres_14_api_hostname              = module.k8s_api_database_staging_14.postgresql_hostname
+  postgres_14_geoprocessing_database    = module.k8s_geoprocessing_database_staging_14.postgresql_database
+  postgres_14_geoprocessing_username    = module.k8s_geoprocessing_database_staging_14.postgresql_username
+  postgres_14_geoprocessing_password    = module.k8s_geoprocessing_database_staging_14.postgresql_password
+  postgres_14_geoprocessing_hostname    = module.k8s_geoprocessing_database_staging_14.postgresql_hostname
+  postgres_tulip_api_database           = module.k8s_api_database_staging_14.postgresql_database
+  postgres_tulip_api_username           = module.k8s_api_database_staging_14.postgresql_username
+  postgres_tulip_api_password           = module.k8s_api_database_staging_14.postgresql_password
+  postgres_tulip_api_hostname           = module.k8s_api_database_staging_14.postgresql_hostname
+  postgres_tulip_geoprocessing_database = module.k8s_geoprocessing_database_staging_14.postgresql_database
+  postgres_tulip_geoprocessing_username = module.k8s_geoprocessing_database_staging_14.postgresql_username
+  postgres_tulip_geoprocessing_password = module.k8s_geoprocessing_database_staging_14.postgresql_password
+  postgres_tulip_geoprocessing_hostname = module.k8s_geoprocessing_database_staging_14.postgresql_hostname
+  azure_storage_account_key             = data.azurerm_storage_account.storage_account.primary_access_key
+}
+
+module "staging_kubernetes_secrets" {
+  source                                 = "./modules/kubernetes_secrets"
+  project_name                           = var.project_name
+  namespace                              = "staging"
+  name                                   = "api"
+  key_vault_id                           = module.key_vault_staging.key_vault_id
+  redis_host                             = data.terraform_remote_state.core.outputs.redis_hostname
+  redis_password                         = data.terraform_remote_state.core.outputs.redis_password
+  redis_port                             = data.terraform_remote_state.core.outputs.redis_port
+  sparkpost_api_key                      = var.sparkpost_api_key
+  api_url                                = "api.staging.${var.domain}"
+  postgres_api_database                  = module.k8s_api_database_staging_14.postgresql_database
+  postgres_api_username                  = module.k8s_api_database_staging_14.postgresql_username
+  postgres_api_password                  = module.k8s_api_database_staging_14.postgresql_password
+  postgres_api_hostname                  = module.k8s_api_database_staging_14.postgresql_hostname
+  postgres_geoprocessing_database        = module.k8s_geoprocessing_database_staging_14.postgresql_database
+  postgres_geoprocessing_username        = module.k8s_geoprocessing_database_staging_14.postgresql_username
+  postgres_geoprocessing_password        = module.k8s_geoprocessing_database_staging_14.postgresql_password
+  postgres_geoprocessing_hostname        = module.k8s_geoprocessing_database_staging_14.postgresql_hostname
+  azure_storage_account_key              = data.azurerm_storage_account.storage_account.primary_access_key
+  api_auth_jwt_secret                    = module.staging_cloud_secrets.api_auth_jwt_secret
+  x_auth_api_key                         = module.staging_cloud_secrets.x_auth_api_key
+  cloning_signing_secret                 = module.staging_cloud_secrets.cloning_signing_secret
+  cloning_storage_backup_restic_password = module.staging_cloud_secrets.cloning_storage_backup_restic_password
 }
 
 module "ingress_staging" {

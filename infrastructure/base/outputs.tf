@@ -97,6 +97,24 @@ output "sql_server_production_14_password" {
   sensitive = true
 }
 
+output "sql_server_production_tulip_name" {
+  value = length(module.sql_server_production_tulip) > 0 ? module.sql_server_production_tulip[0].sql_server_name : null
+}
+
+output "sql_server_production_tulip_hostname" {
+  value = length(module.sql_server_production_tulip) > 0 ? module.sql_server_production_tulip[0].sql_server_url : null
+}
+
+output "sql_server_production_tulip_username" {
+  value     = length(module.sql_server_production_tulip) > 0 ? module.sql_server_production_tulip[0].sql_server_username : null
+  sensitive = true
+}
+
+output "sql_server_production_tulip_password" {
+  value     = length(module.sql_server_production_tulip) > 0 ? module.sql_server_production_tulip[0].sql_server_password : null
+  sensitive = true
+}
+
 output "sql_server_staging_name" {
   value = module.sql_server_staging.sql_server_name
 }

@@ -246,6 +246,20 @@ module "sql_server_production_14" {
   postgresql_version  = "14"
 }
 
+module "sql_server_production_tulip" {
+  count = var.deploy_production ? 1 : 0
+
+  source              = "./modules/database"
+  resource_group      = data.azurerm_resource_group.resource_group
+  project_name        = "${var.project_name}-production-tulip"
+  subnet_id           = module.network.sql_subnet_id
+  private_dns_zone_id = module.sql_server_private_dns_zone.dns_zone_id
+  key_vault_id        = module.sql_server_key_vault.key_vault_id
+  instance_size       = var.production_db_instance_size
+  storage_size        = var.production_db_storage_size
+  postgresql_version  = "14"
+}
+
 module "sql_server_staging" {
   source              = "./modules/database"
   resource_group      = data.azurerm_resource_group.resource_group
