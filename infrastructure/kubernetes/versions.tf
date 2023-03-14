@@ -80,45 +80,12 @@ provider "kubectl" {
 }
 
 provider "postgresql" {
-  alias = "db_tunnel_production"
-
-  host      = length(module.db_tunnel_production) > 0 ? module.db_tunnel_production[0].host : null
-  port      = length(module.db_tunnel_production) > 0 ? module.db_tunnel_production[0].port : null
-  username   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_username", null)
-  password   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_password", null)
-  sslmode   = "require"
-  superuser = false
-}
-
-provider "postgresql" {
-  alias = "db_tunnel_production_14"
-
-  host      = length(module.db_tunnel_production_14) > 0 ? module.db_tunnel_production_14[0].host : null
-  port      = length(module.db_tunnel_production_14) > 0 ? module.db_tunnel_production_14[0].port : null
-  username   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_14_username", null)
-  password   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_14_password", null)
-  sslmode   = "require"
-  superuser = false
-}
-
-provider "postgresql" {
   alias = "db_tunnel_production_tulip"
 
   host      = length(module.db_tunnel_production_tulip) > 0 ? module.db_tunnel_production_tulip[0].host : null
   port      = length(module.db_tunnel_production_tulip) > 0 ? module.db_tunnel_production_tulip[0].port : null
-  username   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_tulip_username", null)
-  password   =lookup(data.terraform_remote_state.core.outputs, "sql_server_production_tulip_password", null)
-  sslmode   = "require"
-  superuser = false
-}
-
-provider "postgresql" {
-  alias = "db_tunnel_staging"
-
-  host      = module.db_tunnel_staging.host
-  port      = module.db_tunnel_staging.port
-  username  = data.terraform_remote_state.core.outputs.sql_server_staging_username
-  password  = data.terraform_remote_state.core.outputs.sql_server_staging_password
+  username  = lookup(data.terraform_remote_state.core.outputs, "sql_server_production_tulip_username", null)
+  password  = lookup(data.terraform_remote_state.core.outputs, "sql_server_production_tulip_password", null)
   sslmode   = "require"
   superuser = false
 }
