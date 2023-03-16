@@ -39,7 +39,7 @@
     ]
   },
   "engines": {
-    "node": "~14.18"
+    "node": "~18.15"
   },
   "dependencies": {
     "@golevelup/nestjs-discovery": "2.3.1",
@@ -263,6 +263,6 @@
     }
   },
   "volta": {
-    "node": "14.18.3"
+    "node": "18.15.0"
   }
 }
