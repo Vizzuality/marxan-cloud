@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for API image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push API Docker image to Azure Container Registry
@@ -30,7 +30,7 @@ jobs:
           intervalSeconds: 30
 
       - name: Wait for Geoprocessing image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Geoprocessing Docker image to Azure Container Registry
@@ -38,7 +38,7 @@ jobs:
           intervalSeconds: 30
 
       - name: Wait for Client image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Client Docker image to Docker Hub
@@ -46,7 +46,7 @@ jobs:
           intervalSeconds: 30
 
       - name: Wait for Webshot image to be pushed to Docker Hub
-        uses: fountainhead/action-wait-for-check@v1.0.0
+        uses: fountainhead/action-wait-for-check@v1.1.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           checkName: Push Webshot Docker image to Azure Container Registry
