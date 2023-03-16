@@ -20,6 +20,10 @@ on:
         type: boolean
         description: If maintenance mode should be enabled
         default: false
+      waitForTest:
+        description: 'Set to "false" to skip waiting for tests to pass.'
+        required: true
+        default: 'true'
 
 jobs:
   wait_for_tests:
@@ -28,6 +32,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Wait for API tests to run
+        if: ${{ github.event.inputs.waitForTest == 'true' }}
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,6 +41,7 @@ jobs:
           intervalSeconds: 20
 
       - name: Wait for Client tests to run
+        if: ${{ github.event.inputs.waitForTest == 'true' }}
         uses: fountainhead/action-wait-for-check@v1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
