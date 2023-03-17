@@ -176,13 +176,13 @@ dump-api-data:
 	docker-compose exec -T postgresql-api pg_dump -T '(migrations|api_event_kinds|roles)' -a -U "${API_POSTGRES_USER}" -F t ${API_POSTGRES_DB} | gzip > data/data/processed/db_dumps/api_db-$$(date +%Y-%m-%d).tar.gz
 
 upload-dump-data:
-	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-dumps -s data/data/processed/db_dumps
+	az storage blob upload-batch --account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/dbs-dumps -s data/data/processed/db_dumps
 
 upload-volumes-data:
-	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/dbs-volumes -s data/data/processed/db_volumes
+	az storage blob upload-batch --account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/dbs-volumes -s data/data/processed/db_volumes
 
 upload-data-for-demo:
-	az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data-demo -s data/data/data_demo/organized
+	az storage blob upload-batch --account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data-demo -s data/data/data_demo/organized
 
 restore-dumps:
 	docker-compose --project-name ${COMPOSE_PROJECT_NAME} -f ./data/docker-compose-data_management.yml up --build marxan-restore-data

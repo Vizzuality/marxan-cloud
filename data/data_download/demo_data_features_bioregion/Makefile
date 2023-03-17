@@ -1,5 +1,15 @@
 .PHONY: import
 
+# Read values as needed from root .env
+# If using the same variables in recipes that need to use a dotenv file other
+# than .env, remember to check that no values from .env are being used
+# inadvertently.
+ENVFILE := '../../../.env'
+ifneq (,$(wildcard $(ENVFILE)))
+    include $(ENVFILE)
+    export
+endif
+
 import: data/demo_data_features/features_demos
 	@for i in $</*.shp; do \
 		echo "start processing $$i "; \
@@ -32,7 +42,7 @@ data/demo_data_features/features_demos: data/demo_data_features/bioregions.zip
 	@unzip -o -u $< -d $@
 
 data/demo_data_features/bioregions.zip: data/demo_data_features
-	@cd $< && curl -O https://marxancloudtest.blob.core.windows.net/data-ingestion-test-00/data-demo/bioregion/bioregions.zip
+	@cd $< && curl -O https://$(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME).blob.core.windows.net/$(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data-demo/bioregion/bioregions.zip
 
 data/demo_data_features:
 	@mkdir -p $@

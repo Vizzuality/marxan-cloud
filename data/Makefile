@@ -1,5 +1,15 @@
 .PHONY: clean data lint requirements sync_data_to_s3 sync_data_from_s3 up inside
 
+# Read values as needed from root .env
+# If using the same variables in recipes that need to use a dotenv file other
+# than .env, remember to check that no values from .env are being used
+# inadvertently.
+ENVFILE := '../.env'
+ifneq (,$(wildcard $(ENVFILE)))
+    include $(ENVFILE)
+    export
+endif
+
 #################################################################################
 # GLOBALS                                                                       #
 #################################################################################
@@ -31,11 +41,11 @@ clean:
 
 ## Upload Data to Azure
 sync_data_to_azure:
-	@az storage blob upload-batch --account-name marxancloudtest --auth-mode login -d data-ingestion-test-00/data -s data/seed
+	@az storage blob upload-batch --account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data -s data/seed
 
 ## Download Data from Azure
 sync_data_from_azure:
-	@az storage blob download-batch--account-name marxancloudtest --auth-mode login -d data/ -s data-ingestion-test-00/data --pattern dir/*
+	@az storage blob download-batch--account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d data/ -s $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data --pattern dir/*
 
 ## Set up python interpreter environment
 create_environment:
