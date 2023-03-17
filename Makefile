@@ -247,3 +247,9 @@ native-seed-geoapi-init-data:
 
 native-seed-api-with-test-data: native-db-migrate native-seed-api-init-data | native-seed-geoapi-init-data
 	psql -U "${API_POSTGRES_USER}" -h "${API_POSTGRES_HOST}" ${API_POSTGRES_DB} < api/apps/api/test/fixtures/test-data.sql
+
+# This is a _real_ make recipe (i.e. not phony) - if .env does not exist, it
+# will generate a minimal one for you, but it will not override an existing .env
+# file, without forcing this (for example, via `make -B .env`)
+.env:
+	cat env.default | bash scripts/development-dotenv > .env
