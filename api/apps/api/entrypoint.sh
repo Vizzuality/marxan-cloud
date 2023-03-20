@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 case "$1" in
@@ -22,7 +22,7 @@ case "$1" in
     test-e2e)
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
-        exec yarn api:test:e2e
+        exec yarn api:test:e2e --testPathPattern=${JEST_TEST_PATH_PATTERN:-.*}
         ;;
     # TODO: This might be redundant / unnecessary
     run-migrations-for-e2e-tests)
