@@ -1,0 +1,21 @@
+name: Tests - API unit tests
+on:
+  push:
+    paths:
+      - 'api/**'
+      - 'geoprocessing/**'
+      - '.github/**'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+
+  test-api-unit:
+    name: Unit tests - API
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run API unit Tests
+        run: make test-unit-api
