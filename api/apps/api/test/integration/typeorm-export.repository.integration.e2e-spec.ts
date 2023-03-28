@@ -1,4 +1,3 @@
-import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities/exports.api.entity';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import {
   Export,
@@ -18,12 +17,9 @@ import {
 } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Connection } from 'typeorm';
 import { v4 } from 'uuid';
 import { GivenUserExists } from '../steps/given-user-exists';
-import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
-import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 
 const millisecondsInADay = 24 * 60 * 60 * 1000;
 
@@ -103,7 +99,6 @@ const getFixtures = async () => {
   const repo = app.get<ExportRepository>(ExportRepository);
   const importRepo = app.get(ImportRepository);
 
-  const ownerToken = await GivenUserIsLoggedIn(app, 'aa');
   const ownerId = await GivenUserExists(app, 'aa');
 
   const amountOfExportsToFind = 5;
@@ -124,6 +119,56 @@ const getFixtures = async () => {
     });
 
   return {
+    GivenProject: () => {
+      return v4();
+    },
+    GivenMultipleExports: async (projectId: string) => {
+      const archiveLocation = '/tmp/foo/bar.zip';
+
+      const anotherProjectExport = exportFactory({
+        resourceId: v4(),
+        archiveLocation,
+      });
+      const cloningExport = exportFactory({
+        resourceId: projectId,
+        archiveLocation,
+        importResourceId: v4(),
+      });
+      const unfinishedExport = exportFactory({
+        resourceId: projectId,
+      });
+
+      const exportsToFind = Array(amountOfExportsToFind)
+        .fill(0)
+        .map((_, index) =>
+          exportFactory({
+            resourceId: projectId,
+            archiveLocation,
+            createdAt: new Date(now.getTime() - millisecondsInADay * index),
+            exportPieces: [
+              {
+                finished: true,
+                id: v4(),
+                piece: ClonePiece.ExportConfig,
+                resourceId: projectId,
+                uris: [
+                  {
+                    relativePath: `bar-${index}.zip`,
+                    uri: `/foo/bar-${index}.zip`,
+                  },
+                ],
+              },
+            ],
+          }),
+        );
+
+      await Promise.all([
+        repo.save(anotherProjectExport),
+        repo.save(cloningExport),
+        repo.save(unfinishedExport),
+        ...exportsToFind.map((exportInstance) => repo.save(exportInstance)),
+      ]);
+    },
     GivenExportWasRequested: async () => {
       resourceId = ResourceId.create();
       componentId = ComponentId.create();

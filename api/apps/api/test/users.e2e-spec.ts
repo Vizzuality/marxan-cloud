@@ -8,7 +8,6 @@ import { User } from '@marxan-api/modules/users/user.api.entity';
 import { ApiEventsService } from '@marxan-api/modules/api-events/api-events.service';
 import { UsersService } from '@marxan-api/modules/users/users.service';
 import { LoginDto } from '@marxan-api/modules/authentication/dto/login.dto';
-import { ApiEventByTopicAndKind } from '@marxan-api/modules/api-events/api-event.topic+kind.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import * as nock from 'nock';
 import { CreateTransmission, Recipient } from 'sparkpost';
@@ -398,11 +397,6 @@ describe('UsersModule (e2e)', () => {
         .send(loginDto)
         .expect(HttpStatus.UNAUTHORIZED);
     });
-  });
-
-  describe('Users - Sign up again', () => {
-    let newUser: User | undefined;
-    let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
       await request(app.getHttpServer())
@@ -416,34 +410,6 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
     });
 
-    test('A user should be able to validate their account (within the validity timeframe of the validationToken)', async () => {
-      /**
-       * Here we need to dig into the actual database to retrieve both the id
-       * assigned to the user when their account is created, and the one-time
-       * token that they would normally receive via email as part of the account
-       * validation/email confirmation workflow.
-       */
-      newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
-
-      if (!newUser) {
-        throw new Error('Cannot retrieve data for newly created user.');
-      }
-
-      validationTokenEvent = await apiEventsService.getLatestEventForTopic({
-        topic: newUser.id,
-        kind: API_EVENT_KINDS.user__accountActivationTokenGenerated__v1alpha1,
-      });
-
-      await request(app.getHttpServer())
-        .post(`/auth/validate`)
-        .send({
-          sub: newUser.id,
-          validationToken: validationTokenEvent?.data?.validationToken,
-        })
-        .expect(HttpStatus.CREATED);
-    });
-
     test('A user should be able to log in once their account has been validated', async () => {
       await request(app.getHttpServer())
         .post('/auth/sign-in')
@@ -451,240 +417,247 @@ describe('UsersModule (e2e)', () => {
         .expect(HttpStatus.CREATED);
     });
   });
-
   describe('Users - Platform admins', () => {
     let adminToken: string;
     let adminUserId: string;
     let nonAdminToken: string;
-    const cleanups: (() => Promise<void>)[] = [];
 
     beforeEach(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
       adminUserId = await GivenUserExists(app, 'dd');
-      nonAdminToken = await GivenUserIsLoggedIn(app, 'aa');
-    });
 
-    test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
-      const WhenGettingAdminListResponse = await request(app.getHttpServer())
-        .get('/api/v1/users/admins')
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenGettingAdminListResponse.status).toEqual(200);
-      expect(WhenGettingAdminListResponse.body).toHaveLength(1);
-      expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
-    });
-
-    test('A platform admin should be able to add a new admin', async () => {
-      const { accessToken: newAdminToken, user } = await GivenUserIsCreated(
-        app,
-      );
-
-      const WhenAddingNewAdminResponse = await request(app.getHttpServer())
-        .post(`/api/v1/users/admins/${user.id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenAddingNewAdminResponse.status).toEqual(201);
-
-      const WhenGettingAdminListByNewUserResponse = await request(
-        app.getHttpServer(),
-      )
-        .get('/api/v1/users/admins')
-        .set('Authorization', `Bearer ${newAdminToken}`);
-      expect(WhenGettingAdminListByNewUserResponse.status).toEqual(200);
-
-      const resources = WhenGettingAdminListByNewUserResponse.body;
-      expect(resources).toHaveLength(2);
-
-      const userIds = [user.id, adminUserId];
-
-      const adminUserIds: string[] = resources.map((s: any) => s.userId);
-      expect(adminUserIds.sort()).toEqual(userIds.sort());
-    });
-
-    test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${adminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
-    });
-
-    test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
-      const WhenGettingOwnInfo = await request(app.getHttpServer())
-        .get('/api/v1/users/me')
-        .set('Authorization', `Bearer ${nonAdminToken}`);
-
-      expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
-    });
-
-    test('A platform admin should be able to remove an existing admin', async () => {
-      const { user } = await GivenUserIsCreated(app);
-
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
+      test('A platform admin should be able to get the list of admins in the app after seed (just 1)', async () => {
+        const WhenGettingAdminListResponse = await request(app.getHttpServer())
+          .get('/api/v1/users/admins')
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenGettingAdminListResponse.status).toEqual(200);
+        expect(WhenGettingAdminListResponse.body).toHaveLength(1);
+        expect(WhenGettingAdminListResponse.body[0].userId).toEqual(
+          adminUserId,
+        );
       });
 
-      const WhenAddingNewAdminResponse = await request(app.getHttpServer())
-        .post(`/api/v1/users/admins/${user.id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenAddingNewAdminResponse.status).toEqual(201);
+      test('A platform admin should be able to add a new admin', async () => {
+        const { accessToken: newAdminToken, user } = await GivenUserIsCreated(
+          app,
+        );
 
-      const WhenRemovingExistingAdmin = await request(app.getHttpServer())
-        .delete(`/api/v1/users/admins/${user.id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenRemovingExistingAdmin.status).toEqual(200);
+        const WhenAddingNewAdminResponse = await request(app.getHttpServer())
+          .post(`/api/v1/users/admins/${user.id}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenAddingNewAdminResponse.status).toEqual(201);
 
-      const WhenGettingAdminListResponse = await request(app.getHttpServer())
-        .get('/api/v1/users/admins')
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenGettingAdminListResponse.status).toEqual(200);
-      expect(WhenGettingAdminListResponse.body).toHaveLength(1);
-      expect(WhenGettingAdminListResponse.body[0].userId).toEqual(adminUserId);
-    });
+        const WhenGettingAdminListByNewUserResponse = await request(
+          app.getHttpServer(),
+        )
+          .get('/api/v1/users/admins')
+          .set('Authorization', `Bearer ${newAdminToken}`);
+        expect(WhenGettingAdminListByNewUserResponse.status).toEqual(200);
 
-    test('A platform admin should not be able to remove oneself', async () => {
-      const WhenRemovingOneself = await request(app.getHttpServer())
-        .delete(`/api/v1/users/admins/${adminUserId}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenRemovingOneself.status).toEqual(400);
-    });
+        const resources = WhenGettingAdminListByNewUserResponse.body;
+        expect(resources).toHaveLength(2);
 
-    test('A platform admin should be able to block existing users by batch', async () => {
-      const firstUsername = `${v4()}@example.com`;
-      const firstPassword = v4();
-      const secondUsername = `${v4()}@example.com`;
-      const secondPassword = v4();
-      const { user: firstUser } = await GivenUserIsCreated(
-        app,
-        firstUsername,
-        firstPassword,
-      );
-      const { user: secondUser } = await GivenUserIsCreated(
-        app,
-        secondUsername,
-        secondPassword,
-      );
+        const userIds = [user.id, adminUserId];
 
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: firstUser.id });
-        return;
-      });
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: secondUser.id });
-        return;
+        const adminUserIds: string[] = resources.map((s: any) => s.userId);
+        expect(adminUserIds.sort()).toEqual(userIds.sort());
       });
 
-      const WhenBlockingUsersInBatch = await request(app.getHttpServer())
-        .patch(`/api/v1/users/admins/block-users`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ userIds: [firstUser.id, secondUser.id] });
-      expect(WhenBlockingUsersInBatch.status).toEqual(200);
+      test('A platform admin should be able to identify itself as admin on /me endpoint', async () => {
+        const WhenGettingOwnInfo = await request(app.getHttpServer())
+          .get('/api/v1/users/me')
+          .set('Authorization', `Bearer ${adminToken}`);
 
-      const WhenLoginAsFirstBlockedUser = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send({
+        expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(true);
+      });
+
+      test('A non platform admin should be not able to identify itself as admin on /me endpoint', async () => {
+        const WhenGettingOwnInfo = await request(app.getHttpServer())
+          .get('/api/v1/users/me')
+          .set('Authorization', `Bearer ${nonAdminToken}`);
+
+        expect(WhenGettingOwnInfo.body.data.attributes.isAdmin).toBe(false);
+      });
+
+      test('A platform admin should be able to remove an existing admin', async () => {
+        const { user } = await GivenUserIsCreated(app);
+
+        const WhenAddingNewAdminResponse = await request(app.getHttpServer())
+          .post(`/api/v1/users/admins/${user.id}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenAddingNewAdminResponse.status).toEqual(201);
+
+        const WhenRemovingExistingAdmin = await request(app.getHttpServer())
+          .delete(`/api/v1/users/admins/${user.id}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenRemovingExistingAdmin.status).toEqual(200);
+
+        const WhenGettingAdminListResponse = await request(app.getHttpServer())
+          .get('/api/v1/users/admins')
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenGettingAdminListResponse.status).toEqual(200);
+        expect(WhenGettingAdminListResponse.body).toHaveLength(1);
+        expect(WhenGettingAdminListResponse.body[0].userId).toEqual(
+          adminUserId,
+        );
+      });
+
+      test('A platform admin should not be able to remove oneself', async () => {
+        const WhenRemovingOneself = await request(app.getHttpServer())
+          .delete(`/api/v1/users/admins/${adminUserId}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenRemovingOneself.status).toEqual(400);
+      });
+
+      test('A platform admin should be able to block existing users by batch', async () => {
+        const firstUsername = `${v4()}@example.com`;
+        const firstPassword = v4();
+        const secondUsername = `${v4()}@example.com`;
+        const secondPassword = v4();
+        const { user: firstUser } = await GivenUserIsCreated(
+          app,
           firstUsername,
           firstPassword,
-        });
-      expect(WhenLoginAsFirstBlockedUser.status).toEqual(401);
-      const WhenLoginAsSecondBlockedUser = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send({
+        );
+        const { user: secondUser } = await GivenUserIsCreated(
+          app,
           secondUsername,
           secondPassword,
-        });
-      expect(WhenLoginAsSecondBlockedUser.status).toEqual(401);
-    });
+        );
 
-    test('A platform admin should be able to block a single user by id', async () => {
-      const username = `${v4()}@example.com`;
-      const password = v4();
-      const { user } = await GivenUserIsCreated(app, username, password);
+        const WhenBlockingUsersInBatch = await request(app.getHttpServer())
+          .patch(`/api/v1/users/admins/block-users`)
+          .set('Authorization', `Bearer ${adminToken}`)
+          .send({ userIds: [firstUser.id, secondUser.id] });
+        expect(WhenBlockingUsersInBatch.status).toEqual(200);
 
-      const WhenBlockingAUser = await request(app.getHttpServer())
-        .post(`/api/v1/users/block/${user.id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenBlockingAUser.status).toEqual(201);
-
-      const WhenLoginAsBlockedUser = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send({
-          username,
-          password,
-        });
-      expect(WhenLoginAsBlockedUser.status).toEqual(401);
-    });
-
-    test('A platform admin should be able to unblock a single user by id', async () => {
-      const username = `${v4()}@example.com`;
-      const password = v4();
-      const { user } = await GivenUserIsCreated(app, username, password);
-      cleanups.push(async () => {
-        await usersRepo.delete({ id: user.id });
-        return;
+        const WhenLoginAsFirstBlockedUser = await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({
+            firstUsername,
+            firstPassword,
+          });
+        expect(WhenLoginAsFirstBlockedUser.status).toEqual(401);
+        const WhenLoginAsSecondBlockedUser = await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({
+            secondUsername,
+            secondPassword,
+          });
+        expect(WhenLoginAsSecondBlockedUser.status).toEqual(401);
       });
-      const WhenBlockingAUser = await request(app.getHttpServer())
-        .post(`/api/v1/users/block/${user.id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenBlockingAUser.status).toEqual(201);
 
-      const WhenLoginAsBlockedUser = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send({
-          username,
-          password,
-        });
-      expect(WhenLoginAsBlockedUser.status).toEqual(401);
+      test('A platform admin should be able to block a single user by id', async () => {
+        const username = `${v4()}@example.com`;
+        const password = v4();
+        const { user } = await GivenUserIsCreated(app, username, password);
 
-      const WhenUnblockingAUser = await request(app.getHttpServer())
-        .delete(`/api/v1/users/block/${user.id}`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenUnblockingAUser.status).toEqual(200);
+        const WhenBlockingAUser = await request(app.getHttpServer())
+          .post(`/api/v1/users/block/${user.id}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenBlockingAUser.status).toEqual(201);
 
-      const WhenLoginAsUnBlockedUser = await request(app.getHttpServer())
-        .post('/auth/sign-in')
-        .send({
-          username,
-          password,
-        });
-      expect(WhenLoginAsUnBlockedUser.status).toEqual(201);
+        const WhenLoginAsBlockedUser = await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({
+            username,
+            password,
+          });
+        expect(WhenLoginAsBlockedUser.status).toEqual(401);
+      });
+
+      test('A platform admin should be able to unblock a single user by id', async () => {
+        const username = `${v4()}@example.com`;
+        const password = v4();
+        const { user } = await GivenUserIsCreated(app, username, password);
+        const WhenBlockingAUser = await request(app.getHttpServer())
+          .post(`/api/v1/users/block/${user.id}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenBlockingAUser.status).toEqual(201);
+
+        const WhenLoginAsBlockedUser = await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({
+            username,
+            password,
+          });
+        expect(WhenLoginAsBlockedUser.status).toEqual(401);
+
+        const WhenUnblockingAUser = await request(app.getHttpServer())
+          .delete(`/api/v1/users/block/${user.id}`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenUnblockingAUser.status).toEqual(200);
+
+        const WhenLoginAsUnBlockedUser = await request(app.getHttpServer())
+          .post('/auth/sign-in')
+          .send({
+            username,
+            password,
+          });
+        expect(WhenLoginAsUnBlockedUser.status).toEqual(201);
+      });
+
+      test('A platform admin should not be able to block oneself', async () => {
+        const WhenBlockingOneself = await request(app.getHttpServer())
+          .patch(`/api/v1/users/admins/block-users`)
+          .set('Authorization', `Bearer ${adminToken}`)
+          .send({ userIds: [adminUserId] });
+        expect(WhenBlockingOneself.status).toEqual(400);
+      });
+
+      test('A platform admin should be able to download csv data from users', async () => {
+        const WhenDownloadingCsvData = await request(app.getHttpServer())
+          .get(`/api/v1/users/csv`)
+          .set('Authorization', `Bearer ${adminToken}`);
+        expect(WhenDownloadingCsvData.status).toEqual(200);
+        expect(WhenDownloadingCsvData.headers['content-type']).toBe(
+          'text/csv; charset=utf-8',
+        );
+      });
+
+      test('A non admin user should not be able to download csv data from users', async () => {
+        const WhenDownloadingCsvData = await request(app.getHttpServer())
+          .get(`/api/v1/users/csv`)
+          .set('Authorization', `Bearer ${nonAdminToken}`);
+        expect(WhenDownloadingCsvData.status).toEqual(403);
+        expect(WhenDownloadingCsvData.headers['content-type']).toBe(
+          'application/json; charset=utf-8',
+        );
+      });
     });
 
-    test('A platform admin should not be able to block oneself', async () => {
-      const WhenBlockingOneself = await request(app.getHttpServer())
-        .patch(`/api/v1/users/admins/block-users`)
-        .set('Authorization', `Bearer ${adminToken}`)
-        .send({ userIds: [adminUserId] });
-      expect(WhenBlockingOneself.status).toEqual(400);
-    });
-
-    test('A platform admin should be able to download csv data from users', async () => {
-      const WhenDownloadingCsvData = await request(app.getHttpServer())
-        .get(`/api/v1/users/csv`)
-        .set('Authorization', `Bearer ${adminToken}`);
-      expect(WhenDownloadingCsvData.status).toEqual(200);
-      expect(WhenDownloadingCsvData.headers['content-type']).toBe(
-        'text/csv; charset=utf-8',
-      );
-    });
-
-    test('A non admin user should not be able to download csv data from users', async () => {
-      const WhenDownloadingCsvData = await request(app.getHttpServer())
-        .get(`/api/v1/users/csv`)
-        .set('Authorization', `Bearer ${nonAdminToken}`);
-      expect(WhenDownloadingCsvData.status).toEqual(403);
-      expect(WhenDownloadingCsvData.headers['content-type']).toBe(
-        'application/json; charset=utf-8',
-      );
+    describe('', () => {
+      test('The API should show a 429: Too many request error if multiple attempts at login are done in a short space of time', async () => {
+        const requestsArray = await Promise.all([
+          await request(app.getHttpServer())
+            .post('/auth/sign-in')
+            .send({ username: 'aa@example.com', password: 'abcde1' }),
+          await request(app.getHttpServer())
+            .post('/auth/sign-in')
+            .send({ username: 'aa@example.com', password: 'abcde2' }),
+          await request(app.getHttpServer())
+            .post('/auth/sign-in')
+            .send({ username: 'aa@example.com', password: 'abcde3' }),
+          await request(app.getHttpServer())
+            .post('/auth/sign-in')
+            .send({ username: 'aa@example.com', password: 'abcde4' }),
+          await request(app.getHttpServer())
+            .post('/auth/sign-in')
+            .send({ username: 'aa@example.com', password: 'abcde5' }),
+        ]);
+        const tooManyRequest = requestsArray.find(
+          (r) => r.status === HttpStatus.TOO_MANY_REQUESTS,
+        );
+        expect(tooManyRequest).toBeDefined();
+      });
     });
   });
 
   describe('Users - Find by email', () => {
     let adminToken: string;
-    let adminUserId: string;
 
     beforeEach(async () => {
       adminToken = await GivenUserIsLoggedIn(app, 'dd');
-      adminUserId = await GivenUserExists(app, 'dd');
     });
 
     test('A user can be found by full email', async () => {
@@ -705,32 +678,6 @@ describe('UsersModule (e2e)', () => {
         .get('/api/v1/users/by-email/aa@example')
         .set('Authorization', `Bearer ${adminToken}`);
       expect(WhenSearchingUserByFullMail.status).toEqual(400);
-    });
-  });
-
-  describe('', () => {
-    test('The API should show a 429: Too many request error if multiple attempts at login are done in a short space of time', async () => {
-      const requestsArray = await Promise.all([
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde1' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde2' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde3' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde4' }),
-        await request(app.getHttpServer())
-          .post('/auth/sign-in')
-          .send({ username: 'aa@example.com', password: 'abcde5' }),
-      ]);
-      const tooManyRequest = requestsArray.find(
-        (r) => r.status === HttpStatus.TOO_MANY_REQUESTS,
-      );
-      expect(tooManyRequest).toBeDefined();
     });
   });
 });

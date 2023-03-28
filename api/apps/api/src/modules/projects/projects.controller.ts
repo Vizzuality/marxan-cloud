@@ -97,8 +97,6 @@ import {
   RequestProjectCloneResponseDto,
   RequestProjectExportBodyDto,
   RequestProjectExportResponseDto,
-} from './dto/export.project.dto';
-  RequestProjectExportResponseDto,
   RequestProjectImportBodyDto,
   RequestProjectImportResponseDto,
 } from './dto/cloning.project.dto';
@@ -174,7 +172,6 @@ export class ProjectsController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') featureClassAndAliasFilter?: string,
-    @Query('tag') featureTag?: FeatureTags,
   ): Promise<GeoFeatureResult> {
     const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
