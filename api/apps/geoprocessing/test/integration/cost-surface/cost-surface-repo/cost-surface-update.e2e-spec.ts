@@ -11,21 +11,19 @@ let app: INestApplication;
 let sut: TypeormCostSurface;
 let world: PromiseType<ReturnType<typeof getFixtures>>;
 
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = await getFixtures(app);
-  sut = app.get(CostSurfacePersistencePort);
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app.close();
-});
-
 describe(`when updating some of the costs`, () => {
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+    sut = app.get(CostSurfacePersistencePort);
+  });
   let puCostDataIds: string[];
   beforeEach(async () => {
+    world = await getFixtures(app);
     puCostDataIds = await world.GivenPuCostDataExists();
+  });
+  afterAll(async () => {
+    await world.cleanup();
+    await app.close();
   });
 
   it(`applies new costs to given PU`, async () => {

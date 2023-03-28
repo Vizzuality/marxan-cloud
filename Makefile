@@ -145,13 +145,13 @@ seed-dbs-e2e: test-start-services
 # except in GitHub Actions CI, where we use a different env setup, which relies
 # on a different environment:
 # `make test-e2e-<api|groprocessing> environment=ci`
-test-e2e-api: test-clean-slate seed-dbs-e2e
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh test-e2e
+test-e2e-api:
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T api ./apps/api/entrypoint.sh test-e2e
 	$(MAKE) test-clean-slate
 
 # See note for test-e2e-api above
-test-e2e-geoprocessing: test-clean-slate seed-dbs-e2e
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
+test-e2e-geoprocessing:
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
 	$(MAKE) test-clean-slate
 
 run-test-e2e-local:

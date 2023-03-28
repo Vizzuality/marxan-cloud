@@ -9,27 +9,17 @@
       ]
     }
   },
-  "redisApi": {
-    "connection": {
-      "host": "localhost",
-      "port": 3379,
-      "password": null,
-      "useTLS": false,
-      "concurrency" : 50
-    },
-    "concurrency": 50
-  },
   "redis": {
-    "port": 3379,
-    "host": "localhost",
+    "host": "marxan-test-e2e-redis",
+    "port": 6379,
     "password": null,
     "useTLS": false,
     "concurrency" : 50
   },
   "postgresApi": {
     "url": null,
-    "port": 3542,
-    "host": "localhost",
+    "port": 5432,
+    "host": "test-e2e-postgresql-api",
     "username": "marxan-api",
     "password": "marxan-api",
     "database": "marxan-api",
@@ -38,16 +28,16 @@
   },
   "postgresGeoApi": {
     "url": null,
-    "port": 3541,
-    "host": "localhost",
-    "username": "marxan-geo",
-    "password": "marxan-geo",
-    "database": "marxan-geo",
+    "port": 5432,
+    "host": "test-e2e-postgresql-geo-api",
+    "username": "marxan-geo-api",
+    "password": "marxan-geo-api",
+    "database": "marxan-geo-api",
     "runMigrationsOnStartup": false,
     "logging": "error"
   },
   "api": {
-    "url": "http://localhost:3000",
+    "url": "http://api:3000",
     "daemonListenPort": 3000
   },
   "jobOptions": {
@@ -66,7 +56,7 @@
     }
   },
   "geoprocessing": {
-    "url": "http://localhost:3001"
+    "url": "http://geoprocessing:3000"
   },
   "storage": {
     "sharedFileStorage": {

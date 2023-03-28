@@ -1,10 +1,16 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { getFixtures } from './protected-area.fixtures';
+import { seedFeatures } from '../utils/seeds/seed-features';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { getConnection } from 'typeorm';
+import { seedWdpa } from '../utils/seeds/seed-wdpa';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
+  await seedFeatures();
+  await seedWdpa();
 });
 
 afterEach(async () => {

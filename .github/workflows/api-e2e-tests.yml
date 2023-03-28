@@ -8,26 +8,42 @@ on:
   workflow_dispatch:
 jobs:
   test-api-e2e:
-    runs-on: ubuntu-20.04
-    timeout-minutes: 30
+    name: E2E tests - API
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: Run CI tests via make task
-      run: make test-e2e-api
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Checkout envs
+        run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
+      - name: Run CI tests via make task
+        run: make test-e2e-api environment=ci
+  test-geoprocessing-e2e:
+    name: E2E tests - Geoprocessing
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Checkout envs
+        run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
+      - name: Run CI tests via make task
+        run: make test-e2e-geoprocessing environment=ci
   test-api-unit:
-    runs-on: ubuntu-18.04
+    name: Unit tests - API
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: Run API unit Tests
-      run: make test-unit-api
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run API unit Tests
+        run: make test-unit-api
   test-geo-unit:
-    runs-on: ubuntu-18.04
+    name: Unit tests - Geoprocessing
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: Run Geoprocessing Unit Tests
-      run: make test-unit-geo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run Geoprocessing Unit Tests
+        run: make test-unit-geo

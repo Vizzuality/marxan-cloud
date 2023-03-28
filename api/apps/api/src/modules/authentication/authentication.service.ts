@@ -78,7 +78,8 @@ export interface JwtDataPayload {
 /**
  * Entropy threshold for password validation.
  */
-export const entropyThreshold = 80;
+// TODO: Make this env var?
+export const entropyThreshold = 10;
 @Injectable()
 export class AuthenticationService {
   private readonly logger = new Logger(AuthenticationService.name);
@@ -124,7 +125,9 @@ export class AuthenticationService {
    *
    * @todo Allow to set all of a user's data on signup, if needed.
    */
-  async createUser(signupDto: SignUpDto): Promise<Either<SignUpError, Partial<User>>> {
+  async createUser(
+    signupDto: SignUpDto,
+  ): Promise<Either<SignUpError, Partial<User>>> {
     const passwordCheck = isStringEntropyHigherThan(
       entropyThreshold,
       signupDto.password,
@@ -141,6 +144,10 @@ export class AuthenticationService {
     user.background = signupDto.background;
     user.level = signupDto.level;
     user.country = signupDto.country;
+    const emailExists = await this.usersService.findByEmail(user.email);
+    if (emailExists) {
+      return left(emailAlreadyInUseError);
+    }
     const newUser = UsersService.getSanitizedUserMetadata(
       await this.usersRepository.save(user),
     );

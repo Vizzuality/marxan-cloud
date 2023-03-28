@@ -30,14 +30,24 @@ cp .env .env-test-e2e
 ```
 
 In the `.env-test-e2e` file, most of the variables can stay the same as those
-used in the main `.env` file, except the ones through which the host port of the
-PostgreSQL services is configured: update these two values with port numbers
-free on the local machine, for example:
+used in the main `.env` file, except: 
 
+1. the ones through which the host port of the PostgreSQL services is configured: update these two values with port numbers
+   free on the local machine, for example:
 ```
 POSTGRES_API_SERVICE_PORT=3532
 POSTGRES_GEO_SERVICE_PORT=3533
 ```
+
+2. The Database migration run configuration, which in the default case is set to
+   `true` in the main `.env` file. For the e2e tests, the migration will be handled by (`make test-e2e-api`), 
+    just once for the whole test run so set this to `true`:
+
+```
+API_RUN_MIGRATIONS_ON_STARTUP=false
+GEOPROCESSING_RUN_MIGRATIONS_ON_STARTUP=false
+```
+
 ### Running e2e tests
 
 Once the testing environment is configured (see above) run the tests:

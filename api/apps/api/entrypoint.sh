@@ -22,11 +22,13 @@ case "$1" in
     test-e2e)
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
-        exec yarn api:test:e2e:new --runInBand --ci --detectOpenHandles --forceExit api/apps/api/test/projects.e2e-spec.ts
+        yarn test:prepare-db && yarn api:test:e2e
         ;;
+    # TODO: This might be redundant / unnecessary
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
         sleep 15
+        export NODE_ENV=test
         exec yarn api:typeorm migration:run -t each
         ;;
     start)
