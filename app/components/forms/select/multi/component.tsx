@@ -41,18 +41,18 @@ export const MultiSelect: React.FC<SelectProps> = ({
 
   const getOptions: SelectOptionProps[] = useMemo(() => {
     return [
-      ...clearSelectionActive ? [{
+      ...(clearSelectionActive ? [{
         value: 'batch-clear-selection',
         label: clearSelectionLabel,
         enabled: false,
         checkbox: false,
-      }] : [],
-      ...batchSelectionActive ? [{
+      }] : []),
+      ...(batchSelectionActive ? [{
         value: 'batch-selection',
         label: batchSelectionLabel,
         enabled: false,
         checkbox: false,
-      }] : [],
+      }] : []),
       ...options.map((o) => ({ ...o, checkbox: true, enabled: true })),
     ];
   }, [
@@ -113,12 +113,12 @@ export const MultiSelect: React.FC<SelectProps> = ({
     selectedItems,
     reset,
   } = useMultipleSelection<SelectOptionProps>({
-    ...!!getSelected && {
+    ...(!!getSelected && {
       selectedItems: getSelected,
-    },
-    ...!!getInitialSelected && {
+    }),
+    ...(!!getInitialSelected && {
       initialSelectedItems: getInitialSelected,
-    },
+    }),
     itemToString: (item) => {
       if (typeof item.label === 'string') {
         return item.label;

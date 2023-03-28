@@ -1,12 +1,12 @@
-import BIOPAMA_LOGO from 'images/partners/biopama_logo.png';
-import EU_COMISSION_LOGO from 'images/partners/european-commission_logo.png';
-import MAPBOX_LOGO from 'images/partners/mapbox_logo.png';
-import MICROSOFT_LOGO from 'images/partners/microsoft_logo.png';
-import PACMARA_LOGO from 'images/partners/pacmara_logo.png';
-import THE_NATURE_CONSERVANCY_LOGO from 'images/partners/the-nature-conservancy_logo.png';
-import UN_ENVIRONMENT_LOGO from 'images/partners/un-environment_logo.png';
-import UNIVERSITY_QUEENSLAND_LOGO from 'images/partners/university-queensland_logo.png';
-import VIZZUALITY_LOGO from 'images/partners/vizzuality_logo.png';
+import BIOPAMA_LOGO from 'public/images/partners/biopama_logo.png';
+import EU_COMISSION_LOGO from 'public/images/partners/european-commission_logo.png';
+import MAPBOX_LOGO from 'public/images/partners/mapbox_logo.png';
+import MICROSOFT_LOGO from 'public/images/partners/microsoft_logo.png';
+import PACMARA_LOGO from 'public/images/partners/pacmara_logo.png';
+import THE_NATURE_CONSERVANCY_LOGO from 'public/images/partners/the-nature-conservancy_logo.png';
+import UN_ENVIRONMENT_LOGO from 'public/images/partners/un-environment_logo.png';
+import UNIVERSITY_QUEENSLAND_LOGO from 'public/images/partners/university-queensland_logo.png';
+import VIZZUALITY_LOGO from 'public/images/partners/vizzuality_logo.png';
 
 export const PARTNER_LOGOS = [
   {

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import Wrapper from 'layout/wrapper';
 
 import Button from 'components/button';
+import Icon from 'components/icon';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
@@ -106,7 +107,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
               onClick={onDiscover}
             >
               Discover more
-              <ARROW_DOWN_SVG className="inline w-3.5 ml-3.5 animate-bounce" fill="white" />
+              <Icon icon={ARROW_DOWN_SVG} className="inline-block w-3.5 ml-3.5 animate-bounce fill-white" />
             </button>
           </motion.div>
         </div>

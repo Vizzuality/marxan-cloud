@@ -3,12 +3,11 @@ import React from 'react';
 import { useInView } from 'react-intersection-observer';
 
 import { motion } from 'framer-motion';
+import BANNER_1_IMG from 'public/images/home/banner/banner-1.png';
+import BANNER_2_IMG from 'public/images/home/banner/banner-2.png';
+import BANNER_3_IMG from 'public/images/home/banner/banner-3.png';
 
 import Wrapper from 'layout/wrapper';
-
-import BANNER_1_IMG from 'images/home/banner/banner-1.png';
-import BANNER_2_IMG from 'images/home/banner/banner-2.png';
-import BANNER_3_IMG from 'images/home/banner/banner-3.png';
 
 export interface HomeBannerProps {
 

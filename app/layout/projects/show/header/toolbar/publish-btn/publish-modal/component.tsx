@@ -147,7 +147,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
     sid: featuredScenarioId,
     include: 'results',
     sublayers: [
-      ...(featuredScenarioId) ? ['frequency'] : [],
+      ...(featuredScenarioId ? ['frequency'] : []),
     ],
     options: {
       settings: {

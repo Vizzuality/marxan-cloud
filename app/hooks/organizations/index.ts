@@ -49,12 +49,12 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...sort && {
+      }),
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 

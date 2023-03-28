@@ -109,7 +109,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     sid: sid ? `${sid}` : null,
     include: 'results',
     sublayers: [
-      ...(sid1 && !sid2) ? ['frequency'] : [],
+      ...(sid1 && !sid2 ? ['frequency'] : []),
     ],
     options: {
       settings: {
@@ -142,9 +142,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
   const LEGEND = useLegend({
     layers: [
-      ...!!sid1 && !sid2 ? ['frequency'] : [],
-      ...!!sid1 && !!sid2 ? ['compare'] : [],
-      ...rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2 ? ['pugrid'] : [],
+      ...(!!sid1 && !sid2 ? ['frequency'] : []),
+      ...(!!sid1 && !!sid2 ? ['compare'] : []),
+      ...(rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2 ? ['pugrid'] : []),
     ],
     options: {
       layerSettings,

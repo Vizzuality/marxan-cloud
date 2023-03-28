@@ -115,13 +115,13 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
           return {
             featureId: fId,
             kind: geoprocessingOperations ? 'withGeoprocessing' : 'plain',
-            ...(!geoprocessingOperations) && {
+            ...(!geoprocessingOperations && {
               marxanSettings: marxanSettings || {
                 fpf: 1,
                 prop: 0.5,
               },
-            },
-            ...!!geoprocessingOperations && { geoprocessingOperations },
+            }),
+            ...(!!geoprocessingOperations && { geoprocessingOperations }),
           };
         }),
       },

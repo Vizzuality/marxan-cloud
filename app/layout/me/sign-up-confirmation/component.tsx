@@ -79,8 +79,8 @@ export const SignUpConfirmation: React.FC<SignUpConfirmationProps> = () => {
                 You can
                 {' '}
 
-                <Link href="/auth/sign-up">
-                  <a href="/auth/sign-up" className="text-black underline hover:no-underline">create an account.</a>
+                <Link href="/auth/sign-up" className="text-black underline hover:no-underline">
+                  create an account.
                 </Link>
               </p>
             </div>

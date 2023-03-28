@@ -82,12 +82,12 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...sort && {
+      }),
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 
@@ -180,12 +180,12 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...sort && {
+      }),
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 

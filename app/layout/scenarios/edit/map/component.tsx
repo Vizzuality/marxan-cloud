@@ -234,7 +234,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
     if (tab === ScenarioSidebarTabs.PLANNING_UNIT && subtab === null) {
       return [
-        ...protectedCategories.length ? ['wdpa-percentage'] : [],
+        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
         'pugrid',
       ];
     }
@@ -247,7 +247,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.FEATURES
       && subtab !== ScenarioSidebarSubTabs.PRE_GAP_ANALYSIS) {
       return [
-        ...protectedCategories.length ? ['wdpa-percentage'] : [],
+        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
         !!previewFeatureIsSelected && 'features-preview',
         'pugrid',
       ];
@@ -255,7 +255,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     if (tab === ScenarioSidebarTabs.FEATURES
       && subtab === null) {
       return [
-        ...protectedCategories.length ? ['wdpa-percentage'] : [],
+        ...(protectedCategories.length ? ['wdpa-percentage'] : []),
         'pugrid',
       ];
     }

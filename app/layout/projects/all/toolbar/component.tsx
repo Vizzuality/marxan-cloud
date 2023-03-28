@@ -65,14 +65,12 @@ export const ProjectsToolbar: React.FC<ProjectsToolbarProps> = () => {
           >
             <div>
               <Link href="/projects/new">
-                <a
-                  href="/projects/new"
-                >
-                  <Button theme="primary" size="base">
-                    <span>Create new project</span>
-                    <Icon className="w-3 h-3 ml-4" icon={PLUS_SVG} />
-                  </Button>
-                </a>
+
+                <Button theme="primary" size="base">
+                  <span>Create new project</span>
+                  <Icon className="w-3 h-3 ml-4" icon={PLUS_SVG} />
+                </Button>
+
               </Link>
             </div>
           </HelpBeacon>

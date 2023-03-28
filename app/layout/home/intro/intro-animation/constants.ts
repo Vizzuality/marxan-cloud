@@ -1,23 +1,15 @@
-import Bg01Img from 'images/home/intro/bg-01.png';
-import Bg02Img from 'images/home/intro/bg-02.png';
-import Bg03Img from 'images/home/intro/bg-03.png';
-import Bg04Img from 'images/home/intro/bg-04.png';
-import ToucanImg from 'images/home/intro/image-01.jpg';
-import FarmerImg from 'images/home/intro/image-02.jpg';
-import BoatImg from 'images/home/intro/image-03.jpg';
-
 export const BACKGROUND_IMAGES = [{
   backgroundColor: '#10223a',
-  image: Bg01Img,
+  image: '/images/home/intro/bg-01.png',
 }, {
   backgroundColor: '#0f171a',
-  image: Bg02Img,
+  image: '/images/home/intro/bg-02.png',
 }, {
   backgroundColor: '#0f171a',
-  image: Bg03Img,
+  image: '/images/home/intro/bg-03.png',
 }, {
   backgroundColor: '#11161a',
-  image: Bg04Img,
+  image: '/images/home/intro/bg-04.png',
 }];
 
 const MAIN_IMAGES_SIZE = {
@@ -26,7 +18,7 @@ const MAIN_IMAGES_SIZE = {
 };
 
 export const MAIN_IMAGES = [{
-  image: ToucanImg,
+  image: '/images/home/intro/image-01.jpg',
   size: MAIN_IMAGES_SIZE,
   position: {
     right: '10rem',
@@ -46,7 +38,7 @@ export const MAIN_IMAGES = [{
     filter: 'blur(0px)',
   }],
 }, {
-  image: FarmerImg,
+  image: '/images/home/intro/image-02.jpg',
   size: MAIN_IMAGES_SIZE,
   position: {
     right: '-4rem',
@@ -70,7 +62,7 @@ export const MAIN_IMAGES = [{
     opacity: 1,
   }],
 }, {
-  image: BoatImg,
+  image: '/images/home/intro/image-03.jpg',
   size: MAIN_IMAGES_SIZE,
   position: {
     right: '12rem',

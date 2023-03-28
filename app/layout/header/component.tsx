@@ -13,6 +13,7 @@ import User from 'layout/header/user';
 import Wrapper from 'layout/wrapper';
 
 import LinkButton from 'components/button';
+import Icon from 'components/icon';
 
 // import LOGO_SVG from 'images/logo-beta.png';
 
@@ -30,11 +31,13 @@ export interface HeaderProps {
 const SIZE = {
   base: {
     logo: {
+      width: 'auto',
       height: 47,
     },
   },
   lg: {
     logo: {
+      width: 'auto',
       height: 60,
     },
   },
@@ -67,56 +70,50 @@ export const Header: React.FC<HeaderProps> = ({
             <Link
               href="/"
             >
-              <a href="/">
-                <img
-                  alt="Marxan logo"
-                  src={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG}
-                  style={SIZE[size].logo}
-                />
-              </a>
+              <Icon icon={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG} style={SIZE[size].logo} />
             </Link>
 
             {!published && (
-              <Title />
+            <Title />
             )}
 
             {!maintenance && (
-              <>
-                <div
-                  className={cx({
-                    'flex items-center space-x-1 md:space-x-5': true,
-                    'divide-x divide-gray-500': theme === 'dark',
-                  })}
-                  style={{
-                    height: SIZE[size].logo.height + 10,
-                  }}
-                >
-                  <MyProjects />
+            <>
+              <div
+                className={cx({
+                  'flex items-center space-x-1 md:space-x-5': true,
+                  'divide-x divide-gray-500': theme === 'dark',
+                })}
+                style={{
+                  height: SIZE[size].logo.height + 10,
+                }}
+              >
+                <MyProjects />
 
-                  <div className="flex items-center h-full pl-1 md:pl-5">
-                    <User />
-                  </div>
+                <div className="flex items-center h-full pl-1 md:pl-5">
+                  <User />
                 </div>
+              </div>
 
-                {!user && (
-                  <div className="flex items-center space-x-4">
-                    <LinkButton
-                      href="/auth/sign-in"
-                      theme={cx({
-                        clear: theme === 'light',
-                        'secondary-alt': theme !== 'light',
-                      })}
-                      size="s"
-                    >
-                      Sign in
-                    </LinkButton>
+              {!user && (
+              <div className="flex items-center space-x-4">
+                <LinkButton
+                  href="/auth/sign-in"
+                  theme={cx({
+                    clear: theme === 'light',
+                    'secondary-alt': theme !== 'light',
+                  })}
+                  size="s"
+                >
+                  Sign in
+                </LinkButton>
 
-                    <LinkButton href="/auth/sign-up" theme="primary" size="s">
-                      Sign up
-                    </LinkButton>
-                  </div>
-                )}
-              </>
+                <LinkButton href="/auth/sign-up" theme="primary" size="s">
+                  Sign up
+                </LinkButton>
+              </div>
+              )}
+            </>
             )}
           </nav>
         </Wrapper>

@@ -68,12 +68,12 @@ export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
     params: {
       'page[number]': page,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...parsedSort && {
+      }),
+      ...(parsedSort && {
         sort: parsedSort,
-      },
+      }),
     },
   }).then((response) => response.data);
 
@@ -264,12 +264,12 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
     params: {
       'page[number]': page,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...parsedSort && {
+      }),
+      ...(parsedSort && {
         sort: parsedSort,
-      },
+      }),
     },
   }).then((response) => response.data);
 

@@ -2,8 +2,8 @@ import React from 'react';
 
 import Head from 'next/head';
 
-import FB_IMAGE from 'images/social-media/share-fb.png';
-import TW_IMAGE from 'images/social-media/share-tw.png';
+import FB_IMAGE from 'public/images/social-media/share-fb.png';
+import TW_IMAGE from 'public/images/social-media/share-tw.png';
 
 export interface MetaTagsProps {
   name: string,

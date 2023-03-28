@@ -39,9 +39,9 @@ export function usePublishedProjects(options: UsePublishedProjectsProps = {}) {
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
+      }),
     },
   });
 

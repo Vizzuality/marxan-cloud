@@ -277,7 +277,7 @@ export const SignUp: React.FC<SignUpProps> = () => {
                 <div className="mt-5 text-sm text-center text-black">
                   Already registered.
                   {' '}
-                  <Link href="/auth/sign-in"><a href="/auth/sign-in" className="underline">Sign in</a></Link>
+                  <Link href="/auth/sign-in" className="underline">Sign in</Link>
                 </div>
               </div>
 

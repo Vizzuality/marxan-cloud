@@ -38,12 +38,12 @@ export const SingleSelect: React.FC<SelectProps> = ({
   const menuRef = useRef();
   const getOptions = useMemo(() => {
     return [
-      ...clearSelectionActive ? [
+      ...(clearSelectionActive ? [
         {
           value: null,
           label: clearSelectionLabel,
         },
-      ] : [],
+      ] : []),
       ...options,
     ];
   }, [
@@ -96,12 +96,12 @@ export const SingleSelect: React.FC<SelectProps> = ({
     reset,
   } = useSelect<SelectOptionProps>({
     items: getVisibleOptions,
-    ...typeof values !== 'undefined' && {
+    ...(typeof values !== 'undefined' && {
       selectedItem: getSelected,
-    },
-    ...typeof initialValues !== 'undefined' && {
+    }),
+    ...(typeof initialValues !== 'undefined' && {
       initialSelectedItem: getInitialSelected,
-    },
+    }),
     itemToString: (item) => {
       if (typeof item.label === 'string') {
         return item.label;

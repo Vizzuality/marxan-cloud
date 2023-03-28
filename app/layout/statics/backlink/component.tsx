@@ -16,14 +16,19 @@ export const Backlink: React.FC<BacklinkProps> = ({
   children,
 }: BacklinkProps) => {
   return (
-    <Link href={href}>
-      <a href={href} className="inline-flex items-center cursor-pointer fle-row transition-opacity hover:opacity-60">
+    (
+      <Link
+        href={href}
+        className="inline-flex items-center cursor-pointer fle-row transition-opacity hover:opacity-60"
+      >
+
         <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 mr-1 text-black" />
         <h1 className="max-w-3xl text-lg font-semibold text-black font-heading underline ">
           {children}
         </h1>
-      </a>
-    </Link>
+
+      </Link>
+    )
   );
 };
 

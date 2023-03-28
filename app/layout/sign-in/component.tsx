@@ -108,10 +108,11 @@ export const SignIn: React.FC<SignInProps> = () => {
 
                       <Link
                         href="/auth/forgot-password"
+                        className="inline-block mt-2 text-sm text-gray-500 underline"
                       >
-                        <a href="/auth/forgot-password" className="inline-block mt-2 text-sm text-gray-500 underline">
-                          Forgot password?
-                        </a>
+
+                        Forgot password?
+
                       </Link>
                     </Field>
                   )}
@@ -127,7 +128,7 @@ export const SignIn: React.FC<SignInProps> = () => {
               <div className="mt-5 text-sm text-center text-black">
                 Don&apos;t have an account?
                 {' '}
-                <Link href="/auth/sign-up"><a href="/auth/sign-up" className="underline">Sign up</a></Link>
+                <Link href="/auth/sign-up" className="underline">Sign up</Link>
               </div>
             </div>
 

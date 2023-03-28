@@ -108,18 +108,20 @@ export const LinkAnchor: FC<AnchorProps> = ({
   disabled,
   href,
   anchorLinkProps,
-  ...restProps
 }: AnchorProps) => (
-  <Link href={href} {...anchorLinkProps}>
-    <a
+  (
+    <Link
+      href={href}
+      {...anchorLinkProps}
       className={buildClassName({
         className, disabled, size, theme,
       })}
-      {...restProps}
     >
+
       {buildChildren({ children, theme })}
-    </a>
-  </Link>
+
+    </Link>
+  )
 );
 
 export const Anchor: FC<AnchorProps> = ({

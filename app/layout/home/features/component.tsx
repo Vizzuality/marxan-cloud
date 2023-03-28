@@ -80,7 +80,7 @@ export const HomeFeatures: React.FC<HomeFeaturesProps> = () => {
                 whileHover="hover"
                 animate="initial"
               >
-                <Link href="/community/projects">
+                <Link href="/community/projects" legacyBehavior>
                   <p className="text-2xl leading-10 cursor-pointer font-heading px-9 hover:underline">
                     Explore and learn from planning examples around the world
                   </p>
