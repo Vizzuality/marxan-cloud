@@ -11,10 +11,6 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Tooltip from 'components/tooltip';
 
-import STRAT_1_IMG from 'images/info-buttons/img_strat_1.png';
-import STRAT_2_IMG from 'images/info-buttons/img_strat_2.png';
-import STRAT_3_IMG from 'images/info-buttons/img_strat_3.png';
-
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import INTERSECT_SVG from 'svgs/ui/intersect.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
@@ -292,7 +288,7 @@ export const Item: React.FC<ItemProps> = ({
                       of ecosystem.
                     </p>
                     <p>See this example with the Giant Anteater&apos;s range:</p>
-                    <img src={STRAT_1_IMG} alt="Stratification_1" />
+                    <img src="/images/info-buttons/img_strat_1.png" alt="Stratification_1" />
 
                     <p>
                       This is problematic because only one ecosystem is
@@ -303,8 +299,8 @@ export const Item: React.FC<ItemProps> = ({
                       range by ecosystem and create new features for
                       setting targets.
                     </p>
-                    <img src={STRAT_2_IMG} alt="Stratification_2" />
-                    <img src={STRAT_3_IMG} alt="Stratification_3" />
+                    <img src="/images/info-buttons/img_strat_2.png" alt="Stratification_2" />
+                    <img src="/images/info-buttons/img_strat_3.png" alt="Stratification_3" />
                   </div>
 
                 </span>

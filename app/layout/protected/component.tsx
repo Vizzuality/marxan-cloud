@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { useEffect, useState, PropsWithChildren } from 'react';
 
 import { useSession, signOut } from 'next-auth/client';
 
@@ -11,11 +11,7 @@ import Modal from 'components/modal';
 // const TIME_INTERVAL = 1000 * 60 * 10; // 10 min
 // const SESSION_BUFFER_TIME = 30 * 60 * 1000; // 30 min
 
-interface ProtectedProps {
-  children: ReactNode
-}
-
-const Protected: React.FC = ({ children }: ProtectedProps) => {
+const Protected = ({ children }: PropsWithChildren) => {
   const { user } = useMe();
   const [session, loading] = useSession();
   const [modal, setModal] = useState(false);

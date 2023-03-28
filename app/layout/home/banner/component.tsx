@@ -3,9 +3,6 @@ import React from 'react';
 import { useInView } from 'react-intersection-observer';
 
 import { motion } from 'framer-motion';
-import BANNER_1_IMG from 'public/images/home/banner/banner-1.png';
-import BANNER_2_IMG from 'public/images/home/banner/banner-2.png';
-import BANNER_3_IMG from 'public/images/home/banner/banner-3.png';
 
 import Wrapper from 'layout/wrapper';
 
@@ -62,9 +59,9 @@ export const HomeBanner: React.FC<HomeBannerProps> = () => {
               }}
             >
               <div className="relative grid justify-between w-full grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-y-0 md:gap-x-6">
-                <img alt="Scenario features example" src={BANNER_1_IMG} />
-                <img alt="Scenario map layers example" src={BANNER_2_IMG} />
-                <img alt="Scenarios tags examples" src={BANNER_3_IMG} className="md:pt-12" />
+                <img alt="Scenario features example" src="/images/home/banner/banner-1.png" />
+                <img alt="Scenario map layers example" src="/images/home/banner/banner-2.png" />
+                <img alt="Scenarios tags examples" src="/images/home/banner/banner-3.png" className="md:pt-12" />
               </div>
             </motion.div>
           </div>

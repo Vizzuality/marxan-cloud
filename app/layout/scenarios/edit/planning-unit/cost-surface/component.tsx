@@ -26,9 +26,6 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
 
-import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
-import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
-
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -228,8 +225,8 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                 activities will make a planning unit cost more than areas further away with
                 less competition for access.
               </p>
-              <img src={COST_SEA_IMG} alt="Cost sea" />
-              <img src={COST_LAND_IMG} alt="Cost Land" />
+              <img src="/images/info-buttons/img_cost_surface_terrestrial.png" alt="Cost sea" />
+              <img src="/images/info-buttons/img_cost_surface_marine.png" alt="Cost Land" />
             </div>
 
           </div>

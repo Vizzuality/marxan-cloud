@@ -4,8 +4,6 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 
-import FREQUENCY_MAP_IMG from 'images/info-buttons/img_frequency_map.png';
-
 import HIDE_SVG from 'svgs/ui/hide.svg?sprite';
 import SHOW_SVG from 'svgs/ui/show.svg?sprite';
 
@@ -41,7 +39,7 @@ export const SolutionFrequency: React.FC<SolutionFrequencyProps> = ({
                   will also have an SF = 100.
                 </p>
 
-                <img src={FREQUENCY_MAP_IMG} alt="Selection frequency" />
+                <img src="/images/info-buttons/img_frequency_map.png" alt="Selection frequency" />
 
               </div>
 

@@ -18,8 +18,6 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
-import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
-
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -210,7 +208,7 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
                 marked as locked-out and a protected area is
                 marked as locked-in:
               </p>
-              <img src={LOCK_IN_OUT_IMG} alt="Feature-Range" />
+              <img src="/images/info-buttons/img_lockin_lock_out.png" alt="Feature-Range" />
               <p>
                 The areas selected to be included will be
                 {' '}

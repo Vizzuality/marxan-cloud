@@ -27,8 +27,6 @@ import {
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 
-import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
-
 export interface WDPAThresholdCategories {
   onSuccess: () => void;
   onBack: () => void;
@@ -242,7 +240,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                                 </p>
                               </div>
 
-                              <img src={THRESHOLD_IMG} alt="Threshold" />
+                              <img src="/images/info-buttons/img_threshold.png" alt="Threshold" />
 
                             </div>
                           </InfoButton>

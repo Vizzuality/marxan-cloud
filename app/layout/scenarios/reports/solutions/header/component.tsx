@@ -6,8 +6,6 @@ import { useProjectUsers } from 'hooks/project-users';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 
-import LOGO_BLACK from 'images/logo-black.png';
-
 export interface ScenariosReportHeaderProps {
   title: string;
 }
@@ -75,7 +73,7 @@ export const ScenariosReportHeader: React.FC<ScenariosReportHeaderProps> = ({
         <img
           className="w-32 h-12"
           alt="Marxan logo"
-          src={LOGO_BLACK}
+          src="/images/logo-black.png"
         />
 
       </header>

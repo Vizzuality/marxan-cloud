@@ -21,8 +21,6 @@ import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import LoadingMore from 'components/loading-more/component';
 
-import FIVE_DIFF_SOLUTIONS_IMG from 'images/info-buttons/img_5_different_solutions.png';
-
 import DOWNLOAD_SVG from 'svgs/ui/download.svg?sprite';
 
 import SolutionsTable from '..';
@@ -198,7 +196,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                         and the solution with the lowest score is used as the representative
                         solution of the group.
                       </p>
-                      <img src={FIVE_DIFF_SOLUTIONS_IMG} alt="Five different solutions" />
+                      <img src="/images/info-buttons/img_5_different_solutions.png" alt="Five different solutions" />
                     </div>
                   </div>
                 </InfoButton>

@@ -40,8 +40,6 @@ import Textarea from 'components/forms/textarea';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 
-import REGION_PU from 'images/info-buttons/img_planning_region_grid.png';
-
 import { DEFAULT_AREA, PA_OPTIONS } from './constants';
 import ProjectFormProps from './types';
 
@@ -310,7 +308,7 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                                   grid of planning units, that are the
                                   central pieces that Marxan uses in its analyses.
                                 </p>
-                                <img src={REGION_PU} alt="Region-PU" />
+                                <img src="/images/info-buttons/img_planning_region_grid.png" alt="Region-PU" />
                               </div>
                             </span>
                           </InfoButton>

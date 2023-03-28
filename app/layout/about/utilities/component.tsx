@@ -3,9 +3,6 @@ import React from 'react';
 import Column from 'layout/statics/column';
 import Wrapper from 'layout/wrapper';
 
-import BackgroundImage from 'images/about/bg-utilities.jpg';
-import UtilitiesImage from 'images/about/utilities-1.png';
-
 import { UTILITIES } from './constants';
 
 export interface AboutUtilitiesProps {
@@ -16,15 +13,15 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
   return (
     <div
       style={{
-        backgroundImage: `url(${BackgroundImage})`,
+        backgroundImage: 'url(/images/about/bg-utilities.jpg)',
         backgroundSize: 'cover',
       }}
     >
       <Wrapper>
-        <div className="grid w-full max-w-5xl grid-cols-2 py-28 mx-auto border-t border-white gap-x-36 border-opacity-20">
+        <div className="grid w-full max-w-5xl grid-cols-2 mx-auto border-t border-white py-28 gap-x-36 border-opacity-20">
           <Column
             title="What can I do with this Marxan planning platform?"
-            image={UtilitiesImage}
+            image="/images/about/utilities-1.png"
           />
           <div className="flex flex-col items-start gap-10">
             {UTILITIES.map((u) => (

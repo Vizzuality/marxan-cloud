@@ -16,10 +16,6 @@ import ListFeatures from 'layout/scenarios/edit/features/set-up/add/list';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 
-import FEATURE_ABUND_IMG from 'images/info-buttons/img_abundance_data.png';
-import FEATURE_SOCIAL_IMG from 'images/info-buttons/img_social_uses.png';
-import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
-
 import FEATURES_SVG from 'svgs/ui/features.svg?sprite';
 
 export interface ScenariosSidebarEditFeaturesProps {
@@ -69,9 +65,9 @@ export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeatures
                       amount set.
                       Some examples include:
                     </p>
-                    <img src={FEATURE_SPECIES_IMG} alt="Feature-Range" />
-                    <img src={FEATURE_ABUND_IMG} alt="Feature-Abundance" />
-                    <img src={FEATURE_SOCIAL_IMG} alt="Feature-Social" />
+                    <img src="/images/info-buttons/img_species_range.png" alt="Feature-Range" />
+                    <img src="/images/info-buttons/img_abundance_data.png" alt="Feature-Abundance" />
+                    <img src="/images/info-buttons/img_social_uses.png" alt="Feature-Social" />
                   </div>
                 </div>
               </InfoButton>

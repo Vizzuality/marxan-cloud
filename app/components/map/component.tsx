@@ -18,7 +18,8 @@ import { useDebouncedCallback } from 'use-debounce';
 
 export interface MapProps extends InteractiveMapProps {
   /** A function that returns the map instance */
-  children?: React.ReactNode;
+  // TODO: fix any type. The type should from react-map-gl but it needs to be updated it first
+  children?: (map: any) => React.ReactNode;
 
   /** Custom css class for styling */
   className?: string;

@@ -6113,6 +6113,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-dom@npm:18.0.11":
+  version: 18.0.11
+  resolution: "@types/react-dom@npm:18.0.11"
+  dependencies:
+    "@types/react": "*"
+  checksum: 579691e4d5ec09688087568037c35edf8cfb1ab3e07f6c60029280733ee7b5c06d66df6fcc90786702c93ac8cb13bc7ff16c79ddfc75d082938fbaa36e1cdbf4
+  languageName: node
+  linkType: hard
+
 "@types/react-map-gl@npm:5.2.2":
   version: 5.2.2
   resolution: "@types/react-map-gl@npm:5.2.2"
@@ -6146,7 +6155,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:^17.0.0":
+"@types/react@npm:*":
   version: 17.0.0
   resolution: "@types/react@npm:17.0.0"
   dependencies:
@@ -6156,10 +6165,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react@npm:18.0.30":
+  version: 18.0.30
+  resolution: "@types/react@npm:18.0.30"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: 3ca13fd10a1ee92826e37cd8c2fe563bff65d4bdb3ff53f632bc46c8fba2e94e24247b4b77ce957677a54e592299782e1235f7a3dfcfea327cb3213ddc98e968
+  languageName: node
+  linkType: hard
+
 "@types/resize-observer-browser@npm:^0.1.5":
   version: 0.1.5
   resolution: "@types/resize-observer-browser@npm:0.1.5"
   checksum: 6a7ee5f26158a39fd07ab3b6b177f4ff1446237264c6d1fa9e5951c6e7576c29de03c890e1ad0e812a25c5d3527410301e88c516637414f2f45b3a98a10f83da
+  languageName: node
+  linkType: hard
+
+"@types/scheduler@npm:*":
+  version: 0.16.3
+  resolution: "@types/scheduler@npm:0.16.3"
+  checksum: 2b0aec39c24268e3ce938c5db2f2e77f5c3dd280e05c262d9c2fe7d890929e4632a6b8e94334017b66b45e4f92a5aa42ba3356640c2a1175fa37bef2f5200767
   languageName: node
   linkType: hard
 
@@ -7085,7 +7112,8 @@ __metadata:
     "@types/lodash": ^4.14.165
     "@types/next-auth": ^3.1.25
     "@types/node": ^14.14.10
-    "@types/react": ^17.0.0
+    "@types/react": 18.0.30
+    "@types/react-dom": 18.0.11
     "@types/react-map-gl": ^5.2.9
     "@typescript-eslint/eslint-plugin": ^4.8.2
     "@typescript-eslint/parser": ^4.8.2
@@ -7113,7 +7141,7 @@ __metadata:
     eslint-plugin-react-hooks: ^4.2.0
     fast-password-entropy: ^1.1.1
     final-form: ^4.20.1
-    framer-motion: ^3.9.1
+    framer-motion: 10.9.2
     fuse.js: ^6.4.6
     husky: ^4.3.0
     jsona: ^1.9.2
@@ -11766,23 +11794,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"framer-motion@npm:^3.9.1":
-  version: 3.9.1
-  resolution: "framer-motion@npm:3.9.1"
+"framer-motion@npm:10.9.2":
+  version: 10.9.2
+  resolution: "framer-motion@npm:10.9.2"
   dependencies:
     "@emotion/is-prop-valid": ^0.8.2
-    framesync: 5.2.0
-    hey-listen: ^1.0.8
-    popmotion: 9.3.1
-    style-value-types: 4.1.1
-    tslib: ^1.10.0
+    tslib: ^2.4.0
   peerDependencies:
-    react: ">=16.8 || ^17.0.0"
-    react-dom: ">=16.8 || ^17.0.0"
+    react: ^18.0.0
+    react-dom: ^18.0.0
   dependenciesMeta:
     "@emotion/is-prop-valid":
       optional: true
-  checksum: dad4356974b409f5277fa29471cd0ae09d79148a180d24fe7073dc0b467fe88dea566e4be13944fe5a263b990160ac5dff692f0e98675816cd1d99b04c8a198e
+  peerDependenciesMeta:
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: ae45174e03551efdb94aa579287d9d83c3ad06fc16849790cc9379692a7e0defb20bd76bab449286dba8ba112963c3e91605fe3085116f0ab967f5e046716627
   languageName: node
   linkType: hard
 
