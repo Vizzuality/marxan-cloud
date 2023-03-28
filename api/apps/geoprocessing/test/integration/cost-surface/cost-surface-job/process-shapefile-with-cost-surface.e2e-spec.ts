@@ -8,21 +8,20 @@ let app: INestApplication;
 let sut: SurfaceCostProcessor;
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeAll(async () => {
-  app = await bootstrapApplication();
-  world = await createWorld(app);
-  sut = app.get(SurfaceCostProcessor);
-});
-
-afterAll(async () => {
-  await world.cleanup();
-  await app?.close();
-}, 500 * 1000);
-
 describe(`given scenario has some planning units`, () => {
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+    sut = app.get(SurfaceCostProcessor);
+  });
   beforeEach(async () => {
+    world = await createWorld(app);
     await world.GivenPuCostDataExists();
   });
+
+  afterAll(async () => {
+    await world.cleanup();
+    await app?.close();
+  }, 500 * 1000);
   it(`updates cost surface`, async () => {
     await sut.process(world.getShapefileWithCost());
     await delay(1000);

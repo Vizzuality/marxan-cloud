@@ -7,12 +7,13 @@ import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry/create.reg
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from 'bullmq';
-import { In, Repository } from 'typeorm';
+import { getConnection, In, Repository } from 'typeorm';
 import {
   PlanningUnitsJobProcessor,
   RegularPlanningAreaJob,
 } from '../src/modules/planning-units/planning-units.job';
 import { E2E_CONFIG } from './e2e.config';
+import { seedAdminRegions } from './utils/seeds/seed-admin-regions';
 
 /**
  * @TODO
@@ -43,6 +44,8 @@ describe('planning units jobs (e2e)', () => {
     projectsPuRepo = sandbox.get(getRepositoryToken(ProjectsPuEntity));
     planningUnitsRepo = sandbox.get(getRepositoryToken(PlanningUnitsGeom));
     sut = sandbox.get(PlanningUnitsJobProcessor);
+
+    await seedAdminRegions();
   });
 
   afterEach(async () => {

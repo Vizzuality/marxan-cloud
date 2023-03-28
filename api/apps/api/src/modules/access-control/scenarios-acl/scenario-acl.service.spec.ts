@@ -12,6 +12,7 @@ import { ProjectRoles } from '../projects-acl/dto/user-role-project.dto';
 import { LockService } from './locks/lock.service';
 import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
+import { User } from '@marxan-api/modules/users/user.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -72,6 +73,13 @@ const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     providers: [
       ScenarioAclService,
+      {
+        provide: getRepositoryToken(User),
+        useValue: {
+          find: jest.fn(),
+          findOne: jest.fn(),
+        },
+      },
       {
         provide: getRepositoryToken(UsersScenariosApiEntity),
         useValue: {
