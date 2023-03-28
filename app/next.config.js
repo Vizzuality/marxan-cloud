@@ -1,14 +1,14 @@
-const withPlugins = require('next-compose-plugins');
-const withOptimizedImages = require('next-optimized-images');
+// const withPlugins = require('next-compose-plugins');
+// const withOptimizedImages = require('next-optimized-images');
 
 const nextConfig = {
-  webpack: (config) => {
-    config.node = {
-      fs: 'empty',
-    };
+  // webpack: (config) => {
+  //   config.node = {
+  //     fs: 'empty',
+  //   };
 
-    return config;
-  },
+  //   return config;
+  // },
   async redirects() {
     const redirects = [];
 
@@ -30,11 +30,13 @@ const nextConfig = {
   },
 };
 
-module.exports = withPlugins(
-  [
-    withOptimizedImages({
-      optimizeImages: false,
-    }),
-  ],
-  nextConfig,
-);
+module.exports = nextConfig;
+
+// module.exports = withPlugins(
+//   [
+//     withOptimizedImages({
+//       optimizeImages: false,
+//     }),
+//   ],
+//   nextConfig,
+// );

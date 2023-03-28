@@ -33,6 +33,18 @@ yarn-error.log*
 # vercel
 .vercel
 
+# NextJS
+next-env.d.ts
+
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # cypress
 /cypress/screenshots
 /cypress/videos
