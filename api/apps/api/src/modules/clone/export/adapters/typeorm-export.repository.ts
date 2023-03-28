@@ -19,7 +19,6 @@ import {
 import { Export, ExportId } from '../domain';
 import { ExportComponentEntity } from './entities/export-components.api.entity';
 import { ExportEntity } from './entities/exports.api.entity';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class TypeormExportRepository implements ExportRepository {
