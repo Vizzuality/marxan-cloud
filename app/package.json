@@ -15,7 +15,7 @@
     "storybook:build": "yarn storybook:styles:prod && build-storybook -s ./public -c .storybook"
   },
   "engines": {
-    "node": "14.21.2"
+    "node": "16.19"
   },
   "dependencies": {
     "@artsy/fresnel": "^1.9.0",
@@ -140,5 +140,6 @@
     "*.{js,ts,tsx}": [
       "eslint --fix"
     ]
-  }
+  },
+  "packageManager": "yarn@3.5.0"
 }
