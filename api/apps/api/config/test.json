@@ -20,7 +20,7 @@
     "concurrency": 50
   },
   "redis": {
-    "port": 3379,
+    "port": 3050,
     "host": "localhost",
     "password": null,
     "useTLS": false,

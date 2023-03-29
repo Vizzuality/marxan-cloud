@@ -100,7 +100,7 @@ services:
     container_name: marxan-test-e2e-redis
     command: [ "redis-server" ]
     ports:
-      - "3379:6379"
+      - "3050:6379"
     restart: on-failure
 
 volumes:
