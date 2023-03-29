@@ -41,11 +41,11 @@ clean:
 
 ## Upload Data to Azure
 sync_data_to_azure:
-	@az storage blob upload-batch --account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data -s data/seed
+	@az storage blob upload-batch --account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) -d $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data -s data/seed
 
 ## Download Data from Azure
 sync_data_from_azure:
-	@az storage blob download-batch--account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) --auth-mode login -d data/ -s $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data --pattern dir/*
+	@az storage blob download-batch--account-name $(DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME) -d data/ -s $(DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME)/data --pattern dir/*
 
 ## Set up python interpreter environment
 create_environment:
