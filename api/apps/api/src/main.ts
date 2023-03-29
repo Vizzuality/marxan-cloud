@@ -19,6 +19,7 @@ export async function bootstrap() {
   // Here we use a larger limit than the one used for the shapefiles from which
   // the GeoJSON payload for this endpoint is generated, to take into account
   // the higher verbosity of JSON vs compressed Shapefile data.
+
   app.use(
     '/api/v1/scenarios/*/planning-units',
     json({ limit: complexGeometry()?.fileSize }),
