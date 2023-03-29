@@ -13,9 +13,9 @@ import { QueueBuilder } from '@marxan-api/modules/queue';
 import { ProjectChecker } from '@marxan-api/modules/projects/project-checker/project-checker.service';
 import { ScenarioChecker } from '@marxan-api/modules/scenarios/scenario-checker/scenario-checker.service';
 import {
-  FileRepository,
-  TempStorageRepository,
-} from '@marxan/files-repository';
+  CloningFilesRepository,
+  LocalCloningFilesStorage,
+} from '@marxan/cloning-files-repository';
 import { ScenarioCalibrationRepo } from '@marxan-api/modules/blm/values/scenario-calibration-repo';
 import { ClassProvider } from '@nestjs/common/interfaces/modules/provider.interface';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
@@ -53,7 +53,8 @@ export class TestClientApi {
       { provide: QueueBuilder, useClass: FakeQueueBuilder },
       { provide: ProjectChecker, useClass: ProjectCheckerFake },
       { provide: ScenarioChecker, useClass: ScenarioCheckerFake },
-      { provide: FileRepository, useClass: TempStorageRepository },
+      // TODO: Make Sure this is the right mock, previous one was TempFileStorage
+      { provide: CloningFilesRepository, useClass: LocalCloningFilesStorage },
       { provide: Mailer, useClass: FakeMailer },
       {
         provide: ScenarioCalibrationRepo,
