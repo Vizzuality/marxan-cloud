@@ -10,6 +10,20 @@ ifneq (,$(wildcard $(ENVFILE)))
     export
 endif
 
+# use compose plugin if available, fall back to docker-compose standalone
+DOCKER_COMPOSE_STANDALONE_EXISTS := $(shell docker-compose version 2>/dev/null)
+DOCKER_COMPOSE_PLUGIN_EXISTS := $(shell docker compose version 2>/dev/null)
+
+ifdef DOCKER_COMPOSE_PLUGIN_EXISTS
+DOCKER_COMPOSE_COMMAND := docker compose
+else
+ifdef DOCKER_COMPOSE_STANDALONE_EXISTS
+DOCKER_COMPOSE_COMMAND := docker-compose
+else
+$(error Please install either the Compose plugin for Docker or the Docker Compose standalone binary)
+endif
+endif
+
 #################################################################################
 # GLOBALS                                                                       #
 #################################################################################
@@ -24,7 +38,7 @@ PROJECT_NAME = science
 #################################################################################
 ## Initiate Docker compose and build services:
 up:
-	docker-compose build && docker-compose up
+	$(DOCKER_COMPOSE_COMMAND) build && $(DOCKER_COMPOSE_COMMAND) up
 ## Install Python Dependencies in your local if you dont want to use docker
 requirements:
 	python3 -m pip install -U pip setuptools wheel
@@ -32,7 +46,7 @@ requirements:
 
 ## Make Dataset
 seed-data:
-	docker-compose -f ./docker-compose-data_download.yml up --build
+	$(DOCKER_COMPOSE_COMMAND) -f ./docker-compose-data_download.yml up --build
 
 ## Delete all compiled Python files
 clean:
