@@ -76,11 +76,11 @@ export class OrganizationsService extends AppBaseService<
   /**
    * Apply service-specific filters.
    */
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<Organization>,
     filters: OrganizationFilters,
     _info?: AppInfoDTO,
-  ): SelectQueryBuilder<Organization> {
+  ): Promise<SelectQueryBuilder<Organization>> {
     this._processBaseFilters<OrganizationFilters>(
       query,
       filters,

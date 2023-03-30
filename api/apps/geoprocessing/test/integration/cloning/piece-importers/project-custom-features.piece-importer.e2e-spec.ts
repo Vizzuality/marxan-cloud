@@ -98,7 +98,13 @@ const getFixtures = async () => {
     ],
     providers: [
       ProjectCustomFeaturesPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
+      {
+        provide: Logger,
+        useValue: {
+          error: () => {},
+          setContext: () => {},
+        },
+      },
     ],
   }).compile();
 
@@ -257,7 +263,9 @@ const getFixtures = async () => {
           );
 
           const featuresData = await featuresDataRepo.find({
-            featureId: In(customFeatures.map((feature) => feature.id)),
+            where: {
+              featureId: In(customFeatures.map((feature) => feature.id)),
+            },
           });
 
           expect(customFeatures).toHaveLength(amountOfCustomFeatures);

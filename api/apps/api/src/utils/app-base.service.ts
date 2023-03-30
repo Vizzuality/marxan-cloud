@@ -146,7 +146,7 @@ export abstract class AppBaseService<
     return { data: entities, metadata: meta };
   }
 
-  _processBaseFilters<Filters>(
+  protected _processBaseFilters<Filters>(
     query: SelectQueryBuilder<Entity>,
     filters: Filters,
     filterKeys: any,
@@ -160,7 +160,7 @@ export abstract class AppBaseService<
     return query;
   }
 
-  _processBaseFilter(
+  protected _processBaseFilter(
     query: SelectQueryBuilder<Entity>,
     [filterKey, filterValues]: [string, unknown],
   ): SelectQueryBuilder<Entity> {

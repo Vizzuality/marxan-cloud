@@ -10,7 +10,7 @@ import { apiConnections } from '@marxan-api/ormconfig';
 import { AuthenticationModule } from '@marxan-api/modules/authentication/authentication.module';
 import { UsersModule } from '@marxan-api/modules/users/users.module';
 import { UserCommand } from '@marxan-api/modules/users/user.command';
-import { FetchSpecificationMiddleware } from 'nestjs-base-service';
+import { ProcessFetchSpecification } from 'nestjs-base-service';
 
 @Module({
   imports: [
@@ -32,7 +32,7 @@ export class AppModule implements NestModule {
    */
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(FetchSpecificationMiddleware)
+      .apply(ProcessFetchSpecification)
       .forRoutes({ path: '*', method: RequestMethod.GET });
   }
 }

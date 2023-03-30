@@ -321,7 +321,9 @@ const getFixtures = async () => {
 
           expect(projectPus).toHaveLength(expectedLength);
 
-          const planningArea = await planningAreasRepo.findOne({ projectId });
+          const planningArea = await planningAreasRepo.findOne({
+            where: { projectId },
+          });
           expect(planningArea).toBeDefined();
           expect(planningArea!.id).toEqual(project.planning_area_geometry_id);
         },

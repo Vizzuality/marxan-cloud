@@ -126,7 +126,8 @@ export class DbSpecificationRepository implements SpecificationRepository {
     const lock = this.inTransaction
       ? { mode: 'pessimistic_write' as const }
       : undefined;
-    const specifications = await this.specificationRepo.findByIds(specIds, {
+    const specifications = await this.specificationRepo.find({
+      where: { id: In(specIds) },
       lock,
       loadEagerRelations: false,
       ...findManyOptions,

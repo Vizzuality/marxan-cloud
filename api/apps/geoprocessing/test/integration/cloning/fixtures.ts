@@ -314,7 +314,7 @@ export async function DeleteScenarioOutputPuDataResults(
   scenarioId: string,
 ) {
   const deletedScenarioPu = await em.getRepository(ScenariosPuPaDataGeo).find({
-    scenarioId,
+    where: { scenarioId },
   });
   return em.getRepository(OutputScenariosPuDataGeoEntity).delete({
     scenarioPuId: In(deletedScenarioPu.map((pu) => pu.id)),

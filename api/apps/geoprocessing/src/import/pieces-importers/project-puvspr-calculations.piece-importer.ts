@@ -214,7 +214,7 @@ export class ProjectPuvsprCalculationsPieceImporter
   }
 
   private async getProjectPusByPuid(projectId: string) {
-    const projectPus = await this.projectPusRepo.find({ projectId });
+    const projectPus = await this.projectPusRepo.find({ where: { projectId } });
     const projectPusById: Record<number, string> = {};
 
     projectPus.reduce((prev, { id, puid }) => {

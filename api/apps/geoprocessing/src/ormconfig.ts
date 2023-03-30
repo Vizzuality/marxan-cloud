@@ -43,9 +43,6 @@ export const geoprocessingConnections: {
     migrationsRun: AppConfig.getBoolean(
       'postgresGeoApi.runMigrationsOnStartup',
     ),
-    cli: {
-      migrationsDir: 'apps/geoprocessing/src/migrations/geoprocessing',
-    },
     extra: {
       max: AppConfig.get<number>('postgresGeoApi.maxClientsInPool', 10),
     },

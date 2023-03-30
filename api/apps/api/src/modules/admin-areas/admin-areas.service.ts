@@ -93,11 +93,11 @@ export class AdminAreasService extends AppBaseService<
     });
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<AdminArea>,
     filters?: AdminAreaFilters,
     _info?: AppInfoDTO,
-  ): SelectQueryBuilder<AdminArea> {
+  ): Promise<SelectQueryBuilder<AdminArea>> {
     if (filters?.countryId) {
       query.andWhere(`${this.alias}.gid0 = :countryId`, {
         countryId: filters.countryId,

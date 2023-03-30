@@ -62,11 +62,11 @@ export class ScenarioFeaturesGapDataService extends AppBaseService<
     return right(await super.findAllPaginated(fetchSpecification, info));
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenarioFeaturesGapData>,
     filters?: FiltersSpecification['filter'],
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenarioFeaturesGapData> {
+  ): Promise<SelectQueryBuilder<ScenarioFeaturesGapData>> {
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenarioId = :scenarioId`, {

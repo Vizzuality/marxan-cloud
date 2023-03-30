@@ -19,7 +19,7 @@ import { GeoModule } from '@marxan-api/modules/geo/geo.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from '@marxan-api/modules/organizations/organizations.module';
-import { FetchSpecificationMiddleware } from 'nestjs-base-service';
+import { ProcessFetchSpecification } from 'nestjs-base-service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
@@ -96,7 +96,7 @@ export class AppModule implements NestModule {
    */
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(FetchSpecificationMiddleware)
+      .apply(ProcessFetchSpecification)
       .forRoutes({ path: '*', method: RequestMethod.GET });
   }
 }

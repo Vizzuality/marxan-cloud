@@ -147,11 +147,13 @@ export class UsersService extends AppBaseService<
    * We treat email addresses as login usernames in this context, so we perform
    * the lookup case-insensitively.
    */
-  async findByEmail(email: string): Promise<User | undefined> {
-    return this.repository.findOne({ email: ILike(email.toLowerCase()) });
+  async findByEmail(email: string): Promise<User | null> {
+    return this.repository.findOne({
+      where: { email: ILike(email.toLowerCase()) },
+    });
   }
 
-  async findByExactEmail(email: string): Promise<User | undefined> {
+  async findByExactEmail(email: string): Promise<User | null> {
     return this.repository
       .createQueryBuilder('users')
       .where('LOWER(email) = :email', { email: email.toLowerCase() })

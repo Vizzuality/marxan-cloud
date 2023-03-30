@@ -28,8 +28,9 @@ export class MarxanProjectChecker implements ProjectChecker {
   async hasPendingImports(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.repository.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
 
     if (!project) {
@@ -70,8 +71,9 @@ export class MarxanProjectChecker implements ProjectChecker {
   async hasPendingExports(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.repository.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
 
     if (!project) {
@@ -112,8 +114,9 @@ export class MarxanProjectChecker implements ProjectChecker {
   async hasPendingBlmCalibration(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.repository.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
 
     if (!project) {
@@ -137,8 +140,9 @@ export class MarxanProjectChecker implements ProjectChecker {
   async hasPendingMarxanRun(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.repository.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
 
     if (!project) {
@@ -162,8 +166,10 @@ export class MarxanProjectChecker implements ProjectChecker {
   async isProjectReady(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.repository.findOne(projectId);
-    if (project === undefined) {
+    const project = await this.repository.findOne({
+      where: { id: projectId },
+    });
+    if (!isDefined(project)) {
       return left(doesntExist);
     }
     const planningUnitEvent = await this.apiEvents

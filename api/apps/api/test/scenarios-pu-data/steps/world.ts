@@ -34,7 +34,7 @@ export const createWorld = async (app: INestApplication): Promise<World> => {
     GivenScenarioPuDataExists: () =>
       GivenScenarioPuDataExists(entityManager, projectId, scenarioId),
     cleanup: async () => {
-      const projectPus = await projectsPuRepo.find({ projectId });
+      const projectPus = await projectsPuRepo.find({ where: { projectId } });
       await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
     },
   };

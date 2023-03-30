@@ -35,7 +35,9 @@ export class ExportProjectHandler
     newProjectId: string,
     ownerId: string,
   ) {
-    const project = await this.projectRepo.findOneOrFail(existingProjectId);
+    const project = await this.projectRepo.findOneOrFail({
+      where: { id: existingProjectId },
+    });
     await this.projectRepo.save({
       id: newProjectId,
       name: project.name + ' - copy',

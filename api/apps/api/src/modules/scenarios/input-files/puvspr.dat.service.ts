@@ -41,7 +41,9 @@ export class PuvsprDatService {
   }
 
   private async isLegacyProject(projectId: string) {
-    const [project] = await this.projectsRepo.find({ id: projectId });
+    const [project] = await this.projectsRepo.find({
+      where: { id: projectId },
+    });
     assertDefined(project);
     return project.sources === ProjectSourcesEnum.legacyImport;
   }

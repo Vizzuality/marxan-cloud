@@ -118,7 +118,7 @@ async function getFixtures() {
 
   return {
     async scenarioWithData() {
-      const first = await planningUnitsRepository.findOne();
+      const first = await planningUnitsRepository.findOne({});
       assertDefined(first);
       return first.scenarioId;
     },

@@ -27,7 +27,9 @@ export class TypeormScenarioBlmRepository extends ScenarioBlmRepo {
   async get(
     scenarioId: string,
   ): Promise<Either<GetScenarioFailure, ScenarioBlm>> {
-    const scenarioBlm = await this.repository.findOne(scenarioId);
+    const scenarioBlm = await this.repository.findOne({
+      where: { id: scenarioId },
+    });
 
     return scenarioBlm ? right(scenarioBlm) : left(scenarioNotFound);
   }
@@ -49,7 +51,8 @@ export class TypeormScenarioBlmRepository extends ScenarioBlmRepo {
     scenarioId: string,
     blm: Blm,
   ): Promise<Either<CreateFailure, SaveSuccess>> {
-    if (await this.repository.findOne(scenarioId)) return left(alreadyCreated);
+    if (await this.repository.findOne({ where: { id: scenarioId } }))
+      return left(alreadyCreated);
 
     const scenarioBlm = await this.repository.create();
     scenarioBlm.id = scenarioId;

@@ -76,11 +76,11 @@ export class ScenarioFeaturesOutputGapDataService extends AppBaseService<
     return right(await super.findAllPaginated(fetchSpecification, info));
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenarioFeaturesOutputGapData>,
     filters?: ScenarioFeaturesOutputGapDataBaseFilters,
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenarioFeaturesOutputGapData> {
+  ): Promise<SelectQueryBuilder<ScenarioFeaturesOutputGapData>> {
     if (filters?.runId) {
       const runIds = filters.runId.map((i) => +i);
       const invalidRunIds = runIds.filter((i) => !(isInt(i) && isPositive(i)));

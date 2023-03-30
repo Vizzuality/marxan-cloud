@@ -45,10 +45,12 @@ export class LegacyProjectImportTypeormRepository
     if (!legacyProjectImport) return left(legacyProjectImportNotFound);
 
     const pieces = await this.legacyProjectImportComponentRepo.find({
-      legacyProjectImportId: legacyProjectImport.id,
+      where: { legacyProjectImportId: legacyProjectImport.id },
     });
     const files = await this.legacyProjectImportFileRepo.find({
-      legacyProjectImportId: legacyProjectImport.id,
+      where: {
+        legacyProjectImportId: legacyProjectImport.id,
+      },
     });
 
     legacyProjectImport.pieces = pieces;

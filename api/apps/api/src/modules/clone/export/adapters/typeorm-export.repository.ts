@@ -5,7 +5,7 @@ import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import {
   EntityManager,
-  FindConditions,
+  FindOptionsWhere,
   IsNull,
   Not,
   Repository,
@@ -37,7 +37,8 @@ export class TypeormExportRepository implements ExportRepository {
     const lock = this.inTransaction
       ? { mode: 'pessimistic_write' as const }
       : undefined;
-    const exportEntity = await this.exportRepo.findOne(exportId.value, {
+    const exportEntity = await this.exportRepo.findOne({
+      where: { id: exportId.value },
       lock,
     });
     if (!exportEntity) return undefined;
@@ -93,7 +94,7 @@ export class TypeormExportRepository implements ExportRepository {
     const foreignExportFilter = {
       foreignExport: !options?.isLocal,
     };
-    const findConditions: FindConditions<ExportEntity> = {
+    const findOptionsWhere: FindOptionsWhere<ExportEntity> = {
       resourceId: projectId,
       resourceKind: ResourceKind.Project,
       ...(options?.isStandalone === undefined ? {} : importResourceIdFilter),
@@ -102,7 +103,7 @@ export class TypeormExportRepository implements ExportRepository {
     };
 
     const entities = await this.exportRepo.find({
-      where: findConditions,
+      where: findOptionsWhere,
       take: limit,
       order: {
         createdAt: 'DESC',

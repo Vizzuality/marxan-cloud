@@ -213,7 +213,7 @@ async function getFixtures() {
       scenarioId: string,
       splitFeature: SingleSplitConfigFeatureValueWithId,
     ) => {
-      const [project] = await projectsRepo.find({ id: projectId });
+      const [project] = await projectsRepo.find({ where: { id: projectId } });
       if (!project) throw new Error('project should be defined');
       return sut.prepareQuery(
         splitFeature,

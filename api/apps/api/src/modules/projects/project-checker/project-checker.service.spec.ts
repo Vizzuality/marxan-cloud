@@ -13,7 +13,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { isEqual } from 'lodash';
-import { FindConditions, In, Repository } from 'typeorm';
+import { FindOneOptions, In, Repository } from 'typeorm';
 import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -416,7 +416,7 @@ async function getFixtures() {
   const fakeScenariosRepo: jest.Mocked<
     Pick<Repository<Scenario>, 'findOne'>
   > = {
-    findOne: jest.fn(() => Promise.resolve({} as Scenario)),
+    findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
   };
 
   const fakePlaningAreaFacade = {
@@ -569,16 +569,14 @@ async function getFixtures() {
     },
     GivenProjectDoesntExist() {
       fakeProjectsService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(undefined),
+        (options: FindOneOptions<Project>) => Promise.resolve(null),
       );
     },
     GivenProjectExists(projectId: string, scenarios?: { id: string }[]) {
       const fakeProject = { id: projectId, scenarios } as Project;
 
       fakeProjectsService.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Project>) =>
-          Promise.resolve(fakeProject),
+        (options: FindOneOptions<Project>) => Promise.resolve(fakeProject),
       );
     },
     GivenScenarioIsBeingExported(scenarioId: string) {
