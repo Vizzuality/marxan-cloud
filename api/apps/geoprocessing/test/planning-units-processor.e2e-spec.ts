@@ -48,7 +48,7 @@ describe('planning units jobs (e2e)', () => {
   afterEach(async () => {
     const projectId = data.projectId;
 
-    const projectPus = await projectsPuRepo.find({ projectId });
+    const projectPus = await projectsPuRepo.find({ where: { projectId } });
     const geometriesIds = projectPus.map((projectPu) => projectPu.geomId);
 
     await planningUnitsRepo.delete({ id: In(geometriesIds) });
@@ -72,7 +72,9 @@ describe('planning units jobs (e2e)', () => {
       await expect(sut.process(createPlanningUnitsDTO)).resolves.not.toThrow();
 
       const projectPus = await projectsPuRepo.find({
-        projectId: data.projectId,
+        where: {
+          projectId: data.projectId,
+        },
       });
 
       expect(projectPus.length).toBeGreaterThan(0);

@@ -46,8 +46,7 @@ export class BlmPartialResultsRepository {
     const puidUuids = await Promise.all(
       filteredPuidList.map(async (puidInt) => {
         const fullPu = await this.projectPuRepository.findOneOrFail({
-          puid: puidInt,
-          projectId,
+          where: { puid: puidInt, projectId },
         });
         return fullPu.id;
       }),

@@ -51,7 +51,9 @@ export class ComputeArea {
 
   private async isLegacyProject(projectId: string) {
     const [project] = await this.projectsRepo.find({
-      id: projectId,
+      where: {
+        id: projectId,
+      },
     });
 
     return project.sources === ProjectSourcesEnum.legacyImport;

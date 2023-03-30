@@ -28,7 +28,8 @@ export class TypeormImportRepository implements ImportRepository {
     const lock = this.inTransaction
       ? { mode: 'pessimistic_write' as const }
       : undefined;
-    const importEntity = await this.importRepo.findOne(importId.value, {
+    const importEntity = await this.importRepo.findOne({
+      where: { id: importId.value },
       lock,
     });
     if (!importEntity) return undefined;

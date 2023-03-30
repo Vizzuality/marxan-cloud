@@ -58,7 +58,7 @@ describe(`when entity created`, () => {
   it('should have equal id and project_id', async () => {
     const [planning_area] = await fixtures
       .getTypeormRepository()
-      .find({ id: result.id });
+      .find({ where: { id: result.id } });
 
     expect(planning_area).toBeDefined();
 
@@ -220,11 +220,15 @@ async function getFixtures() {
       return id;
     },
     async areaShouldNotExist(id: string) {
-      const area = await fixtures.getTypeormRepository().findOne(id);
+      const area = await fixtures
+        .getTypeormRepository()
+        .findOne({ where: { id } });
       expect(area).toBeUndefined();
     },
     async areaShouldBeAssignedTo(id: string, projectId: string | null) {
-      const area = await fixtures.getTypeormRepository().findOne(id);
+      const area = await fixtures
+        .getTypeormRepository()
+        .findOne({ where: { id } });
       assertDefined(area);
       expect(area.projectId).toStrictEqual(projectId);
     },

@@ -122,7 +122,9 @@ async function getFixtures() {
       ]);
     },
     async cleanup() {
-      const projectPus = await projectsPuRepo.find({ projectId });
+      const projectPus = await projectsPuRepo.find({
+        where: { projectId },
+      });
       await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
     },
     getRangeService(): CostRangeService {

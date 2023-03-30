@@ -96,11 +96,11 @@ export class GeoFeaturesService extends AppBaseService<
   /**
    * Apply service-specific filters.
    */
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<GeoFeature>,
     filters: GeoFeatureFilters,
     info?: GeoFeaturesRequestInfo,
-  ): SelectQueryBuilder<GeoFeature> {
+  ): Promise<SelectQueryBuilder<GeoFeature>> {
     this._processBaseFilters<GeoFeatureFilters>(
       query,
       filters,

@@ -10,7 +10,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Either } from 'fp-ts/lib/Either';
-import { FindConditions, Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { API_EVENT_KINDS } from '../../../../../../libs/api-events/src';
 import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
@@ -136,7 +136,7 @@ async function getFixtures() {
   const fakeScenariosRepo: jest.Mocked<
     Pick<Repository<Scenario>, 'findOne'>
   > = {
-    findOne: jest.fn(() => Promise.resolve({} as Scenario)),
+    findOne: jest.fn((_: any) => Promise.resolve({} as Scenario)),
   };
   const testingModule = await Test.createTestingModule({
     providers: [
@@ -160,7 +160,7 @@ async function getFixtures() {
     GivenScenarioExist: () => {
       const id = v4();
       fakeScenariosRepo.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Scenario>) =>
+        (options: FindOneOptions<Scenario>) =>
           Promise.resolve({ id } as Scenario),
       );
 
@@ -168,8 +168,7 @@ async function getFixtures() {
     },
     GivenScenarioDoesntExist: () => {
       fakeScenariosRepo.findOne.mockImplementation(
-        (_id: string | undefined | FindConditions<Scenario>) =>
-          Promise.resolve(undefined),
+        (options: FindOneOptions<Scenario>) => Promise.resolve(null),
       );
     },
     GivenScenarioHasAnOngoingExport: () => {

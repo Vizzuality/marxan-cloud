@@ -93,7 +93,7 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('Users - sign up and validation', () => {
-    let newUser: User | undefined;
+    let newUser: User | null;
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to create an account using an email address not currently in use', async () => {
@@ -141,7 +141,7 @@ describe('UsersModule (e2e)', () => {
        * validation/email confirmation workflow.
        */
       newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
+      expect(newUser).not.toBeNull();
 
       if (!newUser) {
         throw new Error('Cannot retrieve data for newly created user.');
@@ -314,7 +314,7 @@ describe('UsersModule (e2e)', () => {
   });
 
   describe('Users - Sign up again', () => {
-    let newUser: User | undefined;
+    let newUser: User | null;
     let validationTokenEvent: ApiEventByTopicAndKind | undefined;
 
     test('A user should be able to sign up using the same email address as that of an account that has been deleted', async () => {
@@ -334,7 +334,7 @@ describe('UsersModule (e2e)', () => {
        * validation/email confirmation workflow.
        */
       newUser = await usersService.findByEmail(signUpDto.email);
-      expect(newUser).toBeDefined();
+      expect(newUser).not.toBeNull();
 
       if (!newUser) {
         throw new Error('Cannot retrieve data for newly created user.');

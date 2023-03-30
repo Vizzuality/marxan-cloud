@@ -32,11 +32,11 @@ export class ScenariosPlanningUnitService extends AppBaseService<
     });
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenariosPlanningUnitGeoEntity>,
     filters?: FiltersSpecification['filter'],
     info?: UserSearchCriteria,
-  ): SelectQueryBuilder<ScenariosPlanningUnitGeoEntity> {
+  ): Promise<SelectQueryBuilder<ScenariosPlanningUnitGeoEntity>> {
     const scenarioId = info?.params?.scenarioId;
     if (scenarioId) {
       return query.andWhere(`${this.alias}.scenario_id = :scenarioId`, {

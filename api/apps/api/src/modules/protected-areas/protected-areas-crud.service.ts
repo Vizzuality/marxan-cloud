@@ -82,11 +82,11 @@ export class ProtectedAreasCrudService extends AppBaseService<
     });
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ProtectedArea>,
     filters: ProtectedAreaBaseFilters & ProtectedAreaFilters,
     _info?: AppInfoDTO,
-  ): SelectQueryBuilder<ProtectedArea> {
+  ): Promise<SelectQueryBuilder<ProtectedArea>> {
     /**
      * @debt This is a bit of a hack - here we are bending a wrong abstraction
      * to avoid duplication and boilerplate. `setFilters()` should not be a land

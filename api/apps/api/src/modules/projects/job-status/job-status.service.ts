@@ -47,12 +47,10 @@ export class JobStatusService {
 
   async getJobStatusFor(projectId: string): Promise<ProjectWithScenarios> {
     const statuses = await this.statusRepository.find({
-      projectId,
+      where: { projectId },
     });
     const projectJobs = await this.projectStatusRepository.find({
-      where: {
-        projectId,
-      },
+      where: { projectId },
     });
     type ScenarioId = string;
     const groupedStatuses: Record<ScenarioId, Scenario> = {};

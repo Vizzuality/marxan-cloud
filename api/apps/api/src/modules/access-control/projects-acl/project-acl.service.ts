@@ -339,6 +339,8 @@ export class ProjectAclService implements ProjectAccessControl {
   }
 
   private async isProjectPublic(projectId: string): Promise<boolean> {
-    return Boolean(await this.publishedProjectRepo.findOne(projectId));
+    return Boolean(
+      await this.publishedProjectRepo.findOne({ where: { id: projectId } }),
+    );
   }
 }

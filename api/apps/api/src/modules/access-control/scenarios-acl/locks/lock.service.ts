@@ -78,7 +78,7 @@ export class LockService {
   }
 
   async getLock(scenarioId: string): Promise<ScenarioLockResultSingular> {
-    const result = await this.locksRepo.findOne({ scenarioId });
+    const result = await this.locksRepo.findOne({ where: { scenarioId } });
 
     if (!result) {
       return { data: null };

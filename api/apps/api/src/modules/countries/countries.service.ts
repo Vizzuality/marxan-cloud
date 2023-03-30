@@ -31,7 +31,7 @@ export class CountriesService extends AppBaseService<
     });
   }
 
-  async getByGid0(country: string): Promise<Country | undefined> {
+  async getByGid0(country: string): Promise<Country | null> {
     return this.repository.findOne({
       where: {
         gid0: country,
@@ -41,7 +41,7 @@ export class CountriesService extends AppBaseService<
 
   async getIdAndNameByGid0(
     country: string,
-  ): Promise<Pick<Country, 'id' | 'gid0' | 'name0'> | undefined> {
+  ): Promise<Pick<Country, 'id' | 'gid0' | 'name0'> | null> {
     return await this.repository.findOne({
       where: {
         gid0: country,
@@ -52,7 +52,7 @@ export class CountriesService extends AppBaseService<
 
   async getBBoxByGid0(
     country: string,
-  ): Promise<Pick<Country, 'bbox' | 'gid0'> | undefined> {
+  ): Promise<Pick<Country, 'bbox' | 'gid0'> | null> {
     return await this.repository.findOne({
       where: {
         gid0: country,

@@ -49,14 +49,21 @@ export class CustomPlanningAreaRepository {
   }
 
   async getBBox(id: string): Promise<BBox | undefined> {
-    const result = await this.planningAreas.findOne(id);
+    const result = await this.planningAreas.findOne({ where: { id } });
     return result?.bbox;
   }
 
   async has(id: string): Promise<boolean> {
     const selectedId:
       | Pick<PlanningArea, 'id'>
-      | undefined = await this.planningAreas.findOne(id, { select: ['id'] });
+      | null = await this.planningAreas.findOne({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+      },
+    });
     return isDefined(selectedId?.id);
   }
 

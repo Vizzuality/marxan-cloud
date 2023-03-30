@@ -128,7 +128,9 @@ export class MarxanScenarioChecker implements ScenarioChecker {
   }
 
   private async checkScenarioExists(scenarioId: string): Promise<boolean> {
-    const scenario = await this.scenarioRepo.findOne(scenarioId);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: scenarioId },
+    });
 
     return Boolean(scenario);
   }

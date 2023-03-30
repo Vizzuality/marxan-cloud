@@ -17,8 +17,9 @@ export class ExportResourcePiecesAdapter implements ExportResourcePieces {
     id: ResourceId,
     scenarioIds: string[],
   ): Promise<ExportComponent[]> {
-    const project = await this.projectRepository.findOneOrFail(id.value, {
-      relations: ['scenarios'],
+    const project = await this.projectRepository.findOneOrFail({
+      where: { id: id.value },
+      relations: { scenarios: true },
     });
     const { scenarios } = project;
 

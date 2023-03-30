@@ -80,7 +80,9 @@ export class SplitCreateFeatures {
   }
 
   private async getBaseFeature(baseFeatureId: string) {
-    const [feature] = await this.featuresRepo.find({ id: baseFeatureId });
+    const [feature] = await this.featuresRepo.find({
+      where: { id: baseFeatureId },
+    });
 
     if (!feature) throw new Error('did not find base feature');
 

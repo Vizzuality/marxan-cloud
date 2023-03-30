@@ -55,11 +55,11 @@ export class SolutionResultCrudService extends AppBaseService<
     };
   }
 
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<ScenariosOutputResultsApiEntity>,
     filters: ScenarioOutputResultsFilters,
     _info?: AppInfoDTO,
-  ): SelectQueryBuilder<ScenariosOutputResultsApiEntity> {
+  ): Promise<SelectQueryBuilder<ScenariosOutputResultsApiEntity>> {
     if (filters?.scenarioId) {
       query.andWhere(`${this.alias}.scenarioId = :scenarioId`, {
         scenarioId: filters.scenarioId,

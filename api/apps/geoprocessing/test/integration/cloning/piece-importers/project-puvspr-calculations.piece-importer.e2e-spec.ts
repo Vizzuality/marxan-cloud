@@ -274,7 +274,9 @@ const getFixtures = async () => {
             projectId,
           );
           expect(projectPuvsprCalculations).toEqual([]);
-          const projectPus = await projectPusRepo.find({ projectId });
+          const projectPus = await projectPusRepo.find({
+            where: { projectId },
+          });
           expect(projectPus).toHaveLength(amountOfPuvsprCalculations);
 
           await sut.run(input);

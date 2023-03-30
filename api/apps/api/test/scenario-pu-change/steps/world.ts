@@ -53,7 +53,9 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
         scenariosPuData.map((pu) => pu.id),
       ),
     cleanup: async () => {
-      const projectPus = await projectsPuRepo.find({ projectId });
+      const projectPus = await projectsPuRepo.find({
+        where: { projectId },
+      });
       await geomsRepo.delete({ id: In(projectPus.map((pu) => pu.geomId)) });
       await ScenariosTestUtils.deleteScenario(app, jwt, scenarioId);
       await cleanup();

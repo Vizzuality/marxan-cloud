@@ -39,7 +39,9 @@ export class PuvsprDatLegacyProject implements PuvsprDat {
     if (!featureIds.length)
       return { legacyFeatureIds: [], marxanFeatureIds: [] };
 
-    const features = await this.featuresRepo.find({ id: In(featureIds) });
+    const features = await this.featuresRepo.find({
+      where: { id: In(featureIds) },
+    });
 
     const legacyFeatureIds = features
       .filter(({ isLegacy }) => isLegacy)
