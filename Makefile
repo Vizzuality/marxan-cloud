@@ -10,19 +10,7 @@ ifneq (,$(wildcard $(ENVFILE)))
     export
 endif
 
-# use compose plugin if available, fall back to docker-compose standalone
-DOCKER_COMPOSE_STANDALONE_EXISTS := $(shell docker-compose version 2>/dev/null)
-DOCKER_COMPOSE_PLUGIN_EXISTS := $(shell docker compose version 2>/dev/null)
-
-ifdef DOCKER_COMPOSE_PLUGIN_EXISTS
-DOCKER_COMPOSE_COMMAND := docker compose
-else
-ifdef DOCKER_COMPOSE_STANDALONE_EXISTS
-DOCKER_COMPOSE_COMMAND := docker-compose
-else
-$(error Please install either the Compose plugin for Docker or the Docker Compose standalone binary)
-endif
-endif
+include lib/make/compose-detection.mk
 
 CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
 API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
