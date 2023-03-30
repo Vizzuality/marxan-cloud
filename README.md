@@ -371,11 +371,24 @@ DATA_SEEDS_AZURE_STORAGE_ACCOUNT_NAME=
 DATA_SEEDS_AZURE_STORAGE_CONTAINER_NAME=
 ```
 
-Users should have suitable access to the storage container configured: for data
-uploads, they will need to be logged into an Azure account that is allowed to
-write to the container, and for data downloads, the container itself needs to be
-created with "public blobs" settings so that individual blobs can be fetched via
-non-authenticated HTTP requests.
+This will allow to run the `az storage blob` commands in the relevant Make
+recipes with suitable authorization.
+
+Users should have suitable access to the storage container configured.
+
+For data uploads, they will need to be logged into an Azure account that is
+allowed to write to the container:
+
+- [install the Azure CLI tool
+  (`az`)](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+- get an Azure user set up, with suitable permissions to write to the relevant
+  Azure storage account and container
+- log in to this Azure account via the `az` CLI tool
+  (https://learn.microsoft.com/en-us/cli/azure/authenticate-azure-cli)
+
+For data downloads, the container itself needs to be created with "public blobs"
+settings so that individual blobs can be fetched via non-authenticated HTTP
+requests.
 
 To run the geoprocessing ETL pipelines (such as when using the *Seed data,
 option 1* above) to dump data from a previously seeded instance and upload the
