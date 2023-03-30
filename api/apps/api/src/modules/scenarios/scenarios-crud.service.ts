@@ -113,11 +113,11 @@ export class ScenariosCrudService extends AppBaseService<
   /**
    * Apply service-specific filters.
    */
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<Scenario>,
     filters: ScenarioFilters,
     _info?: ScenarioInfoDTO,
-  ): SelectQueryBuilder<Scenario> {
+  ): Promise<SelectQueryBuilder<Scenario>> {
     query = this._processBaseFilters<ScenarioFilters>(
       query,
       filters,

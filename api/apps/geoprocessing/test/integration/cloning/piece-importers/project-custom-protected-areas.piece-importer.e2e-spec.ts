@@ -160,7 +160,9 @@ const getFixtures = async () => {
         ThenCustomProtectedAreasShouldBeAddedToProject: async () => {
           await sut.run(input);
 
-          const protectedAreas = await protectedAreasRepo.find({ projectId });
+          const protectedAreas = await protectedAreasRepo.find({
+            where: { projectId },
+          });
 
           expect(protectedAreas.length).toEqual(
             validProjectCustomProtectedAreasFile.length,

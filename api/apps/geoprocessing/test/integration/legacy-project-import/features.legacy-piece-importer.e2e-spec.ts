@@ -260,7 +260,13 @@ const getFixtures = async () => {
         provide: DatFileDelimiterFinder,
         useClass: DatFileDelimiterFinderFake,
       },
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
+      {
+        provide: Logger,
+        useValue: {
+          error: () => {},
+          setContext: () => {},
+        },
+      },
     ],
   }).compile();
 
@@ -509,7 +515,9 @@ const getFixtures = async () => {
             (pu) => pu.puids,
           ).length;
           const insertedFeaturesData = await featuresDataRepo.find({
-            featureId: In(insertedFeaturesIds),
+            where: {
+              featureId: In(insertedFeaturesIds),
+            },
           });
 
           expect(insertedFeaturesData).toHaveLength(

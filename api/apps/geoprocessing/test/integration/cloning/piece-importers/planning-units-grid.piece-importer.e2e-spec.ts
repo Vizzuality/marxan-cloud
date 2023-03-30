@@ -116,7 +116,7 @@ const getFixtures = async () => {
 
   return {
     cleanUp: async () => {
-      const pus = await projectsPuRepo.find({ projectId });
+      const pus = await projectsPuRepo.find({ where: { projectId } });
       await projectsPuRepo.delete({ projectId });
       await puGeomRepo.delete({
         id: In(pus.map((pu) => pu.geomId)),

@@ -29,8 +29,9 @@ export class ProjectCheckerFake implements ProjectChecker {
   async hasPendingImports(
     projectId: string,
   ): Promise<Either<typeof doesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
     if (!project) return left(doesntExist);
 
@@ -57,8 +58,9 @@ export class ProjectCheckerFake implements ProjectChecker {
   async hasPendingExports(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
     if (!project) return left(doesntExist);
 
@@ -85,8 +87,9 @@ export class ProjectCheckerFake implements ProjectChecker {
   async hasPendingBlmCalibration(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
     if (!project) return left(doesntExist);
 
@@ -109,8 +112,9 @@ export class ProjectCheckerFake implements ProjectChecker {
   async hasPendingMarxanRun(
     projectId: string,
   ): Promise<Either<DoesntExist, boolean>> {
-    const project = await this.projectRepo.findOne(projectId, {
-      relations: ['scenarios'],
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+      relations: { scenarios: true },
     });
     if (!project) return left(doesntExist);
 

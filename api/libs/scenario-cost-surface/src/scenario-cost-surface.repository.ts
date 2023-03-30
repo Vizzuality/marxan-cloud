@@ -44,8 +44,10 @@ export class ScenarioCostSurfaceRepository {
         CostSurfaceFileCache,
       );
       const existingEntity = await repository.findOne({
-        scenarioId: entityToSave.scenarioId,
-        artifactType: entityToSave.artifactType,
+        where: {
+          scenarioId: entityToSave.scenarioId,
+          artifactType: entityToSave.artifactType,
+        },
       });
 
       const largeObjectManager = await this.createLargeObjectManager(
@@ -80,8 +82,10 @@ export class ScenarioCostSurfaceRepository {
         CostSurfaceFileCache,
       );
       const cacheEntity = await repository.findOne({
-        scenarioId,
-        artifactType: type,
+        where: {
+          scenarioId,
+          artifactType: type,
+        },
       });
       const artifactOid = cacheEntity?.artifact;
       if (!isDefined(artifactOid)) {
@@ -111,8 +115,10 @@ export class ScenarioCostSurfaceRepository {
         CostSurfaceFileCache,
       );
       const cacheEntity = await repository.findOne({
-        scenarioId,
-        artifactType,
+        where: {
+          scenarioId,
+          artifactType,
+        },
       });
       if (!cacheEntity) {
         return;

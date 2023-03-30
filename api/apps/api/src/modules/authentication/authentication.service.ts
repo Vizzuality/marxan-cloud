@@ -328,8 +328,8 @@ export class AuthenticationService {
    *
    * See documentation of the IssuedAuthnToken entity for details on these ids.
    */
-  async findTokenById(tokenId: string): Promise<IssuedAuthnToken | undefined> {
-    return this.issuedAuthnTokensRepository.findOne({ id: tokenId });
+  async findTokenById(tokenId: string): Promise<IssuedAuthnToken | null> {
+    return this.issuedAuthnTokensRepository.findOne({ where: { id: tokenId } });
   }
 
   /**

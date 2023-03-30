@@ -15,7 +15,9 @@ export class BoundDatService {
   ) {}
 
   async getContent(scenarioId: string): Promise<string> {
-    const scenario = await this.scenariosRepo.findOneOrFail(scenarioId);
+    const scenario = await this.scenariosRepo.findOneOrFail({
+      where: { id: scenarioId },
+    });
 
     const rows: {
       id1: number;

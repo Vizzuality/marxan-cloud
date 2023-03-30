@@ -319,12 +319,14 @@ const getFixtures = async () => {
 
       expect(status).toBe(LegacyProjectImportStatuses.AcceptingFiles);
 
-      const project = await projectRepo.findOne(projectId);
+      const project = await projectRepo.findOne({ where: { id: projectId } });
       expect(project).toBeDefined();
       expect(project!.name).toEqual(projectName);
       expect(project!.description).toEqual(projectDescription);
 
-      const scenario = await scenarioRepo.findOne(scenarioId);
+      const scenario = await scenarioRepo.findOne({
+        where: { id: scenarioId },
+      });
       expect(scenario).toBeDefined();
       expect(scenario!.solutionsAreLocked).toEqual(false);
     },
@@ -346,7 +348,9 @@ const getFixtures = async () => {
 
       const { pieces, status, scenarioId } = legacyProjectImport.toSnapshot();
 
-      const scenario = await scenarioRepo.findOne(scenarioId);
+      const scenario = await scenarioRepo.findOne({
+        where: { id: scenarioId },
+      });
       expect(scenario).toBeDefined();
       expect(scenario!.solutionsAreLocked).toEqual(opts.solutionsAreLocked);
 

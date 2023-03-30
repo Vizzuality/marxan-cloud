@@ -125,11 +125,11 @@ export class ProjectsCrudService extends AppBaseService<
   /**
    * Apply service-specific filters.
    */
-  setFilters(
+  async setFilters(
     query: SelectQueryBuilder<Project>,
     filters: ProjectFilters,
     _info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
+  ): Promise<SelectQueryBuilder<Project>> {
     this._processBaseFilters<ProjectFilters>(
       query,
       filters,
@@ -312,11 +312,11 @@ export class ProjectsCrudService extends AppBaseService<
     return entity;
   }
 
-  extendGetByIdQuery(
+  async extendGetByIdQuery(
     query: SelectQueryBuilder<Project>,
     fetchSpecification?: FetchSpecification,
     info?: ProjectsRequest,
-  ): SelectQueryBuilder<Project> {
+  ): Promise<SelectQueryBuilder<Project>> {
     /**
      * Bring in publicMetadata (if the project has been made public). This is
      * used in the `@AfterLoad()` event listener to set the `isPublic` property

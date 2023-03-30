@@ -82,8 +82,9 @@ export class InputParameterFileProvider {
   ) {}
 
   async getInputParameterFile(scenarioId: string): Promise<string> {
-    const scenario = await this.scenarioRepository.findOne(scenarioId, {
-      relations: ['project', 'project.organization'],
+    const scenario = await this.scenarioRepository.findOne({
+      where: { id: scenarioId },
+      relations: { project: { organization: true } },
     });
     assertDefined(scenario);
     const inputParameterFile = new InputParameterFile(

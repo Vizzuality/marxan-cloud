@@ -52,9 +52,6 @@ export const apiConnections: Record<
       'postgresApi.runMigrationsOnStartup',
       true,
     ),
-    cli: {
-      migrationsDir: 'apps/api/src/migrations/api',
-    },
   },
   [DbConnections.geoprocessingDB]: {
     name: DbConnections.geoprocessingDB,

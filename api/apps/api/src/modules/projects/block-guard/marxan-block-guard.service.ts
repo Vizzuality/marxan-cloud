@@ -26,7 +26,9 @@ export class MarxanBlockGuard implements BlockGuard {
   ) {}
 
   async ensureThatProjectIsNotBlocked(projectId: string): Promise<void> {
-    const project = await this.projectRepo.findOne(projectId);
+    const project = await this.projectRepo.findOne({
+      where: { id: projectId },
+    });
 
     if (!project) {
       throw new NotFoundException(
@@ -76,7 +78,9 @@ export class MarxanBlockGuard implements BlockGuard {
   }
 
   async ensureThatScenarioIsNotBlocked(scenarioId: string): Promise<void> {
-    const scenario = await this.scenarioRepo.findOne(scenarioId);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: scenarioId },
+    });
 
     if (!scenario) {
       throw new NotFoundException(

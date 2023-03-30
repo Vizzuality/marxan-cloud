@@ -47,7 +47,9 @@ export class MarkLegacyProjectImportAsFinishedHandler
     projectId: ResourceId,
     scenarioId: string,
   ) {
-    const [scenario] = await this.scenariosRepo.find({ id: scenarioId });
+    const [scenario] = await this.scenariosRepo.find({
+      where: { id: scenarioId },
+    });
 
     if (!scenario) {
       const reason = 'could not find scenario';

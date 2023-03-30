@@ -21,7 +21,6 @@ export class PlatformAdminEntity {
 
   @OneToOne(() => User, {
     onDelete: 'CASCADE',
-    primary: true,
   })
   @JoinColumn({
     name: `user_id`,

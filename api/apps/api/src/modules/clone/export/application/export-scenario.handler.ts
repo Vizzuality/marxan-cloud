@@ -30,7 +30,9 @@ export class ExportScenarioHandler
     existingScenarioId: string,
     newScenarioId: string,
   ) {
-    const scenario = await this.scenarioRepo.findOneOrFail(existingScenarioId);
+    const scenario = await this.scenarioRepo.findOneOrFail({
+      where: { id: existingScenarioId },
+    });
     await this.scenarioRepo.save({
       id: newScenarioId,
       name: scenario.name + ' - copy',

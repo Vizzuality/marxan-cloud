@@ -7,6 +7,7 @@ import { TileService } from '@marxan-geoprocessing/modules/tile/tile.service';
 
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ProtectedAreaTileRequest } from './protected-area-tile-request';
+import { IsDefined } from 'class-validator';
 
 type QueryResult = { mvt: Buffer };
 
@@ -91,6 +92,13 @@ export class ProtectedAreasTilesService {
 
         return subQuery;
       }, 'tile');
-    return await query.getRawOne();
+
+    const result = await query.getRawOne();
+
+    if (!IsDefined(result)) {
+      throw new Error('No Tile was found for the given parameters');
+    }
+
+    return result;
   }
 }

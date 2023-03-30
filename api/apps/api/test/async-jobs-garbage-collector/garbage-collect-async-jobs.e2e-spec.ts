@@ -79,7 +79,7 @@ const getFixtures = async () => {
   let scenarioId: string;
 
   const getApiEvents = async (resourceId: string) => {
-    return apiEventsRepo.find({ topic: resourceId });
+    return apiEventsRepo.find({ where: { topic: resourceId } });
   };
 
   const deleteApiEvents = async (resourceId: string) => {

@@ -63,7 +63,9 @@ export class ImportScenarioHandler
 
     const importResourceId = exportInstance.importResourceId!;
 
-    const scenario = await this.scenarioRepo.findOne(importResourceId.value);
+    const scenario = await this.scenarioRepo.findOne({
+      where: { id: importResourceId.value },
+    });
 
     if (!scenario) {
       return left(scenarioShellNotFound);
