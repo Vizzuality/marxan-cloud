@@ -119,7 +119,9 @@ export const getFixtures = async () => {
     },
     GivenPublicProjectExportIdIsAvailable: async (projectId: string) => {
       const publishedProject = await publishedProjectsRepo.find({
-        where: { id: projectId },
+        where: {
+          id: projectId,
+        },
       });
 
       return publishedProject[0].exportId;

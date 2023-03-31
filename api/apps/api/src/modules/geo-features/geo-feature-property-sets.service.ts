@@ -116,7 +116,9 @@ export class GeoFeaturePropertySetService {
       ]),
     );
     const featuresInSpecification = await this.geoFeaturesRepository.find({
-      where: { id: In(idsOfFeaturesInSpecification) },
+      where: {
+        id: In(idsOfFeaturesInSpecification),
+      },
     });
     Logger.debug(inspect(featuresInSpecification));
     const metadataForFeaturesInSpecification = await this.getFeaturePropertySetsForFeatures(

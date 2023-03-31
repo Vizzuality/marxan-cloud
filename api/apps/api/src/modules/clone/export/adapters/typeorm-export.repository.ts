@@ -95,7 +95,7 @@ export class TypeormExportRepository implements ExportRepository {
     const foreignExportFilter = {
       foreignExport: !options?.isLocal,
     };
-    const findOptionsWhere: FindOptionsWhere<ExportEntity> = {
+    const findConditions: FindOptionsWhere<ExportEntity> = {
       resourceId: projectId,
       resourceKind: ResourceKind.Project,
       ...(options?.isStandalone === undefined ? {} : importResourceIdFilter),
@@ -104,7 +104,7 @@ export class TypeormExportRepository implements ExportRepository {
     };
 
     const entities = await this.exportRepo.find({
-      where: findOptionsWhere,
+      where: findConditions,
       take: limit,
       order: {
         createdAt: 'DESC',
