@@ -88,9 +88,9 @@ services:
     ports:
       - "3541:5432"
     environment:
-      - POSTGRES_PASSWORD=marxan-geo
-      - POSTGRES_USER=marxan-geo
-      - POSTGRES_DB=marxan-geo
+      - POSTGRES_PASSWORD=marxan-geo-api
+      - POSTGRES_USER=marxan-geo-api
+      - POSTGRES_DB=marxan-geo-api
     restart: on-failure
 
   test-e2e-redis:
