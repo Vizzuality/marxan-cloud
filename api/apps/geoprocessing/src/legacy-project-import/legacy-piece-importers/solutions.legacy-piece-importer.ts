@@ -12,7 +12,7 @@ import {
   ScenariosOutputResultsApiEntity,
 } from '@marxan/marxan-output';
 import { FileService } from '@marxan/shapefile-converter';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { promises, readdirSync } from 'fs';
@@ -50,7 +50,7 @@ export class SolutionsLegacyProjectPieceImporter
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB.name)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(SolutionsLegacyProjectPieceImporter.name);
   }

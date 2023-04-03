@@ -1,4 +1,5 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { Readable } from 'stream';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { WebshotPdfConfig, WebshotPngConfig } from './webshot.dto';

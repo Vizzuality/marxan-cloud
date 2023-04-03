@@ -10,7 +10,7 @@ import {
   toLockEnum,
 } from '@marxan/scenarios-planning-unit';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -29,7 +29,7 @@ export class ScenarioPlanningUnitsDataPieceImporter
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScenarioPlanningUnitsDataPieceImporter.name);
   }

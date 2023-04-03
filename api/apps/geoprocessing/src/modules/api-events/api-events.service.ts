@@ -1,5 +1,6 @@
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { AppConfig } from '../../utils/config.utils';
 
 @Injectable()

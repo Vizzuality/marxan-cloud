@@ -12,7 +12,7 @@ import {
   ScenariosPuPaDataGeo,
   toLockEnum,
 } from '@marxan/scenarios-planning-unit';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/These';
 import { chunk } from 'lodash';
@@ -36,7 +36,7 @@ export class ScenarioPusDataLegacyProjectPieceImporter
     private readonly datFileDelimiterFinder: DatFileDelimiterFinder,
     @InjectEntityManager(geoprocessingConnections.default.name)
     private readonly geoEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScenarioPusDataLegacyProjectPieceImporter.name);
   }

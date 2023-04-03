@@ -12,7 +12,7 @@ import {
 import { PuvsprCalculationsEntity } from '@marxan/puvspr-calculations';
 import { SpecificationOperation } from '@marxan/specification';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager, Repository } from 'typeorm';
@@ -38,7 +38,7 @@ export class ProjectPuvsprCalculationsPieceImporter
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ProjectPuvsprCalculationsPieceImporter.name);
   }

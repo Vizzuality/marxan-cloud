@@ -1,4 +1,5 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { PlanningAreaRepositoryModule } from '@marxan/planning-area-repository';
 import { CountriesModule } from '@marxan-api/modules/countries/countries.module';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';

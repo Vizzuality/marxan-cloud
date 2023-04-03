@@ -1,5 +1,5 @@
 import { FailedImportDbCleanupJobInput } from '@marxan/cloning/job-input';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { ImportRepository } from '../../import/application/import.repository.port';
@@ -13,7 +13,7 @@ export class ScheduleDbCleanupForFailedImportHandler
     @Inject(failedImportDbCleanupQueueToken)
     private readonly queue: Queue<FailedImportDbCleanupJobInput>,
     private readonly importRepository: ImportRepository,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScheduleDbCleanupForFailedImportHandler.name);
   }

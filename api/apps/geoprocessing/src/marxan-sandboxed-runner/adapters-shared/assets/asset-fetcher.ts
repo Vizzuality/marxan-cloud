@@ -1,4 +1,5 @@
-import { HttpService, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import axios, { CancelTokenSource } from 'axios';
 import { WriteStream } from 'fs';
 import { FetchConfig } from './fetch.config';

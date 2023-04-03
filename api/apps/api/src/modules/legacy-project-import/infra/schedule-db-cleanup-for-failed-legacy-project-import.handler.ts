@@ -1,5 +1,5 @@
 import { FailedLegacyProjectImportDbCleanupJobInput } from '@marxan/legacy-project-import';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { failedLegacyProjectImportDbCleanupQueueToken } from './failed-legacy-project-import-db-cleanup-queue.provider';
@@ -12,7 +12,7 @@ export class ScheduleDbCleanupForFailedLegacyProjectImportHandler
   constructor(
     @Inject(failedLegacyProjectImportDbCleanupQueueToken)
     private readonly queue: Queue<FailedLegacyProjectImportDbCleanupJobInput>,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(
       ScheduleDbCleanupForFailedLegacyProjectImportHandler.name,

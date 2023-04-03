@@ -8,7 +8,7 @@ import {
 } from '@marxan/legacy-project-import';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { ShapefileService } from '@marxan/shapefile-converter';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { BBox, FeatureCollection, GeoJSON, Geometry } from 'geojson';
 import { chunk } from 'lodash';
@@ -38,7 +38,7 @@ export class PlanningGridLegacyProjectPieceImporter
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB.name)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(PlanningGridLegacyProjectPieceImporter.name);
   }
@@ -158,7 +158,7 @@ export class PlanningGridLegacyProjectPieceImporter
       `
         INSERT INTO "planning_areas"("id", "project_id", "the_geom")
         VALUES (
-          $1, 
+          $1,
           $2,
           (SELECT ST_MULTI(ST_UNION(the_geom))
             FROM "planning_units_geom" pug

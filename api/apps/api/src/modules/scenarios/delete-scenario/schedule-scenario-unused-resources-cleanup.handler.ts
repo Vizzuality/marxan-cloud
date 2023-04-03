@@ -1,6 +1,6 @@
 import { UnusedResourcesCleanupJobInput } from '@marxan/unused-resources-cleanup';
 import { unusedResourcesCleanupQueueToken } from '@marxan/unused-resources-cleanup/unused-resources-cleanup-queue.provider';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { ScheduleCleanupForScenarioUnusedResources } from './schedule-scenario-unused-resources-cleanup.command';
@@ -12,7 +12,7 @@ export class ScheduleCleanupForScenarioUnusedResourcesHandler
   constructor(
     @Inject(unusedResourcesCleanupQueueToken)
     private readonly queue: Queue<UnusedResourcesCleanupJobInput>,
-    private logger: Logger,
+    private logger: ConsoleLogger,
   ) {
     this.logger.setContext(
       ScheduleCleanupForScenarioUnusedResourcesHandler.name,

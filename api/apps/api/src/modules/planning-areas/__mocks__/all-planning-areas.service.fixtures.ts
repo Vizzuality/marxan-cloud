@@ -2,7 +2,7 @@ import { CustomPlanningAreaRepository } from '@marxan/planning-area-repository';
 import { BBox } from 'geojson';
 import { assertDefined, FieldsOf, isDefined } from '@marxan/utils';
 import { Test } from '@nestjs/testing';
-import { HttpModule } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { AdminArea } from '@marxan/admin-regions';
 import { Country } from '@marxan-api/modules/countries/country.geo.entity';
 import { CountriesService } from '@marxan-api/modules/countries/countries.service';

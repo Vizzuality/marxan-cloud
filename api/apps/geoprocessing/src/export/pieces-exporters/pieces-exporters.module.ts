@@ -7,7 +7,8 @@ import {
   OutputScenariosFeaturesDataGeoEntity,
 } from '@marxan/marxan-output';
 import { PuvsprCalculationsModule } from '@marxan/puvspr-calculations';
-import { HttpModule, Logger, Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ExportConfigProjectPieceExporter } from './export-config.project-piece-exporter';
 import { ExportConfigScenarioPieceExporter } from './export-config.scenario-piece-exporter';

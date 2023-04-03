@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -19,7 +19,7 @@ export class MarkImportPieceAsFailedHandler
     private readonly importRepository: ImportRepository,
     private readonly commandBus: CommandBus,
     private readonly eventPublisher: EventPublisher,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(MarkImportPieceAsFailedHandler.name);
   }
