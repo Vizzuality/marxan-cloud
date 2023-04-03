@@ -27,7 +27,9 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { HttpService, HttpStatus, Logger } from '@nestjs/common';
+import { ConsoleLogger, HttpStatus } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -395,7 +397,10 @@ const getFixtures = async () => {
         provide: HttpService,
         useClass: FakeHttpService,
       },
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
+      {
+        provide: ConsoleLogger,
+        useValue: { error: () => {}, setContext: () => {} },
+      },
     ],
   }).compile();
 

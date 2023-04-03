@@ -3,7 +3,7 @@ import { isEqual } from 'lodash';
 import { PromiseType } from 'utility-types';
 import { Either, left, right } from 'fp-ts/Either';
 import { Test } from '@nestjs/testing';
-import { HttpModule } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import {
   geoprocessingUrlToken,
   CustomPlanningAreasUploader,

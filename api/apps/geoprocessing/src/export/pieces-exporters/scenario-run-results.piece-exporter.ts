@@ -4,7 +4,7 @@ import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioRunResultsContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-run-results';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
@@ -52,7 +52,7 @@ export class ScenarioRunResultsPieceExporter implements ExportPieceProcessor {
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScenarioRunResultsPieceExporter.name);
   }

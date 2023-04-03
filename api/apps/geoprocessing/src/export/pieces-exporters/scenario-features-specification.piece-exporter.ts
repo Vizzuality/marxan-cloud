@@ -12,7 +12,7 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features/scenario-features-data.geo.entity';
 import { isDefined } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
@@ -69,7 +69,7 @@ export class ScenarioFeaturesSpecificationPieceExporter
     private readonly apiEntityManager: EntityManager,
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScenarioFeaturesSpecificationPieceExporter.name);
   }

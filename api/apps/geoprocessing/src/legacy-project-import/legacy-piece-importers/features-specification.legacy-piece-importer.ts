@@ -11,7 +11,8 @@ import {
   LegacyProjectImportJobOutput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-import { HttpService, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, ConsoleLogger } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -64,7 +65,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
     private readonly httpService: HttpService,
   ) {
     this.logger.setContext(

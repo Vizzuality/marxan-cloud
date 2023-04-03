@@ -1,9 +1,9 @@
 import {
   FactoryProvider,
-  HttpService,
   Inject,
   Injectable,
 } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { Either, left, right } from 'fp-ts/Either';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';

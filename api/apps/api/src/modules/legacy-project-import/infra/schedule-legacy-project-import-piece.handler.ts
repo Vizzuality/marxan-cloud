@@ -1,7 +1,7 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { LegacyProjectImportJobInput } from '@marxan/legacy-project-import';
-import { Inject, Logger } from '@nestjs/common';
+import { Inject, ConsoleLogger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -25,7 +25,7 @@ export class ScheduleLegacyProjectImportPieceHandler
     private readonly queue: Queue<LegacyProjectImportJobInput>,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly commandBus: CommandBus,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScheduleLegacyProjectImportPieceHandler.name);
   }

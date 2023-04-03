@@ -17,7 +17,7 @@ import {
 } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -45,7 +45,7 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       geoprocessingConnections.apiDB.name,
     )
     private readonly outputSummariesRepo: Repository<ScenariosOutputResultsApiEntity>,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ScenarioRunResultsPieceImporter.name);
   }

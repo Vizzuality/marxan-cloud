@@ -14,7 +14,7 @@ import {
 import { isMarxanExecutionMetadataFolderRelativePath } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { readableToBuffer } from '@marxan/utils';
 import { unknownError } from '@marxan/utils/file-operations';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
@@ -39,7 +39,7 @@ export class GenerateExportFromZipFileHandler
   constructor(
     private readonly exportConfigReader: ExportConfigReader,
     private readonly fileRepository: CloningFilesRepository,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
     private readonly exportRepo: ExportRepository,
     private readonly manifestFileService: ManifestFileService,
   ) {

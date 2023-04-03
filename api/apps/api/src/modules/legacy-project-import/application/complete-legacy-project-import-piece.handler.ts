@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -22,7 +22,7 @@ export class CompleteLegacyProjectImportPieceHandler
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly commandBus: CommandBus,
     private readonly eventPublisher: EventPublisher,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(CompleteLegacyProjectImportPieceHandler.name);
   }

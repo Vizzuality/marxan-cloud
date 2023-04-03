@@ -5,7 +5,7 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-protected-areas';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, ConsoleLogger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
@@ -22,7 +22,7 @@ export class ProjectCustomProtectedAreasPieceImporter
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(ProjectCustomProtectedAreasPieceImporter.name);
   }

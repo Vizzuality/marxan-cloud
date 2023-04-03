@@ -4,7 +4,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -28,7 +28,7 @@ export class MarkLegacyProjectImportAsFinishedHandler
     private readonly usersRepo: Repository<UsersProjectsApiEntity>,
     @InjectRepository(Scenario)
     private readonly scenariosRepo: Repository<Scenario>,
-    private readonly logger: Logger,
+    private readonly logger: ConsoleLogger,
   ) {
     this.logger.setContext(MarkLegacyProjectImportAsFinishedHandler.name);
   }
