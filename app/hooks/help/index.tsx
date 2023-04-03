@@ -44,7 +44,7 @@ export function HelpProvider({
     return setActive(a);
   }, [setActive]);
 
-  const addBeacon = useCallback(({ id, state, update }) => {
+  const addBeacon = useCallback(({ id, state, update }: BeaconProps) => {
     setBeacons((prevBeacons) => {
       return {
         ...prevBeacons,

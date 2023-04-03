@@ -1,5 +1,5 @@
 import React, {
-  Children, cloneElement, isValidElement, useCallback, useMemo, useState,
+  Children, cloneElement, isValidElement, ReactElement, useCallback, useMemo, useState,
 } from 'react';
 
 import {
@@ -24,6 +24,7 @@ import {
 import cx from 'classnames';
 
 import SortableItem from './item';
+import type { SortableItemProps } from './item/component';
 
 export interface SortableListProps {
   className?: string;
@@ -116,7 +117,7 @@ export const SortableList: React.FC<SortableListProps> = ({
           })}
         >
           {Children
-            .map(children, (Child) => {
+            .map(children, (Child: ReactElement<SortableItemProps>) => {
               if (isValidElement(Child)) {
                 const { props: { id } } = Child;
 

@@ -159,7 +159,7 @@ export const Title: React.FC<TitleProps> = () => {
                     'relative px-2 h-6 max-w-max': true,
                   })}
                 >
-                  <FieldRFF
+                  <FieldRFF<string>
                     name="name"
                     validate={composeValidators([{ presence: true }])}
                     beforeSubmit={() => {
@@ -230,7 +230,7 @@ export const Title: React.FC<TitleProps> = () => {
             >
               {(fprops) => (
                 <form id="form-title-scenario" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
-                  <FieldRFF
+                  <FieldRFF<string>
                     name="name"
                     validate={composeValidators([{ presence: true }])}
                     beforeSubmit={() => {

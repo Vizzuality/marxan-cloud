@@ -1,5 +1,5 @@
 import React, {
-  Children, cloneElement, isValidElement, useEffect,
+  Children, cloneElement, isValidElement, useEffect, ReactElement,
 } from 'react';
 
 import { useDialog } from '@react-aria/dialog';
@@ -153,7 +153,7 @@ export const Modal: React.FC<ModalProps> = ({
                   )}
 
                   {/* Children */}
-                  {Children.map(children, (child) => {
+                  {Children.map(children, (child: ReactElement<ModalProps>) => {
                     if (isValidElement(child)) {
                       return cloneElement(child, {
                         onDismiss,

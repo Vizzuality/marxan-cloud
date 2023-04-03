@@ -1,4 +1,6 @@
-import React, { MutableRefObject, useCallback, useMemo } from 'react';
+import React, {
+  ReactNode, MutableRefObject, useCallback, useMemo,
+} from 'react';
 
 import { useInView } from 'react-intersection-observer';
 
@@ -28,7 +30,7 @@ export interface ItemProps {
     fpf?: number;
     target?: number;
   }[];
-  splitFeaturesOptions?: Record<string, unknown>[];
+  splitFeaturesOptions?: ReactNode & { label?: string, value?: string }[];
   onSplitFeaturesSelected?: (selected: {
     id: string;
     fpf?: number;

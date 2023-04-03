@@ -4,6 +4,7 @@ import React, {
 
 import cx from 'classnames';
 import { motion, useAnimation } from 'framer-motion';
+import type { ResolvedValues } from 'framer-motion';
 
 import Icon from 'components/icon';
 
@@ -58,8 +59,8 @@ export const Toast: React.FC<ToastProps> = ({
     }
   }, [controls, autoDismiss]);
 
-  const handleProgressUpdate = useCallback(({ y }) => {
-    const y2 = parseInt(y, 10);
+  const handleProgressUpdate = useCallback(({ y }: ResolvedValues) => {
+    const y2 = parseInt(y as string, 10);
     progress.current = y2 / 100;
   }, [progress]);
 

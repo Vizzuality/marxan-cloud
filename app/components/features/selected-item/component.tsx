@@ -1,4 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState, ReactNode,
+} from 'react';
 
 import cx from 'classnames';
 
@@ -38,7 +40,9 @@ export interface ItemProps {
     fpf?: number;
     target?: number;
   }[];
-  splitFeaturesOptions?: Record<string, unknown>[];
+  // not ideal, but we need to pass the label and value to the checkbox
+  // somehow and I have no enough context yet
+  splitFeaturesOptions?: ReactNode & { label?: string, value?: string }[];
   editable?: boolean;
   onSplitFeaturesSelected?: (selected: {
     id: string;

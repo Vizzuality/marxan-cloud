@@ -94,7 +94,7 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                   autoComplete="off"
                   className="relative w-full h-12 px-2"
                 >
-                  <FieldRFF
+                  <FieldRFF<string>
                     name="name"
                     validate={composeValidators([{ presence: true }])}
                     beforeSubmit={() => {

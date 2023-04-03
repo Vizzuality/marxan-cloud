@@ -25,7 +25,7 @@ import { MediaContextProvider } from 'layout/media';
 
 import 'styles/tailwind.css';
 
-const MarxanApp: React.ReactNode = ({ Component, pageProps }: AppProps) => {
+const MarxanApp = ({ Component, pageProps }: AppProps) => {
   const [routeLoading, setRouteLoading] = useState({
     loading: false,
     key: 0,

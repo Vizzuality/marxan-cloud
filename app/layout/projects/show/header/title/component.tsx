@@ -251,7 +251,7 @@ export const Title: React.FC<TitleProps> = () => {
                     </div>
 
                   </div>
-                  <FieldRFF
+                  <FieldRFF<string>
                     name="description"
                     validate={composeValidators([{ presence: true }])}
                   >

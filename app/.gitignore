@@ -50,4 +50,7 @@ yarn-error.log*
 # storybook
 storybook-static
 
+# TypeScript
+tsconfig.tsbuildinfo
+
 report.*

@@ -1,6 +1,9 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Icon from 'components/icon';
+
 import HELP_SVG from 'svgs/ui/help.svg';
 
 import Avatar, { AvatarProps } from './component';

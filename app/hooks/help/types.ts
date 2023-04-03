@@ -10,7 +10,7 @@ export interface HelpContextProps {
   active: boolean;
   onActive: (active: boolean) => void;
   beacons: Record<string, BeaconProps>,
-  addBeacon: (beacon: Record<string, unknown>) => void,
+  addBeacon: (beacon: BeaconProps) => void,
   removeBeacon: (beaconId: string) => void,
 }
 
