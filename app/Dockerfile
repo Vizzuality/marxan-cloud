@@ -1,4 +1,4 @@
-FROM node:16.19-bullseye
+FROM node:18.15-bullseye
 LABEL maintainer="hello@vizzuality.com"
 
 
@@ -33,7 +33,7 @@ USER $USER
 COPY --chown=$USER:$USER .yarnrc.docker.yml .yarnrc.yml
 
 COPY --chown=$USER:$USER package.json yarn.lock next.config.js \
-    next-env.d.ts local.d.ts postcss.config.js tailwind.config.js \
+    local.d.ts postcss.config.js tailwind.config.js \
     cypress.json entrypoint.sh tsconfig.json ./
 
 COPY --chown=$USER:$USER .storybook ./.storybook

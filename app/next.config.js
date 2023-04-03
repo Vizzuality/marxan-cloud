@@ -2,12 +2,9 @@ const withPlugins = require('next-compose-plugins');
 const withOptimizedImages = require('next-optimized-images');
 
 const nextConfig = {
-  webpack: (config) => {
-    config.node = {
-      fs: 'empty',
-    };
-
-    return config;
+  images: {
+    // ? while next-optimized-images is part of the setup, this setting has to be disabled
+    disableStaticImages: true,
   },
   async redirects() {
     const redirects = [];
