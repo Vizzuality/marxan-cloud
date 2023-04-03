@@ -119,15 +119,15 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
         return {
           featureId,
           kind,
-          ...!!newGeoprocessingOperations && {
+          ...(!!newGeoprocessingOperations && {
             geoprocessingOperations: newGeoprocessingOperations,
-          },
-          ...!newGeoprocessingOperations && {
+          }),
+          ...(!newGeoprocessingOperations && {
             marxanSettings: marxanSettings || {
               fpf: 1,
               prop: 0.5,
             },
-          },
+          }),
         };
       }),
     };

@@ -345,12 +345,12 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...sort && {
+      }),
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 

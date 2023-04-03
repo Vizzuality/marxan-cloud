@@ -65,9 +65,9 @@ export const Item: React.FC<ItemProps> = ({
   const { ref, inView } = useInView({
     /* Optional options */
     threshold: 0,
-    ...scrollRoot && {
+    ...(scrollRoot && {
       root: scrollRoot.current,
-    },
+    }),
   });
 
   // EVENTS

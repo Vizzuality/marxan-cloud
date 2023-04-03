@@ -29,11 +29,17 @@ export const Footer: React.FC<FooterProps> = () => {
             </div>
             <div className="flex flex-col space-y-6 text-2xl md:space-y-0 md:space-x-8 md:items-center md:flex-row">
               <p className="text-black">Explore more:</p>
-              <Link href="/community/projects">
-                <a href="/community/projects" className="text-black opacity-50 hover:underline hover:opacity-100">Community</a>
+              <Link
+                href="/community/projects"
+                className="text-black opacity-50 hover:underline hover:opacity-100"
+              >
+                Community
               </Link>
-              <Link href="/about">
-                <a href="/about" className="text-black opacity-50 hover:underline hover:opacity-100">About</a>
+              <Link
+                href="/about"
+                className="text-black opacity-50 hover:underline hover:opacity-100"
+              >
+                About
               </Link>
             </div>
           </div>

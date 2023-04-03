@@ -309,12 +309,12 @@ export function useFeaturePreviewLayers({
               {
                 type: 'fill',
                 'source-layer': 'layer0',
-                ...F.splitSelected && {
+                ...(F.splitSelected && {
                   filter: [
                     'all',
                     ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
                   ],
-                },
+                }),
                 layout: {
                   visibility: getLayerVisibility(),
                 },
@@ -326,12 +326,12 @@ export function useFeaturePreviewLayers({
               {
                 type: 'line',
                 'source-layer': 'layer0',
-                ...F.splitSelected && {
+                ...(F.splitSelected && {
                   filter: [
                     'all',
                     ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
                   ],
-                },
+                }),
                 layout: {
                   visibility: getLayerVisibility(),
                 },
@@ -398,12 +398,12 @@ export function useTargetedPreviewLayers({
               {
                 type: 'fill',
                 'source-layer': 'layer0',
-                ...f.splitSelected && {
+                ...(f.splitSelected && {
                   filter: [
                     'all',
                     ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
                   ],
-                },
+                }),
                 layout: {
                   visibility: getLayerVisibility(),
                 },
@@ -415,12 +415,12 @@ export function useTargetedPreviewLayers({
               {
                 type: 'line',
                 'source-layer': 'layer0',
-                ...f.splitSelected && {
+                ...(f.splitSelected && {
                   filter: [
                     'all',
                     ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
                   ],
-                },
+                }),
                 layout: {
                   visibility: getLayerVisibility(),
                 },
@@ -663,7 +663,7 @@ export function usePUGridLayer({
           },
 
           // ANALYSIS - GAP ANALYSIS
-          ...sublayers.includes('features') ? [
+          ...(sublayers.includes('features') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -731,10 +731,10 @@ export function usePUGridLayer({
               },
             },
 
-          ] : [],
+          ] : []),
 
           // ANALYSIS - COST SURFACE
-          ...sublayers.includes('cost') ? [
+          ...(sublayers.includes('cost') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -754,34 +754,33 @@ export function usePUGridLayer({
                 'fill-opacity': 0.75 * CostOpacity,
               },
             },
-          ] : [],
+          ] : []),
 
           // PROTECTED AREAS
-          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null && !!wdpaIucnCategories.length
-            ? [
-              {
-                type: 'fill',
-                'source-layer': 'layer0',
-                layout: {
-                  visibility: getLayerVisibility(WdpaPercentageVisibility),
-                },
-                paint: {
-                  'fill-color': COLORS.wdpa,
-                  'fill-opacity': [
-                    'case',
-                    ['all',
-                      ['has', 'percentageProtected'],
-                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
-                    ],
-                    0.5 * WdpaPercentageOpacity,
-                    0,
-                  ],
-                },
+          ...(sublayers.includes('wdpa-percentage') && wdpaThreshold !== null && !!wdpaIucnCategories.length ? [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              layout: {
+                visibility: getLayerVisibility(WdpaPercentageVisibility),
               },
-            ] : [],
+              paint: {
+                'fill-color': COLORS.wdpa,
+                'fill-opacity': [
+                  'case',
+                  ['all',
+                    ['has', 'percentageProtected'],
+                    ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
+                  ],
+                  0.5 * WdpaPercentageOpacity,
+                  0,
+                ],
+              },
+            },
+          ] : []),
 
           // ANALYSIS - ADJUST PLANNING UNITS
-          ...sublayers.includes('lock-in') && !!puIncludedValue ? [
+          ...(sublayers.includes('lock-in') && !!puIncludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -799,8 +798,8 @@ export function usePUGridLayer({
                 'line-offset': 0.75,
               },
             },
-          ] : [],
-          ...sublayers.includes('lock-out') && !!puExcludedValue ? [
+          ] : []),
+          ...(sublayers.includes('lock-out') && !!puExcludedValue ? [
             {
               type: 'line',
               'source-layer': 'layer0',
@@ -818,10 +817,10 @@ export function usePUGridLayer({
                 'line-offset': 0.75,
               },
             },
-          ] : [],
+          ] : []),
 
           // SOLUTIONS - FREQUENCY
-          ...sublayers.includes('frequency') ? [
+          ...(sublayers.includes('frequency') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -845,9 +844,9 @@ export function usePUGridLayer({
                 'fill-opacity': 0.75 * FrequencyOpacity,
               },
             },
-          ] : [],
+          ] : []),
 
-          ...sublayers.includes('solution') ? [
+          ...(sublayers.includes('solution') ? [
             {
               type: 'fill',
               'source-layer': 'layer0',
@@ -863,7 +862,7 @@ export function usePUGridLayer({
                 'fill-opacity': 0.75 * SolutionOpacity,
               },
             },
-          ] : [],
+          ] : []),
         ],
       },
     };

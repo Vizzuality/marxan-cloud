@@ -83,12 +83,12 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
       'page[number]': pageParam,
       include: 'scenarios,users',
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...sort && {
+      }),
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 

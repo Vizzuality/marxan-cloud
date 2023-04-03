@@ -30,7 +30,7 @@ export const ProjectScenariosType: React.FC<ProjectScenariosTypeProps> = () => {
                 'pointer-events-none opacity-25': s.disabled,
               })}
             >
-              <Link href={`/projects/${pid}${s.href}`}>
+              <Link href={`/projects/${pid}${s.href}`} legacyBehavior>
                 <div className="h-full p-5">
                   <div className="flex items-center justify-center w-16 h-16 transition-all bg-gray-100 rounded-3xl group-hover:bg-primary-500">
                     <Icon icon={s.icon} style={s.iconStyles} />

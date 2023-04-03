@@ -246,13 +246,11 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
               {' '}
               <Link
                 href="/community/projects"
+                className="font-semibold hover:underline text-primary-600"
               >
-                <a
-                  href="/community/projects"
-                  className="font-semibold hover:underline text-primary-600"
-                >
-                  community page
-                </a>
+
+                community page
+
               </Link>
               {' '}
               and copying an existing project.

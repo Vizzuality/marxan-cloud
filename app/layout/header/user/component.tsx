@@ -55,8 +55,8 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
         >
           <header className="w-full px-8 py-4 bg-black bg-opacity-5">
             <h2 className="mb-1 font-medium text-black">{displayName || email}</h2>
-            <Link href="/me">
-              <a href="/me" className="text-gray-400 hover:underline">My profile</a>
+            <Link href="/me" className="text-gray-400 hover:underline">
+              My profile
             </Link>
           </header>
 
@@ -64,15 +64,15 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
             <ul className="flex flex-col space-y-3">
               {isAdmin && (
                 <li>
-                  <Link href="/admin">
-                    <a href="/admin" className="hover:underline">Admin</a>
+                  <Link href="/admin" className="hover:underline">
+                    Admin
                   </Link>
                 </li>
               )}
 
               <li>
-                <Link href="/projects">
-                  <a href="/projects" className="hover:underline">Projects</a>
+                <Link href="/projects" className="hover:underline">
+                  Projects
                 </Link>
               </li>
             </ul>

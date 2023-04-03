@@ -54,16 +54,16 @@ export const StaticButtonLink: React.FC<StaticButtonLinkProps> = ({
   return (
     <>
       {external && (
-        <a className="flex flex-row items-center cursor-pointer transition-opacity hover:opacity-60" href={href} rel="noopener noreferrer" target="_blank">
-          {children}
-        </a>
+      <a className="flex flex-row items-center cursor-pointer transition-opacity hover:opacity-60" href={href} rel="noopener noreferrer" target="_blank">
+        {children}
+      </a>
       )}
       {!external && (
-        <Link href={href}>
-          <div className="flex flex-row items-center cursor-pointer transition-opacity hover:opacity-60">
-            {children}
-          </div>
-        </Link>
+      <Link href={href} legacyBehavior>
+        <div className="flex flex-row items-center cursor-pointer transition-opacity hover:opacity-60">
+          {children}
+        </div>
+      </Link>
       )}
     </>
   );

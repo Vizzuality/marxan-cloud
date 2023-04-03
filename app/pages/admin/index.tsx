@@ -31,27 +31,31 @@ const AdminPage: React.FC = () => {
             <h2 className="my-10 text-5xl font-medium font-heading">Admin Panel</h2>
 
             <div className="grid grid-cols-3 gap-5">
-              <Link href="/admin/published-projects">
-                <a href="/admin/published-projects" className="block p-8 space-y-3 leading-none bg-white rounded-xl group">
-                  <div className="flex items-center justify-center text-gray-500 transition-all bg-gray-100 w-14 h-14 rounded-2xl group-hover:bg-primary-500">
-                    <Icon icon={PUBLISHED_PROJECTS_SVG} className="w-7 h-7" />
-                  </div>
+              <Link
+                href="/admin/published-projects"
+                className="block p-8 space-y-3 leading-none bg-white rounded-xl group"
+              >
 
-                  <div className="text-xl font-medium font-heading">
-                    Published Projects
-                  </div>
-                </a>
+                <div className="flex items-center justify-center text-gray-500 transition-all bg-gray-100 w-14 h-14 rounded-2xl group-hover:bg-primary-500">
+                  <Icon icon={PUBLISHED_PROJECTS_SVG} className="w-7 h-7" />
+                </div>
+                <div className="text-xl font-medium font-heading">
+                  Published Projects
+                </div>
+
               </Link>
-              <Link href="/admin/users">
-                <a href="/admin/users" className="block p-8 space-y-3 leading-none bg-white rounded-xl group">
-                  <div className="flex items-center justify-center text-gray-500 transition-all bg-gray-100 w-14 h-14 rounded-2xl group-hover:bg-primary-500">
-                    <Icon icon={USERS_SVG} className="w-7 h-7" />
-                  </div>
+              <Link
+                href="/admin/users"
+                className="block p-8 space-y-3 leading-none bg-white rounded-xl group"
+              >
 
-                  <div className="text-xl font-medium font-heading">
-                    Users
-                  </div>
-                </a>
+                <div className="flex items-center justify-center text-gray-500 transition-all bg-gray-100 w-14 h-14 rounded-2xl group-hover:bg-primary-500">
+                  <Icon icon={USERS_SVG} className="w-7 h-7" />
+                </div>
+                <div className="text-xl font-medium font-heading">
+                  Users
+                </div>
+
               </Link>
             </div>
           </Wrapper>

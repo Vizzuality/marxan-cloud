@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
-import cx from 'classnames';
 
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import cx from 'classnames';
 
 import { useMe } from 'hooks/me';
-import { useRouter } from 'next/router';
 
 export interface HeaderMyProjectsProps {
 }
@@ -27,10 +28,8 @@ export const HeaderMyProjects: React.FC<HeaderMyProjectsProps> = () => {
   if (!user) return null;
 
   return (
-    <Link
-      href="/projects"
-    >
-      <a
+    (
+      <Link
         href="/projects"
         className="relative flex items-center h-full px-1 text-sm"
         onMouseEnter={handleMouseEnter}
@@ -45,8 +44,9 @@ export const HeaderMyProjects: React.FC<HeaderMyProjectsProps> = () => {
           })}
         />
         <p className="text-xs md:text-sm">My projects</p>
-      </a>
-    </Link>
+
+      </Link>
+    )
   );
 };
 

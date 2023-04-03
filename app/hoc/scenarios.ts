@@ -70,7 +70,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -104,7 +104,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
     }
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
@@ -136,7 +136,7 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -193,7 +193,7 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
     }
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
 

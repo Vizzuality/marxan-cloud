@@ -77,9 +77,9 @@ export function useProjectsUsers(projectsIds) {
         return {
           ...acc,
           [u]: (PROJECT_USERS.length > 10) ? COLORS_SCALE[i] : COLORS[i],
-          ...user.id === u && {
+          ...(user.id === u && {
             [u]: COLOR_ME,
-          },
+          }),
         };
       }, {}),
     };

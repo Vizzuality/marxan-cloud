@@ -36,8 +36,8 @@ export const Avatar: React.FC<AvatarProps> = ({
         [className]: !!className,
       })}
       style={{
-        ...bgImage && { backgroundImage: `url(${bgImage})` },
-        ...bgColor && { backgroundColor: bgColor },
+        ...(bgImage && { backgroundImage: `url(${bgImage})` }),
+        ...(bgColor && { backgroundColor: bgColor }),
       }}
     >
       {children}

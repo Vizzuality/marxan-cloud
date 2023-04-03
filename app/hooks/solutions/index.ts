@@ -42,9 +42,9 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
     params: {
       'page[number]': pageParam,
       ...parsedFilters,
-      ...sort && {
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 
@@ -119,9 +119,9 @@ export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
     params: {
       disablePagination: true,
       ...parsedFilters,
-      ...sort && {
+      ...(sort && {
         sort,
-      },
+      }),
     },
   }).then((response) => response.data);
 

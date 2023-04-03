@@ -23,12 +23,12 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
   getDropdownProps,
 }: SelectToggleProps) => {
   const toggleButtonProps = {
-    ...!multiple && {
+    ...(!multiple && {
       ...getToggleButtonProps(),
-    },
-    ...multiple && {
+    }),
+    ...(multiple && {
       ...getToggleButtonProps(getDropdownProps({ preventKeyAction: opened })),
-    },
+    }),
   };
 
   const getEnabledOptions = useMemo(() => {

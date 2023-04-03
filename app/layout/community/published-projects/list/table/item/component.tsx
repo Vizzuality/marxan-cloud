@@ -35,8 +35,11 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
       </td>
 
       <td className="py-5 pr-16">
-        <Link href={`/community/projects/${id}`}>
-          <a href={`/community/projects/${id}`} className="pb-1 font-semibold hover:underline">{name}</a>
+        <Link
+          href={`/community/projects/${id}`}
+          className="pb-1 font-semibold hover:underline"
+        >
+          {name}
         </Link>
         <p className="text-sm leading-normal text-gray-400 clamp-2">{description}</p>
       </td>

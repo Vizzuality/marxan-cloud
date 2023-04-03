@@ -58,12 +58,12 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
       'page[number]': pageParam,
       // omitFields: 'properties',
       ...parsedFilters,
-      ...search && {
+      ...(search && {
         q: search,
-      },
-      ...sort && {
+      }),
+      ...(sort && {
         sort,
-      },
+      }),
     },
   });
 
@@ -433,10 +433,10 @@ export function useTargetedFeatures(
               splitted: true,
               splitSelected,
               splitFeaturesSelected,
-              ...!!sfMarxanSettings && {
+              ...(!!sfMarxanSettings && {
                 target: sfMarxanSettings.prop * 100,
                 fpf: sfMarxanSettings.fpf,
-              },
+              }),
             };
           });
       }
@@ -465,10 +465,10 @@ export function useTargetedFeatures(
 
       return {
         ...s,
-        ...!!marxanSettings && {
+        ...(!!marxanSettings && {
           target: marxanSettings.prop * 100,
           fpf: marxanSettings.fpf,
-        },
+        }),
       };
     }));
 

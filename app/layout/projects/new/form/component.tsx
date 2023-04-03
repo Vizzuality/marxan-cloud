@@ -410,16 +410,14 @@ const ProjectForm: React.FC<ProjectFormProps> = () => {
                 {/* BUTTON BAR */}
                 <div className="flex px-8 pb-8 mt-4">
                   <Link href="/projects" passHref>
-                    <a
-                      href="/projects"
+
+                    <Button
+                      theme="secondary"
+                      size="xl"
                     >
-                      <Button
-                        theme="secondary"
-                        size="xl"
-                      >
-                        Cancel
-                      </Button>
-                    </a>
+                      Cancel
+                    </Button>
+
                   </Link>
                   <Button
                     className="ml-6"
