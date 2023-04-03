@@ -30,9 +30,9 @@
     "url": null,
     "port": 5432,
     "host": "test-e2e-postgresql-geo-api",
-    "username": "marxan-geo",
-    "password": "marxan-geo",
-    "database": "marxan-geo",
+    "username": "marxan-geo-api",
+    "password": "marxan-geo-api",
+    "database": "marxan-geo-api",
     "runMigrationsOnStartup": false,
     "logging": "error"
   },
