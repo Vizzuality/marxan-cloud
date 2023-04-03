@@ -1,24 +1,21 @@
-const customForms = require('@tailwindcss/custom-forms');
+const forms = require('@tailwindcss/forms')({
+  strategy: 'class',
+});
 const colors = require('tailwindcss/colors');
 
 // PLUGINS
-const lineClamp = require('./styles/line-clamp');
 const SCREENS = require('./utils/media');
 
 module.exports = {
-  purge: {
-    enabled: process.env.NODE_ENV !== 'development',
-    content: ['./**/*.ts', './**/*.tsx'],
-  },
+  content: ['./**/*.ts', './**/*.tsx'],
   presets: [],
-  darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
       outline: {
         blue: '2px dotted #00ace6',
       },
     },
-    customForms: (theme) => ({
+    forms: (theme) => ({
       default: {
         checkbox: {
           borderRadius: 'rounded-sm',
@@ -1080,5 +1077,5 @@ module.exports = {
     wordBreak: ['responsive'],
     zIndex: ['responsive', 'focus-within', 'focus', 'hover'],
   },
-  plugins: [customForms, lineClamp],
+  plugins: [forms],
 };

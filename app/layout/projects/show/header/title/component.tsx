@@ -291,7 +291,7 @@ export const Title: React.FC<TitleProps> = () => {
                               }}
                             />
                           </div>
-                          <p className="font-normal text-gray-200 text-s font-heading clamp-3">
+                          <p className="font-normal text-gray-200 text-s font-heading line-clamp-3">
                             {input.value}
                           </p>
                         </div>

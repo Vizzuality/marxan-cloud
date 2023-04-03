@@ -80,7 +80,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
                 keepAlive: 10 * 60, // Send keepAlive message every 10 minutes
               }}
             >
-              <MediaContextProvider disableDynamicMediaQueries>
+              <MediaContextProvider>
                 <OverlayProvider>
                   <MultipleModalProvider>
                     <ToastProvider

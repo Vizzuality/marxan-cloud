@@ -224,13 +224,13 @@ export const Item: React.FC<ItemProps> = ({
                     )}
                     <div>
                       <h2
-                        className="text-sm font-medium font-heading clamp-1"
+                        className="text-sm font-medium font-heading line-clamp-1"
                         title={name}
                       >
                         {name}
                       </h2>
 
-                      <div className="clamp-1">
+                      <div className="line-clamp-1">
                         <span
                           className={cx({
                             'm-0 text-xs inline-block': true,

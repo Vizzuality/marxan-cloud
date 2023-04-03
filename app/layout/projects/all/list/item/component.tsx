@@ -257,7 +257,7 @@ export const Item: React.FC<ItemProps> = ({
               {lastUpdateDistance || 'no scenario'}
             </span>
           </div>
-          <div className="text-sm opacity-50 clamp-2">{description}</div>
+          <div className="text-sm opacity-50 line-clamp-2">{description}</div>
         </div>
 
         <footer className="mt-7">

@@ -41,7 +41,7 @@ export const PublishedItem: React.FC<PublishedItemProps> = ({
         >
           {name}
         </Link>
-        <p className="text-sm leading-normal text-gray-400 clamp-2">{description}</p>
+        <p className="text-sm leading-normal text-gray-400 line-clamp-2">{description}</p>
       </td>
 
       <td className="py-5 pr-16">

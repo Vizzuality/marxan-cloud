@@ -95,7 +95,7 @@ export const LegendTypeMatrix: React.FC<LegendTypeMatrixProps> = ({
                     backgroundColor: color,
                   }}
                 />
-                <div className="clamp-2">{value}</div>
+                <div className="line-clamp-2">{value}</div>
               </li>
             ))}
         </ul>

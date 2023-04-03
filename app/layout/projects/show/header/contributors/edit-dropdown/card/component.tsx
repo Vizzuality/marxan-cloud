@@ -111,7 +111,7 @@ export const UserCard: React.FC<UserCardProps> = ({
   return (
     <div className="box-border flex items-center justify-between flex-grow w-full py-3 pl-3 pr-6 space-x-3 bg-gray-100 rounded-3xl">
       <Avatar
-        className="flex-shrink-0 text-sm uppercase border-none bg-primary-700"
+        className="flex-shrink-0 text-sm uppercase border-none !bg-primary-700"
         bgImage={bgImage}
         bgColor={bgColor}
         name={name}
@@ -120,7 +120,7 @@ export const UserCard: React.FC<UserCardProps> = ({
       </Avatar>
 
       <div className="flex flex-col self-center flex-grow w-full space-y-1">
-        <p className="w-40 text-sm text-black clamp-1">{name}</p>
+        <p className="w-40 text-sm text-black line-clamp-1">{name}</p>
         <div className="w-40 pr-4">
           {isOwner && !(isOwner && id === meData.id) && (
             <Select

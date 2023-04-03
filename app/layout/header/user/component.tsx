@@ -105,7 +105,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
         className="flex items-center justify-start space-x-1 focus:outline-none"
         onClick={handleClick}
       >
-        <Avatar className="text-sm text-white uppercase bg-blue-700" bgImage={avatarDataUrl}>
+        <Avatar className="text-sm text-white uppercase !bg-blue-700" bgImage={avatarDataUrl}>
           {!avatarDataUrl && (displayName || email).slice(0, 2)}
         </Avatar>
         <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5" />
