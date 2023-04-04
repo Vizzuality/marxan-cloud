@@ -6,7 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ORGANIZATIONS from 'services/organizations';
 
@@ -19,7 +19,7 @@ import {
 } from './types';
 
 export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const placeholderDataRef = useRef({
     pages: [],
@@ -94,7 +94,7 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
 }
 
 export function useOrganization(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['organizations', id], async () => ORGANIZATIONS.request({
     method: 'GET',
@@ -122,7 +122,7 @@ export function useSaveOrganization({
   },
 }: UseSaveOrganizationProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveOrganization = ({ id, data }: SaveOrganizationProps) => {
     return ORGANIZATIONS.request({
@@ -154,7 +154,7 @@ export function useDeleteOrganization({
     method: 'DELETE',
   },
 }: UseDeleteOrganizationProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteOrganization = ({ id }: DeleteOrganizationProps) => {
     return ORGANIZATIONS.request({

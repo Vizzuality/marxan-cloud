@@ -1,6 +1,6 @@
 import { QueryClient } from 'react-query';
 
-import { getSession } from 'next-auth/client';
+import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
 
 import PROJECTS from 'services/projects';

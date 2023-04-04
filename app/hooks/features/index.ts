@@ -9,7 +9,7 @@ import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 
 import Fuse from 'fuse.js';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
@@ -32,7 +32,7 @@ import {
 interface AllItemProps extends IntersectItemProps, RawItemProps { }
 
 export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     filters = {},
@@ -150,7 +150,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
 }
 
 export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, queryOptions = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { search } = filters;
 
   const fetchFeatures = () => SCENARIOS.request({
@@ -286,7 +286,7 @@ export function useTargetedFeatures(
   filters: UseFeaturesFiltersProps = {},
   queryOptions = {},
 ) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { search } = filters;
 
   const fetchFeatures = () => SCENARIOS.request({
@@ -485,7 +485,7 @@ export function useSaveSelectedFeatures({
   },
 }: UseSaveSelectedFeaturesProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveFeature = ({ id, data }: SaveSelectedFeaturesProps) => {
     return SCENARIOS.request({
@@ -513,7 +513,7 @@ export function useSaveSelectedFeatures({
 }
 
 export function useFeature(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['features', id], async () => GEOFEATURES.request({
     method: 'GET',
@@ -541,7 +541,7 @@ export function useUploadFeaturesShapefile({
   },
 }: UseUploadFeaturesShapefileProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadFeatureShapefile = ({ id, data }: UploadFeaturesShapefileProps) => {
     return UPLOADS.request({

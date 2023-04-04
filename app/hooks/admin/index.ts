@@ -5,7 +5,7 @@ import {
   useQuery, useQueryClient,
 } from 'react-query';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import ADMIN from 'services/admin';
 // import TEST from 'services/test';
@@ -33,7 +33,7 @@ import {
  *
 */
 export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     page,
@@ -105,7 +105,7 @@ export function useSaveAdminUser({
   },
 }: UseSaveAdminUserProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveAdminUser = ({ uid }: SaveAdminUserProps) => {
     return ADMIN.request({
@@ -135,7 +135,7 @@ export function useDeleteAdminUser({
   },
 }: UseDeleteAdminUserProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveAdminUser = ({ uid }: DeleteAdminUserProps) => {
     return ADMIN.request({
@@ -166,7 +166,7 @@ export function useSaveBlockUser({
   },
 }: UseSaveBlockUserProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveBlockUser = ({ uid }: SaveBlockUserProps) => {
     return ADMIN.request({
@@ -196,7 +196,7 @@ export function useDeleteBlockUser({
   },
 }: UseDeleteBlockUserProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveBlockUser = ({ uid }: DeleteBlockUserProps) => {
     return ADMIN.request({
@@ -229,7 +229,7 @@ export function useDeleteBlockUser({
  *
 */
 export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProps = { page: 1 }) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     page,
@@ -336,7 +336,7 @@ export function useSaveAdminPublishedProject({
   },
 }: UseSaveAdminPublishedProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveAdminPublishedProject = ({ id, data, status }: SaveAdminPublishedProjectProps) => {
     const action = status === 'published' ? 'clear' : 'set';

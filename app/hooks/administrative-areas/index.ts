@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useQuery } from 'react-query';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { Region } from 'types/country-model';
 
 import ADMINISTRATIVE_AREAS from 'services/administrative-areas';
@@ -14,7 +14,7 @@ import {
 
 export function useAdministrativeAreas(props: UseAdministrativeAreasProps):
 UseAdministrativeAreasResponse {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { includeAll, id } = props;
 
   const query = useQuery(['administrative areas', id], async () => ADMINISTRATIVE_AREAS.request({

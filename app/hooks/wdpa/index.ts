@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useMutation, useQuery } from 'react-query';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import SCENARIOS from 'services/scenarios';
 import WDPA from 'services/wdpa';
@@ -18,7 +18,7 @@ export function useWDPACategories({
   customAreaId,
   scenarioId,
 }: UseWDPACategoriesProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(
     ['protected-areas', adminAreaId, customAreaId],
@@ -57,7 +57,7 @@ export function useSaveScenarioProtectedAreas({
     method: 'POST',
   },
 }: UseSaveScenarioProtectedAreasProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioProtectedAreas = ({ id, data }: SaveScenarioProtectedAreasProps) => {
     return SCENARIOS.request({

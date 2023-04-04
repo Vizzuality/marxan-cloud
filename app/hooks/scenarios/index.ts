@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
@@ -79,7 +79,7 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
 ****************************************
 */
 export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
     method: 'GET',
@@ -113,7 +113,7 @@ export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
 }
 
 export function useScenarioStatus(pId, sId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenarios-status', pId, sId], async () => PROJECTS.request({
     method: 'GET',
@@ -151,7 +151,7 @@ export function useScenariosStatusOnce({
     method: 'GET',
   },
 }: UseSaveScenarioLockProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioLock = ({ pId }) => {
     return PROJECTS.request({
@@ -183,7 +183,7 @@ export function useScenariosStatusOnce({
 */
 
 export function useProjectScenariosLocks(pid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['project-locks', pid], async () => PROJECTS.request({
     method: 'GET',
@@ -209,7 +209,7 @@ export function useProjectScenariosLocks(pid) {
   }, [query, data?.data]);
 }
 export function useScenarioLock(sid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenario-lock', sid], async () => SCENARIOS.request({
     method: 'GET',
@@ -251,7 +251,7 @@ export function useSaveScenarioLock({
   },
 }: UseSaveScenarioLockProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioLock = ({ sid }: SaveScenarioLockProps) => {
     return SCENARIOS.request({
@@ -283,7 +283,7 @@ export function useDeleteScenarioLock({
   },
 }: UseDeleteScenarioLockProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteScenarioLock = ({ sid }: DeleteScenarioLockProps) => {
     return SCENARIOS.request({
@@ -314,7 +314,7 @@ export function useDeleteScenarioLock({
 ****************************************
 */
 export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { push } = useRouter();
 
   const {
@@ -445,7 +445,7 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
 }
 
 export function useScenario(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenarios', id], async () => SCENARIOS.request({
     method: 'GET',
@@ -475,7 +475,7 @@ export function useSaveScenario({
   },
 }: UseSaveScenarioProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioProps) => {
     return SCENARIOS.request({
@@ -509,7 +509,7 @@ export function useDeleteScenario({
     method: 'DELETE',
   },
 }: UseDeleteScenarioProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteScenario = ({ id }: DeleteScenarioProps) => {
     return SCENARIOS.request({
@@ -538,7 +538,7 @@ export function useUploadScenarioPU({
     method: 'POST',
   },
 }: UseUploadScenarioPUProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadScenarioPUShapefile = ({ id, data }: UploadScenarioPUProps) => {
     return UPLOADS.request({
@@ -569,7 +569,7 @@ export function useUploadPA({
     method: 'POST',
   },
 }: UseUploadPAProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadPAShapefile = ({ id, data }: UploadPAProps) => {
     return UPLOADS.request({
@@ -594,7 +594,7 @@ export function useUploadPA({
 }
 
 export function useCostSurfaceRange(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenarios-cost-surface', id], async () => SCENARIOS.request({
     method: 'GET',
@@ -630,7 +630,7 @@ export function useDownloadCostSurface({
     method: 'GET',
   },
 }: UseDownloadScenarioCostSurfaceProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const downloadScenarioCostSurface = ({ id }: DownloadScenarioCostSurfaceProps) => {
     return DOWNLOADS.request({
@@ -670,7 +670,7 @@ export function useUploadCostSurface({
     method: 'GET',
   },
 }: UseUploadScenarioCostSurfaceProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadScenarioCostSurface = ({ id, data }: UploadScenarioCostSurfaceProps) => {
     return UPLOADS.request({
@@ -697,7 +697,7 @@ export function useUploadCostSurface({
 
 // PLANNING UNITS
 export function useScenarioPU(sid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenarios-pu', sid], async () => SCENARIOS.request({
     method: 'GET',
@@ -759,7 +759,7 @@ export function useSaveScenarioPU({
   },
 }: UseSaveScenarioPUProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenario = ({ id, data }: SaveScenarioPUProps) => {
     return SCENARIOS.request({
@@ -790,7 +790,7 @@ export function useDuplicateScenario({
   },
 }: UseDuplicateScenarioProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateScenario = ({ sid }: DuplicateScenarioProps) => {
     // Pending endpoint
@@ -820,7 +820,7 @@ export function useRunScenario({
     method: 'POST',
   },
 }: UseRunScenarioProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateScenario = ({ id }: RunScenarioProps) => {
     // Pending endpoint
@@ -849,7 +849,7 @@ export function useCancelRunScenario({
     method: 'DELETE',
   },
 }: UseCancelRunScenarioProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateScenario = ({ id }: CancelRunScenarioProps) => {
     // Pending endpoint
@@ -875,7 +875,7 @@ export function useCancelRunScenario({
 
 // BLM
 export function useCalibrationBLMImages({ sid, blmValues }) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const userQueries = useQueries(
     blmValues.map((blmValue) => {
@@ -917,7 +917,7 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
 }
 
 export function useScenarioCalibrationResults(scenarioId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenario-calibration', scenarioId], async () => SCENARIOS.request({
     method: 'GET',
@@ -953,7 +953,7 @@ export function useScenarioCalibrationResults(scenarioId) {
 }
 
 export function useScenarioCalibrationRange(scenarioId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['scenario-calibration-range', scenarioId], async () => SCENARIOS.request({
     method: 'GET',
@@ -980,7 +980,7 @@ export function useSaveScenarioCalibrationRange({
   },
 }: UseSaveScenarioCalibrationRangeProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioCalibrationRange = ({ sid, data }: SaveScenarioCalibrationRangeProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
@@ -1017,7 +1017,7 @@ export function useDownloadScenarioReport({
   scenarioName,
   runId,
 }: UseDownloadScenarioReportProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const downloadScenarioReport = ({ sid, solutionId }: DownloadScenarioReportProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;

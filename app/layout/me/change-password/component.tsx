@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import { signOut } from 'next-auth/client';
+import { signOut } from 'next-auth/react';
 
 import { useSaveMePassword } from 'hooks/me';
 import { useToasts } from 'hooks/toast';

@@ -6,7 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import DOWNLOADS from 'services/downloads';
 import SCENARIOS from 'services/scenarios';
@@ -18,7 +18,7 @@ import {
 } from './types';
 
 export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     filters = {},
@@ -95,7 +95,7 @@ export function useSolutions(sid, options: UseSolutionsOptionsProps = {}) {
 }
 
 export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     filters = {},
@@ -140,7 +140,7 @@ export function useAllSolutions(sid, options: UseSolutionsOptionsProps = {}) {
 }
 
 export function useSolution(sid, solutionId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['solution-id', sid, solutionId], async () => SCENARIOS.request({
     method: 'GET',
@@ -166,7 +166,7 @@ export function useSolution(sid, solutionId) {
 }
 
 export function useMostDifferentSolutions(sid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['solutions-different', sid], async () => SCENARIOS.request({
     method: 'GET',
@@ -209,7 +209,7 @@ export function useMostDifferentSolutions(sid) {
 }
 
 export function useBestSolution(sid, queryOptions) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['solutions-best', sid], async () => SCENARIOS.request({
     method: 'GET',
@@ -239,7 +239,7 @@ export function useDownloadSolutions({
     method: 'GET',
   },
 }: UseDownloadScenarioSolutionsProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const downloadScenarioSolutions = ({ id }: DownloadScenarioSolutionsProps) => {
     return DOWNLOADS.request({

@@ -7,7 +7,7 @@ import omit from 'lodash/omit';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { signIn } from 'next-auth/client';
+import { signIn } from 'next-auth/react';
 
 import { useToasts } from 'hooks/toast';
 

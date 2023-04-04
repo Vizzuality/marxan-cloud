@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
 
@@ -57,7 +57,7 @@ import {
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
   const { push } = useRouter();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     filters = {},
@@ -175,7 +175,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
 }
 
 export function useProject(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['projects', id], async () => PROJECTS.request({
     method: 'GET',
@@ -208,7 +208,7 @@ export function useSaveProject({
   },
 }: UseSaveProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveProject = ({ id, data }: SaveProjectProps) => {
     return PROJECTS.request({
@@ -241,7 +241,7 @@ export function useDeleteProject({
   },
 }: UseDeleteProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteProject = ({ id }: DeleteProjectProps) => {
     return PROJECTS.request({
@@ -272,7 +272,7 @@ export function useImportProject({
   },
 }: UseImportProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadProject = ({ data }: ImportProjectProps) => {
     return UPLOADS.request({
@@ -302,7 +302,7 @@ export function useUploadProjectPA({
     method: 'POST',
   },
 }: UseUploadProjectPAProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadProjectPAShapefile = ({ data }: UploadProjectPAProps) => {
     return UPLOADS.request({
@@ -331,7 +331,7 @@ export function useUploadProjectPAGrid({
     method: 'POST',
   },
 }: UseUploadProjectPAGridProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadProjectPAShapefileGrid = ({ data }: UploadProjectPAGridProps) => {
     return UPLOADS.request({
@@ -361,7 +361,7 @@ export function useDuplicateProject({
   },
 }: UseDuplicateProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateProject = ({ id, data }: DuplicateProjectProps) => {
     return PROJECTS.request({
@@ -394,7 +394,7 @@ export function usePublishProject({
   },
 }: UsePublishProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const publishProject = ({ pid, data }: PublishProjectProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
@@ -431,7 +431,7 @@ export function useUnPublishProject({
   },
 }: UseUnPublishProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const unpublishProject = ({ id }: UnPublishProjectProps) => {
     return PROJECTS.request({
@@ -463,7 +463,7 @@ export function useUnPublishProject({
 ****************************************
 */
 export function useExports(pid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['projects-exports', pid], async () => PROJECTS.request({
     method: 'GET',
@@ -489,7 +489,7 @@ export function useExports(pid) {
 }
 
 export function useExport(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['projects-export-id', id], async () => PROJECTS.request({
     method: 'GET',
@@ -520,7 +520,7 @@ export function useExportProject({
   },
 }: UseExportProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const projectDownload = ({ id, data }: ExportProjectProps) => {
     return PROJECTS.request({
@@ -550,7 +550,7 @@ export function useDownloadExport({
     method: 'GET',
   },
 }: UseDownloadExportProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const downloadProject = ({ pid, exportId }: DownloadExportProps) => {
     return PROJECTS.request({
@@ -594,7 +594,7 @@ export function useSaveLegacyProject({
     method: 'POST',
   },
 }: UseSaveLegacyProjectProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveLegacyProject = ({ data }: SaveLegacyProjectProps) => {
     return PROJECTS.request({
@@ -623,7 +623,7 @@ export function useCancelImportLegacyProject({
     method: 'POST',
   },
 }: UseCancelImportLegacyProjectProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const cancelImportLegacyProject = ({ projectId }: CancelImportLegacyProjectProps) => {
     return PROJECTS.request({
@@ -652,7 +652,7 @@ export function useUploadLegacyProjectFile({
     method: 'POST',
   },
 }: UseUploadLegacyProjectFileProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadLegacyProjectFile = ({ data, projectId }: UploadLegacyProjectFileProps) => {
     return UPLOADS.request({
@@ -681,7 +681,7 @@ export function useCancelUploadLegacyProjectFile({
     method: 'DELETE',
   },
 }: UseCancelUploadLegacyProjectFileProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const cancelUploadLegacyProjectFile = ({
     dataFileId,
@@ -713,7 +713,7 @@ export function useLegacyProjectValidationResults({
     method: 'GET',
   },
 }: UseLegacyProjectValidationResultsProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const getLegacyProjectValidationResults = ({
@@ -746,7 +746,7 @@ export function useImportLegacyProject({
     method: 'POST',
   },
 }: UseImportLegacyProjectProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const importLegacyProject = ({ projectId, data }: ImportLegacyProjectProps) => {

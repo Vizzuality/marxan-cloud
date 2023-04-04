@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 
 import { OverlayProvider } from '@react-aria/overlays';
 import cx from 'classnames';
-import { Provider as AuthenticationProvider } from 'next-auth/client';
+import { SessionProvider as AuthenticationProvider } from 'next-auth/react';
 import PlausibleProvider from 'next-plausible';
 import { Hydrate } from 'react-query/hydration';
 import store from 'store';
@@ -75,10 +75,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
           <Hydrate state={pageProps.dehydratedState}>
             <AuthenticationProvider
               session={pageProps.session}
-              options={{
-                clientMaxAge: 5 * 60, // Re-fetch session if cache is older than 60 seconds
-                keepAlive: 10 * 60, // Send keepAlive message every 10 minutes
-              }}
+              refetchInterval={5 * 60}
             >
               <MediaContextProvider>
                 <OverlayProvider>

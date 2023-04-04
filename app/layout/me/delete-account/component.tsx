@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { signOut } from 'next-auth/client';
+import { signOut } from 'next-auth/react';
 
 import { useDeleteMe } from 'hooks/me';
 import { useToasts } from 'hooks/toast';

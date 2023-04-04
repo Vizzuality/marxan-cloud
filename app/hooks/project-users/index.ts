@@ -6,7 +6,7 @@ import {
 
 import chroma from 'chroma-js';
 import { uniqBy } from 'lodash';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import validate from 'validate.js';
 
 import { useMe } from 'hooks/me';
@@ -39,7 +39,7 @@ function fetchProjectUsers(pId, session) {
 }
 
 export function useProjectsUsers(projectsIds) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { user } = useMe();
 
   const userQueries = useQueries(
@@ -87,7 +87,7 @@ export function useProjectsUsers(projectsIds) {
 }
 
 export function useProjectUsers(projectId) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const { user } = useMe();
 
   const query = useQuery(['roles', projectId], () => fetchProjectUsers(projectId, session), {
@@ -118,7 +118,7 @@ export function useProjectUsers(projectId) {
 }
 
 export function useUserByEmail(email) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(['users', email], () => USERS.request({
     method: 'GET',
@@ -149,7 +149,7 @@ export function useSaveProjectUserRole({
   },
 }: UseSaveProjectUserRoleProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveProjectUserRole = ({ projectId, data }: SaveProjectUserRoleProps) => {
     return ROLES.request({
@@ -181,7 +181,7 @@ export function useDeleteProjectUser({
   },
 }: UseDeleteProjectUserProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteProjectUser = ({ projectId, userId }: DeleteProjectUserProps) => {
     return ROLES.request({

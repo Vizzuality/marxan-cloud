@@ -7,7 +7,7 @@ import {
 import flatten from 'lodash/flatten';
 
 import { format } from 'd3';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { ItemProps as RawItemProps } from 'components/gap-analysis/item/component';
 
@@ -20,7 +20,7 @@ import {
 interface AllItemProps extends RawItemProps {}
 
 export function useAllGapAnalysis(sId, queryOptions) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery('all-gap-analysis', async () => SCENARIOS.request({
     method: 'GET',
@@ -57,7 +57,7 @@ export function usePreGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
     pages: [],
     pageParams: [],
   });
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     filters = {},
@@ -155,7 +155,7 @@ export function usePostGapAnalysis(sId, options: UseFeaturesOptionsProps = {}) {
     pages: [],
     pageParams: [],
   });
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const {
     filters = {},

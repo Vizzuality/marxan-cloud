@@ -2,7 +2,7 @@ import React, {
   useEffect, useState, PropsWithChildren,
 } from 'react';
 
-import { useSession, signOut } from 'next-auth/client';
+import { useSession, signOut } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
 
@@ -15,8 +15,9 @@ import Modal from 'components/modal';
 
 const Protected = ({ children }: PropsWithChildren) => {
   const { user } = useMe();
-  const [session, loading] = useSession();
+  const { data: session, status } = useSession();
   const [modal, setModal] = useState(false);
+  const loading = status === 'loading';
 
   useEffect(() => {
     const { id: userId } = user;

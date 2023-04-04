@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { format } from 'date-fns';
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { useAdminUsers } from 'hooks/admin';
@@ -95,7 +95,7 @@ export const AdminUsersTable: React.FC<AdminUsersTableProps> = () => {
     setSearch(v);
   }, 250);
 
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const onDownloadUsersData = useCallback(async () => {
     const { data: blob, status } = await DOWNLOADS.request({

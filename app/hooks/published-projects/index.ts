@@ -6,7 +6,7 @@ import {
 
 import flatten from 'lodash/flatten';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import { PublishedItemProps } from 'layout/community/published-projects/list/table/item/component';
 
@@ -116,7 +116,7 @@ export function useDuplicatePublishedProject({
   },
 }: UseDuplicatePublishedProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateProject = ({ exportId }: DuplicatePublishedProjectProps) => {
     return PROJECTS.request({

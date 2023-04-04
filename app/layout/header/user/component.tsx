@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 
 import Link from 'next/link';
 
-import { signOut } from 'next-auth/client';
+import { signOut } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
 

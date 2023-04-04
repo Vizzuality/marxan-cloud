@@ -1,6 +1,7 @@
 import JWT from 'jsonwebtoken';
 import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
+import type { NextAuthOptions } from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 
 import AUTHENTICATION from 'services/authentication';
 
@@ -48,13 +49,13 @@ const options = {
   },
 
   session: {
-    jwt: true,
+    strategy: 'jwt',
     maxAge: MAX_AGE,
   },
 
   // Configure one or more authentication providers
   providers: [
-    Providers.Credentials({
+    Credentials({
       // The name to display on the sign in form (e.g. 'Sign in with...')
       name: 'Sign in with Marxan',
       // The credentials is used to generate a suitable form on the sign in page.
@@ -88,7 +89,7 @@ const options = {
 
   callbacks: {
     // Assigning encoded token from API to token created in the session
-    async jwt(token, user) {
+    async jwt({ token, user }) {
       if (user) {
         const { accessToken } = user;
         token.accessToken = accessToken;
@@ -110,22 +111,22 @@ const options = {
     },
 
     // Extending session object
-    async session(session, token) {
+    async session({ session, token }) {
       session.accessToken = token.accessToken;
       return session;
     },
 
-    async redirect(callbackUrl) {
+    async redirect({ url }) {
       // By default it should be redirect to /projects
-      if (callbackUrl.includes('/sign-in') || callbackUrl.includes('/sign-up')) {
+      if (url.includes('/sign-in') || url.includes('/sign-up')) {
         return '/projects';
       }
-      return callbackUrl;
+      return url;
     },
   },
 
   events: {
-    async signOut(session) {
+    async signOut({ session }) {
       // After sign-out expire token in the API
       if (session) {
         await AUTHENTICATION.request({
@@ -139,6 +140,6 @@ const options = {
       }
     },
   },
-};
+} satisfies NextAuthOptions;
 
 export default (req, res) => NextAuth(req, res, options);
