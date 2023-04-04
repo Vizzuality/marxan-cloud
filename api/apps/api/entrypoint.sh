@@ -26,7 +26,7 @@ case "$1" in
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
-        sleep
+        sleep 15
         export NODE_ENV=test
         exec yarn api:typeorm migration:run -t each
         ;;
