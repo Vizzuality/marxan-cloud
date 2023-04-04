@@ -10,7 +10,7 @@ jobs:
   test-api-e2e:
     name: E2E tests - API
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,7 +21,7 @@ jobs:
   test-geoprocessing-e2e:
     name: E2E tests - Geoprocessing
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
