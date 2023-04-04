@@ -22,7 +22,7 @@ case "$1" in
     test-e2e)
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
-        exec yarn api:test:e2e:new
+        exec yarn api:test:e2e:new api/apps/api/test/projects.e2e-spec.ts
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
