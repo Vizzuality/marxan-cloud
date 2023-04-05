@@ -117,6 +117,7 @@ import {
   deleteScenarioFailed,
 } from './delete-scenario/delete-scenario.command';
 import { LegacyProjectImportChecker } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
+import { lastValueFrom } from 'rxjs';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -481,16 +482,16 @@ export class ScenariosService {
      * @validateStatus is required for HttpService to not reject and wrap geoprocessing's response
      * in case a shapefile is not validated and a status 4xx is sent back.
      */
-    const geoJson = await this.httpService
-      .post(
+    const geoJson = await lastValueFrom(
+      this.httpService.post(
         `${this.geoprocessingUrl}${apiGlobalPrefixes.v1}/planning-units/planning-unit-shapefile`,
         file,
         {
           headers: { 'Content-Type': 'application/json' },
           validateStatus: (status) => status <= 499,
         },
-      )
-      .toPromise()
+      ),
+    )
       .then((response) => response.data.data as FeatureCollection)
       .then(
         (geoJson) =>

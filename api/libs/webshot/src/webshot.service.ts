@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { Readable } from 'stream';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { WebshotPdfConfig, WebshotPngConfig } from './webshot.dto';
+import { lastValueFrom } from 'rxjs';
 
 export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
 export const unknownPngWebshotError = Symbol(`unknown png webshot error`);
@@ -18,13 +19,13 @@ export class WebshotService {
     webshotUrl: string,
   ): Promise<Either<typeof unknownPdfWebshotError, Readable>> {
     try {
-      const pdfBuffer = await this.httpService
-        .post(
+      const pdfBuffer = await lastValueFrom(
+        this.httpService.post(
           `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/solutions/report`,
           config,
           { responseType: 'arraybuffer' },
-        )
-        .toPromise()
+        ),
+      )
         .then((response) => response.data)
         .catch((error) => {
           throw new Error(error);
@@ -49,13 +50,13 @@ export class WebshotService {
     webshotUrl: string,
   ): Promise<Either<typeof unknownPngWebshotError, string>> {
     try {
-      const pngBuffer = await this.httpService
-        .post(
+      const pngBuffer = await lastValueFrom(
+        this.httpService.post(
           `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/calibration/maps/preview/${blmValue}`,
           config,
           { responseType: 'arraybuffer' },
-        )
-        .toPromise()
+        ),
+      )
         .then((response) => response.data)
         .catch((error) => {
           throw new Error(error);
@@ -76,13 +77,13 @@ export class WebshotService {
     webshotUrl: string,
   ): Promise<Either<typeof unknownPngWebshotError, string>> {
     try {
-      const pngBuffer = await this.httpService
-        .post(
+      const pngBuffer = await lastValueFrom(
+        this.httpService.post(
           `${webshotUrl}/projects/${projectId}/scenarios/${scenarioId}/published-projects/frequency`,
           config,
           { responseType: 'arraybuffer' },
-        )
-        .toPromise()
+        ),
+      )
         .then((response) => response.data)
         .catch((error) => {
           throw new Error(error);

@@ -14,6 +14,7 @@ import {
   ExportPieceProcessor,
   PieceExportProvider,
 } from '../pieces/export-piece-processor';
+import { lastValueFrom } from 'rxjs';
 
 type SelectScenarioResult = {
   name: string;
@@ -52,21 +53,21 @@ export class ScenarioOutputFolderPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
-    const { status, data } = await this.httpService
-      .get<IncomingMessage>(
-        `${AppConfig.get<string>('api.url')}/api/v1/marxan-run/scenarios/${
-          input.resourceId
-        }/marxan/output`,
-        {
-          headers: {
-            'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
-          },
-          responseType: 'stream',
-          validateStatus: (status) =>
-            status === HttpStatus.OK || status === HttpStatus.NOT_FOUND,
+    const response = this.httpService.get<IncomingMessage>(
+      `${AppConfig.get<string>('api.url')}/api/v1/marxan-run/scenarios/${
+        input.resourceId
+      }/marxan/output`,
+      {
+        headers: {
+          'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
         },
-      )
-      .toPromise();
+        responseType: 'stream',
+        validateStatus: (status) =>
+          status === HttpStatus.OK || status === HttpStatus.NOT_FOUND,
+      },
+    );
+
+    const { status, data } = await lastValueFrom(response);
 
     if (status === HttpStatus.NOT_FOUND) {
       return {
