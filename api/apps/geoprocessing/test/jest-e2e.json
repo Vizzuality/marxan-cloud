@@ -11,8 +11,8 @@
   },
 
   "setupFilesAfterEnv": [
-    "<rootDir>/api/test/utils/set-env-vars.ts",
-    "<rootDir>/api/test/utils/handle-database.ts"
+    "<rootDir>../api/test/utils/set-env-vars.ts",
+    "<rootDir>../api/test/utils/handle-database.ts"
   ],
 
   "moduleNameMapper": {
