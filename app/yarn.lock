@@ -7125,7 +7125,7 @@ __metadata:
     "@vizzuality/layer-manager-provider-carto": ^1.0.0-alpha.3
     "@vizzuality/layer-manager-react": ^1.0.0-alpha.3
     autoprefixer: ^10.0.2
-    axios: ^0.21.1
+    axios: 1.3.4
     babel-loader: ^8.2.2
     chroma-js: ^2.4.2
     classnames: ^2.2.6
@@ -7156,7 +7156,6 @@ __metadata:
     next: 13.2.4
     next-auth: 4.21.1
     next-compose-plugins: ^2.2.1
-    next-connect: ^0.9.1
     next-optimized-images: ^2.6.2
     next-plausible: ^2.0.0
     nprogress: ^0.2.0
@@ -7566,6 +7565,17 @@ __metadata:
   version: 4.1.1
   resolution: "axe-core@npm:4.1.1"
   checksum: 558ab63e4eaa4dedec09546cb1e33a5d666632be28e1bf2c5fedf191204a8d20cdc5c9378908c80437f5c1966607693c3cc6f73c58249722eb7ebb31e83a32cd
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.3.4":
+  version: 1.3.4
+  resolution: "axios@npm:1.3.4"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 7440edefcf8498bc3cdf39de00443e8101f249972c83b739c6e880d9d669fea9486372dbe8739e88b3bf8bb1ad15f6106693f206f078f4516fe8fd47b1c3093c
   languageName: node
   linkType: hard
 
@@ -11649,6 +11659,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"follow-redirects@npm:^1.15.0":
+  version: 1.15.2
+  resolution: "follow-redirects@npm:1.15.2"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
+  languageName: node
+  linkType: hard
+
 "for-in@npm:^1.0.2":
   version: 1.0.2
   resolution: "for-in@npm:1.0.2"
@@ -11707,6 +11727,17 @@ __metadata:
     combined-stream: ^1.0.8
     mime-types: ^2.1.12
   checksum: 60ec3fe7e23154949ab6fef31baedf5afbfb8d6441ea8d19b211b43a5d0448be2918c9bba6218cade56a7cbd43f670d6e75f41f626f8d397d56bf8c60f4a829d
+  languageName: node
+  linkType: hard
+
+"form-data@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "form-data@npm:4.0.0"
+  dependencies:
+    asynckit: ^0.4.0
+    combined-stream: ^1.0.8
+    mime-types: ^2.1.12
+  checksum: 01135bf8675f9d5c61ff18e2e2932f719ca4de964e3be90ef4c36aacfc7b9cb2fceb5eca0b7e0190e3383fe51c5b37f4cb80b62ca06a99aaabfcfd6ac7c9328c
   languageName: node
   linkType: hard
 
@@ -15544,15 +15575,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"next-connect@npm:^0.9.1":
-  version: 0.9.1
-  resolution: "next-connect@npm:0.9.1"
-  dependencies:
-    trouter: ^3.1.0
-  checksum: 97d0d92630ac41ca27aed8731d487a8fd9d77b6390a77cf531d378549178149c15d22de3efe758dae8d207cfee4bf4062e4d775818121b8a9dcf7deb1e374fd8
-  languageName: node
-  linkType: hard
-
 "next-optimized-images@npm:^2.6.2":
   version: 2.6.2
   resolution: "next-optimized-images@npm:2.6.2"
@@ -17317,6 +17339,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"proxy-from-env@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "proxy-from-env@npm:1.1.0"
+  checksum: ed7fcc2ba0a33404958e34d95d18638249a68c430e30fcb6c478497d72739ba64ce9810a24f53a7d921d0c065e5b78e3822759800698167256b04659366ca4d4
+  languageName: node
+  linkType: hard
+
 "prr@npm:~1.0.1":
   version: 1.0.1
   resolution: "prr@npm:1.0.1"
@@ -18285,13 +18314,6 @@ __metadata:
     define-properties: ^1.1.3
     es-abstract: ^1.17.0-next.1
   checksum: b6b985a6d5e78b79f9da6b40a775979a9f972569243799ec8dcaa2c5c14eb1e41b2a14acb1b7216378dddafa8156ed820ab68d4b2ac600fb0a7670dda04b45b4
-  languageName: node
-  linkType: hard
-
-"regexparam@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "regexparam@npm:1.3.0"
-  checksum: ea6449d9984392cdf401d3d9b722a56357224fba7e9fdf2887f1901e0d3a838052d3b92b30f2276047bf5d5b6a1a90b7dff6aa1c89599b246a86285e7e3e3fd4
   languageName: node
   linkType: hard
 
@@ -20413,15 +20435,6 @@ __metadata:
   version: 1.0.5
   resolution: "trough@npm:1.0.5"
   checksum: d6c8564903ed00e5258bab92134b020724dbbe83148dc72e4bf6306c03ed8843efa1bcc773fa62410dd89161ecb067432dd5916501793508a9506cacbc408e25
-  languageName: node
-  linkType: hard
-
-"trouter@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "trouter@npm:3.1.0"
-  dependencies:
-    regexparam: ^1.3.0
-  checksum: 3c79edbd600942f5393dc37a8204b950b1f1b0baaea58c7169c0c30a379fece0439477fbe2873d83857aad1665b17bf1ab34db4f1c8ebe984a3dd450894043d6
   languageName: node
   linkType: hard
 
