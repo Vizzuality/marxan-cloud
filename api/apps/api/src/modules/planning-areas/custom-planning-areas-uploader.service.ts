@@ -1,13 +1,10 @@
-import {
-  FactoryProvider,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { FactoryProvider, Inject, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Either, left, right } from 'fp-ts/Either';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { GeoJSON } from 'geojson';
+import { lastValueFrom } from 'rxjs';
 
 export const validationFailed = Symbol('validation failed');
 export const geoprocessingUrlToken = Symbol('geoprocessing url token');
@@ -36,19 +33,18 @@ export class CustomPlanningAreasUploader {
       }
     >
   > {
-    const { data, status } = await this.httpService
-      .post(
-        `${this.geoprocessingUrl}${
-          apiGlobalPrefixes.v1
-        }/projects/planning-area/shapefile${grid ? '/grid' : ''}`,
-        file,
-        {
-          headers: { 'Content-Type': 'application/json' },
-          // pass-by 4xx
-          validateStatus: (status) => status <= 499,
-        },
-      )
-      .toPromise();
+    const response = this.httpService.post(
+      `${this.geoprocessingUrl}${
+        apiGlobalPrefixes.v1
+      }/projects/planning-area/shapefile${grid ? '/grid' : ''}`,
+      file,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        // pass-by 4xx
+        validateStatus: (status) => status <= 499,
+      },
+    );
+    const { data, status } = await lastValueFrom(response);
     if (status >= 400) {
       return left(validationFailed);
     }

@@ -37,6 +37,7 @@ import {
   SpecDatRow,
   TargetSpecDatRow,
 } from './file-readers/spec-dat.reader';
+import { lastValueFrom } from 'rxjs';
 
 type FeaturesSelectResult = {
   id: string;
@@ -298,32 +299,31 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       projectId,
     );
 
-    const { status } = await this.httpService
-      .post(
-        `${AppConfig.get<string>(
-          'api.url',
-        )}/api/v1/projects/import/legacy/${projectId}/specification`,
-        {
-          features: specRows
-            .filter((row) => Boolean(featureIdByIntegerId[row.id]))
-            .map((row) => ({
-              featureId: featureIdByIntegerId[row.id],
-              kind: 'plain',
-              marxanSettings: {
-                fpf: row.spf,
-                prop: row.prop,
-              },
-            })),
+    const response = this.httpService.post(
+      `${AppConfig.get<string>(
+        'api.url',
+      )}/api/v1/projects/import/legacy/${projectId}/specification`,
+      {
+        features: specRows
+          .filter((row) => Boolean(featureIdByIntegerId[row.id]))
+          .map((row) => ({
+            featureId: featureIdByIntegerId[row.id],
+            kind: 'plain',
+            marxanSettings: {
+              fpf: row.spf,
+              prop: row.prop,
+            },
+          })),
+      },
+      {
+        headers: {
+          'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
         },
-        {
-          headers: {
-            'x-api-key': AppConfig.get<string>('auth.xApiKey.secret'),
-          },
-          validateStatus: () => true,
-        },
-      )
-      .toPromise();
+        validateStatus: () => true,
+      },
+    );
 
+    const { status } = await lastValueFrom(response);
     if (status !== HttpStatus.CREATED) {
       this.logAndThrow(
         `Specification launch request failed with status: ${status}`,
