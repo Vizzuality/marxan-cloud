@@ -23,7 +23,7 @@ case "$1" in
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
         echo "RUNNING COMMAND CORRECTLY"
-        yarn test:prepare-db && yarn api:test:e2e:new api/apps/api/test/projects.e2e-spec.ts
+        yarn test:prepare-db && yarn api:test:e2e:new
         ;;
     # TODO: This might be redundant / unnecessary
     run-migrations-for-e2e-tests)
