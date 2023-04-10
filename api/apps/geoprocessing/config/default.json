@@ -58,5 +58,15 @@
   },
   "cleanupCronJobSettings": {
     "interval": "0 0 1 1 *"
+  },
+  "auth": {
+    "jwt": {
+      "expiresIn": "2h",
+      "secret": "jwtSecret"
+    },
+    "xApiKey": {
+      "secret": "secret"
+    }
   }
 }
+

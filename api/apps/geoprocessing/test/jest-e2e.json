@@ -10,11 +10,6 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
 
-  "setupFilesAfterEnv": [
-    "<rootDir>../api/test/utils/set-env-vars.ts",
-    "<rootDir>../api/test/utils/handle-database.ts"
-  ],
-
   "moduleNameMapper": {
     "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1",
     "^@marxan/utils": ["<rootDir>/../../libs/utils/src"],
