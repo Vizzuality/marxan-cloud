@@ -150,9 +150,9 @@ test-e2e-api:
 	$(MAKE) test-clean-slate
 
 # See note for test-e2e-api above
-test-e2e-geoprocessing: test-start-services
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
-	#$(MAKE) test-clean-slate
+test-e2e-geoprocessing:
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
+	$(MAKE) test-clean-slate
 
 run-test-e2e-local:
 	$(MAKE) --keep-going test-e2e-backend environment=local
