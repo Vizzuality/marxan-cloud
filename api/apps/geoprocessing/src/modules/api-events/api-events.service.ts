@@ -2,6 +2,7 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { AppConfig } from '../../utils/config.utils';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class ApiEventsService {
@@ -22,8 +23,8 @@ export class ApiEventsService {
     kind: API_EVENT_KINDS,
     data?: T,
   ): Promise<void> {
-    await this.http
-      .post(
+    await lastValueFrom(
+      this.http.post(
         this.#apiUrl + `/api/v1/api-events`,
         {
           kind,
@@ -38,7 +39,7 @@ export class ApiEventsService {
           },
           validateStatus: () => true,
         },
-      )
-      .toPromise();
+      ),
+    );
   }
 }
