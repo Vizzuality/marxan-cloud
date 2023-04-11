@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { intersection } from 'lodash';
-import { getConnection, Not, QueryFailedError, Repository } from 'typeorm';
+import { DataSource, Not, QueryFailedError, Repository } from 'typeorm';
 import {
   Denied,
   Permit,
@@ -111,6 +111,8 @@ export class ScenarioAclService implements ScenarioAccessControl {
   }
 
   constructor(
+    @InjectDataSource(DbConnections.default)
+    private readonly apiDataSource: DataSource,
     @InjectRepository(UsersScenariosApiEntity)
     private readonly roles: Repository<UsersScenariosApiEntity>,
     @InjectRepository(UsersProjectsApiEntity)
@@ -357,8 +359,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     }
 
     assertDefined(roleName);
-    const apiDbConnection = getConnection(DbConnections.default);
-    const apiQueryRunner = apiDbConnection.createQueryRunner();
+    const apiQueryRunner = this.apiDataSource.createQueryRunner();
 
     await apiQueryRunner.connect();
     await apiQueryRunner.startTransaction();

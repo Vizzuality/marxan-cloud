@@ -1,6 +1,6 @@
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { getConnection, Not, QueryFailedError, Repository } from 'typeorm';
+import { DataSource, Not, QueryFailedError, Repository } from 'typeorm';
 import { intersection } from 'lodash';
 
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
@@ -59,6 +59,8 @@ export class ProjectAclService implements ProjectAccessControl {
   ];
 
   constructor(
+    @InjectDataSource(DbConnections.default)
+    private readonly apiDataSource: DataSource,
     @InjectRepository(UsersProjectsApiEntity)
     private readonly roles: Repository<UsersProjectsApiEntity>,
     @InjectRepository(User)
@@ -265,8 +267,7 @@ export class ProjectAclService implements ProjectAccessControl {
     if (!userToUpdate) return left(userNotFound);
 
     assertDefined(roleName);
-    const apiDbConnection = getConnection(DbConnections.default);
-    const apiQueryRunner = apiDbConnection.createQueryRunner();
+    const apiQueryRunner = this.apiDataSource.createQueryRunner();
 
     await apiQueryRunner.connect();
     await apiQueryRunner.startTransaction();

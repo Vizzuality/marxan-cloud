@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import {
+  DataSource,
   EntityManager,
-  getConnection,
   Repository,
   SelectQueryBuilder,
 } from 'typeorm';
@@ -57,6 +57,10 @@ export class GeoFeaturesService extends AppBaseService<
   GeoFeaturesRequestInfo
 > {
   constructor(
+    @InjectDataSource(DbConnections.default)
+    private readonly apiDataSource: DataSource,
+    @InjectDataSource(DbConnections.geoprocessingDB)
+    private readonly geoDataSource: DataSource,
     @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
     @InjectRepository(GeoFeature)
@@ -337,13 +341,8 @@ export class GeoFeaturesService extends AppBaseService<
     data: UploadShapefileDTO,
     features: Record<string, any>[],
   ): Promise<void> {
-    const [apiDbConnection, geoDbConnection] = [
-      getConnection(DbConnections.default),
-      getConnection(DbConnections.geoprocessingDB),
-    ];
-
-    const apiQueryRunner = apiDbConnection.createQueryRunner();
-    const geoQueryRunner = geoDbConnection.createQueryRunner();
+    const apiQueryRunner = this.apiDataSource.createQueryRunner();
+    const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
     await apiQueryRunner.connect();
     await geoQueryRunner.connect();
