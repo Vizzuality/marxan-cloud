@@ -97,17 +97,17 @@ seed-api-init-data:
 	@echo "$(RED)seeding initial dbs:$(NC) $(API_DB_INSTANCE)"
 	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-init-apidb.sql
 
-seed-geoapi-init-data:
-	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-features.sql
-	@for i in api/apps/api/test/fixtures/features/*.sql; do \
-		table_name=`basename -s .sql "$$i"`; \
-		featureid=`$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
-		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
-		done;
+#seed-geoapi-init-data:
+#	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
+#	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+#	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
+#	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-features.sql
+#	@for i in api/apps/api/test/fixtures/features/*.sql; do \
+#		table_name=`basename -s .sql "$$i"`; \
+#		featureid=`$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
+#		echo "appending data for $${table_name} with id $${featureid}"; \
+#		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+#		done;
 
 # need notebook service to execute a specific notebook. this requires a full geodb
 generate-geo-test-data: extract-geo-test-data
@@ -151,8 +151,24 @@ test-e2e-api:
 
 # See note for test-e2e-api above
 test-e2e-geoprocessing:
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
-	$(MAKE) test-clean-slate
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) --project-name ${COMPOSE_PROJECT_NAME} up -d --build api geoprocessing && $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing yarn test:prepare-db
+	#$(MAKE) test-clean-slate
+
+seed-geoapi-init-data: test-e2e-geoprocessing
+	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "marxan-geo-api"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "marxan-geo-api";
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "marxan-api" < api/apps/api/test/fixtures/test-features.sql
+	@for i in api/apps/api/test/fixtures/features/*.sql; do \
+		table_name=`basename -s .sql "$$i"`; \
+		featureid=`$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "marxan-api" -c "select id from features where feature_class_name = '$$table_name'"`; \
+		echo "appending data for $${table_name} with id $${featureid}"; \
+		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "marxan-geo-api"; \
+		done;
+
+run-tests: seed-geoapi-init-data
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
+
 
 run-test-e2e-local:
 	$(MAKE) --keep-going test-e2e-backend environment=local

@@ -25,10 +25,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Checkout envs
-        run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
+      #      - name: Checkout envs
+      #        run: docker-compose -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml  config
       - name: Run CI tests via make task
-        run: make test-e2e-geoprocessing environment=ci
+        run: make run-tests environment=ci
   test-api-unit:
     name: Unit tests - API
     runs-on: ubuntu-22.04

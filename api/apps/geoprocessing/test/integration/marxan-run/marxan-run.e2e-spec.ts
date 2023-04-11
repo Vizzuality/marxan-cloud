@@ -14,7 +14,7 @@ import {
   OutputScenariosPuDataGeoEntity,
 } from '@marxan/marxan-output';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
-import { readFileSync } from 'fs';
+import { readdirSync, readFileSync } from 'fs';
 import { last } from 'lodash';
 import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
@@ -22,6 +22,9 @@ import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
 import { bootstrapApplication, delay } from '../../utils';
+import { componentNotFound } from '@marxan-api/modules/clone/import/domain';
+import { readdir } from 'fs/promises';
+import * as process from 'process';
 
 const TEST_TIMEOUT_MULTIPLIER = 35000;
 
@@ -32,6 +35,22 @@ beforeEach(async () => {
 });
 
 describe(`given input data is delayed`, () => {
+  console.error('CHEKING RESOURCE AVAILABILITY: ************');
+  console.error('CURRENT DIR IS:', process.cwd());
+  console.error(
+    'ASSETS PRESENT IN FOLDER::',
+    readdirSync(
+      process.cwd() +
+        '/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/',
+    ),
+  );
+  console.error(
+    'ASSETS PRESENT IN INPUT::',
+    readdirSync(
+      process.cwd() +
+        '/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/input',
+    ),
+  );
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
