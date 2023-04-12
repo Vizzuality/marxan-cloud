@@ -77,7 +77,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
               session={pageProps.session}
               refetchInterval={5 * 60}
             >
-              <MediaContextProvider>
+              <MediaContextProvider disableDynamicMediaQueries>
                 <OverlayProvider>
                   <MultipleModalProvider>
                     <ToastProvider
