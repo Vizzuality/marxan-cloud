@@ -2,7 +2,6 @@ import { ExportEntity } from '@marxan-api/modules/clone/export/adapters/entities
 import { ExportAdaptersModule } from '@marxan-api/modules/clone/export/adapters/export-adapters.module';
 import { ExportRepository } from '@marxan-api/modules/clone/export/application/export-repository.port';
 import { Export } from '@marxan-api/modules/clone/export/domain';
-import { ImportEntity } from '@marxan-api/modules/clone/import/adapters/entities/imports.api.entity';
 import { ImportAdaptersModule } from '@marxan-api/modules/clone/import/adapters/import-adapters.module';
 import { ImportRepository } from '@marxan-api/modules/clone/import/application/import.repository.port';
 import {
@@ -23,7 +22,7 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { hash } from 'bcrypt';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ImportComponentStatuses } from '../../src/modules/clone/import/domain/import/import-component-status';
 import { User } from '../../src/modules/users/user.api.entity';
 import { apiConnections } from '../../src/ormconfig';
@@ -116,8 +115,8 @@ const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      const connection = testingModule.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
+      const dataSource = testingModule.get<DataSource>(DataSource);
+      const exportRepo = dataSource.getRepository(ExportEntity);
       await exportRepo.delete({});
       await userRepo.delete({ id: ownerId.value });
       await testingModule.close();

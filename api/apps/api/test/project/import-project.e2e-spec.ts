@@ -30,7 +30,7 @@ import { isLeft } from 'fp-ts/lib/These';
 import { createWriteStream, rmSync } from 'fs';
 import { Readable } from 'stream';
 import * as request from 'supertest';
-import { Connection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { v4 } from 'uuid';
 import { ExportId } from '../../src/modules/clone';
 import { ExportRepository } from '../../src/modules/clone/export/application/export-repository.port';
@@ -103,9 +103,9 @@ export const getFixtures = async () => {
   return {
     cleanup: async () => {
       rmSync(uriZipFile, { force: true, recursive: true });
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-      const importRepo = connection.getRepository(ImportEntity);
+      const dataSource = app.get<DataSource>(DataSource);
+      const exportRepo = dataSource.getRepository(ExportEntity);
+      const importRepo = dataSource.getRepository(ImportEntity);
 
       await exportRepo.delete({});
       await importRepo.delete({});

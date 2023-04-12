@@ -32,7 +32,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/These';
 import { Readable } from 'stream';
 import * as request from 'supertest';
-import { Connection, Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
@@ -132,9 +132,9 @@ export const getFixtures = async () => {
 
   return {
     cleanup: async () => {
-      const connection = app.get<Connection>(Connection);
-      const exportRepo = connection.getRepository(ExportEntity);
-      const importRepo = connection.getRepository(ImportEntity);
+      const dataSource = app.get<DataSource>(DataSource);
+      const exportRepo = dataSource.getRepository(ExportEntity);
+      const importRepo = dataSource.getRepository(ImportEntity);
 
       await exportRepo.delete({});
       await importRepo.delete({});
