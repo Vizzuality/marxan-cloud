@@ -7937,10 +7937,10 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-nestjs-base-service@0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.10.0.tgz#7ba56aad90625f4b15077cce3fbef888a19e6c3c"
-  integrity sha512-bkIOjbZPS+F4e2SyDdWfnFph5iHUs5eitMASBZft0hzeM966Xe44Zc3lcirG6bZtHMxBHqgYH5ZtVJH3DScIEQ==
+nestjs-base-service@0.11.1:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/nestjs-base-service/-/nestjs-base-service-0.11.1.tgz#cae0a3d390b69bdfeee54fb544780713ed72c570"
+  integrity sha512-IOg/ePCjFVlmUJLlaBrqVStrtXd//m0wdv11T1bY46LDhrXcVzrFV6+HrndDeJVlDK9qHZNcz83unWq0MXp/PQ==
   dependencies:
     class-validator "0.14.0"
     express "4.18.2"
