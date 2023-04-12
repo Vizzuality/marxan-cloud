@@ -17,7 +17,6 @@ let world: PromiseType<ReturnType<typeof createWorld>>;
  * Tests for API contracts for the management of geo features within scenarios.
  */
 describe('GeoFeaturesModule (e2e)', () => {
-  let app: INestApplication;
   let jwtToken: string;
 
   const geoFeaturesFilters = {
