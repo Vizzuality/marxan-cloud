@@ -67,8 +67,8 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
       setPublishing(true);
       const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
 
-      // @ts-ignore
       publishProjectMutation.mutate(
+        // @ts-ignore
         { pid: `${pid}`, data },
         {
           onSuccess: () => {
