@@ -1,29 +1,25 @@
-import React, {
-  useCallback, useState, useRef,
-} from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useCanEditProject } from 'hooks/permissions';
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 
 import EDIT_SVG from 'svgs/project/edit.svg?sprite';
 import CHECKED_SVG from 'svgs/ui/checked.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-export interface TitleProps {
-}
+export interface TitleProps {}
 
 export const Title: React.FC<TitleProps> = () => {
   const [editting, setEditting] = useState(false);
@@ -63,44 +59,54 @@ export const Title: React.FC<TitleProps> = () => {
     form.reset();
   }, []);
 
-  const handleSubmit = useCallback((data) => {
-    // Blur children
-    const $input = document.getElementById('form-title-show-project-input');
-    if ($input instanceof HTMLElement) {
-      $input.blur();
-    }
+  const handleSubmit = useCallback(
+    (data) => {
+      // Blur children
+      const $input = document.getElementById('form-title-show-project-input');
+      if ($input instanceof HTMLElement) {
+        $input.blur();
+      }
 
-    if (data.name !== projectData?.name || data.description !== projectData?.description) {
-      saveProjectMutation.mutate({ id: projectData.id, data }, {
-        onSuccess: ({ data: { data: s } }) => {
-          addToast('success-project-name', (
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <p className="text-sm">Project metadata saved</p>
-            </>
-          ), {
-            level: 'success',
-          });
+      if (data.name !== projectData?.name || data.description !== projectData?.description) {
+        saveProjectMutation.mutate(
+          { id: projectData.id, data },
+          {
+            onSuccess: ({ data: { data: s } }) => {
+              addToast(
+                'success-project-name',
+                <>
+                  <h2 className="font-medium">Success!</h2>
+                  <p className="text-sm">Project metadata saved</p>
+                </>,
+                {
+                  level: 'success',
+                }
+              );
 
-          console.info('Project name saved succesfully', s);
-        },
-        onError: () => {
-          addToast('error-project-name', (
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <p className="text-sm">Project metadata not saved</p>
-            </>
-          ), {
-            level: 'error',
-          });
+              console.info('Project name saved succesfully', s);
+            },
+            onError: () => {
+              addToast(
+                'error-project-name',
+                <>
+                  <h2 className="font-medium">Error!</h2>
+                  <p className="text-sm">Project metadata not saved</p>
+                </>,
+                {
+                  level: 'error',
+                }
+              );
 
-          console.error('Project name not saved');
-        },
-      });
-    }
+              console.error('Project name not saved');
+            },
+          }
+        );
+      }
 
-    setEditting(false);
-  }, [projectData, addToast, saveProjectMutation]);
+      setEditting(false);
+    },
+    [projectData, addToast, saveProjectMutation]
+  );
 
   const invisibleValue = useCallback((value) => {
     if (value) {
@@ -110,9 +116,7 @@ export const Title: React.FC<TitleProps> = () => {
   }, []);
 
   return (
-    <AnimatePresence
-      exitBeforeEnter
-    >
+    <AnimatePresence exitBeforeEnter>
       {projectData?.name && (
         <motion.div
           key="project-name"
@@ -144,7 +148,7 @@ export const Title: React.FC<TitleProps> = () => {
                   })}
                 >
                   {/* INPUTS */}
-                  <div className="space-x-2.5 flex items-start justify-items-start">
+                  <div className="flex items-start justify-items-start space-x-2.5">
                     <FieldRFF
                       name="name"
                       validate={composeValidators([{ presence: true }])}
@@ -164,15 +168,14 @@ export const Title: React.FC<TitleProps> = () => {
                               {...input}
                               id="form-title-show-project-input"
                               className={cx({
-                                'absolute left-0 focus:bg-primary-300 text-4xl focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none transition-colors': true,
+                                'absolute left-0 top-0 h-full w-full overflow-ellipsis border-none bg-transparent font-heading text-4xl font-normal transition-colors focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
+                                  true,
                               })}
                               disabled={!editting}
                               value={`${input.value}`}
                             />
 
-                            <h1
-                              className="invisible h-full px-0 py-1 text-4xl font-normal font-heading overflow-ellipsis"
-                            >
+                            <h1 className="invisible h-full overflow-ellipsis px-0 py-1 font-heading text-4xl font-normal">
                               {invisibleValue(input?.value)}
                             </h1>
                           </div>
@@ -181,7 +184,7 @@ export const Title: React.FC<TitleProps> = () => {
                     </FieldRFF>
 
                     {/* BUTTONS */}
-                    <div className="relative top-2.5 right-0 flex space-x-2">
+                    <div className="relative right-0 top-2.5 flex space-x-2">
                       {editable && !editting && (
                         <motion.button
                           key="edit-button"
@@ -190,7 +193,8 @@ export const Title: React.FC<TitleProps> = () => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cx({
-                            'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 hover:border-gray-300 flex items-center justify-center transition-colors': true,
+                            'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-3 transition-colors hover:border-gray-300 focus:outline-none':
+                              true,
                             'bg-white': editting,
                             'bg-transparent': !editting,
                           })}
@@ -199,7 +203,7 @@ export const Title: React.FC<TitleProps> = () => {
                           <Icon
                             icon={EDIT_SVG}
                             className={cx({
-                              'w-4 h-4 transition-colors': true,
+                              'h-4 w-4 transition-colors': true,
                               'text-white': !editting,
                               'text-black': editting,
                             })}
@@ -214,14 +218,15 @@ export const Title: React.FC<TitleProps> = () => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cx({
-                            'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 hover:border-gray-300 flex items-center justify-center transition-colors': true,
+                            'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-3 transition-colors hover:border-gray-300 focus:outline-none':
+                              true,
                             'bg-white': editting,
                           })}
                         >
                           <Icon
                             icon={CHECKED_SVG}
                             className={cx({
-                              'w-4 h-4 transition-colors text-green-500': true,
+                              'h-4 w-4 text-green-500 transition-colors': true,
                             })}
                           />
                         </motion.button>
@@ -235,7 +240,8 @@ export const Title: React.FC<TitleProps> = () => {
                           animate={{ y: 0, opacity: 1 }}
                           exit={{ y: -10, opacity: 0 }}
                           className={cx({
-                            'cursor-pointer focus:outline-none h-10 w-10 px-3 rounded-full border border-gray-500 hover:border-gray-300 flex items-center justify-center transition-colors': true,
+                            'flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gray-500 px-3 transition-colors hover:border-gray-300 focus:outline-none':
+                              true,
                             'bg-white': editting,
                           })}
                           onClick={() => handleCancel(fprops.form)}
@@ -243,13 +249,12 @@ export const Title: React.FC<TitleProps> = () => {
                           <Icon
                             icon={CLOSE_SVG}
                             className={cx({
-                              'w-3 h-3 transition-colors text-red-500': true,
+                              'h-3 w-3 text-red-500 transition-colors': true,
                             })}
                           />
                         </motion.button>
                       )}
                     </div>
-
                   </div>
                   <FieldRFF<string>
                     name="description"
@@ -263,14 +268,14 @@ export const Title: React.FC<TitleProps> = () => {
                       >
                         <div className="relative">
                           <div>
-                            <p className="absolute top-0 left-0 invisible font-normal text-gray-200 text-s font-heading">
+                            <p className="text-s invisible absolute left-0 top-0 font-heading font-normal text-gray-200">
                               {input.value}
                             </p>
                             <textarea
                               {...input}
                               ref={textRefArea}
                               id="form-description-show-project-input"
-                              className="absolute top-0 left-0 z-50 w-full h-full font-normal text-opacity-0 transition-colors bg-transparent border-none opacity-0 focus:opacity-100 focus:bg-primary-300 text-s focus:text-gray-500 overflow-ellipsis font-heading focus:outline-none"
+                              className="text-s absolute left-0 top-0 z-50 h-full w-full overflow-ellipsis border-none bg-transparent font-heading font-normal text-opacity-0 opacity-0 transition-colors focus:bg-primary-300 focus:text-gray-500 focus:opacity-100 focus:outline-none"
                               disabled={!editting}
                               value={`${input.value}`}
                               onChange={(v) => {
@@ -291,7 +296,7 @@ export const Title: React.FC<TitleProps> = () => {
                               }}
                             />
                           </div>
-                          <p className="font-normal text-gray-200 text-s font-heading line-clamp-3">
+                          <p className="text-s line-clamp-3 font-heading font-normal text-gray-200">
                             {input.value}
                           </p>
                         </div>

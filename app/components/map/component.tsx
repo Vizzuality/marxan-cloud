@@ -1,18 +1,12 @@
-import React, {
-  useEffect, useState, useRef, useCallback,
-} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 
-import ReactMapGL, {
-  FlyToInterpolator,
-  TRANSITION_EVENTS,
-  ViewportProps,
-} from 'react-map-gl';
+import ReactMapGL, { FlyToInterpolator, TRANSITION_EVENTS, ViewportProps } from 'react-map-gl';
 
-import isEmpty from 'lodash/isEmpty';
+import cx from 'classnames';
 
 import { fitBounds } from '@math.gl/web-mercator';
-import cx from 'classnames';
 import { easeCubic } from 'd3-ease';
+import isEmpty from 'lodash/isEmpty';
 import { InteractiveMapProps } from 'react-map-gl/src/components/interactive-map';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -50,7 +44,6 @@ export interface MapProps extends InteractiveMapProps {
 
   /** A function that exposes if current tiles on the viewport are loaded */
   onMapTilesLoaded?: (loaded: boolean) => void;
-
 }
 
 const DEFAULT_VIEWPORT = {
@@ -117,7 +110,7 @@ export const Map = ({
       setViewport(v);
       debouncedOnMapViewportChange(v);
     },
-    [debouncedOnMapViewportChange],
+    [debouncedOnMapViewportChange]
   );
 
   const handleResize = useCallback(
@@ -130,7 +123,7 @@ export const Map = ({
       setViewport(newViewport);
       debouncedOnMapViewportChange(newViewport);
     },
-    [mapViewport, debouncedOnMapViewportChange],
+    [mapViewport, debouncedOnMapViewportChange]
   );
 
   const handleFitBounds = useCallback(() => {
@@ -138,10 +131,7 @@ export const Map = ({
     const { bbox, options = {}, viewportOptions = {} } = bounds;
     const { transitionDuration = 0 } = viewportOptions;
 
-    if (
-      mapContainerRef.current.offsetWidth <= 0
-      || mapContainerRef.current.offsetHeight <= 0
-    ) {
+    if (mapContainerRef.current.offsetWidth <= 0 || mapContainerRef.current.offsetHeight <= 0) {
       console.error("mapContainerRef doesn't have dimensions");
       return null;
     }
@@ -192,7 +182,12 @@ export const Map = ({
   }, [onMapReady]);
 
   useEffect(() => {
-    if (ready && !isEmpty(bounds) && !!bounds.bbox && bounds.bbox.every((b) => typeof b === 'number')) {
+    if (
+      ready &&
+      !isEmpty(bounds) &&
+      !!bounds.bbox &&
+      bounds.bbox.every((b) => typeof b === 'number')
+    ) {
       handleFitBounds();
     }
   }, [ready, bounds, handleFitBounds]);
@@ -236,7 +231,7 @@ export const Map = ({
     <div
       ref={mapContainerRef}
       className={cx({
-        'relative w-full h-full z-0': true,
+        'relative z-0 h-full w-full': true,
         [className]: !!className,
       })}
     >
@@ -269,11 +264,11 @@ export const Map = ({
         transitionEasing={easeCubic}
         // attributionControl={false}
       >
-        {ready
-          && loaded
-          && !!mapRef.current
-          && typeof children === 'function'
-          && children(mapRef.current)}
+        {ready &&
+          loaded &&
+          !!mapRef.current &&
+          typeof children === 'function' &&
+          children(mapRef.current)}
       </ReactMapGL>
     </div>
   );

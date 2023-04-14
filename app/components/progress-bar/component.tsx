@@ -1,4 +1,5 @@
 import React from 'react';
+
 import cx from 'classnames';
 
 export interface ProgressBarProps {
@@ -19,7 +20,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     >
       <div className="h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 opacity-30" />
       <div
-        className="absolute bottom-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500 max-w-full"
+        className="absolute bottom-0 h-0.5 max-w-full bg-gradient-to-r from-blue-400 to-purple-500"
         style={{ width: `${progress}%` }}
       />
     </div>

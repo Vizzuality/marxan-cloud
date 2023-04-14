@@ -5,17 +5,14 @@ import { useDispatch } from 'react-redux';
 
 import { setBbox, setMinPuAreaSize, setMaxPuAreaSize } from 'store/slices/projects/new';
 
-import { RegionLevel } from 'types/country-model';
-
 import { useAdministrativeAreas } from 'hooks/administrative-areas';
 import { useCountries, useCountryRegions } from 'hooks/countries';
 
 import Field from 'components/forms/field';
 import Select from 'components/forms/select';
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import Loading from 'components/loading';
+import { RegionLevel } from 'types/country-model';
 
 import CountryRegionSelectorProps from './types';
 
@@ -31,15 +28,21 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
   const dispatch = useDispatch();
 
   const {
-    data: countriesData, isFetching: isFetchingCountries, isFetched: isFetchedCountries,
+    data: countriesData,
+    isFetching: isFetchingCountries,
+    isFetched: isFetchedCountries,
   } = useCountries({ includeAll: true });
 
   const {
-    data: regionsData, isFetching: isFetchingRegions, isFetched: isFetchedRegions,
+    data: regionsData,
+    isFetching: isFetchingRegions,
+    isFetched: isFetchedRegions,
   } = useCountryRegions({ id: selectedCountry, includeAll: true, level: RegionLevel.ONE });
 
   const {
-    data: subRegionsData, isFetching: isFetchingSubRegions, isFetched: isFetchedSubRegions,
+    data: subRegionsData,
+    isFetching: isFetchingSubRegions,
+    isFetched: isFetchedSubRegions,
   } = useAdministrativeAreas({ id: selectedRegion, includeAll: true });
 
   useEffect(() => {
@@ -57,10 +60,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
         <div>
           {/* Country selector */}
           <div aria-hidden="true" className="mb-3" onClick={onClick}>
-            <FieldRFF
-              name="countryId"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="countryId" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="countryId" {...fprops}>
                   <Select
@@ -89,9 +89,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
           {/* Region selector */}
           {isFetchedRegions && regionsData?.length > 0 && (
             <div className="mb-3">
-              <FieldRFF
-                name="adminAreaLevel1Id"
-              >
+              <FieldRFF name="adminAreaLevel1Id">
                 {(fprops) => (
                   <Field id="adminAreaLevel1Id" {...fprops}>
                     <Select
@@ -114,9 +112,9 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                         setSelectedRegion(value);
                         fprops.input.onChange(value);
                       }}
-                      {...selectedSubRegion && {
+                      {...(selectedSubRegion && {
                         initialSelected: selectedRegion,
-                      }}
+                      })}
                     />
                   </Field>
                 )}
@@ -126,9 +124,7 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
           {/* Sub-Region selector */}
           {isFetchedSubRegions && subRegionsData?.length > 0 && (
             <div>
-              <FieldRFF
-                name="adminAreaLevel2Id"
-              >
+              <FieldRFF name="adminAreaLevel2Id">
                 {(fprops) => (
                   <Field id="adminAreaLevel2Id" {...fprops}>
                     <Select
@@ -150,9 +146,9 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
                         setSelectedSubRegion(value);
                         fprops.input.onChange(value);
                       }}
-                      {...selectedSubRegion && {
+                      {...(selectedSubRegion && {
                         initialSelected: selectedSubRegion,
-                      }}
+                      })}
                     />
                   </Field>
                 )}
@@ -163,10 +159,12 @@ export const CountryRegionSelector: React.FC<CountryRegionSelectorProps> = ({
       )}
 
       <Loading
-        visible={(isFetchingCountries && !isFetchedCountries)
-          || (isFetchingRegions && !isFetchedRegions)
-          || (isFetchingSubRegions && !isFetchedSubRegions)}
-        className="z-40 flex items-center justify-center w-full h-12 bg-transparent bg-opacity-90"
+        visible={
+          (isFetchingCountries && !isFetchedCountries) ||
+          (isFetchingRegions && !isFetchedRegions) ||
+          (isFetchingSubRegions && !isFetchedSubRegions)
+        }
+        className="z-40 flex h-12 w-full items-center justify-center bg-transparent bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
         transition={{
           duration: 0,

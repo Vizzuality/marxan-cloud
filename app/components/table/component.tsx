@@ -7,9 +7,7 @@ import Icon from 'components/icon';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import ARROW_UP_SVG from 'svgs/ui/arrow-up.svg?sprite';
 
-import {
-  TableHeaderItem, TableProps, HeaderSelection, Direction, TableRow,
-} from './types';
+import { TableHeaderItem, TableProps, HeaderSelection, Direction, TableRow } from './types';
 
 const DEFAULT_SORT_DIRECTION: Direction = Direction.DESC;
 
@@ -24,8 +22,8 @@ export const Table: React.FC<TableProps> = ({
 
   const sort = (selection: HeaderSelection) => {
     const { order, id } = selection;
-    const newBody = sortedBody.sort(
-      (a: any, b: any) => (order === Direction.DESC ? a[id] - b[id] : b[id] - a[id]),
+    const newBody = sortedBody.sort((a: any, b: any) =>
+      order === Direction.DESC ? a[id] - b[id] : b[id] - a[id]
     );
     setSortedBody(newBody);
   };
@@ -68,22 +66,26 @@ export const Table: React.FC<TableProps> = ({
           clicking on header, also support custom sort function */}
           {headers.map((header, index) => {
             const firstHeader = index === 0;
-            const lastHeader = index === (headers.length - 1);
+            const lastHeader = index === headers.length - 1;
             return (
               <th
                 key={`header-${header.id}`}
                 className={cx({
-                  'px-4 text-left cursor-pointer font-heading text-sm font-medium': true,
+                  'cursor-pointer px-4 text-left font-heading text-sm font-medium': true,
                   'pl-10 pr-0': firstHeader,
-                  'pr-10 pl-0': lastHeader,
+                  'pl-0 pr-10': lastHeader,
                   [header.className]: !!header.className,
                 })}
                 onClick={() => handleHeaderClick(header)}
               >
                 <div className="flex items-center">
                   {header.label}
-                  {headerSelected?.id === header.id
-                    && <Icon icon={headerSelected.order === Direction.DESC ? ARROW_DOWN_SVG : ARROW_UP_SVG} className="w-4 h-4 pl-2" />}
+                  {headerSelected?.id === header.id && (
+                    <Icon
+                      icon={headerSelected.order === Direction.DESC ? ARROW_DOWN_SVG : ARROW_UP_SVG}
+                      className="h-4 w-4 pl-2"
+                    />
+                  )}
                 </div>
               </th>
             );
@@ -104,36 +106,34 @@ export const Table: React.FC<TableProps> = ({
                 'bg-primary-300 bg-opacity-30': rowIsSelected,
               })}
             >
-              {
-                headers.map(({ id: headerId, Cell }: TableHeaderItem, index) => {
-                  const value = row[headerId];
-                  const CellIsFunction = typeof Cell === 'function';
-                  const firstColumn = index === 0;
-                  const lastColumn = index === (headers.length - 1);
+              {headers.map(({ id: headerId, Cell }: TableHeaderItem, index) => {
+                const value = row[headerId];
+                const CellIsFunction = typeof Cell === 'function';
+                const firstColumn = index === 0;
+                const lastColumn = index === headers.length - 1;
 
-                  const rowData = {
-                    ...row,
-                    isSelected: rowIsSelected,
-                  };
+                const rowData = {
+                  ...row,
+                  isSelected: rowIsSelected,
+                };
 
-                  return (
-                    <td
-                      key={`td-${headerId}-${value}`}
-                      className={cx({
-                        'px-4 py-2': true,
-                        'pl-10 pr-0': firstColumn,
-                        'pr-8 pl-0': lastColumn,
-                      })}
-                      role="gridcell"
-                    >
-                      {/* Cell is a function */}
-                      {CellIsFunction && Cell(value, rowData)}
+                return (
+                  <td
+                    key={`td-${headerId}-${value}`}
+                    className={cx({
+                      'px-4 py-2': true,
+                      'pl-10 pr-0': firstColumn,
+                      'pl-0 pr-8': lastColumn,
+                    })}
+                    role="gridcell"
+                  >
+                    {/* Cell is a function */}
+                    {CellIsFunction && Cell(value, rowData)}
 
-                      {!Cell && value}
-                    </td>
-                  );
-                })
-              }
+                    {!Cell && value}
+                  </td>
+                );
+              })}
             </tr>
           );
         })}

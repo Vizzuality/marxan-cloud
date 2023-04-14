@@ -10,11 +10,7 @@ export default {
 };
 
 const Template: Story<LoadingControlProps> = (args) => {
-  return (
-    <LoadingControl
-      {...args}
-    />
-  );
+  return <LoadingControl {...args} />;
 };
 
 export const Default = Template.bind({});

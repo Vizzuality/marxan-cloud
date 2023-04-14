@@ -2,22 +2,20 @@ import React, { useCallback } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useScenario, useSaveScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import Tooltip from 'components/tooltip';
 
-export interface TitleProps {
-}
+export interface TitleProps {}
 
 export const Title: React.FC<TitleProps> = () => {
   const { query } = useRouter();
@@ -36,44 +34,54 @@ export const Title: React.FC<TitleProps> = () => {
     },
   });
 
-  const handleProjectSubmit = useCallback((data, form) => {
-    // Blur children
-    const $form = document.getElementById('form-title-project');
-    form.getRegisteredFields().forEach((n) => {
-      const element = $form.querySelector(`[name="${n}"]`);
+  const handleProjectSubmit = useCallback(
+    (data, form) => {
+      // Blur children
+      const $form = document.getElementById('form-title-project');
+      form.getRegisteredFields().forEach((n) => {
+        const element = $form.querySelector(`[name="${n}"]`);
 
-      if (element instanceof HTMLElement) {
-        element.blur();
-      }
-    });
+        if (element instanceof HTMLElement) {
+          element.blur();
+        }
+      });
 
-    saveProjectMutation.mutate({ id: projectData.id, data }, {
-      onSuccess: ({ data: { data: s } }) => {
-        addToast('success-project-name', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Project name saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
+      saveProjectMutation.mutate(
+        { id: projectData.id, data },
+        {
+          onSuccess: ({ data: { data: s } }) => {
+            addToast(
+              'success-project-name',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Project name saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
 
-        console.info('Project name saved succesfully', s);
-      },
-      onError: () => {
-        addToast('error-project-name', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Project name not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
+            console.info('Project name saved succesfully', s);
+          },
+          onError: () => {
+            addToast(
+              'error-project-name',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Project name not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
 
-        console.error('Project name not saved');
-      },
-    });
-  }, [projectData?.id, addToast, saveProjectMutation]);
+            console.error('Project name not saved');
+          },
+        }
+      );
+    },
+    [projectData?.id, addToast, saveProjectMutation]
+  );
 
   // Scenario mutation and submit
   const saveScenarioMutation = useSaveScenario({
@@ -82,47 +90,57 @@ export const Title: React.FC<TitleProps> = () => {
     },
   });
 
-  const handleScenarioSubmit = useCallback((data, form) => {
-    // Blur children
-    const $form = document.getElementById('form-title-scenario');
-    form.getRegisteredFields().forEach((name) => {
-      const element = $form.querySelector(`[name="${name}"]`);
+  const handleScenarioSubmit = useCallback(
+    (data, form) => {
+      // Blur children
+      const $form = document.getElementById('form-title-scenario');
+      form.getRegisteredFields().forEach((name) => {
+        const element = $form.querySelector(`[name="${name}"]`);
 
-      if (element instanceof HTMLElement) {
-        element.blur();
-      }
-    });
+        if (element instanceof HTMLElement) {
+          element.blur();
+        }
+      });
 
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data: {
-        ...data,
-        metadata,
-      },
-    }, {
-      onSuccess: ({ data: { data: s } }) => {
-        addToast('save-scenario-name', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario name saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        console.info('Scenario name saved succesfully', s);
-      },
-      onError: () => {
-        addToast('error-scenario-name', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario name not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [sid, addToast, saveScenarioMutation, metadata]);
+      saveScenarioMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            ...data,
+            metadata,
+          },
+        },
+        {
+          onSuccess: ({ data: { data: s } }) => {
+            addToast(
+              'save-scenario-name',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Scenario name saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+            console.info('Scenario name saved succesfully', s);
+          },
+          onError: () => {
+            addToast(
+              'error-scenario-name',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario name not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [sid, addToast, saveScenarioMutation, metadata]
+  );
 
   return (
     <AnimatePresence>
@@ -156,7 +174,7 @@ export const Title: React.FC<TitleProps> = () => {
                   onSubmit={fprops.handleSubmit}
                   autoComplete="off"
                   className={cx({
-                    'relative px-2 h-6 max-w-max': true,
+                    'relative h-6 max-w-max px-2': true,
                   })}
                 >
                   <FieldRFF<string>
@@ -172,22 +190,22 @@ export const Title: React.FC<TitleProps> = () => {
                         arrow
                         placement="bottom"
                         disabled={meta.active}
-                        content={(
-                          <div className="px-2 py-1 text-gray-500 bg-white rounded">
+                        content={
+                          <div className="rounded bg-white px-2 py-1 text-gray-500">
                             <span>Edit name</span>
                           </div>
-                        )}
+                        }
                       >
                         <div
                           className={cx({
                             'relative h-6': true,
                           })}
                         >
-
                           <input
                             {...input}
                             className={cx({
-                              'absolute left-0 focus:bg-primary-300 focus:text-gray-500 w-full h-full font-normal top-0 overflow-ellipsis bg-transparent border-none font-heading focus:outline-none cursor-pointer px-1.5': true,
+                              'absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent px-1.5 font-heading font-normal focus:bg-primary-300 focus:text-gray-500 focus:outline-none':
+                                true,
                             })}
                             value={`${input.value}`}
                             onBlur={() => {
@@ -199,9 +217,11 @@ export const Title: React.FC<TitleProps> = () => {
                             }}
                           />
 
-                          <h1 className={cx({
-                            'invisible h-full px-1.5 font-heading font-normal overflow-ellipsis': true,
-                          })}
+                          <h1
+                            className={cx({
+                              'invisible h-full overflow-ellipsis px-1.5 font-heading font-normal':
+                                true,
+                            })}
                           >
                             {input.value}
                           </h1>
@@ -229,7 +249,12 @@ export const Title: React.FC<TitleProps> = () => {
               }}
             >
               {(fprops) => (
-                <form id="form-title-scenario" onSubmit={fprops.handleSubmit} autoComplete="off" className="relative max-w-xs px-2">
+                <form
+                  id="form-title-scenario"
+                  onSubmit={fprops.handleSubmit}
+                  autoComplete="off"
+                  className="relative max-w-xs px-2"
+                >
                   <FieldRFF<string>
                     name="name"
                     validate={composeValidators([{ presence: true }])}
@@ -243,24 +268,26 @@ export const Title: React.FC<TitleProps> = () => {
                         arrow
                         placement="bottom"
                         disabled={meta.active}
-                        content={(
-                          <div className="px-2 py-1 text-gray-500 bg-white rounded">
+                        content={
+                          <div className="rounded bg-white px-2 py-1 text-gray-500">
                             <span>Edit name</span>
                           </div>
-                        )}
+                        }
                       >
                         <div className="relative h-6">
                           <input
                             {...input}
                             id="form-scenario-name"
-                            className="absolute top-0 left-0 w-full h-full px-1 font-sans font-normal leading-4 bg-transparent border-none overflow-ellipsis focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
+                            className="absolute left-0 top-0 h-full w-full overflow-ellipsis border-none bg-transparent px-1 font-sans font-normal leading-4 focus:bg-primary-300 focus:text-gray-500 focus:outline-none"
                             value={`${input.value}`}
                             onBlur={() => {
                               input.onBlur();
                               fprops.handleSubmit();
                             }}
                           />
-                          <h1 className="invisible px-1.5 h-full font-sans font-normal leading-4">{input.value}</h1>
+                          <h1 className="invisible h-full px-1.5 font-sans font-normal leading-4">
+                            {input.value}
+                          </h1>
                         </div>
                       </Tooltip>
                     )}

@@ -31,9 +31,9 @@ export const FitBoundsControl = ({
     <button
       aria-label="fit-bounds"
       className={cx({
-        'mb-0.5 px-0.5 py-1 rounded-4xl text-white bg-black focus:outline-none': true,
+        'mb-0.5 rounded-4xl bg-black px-0.5 py-1 text-white focus:outline-none': true,
         'hover:bg-gray-700 active:bg-gray-600': !!bounds,
-        'opacity-50 cursor-default': !bounds,
+        'cursor-default opacity-50': !bounds,
         [className]: !!className,
       })}
       type="button"

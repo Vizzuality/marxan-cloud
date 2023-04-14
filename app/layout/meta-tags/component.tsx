@@ -6,19 +6,19 @@ import FB_IMAGE from 'images/social-media/share-fb.png';
 import TW_IMAGE from 'images/social-media/share-tw.png';
 
 export interface MetaTagsProps {
-  name: string,
-  title: string,
-  description: string,
-  url?: string,
-  type: string,
-  publisher?: string,
-  section?: string,
-  tag?: string,
-  imageURL?: string,
-  imageWidth?: string,
-  imageHeight?: string,
-  twitterCard?: string,
-  twitterSite?: string,
+  name: string;
+  title: string;
+  description: string;
+  url?: string;
+  type: string;
+  publisher?: string;
+  section?: string;
+  tag?: string;
+  imageURL?: string;
+  imageWidth?: string;
+  imageHeight?: string;
+  twitterCard?: string;
+  twitterSite?: string;
 }
 
 export const MetaTags: React.FC<MetaTagsProps> = ({

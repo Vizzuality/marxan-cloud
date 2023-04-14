@@ -1,15 +1,13 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF } from 'react-final-form';
 import { useSelector, useDispatch } from 'react-redux';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
-
-import cx from 'classnames';
 
 import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
@@ -38,17 +36,11 @@ export const PlanningUnitDrawing: React.FC<PlanningUnitDrawingProps> = ({
   const { addToast } = useToasts();
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const {
-    setJob,
-    setDrawing,
-    setDrawingValue,
-  } = scenarioSlice.actions;
+  const { setJob, setDrawing, setDrawingValue } = scenarioSlice.actions;
   const dispatch = useDispatch();
-  const {
-    puIncludedValue,
-    puExcludedValue,
-    drawingValue,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { puIncludedValue, puExcludedValue, drawingValue } = useSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const scenarioPUMutation = useSaveScenarioPU({});
 
@@ -78,90 +70,99 @@ export const PlanningUnitDrawing: React.FC<PlanningUnitDrawingProps> = ({
   }, [selected]); // eslint-disable-line
 
   // Callbacks
-  const onSubmit = useCallback((values) => {
-    setSubmitting(true);
-    // Save current drawn shape
-    scenarioPUMutation.mutate({
-      id: `${sid}`,
-      data: {
-        byId: {
-          include: puIncludedValue,
-          exclude: puExcludedValue,
+  const onSubmit = useCallback(
+    (values) => {
+      setSubmitting(true);
+      // Save current drawn shape
+      scenarioPUMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            byId: {
+              include: puIncludedValue,
+              exclude: puExcludedValue,
+            },
+            byGeoJson: {
+              [values.type]: [
+                {
+                  type: 'FeatureCollection',
+                  features: values.drawingValue,
+                },
+              ],
+            },
+          },
         },
-        byGeoJson: {
-          [values.type]: [{
-            type: 'FeatureCollection',
-            features: values.drawingValue,
-          }],
-        },
-      },
-    }, {
-      onSuccess: ({ data: { meta } }) => {
-        // Let's wait unitl we can track fast async jobs
-        dispatch(setJob(new Date(meta.isoDate).getTime()));
-        onSelected(null);
-        dispatch(setDrawing(null));
-        dispatch(setDrawingValue(null));
+        {
+          onSuccess: ({ data: { meta } }) => {
+            // Let's wait unitl we can track fast async jobs
+            dispatch(setJob(new Date(meta.isoDate).getTime()));
+            onSelected(null);
+            dispatch(setDrawing(null));
+            dispatch(setDrawingValue(null));
 
-        addToast('adjust-planning-units-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <ul className="text-sm">
-              <li>Planning units lock status saved</li>
-            </ul>
-          </>
-        ), {
-          level: 'success',
-        });
-      },
-      onError: () => {
-        addToast('adjust-planning-units-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              <li>Ooops! Something went wrong. Try again</li>
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-      onSettled: () => {
-        setSubmitting(false);
-      },
-    });
-  }, [
-    sid,
-    scenarioPUMutation,
-    puIncludedValue,
-    puExcludedValue,
-    onSelected,
-    dispatch,
-    setDrawing,
-    setDrawingValue,
-    setJob,
-    addToast,
-  ]);
+            addToast(
+              'adjust-planning-units-success',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <ul className="text-sm">
+                  <li>Planning units lock status saved</li>
+                </ul>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            addToast(
+              'adjust-planning-units-error',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <ul className="text-sm">
+                  <li>Ooops! Something went wrong. Try again</li>
+                </ul>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+          onSettled: () => {
+            setSubmitting(false);
+          },
+        }
+      );
+    },
+    [
+      sid,
+      scenarioPUMutation,
+      puIncludedValue,
+      puExcludedValue,
+      onSelected,
+      dispatch,
+      setDrawing,
+      setDrawingValue,
+      setJob,
+      addToast,
+    ]
+  );
 
   return (
-    <FormRFF
-      key="drawing-form"
-      onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
-    >
+    <FormRFF key="drawing-form" onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
       {({ handleSubmit }) => (
         <form onSubmit={handleSubmit} autoComplete="off" className="relative">
           <div
             key="drawing"
             role="presentation"
             className={cx({
-              'text-sm py-2.5 focus:outline-none relative transition rounded-3xl px-10 cursor-pointer': true,
+              'relative cursor-pointer rounded-3xl px-10 py-2.5 text-sm transition focus:outline-none':
+                true,
               'bg-gray-600 text-gray-200 opacity-50': !selected,
               'bg-gray-600 text-white': selected,
             })}
             onClick={() => onSelected('drawing')}
           >
-            <header className="relative flex justify-between w-full">
+            <header className="relative flex w-full justify-between">
               <div
                 className={cx({
                   'text-center': !selected,
@@ -173,7 +174,7 @@ export const PlanningUnitDrawing: React.FC<PlanningUnitDrawingProps> = ({
 
               {!selected && (
                 <Icon
-                  className="absolute right-0 w-5 h-5 transform -translate-y-1/2 top-1/2"
+                  className="absolute right-0 top-1/2 h-5 w-5 -translate-y-1/2 transform"
                   icon={DRAW_SHAPE_SVG}
                 />
               )}
@@ -190,12 +191,7 @@ export const PlanningUnitDrawing: React.FC<PlanningUnitDrawingProps> = ({
                     Cancel
                   </Button>
 
-                  <Button
-                    type="submit"
-                    theme="primary"
-                    size="s"
-                    disabled={submitting}
-                  >
+                  <Button type="submit" theme="primary" size="s" disabled={submitting}>
                     Save
                   </Button>
                   {/* <button
@@ -216,7 +212,7 @@ export const PlanningUnitDrawing: React.FC<PlanningUnitDrawingProps> = ({
 
             <Loading
               visible={submitting}
-              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
+              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center rounded-3xl bg-gray-600 bg-opacity-90"
               iconClassName="w-10 h-5 text-primary-500"
             />
 

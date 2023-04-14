@@ -63,19 +63,20 @@ export function withUser(getServerSidePropsFunc?: Function) {
       };
     }
 
-    await queryClient.prefetchQuery('me', () => USERS.request({
-      method: 'GET',
-      url: '/me',
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    })
-      .then((response) => {
+    await queryClient.prefetchQuery('me', () =>
+      USERS.request({
+        method: 'GET',
+        url: '/me',
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
         if (response.status > 500) {
           return new Error('prefetchQuery "me" error');
         }
         return response.data;
-      }));
+      })
+    );
 
     if (getServerSidePropsFunc) {
       const SSPF = (await getServerSidePropsFunc(context)) || {};
@@ -188,9 +189,7 @@ export function withoutProtection(getServerSidePropsFunc?: Function) {
     }
 
     return {
-      props: {
-
-      },
+      props: {},
     };
   };
 }

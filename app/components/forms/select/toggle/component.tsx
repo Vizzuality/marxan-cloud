@@ -48,7 +48,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
       type="button"
       disabled={disabled}
       className={cx({
-        'relative w-full flex items-center focus:outline-none tracking-wide': true,
+        'relative flex w-full items-center tracking-wide focus:outline-none': true,
         [THEME.sizes[size]]: true,
       })}
       {...{
@@ -62,7 +62,7 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
       {prefix && (
         <span
           className={cx({
-            'mr-2 text-xs font-heading': true,
+            'mr-2 font-heading text-xs': true,
             [THEME[theme].prefix.base]: true,
           })}
         >
@@ -70,18 +70,19 @@ export const SelectToggle: React.FC<SelectToggleProps> = ({
         </span>
       )}
 
-      <span className={cx({
-        'text-sm leading-none whitespace-nowrap overflow-hidden overflow-ellipsis': true,
-        [THEME[theme].prefix.base]: selectedItems.length,
-        [THEME.sizes.label[size]]: true,
-      })}
+      <span
+        className={cx({
+          'overflow-hidden overflow-ellipsis whitespace-nowrap text-sm leading-none': true,
+          [THEME[theme].prefix.base]: selectedItems.length,
+          [THEME.sizes.label[size]]: true,
+        })}
       >
         {labelDefaultFormatter()}
       </span>
 
       <Icon
         className={cx({
-          'absolute w-3 h-3 right-4': true,
+          'absolute right-4 h-3 w-3': true,
           [THEME[theme].icon.closed]: !opened,
           [THEME[theme].icon.open]: opened,
           [THEME[theme].icon.disabled]: disabled,

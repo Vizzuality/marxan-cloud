@@ -13,41 +13,41 @@ export interface ConfirmationPromptProps {
   /**
    * Whether the prompt is diplayed
    */
-  open: ModalProps['open'],
+  open: ModalProps['open'];
   /**
    * Whether the user can close the prompt without having to accept nor refuse
    */
-  dismissible?: ModalProps['dismissable'],
+  dismissible?: ModalProps['dismissable'];
   /**
    * Optional icon to display in the prompt. It is not displayed on narrow screens (< 640px).
    */
-  icon?: IconProps['icon'],
+  icon?: IconProps['icon'];
   /**
    * Optional icon className
    */
-  iconClassName?: IconProps['className'],
+  iconClassName?: IconProps['className'];
   /**
    * Optional boolean to set dangeroust prompts.
    */
-  danger?: boolean,
+  danger?: boolean;
   /**
    * Optional button texts
    */
   options?: {
     acceptText?: string;
     refuseText?: string;
-  },
+  };
   /**
    * Callback executed when the user accepts the action
    */
-  onAccept: () => void,
+  onAccept: () => void;
   /**
    * Callback executed when the user refuses the action
    */
-  onRefuse?: () => void,
+  onRefuse?: () => void;
   /**
    * Callback executed when the user dismisses the prompt. Only relevant if `dismissible` is true or
    * unset.
    */
-  onDismiss: ModalProps['onDismiss'],
+  onDismiss: ModalProps['onDismiss'];
 }

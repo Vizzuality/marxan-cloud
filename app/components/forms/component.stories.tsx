@@ -11,11 +11,7 @@ import Radio from 'components/forms/radio';
 import Select from 'components/forms/select';
 import Slider from 'components/forms/slider';
 import Textarea from 'components/forms/textarea';
-import {
-  composeValidators,
-  booleanValidator,
-  arrayValidator,
-} from 'components/forms/validations';
+import { composeValidators, booleanValidator, arrayValidator } from 'components/forms/validations';
 
 export default {
   title: 'Components/Forms',
@@ -26,18 +22,12 @@ export const Form = (): React.ReactNode => {
   const sliderLabelRef = React.useRef(null);
 
   return (
-    <FormRFF
-      debug={() => {}}
-      onSubmit={() => {}}
-    >
+    <FormRFF debug={() => {}} onSubmit={() => {}}>
       {(props) => (
         <form onSubmit={props.handleSubmit} autoComplete="off">
           {/* NAME */}
           <div>
-            <FieldRFF
-              name="name"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="form-name" {...fprops}>
                   <Label className="mb-3 uppercase">Name</Label>
@@ -49,10 +39,7 @@ export const Form = (): React.ReactNode => {
 
           {/* EMAIL */}
           <div className="mt-5">
-            <FieldRFF
-              name="email"
-              validate={composeValidators([{ presence: true, email: true }])}
-            >
+            <FieldRFF name="email" validate={composeValidators([{ presence: true, email: true }])}>
               {(fprops) => (
                 <Field id="form-email" {...fprops}>
                   <Label className="mb-3 uppercase">Email</Label>
@@ -66,9 +53,7 @@ export const Form = (): React.ReactNode => {
           <div className="mt-5">
             <FieldRFF
               name="description"
-              validate={composeValidators([
-                { presence: true, length: { minimum: 20 } },
-              ])}
+              validate={composeValidators([{ presence: true, length: { minimum: 20 } }])}
             >
               {(fprops) => (
                 <Field id="form-description" {...fprops}>
@@ -81,10 +66,7 @@ export const Form = (): React.ReactNode => {
 
           {/* SELECT */}
           <div className="mt-5">
-            <FieldRFF
-              name="category"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="category" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="form-select" {...fprops}>
                   <Label className="mb-3 uppercase">Category</Label>
@@ -113,7 +95,7 @@ export const Form = (): React.ReactNode => {
               validate={composeValidators([booleanValidator])}
             >
               {(fprops) => (
-                <Field className="flex mt-2" id="form-checkbox" {...fprops}>
+                <Field className="mt-2 flex" id="form-checkbox" {...fprops}>
                   <Checkbox />
                   <Label className="ml-2">This is a standalone checkbox</Label>
                 </Field>
@@ -131,11 +113,7 @@ export const Form = (): React.ReactNode => {
               validate={composeValidators([arrayValidator])}
             >
               {(fprops) => (
-                <Field
-                  className="flex mt-2"
-                  id="form-checkbox-group-1"
-                  {...fprops}
-                >
+                <Field className="mt-2 flex" id="form-checkbox-group-1" {...fprops}>
                   <Checkbox />
                   <Label className="ml-2">Option 1</Label>
                 </Field>
@@ -149,11 +127,7 @@ export const Form = (): React.ReactNode => {
               validate={composeValidators([arrayValidator])}
             >
               {(fprops) => (
-                <Field
-                  className="flex mt-2"
-                  id="form-checkbox-group-2"
-                  {...fprops}
-                >
+                <Field className="mt-2 flex" id="form-checkbox-group-2" {...fprops}>
                   <Checkbox />
                   <Label className="ml-2">Option 2</Label>
                 </Field>
@@ -171,11 +145,7 @@ export const Form = (): React.ReactNode => {
               validate={composeValidators([{ presence: true }])}
             >
               {(fprops) => (
-                <Field
-                  className="flex mt-2"
-                  id="radio-group-option-1"
-                  {...fprops}
-                >
+                <Field className="mt-2 flex" id="radio-group-option-1" {...fprops}>
                   <Radio />
                   <Label className="ml-2">Option 1</Label>
                 </Field>
@@ -189,11 +159,7 @@ export const Form = (): React.ReactNode => {
               validate={composeValidators([{ presence: true }])}
             >
               {(fprops) => (
-                <Field
-                  className="flex mt-2"
-                  id="radio-group-option-2"
-                  {...fprops}
-                >
+                <Field className="mt-2 flex" id="radio-group-option-2" {...fprops}>
                   <Radio />
                   <Label className="ml-2">Option 2</Label>
                 </Field>
@@ -202,21 +168,13 @@ export const Form = (): React.ReactNode => {
           </div>
 
           <div className="mt-5">
-            <FieldRFF
-              name="slider"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="slider" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="form-slider" {...fprops}>
                   <Label ref={sliderLabelRef} className="mb-1 uppercase">
                     Slider
                   </Label>
-                  <Slider
-                    labelRef={sliderLabelRef}
-                    minValue={0}
-                    maxValue={1}
-                    step={0.01}
-                  />
+                  <Slider labelRef={sliderLabelRef} minValue={0} maxValue={1} step={0.01} />
                 </Field>
               )}
             </FieldRFF>

@@ -10,7 +10,8 @@ export interface ScenarioFeaturesIntersectToolbarProps {
 }
 
 export const ScenarioFeaturesIntersect: React.FC<ScenarioFeaturesIntersectToolbarProps> = ({
-  search, onSearch,
+  search,
+  onSearch,
 }: ScenarioFeaturesIntersectToolbarProps) => {
   const onChangeDebounced = useDebouncedCallback((value) => {
     onSearch(value);

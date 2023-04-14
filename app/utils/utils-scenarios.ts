@@ -33,14 +33,13 @@ export const STATUS_VALUES = {
   parameters: {
     solutions: 'empty',
   },
-  solutions: {
-  },
+  solutions: {},
 };
 
 export const mergeScenarioStatusMetaData = (
   obj: MergeMetadataProps = {},
   { tab, subtab },
-  options: MergeOptionsProps = { saveTab: true, saveStatus: true },
+  options: MergeOptionsProps = { saveTab: true, saveStatus: true }
 ) => {
   const { scenarioEditingMetadata = {}, marxanInputParameterFile = {} } = obj;
 
@@ -52,12 +51,15 @@ export const mergeScenarioStatusMetaData = (
       ...scenarioEditingMetadata,
       status: {
         ...scenarioEditingMetadata.status,
-        [tab]: (scenarioEditingMetadata.status[tab] === 'empty' || saveStatus) ? 'draft' : scenarioEditingMetadata.status[tab],
+        [tab]:
+          scenarioEditingMetadata.status[tab] === 'empty' || saveStatus
+            ? 'draft'
+            : scenarioEditingMetadata.status[tab],
         ...(saveStatus && {
           ...Object.keys(STATUS_VALUES[tab]).reduce((acc, v) => {
             return {
               ...acc,
-              [v]: (scenarioEditingMetadata.status[v] !== 'empty') ? 'outdated' : 'empty',
+              [v]: scenarioEditingMetadata.status[v] !== 'empty' ? 'outdated' : 'empty',
             };
           }, {}),
         }),

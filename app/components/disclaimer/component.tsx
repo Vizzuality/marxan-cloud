@@ -20,13 +20,13 @@ export interface DisclaimerProps {
 export const Disclaimer: React.FC<DisclaimerProps> = ({ children, type }: DisclaimerProps) => (
   <div
     className={cx({
-      'rounded-xl w-full bg-gray-500 flex text-sm px-4 py-3 space-x-4 items-center': true,
+      'flex w-full items-center space-x-4 rounded-xl bg-gray-500 px-4 py-3 text-sm': true,
     })}
   >
     <Icon
       icon={WARNING_SVG}
       className={cx({
-        'z-10 w-6 h-6': true,
+        'z-10 h-6 w-6': true,
         [TYPE[type]]: true,
       })}
     />

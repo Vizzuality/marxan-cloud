@@ -6,7 +6,7 @@ export interface TargetSPFItemProps {
   splitted?: boolean;
   splitSelected?: string;
   splitFeaturesSelected?: {
-    id: string
+    id: string;
   }[];
   value?: string;
   defaultTarget?: number;

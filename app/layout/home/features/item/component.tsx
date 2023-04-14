@@ -7,18 +7,22 @@ import { motion } from 'framer-motion';
 import Icon from 'components/icon';
 
 export interface HomeFeaturesItemProps {
-  id: string,
-  name: string,
-  description: string,
-  index: number,
+  id: string;
+  name: string;
+  description: string;
+  index: number;
   icon: {
-    id: string,
-    viewBox: string,
-  }
+    id: string;
+    viewBox: string;
+  };
 }
 
 export const HomeFeaturesItem: React.FC<HomeFeaturesItemProps> = ({
-  id, name, description, icon, index,
+  id,
+  name,
+  description,
+  icon,
+  index,
 }: HomeFeaturesItemProps) => {
   const { ref, inView } = useInView({
     threshold: 0.5,
@@ -35,13 +39,15 @@ export const HomeFeaturesItem: React.FC<HomeFeaturesItemProps> = ({
       }}
       transition={{
         duration: 0.35,
-        delay: ((index % 3) * 0.1),
+        delay: (index % 3) * 0.1,
         ease: 'easeInOut',
       }}
     >
       <div key={`${id}`}>
-        <Icon icon={icon} className="w-16 h-16" />
-        <h2 className="mt-2.5 mb-2.5 md:mt-6 md:mb-10 text-2xl font-medium text-gray-800 font-heading">{name}</h2>
+        <Icon icon={icon} className="h-16 w-16" />
+        <h2 className="mb-2.5 mt-2.5 font-heading text-2xl font-medium text-gray-800 md:mb-10 md:mt-6">
+          {name}
+        </h2>
         <p className="text-gray-400">{description}</p>
       </div>
     </motion.div>

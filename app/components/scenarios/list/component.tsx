@@ -8,10 +8,7 @@ export interface ListProps {
   items: ItemProps[];
 }
 
-export const List: React.FC<ListProps> = ({
-  className,
-  items = [],
-}: ListProps) => (
+export const List: React.FC<ListProps> = ({ className, items = [] }: ListProps) => (
   <div className={className}>
     {items.map((item) => {
       return <Item className="mb-3" key={`${item.id}`} {...item} />;

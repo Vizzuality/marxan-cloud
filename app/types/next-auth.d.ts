@@ -4,16 +4,16 @@ import { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
   interface User {
-    accessToken: string
+    accessToken: string;
   }
 
   interface Session {
-    accessToken: string
+    accessToken: string;
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    accessToken: string
+    accessToken: string;
   }
 }

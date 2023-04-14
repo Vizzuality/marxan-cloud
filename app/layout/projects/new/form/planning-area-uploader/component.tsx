@@ -1,17 +1,20 @@
 import React, { useCallback, useState } from 'react';
 
-import { PLANNING_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
+import cx from 'classnames';
+
 import {
-  setBbox, setUploadingPlanningArea, setUploadingPlanningAreaId, setMaxPuAreaSize, setMinPuAreaSize,
+  setBbox,
+  setUploadingPlanningArea,
+  setUploadingPlanningAreaId,
+  setMaxPuAreaSize,
+  setMinPuAreaSize,
 } from 'store/slices/projects/new';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
-import { bytesToMegabytes } from 'utils/units';
 
 import { useUploadProjectPA } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -22,6 +25,8 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
+import { PLANNING_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -59,41 +64,48 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadProjectPAMutation.mutate({ data }, {
-      onSuccess: ({ data: { data: g, id: PAid } }) => {
-        setLoading(false);
-        setSuccessFile({ id: PAid, name: f.name, geom: g });
+    uploadProjectPAMutation.mutate(
+      { data },
+      {
+        onSuccess: ({ data: { data: g, id: PAid } }) => {
+          setLoading(false);
+          setSuccessFile({ id: PAid, name: f.name, geom: g });
 
-        addToast('success-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Shapefile uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        console.info('Shapefile uploaded', g);
-      },
-      onError: ({ response }) => {
-        const { errors } = response.data;
+          addToast(
+            'success-upload-shapefile',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Shapefile uploaded</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+          console.info('Shapefile uploaded', g);
+        },
+        onError: ({ response }) => {
+          const { errors } = response.data;
 
-        setLoading(false);
-        setSuccessFile(null);
+          setLoading(false);
+          setSuccessFile(null);
 
-        addToast('error-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          addToast(
+            'error-upload-shapefile',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">
+                {errors.map((e) => (
+                  <li key={`${e.status}`}>{e.title}</li>
+                ))}
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -103,11 +115,15 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     // It'll display the max size in bytes which the average user may not understand.
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
-        ? { error, message: `File is larger than ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB` }
+        ? {
+            error,
+            message: `File is larger than ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB`,
+          }
         : error;
     });
 
-    addToast('drop-error', (
+    addToast(
+      'drop-error',
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
@@ -115,10 +131,11 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
-      </>
-    ), {
-      level: 'error',
-    });
+      </>,
+      {
+        level: 'error',
+      }
+    );
   };
 
   const onUploadSubmit = useCallback(() => {
@@ -130,20 +147,17 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     dispatch(setMaxPuAreaSize(successFile.geom.marxanMetadata.maxPuAreaSize));
   }, [dispatch, successFile, input]);
 
-  const onUploadRemove = useCallback((f) => {
-    input.onChange(null);
-    setSuccessFile(null);
-    resetPlanningArea(f);
-    dispatch(setUploadingPlanningArea(null));
-  }, [dispatch, input, resetPlanningArea]);
+  const onUploadRemove = useCallback(
+    (f) => {
+      input.onChange(null);
+      setSuccessFile(null);
+      resetPlanningArea(f);
+      dispatch(setUploadingPlanningArea(null));
+    },
+    [dispatch, input, resetPlanningArea]
+  );
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
     maxSize: PLANNING_AREA_UPLOADER_MAX_SIZE,
     onDropAccepted,
@@ -151,32 +165,28 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
   });
 
   return (
-    <div className="mt-3 mb-5">
+    <div className="mb-5 mt-3">
       {!!uploadingPlanningArea && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          <div className="flex flex-col w-full space-y-6 cursor-pointer">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div className="flex w-full cursor-pointer flex-col space-y-6">
             <div className="flex items-center space-x-2">
-              <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+              <label
+                className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                htmlFor="cancel-shapefile-btn"
+              >
                 <p className="text-sm text-primary-500">{successFile.name}</p>
               </label>
               <button
                 aria-label="remove"
                 id="cancel-shapefile-btn"
                 type="button"
-                className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
+                className="group flex h-5 w-5 items-center justify-center rounded-full border border-white hover:bg-black"
                 onClick={() => {
                   onUploadRemove(form);
                   setOpened(false);
                 }}
               >
-                <Icon
-                  className="w-1.5 h-1.5 text-white group-hover:text-white"
-                  icon={CLOSE_SVG}
-                />
+                <Icon className="h-1.5 w-1.5 text-white group-hover:text-white" icon={CLOSE_SVG} />
               </button>
             </div>
           </div>
@@ -196,21 +206,18 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
               return (
                 <form onSubmit={handleSubmit}>
                   <div className="p-9">
-                    <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+                    <h4 className="mb-5 font-heading text-lg text-black">Upload shapefile</h4>
 
                     {!successFile && (
                       <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
                         {(props) => (
                           <div>
-                            <div className="flex items-center mb-2.5 space-x-3">
+                            <div className="mb-2.5 flex items-center space-x-3">
                               <h5 className="text-xs text-gray-400">Supported formats</h5>
-                              <InfoButton
-                                size="s"
-                                theme="secondary"
-                              >
+                              <InfoButton size="s" theme="secondary">
                                 <span className="text-xs">
                                   {' '}
-                                  <h4 className="font-heading mb-2.5">
+                                  <h4 className="mb-2.5 font-heading">
                                     List of supported file formats:
                                   </h4>
                                   <ul>
@@ -226,33 +233,31 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                               {...props}
                               {...getRootProps()}
                               className={cx({
-                                'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                                  true,
                                 'bg-gray-500': isDragActive,
                                 'border-green-800': isDragAccept,
-                                'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                                'border-red-800':
+                                  isDragReject || (props?.meta?.error && props?.meta?.touched),
                               })}
                             >
-
                               <input {...getInputProps()} />
 
-                              <p className="text-sm text-center text-gray-500">
+                              <p className="text-center text-sm text-gray-500">
                                 Drag and drop your planning region shapefile
                                 <br />
-                                or
-                                {' '}
-                                <b>click here</b>
-                                {' '}
-                                to upload
+                                or <b>click here</b> to upload
                               </p>
 
-                              <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB`}</p>
+                              <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+                                PLANNING_AREA_UPLOADER_MAX_SIZE
+                              )} MB`}</p>
 
                               <Loading
                                 visible={loading}
-                                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+                                className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-white bg-opacity-90"
                                 iconClassName="w-5 h-5 text-primary-500"
                               />
-
                             </div>
                           </div>
                         )}
@@ -265,22 +270,25 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                          <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                        <div className="flex w-full cursor-pointer flex-col space-y-3">
+                          <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                           <div className="flex items-center space-x-2">
-                            <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                            <label
+                              className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                              htmlFor="cancel-shapefile-btn"
+                            >
                               <p className="text-sm text-black">{successFile.name}</p>
                             </label>
                             <button
                               id="cancel-shapefile-btn"
                               type="button"
-                              className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
+                              className="group flex h-5 w-5 items-center justify-center rounded-full border border-black hover:bg-black"
                               onClick={() => {
                                 setSuccessFile(null);
                               }}
                             >
                               <Icon
-                                className="w-1.5 h-1.5 text-black group-hover:text-white"
+                                className="h-1.5 w-1.5 text-black group-hover:text-white"
                                 icon={CLOSE_SVG}
                               />
                             </button>
@@ -289,20 +297,12 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
                       </motion.div>
                     )}
 
-                    <div className="flex justify-center mt-16 space-x-6">
-                      <Button
-                        theme="secondary"
-                        size="xl"
-                        onClick={() => setOpened(false)}
-                      >
+                    <div className="mt-16 flex justify-center space-x-6">
+                      <Button theme="secondary" size="xl" onClick={() => setOpened(false)}>
                         Cancel
                       </Button>
 
-                      <Button
-                        theme="primary"
-                        size="xl"
-                        type="submit"
-                      >
+                      <Button theme="primary" size="xl" type="submit">
                         Save
                       </Button>
                     </div>

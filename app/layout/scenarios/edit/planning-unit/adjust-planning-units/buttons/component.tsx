@@ -29,7 +29,7 @@ export const PlanningUnitButtons: React.FC<PlanningUnitButtonsProps> = ({
   ];
 
   return (
-    <div className="flex flex-col w-full space-y-2">
+    <div className="flex w-full flex-col space-y-2">
       {BUTTONS.map((b) => {
         const { id, Component } = b;
         const active = selected === b.id;

@@ -1,15 +1,12 @@
 import { useMemo } from 'react';
 
-import {
-  useQuery, useInfiniteQuery, useMutation, useQueryClient, useQueries,
-} from 'react-query';
-
-import flatten from 'lodash/flatten';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient, useQueries } from 'react-query';
 
 import { useRouter } from 'next/router';
 
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
+import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
 
 import { useMe } from 'hooks/me';
@@ -63,7 +60,6 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
     headers: {
       Authorization: `Bearer ${session.accessToken}`,
     },
-
   }).then((response) => {
     const data = {
       blmValue,
@@ -81,26 +77,31 @@ function fetchScenarioBLMImage(sId, blmValue, session) {
 export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-status', pId], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pId}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    ...requestConfig,
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pId,
-    placeholderData: {
-      data: {
-        jobs: [],
-        scenarios: [],
+  const query = useQuery(
+    ['scenarios-status', pId],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pId}/scenarios/status`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        ...requestConfig,
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!pId,
+      placeholderData: {
+        data: {
+          jobs: [],
+          scenarios: [],
+        },
       },
-    },
-    refetchInterval: 2500,
-    ...queryConfig,
-  });
+      refetchInterval: 2500,
+      ...queryConfig,
+    }
+  );
 
   const { data } = query;
 
@@ -115,23 +116,28 @@ export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
 export function useScenarioStatus(pId, sId) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-status', pId, sId], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pId}/scenarios/status`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!sId,
-    placeholderData: {
-      data: {
-        scenarios: [],
+  const query = useQuery(
+    ['scenarios-status', pId, sId],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pId}/scenarios/status`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!sId,
+      placeholderData: {
+        data: {
+          scenarios: [],
+        },
       },
-    },
-    refetchInterval: 1000,
-  });
+      refetchInterval: 1000,
+    }
+  );
 
   const { data } = query;
 
@@ -185,19 +191,24 @@ export function useScenariosStatusOnce({
 export function useProjectScenariosLocks(pid) {
   const { data: session } = useSession();
 
-  const query = useQuery(['project-locks', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/editing-locks`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pid,
-    refetchInterval: 2500,
-  });
+  const query = useQuery(
+    ['project-locks', pid],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pid}/editing-locks`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!pid,
+      refetchInterval: 2500,
+    }
+  );
 
   const { data } = query;
 
@@ -211,18 +222,23 @@ export function useProjectScenariosLocks(pid) {
 export function useScenarioLock(sid) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenario-lock', sid], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/editing-locks`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!sid,
-  });
+  const query = useQuery(
+    ['scenario-lock', sid],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${sid}/editing-locks`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!sid,
+    }
+  );
 
   const { data } = query;
 
@@ -235,13 +251,11 @@ export function useScenarioLock(sid) {
 }
 
 export function useScenarioLockMe(sid) {
-  const {
-    data: scenarioLockData,
-  } = useScenarioLock(sid);
+  const { data: scenarioLockData } = useScenarioLock(sid);
   const { user } = useMe();
 
   return useMemo(() => {
-    return (user.id === scenarioLockData?.userId);
+    return user.id === scenarioLockData?.userId;
   }, [user, scenarioLockData]);
 }
 
@@ -317,48 +331,46 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const { data: session } = useSession();
   const { push } = useRouter();
 
-  const {
-    filters = {},
-    search,
-    sort,
-  } = options;
+  const { filters = {}, search, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      // Backend isn't able to deal with this one yet; it'll always return an empty array
-      // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
-      // move forward with useable filters.
-      if (k === 'status') return acc;
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    // Backend isn't able to deal with this one yet; it'll always return an empty array
+    // if we set it. We'll do it manually in the frontend. Not ideal, but allows us to
+    // move forward with useable filters.
+    if (k === 'status') return acc;
 
-      return {
-        ...acc,
-        [`filter[${k}]`]: (filters[k] && filters[k].toString) ? filters[k].toString() : filters[k],
-      };
-    }, {});
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k] && filters[k].toString ? filters[k].toString() : filters[k],
+    };
+  }, {});
 
-  const fetchScenarios = ({ pageParam = 1 }) => SCENARIOS.request({
-    method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      ...parsedFilters,
-      ...(search && {
-        q: search,
-      }),
-      ...(sort && {
-        sort,
-      }),
-    },
-  });
+  const fetchScenarios = ({ pageParam = 1 }) =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: '/',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        'page[number]': pageParam,
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    });
 
   const query = useInfiniteQuery(['scenarios', pId, JSON.stringify(options)], fetchScenarios, {
     retry: false,
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
+      const {
+        data: { meta },
+      } = lastPage;
       const { page, totalPages } = meta;
 
       const nextPage = page + 1 > totalPages ? null : page + 1;
@@ -378,58 +390,63 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   const { pages } = data || {};
 
   return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
+    const parsedData = Array.isArray(pages)
+      ? flatten(
+          pages.map((p) => {
+            const {
+              data: { data: pageData },
+            } = p;
 
-      return pageData.map((d): ItemProps => {
-        const {
-          id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns,
-        } = d;
+            return pageData.map((d): ItemProps => {
+              const { id, projectId, name, lastModifiedAt, status, ranAtLeastOnce, numberOfRuns } =
+                d;
 
-        const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
-        const runStatus = status || jobs.find((job) => job.kind === 'run')?.status || 'created';
+              const jobs = statusScenarios.find((s) => s.id === id)?.jobs || [];
+              const runStatus =
+                status || jobs.find((job) => job.kind === 'run')?.status || 'created';
 
-        let lock = scenariosLocksData.find((sl) => sl.scenarioId === id && sl.userId !== user?.id);
-        if (lock) {
-          const userLock = projectUsersData.find((pu) => pu?.user?.id === lock.userId);
+              let lock = scenariosLocksData.find(
+                (sl) => sl.scenarioId === id && sl.userId !== user?.id
+              );
+              if (lock) {
+                const userLock = projectUsersData.find((pu) => pu?.user?.id === lock.userId);
 
-          lock = {
-            ...lock,
-            ...userLock?.user,
-            roleName: userLock?.roleName,
-          };
-        }
+                lock = {
+                  ...lock,
+                  ...userLock?.user,
+                  roleName: userLock?.roleName,
+                };
+              }
 
-        const lastUpdateDistance = () => {
-          return formatDistanceToNow(
-            new Date(lastModifiedAt),
-            { addSuffix: true },
-          );
-        };
+              const lastUpdateDistance = () => {
+                return formatDistanceToNow(new Date(lastModifiedAt), { addSuffix: true });
+              };
 
-        return {
-          id,
-          name,
-          lastUpdate: lastModifiedAt,
-          lastUpdateDistance: lastUpdateDistance(),
-          warnings: false,
-          runStatus,
-          jobs,
-          lock,
-          ranAtLeastOnce,
-          numberOfRuns,
-          onEdit: () => {
-            push(`/projects/${projectId}/scenarios/${id}/edit`);
-          },
-        };
-      });
-    })) : [];
+              return {
+                id,
+                name,
+                lastUpdate: lastModifiedAt,
+                lastUpdateDistance: lastUpdateDistance(),
+                warnings: false,
+                runStatus,
+                jobs,
+                lock,
+                ranAtLeastOnce,
+                numberOfRuns,
+                onEdit: () => {
+                  push(`/projects/${projectId}/scenarios/${id}/edit`);
+                },
+              };
+            });
+          })
+        )
+      : [];
 
     // Backend can't deal with the `status` filter just yet, so we'll just manually
     // filter it out manually in the frontend. It'll allow us to make the feature work
     // in the frontend for now, albeit in a non-ideal way.
     const filteredData = parsedData.filter((parsedDataItem) => {
-      const statusFiltersArr = (filters?.status as Array<string> || []);
+      const statusFiltersArr = (filters?.status as Array<string>) || [];
       // No filters to apply, return everything
       if (!statusFiltersArr.length) return true;
       return statusFiltersArr.includes(parsedDataItem.runStatus);
@@ -440,24 +457,36 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
       data: filteredData,
     };
   }, [
-    query, pages, filters, push, user?.id, statusScenarios, scenariosLocksData, projectUsersData,
+    query,
+    pages,
+    filters,
+    push,
+    user?.id,
+    statusScenarios,
+    scenariosLocksData,
+    projectUsersData,
   ]);
 }
 
 export function useScenario(id) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenarios', id], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['scenarios', id],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${id}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 
@@ -596,24 +625,29 @@ export function useUploadPA({
 export function useCostSurfaceRange(id) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-cost-surface', id], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${id}/cost-surface`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        return data;
-      }
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['scenarios-cost-surface', id],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${id}/cost-surface`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => {
+          try {
+            return JSON.parse(data);
+          } catch (error) {
+            return data;
+          }
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 
@@ -699,43 +733,44 @@ export function useUploadCostSurface({
 export function useScenarioPU(sid) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenarios-pu', sid], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/planning-units`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => {
-      try {
-        return JSON.parse(data);
-      } catch (error) {
-        return data;
-      }
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!sid,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: false,
-    placeholderData: [],
-  });
+  const query = useQuery(
+    ['scenarios-pu', sid],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${sid}/planning-units`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => {
+          try {
+            return JSON.parse(data);
+          } catch (error) {
+            return data;
+          }
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!sid,
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      placeholderData: [],
+    }
+  );
 
   const { data } = query;
 
   return useMemo(() => {
     const parsedData = data || [];
-    const included = parsedData
-      .filter((p) => p.inclusionStatus === 'locked-in')
-      .map((p) => p.id);
+    const included = parsedData.filter((p) => p.inclusionStatus === 'locked-in').map((p) => p.id);
 
     const includedDefault = parsedData
       .filter((p) => p.defaultStatus === 'locked-in')
       .map((p) => p.id);
 
-    const excluded = parsedData
-      .filter((p) => p.inclusionStatus === 'locked-out')
-      .map((p) => p.id);
+    const excluded = parsedData.filter((p) => p.inclusionStatus === 'locked-out').map((p) => p.id);
 
     const excludedDefault = parsedData
       .filter((p) => p.defaultStatus === 'locked-out')
@@ -883,7 +918,7 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
         queryKey: ['scenario-blm-image', sid, blmValue],
         queryFn: () => fetchScenarioBLMImage(sid, blmValue, session),
       };
-    }),
+    })
   );
 
   const CALIBRATION_IMAGES = useMemo(() => {
@@ -919,16 +954,21 @@ export function useCalibrationBLMImages({ sid, blmValues }) {
 export function useScenarioCalibrationResults(scenarioId) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenario-calibration', scenarioId], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${scenarioId}/calibration`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }), {
-    retry: false,
-  });
+  const query = useQuery(
+    ['scenario-calibration', scenarioId],
+    async () =>
+      SCENARIOS.request({
+        method: 'GET',
+        url: `/${scenarioId}/calibration`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }),
+    {
+      retry: false,
+    }
+  );
 
   const { data } = query;
 
@@ -937,32 +977,37 @@ export function useScenarioCalibrationResults(scenarioId) {
 
   return useMemo(() => {
     const parsedData = Array.isArray(data?.data)
-      ? data?.data.sort((a, b) => (a.blmValue > b.blmValue ? 1 : -1)).map((i) => {
-        return {
-          ...i,
-          pngData: blmImages[i.blmValue],
-        };
-      }) : [];
+      ? data?.data
+          .sort((a, b) => (a.blmValue > b.blmValue ? 1 : -1))
+          .map((i) => {
+            return {
+              ...i,
+              pngData: blmImages[i.blmValue],
+            };
+          })
+      : [];
 
     return {
       ...query,
       data: parsedData,
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, data?.data, blmImages]);
 }
 
 export function useScenarioCalibrationRange(scenarioId) {
   const { data: session } = useSession();
 
-  const query = useQuery(['scenario-calibration-range', scenarioId], async () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${scenarioId}/blm/range`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }));
+  const query = useQuery(['scenario-calibration-range', scenarioId], async () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${scenarioId}/blm/range`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (data) => JSON.parse(data),
+    })
+  );
 
   const { data } = query;
 
@@ -1039,7 +1084,10 @@ export function useDownloadScenarioReport({
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `project_${projectName}-scenario_${scenarioName}-run_${runId}.pdf`);
+      link.setAttribute(
+        'download',
+        `project_${projectName}-scenario_${scenarioName}-run_${runId}.pdf`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();

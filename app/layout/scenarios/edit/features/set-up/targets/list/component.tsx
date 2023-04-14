@@ -1,22 +1,17 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
+
+import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
-import { ScenarioSidebarTabs } from 'utils/tabs';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
-import {
-  useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures,
-} from 'hooks/features';
+import { useSaveSelectedFeatures, useSelectedFeatures, useTargetedFeatures } from 'hooks/features';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
@@ -24,6 +19,8 @@ import Button from 'components/button';
 import ConfirmationPrompt from 'components/confirmation-prompt';
 import Item from 'components/features/target-spf-item';
 import Loading from 'components/loading';
+import { ScenarioSidebarTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 export interface ScenariosFeaturesTargetsProps {
   onBack: () => void;
@@ -42,9 +39,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
   const dispatch = useDispatch();
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const {
-    setSelectedFeatures,
-  } = scenarioSlice.actions;
+  const { setSelectedFeatures } = scenarioSlice.actions;
   const { selectedFeatures } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const editable = useCanEditScenario(pid, sid);
@@ -56,9 +51,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
     },
   });
 
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {});
+  const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
   const {
     data: targetedFeaturesData,
@@ -149,113 +142,121 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
     onChange(features);
   }, []);
 
-  const onSubmit = useCallback((values) => {
-    setSubmitting(true);
-    const { features } = values;
+  const onSubmit = useCallback(
+    (values) => {
+      setSubmitting(true);
+      const { features } = values;
 
-    const data = {
-      status: 'created',
-      features: selectedFeaturesData.map((sf) => {
-        const { featureId, kind, geoprocessingOperations } = sf;
+      const data = {
+        status: 'created',
+        features: selectedFeaturesData.map((sf) => {
+          const { featureId, kind, geoprocessingOperations } = sf;
 
-        if (kind === 'withGeoprocessing') {
+          if (kind === 'withGeoprocessing') {
+            return {
+              featureId,
+              kind,
+              geoprocessingOperations: geoprocessingOperations.map((go) => {
+                const { splits } = go;
+
+                return {
+                  ...go,
+                  splits: splits
+                    .filter((s) => {
+                      return features.find((f) => {
+                        return f.parentId === featureId && f.value === s.value;
+                      });
+                    })
+                    .map((s) => {
+                      const { target, fpf } = features.find((f) => {
+                        return f.parentId === featureId && f.value === s.value;
+                      });
+
+                      return {
+                        ...s,
+                        marxanSettings: {
+                          prop: target / 100 || 0.5,
+                          fpf,
+                        },
+                      };
+                    }),
+                };
+              }),
+            };
+          }
+
+          const { target, fpf = 1 } = features.find((f) => f.featureId === featureId);
           return {
             featureId,
             kind,
-            geoprocessingOperations: geoprocessingOperations.map((go) => {
-              const { splits } = go;
-
-              return {
-                ...go,
-                splits: splits
-                  .filter((s) => {
-                    return features.find((f) => {
-                      return f.parentId === featureId && f.value === s.value;
-                    });
-                  })
-                  .map((s) => {
-                    const { target, fpf } = features.find((f) => {
-                      return f.parentId === featureId && f.value === s.value;
-                    });
-
-                    return {
-                      ...s,
-                      marxanSettings: {
-                        prop: target / 100 || 0.5,
-                        fpf,
-                      },
-                    };
-                  }),
-              };
-            }),
-
+            marxanSettings: {
+              prop: target / 100 || 0.5,
+              fpf,
+            },
           };
-        }
+        }),
+      };
 
-        const { target, fpf = 1 } = features.find((f) => f.featureId === featureId);
-        return {
-          featureId,
-          kind,
-          marxanSettings: {
-            prop: target / 100 || 0.5,
-            fpf,
-          },
-        };
-      }),
-    };
-
-    // // Save current features
-    selectedFeaturesMutation.mutate({
-      id: `${sid}`,
-      data,
-    }, {
-      onSuccess: () => {
-        saveScenarioMutation.mutate({
+      // // Save current features
+      selectedFeaturesMutation.mutate(
+        {
           id: `${sid}`,
-          data: {
-            metadata: mergeScenarioStatusMetaData(metadata, {
-              tab: ScenarioSidebarTabs.FEATURES,
-              subtab: null,
-            }),
-          },
-        }, {
+          data,
+        },
+        {
           onSuccess: () => {
-            setSubmitting(false);
+            saveScenarioMutation.mutate(
+              {
+                id: `${sid}`,
+                data: {
+                  metadata: mergeScenarioStatusMetaData(metadata, {
+                    tab: ScenarioSidebarTabs.FEATURES,
+                    subtab: null,
+                  }),
+                },
+              },
+              {
+                onSuccess: () => {
+                  setSubmitting(false);
+                },
+                onError: () => {
+                  setSubmitting(false);
+                },
+              }
+            );
           },
           onError: () => {
             setSubmitting(false);
           },
-        });
-      },
-      onError: () => {
-        setSubmitting(false);
-      },
-    });
-  }, [
-    sid,
-    metadata,
-    selectedFeaturesData,
-    selectedFeaturesMutation,
-    saveScenarioMutation,
-  ]);
+        }
+      );
+    },
+    [sid, metadata, selectedFeaturesData, selectedFeaturesMutation, saveScenarioMutation]
+  );
 
-  const toggleSeeOnMap = useCallback((id) => {
-    const newSelectedFeatures = [...selectedFeatures];
-    if (!newSelectedFeatures.includes(id)) {
-      newSelectedFeatures.push(id);
-    } else {
-      const i = newSelectedFeatures.indexOf(id);
-      newSelectedFeatures.splice(i, 1);
-    }
-    dispatch(setSelectedFeatures(newSelectedFeatures));
-  }, [dispatch, setSelectedFeatures, selectedFeatures]);
+  const toggleSeeOnMap = useCallback(
+    (id) => {
+      const newSelectedFeatures = [...selectedFeatures];
+      if (!newSelectedFeatures.includes(id)) {
+        newSelectedFeatures.push(id);
+      } else {
+        const i = newSelectedFeatures.indexOf(id);
+        newSelectedFeatures.splice(i, 1);
+      }
+      dispatch(setSelectedFeatures(newSelectedFeatures));
+    },
+    [dispatch, setSelectedFeatures, selectedFeatures]
+  );
 
-  const isShown = useCallback((id) => {
-    if (!selectedFeatures.includes(id)) {
-      return false;
-    }
-    return true;
-  }, [selectedFeatures]);
+  const isShown = useCallback(
+    (id) => {
+      if (!selectedFeatures.includes(id)) {
+        return false;
+      }
+      return true;
+    },
+    [selectedFeatures]
+  );
 
   useEffect(() => {
     return () => {
@@ -269,36 +270,36 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
     return (
       <Loading
         visible
-        className="z-40 flex items-center justify-center w-full h-40 bg-transparent bg-opacity-90"
+        className="z-40 flex h-40 w-full items-center justify-center bg-transparent bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
     );
   }
 
   return (
-    <FormRFF
-      key="features-target"
-      onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
-    >
+    <FormRFF key="features-target" onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
       {({ handleSubmit, values }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="relative flex flex-col flex-grow overflow-hidden">
+        <form
+          onSubmit={handleSubmit}
+          autoComplete="off"
+          className="relative flex flex-grow flex-col overflow-hidden"
+        >
           <Loading
             visible={submitting || targetedFeaturesIsFetching}
-            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
             iconClassName="w-10 h-10 text-white"
           />
 
           {(!targetedFeaturesData || !targetedFeaturesData.length) && (
-            <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
+            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
               No results found
             </div>
           )}
 
           {!!targetedFeaturesData && !!targetedFeaturesData.length && (
-            <div className="relative flex flex-col flex-grow overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
-              <div className="relative h-full px-0.5 overflow-x-visible overflow-y-auto">
+            <div className="relative flex flex-grow flex-col overflow-hidden">
+              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
+              <div className="relative h-full overflow-y-auto overflow-x-visible px-0.5">
                 <FieldRFF name="features">
                   {({ input }) => (
                     <div className="py-6">
@@ -370,19 +371,13 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
                   )}
                 </FieldRFF>
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
+              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
           )}
 
           {!!targetedFeaturesData && !!targetedFeaturesData.length && (
-            <div className="flex justify-center flex-shrink-0 space-x-3">
-              <Button
-                className="w-full"
-                type="button"
-                theme="secondary"
-                size="lg"
-                onClick={onBack}
-              >
+            <div className="flex flex-shrink-0 justify-center space-x-3">
+              <Button className="w-full" type="button" theme="secondary" size="lg" onClick={onBack}>
                 {editable ? 'Set features' : 'Back to features'}
               </Button>
 

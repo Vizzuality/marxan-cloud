@@ -102,7 +102,7 @@ const options = {
 
       // Return previous token if the access token has not expired yet
       const remainingTime = expDate.getTime() - Date.now();
-      const shouldRefresh = (remainingTime < SESSION_BUFFER_TIME * 1000) && remainingTime > 0;
+      const shouldRefresh = remainingTime < SESSION_BUFFER_TIME * 1000 && remainingTime > 0;
 
       // Refresh token
       if (shouldRefresh) return refreshAccessToken(token);

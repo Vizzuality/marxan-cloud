@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 
-import BestCell from 'layout/scenarios/edit/solutions/overview/table/cells/best';
-
 import { Button } from 'components/button/component';
 import Table from 'components/table';
+import BestCell from 'layout/scenarios/edit/solutions/overview/table/cells/best';
 
 import { SolutionsTableProps } from './types';
 
@@ -17,9 +16,9 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
 
   const solutionsBest = body.map((obj) => {
     if (obj.id === bestSolutionId) {
-      return ({ ...obj, best: true });
+      return { ...obj, best: true };
     }
-    return ({ ...obj, best: false });
+    return { ...obj, best: false };
   });
 
   const ViewOnMapCell = (value, row) => {
@@ -29,7 +28,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
       <Button
         theme={isSelected ? 'secondary' : 'secondary-alt'}
         size="s"
-        className="flex justify-center w-full"
+        className="flex w-full justify-center"
         onClick={() => {
           setSelectedRowId(row.id);
           onSelectSolution(row);
@@ -74,13 +73,7 @@ export const SolutionsTable: React.FC<SolutionsTableProps> = ({
     },
   ];
 
-  return (
-    <Table
-      headers={headers}
-      body={solutionsBest}
-      selectedRowId={selectedRowId}
-    />
-  );
+  return <Table headers={headers} body={solutionsBest} selectedRowId={selectedRowId} />;
 };
 
 export default SolutionsTable;

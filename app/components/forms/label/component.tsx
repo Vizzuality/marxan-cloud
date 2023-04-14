@@ -14,12 +14,7 @@ export interface LabelProps {
   className?: string;
 }
 
-const LabelComponent = (
-  {
-    id, theme = 'dark', children, className,
-  }: LabelProps,
-  ref,
-) => {
+const LabelComponent = ({ id, theme = 'dark', children, className }: LabelProps, ref) => {
   return (
     <label
       className={cx({
@@ -34,8 +29,6 @@ const LabelComponent = (
   );
 };
 
-export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
-  LabelComponent,
-);
+export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(LabelComponent);
 
 export default Label;

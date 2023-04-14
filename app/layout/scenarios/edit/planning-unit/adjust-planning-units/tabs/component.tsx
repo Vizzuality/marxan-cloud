@@ -16,7 +16,7 @@ export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
       <button
         type="button"
         className={cx({
-          'text-sm py-2.5 focus:outline-none relative transition': true,
+          'relative py-2.5 text-sm transition focus:outline-none': true,
           'text-gray-400': type !== 'include',
         })}
         onClick={() => onChange('include')}
@@ -24,7 +24,8 @@ export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
         Include areas
         <div
           className={cx({
-            'absolute top-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-primary-500 transition-all': true,
+            'absolute left-1/2 top-0 h-0.5 -translate-x-1/2 transform bg-primary-500 transition-all':
+              true,
             'w-full': type === 'include',
             'w-0': type !== 'include',
           })}
@@ -34,7 +35,7 @@ export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
       <button
         type="button"
         className={cx({
-          'text-sm py-2.5 focus:outline-none relative transition': true,
+          'relative py-2.5 text-sm transition focus:outline-none': true,
           'text-gray-400': type !== 'exclude',
         })}
         onClick={() => onChange('exclude')}
@@ -42,7 +43,8 @@ export const PlanningUnitTabs: React.FC<PlanningUnitTabsProps> = ({
         Exclude areas
         <div
           className={cx({
-            'absolute top-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-primary-500 transition-all': true,
+            'absolute left-1/2 top-0 h-0.5 -translate-x-1/2 transform bg-primary-500 transition-all':
+              true,
             'w-full': type === 'exclude',
             'w-0': type !== 'exclude',
           })}

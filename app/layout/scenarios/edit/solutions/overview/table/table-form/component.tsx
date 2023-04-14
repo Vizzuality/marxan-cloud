@@ -9,7 +9,10 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 import { useScenario } from 'hooks/scenarios';
 import useBottomScrollListener from 'hooks/scroll';
 import {
-  useSolutions, useBestSolution, useMostDifferentSolutions, useDownloadSolutions,
+  useSolutions,
+  useBestSolution,
+  useMostDifferentSolutions,
+  useDownloadSolutions,
 } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
@@ -30,7 +33,8 @@ import SolutionsTable from '..';
 import { SolutionsTableFormProps } from './types';
 
 export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
-  onCancel, setShowTable,
+  onCancel,
+  setShowTable,
 }: SolutionsTableFormProps) => {
   const { addToast } = useToasts();
 
@@ -42,19 +46,15 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   const { setSelectedSolution } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  const { data: scenarioData } = useScenario(sid);
 
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid, {
+  const { data: bestSolutionData } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
   });
 
   const { selectedSolution } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
   const [selectSolution, setSelectSolution] = useState(
-    selectedSolution?.id || bestSolutionData?.id,
+    selectedSolution?.id || bestSolutionData?.id
   );
 
   const {
@@ -74,16 +74,15 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   const allSolutionsFetched = solutionsAreFetched || mostDifSolutionsAreFetched;
 
-  const noSolutionResults = (solutionsAreFetched && !solutionsData.length)
-    || (mostDifSolutionsAreFetched && !mostDifSolutionsData.length);
+  const noSolutionResults =
+    (solutionsAreFetched && !solutionsData.length) ||
+    (mostDifSolutionsAreFetched && !mostDifSolutionsData.length);
 
   const solutionsAreLoading = solutionsAreFetching || mostDifSolutionsAreFetching;
 
-  const scrollRef = useBottomScrollListener(
-    () => {
-      if (hasNextPage) fetchNextPage();
-    },
-  );
+  const scrollRef = useBottomScrollListener(() => {
+    if (hasNextPage) fetchNextPage();
+  });
 
   const downloadSolutionsMutation = useDownloadSolutions({});
 
@@ -93,65 +92,58 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
   }, [dispatch, selectSolution, setSelectedSolution, setShowTable]);
 
   const onDownload = useCallback(() => {
-    downloadSolutionsMutation.mutate({ id: `${sid}` }, {
-      onSuccess: () => {
-
-      },
-      onError: () => {
-        addToast('download-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              Template not downloaded
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+    downloadSolutionsMutation.mutate(
+      { id: `${sid}` },
+      {
+        onSuccess: () => {},
+        onError: () => {
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Template not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [sid, downloadSolutionsMutation, addToast]);
 
   return (
-    <div className="relative flex flex-col flex-grow mt-8 overflow-hidden text-gray-800">
-      <div ref={scrollRef} className="relative flex flex-col flex-grow overflow-hidden overflow-x-hidden overflow-y-auto">
-        <div className="items-center px-8 pb-8 space-y-6 flex-column">
-
+    <div className="relative mt-8 flex flex-grow flex-col overflow-hidden text-gray-800">
+      <div
+        ref={scrollRef}
+        className="relative flex flex-grow flex-col overflow-hidden overflow-y-auto overflow-x-hidden"
+      >
+        <div className="flex-column items-center space-y-6 px-8 pb-8">
           <div className="flex items-center space-x-3">
-            <h2 className="text-2xl font-heading">Solutions Table:</h2>
+            <h2 className="font-heading text-2xl">Solutions Table:</h2>
             <InfoButton theme="secondary">
               <div>
                 <p>
-                  Each solution gives an alternative answer to your planning problem.
-                  The result of each solution reflects whether a planning unit is
-                  selected or not in the conservation network.
+                  Each solution gives an alternative answer to your planning problem. The result of
+                  each solution reflects whether a planning unit is selected or not in the
+                  conservation network.
                 </p>
                 <p>
-                  The table shows a summary of the most informative
-                  variables for each solution including:
+                  The table shows a summary of the most informative variables for each solution
+                  including:
                 </p>
-                <ul className="pl-6 space-y-1 list-disc">
+                <ul className="list-disc space-y-1 pl-6">
                   <li>
-                    <b>Score:</b>
-                    {' '}
-                    the answer to Marxan&apos;s
-                    mathematical objective function. Simply put
-                    it is the sum of the three terms:
-                    1) the sum of the costs of the selected
-                    planning units; 2) the total perimeter
-                    of the selected planning units; and 3)
-                    the total penalty incurred if conservation
-                    targets are not met.
+                    <b>Score:</b> the answer to Marxan&apos;s mathematical objective function.
+                    Simply put it is the sum of the three terms: 1) the sum of the costs of the
+                    selected planning units; 2) the total perimeter of the selected planning units;
+                    and 3) the total penalty incurred if conservation targets are not met.
                   </li>
                   <li>
-                    <b>Cost:</b>
-                    {' '}
-                    the sum of the costs of the selected planning units
+                    <b>Cost:</b> the sum of the costs of the selected planning units
                   </li>
                   <li>
-                    <b>Missing Values:</b>
-                    {' '}
-                    number of features that don&apos;t meet their target
+                    <b>Missing Values:</b> number of features that don&apos;t meet their target
                   </li>
                   <li>
                     <b>Planning Units:</b>
@@ -159,13 +151,12 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                   </li>
                 </ul>
                 <p>
-                  When you click on &apos;View on map&apos; you will
-                  see the distribution of the selected planning units on the map
+                  When you click on &apos;View on map&apos; you will see the distribution of the
+                  selected planning units on the map
                 </p>
                 <p>
                   <i>
-                    The files are equivalent to the
-                    output_xxxx.csv from the generic Marxan outputs.
+                    The files are equivalent to the output_xxxx.csv from the generic Marxan outputs.
                   </i>
                 </p>
               </div>
@@ -175,28 +166,29 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
           {!noSolutionResults && (
             <div className="flex items-center justify-between space-x-8">
               <div className="flex items-center">
-
                 <Checkbox
                   theme="light"
                   id="checkbox-5-dif-solutions"
-                  className="block w-4 h-4 text-green-300 form-checkbox-dark"
+                  className="form-checkbox-dark block h-4 w-4 text-green-300"
                   onChange={(event) => setMostDifSolutions(event.target.checked)}
                 />
-                <Label id="checkbox-5-dif-solutions" className="mx-2 text-sm text-gray-700 cursor-pointer hover:underline">
+                <Label
+                  id="checkbox-5-dif-solutions"
+                  className="mx-2 cursor-pointer text-sm text-gray-700 hover:underline"
+                >
                   View 5 most different solutions
                 </Label>
 
                 <InfoButton theme="secondary">
                   <div>
-                    <h4 className="font-heading text-lg mb-2.5">Five different solutions</h4>
+                    <h4 className="mb-2.5 font-heading text-lg">Five different solutions</h4>
                     <div className="space-y-2">
                       <p className="mb-6">
-                        One of Marxan’s advantages is that it creates a range of good solutions
-                        that can be presented to decision-makers. With this feature you can
-                        automatically call the 5 most different solutions that meet your
-                        objectives. These are identified through a 5 group cluster analysis
-                        and the solution with the lowest score is used as the representative
-                        solution of the group.
+                        One of Marxan’s advantages is that it creates a range of good solutions that
+                        can be presented to decision-makers. With this feature you can automatically
+                        call the 5 most different solutions that meet your objectives. These are
+                        identified through a 5 group cluster analysis and the solution with the
+                        lowest score is used as the representative solution of the group.
                       </p>
                       <img src={FIVE_DIFF_SOLUTIONS_IMG} alt="Five different solutions" />
                     </div>
@@ -212,25 +204,25 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
                 disabled={noSolutionResults}
               >
                 Download solutions
-                <Icon icon={DOWNLOAD_SVG} className="w-5 h-5 ml-8 text-white" />
+                <Icon icon={DOWNLOAD_SVG} className="ml-8 h-5 w-5 text-white" />
               </Button>
             </div>
           )}
         </div>
         <div className="relative">
           {solutionsAreLoading && (
-            <div className="absolute top-0 left-0 z-30 flex flex-col items-center justify-center w-full h-full">
+            <div className="absolute left-0 top-0 z-30 flex h-full w-full flex-col items-center justify-center">
               <Loading
                 visible
-                className="z-40 flex items-center justify-center w-full "
+                className="z-40 flex w-full items-center justify-center "
                 iconClassName="w-10 h-10 text-primary-500"
               />
-              <div className="mt-5 text-xs uppercase font-heading">Loading Solutions</div>
+              <div className="mt-5 font-heading text-xs uppercase">Loading Solutions</div>
             </div>
           )}
 
           {noSolutionResults && (
-            <div className="flex items-center justify-center w-full h-40 text-sm uppercase">
+            <div className="flex h-40 w-full items-center justify-center text-sm uppercase">
               No results found
             </div>
           )}
@@ -243,27 +235,16 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
               onSelectSolution={(solution) => setSelectSolution(solution)}
             />
           )}
-          <LoadingMore
-            visible={isFetchingNextPage}
-          />
+          <LoadingMore visible={isFetchingNextPage} />
         </div>
       </div>
 
       {!noSolutionResults && (
-        <div className="flex items-center justify-center w-full pt-8">
-          <Button
-            theme="secondary"
-            size="lg"
-            onClick={() => onCancel()}
-          >
+        <div className="flex w-full items-center justify-center pt-8">
+          <Button theme="secondary" size="lg" onClick={() => onCancel()}>
             Cancel
           </Button>
-          <Button
-            theme="primary"
-            size="lg"
-            onClick={() => onSave()}
-            className="ml-4"
-          >
+          <Button theme="primary" size="lg" onClick={() => onSave()} className="ml-4">
             Save
           </Button>
         </div>

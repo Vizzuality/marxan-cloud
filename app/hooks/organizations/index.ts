@@ -1,11 +1,8 @@
 import { useMemo, useRef } from 'react';
 
-import {
-  useQuery, useInfiniteQuery, useMutation, useQueryClient,
-} from 'react-query';
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 
 import flatten from 'lodash/flatten';
-
 import { useSession } from 'next-auth/react';
 
 import ORGANIZATIONS from 'services/organizations';
@@ -26,43 +23,41 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
     pageParams: [],
   });
 
-  const {
-    filters = {},
-    search,
-    sort,
-  } = options;
+  const { filters = {}, search, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k],
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k],
+    };
+  }, {});
 
-  const fetchOrganizations = ({ pageParam = 1 }) => ORGANIZATIONS.request({
-    method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      ...parsedFilters,
-      ...(search && {
-        q: search,
-      }),
-      ...(sort && {
-        sort,
-      }),
-    },
-  });
+  const fetchOrganizations = ({ pageParam = 1 }) =>
+    ORGANIZATIONS.request({
+      method: 'GET',
+      url: '/',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        'page[number]': pageParam,
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    });
 
   const query = useInfiniteQuery(['organizations', JSON.stringify(options)], fetchOrganizations, {
     retry: false,
     placeholderData: placeholderDataRef.current,
     getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
+      const {
+        data: { meta },
+      } = lastPage;
       const { page, totalPages } = meta;
 
       const nextPage = page + 1 > totalPages ? null : page + 1;
@@ -78,13 +73,19 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
   }
 
   return useMemo(() => {
-    const parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
+    const parsedData = Array.isArray(pages)
+      ? flatten(
+          pages.map((p) => {
+            const {
+              data: { data: pageData },
+            } = p;
 
-      return pageData.map((d) => {
-        return d;
-      });
-    })) : [];
+            return pageData.map((d) => {
+              return d;
+            });
+          })
+        )
+      : [];
 
     return {
       ...query,
@@ -96,15 +97,20 @@ export function useOrganizations(options: UseOrganizationsOptionsProps = {}) {
 export function useOrganization(id) {
   const { data: session } = useSession();
 
-  const query = useQuery(['organizations', id], async () => ORGANIZATIONS.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['organizations', id],
+    async () =>
+      ORGANIZATIONS.request({
+        method: 'GET',
+        url: `/${id}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 

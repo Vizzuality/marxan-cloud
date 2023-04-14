@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 
-import Tippy from '@tippyjs/react/headless';
 import cx from 'classnames';
+
+import Tippy from '@tippyjs/react/headless';
 import { useSpring, motion } from 'framer-motion';
 import { SpringOptions } from 'popmotion';
 
@@ -63,41 +64,34 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
         return (
           <motion.div
-            {...animation && {
+            {...(animation && {
               style: {
-                scale, opacity,
+                scale,
+                opacity,
               },
-            }}
+            })}
             {...attrs}
           >
             <div className="relative shadow-2xl">
               <div
                 className={cx({
-                  'relative flex flex-grow overflow-hidden flex-column': true,
+                  'flex-column relative flex flex-grow overflow-hidden': true,
                   [contentClassName]: !!contentClassName,
                 })}
                 style={{ maxWidth: maxWidth || 'none', maxHeight: maxHeight || '100vh' }}
               >
                 {interactive && !popup && (
-                  <div className="absolute top-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-b from-white via-white" />
+                  <div className="pointer-events-none absolute left-0 top-0 z-10 h-5 w-full bg-gradient-to-b from-white via-white" />
                 )}
 
-                <div className="overflow-x-hidden overflow-y-auto">
-                  {content}
-                </div>
+                <div className="overflow-y-auto overflow-x-hidden">{content}</div>
 
                 {interactive && !popup && (
-                  <div className="absolute bottom-0 left-0 z-10 w-full h-5 pointer-events-none bg-gradient-to-t from-white via-white" />
+                  <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-5 w-full bg-gradient-to-t from-white via-white" />
                 )}
               </div>
 
-              {arrow && (
-                <Arrow
-                  className={arrowClassName}
-                  data-popper-arrow=""
-                  {...attrs}
-                />
-              )}
+              {arrow && <Arrow className={arrowClassName} data-popper-arrow="" {...attrs} />}
             </div>
           </motion.div>
         );

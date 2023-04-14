@@ -29,7 +29,10 @@ export const bytesToKilobytes = (bytes: number): number => {
 };
 
 export const formatFileName = (str) => {
-  return (` ${str}`).toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => {
-    return `_${chr}`;
-  }).substring(1);
+  return ` ${str}`
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (m, chr) => {
+      return `_${chr}`;
+    })
+    .substring(1);
 };

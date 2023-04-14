@@ -1,21 +1,16 @@
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { PROTECTED_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
-import {
-  getScenarioEditSlice,
-} from 'store/slices/scenarios/edit';
+import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
-import { bytesToMegabytes } from 'utils/units';
 
 import { useCanEditScenario } from 'hooks/permissions';
 import { useUploadPA } from 'hooks/scenarios';
@@ -30,6 +25,8 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
+import { PROTECTED_AREA_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -54,9 +51,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
   const scenarioSlice = getScenarioEditSlice(sid);
 
-  const {
-    setCache,
-  } = scenarioSlice.actions;
+  const { setCache } = scenarioSlice.actions;
 
   const editable = useCanEditScenario(pid, sid);
 
@@ -82,14 +77,16 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
 
     setSuccessFile({ ...successFile, name: f.name });
     saveFileData(data);
-    addToast('success-upload-protected-area', (
+    addToast(
+      'success-upload-protected-area',
       <>
         <h2 className="font-medium">Success!</h2>
         <p className="text-sm">Protected area uploaded</p>
-      </>
-    ), {
-      level: 'success',
-    });
+      </>,
+      {
+        level: 'success',
+      }
+    );
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -99,11 +96,15 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     // It'll display the max size in bytes which the average user may not understand.
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
-        ? { error, message: `File is larger than ${bytesToMegabytes(PROTECTED_AREA_UPLOADER_MAX_SIZE)} MB` }
+        ? {
+            error,
+            message: `File is larger than ${bytesToMegabytes(PROTECTED_AREA_UPLOADER_MAX_SIZE)} MB`,
+          }
         : error;
     });
 
-    addToast('drop-error', (
+    addToast(
+      'drop-error',
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
@@ -111,54 +112,53 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
-      </>
-    ), {
-      level: 'error',
-    });
+      </>,
+      {
+        level: 'error',
+      }
+    );
   };
 
   const onSubmit = useCallback(() => {
     const { name } = formRef.current.getState().values;
 
     fileData.append('name', name);
-    uploadPAMutation.mutate({ id: `${sid}`, data: fileData }, {
+    uploadPAMutation.mutate(
+      { id: `${sid}`, data: fileData },
+      {
+        onSuccess: () => {
+          setLoading(false);
+          setSuccessFile({ ...successFile });
 
-      onSuccess: () => {
-        setLoading(false);
-        setSuccessFile({ ...successFile });
+          dispatch(setCache(Date.now()));
+          setOpened(false);
+        },
+        onError: ({ response }) => {
+          const { errors } = response.data;
 
-        dispatch(setCache(Date.now()));
-        setOpened(false);
-      },
-      onError: ({ response }) => {
-        const { errors } = response.data;
+          setLoading(false);
+          setSuccessFile(null);
 
-        setLoading(false);
-        setSuccessFile(null);
-
-        addToast('error-upload-protected-area', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          addToast(
+            'error-upload-protected-area',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">
+                {errors.map((e) => (
+                  <li key={`${e.status}`}>{e.title}</li>
+                ))}
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [uploadPAMutation, addToast, dispatch, setCache, sid, successFile, fileData]);
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
     maxSize: PROTECTED_AREA_UPLOADER_MAX_SIZE,
     onDropAccepted,
@@ -188,45 +188,41 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
           return (
             <form onSubmit={handleSubmit}>
               <div className="space-y-5 p-9">
-                <div className="flex items-center mb-5 space-x-3">
-                  <h4 className="text-lg text-black font-heading">Upload shapefile</h4>
-                  <InfoButton
-                    size="base"
-                    theme="primary"
-                  >
+                <div className="mb-5 flex items-center space-x-3">
+                  <h4 className="font-heading text-lg text-black">Upload shapefile</h4>
+                  <InfoButton size="base" theme="primary">
                     <span className="text-xs">
                       {' '}
-                      <h4 className="font-heading mb-2.5">
+                      <h4 className="mb-2.5 font-heading">
                         When uploading shapefiles of protected areas, please make sure that:
                       </h4>
-                      <ul className="pl-6 space-y-1 list-disc">
+                      <ul className="list-disc space-y-1 pl-6">
                         <li>
                           this is a single zip file that includes all the components of a single
                           shapefile;
                         </li>
                         <li>
-                          all the components are added to the “root”/top-level of the zip
-                          file itself (that is, not within any folder within the zip file);
+                          all the components are added to the “root”/top-level of the zip file
+                          itself (that is, not within any folder within the zip file);
                         </li>
                         <li>
-                          user-defined shapefile attributes are only considered for shapefiles
-                          of features, while they are ignored for any other kind of shapefile
-                          (planning grid, lock-in/out, etc), so you may consider excluding any
-                          attributes from shapefiles other than for features, in order to keep
-                          the shapefile’s file size as small as possible.
+                          user-defined shapefile attributes are only considered for shapefiles of
+                          features, while they are ignored for any other kind of shapefile (planning
+                          grid, lock-in/out, etc), so you may consider excluding any attributes from
+                          shapefiles other than for features, in order to keep the shapefile’s file
+                          size as small as possible.
                         </li>
                       </ul>
                     </span>
                   </InfoButton>
                 </div>
                 <div>
-                  <FieldRFF
-                    name="name"
-                    validate={composeValidators([{ presence: true }])}
-                  >
+                  <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
                     {(fprops) => (
                       <Field id="form-name" {...fprops}>
-                        <Label theme="light" className="mb-3 uppercase">Name</Label>
+                        <Label theme="light" className="mb-3 uppercase">
+                          Name
+                        </Label>
                         <Input theme="light" />
                       </Field>
                     )}
@@ -241,33 +237,31 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                           {...props}
                           {...getRootProps()}
                           className={cx({
-                            'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                            'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                              true,
                             'bg-gray-500': isDragActive,
                             'border-green-800': isDragAccept,
-                            'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                            'border-red-800':
+                              isDragReject || (props?.meta?.error && props?.meta?.touched),
                           })}
                         >
-
                           <input {...getInputProps()} />
 
-                          <p className="text-sm text-center text-gray-500">
+                          <p className="text-center text-sm text-gray-500">
                             Drag and drop your polygon data file
                             <br />
-                            or
-                            {' '}
-                            <b>click here</b>
-                            {' '}
-                            to upload
+                            or <b>click here</b> to upload
                           </p>
 
-                          <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(PROTECTED_AREA_UPLOADER_MAX_SIZE)} MB`}</p>
+                          <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+                            PROTECTED_AREA_UPLOADER_MAX_SIZE
+                          )} MB`}</p>
 
                           <Loading
                             visible={loading}
-                            className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                            className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-600 bg-opacity-90"
                             iconClassName="w-5 h-5 text-primary-500"
                           />
-
                         </div>
                       </div>
                     )}
@@ -280,16 +274,19 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                      <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                    <div className="flex w-full cursor-pointer flex-col space-y-3">
+                      <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                       <div className="flex items-center space-x-2">
-                        <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                        <label
+                          className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                          htmlFor="cancel-shapefile-btn"
+                        >
                           <p className="text-sm text-black">{successFile.name}</p>
                         </label>
                         <button
                           id="cancel-shapefile-btn"
                           type="button"
-                          className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
+                          className="group flex h-5 w-5 items-center justify-center rounded-full border border-black hover:bg-black"
                           onClick={() => {
                             setSuccessFile(null);
                             saveFileData(null);
@@ -298,7 +295,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                           }}
                         >
                           <Icon
-                            className="w-1.5 h-1.5 text-black group-hover:text-white"
+                            className="h-1.5 w-1.5 text-black group-hover:text-white"
                             icon={CLOSE_SVG}
                           />
                         </button>
@@ -307,17 +304,12 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                   </motion.div>
                 )}
 
-                <div className="flex items-center mb-2.5 space-x-3">
+                <div className="mb-2.5 flex items-center space-x-3">
                   <h5 className="text-xs text-gray-400">Supported formats</h5>
-                  <InfoButton
-                    size="s"
-                    theme="secondary"
-                  >
+                  <InfoButton size="s" theme="secondary">
                     <span className="text-xs">
                       {' '}
-                      <h4 className="font-heading mb-2.5">
-                        List of supported file formats:
-                      </h4>
+                      <h4 className="mb-2.5 font-heading">List of supported file formats:</h4>
                       <ul>
                         Zipped: .shp (zipped shapefiles must include
                         <br />
@@ -327,7 +319,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                   </InfoButton>
                 </div>
 
-                <div className="flex justify-center mt-16 space-x-6">
+                <div className="mt-16 flex justify-center space-x-6">
                   <Button
                     theme="secondary"
                     size="xl"
@@ -339,12 +331,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
                     Cancel
                   </Button>
 
-                  <Button
-                    theme="primary"
-                    size="xl"
-                    type="submit"
-                    disabled={!name}
-                  >
+                  <Button theme="primary" size="xl" type="submit" disabled={!name}>
                     Save
                   </Button>
                 </div>

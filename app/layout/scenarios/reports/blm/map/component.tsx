@@ -10,10 +10,7 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
-import {
-  useBBOX,
-  useScenarioBlmLayer,
-} from 'hooks/map';
+import { useBBOX, useScenarioBlmLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 
 import Map from 'components/map';
@@ -36,9 +33,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
 
   const dispatch = useDispatch();
 
-  const {
-    data = {},
-  } = useProject(pid);
+  const { data = {} } = useProject(pid);
   const { bbox } = data;
 
   const BBOX = useBBOX({
@@ -69,18 +64,21 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
     setViewport(vw);
   }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
   // const handleMapLoad = () => {
   //   dispatch(setMaps({ [id]: true }));
@@ -94,9 +92,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
 
   return (
     <>
-      <div
-        className="relative w-full h-full overflow-hidden"
-      >
+      <div className="relative h-full w-full overflow-hidden">
         <Map
           key={accessToken}
           className="map-report"

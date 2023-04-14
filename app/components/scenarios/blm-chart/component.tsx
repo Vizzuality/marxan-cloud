@@ -1,11 +1,8 @@
-import React, {
-  useRef, useState, useMemo, useEffect, useCallback,
-} from 'react';
+import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 
 import classnames from 'classnames';
-import {
-  scaleLinear, line, curveMonotoneX, area,
-} from 'd3';
+
+import { scaleLinear, line, curveMonotoneX, area } from 'd3';
 
 import {
   VISUALIZATION_PADDING,
@@ -53,45 +50,50 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
 
   const blmDataPoint = useMemo(() => data.find(({ isBlm }) => isBlm), [data]);
 
-  const xDomain = useMemo(() => [
-    Math.min(...data.map((d) => d.cost)),
-    Math.max(...data.map((d) => d.cost)),
-  ], [data]);
+  const xDomain = useMemo(
+    () => [Math.min(...data.map((d) => d.cost)), Math.max(...data.map((d) => d.cost))],
+    [data]
+  );
 
   const xScale = useMemo(
-    () => scaleLinear()
-      .domain(xDomain)
-      .range([Y_AXIS_WIDTH + VISUALIZATION_PADDING, width - VISUALIZATION_PADDING]),
-    [xDomain, width],
+    () =>
+      scaleLinear()
+        .domain(xDomain)
+        .range([Y_AXIS_WIDTH + VISUALIZATION_PADDING, width - VISUALIZATION_PADDING]),
+    [xDomain, width]
   );
 
   const yDomain = useMemo(() => {
     const min = Math.min(...data.map((d) => d.boundaryLength));
     const max = Math.max(...data.map((d) => d.boundaryLength));
-    return [min - (Y_BASELINE_OFFSET * (max - min)), max];
+    return [min - Y_BASELINE_OFFSET * (max - min), max];
   }, [data]);
 
   const yScale = useMemo(
-    () => scaleLinear()
-      .domain(yDomain)
-      .range([height - X_AXIS_HEIGHT - VISUALIZATION_PADDING, VISUALIZATION_PADDING]),
-    [yDomain, height],
+    () =>
+      scaleLinear()
+        .domain(yDomain)
+        .range([height - X_AXIS_HEIGHT - VISUALIZATION_PADDING, VISUALIZATION_PADDING]),
+    [yDomain, height]
   );
 
   const pointsWithVisibleThumbnail = useMemo(() => {
     if (hoveredPointCoords) {
       return [
-        data.find(({ cost, boundaryLength }) => (
-          xScale(cost) === hoveredPointCoords[0] && yScale(boundaryLength) === hoveredPointCoords[1]
-        )),
+        data.find(
+          ({ cost, boundaryLength }) =>
+            xScale(cost) === hoveredPointCoords[0] &&
+            yScale(boundaryLength) === hoveredPointCoords[1]
+        ),
       ];
     }
 
     // By default, the thumbnails that are visible are the ones of the first and last point, as well
     // as the one of the BLM point
-    return data.filter(({ isBlm, thumbnail }, index) => (
-      !!thumbnail && (index === 0 || index === data.length - 1 || isBlm)
-    ));
+    return data.filter(
+      ({ isBlm, thumbnail }, index) =>
+        !!thumbnail && (index === 0 || index === data.length - 1 || isBlm)
+    );
   }, [data, hoveredPointCoords, xScale, yScale]);
 
   const lineGenerator = line<DataRow>()
@@ -115,17 +117,23 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
     }
   }, [containerRef, setDimensions]);
 
-  const onMouseEnterPoint = useCallback((coords: [number, number], thumbnail: string) => {
-    if (thumbnail) {
-      setHoveredPointCoords(coords);
-    }
-  }, [setHoveredPointCoords]);
+  const onMouseEnterPoint = useCallback(
+    (coords: [number, number], thumbnail: string) => {
+      if (thumbnail) {
+        setHoveredPointCoords(coords);
+      }
+    },
+    [setHoveredPointCoords]
+  );
 
-  const onMouseLeavePoint = useCallback((coords: [number, number], thumbnail: string) => {
-    if (thumbnail) {
-      setHoveredPointCoords(null);
-    }
-  }, [setHoveredPointCoords]);
+  const onMouseLeavePoint = useCallback(
+    (coords: [number, number], thumbnail: string) => {
+      if (thumbnail) {
+        setHoveredPointCoords(null);
+      }
+    },
+    [setHoveredPointCoords]
+  );
 
   /**
    * When containerRef changes, we update the dimensions of the SVG
@@ -148,7 +156,7 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
   }, [updateDimensions]);
 
   return (
-    <div ref={containerRef} className="w-full h-full">
+    <div ref={containerRef} className="h-full w-full">
       {containerRef.current && (
         <svg width={width} height={height}>
           <defs>
@@ -170,15 +178,23 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 x={Y_AXIS_WIDTH}
                 y="0"
                 textAnchor="end"
-                className="text-xs text-black transform translate-y-3 opacity-50"
+                className="translate-y-3 transform text-xs text-black opacity-50"
               >
                 More
               </text>
             </g>
-            <g transform={`translate(${0} ${yScale(yDomain[1]) + 0.3 * (yScale(yDomain[0]) - yScale(yDomain[1]))})`}>
-              <text textAnchor="end" className="text-xs text-right text-gray-600 uppercase">
-                <tspan x={Y_AXIS_WIDTH} y="0">Boundary</tspan>
-                <tspan x={Y_AXIS_WIDTH} y="18">length</tspan>
+            <g
+              transform={`translate(${0} ${
+                yScale(yDomain[1]) + 0.3 * (yScale(yDomain[0]) - yScale(yDomain[1]))
+              })`}
+            >
+              <text textAnchor="end" className="text-right text-xs uppercase text-gray-600">
+                <tspan x={Y_AXIS_WIDTH} y="0">
+                  Boundary
+                </tspan>
+                <tspan x={Y_AXIS_WIDTH} y="18">
+                  length
+                </tspan>
               </text>
             </g>
             <g transform={`translate(${0} ${yScale(yDomain[0])})`}>
@@ -195,25 +211,21 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
           {/* X axis */}
           <g>
             <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-              <text x="0" y="0" className="text-xs text-black opacity-50">Less</text>
+              <text x="0" y="0" className="text-xs text-black opacity-50">
+                Less
+              </text>
             </g>
-            <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-              <text
-                x="0"
-                y="0"
-                textAnchor="middle"
-                className="text-xs text-gray-600 uppercase"
-              >
+            <g
+              transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${
+                yScale(yDomain[0]) + X_AXIS_HEIGHT
+              })`}
+            >
+              <text x="0" y="0" textAnchor="middle" className="text-xs uppercase text-gray-600">
                 Cost
               </text>
             </g>
             <g transform={`translate(${xScale(xDomain[1])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-              <text
-                x="0"
-                y="0"
-                textAnchor="end"
-                className="text-xs text-black opacity-50"
-              >
+              <text x="0" y="0" textAnchor="end" className="text-xs text-black opacity-50">
                 More
               </text>
             </g>
@@ -225,14 +237,18 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
             className="fill-current text-primary-500 opacity-20"
           />
           {/* Line */}
-          <path d={lineGenerator(data)} className="text-black stroke-current fill-none" />
+          <path d={lineGenerator(data)} className="fill-none stroke-current text-black" />
           {/* BLM indicator */}
           {blmDataPoint && (
             <g>
               <g transform={`translate(${0} ${yScale(blmDataPoint.boundaryLength)})`}>
-                <text textAnchor="end" className="text-sm text-black transform translate-y-1">
-                  <tspan x={Y_AXIS_WIDTH} y="0">Recommended</tspan>
-                  <tspan x={Y_AXIS_WIDTH} y="21">(BLM)</tspan>
+                <text textAnchor="end" className="translate-y-1 transform text-sm text-black">
+                  <tspan x={Y_AXIS_WIDTH} y="0">
+                    Recommended
+                  </tspan>
+                  <tspan x={Y_AXIS_WIDTH} y="21">
+                    (BLM)
+                  </tspan>
                 </text>
               </g>
               <line
@@ -240,20 +256,18 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                 x2={xScale(blmDataPoint.cost)}
                 y1={yScale(blmDataPoint.boundaryLength)}
                 y2={yScale(blmDataPoint.boundaryLength)}
-                className="text-black stroke-current"
+                className="stroke-current text-black"
               />
             </g>
           )}
           {/* Thumbnails */}
           <g>
-            {pointsWithVisibleThumbnail.map(({
-              cost, boundaryLength, isBlm, thumbnail,
-            }, index) => {
-              const {
-                x,
-                y,
-                linePath,
-              } = getThumbnailPosition([cost, boundaryLength], xScale, yScale);
+            {pointsWithVisibleThumbnail.map(({ cost, boundaryLength, isBlm, thumbnail }, index) => {
+              const { x, y, linePath } = getThumbnailPosition(
+                [cost, boundaryLength],
+                xScale,
+                yScale
+              );
 
               return (
                 // eslint-disable-next-line react/no-array-index-key
@@ -261,55 +275,47 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
                   <path
                     d={linePath}
                     strokeDasharray="3"
-                    className="text-black stroke-current fill-none"
+                    className="fill-none stroke-current text-black"
                   />
 
-                  <foreignObject
-                    x={0}
-                    y={0}
-                    width={THUMBNAIL_SIZE}
-                    height={THUMBNAIL_SIZE}
-                  >
+                  <foreignObject x={0} y={0} width={THUMBNAIL_SIZE} height={THUMBNAIL_SIZE}>
                     <div
                       className={classnames({
-                        'w-full h-full rounded-2xl bg-white bg-contain': true,
-                        'border-gray-800 border-2': !isBlm,
-                        'border-primary-500 border-2': isBlm,
+                        'h-full w-full rounded-2xl bg-white bg-contain': true,
+                        'border-2 border-gray-800': !isBlm,
+                        'border-2 border-primary-500': isBlm,
                       })}
                       style={{ backgroundImage: `url(${thumbnail})` }}
                     />
                   </foreignObject>
-
                 </g>
               );
             })}
           </g>
           {/* Points */}
           <g>
-            {data.map(({
-              cost, boundaryLength, isBlm, thumbnail,
-            }, index) => (
+            {data.map(({ cost, boundaryLength, isBlm, thumbnail }, index) => (
               <foreignObject
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 x={xScale(cost)}
                 y={yScale(boundaryLength)}
-                className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
+                className="h-3 w-3 -translate-x-1.5 -translate-y-1.5 transform"
               >
                 <div
                   className={classnames({
-                    'w-3 h-3 rounded-full border-black': true,
+                    'h-3 w-3 rounded-full border-black': true,
                     'bg-white': !isBlm || !!hoveredPointCoords,
                     'bg-primary-500': isBlm && !hoveredPointCoords,
                     border: !isBlm,
                     'border-2': isBlm,
-                    'cursor-pointer hover:bg-primary-500 hover:border-2': !!thumbnail,
+                    'cursor-pointer hover:border-2 hover:bg-primary-500': !!thumbnail,
                   })}
-                  onMouseEnter={
-                    () => onMouseEnterPoint([xScale(cost), yScale(boundaryLength)], thumbnail)
+                  onMouseEnter={() =>
+                    onMouseEnterPoint([xScale(cost), yScale(boundaryLength)], thumbnail)
                   }
-                  onMouseLeave={
-                    () => onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
+                  onMouseLeave={() =>
+                    onMouseLeavePoint([xScale(cost), yScale(boundaryLength)], thumbnail)
                   }
                   aria-hidden="true"
                 />
@@ -319,7 +325,6 @@ export const BlmChart: React.FC<BlmChartProps> = ({ data }: BlmChartProps) => {
         </svg>
       )}
     </div>
-
   );
 };
 

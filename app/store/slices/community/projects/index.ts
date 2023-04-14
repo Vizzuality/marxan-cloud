@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CommunityProjectsStateProps {
-  search: string
+  search: string;
 }
 
 const initialState = { search: '' } as CommunityProjectsStateProps;

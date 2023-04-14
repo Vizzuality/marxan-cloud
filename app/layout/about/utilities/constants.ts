@@ -9,7 +9,8 @@ export const UTILITIES = [
   },
   {
     order: '03',
-    description: 'Collaborate and manage projects with your teams, stakeholders and decision-makers.',
+    description:
+      'Collaborate and manage projects with your teams, stakeholders and decision-makers.',
   },
   {
     order: '04',

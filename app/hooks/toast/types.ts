@@ -39,8 +39,4 @@ export type Placement =
   | 'top-center'
   | 'top-right';
 
-export type Level =
-  | 'info'
-  | 'success'
-  | 'warning'
-  | 'error';
+export type Level = 'info' | 'success' | 'warning' | 'error';

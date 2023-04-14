@@ -9,16 +9,17 @@ import PUBLISHED_PROJECTS from 'services/published-projects';
 import { mergeDehydratedState } from './utils';
 
 const fetchProject = (session, queryClient, { pid }) => {
-  return queryClient.prefetchQuery(['projects', pid], () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  })
-    .then((response) => {
+  return queryClient.prefetchQuery(['projects', pid], () =>
+    PROJECTS.request({
+      method: 'GET',
+      url: `/${pid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    }).then((response) => {
       return response.data;
-    }));
+    })
+  );
 };
 
 export function withProject(getServerSidePropsFunc?: Function) {
@@ -97,12 +98,14 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
 
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery(['published-projects', pid], () => PUBLISHED_PROJECTS.request({
-      method: 'GET',
-      url: `/${pid}`,
-    }).then((response) => {
-      return response.data;
-    }));
+    await queryClient.prefetchQuery(['published-projects', pid], () =>
+      PUBLISHED_PROJECTS.request({
+        method: 'GET',
+        url: `/${pid}`,
+      }).then((response) => {
+        return response.data;
+      })
+    );
 
     if (getServerSidePropsFunc) {
       const SSPF = (await getServerSidePropsFunc(context)) || {};

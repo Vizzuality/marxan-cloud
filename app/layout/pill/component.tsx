@@ -4,28 +4,26 @@ import cx from 'classnames';
 
 export interface PillProps {
   selected?: boolean;
-  children: ReactNode
+  children: ReactNode;
 }
 
 export const Pill: React.FC<PillProps> = ({ children, selected }: PillProps) => {
   return (
     <div
       className={cx({
-        'bg-gray-700 rounded-4xl': true,
-        'ring-1 ring-gray-500 ring-offset-8 ring-inset ring-offset-gray-700': selected,
-        'flex flex-col flex-grow overflow-hidden': true,
+        'rounded-4xl bg-gray-700': true,
+        'ring-1 ring-inset ring-gray-500 ring-offset-8 ring-offset-gray-700': selected,
+        'flex flex-grow flex-col overflow-hidden': true,
       })}
     >
       <div
         className={cx({
-          'flex flex-col flex-grow px-10 overflow-hidden': true,
+          'flex flex-grow flex-col overflow-hidden px-10': true,
           'py-10': selected,
           'py-3': !selected,
         })}
       >
-        <div className="flex flex-col flex-grow overflow-hidden py-0.5 px-0.5">
-          {children}
-        </div>
+        <div className="flex flex-grow flex-col overflow-hidden px-0.5 py-0.5">{children}</div>
       </div>
     </div>
   );

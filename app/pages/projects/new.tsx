@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 
+import Breadcrumb from 'components/breadcrumb';
 import Header from 'layout/header';
 import Help from 'layout/help/button';
 import DocumentationLink from 'layout/help/documentation';
@@ -13,8 +14,6 @@ import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
 import Wrapper from 'layout/wrapper';
 
-import Breadcrumb from 'components/breadcrumb';
-
 export const getServerSideProps = withProtection(withUser());
 
 const NewProjectsPage: React.FC = () => {
@@ -22,17 +21,16 @@ const NewProjectsPage: React.FC = () => {
 
   return (
     <Protected>
-
       <ProjectTitle title="New" />
 
       <MetaIcons />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
         <DocumentationLink />
         <Help />
 
-        <div className="flex flex-col py-2.5 overflow-hidden flex-grow">
+        <div className="flex flex-grow flex-col overflow-hidden py-2.5">
           <Wrapper>
             <Breadcrumb
               onClick={() => {
@@ -42,7 +40,7 @@ const NewProjectsPage: React.FC = () => {
               All projects
             </Breadcrumb>
 
-            <div className="flex flex-col flex-grow pt-5 overflow-hidden">
+            <div className="flex flex-grow flex-col overflow-hidden pt-5">
               <ProjectNewForm />
             </div>
           </Wrapper>

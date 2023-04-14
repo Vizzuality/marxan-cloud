@@ -5,24 +5,24 @@ export interface UseFeaturesFiltersProps {
 }
 
 export interface UseSaveFeatureProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveFeatureProps {
-  id?: string,
-  data: any
+  id?: string;
+  data: any;
 }
 
 export interface UseDeleteFeatureProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteFeatureProps {
-  id: string
+  id: string;
 }
 
 export interface UseFeaturesOptionsProps {
   search?: string;
   sort?: string;
-  filters?: Record<string, unknown>
+  filters?: Record<string, unknown>;
 }

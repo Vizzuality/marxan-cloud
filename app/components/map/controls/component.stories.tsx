@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
 
-import ZoomControl from 'components/map/controls/zoom';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
+import ZoomControl from 'components/map/controls/zoom';
 
 import Controls, { ControlsProps } from './component';
 
@@ -33,12 +34,7 @@ const Template: Story<ControlsProps> = (args) => {
 
         <FitBoundsControl
           bounds={{
-            bbox: [
-              10.5194091796875,
-              43.6499881760459,
-              10.9588623046875,
-              44.01257086123085,
-            ],
+            bbox: [10.5194091796875, 43.6499881760459, 10.9588623046875, 44.01257086123085],
             options: {
               padding: 50,
             },

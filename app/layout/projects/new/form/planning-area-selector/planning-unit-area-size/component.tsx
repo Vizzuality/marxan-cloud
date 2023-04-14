@@ -13,10 +13,7 @@ import { PlanningUnitAreaSizeProps } from './types';
 export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
   input,
 }: PlanningUnitAreaSizeProps) => {
-  const {
-    minPuAreaSize,
-    maxPuAreaSize,
-  } = useSelector((state) => state['/projects/new']);
+  const { minPuAreaSize, maxPuAreaSize } = useSelector((state) => state['/projects/new']);
 
   useEffect(() => {
     if (minPuAreaSize) {
@@ -37,34 +34,27 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
     <div>
       <div className="space-y-3">
         <div className="flex items-center">
-          <Label theme="dark" className="mr-2 uppercase text-xxs">Planning unit area size</Label>
+          <Label theme="dark" className="mr-2 text-xxs uppercase">
+            Planning unit area size
+          </Label>
           <InfoButton>
             <span>
-              <h4 className="font-heading text-lg mb-2.5">Planning unit size</h4>
+              <h4 className="mb-2.5 font-heading text-lg">Planning unit size</h4>
               <div className="space-y-2">
                 <p>
-                  Select a size that is relevant to your planning area
-                  and to the resolution of the features you are considering
-                  in the study.
+                  Select a size that is relevant to your planning area and to the resolution of the
+                  features you are considering in the study.
                 </p>
                 <p>
-                  For example, small areas with detailed species
-                  or ecosystems information typically have small planning
-                  unit sizes (below 1km
-                  <sup>2</sup>
-                  ) while whole country studies with
-                  broader species information generally have larger planning
-                  unit sizes of 5 km
-                  <sup>2</sup>
-                  {' '}
-                  or 10 km
-                  <sup>2</sup>
-                  .
+                  For example, small areas with detailed species or ecosystems information typically
+                  have small planning unit sizes (below 1km
+                  <sup>2</sup>) while whole country studies with broader species information
+                  generally have larger planning unit sizes of 5 km
+                  <sup>2</sup> or 10 km
+                  <sup>2</sup>.
                 </p>
                 <p>
-                  The platform
-                  provides a recommended planning unit area size based on
-                  extent of the
+                  The platform provides a recommended planning unit area size based on extent of the
                   planning area selected
                 </p>
               </div>
@@ -87,7 +77,9 @@ export const PlanningUnitAreaSize: React.FC<PlanningUnitAreaSizeProps> = ({
       </div>
 
       {minPuAreaSize && maxPuAreaSize && (
-        <p className="mt-2 text-xs opacity-50">{`Going below ${format(minPuAreaSize)} km2 could cause performance issues`}</p>
+        <p className="mt-2 text-xs opacity-50">{`Going below ${format(
+          minPuAreaSize
+        )} km2 could cause performance issues`}</p>
       )}
     </div>
   );

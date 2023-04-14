@@ -7,7 +7,6 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { formatFileName } from 'utils/units';
 
 // import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
@@ -16,12 +15,13 @@ import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
 // import SolutionFrequency from 'layout/solutions/frequency';
-import SolutionSelected from 'layout/solutions/selected';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
+import SolutionSelected from 'layout/solutions/selected';
+import { formatFileName } from 'utils/units';
 
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
@@ -38,15 +38,15 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setLayerSettings } = scenarioSlice.actions;
 
-  const { selectedSolution, layerSettings } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
+  const { selectedSolution, layerSettings } = useSelector(
+    (state) => state[`/scenarios/${sid}/edit`]
+  );
 
   const dispatch = useDispatch();
 
   const { data: projectData } = useProject(pid);
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  const { data: scenarioData } = useScenario(sid);
 
   const {
     data: selectedSolutionData,
@@ -70,69 +70,76 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
 
   const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
-  const isBestSolution = (selectedSolution
-    && bestSolutionData
-    && selectedSolution?.id === bestSolutionData?.id) || !selectedSolution?.id;
+  const isBestSolution =
+    (selectedSolution && bestSolutionData && selectedSolution?.id === bestSolutionData?.id) ||
+    !selectedSolution?.id;
 
-  const solutionIsLoading = (
-    bestSolutionisFetching && !bestSolutionisFetched)
-    || (selectedSolutionisFetching && !selectedSolutionisFetched
-    );
+  const solutionIsLoading =
+    (bestSolutionisFetching && !bestSolutionisFetched) ||
+    (selectedSolutionisFetching && !selectedSolutionisFetched);
 
   // const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
 
   const onDownloadReport = useCallback(() => {
     setPDFLoader(true);
-    addToast(`info-generating-report-${sid}`, (
+    addToast(
+      `info-generating-report-${sid}`,
       <>
         <h2 className="font-medium">Info</h2>
-        <p className="text-sm">
-          {`Generating "${scenarioData.name}" PDF report`}
-        </p>
-      </>
-    ), {
-      level: 'info',
-    });
+        <p className="text-sm">{`Generating "${scenarioData.name}" PDF report`}</p>
+      </>,
+      {
+        level: 'info',
+      }
+    );
 
-    downloadScenarioReportMutation.mutate({ sid: `${sid}`, solutionId: SOLUTION_DATA?.id }, {
-      onSuccess: () => {
-        setPDFLoader(false);
+    downloadScenarioReportMutation.mutate(
+      { sid: `${sid}`, solutionId: SOLUTION_DATA?.id },
+      {
+        onSuccess: () => {
+          setPDFLoader(false);
 
-        addToast(`success-generating-report-${sid}`, (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">
-              {`"${scenarioData.name}" PDF report generated`}
-            </p>
-          </>
-        ), {
-          level: 'success',
-        });
-      },
-      onError: () => {
-        setPDFLoader(false);
+          addToast(
+            `success-generating-report-${sid}`,
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">{`"${scenarioData.name}" PDF report generated`}</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        },
+        onError: () => {
+          setPDFLoader(false);
 
-        addToast(`error-generating-report-${sid}`, (
-          <>
-            <h2 className="font-medium">Error</h2>
-            <p className="text-sm">
-              {`"${scenarioData.name}" PDF report not generated`}
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          addToast(
+            `error-generating-report-${sid}`,
+            <>
+              <h2 className="font-medium">Error</h2>
+              <p className="text-sm">{`"${scenarioData.name}" PDF report not generated`}</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [sid, scenarioData.name, downloadScenarioReportMutation, SOLUTION_DATA, addToast]);
 
-  const onChangeVisibility = useCallback((lid) => {
-    const { visibility = true } = layerSettings[lid] || {};
-    dispatch(setLayerSettings({
-      id: lid,
-      settings: { visibility: !visibility },
-    }));
-  }, [dispatch, setLayerSettings, layerSettings]);
+  const onChangeVisibility = useCallback(
+    (lid) => {
+      const { visibility = true } = layerSettings[lid] || {};
+      dispatch(
+        setLayerSettings({
+          id: lid,
+          settings: { visibility: !visibility },
+        })
+      );
+    },
+    [dispatch, setLayerSettings, layerSettings]
+  );
 
   return (
     <motion.div
@@ -144,21 +151,20 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     >
       <div className="w-full">
         <div className="px-0.5">
-          <div className="relative flex flex-col w-full mt-1 text-sm">
+          <div className="relative mt-1 flex w-full flex-col text-sm">
             <Loading
               visible={solutionIsLoading}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+              className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
               iconClassName="w-10 h-10 text-primary-500"
             />
 
             <p className="py-4 opacity-50">
-              Each solution gives you an alternative answer to your planning
-              problem showing which planning units have been selected in the
-              proposed conservation network, the overall cost,
-              and whether targets have been met.
+              Each solution gives you an alternative answer to your planning problem showing which
+              planning units have been selected in the proposed conservation network, the overall
+              cost, and whether targets have been met.
             </p>
 
-            <div className="w-full py-6 border-t border-gray-600">
+            <div className="w-full border-t border-gray-600 py-6">
               <SolutionSelected
                 best={isBestSolution}
                 values={selectedSolutionData || bestSolutionData}
@@ -170,26 +176,25 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             <Button
               theme="primary"
               size="base"
-              className="flex h-12 mb-4"
+              className="mb-4 flex h-12"
               onClick={() => setShowTable(true)}
             >
               View solutions table
-              <Icon icon={TABLE_SVG} className="absolute w-4 h-4 right-8" />
+              <Icon icon={TABLE_SVG} className="absolute right-8 h-4 w-4" />
             </Button>
 
             <Button
               theme="primary-alt"
               size="base"
-              className="flex h-12 mb-4 overflow-hidden"
+              className="mb-4 flex h-12 overflow-hidden"
               disabled={PDFLoader}
               onClick={onDownloadReport}
             >
               <Loading
                 visible={PDFLoader}
-                className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-90"
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
                 iconClassName="w-10 h-10 text-primary-500"
               />
-
               Download report
             </Button>
 

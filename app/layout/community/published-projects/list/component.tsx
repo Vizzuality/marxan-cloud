@@ -8,27 +8,22 @@ import { useDebouncedCallback } from 'use-debounce';
 
 import { usePublishedProjects } from 'hooks/published-projects';
 
-import Wrapper from 'layout/wrapper';
-
 import Loading from 'components/loading';
 import Search from 'components/search';
+import Wrapper from 'layout/wrapper';
 
 import CommunityProjectsTable from './table';
 
-export interface CommunityProjectsListProps {
-
-}
+export interface CommunityProjectsListProps {}
 
 export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () => {
   const { search } = useSelector((state) => state['/community/projects']);
   const dispatch = useDispatch();
 
-  const {
-    data: publishedProjectsData,
-    isFetching: publishedProjectsIsFetching,
-  } = usePublishedProjects({
-    search,
-  });
+  const { data: publishedProjectsData, isFetching: publishedProjectsIsFetching } =
+    usePublishedProjects({
+      search,
+    });
 
   const onChangeSearchDebounced = useDebouncedCallback((value) => {
     dispatch(setSearch(value));
@@ -41,9 +36,9 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
   }, [dispatch]);
 
   return (
-    <div className="pt-12 text-black bg-white">
+    <div className="bg-white pt-12 text-black">
       <Wrapper>
-        <div className="w-full max-w-5xl pb-20 mx-auto">
+        <div className="mx-auto w-full max-w-5xl pb-20">
           <Search
             id="project-search"
             defaultValue={search}
@@ -54,17 +49,15 @@ export const CommunityProjectsList: React.FC<CommunityProjectsListProps> = () =>
             theme="light"
           />
 
-          <h3 className="pt-10 text-2xl font-heading">
-            Projects published (
-            {publishedProjectsData.length}
-            )
+          <h3 className="pt-10 font-heading text-2xl">
+            Projects published ({publishedProjectsData.length})
           </h3>
 
           <div className="relative" style={{ minHeight: 250 }}>
             {publishedProjectsIsFetching && (
-              <div className="absolute flex items-center justify-center w-full h-full py-12">
+              <div className="absolute flex h-full w-full items-center justify-center py-12">
                 <Loading
-                  className="flex items-center justify-center w-full h-full text-white"
+                  className="flex h-full w-full items-center justify-center text-white"
                   iconClassName="w-10 h-10"
                   visible
                 />

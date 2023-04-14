@@ -23,10 +23,10 @@ const NewScenarioPage: React.FC = () => {
 
       <MetaIcons />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
 
-        <div className="py-2.5 overflow-hidden md:flex-grow">
+        <div className="overflow-hidden py-2.5 md:flex-grow">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosSidebar>

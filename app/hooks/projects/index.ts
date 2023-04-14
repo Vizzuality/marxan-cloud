@@ -1,16 +1,13 @@
 import { useMemo } from 'react';
 
-import {
-  useInfiniteQuery, useMutation, useQuery, useQueryClient,
-} from 'react-query';
-
-import flatten from 'lodash/flatten';
-import orderBy from 'lodash/orderBy';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
+import flatten from 'lodash/flatten';
+import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
@@ -59,44 +56,42 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   const { push } = useRouter();
   const { data: session } = useSession();
 
-  const {
-    filters = {},
-    search,
-    sort = '-lastModifiedAt',
-  } = options;
+  const { filters = {}, search, sort = '-lastModifiedAt' } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k].toString(),
+    };
+  }, {});
 
-  const fetchProjects = ({ pageParam = 1 }) => PROJECTS.request({
-    method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      include: 'scenarios,users',
-      ...parsedFilters,
-      ...(search && {
-        q: search,
-      }),
-      ...(sort && {
-        sort,
-      }),
-    },
-  });
+  const fetchProjects = ({ pageParam = 1 }) =>
+    PROJECTS.request({
+      method: 'GET',
+      url: '/',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        'page[number]': pageParam,
+        include: 'scenarios,users',
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    });
 
   const query = useInfiniteQuery(['projects', JSON.stringify(options)], fetchProjects, {
     retry: false,
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
+      const {
+        data: { meta },
+      } = lastPage;
       const { page, totalPages } = meta;
 
       const nextPage = page + 1 > totalPages ? null : page + 1;
@@ -108,61 +103,65 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   const { pages } = data || {};
 
   return useMemo(() => {
-    let parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
+    let parsedData = Array.isArray(pages)
+      ? flatten(
+          pages.map((p) => {
+            const {
+              data: { data: pageData },
+            } = p;
 
-      return pageData.map((d): ItemProps => {
-        const {
-          id,
-          name,
-          description,
-          lastModifiedAt,
-          scenarios,
-          planningAreaName,
-          isPublic,
-          publicMetadata,
-        } = d;
+            return pageData.map((d): ItemProps => {
+              const {
+                id,
+                name,
+                description,
+                lastModifiedAt,
+                scenarios,
+                planningAreaName,
+                isPublic,
+                publicMetadata,
+              } = d;
 
-        const lastUpdate = scenarios.reduce((acc, s) => {
-          const { lastModifiedAt: slastModifiedAt } = s;
+              const lastUpdate = scenarios.reduce((acc, s) => {
+                const { lastModifiedAt: slastModifiedAt } = s;
 
-          return (slastModifiedAt > acc) ? slastModifiedAt : acc;
-        }, lastModifiedAt);
+                return slastModifiedAt > acc ? slastModifiedAt : acc;
+              }, lastModifiedAt);
 
-        const lastUpdateDistance = () => {
-          return formatDistance(
-            new Date(lastUpdate || null),
-            new Date(),
-            { addSuffix: true },
-          );
-        };
+              const lastUpdateDistance = () => {
+                return formatDistance(new Date(lastUpdate || null), new Date(), {
+                  addSuffix: true,
+                });
+              };
 
-        return {
-          id,
-          area: planningAreaName || 'Custom area name',
-          name,
-          description,
-          lastUpdate,
-          lastUpdateDistance: lastUpdateDistance(),
-          contributors: [],
-          isPublic,
-          scenarios,
-          underModeration: publicMetadata?.underModeration,
-          onClick: () => {
-            push(`/projects/${id}`);
-          },
-          onDownload: (e) => {
-            console.info('onDownload', e);
-          },
-          onDuplicate: (e) => {
-            console.info('onDuplicate', e);
-          },
-          onDelete: (e) => {
-            console.info('onDelete', e);
-          },
-        };
-      });
-    })) : [];
+              return {
+                id,
+                area: planningAreaName || 'Custom area name',
+                name,
+                description,
+                lastUpdate,
+                lastUpdateDistance: lastUpdateDistance(),
+                contributors: [],
+                isPublic,
+                scenarios,
+                underModeration: publicMetadata?.underModeration,
+                onClick: () => {
+                  push(`/projects/${id}`);
+                },
+                onDownload: (e) => {
+                  console.info('onDownload', e);
+                },
+                onDuplicate: (e) => {
+                  console.info('onDuplicate', e);
+                },
+                onDelete: (e) => {
+                  console.info('onDelete', e);
+                },
+              };
+            });
+          })
+        )
+      : [];
 
     // Sort
     parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
@@ -177,20 +176,25 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
 export function useProject(id) {
   const { data: session } = useSession();
 
-  const query = useQuery(['projects', id], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      include: 'scenarios,users',
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['projects', id],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${id}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        params: {
+          include: 'scenarios,users',
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 
@@ -465,18 +469,23 @@ export function useUnPublishProject({
 export function useExports(pid) {
   const { data: session } = useSession();
 
-  const query = useQuery(['projects-exports', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/latest-exports`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pid,
-  });
+  const query = useQuery(
+    ['projects-exports', pid],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pid}/latest-exports`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!pid,
+    }
+  );
 
   const { data } = query;
 
@@ -491,18 +500,23 @@ export function useExports(pid) {
 export function useExport(id) {
   const { data: session } = useSession();
 
-  const query = useQuery(['projects-export-id', id], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${id}/export`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['projects-export-id', id],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${id}/export`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 

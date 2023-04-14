@@ -1,6 +1,4 @@
-import React, {
-  ReactNode, MutableRefObject, useCallback, useMemo,
-} from 'react';
+import React, { ReactNode, MutableRefObject, useCallback, useMemo } from 'react';
 
 import { useInView } from 'react-intersection-observer';
 
@@ -23,19 +21,21 @@ export interface ItemProps {
 
   // SPLIT
   splitSelected?: string;
-  splitOptions?: { key: string; values: any[]; }[];
+  splitOptions?: { key: string; values: any[] }[];
   onSplitSelected?: (selected: string) => void;
   splitFeaturesSelected?: {
     id: string;
     fpf?: number;
     target?: number;
   }[];
-  splitFeaturesOptions?: ReactNode & { label?: string, value?: string }[];
-  onSplitFeaturesSelected?: (selected: {
-    id: string;
-    fpf?: number;
-    target?: number;
-  }[]) => void;
+  splitFeaturesOptions?: ReactNode & { label?: string; value?: string }[];
+  onSplitFeaturesSelected?: (
+    selected: {
+      id: string;
+      fpf?: number;
+      target?: number;
+    }[]
+  ) => void;
 
   // INTERSECT
   intersectFeaturesSelected?: {
@@ -77,14 +77,14 @@ export const Item: React.FC<ItemProps> = ({
     (e) => {
       if (onSelected) onSelected(e.target.checked);
     },
-    [onSelected],
+    [onSelected]
   );
 
   const onSplitChanged = useCallback(
     (s) => {
       if (onSplitSelected) onSplitSelected(s);
     },
-    [onSplitSelected],
+    [onSplitSelected]
   );
 
   const onSplitFeaturesChanged = useCallback(
@@ -102,7 +102,7 @@ export const Item: React.FC<ItemProps> = ({
 
       if (onSplitFeaturesSelected) onSplitFeaturesSelected(newSplitFeaturesSelected);
     },
-    [splitFeaturesSelected, onSplitFeaturesSelected],
+    [splitFeaturesSelected, onSplitFeaturesSelected]
   );
 
   const OPTIONS = useMemo(() => {
@@ -121,7 +121,7 @@ export const Item: React.FC<ItemProps> = ({
     >
       <header
         className={cx({
-          'px-4 pt-2 pb-4': true,
+          'px-4 pb-4 pt-2': true,
         })}
       >
         <div className="flex space-x-3">
@@ -130,26 +130,22 @@ export const Item: React.FC<ItemProps> = ({
             id={`checkbox-${id}`}
             value={`${id}`}
             checked={selected}
-            className="block w-4 h-4 mt-1.5 text-green-300 form-checkbox-dark"
+            className="form-checkbox-dark mt-1.5 block h-4 w-4 text-green-300"
             onChange={onSelectedChanged}
           />
-          <h2 className="mt-1 text-sm font-heading">{name}</h2>
+          <h2 className="mt-1 font-heading text-sm">{name}</h2>
         </div>
 
         {selected && (
           <div>
-            <div className="flex items-center mt-3 tracking-wide font-heading">
-              <Icon icon={SPLIT_SVG} className="w-5 h-5 text-green-300" />
-              <h4 className="ml-2 text-xs text-gray-500 uppercase">
-                You can
-                {' '}
-                <strong>split</strong>
-                {' '}
-                this feature into categories
+            <div className="mt-3 flex items-center font-heading tracking-wide">
+              <Icon icon={SPLIT_SVG} className="h-5 w-5 text-green-300" />
+              <h4 className="ml-2 text-xs uppercase text-gray-500">
+                You can <strong>split</strong> this feature into categories
               </h4>
             </div>
 
-            <div className="inline-block mt-2">
+            <div className="mt-2 inline-block">
               <Select
                 theme="light"
                 size="s"
@@ -168,31 +164,26 @@ export const Item: React.FC<ItemProps> = ({
       {splitSelected && selected && (
         <ul className="pl-3">
           {splitFeaturesOptions.map((f) => {
-            const checked = !splitFeaturesSelected.length
-              || splitFeaturesSelected.map((s) => s.id).includes(`${f.value}`);
+            const checked =
+              !splitFeaturesSelected.length ||
+              splitFeaturesSelected.map((s) => s.id).includes(`${f.value}`);
 
             return (
-              <li
-                key={`${f.value}`}
-                className="flex items-center pr-2.5 py-2 mt-0.5 relative"
-              >
-                <div className="absolute top-0 left-0 block w-px h-full bg-green-300" />
-                <div className="relative flex text-xs font-heading">
+              <li key={`${f.value}`} className="relative mt-0.5 flex items-center py-2 pr-2.5">
+                <div className="absolute left-0 top-0 block h-full w-px bg-green-300" />
+                <div className="relative flex font-heading text-xs">
                   <div className="ml-2.5">
                     <Checkbox
                       theme="light"
                       id={`checkbox-${f.value}`}
                       value={`${f.value}`}
                       checked={checked}
-                      className="block w-4 h-4 text-green-300 form-checkbox-dark"
+                      className="form-checkbox-dark block h-4 w-4 text-green-300"
                       onChange={onSplitFeaturesChanged}
                     />
                   </div>
 
-                  <label
-                    htmlFor={`checkbox-${f.value}`}
-                    className="inline-block max-w-sm ml-2.5"
-                  >
+                  <label htmlFor={`checkbox-${f.value}`} className="ml-2.5 inline-block max-w-sm">
                     {f.label}
                   </label>
                 </div>

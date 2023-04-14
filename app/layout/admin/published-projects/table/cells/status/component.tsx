@@ -5,14 +5,11 @@ import { useSaveAdminPublishedProject } from 'hooks/admin';
 import Select from 'components/forms/select';
 
 export interface CellStatusProps {
-  value: string,
-  row: any,
+  value: string;
+  row: any;
 }
 
-export const CellStatus: React.FC<CellStatusProps> = ({
-  value,
-  row,
-}: CellStatusProps) => {
+export const CellStatus: React.FC<CellStatusProps> = ({ value, row }: CellStatusProps) => {
   const adminPublishedProjectMutation = useSaveAdminPublishedProject({});
 
   if (!value) return null;

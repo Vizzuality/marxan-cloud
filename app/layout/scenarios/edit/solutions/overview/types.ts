@@ -1,3 +1,1 @@
-export interface ScenariosSolutionsOverviewProps {
-
-}
+export interface ScenariosSolutionsOverviewProps {}

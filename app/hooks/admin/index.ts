@@ -1,9 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  useMutation,
-  useQuery, useQueryClient,
-} from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { useSession } from 'next-auth/react';
 
@@ -31,24 +28,18 @@ import {
  * USERS
  *
  *
-*/
+ */
 export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
   const { data: session } = useSession();
 
-  const {
-    page,
-    search,
-    filters = {},
-    sort,
-  } = options;
+  const { page, search, filters = {}, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k].toString(),
+    };
+  }, {});
 
   const parsedSort = useMemo(() => {
     if (!sort) {
@@ -59,23 +50,24 @@ export function useAdminUsers(options: UseAdminUsersProps = { page: 1 }) {
     return `${direction}${sort.id}`;
   }, [sort]);
 
-  const fetchUsers = () => ADMIN.request({
-    method: 'GET',
-    url: '/users',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': page,
-      ...parsedFilters,
-      ...(search && {
-        q: search,
-      }),
-      ...(parsedSort && {
-        sort: parsedSort,
-      }),
-    },
-  }).then((response) => response.data);
+  const fetchUsers = () =>
+    ADMIN.request({
+      method: 'GET',
+      url: '/users',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        'page[number]': page,
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(parsedSort && {
+          sort: parsedSort,
+        }),
+      },
+    }).then((response) => response.data);
 
   const query = useQuery(['admin-users', JSON.stringify(options), page], fetchUsers, {
     retry: false,
@@ -227,24 +219,18 @@ export function useDeleteBlockUser({
  * PUBLISHED PROJECTS
  *
  *
-*/
+ */
 export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProps = { page: 1 }) {
   const { data: session } = useSession();
 
-  const {
-    page,
-    search,
-    filters = {},
-    sort,
-  } = options;
+  const { page, search, filters = {}, sort } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k].toString(),
+    };
+  }, {});
 
   const parsedSort = useMemo(() => {
     if (!sort) {
@@ -255,23 +241,24 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
     return `${direction}${sort.id}`;
   }, [sort]);
 
-  const fetchPublishedProjects = () => ADMIN.request({
-    method: 'GET',
-    url: '/projects/published-projects/by-admin',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': page,
-      ...parsedFilters,
-      ...(search && {
-        q: search,
-      }),
-      ...(parsedSort && {
-        sort: parsedSort,
-      }),
-    },
-  }).then((response) => response.data);
+  const fetchPublishedProjects = () =>
+    ADMIN.request({
+      method: 'GET',
+      url: '/projects/published-projects/by-admin',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        'page[number]': page,
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(parsedSort && {
+          sort: parsedSort,
+        }),
+      },
+    }).then((response) => response.data);
 
   // TEST
   // const fetchPublishedProjects = () => TEST.request({
@@ -290,16 +277,20 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
   //   },
   // }).then((response) => response.data);
 
-  const query = useQuery(['admin-published-projects', JSON.stringify(options), page], fetchPublishedProjects, {
-    retry: false,
-    keepPreviousData: true,
-    placeholderData: {
-      data: [],
-      meta: {} as any,
-    },
-    // TEST
-    // placeholderData: [],
-  });
+  const query = useQuery(
+    ['admin-published-projects', JSON.stringify(options), page],
+    fetchPublishedProjects,
+    {
+      retry: false,
+      keepPreviousData: true,
+      placeholderData: {
+        data: [],
+        meta: {} as any,
+      },
+      // TEST
+      // placeholderData: [],
+    }
+  );
 
   const { data } = query;
 
@@ -310,11 +301,13 @@ export function useAdminPublishedProjects(options: UseAdminPublishedProjectsProp
         const { creators, ownerEmails } = d;
 
         const mergeCreators = creators?.map((c) => ({
-          ...ownerEmails.find((o) => (o.id === c.id) && o),
+          ...ownerEmails.find((o) => o.id === c.id && o),
           ...c,
         }));
 
-        const owners = mergeCreators ? mergeCreators.filter((c) => c.roleName === 'project_owner') : [];
+        const owners = mergeCreators
+          ? mergeCreators.filter((c) => c.roleName === 'project_owner')
+          : [];
 
         return {
           id: d.id,

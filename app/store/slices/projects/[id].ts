@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ProjectShowStateProps {
-  search: string,
+  search: string;
   filters: Record<string, any>;
   sort: string;
-  layerSettings: Record<string, Record<string, unknown>>
+  layerSettings: Record<string, Record<string, unknown>>;
 }
 
 const initialState = {
@@ -28,10 +28,13 @@ const projectsDetailSlice = createSlice({
       state.sort = action.payload;
     },
     // SETTINGS
-    setLayerSettings: (state, action: PayloadAction<{
-      id: string,
-      settings: Record<string, unknown>
-    }>) => {
+    setLayerSettings: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        settings: Record<string, unknown>;
+      }>
+    ) => {
       const { id: layerId, settings } = action.payload;
       const newSettings = {
         ...state.layerSettings,
@@ -45,7 +48,5 @@ const projectsDetailSlice = createSlice({
   },
 });
 
-export const {
-  setSearch, setFilters, setSort, setLayerSettings,
-} = projectsDetailSlice.actions;
+export const { setSearch, setFilters, setSort, setLayerSettings } = projectsDetailSlice.actions;
 export default projectsDetailSlice.reducer;

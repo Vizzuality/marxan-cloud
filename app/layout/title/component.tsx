@@ -7,7 +7,7 @@ export interface TitleProps {
   subtitle?: string;
 }
 
-export const Title: React.FC<TitleProps> = ({ title, subtitle }:TitleProps) => {
+export const Title: React.FC<TitleProps> = ({ title, subtitle }: TitleProps) => {
   return (
     <Head>
       <title>

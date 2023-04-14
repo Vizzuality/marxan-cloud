@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF, FormSpy } from 'react-final-form';
 
@@ -94,7 +92,9 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
     }
 
     return projectUsersData
-      .filter((user) => user.roleName === 'project_owner' || user.roleName === 'project_contributor')
+      .filter(
+        (user) => user.roleName === 'project_owner' || user.roleName === 'project_contributor'
+      )
       .map((user) => {
         return {
           roleName: user.roleName,
@@ -105,10 +105,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
 
   const isOwner = useOwnsProject(pid);
 
-  const {
-    data: rawScenariosData,
-    isFetched: rawScenariosIsFetched,
-  } = useScenarios(pid, {
+  const { data: rawScenariosData, isFetched: rawScenariosIsFetched } = useScenarios(pid, {
     filters: {
       projectId: pid,
     },
@@ -146,18 +143,13 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length,
     sid: featuredScenarioId,
     include: 'results',
-    sublayers: [
-      ...(featuredScenarioId ? ['frequency'] : []),
-    ],
+    sublayers: [...(featuredScenarioId ? ['frequency'] : [])],
     options: {
-      settings: {
-      },
+      settings: {},
     },
   });
 
-  const LAYERS = [
-    PUGridLayer,
-  ].filter((l) => !!l);
+  const LAYERS = [PUGridLayer].filter((l) => !!l);
 
   useEffect(() => {
     setBounds({
@@ -171,50 +163,50 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
     setViewport(vw);
   }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
   return (
-    <FormRFF
-      onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
-    >
+    <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
       {({ form, handleSubmit, values }) => (
         <form
           onSubmit={handleSubmit}
           autoComplete="off"
-          className="flex flex-col justify-between flex-grow w-full overflow-auto px-9"
+          className="flex w-full flex-grow flex-col justify-between overflow-auto px-9"
         >
           <Loading
-            className="absolute top-0 left-0 z-10 flex items-center justify-center w-full h-full bg-white bg-opacity-50"
+            className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-white bg-opacity-50"
             iconClassName="w-10 h-10"
             visible={publishing}
           />
 
           <FormSpy onChange={({ values: spyValues }) => setTmpValues(spyValues)} />
 
-          <h1 className="mb-2 text-xl font-medium text-black mt-9">
+          <h1 className="mb-2 mt-9 text-xl font-medium text-black">
             Publish project to the community
           </h1>
-          <p className="mb-5 text-sm text-black">By publishing this project you allow other users to access all the information of the project. </p>
+          <p className="mb-5 text-sm text-black">
+            By publishing this project you allow other users to access all the information of the
+            project.{' '}
+          </p>
           <div className="mt-8">
-            <FieldRFF
-              name="name"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="name" {...fprops}>
-                  <div className="flex items-center mb-3 space-x-2">
+                  <div className="mb-3 flex items-center space-x-2">
                     <Label theme="light" className="uppercase" id="name">
                       Project Name
                     </Label>
@@ -226,13 +218,12 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
           </div>
 
           <div className="mt-8">
-            <FieldRFF
-              name="description"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="description" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="description" {...fprops}>
-                  <Label theme="light" className="mb-3 uppercase">Description</Label>
+                  <Label theme="light" className="mb-3 uppercase">
+                    Description
+                  </Label>
                   <Textarea
                     theme="light"
                     rows={4}
@@ -244,32 +235,34 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
           </div>
 
           <div className="mt-8">
-            <FieldRFF
-              name="location"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="location" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <Field id="location" {...fprops}>
-                  <Label theme="light" className="mb-3 uppercase">Location</Label>
-                  <Input theme="light" type="text" placeholder="Write country or region from this project..." />
+                  <Label theme="light" className="mb-3 uppercase">
+                    Location
+                  </Label>
+                  <Input
+                    theme="light"
+                    type="text"
+                    placeholder="Write country or region from this project..."
+                  />
                 </Field>
               )}
             </FieldRFF>
           </div>
 
           <div className="mt-8">
-            <FieldRFF
-              name="creators"
-              validate={composeValidators([arrayValidator])}
-            >
+            <FieldRFF name="creators" validate={composeValidators([arrayValidator])}>
               {(fprops) => (
                 <Field id="creators" {...fprops}>
-                  <Label theme="light" className="mb-3 uppercase">Creators</Label>
+                  <Label theme="light" className="mb-3 uppercase">
+                    Creators
+                  </Label>
                   {PROJECT_CREATORS.map((user) => (
-                    <div key={user.id} className="flex items-center mb-3 space-x-2">
+                    <div key={user.id} className="mb-3 flex items-center space-x-2">
                       <div className="flex items-center">
                         <Avatar
-                          className="mr-2 text-sm uppercase border bg-primary-700"
+                          className="mr-2 border bg-primary-700 text-sm uppercase"
                           size="s"
                           bgImage={user.avatarDataUrl}
                           bgColor={projectsUsersData[user.id]}
@@ -288,13 +281,13 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
           </div>
 
           <div className="mt-8">
-            <FieldRFF
-              name="company"
-            >
+            <FieldRFF name="company">
               {(fprops) => {
                 return (
                   <div>
-                    <Label theme="light" className="mb-3 uppercase">Company</Label>
+                    <Label theme="light" className="mb-3 uppercase">
+                      Company
+                    </Label>
 
                     <CompanyUploader
                       form={form}
@@ -308,25 +301,33 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
           </div>
 
           <div className="mt-8">
-            <FieldRFF
-              name="resources"
-              validate={composeValidators([resourcesValidator])}
-            >
+            <FieldRFF name="resources" validate={composeValidators([resourcesValidator])}>
               {(fprops) => {
                 const { error } = fprops.meta;
 
                 return (
                   <div>
-                    <Label theme="light" className="mb-3 uppercase">Resources</Label>
+                    <Label theme="light" className="mb-3 uppercase">
+                      Resources
+                    </Label>
 
                     <div className="flex flex-col space-y-5">
                       {values.resources.map((resource, i) => {
                         const err = error && error[0].find((e) => e.id === resource.id);
 
                         return (
-                          <div key={resource.id} className="flex items-center justify-between space-x-2">
+                          <div
+                            key={resource.id}
+                            className="flex items-center justify-between space-x-2"
+                          >
                             <div className="w-full">
-                              <Label id={`resource-${i}-title`} theme="light" className="mb-3 uppercase">Title</Label>
+                              <Label
+                                id={`resource-${i}-title`}
+                                theme="light"
+                                className="mb-3 uppercase"
+                              >
+                                Title
+                              </Label>
                               <Input
                                 id={`resource-${i}-title`}
                                 name={`resource-${i}-url`}
@@ -338,14 +339,18 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                                   const resources = [...values.resources];
                                   resources[i].title = e.target.value || null;
 
-                                  fprops.input.onChange(
-                                    resources,
-                                  );
+                                  fprops.input.onChange(resources);
                                 }}
                               />
                             </div>
                             <div className="w-full">
-                              <Label id={`resource-${i}-url`} theme="light" className="mb-3 uppercase">Url</Label>
+                              <Label
+                                id={`resource-${i}-url`}
+                                theme="light"
+                                className="mb-3 uppercase"
+                              >
+                                Url
+                              </Label>
                               <Input
                                 id={`resource-${i}-url`}
                                 name={`resource-${i}-url`}
@@ -357,31 +362,26 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                                   const resources = [...values.resources];
                                   resources[i].url = e.target.value || null;
 
-                                  fprops.input.onChange(
-                                    resources,
-                                  );
+                                  fprops.input.onChange(resources);
                                 }}
                               />
                             </div>
 
-                            <div className="relative w-8 h-8 flex-shrink-0 top-3.5">
+                            <div className="relative top-3.5 h-8 w-8 flex-shrink-0">
                               <Button
                                 size="xs"
                                 theme="danger"
-                                className="w-full h-full"
+                                className="h-full w-full"
                                 onClick={() => {
                                   const resources = [...values.resources];
                                   resources.splice(i, 1);
 
-                                  fprops.input.onChange(
-                                    resources,
-                                  );
+                                  fprops.input.onChange(resources);
                                 }}
                               >
-                                <Icon icon={CLOSE_SVG} className="w-2.5 h-2.5" />
+                                <Icon icon={CLOSE_SVG} className="h-2.5 w-2.5" />
                               </Button>
                             </div>
-
                           </div>
                         );
                       })}
@@ -408,7 +408,6 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                         Add resources
                       </Button>
                     </div>
-
                   </div>
                 );
               }}
@@ -416,25 +415,24 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
           </div>
 
           <div className="mt-8">
-            <FieldRFF
-              name="featuredScenarioId"
-              validate={composeValidators([{ presence: true }])}
-            >
+            <FieldRFF name="featuredScenarioId" validate={composeValidators([{ presence: true }])}>
               {(fprops) => (
                 <div>
-                  <Label id="featuredScenarioId" theme="light" className="mb-3 uppercase">Scenario thumbnail</Label>
+                  <Label id="featuredScenarioId" theme="light" className="mb-3 uppercase">
+                    Scenario thumbnail
+                  </Label>
                   <div className="flex items-start justify-between space-x-5">
                     <Field id="featuredScenarioId" {...fprops} className="w-full">
                       <Select
                         theme="light"
                         size="base"
                         placeholder="Select..."
-                          // selected={values.featuredScenarioId}
+                        // selected={values.featuredScenarioId}
                         options={SCENARIOS_RUNNED}
                         onChange={fprops.input.onChange}
                       />
                     </Field>
-                    <div className="flex-shrink-0 overflow-hidden h-44 w-44 rounded-3xl">
+                    <div className="h-44 w-44 flex-shrink-0 overflow-hidden rounded-3xl">
                       <Map
                         key={accessToken}
                         bounds={bounds}
@@ -466,36 +464,25 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
                             </LayerManager>
                           );
                         }}
-
                       </Map>
                     </div>
                   </div>
                 </div>
-
               )}
             </FieldRFF>
           </div>
 
           <div
-            className="flex justify-center mx-auto mt-4 pt-3.5 space-x-4 sticky bottom-0 bg-white w-full"
+            className="sticky bottom-0 mx-auto mt-4 flex w-full justify-center space-x-4 bg-white pt-3.5"
             style={{
               boxShadow: '0 0 0 3px #FFF',
             }}
           >
-            <div className="absolute left-0 z-10 w-full h-4 pointer-events-none bottom-full bg-gradient-to-t from-white via-white" />
-            <Button
-              theme="tertiary"
-              size="lg"
-              onClick={onCancel}
-            >
+            <div className="pointer-events-none absolute bottom-full left-0 z-10 h-4 w-full bg-gradient-to-t from-white via-white" />
+            <Button theme="tertiary" size="lg" onClick={onCancel}>
               Cancel
             </Button>
-            <Button
-              disabled={isPublic || !isOwner}
-              theme="primary"
-              size="lg"
-              type="submit"
-            >
+            <Button disabled={isPublic || !isOwner} theme="primary" size="lg" type="submit">
               Publish
             </Button>
           </div>

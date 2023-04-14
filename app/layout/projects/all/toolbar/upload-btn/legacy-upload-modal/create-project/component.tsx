@@ -33,56 +33,61 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
 
   const saveLegacyProjectMutation = useSaveLegacyProject({});
 
-  const onCreateProjectSubmit = useCallback((values) => {
-    setLoading(true);
-    const data = {
-      projectName: values.name,
-      description: values.description,
-    };
+  const onCreateProjectSubmit = useCallback(
+    (values) => {
+      setLoading(true);
+      const data = {
+        projectName: values.name,
+        description: values.description,
+      };
 
-    saveLegacyProjectMutation.mutate({ data }, {
-      onSuccess: ({ data: { projectId, scenarioId } }) => {
-        dispatch(setLegacyProjectId(projectId));
-        setLoading(false);
-        addToast('success-create-legacy-project', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Legacy project created</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        setStep(2);
-        console.info('Legacy project created', projectId, scenarioId);
-      },
-      onError: ({ response }) => {
-        const { errors } = response.data;
+      saveLegacyProjectMutation.mutate(
+        { data },
+        {
+          onSuccess: ({ data: { projectId, scenarioId } }) => {
+            dispatch(setLegacyProjectId(projectId));
+            setLoading(false);
+            addToast(
+              'success-create-legacy-project',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Legacy project created</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+            setStep(2);
+            console.info('Legacy project created', projectId, scenarioId);
+          },
+          onError: ({ response }) => {
+            const { errors } = response.data;
 
-        setLoading(false);
+            setLoading(false);
 
-        addToast('error-create-legacy-project', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [
-    addToast,
-    dispatch,
-    saveLegacyProjectMutation,
-    setStep,
-  ]);
+            addToast(
+              'error-create-legacy-project',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <ul className="text-sm">
+                  {errors.map((e) => (
+                    <li key={`${e.status}`}>{e.title}</li>
+                  ))}
+                </ul>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [addToast, dispatch, saveLegacyProjectMutation, setStep]
+  );
 
   return (
-    <div className="mt-3 mb-5">
+    <div className="mb-5 mt-3">
       <Form
         onSubmit={onCreateProjectSubmit}
         render={({ form, handleSubmit }) => {
@@ -91,16 +96,13 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
           return (
             <form onSubmit={handleSubmit}>
               <div className="p-9">
-                <h4 className="mb-5 text-lg text-black font-heading">Upload legacy project</h4>
+                <h4 className="mb-5 font-heading text-lg text-black">Upload legacy project</h4>
 
                 <div className="space-y-5">
-                  <FieldRFF
-                    name="name"
-                    validate={composeValidators([{ presence: true }])}
-                  >
+                  <FieldRFF name="name" validate={composeValidators([{ presence: true }])}>
                     {(fprops) => (
                       <Field id="name" {...fprops}>
-                        <div className="flex items-center mb-3 space-x-2">
+                        <div className="mb-3 flex items-center space-x-2">
                           <Label theme="light" className="uppercase" id="name">
                             Name
                           </Label>
@@ -109,37 +111,30 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
                       </Field>
                     )}
                   </FieldRFF>
-                  <FieldRFF
-                    name="description"
-                  >
+                  <FieldRFF name="description">
                     {(fprops) => (
                       <Field id="description" {...fprops}>
-                        <div className="flex items-center mb-3 space-x-2">
+                        <div className="mb-3 flex items-center space-x-2">
                           <Label theme="light" className="uppercase" id="description">
                             Description
                           </Label>
                         </div>
-                        <Textarea rows={4} theme="light" placeholder="Write project description..." />
+                        <Textarea
+                          rows={4}
+                          theme="light"
+                          placeholder="Write project description..."
+                        />
                       </Field>
                     )}
                   </FieldRFF>
-
                 </div>
 
-                <div className="flex justify-center mt-16 space-x-6">
-                  <Button
-                    theme="secondary"
-                    size="xl"
-                    onClick={() => onDismiss()}
-                  >
+                <div className="mt-16 flex justify-center space-x-6">
+                  <Button theme="secondary" size="xl" onClick={() => onDismiss()}>
                     Cancel
                   </Button>
 
-                  <Button
-                    theme="primary"
-                    size="xl"
-                    type="submit"
-                  >
+                  <Button theme="primary" size="xl" type="submit">
                     Next
                   </Button>
                 </div>
@@ -147,14 +142,13 @@ export const CreateProject: React.FC<CreateProjectProps> = ({
 
               <Loading
                 visible={loading}
-                className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-white bg-opacity-90"
+                className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-white bg-opacity-90"
                 iconClassName="w-10 h-10 text-primary-500"
               />
             </form>
           );
         }}
       />
-
     </div>
   );
 };

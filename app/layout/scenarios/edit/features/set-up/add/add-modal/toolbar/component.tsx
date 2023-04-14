@@ -1,14 +1,11 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useDebouncedCallback } from 'use-debounce';
-
-import Filters from 'layout/scenarios/edit/features/set-up/add/add-modal/filters';
 
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 import Search from 'components/search';
+import Filters from 'layout/scenarios/edit/features/set-up/add/add-modal/filters';
 
 import FILTER_SVG from 'svgs/ui/filter.svg?sprite';
 
@@ -35,16 +32,15 @@ export const ScenarioFeaturesAddToolbar: React.FC<ScenarioFeaturesAddToolbarProp
   const FILTERS_LENGTH = useMemo(() => {
     if (!filters) return 0;
 
-    return Object.keys(filters)
-      .reduce((acc, k) => {
-        if (typeof filters[k] === 'undefined') return acc;
+    return Object.keys(filters).reduce((acc, k) => {
+      if (typeof filters[k] === 'undefined') return acc;
 
-        if (filters[k] && Array.isArray(filters[k])) {
-          return acc + filters[k].length;
-        }
+      if (filters[k] && Array.isArray(filters[k])) {
+        return acc + filters[k].length;
+      }
 
-        return acc + 1;
-      }, 0);
+      return acc + 1;
+    }, 0);
   }, [filters]);
 
   const onChangeOpen = useCallback(() => {
@@ -76,14 +72,17 @@ export const ScenarioFeaturesAddToolbar: React.FC<ScenarioFeaturesAddToolbarProp
 
         <button
           type="button"
-          className="relative flex items-center px-1 py-2 space-x-2"
+          className="relative flex items-center space-x-2 px-1 py-2"
           onClick={onChangeOpen}
         >
           <Icon icon={FILTER_SVG} />
-          <span className="text-xs tracking-wider uppercase font-heading">
+          <span className="font-heading text-xs uppercase tracking-wider">
             Filters
             {!!FILTERS_LENGTH && (
-              <span className="absolute top-0 left-0 py-0.5 px-1 rounded-full bg-red-500 text-white text-xxs leading-none" style={{ fontFamily: 'Arial' }}>
+              <span
+                className="absolute left-0 top-0 rounded-full bg-red-500 px-1 py-0.5 text-xxs leading-none text-white"
+                style={{ fontFamily: 'Arial' }}
+              >
                 {FILTERS_LENGTH}
               </span>
             )}

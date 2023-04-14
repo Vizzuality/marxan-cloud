@@ -1,10 +1,8 @@
-import React, {
-  useCallback, useEffect, useMemo, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
-import pick from 'lodash/pick';
+import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
@@ -12,8 +10,8 @@ import { setLayerSettings } from 'store/slices/projects/[id]';
 
 import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
+import pick from 'lodash/pick';
 
 import { useAccessToken } from 'hooks/auth';
 import {
@@ -25,8 +23,6 @@ import {
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenarios } from 'hooks/scenarios';
-
-import HelpBeacon from 'layout/help/beacon';
 
 import Select from 'components/forms/select';
 import Loading from 'components/loading';
@@ -41,9 +37,9 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
+import HelpBeacon from 'layout/help/beacon';
 
-export interface ProjectMapProps {
-}
+export interface ProjectMapProps {}
 
 export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [open, setOpen] = useState(false);
@@ -76,10 +72,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     bbox,
   });
 
-  const {
-    data: rawScenariosData,
-    isFetched: rawScenariosIsFetched,
-  } = useScenarios(pid, {
+  const { data: rawScenariosData, isFetched: rawScenariosIsFetched } = useScenarios(pid, {
     filters: {
       projectId: pid,
     },
@@ -96,7 +89,9 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const sid = useMemo(() => {
     if (sid1) return sid1;
 
-    return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length ? `${rawScenariosData[0].id}` : null;
+    return rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length
+      ? `${rawScenariosData[0].id}`
+      : null;
   }, [sid1, rawScenariosData, rawScenariosIsFetched]);
 
   const PlanningAreaLayer = useProjectPlanningAreaLayer({
@@ -108,9 +103,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     active: rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2,
     sid: sid ? `${sid}` : null,
     include: 'results',
-    sublayers: [
-      ...(sid1 && !sid2 ? ['frequency'] : []),
-    ],
+    sublayers: [...(sid1 && !sid2 ? ['frequency'] : [])],
     options: {
       settings: {
         pugrid: layerSettings.pugrid,
@@ -134,17 +127,15 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
     },
   });
 
-  const LAYERS = [
-    PUGridLayer,
-    PUCompareLayer,
-    PlanningAreaLayer,
-  ].filter((l) => !!l);
+  const LAYERS = [PUGridLayer, PUCompareLayer, PlanningAreaLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [
       ...(!!sid1 && !sid2 ? ['frequency'] : []),
       ...(!!sid1 && !!sid2 ? ['compare'] : []),
-      ...(rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2 ? ['pugrid'] : []),
+      ...(rawScenariosIsFetched && rawScenariosData && !!rawScenariosData.length && !sid2
+        ? ['pugrid']
+        : []),
     ],
     options: {
       layerSettings,
@@ -189,89 +180,120 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
         transitionDuration: 500,
       });
     },
-    [viewport],
+    [viewport]
   );
 
   const handleFitBoundsChange = useCallback((b) => {
     setBounds(b);
   }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
-  const onChangeScenario1 = useCallback((s) => {
-    setSid1(s);
+  const onChangeScenario1 = useCallback(
+    (s) => {
+      setSid1(s);
 
-    dispatch(setLayerSettings({
-      id: 'compare',
-      settings: {
-        scenario1: pick(rawScenariosData.find((sc) => sc.id === s), ['id', 'name']),
-      },
-    }));
+      dispatch(
+        setLayerSettings({
+          id: 'compare',
+          settings: {
+            scenario1: pick(
+              rawScenariosData.find((sc) => sc.id === s),
+              ['id', 'name']
+            ),
+          },
+        })
+      );
 
-    // Remove compare if you unselect a sceanrio or
-    // if it's the same as the compare one
-    if (!s || s === sid2) {
-      setSid2(null);
+      // Remove compare if you unselect a sceanrio or
+      // if it's the same as the compare one
+      if (!s || s === sid2) {
+        setSid2(null);
 
-      dispatch(setLayerSettings({
-        id: 'compare',
-        settings: {
-          scenario2: null,
-        },
-      }));
-    }
-  }, [dispatch, rawScenariosData, sid2]);
+        dispatch(
+          setLayerSettings({
+            id: 'compare',
+            settings: {
+              scenario2: null,
+            },
+          })
+        );
+      }
+    },
+    [dispatch, rawScenariosData, sid2]
+  );
 
-  const onChangeScenario2 = useCallback((s) => {
-    setSid2(s);
+  const onChangeScenario2 = useCallback(
+    (s) => {
+      setSid2(s);
 
-    dispatch(setLayerSettings({
-      id: 'compare',
-      settings: {
-        scenario2: pick(rawScenariosData.find((sc) => sc.id === s), ['id', 'name']),
-      },
-    }));
-  }, [rawScenariosData, dispatch]);
+      dispatch(
+        setLayerSettings({
+          id: 'compare',
+          settings: {
+            scenario2: pick(
+              rawScenariosData.find((sc) => sc.id === s),
+              ['id', 'name']
+            ),
+          },
+        })
+      );
+    },
+    [rawScenariosData, dispatch]
+  );
 
-  const onChangeOpacity = useCallback((opacity, lid) => {
-    dispatch(setLayerSettings({
-      id: lid,
-      settings: { opacity },
-    }));
-  }, [dispatch]);
+  const onChangeOpacity = useCallback(
+    (opacity, lid) => {
+      dispatch(
+        setLayerSettings({
+          id: lid,
+          settings: { opacity },
+        })
+      );
+    },
+    [dispatch]
+  );
 
-  const onChangeVisibility = useCallback((lid) => {
-    const { visibility = true } = layerSettings[lid] || {};
-    dispatch(setLayerSettings({
-      id: lid,
-      settings: { visibility: !visibility },
-    }));
-  }, [dispatch, layerSettings]);
+  const onChangeVisibility = useCallback(
+    (lid) => {
+      const { visibility = true } = layerSettings[lid] || {};
+      dispatch(
+        setLayerSettings({
+          id: lid,
+          settings: { visibility: !visibility },
+        })
+      );
+    },
+    [dispatch, layerSettings]
+  );
 
   return (
     <AnimatePresence>
       {id && (
         <motion.div
           key="project-map"
-          className="relative w-full h-full col-span-5 overflow-hidden rounded-4xl"
+          className="relative col-span-5 h-full w-full overflow-hidden rounded-4xl"
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
         >
           <Loading
             visible={!mapInteractive}
-            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
 
@@ -279,25 +301,22 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
             id="project-map"
             title="Map view"
             subtitle="Visualize all elements"
-            content={(
+            content={
               <div className="space-y-2">
                 <p>
-                  On this map you will be able to visualize all the
-                  spatial components of the conservation plan.
+                  On this map you will be able to visualize all the spatial components of the
+                  conservation plan.
                 </p>
                 <p>
-                  You will
-                  be able to visualize your planning region,
-                  your features and, once you have run Marxan,
-                  you will also be able to visualize the
-                  results here.
+                  You will be able to visualize your planning region, your features and, once you
+                  have run Marxan, you will also be able to visualize the results here.
                 </p>
               </div>
-            )}
+            }
             modifiers={['flip']}
             tooltipPlacement="left"
           >
-            <div className="w-full h-full">
+            <div className="h-full w-full">
               <Map
                 key={accessToken}
                 bounds={bounds}
@@ -327,15 +346,12 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                     </LayerManager>
                   );
                 }}
-
               </Map>
             </div>
           </HelpBeacon>
 
           <Controls>
-            <LoadingControl
-              loading={!mapTilesLoaded}
-            />
+            <LoadingControl loading={!mapTilesLoaded} />
 
             <ZoomControl
               viewport={{
@@ -358,7 +374,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </Controls>
 
           {/* Legend */}
-          <div className="absolute w-full max-w-xs bottom-16 right-5">
+          <div className="absolute bottom-16 right-5 w-full max-w-xs">
             <Legend
               open={open}
               className="w-full"
@@ -377,10 +393,25 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
                     onChangeVisibility={() => onChangeVisibility(i.id)}
                     {...i}
                   >
-                    {type === 'matrix' && <LegendTypeMatrix className="text-sm text-white" intersections={intersections} items={items} />}
-                    {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
-                    {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
-                    {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
+                    {type === 'matrix' && (
+                      <LegendTypeMatrix
+                        className="text-sm text-white"
+                        intersections={intersections}
+                        items={items}
+                      />
+                    )}
+                    {type === 'basic' && (
+                      <LegendTypeBasic className="text-sm text-gray-300" items={items} />
+                    )}
+                    {type === 'choropleth' && (
+                      <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />
+                    )}
+                    {type === 'gradient' && (
+                      <LegendTypeGradient
+                        className={{ box: 'text-sm text-gray-300' }}
+                        items={items}
+                      />
+                    )}
                   </LegendItem>
                 );
               })}
@@ -388,7 +419,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </div>
 
           {!!SCENARIOS_RUNNED.sid1Options.length && (
-            <div className="absolute top-0 left-0 flex w-full p-5 space-x-5">
+            <div className="absolute left-0 top-0 flex w-full space-x-5 p-5">
               <div className="w-full">
                 <Select
                   theme="dark"
@@ -421,7 +452,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           )}
           <Loading
             visible={!mapInteractive}
-            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
         </motion.div>

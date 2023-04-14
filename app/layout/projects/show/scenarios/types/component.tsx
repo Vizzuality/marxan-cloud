@@ -1,16 +1,15 @@
 import React from 'react';
 
+import cx from 'classnames';
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-
-import cx from 'classnames';
 
 import Icon from 'components/icon';
 
 import { SCENARIO_TYPES } from './constants';
 
-export interface ProjectScenariosTypeProps {
-}
+export interface ProjectScenariosTypeProps {}
 
 export const ProjectScenariosType: React.FC<ProjectScenariosTypeProps> = () => {
   const { query } = useRouter();
@@ -18,36 +17,34 @@ export const ProjectScenariosType: React.FC<ProjectScenariosTypeProps> = () => {
 
   return (
     <div className="px-10 py-5 text-gray-500">
-      <h2 className="text-2xl font-medium font-heading">Choose scenario type:</h2>
+      <h2 className="font-heading text-2xl font-medium">Choose scenario type:</h2>
 
-      <ul className="grid grid-cols-3 gap-10 my-5 -mx-5">
+      <ul className="-mx-5 my-5 grid grid-cols-3 gap-10">
         {SCENARIO_TYPES.map((s) => {
           return (
             <li
               key={`${s.id}`}
               className={cx({
-                'transition-all border-2 border-transparent cursor-pointer group hover:shadow-2xl rounded-3xl hover:border-gray-100': true,
+                'group cursor-pointer rounded-3xl border-2 border-transparent transition-all hover:border-gray-100 hover:shadow-2xl':
+                  true,
                 'pointer-events-none opacity-25': s.disabled,
               })}
             >
               <Link href={`/projects/${pid}${s.href}`} legacyBehavior>
                 <div className="h-full p-5">
-                  <div className="flex items-center justify-center w-16 h-16 transition-all bg-gray-100 rounded-3xl group-hover:bg-primary-500">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-gray-100 transition-all group-hover:bg-primary-500">
                     <Icon icon={s.icon} style={s.iconStyles} />
                   </div>
 
                   <div className="mt-8 text-black">
-                    <h3 className="text-lg font-medium font-heading">{s.title}</h3>
+                    <h3 className="font-heading text-lg font-medium">{s.title}</h3>
                     <h4 className="mt-5">{s.subtitle}</h4>
                   </div>
 
                   {s.disclaimer && (
-                    <div className="mt-20 text-sm text-gray-400">
-                      {s.disclaimer}
-                    </div>
+                    <div className="mt-20 text-sm text-gray-400">{s.disclaimer}</div>
                   )}
                 </div>
-
               </Link>
             </li>
           );

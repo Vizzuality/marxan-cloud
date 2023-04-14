@@ -24,7 +24,7 @@ const ShowProjectsPage: React.FC = () => {
 
       <MetaIcons />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
 
         <DocumentationLink />
@@ -36,7 +36,7 @@ const ShowProjectsPage: React.FC = () => {
           <ProjectHeader />
         </div>
 
-        <div className="py-5 overflow-hidden md:flex-grow">
+        <div className="overflow-hidden py-5 md:flex-grow">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-12">
               <ProjectScenarios />

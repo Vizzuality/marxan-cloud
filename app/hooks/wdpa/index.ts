@@ -22,24 +22,25 @@ export function useWDPACategories({
 
   const query = useQuery(
     ['protected-areas', adminAreaId, customAreaId],
-    async () => WDPA.request({
-      method: 'GET',
-      url: `/${scenarioId}/protected-areas`,
-      params: {
-        ...(adminAreaId && {
-          'filter[adminAreaId]': adminAreaId,
-        }),
-        ...(customAreaId && {
-          'filter[customAreaId]': customAreaId,
-        }),
-      },
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    }),
+    async () =>
+      WDPA.request({
+        method: 'GET',
+        url: `/${scenarioId}/protected-areas`,
+        params: {
+          ...(adminAreaId && {
+            'filter[adminAreaId]': adminAreaId,
+          }),
+          ...(customAreaId && {
+            'filter[customAreaId]': customAreaId,
+          }),
+        },
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }),
     {
       enabled: !!adminAreaId || !!customAreaId,
-    },
+    }
   );
 
   const { data } = query;

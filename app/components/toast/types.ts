@@ -1,7 +1,6 @@
 import { ToastItemProps } from 'hooks/toast/types';
 
-export interface ToastProps extends ToastItemProps {
-}
+export type ToastProps = ToastItemProps;
 
 export interface ToastTheme {
   info: ToastThemeOption;

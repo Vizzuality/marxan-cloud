@@ -1,18 +1,17 @@
 import React, { useCallback, useState } from 'react';
 
-import { COST_SURFACE_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { useDropzone } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
+
+import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
 import { usePlausible } from 'next-plausible';
-import { bytesToMegabytes } from 'utils/units';
 
 import { useMe } from 'hooks/me';
 import { useCanEditScenario } from 'hooks/permissions';
@@ -25,6 +24,8 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import Uploader from 'components/uploader';
+import { COST_SURFACE_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
+import { bytesToMegabytes } from 'utils/units';
 
 import COST_LAND_IMG from 'images/info-buttons/img_cost_surface_marine.png';
 import COST_SEA_IMG from 'images/info-buttons/img_cost_surface_terrestrial.png';
@@ -50,9 +51,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
   const dispatch = useDispatch();
   const scenarioSlice = getScenarioEditSlice(sid);
-  const {
-    setJob,
-  } = scenarioSlice.actions;
+  const { setJob } = scenarioSlice.actions;
 
   const { user } = useMe();
   const editable = useCanEditScenario(pid, sid);
@@ -64,23 +63,24 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   });
 
   const onDownload = useCallback(() => {
-    downloadMutation.mutate({ id: `${sid}` }, {
-      onSuccess: () => {
-
-      },
-      onError: () => {
-        addToast('download-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              Template not downloaded
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+    downloadMutation.mutate(
+      { id: `${sid}` },
+      {
+        onSuccess: () => {},
+        onError: () => {
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Template not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [sid, downloadMutation, addToast]);
 
   const onDropAccepted = async (acceptedFiles) => {
@@ -92,52 +92,59 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     const data = new FormData();
     data.append('file', f);
 
-    uploadMutation.mutate({ id: `${sid}`, data }, {
-      onSuccess: ({ data: { data: g, meta } }) => {
-        dispatch(setJob(new Date(meta.isoDate).getTime()));
-        setLoading(false);
-        setSuccessFile({ name: f.name });
+    uploadMutation.mutate(
+      { id: `${sid}`, data },
+      {
+        onSuccess: ({ data: { data: g, meta } }) => {
+          dispatch(setJob(new Date(meta.isoDate).getTime()));
+          setLoading(false);
+          setSuccessFile({ name: f.name });
 
-        addToast('success-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Cost surface uploaded</p>
-          </>
-        ), {
-          level: 'success',
-        });
+          addToast(
+            'success-upload-shapefile',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Cost surface uploaded</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
 
-        console.info('Cost surface uploaded', g);
+          console.info('Cost surface uploaded', g);
 
-        plausible('Upload cost surface', {
-          props: {
-            userId: `${user.id}`,
-            userEmail: `${user.email}`,
-            projectId: `${pid}`,
-            scenarioId: `${sid}`,
-          },
-        });
-      },
-      onError: ({ response }) => {
-        const { errors } = response.data;
+          plausible('Upload cost surface', {
+            props: {
+              userId: `${user.id}`,
+              userEmail: `${user.email}`,
+              projectId: `${pid}`,
+              scenarioId: `${sid}`,
+            },
+          });
+        },
+        onError: ({ response }) => {
+          const { errors } = response.data;
 
-        setLoading(false);
-        setSuccessFile(null);
+          setLoading(false);
+          setSuccessFile(null);
 
-        addToast('error-upload-shapefile', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          addToast(
+            'error-upload-shapefile',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">
+                {errors.map((e) => (
+                  <li key={`${e.status}`}>{e.title}</li>
+                ))}
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -147,11 +154,15 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     // It'll display the max size in bytes which the average user may not understand.
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
-        ? { error, message: `File is larger than ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB` }
+        ? {
+            error,
+            message: `File is larger than ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`,
+          }
         : error;
     });
 
-    addToast('drop-error', (
+    addToast(
+      'drop-error',
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
@@ -159,26 +170,20 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
-      </>
-    ), {
-      level: 'error',
-    });
+      </>,
+      {
+        level: 'error',
+      }
+    );
   };
 
-  const onUploadSubmit = useCallback(() => {
-  }, []);
+  const onUploadSubmit = useCallback(() => {}, []);
 
   const onUploadRemove = useCallback(() => {
     setSuccessFile(null);
   }, []);
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
     maxSize: COST_SURFACE_UPLOADER_MAX_SIZE,
     onDropAccepted,
@@ -193,26 +198,26 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
   return (
     <motion.div
       key="cost-surface"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex min-h-0 flex-col items-start justify-start overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="flex items-center pt-5 pb-1 space-x-3">
+      <header className="flex items-center space-x-3 pb-1 pt-5">
         <button
           aria-label="return"
           type="button"
-          className="flex items-center w-full space-x-2 text-left focus:outline-none"
+          className="flex w-full items-center space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
         >
-          <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Cost surface</h4>
+          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+          <h4 className="font-heading text-xs uppercase text-primary-500">Cost surface</h4>
         </button>
         <InfoButton>
           <div>
-            <h4 className="font-heading text-lg mb-2.5">What is a Cost Surface?</h4>
+            <h4 className="mb-2.5 font-heading text-lg">What is a Cost Surface?</h4>
             <div className="space-y-2">
               <p>
                 Marxan aims to minimize socio-economic impacts and conflicts between uses through
@@ -225,32 +230,28 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
               <p>
                 In the examples below, we illustrate how distance from a city, road or port can be
                 used as a proxy cost surface. In these examples, areas with many competing
-                activities will make a planning unit cost more than areas further away with
-                less competition for access.
+                activities will make a planning unit cost more than areas further away with less
+                competition for access.
               </p>
               <img src={COST_SEA_IMG} alt="Cost sea" />
               <img src={COST_LAND_IMG} alt="Cost Land" />
             </div>
-
           </div>
         </InfoButton>
       </header>
 
-      <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">
-        <p className="pt-2">By default all projects have an equal area cost surface which means that planning units with the same area have the same cost</p>
+      <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col overflow-hidden text-sm">
+        <p className="pt-2">
+          By default all projects have an equal area cost surface which means that planning units
+          with the same area have the same cost
+        </p>
 
         <div className="pt-5">
           <h4 className="mb-2">
             {editable && '1. '}
             Download cost template
-
           </h4>
-          <Button
-            theme="primary-alt"
-            size="base"
-            className="w-full"
-            onClick={onDownload}
-          >
+          <Button theme="primary-alt" size="base" className="w-full" onClick={onDownload}>
             Download cost surface template
           </Button>
         </div>
@@ -260,7 +261,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
           {!editable && successFile && <h4 className="mb-2">Uploaded cost template</h4>}
 
           {editable && (
-            <div className="mt-3 mb-5">
+            <div className="mb-5 mt-3">
               {!successFile && (
                 <Uploader
                   caption="Upload cost surface"
@@ -274,21 +275,23 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                       return (
                         <form onSubmit={handleSubmit}>
                           <div className="p-9">
-                            <h4 className="mb-5 text-lg text-black font-heading">Upload shapefile</h4>
+                            <h4 className="mb-5 font-heading text-lg text-black">
+                              Upload shapefile
+                            </h4>
 
                             {!successFile && (
-                              <Field name="dropFile" validate={composeValidators([{ presence: true }])}>
+                              <Field
+                                name="dropFile"
+                                validate={composeValidators([{ presence: true }])}
+                              >
                                 {(props) => (
                                   <div>
-                                    <div className="flex items-center mb-2.5 space-x-3">
+                                    <div className="mb-2.5 flex items-center space-x-3">
                                       <h5 className="text-xs text-gray-400">Supported formats</h5>
-                                      <InfoButton
-                                        size="s"
-                                        theme="secondary"
-                                      >
+                                      <InfoButton size="s" theme="secondary">
                                         <span className="text-xs">
                                           {' '}
-                                          <h4 className="font-heading mb-2.5">
+                                          <h4 className="mb-2.5 font-heading">
                                             List of supported file formats:
                                           </h4>
                                           <ul>
@@ -304,33 +307,32 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                                       {...props}
                                       {...getRootProps()}
                                       className={cx({
-                                        'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
+                                        'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                                          true,
                                         'bg-gray-500': isDragActive,
                                         'border-green-800': isDragAccept,
-                                        'border-red-800': isDragReject || (props?.meta?.error && props?.meta?.touched),
+                                        'border-red-800':
+                                          isDragReject ||
+                                          (props?.meta?.error && props?.meta?.touched),
                                       })}
                                     >
-
                                       <input {...getInputProps()} />
 
-                                      <p className="text-sm text-center text-gray-500">
+                                      <p className="text-center text-sm text-gray-500">
                                         Drag and drop your polygon data file
                                         <br />
-                                        or
-                                        {' '}
-                                        <b>click here</b>
-                                        {' '}
-                                        to upload
+                                        or <b>click here</b> to upload
                                       </p>
 
-                                      <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`}</p>
+                                      <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+                                        COST_SURFACE_UPLOADER_MAX_SIZE
+                                      )} MB`}</p>
 
                                       <Loading
                                         visible={loading}
-                                        className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90"
+                                        className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-600 bg-opacity-90"
                                         iconClassName="w-5 h-5 text-primary-500"
                                       />
-
                                     </div>
                                   </div>
                                 )}
@@ -343,20 +345,23 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                               >
-                                <div className="flex flex-col w-full space-y-3 cursor-pointer">
-                                  <h5 className="text-xs text-black uppercase">Uploaded file:</h5>
+                                <div className="flex w-full cursor-pointer flex-col space-y-3">
+                                  <h5 className="text-xs uppercase text-black">Uploaded file:</h5>
                                   <div className="flex items-center space-x-2">
-                                    <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                                    <label
+                                      className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                                      htmlFor="cancel-shapefile-btn"
+                                    >
                                       <p className="text-sm text-black">{successFile.name}</p>
                                     </label>
                                     <button
                                       id="cancel-shapefile-btn"
                                       type="button"
-                                      className="flex items-center justify-center w-5 h-5 border border-black rounded-full group hover:bg-black"
+                                      className="group flex h-5 w-5 items-center justify-center rounded-full border border-black hover:bg-black"
                                       onClick={onUploadRemove}
                                     >
                                       <Icon
-                                        className="w-1.5 h-1.5 text-black group-hover:text-white"
+                                        className="h-1.5 w-1.5 text-black group-hover:text-white"
                                         icon={CLOSE_SVG}
                                       />
                                     </button>
@@ -365,20 +370,12 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
                               </motion.div>
                             )}
 
-                            <div className="flex justify-center mt-16 space-x-6">
-                              <Button
-                                theme="secondary"
-                                size="xl"
-                                onClick={() => setOpened(false)}
-                              >
+                            <div className="mt-16 flex justify-center space-x-6">
+                              <Button theme="secondary" size="xl" onClick={() => setOpened(false)}>
                                 Cancel
                               </Button>
 
-                              <Button
-                                theme="primary"
-                                size="xl"
-                                type="submit"
-                              >
+                              <Button theme="primary" size="xl" type="submit">
                                 Save
                               </Button>
                             </div>
@@ -391,25 +388,24 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
               )}
 
               {successFile && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <div className="flex flex-col w-full space-y-6 cursor-pointer">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <div className="flex w-full cursor-pointer flex-col space-y-6">
                     <div className="flex items-center space-x-2">
-                      <label className="px-3 py-1 bg-blue-100 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
+                      <label
+                        className="rounded-3xl bg-blue-100 bg-opacity-10 px-3 py-1"
+                        htmlFor="cancel-shapefile-btn"
+                      >
                         <p className="text-sm text-primary-500">{successFile.name}</p>
                       </label>
                       <button
                         id="cancel-shapefile-btn"
                         type="button"
-                        className="flex items-center justify-center w-5 h-5 border border-white rounded-full group hover:bg-black"
+                        className="group flex h-5 w-5 items-center justify-center rounded-full border border-white hover:bg-black"
                         onClick={cancelCostSurfaceUpload}
                       >
                         {editable && (
                           <Icon
-                            className="w-4.5 h-1.5 text-white group-hover:text-white"
+                            className="h-1.5 w-4.5 text-white group-hover:text-white"
                             icon={CLOSE_SVG}
                           />
                         )}
@@ -421,7 +417,6 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
             </div>
           )}
         </div>
-
       </div>
     </motion.div>
   );

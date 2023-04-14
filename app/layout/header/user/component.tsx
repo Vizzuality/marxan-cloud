@@ -13,8 +13,7 @@ import Tooltip from 'components/tooltip';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import SIGN_OUT_SVG from 'svgs/ui/sign-out.svg?sprite';
 
-export interface HeaderUserProps {
-}
+export interface HeaderUserProps {}
 
 export const HeaderUser: React.FC<HeaderUserProps> = () => {
   const { user } = useMe();
@@ -34,9 +33,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
 
   if (!user) return null;
 
-  const {
-    email, displayName, avatarDataUrl, isAdmin,
-  } = user;
+  const { email, displayName, avatarDataUrl, isAdmin } = user;
 
   return (
     <Tooltip
@@ -46,21 +43,21 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
       popup
       visible={open}
       onClickOutside={handleClickOutside}
-      content={(
+      content={
         <div
-          className="overflow-hidden text-sm text-gray-500 bg-white shadow-md rounded-2xl"
+          className="overflow-hidden rounded-2xl bg-white text-sm text-gray-500 shadow-md"
           style={{
             minWidth: 200,
           }}
         >
-          <header className="w-full px-8 py-4 bg-black bg-opacity-5">
+          <header className="w-full bg-black bg-opacity-5 px-8 py-4">
             <h2 className="mb-1 font-medium text-black">{displayName || email}</h2>
             <Link href="/me" className="text-gray-400 hover:underline">
               My profile
             </Link>
           </header>
 
-          <nav className="w-full px-8 py-5 space-y-5">
+          <nav className="w-full space-y-5 px-8 py-5">
             <ul className="flex flex-col space-y-3">
               {isAdmin && (
                 <li>
@@ -91,13 +88,13 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
             aria-label="log-out"
             type="button"
             onClick={handleSignOut}
-            className="flex w-full px-8 py-3 bg-primary-500 hover:underline focus:outline-none"
+            className="flex w-full bg-primary-500 px-8 py-3 hover:underline focus:outline-none"
           >
-            <Icon icon={SIGN_OUT_SVG} className="w-5 h-5 mr-2" />
+            <Icon icon={SIGN_OUT_SVG} className="mr-2 h-5 w-5" />
             <span>Log out</span>
           </button>
         </div>
-      )}
+      }
     >
       <button
         aria-label="open-menu"
@@ -105,10 +102,10 @@ export const HeaderUser: React.FC<HeaderUserProps> = () => {
         className="flex items-center justify-start space-x-1 focus:outline-none"
         onClick={handleClick}
       >
-        <Avatar className="text-sm text-white uppercase !bg-blue-700" bgImage={avatarDataUrl}>
+        <Avatar className="!bg-blue-700 text-sm uppercase text-white" bgImage={avatarDataUrl}>
           {!avatarDataUrl && (displayName || email).slice(0, 2)}
         </Avatar>
-        <Icon icon={ARROW_DOWN_SVG} className="w-2.5 h-2.5" />
+        <Icon icon={ARROW_DOWN_SVG} className="h-2.5 w-2.5" />
       </button>
     </Tooltip>
   );

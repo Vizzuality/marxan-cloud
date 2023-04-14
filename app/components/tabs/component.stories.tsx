@@ -11,13 +11,7 @@ export default {
 
 const Template: Story<TabsProps> = ({ ...args }: TabsProps) => {
   const [selected, setSelected] = useState(args.selected);
-  return (
-    <Tabs
-      {...args}
-      selected={selected}
-      onSelected={(s) => setSelected(s)}
-    />
-  );
+  return <Tabs {...args} selected={selected} onSelected={(s) => setSelected(s)} />;
 };
 
 export const Default = Template.bind({});

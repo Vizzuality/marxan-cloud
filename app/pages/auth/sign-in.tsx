@@ -31,11 +31,11 @@ const SignInPage: React.FC = () => {
         twitterSite="@Marxan_Planning"
       />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
 
-        <div className="flex flex-col h-full md:flex-grow">
-          <div className="flex items-center justify-center h-full py-10 bg-white">
+        <div className="flex h-full flex-col md:flex-grow">
+          <div className="flex h-full items-center justify-center bg-white py-10">
             <SignIn />
           </div>
         </div>

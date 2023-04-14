@@ -1,1 +1,1 @@
-export interface ScenariosSidebarTabsProps { }
+export interface ScenariosSidebarTabsProps {}

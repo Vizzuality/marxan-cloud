@@ -5,13 +5,15 @@ import { useInView } from 'react-intersection-observer';
 import { motion } from 'framer-motion';
 
 export interface HomeSupportItemProps {
-  id: string,
-  text: string,
-  image: string,
+  id: string;
+  text: string;
+  image: string;
 }
 
 export const HomeSupportItem: React.FC<HomeSupportItemProps> = ({
-  id, text, image,
+  id,
+  text,
+  image,
 }: HomeSupportItemProps) => {
   const { ref, inView } = useInView({
     threshold: 1,
@@ -37,7 +39,6 @@ export const HomeSupportItem: React.FC<HomeSupportItemProps> = ({
         </div>
       </motion.div>
     </div>
-
   );
 };
 

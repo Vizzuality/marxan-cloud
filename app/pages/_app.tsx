@@ -1,20 +1,18 @@
-import React, {
-  useCallback, useEffect, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { CookiesProvider } from 'react-cookie';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 
+import cx from 'classnames';
+
 import type { AppProps } from 'next/app';
 import { useRouter } from 'next/router';
 
 import { OverlayProvider } from '@react-aria/overlays';
-import cx from 'classnames';
 import { SessionProvider as AuthenticationProvider } from 'next-auth/react';
 import PlausibleProvider from 'next-plausible';
 import { Hydrate } from 'react-query/hydration';
-import store from 'store';
 
 import { HelpProvider } from 'hooks/help';
 import { MultipleModalProvider } from 'hooks/modal';
@@ -22,6 +20,7 @@ import { ToastProvider } from 'hooks/toast';
 
 import Loading from 'layout/loading';
 import { MediaContextProvider } from 'layout/media';
+import store from 'store';
 
 import 'styles/tailwind.css';
 
@@ -73,10 +72,7 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
       <ReduxProvider store={store}>
         <QueryClientProvider client={queryClientRef.current}>
           <Hydrate state={pageProps.dehydratedState}>
-            <AuthenticationProvider
-              session={pageProps.session}
-              refetchInterval={5 * 60}
-            >
+            <AuthenticationProvider session={pageProps.session} refetchInterval={5 * 60}>
               <MediaContextProvider disableDynamicMediaQueries>
                 <OverlayProvider>
                   <MultipleModalProvider>
@@ -89,10 +85,11 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
                         <PlausibleProvider domain="marxan.vercel.app">
                           <Loading {...routeLoading} />
 
-                          <div className={cx({
-                            'bg-black': !lightThemeRegex.test(pathname),
-                            'bg-white': lightThemeRegex.test(pathname),
-                          })}
+                          <div
+                            className={cx({
+                              'bg-black': !lightThemeRegex.test(pathname),
+                              'bg-white': lightThemeRegex.test(pathname),
+                            })}
                           >
                             <Component {...pageProps} />
                           </div>

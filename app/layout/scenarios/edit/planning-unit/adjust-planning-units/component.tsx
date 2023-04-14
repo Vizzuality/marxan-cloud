@@ -108,9 +108,12 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
     setTmpPuIncludedValue,
   ]);
 
-  const onChangeTab = useCallback((t) => {
-    dispatch(setPUAction(t));
-  }, [dispatch, setPUAction]);
+  const onChangeTab = useCallback(
+    (t) => {
+      dispatch(setPUAction(t));
+    },
+    [dispatch, setPUAction]
+  );
 
   const onClear = useCallback(() => {
     const { includedDefault, excludedDefault } = PUData;
@@ -121,44 +124,51 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
     dispatch(setTmpPuExcludedValue(excludedDefault));
 
     // Save current clicked pu ids
-    scenarioPUMutation.mutate({
-      id: `${sid}`,
-      data: {
-        byId: {
-          include: includedDefault,
-          exclude: excludedDefault,
+    scenarioPUMutation.mutate(
+      {
+        id: `${sid}`,
+        data: {
+          byId: {
+            include: includedDefault,
+            exclude: excludedDefault,
+          },
         },
       },
-    }, {
-      onSuccess: ({ data: { meta } }) => {
-        dispatch(setJob(new Date(meta.isoDate).getTime()));
-        addToast('clear-planning-units-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <ul className="text-sm">
-              <li>Planning units cleared</li>
-            </ul>
-          </>
-        ), {
-          level: 'success',
-        });
-      },
-      onError: () => {
-        addToast('clear-planning-units-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              <li>Ooops! Something went wrong. Try again</li>
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-      onSettled: () => {
-        setClearing(false);
-      },
-    });
+      {
+        onSuccess: ({ data: { meta } }) => {
+          dispatch(setJob(new Date(meta.isoDate).getTime()));
+          addToast(
+            'clear-planning-units-success',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <ul className="text-sm">
+                <li>Planning units cleared</li>
+              </ul>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+        },
+        onError: () => {
+          addToast(
+            'clear-planning-units-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">
+                <li>Ooops! Something went wrong. Try again</li>
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+        onSettled: () => {
+          setClearing(false);
+        },
+      }
+    );
   }, [
     PUData,
     dispatch,
@@ -173,67 +183,57 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
   return (
     <motion.div
       key="gap-analysis"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex min-h-0 flex-col items-start justify-start overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="flex items-center pt-5 pb-1 space-x-3">
+      <header className="flex items-center space-x-3 pb-1 pt-5">
         <button
           type="button"
-          className="flex items-center w-full space-x-2 text-left focus:outline-none"
+          className="flex w-full items-center space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
         >
-          <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Adjust planning units</h4>
+          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+          <h4 className="font-heading text-xs uppercase text-primary-500">Adjust planning units</h4>
         </button>
 
         <InfoButton>
           <div>
-            <h4 className="font-heading text-lg mb-2.5">Locked-in and locked-out planning units</h4>
+            <h4 className="mb-2.5 font-heading text-lg">Locked-in and locked-out planning units</h4>
             <div className="space-y-2">
               <p>
                 You can force Marxan to include or exclude some planning units from your analysis.
               </p>
               <p>
-                Manually including or excluding individual planning units
-                is useful when a real-world issue affects where new
-                protected areas can be designated. For example, if
-                you know that a particular planning unit contains a restricted
-                military area and cannot be designated, then you could
-                manually exclude that planning unit from the project.
+                Manually including or excluding individual planning units is useful when a
+                real-world issue affects where new protected areas can be designated. For example,
+                if you know that a particular planning unit contains a restricted military area and
+                cannot be designated, then you could manually exclude that planning unit from the
+                project.
               </p>
               <p>
-                You can see the example below where a city is
-                marked as locked-out and a protected area is
-                marked as locked-in:
+                You can see the example below where a city is marked as locked-out and a protected
+                area is marked as locked-in:
               </p>
               <img src={LOCK_IN_OUT_IMG} alt="Feature-Range" />
               <p>
-                The areas selected to be included will be
-                {' '}
-                <b>locked in </b>
+                The areas selected to be included will be <b>locked in </b>
                 to your conservation plan and will appear in all of the solutions.
               </p>
               <p>
-                The areas selected to be excluded will be
-                {' '}
-                <b>locked out </b>
+                The areas selected to be excluded will be <b>locked out </b>
                 of your conservation plan and will never appear in the solutions
               </p>
             </div>
-
           </div>
         </InfoButton>
       </header>
 
-      <div className="w-full flex items-center justify-between border-t border-gray-500 mt-2.5">
-        <Tabs
-          type={puAction}
-          onChange={onChangeTab}
-        />
+      <div className="mt-2.5 flex w-full items-center justify-between border-t border-gray-500">
+        <Tabs type={puAction} onChange={onChangeTab} />
 
         {PUData && (!!PUData.included.length || !!PUData.excluded.length) && editable && (
           <Button
@@ -245,54 +245,34 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
           >
             <div className="flex items-center space-x-2">
               <span>Clear</span>
-              <Icon icon={CLOSE_SVG} className="w-2 h-2" />
+              <Icon icon={CLOSE_SVG} className="h-2 w-2" />
             </div>
 
             <Loading
               visible={clearing}
-              className="absolute top-0 left-0 z-40 flex items-center justify-center w-full h-full bg-gray-600 bg-opacity-90 rounded-3xl"
+              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center rounded-3xl bg-gray-600 bg-opacity-90"
               iconClassName="w-10 h-5 text-primary-500"
             />
-
           </Button>
         )}
       </div>
 
-      <div className="relative flex flex-col flex-grow w-full min-h-0 overflow-hidden">
-        <div className="absolute top-0 left-0 z-10 w-full h-3 bg-gradient-to-b from-gray-700 via-gray-700" />
-        <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+      <div className="relative flex min-h-0 w-full flex-grow flex-col overflow-hidden">
+        <div className="absolute left-0 top-0 z-10 h-3 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
+        <div className="relative overflow-y-auto overflow-x-visible px-0.5">
           <div className="py-3">
-            {editable && (
-              <Buttons
-                type={puAction}
-              />
-            )}
+            {editable && <Buttons type={puAction} />}
             {!editable && (
               <div className="mt-4 space-y-3 text-xs">
-                {puAction === 'include' && (
-                  <p>
+                {puAction === 'include' && <p>{PUData.included.length} PU</p>}
 
-                    {PUData.included.length}
-                    {' '}
-                    PU
-                  </p>
-                )}
-
-                {puAction === 'exclude' && (
-                  <p>
-
-                    {PUData.excluded.length}
-                    {' '}
-                    PU
-                  </p>
-                )}
+                {puAction === 'exclude' && <p>{PUData.excluded.length} PU</p>}
               </div>
             )}
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 z-10 w-full h-3 bg-gradient-to-t from-gray-700 via-gray-700" />
+        <div className="absolute bottom-0 left-0 z-10 h-3 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
       </div>
-
     </motion.div>
   );
 };

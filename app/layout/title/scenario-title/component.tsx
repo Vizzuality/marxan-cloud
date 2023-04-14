@@ -10,7 +10,7 @@ export interface TitleProps {
   title?: string;
 }
 
-export const Title: React.FC<TitleProps> = ({ title }:TitleProps) => {
+export const Title: React.FC<TitleProps> = ({ title }: TitleProps) => {
   const { query } = useRouter();
   const { pid, sid } = query;
   const { data: projectData } = useProject(pid);
@@ -21,16 +21,8 @@ export const Title: React.FC<TitleProps> = ({ title }:TitleProps) => {
       <title>
         {/* Scenario */}
         Scenarios
-        {(scenarioData?.name || title) && ':'}
-        {' '}
-        {title}
-        {' '}
-        {scenarioData?.name}
-        {' '}
-        {/* Project */}
-        {(projectData?.name) && '-'}
-        {' '}
-        {projectData?.name}
+        {(scenarioData?.name || title) && ':'} {title} {scenarioData?.name} {/* Project */}
+        {projectData?.name && '-'} {projectData?.name}
       </title>
     </Head>
   );

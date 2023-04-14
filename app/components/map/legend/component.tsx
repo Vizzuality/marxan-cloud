@@ -1,6 +1,4 @@
-import React, {
-  useMemo, useCallback, Children, isValidElement,
-} from 'react';
+import React, { useMemo, useCallback, Children, isValidElement } from 'react';
 
 import cx from 'classnames';
 
@@ -19,7 +17,7 @@ export interface LegendProps {
   sortable?: {
     enabled: boolean;
     handle: boolean;
-    handleIcon: React.ReactNode,
+    handleIcon: React.ReactNode;
   };
   onChangeOrder?: (id: string[]) => void;
   onChangeOpen?: (open: boolean) => void;
@@ -45,23 +43,24 @@ export const Legend: React.FC<LegendProps> = ({
   return (
     <div
       className={cx({
-        'bg-black rounded-3xl flex flex-col flex-grow overflow-hidden w-full': true,
+        'flex w-full flex-grow flex-col overflow-hidden rounded-3xl bg-black': true,
         hidden: !isChildren,
         [className]: !!className,
       })}
     >
       <button
         type="button"
-        className="relative flex items-center w-full px-5 py-3 space-x-2 text-xs text-white uppercase font-heading focus:outline-none"
+        className="relative flex w-full items-center space-x-2 px-5 py-3 font-heading text-xs uppercase text-white focus:outline-none"
         onClick={onToggleOpen}
       >
-        <Icon icon={LEGEND_SVG} className="w-4 h-4 text-gray-300" />
+        <Icon icon={LEGEND_SVG} className="h-4 w-4 text-gray-300" />
         <span>Legend</span>
 
         <Icon
           icon={ARROW_DOWN_SVG}
           className={cx({
-            'absolute w-3 h-3 transition-transform transform -translate-y-1/2 text-primary-500 top-1/2 right-5': true,
+            'absolute right-5 top-1/2 h-3 w-3 -translate-y-1/2 transform text-primary-500 transition-transform':
+              true,
             'rotate-180': !open,
             'rotate-0': open,
           })}
@@ -70,31 +69,24 @@ export const Legend: React.FC<LegendProps> = ({
 
       {open && isChildren && (
         <div
-          className="relative flex flex-col flex-grow"
+          className="relative flex flex-grow flex-col"
           style={{
             maxHeight,
           }}
         >
-          <div className="absolute top-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-b from-black via-black" />
-          <div
-            className="overflow-x-hidden overflow-y-auto"
-          >
-            <div className="py-2 divide-y divide-gray-600 divide-opacity-50">
+          <div className="pointer-events-none absolute left-0 top-0 z-10 h-3 w-full bg-gradient-to-b from-black via-black" />
+          <div className="overflow-y-auto overflow-x-hidden">
+            <div className="divide-y divide-gray-600 divide-opacity-50 py-2">
               {!!sortable && (
-                <SortableList
-                  sortable={sortable}
-                  onChangeOrder={onChangeOrder}
-                >
+                <SortableList sortable={sortable} onChangeOrder={onChangeOrder}>
                   {children}
                 </SortableList>
               )}
 
-              {!sortable && (
-                children
-              )}
+              {!sortable && children}
             </div>
           </div>
-          <div className="absolute bottom-0 left-0 z-10 w-full h-3 pointer-events-none bg-gradient-to-t from-black via-black" />
+          <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-3 w-full bg-gradient-to-t from-black via-black" />
         </div>
       )}
     </div>

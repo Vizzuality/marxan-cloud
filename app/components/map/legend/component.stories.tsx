@@ -31,26 +31,28 @@ const Template: Story<LegendProps> = (args) => {
   }, []);
 
   return (
-    <Legend
-      {...args}
-      open
-      sortable={sortable}
-      maxHeight={300}
-      onChangeOrder={onChangeOrder}
-    >
+    <Legend {...args} open sortable={sortable} maxHeight={300} onChangeOrder={onChangeOrder}>
       {sortedItems.map((i) => {
         const { type, items, intersections } = i;
 
         return (
-          <LegendItem
-            sortable={sortable}
-            key={i.id}
-            {...i}
-          >
-            {type === 'matrix' && <LegendTypeMatrix className="text-sm text-white" intersections={intersections} items={items} />}
-            {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
-            {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
-            {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
+          <LegendItem sortable={sortable} key={i.id} {...i}>
+            {type === 'matrix' && (
+              <LegendTypeMatrix
+                className="text-sm text-white"
+                intersections={intersections}
+                items={items}
+              />
+            )}
+            {type === 'basic' && (
+              <LegendTypeBasic className="text-sm text-gray-300" items={items} />
+            )}
+            {type === 'choropleth' && (
+              <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />
+            )}
+            {type === 'gradient' && (
+              <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />
+            )}
           </LegendItem>
         );
       })}

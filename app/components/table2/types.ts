@@ -7,16 +7,16 @@ export interface TableProps {
   selectedRowId?: string | number;
 }
 export interface TableHeaderItem {
-  id: string,
-  label: string,
-  Cell?: ((value: any, row: TableRow) => ReactNode);
+  id: string;
+  label: string;
+  Cell?: (value: any, row: TableRow) => ReactNode;
   customSort?: (a: any, b: any) => number;
   className?: string;
 }
 
 export interface TableRow {
-  id: string,
-  isSelected?: boolean
+  id: string;
+  isSelected?: boolean;
 }
 
 export enum Direction {

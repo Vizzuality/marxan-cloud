@@ -1,8 +1,6 @@
 import React from 'react';
 
-import Document, {
-  Html, Head, Main, NextScript,
-} from 'next/document';
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 
 import { mediaStyles } from 'layout/media';
 
@@ -22,7 +20,7 @@ class MyDocument extends Document {
             dangerouslySetInnerHTML={{ __html: mediaStyles }}
           />
         </Head>
-        <body className="text-white bg-black">
+        <body className="bg-black text-white">
           <Main />
           <NextScript />
         </body>

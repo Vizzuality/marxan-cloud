@@ -23,17 +23,22 @@ export function useMe() {
   const { data: session, status } = useSession();
   const loading = status === 'loading';
 
-  const query = useQuery('me', () => USERS.request({
-    method: 'GET',
-    url: '/me',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!session && !loading,
-  });
+  const query = useQuery(
+    'me',
+    () =>
+      USERS.request({
+        method: 'GET',
+        url: '/me',
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!session && !loading,
+    }
+  );
 
   const { data } = query;
 

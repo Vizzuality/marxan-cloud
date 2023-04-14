@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
 
-import {
-  useMutation, useQueries, useQuery, useQueryClient,
-} from 'react-query';
+import { useMutation, useQueries, useQuery, useQueryClient } from 'react-query';
 
 import chroma from 'chroma-js';
 import { uniqBy } from 'lodash';
@@ -22,7 +20,20 @@ import {
 } from './types';
 
 const COLOR_ME = '#1b72f5';
-const COLORS = ['#03E7D1', '#A8FFED', '#5ED3FF', '#46A0FF', '#674BFD', '#9713DD', '#D383FE', '#F65884', '#FF7470', '#FE8B5C', '#FEC95A', '#FFF1A0'];
+const COLORS = [
+  '#03E7D1',
+  '#A8FFED',
+  '#5ED3FF',
+  '#46A0FF',
+  '#674BFD',
+  '#9713DD',
+  '#D383FE',
+  '#F65884',
+  '#FF7470',
+  '#FE8B5C',
+  '#FEC95A',
+  '#FFF1A0',
+];
 
 function fetchProjectUsers(pId, session) {
   return ROLES.request({
@@ -48,23 +59,21 @@ export function useProjectsUsers(projectsIds) {
         queryKey: ['roles', p],
         queryFn: () => fetchProjectUsers(p, session),
       };
-    }),
+    })
   );
 
   const PROJECT_USERS = useMemo(() => {
     if (userQueries.every((u) => u?.isFetched)) {
       const uniqUsers = uniqBy(
         userQueries
-          .map((u:any) => {
+          .map((u: any) => {
             const { data } = u;
             return data?.data;
           })
           .flat(),
-        (u) => u?.user?.id,
+        (u) => u?.user?.id
       );
-      return uniqUsers
-        .map((u) => u?.user?.id)
-        .filter((u) => !!u);
+      return uniqUsers.map((u) => u?.user?.id).filter((u) => !!u);
     }
     return [];
   }, [userQueries]);
@@ -76,7 +85,7 @@ export function useProjectsUsers(projectsIds) {
       data: PROJECT_USERS.reduce((acc, u, i) => {
         return {
           ...acc,
-          [u]: (PROJECT_USERS.length > 10) ? COLORS_SCALE[i] : COLORS[i],
+          [u]: PROJECT_USERS.length > 10 ? COLORS_SCALE[i] : COLORS[i],
           ...(user.id === u && {
             [u]: COLOR_ME,
           }),
@@ -111,8 +120,7 @@ export function useProjectUsers(projectId) {
         if (ROLES_SORT[a.roleName] < ROLES_SORT[b.roleName]) return -1;
         if (ROLES_SORT[a.roleName] > ROLES_SORT[b.roleName]) return 1;
         return 0;
-      })
-      ,
+      }),
     };
   }, [query, data?.data, user]);
 }
@@ -120,18 +128,22 @@ export function useProjectUsers(projectId) {
 export function useUserByEmail(email) {
   const { data: session } = useSession();
 
-  const query = useQuery(['users', email], () => USERS.request({
-    method: 'GET',
-    url: `/by-email/${email}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }),
-  {
-    enabled: !!email && !validate.single(email, { email: true }),
-  });
+  const query = useQuery(
+    ['users', email],
+    () =>
+      USERS.request({
+        method: 'GET',
+        url: `/by-email/${email}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!email && !validate.single(email, { email: true }),
+    }
+  );
 
   const { data } = query;
 
