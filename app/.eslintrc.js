@@ -1,36 +1,44 @@
 module.exports = {
-  parser: '@typescript-eslint/parser', // Specifies the ESLint parser
-  parserOptions: {
-    ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
-    sourceType: 'module', // Allows for the use of imports
-    tsconfigRootDir: __dirname,
-    project: './tsconfig.eslint.json',
-    ecmaFeatures: {
-      jsx: true, // Allows for the parsing of JSX
-    },
-  },
-  settings: {
-    react: {
-      version: 'detect', // Tells eslint-plugin-react to automatically detect the version of React to use
-    },
-  },
   extends: [
-    'airbnb-typescript', // Uses the recommended rules from @eslint-plugin-react
-    'airbnb/hooks', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
-    'plugin:react/recommended', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
-    'plugin:cypress/recommended',
+    'next/core-web-vitals',
+    'plugin:@typescript-eslint/recommended',
+    // 'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:prettier/recommended',
   ],
-  plugins: ['cypress', 'import'],
+  parserOptions: {
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.eslint.json'],
+  },
   rules: {
-    // Place to specify ESLint rules.
-    // Can be used to overwrite rules specified from the extended configs
-    // e.g. "@typescript-eslint/explicit-function-return-type": "off",
-    'no-console': [1, { allow: ['info', 'warn', 'error'] }],
-    'react/jsx-props-no-spreading': [0, {}],
-    'arrow-body-style': 0,
+    // ! enabling @typescript-eslint/recommended-requiring-type-checking triggers a lot of errors
+    // ! as type-checking is more strict than usual. In order to fix those errors progressively,
+    // ! we have changed the configuration rules from error to warning for now to avoid crashing the deploy.
+    // ! This does not mean the below rules are meant to stay as if, the warning must be fixed until
+    // ! linter does not complain about a specific rule and can be safely removed from below.
+    '@typescript-eslint/ban-types': 'warn',
+    '@typescript-eslint/no-empty-function': 'warn',
+    '@typescript-eslint/no-empty-interface': 'warn',
+    '@typescript-eslint/no-unsafe-assignment': 'warn',
+    '@typescript-eslint/no-unsafe-member-access': 'warn',
+    '@typescript-eslint/no-unsafe-call': 'warn',
+    '@typescript-eslint/no-unsafe-argument': 'warn',
+    '@typescript-eslint/no-floating-promises': 'warn',
+    '@typescript-eslint/restrict-template-expressions': 'warn',
+    '@typescript-eslint/no-unsafe-return': 'warn',
+    '@typescript-eslint/ban-ts-comment': 'warn',
+    '@typescript-eslint/no-misused-promises': 'warn',
+    '@typescript-eslint/require-await': 'warn',
+    // ---
+    'no-console': [1, { allow: ['info', 'error'] }],
+    'react/jsx-props-no-spreading': [
+      'error',
+      {
+        html: 'ignore',
+        custom: 'ignore',
+        exceptions: [''],
+      },
+    ],
     'import/no-named-as-default': 0,
-    'import/prefer-default-export': 0,
-    'no-param-reassign': ['error', { props: false }],
     'import/order': [
       'warn',
       {
@@ -55,7 +63,12 @@ module.exports = {
             group: 'builtin',
           },
           {
-            pattern: 'lodash/**',
+            pattern: 'classnames',
+            group: 'builtin',
+            position: 'after',
+          },
+          {
+            pattern: 'lodash-es/**',
             group: 'builtin',
             position: 'after',
           },
@@ -84,7 +97,7 @@ module.exports = {
             position: 'before',
           },
           {
-            pattern: 'layout/**',
+            pattern: 'containers/**',
             group: 'internal',
             position: 'before',
           },
@@ -108,10 +121,14 @@ module.exports = {
             position: 'after',
           },
         ],
-        pathGroupsExcludedImportTypes: [
-          'react',
-        ],
+        pathGroupsExcludedImportTypes: ['react'],
       },
     ],
+    // 'no-restricted-imports': [
+    //   'error',
+    //   {
+    //     patterns: [{ group: ['lodash', '!lodash-es'], message: 'Use lodash-es instead' }],
+    //   },
+    // ],
   },
 };
