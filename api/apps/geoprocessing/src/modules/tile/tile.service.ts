@@ -10,7 +10,6 @@ import * as zlib from 'zlib';
 import { TileRequest } from '@marxan/tiles';
 import { promisify } from 'util';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 /**
  * @description The required input values for the tile renderer
@@ -64,8 +63,8 @@ export class TileService {
   private readonly logger: Logger = new Logger(TileService.name);
 
   constructor(
-    @InjectDataSource(DbConnections.default)
-    private readonly apiDataSource: DataSource,
+    @InjectDataSource()
+    private readonly geoDataSource: DataSource,
   ) {}
 
   /**
@@ -101,7 +100,7 @@ export class TileService {
     inputProjection = 4326,
     attributes,
   }: TileInput<string>): Promise<Record<'mvt', Buffer>[]> {
-    const query = this.apiDataSource
+    const query = this.geoDataSource
       .createQueryBuilder()
       .select(`ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom')`, 'mvt')
       .from((subQuery) => {
