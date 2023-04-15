@@ -35,22 +35,6 @@ beforeEach(async () => {
 });
 
 describe(`given input data is delayed`, () => {
-  console.error('CHEKING RESOURCE AVAILABILITY: ************');
-  console.error('CURRENT DIR IS:', process.cwd());
-  console.error(
-    'ASSETS PRESENT IN FOLDER::',
-    readdirSync(
-      process.cwd() +
-        '/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/',
-    ),
-  );
-  console.error(
-    'ASSETS PRESENT IN INPUT::',
-    readdirSync(
-      process.cwd() +
-        '/apps/geoprocessing/src/marxan-sandboxed-runner/__mocks__/sample-input/input',
-    ),
-  );
   beforeEach(() => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
