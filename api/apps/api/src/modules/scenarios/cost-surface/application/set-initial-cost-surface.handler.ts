@@ -2,7 +2,7 @@ import {
   InitialCostJobInput,
   jobSubmissionFailed,
 } from '@marxan/scenario-cost-surface';
-import { Inject, ConsoleLogger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { Either, left, right } from 'fp-ts/lib/Either';
@@ -19,14 +19,15 @@ import {
 @CommandHandler(SetInitialCostSurface)
 export class SetInitialCostSurfaceHandler
   implements IInferredCommandHandler<SetInitialCostSurface> {
+  private readonly logger: Logger = new Logger(
+    SetInitialCostSurfaceHandler.name,
+  );
+
   constructor(
     @Inject(surfaceCostQueueToken)
     private readonly queue: Queue<InitialCostJobInput>,
     private readonly events: CostSurfaceEventsPort,
-    private logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(SetInitialCostSurfaceHandler.name);
-  }
+  ) {}
 
   async execute({
     scenarioId,

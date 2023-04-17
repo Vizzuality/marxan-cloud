@@ -1,5 +1,5 @@
 import { ApiCloningFilesRepositoryModule } from '@marxan-api/modules/cloning-file-repository/api-cloning-file-repository.module';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ApiEventsModule } from '../../../api-events';
 import { QueueApiEventsModule } from '../../../queue-api-events';
@@ -50,11 +50,6 @@ import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
     ImportPieceEventsHandler,
     ScheduleDbCleanupForFailedImportHandler,
     GenerateExportFromZipFileHandler,
-    {
-      provide: Logger,
-      useClass: Logger,
-      scope: Scope.TRANSIENT,
-    },
     importPieceQueueProvider,
     importPiecenQueueEventsProvider,
     importPieceEventsFactoryProvider,

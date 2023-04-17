@@ -5,7 +5,7 @@ import { ProjectCustomFeaturesContent } from '@marxan/cloning/infrastructure/clo
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
@@ -22,16 +22,17 @@ import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan-geoprocessing/uti
 @PieceImportProvider()
 export class ProjectCustomFeaturesPieceImporter
   implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ProjectCustomFeaturesPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ProjectCustomFeaturesPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

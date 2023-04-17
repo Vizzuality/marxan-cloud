@@ -3,7 +3,6 @@ import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
@@ -31,6 +30,7 @@ import {
 import { SpecificationOperation } from '@marxan/specification';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { DeleteProjectPus, GivenProjectPus } from '../fixtures';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 type FeatureData = {
   id: string;
@@ -140,13 +140,12 @@ const getFixtures = async () => {
       GeoCloningFilesRepositoryModule,
       PuvsprCalculationsModule.for(geoprocessingConnections.default.name!),
     ],
-    providers: [
-      ProjectPuvsprCalculationsPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectPuvsprCalculationsPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const sut = sandbox.get(ProjectPuvsprCalculationsPieceExporter);

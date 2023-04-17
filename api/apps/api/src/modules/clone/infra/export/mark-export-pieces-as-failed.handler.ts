@@ -4,11 +4,15 @@ import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { MarkExportPiecesAsFailed } from '@marxan-api/modules/clone/infra/export/mark-export-pieces-as-failed.command';
 import { ExportRepository } from '../../export/application/export-repository.port';
-import { ConsoleLogger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 @CommandHandler(MarkExportPiecesAsFailed)
 export class MarkExportPiecesAsFailedHandler
   implements IInferredCommandHandler<MarkExportPiecesAsFailed> {
+  private readonly logger: Logger = new Logger(
+    MarkExportPiecesAsFailedHandler.name,
+  );
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__piece__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__piece__failed__v1__alpha,
@@ -17,10 +21,7 @@ export class MarkExportPiecesAsFailedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarkExportPiecesAsFailedHandler.name);
-  }
+  ) {}
 
   async execute({
     exportId,

@@ -3,7 +3,7 @@ import { ClonePiece, ExportJobInput, ExportJobOutput } from '@marxan/cloning';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
-import { HttpStatus, Injectable, ConsoleLogger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
@@ -23,15 +23,16 @@ type SelectScenarioResult = {
 @Injectable()
 @PieceExportProvider()
 export class ScenarioInputFolderPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioInputFolderPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
     private readonly httpService: HttpService,
-  ) {
-    this.logger.setContext(ScenarioInputFolderPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioInputFolder;

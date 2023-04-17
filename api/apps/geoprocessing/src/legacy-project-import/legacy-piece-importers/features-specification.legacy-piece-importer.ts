@@ -11,7 +11,7 @@ import {
   LegacyProjectImportJobOutput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-import { HttpStatus, Injectable, ConsoleLogger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Either, isLeft, left, right } from 'fp-ts/lib/Either';
@@ -55,6 +55,10 @@ export const retriesIntervalForSpecificationStatusInSeconds = 30;
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesSpecificationLegacyProjectPieceImporter
   implements LegacyProjectImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    FeaturesSpecificationLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly specDatReader: SpecDatReader,
@@ -66,13 +70,8 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
     private readonly featuresDataRepo: Repository<GeoFeatureGeometry>,
     @InjectRepository(ScenarioFeaturesData)
     private readonly scenarioFeaturesDataRepo: Repository<ScenarioFeaturesData>,
-    private readonly logger: ConsoleLogger,
     private readonly httpService: HttpService,
-  ) {
-    this.logger.setContext(
-      FeaturesSpecificationLegacyProjectPieceImporter.name,
-    );
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.FeaturesSpecification;

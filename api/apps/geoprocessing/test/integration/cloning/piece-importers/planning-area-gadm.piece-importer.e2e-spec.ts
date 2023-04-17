@@ -10,7 +10,6 @@ import {
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -19,6 +18,7 @@ import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { DeleteProjectAndOrganization, GivenProjectExists } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 interface ProjectSelectResult {
   country_id: string;
@@ -75,13 +75,12 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      PlanningAreaGadmPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [PlanningAreaGadmPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const organizationId = v4();
   const projectId = v4();
   const userId = v4();

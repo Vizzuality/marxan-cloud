@@ -9,7 +9,6 @@ import {
 } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -38,6 +37,7 @@ import {
   PuvsprCalculationsRepository,
 } from '@marxan/puvspr-calculations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -95,13 +95,12 @@ const getFixtures = async () => {
       GeoCloningFilesRepositoryModule,
       PuvsprCalculationsModule.for(geoprocessingConnections.default.name!),
     ],
-    providers: [
-      ProjectPuvsprCalculationsPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectPuvsprCalculationsPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const userId = v4();

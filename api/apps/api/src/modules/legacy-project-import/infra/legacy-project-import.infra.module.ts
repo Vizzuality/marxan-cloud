@@ -1,6 +1,6 @@
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { failedLegacyProjectImportDbCleanupQueueProvider } from './failed-legacy-project-import-db-cleanup-queue.provider';
 import { ImportLegacyProjectPieceEventsHandler } from './import-legacy-project-piece.events-handler';
@@ -36,11 +36,6 @@ import { LegacyProjectImportCanceledSaga } from './legacy-project-import-cancele
     ScheduleLegacyProjectImportPieceHandler,
     ImportLegacyProjectPieceEventsHandler,
     LegacyProjectImportCanceledSaga,
-    {
-      provide: Logger,
-      useClass: Logger,
-      scope: Scope.TRANSIENT,
-    },
   ],
 })
 export class LegacyProjectImportInfraModule {}

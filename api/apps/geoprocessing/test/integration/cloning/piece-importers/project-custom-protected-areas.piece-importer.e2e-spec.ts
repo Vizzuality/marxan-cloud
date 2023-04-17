@@ -11,7 +11,6 @@ import { ProjectCustomProtectedAreasContent } from '@marxan/cloning/infrastructu
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -24,6 +23,7 @@ import { GenerateRandomGeometries } from '../fixtures';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -71,13 +71,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([ProtectedArea]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ProjectCustomProtectedAreasPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectCustomProtectedAreasPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const userId = v4();
 

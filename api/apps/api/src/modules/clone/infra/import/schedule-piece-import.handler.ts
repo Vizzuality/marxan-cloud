@@ -2,7 +2,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ImportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Inject, ConsoleLogger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -19,6 +19,8 @@ import { SchedulePieceImport } from './schedule-piece-import.command';
 @CommandHandler(SchedulePieceImport)
 export class SchedulePieceImportHandler
   implements IInferredCommandHandler<SchedulePieceImport> {
+  private readonly logger: Logger = new Logger(SchedulePieceImportHandler.name);
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__piece__submitted__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__piece__submitted__v1__alpha,
@@ -30,10 +32,7 @@ export class SchedulePieceImportHandler
     private readonly queue: Queue<ImportJobInput>,
     private readonly commandBus: CommandBus,
     private readonly importRepository: ImportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(SchedulePieceImportHandler.name);
-  }
+  ) {}
 
   private markImportAsFailed(importId: ImportId, reason: string): void {
     this.logger.error(reason);

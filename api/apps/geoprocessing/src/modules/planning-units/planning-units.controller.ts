@@ -3,12 +3,11 @@ import {
   Body,
   Controller,
   Get,
-  Header,
-  ConsoleLogger,
   Param,
   Post,
   Query,
   Res,
+  Logger,
 } from '@nestjs/common';
 
 import {
@@ -33,13 +32,12 @@ import { setTileResponseHeadersForSuccessfulRequests } from '@marxan/tiles';
 
 @Controller(`${apiGlobalPrefixes.v1}/planning-units`)
 export class PlanningUnitsController {
+  private readonly logger: Logger = new Logger(PlanningUnitsController.name);
+
   constructor(
     private service: PlanningUnitsService,
     private shapefileService: ShapefileService,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(PlanningUnitsController.name);
-  }
+  ) {}
 
   @ApiConsumesShapefile()
   @Post('/planning-unit-shapefile')

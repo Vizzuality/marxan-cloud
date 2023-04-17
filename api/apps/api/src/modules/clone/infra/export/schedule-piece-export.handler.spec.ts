@@ -7,7 +7,6 @@ import {
 } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
@@ -19,6 +18,7 @@ import { ExportId } from '../../export/domain/export/export.id';
 import { exportPieceQueueToken } from './export-queue.provider';
 import { SchedulePieceExport } from './schedule-piece-export.command';
 import { SchedulePieceExportHandler } from './schedule-piece-export.handler';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -93,13 +93,6 @@ const getFixtures = async () => {
         },
       },
       {
-        provide: Logger,
-        useValue: {
-          setContext: () => {},
-          error: () => {},
-        },
-      },
-      {
         provide: ExportRepository,
         useClass: MemoryExportRepo,
       },
@@ -107,6 +100,7 @@ const getFixtures = async () => {
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const events: IEvent[] = [];
   sandbox.get(EventBus).subscribe((event) => {

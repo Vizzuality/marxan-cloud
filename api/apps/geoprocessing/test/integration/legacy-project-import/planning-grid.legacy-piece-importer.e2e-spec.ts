@@ -13,7 +13,6 @@ import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -28,6 +27,7 @@ import {
   DeleteProjectAndScenarioShells,
   GivenProjectAndScenarioShells,
 } from './fixtures';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 type ProjectSelectResult = {
   planning_area_geometry_id: string;
@@ -134,11 +134,11 @@ const getFixtures = async () => {
         provide: ShapefileService,
         useClass: FakeShapefileService,
       },
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
     ],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
   const organizationId = v4();
   const projectId = v4();
   const scenarioId = v4();

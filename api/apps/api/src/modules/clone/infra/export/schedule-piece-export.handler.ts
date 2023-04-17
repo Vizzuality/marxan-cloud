@@ -2,7 +2,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { Inject, ConsoleLogger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import {
   CommandHandler,
   EventBus,
@@ -17,6 +17,8 @@ import { SchedulePieceExport } from './schedule-piece-export.command';
 @CommandHandler(SchedulePieceExport)
 export class SchedulePieceExportHandler
   implements IInferredCommandHandler<SchedulePieceExport> {
+  private readonly logger: Logger = new Logger(SchedulePieceExportHandler.name);
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__piece__submitted__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__piece__submitted__v1__alpha,
@@ -28,10 +30,7 @@ export class SchedulePieceExportHandler
     private readonly queue: Queue<ExportJobInput>,
     private readonly eventBus: EventBus,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(SchedulePieceExportHandler.name);
-  }
+  ) {}
 
   async execute({ exportId, componentId }: SchedulePieceExport): Promise<void> {
     const exportInstance = await this.exportRepository.find(exportId);

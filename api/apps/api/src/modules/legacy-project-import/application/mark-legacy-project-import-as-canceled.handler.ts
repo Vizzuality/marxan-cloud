@@ -1,18 +1,17 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ConsoleLogger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { MarkLegacyProjectImportAsCanceled } from './mark-legacy-project-import-as-canceled.command';
 
 @CommandHandler(MarkLegacyProjectImportAsCanceled)
 export class MarkLegacyProjectImportAsCanceledHandler
   implements IInferredCommandHandler<MarkLegacyProjectImportAsCanceled> {
-  constructor(
-    private readonly apiEvents: ApiEventsService,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarkLegacyProjectImportAsCanceledHandler.name);
-  }
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsCanceledHandler.name,
+  );
+
+  constructor(private readonly apiEvents: ApiEventsService) {}
 
   async execute({
     projectId,

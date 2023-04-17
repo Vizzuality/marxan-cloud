@@ -8,7 +8,6 @@ import {
 } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -123,15 +122,12 @@ const getFixtures = async () => {
         provide: ImportRepository,
         useClass: MemoryImportRepository,
       },
-      {
-        provide: Logger,
-        useClass: FakeLogger,
-      },
       CompleteImportPieceHandler,
       FakeMarkImportAsFailedHandler,
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const ownerId = UserId.create();
 

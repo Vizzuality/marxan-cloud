@@ -1,7 +1,7 @@
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -48,14 +48,11 @@ const getFixtures = async () => {
     imports: [CqrsModule],
     providers: [
       { provide: getRepositoryToken(Scenario), useClass: FakeScenarioRepo },
-      {
-        provide: Logger,
-        useClass: FakeLogger,
-      },
       DeleteScenarioHandler,
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const scenarioIds = [v4(), v4(), v4()];
 

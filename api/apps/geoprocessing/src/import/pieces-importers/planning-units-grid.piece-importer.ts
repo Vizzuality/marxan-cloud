@@ -4,7 +4,7 @@ import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { Readable, Transform } from 'stream';
@@ -22,16 +22,17 @@ type ProjectSelectResult = {
 @Injectable()
 @PieceImportProvider()
 export class PlanningUnitsGridPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningUnitsGridPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(PlanningUnitsGridPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

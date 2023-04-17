@@ -8,7 +8,7 @@ import {
 } from '@marxan/legacy-project-import';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { ShapefileService } from '@marxan/shapefile-converter';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { BBox, FeatureCollection, GeoJSON, Geometry } from 'geojson';
 import { chunk } from 'lodash';
@@ -32,16 +32,17 @@ type GeomIdAndPuid = {
 @LegacyProjectImportPieceProcessorProvider()
 export class PlanningGridLegacyProjectPieceImporter
   implements LegacyProjectImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningGridLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly shapefileService: ShapefileService,
     @InjectEntityManager(geoprocessingConnections.default.name)
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB.name)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(PlanningGridLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.PlanningGrid;

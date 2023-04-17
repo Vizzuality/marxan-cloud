@@ -1,7 +1,7 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ConsoleLogger, NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ApiEventByTopicAndKind } from '../../../api-events/api-event.topic+kind.api.entity';
 import { ImportRepository } from '../../import/application/import.repository.port';
@@ -10,6 +10,8 @@ import { MarkImportAsFailed } from './mark-import-as-failed.command';
 @CommandHandler(MarkImportAsFailed)
 export class MarkImportAsFailedHandler
   implements IInferredCommandHandler<MarkImportAsFailed> {
+  private readonly logger: Logger = new Logger(MarkImportAsFailedHandler.name);
+
   private importEventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__import__failed__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__import__failed__v1__alpha,
@@ -22,10 +24,7 @@ export class MarkImportAsFailedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly importRepository: ImportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarkImportAsFailedHandler.name);
-  }
+  ) {}
 
   async findPreviousEvent(
     kind: API_EVENT_KINDS,

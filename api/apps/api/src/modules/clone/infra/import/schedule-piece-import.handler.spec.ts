@@ -8,7 +8,6 @@ import {
 } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { ApiEventsService } from '../../../api-events';
@@ -21,6 +20,7 @@ import { MarkImportAsFailed } from './mark-import-as-failed.command';
 import { MarkImportPieceAsFailed } from './mark-import-piece-as-failed.command';
 import { SchedulePieceImport } from './schedule-piece-import.command';
 import { SchedulePieceImportHandler } from './schedule-piece-import.handler';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -98,13 +98,6 @@ const getFixtures = async () => {
         },
       },
       {
-        provide: Logger,
-        useValue: {
-          setContext: () => {},
-          error: () => {},
-        },
-      },
-      {
         provide: ImportRepository,
         useClass: MemoryImportRepository,
       },
@@ -114,6 +107,7 @@ const getFixtures = async () => {
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const ownerId = UserId.create();
   const commands: ICommand[] = [];

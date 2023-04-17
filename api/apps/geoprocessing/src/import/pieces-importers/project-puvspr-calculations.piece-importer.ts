@@ -12,7 +12,7 @@ import {
 import { PuvsprCalculationsEntity } from '@marxan/puvspr-calculations';
 import { SpecificationOperation } from '@marxan/specification';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager, Repository } from 'typeorm';
@@ -30,6 +30,10 @@ type FeatureSelectResult = {
 @PieceImportProvider()
 export class ProjectPuvsprCalculationsPieceImporter
   implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ProjectPuvsprCalculationsPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectRepository(ProjectsPuEntity)
@@ -38,10 +42,7 @@ export class ProjectPuvsprCalculationsPieceImporter
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ProjectPuvsprCalculationsPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

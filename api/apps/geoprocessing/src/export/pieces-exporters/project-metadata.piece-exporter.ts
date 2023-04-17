@@ -5,7 +5,7 @@ import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/c
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -25,14 +25,15 @@ type SelectProjectBlmResult = {
 @Injectable()
 @PieceExportProvider()
 export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ProjectMetadataPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ProjectMetadataPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

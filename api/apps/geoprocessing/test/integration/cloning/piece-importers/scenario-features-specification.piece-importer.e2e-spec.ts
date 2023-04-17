@@ -15,7 +15,6 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager, In } from 'typeorm';
@@ -33,6 +32,7 @@ import { isDefined } from '@marxan/utils';
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 function getFeatureClassNameByIdMap(
   features: {
@@ -112,13 +112,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioFeaturesSpecificationPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioFeaturesSpecificationPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
   const scenarioId = v4();

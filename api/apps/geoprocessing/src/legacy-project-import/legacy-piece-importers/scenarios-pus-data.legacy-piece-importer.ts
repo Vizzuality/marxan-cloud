@@ -12,11 +12,11 @@ import {
   ScenariosPuPaDataGeo,
   toLockEnum,
 } from '@marxan/scenarios-planning-unit';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/These';
 import { chunk } from 'lodash';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { geoprocessingConnections } from '../../ormconfig';
 import {
@@ -30,16 +30,17 @@ import { PuDatReader, PuDatRow } from './file-readers/pu-dat.reader';
 @LegacyProjectImportPieceProcessorProvider()
 export class ScenarioPusDataLegacyProjectPieceImporter
   implements LegacyProjectImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioPusDataLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly puDatReader: PuDatReader,
     private readonly datFileDelimiterFinder: DatFileDelimiterFinder,
     @InjectEntityManager(geoprocessingConnections.default.name)
     private readonly geoEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ScenarioPusDataLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.ScenarioPusData;

@@ -1,4 +1,4 @@
-import { ConsoleLogger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -18,14 +18,15 @@ import {
 @CommandHandler(CompleteLegacyProjectImportPiece)
 export class CompleteLegacyProjectImportPieceHandler
   implements IInferredCommandHandler<CompleteLegacyProjectImportPiece> {
+  private readonly logger: Logger = new Logger(
+    CompleteLegacyProjectImportPieceHandler.name,
+  );
+
   constructor(
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly commandBus: CommandBus,
     private readonly eventPublisher: EventPublisher,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(CompleteLegacyProjectImportPieceHandler.name);
-  }
+  ) {}
 
   private async markLegacyProjectImportAsFailed(
     projectId: ResourceId,

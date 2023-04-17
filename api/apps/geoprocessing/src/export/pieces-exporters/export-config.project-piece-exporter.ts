@@ -7,7 +7,7 @@ import {
   ProjectExportConfigContent,
 } from '@marxan/cloning/infrastructure/clone-piece-data/export-config';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -20,14 +20,15 @@ import {
 @Injectable()
 @PieceExportProvider()
 export class ExportConfigProjectPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ExportConfigProjectPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ExportConfigProjectPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return piece === ClonePiece.ExportConfig && kind === ResourceKind.Project;

@@ -10,7 +10,7 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-data';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { OutputScenariosFeaturesDataGeoEntity } from '@marxan/marxan-output';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -47,16 +47,17 @@ type FeatureDataElementWithIsCustom = FeatureDataElementWithFeatureId & {
 @Injectable()
 @PieceExportProvider()
 export class ScenarioFeaturesDataPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioFeaturesDataPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ScenarioFeaturesDataPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioFeaturesData;

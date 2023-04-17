@@ -14,7 +14,6 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -30,6 +29,7 @@ import {
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { ProjectSourcesEnum } from '@marxan/projects';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 interface ProjectSelectResult {
   name: string;
@@ -153,13 +153,12 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ProjectMetadataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectMetadataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const userId = v4();

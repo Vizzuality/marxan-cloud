@@ -14,7 +14,7 @@ import {
   LegacyProjectImportJobOutput,
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -44,6 +44,10 @@ export const specDatPuidPropertyKey = 'puid';
 @LegacyProjectImportPieceProcessorProvider()
 export class FeaturesLegacyProjectPieceImporter
   implements LegacyProjectImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    FeaturesLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly specDatReader: SpecDatReader,
@@ -53,10 +57,7 @@ export class FeaturesLegacyProjectPieceImporter
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(FeaturesLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.Features;
