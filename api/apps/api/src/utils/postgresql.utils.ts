@@ -1,4 +1,4 @@
-import { getManager } from 'typeorm';
+import { apiDataSource } from '@marxan-api/data-source';
 
 /**
  * Utility functions related to lower-level interaction with PostgreSQL servers.
@@ -10,7 +10,7 @@ export class PostgreSQLUtils {
    * Check if the PostgreSQL server we are connected to is version 13 or higher.
    */
   static async version13Plus(): Promise<boolean> {
-    const postgresqlMajorVersion = await getManager()
+    const postgresqlMajorVersion = await apiDataSource
       .query('show server_version')
       .then((result: [{ server_version: string }]) => {
         return result[0].server_version.split('.')[0];

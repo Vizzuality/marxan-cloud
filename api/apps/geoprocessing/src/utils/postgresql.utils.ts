@@ -1,4 +1,4 @@
-import { getManager } from 'typeorm';
+import { geoDataSource } from '@marxan-geoprocessing/data-source';
 
 /**
  * Utility functions related to lower-level interaction with PostgreSQL servers.
@@ -10,7 +10,7 @@ export class PostgreSQLUtils {
    * Check if the PostgreSQL server we are connected to is version 13 or higher.
    */
   static async version13Plus(): Promise<boolean> {
-    const postgresqlMajorVersion = await getManager()
+    const postgresqlMajorVersion = await geoDataSource
       .query('show server_version')
       .then((result: [{ server_version: string }]) => {
         return result[0].server_version.split('.')[0];
