@@ -1,8 +1,8 @@
 import * as path from 'path';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { DbConnections } from './ormconfig.connections';
 import { LoggerOptions } from 'typeorm';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 /**
  * @see https://typeorm.io/#/using-ormconfig/using-ormconfigjs
@@ -20,7 +20,7 @@ export const apiConnections: Record<
     // Could be named differently for it to be more descriptive, but keeping
     // this as `default` allows avoiding explicitly specifying the connection in
     // `TypeOrmModule.forFeature()`
-    name: DbConnections.default,
+    applicationName: DbConnections.default,
     synchronize: false,
     type: 'postgres',
     username: AppConfig.get('postgresApi.username'),
@@ -54,7 +54,7 @@ export const apiConnections: Record<
     ),
   },
   [DbConnections.geoprocessingDB]: {
-    name: DbConnections.geoprocessingDB,
+    applicationName: DbConnections.geoprocessingDB,
     synchronize: false,
     type: 'postgres',
     username: AppConfig.get('postgresGeoApi.username'),
