@@ -23,7 +23,6 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -43,6 +42,7 @@ import {
   GivenProjectPus,
   GivenUserExists,
 } from '../cloning/fixtures';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -260,17 +260,12 @@ const getFixtures = async () => {
         provide: DatFileDelimiterFinder,
         useClass: DatFileDelimiterFinderFake,
       },
-      {
-        provide: Logger,
-        useValue: {
-          error: () => {},
-          setContext: () => {},
-        },
-      },
     ],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const organizationId = v4();
   const projectId = v4();
   const scenarioId = v4();

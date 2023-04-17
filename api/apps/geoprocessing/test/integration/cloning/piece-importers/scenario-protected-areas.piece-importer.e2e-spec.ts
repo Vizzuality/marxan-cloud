@@ -16,7 +16,6 @@ import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { ProtectedArea } from '@marxan/protected-areas';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
@@ -32,6 +31,7 @@ import {
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 interface ScenarioSelectResult {
   protected_area_filter_by_ids: string[];
@@ -114,13 +114,11 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioProtectedAreasPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioProtectedAreasPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const scenarioId = v4();
   const projectId = v4();

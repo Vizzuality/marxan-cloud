@@ -6,7 +6,7 @@ import {
   LegacyProjectImportFilesRepository,
   LegacyProjectImportStoragePath,
 } from '@marxan/legacy-project-import';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppConfig } from '../../../utils/config.utils';
@@ -75,7 +75,6 @@ import { UpdateSolutionsAreLockedHandler } from './update-solutions-are-locked-t
     CancelLegacyProjectImportHandler,
     MarkLegacyProjectImportAsCanceledHandler,
     UpdateSolutionsAreLockedHandler,
-    { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
 export class LegacyProjectImportApplicationModule {}

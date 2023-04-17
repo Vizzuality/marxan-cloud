@@ -28,6 +28,7 @@ import {
   GivenFeaturesData,
   GivenScenarioExists,
 } from '../fixtures';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 function getFeatureClassNameByIdMap(
   features: { id: string; feature_class_name: string }[],
@@ -102,13 +103,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioFeaturesDataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioFeaturesDataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const resourceKind = ResourceKind.Project;
   const oldScenarioId = v4();
   const scenarioId = v4();

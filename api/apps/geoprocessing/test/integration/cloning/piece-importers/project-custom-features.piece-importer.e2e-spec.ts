@@ -14,7 +14,6 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/project-custom-features';
 import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import {
   getEntityManagerToken,
@@ -31,6 +30,7 @@ import {
   GivenProjectExists,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -96,19 +96,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([], geoprocessingConnections.apiDB.name),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ProjectCustomFeaturesPieceImporter,
-      {
-        provide: Logger,
-        useValue: {
-          error: () => {},
-          setContext: () => {},
-        },
-      },
-    ],
+    providers: [ProjectCustomFeaturesPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const userId = v4();

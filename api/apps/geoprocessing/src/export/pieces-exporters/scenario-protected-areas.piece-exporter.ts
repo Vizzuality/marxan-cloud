@@ -5,7 +5,7 @@ import { ComponentLocation } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { ScenarioProtectedAreasContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-protected-areas';
 import { isDefined } from '@marxan/utils';
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -38,16 +38,17 @@ type SelectWdpaResult = WdpaProtectedArea | CustomProtectedArea;
 @PieceExportProvider()
 export class ScenarioProtectedAreasPieceExporter
   implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioProtectedAreasPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ScenarioProtectedAreasPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.ScenarioProtectedAreas;

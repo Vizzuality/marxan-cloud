@@ -12,7 +12,7 @@ import {
   ScenariosOutputResultsApiEntity,
 } from '@marxan/marxan-output';
 import { FileService } from '@marxan/shapefile-converter';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { promises, readdirSync } from 'fs';
@@ -39,6 +39,10 @@ type SolutionsFileExtension = 'dat' | 'csv' | 'txt';
 @LegacyProjectImportPieceProcessorProvider()
 export class SolutionsLegacyProjectPieceImporter
   implements LegacyProjectImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    SolutionsLegacyProjectPieceImporter.name,
+  );
+
   constructor(
     private readonly filesRepo: LegacyProjectImportFilesRepository,
     private readonly filesService: FileService,
@@ -50,10 +54,7 @@ export class SolutionsLegacyProjectPieceImporter
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB.name)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(SolutionsLegacyProjectPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: LegacyProjectImportPiece): boolean {
     return piece === LegacyProjectImportPiece.Solutions;

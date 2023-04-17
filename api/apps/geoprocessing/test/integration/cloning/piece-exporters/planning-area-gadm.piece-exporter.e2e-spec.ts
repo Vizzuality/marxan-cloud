@@ -5,7 +5,6 @@ import { ResourceKind } from '@marxan/cloning/domain';
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
@@ -18,6 +17,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -55,13 +55,12 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      PlanningAreaGadmPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [PlanningAreaGadmPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const organizationId = v4();
   const sut = sandbox.get(PlanningAreaGadmPieceExporter);

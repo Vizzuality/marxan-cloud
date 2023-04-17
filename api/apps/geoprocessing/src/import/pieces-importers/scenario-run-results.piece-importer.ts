@@ -17,7 +17,7 @@ import {
 } from '@marxan/marxan-output';
 import { ScenariosPuPaDataGeo } from '@marxan/scenarios-planning-unit';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -36,6 +36,10 @@ interface ProjectsPuSelectResult {
 @Injectable()
 @PieceImportProvider()
 export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioRunResultsPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
@@ -45,10 +49,7 @@ export class ScenarioRunResultsPieceImporter implements ImportPieceProcessor {
       geoprocessingConnections.apiDB.name,
     )
     private readonly outputSummariesRepo: Repository<ScenariosOutputResultsApiEntity>,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ScenarioRunResultsPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return piece === ClonePiece.ScenarioRunResults;

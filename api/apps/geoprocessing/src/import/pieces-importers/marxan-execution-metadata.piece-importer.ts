@@ -10,7 +10,7 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm/entity-manager/EntityManager';
@@ -25,14 +25,15 @@ type MetadataFolderBuffers = Record<string, Buffer>;
 @PieceImportProvider()
 export class MarxanExecutionMetadataPieceImporter
   implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    MarxanExecutionMetadataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarxanExecutionMetadataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.MarxanExecutionMetadata;

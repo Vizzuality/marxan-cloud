@@ -12,7 +12,7 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-features-specification';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { isDefined, readableToBuffer } from '@marxan/utils';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { chunk } from 'lodash';
@@ -40,16 +40,17 @@ type FeatureNames = {
 @PieceImportProvider()
 export class ScenarioFeaturesSpecificationPieceImporter
   implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ScenarioFeaturesSpecificationPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ScenarioFeaturesSpecificationPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece): boolean {
     return piece === ClonePiece.FeaturesSpecification;

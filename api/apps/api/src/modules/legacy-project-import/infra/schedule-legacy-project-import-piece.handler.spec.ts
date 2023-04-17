@@ -4,7 +4,6 @@ import { ResourceId } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { LegacyProjectImportPiece } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
@@ -19,6 +18,7 @@ import { LegacyProjectImportMemoryRepository } from './legacy-project-import-mem
 import { importLegacyProjectPieceQueueToken } from './legacy-project-import-queue.provider';
 import { ScheduleLegacyProjectImportPiece } from './schedule-legacy-project-import-piece.command';
 import { ScheduleLegacyProjectImportPieceHandler } from './schedule-legacy-project-import-piece.handler';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -124,13 +124,6 @@ const getFixtures = async () => {
         },
       },
       {
-        provide: Logger,
-        useValue: {
-          setContext: () => {},
-          error: () => {},
-        },
-      },
-      {
         provide: LegacyProjectImportRepository,
         useClass: LegacyProjectImportMemoryRepository,
       },
@@ -140,6 +133,7 @@ const getFixtures = async () => {
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const ownerId = UserId.create();
   const commands: ICommand[] = [];

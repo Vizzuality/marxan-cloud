@@ -1,6 +1,6 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { ConsoleLogger, NotFoundException } from '@nestjs/common';
+import { Logger, NotFoundException } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { isRight } from 'fp-ts/lib/Either';
 import { ApiEventByTopicAndKind } from '../../api-events/api-event.topic+kind.api.entity';
@@ -10,13 +10,14 @@ import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as
 @CommandHandler(MarkLegacyProjectImportAsFailed)
 export class MarkLegacyProjectImportAsFailedHandler
   implements IInferredCommandHandler<MarkLegacyProjectImportAsFailed> {
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsFailedHandler.name,
+  );
+
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarkLegacyProjectImportAsFailedHandler.name);
-  }
+  ) {}
 
   async findPreviousEvent(
     kind: API_EVENT_KINDS,

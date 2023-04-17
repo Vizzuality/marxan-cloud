@@ -2,7 +2,7 @@ import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/c
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { PuvsprCalculationsEntity } from '@marxan/puvspr-calculations';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScenariosOutputResultsApiEntity } from '../../../../../libs/marxan-output/src';
 import { MarxanExecutionMetadataPieceImporter } from './marxan-execution-metadata.piece-importer';
@@ -44,7 +44,6 @@ import { ScenarioRunResultsPieceImporter } from './scenario-run-results.piece-im
     ScenarioFeaturesSpecificationPieceImporter,
     MarxanExecutionMetadataPieceImporter,
     ProjectPuvsprCalculationsPieceImporter,
-    { provide: Logger, useClass: Logger, scope: Scope.TRANSIENT },
   ],
 })
 export class PiecesImportersModule {}

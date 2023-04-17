@@ -8,7 +8,6 @@ import {
 } from '@marxan/cloning/domain';
 import { UserId } from '@marxan/domain-ids';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { CqrsModule, EventBus, IEvent } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
 import { v4 } from 'uuid';
@@ -90,14 +89,11 @@ const getFixtures = async () => {
         provide: ExportRepository,
         useClass: MemoryExportRepo,
       },
-      {
-        provide: Logger,
-        useClass: FakeLogger,
-      },
       CompleteExportPieceHandler,
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const events: IEvent[] = [];
 

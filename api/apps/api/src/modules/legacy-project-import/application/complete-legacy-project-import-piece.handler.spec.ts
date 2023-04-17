@@ -7,7 +7,6 @@ import {
   LegacyProjectImportPiece,
 } from '@marxan/legacy-project-import';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -190,15 +189,12 @@ const getFixtures = async () => {
         provide: LegacyProjectImportRepository,
         useClass: LegacyProjectImportMemoryRepository,
       },
-      {
-        provide: Logger,
-        useClass: FakeLogger,
-      },
       CompleteLegacyProjectImportPieceHandler,
       FakeMarkLegacyProjectImportAsFailed,
     ],
   }).compile();
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
 
   const ownerId = UserId.create();
   const projectId = ResourceId.create();

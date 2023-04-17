@@ -1,5 +1,5 @@
 import { FailedImportDbCleanupJobInput } from '@marxan/cloning/job-input';
-import { Inject, ConsoleLogger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { ImportRepository } from '../../import/application/import.repository.port';
@@ -9,14 +9,15 @@ import { ScheduleDbCleanupForFailedImport } from './schedule-db-cleanup-for-fail
 @CommandHandler(ScheduleDbCleanupForFailedImport)
 export class ScheduleDbCleanupForFailedImportHandler
   implements IInferredCommandHandler<ScheduleDbCleanupForFailedImport> {
+  private readonly logger: Logger = new Logger(
+    ScheduleDbCleanupForFailedImportHandler.name,
+  );
+
   constructor(
     @Inject(failedImportDbCleanupQueueToken)
     private readonly queue: Queue<FailedImportDbCleanupJobInput>,
     private readonly importRepository: ImportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ScheduleDbCleanupForFailedImportHandler.name);
-  }
+  ) {}
 
   async execute({ importId }: ScheduleDbCleanupForFailedImport): Promise<void> {
     const importInstance = await this.importRepository.find(importId);

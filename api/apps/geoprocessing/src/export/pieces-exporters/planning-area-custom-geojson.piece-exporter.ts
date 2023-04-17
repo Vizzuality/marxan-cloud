@@ -4,7 +4,7 @@ import { ComponentLocation, ResourceKind } from '@marxan/cloning/domain';
 import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/clone-piece-data';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -22,14 +22,15 @@ type PlanningAreaGeojsonSelectResult = {
 @PieceExportProvider()
 export class PlanningAreaCustomGeojsonPieceExporter
   implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningAreaCustomGeojsonPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(PlanningAreaCustomGeojsonPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

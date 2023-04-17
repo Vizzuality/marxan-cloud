@@ -4,7 +4,7 @@ import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceId } from '@marxan/cloning/domain';
-import { ConsoleLogger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import {
   CommandBus,
   CommandHandler,
@@ -20,6 +20,10 @@ import { MarkLegacyProjectImportAsFinished } from './mark-legacy-project-import-
 @CommandHandler(MarkLegacyProjectImportAsFinished)
 export class MarkLegacyProjectImportAsFinishedHandler
   implements IInferredCommandHandler<MarkLegacyProjectImportAsFinished> {
+  private readonly logger: Logger = new Logger(
+    MarkLegacyProjectImportAsFinishedHandler.name,
+  );
+
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
@@ -28,10 +32,7 @@ export class MarkLegacyProjectImportAsFinishedHandler
     private readonly usersRepo: Repository<UsersProjectsApiEntity>,
     @InjectRepository(Scenario)
     private readonly scenariosRepo: Repository<Scenario>,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarkLegacyProjectImportAsFinishedHandler.name);
-  }
+  ) {}
 
   private async markLegacyProjectImportAsFailed(
     projectId: ResourceId,

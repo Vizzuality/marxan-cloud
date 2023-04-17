@@ -1,10 +1,4 @@
-import {
-  DynamicModule,
-  Logger,
-  Module,
-  ModuleMetadata,
-  Scope,
-} from '@nestjs/common';
+import { DynamicModule, Module, ModuleMetadata } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersProjectsApiEntity } from '../../../access-control/projects-acl/entity/users-projects.api.entity';
@@ -36,11 +30,6 @@ export class ExportApplicationModule {
         CompleteExportPieceHandler,
         FinalizeArchiveHandler,
         GetArchiveHandler,
-        {
-          provide: Logger,
-          useClass: Logger,
-          scope: Scope.TRANSIENT,
-        },
       ],
       exports: [],
     };

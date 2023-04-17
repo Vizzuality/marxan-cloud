@@ -2,7 +2,7 @@ import {
   FromShapefileJobInput,
   jobSubmissionFailed,
 } from '@marxan/scenario-cost-surface';
-import { Inject, ConsoleLogger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { Either, left, right } from 'fp-ts/lib/Either';
@@ -16,14 +16,13 @@ import { UpdateCostSurface } from './update-cost-surface.command';
 @CommandHandler(UpdateCostSurface)
 export class UpdateCostSurfaceHandler
   implements IInferredCommandHandler<UpdateCostSurface> {
+  private readonly logger: Logger = new Logger(UpdateCostSurfaceHandler.name);
+
   constructor(
     @Inject(surfaceCostQueueToken)
     private readonly queue: Queue<FromShapefileJobInput>,
     private readonly events: CostSurfaceEventsPort,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(UpdateCostSurfaceHandler.name);
-  }
+  ) {}
 
   async execute({
     scenarioId,

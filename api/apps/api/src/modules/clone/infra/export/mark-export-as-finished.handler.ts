@@ -1,7 +1,7 @@
 import { ApiEventsService } from '@marxan-api/modules/api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
 import { ResourceKind } from '@marxan/cloning/domain';
-import { ConsoleLogger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { ExportRepository } from '../../export/application/export-repository.port';
 import { MarkExportAsFinished } from './mark-export-as-finished.command';
@@ -9,6 +9,10 @@ import { MarkExportAsFinished } from './mark-export-as-finished.command';
 @CommandHandler(MarkExportAsFinished)
 export class MarkExportAsFinishedHandler
   implements IInferredCommandHandler<MarkExportAsFinished> {
+  private readonly logger: Logger = new Logger(
+    MarkExportAsFinishedHandler.name,
+  );
+
   private eventMapper: Record<ResourceKind, API_EVENT_KINDS> = {
     project: API_EVENT_KINDS.project__export__finished__v1__alpha,
     scenario: API_EVENT_KINDS.scenario__export__finished__v1__alpha,
@@ -17,10 +21,7 @@ export class MarkExportAsFinishedHandler
   constructor(
     private readonly apiEvents: ApiEventsService,
     private readonly exportRepository: ExportRepository,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(MarkExportAsFinishedHandler.name);
-  }
+  ) {}
 
   async execute({ exportId }: MarkExportAsFinished): Promise<void> {
     const exportInstance = await this.exportRepository.find(exportId);

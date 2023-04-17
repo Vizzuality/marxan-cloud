@@ -12,7 +12,6 @@ import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/c
 import { BlmRange } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { ScenarioMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/scenario-metadata';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
@@ -26,6 +25,7 @@ import {
   GivenScenarioExists,
   GivenUserExists,
 } from '../fixtures';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 interface ScenarioSelectResult {
   name: string;
@@ -140,13 +140,12 @@ const getFixtures = async () => {
       }),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ScenarioMetadataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ScenarioMetadataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const scenarioId = v4();
   const projectId = v4();
   const organizationId = v4();

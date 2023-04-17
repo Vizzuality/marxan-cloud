@@ -3,7 +3,7 @@ import { ClonePiece, ImportJobInput, ImportJobOutput } from '@marxan/cloning';
 import { ProjectMetadataContent } from '@marxan/cloning/infrastructure/clone-piece-data/project-metadata';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { readableToBuffer } from '@marxan/utils';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/lib/Either';
 import { EntityManager } from 'typeorm';
@@ -16,14 +16,15 @@ import {
 @Injectable()
 @PieceImportProvider()
 export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    ProjectMetadataPieceImporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(ProjectMetadataPieceImporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

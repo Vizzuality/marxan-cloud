@@ -6,7 +6,7 @@ import { PlanningAreaCustomContent } from '@marxan/cloning/infrastructure/clone-
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningArea } from '@marxan/planning-area-repository/planning-area.geo.entity';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -28,16 +28,17 @@ type ProjectSelectResult = {
 @Injectable()
 @PieceExportProvider()
 export class PlanningAreaCustomPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningAreaCustomPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly geoprocessingEntityManager: EntityManager,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly apiEntityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(PlanningAreaCustomPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

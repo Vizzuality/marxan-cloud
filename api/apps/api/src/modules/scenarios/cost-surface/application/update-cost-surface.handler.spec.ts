@@ -1,5 +1,4 @@
 import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { Queue } from 'bullmq';
 import { Either, Left, Right } from 'fp-ts/lib/Either';
@@ -11,7 +10,7 @@ import { UpdateCostSurfaceHandler } from './update-cost-surface.handler';
 import { CostSurfaceEventsFake } from './__mocks__/cost-surface-events-fake';
 
 let sut: UpdateCostSurfaceHandler;
-let logger: FakeLogger;
+const logger: FakeLogger = new FakeLogger();
 let addJobMock: jest.SpyInstance;
 let eventsService: CostSurfaceEventsFake;
 
@@ -32,18 +31,15 @@ beforeEach(async () => {
         } as unknown) as Queue,
       },
       {
-        provide: Logger,
-        useClass: FakeLogger,
-      },
-      {
         provide: CostSurfaceEventsPort,
         useClass: CostSurfaceEventsFake,
       },
     ],
   }).compile();
 
+  sandbox.useLogger(logger);
+
   sut = sandbox.get(UpdateCostSurfaceHandler);
-  logger = sandbox.get(Logger);
   eventsService = sandbox.get(CostSurfaceEventsPort);
 });
 

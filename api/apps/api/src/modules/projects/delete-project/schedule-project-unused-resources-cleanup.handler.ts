@@ -1,5 +1,5 @@
 import { UnusedResourcesCleanupJobInput } from '@marxan/unused-resources-cleanup';
-import { Inject, ConsoleLogger } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
 import { ScheduleCleanupForProjectUnusedResources } from './schedule-project-unused-resources-cleanup.command';
@@ -8,15 +8,14 @@ import { unusedResourcesCleanupQueueToken } from '@marxan/unused-resources-clean
 @CommandHandler(ScheduleCleanupForProjectUnusedResources)
 export class ScheduleCleanupForProjectUnusedResourcesHandler
   implements IInferredCommandHandler<ScheduleCleanupForProjectUnusedResources> {
+  private readonly logger: Logger = new Logger(
+    ScheduleCleanupForProjectUnusedResourcesHandler.name,
+  );
+
   constructor(
     @Inject(unusedResourcesCleanupQueueToken)
     private readonly queue: Queue<UnusedResourcesCleanupJobInput>,
-    private logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(
-      ScheduleCleanupForProjectUnusedResourcesHandler.name,
-    );
-  }
+  ) {}
 
   async execute({
     projectId,

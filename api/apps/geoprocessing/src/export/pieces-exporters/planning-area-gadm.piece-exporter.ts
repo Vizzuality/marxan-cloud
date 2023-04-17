@@ -5,7 +5,7 @@ import { ClonePieceRelativePathResolver } from '@marxan/cloning/infrastructure/c
 import { PlanningAreaGadmContent } from '@marxan/cloning/infrastructure/clone-piece-data/planning-area-gadm';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
-import { Injectable, ConsoleLogger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { isLeft } from 'fp-ts/Either';
 import { Readable } from 'stream';
@@ -27,14 +27,15 @@ type QueryResult = {
 @Injectable()
 @PieceExportProvider()
 export class PlanningAreaGadmPieceExporter implements ExportPieceProcessor {
+  private readonly logger: Logger = new Logger(
+    PlanningAreaGadmPieceExporter.name,
+  );
+
   constructor(
     private readonly fileRepository: CloningFilesRepository,
     @InjectEntityManager(geoprocessingConnections.apiDB)
     private readonly entityManager: EntityManager,
-    private readonly logger: ConsoleLogger,
-  ) {
-    this.logger.setContext(PlanningAreaGadmPieceExporter.name);
-  }
+  ) {}
 
   isSupported(piece: ClonePiece, kind: ResourceKind): boolean {
     return (

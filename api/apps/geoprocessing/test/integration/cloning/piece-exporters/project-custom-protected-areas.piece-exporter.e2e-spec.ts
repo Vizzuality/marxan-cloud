@@ -3,12 +3,11 @@ import { ClonePiece, ExportJobInput } from '@marxan/cloning';
 import { ResourceKind } from '@marxan/cloning/domain';
 import { CloningFilesRepository } from '@marxan/cloning-files-repository';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, Right } from 'fp-ts/lib/Either';
 import { Readable } from 'stream';
-import { EntityManager, In, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { ProjectCustomProtectedAreasPieceExporter } from '@marxan-geoprocessing/export/pieces-exporters/project-custom-protected-areas.piece-exporter';
 import { ProtectedArea } from '@marxan/protected-areas';
@@ -21,6 +20,7 @@ import {
   readSavedFile,
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -67,13 +67,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([ProtectedArea]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      ProjectCustomProtectedAreasPieceExporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [ProjectCustomProtectedAreasPieceExporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const projectId = v4();
   const otherProjectId = v4();
   let projectPlanningAreaId: string;

@@ -17,7 +17,6 @@ import {
 } from '@marxan/cloning/infrastructure/clone-piece-data/marxan-execution-metadata';
 import { MarxanExecutionMetadataGeoEntity } from '@marxan/marxan-output';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { Logger } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { isLeft, isRight } from 'fp-ts/lib/Either';
@@ -25,6 +24,7 @@ import { Readable } from 'stream';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
+import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 
 type MetadataFolder = {
   id: string;
@@ -182,13 +182,12 @@ const getFixtures = async () => {
       TypeOrmModule.forFeature([MarxanExecutionMetadataGeoEntity]),
       GeoCloningFilesRepositoryModule,
     ],
-    providers: [
-      MarxanExecutionMetadataPieceImporter,
-      { provide: Logger, useValue: { error: () => {}, setContext: () => {} } },
-    ],
+    providers: [MarxanExecutionMetadataPieceImporter],
   }).compile();
 
   await sandbox.init();
+  sandbox.useLogger(new FakeLogger());
+
   const scenarioId = v4();
   const projectId = v4();
   const oldScenarioId = v4();

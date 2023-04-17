@@ -1,6 +1,6 @@
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
 import { QueueApiEventsModule } from '@marxan-api/modules/queue-api-events';
-import { Logger, Module, Scope } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ExportAdaptersModule } from '../../export/adapters/export-adapters.module';
 import { ArchiveReadySaga } from './archive-ready.saga';
@@ -44,11 +44,6 @@ import { SchedulePieceExportHandler } from './schedule-piece-export.handler';
     CancelExportPendingJobsHandler,
     MarkExportAsFailedHandler,
     MarkExportPiecesAsFailedHandler,
-    {
-      provide: Logger,
-      useClass: Logger,
-      scope: Scope.TRANSIENT,
-    },
   ],
 })
 export class ExportInfraModule {}
