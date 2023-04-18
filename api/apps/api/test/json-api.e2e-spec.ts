@@ -20,8 +20,11 @@ describe('JSON API Specs (e2e)', () => {
     keyForAttribute: 'camelCase',
   });
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await bootstrapApplication();
+  });
+
+  beforeEach(async () => {
     jwtToken = await GivenUserIsLoggedIn(app);
 
     /**

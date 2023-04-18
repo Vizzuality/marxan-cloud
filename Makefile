@@ -12,12 +12,12 @@ endif
 
 include lib/make/compose-detection.mk
 
-CIENV := $(if $(filter $(environment), ci), -f docker-compose-test-e2e.ci.yml , -f docker-compose-test-e2e.local.yml)
+CIENV := $(if $(filter $(environment), local), -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml, -f docker-compose-test-e2e.yml)
 API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
 GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
 REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
 
-DOCKER_COMPOSE_FILE := $(if $(environment), -f docker-compose-test-e2e.yml $(CIENV), -f docker-compose.yml )
+DOCKER_COMPOSE_FILE := $(CIENV)
 DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data && \

@@ -6,18 +6,21 @@ import { FakeQueue } from '../utils/queues';
 import { createWorld } from './world';
 import { pick } from 'lodash';
 
-let app: INestApplication;
-let queue: FakeQueue;
-let world: PromiseType<ReturnType<typeof createWorld>>;
-
-beforeEach(async () => {
-  app = await bootstrapApplication();
-  world = await createWorld(app);
-
-  queue = FakeQueue.getByName('planning-units');
-});
-
 describe('PlanningUnitsModule (e2e)', () => {
+  let app: INestApplication;
+  let queue: FakeQueue;
+  let world: PromiseType<ReturnType<typeof createWorld>>;
+
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+  });
+
+  beforeEach(async () => {
+    world = await createWorld(app);
+
+    queue = FakeQueue.getByName('planning-units');
+  });
+
   describe('When creating a project without Admin Areas', () => {
     beforeEach(async () => {
       queue.disposeFakeJobs();

@@ -10,47 +10,49 @@ let app: INestApplication;
 let queue: FakeQueue;
 let commandBus: CommandBus;
 
-beforeEach(async () => {
-  app = await bootstrapApplication();
-  queue = FakeQueue.getByName(queueName);
-  commandBus = app.get(CommandBus);
-});
-
-describe(`when requesting update`, () => {
-  const scenarioId = v4();
-  const protectedAreaFilterByIds = [v4()];
-  beforeEach(async () => {
-    // could have the whole setup of seeds etc and shoot to API
-    await commandBus.execute(
-      new CalculatePlanningUnitsProtectionLevel(
-        scenarioId,
-        protectedAreaFilterByIds,
-      ),
-    );
+describe(`CalculatePlanningUnitsProtectionLevel (e2e)`, () => {
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+    queue = FakeQueue.getByName(queueName);
+    commandBus = app.get(CommandBus);
   });
 
-  it(`processes the job`, async () => {
-    // we can get the job manually, or beforehand register "processor"
-    // up to us how we want to make the interface easy to use
-    const jobs = Object.values(queue.jobs);
-    expect(jobs.length).toEqual(1); // or other check with name regex or data details
+  describe(`when requesting update`, () => {
+    const scenarioId = v4();
+    const protectedAreaFilterByIds = [v4()];
+    beforeEach(async () => {
+      // could have the whole setup of seeds etc and shoot to API
+      await commandBus.execute(
+        new CalculatePlanningUnitsProtectionLevel(
+          scenarioId,
+          protectedAreaFilterByIds,
+        ),
+      );
+    });
 
-    /**
-     * That's it, for integration testing of API-side, we are fine just to do checks against `queue.jobs`.
-     * We don't need to check if redis/queue works or anything on infrastructure.
-     *
-     *
-     * If we would like to have a full-blown e2e test including GeoService and whole infrastructure, we would need real queues anyway
-     * (and redis or in-memory redis) and decide when to run them (as heavy and potentially flaky ones).
-     * And to run them on staging/prod environments (staging maybe after deployment, prod in regular intervals, for example daily)
-     *
-     * There are a few other options, as mocking bull/redis to go straight to worker within GeoService but they won't provide any real value
-     * (what would it test? just additional effort on mocking, while it anyway tests very ends of each service
-     *
-     */
+    it(`processes the job`, async () => {
+      // we can get the job manually, or beforehand register "processor"
+      // up to us how we want to make the interface easy to use
+      const jobs = Object.values(queue.jobs);
+      expect(jobs.length).toEqual(1); // or other check with name regex or data details
 
-    // pretend we are a worker - see above; we may register workers and tell them return value how we want to
-    // however for integration test (i.e. only API-side) this seems not necessary
-    // another point is that the below may be not necessary unless we have some real "listeners" attached on job finish
+      /**
+       * That's it, for integration testing of API-side, we are fine just to do checks against `queue.jobs`.
+       * We don't need to check if redis/queue works or anything on infrastructure.
+       *
+       *
+       * If we would like to have a full-blown e2e test including GeoService and whole infrastructure, we would need real queues anyway
+       * (and redis or in-memory redis) and decide when to run them (as heavy and potentially flaky ones).
+       * And to run them on staging/prod environments (staging maybe after deployment, prod in regular intervals, for example daily)
+       *
+       * There are a few other options, as mocking bull/redis to go straight to worker within GeoService but they won't provide any real value
+       * (what would it test? just additional effort on mocking, while it anyway tests very ends of each service
+       *
+       */
+
+      // pretend we are a worker - see above; we may register workers and tell them return value how we want to
+      // however for integration test (i.e. only API-side) this seems not necessary
+      // another point is that the below may be not necessary unless we have some real "listeners" attached on job finish
+    });
   });
 });
