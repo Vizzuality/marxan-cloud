@@ -28,11 +28,8 @@ describe('GeoFeaturesModule (e2e)', () => {
     partialMatches: { us: 'us' },
   };
 
-  beforeAll(async () => {
-    app = await bootstrapApplication();
-  });
-
   beforeEach(async () => {
+    app = await bootstrapApplication();
     jwtToken = await GivenUserIsLoggedIn(app);
 
     world = await createWorld(app, jwtToken);

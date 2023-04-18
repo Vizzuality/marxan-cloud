@@ -5,7 +5,7 @@ import { AppConfig } from '@marxan-api/utils/config.utils';
 
 describe(`ApiEventsSecurity (e2e)`, () => {
   let app: INestApplication;
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
   });
 
