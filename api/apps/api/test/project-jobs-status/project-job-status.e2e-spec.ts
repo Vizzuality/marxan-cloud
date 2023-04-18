@@ -7,10 +7,9 @@ import { bootstrapApplication } from '../utils/api-application';
 describe('ProjectJobsStatus (e2e)', () => {
   let app: INestApplication;
   let world: PromiseType<ReturnType<typeof createWorld>>;
-  beforeAll(async () => {
-    app = await bootstrapApplication();
-  });
+
   beforeEach(async () => {
+    app = await bootstrapApplication();
     world = await createWorld(app);
   });
 

@@ -8,11 +8,8 @@ describe('Project protected areas - Upload shapefile (e2e)', () => {
   let app: INestApplication;
   let world: FixtureType<typeof createWorld>;
 
-  beforeAll(async () => {
-    app = await bootstrapApplication();
-  });
-
   beforeEach(async () => {
+    app = await bootstrapApplication();
     world = await createWorld(app);
   });
 

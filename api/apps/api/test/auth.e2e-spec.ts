@@ -6,7 +6,7 @@ import { bootstrapApplication } from './utils/api-application';
 describe('AppController (e2e)', () => {
   let app: INestApplication;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
   });
 

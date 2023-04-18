@@ -19,13 +19,16 @@ beforeAll(async () => {
 beforeEach(async () => {
   // TODO: This approach is not fully functional as it only clears tables that are defined within each microservice.
   //       We need to find a way to clear all tables for both dbs, plus insert admin-regions just once.
-  await clearTables(apiConnection, ['roles', 'api_event_kinds', 'users']);
+  await clearTables(apiConnection, ['roles', 'api_event_kinds']);
   await clearTables(geoConnection);
   await insertAdminRegions(geoConnection);
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await TestClientApi.teardownApps();
+});
+
+afterAll(async () => {
   await apiConnection.close();
   await geoConnection.close();
 });

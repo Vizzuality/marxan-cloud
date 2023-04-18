@@ -11,7 +11,7 @@ let queue: FakeQueue;
 let commandBus: CommandBus;
 
 describe(`CalculatePlanningUnitsProtectionLevel (e2e)`, () => {
-  beforeAll(async () => {
+  beforeEach(async () => {
     app = await bootstrapApplication();
     queue = FakeQueue.getByName(queueName);
     commandBus = app.get(CommandBus);
