@@ -1,4 +1,4 @@
-import { Connection, getConnection } from 'typeorm';
+import { getConnection } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
@@ -30,7 +30,6 @@ export async function seedFeatures(dirPath?: string) {
       await queryRunner.query(sql);
 
       await queryRunner.commitTransaction();
-      console.log('SEED COMPLETED: ', sqlFile);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

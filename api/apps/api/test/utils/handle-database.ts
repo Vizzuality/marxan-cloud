@@ -6,27 +6,26 @@ import { insertAdminRegions } from './test-client/seed/admin-regions';
 let apiConnection: Connection;
 let geoConnection: Connection;
 
+// TODO: Move this to lib to be shared by both microservices. It is not a trivial as it might seem
+
 beforeAll(async () => {
   apiConnection = await createConnection(apiConnections.default);
   geoConnection = await createConnection(apiConnections.geoprocessingDB);
-
-  console.log(apiConnection.isConnected, geoConnection.isConnected);
 
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
 });
 
 beforeEach(async () => {
-  await clearTables(apiConnection, ['roles', 'api_event_kinds']);
+  // TODO: This approach is not fully functional as it only clears tables that are defined within each microservice.
+  //       We need to find a way to clear all tables for both dbs, plus insert admin-regions just once.
+  await clearTables(apiConnection, ['roles', 'api_event_kinds', 'users']);
   await clearTables(geoConnection);
   await insertAdminRegions(geoConnection);
 });
 
-afterEach(async () => {
-  await TestClientApi.teardownApps();
-});
-
 afterAll(async () => {
+  await TestClientApi.teardownApps();
   await apiConnection.close();
   await geoConnection.close();
 });

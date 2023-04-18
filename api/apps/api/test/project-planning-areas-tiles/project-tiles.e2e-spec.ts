@@ -4,15 +4,18 @@ import { INestApplication } from '@nestjs/common';
 import { bootstrapApplication } from '../utils/api-application';
 import { createWorld } from './world';
 
-let app: INestApplication;
-let world: PromiseType<ReturnType<typeof createWorld>>;
-
-beforeEach(async () => {
-  app = await bootstrapApplication();
-  world = await createWorld(app);
-});
-
 describe('PlanningUnitsTilesModule (e2e)', () => {
+  let app: INestApplication;
+  let world: PromiseType<ReturnType<typeof createWorld>>;
+
+  beforeAll(async () => {
+    app = await bootstrapApplication();
+  });
+
+  beforeEach(async () => {
+    world = await createWorld(app);
+  });
+
   test.only('When creating a regular project whe should be able to access to its planning area tiles', async () => {
     const tile: Buffer = await world.WhenRequestingTileForProjectPlanningArea(
       world.regularProjectId,

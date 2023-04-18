@@ -10,9 +10,11 @@ describe('CountriesModule (e2e)', () => {
 
   let jwtToken: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     app = await bootstrapApplication();
+  });
 
+  beforeEach(async () => {
     const response = await request(app.getHttpServer())
       .post('/auth/sign-in')
       .send({

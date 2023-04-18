@@ -42,17 +42,9 @@
   "geoprocessing": {
     "url": "GEOPROCESSING_URL"
   },
-
   "redis": {
     "host": "REDIS_HOST",
     "port": "REDIS_PORT"
-  },
-
-  "redisApi": {
-    "connection": {
-      "host": "REDIS_HOST",
-      "port": "REDIS_API_SERVICE_PORT"
-    }
   },
   "api": {
     "url": "API_SERVICE_URL",

@@ -17,7 +17,7 @@ case "$1" in
         ;;
     test-e2e)
         echo "Running e2e Tests"
-        yarn test:prepare-db && yarn geoprocessing:test:e2e
+        exec yarn geoprocessing:test:e2e
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (geoprocessing db) for e2e Tests(ESC)[0m"
