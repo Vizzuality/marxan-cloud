@@ -346,7 +346,7 @@ export class ScenarioAclService implements ScenarioAccessControl {
     >
   > {
     const { userId, roleName } = userAndRoleToChange;
-    const userToAdd = await this.users.findOne(userId);
+    const userToAdd = await this.users.findOne({ where: { id: userId } });
 
     if (!userToAdd) return left(userNotFound);
 

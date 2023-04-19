@@ -3,8 +3,8 @@ import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadat
 import { TestClientApi } from './test-client/test-client-api';
 import { E2E_CONFIG } from '../e2e.config';
 import { PlatformAdminEntity } from '@marxan-api/modules/users/platform-admin/admin.api.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { getConnection, Repository } from 'typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from '@marxan-api/modules/users/user.api.entity';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 
@@ -48,7 +48,7 @@ async function granAdminPrivilegesToUser(
     .get<Repository<User>>(getRepositoryToken(User));
 
   const admin = await userRepository.findOneOrFail({
-    email: E2E_CONFIG.users.basic[user].username,
+    where: { email: E2E_CONFIG.users.basic[user].username },
   });
   await adminRepository.save({ userId: admin.id });
 }
@@ -62,10 +62,12 @@ async function assignAdminRegionsToUser(
     .get<Repository<User>>(getRepositoryToken(User));
 
   const admin = await userRepository.findOneOrFail({
-    email: E2E_CONFIG.users.basic[user].username,
+    where: { email: E2E_CONFIG.users.basic[user].username },
   });
 
-  const geoConnection = await getConnection(DbConnections.geoprocessingDB);
+  const geoConnection = await api.getNestInstance.get<DataSource>(
+    getDataSourceToken(DbConnections.geoprocessingDB),
+  );
   await geoConnection.query(
     `UPDATE admin_regions SET created_by = '${admin.id}';`,
   );
