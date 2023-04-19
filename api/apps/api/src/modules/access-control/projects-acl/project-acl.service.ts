@@ -260,7 +260,7 @@ export class ProjectAclService implements ProjectAccessControl {
     loggedUserId: string,
   ): Promise<Either<AclErrors, void>> {
     const { userId, roleName } = userAndRoleToChange;
-    const userToUpdate = await this.users.findOne(userId);
+    const userToUpdate = await this.users.findOne({ where: { id: userId } });
     if (!(await this.isOwner(loggedUserId, projectId)))
       return left(forbiddenError);
     if (!(await this.hasOtherOwner(userId, projectId))) return left(lastOwner);
