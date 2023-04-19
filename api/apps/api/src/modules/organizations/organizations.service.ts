@@ -68,7 +68,7 @@ export class OrganizationsService extends AppBaseService<
   }
 
   async findOne(id: string): Promise<Either<NotFound, Organization>> {
-    const organization = await this.repository.findOne(id);
+    const organization = await this.repository.findOne({ where: { id } });
 
     return organization ? right(organization) : left(notFoundError);
   }

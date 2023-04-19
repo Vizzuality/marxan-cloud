@@ -87,6 +87,7 @@ export class TestClientApi {
     }
     this.apps = [];
   }
+
   public static async initialize(
     overrides = TestClientApi.emptyOverrides,
     imports: ModuleMetadata['imports'] = [],
@@ -120,6 +121,7 @@ export class TestClientApi {
 
     return new TestClientApi(app, moduleRef, nestApplication);
   }
+
   private constructor(
     app: Server,
     moduleRef: TestingModule,
@@ -218,7 +220,7 @@ export class TestClientApi {
       const userRepository: Repository<User> = this.moduleRef.get(
         getRepositoryToken(User),
       );
-      const user = await userRepository.findOneOrFail({ email });
+      const user = await userRepository.findOneOrFail({ where: { email } });
       const validationToken = mailer.confirmationTokens[user.id];
 
       await this.requests.users

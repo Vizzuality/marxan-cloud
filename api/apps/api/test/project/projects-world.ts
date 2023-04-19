@@ -3,8 +3,9 @@ import { OrganizationsTestUtils } from '../utils/organizations.test.utils';
 import { E2E_CONFIG } from '../e2e.config';
 import { ProjectsTestUtils } from '../utils/projects.test.utils';
 import { insertFeatures } from '../utils/test-client/seed/features';
-import { getConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { getDataSourceToken } from '@nestjs/typeorm';
 
 /**
  * See note about the choice of country and admin area codes for the
@@ -32,8 +33,12 @@ export const createWorld = async (app: INestApplication, jwtToken: string) => {
     })
   ).data.id;
 
-  const geoConnection = getConnection(DbConnections.geoprocessingDB);
-  const apiConnection = getConnection(DbConnections.default);
+  const geoConnection = app.get<DataSource>(
+    getDataSourceToken(DbConnections.geoprocessingDB),
+  );
+  const apiConnection = app.get<DataSource>(
+    getDataSourceToken(DbConnections.default),
+  );
   await insertFeatures(apiConnection, geoConnection);
 
   const projectWithGid1 = (

@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
-export const geoDataSource: DataSource = new DataSource(
+export const geoMigrationDataSource: DataSource = new DataSource(
   geoprocessingConnections.default,
 );

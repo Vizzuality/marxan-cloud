@@ -7,7 +7,7 @@ import { PlanningUnitsJob } from '@marxan-jobs/planning-unit-geometry/create.reg
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Job } from 'bullmq';
-import { getConnection, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import {
   PlanningUnitsJobProcessor,
   RegularPlanningAreaJob,
