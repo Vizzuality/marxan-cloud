@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { v4 } from 'uuid';
 
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
@@ -13,6 +13,7 @@ import { LockService } from './locks/lock.service';
 import { ScenarioLockEntity } from './locks/entity/scenario.lock.api.entity';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -73,6 +74,10 @@ const getFixtures = async () => {
   const sandbox = await Test.createTestingModule({
     providers: [
       ScenarioAclService,
+      {
+        provide: getDataSourceToken(DbConnections.default),
+        useValue: {},
+      },
       {
         provide: getRepositoryToken(User),
         useValue: {
