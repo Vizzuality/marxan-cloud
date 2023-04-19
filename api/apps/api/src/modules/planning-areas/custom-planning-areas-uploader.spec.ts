@@ -67,7 +67,7 @@ describe(`when underlying service failed`, () => {
   // then
   it(`should throw`, async () => {
     await expect(result).rejects.toMatchInlineSnapshot(
-      `[Error: Request failed with status code 500]`,
+      `[AxiosError: Request failed with status code 500]`,
     );
   });
 });
