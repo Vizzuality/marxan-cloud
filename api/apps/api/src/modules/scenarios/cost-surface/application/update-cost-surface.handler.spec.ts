@@ -103,6 +103,7 @@ describe(`when job submission fails`, () => {
       Array [
         "Failed submitting cost-surface-for-scenarioId-id job",
         "Error: Oups",
+        "UpdateCostSurfaceHandler",
       ]
     `);
   });
