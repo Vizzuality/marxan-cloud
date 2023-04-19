@@ -167,14 +167,13 @@ async function getFixtures() {
   class FakeScenario implements Pick<Repository<Scenario>, 'findOne'> {
     db: Record<string, Scenario> = {};
 
-    async findOne(scenarioId: any, ...rest: any[]): Promise<Scenario> {
-      expect(rest).toStrictEqual([
-        {
-          relations: ['project', 'project.organization'],
-        },
-      ]);
-      if (typeof scenarioId !== 'string') fail();
-      return this.db[scenarioId];
+    async findOne(findOneOptions: any): Promise<Scenario> {
+      expect(findOneOptions).toHaveProperty('where.id');
+      expect(findOneOptions).toHaveProperty('relations.project.organization');
+      expect(typeof findOneOptions?.where?.id).toBe('string');
+      expect(findOneOptions?.relations?.project?.organization).toBe(true);
+
+      return this.db[findOneOptions?.where?.id];
     }
   }
 

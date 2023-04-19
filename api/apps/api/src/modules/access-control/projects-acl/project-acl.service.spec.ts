@@ -1,5 +1,5 @@
 import { Test } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 
@@ -14,6 +14,7 @@ import { ScenarioLockEntity } from '@marxan-api/modules/access-control/scenarios
 import { LockService } from '@marxan-api/modules/access-control/scenarios-acl/locks/lock.service';
 import { IssuedAuthnToken } from '@marxan-api/modules/authentication/issued-authn-token.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -86,6 +87,10 @@ const getFixtures = async () => {
     providers: [
       ProjectAclService,
       {
+        provide: getDataSourceToken(DbConnections.default),
+        useValue: {},
+      },
+      {
         provide: getRepositoryToken(User),
         useValue: {
           find: jest.fn(),
@@ -139,7 +144,8 @@ const getFixtures = async () => {
         provide: getRepositoryToken(PublishedProject),
         useValue: {
           find: jest.fn(),
-          findOne: (id: string) => publicProjects.find((p) => p === id),
+          findOne: (findOneOptions: any) =>
+            publicProjects.find((p) => p === findOneOptions.where.id),
           createQueryBuilder: jest.fn(() => ({
             leftJoinAndSelect: jest.fn().mockReturnThis(),
             select: jest.fn().mockReturnThis(),
