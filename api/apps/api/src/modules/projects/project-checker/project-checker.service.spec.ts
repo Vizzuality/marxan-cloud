@@ -15,6 +15,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { isEqual } from 'lodash';
 import { FindOneOptions, In, Repository } from 'typeorm';
 import { ScenarioCheckerFake } from '../../../../../api/test/utils/scenario-checker.service-fake';
+import { PlanningAreasService } from '@marxan-api/modules/planning-areas';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -425,7 +426,7 @@ async function getFixtures() {
   const testingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: `ApiEventsService`,
+        provide: ApiEventsService,
         useValue: fakeApiEventsService,
       },
       {
@@ -437,7 +438,7 @@ async function getFixtures() {
         useValue: fakeScenariosRepo,
       },
       {
-        provide: `PlanningAreasService`,
+        provide: PlanningAreasService,
         useValue: fakePlaningAreaFacade,
       },
       {

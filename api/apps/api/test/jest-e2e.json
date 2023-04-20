@@ -12,6 +12,14 @@
     "<rootDir>/utils/set-env-vars.ts",
     "<rootDir>/utils/handle-database.ts"
   ],
+  "transformIgnorePatterns": [
+    "<rootDir>/node_modules/(?!(axios)/)"
+  ],
+  "testRunner": "jasmine2",
+  "snapshotFormat": {
+    "escapeString": true,
+    "printBasicPrototype": true
+  },
   "moduleNameMapper": {
     "@marxan-api/(.*)": "<rootDir>/../src/$1",
     "^@marxan/utils": ["<rootDir>/../../../libs/utils/src"],

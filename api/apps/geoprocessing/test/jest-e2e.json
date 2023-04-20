@@ -21,6 +21,14 @@
     "<rootDir>/test/setEnvironment.ts",
     "<rootDir>/test/utils/handle-database.ts"
   ],
+  "transformIgnorePatterns": [
+    "<rootDir>/node_modules/(?!(axios)/)"
+  ],
+  "testRunner": "jasmine2",
+  "snapshotFormat": {
+    "escapeString": true,
+    "printBasicPrototype": true
+  },
   "moduleNameMapper": {
     "@marxan-geoprocessing/(.*)": "<rootDir>/src/$1",
     "^@marxan/utils": [
