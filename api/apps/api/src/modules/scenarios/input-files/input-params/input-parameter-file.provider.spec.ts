@@ -9,7 +9,7 @@ import { ioSettingsToken } from './io-settings';
 import { defaultBlmRange } from '@marxan-api/modules/projects/blm/domain/blm-values-calculator';
 import { ProjectSourcesEnum } from '@marxan/projects';
 
-jest.useFakeTimers('modern').setSystemTime(new Date('2020-01-01').getTime());
+jest.useFakeTimers().setSystemTime(new Date('2020-01-01').getTime());
 
 jest.mock('config', () => ({
   get: () => 'value',

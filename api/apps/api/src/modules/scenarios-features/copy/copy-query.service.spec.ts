@@ -218,22 +218,6 @@ test(`returns full query with no wdpa`, async () => {
   );
   // and
   expect(query.parameters).toMatchInlineSnapshot(
-    [
-      'parent-feature-id',
-      'key 1',
-      'input-base-feature-id',
-      'scenario-id-1',
-      'specification-id-1',
-      0.2,
-      1,
-      0.3,
-      'random value',
-      'planning-area-id',
-      1,
-      2,
-      3,
-      4,
-    ],
     `
     Array [
       "parent-feature-id",
