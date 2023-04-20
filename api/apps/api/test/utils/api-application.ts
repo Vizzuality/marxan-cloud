@@ -65,9 +65,9 @@ async function assignAdminRegionsToUser(
     where: { email: E2E_CONFIG.users.basic[user].username },
   });
 
-  const geoConnection = await api.getNestInstance.get<DataSource>(
-    getDataSourceToken(DbConnections.geoprocessingDB),
-  );
+  const geoConnection = await api
+    .getNestInstance()
+    .get<DataSource>(getDataSourceToken(DbConnections.geoprocessingDB));
   await geoConnection.query(
     `UPDATE admin_regions SET created_by = '${admin.id}';`,
   );

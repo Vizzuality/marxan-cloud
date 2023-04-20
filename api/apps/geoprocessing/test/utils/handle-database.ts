@@ -1,12 +1,20 @@
-import { Connection, createConnection, MigrationExecutor } from 'typeorm';
+import {
+  Connection,
+  createConnection,
+  DataSource,
+  MigrationExecutor,
+} from 'typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing//ormconfig';
 
-let apiConnection: Connection;
-let geoConnection: Connection;
+let apiConnection: DataSource;
+let geoConnection: DataSource;
 
 beforeAll(async () => {
-  apiConnection = await createConnection(geoprocessingConnections.apiDB);
-  geoConnection = await createConnection(geoprocessingConnections.default);
+  apiConnection = new DataSource(geoprocessingConnections.apiDB);
+  geoConnection = new DataSource(geoprocessingConnections.default);
+
+  apiConnection = await apiConnection.initialize();
+  geoConnection = await geoConnection.initialize();
 
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
@@ -22,21 +30,21 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await apiConnection.close();
-  await geoConnection.close();
+  await apiConnection.destroy();
+  await geoConnection.destroy();
 });
 
 const clearTables = async (
-  connection: Connection,
+  dataSource: DataSource,
   tablesToSkip: string[] = [],
 ) => {
-  const tables = connection.entityMetadatas.filter(
+  const tables = dataSource.entityMetadatas.filter(
     (entity) =>
       entity.tableType !== 'view' && !tablesToSkip.includes(entity.tableName),
   );
 
   for (const table of tables) {
-    const repository = await connection.getRepository(table.tableName);
+    const repository = await dataSource.getRepository(table.tableName);
     await repository.query(
       `TRUNCATE ${table.tableName} RESTART IDENTITY CASCADE;`,
     );
@@ -44,12 +52,12 @@ const clearTables = async (
 };
 
 const ensureThereAreNotPendingMigrations = async (
-  connection: Connection,
+  dataSource: DataSource,
   connectionName: string,
 ) => {
   const pendingMigrations = await new MigrationExecutor(
-    connection,
-    connection.createQueryRunner('master'),
+    dataSource,
+    dataSource.createQueryRunner('master'),
   ).getPendingMigrations();
 
   if (pendingMigrations.length) {
