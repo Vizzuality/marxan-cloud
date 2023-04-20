@@ -1,16 +1,19 @@
-import { Connection, createConnection, MigrationExecutor } from 'typeorm';
+import { DataSource, MigrationExecutor } from 'typeorm';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { TestClientApi } from './test-client/test-client-api';
 import { insertAdminRegions } from './test-client/seed/admin-regions';
 
-let apiConnection: Connection;
-let geoConnection: Connection;
+let apiConnection: DataSource;
+let geoConnection: DataSource;
 
 // TODO: Move this to lib to be shared by both microservices. It is not a trivial as it might seem
 
 beforeAll(async () => {
-  apiConnection = await createConnection(apiConnections.default);
-  geoConnection = await createConnection(apiConnections.geoprocessingDB);
+  apiConnection = new DataSource(apiConnections.default);
+  geoConnection = new DataSource(apiConnections.geoprocessingDB);
+
+  apiConnection = await apiConnection.initialize();
+  geoConnection = await geoConnection.initialize();
 
   await ensureThereAreNotPendingMigrations(apiConnection, 'API');
   await ensureThereAreNotPendingMigrations(geoConnection, 'Geoprocessing');
@@ -29,21 +32,21 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await apiConnection.close();
-  await geoConnection.close();
+  await apiConnection.destroy();
+  await geoConnection.destroy();
 });
 
 const clearTables = async (
-  connection: Connection,
+  dataSource: DataSource,
   tablesToSkip: string[] = [],
 ) => {
-  const tables = connection.entityMetadatas.filter(
+  const tables = dataSource.entityMetadatas.filter(
     (entity) =>
       entity.tableType !== 'view' && !tablesToSkip.includes(entity.tableName),
   );
 
   for (const table of tables) {
-    const repository = await connection.getRepository(table.tableName);
+    const repository = await dataSource.getRepository(table.tableName);
     await repository.query(
       `TRUNCATE ${table.tableName} RESTART IDENTITY CASCADE;`,
     );
@@ -51,12 +54,12 @@ const clearTables = async (
 };
 
 const ensureThereAreNotPendingMigrations = async (
-  connection: Connection,
+  dataSource: DataSource,
   connectionName: string,
 ) => {
   const pendingMigrations = await new MigrationExecutor(
-    connection,
-    connection.createQueryRunner('master'),
+    dataSource,
+    dataSource.createQueryRunner('master'),
   ).getPendingMigrations();
 
   if (pendingMigrations.length) {
