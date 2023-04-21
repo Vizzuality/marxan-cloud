@@ -20,7 +20,7 @@ export const apiConnections: Record<
     // Could be named differently for it to be more descriptive, but keeping
     // this as `default` allows avoiding explicitly specifying the connection in
     // `TypeOrmModule.forFeature()`
-    applicationName: DbConnections.default,
+    name: DbConnections.default,
     synchronize: false,
     type: 'postgres',
     username: AppConfig.get('postgresApi.username'),
@@ -54,7 +54,7 @@ export const apiConnections: Record<
     ),
   },
   [DbConnections.geoprocessingDB]: {
-    applicationName: DbConnections.geoprocessingDB,
+    name: DbConnections.geoprocessingDB,
     synchronize: false,
     type: 'postgres',
     username: AppConfig.get('postgresGeoApi.username'),
