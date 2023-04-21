@@ -1,4 +1,4 @@
-import { apiMigrationDataSource } from '@marxan-api/ormconfig.migration';
+import { newApiMigrationDataSource } from '@marxan-api/api-data-source';
 
 /**
  * Utility functions related to lower-level interaction with PostgreSQL servers.
@@ -10,14 +10,14 @@ export class PostgreSQLUtils {
    * Check if the PostgreSQL server we are connected to is version 13 or higher.
    */
   static async version13Plus(): Promise<boolean> {
-    await apiMigrationDataSource.initialize();
-    const postgresqlMajorVersion = await apiMigrationDataSource
+    await newApiMigrationDataSource.initialize();
+    const postgresqlMajorVersion = await newApiMigrationDataSource
       .query('show server_version')
       .then((result: [{ server_version: string }]) => {
         return result[0].server_version.split('.')[0];
       })
       .then((majorVersion: string) => Number(majorVersion));
-    await apiMigrationDataSource.destroy();
+    await newApiMigrationDataSource.destroy();
     return postgresqlMajorVersion >= 13;
   }
 }
