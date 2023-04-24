@@ -10,14 +10,13 @@ export class PostgreSQLUtils {
    * Check if the PostgreSQL server we are connected to is version 13 or higher.
    */
   static async version13Plus(): Promise<boolean> {
-    await geoMigrationDataSource.initialize();
+    // Here we do not need to initialize DataSource again, because it is happening internally when starting the migration process
     const postgresqlMajorVersion = await geoMigrationDataSource
       .query('show server_version')
       .then((result: [{ server_version: string }]) => {
         return result[0].server_version.split('.')[0];
       })
       .then((majorVersion: string) => Number(majorVersion));
-    await geoMigrationDataSource.destroy();
     return postgresqlMajorVersion >= 13;
   }
 }
