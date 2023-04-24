@@ -9,8 +9,14 @@ let geoConnection: DataSource;
 // TODO: Move this to lib to be shared by both microservices. It is not a trivial as it might seem
 
 beforeAll(async () => {
-  apiConnection = new DataSource(apiConnections.default);
-  geoConnection = new DataSource(apiConnections.geoprocessingDB);
+  apiConnection = new DataSource({
+    ...apiConnections.default,
+    name: 'apiTestDatasourceAPI',
+  });
+  geoConnection = new DataSource({
+    ...apiConnections.geoprocessingDB,
+    name: 'apiTestDatasourceGEO',
+  });
 
   apiConnection = await apiConnection.initialize();
   geoConnection = await geoConnection.initialize();
