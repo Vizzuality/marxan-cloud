@@ -15,11 +15,11 @@ import { MarkLegacyProjectImportAsFailed } from './mark-legacy-project-import-as
 @CommandHandler(MarkLegacyProjectImportAsSubmitted)
 export class MarkLegacyProjectImportAsSubmittedHandler
   implements IInferredCommandHandler<MarkLegacyProjectImportAsSubmitted> {
+  private readonly logger: Logger = new Logger();
   constructor(
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly apiEvents: ApiEventsService,
     private readonly commandBus: CommandBus,
-    private readonly logger: Logger,
   ) {}
 
   private async markLegacyProjectImportAsSubmitted(
