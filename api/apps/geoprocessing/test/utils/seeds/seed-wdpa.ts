@@ -1,11 +1,14 @@
-import { Connection, getConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { getDataSourceToken } from '@nestjs/typeorm';
+import { INestApplication } from '@nestjs/common';
 
-export const seedWdpa = async () => {
-  const connection: Connection = await getConnection(
-    geoprocessingConnections.default.name,
+
+export const seedWdpa = async (app: INestApplication) => {
+  const dataSource: DataSource = await app.get<DataSource>(
+    getDataSourceToken(geoprocessingConnections.default.name),
   );
-  await connection.manager.query(
+  await dataSource.manager.query(
     '\n' +
       `
 

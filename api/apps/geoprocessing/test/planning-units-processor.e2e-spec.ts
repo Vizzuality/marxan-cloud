@@ -45,7 +45,7 @@ describe('planning units jobs (e2e)', () => {
     planningUnitsRepo = sandbox.get(getRepositoryToken(PlanningUnitsGeom));
     sut = sandbox.get(PlanningUnitsJobProcessor);
 
-    await seedAdminRegions();
+    await seedAdminRegions(sandbox);
   });
 
   afterEach(async () => {

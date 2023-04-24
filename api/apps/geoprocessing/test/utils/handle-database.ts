@@ -1,6 +1,4 @@
 import {
-  Connection,
-  createConnection,
   DataSource,
   MigrationExecutor,
 } from 'typeorm';
@@ -10,8 +8,14 @@ let apiConnection: DataSource;
 let geoConnection: DataSource;
 
 beforeAll(async () => {
-  apiConnection = new DataSource(geoprocessingConnections.apiDB);
-  geoConnection = new DataSource(geoprocessingConnections.default);
+  apiConnection = new DataSource({
+    ...geoprocessingConnections.apiDB,
+    name: 'geoTestDatasourceAPI',
+  });
+  geoConnection = new DataSource({
+    ...geoprocessingConnections.default,
+    name: 'geoTestDatasourceGEO',
+  });
 
   apiConnection = await apiConnection.initialize();
   geoConnection = await geoConnection.initialize();

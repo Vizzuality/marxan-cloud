@@ -1,13 +1,19 @@
-import { getConnection } from 'typeorm';
+import { DataSource } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
+import { INestApplicationContext } from '@nestjs/common';
+import { getDataSourceToken } from '@nestjs/typeorm';
 
-export async function seedFeatures(dirPath?: string) {
-  const queryRunner = await getConnection(
-    geoprocessingConnections.default.name,
-  ).createQueryRunner();
+export async function seedFeatures(
+  app: INestApplicationContext,
+  dirPath?: string,
+) {
+  const dataSource = app.get<DataSource>(
+    getDataSourceToken(geoprocessingConnections.default.name),
+  );
+  const queryRunner = dataSource.createQueryRunner();
   const featureId = v4();
 
   const sqlFiles = fs
