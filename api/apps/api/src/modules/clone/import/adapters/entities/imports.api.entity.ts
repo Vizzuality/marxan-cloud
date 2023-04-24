@@ -30,6 +30,7 @@ export class ImportEntity {
     type: 'enum',
     name: 'resource_kind',
     enum: ResourceKind,
+    enumName: 'clone_resource_kind_enum',
   })
   resourceKind!: ResourceKind;
 
