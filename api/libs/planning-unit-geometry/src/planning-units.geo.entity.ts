@@ -33,6 +33,7 @@ export class PlanningUnitsGeom {
      * values of this column.
      */
     enum: PlanningUnitGridShape,
+    enumName: 'planning_unit_grid_shape',
     type: 'enum',
     name: 'type',
   })

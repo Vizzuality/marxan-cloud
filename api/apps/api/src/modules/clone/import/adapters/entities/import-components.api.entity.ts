@@ -24,6 +24,7 @@ export class ImportComponentEntity {
     type: 'enum',
     name: 'piece',
     enum: ClonePiece,
+    enumName: 'clone_piece_enum',
   })
   piece!: ClonePiece;
 
