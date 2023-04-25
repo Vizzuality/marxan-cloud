@@ -35,10 +35,8 @@ export class PlanningUnitsFilters {
 @Injectable()
 export class PlanningUnitsService {
   private readonly logger: Logger = new Logger(PlanningUnitsService.name);
-  constructor(
-    @Inject(TileService)
-    private readonly tileService: TileService,
-  ) {}
+
+  constructor(private readonly tileService: TileService) {}
 
   /**
    * @todo findTile for entity:(already created grid for a scenario with join options of other entities)
@@ -82,6 +80,7 @@ export class PlanningUnitsService {
       customQuery,
     });
   }
+
   /**
    * @param x x param of a tiler system
    * @param y y param of a tiler system
@@ -121,6 +120,7 @@ export class PlanningUnitsService {
 
     return query;
   }
+
   /**
    * @param filters including only bounding box of the area where the grids would be generated
    *

@@ -49,7 +49,6 @@ export class AdminAreasService {
   constructor(
     @InjectRepository(AdminArea)
     private readonly adminAreasRepository: Repository<AdminArea>,
-    @Inject(TileService)
     private readonly tileService: TileService,
   ) {}
 
