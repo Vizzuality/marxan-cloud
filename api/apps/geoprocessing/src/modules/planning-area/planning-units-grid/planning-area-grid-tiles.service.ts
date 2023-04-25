@@ -12,7 +12,6 @@ export class PlanningAreaGridTilesService {
   constructor(
     @InjectRepository(PlanningUnitsGeom)
     private readonly repository: Repository<PlanningUnitsGeom>,
-    @Inject('TileService')
     private readonly tileService: TileService,
   ) {}
 

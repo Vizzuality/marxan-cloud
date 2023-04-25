@@ -6,15 +6,11 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Project } from './project.api.entity';
 import { CreateProjectDTO } from './dto/create.project.dto';
 import { UpdateProjectDTO } from './dto/update.project.dto';
-import { UsersService } from '@marxan-api/modules/users/users.service';
-import { ScenariosCrudService } from '@marxan-api/modules/scenarios/scenarios-crud.service';
 import { PlanningUnitsService } from '@marxan-api/modules/planning-units';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
 } from '@marxan-api/utils/app-base.service';
-import { AdminAreasService } from '@marxan-api/modules/admin-areas/admin-areas.service';
-import { CountriesService } from '@marxan-api/modules/countries/countries.service';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { User } from '@marxan-api/modules/users/user.api.entity';
@@ -57,14 +53,6 @@ export class ProjectsCrudService extends AppBaseService<
   constructor(
     @InjectRepository(Project)
     protected readonly repository: Repository<Project>,
-    @Inject(forwardRef(() => ScenariosCrudService))
-    protected readonly scenariosService: ScenariosCrudService,
-    @Inject(UsersService) protected readonly usersService: UsersService,
-    @Inject(AdminAreasService)
-    protected readonly adminAreasService: AdminAreasService,
-    @Inject(CountriesService)
-    protected readonly countriesService: CountriesService,
-    @Inject(PlanningUnitsService)
     private readonly planningUnitsService: PlanningUnitsService,
     private readonly planningAreasService: PlanningAreasService,
     @InjectRepository(UsersProjectsApiEntity)

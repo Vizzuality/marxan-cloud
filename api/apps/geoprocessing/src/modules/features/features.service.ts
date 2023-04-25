@@ -35,7 +35,6 @@ export class FeatureService {
   constructor(
     @InjectRepository(GeoFeatureGeometry)
     private readonly featuresRepository: Repository<GeoFeatureGeometry>,
-    @Inject(TileService)
     private readonly tileService: TileService,
   ) {}
 

@@ -32,7 +32,7 @@ export class OrganizationsService extends AppBaseService<
   constructor(
     @InjectRepository(Organization)
     protected readonly repository: Repository<Organization>,
-    @Inject(UsersService) private readonly usersService: UsersService,
+    private readonly usersService: UsersService,
   ) {
     super(repository, 'organization', 'organizations', {
       logging: { muteAll: AppConfig.getBoolean('logging.muteAll', false) },
