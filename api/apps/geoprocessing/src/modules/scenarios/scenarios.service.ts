@@ -82,7 +82,6 @@ export class ScenariosService {
   constructor(
     @InjectRepository(ScenariosPuPaDataGeo)
     private readonly scenariosPuDataRepository: Repository<ScenariosPuPaDataGeo>,
-    @Inject(TileService)
     private readonly tileService: TileService,
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
@@ -194,15 +193,15 @@ export class ScenariosService {
   ): Promise<Buffer> {
     const { id, z, x, y, blmValue } = tileSpecification;
 
-    const query = `with data as (select unnest(protected_pu_ids) as pu_ids 
-    from blm_final_results bfr where blm_value = $1) 
-    select ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom') as mvt 
+    const query = `with data as (select unnest(protected_pu_ids) as pu_ids
+    from blm_final_results bfr where blm_value = $1)
+    select ST_AsMVT(tile.*, 'layer0', ${extent}, 'mvt_geom') as mvt
     from (select pu_ids, ST_AsMVTGeom(ST_Transform(${geometry}, 3857),
-    ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom from scenarios_pu_data spd 
+    ST_TileEnvelope(${z}, ${x}, ${y}), ${extent}, ${buffer}, true) AS mvt_geom from scenarios_pu_data spd
     inner join projects_pu pp on pp.id = spd.project_pu_id
-    inner join planning_units_geom pug on geom_id = pug.id 
+    inner join planning_units_geom pug on geom_id = pug.id
     left join data on  pp.id = pu_ids
-    where scenario_id = $2 
+    where scenario_id = $2
     and st_intersects(${geometry}, st_transform(ST_TileEnvelope(${z}, ${x}, ${y}), ${inputProjection})) ) as tile`;
 
     const result = await this.entityManager.query(query, [blmValue, id]);
