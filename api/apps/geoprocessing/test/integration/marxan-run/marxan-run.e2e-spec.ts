@@ -37,18 +37,13 @@ describe(`given input data is delayed`, () => {
   });
 
   test(
-    `cancelling marxan run during fetching assets`,
-    async () => {
+    `cancelling marxan run during fetching assets shouldn't finish Marxan run.`,
+    () => {
       expect.assertions(1);
-
-      try {
-        await fixtures.GivenBLMCalibrationIsRunning();
-      } catch (error) {
-        await expect(JSON.parse(error).signal).toEqual('SIGTERM');
-      }
-
-      await delay(1000);
-      fixtures.WhenKillingMarxanRun();
+      setTimeout(fixtures.WhenKillingMarxanRun, 1000);
+      return expect(
+        fixtures.GivenBLMCalibrationIsRunning(),
+      ).rejects.toHaveProperty('signal', 'SIGTERM');
     },
     TEST_TIMEOUT_MULTIPLIER,
   );
@@ -75,18 +70,16 @@ describe(`given input data is available`, () => {
   );
 
   test(
-    `cancelling marxan run`,
-    async () => {
+    `cancelling marxan run shouldn't finish Marxan run.`,
+    () => {
       expect.assertions(1);
 
-      try {
-        await fixtures.GivenBLMCalibrationIsRunning();
-      } catch (error) {
-        await expect(JSON.parse(error).signal).toEqual('SIGTERM');
-      }
+      setTimeout(fixtures.WhenKillingMarxanRun, 1000);
 
-      await delay(1000);
-      fixtures.WhenKillingMarxanRun();
+      expect(fixtures.GivenBLMCalibrationIsRunning()).rejects.toHaveProperty(
+        'signal',
+        'SIGTERM',
+      );
     },
     TEST_TIMEOUT_MULTIPLIER,
   );

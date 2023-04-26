@@ -25,7 +25,6 @@ import { EntityManager, In, Repository } from 'typeorm';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
 import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
-import { delay } from '../../utils';
 import { Test } from '@nestjs/testing';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
@@ -44,20 +43,13 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling blm calibration run during fetching assets`, async () => {
+  test(`cancelling blm calibration run during fetching assets BLM calibration run shouldn't finish`, () => {
     expect.assertions(1);
 
-    fixtures
-      .GivenBLMCalibrationIsRunning()
-      .then(() => {
-        throw new Error(`BLM calibration run shouldn't finish`);
-      })
-      .catch(async (error) => {
-        expect(error.signal).toEqual('SIGTERM');
-      });
-
-    await delay(1000);
-    fixtures.WhenKillingMarxanRun();
+    setTimeout(fixtures.WhenKillingMarxanRun, 1000);
+    return expect(
+      fixtures.GivenBLMCalibrationIsRunning(),
+    ).rejects.toHaveProperty('signal', 'SIGTERM');
   }, 30000);
 });
 
@@ -78,18 +70,15 @@ describe(`given input data is available`, () => {
     60000 * 15,
   );
 
-  test(`cancelling BLM calibration run`, async () => {
+  test(`cancelling BLM calibration run shouldn't finish BLM calibration run.`, () => {
     expect.assertions(1);
 
-    fixtures
-      .GivenBLMCalibrationIsRunning()
-      .then()
-      .catch((error) => {
-        expect(JSON.parse(error).signal).toEqual('SIGTERM');
-      });
+    setTimeout(fixtures.WhenKillingMarxanRun, 1000);
 
-    await delay(1000);
-    fixtures.WhenKillingMarxanRun();
+    expect(fixtures.GivenBLMCalibrationIsRunning()).rejects.toHaveProperty(
+      'signal',
+      'SIGTERM',
+    );
   }, 30000);
 });
 
