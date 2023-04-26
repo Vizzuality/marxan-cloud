@@ -29,7 +29,7 @@ import {
 } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { ProjectSourcesEnum } from '@marxan/projects';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 interface ProjectSelectResult {
   name: string;

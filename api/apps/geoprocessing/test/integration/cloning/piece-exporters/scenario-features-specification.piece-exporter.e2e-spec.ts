@@ -25,7 +25,7 @@ import { ScenarioFeaturesSpecificationContent } from '@marxan/cloning/infrastruc
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

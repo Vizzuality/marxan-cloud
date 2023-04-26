@@ -18,7 +18,7 @@ import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
 import { DeleteProjectAndOrganization, GivenProjectExists } from '../fixtures';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 interface ProjectSelectResult {
   country_id: string;

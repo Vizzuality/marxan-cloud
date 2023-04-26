@@ -27,7 +27,7 @@ import {
   DeleteProjectAndScenarioShells,
   GivenProjectAndScenarioShells,
 } from './fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 type ProjectSelectResult = {
   planning_area_geometry_id: string;

@@ -31,7 +31,7 @@ import {
 import { Readable } from 'stream';
 import { isLeft } from 'fp-ts/lib/Either';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 interface ScenarioSelectResult {
   protected_area_filter_by_ids: string[];

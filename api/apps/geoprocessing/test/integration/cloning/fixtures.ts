@@ -21,6 +21,7 @@ import { hash } from 'bcrypt';
 import { Readable, Transform } from 'stream';
 import { DeepPartial, EntityManager, In } from 'typeorm';
 import { v4 } from 'uuid';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export type TestSpecification = {
   id: string;
@@ -512,7 +513,7 @@ export async function GivenScenarioFeaturesData(
     .createQueryBuilder()
     .insert()
     .into(ScenarioFeaturesData)
-    .values(insertValues)
+    .values(insertValues as QueryDeepPartialEntity<ScenarioFeaturesData>[])
     .execute();
 
   return insertValues;

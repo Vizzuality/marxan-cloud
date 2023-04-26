@@ -24,7 +24,7 @@ import { Readable } from 'stream';
 import { Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 type MetadataFolder = {
   id: string;

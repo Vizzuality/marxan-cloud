@@ -28,7 +28,7 @@ import {
   GivenFeaturesData,
   GivenScenarioExists,
 } from '../fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 function getFeatureClassNameByIdMap(
   features: { id: string; feature_class_name: string }[],

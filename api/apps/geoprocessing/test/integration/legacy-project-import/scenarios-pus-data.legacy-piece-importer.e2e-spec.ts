@@ -32,7 +32,7 @@ import { Readable } from 'stream';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { DeleteProjectPus, GivenProjectPus } from '../cloning/fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

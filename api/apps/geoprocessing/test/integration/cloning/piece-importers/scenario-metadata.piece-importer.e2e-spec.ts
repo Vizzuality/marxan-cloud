@@ -25,7 +25,7 @@ import {
   GivenScenarioExists,
   GivenUserExists,
 } from '../fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 interface ScenarioSelectResult {
   name: string;
