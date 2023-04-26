@@ -37,7 +37,7 @@ import {
   PuvsprCalculationsRepository,
 } from '@marxan/puvspr-calculations';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

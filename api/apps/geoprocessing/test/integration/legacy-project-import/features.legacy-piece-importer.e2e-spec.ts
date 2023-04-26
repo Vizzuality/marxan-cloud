@@ -42,7 +42,7 @@ import {
   GivenProjectPus,
   GivenUserExists,
 } from '../cloning/fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -499,7 +499,7 @@ const getFixtures = async () => {
           expect(result).toBeDefined();
 
           expect(result.warnings).toHaveLength(1);
-          expect(result.warnings![0]).toContain(nonExistingPuid);
+          expect(result.warnings![0]).toContain(nonExistingPuid.toString());
 
           const insertedFeaturesIds = await findProjectFeaturesIds();
 

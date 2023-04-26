@@ -57,6 +57,7 @@ import {
   GivenProjectPus,
   GivenUserExists,
 } from '../cloning/fixtures';
+import { Observable, of } from 'rxjs';
 
 let fixtures: FixtureType<typeof getFixtures>;
 // needs to be comfortably > than the retries interval when polling for
@@ -836,11 +837,9 @@ class FakePuvsprDatReader {
 class FakeHttpService {
   public status = HttpStatus.CREATED;
 
-  post() {
-    return {
-      toPromise: async () => ({
-        status: this.status,
-      }),
-    };
+  post(): Observable<any> {
+    return of({
+      status: this.status,
+    });
   }
 }

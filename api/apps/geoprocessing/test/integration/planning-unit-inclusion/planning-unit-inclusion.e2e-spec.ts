@@ -20,11 +20,10 @@ let world: PromiseType<ReturnType<typeof createWorld>>;
 
 let sut: ScenarioPlanningUnitsInclusionProcessor;
 
-beforeAll(async (done) => {
+beforeAll(async () => {
   app = await bootstrapApplication();
   world = await createWorld(app);
   sut = app.get(ScenarioPlanningUnitsInclusionProcessor);
-  done();
 });
 
 afterAll(async () => {

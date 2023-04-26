@@ -44,7 +44,7 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling blm calibration run during fetching assets`, async (done) => {
+  test(`cancelling blm calibration run during fetching assets`, async () => {
     expect.assertions(1);
 
     fixtures
@@ -54,7 +54,6 @@ describe(`given input data is delayed`, () => {
       })
       .catch(async (error) => {
         expect(error.signal).toEqual('SIGTERM');
-        done();
       });
 
     await delay(1000);
@@ -79,17 +78,14 @@ describe(`given input data is available`, () => {
     60000 * 15,
   );
 
-  test(`cancelling BLM calibration run`, async (done) => {
+  test(`cancelling BLM calibration run`, async () => {
     expect.assertions(1);
 
     fixtures
       .GivenBLMCalibrationIsRunning()
-      .then(() => {
-        done(`Shouldn't finish BLM calibration run.`);
-      })
+      .then()
       .catch((error) => {
         expect(JSON.parse(error).signal).toEqual('SIGTERM');
-        done();
       });
 
     await delay(1000);

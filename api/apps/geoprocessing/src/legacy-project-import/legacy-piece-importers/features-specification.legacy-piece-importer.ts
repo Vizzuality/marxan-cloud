@@ -37,7 +37,8 @@ import {
   SpecDatRow,
   TargetSpecDatRow,
 } from './file-readers/spec-dat.reader';
-import { lastValueFrom } from 'rxjs';
+import { lastValueFrom, Observable } from 'rxjs';
+import { AxiosResponse } from 'axios';
 
 type FeaturesSelectResult = {
   id: string;
@@ -298,7 +299,7 @@ export class FeaturesSpecificationLegacyProjectPieceImporter
       projectId,
     );
 
-    const response = this.httpService.post(
+    const response: Observable<AxiosResponse<any, any>> = this.httpService.post(
       `${AppConfig.get<string>(
         'api.url',
       )}/api/v1/projects/import/legacy/${projectId}/specification`,

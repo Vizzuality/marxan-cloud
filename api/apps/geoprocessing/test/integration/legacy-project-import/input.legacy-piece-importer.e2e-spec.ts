@@ -22,7 +22,7 @@ import {
   DeleteProjectAndOrganization,
   GivenScenarioExists,
 } from '../cloning/fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

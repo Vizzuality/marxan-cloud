@@ -30,7 +30,7 @@ import {
 import { SpecificationOperation } from '@marxan/specification';
 import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 import { DeleteProjectPus, GivenProjectPus } from '../fixtures';
-import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
+import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 
 type FeatureData = {
   id: string;
