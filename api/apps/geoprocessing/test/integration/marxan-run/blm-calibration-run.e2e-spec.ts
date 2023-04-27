@@ -75,10 +75,9 @@ describe(`given input data is available`, () => {
 
     setTimeout(fixtures.WhenKillingMarxanRun, 1000);
 
-    expect(fixtures.GivenBLMCalibrationIsRunning()).rejects.toHaveProperty(
-      'signal',
-      'SIGTERM',
-    );
+    return expect(
+      fixtures.GivenBLMCalibrationIsRunning(),
+    ).rejects.toHaveProperty('signal', 'SIGTERM');
   }, 30000);
 });
 
