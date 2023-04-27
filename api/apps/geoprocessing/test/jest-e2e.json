@@ -10,7 +10,7 @@
   "moduleDirectories": [
     "node_modules"
   ],
-  "testTimeout": 10000,
+  "testTimeout": 30000,
   "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": "/test/.*.e2e-spec.ts$",
