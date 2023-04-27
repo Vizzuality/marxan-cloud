@@ -1,6 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-import { EntityManager, In, Repository } from 'typeorm';
-import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
 import { Feature, MultiPolygon, Polygon } from 'geojson';
 
@@ -25,15 +24,15 @@ const geomType = PlanningUnitGridShape.Square;
 export const createWorld = async (app: INestApplication) => {
   const projectId = v4();
   const scenarioId = v4();
-  const entityManager = app.get<EntityManager>(getEntityManagerToken());
-  const projectsPuRepo: Repository<ProjectsPuEntity> = entityManager.getRepository(
+  const dataSource = app.get<DataSource>(DataSource);
+  const projectsPuRepo: Repository<ProjectsPuEntity> = await dataSource.getRepository(
     ProjectsPuEntity,
   );
-  const puGeometryRepo: Repository<PlanningUnitsGeom> = app.get(
-    getRepositoryToken(PlanningUnitsGeom),
+  const puGeometryRepo: Repository<PlanningUnitsGeom> = await dataSource.getRepository(
+    PlanningUnitsGeom,
   );
-  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = app.get(
-    getRepositoryToken(ScenariosPlanningUnitGeoEntity),
+  const scenarioPuDataRepo: Repository<ScenariosPlanningUnitGeoEntity> = await dataSource.getRepository(
+    ScenariosPlanningUnitGeoEntity,
   );
 
   const geometriesByCase: {
@@ -196,13 +195,17 @@ export const createWorld = async (app: INestApplication) => {
         .map((entity) => entity.id)
         .sort(sortUuid),
     GetUnstatedPlanningUnits: async () =>
+      /**
+       * @debt: refactor this to use .find() with options
+       * currently, possibly because of lockStatus property transform and typeorm breaking change,
+       * not null condition is being passed to raw sql as '= null', instead of 'is null'
+       */
       (
-        await scenarioPuDataRepo.find({
-          where: {
-            scenarioId,
-            lockStatus: LockStatus.Unstated,
-          },
-        })
+        await scenarioPuDataRepo
+          .createQueryBuilder('scenarioPuData')
+          .where('scenarioPuData.scenario_id = :scenarioId', { scenarioId })
+          .andWhere('scenarioPuData.lockin_status IS NULL')
+          .getMany()
       )
         .map((entity) => entity.id)
         .sort(sortUuid),
