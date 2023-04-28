@@ -43,13 +43,17 @@ describe(`given input data is delayed`, () => {
     fixtures.GivenInputFilesAreAvailable(500000);
   });
 
-  test(`cancelling blm calibration run during fetching assets BLM calibration run shouldn't finish`, () => {
+  test(`cancelling blm calibration run during fetching assets BLM calibration run shouldn't finish`, async () => {
     expect.assertions(1);
 
     setTimeout(fixtures.WhenKillingMarxanRun, 1000);
-    return expect(
-      fixtures.GivenBLMCalibrationIsRunning(),
-    ).rejects.toHaveProperty('signal', 'SIGTERM');
+
+    try {
+      await fixtures.GivenBLMCalibrationIsRunning();
+      fail();
+    } catch (e) {
+      expect(e).toHaveProperty('signal', 'SIGTERM');
+    }
   }, 30000);
 });
 
@@ -70,14 +74,17 @@ describe(`given input data is available`, () => {
     60000 * 15,
   );
 
-  test(`cancelling BLM calibration run shouldn't finish BLM calibration run.`, () => {
+  test(`cancelling BLM calibration run shouldn't finish BLM calibration run.`, async () => {
     expect.assertions(1);
 
     setTimeout(fixtures.WhenKillingMarxanRun, 1000);
 
-    return expect(
-      fixtures.GivenBLMCalibrationIsRunning(),
-    ).rejects.toHaveProperty('signal', 'SIGTERM');
+    try {
+      await fixtures.GivenBLMCalibrationIsRunning();
+      fail();
+    } catch (e) {
+      expect(JSON.parse(e)).toHaveProperty('signal', 'SIGTERM');
+    }
   }, 30000);
 });
 
