@@ -19,13 +19,13 @@ const staticReducers = {
   '/reports/frequency': reportsFrequency,
 };
 
-const asyncReducers = {
-};
+const asyncReducers = {};
 
-const createReducer = (newReducers) => combineReducers({
-  ...staticReducers,
-  ...newReducers,
-});
+const createReducer = (newReducers) =>
+  combineReducers({
+    ...staticReducers,
+    ...newReducers,
+  });
 
 const store = configureStore({
   reducer: createReducer(asyncReducers),

@@ -13,18 +13,16 @@ export const getServerSideProps = withProtection(withUser());
 const MePage: React.FC = () => {
   return (
     <Protected>
-
       <Head title="Me" />
 
       <MetaIcons />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
 
-        <div className="flex items-center justify-center text-gray-600 bg-white">
+        <div className="flex items-center justify-center bg-white text-gray-600">
           <Me />
         </div>
-
       </main>
     </Protected>
   );

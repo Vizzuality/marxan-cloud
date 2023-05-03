@@ -6,9 +6,7 @@ export interface LoadingControlProps {
   loading: boolean;
 }
 
-export const LoadingControl = ({
-  loading,
-}: LoadingControlProps) => {
+export const LoadingControl = ({ loading }: LoadingControlProps) => {
   return (
     <Loading
       className="relative inline-flex items-center justify-center p-0.5"

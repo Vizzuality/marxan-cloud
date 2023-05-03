@@ -52,12 +52,12 @@ export interface UsePUGridPreviewLayer {
     settings?: {
       opacity?: number;
       visibility?: boolean;
-    },
-  }
+    };
+  };
 }
 
 export interface UseWDPAPreviewLayer {
-  pid: string,
+  pid: string;
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
@@ -78,7 +78,7 @@ export interface UseFeaturePreviewLayers {
   bbox?: number[] | unknown;
   features?: SelectedItemProps[];
   options?: {
-    featuresRecipe?: Record<string, any>[],
+    featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
     opacity?: number;
@@ -91,7 +91,7 @@ export interface UseTargetedPreviewLayers {
   bbox?: number[] | unknown;
   features?: TargetSPFItemProps[];
   options?: {
-    featuresRecipe?: Record<string, any>[],
+    featuresRecipe?: Record<string, any>[];
     featureHoverId?: string;
     selectedFeatures?: Array<string>;
     opacity?: number;
@@ -118,45 +118,45 @@ export interface UsePUGridLayer {
     postHighlightFeatures?: Array<string>;
     cost?: {
       min: number;
-      max: number,
-    }
+      max: number;
+    };
     settings?: {
       pugrid?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       'wdpa-percentage'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       features?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       'features-highlight'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       cost?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       'lock-in'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       'lock-out'?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       frequency?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
       solution?: {
         opacity?: number;
         visibility?: boolean;
-      },
+      };
     };
   };
 }
@@ -183,9 +183,9 @@ export interface UseLegend {
     wdpaThreshold?: number;
     cost?: {
       min: number;
-      max: number,
+      max: number;
     };
-    items?:string[];
+    items?: string[];
     puAction?: string;
     puIncludedValue?: string[];
     puExcludedValue?: string[];

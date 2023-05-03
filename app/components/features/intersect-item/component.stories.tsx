@@ -11,17 +11,11 @@ export default {
 };
 
 const Template: Story<ItemProps> = ({ ...args }: ItemProps) => {
-  const [selectedS, setSelectedS] = useState(
-    args.selected,
-  );
+  const [selectedS, setSelectedS] = useState(args.selected);
 
-  const [splitSelectedS, setSplitSelectedS] = useState(
-    args.splitSelected,
-  );
+  const [splitSelectedS, setSplitSelectedS] = useState(args.splitSelected);
 
-  const [splitFeaturesSelectedS, setSplitFeaturesSelectedS] = useState(
-    args.splitFeaturesSelected,
-  );
+  const [splitFeaturesSelectedS, setSplitFeaturesSelectedS] = useState(args.splitFeaturesSelected);
 
   return (
     <Item

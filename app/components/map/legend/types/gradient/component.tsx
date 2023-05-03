@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { useNumberFormatter } from '@react-aria/i18n';
 import cx from 'classnames';
+
+import { useNumberFormatter } from '@react-aria/i18n';
 
 export interface LegendTypeGradientProps {
   className?: {
-    box?: string,
+    box?: string;
     bar?: string;
     labels?: string;
   };
@@ -31,7 +32,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
     >
       <div
         className={cx({
-          'flex w-full h-2': true,
+          'flex h-2 w-full': true,
           [className?.bar]: className?.bar,
         })}
         style={{
@@ -39,7 +40,7 @@ export const LegendTypeGradient: React.FC<LegendTypeGradientProps> = ({
         }}
       />
 
-      <ul className="flex justify-between w-full mt-1">
+      <ul className="mt-1 flex w-full justify-between">
         {items
           .filter(({ value }) => !!value)
           .map(({ value }) => (

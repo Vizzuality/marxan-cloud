@@ -2,17 +2,16 @@ import React, { useCallback } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useProject, useSaveProject } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
 
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 
 export interface DescriptionProps {
   editable?: boolean;
@@ -31,37 +30,46 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
     },
   });
 
-  const handleProjectSubmit = useCallback((data) => {
-    const { description } = data;
+  const handleProjectSubmit = useCallback(
+    (data) => {
+      const { description } = data;
 
-    saveProjectMutation.mutate({ id: projectData.id, data: { description } }, {
+      saveProjectMutation.mutate(
+        { id: projectData.id, data: { description } },
+        {
+          onSuccess: ({ data: { data: s } }) => {
+            addToast(
+              'success-project-description',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Project description saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
 
-      onSuccess: ({ data: { data: s } }) => {
-        addToast('success-project-description', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Project description saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
+            console.info('Project description saved succesfully', s);
+          },
+          onError: () => {
+            addToast(
+              'error-project-description',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Project name not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
 
-        console.info('Project description saved succesfully', s);
-      },
-      onError: () => {
-        addToast('error-project-description', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Project name not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-
-        console.error('Project description not saved');
-      },
-    });
-  }, [projectData?.id, addToast, saveProjectMutation]);
+            console.error('Project description not saved');
+          },
+        }
+      );
+    },
+    [projectData?.id, addToast, saveProjectMutation]
+  );
 
   return (
     <AnimatePresence>
@@ -92,9 +100,9 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                   id="form-description-project"
                   onSubmit={fprops.handleSubmit}
                   autoComplete="off"
-                  className="relative w-full h-12 px-2"
+                  className="relative h-12 w-full px-2"
                 >
-                  <FieldRFF
+                  <FieldRFF<string>
                     name="name"
                     validate={composeValidators([{ presence: true }])}
                     beforeSubmit={() => {
@@ -106,7 +114,7 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                       <div className="relative h-12">
                         <input
                           {...input}
-                          className="absolute top-0 left-0 w-full h-full font-normal bg-transparent border-none cursor-pointer text-s leading-1 overflow-ellipsis opacity-80 font-heading focus:outline-none"
+                          className="text-s leading-1 absolute left-0 top-0 h-full w-full cursor-pointer overflow-ellipsis border-none bg-transparent font-heading font-normal opacity-80 focus:outline-none"
                           value={`${input.value}`}
                           disabled={!editable}
                           onBlur={() => {
@@ -115,9 +123,10 @@ export const Description: React.FC<DescriptionProps> = ({ editable = false }: De
                           }}
                         />
 
-                        <h1 className={cx({
-                          'invisible h-full px-1.5 font-heading font-normal leading-4': true,
-                        })}
+                        <h1
+                          className={cx({
+                            'invisible h-full px-1.5 font-heading font-normal leading-4': true,
+                          })}
                         >
                           {input.value}
                         </h1>

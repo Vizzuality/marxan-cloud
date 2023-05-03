@@ -5,20 +5,16 @@ import chroma from 'chroma-js';
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
   UseGeoJSONLayer,
-
   UseAdminPreviewLayer,
   UsePlanningAreaPreviewLayer,
   UseWDPAPreviewLayer,
   UseFeaturePreviewLayer,
   UseFeaturePreviewLayers,
   UsePUGridPreviewLayer,
-
   UseProyectPlanningAreaLayer,
   UseProyectGridLayer,
-
   UsePUGridLayer,
   UsePUCompareLayer,
-
   UseLegend,
   UseGridPreviewLayer,
   UseScenarioBLMLayer,
@@ -31,9 +27,7 @@ import {
  * GLOBAL LAYERS
  *******************************************************************
  */
-export function useGeoJsonLayer({
-  id, active, data, options,
-}: UseGeoJSONLayer) {
+export function useGeoJsonLayer({ id, active, data, options }: UseGeoJSONLayer) {
   const { customPAshapefileGrid } = options || {};
 
   return useMemo(() => {
@@ -69,7 +63,11 @@ export function useGeoJsonLayer({
 
 // Admin preview layer
 export function useAdminPreviewLayer({
-  active, country, region, subregion, cache = 0,
+  active,
+  country,
+  region,
+  subregion,
+  cache = 0,
 }: UseAdminPreviewLayer) {
   const level = useMemo(() => {
     if (subregion) return 2;
@@ -89,7 +87,9 @@ export function useAdminPreviewLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/administrative-areas/${level}/preview/tiles/{z}/{x}/{y}.mvt?guid=${guid}`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/administrative-areas/${level}/preview/tiles/{z}/{x}/{y}.mvt?guid=${guid}`,
+        ],
       },
       render: {
         layers: [
@@ -109,7 +109,9 @@ export function useAdminPreviewLayer({
 
 // Planning area preview layer
 export function usePlanningAreaPreviewLayer({
-  active, planningAreaId, cache = 0,
+  active,
+  planningAreaId,
+  cache = 0,
 }: UsePlanningAreaPreviewLayer) {
   return useMemo(() => {
     if (!active || !planningAreaId) return null;
@@ -119,7 +121,9 @@ export function usePlanningAreaPreviewLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${planningAreaId}/preview/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${planningAreaId}/preview/tiles/{z}/{x}/{y}.mvt`,
+        ],
       },
       render: {
         layers: [
@@ -137,9 +141,7 @@ export function usePlanningAreaPreviewLayer({
   }, [active, planningAreaId, cache]);
 }
 
-export function useGridPreviewLayer({
-  active, gridId, cache = 0,
-}: UseGridPreviewLayer) {
+export function useGridPreviewLayer({ active, gridId, cache = 0 }: UseGridPreviewLayer) {
   return useMemo(() => {
     if (!active || !gridId) return null;
 
@@ -148,7 +150,9 @@ export function useGridPreviewLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${gridId}/grid/preview/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/planning-area/${gridId}/grid/preview/tiles/{z}/{x}/{y}.mvt`,
+        ],
       },
       render: {
         layers: [
@@ -160,7 +164,6 @@ export function useGridPreviewLayer({
               'line-color': COLORS.primary,
               'line-opacity': 0.5,
             },
-
           },
         ],
       },
@@ -170,7 +173,12 @@ export function useGridPreviewLayer({
 
 // WDPA preview layer
 export function useWDPAPreviewLayer({
-  pid, active, bbox, wdpaIucnCategories, cache = 0, options,
+  pid,
+  active,
+  bbox,
+  wdpaIucnCategories,
+  cache = 0,
+  options,
 }: UseWDPAPreviewLayer) {
   const { opacity = 1, visibility = true } = options || {};
 
@@ -183,7 +191,9 @@ export function useWDPAPreviewLayer({
       opacity,
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/${pid}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/protected-areas/${pid}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
+        ],
       },
       render: {
         layers: [
@@ -195,7 +205,8 @@ export function useWDPAPreviewLayer({
             },
             // wdpaIucnCategories are filtered in two steps as they are custom and WDPA.
             // We have not way to separate them into two arrays but it would be ideal
-            filter: ['any',
+            filter: [
+              'any',
               ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
               ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
@@ -209,7 +220,8 @@ export function useWDPAPreviewLayer({
             layout: {
               visibility: visibility ? 'visible' : 'none',
             },
-            filter: ['any',
+            filter: [
+              'any',
               ['all', ['in', ['get', 'iucn_cat'], ['literal', wdpaIucnCategories]]],
               ['all', ['in', ['get', 'id'], ['literal', wdpaIucnCategories]]],
             ],
@@ -224,9 +236,7 @@ export function useWDPAPreviewLayer({
 }
 
 // Feature preview layer
-export function useFeaturePreviewLayer({
-  active, bbox, id, cache = 0,
-}: UseFeaturePreviewLayer) {
+export function useFeaturePreviewLayer({ active, bbox, id, cache = 0 }: UseFeaturePreviewLayer) {
   return useMemo(() => {
     if (!active || !bbox) return null;
 
@@ -235,7 +245,9 @@ export function useFeaturePreviewLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
+        ],
       },
       render: {
         layers: [
@@ -261,14 +273,16 @@ export function useFeaturePreviewLayer({
 }
 
 export function useFeaturePreviewLayers({
-  active, bbox, features, cache = 0, options = {},
+  active,
+  bbox,
+  features,
+  cache = 0,
+  options = {},
 }: UseFeaturePreviewLayers) {
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    const {
-      featuresRecipe = [], selectedFeatures = [],
-    } = options;
+    const { featuresRecipe = [], selectedFeatures = [] } = options;
 
     const FEATURES = [...features]
       .filter((ft) => selectedFeatures.includes(ft.id as string))
@@ -287,75 +301,89 @@ export function useFeaturePreviewLayers({
       return 'visible';
     };
 
-    return FEATURES
-      .map((f, index) => {
-        const { id } = f;
+    return FEATURES.map((f, index) => {
+      const { id } = f;
 
-        const F = featuresRecipe.find((fr) => fr.id === id) || f;
+      const F = featuresRecipe.find((fr) => fr.id === id) || f;
 
-        const COLOR = (selectedFeatures.length > COLORS['features-preview'].ramp.length)
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[selectedFeatures.length - 1 - index]
+      const COLOR =
+        selectedFeatures.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[
+              selectedFeatures.length - 1 - index
+            ]
           : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
 
-        return {
-          id: `feature-${id}-preview-layer-${cache}`,
+      return {
+        id: `feature-${id}-preview-layer-${cache}`,
+        type: 'vector',
+        source: {
           type: 'vector',
-          source: {
-            type: 'vector',
-            tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
-          },
-          render: {
-            layers: [
-              {
-                type: 'fill',
-                'source-layer': 'layer0',
-                ...F.splitSelected && {
-                  filter: [
-                    'all',
-                    ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+          tiles: [
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${id}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
+          ],
+        },
+        render: {
+          layers: [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              ...(F.splitSelected && {
+                filter: [
+                  'all',
+                  [
+                    'in',
+                    ['to-string', ['get', F.splitSelected]],
+                    ['literal', F.splitFeaturesSelected.map((s) => s.id)],
                   ],
-                },
-                layout: {
-                  visibility: getLayerVisibility(),
-                },
-                paint: {
-                  'fill-color': COLOR,
-                  'fill-opacity': opacity,
-                },
+                ],
+              }),
+              layout: {
+                visibility: getLayerVisibility(),
               },
-              {
-                type: 'line',
-                'source-layer': 'layer0',
-                ...F.splitSelected && {
-                  filter: [
-                    'all',
-                    ['in', ['to-string', ['get', F.splitSelected]], ['literal', F.splitFeaturesSelected.map((s) => s.id)]],
+              paint: {
+                'fill-color': COLOR,
+                'fill-opacity': opacity,
+              },
+            },
+            {
+              type: 'line',
+              'source-layer': 'layer0',
+              ...(F.splitSelected && {
+                filter: [
+                  'all',
+                  [
+                    'in',
+                    ['to-string', ['get', F.splitSelected]],
+                    ['literal', F.splitFeaturesSelected.map((s) => s.id)],
                   ],
-                },
-                layout: {
-                  visibility: getLayerVisibility(),
-                },
-                paint: {
-                  'line-color': '#000',
-                  'line-opacity': 0.5 * opacity,
-                },
+                ],
+              }),
+              layout: {
+                visibility: getLayerVisibility(),
               },
-            ],
-          },
-        };
-      });
+              paint: {
+                'line-color': '#000',
+                'line-opacity': 0.5 * opacity,
+              },
+            },
+          ],
+        },
+      };
+    });
   }, [active, bbox, features, cache, options]);
 }
 
 export function useTargetedPreviewLayers({
-  active, bbox, features, cache = 0, options = {},
+  active,
+  bbox,
+  features,
+  cache = 0,
+  options = {},
 }: UseTargetedPreviewLayers) {
   return useMemo(() => {
     if (!active || !bbox || !features) return [];
 
-    const {
-      selectedFeatures = [],
-    } = options;
+    const { selectedFeatures = [] } = options;
 
     const FEATURES = [...features]
       .filter((ft) => selectedFeatures.includes(ft.id as string))
@@ -374,71 +402,78 @@ export function useTargetedPreviewLayers({
       return 'visible';
     };
 
-    return FEATURES
-      .map((f, index) => {
-        const {
-          id, parentId, splitted, value,
-        } = f;
+    return FEATURES.map((f, index) => {
+      const { id, parentId, splitted, value } = f;
 
-        const ID = splitted ? parentId : id;
+      const ID = splitted ? parentId : id;
 
-        const COLOR = (selectedFeatures.length > COLORS['features-preview'].ramp.length)
-          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[selectedFeatures.length - 1 - index]
+      const COLOR =
+        selectedFeatures.length > COLORS['features-preview'].ramp.length
+          ? chroma.scale(COLORS['features-preview'].ramp).colors(selectedFeatures.length)[
+              selectedFeatures.length - 1 - index
+            ]
           : COLORS['features-preview'].ramp[selectedFeatures.length - 1 - index];
 
-        return {
-          id: `feature-${id}-preview-layer-${cache}`,
+      return {
+        id: `feature-${id}-preview-layer-${cache}`,
+        type: 'vector',
+        source: {
           type: 'vector',
-          source: {
-            type: 'vector',
-            tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${ID}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
-          },
-          render: {
-            layers: [
-              {
-                type: 'fill',
-                'source-layer': 'layer0',
-                ...f.splitSelected && {
-                  filter: [
-                    'all',
-                    ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
-                  ],
-                },
-                layout: {
-                  visibility: getLayerVisibility(),
-                },
-                paint: {
-                  'fill-color': COLOR,
-                  'fill-opacity': opacity,
-                },
+          tiles: [
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/geo-features/${ID}/preview/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
+          ],
+        },
+        render: {
+          layers: [
+            {
+              type: 'fill',
+              'source-layer': 'layer0',
+              ...(f.splitSelected && {
+                filter: [
+                  'all',
+                  ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
+                ],
+              }),
+              layout: {
+                visibility: getLayerVisibility(),
               },
-              {
-                type: 'line',
-                'source-layer': 'layer0',
-                ...f.splitSelected && {
-                  filter: [
-                    'all',
-                    ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
-                  ],
-                },
-                layout: {
-                  visibility: getLayerVisibility(),
-                },
-                paint: {
-                  'line-color': '#000',
-                  'line-opacity': 0.5 * opacity,
-                },
+              paint: {
+                'fill-color': COLOR,
+                'fill-opacity': opacity,
               },
-            ],
-          },
-        };
-      });
+            },
+            {
+              type: 'line',
+              'source-layer': 'layer0',
+              ...(f.splitSelected && {
+                filter: [
+                  'all',
+                  ['in', ['to-string', ['get', f.splitSelected]], ['literal', [value]]],
+                ],
+              }),
+              layout: {
+                visibility: getLayerVisibility(),
+              },
+              paint: {
+                'line-color': '#000',
+                'line-opacity': 0.5 * opacity,
+              },
+            },
+          ],
+        },
+      };
+    });
   }, [active, bbox, features, cache, options]);
 }
 
 // PU Grid preview layer
 export function usePUGridPreviewLayer({
-  active, bbox, planningUnitGridShape, planningUnitAreakm2, cache, options = {},
+  active,
+  bbox,
+  planningUnitGridShape,
+  planningUnitAreakm2,
+  cache,
+  options = {},
 }: UsePUGridPreviewLayer) {
   return useMemo(() => {
     if (!active || !bbox || !planningUnitGridShape || !planningUnitAreakm2) return null;
@@ -462,7 +497,9 @@ export function usePUGridPreviewLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/planning-units/preview/regular/${planningUnitGridShape}/${planningUnitAreakm2}/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/planning-units/preview/regular/${planningUnitGridShape}/${planningUnitAreakm2}/tiles/{z}/{x}/{y}.mvt?bbox=[${bbox}]`,
+        ],
       },
       render: {
         layers: [
@@ -489,7 +526,9 @@ export function usePUGridPreviewLayer({
  *******************************************************************
  */
 export function useProjectPlanningAreaLayer({
-  active, pId, cache = 0,
+  active,
+  pId,
+  cache = 0,
 }: UseProyectPlanningAreaLayer) {
   return useMemo(() => {
     if (!active || !pId) return null;
@@ -499,7 +538,9 @@ export function useProjectPlanningAreaLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/planning-area/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/planning-area/tiles/{z}/{x}/{y}.mvt`,
+        ],
       },
       render: {
         layers: [
@@ -517,9 +558,7 @@ export function useProjectPlanningAreaLayer({
   }, [active, pId, cache]);
 }
 
-export function useProjectGridLayer({
-  active, pId, cache = 0,
-}: UseProyectGridLayer) {
+export function useProjectGridLayer({ active, pId, cache = 0 }: UseProyectGridLayer) {
   return useMemo(() => {
     if (!active || !pId) return null;
 
@@ -528,7 +567,9 @@ export function useProjectGridLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/grid/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/${pId}/grid/tiles/{z}/{x}/{y}.mvt`,
+        ],
       },
       render: {
         layers: [
@@ -539,7 +580,6 @@ export function useProjectGridLayer({
               'line-color': COLORS.primary,
               'line-opacity': 0.5,
             },
-
           },
         ],
       },
@@ -553,7 +593,12 @@ export function useProjectGridLayer({
  *******************************************************************
  */
 export function usePUGridLayer({
-  active, sid, include, sublayers, options = {}, cache,
+  active,
+  sid,
+  include,
+  sublayers,
+  options = {},
+  cache,
 }: UsePUGridLayer) {
   return useMemo(() => {
     if (!active || !sid) return null;
@@ -584,42 +629,22 @@ export function usePUGridLayer({
       solution: SolutionSettings = {},
     } = settings;
 
-    const {
-      opacity: PUgridOpacity = 1,
-      visibility: PUgridVisibility = true,
-    } = PUgridSettings;
-    const {
-      opacity: WdpaPercentageOpacity = 1,
-      visibility: WdpaPercentageVisibility = true,
-    } = WdpaPercentageSettings;
-    const {
-      opacity: FeaturesOpacity = 1,
-      visibility: FeaturesVisibility = true,
-    } = FeaturesSettings;
+    const { opacity: PUgridOpacity = 1, visibility: PUgridVisibility = true } = PUgridSettings;
+    const { opacity: WdpaPercentageOpacity = 1, visibility: WdpaPercentageVisibility = true } =
+      WdpaPercentageSettings;
+    const { opacity: FeaturesOpacity = 1, visibility: FeaturesVisibility = true } =
+      FeaturesSettings;
     const {
       opacity: FeaturesHighlightOpacity = 1,
       visibility: FeaturesHighlightVisibility = true,
     } = FeaturesHighlightSettings;
-    const {
-      opacity: CostOpacity = 1,
-      visibility: CostVisibility = true,
-    } = CostSettings;
-    const {
-      opacity: LockInOpacity = 1,
-      visibility: LockInVisibility = true,
-    } = LockInSettings;
-    const {
-      opacity: LockOutOpacity = 1,
-      visibility: LockOutVisibility = true,
-    } = LockOutSettings;
-    const {
-      opacity: FrequencyOpacity = 1,
-      visibility: FrequencyVisibility = true,
-    } = FrequencySettings;
-    const {
-      opacity: SolutionOpacity = 1,
-      visibility: SolutionVisibility = true,
-    } = SolutionSettings;
+    const { opacity: CostOpacity = 1, visibility: CostVisibility = true } = CostSettings;
+    const { opacity: LockInOpacity = 1, visibility: LockInVisibility = true } = LockInSettings;
+    const { opacity: LockOutOpacity = 1, visibility: LockOutVisibility = true } = LockOutSettings;
+    const { opacity: FrequencyOpacity = 1, visibility: FrequencyVisibility = true } =
+      FrequencySettings;
+    const { opacity: SolutionOpacity = 1, visibility: SolutionVisibility = true } =
+      SolutionSettings;
 
     const getLayerVisibility = (layer) => {
       if (!layer) {
@@ -633,7 +658,9 @@ export function usePUGridLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt?include=${include}`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid}/planning-units/tiles/{z}/{x}/{y}.mvt?include=${include}`,
+        ],
       },
       render: {
         layers: [
@@ -663,216 +690,223 @@ export function usePUGridLayer({
           },
 
           // ANALYSIS - GAP ANALYSIS
-          ...sublayers.includes('features') ? [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(FeaturesVisibility),
-              },
-              // ...runId && {
-              //   filter: [
-              //     'all',
-              //     ['in', `-${runId}-`, ['get', 'valuePosition']],
-              //   ],
-              // },
-              paint: {
-                'fill-color': COLORS.features,
-                'fill-opacity': [
-                  'case',
-                  ['any',
-                    ...(features.map((id) => {
-                      return ['in', id, ['get', 'featureList']];
-                    })),
-                  ],
-                  0.5 * FeaturesOpacity,
-                  0,
-                ],
-              },
-            },
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(FeaturesHighlightVisibility),
-              },
-              paint: {
-                'fill-color': COLORS.highlightFeatures,
-                'fill-opacity': [
-                  'case',
-                  ['any',
-                    ...(preHighlightFeatures.map((id) => {
-                      return ['in', id, ['get', 'featureList']];
-                    })),
-                  ],
-                  0.5 * FeaturesHighlightOpacity,
-                  0,
-                ],
-              },
-            },
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(FeaturesHighlightVisibility),
-              },
-              paint: {
-                'fill-color': COLORS.highlightFeatures,
-                'fill-opacity': [
-                  'case',
-                  ['any',
-                    ...(postHighlightFeatures.map((id) => {
-                      return ['in', id, ['get', 'featureList']];
-                    })),
-                  ],
-                  0.5 * FeaturesOpacity,
-                  0,
-                ],
-              },
-            },
-
-          ] : [],
+          ...(sublayers.includes('features')
+            ? [
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(FeaturesVisibility),
+                  },
+                  // ...runId && {
+                  //   filter: [
+                  //     'all',
+                  //     ['in', `-${runId}-`, ['get', 'valuePosition']],
+                  //   ],
+                  // },
+                  paint: {
+                    'fill-color': COLORS.features,
+                    'fill-opacity': [
+                      'case',
+                      [
+                        'any',
+                        ...features.map((id) => {
+                          return ['in', id, ['get', 'featureList']];
+                        }),
+                      ],
+                      0.5 * FeaturesOpacity,
+                      0,
+                    ],
+                  },
+                },
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(FeaturesHighlightVisibility),
+                  },
+                  paint: {
+                    'fill-color': COLORS.highlightFeatures,
+                    'fill-opacity': [
+                      'case',
+                      [
+                        'any',
+                        ...preHighlightFeatures.map((id) => {
+                          return ['in', id, ['get', 'featureList']];
+                        }),
+                      ],
+                      0.5 * FeaturesHighlightOpacity,
+                      0,
+                    ],
+                  },
+                },
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(FeaturesHighlightVisibility),
+                  },
+                  paint: {
+                    'fill-color': COLORS.highlightFeatures,
+                    'fill-opacity': [
+                      'case',
+                      [
+                        'any',
+                        ...postHighlightFeatures.map((id) => {
+                          return ['in', id, ['get', 'featureList']];
+                        }),
+                      ],
+                      0.5 * FeaturesOpacity,
+                      0,
+                    ],
+                  },
+                },
+              ]
+            : []),
 
           // ANALYSIS - COST SURFACE
-          ...sublayers.includes('cost') ? [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(CostVisibility),
-              },
-              paint: {
-                'fill-color': [
-                  'interpolate',
-                  ['linear'],
-                  ['get', 'costValue'],
-                  cost.min === cost.max ? 0 : cost.min,
-                  COLORS.cost[0],
-                  cost.max,
-                  COLORS.cost[1],
-                ],
-                'fill-opacity': 0.75 * CostOpacity,
-              },
-            },
-          ] : [],
+          ...(sublayers.includes('cost')
+            ? [
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(CostVisibility),
+                  },
+                  paint: {
+                    'fill-color': [
+                      'interpolate',
+                      ['linear'],
+                      ['get', 'costValue'],
+                      cost.min === cost.max ? 0 : cost.min,
+                      COLORS.cost[0],
+                      cost.max,
+                      COLORS.cost[1],
+                    ],
+                    'fill-opacity': 0.75 * CostOpacity,
+                  },
+                },
+              ]
+            : []),
 
           // PROTECTED AREAS
-          ...sublayers.includes('wdpa-percentage') && wdpaThreshold !== null && !!wdpaIucnCategories.length
+          ...(sublayers.includes('wdpa-percentage') &&
+          wdpaThreshold !== null &&
+          !!wdpaIucnCategories.length
             ? [
-              {
-                type: 'fill',
-                'source-layer': 'layer0',
-                layout: {
-                  visibility: getLayerVisibility(WdpaPercentageVisibility),
-                },
-                paint: {
-                  'fill-color': COLORS.wdpa,
-                  'fill-opacity': [
-                    'case',
-                    ['all',
-                      ['has', 'percentageProtected'],
-                      ['>=', ['get', 'percentageProtected'], (wdpaThreshold)],
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(WdpaPercentageVisibility),
+                  },
+                  paint: {
+                    'fill-color': COLORS.wdpa,
+                    'fill-opacity': [
+                      'case',
+                      [
+                        'all',
+                        ['has', 'percentageProtected'],
+                        ['>=', ['get', 'percentageProtected'], wdpaThreshold],
+                      ],
+                      0.5 * WdpaPercentageOpacity,
+                      0,
                     ],
-                    0.5 * WdpaPercentageOpacity,
-                    0,
-                  ],
+                  },
                 },
-              },
-            ] : [],
+              ]
+            : []),
 
           // ANALYSIS - ADJUST PLANNING UNITS
-          ...sublayers.includes('lock-in') && !!puIncludedValue ? [
-            {
-              type: 'line',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(LockInVisibility),
-              },
-              filter: [
-                'all',
-                ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]],
-              ],
-              paint: {
-                'line-color': COLORS.include,
-                'line-opacity': 1 * LockInOpacity,
-                'line-width': 1.5,
-                'line-offset': 0.75,
-              },
-            },
-          ] : [],
-          ...sublayers.includes('lock-out') && !!puExcludedValue ? [
-            {
-              type: 'line',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(LockOutVisibility),
-              },
-              filter: [
-                'all',
-                ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]],
-              ],
-              paint: {
-                'line-color': COLORS.exclude,
-                'line-opacity': 1 * LockOutOpacity,
-                'line-width': 1.5,
-                'line-offset': 0.75,
-              },
-            },
-          ] : [],
+          ...(sublayers.includes('lock-in') && !!puIncludedValue
+            ? [
+                {
+                  type: 'line',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(LockInVisibility),
+                  },
+                  filter: ['all', ['in', ['get', 'scenarioPuId'], ['literal', puIncludedValue]]],
+                  paint: {
+                    'line-color': COLORS.include,
+                    'line-opacity': 1 * LockInOpacity,
+                    'line-width': 1.5,
+                    'line-offset': 0.75,
+                  },
+                },
+              ]
+            : []),
+          ...(sublayers.includes('lock-out') && !!puExcludedValue
+            ? [
+                {
+                  type: 'line',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(LockOutVisibility),
+                  },
+                  filter: ['all', ['in', ['get', 'scenarioPuId'], ['literal', puExcludedValue]]],
+                  paint: {
+                    'line-color': COLORS.exclude,
+                    'line-opacity': 1 * LockOutOpacity,
+                    'line-width': 1.5,
+                    'line-offset': 0.75,
+                  },
+                },
+              ]
+            : []),
 
           // SOLUTIONS - FREQUENCY
-          ...sublayers.includes('frequency') ? [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(FrequencyVisibility),
-              },
-              paint: {
-                'fill-color': [
-                  'interpolate',
-                  ['linear'],
-                  ['get', 'frequencyValue'],
-                  0,
-                  COLORS.frequency[0],
-                  33.33,
-                  COLORS.frequency[1],
-                  66.66,
-                  COLORS.frequency[2],
-                  100,
-                  COLORS.frequency[3],
-                ],
-                'fill-opacity': 0.75 * FrequencyOpacity,
-              },
-            },
-          ] : [],
+          ...(sublayers.includes('frequency')
+            ? [
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(FrequencyVisibility),
+                  },
+                  paint: {
+                    'fill-color': [
+                      'interpolate',
+                      ['linear'],
+                      ['get', 'frequencyValue'],
+                      0,
+                      COLORS.frequency[0],
+                      33.33,
+                      COLORS.frequency[1],
+                      66.66,
+                      COLORS.frequency[2],
+                      100,
+                      COLORS.frequency[3],
+                    ],
+                    'fill-opacity': 0.75 * FrequencyOpacity,
+                  },
+                },
+              ]
+            : []),
 
-          ...sublayers.includes('solution') ? [
-            {
-              type: 'fill',
-              'source-layer': 'layer0',
-              layout: {
-                visibility: getLayerVisibility(SolutionVisibility),
-              },
-              filter: [
-                'all',
-                ['in', `-${runId}-`, ['get', 'valuePosition']],
-              ],
-              paint: {
-                'fill-color': COLORS.primary,
-                'fill-opacity': 0.75 * SolutionOpacity,
-              },
-            },
-          ] : [],
+          ...(sublayers.includes('solution')
+            ? [
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(SolutionVisibility),
+                  },
+                  filter: ['all', ['in', `-${runId}-`, ['get', 'valuePosition']]],
+                  paint: {
+                    'fill-color': COLORS.primary,
+                    'fill-opacity': 0.75 * SolutionOpacity,
+                  },
+                },
+              ]
+            : []),
         ],
       },
     };
   }, [cache, active, sid, options, include, sublayers]);
 }
 
-export function usePUCompareLayer({
-  active, sid1, sid2, cache = 0, options,
-}: UsePUCompareLayer) {
+export function usePUCompareLayer({ active, sid1, sid2, cache = 0, options }: UsePUCompareLayer) {
   const COLOR_NUMBER = 10;
 
   const COLOR_RAMP = useMemo(() => {
@@ -880,7 +914,9 @@ export function usePUCompareLayer({
 
     return colors
       .map((c, i) => {
-        const position = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${i % (COLOR_NUMBER + 1)}`;
+        const position = `${Math.floor((i / (COLOR_NUMBER + 1)) % (COLOR_NUMBER + 1))}${
+          i % (COLOR_NUMBER + 1)
+        }`;
         const color = Object.keys(COLORS.compare).reduce((acc, k) => {
           if (COLORS.compare[k].includes(position) && !acc) {
             return k;
@@ -1022,7 +1058,9 @@ export function usePUCompareLayer({
       visibility,
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/compare/${sid2}/tiles/{z}/{x}/{y}.mvt`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sid1}/compare/${sid2}/tiles/{z}/{x}/{y}.mvt`,
+        ],
       },
       render: {
         layers: [
@@ -1057,9 +1095,7 @@ export function usePUCompareLayer({
   }, [active, sid1, sid2, cache, options, COLOR_RAMP]);
 }
 
-export function useScenarioBlmLayer({
-  active, sId, blm, cache = 0,
-}: UseScenarioBLMLayer) {
+export function useScenarioBlmLayer({ active, sId, blm, cache = 0 }: UseScenarioBLMLayer) {
   return useMemo(() => {
     if (!active || !sId) return null;
 
@@ -1068,22 +1104,20 @@ export function useScenarioBlmLayer({
       type: 'vector',
       source: {
         type: 'vector',
-        tiles: [`${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sId}/calibration/tiles/${blm}/{z}/{x}/{y}.mvt`],
+        tiles: [
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/scenarios/${sId}/calibration/tiles/${blm}/{z}/{x}/{y}.mvt`,
+        ],
       },
       render: {
         layers: [
           {
             type: 'fill',
             'source-layer': 'layer0',
-            filter: [
-              'all',
-              ['has', 'pu_ids'],
-            ],
+            filter: ['all', ['has', 'pu_ids']],
             paint: {
               'fill-color': COLORS.primary,
               'fill-opacity': 0.5,
             },
-
           },
         ],
       },
@@ -1096,9 +1130,7 @@ export function useScenarioBlmLayer({
  * LEGEND
  *******************************************************************
  */
-export function useLegend({
-  layers, options = {},
-}: UseLegend) {
+export function useLegend({ layers, options = {} }: UseLegend) {
   return useMemo(() => {
     const { layerSettings = {}, items = [] } = options;
 
@@ -1128,18 +1160,11 @@ export function useLegend({
  * UTILS
  *******************************************************************
  */
-export function useBBOX({
-  bbox,
-}: UseBbox) {
+export function useBBOX({ bbox }: UseBbox) {
   return useMemo(() => {
     if (bbox) {
       if (bbox[0] < bbox[1]) {
-        return [
-          bbox[0] + 360,
-          bbox[1],
-          bbox[2],
-          bbox[3],
-        ];
+        return [bbox[0] + 360, bbox[1], bbox[2], bbox[3]];
       }
       return bbox;
     }

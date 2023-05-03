@@ -22,4 +22,5 @@ export const ROLE_OPTIONS = [
   {
     label: 'Viewer',
     value: 'project_viewer',
-  }];
+  },
+];

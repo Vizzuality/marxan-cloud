@@ -30,9 +30,9 @@ export const Item: React.FC<ItemProps> = ({
   const { ref, inView } = useInView({
     /* Optional options */
     threshold: 0,
-    ...scrollRoot && {
+    ...(scrollRoot && {
       root: scrollRoot.current,
-    },
+    }),
   });
 
   return (
@@ -46,22 +46,16 @@ export const Item: React.FC<ItemProps> = ({
     >
       <header className="flex items-baseline justify-between">
         <div className="flex space-x-2">
-          <h2 className="text-sm font-medium font-heading">{name}</h2>
+          <h2 className="font-heading text-sm font-medium">{name}</h2>
 
           {description && (
-            <InfoButton
-              theme="secondary"
-            >
-              <div className="text-sm opacity-50">
-                {description}
-              </div>
+            <InfoButton theme="secondary">
+              <div className="text-sm opacity-50">{description}</div>
             </InfoButton>
           )}
 
           {!!categories && (
-            <div className="pl-2 ml-2 text-sm underline">
-              {`${categories} Categories`}
-            </div>
+            <div className="ml-2 pl-2 text-sm underline">{`${categories} Categories`}</div>
           )}
         </div>
         <div>

@@ -1,6 +1,4 @@
-import {
-  useMemo,
-} from 'react';
+import { useMemo } from 'react';
 
 export function useFeatureFlags(): Record<string, boolean> {
   const flags = useMemo(() => {

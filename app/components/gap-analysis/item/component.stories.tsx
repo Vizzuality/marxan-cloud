@@ -10,9 +10,7 @@ export default {
   argTypes: {},
 };
 
-const Template: Story<ItemProps> = ({ ...args }) => (
-  <Item {...args} />
-);
+const Template: Story<ItemProps> = ({ ...args }) => <Item {...args} />;
 
 export const Default: Story<ItemProps> = Template.bind({});
 Default.args = {

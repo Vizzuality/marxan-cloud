@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Label, { LabelProps } from './component';
 
 export default {
@@ -16,11 +18,7 @@ export default {
   },
 };
 
-const Template: Story<LabelProps> = ({ ...args }) => (
-  <Label {...args}>
-    This is a test
-  </Label>
-);
+const Template: Story<LabelProps> = ({ ...args }) => <Label {...args}>This is a test</Label>;
 
 export const Default = Template.bind({});
 Default.args = {

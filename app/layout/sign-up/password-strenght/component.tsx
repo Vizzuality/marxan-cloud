@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 
 import cx from 'classnames';
+
 import stringEntropy from 'fast-password-entropy';
 
 export interface PaasswordStrengthProps {
@@ -9,10 +10,10 @@ export interface PaasswordStrengthProps {
 
 export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
   password,
-}:PaasswordStrengthProps) => {
+}: PaasswordStrengthProps) => {
   const ENTROPY = useMemo(() => {
     const e = stringEntropy(password);
-    return (e > 100) ? 100 : stringEntropy(password);
+    return e > 100 ? 100 : stringEntropy(password);
   }, [password]);
 
   const STRENGTH = useMemo(() => {
@@ -27,8 +28,8 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
   }, [ENTROPY]);
 
   return (
-    <div className="mt-1 space-y-0.5 h-4">
-      <div className="w-full h-1 text-sm bg-gray-100 rounded-md">
+    <div className="mt-1 h-4 space-y-0.5">
+      <div className="h-1 w-full rounded-md bg-gray-100 text-sm">
         <div
           className={cx({
             'h-full rounded-md': true,
@@ -43,12 +44,8 @@ export const PaasswordStrength: React.FC<PaasswordStrengthProps> = ({
       </div>
 
       {!!password && (
-        <div className="text-right text-gray-500 text-xxs">
-          Strength:
-          {' '}
-          <span>
-            {STRENGTH}
-          </span>
+        <div className="text-right text-xxs text-gray-500">
+          Strength: <span>{STRENGTH}</span>
         </div>
       )}
     </div>

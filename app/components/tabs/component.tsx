@@ -1,6 +1,7 @@
 import React from 'react';
 
 import cx from 'classnames';
+
 import { motion } from 'framer-motion';
 
 export interface TabsProps {
@@ -16,11 +17,7 @@ export interface TabsProps {
   onSelected?: (selected: string | number) => void | unknown;
 }
 
-export const Tabs: React.FC<TabsProps> = ({
-  items = [],
-  selected,
-  onSelected,
-}: TabsProps) => {
+export const Tabs: React.FC<TabsProps> = ({ items = [], selected, onSelected }: TabsProps) => {
   return (
     <ul className="flex justify-between font-heading">
       {items.map((tab) => (
@@ -29,15 +26,13 @@ export const Tabs: React.FC<TabsProps> = ({
             aria-label="select-tab"
             type="button"
             disabled={tab.status === 'disabled'}
-            className={cx(
-              {
-                'relative focus:outline-none text-white text-sm py-4': true,
-                'text-opacity-50': tab.status !== 'disabled',
-                'hover:text-opacity-75': tab.id !== selected && tab.status !== 'disabled',
-                'text-opacity-100 text-white': tab.id === selected && tab.status !== 'disabled',
-                'text-opacity-20 cursor-auto text-white': tab.status === 'disabled',
-              },
-            )}
+            className={cx({
+              'relative py-4 text-sm text-white focus:outline-none': true,
+              'text-opacity-50': tab.status !== 'disabled',
+              'hover:text-opacity-75': tab.id !== selected && tab.status !== 'disabled',
+              'text-white text-opacity-100': tab.id === selected && tab.status !== 'disabled',
+              'cursor-auto text-white text-opacity-20': tab.status === 'disabled',
+            })}
             onClick={() => onSelected(tab.id)}
           >
             {tab.name}
@@ -49,7 +44,7 @@ export const Tabs: React.FC<TabsProps> = ({
               <motion.div
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: '100%' }}
-                className="absolute w-full h-0.5 bg-primary-500 top-0 left-0"
+                className="absolute left-0 top-0 h-0.5 w-full bg-primary-500"
               />
             )}
           </button>

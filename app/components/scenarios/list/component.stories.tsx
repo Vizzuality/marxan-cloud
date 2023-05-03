@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import List, { ListProps } from './component';
 
 export default {
@@ -8,9 +10,7 @@ export default {
   argTypes: {},
 };
 
-const Template: Story<ListProps> = ({ ...args }: ListProps) => (
-  <List {...args} />
-);
+const Template: Story<ListProps> = ({ ...args }: ListProps) => <List {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

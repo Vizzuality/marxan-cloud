@@ -1,8 +1,9 @@
+const taildinwindcss = require('prettier-plugin-tailwindcss');
+
 module.exports = {
   semi: true,
-  trailingComma: 'all',
-  singleQuote: true,
-  printWidth: 80,
   tabWidth: 2,
-  endOfLine: 'lf',
+  printWidth: 100,
+  singleQuote: true,
+  plugins: [taildinwindcss],
 };

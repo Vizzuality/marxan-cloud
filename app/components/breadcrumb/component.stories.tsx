@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Breadcrum, { BreadcrumProps } from './component';
 
 export default {
@@ -8,10 +10,9 @@ export default {
   argTypes: {},
 };
 
-const Template: Story<BreadcrumProps> = ({
-  children,
-  ...args
-}: BreadcrumProps) => <Breadcrum {...args}>{children}</Breadcrum>;
+const Template: Story<BreadcrumProps> = ({ children, ...args }: BreadcrumProps) => (
+  <Breadcrum {...args}>{children}</Breadcrum>
+);
 
 export const Default = Template.bind({});
 Default.args = {

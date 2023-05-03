@@ -2,18 +2,13 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import { useRouter } from 'next/router';
-
 import cx from 'classnames';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
-import { blmFormat } from 'utils/units';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
+
+import { useRouter } from 'next/router';
 
 import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario, useScenarioCalibrationResults } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
-
-import BlmChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
 
 import Button from 'components/button';
 import Field from 'components/forms/field';
@@ -22,12 +17,16 @@ import Label from 'components/forms/label';
 import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import BlmChart from 'layout/scenarios/edit/parameters/blm-calibration/chart';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
+import { blmFormat } from 'utils/units';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import ScenariosBlmResultsCard from './card';
 
 export interface ScenariosBlmResultsProps {
-  maxBlmValue: number,
-  minBlmValue: number,
+  maxBlmValue: number;
+  minBlmValue: number;
 }
 
 export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
@@ -77,74 +76,74 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
     },
   });
 
-  const onSaveBlm = useCallback((values) => {
-    setSubmitting(true);
-    const { blmCalibration } = values;
-    const meta = {
-      scenarioEditingMetadata,
-      marxanInputParameterFile: {
-        ...marxanInputParameterFile,
-        BLM: blmCalibration,
-      },
-    };
+  const onSaveBlm = useCallback(
+    (values) => {
+      setSubmitting(true);
+      const { blmCalibration } = values;
+      const meta = {
+        scenarioEditingMetadata,
+        marxanInputParameterFile: {
+          ...marxanInputParameterFile,
+          BLM: blmCalibration,
+        },
+      };
 
-    saveScenarioMutation.mutate({
-      id: `${sid}`,
-      data:
-      {
-        boundaryLengthModifier: blmCalibration,
-        metadata: mergeScenarioStatusMetaData(meta, {
-          tab: ScenarioSidebarTabs.PARAMETERS,
-          subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
-        }),
-      },
-    }, {
-      onSuccess: ({ data: { data: s } }) => {
-        setSubmitting(false);
-        addToast('success-save-blm-value', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario blm calibration saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
+      saveScenarioMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            boundaryLengthModifier: blmCalibration,
+            metadata: mergeScenarioStatusMetaData(meta, {
+              tab: ScenarioSidebarTabs.PARAMETERS,
+              subtab: ScenarioSidebarSubTabs.BLM_CALIBRATION,
+            }),
+          },
+        },
+        {
+          onSuccess: ({ data: { data: s } }) => {
+            setSubmitting(false);
+            addToast(
+              'success-save-blm-value',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Scenario blm calibration saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
 
-        console.info('Scenario blm calibration saved', s);
-      },
-      onError: () => {
-        setSubmitting(false);
-        addToast('error-save-blm-value', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario blm calibration not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [
-    sid,
-    saveScenarioMutation,
-    addToast,
-    marxanInputParameterFile,
-    scenarioEditingMetadata,
-  ]);
+            console.info('Scenario blm calibration saved', s);
+          },
+          onError: () => {
+            setSubmitting(false);
+            addToast(
+              'error-save-blm-value',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario blm calibration not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [sid, saveScenarioMutation, addToast, marxanInputParameterFile, scenarioEditingMetadata]
+  );
 
   return (
     <>
       <div className="flex">
         {calibrationResultsAreFetched && !!calibrationResultsData.length && (
-          <FormRFF
-            onSubmit={onSaveBlm}
-            initialValues={INITIAL_VALUES}
-          >
+          <FormRFF onSubmit={onSaveBlm} initialValues={INITIAL_VALUES}>
             {({ form, values, handleSubmit }) => {
               return (
                 <form
                   className={cx({
-                    'relative flex flex-col flex-grow pt-10 overflow-hidden text-white': true,
+                    'relative flex flex-grow flex-col overflow-hidden pt-10 text-white': true,
                     'border-t border-gray-500': editable,
                   })}
                   autoComplete="off"
@@ -152,47 +151,45 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                   onSubmit={handleSubmit}
                 >
                   <div className="flex flex-col">
-
-                    <div className="flex items-end w-full space-x-5">
+                    <div className="flex w-full items-end space-x-5">
                       <FieldRFF
                         name="blmCalibration"
                         validate={composeValidators([{ presence: true }])}
                       >
                         {(fprops) => (
                           <Field className="w-44" id="blmCalibration" {...fprops}>
-                            <Label id="blmCalibration" theme="dark" className="flex items-center space-x-2 text-xs uppercase">
+                            <Label
+                              id="blmCalibration"
+                              theme="dark"
+                              className="flex items-center space-x-2 text-xs uppercase"
+                            >
                               <span>BLM:</span>
 
-                              <InfoButton
-                                size="base"
-                                theme="primary"
-                              >
+                              <InfoButton size="base" theme="primary">
                                 <div className="space-y-2">
-                                  <h4 className="font-heading text-lg mb-2.5">Boundary Length Modifier (BLM)</h4>
+                                  <h4 className="mb-2.5 font-heading text-lg">
+                                    Boundary Length Modifier (BLM)
+                                  </h4>
+                                  <p>The BLM should be either ‘0’ or a positive number.</p>
                                   <p>
-                                    The BLM should be either ‘0’ or a positive number.
+                                    It is permissible for the BLM to include decimal points (e.g.
+                                    0.1). Setting the BLM to ‘0’ will remove boundary length from
+                                    consideration altogether.
                                   </p>
                                   <p>
-                                    It is permissible for the BLM to include decimal
-                                    points (e.g. 0.1). Setting the BLM to ‘0’ will
-                                    remove boundary length from consideration altogether.
+                                    There is no universally good value for the BLM, as it works in
+                                    relation to the costs and geometry of the study region/planning
+                                    units.
                                   </p>
                                   <p>
-                                    There is no universally good value for the BLM,
-                                    as it works in relation to the costs and
-                                    geometry of the study region/planning units.
+                                    With a small BLM, Marxan will concentrate on minimizing overall
+                                    reserve cost and will only aim for compactness when little extra
+                                    cost will be incurred.
                                   </p>
                                   <p>
-                                    With a small BLM, Marxan will concentrate on
-                                    minimizing overall reserve cost and will only
-                                    aim for compactness when little extra cost will
-                                    be incurred.
-                                  </p>
-                                  <p>
-                                    Alternatively, a large BLM will
-                                    place a high emphasis on minimizing the
-                                    boundary length, even if it means a more
-                                    costly solution.
+                                    Alternatively, a large BLM will place a high emphasis on
+                                    minimizing the boundary length, even if it means a more costly
+                                    solution.
                                   </p>
                                 </div>
                               </InfoButton>
@@ -216,19 +213,16 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                           </Field>
                         )}
                       </FieldRFF>
-                      <p className="text-sm whitespace-pre opacity-50">{`max ${blmFormat(maxBlmValue)}`}</p>
-                      <Button
-                        type="submit"
-                        theme="primary"
-                        size="base"
-                        disabled={!editable}
-                      >
+                      <p className="whitespace-pre text-sm opacity-50">{`max ${blmFormat(
+                        maxBlmValue
+                      )}`}</p>
+                      <Button type="submit" theme="primary" size="base" disabled={!editable}>
                         Save
                       </Button>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-5 mt-10">
+                  <div className="mt-10 grid grid-cols-3 gap-5">
                     {CALIBRATION_CARDS_DATA.map((result) => {
                       const selected = result.blmValue === values.blmCalibration;
 
@@ -246,10 +240,9 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
                   </div>
 
                   <div className="mb-8">
+                    <h3 className="mb-2 mt-10 text-sm font-bold text-white">Calibration results</h3>
 
-                    <h3 className="mt-10 mb-2 text-sm font-bold text-white">Calibration results</h3>
-
-                    <div className="w-full h-32">
+                    <div className="h-32 w-full">
                       <BlmChart
                         data={CALIBRATION_CHART_DATA}
                         selected={values.blmCalibration}
@@ -262,7 +255,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
 
                   <Loading
                     visible={submitting}
-                    className="absolute top-0 left-0 z-10 flex items-center justify-center w-full h-full text-white bg-gray-700 bg-opacity-90"
+                    className="absolute left-0 top-0 z-10 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90 text-white"
                     iconClassName="w-10 h-10"
                   />
                 </form>
@@ -275,7 +268,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
       {calibrationResultsAreFetching && !calibrationResultsData && (
         <div className="py-10">
           <Loading
-            className="flex items-center justify-center w-full h-full text-white"
+            className="flex h-full w-full items-center justify-center text-white"
             iconClassName="w-10 h-10"
             visible
           />

@@ -1,6 +1,5 @@
-import { Solution } from 'types/project-model';
-
 import { TableRow } from 'components/table/types';
+import { Solution } from 'types/project-model';
 
 export interface SolutionRow extends TableRow, Solution {
   'view-on-map': boolean;
@@ -8,8 +7,8 @@ export interface SolutionRow extends TableRow, Solution {
 }
 
 export interface SolutionsTableProps {
-  bestSolutionId: string,
+  bestSolutionId: string;
   body: SolutionRow[];
-  selectedSolution: string,
+  selectedSolution: string;
   onSelectSolution: (s: Solution) => void;
 }

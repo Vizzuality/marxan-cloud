@@ -1,6 +1,6 @@
 import { QueryClient } from 'react-query';
 
-import { getSession } from 'next-auth/client';
+import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
 
 import PROJECTS from 'services/projects';
@@ -9,16 +9,17 @@ import PUBLISHED_PROJECTS from 'services/published-projects';
 import { mergeDehydratedState } from './utils';
 
 const fetchProject = (session, queryClient, { pid }) => {
-  return queryClient.prefetchQuery(['projects', pid], () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  })
-    .then((response) => {
+  return queryClient.prefetchQuery(['projects', pid], () =>
+    PROJECTS.request({
+      method: 'GET',
+      url: `/${pid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    }).then((response) => {
       return response.data;
-    }));
+    })
+  );
 };
 
 export function withProject(getServerSidePropsFunc?: Function) {
@@ -27,7 +28,7 @@ export function withProject(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -61,7 +62,7 @@ export function withProject(getServerSidePropsFunc?: Function) {
     }
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
@@ -97,15 +98,17 @@ export function withPublishedProject(getServerSidePropsFunc?: Function) {
 
     const queryClient = new QueryClient();
 
-    await queryClient.prefetchQuery(['published-projects', pid], () => PUBLISHED_PROJECTS.request({
-      method: 'GET',
-      url: `/${pid}`,
-    }).then((response) => {
-      return response.data;
-    }));
+    await queryClient.prefetchQuery(['published-projects', pid], () =>
+      PUBLISHED_PROJECTS.request({
+        method: 'GET',
+        url: `/${pid}`,
+      }).then((response) => {
+        return response.data;
+      })
+    );
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));

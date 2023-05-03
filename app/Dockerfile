@@ -1,5 +1,6 @@
-FROM node:14.21.2-alpine3.17
+FROM node:18.15-bullseye
 LABEL maintainer="hello@vizzuality.com"
+
 
 ARG NEXTAUTH_URL
 ARG NEXT_PUBLIC_URL
@@ -9,6 +10,7 @@ ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_FEATURE_FLAGS
 ARG NEXT_PUBLIC_CONTACT_EMAIL
 
+ENV YARN_VERSION 3.5.0
 ENV NAME marxan-app
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
@@ -20,15 +22,18 @@ ENV NEXT_PUBLIC_API_URL $NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_FEATURE_FLAGS $NEXT_PUBLIC_FEATURE_FLAGS
 ENV NEXT_PUBLIC_CONTACT_EMAIL $NEXT_PUBLIC_CONTACT_EMAIL
 
-RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
+RUN addgroup --system --gid 1001 $USER
+RUN adduser --system --uid 1001 $USER
 
 WORKDIR $APP_HOME
 RUN chown $USER:$USER $APP_HOME
 
 USER $USER
 
+COPY --chown=$USER:$USER .yarnrc.docker.yml .yarnrc.yml
+
 COPY --chown=$USER:$USER package.json yarn.lock next.config.js \
-    next-env.d.ts local.d.ts postcss.config.js tailwind.config.js \
+    local.d.ts postcss.config.js tailwind.config.js \
     cypress.json entrypoint.sh tsconfig.json ./
 
 COPY --chown=$USER:$USER .storybook ./.storybook
@@ -49,9 +54,8 @@ COPY --chown=$USER:$USER svgs ./svgs
 COPY --chown=$USER:$USER types ./types
 COPY --chown=$USER:$USER utils ./utils
 
-RUN yarn install --frozen-lockfile
-
-RUN yarn build
+RUN yarn policies set-version $YARN_VERSION
+RUN yarn install --immutable
 
 EXPOSE 3000
 ENTRYPOINT ["./entrypoint.sh"]

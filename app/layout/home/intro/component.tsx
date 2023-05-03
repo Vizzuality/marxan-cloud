@@ -2,17 +2,14 @@ import React, { useCallback } from 'react';
 
 import { motion } from 'framer-motion';
 
-import Wrapper from 'layout/wrapper';
-
 import Button from 'components/button';
+import Wrapper from 'layout/wrapper';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 import HeroAnimation, { BACKGROUND_IMAGES } from './intro-animation';
 
-export interface HomeIntroProps {
-
-}
+export interface HomeIntroProps {}
 
 export const HomeIntro: React.FC<HomeIntroProps> = () => {
   const { backgroundColor } = BACKGROUND_IMAGES[0];
@@ -29,12 +26,12 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
 
   return (
     <div
-      className="relative flex items-center w-full min-h-screen text-white pt-44 md:h-screen md:pt-0"
+      className="relative flex min-h-screen w-full items-center pt-44 text-white md:h-screen md:pt-0"
       style={{ backgroundColor }}
     >
       <HeroAnimation />
       <Wrapper>
-        <div className="relative z-10 flex flex-col justify-between w-full h-full max-w-5xl py-8 m-auto md:py-0 md:mt-52 md:mb-48">
+        <div className="relative z-10 m-auto flex h-full w-full max-w-5xl flex-col justify-between py-8 md:mb-48 md:mt-52 md:py-0">
           <div className="lg:pr-80">
             <motion.h1
               className="pb-8 text-5xl font-semibold leading-tight"
@@ -57,12 +54,12 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
               }}
             >
               The Marxan Planning Platform (MaPP) supports collaboration and decision-making for
-              biodiversity conservation and socio-economic objectives for land, freshwater and
-              ocean systems.
+              biodiversity conservation and socio-economic objectives for land, freshwater and ocean
+              systems.
             </motion.p>
 
             <motion.div
-              className="mt-10 space-y-4 xs:flex xs:space-x-4 xs:space-y-0 md:mt-18 md:mb-18"
+              className="mt-10 space-y-4 xs:flex xs:space-x-4 xs:space-y-0 md:mb-18 md:mt-18"
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{
@@ -70,12 +67,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
                 delay: 0.15 * 2,
               }}
             >
-              <Button
-                className="w-full md:w-40"
-                theme="primary"
-                size="lg"
-                href="/projects"
-              >
+              <Button className="w-full md:w-40" theme="primary" size="lg" href="/projects">
                 Get started
               </Button>
 
@@ -98,15 +90,10 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
               duration: 0.5,
               delay: 0.15 * 3,
             }}
-
           >
-            <button
-              className="mt-8 focus:outline-none"
-              type="button"
-              onClick={onDiscover}
-            >
+            <button className="mt-8 focus:outline-none" type="button" onClick={onDiscover}>
               Discover more
-              <ARROW_DOWN_SVG className="inline w-3.5 ml-3.5 animate-bounce" fill="white" />
+              <ARROW_DOWN_SVG className="ml-3.5 inline w-3.5 animate-bounce" fill="white" />
             </button>
           </motion.div>
         </div>

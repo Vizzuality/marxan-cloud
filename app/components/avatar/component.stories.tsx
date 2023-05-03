@@ -1,6 +1,9 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Icon from 'components/icon';
+
 import HELP_SVG from 'svgs/ui/help.svg';
 
 import Avatar, { AvatarProps } from './component';
@@ -25,30 +28,20 @@ export const Groups = () => {
   return (
     <ul className="flex">
       <li>
-        <Avatar
-          bgImage="/images/avatar.png"
-        />
+        <Avatar bgImage="/images/avatar.png" />
       </li>
       <li className="-ml-3">
-        <Avatar
-          bgImage="/images/avatar.png"
-        />
+        <Avatar bgImage="/images/avatar.png" />
       </li>
       <li className="-ml-3">
-        <Avatar
-          bgImage="/images/avatar.png"
-        />
+        <Avatar bgImage="/images/avatar.png" />
       </li>
       <li className="-ml-3">
-        <Avatar
-          bgImage="/images/avatar.png"
-        />
+        <Avatar bgImage="/images/avatar.png" />
       </li>
       <li className="ml-3">
-        <Avatar
-          className="bg-white"
-        >
-          <Icon icon={HELP_SVG} className="w-5 h-5" />
+        <Avatar className="bg-white">
+          <Icon icon={HELP_SVG} className="h-5 w-5" />
         </Avatar>
       </li>
     </ul>

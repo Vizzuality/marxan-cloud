@@ -6,11 +6,10 @@ import { useRouter } from 'next/router';
 
 import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
 
-import List from 'layout/scenarios/edit/features/set-up/add/intersect/list';
-import Toolbar from 'layout/scenarios/edit/features/set-up/add/intersect/toolbar';
-
 import Button from 'components/button';
 import { composeValidators } from 'components/forms/validations';
+import List from 'layout/scenarios/edit/features/set-up/add/intersect/list';
+import Toolbar from 'layout/scenarios/edit/features/set-up/add/intersect/toolbar';
 
 export interface ScenariosFeaturesIntersectProps {
   intersecting: string;
@@ -28,17 +27,17 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
 
-  const {
-    data: selectedFeaturesData,
-  } = useSelectedFeatures(sid, {}, {
-    refetchOnMount: false,
-  });
+  const { data: selectedFeaturesData } = useSelectedFeatures(
+    sid,
+    {},
+    {
+      refetchOnMount: false,
+    }
+  );
 
   const intersectingCurrent = selectedFeaturesData.find((s) => s.id === intersecting);
 
-  const {
-    isFetched: allFeaturesIsFetched,
-  } = useAllFeatures(pid, {
+  const { isFetched: allFeaturesIsFetched } = useAllFeatures(pid, {
     search,
   });
 
@@ -76,9 +75,8 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 
     const { splitOptions } = feature;
 
-    const splitFeaturesOptions = key ? splitOptions
-      .find((s) => s.key === key).values
-      .map((v) => ({ label: v.name, value: v.id }))
+    const splitFeaturesOptions = key
+      ? splitOptions.find((s) => s.key === key).values.map((v) => ({ label: v.name, value: v.id }))
       : [];
 
     intersections[featureIndex] = {
@@ -112,56 +110,62 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
     setSearch(s);
   }, []);
 
-  const onSubmit = useCallback((values) => {
-    // Save current features then dismiss the modal
-    const { selected } = values;
+  const onSubmit = useCallback(
+    (values) => {
+      // Save current features then dismiss the modal
+      const { selected } = values;
 
-    setSubmitting(true);
+      setSubmitting(true);
 
-    // Save current features then dismiss the modal
-    selectedFeaturesMutation.mutate({
-      id: `${sid}`,
-      data: {
-        status: 'draft',
-        features: selectedFeaturesData.map((sf) => {
-          const { featureId } = sf;
-
-          return {
-            featureId,
-            kind: 'withGeoprocessing',
-            geoprocessingOperations: selected.map((s) => {
-              const { splitSelected, splitFeaturesSelected = [] } = s;
+      // Save current features then dismiss the modal
+      selectedFeaturesMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            status: 'draft',
+            features: selectedFeaturesData.map((sf) => {
+              const { featureId } = sf;
 
               return {
-                kind: 'stratification/v1',
-                intersectWith: {
-                  featureId: s.id,
-                },
-                splitByProperty: splitSelected,
-                splits: splitFeaturesSelected.map((sfs) => {
+                featureId,
+                kind: 'withGeoprocessing',
+                geoprocessingOperations: selected.map((s) => {
+                  const { splitSelected, splitFeaturesSelected = [] } = s;
+
                   return {
-                    value: (sfs.id).toString(),
-                    marxanSettings: {
-                      fpf: 1,
-                      prop: 0.5,
+                    kind: 'stratification/v1',
+                    intersectWith: {
+                      featureId: s.id,
                     },
+                    splitByProperty: splitSelected,
+                    splits: splitFeaturesSelected.map((sfs) => {
+                      return {
+                        value: sfs.id.toString(),
+                        marxanSettings: {
+                          fpf: 1,
+                          prop: 0.5,
+                        },
+                      };
+                    }),
                   };
                 }),
               };
             }),
-          };
-        }),
-      },
-    }, {
-      onSuccess: () => {
-        onDismiss();
-        setSubmitting(false);
-      },
-      onError: () => {
-        setSubmitting(false);
-      },
-    });
-  }, [sid, selectedFeaturesData, selectedFeaturesMutation, onDismiss]);
+          },
+        },
+        {
+          onSuccess: () => {
+            onDismiss();
+            setSubmitting(false);
+          },
+          onError: () => {
+            setSubmitting(false);
+          },
+        }
+      );
+    },
+    [sid, selectedFeaturesData, selectedFeaturesMutation, onDismiss]
+  );
 
   const onCancel = useCallback(() => {
     onDismiss();
@@ -183,16 +187,16 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
   }, []);
 
   return (
-    <FormRFF
-      key="features-intersect"
-      onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
-    >
+    <FormRFF key="features-intersect" onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
       {({ handleSubmit, form, values }) => {
         const { valid } = form.getState();
         return (
-          <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
-            <h2 className="flex-shrink-0 pl-8 mb-5 text-lg pr-28 font-heading">
+          <form
+            onSubmit={handleSubmit}
+            autoComplete="off"
+            className="flex flex-grow flex-col overflow-hidden text-black"
+          >
+            <h2 className="mb-5 flex-shrink-0 pl-8 pr-28 font-heading text-lg">
               Interesect with features
             </h2>
             <Toolbar search={search} onSearch={onSearch} />
@@ -219,13 +223,8 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
             </FieldRFF>
 
             {allFeaturesIsFetched && (
-              <div className="flex justify-center flex-shrink-0 px-8 space-x-3">
-                <Button
-                  className="w-full"
-                  theme="secondary"
-                  size="lg"
-                  onClick={onCancel}
-                >
+              <div className="flex flex-shrink-0 justify-center space-x-3 px-8">
+                <Button className="w-full" theme="secondary" size="lg" onClick={onCancel}>
                   Cancel
                 </Button>
 

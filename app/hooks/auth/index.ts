@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 export function useAccessToken() {
-  const [session] = useSession();
+  const { data: session } = useSession();
   return useMemo(() => {
     return session.accessToken;
   }, [session.accessToken]);

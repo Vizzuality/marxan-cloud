@@ -5,33 +5,33 @@ export interface UseFeaturesFiltersProps {
 }
 
 export interface UseSaveSelectedFeaturesProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveSelectedFeaturesProps {
-  id?: string,
-  data: any
+  id?: string;
+  data: any;
 }
 
 export interface UseDeleteFeatureProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface DeleteFeatureProps {
-  id: string
+  id: string;
 }
 
 export interface UseFeaturesOptionsProps {
   search?: string;
   sort?: string;
-  filters?: Record<string, unknown>
+  filters?: Record<string, unknown>;
 }
 
 export interface UseUploadFeaturesShapefileProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface UploadFeaturesShapefileProps {
-  id?: string,
-  data: any,
+  id?: string;
+  data: any;
 }

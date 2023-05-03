@@ -20,13 +20,9 @@ const PublishedProjectPage: React.FC = () => {
   const { query, asPath } = useRouter();
   const { pid } = query;
 
-  const {
-    data: publishedProject,
-  } = usePublishedProject(pid);
+  const { data: publishedProject } = usePublishedProject(pid);
 
-  const {
-    description, name,
-  } = publishedProject || {};
+  const { description, name } = publishedProject || {};
 
   return (
     <>
@@ -49,7 +45,6 @@ const PublishedProjectPage: React.FC = () => {
         <ProjectDetail />
         <Footer />
       </main>
-
     </>
   );
 };

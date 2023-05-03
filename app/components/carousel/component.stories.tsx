@@ -7,14 +7,10 @@ import Carousel, { CarouselProps } from './component';
 export default {
   title: 'Components/Carousel',
   component: Carousel,
-  argTypes: {
-
-  },
+  argTypes: {},
 };
 
-const Template: Story<CarouselProps> = ({ ...args }: CarouselProps) => (
-  <Carousel {...args} />
-);
+const Template: Story<CarouselProps> = ({ ...args }: CarouselProps) => <Carousel {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
@@ -29,7 +25,7 @@ Default.args = {
           }}
         >
           <div
-            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            className="absolute h-full w-full rounded-3xl bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=01)',
             }}
@@ -47,7 +43,7 @@ Default.args = {
           }}
         >
           <div
-            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            className="absolute h-full w-full rounded-3xl bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=02)',
             }}
@@ -65,7 +61,7 @@ Default.args = {
           }}
         >
           <div
-            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            className="absolute h-full w-full rounded-3xl bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=03)',
             }}
@@ -83,7 +79,7 @@ Default.args = {
           }}
         >
           <div
-            className="absolute w-full h-full bg-center bg-no-repeat bg-contain rounded-3xl"
+            className="absolute h-full w-full rounded-3xl bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: 'url(https://dummyimage.com/866x565/000/fff.png&text=04)',
             }}

@@ -1,9 +1,9 @@
 import React, { useCallback, useRef, useState } from 'react';
 
 import cx from 'classnames';
-import { blmFormat } from 'utils/units';
 
 import Loading from 'components/loading';
+import { blmFormat } from 'utils/units';
 
 export interface ScenariosBlmResultsCardProps {
   id: string;
@@ -40,45 +40,48 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
     setEnter(false);
   }, []);
 
-  const handleImageMouseMove = useCallback((e) => {
-    const imgContainer = imgContainerRef.current;
-    const imgZoom = imgZoomRef.current;
+  const handleImageMouseMove = useCallback(
+    (e) => {
+      const imgContainer = imgContainerRef.current;
+      const imgZoom = imgZoomRef.current;
 
-    if (enter && imgContainer && imgZoom) {
-      const { clientX, clientY } = e;
-      const {
-        left, top, width, height,
-      } = imgContainer.getBoundingClientRect();
-      const x = clientX - left;
-      const y = clientY - top;
-      const xPercent = (x / width);
-      const yPercent = (y / height);
+      if (enter && imgContainer && imgZoom) {
+        const { clientX, clientY } = e;
+        const { left, top, width, height } = imgContainer.getBoundingClientRect();
+        const x = clientX - left;
+        const y = clientY - top;
+        const xPercent = x / width;
+        const yPercent = y / height;
 
-      imgZoom.style.transform = `translate(${-xPercent * (imgZoom.naturalWidth - width)}px, ${-yPercent * (imgZoom.naturalHeight - height)}px)`;
-      imgZoom.style.maxWidth = 'none';
-      imgZoom.style.width = 500;
-      imgZoom.style.height = 500;
-    }
-  }, [enter]);
+        imgZoom.style.transform = `translate(${-xPercent * (imgZoom.naturalWidth - width)}px, ${
+          -yPercent * (imgZoom.naturalHeight - height)
+        }px)`;
+        imgZoom.style.maxWidth = 'none';
+        imgZoom.style.width = 500;
+        imgZoom.style.height = 500;
+      }
+    },
+    [enter]
+  );
 
   return (
     <div
       role="presentation"
       key={id}
       className={cx({
-        'relative overflow-hidden rounded-md cursor-pointer': true,
-
+        'relative cursor-pointer overflow-hidden rounded-md': true,
       })}
       onClick={handleClick}
     >
       <div
         className={cx({
-          'absolute w-full h-full top-0 left-0 z-10 ring-2 ring-offset-primary-500 ring-inset rounded-md pointer-events-none': selected,
+          'pointer-events-none absolute left-0 top-0 z-10 h-full w-full rounded-md ring-2 ring-inset ring-offset-primary-500':
+            selected,
         })}
       />
       <dl
         className={cx({
-          'p-2 space-y-0.5': true,
+          'space-y-0.5 p-2': true,
           'bg-gray-500': !selected,
           'bg-primary-500': selected,
         })}
@@ -127,7 +130,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
         {!pngData && (
           <Loading
             visible
-            className="flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            className="flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
             iconClassName="w-10 h-10 text-primary-500"
           />
         )}
@@ -135,7 +138,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
         {pngData && (
           <div
             ref={imgContainerRef}
-            className="w-full relative overflow-hidden"
+            className="relative w-full overflow-hidden"
             onMouseEnter={handleImageMouseEnter}
             onMouseLeave={handleImageMouseLeave}
             onMouseMove={handleImageMouseMove}
@@ -143,7 +146,7 @@ export const ScenariosBlmResultsCard: React.FC<ScenariosBlmResultsCardProps> = (
             <img className="w-full" src={pngData} alt={`BLM: ${blmValue}`} />
             <img
               className={cx({
-                'absolute z-10 top-0 left-0 pointer-events-none': true,
+                'pointer-events-none absolute left-0 top-0 z-10': true,
                 invisible: !enter,
               })}
               ref={imgZoomRef}

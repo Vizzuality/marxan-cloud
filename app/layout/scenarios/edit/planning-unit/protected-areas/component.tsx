@@ -7,20 +7,18 @@ import { useRouter } from 'next/router';
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { motion } from 'framer-motion';
-import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 
 import { useScenario } from 'hooks/scenarios';
 
+import Icon from 'components/icon';
 import ScenariosSidebarWDPACategories from 'layout/scenarios/edit/planning-unit/protected-areas/categories';
 import ScenariosSidebarWDPAThreshold from 'layout/scenarios/edit/planning-unit/protected-areas/threshold';
-
-import Icon from 'components/icon';
+import { ScenarioSidebarSubTabs, ScenarioSidebarTabs } from 'utils/tabs';
 // import Steps from 'components/steps';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
-export interface ScenariosSidebarEditWDPAProps {
-}
+export interface ScenariosSidebarEditWDPAProps {}
 
 export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = () => {
   const { query } = useRouter();
@@ -38,14 +36,14 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
   if (!scenarioData || tab !== ScenarioSidebarTabs.PLANNING_UNIT) return null;
 
   return (
-    <div className="flex flex-col flex-grow w-full h-full overflow-hidden">
+    <div className="flex h-full w-full flex-grow flex-col overflow-hidden">
       <motion.div
         key="protected-areas"
-        className="flex flex-col min-h-0 overflow-hidden"
+        className="flex min-h-0 flex-col overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <header className="flex items-center pt-5 pb-1 space-x-3">
+        <header className="flex items-center space-x-3 pb-1 pt-5">
           <button
             aria-label="return"
             type="button"
@@ -54,12 +52,12 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
               dispatch(setSubTab(null));
             }}
           >
-            <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-            <h4 className="text-xs uppercase font-heading text-primary-500">Protected areas</h4>
+            <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+            <h4 className="font-heading text-xs uppercase text-primary-500">Protected areas</h4>
           </button>
         </header>
 
-        {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW) && (
+        {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_PREVIEW && (
           <ScenariosSidebarWDPACategories
             onSuccess={() => {
               dispatch(setSubTab(ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD));
@@ -67,7 +65,7 @@ export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> =
           />
         )}
 
-        {(subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD) && (
+        {subtab === ScenarioSidebarSubTabs.PROTECTED_AREAS_THRESHOLD && (
           <ScenariosSidebarWDPAThreshold
             onSuccess={() => {
               dispatch(setTab(ScenarioSidebarTabs.PLANNING_UNIT));

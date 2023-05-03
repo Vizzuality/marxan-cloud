@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useMutation, useQuery } from 'react-query';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import SCENARIOS from 'services/scenarios';
 import WDPA from 'services/wdpa';
@@ -18,28 +18,29 @@ export function useWDPACategories({
   customAreaId,
   scenarioId,
 }: UseWDPACategoriesProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const query = useQuery(
     ['protected-areas', adminAreaId, customAreaId],
-    async () => WDPA.request({
-      method: 'GET',
-      url: `/${scenarioId}/protected-areas`,
-      params: {
-        ...(adminAreaId && {
-          'filter[adminAreaId]': adminAreaId,
-        }),
-        ...(customAreaId && {
-          'filter[customAreaId]': customAreaId,
-        }),
-      },
-      headers: {
-        Authorization: `Bearer ${session.accessToken}`,
-      },
-    }),
+    async () =>
+      WDPA.request({
+        method: 'GET',
+        url: `/${scenarioId}/protected-areas`,
+        params: {
+          ...(adminAreaId && {
+            'filter[adminAreaId]': adminAreaId,
+          }),
+          ...(customAreaId && {
+            'filter[customAreaId]': customAreaId,
+          }),
+        },
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }),
     {
       enabled: !!adminAreaId || !!customAreaId,
-    },
+    }
   );
 
   const { data } = query;
@@ -57,7 +58,7 @@ export function useSaveScenarioProtectedAreas({
     method: 'POST',
   },
 }: UseSaveScenarioProtectedAreasProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveScenarioProtectedAreas = ({ id, data }: SaveScenarioProtectedAreasProps) => {
     return SCENARIOS.request({

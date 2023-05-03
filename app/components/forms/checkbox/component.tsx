@@ -1,10 +1,10 @@
 import React, { InputHTMLAttributes } from 'react';
+
 import cx from 'classnames';
 
 const THEME = {
   dark: {
-    base:
-      'bg-black border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
+    base: 'bg-black border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
     status: {
       none: 'border-gray-500',
       valid: 'border-gray-500',
@@ -13,8 +13,7 @@ const THEME = {
     },
   },
   light: {
-    base:
-      'bg-white border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
+    base: 'bg-white border rounded-sm text-primary-500 focus:border-primary-500 focus:outline-none',
     status: {
       none: 'border-gray-800',
       valid: 'border-gray-800',

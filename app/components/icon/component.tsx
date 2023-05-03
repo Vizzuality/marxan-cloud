@@ -11,11 +11,7 @@ export interface IconProps {
   style?: any;
 }
 
-export const Icon: React.FC<IconProps> = ({
-  icon,
-  className = 'w-5 h-5',
-  style,
-}: IconProps) => {
+export const Icon: React.FC<IconProps> = ({ icon, className = 'w-5 h-5', style }: IconProps) => {
   return (
     <svg
       className={cx({

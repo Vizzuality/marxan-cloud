@@ -8,64 +8,55 @@ import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
-import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selection-frequency-page/map';
-
 import LegendItem from 'components/map/legend/item/component';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
+import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selection-frequency-page/map';
 
-export interface SelectionFrequencyPageProps {
-
-}
+export interface SelectionFrequencyPageProps {}
 
 export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const {
-    data: projectData,
-    isFetched: projectDataIsFetched,
-  } = useProject(pid);
+  const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
 
-  const {
-    data: projectUsers,
-    isFetched: projectUsersDataIsFetched,
-  } = useProjectUsers(pid);
+  const { data: projectUsers, isFetched: projectUsersDataIsFetched } = useProjectUsers(pid);
 
   const contributors = projectUsers?.map((u) => u.user.displayName || u.user.email);
 
-  const {
-    data: protectedAreasData,
-    isFetched: protectedAreasDataIsFetched,
-  } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
+  const { data: protectedAreasData, isFetched: protectedAreasDataIsFetched } = useWDPACategories({
+    adminAreaId:
+      projectData?.adminAreaLevel2Id || projectData?.adminAreaLevel1I || projectData?.countryId,
+    customAreaId:
+      !projectData?.adminAreaLevel2Id && !projectData?.adminAreaLevel1I && !projectData?.countryId
+        ? projectData?.planningAreaId
+        : null,
     scenarioId: sid,
   });
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  const { data: scenarioData } = useScenario(sid);
 
   const protectedAreas = useMemo(() => {
-    return protectedAreasData?.sort((a, b) => {
-      if (a.kind === 'project') return 1;
-      if (a.name === 'Not Reported') return 1;
-      if (b.name !== 'Not Reported') return -1;
-      return a - b;
-    }).map((pa) => {
-      if (pa.kind === 'global' && pa.name !== 'Not Reported') {
+    return protectedAreasData
+      ?.sort((a, b) => {
+        if (a.kind === 'project') return 1;
+        if (a.name === 'Not Reported') return 1;
+        if (b.name !== 'Not Reported') return -1;
+        return a - b;
+      })
+      .map((pa) => {
+        if (pa.kind === 'global' && pa.name !== 'Not Reported') {
+          return {
+            ...pa,
+            name: `Category ${pa.name}`,
+          };
+        }
         return {
           ...pa,
-          name: `Category ${pa.name}`,
         };
-      } return {
-        ...pa,
-      };
-    }).filter((a) => a.selected).map((a) => a.name);
+      })
+      .filter((a) => a.selected)
+      .map((a) => a.name);
   }, [protectedAreasData]);
 
   const LEGEND = useMemo(() => {
@@ -80,14 +71,13 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
     };
   }, [scenarioData?.numberOfRuns]);
 
-  const reportDataIsFetched = projectDataIsFetched && projectUsersDataIsFetched
-    && protectedAreasDataIsFetched;
+  const reportDataIsFetched =
+    projectDataIsFetched && projectUsersDataIsFetched && protectedAreasDataIsFetched;
 
   return (
     reportDataIsFetched && (
       <div className="flex space-x-8">
-
-        <section className="flex flex-col justify-between w-1/3">
+        <section className="flex w-1/3 flex-col justify-between">
           <div className="space-y-8 text-xs">
             <div>
               <p className="font-semibold">Contributors</p>
@@ -112,16 +102,9 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
             <p>{scenarioData.metadata.marxanInputParameterFile.BLM || null}</p>
           </div> */}
           <div>
-            <div className="py-5 border-t border-gray-500 mr-14">
-              <LegendItem
-                {...LEGEND}
-                key="frequency"
-                className="block"
-                theme="light"
-              >
-                <LegendTypeGradient
-                  items={LEGEND.items}
-                />
+            <div className="mr-14 border-t border-gray-500 py-5">
+              <LegendItem {...LEGEND} key="frequency" className="block" theme="light">
+                <LegendTypeGradient items={LEGEND.items} />
               </LegendItem>
             </div>
             <div className="mt-5">
@@ -143,11 +126,9 @@ export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () 
               </p>
             </div>
           </div>
-
         </section>
 
         <ScenarioReportsMap id="report-map-1" />
-
       </div>
     )
   );

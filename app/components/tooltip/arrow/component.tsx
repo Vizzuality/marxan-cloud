@@ -22,7 +22,7 @@ export const Arrow: React.FC<ArrowProps> = (props: ArrowProps) => {
     >
       <div
         className={cx({
-          'w-2 h-2 bg-white transform rotate-45': true,
+          'h-2 w-2 rotate-45 transform bg-white': true,
           [className]: !!className,
         })}
       />

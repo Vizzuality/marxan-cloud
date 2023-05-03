@@ -4,17 +4,14 @@ import { useRouter } from 'next/router';
 
 import { usePublishedProject } from 'hooks/published-projects';
 
+import Avatar from 'components/avatar';
+import Loading from 'components/loading';
 import Share from 'layout/community/published-projects/detail/share';
 import DuplicateButton from 'layout/community/published-projects/list/table/item/duplicate-button';
 import Backlink from 'layout/statics/backlink';
 import Wrapper from 'layout/wrapper';
 
-import Avatar from 'components/avatar';
-import Loading from 'components/loading';
-
-export interface CommunityProjectsDetailProps {
-
-}
+export interface CommunityProjectsDetailProps {}
 
 export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = () => {
   const { query } = useRouter();
@@ -26,48 +23,33 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
     isFetched: publishedProjectIsFetched,
   } = usePublishedProject(pid);
 
-  const {
-    creators,
-  } = publishedProject;
+  const { creators } = publishedProject;
 
   const creatorsVisibleSize = 2;
   const creatorsVisible = creators?.slice(0, creatorsVisibleSize);
 
-  const {
-    description, name, location, company, pngData, resources, exportId,
-  } = publishedProject || {};
+  const { description, name, location, company, pngData, resources, exportId } =
+    publishedProject || {};
 
   return (
-    <div className="text-black bg-primary-50">
+    <div className="bg-primary-50 text-black">
       <Wrapper>
-        <div className="w-full max-w-5xl mx-auto my-32">
-
-          <Backlink href="/community/projects">
-            Projects
-          </Backlink>
+        <div className="mx-auto my-32 w-full max-w-5xl">
+          <Backlink href="/community/projects">Projects</Backlink>
 
           <div className="relative" style={{ minHeight: 600 }}>
             {publishedProject && (
               <div className="flex flex-row">
                 <div className="w-7/12 pr-12">
+                  <h2 className="mb-12 mt-5 text-left font-heading text-4xl font-medium">{name}</h2>
 
-                  <h2 className="mt-5 mb-12 text-4xl font-medium text-left font-heading">
-                    {name}
-                  </h2>
+                  <p className="mb-10 text-sm leading-normal text-gray-400">{description}</p>
 
-                  <p className="mb-10 text-sm leading-normal text-gray-400">
-                    {description}
-                  </p>
-
-                  <div className="flex flex-row items-center mb-10">
-                    <DuplicateButton
-                      exportId={exportId}
-                      name={name}
-                      theme="dark"
-                    />
+                  <div className="mb-10 flex flex-row items-center">
+                    <DuplicateButton exportId={exportId} name={name} theme="dark" />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-y-9 gap-x-9">
+                  <div className="grid grid-cols-2 gap-x-9 gap-y-9">
                     {/* LOCATION */}
                     <div>
                       <h3 className="mb-5 text-sm font-semibold">Location</h3>
@@ -79,7 +61,11 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       <div>
                         <h3 className="mb-5 text-sm font-semibold">Creator</h3>
                         <div className="w-28">
-                          <img src={company.logoDataUrl} alt={company.name} className="max-w-full" />
+                          <img
+                            src={company.logoDataUrl}
+                            alt={company.name}
+                            className="max-w-full"
+                          />
                         </div>
                       </div>
                     )}
@@ -90,15 +76,13 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                       {!!creatorsVisible?.length && (
                         <div className="space-y-2">
                           {creatorsVisible.map((u) => {
-                            const {
-                              displayName, id: userId, avatarDataUrl,
-                            } = u;
+                            const { displayName, id: userId, avatarDataUrl } = u;
 
                             return (
                               <div key={userId} className="flex flex-row items-center space-x-2.5">
                                 <Avatar
                                   size="s"
-                                  className="text-sm text-white uppercase border bg-primary-700"
+                                  className="border bg-primary-700 text-sm uppercase text-white"
                                   bgImage={avatarDataUrl}
                                   name={displayName}
                                 >
@@ -112,7 +96,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                             <div className="flex flex-row items-center space-x-2.5">
                               <Avatar
                                 size="s"
-                                className="text-sm text-white uppercase border bg-primary-700"
+                                className="border bg-primary-700 text-sm uppercase text-white"
                               >
                                 {`+${creators.length - creatorsVisibleSize}`}
                               </Avatar>
@@ -128,9 +112,7 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
                         <h3 className="mb-5 text-sm font-semibold">Resources</h3>
                         <ul className="space-y-1">
                           {resources.map((r) => {
-                            const {
-                              id: resourceId, title: resourceTitle, url: resourceUrl,
-                            } = r;
+                            const { id: resourceId, title: resourceTitle, url: resourceUrl } = r;
 
                             return (
                               <li key={resourceId} className="flex flex-row items-center">
@@ -151,16 +133,12 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
 
                     {/* SHARE */}
                     <Share />
-
                   </div>
                 </div>
 
-                <div
-                  className="w-5/12 mt-6"
-                  style={{ maxHeight: 500 }}
-                >
+                <div className="mt-6 w-5/12" style={{ maxHeight: 500 }}>
                   <div
-                    className="overflow-hidden bg-primary-500 rounded-xl"
+                    className="overflow-hidden rounded-xl bg-primary-500"
                     style={{
                       width: 500,
                       height: 500,
@@ -181,14 +159,10 @@ export const CommunityProjectsDetail: React.FC<CommunityProjectsDetailProps> = (
         </div>
       </Wrapper>
       <Loading
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-50 bg-opacity-90"
+        className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-50 bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
-        visible={
-          publishedProjectIsFetching
-          && !publishedProjectIsFetched
-        }
+        visible={publishedProjectIsFetching && !publishedProjectIsFetched}
       />
-
     </div>
   );
 };

@@ -24,46 +24,42 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
   onAccept,
   onRefuse,
 }: ConfirmationPromptProps) => (
-  <Modal
-    open={open}
-    title={title}
-    size="narrow"
-    dismissable={dismissible}
-    onDismiss={onDismiss}
-  >
+  <Modal open={open} title={title} size="narrow" dismissable={dismissible} onDismiss={onDismiss}>
     <div className="px-8 py-4">
       <header>
-        <div className="mt-8 text-xl font-medium text-gray-800 leading-1 sm:mt-0 sm:pr-32 font-heading">
+        <div className="leading-1 mt-8 font-heading text-xl font-medium text-gray-800 sm:mt-0 sm:pr-32">
           {title}
         </div>
-        <p className={classnames({
-          'my-4 text-sm sm:pr-32': true,
-          'underline text-black': !!danger,
-          'text-gray-400': !danger,
-        })}
+        <p
+          className={classnames({
+            'my-4 text-sm sm:pr-32': true,
+            'text-black underline': !!danger,
+            'text-gray-400': !danger,
+          })}
         >
           {description}
         </p>
       </header>
       <div
         className={classnames({
-          'flex justify-between items-end': true,
+          'flex items-end justify-between': true,
           'mt-10 sm:mt-12': !icon && !description,
           'mt-8': !icon && !!description,
           'mt-10 sm:mt-1': !!icon && !description,
           'mt-8 sm:mt-1': !!icon && !!description,
         })}
       >
-        <div className={classnames({
-          flex: true,
-          'flex-row-reverse': !!danger,
-        })}
+        <div
+          className={classnames({
+            flex: true,
+            'flex-row-reverse': !!danger,
+          })}
         >
           {!!onRefuse && (
             <Button
               theme="secondary"
               size="lg"
-              className="flex-shrink-0 w-32 mr-5"
+              className="mr-5 w-32 flex-shrink-0"
               onClick={onRefuse}
             >
               {options.refuseText}
@@ -74,7 +70,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
             <Button
               theme={danger ? 'danger' : 'primary'}
               size="lg"
-              className="flex-shrink-0 w-32 sm:mr-5"
+              className="w-32 flex-shrink-0 sm:mr-5"
               onClick={onAccept}
             >
               {options.acceptText}
@@ -86,7 +82,7 @@ export const ConfirmationPrompt: React.FC<ConfirmationPromptProps> = ({
           <Icon
             icon={icon}
             className={classnames({
-              'hidden sm:block flex-shrink-1 flex-grow-1': true,
+              'flex-shrink-1 flex-grow-1 hidden sm:block': true,
               'ml-auto w-36': !iconClassName,
               [iconClassName]: !!iconClassName,
             })}

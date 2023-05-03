@@ -9,12 +9,10 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 
 export interface CellUnpublishProps {
-  row: any,
+  row: any;
 }
 
-export const CellUnpublish: React.FC<CellUnpublishProps> = ({
-  row,
-}: CellUnpublishProps) => {
+export const CellUnpublish: React.FC<CellUnpublishProps> = ({ row }: CellUnpublishProps) => {
   const [confirmUnPublish, setConfirmUnPublish] = useState<Record<string, any>>();
 
   const { addToast } = useToasts();
@@ -22,28 +20,32 @@ export const CellUnpublish: React.FC<CellUnpublishProps> = ({
   const unpublishProjectMutation = useUnPublishProject({});
 
   const handleUnpublish = useCallback(() => {
-    unpublishProjectMutation.mutate({
-      id: confirmUnPublish.id,
-    }, {
-      onSuccess: () => {
-        setConfirmUnPublish(null);
+    unpublishProjectMutation.mutate(
+      {
+        id: confirmUnPublish.id,
       },
-      onError: () => {
-        addToast('delete-admin-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Oops! Something went wrong.
-              <br />
-              Please, try again!
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-
-    });
+      {
+        onSuccess: () => {
+          setConfirmUnPublish(null);
+        },
+        onError: () => {
+          addToast(
+            'delete-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [unpublishProjectMutation, confirmUnPublish, addToast]);
 
   return (
@@ -68,7 +70,6 @@ export const CellUnpublish: React.FC<CellUnpublishProps> = ({
         onRefuse={() => setConfirmUnPublish(null)}
         onDismiss={() => setConfirmUnPublish(null)}
       />
-
     </>
   );
 };

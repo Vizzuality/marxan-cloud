@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
 import { injectReducer } from 'store';
 import { Solution } from 'types/project-model';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
 interface ScenarioEditStateProps {
-  tab: string,
-  subtab: string,
+  tab: string;
+  subtab: string;
 
   // WDPA
   wdpaCategories: Record<string, any>;
@@ -32,18 +33,18 @@ interface ScenarioEditStateProps {
   drawingValue: Record<string, object>;
 
   uploading: boolean;
-  uploadingValue: Record<string, object>
+  uploadingValue: Record<string, object>;
 
   // SOLUTIONS
-  selectedSolution: Solution,
+  selectedSolution: Solution;
 
   // SETTINGS
-  layerSettings: Record<string, Record<string, unknown>>
+  layerSettings: Record<string, Record<string, unknown>>;
 
   // BLM CALIBRATION
-  blm: number,
-  blmRange: number[],
-  blmImage: string,
+  blm: number;
+  blmRange: number[];
+  blmImage: string;
 
   // JOBS
   lastJobTimestamp: number;
@@ -170,10 +171,13 @@ export function getScenarioEditSlice(id) {
       },
 
       // SETTINGS
-      setLayerSettings: (state, action: PayloadAction<{
-        id: string,
-        settings: Record<string, unknown>
-      }>) => {
+      setLayerSettings: (
+        state,
+        action: PayloadAction<{
+          id: string;
+          settings: Record<string, unknown>;
+        }>
+      ) => {
         const { id: layerId, settings } = action.payload;
         const newSettings = {
           ...state.layerSettings,

@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useState,
-} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -8,14 +6,8 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
-import {
-  useProjectPlanningAreaLayer,
-  useLegend,
-  useBBOX,
-} from 'hooks/map';
+import { useProjectPlanningAreaLayer, useLegend, useBBOX } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-
-import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
 import Loading from 'components/loading';
 import Map from 'components/map';
@@ -30,9 +22,9 @@ import LegendTypeBasic from 'components/map/legend/types/basic';
 import LegendTypeChoropleth from 'components/map/legend/types/choropleth';
 import LegendTypeGradient from 'components/map/legend/types/gradient';
 import LegendTypeMatrix from 'components/map/legend/types/matrix';
+import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 
-export interface ScenarioNewMapProps {
-}
+export interface ScenarioNewMapProps {}
 
 export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   const [open, setOpen] = useState(true);
@@ -44,9 +36,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
   const { pid } = query;
 
-  const {
-    data: projectData,
-  } = useProject(pid);
+  const { data: projectData } = useProject(pid);
   const { bbox } = projectData;
 
   const BBOX = useBBOX({
@@ -64,9 +54,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
     pId: `${pid}`,
   });
 
-  const LAYERS = [
-    PlanningAreaLayer,
-  ].filter((l) => !!l);
+  const LAYERS = [PlanningAreaLayer].filter((l) => !!l);
 
   const LEGEND = useLegend({
     layers: [],
@@ -92,7 +80,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
         transitionDuration: 500,
       });
     },
-    [viewport],
+    [viewport]
   );
 
   const handleFitBoundsChange = useCallback((b) => {
@@ -103,24 +91,26 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
     if (e && e.features) {
       console.info(e.features);
     }
-  }, [
-  ]);
+  }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
   return (
-    <div className="relative w-full h-full overflow-hidden rounded-4xl">
+    <div className="relative h-full w-full overflow-hidden rounded-4xl">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -155,9 +145,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
       {/* Controls */}
       <Controls>
-        <LoadingControl
-          loading={!mapTilesLoaded}
-        />
+        <LoadingControl loading={!mapTilesLoaded} />
 
         <ZoomControl
           viewport={{
@@ -180,17 +168,10 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
       </Controls>
 
       {/* Legend */}
-      <div className="absolute w-full max-w-xs bottom-16 right-5">
-        <Legend
-          open={open}
-          className="w-full"
-          maxHeight={325}
-          onChangeOpen={() => setOpen(!open)}
-        >
+      <div className="absolute bottom-16 right-5 w-full max-w-xs">
+        <Legend open={open} className="w-full" maxHeight={325} onChangeOpen={() => setOpen(!open)}>
           {LEGEND.map((i) => {
-            const {
-              type, items, intersections,
-            } = i;
+            const { type, items, intersections } = i;
 
             return (
               <LegendItem
@@ -201,10 +182,22 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
                 // onChangeVisibility={() => onChangeVisibility(id)}
                 {...i}
               >
-                {type === 'matrix' && <LegendTypeMatrix className="text-sm text-white" intersections={intersections} items={items} />}
-                {type === 'basic' && <LegendTypeBasic className="text-sm text-gray-300" items={items} />}
-                {type === 'choropleth' && <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />}
-                {type === 'gradient' && <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />}
+                {type === 'matrix' && (
+                  <LegendTypeMatrix
+                    className="text-sm text-white"
+                    intersections={intersections}
+                    items={items}
+                  />
+                )}
+                {type === 'basic' && (
+                  <LegendTypeBasic className="text-sm text-gray-300" items={items} />
+                )}
+                {type === 'choropleth' && (
+                  <LegendTypeChoropleth className="text-sm text-gray-300" items={items} />
+                )}
+                {type === 'gradient' && (
+                  <LegendTypeGradient className={{ box: 'text-sm text-gray-300' }} items={items} />
+                )}
               </LegendItem>
             );
           })}
@@ -212,7 +205,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
       </div>
       <Loading
         visible={!mapInteractive}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
     </div>

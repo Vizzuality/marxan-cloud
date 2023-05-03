@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
-import omit from 'lodash/omit';
-
 import { useRouter } from 'next/router';
+
+import omit from 'lodash/omit';
 
 import { useOwnsProject } from 'hooks/permissions';
 import { useProject, usePublishProject, useUnPublishProject } from 'hooks/projects';
@@ -20,8 +20,7 @@ import COMMUNITY_SVG from 'svgs/project/community.svg?sprite';
 
 import PublishModal from './publish-modal';
 
-export interface PublishProjectButtonProps {
-}
+export interface PublishProjectButtonProps {}
 
 export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
   const [publishing, setPublishing] = useState(false);
@@ -50,9 +49,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
     },
   });
 
-  const {
-    data: rawScenariosData,
-  } = useScenarios(pid, {
+  const { data: rawScenariosData } = useScenarios(pid, {
     filters: {
       projectId: pid,
     },
@@ -60,67 +57,82 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
   });
 
   const SCENARIOS_RUNNED = useMemo(() => {
-    return rawScenariosData
-      .some((s) => {
-        return s.ranAtLeastOnce;
-      });
+    return rawScenariosData.some((s) => {
+      return s.ranAtLeastOnce;
+    });
   }, [rawScenariosData]);
 
-  const handlePublish = useCallback((values) => {
-    setPublishing(true);
-    const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
+  const handlePublish = useCallback(
+    (values) => {
+      setPublishing(true);
+      const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
 
-    // @ts-ignore
-    publishProjectMutation.mutate({ pid: `${pid}`, data }, {
-      onSuccess: () => {
-        setPublishing(false);
-        setModal(false);
-        addToast('success-publish-project', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">You have published the project in the community.</p>
-          </>
-        ), {
-          level: 'success',
-        });
-      },
-      onError: () => {
-        setPublishing(false);
-        addToast('error-publish-project', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">It has not been possible to publish the project in the community.</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [pid, publishProjectMutation, addToast]);
+      publishProjectMutation.mutate(
+        // @ts-ignore
+        { pid: `${pid}`, data },
+        {
+          onSuccess: () => {
+            setPublishing(false);
+            setModal(false);
+            addToast(
+              'success-publish-project',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">You have published the project in the community.</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            setPublishing(false);
+            addToast(
+              'error-publish-project',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">
+                  It has not been possible to publish the project in the community.
+                </p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [pid, publishProjectMutation, addToast]
+  );
 
   const handleUnpublish = useCallback(() => {
-    unpublishProjectMutation.mutate({
-      id: confirmUnPublish.id,
-    }, {
-      onSuccess: () => {
-        setConfirmUnPublish(null);
+    unpublishProjectMutation.mutate(
+      {
+        id: confirmUnPublish.id,
       },
-      onError: () => {
-        addToast('delete-admin-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Oops! Something went wrong.
-              <br />
-              Please, try again!
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-
-    });
+      {
+        onSuccess: () => {
+          setConfirmUnPublish(null);
+        },
+        onError: () => {
+          addToast(
+            'delete-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [unpublishProjectMutation, confirmUnPublish, addToast]);
 
   return (
@@ -128,21 +140,21 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
       {!isPublic && (
         <>
           <Tooltip
-            disabled={(isOwner && SCENARIOS_RUNNED)}
+            disabled={isOwner && SCENARIOS_RUNNED}
             arrow
             placement="top"
-            content={(
+            content={
               <div
-                className="p-4 text-xs text-gray-500 bg-white rounded"
+                className="rounded bg-white p-4 text-xs text-gray-500"
                 style={{
                   boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
                   maxWidth: 200,
                 }}
               >
-                You need to be the owner and have at
-                least one scenario runned to publish the project.
+                You need to be the owner and have at least one scenario runned to publish the
+                project.
               </div>
-            )}
+            }
           >
             <div>
               <Button
@@ -198,7 +210,6 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
             onRefuse={() => setConfirmUnPublish(null)}
             onDismiss={() => setConfirmUnPublish(null)}
           />
-
         </>
       )}
     </>

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
+
 import STAR_SVG from 'svgs/ui/star.svg?sprite';
+
 import Table from './component';
 import { TableProps } from './types';
 
@@ -16,7 +20,7 @@ const Template: Story<TableProps> = ({ ...args }: TableProps) => {
   const [selectedRowId, setSelectedRowId] = useState('row1');
 
   const BestCell = (value) => {
-    if (value) return <Icon className="w-3 h-3" icon={STAR_SVG} />;
+    if (value) return <Icon className="h-3 w-3" icon={STAR_SVG} />;
     return '';
   };
 
@@ -27,7 +31,7 @@ const Template: Story<TableProps> = ({ ...args }: TableProps) => {
       <Button
         theme="secondary-alt"
         size="s"
-        className="flex justify-center w-full"
+        className="flex w-full justify-center"
         onClick={() => {
           setSelectedRowId(row.id);
         }}
@@ -98,16 +102,8 @@ const Template: Story<TableProps> = ({ ...args }: TableProps) => {
     },
   ];
 
-  return (
-    <Table
-      {...args}
-      headers={headers}
-      body={body}
-      selectedRowId={selectedRowId}
-    />
-  );
+  return <Table {...args} headers={headers} body={body} selectedRowId={selectedRowId} />;
 };
 
 export const Default = Template.bind({});
-Default.args = {
-};
+Default.args = {};

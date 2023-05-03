@@ -9,14 +9,11 @@ import Checkbox from 'components/forms/checkbox';
 import BLOCK_WARNING_SVG from 'svgs/notifications/block.svg?sprite';
 
 export interface CellBlockProps {
-  value: boolean,
-  row: any,
+  value: boolean;
+  row: any;
 }
 
-export const CellBlock: React.FC<CellBlockProps> = ({
-  value,
-  row,
-}: CellBlockProps) => {
+export const CellBlock: React.FC<CellBlockProps> = ({ value, row }: CellBlockProps) => {
   const [confirmBlock, setConfirmBlock] = useState<Record<string, any>>();
   const [confirmUnBlock, setConfirmUnBlock] = useState<Record<string, any>>();
 
@@ -26,51 +23,61 @@ export const CellBlock: React.FC<CellBlockProps> = ({
   const { addToast } = useToasts();
 
   const onBlock = useCallback(() => {
-    saveBlockMutation.mutate({
-      uid: confirmBlock.id,
-    }, {
-      onSuccess: () => {
-        setConfirmBlock(null);
+    saveBlockMutation.mutate(
+      {
+        uid: confirmBlock.id,
       },
-      onError: () => {
-        addToast('save-admin-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Oops! Something went wrong.
-              <br />
-              Please, try again!
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+      {
+        onSuccess: () => {
+          setConfirmBlock(null);
+        },
+        onError: () => {
+          addToast(
+            'save-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [confirmBlock, saveBlockMutation, addToast]);
 
   const onUnBlock = useCallback(() => {
-    deleteBlockMutation.mutate({
-      uid: confirmUnBlock.id,
-    }, {
-      onSuccess: () => {
-        setConfirmUnBlock(null);
+    deleteBlockMutation.mutate(
+      {
+        uid: confirmUnBlock.id,
       },
-      onError: () => {
-        addToast('delete-admin-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Oops! Something went wrong.
-              <br />
-              Please, try again!
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+      {
+        onSuccess: () => {
+          setConfirmUnBlock(null);
+        },
+        onError: () => {
+          addToast(
+            'delete-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [confirmUnBlock, deleteBlockMutation, addToast]);
 
   return (

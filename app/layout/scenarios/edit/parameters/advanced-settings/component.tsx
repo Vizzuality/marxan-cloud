@@ -2,12 +2,11 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { Form as FormRFF } from 'react-final-form';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { motion } from 'framer-motion';
-import { ScenarioSidebarTabs } from 'utils/tabs';
-import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
@@ -15,6 +14,8 @@ import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Icon from 'components/icon';
+import { ScenarioSidebarTabs } from 'utils/tabs';
+import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 
@@ -50,100 +51,106 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
 
       return {
         ...acc,
-        [f.id]: typeof scenarioParamters[f.id] !== 'undefined' ? scenarioParamters[f.id] : f.default,
+        [f.id]:
+          typeof scenarioParamters[f.id] !== 'undefined' ? scenarioParamters[f.id] : f.default,
       };
     }, {});
   }, [scenarioData]);
 
-  const onSubmit = useCallback((values) => {
-    setSubmitting(true);
+  const onSubmit = useCallback(
+    (values) => {
+      setSubmitting(true);
 
-    const data = {
-      numberOfRuns: values.NUMREPS,
-      boundaryLengthModifier: values.BLM,
-      metadata: mergeScenarioStatusMetaData({
-        ...metadata,
-        marxanInputParameterFile: values,
-      }, {
-        tab: ScenarioSidebarTabs.PARAMETERS,
-        subtab: null,
-      }),
-    };
+      const data = {
+        numberOfRuns: values.NUMREPS,
+        boundaryLengthModifier: values.BLM,
+        metadata: mergeScenarioStatusMetaData(
+          {
+            ...metadata,
+            marxanInputParameterFile: values,
+          },
+          {
+            tab: ScenarioSidebarTabs.PARAMETERS,
+            subtab: null,
+          }
+        ),
+      };
 
-    saveScenarioMutation.mutate({ id: `${sid}`, data }, {
-      onSuccess: () => {
-        setSubmitting(false);
-        addToast('success-advanced-setting', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Advanced settings saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-        console.info('Advanced settings saved succesfully');
-      },
-      onError: () => {
-        setSubmitting(false);
+      saveScenarioMutation.mutate(
+        { id: `${sid}`, data },
+        {
+          onSuccess: () => {
+            setSubmitting(false);
+            addToast(
+              'success-advanced-setting',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Advanced settings saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+            console.info('Advanced settings saved succesfully');
+          },
+          onError: () => {
+            setSubmitting(false);
 
-        addToast('error-scenario-name', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario name not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [
-    sid,
-    metadata,
-    saveScenarioMutation,
-    addToast,
-  ]);
+            addToast(
+              'error-scenario-name',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario name not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [sid, metadata, saveScenarioMutation, addToast]
+  );
 
   return (
     <motion.div
       key="cost-surface"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex min-h-0 flex-col items-start justify-start overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="flex items-center pt-5 pb-1 space-x-3">
+      <header className="flex items-center space-x-3 pb-1 pt-5">
         <button
           type="button"
-          className="flex items-center w-full space-x-2 text-left focus:outline-none"
+          className="flex w-full items-center space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
         >
-          <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Advanced Settings</h4>
+          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+          <h4 className="font-heading text-xs uppercase text-primary-500">Advanced Settings</h4>
         </button>
       </header>
 
-      <FormRFF
-        onSubmit={onSubmit}
-        initialValues={INITIAL_VALUES}
-      >
-
+      <FormRFF onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
         {({ handleSubmit }) => (
           <form
             className={cx({
-              'w-full overflow-hidden flex flex-col flex-grow text-gray-500': true,
+              'flex w-full flex-grow flex-col overflow-hidden text-gray-500': true,
             })}
             autoComplete="off"
             noValidate
             onSubmit={handleSubmit}
           >
-
             <div className="flex w-full overflow-hidden" style={{ height: 475 }}>
-              <div className="flex flex-col flex-grow flex-shrink-0 pt-5 space-y-6 overflow-hidden">
-                <div className="relative flex flex-col flex-grow overflow-x-hidden overflow-y-auto">
+              <div className="flex flex-shrink-0 flex-grow flex-col space-y-6 overflow-hidden pt-5">
+                <div className="relative flex flex-grow flex-col overflow-y-auto overflow-x-hidden">
                   <div className="mr-12 space-y-10">
-                    {FIELDS.map((f) => <RunField key={f.id} {...f} />)}
+                    {FIELDS.map((f) => (
+                      <RunField key={f.id} {...f} />
+                    ))}
                   </div>
                 </div>
 
@@ -167,7 +174,6 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
               </div>
             </div>
           </form>
-
         )}
       </FormRFF>
     </motion.div>

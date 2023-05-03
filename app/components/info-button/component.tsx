@@ -34,7 +34,7 @@ const SIZE = {
 export interface InfoButtonProps {
   children: ReactElement;
   className?: string;
-  theme?: 'primary' | 'secondary'
+  theme?: 'primary' | 'secondary';
   size?: 's' | 'base' | 'lg';
 }
 
@@ -51,21 +51,22 @@ export const InfoButton: React.FC<InfoButtonProps> = ({
     trigger="click"
     maxWidth={350}
     interactive
-    content={(
+    content={
       <div
-        className="p-4 text-gray-500 bg-white rounded"
+        className="rounded bg-white p-4 text-gray-500"
         style={{
           boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
         }}
       >
         {children || 'Add your tooltip info'}
       </div>
-    )}
+    }
   >
     <button
       aria-label="info-button"
       className={cx({
-        'flex flex-shrink-0 items-center justify-center transition rounded-full bg-opacity-50 focus:outline-none hover:bg-opacity-75 focus:bg-opacity-90': true,
+        'flex flex-shrink-0 items-center justify-center rounded-full bg-opacity-50 transition hover:bg-opacity-75 focus:bg-opacity-90 focus:outline-none':
+          true,
         [THEME[theme].button]: true,
         [SIZE.button[size]]: true,
         [className]: !!className,

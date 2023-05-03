@@ -47,7 +47,7 @@ const DEFAULT_STYLE = {
 
 export function featureStyle({ feature, state }) {
   const type = feature.properties.shape || feature.geometry.type;
-  let style:any = null;
+  let style: any = null;
 
   switch (state) {
     case RENDER_STATE.SELECTED:
@@ -97,7 +97,7 @@ export function featureStyle({ feature, state }) {
 }
 
 export function editHandleStyle({ shape, state }) {
-  let style:any = {};
+  let style: any = {};
   switch (state) {
     case RENDER_STATE.SELECTED:
       style = { ...SELECTED_STYLE };

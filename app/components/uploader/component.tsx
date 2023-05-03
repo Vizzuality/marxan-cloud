@@ -18,24 +18,19 @@ export const Uploader: React.FC<UploaderProps> = ({
   onClose,
 }: UploaderProps) => {
   return (
-    <div className="mt-3 mb-5">
+    <div className="mb-5 mt-3">
       <Button
-        className="w-full py-1 text-xs cursor-pointer dropzone hover:bg-gray-500"
+        className="dropzone w-full cursor-pointer py-1 text-xs hover:bg-gray-500"
         theme="secondary"
         size="base"
         disabled={disabled}
         onClick={onOpen}
       >
         {caption || 'Upload'}
-        <Icon className="absolute w-4 h-4 text-white right-6" icon={UPLOAD_SVG} />
+        <Icon className="absolute right-6 h-4 w-4 text-white" icon={UPLOAD_SVG} />
       </Button>
 
-      <Modal
-        id={id}
-        open={open}
-        size="narrow"
-        onDismiss={onClose}
-      >
+      <Modal id={id} open={open} size="narrow" onDismiss={onClose}>
         {children}
       </Modal>
     </div>

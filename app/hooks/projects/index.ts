@@ -1,17 +1,14 @@
 import { useMemo } from 'react';
 
-import {
-  useInfiniteQuery, useMutation, useQuery, useQueryClient,
-} from 'react-query';
-
-import flatten from 'lodash/flatten';
-import orderBy from 'lodash/orderBy';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
 import axios from 'axios';
 import { formatDistance } from 'date-fns';
-import { useSession } from 'next-auth/client';
+import flatten from 'lodash/flatten';
+import orderBy from 'lodash/orderBy';
+import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
 
@@ -57,46 +54,44 @@ import {
 
 export function useProjects(options: UseProjectsOptionsProps): UseProjectsResponse {
   const { push } = useRouter();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const {
-    filters = {},
-    search,
-    sort = '-lastModifiedAt',
-  } = options;
+  const { filters = {}, search, sort = '-lastModifiedAt' } = options;
 
-  const parsedFilters = Object.keys(filters)
-    .reduce((acc, k) => {
-      return {
-        ...acc,
-        [`filter[${k}]`]: filters[k].toString(),
-      };
-    }, {});
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k].toString(),
+    };
+  }, {});
 
-  const fetchProjects = ({ pageParam = 1 }) => PROJECTS.request({
-    method: 'GET',
-    url: '/',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      'page[number]': pageParam,
-      include: 'scenarios,users',
-      ...parsedFilters,
-      ...search && {
-        q: search,
+  const fetchProjects = ({ pageParam = 1 }) =>
+    PROJECTS.request({
+      method: 'GET',
+      url: '/',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
       },
-      ...sort && {
-        sort,
+      params: {
+        'page[number]': pageParam,
+        include: 'scenarios,users',
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
       },
-    },
-  });
+    });
 
   const query = useInfiniteQuery(['projects', JSON.stringify(options)], fetchProjects, {
     retry: false,
     keepPreviousData: true,
     getNextPageParam: (lastPage) => {
-      const { data: { meta } } = lastPage;
+      const {
+        data: { meta },
+      } = lastPage;
       const { page, totalPages } = meta;
 
       const nextPage = page + 1 > totalPages ? null : page + 1;
@@ -108,61 +103,65 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   const { pages } = data || {};
 
   return useMemo(() => {
-    let parsedData = Array.isArray(pages) ? flatten(pages.map((p) => {
-      const { data: { data: pageData } } = p;
+    let parsedData = Array.isArray(pages)
+      ? flatten(
+          pages.map((p) => {
+            const {
+              data: { data: pageData },
+            } = p;
 
-      return pageData.map((d): ItemProps => {
-        const {
-          id,
-          name,
-          description,
-          lastModifiedAt,
-          scenarios,
-          planningAreaName,
-          isPublic,
-          publicMetadata,
-        } = d;
+            return pageData.map((d): ItemProps => {
+              const {
+                id,
+                name,
+                description,
+                lastModifiedAt,
+                scenarios,
+                planningAreaName,
+                isPublic,
+                publicMetadata,
+              } = d;
 
-        const lastUpdate = scenarios.reduce((acc, s) => {
-          const { lastModifiedAt: slastModifiedAt } = s;
+              const lastUpdate = scenarios.reduce((acc, s) => {
+                const { lastModifiedAt: slastModifiedAt } = s;
 
-          return (slastModifiedAt > acc) ? slastModifiedAt : acc;
-        }, lastModifiedAt);
+                return slastModifiedAt > acc ? slastModifiedAt : acc;
+              }, lastModifiedAt);
 
-        const lastUpdateDistance = () => {
-          return formatDistance(
-            new Date(lastUpdate || null),
-            new Date(),
-            { addSuffix: true },
-          );
-        };
+              const lastUpdateDistance = () => {
+                return formatDistance(new Date(lastUpdate || null), new Date(), {
+                  addSuffix: true,
+                });
+              };
 
-        return {
-          id,
-          area: planningAreaName || 'Custom area name',
-          name,
-          description,
-          lastUpdate,
-          lastUpdateDistance: lastUpdateDistance(),
-          contributors: [],
-          isPublic,
-          scenarios,
-          underModeration: publicMetadata?.underModeration,
-          onClick: () => {
-            push(`/projects/${id}`);
-          },
-          onDownload: (e) => {
-            console.info('onDownload', e);
-          },
-          onDuplicate: (e) => {
-            console.info('onDuplicate', e);
-          },
-          onDelete: (e) => {
-            console.info('onDelete', e);
-          },
-        };
-      });
-    })) : [];
+              return {
+                id,
+                area: planningAreaName || 'Custom area name',
+                name,
+                description,
+                lastUpdate,
+                lastUpdateDistance: lastUpdateDistance(),
+                contributors: [],
+                isPublic,
+                scenarios,
+                underModeration: publicMetadata?.underModeration,
+                onClick: () => {
+                  push(`/projects/${id}`);
+                },
+                onDownload: (e) => {
+                  console.info('onDownload', e);
+                },
+                onDuplicate: (e) => {
+                  console.info('onDuplicate', e);
+                },
+                onDelete: (e) => {
+                  console.info('onDelete', e);
+                },
+              };
+            });
+          })
+        )
+      : [];
 
     // Sort
     parsedData = orderBy(parsedData, ['lastUpdate'], ['desc']);
@@ -175,22 +174,27 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
 }
 
 export function useProject(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['projects', id], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${id}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {
-      include: 'scenarios,users',
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['projects', id],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${id}`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        params: {
+          include: 'scenarios,users',
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 
@@ -208,7 +212,7 @@ export function useSaveProject({
   },
 }: UseSaveProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveProject = ({ id, data }: SaveProjectProps) => {
     return PROJECTS.request({
@@ -241,7 +245,7 @@ export function useDeleteProject({
   },
 }: UseDeleteProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteProject = ({ id }: DeleteProjectProps) => {
     return PROJECTS.request({
@@ -272,7 +276,7 @@ export function useImportProject({
   },
 }: UseImportProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadProject = ({ data }: ImportProjectProps) => {
     return UPLOADS.request({
@@ -302,7 +306,7 @@ export function useUploadProjectPA({
     method: 'POST',
   },
 }: UseUploadProjectPAProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadProjectPAShapefile = ({ data }: UploadProjectPAProps) => {
     return UPLOADS.request({
@@ -331,7 +335,7 @@ export function useUploadProjectPAGrid({
     method: 'POST',
   },
 }: UseUploadProjectPAGridProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadProjectPAShapefileGrid = ({ data }: UploadProjectPAGridProps) => {
     return UPLOADS.request({
@@ -361,7 +365,7 @@ export function useDuplicateProject({
   },
 }: UseDuplicateProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const duplicateProject = ({ id, data }: DuplicateProjectProps) => {
     return PROJECTS.request({
@@ -394,7 +398,7 @@ export function usePublishProject({
   },
 }: UsePublishProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const publishProject = ({ pid, data }: PublishProjectProps) => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || window.location.origin;
@@ -431,7 +435,7 @@ export function useUnPublishProject({
   },
 }: UseUnPublishProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const unpublishProject = ({ id }: UnPublishProjectProps) => {
     return PROJECTS.request({
@@ -463,20 +467,25 @@ export function useUnPublishProject({
 ****************************************
 */
 export function useExports(pid) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['projects-exports', pid], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${pid}/latest-exports`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!pid,
-  });
+  const query = useQuery(
+    ['projects-exports', pid],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${pid}/latest-exports`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!pid,
+    }
+  );
 
   const { data } = query;
 
@@ -489,20 +498,25 @@ export function useExports(pid) {
 }
 
 export function useExport(id) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
-  const query = useQuery(['projects-export-id', id], async () => PROJECTS.request({
-    method: 'GET',
-    url: `/${id}/export`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!id,
-  });
+  const query = useQuery(
+    ['projects-export-id', id],
+    async () =>
+      PROJECTS.request({
+        method: 'GET',
+        url: `/${id}/export`,
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+        transformResponse: (data) => JSON.parse(data),
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!id,
+    }
+  );
 
   const { data } = query;
 
@@ -520,7 +534,7 @@ export function useExportProject({
   },
 }: UseExportProjectProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const projectDownload = ({ id, data }: ExportProjectProps) => {
     return PROJECTS.request({
@@ -550,7 +564,7 @@ export function useDownloadExport({
     method: 'GET',
   },
 }: UseDownloadExportProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const downloadProject = ({ pid, exportId }: DownloadExportProps) => {
     return PROJECTS.request({
@@ -594,7 +608,7 @@ export function useSaveLegacyProject({
     method: 'POST',
   },
 }: UseSaveLegacyProjectProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveLegacyProject = ({ data }: SaveLegacyProjectProps) => {
     return PROJECTS.request({
@@ -623,7 +637,7 @@ export function useCancelImportLegacyProject({
     method: 'POST',
   },
 }: UseCancelImportLegacyProjectProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const cancelImportLegacyProject = ({ projectId }: CancelImportLegacyProjectProps) => {
     return PROJECTS.request({
@@ -652,7 +666,7 @@ export function useUploadLegacyProjectFile({
     method: 'POST',
   },
 }: UseUploadLegacyProjectFileProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const uploadLegacyProjectFile = ({ data, projectId }: UploadLegacyProjectFileProps) => {
     return UPLOADS.request({
@@ -681,7 +695,7 @@ export function useCancelUploadLegacyProjectFile({
     method: 'DELETE',
   },
 }: UseCancelUploadLegacyProjectFileProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const cancelUploadLegacyProjectFile = ({
     dataFileId,
@@ -713,7 +727,7 @@ export function useLegacyProjectValidationResults({
     method: 'GET',
   },
 }: UseLegacyProjectValidationResultsProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const getLegacyProjectValidationResults = ({
@@ -746,7 +760,7 @@ export function useImportLegacyProject({
     method: 'POST',
   },
 }: UseImportLegacyProjectProps) {
-  const [session] = useSession();
+  const { data: session } = useSession();
   const queryClient = useQueryClient();
 
   const importLegacyProject = ({ projectId, data }: ImportLegacyProjectProps) => {

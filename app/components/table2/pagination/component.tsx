@@ -27,15 +27,18 @@ export const Table2Pagination: React.FC<Table2PaginationProps> = ({
   nextPage,
   previousPage,
 }: Table2PaginationProps) => {
-  const handlePageClick = useCallback(({ selected }) => {
-    gotoPage(selected);
-  }, [gotoPage]);
+  const handlePageClick = useCallback(
+    ({ selected }) => {
+      gotoPage(selected);
+    },
+    [gotoPage]
+  );
 
   if (pageCount === 0) return null;
 
   return (
-    <div className="sticky bottom-0 px-10 py-5 bg-white rounded-b-3xl">
-      <div className="absolute top-0 left-0 z-0 w-full h-full transform rotate-180 shadow-lg pointer-events-none" />
+    <div className="sticky bottom-0 rounded-b-3xl bg-white px-10 py-5">
+      <div className="pointer-events-none absolute left-0 top-0 z-0 h-full w-full rotate-180 transform shadow-lg" />
 
       <div className="flex items-center justify-between">
         <Button
@@ -45,7 +48,7 @@ export const Table2Pagination: React.FC<Table2PaginationProps> = ({
           disabled={!canPreviousPage}
           onClick={previousPage}
         >
-          <Icon icon={ARROW_LEFT_2_SVG} className="w-3 h-3" />
+          <Icon icon={ARROW_LEFT_2_SVG} className="h-3 w-3" />
           <span>Previous</span>
         </Button>
 
@@ -71,7 +74,7 @@ export const Table2Pagination: React.FC<Table2PaginationProps> = ({
           onClick={nextPage}
         >
           <span>Next</span>
-          <Icon icon={ARROW_RIGHT_2_SVG} className="w-3 h-3" />
+          <Icon icon={ARROW_RIGHT_2_SVG} className="h-3 w-3" />
         </Button>
       </div>
     </div>

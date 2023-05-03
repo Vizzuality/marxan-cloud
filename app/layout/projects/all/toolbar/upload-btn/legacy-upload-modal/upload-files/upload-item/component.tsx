@@ -4,8 +4,8 @@ import { useDropzone } from 'react-dropzone';
 import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
+
 import { motion } from 'framer-motion';
-import { bytesToMegabytes } from 'utils/units';
 
 import { useUploadLegacyProjectFile, useCancelUploadLegacyProjectFile } from 'hooks/projects';
 import { useToasts } from 'hooks/toast';
@@ -13,6 +13,7 @@ import { useToasts } from 'hooks/toast';
 import Label from 'components/forms/label';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
+import { bytesToMegabytes } from 'utils/units';
 
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
@@ -28,14 +29,10 @@ export interface UploadItemProps {
   meta: {
     error?: boolean;
     touched?: boolean;
-  }
+  };
 }
 
-export const UploadItem: React.FC<UploadItemProps> = ({
-  f,
-  input,
-  ...fprops
-}: UploadItemProps) => {
+export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: UploadItemProps) => {
   const [successFile, setSuccessFile] = useState(null);
   const [dataFileId, setDataFileId] = useState(null);
 
@@ -57,27 +54,32 @@ export const UploadItem: React.FC<UploadItemProps> = ({
     data.append('fileType', `${f.fileType}.${f.format}`);
     data.append('file', fl);
 
-    uploadLegacyProjectFileMutation.mutate({ data, projectId: legacyProjectId }, {
-      onSuccess: ({ data: { fileId } }) => {
-        setDataFileId(fileId);
-      },
-      onError: ({ response }) => {
-        const { errors } = response.data;
+    uploadLegacyProjectFileMutation.mutate(
+      { data, projectId: legacyProjectId },
+      {
+        onSuccess: ({ data: { fileId } }) => {
+          setDataFileId(fileId);
+        },
+        onError: ({ response }) => {
+          const { errors } = response.data;
 
-        addToast('error-upload-legacy-data-file', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <ul className="text-sm">
-              {errors.map((e) => (
-                <li key={`${e.status}`}>{e.title}</li>
-              ))}
-            </ul>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          addToast(
+            'error-upload-legacy-data-file',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">
+                {errors.map((e) => (
+                  <li key={`${e.status}`}>{e.title}</li>
+                ))}
+              </ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   };
 
   const onDropRejected = (rejectedFiles) => {
@@ -92,7 +94,8 @@ export const UploadItem: React.FC<UploadItemProps> = ({
         : error;
     });
 
-    addToast('drop-error', (
+    addToast(
+      'drop-error',
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
@@ -100,32 +103,30 @@ export const UploadItem: React.FC<UploadItemProps> = ({
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
-      </>
-    ), {
-      level: 'error',
-    });
+      </>,
+      {
+        level: 'error',
+      }
+    );
   };
 
   const onUploadRemove = useCallback(() => {
-    cancelUploadLegacyProjectFileMutation.mutate({ projectId: legacyProjectId, dataFileId }, {
-      onSuccess: ({ data: { projectId } }) => {
-        setSuccessFile(null);
-        input.onChange(null);
-        console.info('Upload legacy project data file has been canceled', projectId);
-      },
-      onError: () => {
-        console.error('Upload legacy project data file has not been canceled');
-      },
-    });
+    cancelUploadLegacyProjectFileMutation.mutate(
+      { projectId: legacyProjectId, dataFileId },
+      {
+        onSuccess: ({ data: { projectId } }) => {
+          setSuccessFile(null);
+          input.onChange(null);
+          console.info('Upload legacy project data file has been canceled', projectId);
+        },
+        onError: () => {
+          console.error('Upload legacy project data file has not been canceled');
+        },
+      }
+    );
   }, [input, cancelUploadLegacyProjectFileMutation, dataFileId, legacyProjectId]);
 
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone({
     multiple: false,
     maxSize: f.maxSize,
     onDropAccepted,
@@ -133,92 +134,76 @@ export const UploadItem: React.FC<UploadItemProps> = ({
   });
 
   return (
-
-    <form onSubmit={() => { }}>
+    <form onSubmit={() => {}}>
       {!successFile && (
-
-      <div className="space-y-2.5">
-        <Label theme="light" className="flex uppercase space-x-2.5" id={`${f.fileType}`}>
-          {`Upload your ${f.label}`}
-          {' '}
-          <span className="lowercase">
-            {`(${f.fileType}.${f.format})`}
-          </span>
-          {' '}
-          {`${f.optional ? '(optional)' : ''}`}
-          {f.fileType === 'output' && (
-          <InfoButton
-            size="s"
-            theme="secondary"
+        <div className="space-y-2.5">
+          <Label theme="light" className="flex space-x-2.5 uppercase" id={`${f.fileType}`}>
+            {`Upload your ${f.label}`}{' '}
+            <span className="lowercase">{`(${f.fileType}.${f.format})`}</span>{' '}
+            {`${f.optional ? '(optional)' : ''}`}
+            {f.fileType === 'output' && (
+              <InfoButton size="s" theme="secondary">
+                <p className="text-xs">
+                  This .zip file must include the full content of an output folder from a Marxan
+                  run. All the files generated by the Marxan solver must be included directly in the
+                  zip file, not within any folder.
+                </p>
+              </InfoButton>
+            )}
+          </Label>
+          <div
+            {...fprops}
+            {...getRootProps()}
+            className={cx({
+              'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
+                true,
+              'bg-gray-500': isDragActive,
+              'border-green-800': isDragAccept,
+              'border-red-800': isDragReject || (fprops?.meta?.error && fprops?.meta?.touched),
+            })}
           >
-            <p className="text-xs">This .zip file must include the full content of an output folder from a Marxan run. All the files generated by the Marxan solver must be included directly in the zip file, not within any folder.</p>
-          </InfoButton>
-          )}
-        </Label>
-        <div
-          {...fprops}
-          {...getRootProps()}
-          className={cx({
-            'relative py-10 w-full bg-gray-100 bg-opacity-20 border border-dotted border-gray-300 hover:bg-gray-100 cursor-pointer': true,
-            'bg-gray-500': isDragActive,
-            'border-green-800': isDragAccept,
-            'border-red-800': isDragReject || (fprops?.meta?.error && fprops?.meta?.touched),
-          })}
-        >
+            <input {...getInputProps()} />
 
-          <input {...getInputProps()} />
+            <p className="text-center text-sm text-gray-500">
+              {`Drag and drop your project ${f.format}`}
+              <br />
+              or <b>click here</b> to upload
+            </p>
 
-          <p className="text-sm text-center text-gray-500">
-            {`Drag and drop your project ${f.format}`}
-            <br />
-            or
-            {' '}
-            <b>click here</b>
-            {' '}
-            to upload
-          </p>
-
-          <p className="mt-2 text-center text-gray-400 text-xxs">{`Recommended file size < ${bytesToMegabytes(f.maxSize)} MB`}</p>
+            <p className="mt-2 text-center text-xxs text-gray-400">{`Recommended file size < ${bytesToMegabytes(
+              f.maxSize
+            )} MB`}</p>
+          </div>
         </div>
-      </div>
       )}
 
       {successFile && (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <div className="flex flex-col w-full space-y-3 cursor-pointer">
-          <h5 className="text-xs text-black uppercase">
-            Uploaded
-            {' '}
-            {f.label}
-          </h5>
-          <div className="flex items-center space-x-2">
-            <label className="px-3 py-1 bg-gray-400 bg-opacity-10 rounded-3xl" htmlFor="cancel-shapefile-btn">
-              <p className="text-sm text-black">{successFile.path}</p>
-            </label>
-            <button
-              id="cancel-shapefile-btn"
-              type="button"
-              className="flex items-center justify-center flex-shrink-0 w-5 h-5 border border-black rounded-full group hover:bg-black"
-              onClick={() => {
-                setSuccessFile(null);
-                onUploadRemove();
-              }}
-            >
-              <Icon
-                className="w-1.5 h-1.5 text-black group-hover:text-white"
-                icon={CLOSE_SVG}
-              />
-            </button>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <div className="flex w-full cursor-pointer flex-col space-y-3">
+            <h5 className="text-xs uppercase text-black">Uploaded {f.label}</h5>
+            <div className="flex items-center space-x-2">
+              <label
+                className="rounded-3xl bg-gray-400 bg-opacity-10 px-3 py-1"
+                htmlFor="cancel-shapefile-btn"
+              >
+                <p className="text-sm text-black">{successFile.path}</p>
+              </label>
+              <button
+                id="cancel-shapefile-btn"
+                type="button"
+                className="group flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-black hover:bg-black"
+                onClick={() => {
+                  setSuccessFile(null);
+                  onUploadRemove();
+                }}
+              >
+                <Icon className="h-1.5 w-1.5 text-black group-hover:text-white" icon={CLOSE_SVG} />
+              </button>
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
       )}
     </form>
-
   );
 };
 

@@ -9,26 +9,25 @@ export const DocumentationLink = () => {
   const [isHover, setIsHover] = useState(false);
   return (
     <a
-      className="fixed z-50 p-2 right-1 bottom-28"
+      className="fixed bottom-28 right-1 z-50 p-2"
       href="https://marxansolutions.org"
       target="_blank"
       rel="noopener noreferrer"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <div className="px-1 pb-5 border-b border-gray-500">
-        <Icon className="flex-shrink-0 w-6 h-6" icon={isHover ? DOCUMENTATION_HOVER_SVG : DOCUMENTATION_SVG} />
+      <div className="border-b border-gray-500 px-1 pb-5">
+        <Icon
+          className="h-6 w-6 flex-shrink-0"
+          icon={isHover ? DOCUMENTATION_HOVER_SVG : DOCUMENTATION_SVG}
+        />
       </div>
       {isHover && (
-
-        <div className="absolute px-2 py-px text-black bg-white top-2 right-12 z-60 rounded-xl">
-          <p className="font-sans text-sm whitespace-nowrap">
-            Marxan&apos;s documentation
-          </p>
+        <div className="absolute right-12 top-2 z-60 rounded-xl bg-white px-2 py-px text-black">
+          <p className="whitespace-nowrap font-sans text-sm">Marxan&apos;s documentation</p>
         </div>
       )}
     </a>
-
   );
 };
 

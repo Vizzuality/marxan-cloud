@@ -7,7 +7,7 @@ export interface UseWDPACategoriesProps {
 }
 
 export interface UseSaveScenarioProtectedAreasProps {
-  requestConfig?: AxiosRequestConfig
+  requestConfig?: AxiosRequestConfig;
 }
 
 export interface SaveScenarioProtectedAreasProps {

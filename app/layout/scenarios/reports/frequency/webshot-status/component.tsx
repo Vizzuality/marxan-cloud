@@ -6,9 +6,7 @@ import { useRouter } from 'next/router';
 
 import { useProject } from 'hooks/projects';
 
-export interface WebShotStatusProps {
-
-}
+export interface WebShotStatusProps {}
 
 globalThis.MARXAN = {
   webshot_ready: false,
@@ -24,13 +22,9 @@ export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
     return Object.keys(maps).every((k) => maps[k]);
   }, [maps]);
 
-  const {
-    data: projectData,
-    isFetched: projectDataIsFetched,
-  } = useProject(pid);
+  const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
 
-  const reportDataIsFetched = projectData && projectDataIsFetched
-    && mapsLoaded;
+  const reportDataIsFetched = projectData && projectDataIsFetched && mapsLoaded;
 
   useEffect(() => {
     if (reportDataIsFetched) {

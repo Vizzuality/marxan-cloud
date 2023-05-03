@@ -15,12 +15,7 @@ const Template: Story<UploaderProps> = ({ ...args }: UploaderProps) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Uploader
-      open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      {...args}
-    >
+    <Uploader open={open} onOpen={() => setOpen(true)} onClose={() => setOpen(false)} {...args}>
       <div>You should render a form here</div>
     </Uploader>
   );

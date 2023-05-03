@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useEffect, useRef,
-} from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -26,8 +24,7 @@ import {
   useScenarioTextRunning,
 } from './utils';
 
-export interface ScenarioStatusProps {
-}
+export interface ScenarioStatusProps {}
 
 export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const { query } = useRouter();
@@ -44,7 +41,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   // Failure
   const JOB_FAILURE = useScenarioJobFailure(
     JOBS,
-    scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck,
+    scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck
   );
   const TEXT_FAILURE = useScenarioTextFailure(JOB_FAILURE);
 
@@ -52,7 +49,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const JOB_DONE_REF = useRef(null);
   const JOB_DONE = useScenarioJobDone(
     JOBS,
-    scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck,
+    scenarioData?.metadata?.scenarioEditingMetadata?.lastJobCheck
   );
   const TEXT_DONE = useScenarioTextDone(JOB_DONE, JOB_DONE_REF);
 
@@ -84,29 +81,31 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   }, [ACTIONS_FAILURE, JOB_FAILURE?.kind, isLockMe]);
 
   return (
-    <div className="absolute top-0 left-0 z-50 flex flex-col justify-end w-full h-full pointer-events-none">
+    <div className="pointer-events-none absolute left-0 top-0 z-50 flex h-full w-full flex-col justify-end">
       {(JOB_RUNNING || JOB_FAILURE || JOB_DONE) && (
         <motion.div
-          className="absolute top-0 left-0 z-10 w-full h-full bg-black bg-opacity-75 pointer-events-auto"
+          className="pointer-events-auto absolute left-0 top-0 z-10 h-full w-full bg-black bg-opacity-75"
           key="status-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         />
       )}
 
-      {((JOB_RUNNING || JOB_DONE) && !JOB_FAILURE) && (
+      {(JOB_RUNNING || JOB_DONE) && !JOB_FAILURE && (
         <motion.div
-          className="absolute z-10 pointer-events-auto top-1/2 left-1/2"
+          className="pointer-events-auto absolute left-1/2 top-1/2 z-10"
           key="status-text"
           initial={{ opacity: 0, y: '-60%', x: '-50%' }}
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
-          <div className="w-full max-w-md p-10 space-y-5 text-center">
-            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT_RUNNING || TEXT_DONE}</h3>
+          <div className="w-full max-w-md space-y-5 p-10 text-center">
+            <h3 className="font-heading text-xs uppercase tracking-wide">
+              {TEXT_RUNNING || TEXT_DONE}
+            </h3>
 
             <Icon icon={PROCESSING_SVG} className="m-auto" style={{ width: 40, height: 10 }} />
 
-            <p className="text-xs tracking-wide text-center font-heading">
+            <p className="text-center font-heading text-xs tracking-wide">
               This task may take some time.
               <br />
               You can wait here or go back to your project dashboard.
@@ -120,12 +119,7 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
                 Cancel
               </Button> */}
 
-              <Button
-                theme="primary-alt"
-                size="base"
-                href={`/projects/${pid}`}
-                className="w-1/2"
-              >
+              <Button theme="primary-alt" size="base" href={`/projects/${pid}`} className="w-1/2">
                 Go to project
               </Button>
             </div>
@@ -135,22 +129,22 @@ export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
 
       {JOB_FAILURE && (
         <motion.div
-          className="absolute z-10 pointer-events-auto top-1/2 left-1/2"
+          className="pointer-events-auto absolute left-1/2 top-1/2 z-10"
           key="status-text"
           initial={{ opacity: 0, y: '-60%', x: '-50%' }}
           animate={{ opacity: 1, y: '-50%', x: '-50%' }}
         >
-          <div className="w-full max-w-md p-10 space-y-5 text-center">
-            <Icon icon={CLOSE_SVG} className="m-auto text-red-500" style={{ width: 20, height: 20 }} />
+          <div className="w-full max-w-md space-y-5 p-10 text-center">
+            <Icon
+              icon={CLOSE_SVG}
+              className="m-auto text-red-500"
+              style={{ width: 20, height: 20 }}
+            />
 
-            <h3 className="text-xs tracking-wide uppercase font-heading">{TEXT_FAILURE}</h3>
+            <h3 className="font-heading text-xs uppercase tracking-wide">{TEXT_FAILURE}</h3>
 
             <div className="flex justify-center space-x-2">
-              <Button
-                theme="primary-alt"
-                size="base"
-                onClick={onCloseFailure}
-              >
+              <Button theme="primary-alt" size="base" onClick={onCloseFailure}>
                 Close
               </Button>
             </div>

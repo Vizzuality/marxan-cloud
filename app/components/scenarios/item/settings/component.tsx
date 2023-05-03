@@ -23,10 +23,10 @@ export const Item: React.FC<ItemSettingsProps> = ({
   const editable = useCanEditProject(pid);
 
   return (
-    <div className="w-full px-8 pt-6 pb-4 bg-gray-700 rounded-b-3xl">
+    <div className="w-full rounded-b-3xl bg-gray-700 px-8 pb-4 pt-6">
       {children}
 
-      <div className="flex justify-end w-full space-x-1 mt-2.5">
+      <div className="mt-2.5 flex w-full justify-end space-x-1">
         <Button
           className="flex-shrink-0"
           size="s"

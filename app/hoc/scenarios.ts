@@ -1,6 +1,6 @@
 import { QueryClient } from 'react-query';
 
-import { getSession } from 'next-auth/client';
+import { getSession } from 'next-auth/react';
 import { dehydrate } from 'react-query/hydration';
 
 import ROLES from 'services/roles';
@@ -10,58 +10,65 @@ import USERS from 'services/users';
 import { mergeDehydratedState } from './utils';
 
 const fetchUser = (session, queryClient) => {
-  return queryClient.prefetchQuery('me', () => USERS.request({
-    method: 'GET',
-    url: '/me',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  })
-    .then((response) => {
+  return queryClient.prefetchQuery('me', () =>
+    USERS.request({
+      method: 'GET',
+      url: '/me',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    }).then((response) => {
       if (response.status > 500) {
         return new Error('prefetchQuery "me" error');
       }
       return response.data;
-    }));
+    })
+  );
 };
 
 const fetchProjectUsers = (session, queryClient, { pid }) => {
-  return queryClient.prefetchQuery(['roles', pid], () => ROLES.request({
-    method: 'GET',
-    url: `/${pid}/users`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    params: {},
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }));
+  return queryClient.prefetchQuery(['roles', pid], () =>
+    ROLES.request({
+      method: 'GET',
+      url: `/${pid}/users`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {},
+      transformResponse: (data) => JSON.parse(data),
+    }).then((response) => {
+      return response.data;
+    })
+  );
 };
 
 const fetchScenario = (session, queryClient, { sid }) => {
-  return queryClient.prefetchQuery(['scenarios', sid], () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }));
+  return queryClient.prefetchQuery(['scenarios', sid], () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${sid}`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    }).then((response) => {
+      return response.data;
+    })
+  );
 };
 
 const fetchScenarioLock = (session, queryClient, { sid }) => {
-  return queryClient.prefetchQuery(['scenario-lock', sid], () => SCENARIOS.request({
-    method: 'GET',
-    url: `/${sid}/editing-locks`,
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    transformResponse: (data) => JSON.parse(data),
-  }).then((response) => {
-    return response.data;
-  }));
+  return queryClient.prefetchQuery(['scenario-lock', sid], () =>
+    SCENARIOS.request({
+      method: 'GET',
+      url: `/${sid}/editing-locks`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      transformResponse: (data) => JSON.parse(data),
+    }).then((response) => {
+      return response.data;
+    })
+  );
 };
 
 export function withScenario(getServerSidePropsFunc?: Function) {
@@ -70,7 +77,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -104,7 +111,7 @@ export function withScenario(getServerSidePropsFunc?: Function) {
     }
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
       const currentDehydratedState = JSON.parse(JSON.stringify(dehydrate(queryClient)));
@@ -136,7 +143,7 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
 
     if (!session) {
       if (getServerSidePropsFunc) {
-        const SSPF = await getServerSidePropsFunc(context) || {};
+        const SSPF = (await getServerSidePropsFunc(context)) || {};
 
         return {
           props: {
@@ -193,7 +200,7 @@ export function withScenarioLock(getServerSidePropsFunc?: Function) {
     }
 
     if (getServerSidePropsFunc) {
-      const SSPF = await getServerSidePropsFunc(context) || {};
+      const SSPF = (await getServerSidePropsFunc(context)) || {};
 
       const { dehydratedState: prevDehydratedState } = SSPF.props;
 

@@ -1,5 +1,8 @@
 import React, {
-  ReactNode, ReactElement, cloneElement, useState,
+  ReactNode,
+  ReactElement,
+  cloneElement,
+  useState,
   useEffect,
   useCallback,
   useRef,
@@ -9,18 +12,18 @@ import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
 import { useResizeDetector } from 'react-resize-detector';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
 import type { Placement } from '@popperjs/core';
-import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useHelp } from 'hooks/help';
 
+import Tooltip from 'components/tooltip';
 import HelpSpotlight from 'layout/help/spotlight';
 import HelpTooltip from 'layout/help/tooltip';
-
-import Tooltip from 'components/tooltip';
 
 const flipModifier = {
   name: 'flip',
@@ -32,10 +35,7 @@ const hideModifier = {
   enabled: true,
 };
 
-const MODIFIERS = [
-  flipModifier,
-  hideModifier,
-];
+const MODIFIERS = [flipModifier, hideModifier];
 export interface HelpBeaconProps {
   id: string;
   title: string;
@@ -97,9 +97,7 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
   }, [active, onResize]);
 
   // 'usePopper'
-  const {
-    styles, attributes, state, update,
-  } = usePopper(childrenRef.current, beaconRef, {
+  const { styles, attributes, state, update } = usePopper(childrenRef.current, beaconRef, {
     placement,
     modifiers: MODIFIERS.map((m) => {
       return {
@@ -144,62 +142,58 @@ export const HelpBeacon: React.FC<HelpBeaconProps> = ({
         onClickOutside={() => {
           setVisible(false);
         }}
-        content={(
-          <HelpTooltip
-            title={title}
-            subtitle={subtitle}
-            content={content}
-          />
-        )}
+        content={<HelpTooltip title={title} subtitle={subtitle} content={content} />}
       >
         {CHILDREN}
       </Tooltip>
 
-      {typeof window !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {!visible && active && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              ref={((el) => setBeaconRef(el))}
-              className={cx({
-                'z-30': !beaconClassName,
-                [beaconClassName]: !!beaconClassName,
-                'visible pointer-events-auto': active,
-                'invisible pointer-events-none': !active || attributes?.popper?.['data-popper-reference-hidden'] || attributes?.popper?.['data-popper-escaped'],
-              })}
-              style={styles.popper}
-              {...attributes.popper}
-            >
-              <button
-                aria-label="manage-visibility"
-                type="button"
+      {typeof window !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {!visible && active && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                ref={(el) => setBeaconRef(el)}
                 className={cx({
-                  'relative beacon flex items-center justify-center w-6 h-6 bg-primary-500 border-2 border-gray-700 transition rounded-full focus:outline-none transform translate-y-3/4': true,
+                  'z-30': !beaconClassName,
+                  [beaconClassName]: !!beaconClassName,
+                  'pointer-events-auto visible': active,
+                  'pointer-events-none invisible':
+                    !active ||
+                    attributes?.popper?.['data-popper-reference-hidden'] ||
+                    attributes?.popper?.['data-popper-escaped'],
                 })}
-                onClick={() => {
-                  setVisible(!visible);
-                }}
+                style={styles.popper}
+                {...attributes.popper}
               >
-                <div className="absolute top-0 bottom-0 left-0 right-0 border-2 rounded-full pointer-events-none animate-pulse border-primary-500" />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document?.body,
-      )}
+                <button
+                  aria-label="manage-visibility"
+                  type="button"
+                  className={cx({
+                    'beacon relative flex h-6 w-6 translate-y-3/4 transform items-center justify-center rounded-full border-2 border-gray-700 bg-primary-500 transition focus:outline-none':
+                      true,
+                  })}
+                  onClick={() => {
+                    setVisible(!visible);
+                  }}
+                >
+                  <div className="pointer-events-none absolute bottom-0 left-0 right-0 top-0 animate-pulse rounded-full border-2 border-primary-500" />
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document?.body
+        )}
 
-      {typeof window !== 'undefined' && createPortal(
-        <AnimatePresence>
-          {visible && active && (
-            <HelpSpotlight
-              childrenRef={childrenRef}
-            />
-          )}
-        </AnimatePresence>,
-        document?.body,
-      )}
+      {typeof window !== 'undefined' &&
+        createPortal(
+          <AnimatePresence>
+            {visible && active && <HelpSpotlight childrenRef={childrenRef} />}
+          </AnimatePresence>,
+          document?.body
+        )}
     </>
   );
 };

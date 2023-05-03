@@ -1,6 +1,4 @@
-import {
-  useCallback, useEffect, useRef, useMemo, RefObject,
-} from 'react';
+import { useCallback, useEffect, useRef, useMemo, RefObject } from 'react';
 
 import lodashDebounce from 'lodash/debounce';
 
@@ -9,9 +7,8 @@ export type DebounceOptions = Parameters<typeof lodashDebounce>[2];
 const createCallback = (
   debounce: number,
   handleOnScroll: () => void,
-  options: DebounceOptions,
-): (() => void
-  ) => {
+  options: DebounceOptions
+): (() => void) => {
   if (debounce) {
     return lodashDebounce(handleOnScroll, debounce, options);
   }
@@ -46,35 +43,28 @@ function useBottomScrollListener<T extends HTMLDivElement>(
     debounce?: number;
     debounceOptions?: DebounceOptions;
     triggerOnNoScroll?: boolean;
-  },
+  }
 ): RefObject<T> {
-  const {
-    offset, triggerOnNoScroll, debounce, debounceOptions,
-  } = useMemo(
+  const { offset, triggerOnNoScroll, debounce, debounceOptions } = useMemo(
     () => ({
       offset: options?.offset ?? 0,
       debounce: options?.debounce ?? 200,
       debounceOptions: options?.debounceOptions ?? { leading: true },
       triggerOnNoScroll: options?.triggerOnNoScroll ?? false,
     }),
-    [
-      options?.offset,
-      options?.debounce,
-      options?.debounceOptions,
-      options?.triggerOnNoScroll,
-    ],
+    [options?.offset, options?.debounce, options?.debounceOptions, options?.triggerOnNoScroll]
   );
 
   const debouncedOnBottom = useMemo(
     () => createCallback(debounce, onBottom, debounceOptions),
-    [debounce, debounceOptions, onBottom],
+    [debounce, debounceOptions, onBottom]
   );
   const containerRef = useRef<T>(null);
   const handleOnScroll = useCallback(() => {
     if (containerRef.current != null) {
       const scrollNode: T = containerRef.current;
       const scrollContainerBottomPosition = Math.round(
-        scrollNode.scrollTop + scrollNode.clientHeight,
+        scrollNode.scrollTop + scrollNode.clientHeight
       );
       const scrollPosition = Math.round(scrollNode.scrollHeight - offset);
 
@@ -83,9 +73,7 @@ function useBottomScrollListener<T extends HTMLDivElement>(
       }
     } else {
       const scrollNode: Element = document.scrollingElement || document.documentElement;
-      const scrollContainerBottomPosition = Math.round(
-        scrollNode.scrollTop + window.innerHeight,
-      );
+      const scrollContainerBottomPosition = Math.round(scrollNode.scrollTop + window.innerHeight);
       const scrollPosition = Math.round(scrollNode.scrollHeight - offset);
 
       if (scrollPosition <= scrollContainerBottomPosition) {

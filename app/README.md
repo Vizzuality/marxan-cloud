@@ -14,6 +14,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
   and callbacks](https://next-auth.js.org/configuration/options#nextauth_url).
   Set the environment variable to the canonical URL of your site. Not needed in
   Vercel deploys.
+  
+- `NEXTAUTH_SECRET`: Secret used to encrypt the session cookie. It can be any
+  string. Not needed in Vercel deploys.
 
 - `NEXT_PUBLIC_MAPBOX_API_TOKEN`: Mapbox token. It MUST be TNC mapbox token.
 

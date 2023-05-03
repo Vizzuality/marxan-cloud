@@ -6,7 +6,7 @@ export interface MultipleModalProps {
 }
 
 export interface MultipleModalContextProps {
-  modals: MultipleModalProps[],
+  modals: MultipleModalProps[];
   addMultipleModal: (modal: MultipleModalProps) => void;
   removeMultipleModal: (modal: MultipleModalProps) => void;
 }

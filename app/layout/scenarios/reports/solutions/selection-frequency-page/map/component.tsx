@@ -10,10 +10,7 @@ import PluginMapboxGl from '@vizzuality/layer-manager-plugin-mapboxgl';
 import { LayerManager, Layer } from '@vizzuality/layer-manager-react';
 
 import { useAccessToken } from 'hooks/auth';
-import {
-  useBBOX,
-  usePUGridLayer,
-} from 'hooks/map';
+import { useBBOX, usePUGridLayer } from 'hooks/map';
 import { useProject } from 'hooks/projects';
 import { useScenario } from 'hooks/scenarios';
 
@@ -37,17 +34,13 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   const dispatch = useDispatch();
 
-  const {
-    data = {},
-  } = useProject(pid);
+  const { data = {} } = useProject(pid);
   const { bbox } = data;
   const BBOX = useBBOX({
     bbox,
   });
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  const { data: scenarioData } = useScenario(sid);
 
   const minZoom = 2;
   const maxZoom = 20;
@@ -77,18 +70,21 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
     setViewport(vw);
   }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
   // const handleMapLoad = () => {
   //   dispatch(setMaps({ [id]: true }));
@@ -102,10 +98,7 @@ export const ScenariosReportMap: React.FC<ScenariosReportMapProps> = ({
 
   return (
     <>
-      <div
-        className="relative w-2/3 h-full overflow-hidden"
-        style={{ height: '146.05mm' }}
-      >
+      <div className="relative h-full w-2/3 overflow-hidden" style={{ height: '146.05mm' }}>
         <Map
           key={accessToken}
           className="map-report"

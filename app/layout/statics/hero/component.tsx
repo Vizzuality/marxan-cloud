@@ -21,25 +21,20 @@ export const StaticHero: React.FC<StaticHeroProps> = ({
   theme = 'dark',
 }: StaticHeroProps) => {
   return (
-    <div className={classnames({
-      'bg-primary-50 text-black': theme === 'light',
-      'bg-black': theme === 'dark',
-    })}
+    <div
+      className={classnames({
+        'bg-primary-50 text-black': theme === 'light',
+        'bg-black': theme === 'dark',
+      })}
     >
       <Wrapper>
-        <div className="w-full max-w-5xl mx-auto my-32">
-          {backlink && (
-            <Backlink href={backlink}>{section}</Backlink>
-          )}
-          <h2
-            className="pb-16 mt-3 font-semibold leading-tight text-left max-w-max bg-clip-text text-7xl"
-          >
+        <div className="mx-auto my-32 w-full max-w-5xl">
+          {backlink && <Backlink href={backlink}>{section}</Backlink>}
+          <h2 className="mt-3 max-w-max bg-clip-text pb-16 text-left text-7xl font-semibold leading-tight">
             {title}
           </h2>
 
-          <p className="text-lg leading-8 max-w-max">
-            {description}
-          </p>
+          <p className="max-w-max text-lg leading-8">{description}</p>
         </div>
       </Wrapper>
     </div>

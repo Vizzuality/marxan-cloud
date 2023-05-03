@@ -9,7 +9,7 @@ import Icon from 'components/icon';
 import GUIDE_REQUEST_SVG from 'svgs/users/guide-request.svg?sprite';
 
 export interface GuideRequestProps {
-  onDismiss?: () => void,
+  onDismiss?: () => void;
 }
 
 export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRequestProps) => {
@@ -17,24 +17,29 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRe
 
   const { onActive } = useHelp();
 
-  const handleActiveRequestGuide = useCallback((active) => {
-    onActive(active);
-    const { id: userId } = user;
-    window.localStorage.setItem(`help-${userId}`, userId);
-    onDismiss();
-  }, [onActive, onDismiss, user]);
+  const handleActiveRequestGuide = useCallback(
+    (active) => {
+      onActive(active);
+      const { id: userId } = user;
+      window.localStorage.setItem(`help-${userId}`, userId);
+      onDismiss();
+    },
+    [onActive, onDismiss, user]
+  );
 
   return (
-    <div className="flex flex-col items-center justify-center py-10 space-y-6">
-
-      <h2 className="font-medium text-center text-gray-600 text-m font-heading">First things first...</h2>
+    <div className="flex flex-col items-center justify-center space-y-6 py-10">
+      <h2 className="text-m text-center font-heading font-medium text-gray-600">
+        First things first...
+      </h2>
 
       <Icon icon={GUIDE_REQUEST_SVG} className="w-28" />
       <div className="w-72">
-        <p className="text-center text-gray-600 text-m font-heading">Would you like to get some guidance on Marxan&apos;s workflow?</p>
+        <p className="text-m text-center font-heading text-gray-600">
+          Would you like to get some guidance on Marxan&apos;s workflow?
+        </p>
       </div>
-      <div className="flex space-x-4 w-72">
-
+      <div className="flex w-72 space-x-4">
         <Button
           theme="tertiary"
           size="base"
@@ -55,7 +60,6 @@ export const GuideRequest: React.FC<GuideRequestProps> = ({ onDismiss }: GuideRe
           Yes
         </Button>
       </div>
-
     </div>
   );
 };

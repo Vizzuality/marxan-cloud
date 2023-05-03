@@ -9,63 +9,57 @@ import { useWDPACategories } from 'hooks/wdpa';
 
 import { SCENARIO_PARAMETERS, Types } from './constants';
 
-export interface SettingsPageProps {
-
-}
+export interface SettingsPageProps {}
 
 export const SettingsPage: React.FC<SettingsPageProps> = () => {
   const { query } = useRouter();
   const { pid, sid } = query;
 
-  const {
-    data: projectData,
-    isFetched: projectDataIsFetched,
-  } = useProject(pid);
+  const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
 
-  const {
-    data: featuresData,
-    isFetched: featuresDataIsFetched,
-  } = useSelectedFeatures(sid, {});
+  const { data: featuresData, isFetched: featuresDataIsFetched } = useSelectedFeatures(sid, {});
 
-  const {
-    data: costSurfaceRangeData,
-    isFetched: costSurfaceRangeDataIsFetched,
-  } = useCostSurfaceRange(sid);
+  const { data: costSurfaceRangeData, isFetched: costSurfaceRangeDataIsFetched } =
+    useCostSurfaceRange(sid);
 
-  const {
-    data: protectedAreasData,
-    isFetched: protectedAreasDataIsFetched,
-  } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
+  const { data: protectedAreasData, isFetched: protectedAreasDataIsFetched } = useWDPACategories({
+    adminAreaId:
+      projectData?.adminAreaLevel2Id || projectData?.adminAreaLevel1I || projectData?.countryId,
+    customAreaId:
+      !projectData?.adminAreaLevel2Id && !projectData?.adminAreaLevel1I && !projectData?.countryId
+        ? projectData?.planningAreaId
+        : null,
     scenarioId: sid,
   });
 
   const protectedAreas = protectedAreasData?.filter((a) => a.selected).map((a) => a.name);
 
-  const {
-    data: PUData,
-    isFetched: PUDataIsFetched,
-  } = useScenarioPU(sid);
+  const { data: PUData, isFetched: PUDataIsFetched } = useScenarioPU(sid);
 
-  const {
-    data: scenarioData,
-    isFetched: scenarioDataIsFetched,
-  } = useScenario(sid);
+  const { data: scenarioData, isFetched: scenarioDataIsFetched } = useScenario(sid);
 
   const { metadata } = scenarioData || {};
 
   const { marxanInputParameterFile } = metadata || {};
 
   const {
-    BESTSCORE, CLUMPTYPE, COSTTHRESH,
-    COOLFAC, HEURTYPE, ITIMPTYPE, MISSLEVEL, NUMTEMP,
-    NUMITNS, PROP, RANDSEED, RUNMODE, STARTTEMP,
-    THRESHPEN1, VERBOSITY, BLM, NUMREPS,
+    BESTSCORE,
+    CLUMPTYPE,
+    COSTTHRESH,
+    COOLFAC,
+    HEURTYPE,
+    ITIMPTYPE,
+    MISSLEVEL,
+    NUMTEMP,
+    NUMITNS,
+    PROP,
+    RANDSEED,
+    RUNMODE,
+    STARTTEMP,
+    THRESHPEN1,
+    VERBOSITY,
+    BLM,
+    NUMREPS,
   } = marxanInputParameterFile || {};
 
   const PARAMETERS = {
@@ -86,24 +80,27 @@ export const SettingsPage: React.FC<SettingsPageProps> = () => {
     [Types.CLUMPTYPE]: CLUMPTYPE,
   };
 
-  const reportDataIsFetched = scenarioDataIsFetched && featuresDataIsFetched
-    && protectedAreasDataIsFetched && projectDataIsFetched && PUDataIsFetched
-    && costSurfaceRangeDataIsFetched;
+  const reportDataIsFetched =
+    scenarioDataIsFetched &&
+    featuresDataIsFetched &&
+    protectedAreasDataIsFetched &&
+    projectDataIsFetched &&
+    PUDataIsFetched &&
+    costSurfaceRangeDataIsFetched;
 
   return (
     reportDataIsFetched && (
-      <div className="flex pt-6 space-x-4">
-
+      <div className="flex space-x-4 pt-6">
         <section className="w-1/2 space-y-8 text-xs">
           <div>
             <p className="pb-2 font-medium">Feature name, target, spf:</p>
             {featuresData.map((f) => {
               const { featureId, name, kind } = f;
               if (kind === 'plain') {
-                const { marxanSettings: { fpf: spf, prop: target } } = f;
-                return (
-                  <p key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>
-                );
+                const {
+                  marxanSettings: { fpf: spf, prop: target },
+                } = f;
+                return <p key={featureId}>{`${name}, ${target * 100}%, ${spf}`}</p>;
               }
 
               if (kind === 'withGeoprocessing') {
@@ -146,15 +143,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = () => {
             return (
               <div key={p.value} className="flex">
                 <p className="font-medium">
-                  {description}
-                  :
-                  {' '}
-                  <span>
-                    {' '}
-                    {PARAMETERS[value]}
-                  </span>
+                  {description}: <span> {PARAMETERS[value]}</span>
                 </p>
-
               </div>
             );
           })}

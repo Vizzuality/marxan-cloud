@@ -35,9 +35,9 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
 }: ProjectMapProps) => {
   const minZoom = 2;
   const maxZoom = 20;
-  const {
-    bbox, uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId,
-  } = useSelector((state) => state['/projects/new']);
+  const { bbox, uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId } = useSelector(
+    (state) => state['/projects/new']
+  );
 
   const BBOX = useBBOX({ bbox });
 
@@ -107,31 +107,31 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
         transitionDuration: 500,
       });
     },
-    [viewport],
+    [viewport]
   );
 
   const handleFitBoundsChange = useCallback((b) => {
     setBounds(b);
   }, []);
 
-  const handleTransformRequest = useCallback((url) => {
-    if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
-      return {
-        url,
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
-    }
+  const handleTransformRequest = useCallback(
+    (url) => {
+      if (url.startsWith(process.env.NEXT_PUBLIC_API_URL)) {
+        return {
+          url,
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+      }
 
-    return null;
-  }, [accessToken]);
+      return null;
+    },
+    [accessToken]
+  );
 
   return (
-    <div
-      id="project-new-map"
-      className="relative w-full h-full overflow-hidden rounded-r-3xl"
-    >
+    <div id="project-new-map" className="relative h-full w-full overflow-hidden rounded-r-3xl">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -159,9 +159,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       </Map>
 
       <Controls>
-        <LoadingControl
-          loading={!mapTilesLoaded}
-        />
+        <LoadingControl loading={!mapTilesLoaded} />
         <ZoomControl
           viewport={{
             ...viewport,
@@ -183,7 +181,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       </Controls>
       <Loading
         visible={!mapInteractive}
-        className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-black bg-opacity-90"
+        className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"
         iconClassName="w-10 h-10 text-primary-500"
       />
     </div>

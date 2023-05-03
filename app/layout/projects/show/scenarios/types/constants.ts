@@ -13,7 +13,8 @@ export const SCENARIO_TYPES = [
       height: 20,
     },
     subtitle: 'Prioritizes for a single action (e.g. a protected area network)',
-    disclaimer: 'If just starting out, we recommend Marxan to help you familiarize yourself with the process.',
+    disclaimer:
+      'If just starting out, we recommend Marxan to help you familiarize yourself with the process.',
   },
   {
     id: 'marxan-with-zones',
@@ -24,7 +25,8 @@ export const SCENARIO_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Prioritizes for multiple actions simultaneously (e.g. protected areas, community-use, and sustainable use zones).',
+    subtitle:
+      'Prioritizes for multiple actions simultaneously (e.g. protected areas, community-use, and sustainable use zones).',
     disclaimer: 'This approach is more data and process intensive.',
     disabled: true,
   },
@@ -37,7 +39,8 @@ export const SCENARIO_TYPES = [
       width: 42,
       height: 20,
     },
-    subtitle: 'Prioritizes for one action at a time while accounting for ecological processes and flows.',
+    subtitle:
+      'Prioritizes for one action at a time while accounting for ecological processes and flows.',
     disabled: true,
   },
 ];

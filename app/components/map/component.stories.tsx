@@ -71,7 +71,7 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => {
         transitionDuration: 500,
       });
     },
-    [viewport],
+    [viewport]
   );
 
   const handleFitBoundsChange = useCallback((b) => {
@@ -79,7 +79,7 @@ const Template: Story<MapProps> = ({ children, ...args }: MapProps) => {
   }, []);
 
   return (
-    <div className="relative w-full h-96">
+    <div className="relative h-96 w-full">
       <Map
         bounds={bounds}
         minZoom={minZoom}
@@ -135,12 +135,7 @@ Default.args = {
   className: '',
   viewport: {},
   bounds: {
-    bbox: [
-      10.9588623046875,
-      10.5194091796875,
-      44.01257086123085,
-      43.6499881760459,
-    ],
+    bbox: [10.9588623046875, 10.5194091796875, 44.01257086123085, 43.6499881760459],
     options: {
       padding: 50,
     },

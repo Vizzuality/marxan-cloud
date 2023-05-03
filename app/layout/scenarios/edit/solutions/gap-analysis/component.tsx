@@ -24,46 +24,39 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
   return (
     <motion.div
       key="details"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex min-h-0 flex-col items-start justify-start overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <header className="flex items-center pt-5 pb-1">
+      <header className="flex items-center pb-1 pt-5">
         <button
           aria-label="return"
           type="button"
-          className="flex items-center w-full mr-2 space-x-2 text-left focus:outline-none"
+          className="mr-2 flex w-full items-center space-x-2 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
         >
-          <Icon icon={ARROW_RIGHT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading text-primary-500">Target Achievement</h4>
+          <Icon icon={ARROW_RIGHT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+          <h4 className="font-heading text-xs uppercase text-primary-500">Target Achievement</h4>
         </button>
-        <InfoButton
-          theme="primary"
-        >
+        <InfoButton theme="primary">
           <div>
-            <h4 className="font-heading text-lg mb-2.5">What is the Solutions Target Achievement?</h4>
+            <h4 className="mb-2.5 font-heading text-lg">
+              What is the Solutions Target Achievement?
+            </h4>
             <div className="space-y-2 text-sm opacity-100">
               <p>
-                Before running Marxan you were able to see
-                the percentage of each feature that was currently
-                inside your conservation network in
-                {' '}
-                <b>Target Achievement</b>
+                Before running Marxan you were able to see the percentage of each feature that was
+                currently inside your conservation network in <b>Target Achievement</b>
               </p>
               <p>
-                In this Target Achievement, you add to that
-                previous network all the planning units that have been
-                selected by Marxan,
-                so this new percentage shows the amount of each feature that
-                would be included if the new conservation plan your
-                are working on is
+                In this Target Achievement, you add to that previous network all the planning units
+                that have been selected by Marxan, so this new percentage shows the amount of each
+                feature that would be included if the new conservation plan your are working on is
                 implemented.
               </p>
-
             </div>
           </div>
         </InfoButton>
@@ -77,12 +70,10 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsGapAnalys
         </Button> */}
       </header>
 
-      <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden text-sm">
-        <div className="relative flex flex-col flex-grow w-full min-h-0 mt-1 overflow-hidden">
+      <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col overflow-hidden text-sm">
+        <div className="relative mt-1 flex min-h-0 w-full flex-grow flex-col overflow-hidden">
           <Toolbar search={search} onSearch={onSearch} />
-          <List
-            search={search}
-          />
+          <List search={search} />
         </div>
       </div>
     </motion.div>

@@ -1,10 +1,10 @@
 import React, { TextareaHTMLAttributes } from 'react';
+
 import cx from 'classnames';
 
 const THEME = {
   dark: {
-    base:
-      'leading-tight text-white bg-transparent border rounded focus:outline-none',
+    base: 'leading-tight text-white bg-transparent border rounded focus:outline-none',
     status: {
       none: 'border-gray-500',
       valid: 'border-gray-500',
@@ -13,8 +13,7 @@ const THEME = {
     },
   },
   light: {
-    base:
-      'leading-tight text-gray-800 bg-transparent border rounded focus:outline-none',
+    base: 'leading-tight text-gray-800 bg-transparent border rounded focus:outline-none',
     status: {
       none: 'border-gray-500',
       valid: 'border-gray-500',
@@ -24,8 +23,7 @@ const THEME = {
   },
 };
 
-export interface TextareaProps
-  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   theme?: 'dark' | 'light';
   status?: 'none' | 'valid' | 'error' | 'disabled';
 }

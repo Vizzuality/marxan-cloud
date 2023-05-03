@@ -1,21 +1,13 @@
-import React, {
-  useRef, useState, useMemo, useEffect, useCallback,
-} from 'react';
+import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 
 import classnames from 'classnames';
-import {
-  scaleLinear, line, area, format,
-} from 'd3';
-import { blmFormat } from 'utils/units';
+
+import { scaleLinear, line, area, format } from 'd3';
 
 import Tooltip from 'components/tooltip';
+import { blmFormat } from 'utils/units';
 
-import {
-  VISUALIZATION_PADDING,
-  X_AXIS_HEIGHT,
-  Y_AXIS_WIDTH,
-  Y_BASELINE_OFFSET,
-} from './constants';
+import { VISUALIZATION_PADDING, X_AXIS_HEIGHT, Y_AXIS_WIDTH, Y_BASELINE_OFFSET } from './constants';
 
 type DataRow = {
   /**
@@ -28,7 +20,7 @@ type DataRow = {
   boundaryLength: number;
   /**
    * Blm value of that intersection
-  */
+   */
   blmValue: number;
   /**
    * Whether the point is the Boundary Length Modifier
@@ -50,7 +42,7 @@ export interface BlmChartProps {
 
   /**
    * selected BLM value.
-  */
+   */
   selected: number;
 
   /**
@@ -59,11 +51,7 @@ export interface BlmChartProps {
   onChange: (v: number) => void;
 }
 
-export const BlmChart: React.FC<BlmChartProps> = ({
-  data,
-  selected,
-  onChange,
-}: BlmChartProps) => {
+export const BlmChart: React.FC<BlmChartProps> = ({ data, selected, onChange }: BlmChartProps) => {
   const containerRef: React.MutableRefObject<HTMLDivElement> = useRef(null);
 
   const costValues = useMemo(() => {
@@ -76,33 +64,37 @@ export const BlmChart: React.FC<BlmChartProps> = ({
 
   const maxCostValue = format('.3~s')(Math.ceil(Math.max(...costValues) / 1000) * 1000);
   const minCostValue = format('.3~s')(Math.floor(Math.min(...costValues) / 1000) * 1000);
-  const maxBoundaryLengthValue = format('.3~s')(Math.ceil(Math.max(...boundaryLengthValues) / 1000) * 1000);
+  const maxBoundaryLengthValue = format('.3~s')(
+    Math.ceil(Math.max(...boundaryLengthValues) / 1000) * 1000
+  );
 
   const [{ width, height }, setDimensions] = useState({ width: 0, height: 0 });
 
-  const xDomain = useMemo(() => [
-    Math.min(...data.map((d) => d.cost)),
-    Math.max(...data.map((d) => d.cost)),
-  ], [data]);
+  const xDomain = useMemo(
+    () => [Math.min(...data.map((d) => d.cost)), Math.max(...data.map((d) => d.cost))],
+    [data]
+  );
 
   const xScale = useMemo(
-    () => scaleLinear()
-      .domain(xDomain)
-      .range([Y_AXIS_WIDTH + VISUALIZATION_PADDING, width - VISUALIZATION_PADDING]),
-    [xDomain, width],
+    () =>
+      scaleLinear()
+        .domain(xDomain)
+        .range([Y_AXIS_WIDTH + VISUALIZATION_PADDING, width - VISUALIZATION_PADDING]),
+    [xDomain, width]
   );
 
   const yDomain = useMemo(() => {
     const min = Math.min(...data.map((d) => d.boundaryLength));
     const max = Math.max(...data.map((d) => d.boundaryLength));
-    return [min - (Y_BASELINE_OFFSET * (max - min)), max];
+    return [min - Y_BASELINE_OFFSET * (max - min), max];
   }, [data]);
 
   const yScale = useMemo(
-    () => scaleLinear()
-      .domain(yDomain)
-      .range([height - X_AXIS_HEIGHT - VISUALIZATION_PADDING, VISUALIZATION_PADDING]),
-    [yDomain, height],
+    () =>
+      scaleLinear()
+        .domain(yDomain)
+        .range([height - X_AXIS_HEIGHT - VISUALIZATION_PADDING, VISUALIZATION_PADDING]),
+    [yDomain, height]
   );
 
   const lineGenerator = line<DataRow>()
@@ -146,26 +138,16 @@ export const BlmChart: React.FC<BlmChartProps> = ({
   }, [updateDimensions]);
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
-
+    <div ref={containerRef} className="relative h-full w-full">
       {containerRef.current && (
         <div className="flex flex-col">
           <g>
-            <text
-              x="0"
-              y="0"
-              textAnchor="middle"
-              className="text-xs text-white fill-current"
-            >
+            <text x="0" y="0" textAnchor="middle" className="fill-current text-xs text-white">
               Boundary length
             </text>
           </g>
           <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) - 85})`}>
-            <text
-              x="0"
-              y="0"
-              className="text-xs text-white fill-current"
-            >
+            <text x="0" y="0" className="fill-current text-xs text-white">
               {maxBoundaryLengthValue}
             </text>
           </g>
@@ -174,35 +156,24 @@ export const BlmChart: React.FC<BlmChartProps> = ({
 
       {containerRef.current && (
         <svg width={width} height={height}>
-
           {/* X axis */}
           <g>
             <g transform={`translate(${xScale(xDomain[0])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-              <text
-                x="0"
-                y="0"
-                className="text-xs text-white fill-current"
-              >
+              <text x="0" y="0" className="fill-current text-xs text-white">
                 {minCostValue}
               </text>
             </g>
-            <g transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-              <text
-                x="0"
-                y="0"
-                textAnchor="middle"
-                className="text-xs text-white fill-current"
-              >
+            <g
+              transform={`translate(${(xScale(xDomain[0]) + xScale(xDomain[1])) / 2} ${
+                yScale(yDomain[0]) + X_AXIS_HEIGHT
+              })`}
+            >
+              <text x="0" y="0" textAnchor="middle" className="fill-current text-xs text-white">
                 Cost
               </text>
             </g>
             <g transform={`translate(${xScale(xDomain[1])} ${yScale(yDomain[0]) + X_AXIS_HEIGHT})`}>
-              <text
-                className="text-xs text-white fill-current"
-                x="0"
-                y="0"
-                textAnchor="end"
-              >
+              <text className="fill-current text-xs text-white" x="0" y="0" textAnchor="end">
                 {maxCostValue}
               </text>
             </g>
@@ -215,27 +186,25 @@ export const BlmChart: React.FC<BlmChartProps> = ({
               <stop offset="100%" stopColor="transparent" />
             </linearGradient>
           </defs>
-          <path
-            d={areaGenerator(data)}
-            fill="url(#gradient)"
-          />
+          <path d={areaGenerator(data)} fill="url(#gradient)" />
           {/* Line */}
-          <path d={lineGenerator(data)} className="text-white stroke-current stroke-2 opacity-30 fill-none" />
+          <path
+            d={lineGenerator(data)}
+            className="fill-none stroke-current stroke-2 text-white opacity-30"
+          />
           {/* Points */}
           <g>
-            {data.map(({
-              cost, boundaryLength, blmValue,
-            }, index) => (
+            {data.map(({ cost, boundaryLength, blmValue }, index) => (
               <foreignObject
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 x={xScale(cost)}
                 y={yScale(boundaryLength)}
-                className="w-3 h-3 transform -translate-x-1.5 -translate-y-1.5"
+                className="h-3 w-3 -translate-x-1.5 -translate-y-1.5 transform"
               >
                 <Tooltip
-                  content={(
-                    <div className="flex flex-col p-2 bg-white rounded-md">
+                  content={
+                    <div className="flex flex-col rounded-md bg-white p-2">
                       <div className="flex justify-between space-x-2 text-xs">
                         <div>
                           <span className="text-gray-600">Boundary Length:</span>
@@ -248,25 +217,22 @@ export const BlmChart: React.FC<BlmChartProps> = ({
                         <div>
                           <span className="text-gray-600">Cost:</span>
                         </div>
-                        <div className="text-xs text-gray-700">
-                          {`${blmFormat(cost)}`}
-                        </div>
+                        <div className="text-xs text-gray-700">{`${blmFormat(cost)}`}</div>
                       </div>
                       <div className="flex justify-between space-x-2 text-xs">
                         <div>
                           <span className="text-gray-600">BLM:</span>
                         </div>
-                        <div className="text-xs text-gray-700">
-                          {`${blmFormat(blmValue)}`}
-                        </div>
+                        <div className="text-xs text-gray-700">{`${blmFormat(blmValue)}`}</div>
                       </div>
                     </div>
-                  )}
+                  }
                 >
                   <div
                     aria-hidden="true"
                     className={classnames({
-                      'w-3 h-3 rounded-full border-blue-500 border-2 bg-black hover:bg-primary-500 cursor-pointer hover:border-2': true,
+                      'h-3 w-3 cursor-pointer rounded-full border-2 border-blue-500 bg-black hover:border-2 hover:bg-primary-500':
+                        true,
                       'bg-blue-500': blmValue === selected,
                     })}
                     onClick={() => {
@@ -280,7 +246,6 @@ export const BlmChart: React.FC<BlmChartProps> = ({
         </svg>
       )}
     </div>
-
   );
 };
 

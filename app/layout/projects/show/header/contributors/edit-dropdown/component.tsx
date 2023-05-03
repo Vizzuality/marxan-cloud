@@ -1,23 +1,25 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
+import cx from 'classnames';
+
 import { useRouter } from 'next/router';
 
-import cx from 'classnames';
 import { useDebouncedCallback } from 'use-debounce';
 
 import { useOwnsProject } from 'hooks/permissions';
 import {
-  useProjectsUsers, useProjectUsers, useSaveProjectUserRole, useUserByEmail,
+  useProjectsUsers,
+  useProjectUsers,
+  useSaveProjectUserRole,
+  useUserByEmail,
 } from 'hooks/project-users';
 import { useToasts } from 'hooks/toast';
 
-import UserCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
-
 import Button from 'components/button';
 import Search from 'components/search';
+import UserCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
 
-export interface EditContributorsDropdownProps {
-}
+export interface EditContributorsDropdownProps {}
 
 export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = () => {
   const { query } = useRouter();
@@ -30,14 +32,9 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
 
   const isOwner = useOwnsProject(pid);
 
-  const {
-    data: userByEmailData,
-    isFetched: userByEmailIsFetched,
-  } = useUserByEmail(email);
+  const { data: userByEmailData, isFetched: userByEmailIsFetched } = useUserByEmail(email);
 
-  const {
-    data: projectUsersData,
-  } = useProjectUsers(pid);
+  const { data: projectUsersData } = useProjectUsers(pid);
 
   const { data: projectsUsersData } = useProjectsUsers([pid]);
 
@@ -55,58 +52,64 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
     setEmail(value);
   }, 500);
 
-  const onChangeSearch = useCallback((value) => {
-    setSearch(value);
-    onChangeEmailDebounced(value);
-  }, [onChangeEmailDebounced]);
+  const onChangeSearch = useCallback(
+    (value) => {
+      setSearch(value);
+      onChangeEmailDebounced(value);
+    },
+    [onChangeEmailDebounced]
+  );
 
   const addUser = useCallback(() => {
-    saveProjectUserRoleMutation.mutate({
-      projectId: `${pid}`,
-      data: {
-        userId: userByEmailData.id,
+    saveProjectUserRoleMutation.mutate(
+      {
         projectId: `${pid}`,
-        roleName: 'project_contributor',
+        data: {
+          userId: userByEmailData.id,
+          projectId: `${pid}`,
+          roleName: 'project_contributor',
+        },
       },
-    }, {
-      onSuccess: () => {
-        addToast('add-conttributor-success', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">
-              {userByEmailData.displayName || userByEmailData.email}
-              {' '}
-              added as contributor
-            </p>
-          </>
-        ), {
-          level: 'success',
-        });
+      {
+        onSuccess: () => {
+          addToast(
+            'add-conttributor-success',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">
+                {userByEmailData.displayName || userByEmailData.email} added as contributor
+              </p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
 
-        setSearch(null);
-        setEmail(null);
-      },
-      onError: () => {
-        addToast('add-conttributor-error', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">
-              Something went wrong, please try again.
-            </p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
+          setSearch(null);
+          setEmail(null);
+        },
+        onError: () => {
+          addToast(
+            'add-conttributor-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">Something went wrong, please try again.</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
   }, [pid, userByEmailData, saveProjectUserRoleMutation, addToast]);
 
   const contributorsSpelling = projectUsersData?.length !== 1 ? 'contributors' : 'contributor';
 
   return (
-    <div className="overflow-x-visible overflow-y-auto bg-white p-9 rounded-3xl">
-      <div className="flex flex-col space-y-5 w-96">
-        <div className="text-sm text-center text-black">Project members</div>
+    <div className="overflow-y-auto overflow-x-visible rounded-3xl bg-white p-9">
+      <div className="flex w-96 flex-col space-y-5">
+        <div className="text-center text-sm text-black">Project members</div>
 
         {isOwner && (
           <div>
@@ -121,12 +124,12 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
             />
 
             {SEARCH_RESULT && userByEmailIsFetched && (
-              <div className="flex justify-between pt-2 pr-5 text-black pl-9">
+              <div className="flex justify-between pl-9 pr-5 pt-2 text-black">
                 <div className="text-sm">{SEARCH_RESULT.displayName || SEARCH_RESULT.email}</div>
 
                 <Button
                   className={cx({
-                    'flex-shrink-0 h-6 py-2 text-sm  group': true,
+                    'group h-6 flex-shrink-0 py-2  text-sm': true,
                   })}
                   theme="primary"
                   size="xs"
@@ -138,7 +141,7 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
             )}
 
             {!SEARCH_RESULT && userByEmailIsFetched && (
-              <div className="flex justify-between pt-2 pr-5 text-black pl-9">
+              <div className="flex justify-between pl-9 pr-5 pt-2 text-black">
                 <div className="text-sm">No results</div>
               </div>
             )}
@@ -146,26 +149,26 @@ export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> =
         )}
 
         <div className="flex flex-col space-y-2.5">
-          <p className="text-xs text-black uppercase font-heading">{`${projectUsersData?.length} ${contributorsSpelling}`}</p>
-          <div className="w-full space-y-2.5 flex-grow flex flex-col overflow-x-visible overflow-y-auto max-h-64">
-            {!!projectUsersData?.length && projectUsersData.map((u) => {
-              const {
-                user: {
-                  email: userEmail, displayName, id, avatarDataUrl,
-                }, roleName,
-              } = u;
+          <p className="font-heading text-xs uppercase text-black">{`${projectUsersData?.length} ${contributorsSpelling}`}</p>
+          <div className="flex max-h-64 w-full flex-grow flex-col space-y-2.5 overflow-y-auto overflow-x-visible">
+            {!!projectUsersData?.length &&
+              projectUsersData.map((u) => {
+                const {
+                  user: { email: userEmail, displayName, id, avatarDataUrl },
+                  roleName,
+                } = u;
 
-              return (
-                <UserCard
-                  key={id}
-                  id={id}
-                  name={displayName || userEmail}
-                  roleName={roleName}
-                  bgImage={avatarDataUrl}
-                  bgColor={projectsUsersData[id]}
-                />
-              );
-            })}
+                return (
+                  <UserCard
+                    key={id}
+                    id={id}
+                    name={displayName || userEmail}
+                    roleName={roleName}
+                    bgImage={avatarDataUrl}
+                    bgColor={projectsUsersData[id]}
+                  />
+                );
+              })}
           </div>
         </div>
       </div>

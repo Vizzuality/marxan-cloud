@@ -8,9 +8,7 @@ import UtilitiesImage from 'images/about/utilities-1.png';
 
 import { UTILITIES } from './constants';
 
-export interface AboutUtilitiesProps {
-
-}
+export interface AboutUtilitiesProps {}
 
 export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
   return (
@@ -21,7 +19,7 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
       }}
     >
       <Wrapper>
-        <div className="grid w-full max-w-5xl grid-cols-2 py-28 mx-auto border-t border-white gap-x-36 border-opacity-20">
+        <div className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-x-36 border-t border-white border-opacity-20 py-28">
           <Column
             title="What can I do with this Marxan planning platform?"
             image={UtilitiesImage}
@@ -30,7 +28,7 @@ export const AboutUtilities: React.FC<AboutUtilitiesProps> = () => {
             {UTILITIES.map((u) => (
               <div className="flex flex-row gap-16" key={u.order}>
                 <p className="text-2xl font-semibold text-primary-500">{u.order}</p>
-                <p className="text-lg font-heading">{u.description}</p>
+                <p className="font-heading text-lg">{u.description}</p>
               </div>
             ))}
           </div>

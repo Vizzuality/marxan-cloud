@@ -1,16 +1,16 @@
 import React from 'react';
 
+import cx from 'classnames';
+
 import { useFocusRing } from '@react-aria/focus';
 import { useSliderThumb } from '@react-aria/slider';
 import { mergeProps } from '@react-aria/utils';
 import { VisuallyHidden } from '@react-aria/visually-hidden';
 import { SliderState } from '@react-stately/slider';
-import cx from 'classnames';
 
 const THEME = {
   dark: {
-    thumb:
-      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    thumb: 'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
@@ -21,8 +21,7 @@ const THEME = {
     },
   },
   light: {
-    thumb:
-      'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
+    thumb: 'absolute top-0 w-4 h-4 transform -translate-x-1/2 rounded-full bg-gray-700 border-2',
     status: {
       default: 'border-white',
       dragging: 'border-white opacity-80',
@@ -74,7 +73,7 @@ export const Thumb: React.FC<ThumbProps> = ({
       inputRef,
       isDisabled,
     },
-    sliderState,
+    sliderState
   );
 
   const { focusProps, isFocusVisible } = useFocusRing();

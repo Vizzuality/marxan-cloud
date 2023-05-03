@@ -6,38 +6,26 @@ import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useBestSolution, useSolution } from 'hooks/solutions';
 
+import LegendItem from 'components/map/legend/item/component';
 import ScenarioReportsMap from 'layout/scenarios/reports/solutions/selected-solution-page/map';
 
-import LegendItem from 'components/map/legend/item/component';
-
-export interface SelectedSolutionPageProps {
-
-}
+export interface SelectedSolutionPageProps {}
 
 export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
   const { query } = useRouter();
   const { sid, solutionId } = query;
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  const { data: scenarioData } = useScenario(sid);
 
-  const {
-    data: selectedSolutionData,
-  } = useSolution(sid, solutionId);
+  const { data: selectedSolutionData } = useSolution(sid, solutionId);
 
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid, {
+  const { data: bestSolutionData } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
   });
 
   const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
-  const {
-    data: PUData,
-    isFetched: PUDataIsFetched,
-  } = useScenarioPU(sid);
+  const { data: PUData, isFetched: PUDataIsFetched } = useScenarioPU(sid);
 
   const LEGEND = useMemo(() => {
     return {
@@ -52,7 +40,7 @@ export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
   return (
     <div className="flex space-x-8">
       {reportDataIsFetched && (
-        <section className="flex flex-col justify-between w-1/3 text-xs">
+        <section className="flex w-1/3 flex-col justify-between text-xs">
           <div className="space-y-8">
             <div>
               <p className="font-semibold">Solution</p>
@@ -78,13 +66,8 @@ export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
             </div>
           </div>
 
-          <div className="py-5 border-t border-gray-500 mr-14">
-            <LegendItem
-              {...LEGEND}
-              key="solution"
-              className="block"
-              theme="light"
-            />
+          <div className="mr-14 border-t border-gray-500 py-5">
+            <LegendItem {...LEGEND} key="solution" className="block" theme="light" />
           </div>
         </section>
       )}

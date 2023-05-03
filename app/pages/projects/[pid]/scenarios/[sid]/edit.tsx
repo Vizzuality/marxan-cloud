@@ -10,8 +10,6 @@ import { withScenario, withScenarioLock } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { ScenarioSidebarTabs } from 'utils/tabs';
-
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 import Header from 'layout/header';
@@ -29,10 +27,11 @@ import ScenarioStatus from 'layout/scenarios/edit/status';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import Wrapper from 'layout/wrapper';
+import { ScenarioSidebarTabs } from 'utils/tabs';
 
-export const getServerSideProps = withProtection(withUser(
-  withProject(withScenario(withScenarioLock())),
-));
+export const getServerSideProps = withProtection(
+  withUser(withProject(withScenario(withScenarioLock())))
+);
 
 const EditScenarioPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
@@ -41,11 +40,7 @@ const EditScenarioPage: React.FC = () => {
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};
-  const {
-    tab: metaTab,
-    subtab: metaSubtab,
-    lastJobCheck,
-  } = scenarioEditingMetadata || {};
+  const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
@@ -68,25 +63,28 @@ const EditScenarioPage: React.FC = () => {
     if (!lastJobCheck && !submitting) {
       setSubmitting(true);
 
-      saveScenarioMutation.mutate({
-        id: `${sid}`,
-        data: {
-          metadata: {
-            ...metadata,
-            scenarioEditingMetadata: {
-              lastJobCheck: new Date().getTime(),
-              ...scenarioEditingMetadata,
+      saveScenarioMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            metadata: {
+              ...metadata,
+              scenarioEditingMetadata: {
+                lastJobCheck: new Date().getTime(),
+                ...scenarioEditingMetadata,
+              },
             },
           },
         },
-      }, {
-        onSuccess: () => {
-          setSubmitting(false);
-        },
-        onError: () => {
-          setSubmitting(false);
-        },
-      });
+        {
+          onSuccess: () => {
+            setSubmitting(false);
+          },
+          onError: () => {
+            setSubmitting(false);
+          },
+        }
+      );
     }
   }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
 
@@ -99,10 +97,10 @@ const EditScenarioPage: React.FC = () => {
       <DocumentationLink />
       <Help />
 
-      <main className="flex flex-col w-screen h-screen">
+      <main className="flex h-screen w-screen flex-col">
         <Header size="base" />
 
-        <div className="flex flex-col py-2.5 overflow-hidden flex-grow">
+        <div className="flex flex-grow flex-col overflow-hidden py-2.5">
           <Wrapper>
             <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
               <ScenariosEditSidebar>

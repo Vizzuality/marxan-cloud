@@ -44,12 +44,15 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
   }, [filters, sort]);
 
   // Callbacks
-  const onSubmit = useCallback((values) => {
-    const { sort: valuesSort, ...valuesFilters } = values;
-    onChangeFilters(valuesFilters);
-    onChangeSort(valuesSort);
-    if (onDismiss) onDismiss();
-  }, [onChangeFilters, onChangeSort, onDismiss]);
+  const onSubmit = useCallback(
+    (values) => {
+      const { sort: valuesSort, ...valuesFilters } = values;
+      onChangeFilters(valuesFilters);
+      onChangeSort(valuesSort);
+      if (onDismiss) onDismiss();
+    },
+    [onChangeFilters, onChangeSort, onDismiss]
+  );
 
   const onClear = useCallback(() => {
     onChangeFilters({});
@@ -58,31 +61,28 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
   }, [onChangeFilters, onChangeSort, onDismiss]);
 
   return (
-    <FormRFF
-      key="features-all-filters"
-      onSubmit={onSubmit}
-      initialValues={INITIAL_VALUES}
-    >
+    <FormRFF key="features-all-filters" onSubmit={onSubmit} initialValues={INITIAL_VALUES}>
       {({ handleSubmit }) => (
-        <form onSubmit={handleSubmit} autoComplete="off" className="flex flex-col flex-grow overflow-hidden text-black">
-          <h2 className="pl-8 mb-5 text-lg pr-28 font-heading">Filters</h2>
+        <form
+          onSubmit={handleSubmit}
+          autoComplete="off"
+          className="flex flex-grow flex-col overflow-hidden text-black"
+        >
+          <h2 className="mb-5 pl-8 pr-28 font-heading text-lg">Filters</h2>
 
-          <div className="flex flex-col px-8 space-y-5">
+          <div className="flex flex-col space-y-5 px-8">
             <div>
-              <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Filter by type</h3>
+              <h3 className="mb-2 flex-shrink-0 pr-28 font-heading text-sm">Filter by type</h3>
               <div className="flex flex-col space-y-2">
                 {STATUS.map(({ id, label }) => {
                   return (
-                    <FieldRFF
-                      key={id}
-                      name="status"
-                      type="checkbox"
-                      value={id}
-                    >
+                    <FieldRFF key={id} name="status" type="checkbox" value={id}>
                       {(fprops) => (
                         <div className="flex space-x-2">
                           <Checkbox theme="light" id={`status-${id}`} {...fprops.input} />
-                          <Label theme="light" id={`status-${id}`} className="ml-2">{label}</Label>
+                          <Label theme="light" id={`status-${id}`} className="ml-2">
+                            {label}
+                          </Label>
                         </div>
                       )}
                     </FieldRFF>
@@ -92,20 +92,17 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
             </div>
 
             <div>
-              <h3 className="flex-shrink-0 mb-2 text-sm pr-28 font-heading">Order by</h3>
+              <h3 className="mb-2 flex-shrink-0 pr-28 font-heading text-sm">Order by</h3>
               <div className="flex flex-col space-y-2">
                 {SORT.map(({ id, label }) => {
                   return (
-                    <FieldRFF
-                      key={id}
-                      name="sort"
-                      type="radio"
-                      value={id}
-                    >
+                    <FieldRFF key={id} name="sort" type="radio" value={id}>
                       {(fprops) => (
                         <div className="flex space-x-2">
                           <Radio theme="light" id={`sort-${id}`} {...fprops.input} />
-                          <Label theme="light" id={`sort-${id}`} className="ml-2">{label}</Label>
+                          <Label theme="light" id={`sort-${id}`} className="ml-2">
+                            {label}
+                          </Label>
                         </div>
                       )}
                     </FieldRFF>
@@ -115,22 +112,12 @@ export const ProjectScenariosFilters: React.FC<ProjectScenariosFiltersProps> = (
             </div>
           </div>
 
-          <div className="flex justify-center flex-shrink-0 px-8 mt-10 space-x-3">
-            <Button
-              className="w-full"
-              theme="secondary"
-              size="lg"
-              onClick={onClear}
-            >
+          <div className="mt-10 flex flex-shrink-0 justify-center space-x-3 px-8">
+            <Button className="w-full" theme="secondary" size="lg" onClick={onClear}>
               Clear all
             </Button>
 
-            <Button
-              type="submit"
-              className="w-full"
-              theme="primary"
-              size="lg"
-            >
+            <Button type="submit" className="w-full" theme="primary" size="lg">
               Apply
             </Button>
           </div>

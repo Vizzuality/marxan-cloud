@@ -19,7 +19,8 @@ export const getServerSideProps = withUser();
 const About: React.FC = () => {
   const { asPath } = useRouter();
 
-  const DESCRIPTION_TEXT = 'Marxan is a suite of open-source decision-support tools that help structure, design and evaluate spatial planning projects for land, freshwater and ocean conservation. Marxan helps decision-making by balancing objectives such as protecting biodiversity and the benefits it provides to people, with socio-economic, cultural and political realities. As the analytic engine behind major planning projects, such as the Great Barrier Reef’s Rezoning Plan and Mongolia’s National Protected Area portfolio, Marxan leads the world in providing robust and flexible systematic decision-support to governments, practitioners and planners around the world.';
+  const DESCRIPTION_TEXT =
+    'Marxan is a suite of open-source decision-support tools that help structure, design and evaluate spatial planning projects for land, freshwater and ocean conservation. Marxan helps decision-making by balancing objectives such as protecting biodiversity and the benefits it provides to people, with socio-economic, cultural and political realities. As the analytic engine behind major planning projects, such as the Great Barrier Reef’s Rezoning Plan and Mongolia’s National Protected Area portfolio, Marxan leads the world in providing robust and flexible systematic decision-support to governments, practitioners and planners around the world.';
   const TITLE_TEXT = 'Spatial conservation planning with Marxan.';
 
   return (
@@ -40,11 +41,7 @@ const About: React.FC = () => {
 
       <main>
         <Header size="base" theme="light" />
-        <Hero
-          theme="light"
-          title={TITLE_TEXT}
-          description={DESCRIPTION_TEXT}
-        />
+        <Hero theme="light" title={TITLE_TEXT} description={DESCRIPTION_TEXT} />
         <Utilities />
         <Values />
         <Contact />

@@ -28,10 +28,7 @@ interface SelectDataProps {
   removeSelected?: boolean;
 }
 
-export interface SelectProps extends
-  SelectStatusProps,
-  SelectDataProps,
-  SelectThemeProps {
+export interface SelectProps extends SelectStatusProps, SelectDataProps, SelectThemeProps {
   onChange?: (selection: string | string[]) => void;
   onSelect?: (option: SelectOptionProps | SelectOptionProps[]) => void;
   onFocus?: FocusEventHandler;
@@ -46,21 +43,16 @@ export interface SelectOptionProps {
   checkbox?: boolean;
 }
 
-export interface SelectMenuProps extends
-  SelectStatusProps,
-  SelectThemeProps {
+export interface SelectMenuProps extends SelectStatusProps, SelectThemeProps {
   children: ReactNode;
   opened: boolean;
-  attributes: Record<string, unknown>,
+  attributes: Record<string, unknown>;
 }
 
-export interface SelectToggleProps extends
-  SelectStatusProps,
-  SelectDataProps,
-  SelectThemeProps {
+export interface SelectToggleProps extends SelectStatusProps, SelectDataProps, SelectThemeProps {
   opened: boolean;
   selectedItems: SelectOptionProps[];
   getToggleButtonProps: (e?: any) => any;
   getDropdownProps?: (e?: any) => any;
-  update?: () => void
+  update?: () => void;
 }

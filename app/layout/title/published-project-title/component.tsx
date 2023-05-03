@@ -20,11 +20,7 @@ export const PublishedProjectTitle: React.FC<PublishedProjectTitleProps> = ({
     <Head>
       <title>
         Projects
-        {(projectData?.name || title) && ':'}
-        {' '}
-        {title}
-        {' '}
-        {projectData?.name}
+        {(projectData?.name || title) && ':'} {title} {projectData?.name}
       </title>
     </Head>
   );

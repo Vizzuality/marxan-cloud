@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Story } from '@storybook/react/types-6-0';
+
 import Item, { ItemProps } from './component';
 
 export default {
@@ -8,9 +10,7 @@ export default {
   argTypes: {},
 };
 
-const Template: Story<ItemProps> = ({ ...args }: ItemProps) => (
-  <Item {...args} />
-);
+const Template: Story<ItemProps> = ({ ...args }: ItemProps) => <Item {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {

@@ -14,8 +14,8 @@ export const SelectMenu: React.FC<SelectMenuProps> = ({
   return (
     <div
       className={cx({
-        'focus:outline-none overflow-hidden': true,
-        'invisible pointer-events-none': attributes?.popper?.['data-popper-reference-hidden'],
+        'overflow-hidden focus:outline-none': true,
+        'pointer-events-none invisible': attributes?.popper?.['data-popper-reference-hidden'],
         [THEME[theme].open]: opened,
       })}
     >

@@ -1,16 +1,14 @@
-import React, {
-  useCallback, useEffect, useMemo, useRef, useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
-import intersection from 'lodash/intersection';
-import isEqual from 'lodash/isEqual';
-
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+
+import intersection from 'lodash/intersection';
+import isEqual from 'lodash/isEqual';
 
 import { useCanEditScenario } from 'hooks/permissions';
 import { useProject } from 'hooks/projects';
@@ -18,18 +16,17 @@ import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
-import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
-import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
-
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Select from 'components/forms/select';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import ProtectedAreaUploader from 'layout/scenarios/edit/planning-unit/protected-areas/categories/pa-uploader';
+import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
 
 export interface WDPACategoriesProps {
-  onSuccess: () => void,
+  onSuccess: () => void;
 }
 
 export const WDPACategories: React.FC<WDPACategoriesProps> = ({
@@ -60,12 +57,12 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
+    adminAreaId:
+      projectData?.adminAreaLevel2Id || projectData?.adminAreaLevel1I || projectData?.countryId,
+    customAreaId:
+      !projectData?.adminAreaLevel2Id && !projectData?.adminAreaLevel1I && !projectData?.countryId
+        ? projectData?.planningAreaId
+        : null,
     scenarioId: sid,
   });
 
@@ -75,67 +72,75 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     },
   });
 
-  const onCalculateProtectedAreas = useCallback((values) => {
-    setSubmitting(true);
-    const { wdpaIucnCategories } = values;
+  const onCalculateProtectedAreas = useCallback(
+    (values) => {
+      setSubmitting(true);
+      const { wdpaIucnCategories } = values;
 
-    const selectedProtectedAreas = wdpaData?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
-      .map((pa) => {
-        return {
-          id: pa.id,
-          selected: true,
-        };
-      });
-
-    saveScenarioProtectedAreasMutation.mutate({
-      id: `${sid}`,
-      data: {
-        areas: selectedProtectedAreas,
-        threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario protected areas saved</p>
-          </>
-        ), {
-          level: 'success',
+      const selectedProtectedAreas = wdpaData
+        ?.filter((pa) => wdpaIucnCategories?.includes(pa.id))
+        .map((pa) => {
+          return {
+            id: pa.id,
+            selected: true,
+          };
         });
-      },
-      onError: () => {
-        setSubmitting(false);
 
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario protected areas not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [
-    saveScenarioProtectedAreasMutation,
-    sid,
-    wdpaData,
-    scenarioData,
-    addToast,
-  ]);
+      saveScenarioProtectedAreasMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            areas: selectedProtectedAreas,
+            threshold: scenarioData.wdpaThreshold ? scenarioData.wdpaThreshold : 75,
+          },
+        },
+        {
+          onSuccess: () => {
+            setSubmitting(false);
+            addToast(
+              'save-scenario-wdpa',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Scenario protected areas saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            setSubmitting(false);
 
-  const onSubmit = useCallback((values) => {
-    const wdpaSelected = wdpaData.filter((w) => !!w.selected).map((w) => w.id);
-    const isModified = !isEqual(wdpaSelected, values.wdpaIucnCategories);
+            addToast(
+              'error-scenario-wdpa',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario protected areas not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [saveScenarioProtectedAreasMutation, sid, wdpaData, scenarioData, addToast]
+  );
 
-    if (isModified) {
-      onCalculateProtectedAreas(values);
-    } else {
-      onSuccess();
-    }
-  }, [wdpaData, onSuccess, onCalculateProtectedAreas]);
+  const onSubmit = useCallback(
+    (values) => {
+      const wdpaSelected = wdpaData.filter((w) => !!w.selected).map((w) => w.id);
+      const isModified = !isEqual(wdpaSelected, values.wdpaIucnCategories);
+
+      if (isModified) {
+        onCalculateProtectedAreas(values);
+      } else {
+        onSuccess();
+      }
+    },
+    [wdpaData, onSuccess, onCalculateProtectedAreas]
+  );
 
   // Constants
   const WDPA_CATEGORIES_OPTIONS = useMemo(() => {
@@ -187,7 +192,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
     return (
       <Loading
         visible
-        className="relative flex items-center justify-center w-full h-16"
+        className="relative flex h-16 w-full items-center justify-center"
         iconClassName="w-10 h-10 text-white"
       />
     );
@@ -221,50 +226,49 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
         const plainWDPAOptions = WDPA_OPTIONS.map((o) => o.value);
         const plainProjectPAOptions = PROJECT_PA_OPTIONS.map((o) => o.value);
 
-        const areWDPAreasSelected = intersection(plainWDPAOptions,
-          values.wdpaIucnCategories).length > 0;
+        const areWDPAreasSelected =
+          intersection(plainWDPAOptions, values.wdpaIucnCategories).length > 0;
 
-        const areProjectPAreasSelected = intersection(plainProjectPAOptions,
-          values.wdpaIucnCategories).length > 0;
+        const areProjectPAreasSelected =
+          intersection(plainProjectPAOptions, values.wdpaIucnCategories).length > 0;
 
         return (
           <form
             onSubmit={handleSubmit}
             autoComplete="off"
-            className="relative flex flex-col flex-grow w-full overflow-hidden"
+            className="relative flex w-full flex-grow flex-col overflow-hidden"
           >
             <Loading
               visible={submitting}
-              className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+              className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
               iconClassName="w-10 h-10 text-white"
             />
 
-            <div className="relative flex flex-col flex-grow overflow-hidden">
-              <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
+            <div className="relative flex flex-grow flex-col overflow-hidden">
+              <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
 
-              <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+              <div className="relative overflow-y-auto overflow-x-visible px-0.5">
                 <div className="py-6">
                   {/* WDPA */}
 
                   <div>
-                    <FieldRFF
-                      name="wdpaIucnCategories"
-                    >
+                    <FieldRFF name="wdpaIucnCategories">
                       {(fprops) => (
                         <Field id="wdpaIucnCategories" {...fprops}>
-                          <div className="flex items-center mb-3">
-                            <Label theme="dark" className="mr-3 uppercase">Choose one or more protected areas categories</Label>
+                          <div className="mb-3 flex items-center">
+                            <Label theme="dark" className="mr-3 uppercase">
+                              Choose one or more protected areas categories
+                            </Label>
                             <InfoButton>
                               <span>
-                                <h4 className="font-heading text-lg mb-2.5">IUCN categories</h4>
+                                <h4 className="mb-2.5 font-heading text-lg">IUCN categories</h4>
                                 <div className="space-y-2">
                                   <p>
-                                    You can select to include protected areas
-                                    from any or all of the
+                                    You can select to include protected areas from any or all of the
                                     IUCN categories that exist in your planning area:
                                   </p>
 
-                                  <ul className="pl-6 space-y-1 list-disc">
+                                  <ul className="list-disc space-y-1 pl-6">
                                     <li>Ia: Strict Nature Reserve.</li>
                                     <li>Ib: Wilderness Area.</li>
                                     <li>II: National Park.</li>
@@ -279,7 +283,10 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                           </div>
 
                           {WDPA_CATEGORIES_OPTIONS.length < 1 && (
-                            <div className="py-6 text-sm">This planning area doesn&apos;t have any protected areas categories associated with it. You can upload a new one using the button below.</div>
+                            <div className="py-6 text-sm">
+                              This planning area doesn&apos;t have any protected areas categories
+                              associated with it. You can upload a new one using the button below.
+                            </div>
                           )}
 
                           {WDPA_CATEGORIES_OPTIONS.length === 1 && (
@@ -289,9 +296,11 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                               placeholder="Select..."
                               clearSelectionActive
                               disabled={!editable}
-                              selected={values.wdpaIucnCategories.length
-                                ? values.wdpaIucnCategories[0]
-                                : null}
+                              selected={
+                                values.wdpaIucnCategories.length
+                                  ? values.wdpaIucnCategories[0]
+                                  : null
+                              }
                               options={ORDERED_WDPA_CATEGORIES_OPTIONS}
                               onChange={(v) => {
                                 if (v) {
@@ -325,26 +334,22 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                   </div>
 
                   {WDPA_CATEGORIES_OPTIONS.length > 1 && (
-                    <p className="py-4 text-sm text-center">or</p>
+                    <p className="py-4 text-center text-sm">or</p>
                   )}
 
                   <FieldRFF name="uploadedProtectedArea">
                     {(flprops) => {
-                      return (
-                        <ProtectedAreaUploader
-                          {...flprops}
-                        />
-                      );
+                      return <ProtectedAreaUploader {...flprops} />;
                     }}
                   </FieldRFF>
 
                   {areWDPAreasSelected && (
-                  <ProtectedAreasSelected
-                    form={form}
-                    options={WDPA_OPTIONS}
-                    title="Selected protected areas:"
-                    wdpaIucnCategories={values.wdpaIucnCategories}
-                  />
+                    <ProtectedAreasSelected
+                      form={form}
+                      options={WDPA_OPTIONS}
+                      title="Selected protected areas:"
+                      wdpaIucnCategories={values.wdpaIucnCategories}
+                    />
                   )}
 
                   {areProjectPAreasSelected && (
@@ -355,20 +360,17 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
                       wdpaIucnCategories={values.wdpaIucnCategories}
                     />
                   )}
-
                 </div>
               </div>
-              <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
+              <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
             </div>
             <div className="flex flex-col space-y-4 text-xs text-white">
               <p className="leading-relaxed opacity-50">
-                UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on
-                Protected Areas (WDPA) [On-line],
-                [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
+                UNEP-WCMC and IUCN (2022), Protected Planet: The World Database on Protected Areas
+                (WDPA) [On-line], [05/2022], Cambridge, UK: UNEP-WCMC and IUCN.
               </p>
               <p>
-                Available at:
-                {' '}
+                Available at:{' '}
                 <a
                   className="text-primary-500"
                   href="www.protectedplanet.net"
@@ -380,17 +382,11 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
               </p>
             </div>
 
-            <div className="flex justify-center mt-5 space-x-2">
-              <Button
-                theme="secondary-alt"
-                size="lg"
-                type="submit"
-                className="relative px-20"
-              >
+            <div className="mt-5 flex justify-center space-x-2">
+              <Button theme="secondary-alt" size="lg" type="submit" className="relative px-20">
                 Continue
               </Button>
             </div>
-
           </form>
         );
       }}

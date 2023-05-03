@@ -5,15 +5,23 @@ import groupBy from 'lodash/groupBy';
 import { TEXTS_FAILURE, TEXTS_RUNNING } from './constants';
 
 const getStatus = (arr) => {
-  if (arr.some(((d) => d.status === 'failure'))) return 'failure';
-  if (arr.some(((d) => d.status === 'running'))) return 'running';
+  if (arr.some((d) => d.status === 'failure')) return 'failure';
+  if (arr.some((d) => d.status === 'running')) return 'running';
   return 'done';
 };
 
 export const useProjectJobs = (jobs) => {
   return useMemo(() => {
     const groups = groupBy(jobs, (j) => {
-      if (['featuresWithPuIntersection', 'specification', 'geofeatureCopy', 'geofeatureSplit', 'geofeatureStrat'].includes(j.kind)) {
+      if (
+        [
+          'featuresWithPuIntersection',
+          'specification',
+          'geofeatureCopy',
+          'geofeatureSplit',
+          'geofeatureStrat',
+        ].includes(j.kind)
+      ) {
         return 'features';
       }
 
@@ -23,7 +31,7 @@ export const useProjectJobs = (jobs) => {
     return Object.keys(groups).map((k) => {
       const status = getStatus(groups[k]);
       const isoDate = groups[k].reduce((a, b) => {
-        return (a.isoDate > b.isoDate) ? a.isoDate : b.isoDate;
+        return a.isoDate > b.isoDate ? a.isoDate : b.isoDate;
       }, 0);
 
       return {

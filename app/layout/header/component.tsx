@@ -1,18 +1,17 @@
 import React from 'react';
 
-import Link from 'next/link';
-
 import cx from 'classnames';
+
+import Link from 'next/link';
 
 import { useMe } from 'hooks/me';
 
 // import Beta from 'layout/beta';
+import LinkButton from 'components/button';
 import MyProjects from 'layout/header/my-projects';
 import Title from 'layout/header/title';
 import User from 'layout/header/user';
 import Wrapper from 'layout/wrapper';
-
-import LinkButton from 'components/button';
 
 // import LOGO_SVG from 'images/logo-beta.png';
 
@@ -23,8 +22,8 @@ export interface HeaderProps {
   className?: string;
   published?: boolean;
   maintenance?: boolean;
-  size: 'base' | 'lg',
-  theme?: 'dark' | 'light' | 'transparent',
+  size: 'base' | 'lg';
+  theme?: 'dark' | 'light' | 'transparent';
 }
 
 const SIZE = {
@@ -56,29 +55,23 @@ export const Header: React.FC<HeaderProps> = ({
       <header
         className={cx({
           [className]: true,
-          'w-full row-auto z-10': true,
+          'z-10 row-auto w-full': true,
           'bg-black text-white': theme === 'dark',
           'bg-primary-50 text-gray-800': theme === 'light',
           'py-1.5': maintenance,
         })}
       >
         <Wrapper>
-          <nav className="relative flex flex-wrap items-center justify-between mt-10 md:mt-0 navbar-expand-lg">
-            <Link
-              href="/"
-            >
-              <a href="/">
-                <img
-                  alt="Marxan logo"
-                  src={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG}
-                  style={SIZE[size].logo}
-                />
-              </a>
+          <nav className="navbar-expand-lg relative mt-10 flex flex-wrap items-center justify-between md:mt-0">
+            <Link href="/">
+              <img
+                alt="Marxan logo"
+                src={theme === 'light' ? LOGO_BLACK_SVG : LOGO_SVG}
+                style={SIZE[size].logo}
+              />
             </Link>
 
-            {!published && (
-              <Title />
-            )}
+            {!published && <Title />}
 
             {!maintenance && (
               <>
@@ -93,7 +86,7 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <MyProjects />
 
-                  <div className="flex items-center h-full pl-1 md:pl-5">
+                  <div className="flex h-full items-center pl-1 md:pl-5">
                     <User />
                   </div>
                 </div>

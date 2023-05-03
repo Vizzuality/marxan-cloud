@@ -14,7 +14,7 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsListProps
   return (
     <motion.div
       key="details"
-      className="flex flex-col items-start justify-start min-h-0 overflow-hidden"
+      className="flex min-h-0 flex-col items-start justify-start overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -23,13 +23,13 @@ export const ScenariosSolutionsGapAnalysis: React.FC<ScenariosSolutionsListProps
         <button
           aria-label="return"
           type="button"
-          className="flex items-center w-full pt-5 pb-1 space-x-2 text-left focus:outline-none"
+          className="flex w-full items-center space-x-2 pb-1 pt-5 text-left focus:outline-none"
           onClick={() => {
             onChangeSection(null);
           }}
         >
-          <Icon icon={ARROW_LEFT_SVG} className="w-3 h-3 transform rotate-180 text-primary-500" />
-          <h4 className="text-xs uppercase font-heading">SOLUTIONS</h4>
+          <Icon icon={ARROW_LEFT_SVG} className="h-3 w-3 rotate-180 transform text-primary-500" />
+          <h4 className="font-heading text-xs uppercase">SOLUTIONS</h4>
         </button>
       </header>
     </motion.div>

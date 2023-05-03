@@ -16,7 +16,7 @@ const getRoundedLinePath = (
   p1Coords: [number, number],
   p2Coords: [number, number],
   step: 'before' | 'after',
-  radius: number,
+  radius: number
 ): string => {
   // If the points are aligned horizontally or vertically, we return a straight line
   if (p1Coords[0] === p2Coords[0] || p1Coords[1] === p2Coords[1]) {
@@ -50,7 +50,9 @@ const getRoundedLinePath = (
     return `
       M ${p1Coords[0]} ${p1Coords[1]}
       L ${p1Coords[0]} ${p2Coords[1] + radius * (p2Coords[1] > p1Coords[1] ? -1 : 1)}
-      A ${radius} ${radius} 0 0 ${+sweepFlag} ${p1Coords[0] + radius * (p2Coords[0] > p1Coords[0] ? 1 : -1)} ${p2Coords[1]}
+      A ${radius} ${radius} 0 0 ${+sweepFlag} ${
+      p1Coords[0] + radius * (p2Coords[0] > p1Coords[0] ? 1 : -1)
+    } ${p2Coords[1]}
       L ${p2Coords[0]} ${p2Coords[1]}
     `;
   }
@@ -61,7 +63,9 @@ const getRoundedLinePath = (
   return `
     M ${p1Coords[0]} ${p1Coords[1]}
     L ${p2Coords[0] + radius * (p2Coords[0] > p1Coords[0] ? -1 : 1)} ${p1Coords[1]}
-    A ${radius} ${radius} 0 0 ${+sweepFlag} ${p2Coords[0]} ${p1Coords[1] + radius * (p2Coords[1] > p1Coords[1] ? 1 : -1)}
+    A ${radius} ${radius} 0 0 ${+sweepFlag} ${p2Coords[0]} ${
+    p1Coords[1] + radius * (p2Coords[1] > p1Coords[1] ? 1 : -1)
+  }
     L ${p2Coords[0]} ${p2Coords[1]}
   `;
 };
@@ -77,21 +81,17 @@ const getRoundedLinePath = (
 export const getThumbnailPosition = (
   coords: [number, number],
   xScale: ScaleLinear<number, number, never>,
-  yScale: ScaleLinear<number, number, never>,
-): { x: number, y: number, linePath: string } => {
+  yScale: ScaleLinear<number, number, never>
+): { x: number; y: number; linePath: string } => {
   const xDomain = xScale.domain();
   const yDomain = yScale.domain();
 
-  const canBeOnTop = (
-    yScale(coords[1]) - THUMBNAIL_OFFSET - THUMBNAIL_SIZE > yScale(yDomain[1])
-  ) && (xScale(coords[0]) - THUMBNAIL_SIZE / 2 >= xScale(xDomain[0]))
-    && (xScale(coords[0]) + THUMBNAIL_SIZE / 2 <= xScale(xDomain[1]));
-  const canBeOnRight = (
-    xScale(coords[0]) + THUMBNAIL_OFFSET + THUMBNAIL_SIZE < xScale(xDomain[1])
-  );
-  const canBeOnLeft = (
-    xScale(coords[0]) - THUMBNAIL_OFFSET - THUMBNAIL_SIZE > xScale(xDomain[0])
-  );
+  const canBeOnTop =
+    yScale(coords[1]) - THUMBNAIL_OFFSET - THUMBNAIL_SIZE > yScale(yDomain[1]) &&
+    xScale(coords[0]) - THUMBNAIL_SIZE / 2 >= xScale(xDomain[0]) &&
+    xScale(coords[0]) + THUMBNAIL_SIZE / 2 <= xScale(xDomain[1]);
+  const canBeOnRight = xScale(coords[0]) + THUMBNAIL_OFFSET + THUMBNAIL_SIZE < xScale(xDomain[1]);
+  const canBeOnLeft = xScale(coords[0]) - THUMBNAIL_OFFSET - THUMBNAIL_SIZE > xScale(xDomain[0]);
 
   // Coordinates of the top-right corner of the thumbnail
   let x: number;
@@ -133,7 +133,7 @@ export const getThumbnailPosition = (
     [xScale(coords[0]) - x, yScale(coords[1]) - y],
     [THUMBNAIL_SIZE / 2, THUMBNAIL_SIZE / 2],
     lineCurveStepBefore ? 'before' : 'after',
-    BORDER_RADIUS,
+    BORDER_RADIUS
   );
 
   return { x, y, linePath };

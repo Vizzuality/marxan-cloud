@@ -1,6 +1,4 @@
-import React, {
-  useCallback, useMemo, useState, useEffect,
-} from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,17 +13,14 @@ import { useScenario } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 import { useWDPACategories, useSaveScenarioProtectedAreas } from 'hooks/wdpa';
 
-import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
-
 import Button from 'components/button';
 import Field from 'components/forms/field';
 import Label from 'components/forms/label';
 import Slider from 'components/forms/slider';
-import {
-  composeValidators,
-} from 'components/forms/validations';
+import { composeValidators } from 'components/forms/validations';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
+import ProtectedAreasSelected from 'layout/scenarios/edit/planning-unit/protected-areas/pa-selected';
 
 import THRESHOLD_IMG from 'images/info-buttons/img_threshold.png';
 
@@ -62,12 +57,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     isFetching: wdpaIsFetching,
     isFetched: wdpaIsFetched,
   } = useWDPACategories({
-    adminAreaId: projectData?.adminAreaLevel2Id
-      || projectData?.adminAreaLevel1I
-      || projectData?.countryId,
-    customAreaId: !projectData?.adminAreaLevel2Id
-      && !projectData?.adminAreaLevel1I
-      && !projectData?.countryId ? projectData?.planningAreaId : null,
+    adminAreaId:
+      projectData?.adminAreaLevel2Id || projectData?.adminAreaLevel1I || projectData?.countryId,
+    customAreaId:
+      !projectData?.adminAreaLevel2Id && !projectData?.adminAreaLevel1I && !projectData?.countryId
+        ? projectData?.planningAreaId
+        : null,
     scenarioId: sid,
   });
 
@@ -96,12 +91,14 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const selectedProtectedAreas = useMemo(() => {
     if (wdpaData && Array.isArray(wdpaData)) {
-      return wdpaData.filter((pa) => pa.selected).map((pa) => {
-        return {
-          id: pa.id,
-          selected: true,
-        };
-      });
+      return wdpaData
+        .filter((pa) => pa.selected)
+        .map((pa) => {
+          return {
+            id: pa.id,
+            selected: true,
+          };
+        });
     }
 
     return [];
@@ -118,16 +115,12 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const globalPAreasSelectedIds = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
-    return GLOBAL_PA_OPTIONS
-      .map((p) => p.value)
-      .filter((p) => wdpaIucnCategories?.includes(p));
+    return GLOBAL_PA_OPTIONS.map((p) => p.value).filter((p) => wdpaIucnCategories?.includes(p));
   }, [wdpaCategories, GLOBAL_PA_OPTIONS]);
 
   const projectPAreasSelectedIds = useMemo(() => {
     const { wdpaIucnCategories } = wdpaCategories;
-    return PROJECT_PA_OPTIONS
-      .map((p) => p.value)
-      .filter((p) => wdpaIucnCategories?.includes(p));
+    return PROJECT_PA_OPTIONS.map((p) => p.value).filter((p) => wdpaIucnCategories?.includes(p));
   }, [wdpaCategories, PROJECT_PA_OPTIONS]);
 
   const areGlobalPAreasSelected = !!globalPAreasSelectedIds.length;
@@ -138,48 +131,53 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
     dispatch(setWDPAThreshold(wdpaThreshold ? wdpaThreshold / 100 : 0.75));
   }, [scenarioData]); //eslint-disable-line
 
-  const handleSubmit = useCallback((values) => {
-    setSubmitting(true);
+  const handleSubmit = useCallback(
+    (values) => {
+      setSubmitting(true);
 
-    const { wdpaThreshold } = values;
+      const { wdpaThreshold } = values;
 
-    saveScenarioProtectedAreasMutation.mutate({
-      id: `${sid}`,
-      data: {
-        areas: selectedProtectedAreas,
-        threshold: +(wdpaThreshold * 100).toFixed(0),
-      },
-    }, {
-      onSuccess: () => {
-        setSubmitting(false);
-        addToast('save-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Success!</h2>
-            <p className="text-sm">Scenario protected areas threshold saved</p>
-          </>
-        ), {
-          level: 'success',
-        });
-      },
-      onError: () => {
-        setSubmitting(false);
+      saveScenarioProtectedAreasMutation.mutate(
+        {
+          id: `${sid}`,
+          data: {
+            areas: selectedProtectedAreas,
+            threshold: +(wdpaThreshold * 100).toFixed(0),
+          },
+        },
+        {
+          onSuccess: () => {
+            setSubmitting(false);
+            addToast(
+              'save-scenario-wdpa',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">Scenario protected areas threshold saved</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            setSubmitting(false);
 
-        addToast('error-scenario-wdpa', (
-          <>
-            <h2 className="font-medium">Error!</h2>
-            <p className="text-sm">Scenario protected areas threshold not saved</p>
-          </>
-        ), {
-          level: 'error',
-        });
-      },
-    });
-  }, [
-    saveScenarioProtectedAreasMutation,
-    selectedProtectedAreas,
-    sid,
-    addToast,
-  ]);
+            addToast(
+              'error-scenario-wdpa',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">Scenario protected areas threshold not saved</p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [saveScenarioProtectedAreasMutation, selectedProtectedAreas, sid, addToast]
+  );
 
   const handleBack = useCallback(() => {
     onBack();
@@ -187,73 +185,69 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   // Loading
   if (
-    (!!scenarioData && scenarioIsFetching && !scenarioIsFetched)
-    || (!!wdpaData && wdpaIsFetching && !wdpaIsFetched)
+    (!!scenarioData && scenarioIsFetching && !scenarioIsFetched) ||
+    (!!wdpaData && wdpaIsFetching && !wdpaIsFetched)
   ) {
     return (
       <Loading
         visible
-        className="relative flex items-center justify-center w-full h-16"
+        className="relative flex h-16 w-full items-center justify-center"
         iconClassName="w-10 h-10 text-white"
       />
     );
   }
 
   return (
-    <FormRFF
-      onSubmit={handleSubmit}
-      initialValues={INITIAL_VALUES}
-    >
+    <FormRFF onSubmit={handleSubmit} initialValues={INITIAL_VALUES}>
       {({ values, handleSubmit: RFFhandleSubmit }) => (
-        <form onSubmit={RFFhandleSubmit} autoComplete="off" className="relative flex flex-col flex-grow w-full overflow-hidden">
+        <form
+          onSubmit={RFFhandleSubmit}
+          autoComplete="off"
+          className="relative flex w-full flex-grow flex-col overflow-hidden"
+        >
           <Loading
             visible={submitting}
-            className="absolute top-0 bottom-0 left-0 right-0 z-40 flex items-center justify-center w-full h-full bg-gray-700 bg-opacity-90"
+            className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-90"
             iconClassName="w-10 h-10 text-white"
           />
 
-          <div className="relative flex flex-col flex-grow overflow-hidden">
-            <div className="absolute top-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-b from-gray-700 via-gray-700" />
+          <div className="relative flex flex-grow flex-col overflow-hidden">
+            <div className="pointer-events-none absolute left-0 top-0 z-10 h-6 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
 
-            <div className="relative px-0.5 overflow-x-visible overflow-y-auto">
+            <div className="relative overflow-y-auto overflow-x-visible px-0.5">
               <div className="py-6">
                 {/* WDPA */}
                 <div>
-                  <FieldRFF
-                    name="wdpaThreshold"
-                    validate={composeValidators([{ presence: true }])}
-                  >
+                  <FieldRFF name="wdpaThreshold" validate={composeValidators([{ presence: true }])}>
                     {(flprops) => (
                       <Field id="scenario-wdpaThreshold" {...flprops}>
-                        <div className="flex items-center mb-3">
-                          <Label ref={labelRef} theme="dark" className="mr-3 uppercase">Set the threshold for protected areas</Label>
+                        <div className="mb-3 flex items-center">
+                          <Label ref={labelRef} theme="dark" className="mr-3 uppercase">
+                            Set the threshold for protected areas
+                          </Label>
                           <InfoButton>
                             <div>
-                              <h4 className="font-heading text-lg mb-2.5">Threshold for Protected Areas</h4>
+                              <h4 className="mb-2.5 font-heading text-lg">
+                                Threshold for Protected Areas
+                              </h4>
                               <div className="space-y-2">
                                 <p>
-                                  Refers to what percentage of a planning
-                                  unit must be covered by a protected area
-                                  to be considered &quot;protected&quot; by Marxan.
+                                  Refers to what percentage of a planning unit must be covered by a
+                                  protected area to be considered &quot;protected&quot; by Marxan.
                                 </p>
                                 <p>
-                                  The following
-                                  image shows an example setting a threshold of 50%:
+                                  The following image shows an example setting a threshold of 50%:
                                 </p>
                               </div>
 
                               <img src={THRESHOLD_IMG} alt="Threshold" />
-
                             </div>
                           </InfoButton>
                         </div>
 
-                        <p
-                          className="mb-3 text-sm text-gray-300"
-                        >
-                          Refers to what percentage of a planning unit must
-                          {' '}
-                          be covered by a protected area to be considered “protected”.
+                        <p className="mb-3 text-sm text-gray-300">
+                          Refers to what percentage of a planning unit must be covered by a
+                          protected area to be considered “protected”.
                         </p>
 
                         <Slider
@@ -272,7 +266,6 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                             dispatch(setWDPAThreshold(s));
                           }}
                         />
-
                       </Field>
                     )}
                   </FieldRFF>
@@ -297,10 +290,10 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
                 )}
               </div>
             </div>
-            <div className="absolute bottom-0 left-0 z-10 w-full h-6 pointer-events-none bg-gradient-to-t from-gray-700 via-gray-700" />
+            <div className="pointer-events-none absolute bottom-0 left-0 z-10 h-6 w-full bg-gradient-to-t from-gray-700 via-gray-700" />
           </div>
 
-          <div className="flex justify-center mt-5 space-x-4">
+          <div className="mt-5 flex justify-center space-x-4">
             <Button
               theme="secondary"
               size="lg"

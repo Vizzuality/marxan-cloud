@@ -10,7 +10,8 @@ export interface ScenarioPostGapAnalysisToolbarProps {
 }
 
 export const ScenarioGapAnalysis: React.FC<ScenarioPostGapAnalysisToolbarProps> = ({
-  search, onSearch,
+  search,
+  onSearch,
 }: ScenarioPostGapAnalysisToolbarProps) => {
   const onChangeDebounced = useDebouncedCallback((value) => {
     onSearch(value);

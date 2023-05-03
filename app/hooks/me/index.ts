@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 
-import { useSession } from 'next-auth/client';
+import { useSession } from 'next-auth/react';
 
 import USERS from 'services/users';
 
@@ -20,19 +20,25 @@ import {
 
 // ME
 export function useMe() {
-  const [session, loading] = useSession();
+  const { data: session, status } = useSession();
+  const loading = status === 'loading';
 
-  const query = useQuery('me', () => USERS.request({
-    method: 'GET',
-    url: '/me',
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-  }).then((response) => {
-    return response.data;
-  }), {
-    enabled: !!session && !loading,
-  });
+  const query = useQuery(
+    'me',
+    () =>
+      USERS.request({
+        method: 'GET',
+        url: '/me',
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }).then((response) => {
+        return response.data;
+      }),
+    {
+      enabled: !!session && !loading,
+    }
+  );
 
   const { data } = query;
 
@@ -51,7 +57,7 @@ export function useSaveMe({
   },
 }: UseSaveMeProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveMe = ({ data }: SaveMeProps) => {
     return USERS.request({
@@ -83,7 +89,7 @@ export function useSaveMePassword({
   },
 }: UseSaveMePasswordProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const saveMe = ({ data }: SaveMePasswordProps) => {
     return USERS.request({
@@ -115,7 +121,7 @@ export function useDeleteMe({
   },
 }: UseDeleteMeProps) {
   const queryClient = useQueryClient();
-  const [session] = useSession();
+  const { data: session } = useSession();
 
   const deleteMe = () => {
     return USERS.request({

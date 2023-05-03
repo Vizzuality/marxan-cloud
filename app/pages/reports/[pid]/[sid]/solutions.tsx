@@ -32,17 +32,11 @@ const SolutionsReport: React.FC = () => {
   const { query } = useRouter();
   const { sid, solutionId } = query;
 
-  const {
-    data: scenarioData,
-  } = useScenario(sid);
+  const { data: scenarioData } = useScenario(sid);
 
-  const {
-    data: selectedSolutionData,
-  } = useSolution(sid, solutionId);
+  const { data: selectedSolutionData } = useSolution(sid, solutionId);
 
-  const {
-    data: bestSolutionData,
-  } = useBestSolution(sid, {
+  const { data: bestSolutionData } = useBestSolution(sid, {
     enabled: scenarioData?.ranAtLeastOnce,
   });
 
@@ -53,33 +47,21 @@ const SolutionsReport: React.FC = () => {
       <Head title="Solutions Report" />
 
       <MetaIcons />
-      <div
-        style={styles.page}
-        className="flex flex-col h-full text-black bg-white"
-      >
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <IntroPage />
       </div>
 
-      <div
-        style={styles.page}
-        className="flex flex-col h-full text-black bg-white"
-      >
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader title="Selection Frequency" />
         <SelectionFrequencyPage />
       </div>
 
-      <div
-        style={styles.page}
-        className="flex flex-col h-full text-black bg-white"
-      >
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader title={`Selected Solution: ${solutionNumber}`} />
         <SelectedSolutionPage />
       </div>
 
-      <div
-        style={styles.page}
-        className="flex flex-col h-full text-black bg-white"
-      >
+      <div style={styles.page} className="flex h-full flex-col bg-white text-black">
         <ReportHeader title="Settings" />
         <SettingsPage />
       </div>

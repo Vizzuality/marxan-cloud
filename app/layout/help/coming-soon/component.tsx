@@ -1,6 +1,4 @@
-import React, {
-  ReactChild,
-} from 'react';
+import React, { ReactChild } from 'react';
 
 import cx from 'classnames';
 
@@ -35,7 +33,7 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
       })}
       placement={placement}
       maxWidth={350}
-      content={(
+      content={
         <div
           className={cx({
             [THEME[theme].base]: true,
@@ -43,12 +41,10 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
         >
           <span>Feature coming soon!</span>
         </div>
-      )}
+      }
     >
       <div className="opacity-30">
-        <div className="pointer-events-none">
-          {children}
-        </div>
+        <div className="pointer-events-none">{children}</div>
       </div>
     </Tooltip>
   );
