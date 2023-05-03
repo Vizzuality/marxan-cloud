@@ -24,7 +24,7 @@
     "password": "marxan-api",
     "database": "marxan-api",
     "runMigrationsOnStartup": false,
-    "logging": ["error", "query"]
+    "logging": "error"
   },
   "postgresGeoApi": {
     "url": null,
@@ -34,7 +34,7 @@
     "password": "marxan-geo-api",
     "database": "marxan-geo-api",
     "runMigrationsOnStartup": false,
-    "logging": ["error", "query"]
+    "logging": "error"
   },
   "api": {
     "url": "http://api:3000",
