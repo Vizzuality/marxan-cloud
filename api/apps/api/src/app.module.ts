@@ -94,9 +94,5 @@ export class AppModule implements NestModule {
    * @todo Apply middleware more surgically; probably rename it to something
    * more generic (e.g. `FetchSpecificationMiddleware`?).
    */
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(ProcessFetchSpecification)
-      .forRoutes({ path: '*', method: RequestMethod.GET });
-  }
+  configure(consumer: MiddlewareConsumer) {}
 }
