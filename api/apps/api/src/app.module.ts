@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,7 +14,6 @@ import { GeoModule } from '@marxan-api/modules/geo/geo.module';
 import { GeoFeaturesModule } from '@marxan-api/modules/geo-features/geo-features.module';
 import { apiConnections } from './ormconfig';
 import { OrganizationsModule } from '@marxan-api/modules/organizations/organizations.module';
-import { ProcessFetchSpecification } from 'nestjs-base-service';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from '@marxan-api/filters/all-exceptions.exception.filter';
 import { AdminAreasModule } from '@marxan-api/modules/admin-areas/admin-areas.module';
@@ -89,10 +83,4 @@ import { ScheduleModule } from '@nestjs/schedule';
     },
   ],
 })
-export class AppModule implements NestModule {
-  /**
-   * @todo Apply middleware more surgically; probably rename it to something
-   * more generic (e.g. `FetchSpecificationMiddleware`?).
-   */
-  configure(consumer: MiddlewareConsumer) {}
-}
+export class AppModule {}
