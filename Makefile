@@ -146,12 +146,12 @@ seed-dbs-e2e: test-start-services
 # on a different environment:
 # `make test-e2e-<api|groprocessing> environment=ci`
 test-e2e-api: test-clean-slate seed-dbs-e2e
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -e JEST_TEST_PATH_PATTERN=$(JEST_TEST_PATH_PATTERN) -T api ./apps/api/entrypoint.sh test-e2e
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -e TEST_SUITE_PATH=$(TEST_SUITE_PATH) -T api ./apps/api/entrypoint.sh test-e2e
 	$(MAKE) test-clean-slate
 
 # See note for test-e2e-api above
 test-e2e-geoprocessing: test-clean-slate seed-dbs-e2e
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -e JEST_TEST_PATH_PATTERN=$(JEST_TEST_PATH_PATTERN) -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -e TEST_SUITE_PATH=$(TEST_SUITE_PATH) -T geoprocessing ./apps/geoprocessing/entrypoint.sh test-e2e
 	$(MAKE) test-clean-slate
 
 run-test-e2e-local:

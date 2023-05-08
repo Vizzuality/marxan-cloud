@@ -18,36 +18,36 @@ jobs:
       fail-fast: false
       matrix:
         test-suite:
-          - access-control
-          - api-events
-          - async-jobs-garbage-collector
-          - business-critical
-          - calculate-pu-protection-level
-          - cloning
-          - files-repository
-          - implicit-permissions
-          - integration
-          - legacy-project-import
-          - project
-          - project-jobs-status
-          - project-planning-areas-tiles
-          - project-planning-units
-          - project-protected-areas
-          - scenario-cost-template
-          - scenario-difference-map-tiles
-          - scenario-features
-          - scenario-input-files
-          - scenario-locks
-          - scenario-protected-areas
-          - scenario-pu-change
-          - scenario-run-results
-          - scenarios
-          - scenario-solutions
-          - scenarios-pu-data
-          - upload-feature
+          - 'access-control'
+          - 'api-events'
+          - 'async-jobs-garbage-collector'
+          - 'business-critical'
+          - 'calculate-pu-protection-level'
+          - 'cloning'
+          - 'files-repository'
+          - 'implicit-permissions'
+          - 'integration'
+          - 'legacy-project-import'
+          - 'project'
+          - 'project-jobs-status'
+          - 'project-planning-areas-tiles'
+          - 'project-planning-units'
+          - 'project-protected-areas'
+          - 'scenario-cost-template'
+          - 'scenario-difference-map-tiles'
+          - 'scenario-features'
+          - 'scenario-input-files'
+          - 'scenario-locks'
+          - 'scenario-protected-areas'
+          - 'scenario-pu-change'
+          - 'scenario-run-results'
+          - 'scenarios'
+          - 'scenario-solutions'
+          - 'scenarios-pu-data'
+          - 'upload-feature'
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Run CI tests via make task
-        run: JEST_TEST_PATH_PATTERN="${{ matrix.test-suite }}" make test-e2e-api environment=ci
+        run: TEST_SUITE_PATH="${{ matrix.test-suite }}" make test-e2e-api environment=ci
