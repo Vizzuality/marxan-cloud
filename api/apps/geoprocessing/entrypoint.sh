@@ -17,7 +17,10 @@ case "$1" in
         ;;
     test-e2e)
         echo "Running e2e Tests"
-        exec yarn geoprocessing:test:e2e --testPathPattern=${JEST_TEST_PATH_PATTERN:-.*}
+        # fall back to ".*" if TEST_SUITE_PATH is not set
+        TEST_SUITE_PATH=${TEST_SUITE_PATH:-.*}
+        TEST_SUITE_PATH=`sed -e 's|\/|\\\/|g' <<< $TEST_SUITE_PATH`
+        exec time yarn geoprocessing:test:e2e --testPathPattern="\/test\/${TEST_SUITE_PATH}\/"
         ;;
     run-migrations-for-e2e-tests)
         echo "(ESC)[44m Running migrations (geoprocessing db) for e2e Tests(ESC)[0m"
