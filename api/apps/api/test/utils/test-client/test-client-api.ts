@@ -82,8 +82,8 @@ export class TestClientApi {
   }
 
   public static async teardownApps() {
-    for await (const app of this.apps) {
-      app.close();
+    for (const app of this.apps) {
+      await app.close();
     }
     this.apps = [];
   }

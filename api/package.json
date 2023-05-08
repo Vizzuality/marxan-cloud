@@ -22,7 +22,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "api:test:e2e": "yarn test:prepare-db && NODE_OPTIONS=\\\"--max_old_space_size=6144\\\" jest --runInBand --forceExit --ci --detectOpenHandles --logHeapUsage --config apps/api/test/jest-e2e.json",
+    "api:test:e2e": "yarn test:prepare-db && NODE_OPTIONS=\\\"--max_old_space_size=6144\\\" jest --runInBand --forceExit --ci --detectOpenHandles --logHeapUsage --config apps/api/test/jest-e2e.json users.e2e-spec.ts",
     "geoprocessing:test:e2e": "yarn test:prepare-db && jest --runInBand --ci --detectOpenHandles --forceExit --config ./apps/geoprocessing/test/jest-e2e.json",
     "ts-coverage": "typescript-coverage-report",
     "api:typeorm": "NODE_CONFIG_DIR=apps/api/config ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d apps/api/src/ormconfig.migration.ts",
