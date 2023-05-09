@@ -22,7 +22,7 @@ case "$1" in
     test-e2e)
         echo "Running e2e Tests"
         export API_LOGGING_MUTE_ALL=true
-        # fall back to ".*" if TEST_SUITE_PATH is not set
+        # fall back to ".*" regexp if TEST_SUITE_PATH is not set
         TEST_SUITE_PATH=${TEST_SUITE_PATH:-.*}
         TEST_SUITE_PATH=`sed -e 's|\/|\\\/|g' <<< $TEST_SUITE_PATH`
         exec time yarn api:test:e2e --testPathPattern="\/test\/${TEST_SUITE_PATH}\/"
@@ -32,7 +32,7 @@ case "$1" in
         echo "(ESC)[44m Running migrations (api db) for e2e Tests in Api (ESC)[0m"
         sleep 15
         export NODE_ENV=test
-        exec yarn api:typeorm migration:run -t each
+        exec time yarn api:typeorm migration:run -t each
         ;;
     start)
         echo "Running Start"

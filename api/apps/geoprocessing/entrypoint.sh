@@ -17,7 +17,7 @@ case "$1" in
         ;;
     test-e2e)
         echo "Running e2e Tests"
-        # fall back to ".*" if TEST_SUITE_PATH is not set
+        # fall back to ".*" regexp if TEST_SUITE_PATH is not set
         TEST_SUITE_PATH=${TEST_SUITE_PATH:-.*}
         TEST_SUITE_PATH=`sed -e 's|\/|\\\/|g' <<< $TEST_SUITE_PATH`
         exec time yarn geoprocessing:test:e2e --testPathPattern="\/test\/${TEST_SUITE_PATH}\/"

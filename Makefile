@@ -24,6 +24,9 @@ DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
 	docker volume rm -f marxan-cloud_marxan-cloud-redis-api-data )
 COMPOSE_PROJECT_NAME := marxan-cloud
 
+API_POSTGRES_USER_FOR_TESTS := $(if $(API_POSTGRES_USER),$(API_POSTGRES_USER),$(shell jq -r '.postgresApi.username' api/apps/api/config/test.json))
+GEO_POSTGRES_USER_FOR_TESTS := $(if $(GEO_POSTGRES_USER),$(GEO_POSTGRES_USER),$(shell jq -r '.postgresGeoApi.username' api/apps/api/config/test.json))
+
 ## some color to give live to the outputs
 RED :=\033[1;32m
 NC :=\033[0m # No Color
@@ -91,22 +94,22 @@ seed-dbs: seed-api-with-test-data
 
 seed-api-with-test-data: seed-api-init-data | seed-geoapi-init-data
 	@echo "$(RED)seeding db with testing project and scenarios:$(NC) $(API_DB_INSTANCE)"
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-data.sql
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "$(API_POSTGRES_USER_FOR_TESTS)" < api/apps/api/test/fixtures/test-data.sql
 
 seed-api-init-data:
 	@echo "$(RED)seeding initial dbs:$(NC) $(API_DB_INSTANCE)"
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-init-apidb.sql
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "$(API_POSTGRES_USER_FOR_TESTS)" < api/apps/api/test/fixtures/test-init-apidb.sql
 
 seed-geoapi-init-data:
 	@echo "$(RED)seeding dbs with initial geodata:$(NC) $(API_DB_INSTANCE), $(GEO_DB_INSTANCE)"
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
-	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}";
-	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "${API_POSTGRES_USER}" < api/apps/api/test/fixtures/test-features.sql
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-admin-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "$(GEO_POSTGRES_USER_FOR_TESTS)"; \
+	sed -e "s/\$$user/00000000-0000-0000-0000-000000000000/g" api/apps/api/test/fixtures/test-wdpa-data.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "$(GEO_POSTGRES_USER_FOR_TESTS)";
+	$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -U "$(API_POSTGRES_USER_FOR_TESTS)" < api/apps/api/test/fixtures/test-features.sql
 	@for i in api/apps/api/test/fixtures/features/*.sql; do \
 		table_name=`basename -s .sql "$$i"`; \
-		featureid=`$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "${API_POSTGRES_USER}" -c "select id from features where feature_class_name = '$$table_name'"`; \
+		featureid=`$(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(API_DB_INSTANCE) psql -X -A -t -U "$(API_POSTGRES_USER_FOR_TESTS)" -c "select id from features where feature_class_name = '$$table_name'"`; \
 		echo "appending data for $${table_name} with id $${featureid}"; \
-		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "${GEO_POSTGRES_USER}"; \
+		sed -e "s/\$$feature_id/$$featureid/g" api/apps/api/test/fixtures/features/$${table_name}.sql | $(DOCKER_COMPOSE_COMMAND) $(DOCKER_COMPOSE_FILE) exec -T $(GEO_DB_INSTANCE) psql -U "$(GEO_POSTGRES_USER_FOR_TESTS)"; \
 		done;
 
 # need notebook service to execute a specific notebook. this requires a full geodb
