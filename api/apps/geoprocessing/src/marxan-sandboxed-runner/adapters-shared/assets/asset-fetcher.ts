@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import axios, { CancelTokenSource } from 'axios';
 import { WriteStream } from 'fs';
@@ -29,6 +29,7 @@ export class AssetFetcher {
       );
       assetStream.data.pipe(output);
     } catch (error) {
+      Logger.error(error);
       output.end();
       return;
     }
