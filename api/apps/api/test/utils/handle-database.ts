@@ -35,7 +35,6 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await TestClientApi.teardownApps();
-  global.gc?.();
 });
 
 afterAll(async () => {
