@@ -10,10 +10,14 @@ on:
 
 jobs:
 
+  build_and_push:
+    uses: vizzuality/marxan-cloud/.github/workflows/tests-backend-build-oci-images.yml@chore/infra/MRXN23-59_use-prebuilt-images-for-tests
+
   test-api-e2e:
     name: E2E tests - API
     runs-on: ubuntu-22.04
     timeout-minutes: 60
+    needs: build_and_push
     strategy:
       fail-fast: false
       matrix:
@@ -49,5 +53,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Render Compose file with image tags
+        env:
+          API_IMAGE_TAG: ${{ needs.build_and_push.outputs.api_image_tag }}
+          GEOPROCESSING_IMAGE_TAG: ${{ needs.build_and_push.outputs.geoprocessing_image_tag }}
+          APIDB_IMAGE_TAG: ${{ needs.build_and_push.outputs.apidb_image_tag }}
+          GEODB_IMAGE_TAG: ${{ needs.build_and_push.outputs.geodb_image_tag }}
+          REDIS_IMAGE_TAG: ${{ needs.build_and_push.outputs.redis_image_tag }}
+        run: |
+          envsubst < docker-compose-test-e2e.ci.yml.tpl > docker-compose-test-e2e.ci.yml
       - name: Run CI tests via make task
         run: TEST_SUITE_PATH="${{ matrix.test-suite }}" make test-e2e-api environment=ci
