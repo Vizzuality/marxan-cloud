@@ -8,10 +8,13 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+
 jobs:
 
   build_and_push:
-    uses: vizzuality/marxan-cloud/.github/workflows/tests-backend-build-oci-images.yml@chore/infra/MRXN23-59_use-prebuilt-images-for-tests
+    uses: ./.github/workflows/tests-backend-build-oci-images.yml
 
   test-api-e2e:
     name: E2E tests - API
@@ -51,8 +54,17 @@ jobs:
           - 'upload-feature'
 
     steps:
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout repository
         uses: actions/checkout@v3
+
       - name: Render Compose file with image tags
         env:
           API_IMAGE_TAG: ${{ needs.build_and_push.outputs.api_image_tag }}
@@ -62,5 +74,6 @@ jobs:
           REDIS_IMAGE_TAG: ${{ needs.build_and_push.outputs.redis_image_tag }}
         run: |
           envsubst < docker-compose-test-e2e.ci.yml.tpl > docker-compose-test-e2e.ci.yml
+
       - name: Run CI tests via make task
         run: TEST_SUITE_PATH="${{ matrix.test-suite }}" make test-e2e-api environment=ci
