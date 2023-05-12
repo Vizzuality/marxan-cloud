@@ -1,9 +1,8 @@
 version: "3.8"
 services:
   api:
-    build:
-      context: ./api
-      dockerfile: api.Dockerfile
+    # no build section: when running in CI, we use `image` and when running
+    # locally we define the build in docker-compose-test-e2e.local.yml
     ports:
       - "3000:3000"
     container_name: marxan-test-e2e-api
@@ -33,9 +32,8 @@ services:
       - test-e2e-redis
 
   geoprocessing:
-      build:
-        context: ./api
-        dockerfile: geo.Dockerfile
+      # no build section: when running in CI, we use `image` and when running
+      # locally we define the build in docker-compose-test-e2e.local.yml
       ports:
         - "3001:3000"
       container_name: marxan-test-e2e-geoprocessing
@@ -66,9 +64,8 @@ services:
         - api
 
   test-e2e-postgresql-api:
-    build:
-      context: ./postgresql
-      dockerfile: apidb.Dockerfile
+    # no build section: when running in CI, we use `image` and when running
+    # locally we define the build in docker-compose-test-e2e.local.yml
     container_name: marxan-test-e2e-postgresql-api
     volumes:
       - "./api/test/fixtures:/opt"
@@ -81,9 +78,8 @@ services:
     restart: on-failure
 
   test-e2e-postgresql-geo-api:
-    build:
-      context: ./postgresql
-      dockerfile: geodb.Dockerfile
+    # no build section: when running in CI, we use `image` and when running
+    # locally we define the build in docker-compose-test-e2e.local.yml
     container_name: marxan-test-e2e-postgresql-geo-api
     ports:
       - "3541:5432"
@@ -94,9 +90,8 @@ services:
     restart: on-failure
 
   test-e2e-redis:
-    build:
-      context: ./redis
-      dockerfile: Dockerfile
+    # no build section: when running in CI, we use `image` and when running
+    # locally we define the build in docker-compose-test-e2e.local.yml
     container_name: marxan-test-e2e-redis
     command: [ "redis-server" ]
     ports:

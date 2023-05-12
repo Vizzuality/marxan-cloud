@@ -1,16 +1,31 @@
 version: "3.8"
 services:
   api:
+    build:
+      context: ./api
+      dockerfile: api.Dockerfile
     env_file: .env-test-e2e
 
   geoprocessing:
+    build:
+      context: ./api
+      dockerfile: geo.Dockerfile
     env_file: .env-test-e2e
 
   test-e2e-postgresql-api:
+    build:
+      context: ./postgresql
+      dockerfile: apidb.Dockerfile
     env_file: .env-test-e2e
 
   test-e2e-postgresql-geo-api:
+    build:
+      context: ./postgresql
+      dockerfile: geodb.Dockerfile
     env_file: .env-test-e2e
 
   test-e2e-redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile
     env_file: .env-test-e2e
