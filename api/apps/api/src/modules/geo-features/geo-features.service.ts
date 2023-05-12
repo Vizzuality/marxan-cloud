@@ -29,6 +29,10 @@ import { v4 } from 'uuid';
 import { UploadShapefileDTO } from '../projects/dto/upload-shapefile.dto';
 import { GeoFeaturesRequestInfo } from './geo-features-request-info';
 import { antimeridianBbox, nominatim2bbox } from '@marxan/utils/geo';
+import { Either, left, right } from 'fp-ts/lib/Either';
+import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
+import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
+import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -43,6 +47,9 @@ type GeoFeatureFilterKeys = keyof Pick<
   typeof geoFeatureFilterKeyNames[number]
 >;
 type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
+
+export const featureNotFound = Symbol('feature not found');
+export const featureNotEditable = Symbol('feature cannot be edited');
 
 export type FindResult = {
   data: (Partial<GeoFeature> | undefined)[];
@@ -70,6 +77,7 @@ export class GeoFeaturesService extends AppBaseService<
     @InjectRepository(Scenario)
     private readonly scenarioRepository: Repository<Scenario>,
     private readonly geoFeaturesPropertySet: GeoFeaturePropertySetService,
+    private readonly projectAclService: ProjectAclService,
   ) {
     super(
       geoFeaturesRepository,
@@ -384,6 +392,48 @@ export class GeoFeaturesService extends AppBaseService<
       await apiQueryRunner.release();
       await geoQueryRunner.release();
     }
+  }
+
+  public async updateFeatureForProject(
+    userId: string,
+    projectId: string,
+    featureId: string,
+    updateFeatureNameDto: UpdateFeatureNameDto,
+  ): Promise<
+    Either<
+      | typeof featureNotFound
+      | typeof featureNotEditable
+      | typeof projectNotFound,
+      any
+    >
+  > {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+    });
+    if (!project) {
+      return left(projectNotFound);
+    }
+
+    const feature = await this.geoFeaturesRepository.findOne({
+      where: { id: featureId },
+    });
+    if (!feature) {
+      return left(featureNotFound);
+    }
+
+    if (
+      !feature.isCustom ||
+      feature.projectId !== projectId ||
+      !(await this.projectAclService.canEditProject(userId, projectId))
+    ) {
+      return left(featureNotEditable);
+    }
+
+    await this.geoFeaturesRepository.update(featureId, {
+      featureClassName: updateFeatureNameDto.featureClassName,
+    });
+
+    return right(true);
   }
 
   private async createFeature(
