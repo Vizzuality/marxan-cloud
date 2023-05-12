@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { GeoFeature } from './geo-feature.api.entity';
@@ -15,6 +15,8 @@ import { ScenarioFeaturesData } from '@marxan/features';
 import { GeoFeaturePropertySetService } from './geo-feature-property-sets.service';
 import { ProcessingModule } from './processing';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
+import { ProjectAclModule } from '@marxan-api/modules/access-control/projects-acl/project-acl.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
     ),
     TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
     ProcessingModule,
+    forwardRef(() => ProjectsModule),
+    ProjectAclModule,
   ],
   providers: [
     GeoFeaturesService,

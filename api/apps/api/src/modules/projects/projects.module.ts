@@ -50,7 +50,7 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     AdminAreasModule,
     CountriesModule,
     PlanningAreasModule,
-    GeoFeaturesModule,
+    forwardRef(() => GeoFeaturesModule),
     forwardRef(() => ScenariosModule),
     TypeOrmModule.forFeature([
       Project,
