@@ -14,6 +14,11 @@ on:
       - '.github/**'
   pull_request:
   workflow_dispatch:
+  workflow_call:
+    outputs:
+      api-service-tag:
+        description: OCI image tag for the marxan-api image
+        value: {{ jobs.build_and_push_api.outputs.image_tag }}
 
 env:
   REGISTRY: ghcr.io
@@ -23,7 +28,9 @@ jobs:
   build_and_push_api:
     name: Build and push API service container image to registry
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.build_and_push.outputs.imageid }}
     env:
       REPOSITORY: marxan-api
     steps:
@@ -49,6 +56,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
+        id: build_and_push
         uses: docker/build-push-action@v4
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
@@ -59,10 +67,12 @@ jobs:
           file: api/api.Dockerfile
           tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
 
-  build_and_push_geoprocesing:
+  build_and_push_geoprocessing:
     name: Build and push Geoprocessing service container image to registry
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.build_and_push.outputs.imageid }}
     env:
       REPOSITORY: marxan-geoprocessing
     steps:
@@ -88,6 +98,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
+        id: build_and_push
         uses: docker/build-push-action@v4
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
@@ -101,7 +112,9 @@ jobs:
   build_and_push_apidb:
     name: Build and push apidb service container image to registry
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.build_and_push.outputs.imageid }}
     env:
       REPOSITORY: marxan-postgresql-api
     steps:
@@ -127,6 +140,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
+        id: build_and_push
         uses: docker/build-push-action@v4
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
@@ -140,7 +154,9 @@ jobs:
   build_and_push_geodb:
     name: Build and push geodb service container image to registry
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.build_and_push.outputs.imageid }}
     env:
       REPOSITORY: marxan-postgresql-geo-api
     steps:
@@ -166,6 +182,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
+        id: build_and_push
         uses: docker/build-push-action@v4
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
@@ -179,7 +196,9 @@ jobs:
   build_and_push_redis:
     name: Build and push Redis service container image to registry
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.build_and_push.outputs.imageid }}
     env:
       REPOSITORY: marxan-redis
     steps:
@@ -205,6 +224,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
+        id: build_and_push
         uses: docker/build-push-action@v4
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
@@ -217,7 +237,9 @@ jobs:
   build_and_push_webshot:
     name: Build and push Webshot service container image to registry
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 10
+    outputs:
+      image-tag: ${{ steps.build_and_push.outputs.imageid }}
     env:
       REPOSITORY: marxan-webshot
     steps:
@@ -243,6 +265,7 @@ jobs:
         id: extract_branch
 
       - name: Build and push
+        id: build_and_push
         uses: docker/build-push-action@v4
         env:
           IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
