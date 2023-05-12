@@ -12,12 +12,11 @@ endif
 
 include lib/make/compose-detection.mk
 
-CIENV := $(if $(filter $(environment), local), -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml, -f docker-compose-test-e2e.yml)
+DOCKER_COMPOSE_FILE := $(if $(filter $(environment), local), -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.local.yml, -f docker-compose-test-e2e.yml -f docker-compose-test-e2e.ci.yml)
 API_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-api, postgresql-api)
 GEO_DB_INSTANCE := $(if $(environment), test-e2e-postgresql-geo-api, postgresql-geo-api)
 REDIS_INSTANCE := $(if $(environment), test-e2e-redis, redis)
 
-DOCKER_COMPOSE_FILE := $(CIENV)
 DOCKER_CLEAN_VOLUMES := $(if $(environment), , \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-api-data && \
 	docker volume rm -f marxan-cloud_marxan-cloud-postgresql-geo-data && \
@@ -34,7 +33,6 @@ NC :=\033[0m # No Color
 test-commands:
 	@echo $(ENVFILE)
 	@echo $(DOCKER_COMPOSE_FILE)
-	@echo $(CIENV)
 	@echo $(API_POSTGRES_DB)
 	@echo $(GEO_POSTGRES_USER)
 
