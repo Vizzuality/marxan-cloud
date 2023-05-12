@@ -1,0 +1,253 @@
+name: Build and publish container images for test jobs to GitHub Container Registry
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+      - 'staging'
+      - 'production'
+    paths:
+      - 'api/**'
+      - 'postgresql/**'
+      - 'webshot/**'
+      - '.github/**'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+
+  build_and_push_api:
+    name: Build and push API service container image to registry
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      REPOSITORY: marxan-api
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Prepare ids
+        shell: bash
+        run: |
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "shortsha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "registry_namespace=$(echo ${{ github.repository_owner }} | tr A-Z a-z)" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
+          REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
+        with:
+          context: ./api
+          push: true
+          file: api/api.Dockerfile
+          tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+
+  build_and_push_geoprocesing:
+    name: Build and push Geoprocessing service container image to registry
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      REPOSITORY: marxan-geoprocessing
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Prepare ids
+        shell: bash
+        run: |
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "shortsha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "registry_namespace=$(echo ${{ github.repository_owner }} | tr A-Z a-z)" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
+          REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
+        with:
+          context: ./api
+          push: true
+          file: api/geo.Dockerfile
+          tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+
+  build_and_push_apidb:
+    name: Build and push apidb service container image to registry
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      REPOSITORY: marxan-postgresql-api
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Prepare ids
+        shell: bash
+        run: |
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "shortsha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "registry_namespace=$(echo ${{ github.repository_owner }} | tr A-Z a-z)" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
+          REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
+        with:
+          context: ./postgresql
+          push: true
+          file: postgresql/apidb.Dockerfile
+          tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+
+  build_and_push_geodb:
+    name: Build and push geodb service container image to registry
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      REPOSITORY: marxan-postgresql-geo-api
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Prepare ids
+        shell: bash
+        run: |
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "shortsha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "registry_namespace=$(echo ${{ github.repository_owner }} | tr A-Z a-z)" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
+          REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
+        with:
+          context: ./postgresql
+          push: true
+          file: postgresql/geodb.Dockerfile
+          tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+
+  build_and_push_redis:
+    name: Build and push Redis service container image to registry
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      REPOSITORY: marxan-redis
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Prepare ids
+        shell: bash
+        run: |
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "shortsha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "registry_namespace=$(echo ${{ github.repository_owner }} | tr A-Z a-z)" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
+          REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
+        with:
+          context: ./redis
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
+
+  build_and_push_webshot:
+    name: Build and push Webshot service container image to registry
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      REPOSITORY: marxan-webshot
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v3
+
+      - name: Login to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Prepare ids
+        shell: bash
+        run: |
+          echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT
+          echo "shortsha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "registry_namespace=$(echo ${{ github.repository_owner }} | tr A-Z a-z)" >> $GITHUB_OUTPUT
+        id: extract_branch
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        env:
+          IMAGE_TAG: ${{ steps.extract_branch.outputs.shortsha }}
+          REGISTRY_NAMESPACE: ${{ steps.extract_branch.outputs.registry_namespace }}
+        with:
+          context: ./webshot
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.REGISTRY_NAMESPACE }}/${{ env.REPOSITORY }}:${{ env.IMAGE_TAG }}
