@@ -35,7 +35,7 @@ describe(`scenarios-pu-data fetch`, () => {
   it(`returns valid data`, () => {
     expect(result).toEqual([
       expect.arrayContaining([
-        expect.objectContaining({ lockStatus: LockStatus.Unstated }),
+        expect.objectContaining({ lockStatus: LockStatus.Available }),
         expect.objectContaining({ lockStatus: LockStatus.LockedOut }),
         expect.objectContaining({ lockStatus: LockStatus.LockedIn }),
       ]),

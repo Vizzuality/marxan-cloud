@@ -9,4 +9,8 @@ export interface AdjustPlanningUnitsInput {
     pu?: string[];
     geo?: FeatureCollection<Polygon | MultiPolygon>[];
   };
+  makeAvailable?: {
+    pu?: string[];
+    geo?: FeatureCollection<Polygon | MultiPolygon>[];
+  };
 }

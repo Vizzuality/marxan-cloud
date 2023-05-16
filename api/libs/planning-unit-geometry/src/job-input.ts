@@ -11,4 +11,8 @@ export interface JobInput {
     pu?: string[];
     geo?: FeatureCollection<Polygon | MultiPolygon>[];
   };
+  makeAvailable?: {
+    pu?: string[];
+    geo?: FeatureCollection<Polygon | MultiPolygon>[];
+  };
 }

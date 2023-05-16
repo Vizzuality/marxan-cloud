@@ -115,7 +115,7 @@ export const getFixtures = async () => {
       );
 
       const lockStatuses: Record<number, LockStatus | null> = {
-        0: LockStatus.Unstated,
+        0: LockStatus.Available,
         1: LockStatus.LockedIn,
         2: LockStatus.LockedOut,
         3: null,

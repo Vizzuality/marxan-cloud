@@ -41,15 +41,17 @@ export class ScenarioPlanningUnitsInclusionProcessor
    * - if claims for inclusions and exclusions have any overlaps, throw an error
    * - otherwise, apply the resulting claims
    *
-   * TL;DR claims by GeoJSON always "win" over claims by id when overlapping,
+   * TL;DR claims by GeoJSON always "win" over claims by id when overlapping.
    */
   async process(job: Job<JobInput, true>): Promise<true> {
     const scenarioId = job.data.scenarioId;
     const includeGeo = job.data.include?.geo;
     const excludeGeo = job.data.exclude?.geo;
+    const makeAvailableGeo = job.data.makeAvailable?.geo;
 
     const puIdsToInclude: string[] = [];
     const puIdsToExclude: string[] = [];
+    const puIdsToMakeAvailable: string[] = [];
 
     const puIdsToIncludeFromGeo: string[] = [];
     if (includeGeo) {
@@ -84,37 +86,64 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    const puIdsToMakeAvailableFromGeo: string[] = [];
+    if (makeAvailableGeo) {
+      const targetGeometries = flatMap(
+        makeAvailableGeo,
+        (collection) => collection.features,
+      ).map((feature) => feature.geometry);
+      puIdsToMakeAvailableFromGeo.push(
+        ...(
+          await this.getPlanningUnitsIntersectingGeometriesFor(
+            scenarioId,
+            targetGeometries,
+          )
+        ).map(({ spd_id: id }) => id),
+      );
+    }
+
     const puIdsToIncludeFromIds = job.data.include?.pu ?? [];
     const puIdsToExcludeFromIds = job.data.exclude?.pu ?? [];
+    const puIdsToMakeAvailableFromIds = job.data.makeAvailable?.pu ?? [];
 
     // If there are overlaps between opposing claims byId and byGeoJSON, ignore the claims byId
-    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = difference(
-      puIdsToIncludeFromIds,
-      puIdsToExcludeFromGeo,
-    );
-    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = difference(
-      puIdsToExcludeFromIds,
-      puIdsToIncludeFromGeo,
-    );
+    // const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = difference(
+    //   puIdsToIncludeFromIds,
+    //   puIdsToExcludeFromGeo,
+    // );
+    // const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = difference(
+    //   puIdsToExcludeFromIds,
+    //   puIdsToIncludeFromGeo,
+    // );
 
-    // Union of claims byId and byGeoJSON, for inclusions and for exclusions
+    // Union of claims byId and byGeoJSON, for inclusions, exclusions and
+    // makeAvailable.
     puIdsToInclude.push(
       ...[
-        ...puIdsToIncludeFromIdsLessIdsToExcludeFromGeo,
+        ...puIdsToIncludeFromIds,
         ...puIdsToIncludeFromGeo,
       ],
     );
     puIdsToExclude.push(
       ...[
-        ...puIdsToExcludeFromIdsLessIdsToIncludeFromGeo,
+        ...puIdsToExcludeFromIds,
         ...puIdsToExcludeFromGeo,
       ],
     );
+    puIdsToMakeAvailable.push(
+      ...[
+        ...puIdsToMakeAvailableFromIds,
+        ...puIdsToMakeAvailableFromGeo,
+      ],
+    );
+
+    // deduplicate arrays
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
+    const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailable);
 
     const doInclusionAndExclusionIntersect =
-      intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude])
+      intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude], [...uniquePuIdsToMakeAvailable])
         .length > 0;
 
     if (doInclusionAndExclusionIntersect) {
@@ -123,17 +152,24 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    // @debt Do these updates in a transaction; throw an error if anything fails
+    // with a transaction.
+
+    // First, reset all planning units to their default lock status of
+    // "available", unless they are marked as "protected by default".
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
         protectedByDefault: false,
       },
       {
-        lockStatus: LockStatus.Unstated,
+        lockStatus: LockStatus.Available,
         setByUser: false,
       },
     );
 
+    // Then, lock in all planning units that are marked as "protected by
+    // default".
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
@@ -145,6 +181,13 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
     );
 
+    // By now, we've reset the status of all the planning units to "available"
+    // or to "locked in", as a consequence of them being marked as "protected by
+    // default". Now, we can apply the claims made by the user.
+    // The order in which we apply these claims is irrelevant, as we have
+    // already checked that there are no overlaps between them.
+
+    // First, lock in all planning units that have been claimed for inclusion.
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
@@ -156,6 +199,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
     );
 
+    // Then, lock out all planning units that have been claimed for exclusion.
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
@@ -166,6 +210,20 @@ export class ScenarioPlanningUnitsInclusionProcessor
         setByUser: true,
       },
     );
+
+    // Then, make available all planning units that have been claimed for
+    // being available.
+    await this.scenarioPlanningUnitsRepo.update(
+      {
+        scenarioId,
+        id: In([...uniquePuIdsToMakeAvailable]),
+      },
+      {
+        lockStatus: LockStatus.Available,
+        setByUser: true,
+      },
+    );
+
     return true;
   }
 

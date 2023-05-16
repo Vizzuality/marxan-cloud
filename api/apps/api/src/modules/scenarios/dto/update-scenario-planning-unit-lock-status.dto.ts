@@ -14,6 +14,8 @@ export class PlanningUnitsByIdUpdateDto {
   @IsOptional()
   @IsUUID('all', { each: true })
   exclude?: string[];
+
+  makeAvailable?: string[];
 }
 
 export class PlanningUnitsByGeoJsonUpdateDto {
@@ -28,6 +30,8 @@ export class PlanningUnitsByGeoJsonUpdateDto {
   @IsArray()
   @IsFeatureCollectionOfPolygons({ each: true })
   exclude?: FeatureCollection<MultiPolygon | Polygon>[];
+
+  makeAvailable?: FeatureCollection<MultiPolygon | Polygon>[];
 }
 
 export class UpdateScenarioPlanningUnitLockStatusDto {

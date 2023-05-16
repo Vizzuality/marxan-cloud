@@ -25,6 +25,7 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
     const targetPuIds = [
       ...(constraints.include?.pu ?? []),
       ...(constraints.exclude?.pu ?? []),
+      ...(constraints.makeAvailable?.pu ?? []),
     ];
     if (targetPuIds.length > 0) {
       const { errors } = await this.puUuidValidator.validate(
