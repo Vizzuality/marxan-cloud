@@ -129,7 +129,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
         protectedByDefault: false,
       },
       {
-        lockStatus: LockStatus.Unstated,
+        lockStatus: LockStatus.Available,
         setByUser: false,
       },
     );

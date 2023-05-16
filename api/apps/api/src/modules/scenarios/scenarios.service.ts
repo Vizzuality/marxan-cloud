@@ -118,6 +118,7 @@ import {
 } from './delete-scenario/delete-scenario.command';
 import { LegacyProjectImportChecker } from '../legacy-project-import/domain/legacy-project-import-checker/legacy-project-import-checker.service';
 import { lastValueFrom } from 'rxjs';
+import { AdjustPlanningUnitsInput } from '@marxan-api/modules/analysis/entry-points/adjust-planning-units-input';
 
 /** @debt move to own module */
 const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
@@ -420,7 +421,18 @@ export class ScenariosService {
     if (isLeft(userCanEditScenario)) {
       return userCanEditScenario;
     }
-    await this.updatePlanningUnits.update(scenarioId, {
+
+    const updateConstraints: AdjustPlanningUnitsInput = this.mapLockStatusDtoToAdjustPlanningUnitsInput(
+      input,
+    );
+    await this.updatePlanningUnits.update(scenarioId, updateConstraints);
+    return right(void 0);
+  }
+
+  private mapLockStatusDtoToAdjustPlanningUnitsInput(
+    input: UpdateScenarioPlanningUnitLockStatusDto,
+  ): AdjustPlanningUnitsInput {
+    return {
       include: {
         geo: input.byGeoJson?.include,
         pu: input.byId?.include,
@@ -429,10 +441,12 @@ export class ScenariosService {
         pu: input.byId?.exclude,
         geo: input.byGeoJson?.exclude,
       },
-    });
-    return right(void 0);
+      makeAvailable: {
+        pu: input.byId?.makeAvailable,
+        geo: input.byGeoJson?.makeAvailable,
+      },
+    };
   }
-
   async processCostSurfaceShapefile(
     scenarioId: string,
     userId: string,

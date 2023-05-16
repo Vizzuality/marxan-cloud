@@ -12,7 +12,7 @@ type ReadRow = {
 };
 
 enum MarxanPuLockStatus {
-  Unstated = 0,
+  Available = 0,
   InSeed = 1,
   LockedIn = 2,
   LockedOut = 3,
@@ -26,7 +26,7 @@ const marxanToInternalPuLockStatus = {
 };
 
 enum InternalPuLockStatus {
-  Unstated = 0,
+  Available = 0,
   LockedIn = 1,
   LockedOut = 2,
 }

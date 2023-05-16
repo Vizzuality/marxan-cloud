@@ -8,6 +8,7 @@ import {
   UpdatePlanningUnitsEventsPort,
   UpdatePlanningUnitsState,
 } from './update-planning-units-events.port';
+import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 @Injectable()
 export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
@@ -22,10 +23,9 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
     constraints: AdjustPlanningUnitsInput,
   ): Promise<void> {
     await this.apiEvents.event(scenarioId, UpdatePlanningUnitsState.Submitted);
-    const targetPuIds = [
-      ...(constraints.include?.pu ?? []),
-      ...(constraints.exclude?.pu ?? []),
-    ];
+    const targetPuIds: string[] = this.getAllPlanningUnitsAffectedByStatusClaims(
+      constraints,
+    );
     if (targetPuIds.length > 0) {
       const { errors } = await this.puUuidValidator.validate(
         scenarioId,
@@ -59,5 +59,15 @@ export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
     }
 
     return;
+  }
+
+  private getAllPlanningUnitsAffectedByStatusClaims(
+    constraints: AdjustPlanningUnitsInput,
+  ): string[] {
+    return [
+      ...(constraints.include?.pu ?? []),
+      ...(constraints.exclude?.pu ?? []),
+      ...(constraints.makeAvailable?.pu ?? []),
+    ];
   }
 }
