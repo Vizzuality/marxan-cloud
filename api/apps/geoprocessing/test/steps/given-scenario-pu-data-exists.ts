@@ -38,7 +38,7 @@ export const GivenScenarioPuDataExists = async (
   const rows = await entityManager.save(ScenariosPuPaDataGeo, [
     {
       scenarioId,
-      lockStatus: LockStatus.Unstated,
+      lockStatus: LockStatus.Available,
       projectPuId: first.id,
       projectPu: first,
       protectedByDefault,
@@ -77,7 +77,7 @@ export const GivenScenarioPuData = async (
     const scenarioPuData: DeepPartial<ScenariosPuPaDataGeo>[] = projectPus.map(
       (projectPu) => ({
         scenarioId,
-        lockStatus: LockStatus.Unstated,
+        lockStatus: LockStatus.Available,
         projectPuId: projectPu.id,
       }),
     );

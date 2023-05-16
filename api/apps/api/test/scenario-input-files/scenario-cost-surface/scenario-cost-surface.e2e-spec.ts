@@ -22,24 +22,24 @@ describe(`As owner, when scenario has PUs with cost and lock status`, () => {
     const results = await fixtures.WhenGettingPuInclusionStateAsOwner();
     expect(results).toEqual([
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
       },
     ]);
   });
@@ -60,24 +60,24 @@ describe(`As contributor, when scenario has PUs with cost and lock status`, () =
     const results = await fixtures.WhenGettingPuInclusionStateAsContributor();
     expect(results).toEqual([
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
       },
     ]);
   });
@@ -98,24 +98,24 @@ describe(`As viewer, when scenario has PUs with cost and lock status`, () => {
     const results = await fixtures.WhenGettingPuInclusionStateAsViewer();
     expect(results).toEqual([
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
       },
       {
-        defaultStatus: 'unstated',
+        defaultStatus: 'available',
         id: expect.any(String),
-        inclusionStatus: 'unstated',
+        inclusionStatus: 'available',
       },
     ]);
   });

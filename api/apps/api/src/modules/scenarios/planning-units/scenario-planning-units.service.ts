@@ -37,7 +37,7 @@ export class ScenarioPlanningUnitsService {
           protectedByDefault: false,
         },
         {
-          lockStatus: LockStatus.Unstated,
+          lockStatus: LockStatus.Available,
         },
       );
 

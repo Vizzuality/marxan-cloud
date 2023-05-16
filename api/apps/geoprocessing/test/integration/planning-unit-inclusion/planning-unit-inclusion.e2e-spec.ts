@@ -60,7 +60,7 @@ describe(`when planning units exist for a scenario`, () => {
       expect(await world.GetLockedOutPlanningUnits()).toEqual(
         world.planningUnitsToBeExcluded(forCase),
       );
-      expect(await world.GetUnstatedPlanningUnits()).toEqual(
+      expect(await world.GetAvailablePlanningUnits()).toEqual(
         world.planningUnitsToBeUntouched(forCase),
       );
     }, 10000);
@@ -95,7 +95,7 @@ describe(`when planning units exist for a scenario`, () => {
       expect(await world.GetLockedOutPlanningUnits()).toEqual(
         world.planningUnitsToBeExcluded(forCase),
       );
-      expect(await world.GetUnstatedPlanningUnits()).toEqual(
+      expect(await world.GetAvailablePlanningUnits()).toEqual(
         world.planningUnitsToBeUntouched(forCase),
       );
     }, 10000);

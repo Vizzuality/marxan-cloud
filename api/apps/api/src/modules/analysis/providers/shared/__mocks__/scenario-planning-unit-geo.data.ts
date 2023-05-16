@@ -9,7 +9,7 @@ export const validDataWithGivenPuIds = (
   scenarioId = 'scenario-0000-fake-uuid',
 ): ScenariosPlanningUnitGeoEntity[] =>
   puids.map((id, index) => ({
-    lockStatus: LockStatus.Unstated,
+    lockStatus: LockStatus.Available,
     protectedByDefault: false,
     scenarioId,
     projectPuId: v4(),

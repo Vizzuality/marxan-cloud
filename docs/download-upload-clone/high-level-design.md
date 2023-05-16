@@ -33,7 +33,7 @@
     * Features geometries for any user-supplied ones
     * Feature specification (dependency on platform-wide features)
     * Cost data per planning unit
-    * Lock status (default, unstated, locked-in, locked-out)
+    * Lock status (default, available, locked-in, locked-out)
     * Marxan settings (iterations, BLM, all advanced settings - input.dat in 
       general)
     * scenario run results (with option to not export or import them)

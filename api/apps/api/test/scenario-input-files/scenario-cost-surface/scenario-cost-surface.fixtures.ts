@@ -33,15 +33,11 @@ export const getFixtures = async () => {
   const viewerUserId = await GivenUserExists(app, 'cc');
   const scenarioViewerRole = ScenarioRoles.scenario_viewer;
   const scenarioContributorRole = ScenarioRoles.scenario_contributor;
-  const { projectId } = await GivenProjectExists(
-    app,
-    ownerToken,
-    {
-      countryId: 'BWA',
-      adminAreaLevel1Id: 'BWA.12_1',
-      adminAreaLevel2Id: 'BWA.12.1_1',
-    },
-  );
+  const { projectId } = await GivenProjectExists(app, ownerToken, {
+    countryId: 'BWA',
+    adminAreaLevel1Id: 'BWA.12_1',
+    adminAreaLevel2Id: 'BWA.12.1_1',
+  });
   let scenarioId: string;
   const geometries: string[] = [];
   const scenariosPuData: string[] = [];
@@ -115,7 +111,7 @@ export const getFixtures = async () => {
       );
 
       const lockStatuses: Record<number, LockStatus | null> = {
-        0: LockStatus.Unstated,
+        0: LockStatus.Available,
         1: LockStatus.LockedIn,
         2: LockStatus.LockedOut,
         3: null,

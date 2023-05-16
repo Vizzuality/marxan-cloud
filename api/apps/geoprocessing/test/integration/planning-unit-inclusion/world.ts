@@ -151,7 +151,7 @@ export const createWorld = async (app: INestApplication) => {
         )
       ).map((pu) => pu.id);
 
-      const puToBeUnstated = (
+      const puToBeAvailable = (
         await scenarioPuDataRepo.save(
           untouchedPu.map((projectPu) =>
             scenarioPuDataRepo.create({
@@ -169,7 +169,7 @@ export const createWorld = async (app: INestApplication) => {
         ...puToBeIncluded,
       );
       geometriesByCase[forCase].planningUnitsToBeUntouched.push(
-        ...puToBeUnstated,
+        ...puToBeAvailable,
       );
     },
     GetLockedInPlanningUnits: async () =>
@@ -194,7 +194,7 @@ export const createWorld = async (app: INestApplication) => {
       )
         .map((entity) => entity.id)
         .sort(sortUuid),
-    GetUnstatedPlanningUnits: async () =>
+    GetAvailablePlanningUnits: async () =>
       /**
        * @debt: refactor this to use .find() with options
        * currently, possibly because of lockStatus property transform and typeorm breaking change,
