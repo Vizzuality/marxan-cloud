@@ -59,9 +59,9 @@ describe('Project - update feature Name', () => {
     );
     await fixtures.ThenUpdateWasForbidden(
       result,
-      projectId,
       featureId,
       originalName,
+      `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
     );
   });
 
@@ -76,9 +76,9 @@ describe('Project - update feature Name', () => {
     );
     await fixtures.ThenUpdateWasForbidden(
       result,
-      projectId,
       featureId,
       originalName,
+      `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
     );
   });
 
@@ -96,9 +96,29 @@ describe('Project - update feature Name', () => {
     );
     await fixtures.ThenUpdateWasForbidden(
       result,
-      viewOnlyProject,
       featureId,
       originalName,
+      `Feature with id ${featureId}, for project with id ${viewOnlyProject}, not editable`,
+    );
+  });
+
+  test('should not permit updating a given feature, when another feature with the same name already exists for the same project', async () => {
+    const originalName = 'originalFeatureName';
+    const sameName = 'sameName';
+    const projectId = fixtures.projectId;
+    const featureId = await fixtures.GivenBaseFeature(originalName, projectId);
+    await fixtures.GivenBaseFeature(sameName, projectId);
+
+    const result = await fixtures.WhenUpdatingFeatureForProject(
+      projectId,
+      featureId,
+      sameName,
+    );
+    await fixtures.ThenUpdateWasForbidden(
+      result,
+      featureId,
+      originalName,
+      `Feature with id ${featureId}, for project with id ${projectId}, cannot be updated: name is already in use`,
     );
   });
 
@@ -171,6 +191,13 @@ const getFixtures = async () => {
     projectId: project.projectId,
     anotherProjectId: anotherProject.projectId,
     cleanup: async () => {
+      //Restore the owner role to anotherProject to avoid errors when cleaning up
+      await userProjectsRepo.save({
+        projectId: anotherProject.projectId,
+        userId: userId,
+        roleName: ProjectRoles.project_owner,
+      });
+
       await geoFeaturesApiRepo.clear();
       await project.cleanup();
       await anotherProject.cleanup();
@@ -228,15 +255,13 @@ const getFixtures = async () => {
     },
     ThenUpdateWasForbidden: async (
       response: request.Response,
-      projectId: string,
       featureId: string,
       originalName: string,
+      errorMessage: string,
     ) => {
       expect(response.status).toEqual(403);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(
-        `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
-      );
+      expect(error.title).toEqual(errorMessage);
 
       const features = await geoFeaturesApiRepo.findOne({
         where: {

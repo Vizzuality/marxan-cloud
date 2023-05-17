@@ -140,6 +140,7 @@ import { updateSolutionsAreLockFailed } from '../legacy-project-import/applicati
 import { blmCreationFailure } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import {
+  featureNameAlreadyInUse,
   featureNotEditable,
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
@@ -783,6 +784,10 @@ export class ProjectsController {
         case featureNotEditable:
           throw new ForbiddenException(
             `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
+          );
+        case featureNameAlreadyInUse:
+          throw new ForbiddenException(
+            `Feature with id ${featureId}, for project with id ${projectId}, cannot be updated: name is already in use`,
           );
       }
     }
