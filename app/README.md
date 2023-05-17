@@ -10,13 +10,11 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with
   use different urls. For now, https://marxan49.westeurope.cloudapp.azure.com is
   the one we use as PROD in frontend.
 
-- `NEXTAUTH_URL`: Needed by the next-auth library for [handling auth requests
+- [`NEXTAUTH_URL`](https://next-auth.js.org/configuration/options#nextauth_url): Needed by the next-auth library for [handling auth requests
   and callbacks](https://next-auth.js.org/configuration/options#nextauth_url).
-  Set the environment variable to the canonical URL of your site. Not needed in
-  Vercel deploys.
+  Set the environment variable to the canonical URL of your site.
   
-- `NEXTAUTH_SECRET`: Secret used to encrypt the session cookie. It can be any
-  string. Not needed in Vercel deploys.
+- [`NEXTAUTH_SECRET`](https://next-auth.js.org/configuration/options#secret): Used to encrypt the NextAuth.js JWT. This variable is **mandatory**.
 
 - `NEXT_PUBLIC_MAPBOX_API_TOKEN`: Mapbox token. It MUST be TNC mapbox token.
 
