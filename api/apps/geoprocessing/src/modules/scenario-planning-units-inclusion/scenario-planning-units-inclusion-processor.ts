@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { MultiPolygon, Polygon } from 'geojson';
-import { difference, flatMap, intersection } from 'lodash';
+import { flatMap, intersection } from 'lodash';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
@@ -11,11 +11,14 @@ import {
   LockStatus,
   ScenariosPlanningUnitGeoEntity,
 } from '@marxan/scenarios-planning-unit';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 @Injectable()
 export class ScenarioPlanningUnitsInclusionProcessor
   implements WorkerProcessor<JobInput, true> {
   constructor(
+    @InjectDataSource(DbConnections.geoprocessingDB)
+    private readonly geoprocessingDataSource: DataSource,
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {}
@@ -47,6 +50,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const scenarioId = job.data.scenarioId;
     const includeGeo = job.data.include?.geo;
     const excludeGeo = job.data.exclude?.geo;
+    const makeAvailableGeo = job.data.makeAvailable?.geo;
 
     const puIdsToInclude: string[] = [];
     const puIdsToExclude: string[] = [];
@@ -84,34 +88,40 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    const puIdsToMakeAvailableFromGeo: string[] = [];
+    if (makeAvailableGeo) {
+      const targetGeometries = flatMap(
+        makeAvailableGeo,
+        (collection) => collection.features,
+      ).map((feature) => feature.geometry);
+      puIdsToMakeAvailableFromGeo.push(
+        ...(
+          await this.getPlanningUnitsIntersectingGeometriesFor(
+            scenarioId,
+            targetGeometries,
+          )
+        ).map(({ spd_id: id }) => id),
+      );
+    }
+
     const puIdsToIncludeFromIds = job.data.include?.pu ?? [];
     const puIdsToExcludeFromIds = job.data.exclude?.pu ?? [];
-
-    // If there are overlaps between opposing claims byId and byGeoJSON, ignore the claims byId
-    const puIdsToIncludeFromIdsLessIdsToExcludeFromGeo = difference(
-      puIdsToIncludeFromIds,
-      puIdsToExcludeFromGeo,
-    );
-    const puIdsToExcludeFromIdsLessIdsToIncludeFromGeo = difference(
-      puIdsToExcludeFromIds,
-      puIdsToIncludeFromGeo,
-    );
+    const puIdsToMakeAvailableFromIds = job.data.makeAvailable?.pu ?? [];
 
     // Union of claims byId and byGeoJSON, for inclusions and for exclusions
     puIdsToInclude.push(
-      ...[
-        ...puIdsToIncludeFromIdsLessIdsToExcludeFromGeo,
-        ...puIdsToIncludeFromGeo,
-      ],
+      ...[...puIdsToIncludeFromIds, ...puIdsToIncludeFromGeo],
     );
     puIdsToExclude.push(
-      ...[
-        ...puIdsToExcludeFromIdsLessIdsToIncludeFromGeo,
-        ...puIdsToExcludeFromGeo,
-      ],
+      ...[...puIdsToExcludeFromIds, ...puIdsToExcludeFromGeo],
+    );
+
+    puIdsToMakeAvailableFromGeo.push(
+      ...[...puIdsToMakeAvailableFromIds, ...puIdsToMakeAvailableFromGeo],
     );
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
+    const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailableFromGeo);
 
     const doInclusionAndExclusionIntersect =
       intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude])
@@ -123,6 +133,36 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
+    const geoprocessingQueryRunner = this.geoprocessingDataSource.createQueryRunner();
+
+    await geoprocessingQueryRunner.connect();
+    await geoprocessingQueryRunner.startTransaction();
+
+    try {
+      await this.applyClaims(
+        scenarioId,
+        uniquePuIdsToInclude,
+        uniquePuIdsToExclude,
+        uniquePuIdsToMakeAvailable,
+      );
+
+      await geoprocessingQueryRunner.commitTransaction();
+    } catch (err) {
+      await geoprocessingQueryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await geoprocessingQueryRunner.release();
+    }
+
+    return true;
+  }
+
+  private async applyClaims(
+    scenarioId: string,
+    uniquePuIdsToInclude: Set<string>,
+    uniquePuIdsToExclude: Set<string>,
+    uniquePuIdsToMakeAvailable: Set<string>,
+  ) {
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
@@ -166,9 +206,18 @@ export class ScenarioPlanningUnitsInclusionProcessor
         setByUser: true,
       },
     );
-    return true;
-  }
 
+    await this.scenarioPlanningUnitsRepo.update(
+      {
+        scenarioId,
+        id: In([...uniquePuIdsToMakeAvailable]),
+      },
+      {
+        lockStatus: LockStatus.Available,
+        setByUser: true,
+      },
+    );
+  }
   private async getPlanningUnitsIntersectingGeometriesFor(
     scenarioId: string,
     geometries: (Polygon | MultiPolygon)[],
