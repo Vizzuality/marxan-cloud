@@ -50,6 +50,7 @@ type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
 export const featureNotFound = Symbol('feature not found');
 export const featureNotEditable = Symbol('feature cannot be edited');
+export const featureNameAlreadyInUse = Symbol('feature name already in use');
 
 export type FindResult = {
   data: (Partial<GeoFeature> | undefined)[];
@@ -403,8 +404,9 @@ export class GeoFeaturesService extends AppBaseService<
     Either<
       | typeof featureNotFound
       | typeof featureNotEditable
-      | typeof projectNotFound,
-      any
+      | typeof projectNotFound
+      | typeof featureNameAlreadyInUse,
+      true
     >
   > {
     const project = await this.projectRepository.findOne({
@@ -427,6 +429,16 @@ export class GeoFeaturesService extends AppBaseService<
       !(await this.projectAclService.canEditProject(userId, projectId))
     ) {
       return left(featureNotEditable);
+    }
+
+    const projectsWithSameName = await this.geoFeaturesRepository.count({
+      where: {
+        featureClassName: updateFeatureNameDto.featureClassName,
+        projectId,
+      },
+    });
+    if (projectsWithSameName > 0) {
+      return left(featureNameAlreadyInUse);
     }
 
     await this.geoFeaturesRepository.update(featureId, {
