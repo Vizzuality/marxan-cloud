@@ -4,6 +4,8 @@ on:
       paths:
         - 'app/**'
         - ".github/workflows/cypress.yml"
+      - paths-ignore:
+        - 'app/README.md'
 jobs:
   cypress:
     runs-on: ubuntu-22.04
