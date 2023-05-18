@@ -11,13 +11,13 @@ import {
   LockStatus,
   ScenariosPlanningUnitGeoEntity,
 } from '@marxan/scenarios-planning-unit';
-import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 @Injectable()
 export class ScenarioPlanningUnitsInclusionProcessor
   implements WorkerProcessor<JobInput, true> {
   constructor(
-    @InjectDataSource(DbConnections.geoprocessingDB)
+    @InjectDataSource(geoprocessingConnections.default)
     private readonly geoprocessingDataSource: DataSource,
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,
@@ -145,7 +145,6 @@ export class ScenarioPlanningUnitsInclusionProcessor
         uniquePuIdsToExclude,
         uniquePuIdsToMakeAvailable,
       );
-
       await geoprocessingQueryRunner.commitTransaction();
     } catch (err) {
       await geoprocessingQueryRunner.rollbackTransaction();
@@ -162,7 +161,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     uniquePuIdsToInclude: Set<string>,
     uniquePuIdsToExclude: Set<string>,
     uniquePuIdsToMakeAvailable: Set<string>,
-  ) {
+  ): Promise<void> {
     await this.scenarioPlanningUnitsRepo.update(
       {
         scenarioId,
