@@ -9,18 +9,20 @@ import { invalidMultiPolygon, sampleMultiPolygonJson } from './geometry';
 export const getDtoByIds = (
   include: string[],
   exclude: string[],
+  makeAvailable: string[],
 ): UpdateScenarioPlanningUnitLockStatusDto => {
   const withInvalidIds: UpdateScenarioPlanningUnitLockStatusDto = new UpdateScenarioPlanningUnitLockStatusDto();
   const withOptions = new PlanningUnitsByIdUpdateDto();
   withOptions.include = include;
   withOptions.exclude = exclude;
+  withOptions.makeAvailable = makeAvailable;
   withInvalidIds.byId = withOptions;
 
   return withInvalidIds;
 };
 
 export const getDtoWithInvalidUuids = (): UpdateScenarioPlanningUnitLockStatusDto =>
-  getDtoByIds(['non-uuid'], [v4()]);
+  getDtoByIds(['non-uuid'], [v4()], [v4()]);
 
 export const getDtoWithInvalidMultiPolygon = (): UpdateScenarioPlanningUnitLockStatusDto => {
   const withInvalidIds: UpdateScenarioPlanningUnitLockStatusDto = new UpdateScenarioPlanningUnitLockStatusDto();

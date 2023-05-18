@@ -98,6 +98,35 @@ describe(`when planning units exist for a scenario`, () => {
       expect(await world.GetAvailablePlanningUnits()).toEqual(
         world.planningUnitsToBeUntouched(forCase),
       );
+
+      /** Use case for changing the status of previously excluded PUs to available
+       * resulting to scenario having same included PUs, rest of PUs available and no excluded PUs
+       **/
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          makeAvailable: {
+            geo: [excludeSample()],
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      expect(await world.GetLockedInPlanningUnits()).toEqual(
+        world.planningUnitsToBeIncluded(forCase),
+      );
+      expect(await world.GetLockedOutPlanningUnits()).toEqual([]);
+      expect(await world.GetAvailablePlanningUnits()).toEqual(
+        world
+          .planningUnitsToBeExcluded(forCase)
+          .concat(world.planningUnitsToBeUntouched(forCase))
+          .sort((a: string, b: string) => a.localeCompare(b)),
+      );
+
+      // PUs initially excluded are must now be available, with status changed by user equals to true
+
+      expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
+        world.planningUnitsToBeExcluded(forCase),
+      );
     }, 10000);
   });
 
