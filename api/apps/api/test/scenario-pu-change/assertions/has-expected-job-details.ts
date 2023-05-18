@@ -28,7 +28,7 @@ export const HasExpectedJobDetails = (job: Job) =>
       },
       "makeAvailable": Object {
         "geo": undefined,
-        "pu": undefined,
+        "pu": Array [],
       },
       "scenarioId": Any<String>,
     }
