@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -33,6 +33,7 @@ import { Either, left, right } from 'fp-ts/lib/Either';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
+import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -51,6 +52,10 @@ type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 export const featureNotFound = Symbol('feature not found');
 export const featureNotEditable = Symbol('feature cannot be edited');
 export const featureNameAlreadyInUse = Symbol('feature name already in use');
+export const featureNotDeletable = Symbol('feature cannot be deleted');
+export const featureIsLinkedToOneOrMoreScenarios = Symbol(
+  'feature is linked to one or more scenarios',
+);
 
 export type FindResult = {
   data: (Partial<GeoFeature> | undefined)[];
@@ -78,6 +83,8 @@ export class GeoFeaturesService extends AppBaseService<
     @InjectRepository(Scenario)
     private readonly scenarioRepository: Repository<Scenario>,
     private readonly geoFeaturesPropertySet: GeoFeaturePropertySetService,
+    @Inject(forwardRef(() => ScenarioFeaturesService))
+    private readonly scenarioFeaturesService: ScenarioFeaturesService,
     private readonly projectAclService: ProjectAclService,
   ) {
     super(
@@ -444,6 +451,61 @@ export class GeoFeaturesService extends AppBaseService<
     await this.geoFeaturesRepository.update(featureId, {
       featureClassName: updateFeatureNameDto.featureClassName,
     });
+
+    return right(true);
+  }
+
+  public async deleteFeature(
+    userId: string,
+    projectId: string,
+    featureId: string,
+  ): Promise<
+    Either<
+      | typeof projectNotFound
+      | typeof featureNotFound
+      | typeof featureIsLinkedToOneOrMoreScenarios
+      | typeof featureNotDeletable,
+      any
+    >
+  > {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+    });
+    if (!project) {
+      return left(projectNotFound);
+    }
+
+    const feature = await this.geoFeaturesRepository.findOne({
+      where: { id: featureId },
+    });
+    if (!feature) {
+      return left(featureNotFound);
+    }
+
+    if (
+      await this.scenarioFeaturesService.isFeaturePresentInAnyScenario(
+        featureId,
+      )
+    ) {
+      return left(featureIsLinkedToOneOrMoreScenarios);
+    }
+
+    if (
+      !feature.isCustom ||
+      feature.projectId !== projectId ||
+      !(await this.projectAclService.canDeleteFeatureInProject(
+        userId,
+        projectId,
+      ))
+    ) {
+      return left(featureNotDeletable);
+    }
+
+    // NOTE
+    // This deletes the feature on the API DB but not on the GEO DB. That task is left up to the CleanupTasks
+    // cronjob; the cronjob is not activated manually because it may take a non trivial amount of time because
+    // of other data to be garbage collected
+    await this.repository.delete(featureId);
 
     return right(true);
   }

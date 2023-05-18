@@ -141,6 +141,8 @@ import { blmCreationFailure } from '../scenarios/blm-calibration/create-initial-
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import {
   featureNameAlreadyInUse,
+  featureIsLinkedToOneOrMoreScenarios,
+  featureNotDeletable,
   featureNotEditable,
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
@@ -788,6 +790,53 @@ export class ProjectsController {
         case featureNameAlreadyInUse:
           throw new ForbiddenException(
             `Feature with id ${featureId}, for project with id ${projectId}, cannot be updated: name is already in use`,
+          );
+      }
+    }
+
+    return;
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: 'Deletes a feature that is related tot he given projectId',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project',
+  })
+  @ApiParam({
+    name: 'featureId',
+    description: 'ID of the Feature to be deleted',
+  })
+  @ApiTags(inlineJobTag)
+  @Delete(':projectId/features/:featureId')
+  async deleteFeature(
+    @Param('projectId') projectId: string,
+    @Param('featureId') featureId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.geoFeatureService.deleteFeature(
+      req.user.id,
+      projectId,
+      featureId,
+    );
+
+    if (isLeft(result)) {
+      switch (result.left) {
+        case projectNotFound:
+          throw new NotFoundException(`Project with id ${projectId} not found`);
+        case featureNotFound:
+          throw new NotFoundException(
+            `Feature with id ${featureId}, for project with id ${projectId}, not found`,
+          );
+        case featureIsLinkedToOneOrMoreScenarios:
+          throw new ForbiddenException(
+            `Feature with id ${featureId}, for project with id ${projectId}, still has Scenarios linked to it`,
+          );
+        case featureNotDeletable:
+          throw new ForbiddenException(
+            `Feature with id ${featureId}, for project with id ${projectId}, cannot be deleted`,
           );
       }
     }
