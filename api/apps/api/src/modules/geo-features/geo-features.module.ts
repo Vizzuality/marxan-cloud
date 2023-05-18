@@ -17,6 +17,7 @@ import { ProcessingModule } from './processing';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ProjectAclModule } from '@marxan-api/modules/access-control/projects-acl/project-acl.module';
+import { ScenarioFeaturesModule } from '@marxan-api/modules/scenarios-features';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ProjectAclModule } from '@marxan-api/modules/access-control/projects-ac
     ProcessingModule,
     forwardRef(() => ProjectsModule),
     ProjectAclModule,
+    forwardRef(() => ScenarioFeaturesModule),
   ],
   providers: [
     GeoFeaturesService,

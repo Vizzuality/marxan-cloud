@@ -57,6 +57,10 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_contributor,
     ProjectRoles.project_viewer,
   ];
+  private readonly canDeleteFeatureInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
 
   constructor(
     @InjectDataSource(DbConnections.default)
@@ -69,30 +73,6 @@ export class ProjectAclService implements ProjectAccessControl {
     private readonly publishedProjectRepo: Repository<PublishedProject>,
     private readonly lockService: LockService,
   ) {}
-
-  private async getRolesWithinProjectForUser(
-    userId: string,
-    projectId: string,
-  ): Promise<Array<ProjectRoles>> {
-    const rolesToCheck = (
-      await this.roles.find({
-        where: {
-          projectId,
-          userId,
-        },
-        select: ['roleName'],
-      })
-    ).flatMap((role) => role.roleName);
-
-    return rolesToCheck;
-  }
-
-  private async doesUserHaveRole(
-    roles: ProjectRoles[],
-    rolesToCheck: ProjectRoles[],
-  ): Promise<Permit> {
-    return intersection(roles, rolesToCheck).length > 0;
-  }
 
   // TODO: this will be changed in the following release of user requirements.
   // For now, anyone should be able to create projects, regardless of having
@@ -174,6 +154,18 @@ export class ProjectAclService implements ProjectAccessControl {
     );
 
     return userHasPermit || isPublic;
+  }
+
+  async canDeleteFeatureInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    const userhasPermit = await this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canDeleteFeatureInProjectRoles,
+    );
+
+    return userhasPermit;
   }
 
   async isOwner(userId: string, projectId: string): Promise<Permit> {
@@ -334,6 +326,30 @@ export class ProjectAclService implements ProjectAccessControl {
 
     await this.roles.delete({ projectId, userId });
     return right(void 0);
+  }
+
+  private async getRolesWithinProjectForUser(
+    userId: string,
+    projectId: string,
+  ): Promise<Array<ProjectRoles>> {
+    const rolesToCheck = (
+      await this.roles.find({
+        where: {
+          projectId,
+          userId,
+        },
+        select: ['roleName'],
+      })
+    ).flatMap((role) => role.roleName);
+
+    return rolesToCheck;
+  }
+
+  private async doesUserHaveRole(
+    roles: ProjectRoles[],
+    rolesToCheck: ProjectRoles[],
+  ): Promise<Permit> {
+    return intersection(roles, rolesToCheck).length > 0;
   }
 
   private async isProjectPublic(projectId: string): Promise<boolean> {
