@@ -80,11 +80,12 @@ export class ScenarioFeaturesService extends AppBaseService<
   }
 
   async isFeaturePresentInAnyScenario(featureId: string): Promise<boolean> {
-    const count = await this.remoteScenarioFeatures.query(
-      `select count(*) from scenario_features_data where feature_class_id in (select id from features_data where feature_id = '${featureId}')`,
+    const result = await this.remoteScenarioFeatures.query(
+      `select count(*) from scenario_features_data where feature_class_id in (select id from features_data where feature_id = $1)`,
+      [featureId],
     );
 
-    return count > 0;
+    return result[0].count > 0;
   }
 
   get serializerConfig(): JSONAPISerializerConfig<ScenarioFeaturesData> {

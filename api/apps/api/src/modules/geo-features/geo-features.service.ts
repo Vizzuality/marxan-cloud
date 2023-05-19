@@ -465,7 +465,7 @@ export class GeoFeaturesService extends AppBaseService<
       | typeof featureNotFound
       | typeof featureIsLinkedToOneOrMoreScenarios
       | typeof featureNotDeletable,
-      any
+      true
     >
   > {
     const project = await this.projectRepository.findOne({
