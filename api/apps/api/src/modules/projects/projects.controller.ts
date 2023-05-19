@@ -799,7 +799,7 @@ export class ProjectsController {
 
   @ImplementsAcl()
   @ApiOperation({
-    description: 'Deletes a feature that is related tot he given projectId',
+    description: 'Deletes a feature that is related to the given projectId',
   })
   @ApiParam({
     name: 'projectId',

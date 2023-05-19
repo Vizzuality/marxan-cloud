@@ -1,16 +1,24 @@
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { GivenProjectExists } from '../steps/given-project';
 import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { bootstrapApplication } from '../utils/api-application';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { v4 } from 'uuid';
-import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import {
+  JobStatus,
+  Scenario,
+} from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dto/user-role-project.dto';
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { GivenUserExists } from '../steps/given-user-exists';
+import { GivenScenarioFeaturesData } from '../../../geoprocessing/test/integration/cloning/fixtures';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import { apiConnections } from '@marxan-api/ormconfig';
+import { GivenScenarioExists } from '../steps/given-scenario-exists';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -81,19 +89,19 @@ describe('Project - Delete Feature', () => {
   });
 
   test('should not permit updating a given feature, when it is still linked to a scenario', async () => {
-    const viewOnlyProjectId = fixtures.anotherProjectId;
-    const featureId = await fixtures.GivenBaseFeature(
+    const projectId = fixtures.projectId;
+    const featureId = await fixtures.GivenBaseFeatureLinkedToScenario(
       'linkedFeature',
-      viewOnlyProjectId,
+      projectId,
     );
     const result = await fixtures.WhenDeletingFeatureForProject(
-      viewOnlyProjectId,
+      projectId,
       featureId,
     );
     await fixtures.ThenDeleteWasForbidden(
       result,
       featureId,
-      `Feature with id ${featureId}, for project with id ${viewOnlyProjectId}, cannot be deleted`,
+      `Feature with id ${featureId}, for project with id ${projectId}, still has Scenarios linked to it`,
     );
   });
 
@@ -114,7 +122,7 @@ describe('Project - Delete Feature', () => {
     );
   });
 
-  test('should delete the name of a feature, when permitted', async () => {
+  test('should delete a feature, when permitted', async () => {
     const projectId = fixtures.projectId;
     const featureId = await fixtures.GivenBaseFeature(
       'deletedFeature',
@@ -144,6 +152,15 @@ const getFixtures = async () => {
   );
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
+  );
+  const featuresDataRepo: Repository<GeoFeatureGeometry> = app.get(
+    getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
+  );
+  const scenarioRepo: Repository<Scenario> = app.get(
+    getRepositoryToken(Scenario),
+  );
+  const geoEntityManager: EntityManager = app.get(
+    getEntityManagerToken(apiConnections.geoprocessingDB.name),
   );
 
   const project = await GivenProjectExists(
@@ -192,6 +209,8 @@ const getFixtures = async () => {
     anotherProjectId: anotherProject.projectId,
     cleanup: async () => {
       await geoFeaturesApiRepo.clear();
+      await featuresDataRepo.delete({});
+      await scenarioRepo.delete({});
       await project.cleanup();
 
       //restores the project owner role because if not an error will throw when deleting
@@ -205,6 +224,33 @@ const getFixtures = async () => {
     },
     GivenNonExistentProjectId: () => {
       return v4();
+    },
+    GivenBaseFeatureLinkedToScenario: async (
+      featureClassName: string,
+      projectId: string,
+    ) => {
+      const linkedFeature = await geoFeaturesApiRepo.save({
+        id: v4(),
+        featureClassName,
+        projectId,
+        creationStatus: JobStatus.created,
+      });
+
+      const linkedScenario = await GivenScenarioExists(
+        app,
+        projectId,
+        userToken,
+        { name: 'linkedScenario' },
+      );
+
+      await GivenScenarioFeaturesData(
+        geoEntityManager,
+        1,
+        [linkedFeature.id],
+        linkedScenario.id,
+        { name: 'linked scenario features data' },
+      );
+      return linkedFeature.id;
     },
 
     // ARRANGE
