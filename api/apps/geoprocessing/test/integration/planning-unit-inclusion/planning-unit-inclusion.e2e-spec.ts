@@ -12,6 +12,7 @@ import {
   includeSample,
   includeSampleWithSingleFeature,
   includeSampleOverlappingWithExclude,
+  makeAvailableSampleWithSingleFeature,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
 import { Job } from 'bullmq';
 
@@ -51,6 +52,9 @@ describe(`when planning units exist for a scenario`, () => {
           exclude: {
             geo: [excludeSampleWithSingleFeature()],
           },
+          makeAvailable: {
+            geo: [makeAvailableSampleWithSingleFeature()],
+          },
         },
       } as unknown) as Job<JobInput>);
 
@@ -59,6 +63,9 @@ describe(`when planning units exist for a scenario`, () => {
       );
       expect(await world.GetLockedOutPlanningUnits()).toEqual(
         world.planningUnitsToBeExcluded(forCase),
+      );
+      expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
+        world.planningUnitsToBeMadeAvailable(forCase),
       );
       expect(await world.GetAvailablePlanningUnits()).toEqual(
         world.planningUnitsToBeUntouched(forCase),
@@ -98,48 +105,47 @@ describe(`when planning units exist for a scenario`, () => {
       expect(await world.GetAvailablePlanningUnits()).toEqual(
         world.planningUnitsToBeUntouched(forCase),
       );
+    }, 10000);
 
-      /** Use case for changing the status of previously excluded PUs to available
-       * resulting to scenario having same included PUs, rest of PUs available and no excluded PUs
+    it(`marks available status of pu initially excluded and made available after`, async () => {
+      const sampleToBeExcludedFirst = excludeSample();
+      const sampleToBeMadeAvailableAfterExcluding = excludeSample();
+
+      /**
+       * First step - excluding selected PUs
+       **/
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          exclude: {
+            geo: [sampleToBeExcludedFirst],
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      expect(await world.GetLockedOutPlanningUnits()).toEqual(
+        world.planningUnitsToBeExcluded(forCase),
+      );
+
+      /**
+       * Second step - making available PUs initially excluded
        **/
       await sut.process(({
         data: {
           scenarioId: world.scenarioId,
           makeAvailable: {
-            geo: [excludeSample()],
+            geo: [sampleToBeMadeAvailableAfterExcluding],
           },
         },
       } as unknown) as Job<JobInput>);
 
-      expect(await world.GetLockedInPlanningUnits()).toEqual(
-        world.planningUnitsToBeIncluded(forCase),
-      );
       expect(await world.GetLockedOutPlanningUnits()).toEqual([]);
-      expect(await world.GetAvailablePlanningUnits()).toEqual(
-        world
-          .planningUnitsToBeExcluded(forCase)
-          .concat(world.planningUnitsToBeUntouched(forCase))
-          .sort((a: string, b: string) => a.localeCompare(b)),
-      );
-
       // PUs initially excluded are must now be available, with status changed by user equals to true
 
       expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
-        world.planningUnitsToBeExcluded(forCase),
+        world.planningUnitsToBeMadeAvailableAfterExclusion(forCase),
       );
     }, 10000);
-  });
-
-  describe('when setting inclusions by id and exclusions by GeoJSON', () => {
-    it.todo(
-      'if there are overlaps between these, then exclusions set by GeoJSON should be applied',
-    );
-  });
-
-  describe('when setting exclusions by id and inclusions by GeoJSON', () => {
-    it.todo(
-      'if there are overlaps between these, then inclusions set by GeoJSON should be applied',
-    );
   });
 
   describe('When there are contrasting claims for inclusion and exclusion on one or more planning units', () => {
