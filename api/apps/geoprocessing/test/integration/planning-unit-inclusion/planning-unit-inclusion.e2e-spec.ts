@@ -106,19 +106,19 @@ describe(`when planning units exist for a scenario`, () => {
         world.planningUnitsToBeUntouched(forCase),
       );
     }, 10000);
-
-    it(`marks available status of pu initially excluded and made available after`, async () => {
-      const sampleToBeExcludedFirst = excludeSample();
-      const sampleToBeMadeAvailableAfterExcluding = excludeSample();
-
+    it(`marks pu initially excluded in available status after using makeAvailbale claims`, async () => {
       /**
        * First step - excluding selected PUs
        **/
+
       await sut.process(({
         data: {
           scenarioId: world.scenarioId,
+          include: {
+            geo: [includeSample()],
+          },
           exclude: {
-            geo: [sampleToBeExcludedFirst],
+            geo: [excludeSample()],
           },
         },
       } as unknown) as Job<JobInput>);
@@ -134,7 +134,7 @@ describe(`when planning units exist for a scenario`, () => {
         data: {
           scenarioId: world.scenarioId,
           makeAvailable: {
-            geo: [sampleToBeMadeAvailableAfterExcluding],
+            geo: [excludeSample()],
           },
         },
       } as unknown) as Job<JobInput>);

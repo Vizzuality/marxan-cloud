@@ -35,7 +35,7 @@ export const createWorld = async (app: INestApplication) => {
     ScenariosPlanningUnitGeoEntity,
   );
 
-  const geometriesByCase: {
+  let geometriesByCase: {
     [k in ForCase]: {
       storedGeometries: string[];
       planningUnitsToBeExcluded: string[];
@@ -279,6 +279,25 @@ export const createWorld = async (app: INestApplication) => {
       await puGeometryRepo.delete({
         id: In(geometriesByCase[forCase].storedGeometries),
       });
+
+      geometriesByCase = {
+        singleFeature: {
+          storedGeometries: [],
+          planningUnitsToBeExcluded: [],
+          planningUnitsToBeIncluded: [],
+          planningUnitsToBeMadeAvailable: [],
+          planningUnitsToBeUntouched: [],
+          planningUnitsToBeAvailableAfterExclusion: [],
+        },
+        multipleFeatures: {
+          storedGeometries: [],
+          planningUnitsToBeExcluded: [],
+          planningUnitsToBeIncluded: [],
+          planningUnitsToBeMadeAvailable: [],
+          planningUnitsToBeUntouched: [],
+          planningUnitsToBeAvailableAfterExclusion: [],
+        },
+      };
     },
   };
 };
