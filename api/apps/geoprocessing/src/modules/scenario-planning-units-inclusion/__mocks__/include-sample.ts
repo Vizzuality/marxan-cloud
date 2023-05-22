@@ -224,10 +224,41 @@ export const includeSampleWithSingleFeature = (): FeatureCollection<
   ],
 });
 
+export const makeAvailableSampleWithSingleFeature = (): FeatureCollection<
+  Polygon | MultiPolygon
+> => ({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        stroke: '#555555',
+        'stroke-width': 2,
+        'stroke-opacity': 1,
+        fill: '#dbae4d',
+        'fill-opacity': 0.5,
+      },
+      geometry: {
+        coordinates: [
+          [
+            [-9.912621326936375, 51.65495466532562],
+            [-9.912621326936375, 51.6538833660135],
+            [-9.91081650113756, 51.6538833660135],
+            [-9.91081650113756, 51.65495466532562],
+            [-9.912621326936375, 51.65495466532562],
+          ],
+        ],
+        type: 'Polygon',
+      },
+    },
+  ],
+});
+
 export type AreaUnitSampleGeometryProps = {
   [k in ForCase]: {
     shouldBeExcluded: boolean;
     shouldBeIncluded: boolean;
+    shouldBeMadeAvailable: boolean;
     protectedByDefault?: boolean;
   };
 };
@@ -246,10 +277,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: true,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: true,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -271,10 +304,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: true,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -296,10 +331,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -321,10 +358,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -346,10 +385,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -371,10 +412,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -396,10 +439,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: true,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -421,10 +466,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -446,10 +493,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -471,10 +520,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -497,10 +548,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
           shouldBeExcluded: false,
           shouldBeIncluded: false,
           protectedByDefault: true,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: true,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
@@ -522,10 +575,12 @@ export const areaUnitsSample = (forCase: string): AreaUnitSampleGeometry => ({
         singleFeature: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
         multipleFeatures: {
           shouldBeExcluded: false,
           shouldBeIncluded: false,
+          shouldBeMadeAvailable: false,
         },
       },
       geometry: {
