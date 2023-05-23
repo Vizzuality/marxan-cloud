@@ -162,6 +162,36 @@ export const includeSampleOverlappingWithExclude = (): FeatureCollection<
   ],
 });
 
+export const makeAvailableSampleOverlappingWithExclude = (): FeatureCollection<
+  Polygon | MultiPolygon
+> => ({
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: {
+        stroke: '#555555',
+        'stroke-width': 2,
+        'stroke-opacity': 1,
+        fill: '#db9e1a',
+        'fill-opacity': 0.5,
+      },
+      geometry: {
+        coordinates: [
+          [
+            [-9.914670048111162, 51.65501518995541],
+            [-9.914670048111162, 51.65385310295383],
+            [-9.911509164009601, 51.65385310295383],
+            [-9.911509164009601, 51.65501518995541],
+            [-9.914670048111162, 51.65501518995541],
+          ],
+        ],
+        type: 'Polygon',
+      },
+    },
+  ],
+});
+
 export const excludeSampleWithSingleFeature = (): FeatureCollection<
   Polygon | MultiPolygon
 > => ({

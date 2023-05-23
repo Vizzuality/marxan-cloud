@@ -13,6 +13,7 @@ import {
   includeSampleWithSingleFeature,
   includeSampleOverlappingWithExclude,
   makeAvailableSampleWithSingleFeature,
+  makeAvailableSampleOverlappingWithExclude,
 } from '@marxan-geoprocessing/modules/scenario-planning-units-inclusion/__mocks__/include-sample';
 import { Job } from 'bullmq';
 
@@ -148,7 +149,7 @@ describe(`when planning units exist for a scenario`, () => {
     }, 10000);
   });
 
-  describe('When there are contrasting claims for inclusion and exclusion on one or more planning units', () => {
+  describe('When there are contrasting claims on one or more planning units', () => {
     const forCase: ForCase = 'multipleFeatures';
     beforeEach(async () => {
       await world.GivenPlanningUnitsExist(forCase, areaUnitsSample(forCase));
@@ -158,13 +159,29 @@ describe(`when planning units exist for a scenario`, () => {
       await world?.cleanup('multipleFeatures');
     });
 
-    it(`the operation should be rejected with an error`, async () => {
+    it(`the operation should be rejected with an error when include and exclude PUs overlap`, async () => {
       await expect(
         sut.process(({
           data: {
             scenarioId: world.scenarioId,
             include: {
               geo: [includeSampleOverlappingWithExclude()],
+            },
+            exclude: {
+              geo: [excludeSample()],
+            },
+          },
+        } as unknown) as Job<JobInput>),
+      ).rejects.toThrow(/Contrasting claims/);
+    }, 10000);
+
+    it(`the operation should be rejected with an error when makeAvailable and exclude PUs overlap`, async () => {
+      await expect(
+        sut.process(({
+          data: {
+            scenarioId: world.scenarioId,
+            makeAvailable: {
+              geo: [makeAvailableSampleOverlappingWithExclude()],
             },
             exclude: {
               geo: [excludeSample()],

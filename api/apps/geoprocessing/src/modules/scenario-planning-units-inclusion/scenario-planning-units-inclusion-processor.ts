@@ -54,6 +54,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
 
     const puIdsToInclude: string[] = [];
     const puIdsToExclude: string[] = [];
+    const puIdsToMakeAvailable: string[] = [];
 
     const puIdsToIncludeFromGeo: string[] = [];
     if (includeGeo) {
@@ -116,20 +117,40 @@ export class ScenarioPlanningUnitsInclusionProcessor
       ...[...puIdsToExcludeFromIds, ...puIdsToExcludeFromGeo],
     );
 
-    puIdsToMakeAvailableFromGeo.push(
+    puIdsToMakeAvailable.push(
       ...[...puIdsToMakeAvailableFromIds, ...puIdsToMakeAvailableFromGeo],
     );
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
-    const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailableFromGeo);
+    const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailable);
 
     const doInclusionAndExclusionIntersect =
       intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude])
         .length > 0;
 
+    const doMakeAvailableAndExclusionIntersect =
+      intersection([...uniquePuIdsToMakeAvailable], [...uniquePuIdsToExclude])
+        .length > 0;
+
+    const doMakeAvailableAndInclusionIntersect =
+      intersection([...uniquePuIdsToMakeAvailable], [...uniquePuIdsToInclude])
+        .length > 0;
+
     if (doInclusionAndExclusionIntersect) {
       throw new Error(
         'Contrasting claims for inclusion and exclusion have been made for some of the planning units: please check your selections.',
+      );
+    }
+
+    if (doMakeAvailableAndExclusionIntersect) {
+      throw new Error(
+        'Contrasting claims for makeAvailable and exclusion have been made for some of the planning units: please check your selections.',
+      );
+    }
+
+    if (doMakeAvailableAndInclusionIntersect) {
+      throw new Error(
+        'Contrasting claims for makeAvailable and inclusion have been made for some of the planning units: please check your selections.',
       );
     }
 
