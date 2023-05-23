@@ -236,6 +236,19 @@ export const createWorld = async (app: INestApplication) => {
       )
         .map((entity) => entity.id)
         .sort(sortUuid),
+    GetLockedInByProtectedAreaPlanningUnits: async () =>
+      (
+        await scenarioPuDataRepo.find({
+          where: {
+            scenarioId,
+            lockStatus: LockStatus.LockedIn,
+            protectedByDefault: true,
+            setByUser: false,
+          },
+        })
+      )
+        .map((entity) => entity.id)
+        .sort(sortUuid),
     GetLockedOutPlanningUnits: async () =>
       (
         await scenarioPuDataRepo.find({
@@ -271,6 +284,7 @@ export const createWorld = async (app: INestApplication) => {
           .where('scenarioPuData.scenario_id = :scenarioId', { scenarioId })
           .andWhere('scenarioPuData.lockin_status IS NULL')
           .andWhere('scenarioPuData.lock_status_set_by_user = true')
+          .andWhere('scenarioPuData.protected_by_default = false')
           .getMany()
       )
         .map((entity) => entity.id)
