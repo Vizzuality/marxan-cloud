@@ -154,25 +154,14 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
-    const geoprocessingQueryRunner = this.geoprocessingDataSource.createQueryRunner();
-
-    await geoprocessingQueryRunner.connect();
-    await geoprocessingQueryRunner.startTransaction();
-
-    try {
+    await this.scenarioPlanningUnitsRepo.manager.transaction(async () => {
       await this.applyClaims(
         scenarioId,
         uniquePuIdsToInclude,
         uniquePuIdsToExclude,
         uniquePuIdsToMakeAvailable,
       );
-      await geoprocessingQueryRunner.commitTransaction();
-    } catch (err) {
-      await geoprocessingQueryRunner.rollbackTransaction();
-      throw err;
-    } finally {
-      await geoprocessingQueryRunner.release();
-    }
+    });
 
     return true;
   }
