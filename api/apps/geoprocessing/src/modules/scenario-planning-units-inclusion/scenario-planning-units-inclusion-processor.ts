@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import { MultiPolygon, Polygon } from 'geojson';
 import { flatMap, intersection } from 'lodash';
 import { Job } from 'bullmq';
@@ -17,8 +17,6 @@ import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 export class ScenarioPlanningUnitsInclusionProcessor
   implements WorkerProcessor<JobInput, true> {
   constructor(
-    @InjectDataSource(geoprocessingConnections.default)
-    private readonly geoprocessingDataSource: DataSource,
     @InjectRepository(ScenariosPlanningUnitGeoEntity)
     private readonly scenarioPlanningUnitsRepo: Repository<ScenariosPlanningUnitGeoEntity>,
   ) {}
@@ -134,8 +132,9 @@ export class ScenarioPlanningUnitsInclusionProcessor
       );
     }
 
-    await this.scenarioPlanningUnitsRepo.manager.transaction(async () => {
+    await this.scenarioPlanningUnitsRepo.manager.transaction(async (transactionalEntityManager) => {
       await this.applyClaims(
+        transactionalEntityManager,
         scenarioId,
         uniquePuIdsToInclude,
         uniquePuIdsToExclude,
@@ -147,12 +146,14 @@ export class ScenarioPlanningUnitsInclusionProcessor
   }
 
   private async applyClaims(
+    transactionalEntityManager: EntityManager,
     scenarioId: string,
     uniquePuIdsToInclude: Set<string>,
     uniquePuIdsToExclude: Set<string>,
     uniquePuIdsToMakeAvailable: Set<string>,
   ): Promise<void> {
-    await this.scenarioPlanningUnitsRepo.update(
+    await transactionalEntityManager.update(
+      ScenariosPlanningUnitGeoEntity,
       {
         scenarioId,
         protectedByDefault: false,
@@ -163,7 +164,8 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
     );
 
-    await this.scenarioPlanningUnitsRepo.update(
+    await transactionalEntityManager.update(
+      ScenariosPlanningUnitGeoEntity,
       {
         scenarioId,
         protectedByDefault: true,
@@ -174,7 +176,8 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
     );
 
-    await this.scenarioPlanningUnitsRepo.update(
+    await transactionalEntityManager.update(
+      ScenariosPlanningUnitGeoEntity,
       {
         scenarioId,
         id: In([...uniquePuIdsToInclude]),
@@ -185,7 +188,8 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
     );
 
-    await this.scenarioPlanningUnitsRepo.update(
+    await transactionalEntityManager.update(
+      ScenariosPlanningUnitGeoEntity,
       {
         scenarioId,
         id: In([...uniquePuIdsToExclude]),
@@ -196,7 +200,8 @@ export class ScenarioPlanningUnitsInclusionProcessor
       },
     );
 
-    await this.scenarioPlanningUnitsRepo.update(
+    await transactionalEntityManager.update(
+      ScenariosPlanningUnitGeoEntity,
       {
         scenarioId,
         id: In([...uniquePuIdsToMakeAvailable]),
