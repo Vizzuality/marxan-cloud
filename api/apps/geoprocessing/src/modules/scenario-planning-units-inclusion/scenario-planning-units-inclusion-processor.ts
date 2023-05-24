@@ -122,11 +122,7 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
     const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailable);
 
-    const doClaimsIntersect =
-      intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude], [...uniquePuIdsToMakeAvailable])
-        .length > 0;
-
-    if (doClaimsIntersect) {
+    if (this.doClaimsIntersect([...uniquePuIdsToInclude], [...uniquePuIdsToExclude], [...uniquePuIdsToMakeAvailable])) {
       throw new Error(
         'Contrasting claims to include, exclude or make available some of the planning units have been made: please check your selections.',
       );
@@ -143,6 +139,14 @@ export class ScenarioPlanningUnitsInclusionProcessor
     });
 
     return true;
+  }
+
+  private doClaimsIntersect(puIdsToInclude: string[], puIdsToExclude: string[], puIdsToMakeAvailable: string[]): boolean {
+    const allClaims = [...puIdsToInclude, ...puIdsToExclude, ...puIdsToMakeAvailable];
+    const duplicateElements = allClaims.filter((element, index) => {
+      return allClaims.indexOf(element) !== index;
+    });
+    return duplicateElements.length > 0;
   }
 
   private async applyClaims(
