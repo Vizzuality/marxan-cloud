@@ -124,33 +124,13 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
     const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailable);
 
-    const doInclusionAndExclusionIntersect =
-      intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude])
+    const doClaimsIntersect =
+      intersection([...uniquePuIdsToInclude], [...uniquePuIdsToExclude], [...uniquePuIdsToMakeAvailable])
         .length > 0;
 
-    const doMakeAvailableAndExclusionIntersect =
-      intersection([...uniquePuIdsToMakeAvailable], [...uniquePuIdsToExclude])
-        .length > 0;
-
-    const doMakeAvailableAndInclusionIntersect =
-      intersection([...uniquePuIdsToMakeAvailable], [...uniquePuIdsToInclude])
-        .length > 0;
-
-    if (doInclusionAndExclusionIntersect) {
+    if (doClaimsIntersect) {
       throw new Error(
-        'Contrasting claims for inclusion and exclusion have been made for some of the planning units: please check your selections.',
-      );
-    }
-
-    if (doMakeAvailableAndExclusionIntersect) {
-      throw new Error(
-        'Contrasting claims for makeAvailable and exclusion have been made for some of the planning units: please check your selections.',
-      );
-    }
-
-    if (doMakeAvailableAndInclusionIntersect) {
-      throw new Error(
-        'Contrasting claims for makeAvailable and inclusion have been made for some of the planning units: please check your selections.',
+        'Contrasting claims to include, exclude or make available some of the planning units have been made: please check your selections.',
       );
     }
 

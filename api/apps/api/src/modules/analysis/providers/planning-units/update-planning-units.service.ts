@@ -8,7 +8,6 @@ import {
   UpdatePlanningUnitsEventsPort,
   UpdatePlanningUnitsState,
 } from './update-planning-units-events.port';
-import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
 
 @Injectable()
 export class UpdatePlanningUnitsService implements AdjustPlanningUnits {
