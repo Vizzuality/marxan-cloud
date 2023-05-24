@@ -107,7 +107,7 @@ describe(`when planning units exist for a scenario`, () => {
         world.planningUnitsToBeUntouched(forCase),
       );
     }, 10000);
-    it(`marks pu initially excluded in available status after using makeAvailbale claims`, async () => {
+    it(`updates PUs initially excluded to available status, after applying makeAvailable claims`, async () => {
       /**
        * First step - excluding selected PUs
        **/
@@ -138,14 +138,14 @@ describe(`when planning units exist for a scenario`, () => {
       } as unknown) as Job<JobInput>);
 
       expect(await world.GetLockedOutPlanningUnits()).toEqual([]);
-      // PUs initially excluded are must now be available, with status changed by user equals to true
+      // PUs initially excluded are now be available, with status changed by user equals to true
 
       expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
         world.planningUnitsToBeMadeAvailableAfterExclusion(forCase),
       );
     }, 10000);
 
-    it(`marks pu initially locked-in as protected area available after passing relevant makeAvailable claims`, async () => {
+    it(`updates PUs initially locked-in as protected area to available status, after applying relevant makeAvailable claims`, async () => {
       /**
        * Running the processor with no claims to make sure protected by default PUs
        * are marked as locked in and value of lock status set by user is false
