@@ -1,7 +1,4 @@
-import {
-  DataSource,
-  MigrationExecutor,
-} from 'typeorm';
+import { DataSource, MigrationExecutor } from 'typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing//ormconfig';
 
 let apiConnection: DataSource;

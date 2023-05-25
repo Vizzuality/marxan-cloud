@@ -1,13 +1,12 @@
 import { DataSource } from 'typeorm';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
-import {INestApplication, INestApplicationContext} from "@nestjs/common";
-import {getDataSourceToken} from "@nestjs/typeorm";
-import {DbConnections} from "@marxan-api/ormconfig.connections";
+import { INestApplication, INestApplicationContext } from '@nestjs/common';
+import { getDataSourceToken } from '@nestjs/typeorm';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
 
 export const seedAdminRegions = async (app: INestApplicationContext) => {
-
   const dataSource: DataSource = await app.get<DataSource>(
-    getDataSourceToken(geoprocessingConnections.default.name)
+    getDataSourceToken(geoprocessingConnections.default.name),
   );
   await dataSource.manager.query(
     '\n' +

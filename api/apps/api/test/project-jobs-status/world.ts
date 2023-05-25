@@ -9,15 +9,11 @@ import * as request from 'supertest';
 
 export const createWorld = async (app: INestApplication) => {
   const token = await GivenUserIsLoggedIn(app);
-  const { projectId } = await GivenProjectExists(
-    app,
-    token,
-    {
-      countryId: 'BWA',
-      adminAreaLevel1Id: 'BWA.12_1',
-      adminAreaLevel2Id: 'BWA.12.1_1',
-    },
-  );
+  const { projectId } = await GivenProjectExists(app, token, {
+    countryId: 'BWA',
+    adminAreaLevel1Id: 'BWA.12_1',
+    adminAreaLevel2Id: 'BWA.12.1_1',
+  });
   const scenarios: string[] = [];
   let scenarioIdWithPendingJob: string | undefined;
   let scenarioIdWithCostSurfaceFinished: string | undefined;

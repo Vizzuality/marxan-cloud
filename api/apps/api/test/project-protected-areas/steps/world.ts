@@ -12,14 +12,15 @@ import { GivenScenarioExists } from '../../steps/given-scenario-exists';
 export const createWorld = async (app: INestApplication) => {
   const jwtToken = await GivenUserIsLoggedIn(app);
   const queue = FakeQueue.getByName(addProtectedAreaQueueName);
-  const {
-    projectId,
-    organizationId,
-  } = await GivenProjectExists(app, jwtToken, {
-    countryId: 'BWA',
-    adminAreaLevel1Id: 'BWA.12_1',
-    adminAreaLevel2Id: 'BWA.12.1_1',
-  });
+  const { projectId, organizationId } = await GivenProjectExists(
+    app,
+    jwtToken,
+    {
+      countryId: 'BWA',
+      adminAreaLevel1Id: 'BWA.12_1',
+      adminAreaLevel2Id: 'BWA.12.1_1',
+    },
+  );
   const scenario = await GivenScenarioExists(app, projectId, jwtToken, {
     name: `${new Date().getTime()}`,
   });

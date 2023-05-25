@@ -54,9 +54,10 @@ export class CustomPlanningAreaRepository {
   }
 
   async has(id: string): Promise<boolean> {
-    const selectedId:
-      | Pick<PlanningArea, 'id'>
-      | null = await this.planningAreas.findOne({
+    const selectedId: Pick<
+      PlanningArea,
+      'id'
+    > | null = await this.planningAreas.findOne({
       where: {
         id,
       },
