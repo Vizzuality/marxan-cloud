@@ -3,7 +3,7 @@
 The selected solution for this feature is to implement a new table `feature_tags` on the API DB that will hold, for each
 row, a tag for a given combination of feature and project id like this:
 
-`| rowId (VARCHAR) | projectId (VARCHAR) | featureId (VARCHAR) | tag (VARCHAR) |`
+`| rowId (uuid) | projectId (uuid) | featureId (uuid) | tag (VARCHAR) |`
 
 where:
 
@@ -18,19 +18,18 @@ where:
   **capitalization uniqueness** of the tag names
 
 On the DB side, the size the `tag` is unbounded, but is bounded at the service level via validation by a configurable
-amount of
-max characters.
+amount of max characters.
 
 Once the last feature with a given tag is removed or untagged, that tag won't be available to be selected as a tag
-anymore. Tags will be considered removed when there are no rows for a given `projectId` and `featureId` combination
-with a given tag name.
+anymore. Tags will be considered removed from a project when there are no rows for a given `projectId` and `featureId`
+combination with a given tag name.
 
 **Capitalization uniqueness should be enforced at the service level**. When tagging/renaming a tag on a feature, a case
 insensitive check must be made first to see if there's an already existing tag, regardless of capitalization, and use
-that tag instead of the one provided by the user. For example, if an user tags a Feature with `Mogwai`, and other
+that tag instead of the one provided by the user. For example, if a user tags a Feature with `Mogwai`, and other
 features for the same project are already tagged with `mogwai` instead, `mogwai` should be used as the new tag. However
-this capitalization uniqueness **should not be applied tag renames for a given project** as the user might want to
-change capitalization of an existing tag.
+this capitalization uniqueness **should not be applied when renaming tags for a given project** as the user might want
+to change capitalization of an existing tag.
 
 Some other solutions considered were JSONB Arrays or an Array of text values, as an extra column on the `features`
 table, containing all the tags in plain text form. Although these are better performant solutions in some use cases (tag
@@ -41,7 +40,7 @@ More info on different tagging implementation approaches [here](http://www.datab
 
 These are some of the main criteria used for deciding on the external table solution:
 
-- **All tag managing operations are done per project**: this limits quite a bit the number rows that queries must
+- **All tag managing operations are done per project**: this limits quite a bit the number of rows that queries must
   handle, since doing system wide queries are not contemplated.
 - **System wide features are non-taggable**.
 - **Low volume of feature entries**: each project will have features in the hundreds, low thousands at most.
@@ -58,7 +57,7 @@ There are two distinct parts to the tagging system.
 
 ### Feature tagging operations
 
-These endpoints deal with operating tags for an individual feature.
+These endpoints deal with handling tags for an individual feature.
 
 - `PATCH /api/v1/geo-features/:featureId/tags`
 
@@ -100,21 +99,18 @@ These endpoints deal with tag managing operations on a per Project level.
 
 - `GET /api/v1/projects/:projectId/tags?tag=someName`
 
-For the given `projectId`, returns a list of all the DISTINCT tags from the Project's Features that have a tag that
-partially matches with `tag`. By default, the matching is `containing`, but other options could be considered.
+For the given `projectId`, returns a list of all the DISTINCT tags from the Project's Features that partially matches
+the `tag` query parameter. By default, the matching is `containing`, but other options could be considered.
+
+The `tag` query parameter may be optional, so that if it is empty, all the DISTINCT tags for the given `projectId` are
+returned.
 
 Ordered alphabetically by default.
 
-No pagination required, since the possible number of tags per Project will be in the low tens.
+No pagination required, since the possible number of tags per Project will be in the low tens, and the tag will have a
+maximum size.
 
-- `DELETE /api/v1/projects/:projectId/tags/`
-
-```typescript
-Payload
-{
-	tag: string;
-}
-```
+- `DELETE /api/v1/projects/:projectId/tags/?tag=someTagText`
 
 For the given `projectId`, removes the tag from all the Project's features that have a tag that has an exact match
 with `tag`.
