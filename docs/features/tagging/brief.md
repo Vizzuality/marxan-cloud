@@ -9,7 +9,7 @@ useful for the users, so that they may be able to identify/group features and do
 
 ## Requirements
 
-Whenever an user uploads a feature, they must be able to add a tag (although it shouldn't be a requirement when creating
+Whenever a user uploads a feature, they must be able to add a tag (although it shouldn't be a requirement when creating
 the feature). There will be one tag per feature. The user must also be able to change the tag of a feature at later
 point when editing the feature. There's an exception to this: System wide features (features with no project) are
 considered to be non-taggable, however features obtained by splitting from System wide features will become effectively
@@ -29,13 +29,13 @@ Bulk operations are not required to be implemented on the API side.
 
 ## Use cases
 
-This are the main use cases that are to be expected:
+These are the main use cases that are to be expected:
 
 - tagging a feature (when uploading, or as an isolated operation)
-- update/change a tag in a feature
-- remove the tag of a feature
-- get all features for a given project and tag
-- remove a tag in a project (thus removing the tags from the affected features)
+- updating/changing a tag in a feature
+- removing the tag of a feature
+- getting all features for a given project and tag
+- removing a tag in a project (thus removing the tags from the affected features)
 - renaming a tag in a project
-- query tags for a project with partial match on the tag name (by default, tags containing `lepr`, other matching styles
-  can be considered in the implementation)
+- querying tags for a project with partial match on the tag name (by default, tags containing a given token such as, for
+  example, `lepr`; other matching styles can be considered in the implementation)
