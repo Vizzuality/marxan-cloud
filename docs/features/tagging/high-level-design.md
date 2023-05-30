@@ -3,7 +3,7 @@
 The selected solution for this feature is to implement a new table `feature_tags` on the API DB that will hold, for each
 row, a tag for a given combination of feature and project id like this:
 
-`| rowId (uuid) | projectId (uuid) | featureId (uuid) | tag (VARCHAR) |`
+`| rowId (uuid) | projectId (uuid) | featureId (uuid) | tag (VARCHAR) | last_applied (timestamp) |`
 
 where:
 
@@ -12,6 +12,7 @@ where:
 - **featureId** is a foreign key referencing the PK of the Features table with ON DELETE CASCADE set. Cannot be NULL.
 - **tag** contains the tag string itself, **case sensitive**, and cannot be NULL or empty. If a feature doesn't have
   any tags for a given project, then no rows associated to it should be present.
+- **last_updated** a timestamp that gets updated automatically on row update.
 - There will be an **UNIQUE INDEX** on the combination of **`projectId` and `featureId`**. This will limit the number of
   tags to **1 tag per feature**.
 - There will be an **UNIQUE INDEX** on the combination of **`projectId` and `LOWER(tag)`** in order to enforce
@@ -22,7 +23,8 @@ amount of max characters.
 
 Once the last feature with a given tag is removed or untagged, that tag won't be available to be selected as a tag
 anymore. Tags will be considered removed from a project when there are no rows for a given `projectId` and `featureId`
-combination with a given tag name.
+combination with a given tag name. This also means that a tag that was completely removed from a project wouldn't appear
+anymore when querying for recently used tags.
 
 **Capitalization uniqueness should be enforced at the service level**. When tagging/renaming a tag on a feature, a case
 insensitive check must be made first to see if there's an already existing tag, regardless of capitalization, and use
@@ -30,6 +32,13 @@ that tag instead of the one provided by the user. For example, if a user tags a 
 features for the same project are already tagged with `mogwai` instead, `mogwai` should be used as the new tag. However
 this capitalization uniqueness **should not be applied when renaming tags for a given project** as the user might want
 to change capitalization of an existing tag.
+
+(For future reference) In order to be able to retrieve a list of recent tags for a given project, without further adding
+to the complexity of the solution and having to rework it, each time a tag is applied to a feature, all occurrences of
+the same  `projectId`and `tag` combination would have their `last_update` field updated with the same timestamp; this is
+to avoid an edge case where, is that a tag is already widely used in a project, is newly used for a an untagged feature,
+and then untagged, this tag wouldn't appear on the list of recent tags. That said, the recent list of tags functionality
+is **not prioritary** for the current scope.
 
 Some other solutions considered were JSONB Arrays or an Array of text values, as an extra column on the `features`
 table, containing all the tags in plain text form. Although these are better performant solutions in some use cases (tag
@@ -77,6 +86,10 @@ In order to maintain capitalization uniqueness, a check is made first to see if 
 match with a previously existing tag for the same Project with `projectId`. If so, that tag will be used instead of the
 tag provided in the payload.
 
+(For future reference, not to be implemented for now)
+Lastly, all `feature_tag` rows for the same combination of `projectId` and `tag` will have the `last_applied` updated to
+the current time.
+
 - Extend `POST /api/v1/projects/:id/features/shapefile`
 
 The `UploadShapefileDTO` should be expanded to also accept an optional tag field, so that **all Features created from
@@ -89,6 +102,10 @@ In order to maintain capitalization uniqueness, a check is made first to see if 
 match with a previously existing tag for the same Project with `projectId`. If so, that tag will be used instead of the
 tag provided in the payload.
 
+(For future reference, not to be implemented for now)
+Lastly, all `feature_tag` rows for the same combination of `projectId` and `tag` will have the `last_applied` updated to
+the current time.
+
 - `DELETE /api/v1/geo-features/:featureId/tags/`
 
 Removes the tag for the given `featureId`. This means removing the corresponding row on the `feature_tags` table.
@@ -97,7 +114,7 @@ Removes the tag for the given `featureId`. This means removing the corresponding
 
 These endpoints deal with tag managing operations on a per Project level.
 
-- `GET /api/v1/projects/:projectId/tags?tag=someName`
+- `GET /api/v1/projects/:projectId/tags?tag=someName?order=ASC?orderType=someOrderType`
 
 For the given `projectId`, returns a list of all the DISTINCT tags from the Project's Features that partially matches
 the `tag` query parameter. By default, the matching is `containing`, but other options could be considered.
@@ -105,7 +122,13 @@ the `tag` query parameter. By default, the matching is `containing`, but other o
 The `tag` query parameter may be optional, so that if it is empty, all the DISTINCT tags for the given `projectId` are
 returned.
 
-Ordered alphabetically by default.
+`order` indicates whether the results are sorted in an ascending (`ASC`, default) or descending (`DESC`) order
+
+(For future reference, not to be implemented for now)
+`orderType` indicates the way the results will be sorted:
+
+- `alphabetical` (default): tags will be sorted alphabetically
+- `recent`: tags will be ordered by the time they were last applied (`last_applied` field on the `features_tag` table)
 
 No pagination required, since the possible number of tags per Project will be in the low tens, and the tag will have a
 maximum size.
@@ -135,7 +158,7 @@ No capitalization uniqueness is enforced at service level in this case.
 
 The already existing findAll is extended to allow searching by tags as well. This way it's consistent with the way that
 entities are queried across the whole application, and the `GeoFeaturesRequestInfo` can be reused and extended to set
-further the filtering by tag.
+further filtering by tag.
 
 This filter field will contain a list of tags, and anyone of them must match exactly with the feature
 tag ( `features_tag.tag IN ('tag1', 'tag2'...)` )
