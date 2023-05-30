@@ -1,9 +1,9 @@
 # Feature Tagging (High-Level Design)
 
-The selected solution for this feature is to implement a new table `feature_tags` on the API DB that will hold, for each
-row, a tag for a given combination of feature and project id like this:
+The selected solution for this feature is to implement a new table `project_feature_tags` on the API DB that will hold,
+for each row, a tag for a given combination of feature and project id like this:
 
-`| rowId (uuid) | projectId (uuid) | featureId (uuid) | tag (VARCHAR) | last_applied (timestamp) |`
+`| rowId (uuid) | projectId (uuid) | featureId (uuid) | tag (VARCHAR) | last_modified_at (timestamp) |`
 
 where:
 
@@ -12,7 +12,7 @@ where:
 - **featureId** is a foreign key referencing the PK of the Features table with ON DELETE CASCADE set. Cannot be NULL.
 - **tag** contains the tag string itself, **case sensitive**, and cannot be NULL or empty. If a feature doesn't have
   any tags for a given project, then no rows associated to it should be present.
-- **last_updated** a timestamp that gets updated automatically on row update.
+- **last_modified_at** a timestamp that gets updated automatically on row update.
 - There will be an **UNIQUE INDEX** on the combination of **`projectId` and `featureId`**. This will limit the number of
   tags to **1 tag per feature**.
 - There will be an **UNIQUE INDEX** on the combination of **`projectId` and `LOWER(tag)`** in order to enforce
@@ -35,10 +35,10 @@ to change capitalization of an existing tag.
 
 (For future reference) In order to be able to retrieve a list of recent tags for a given project, without further adding
 to the complexity of the solution and having to rework it, each time a tag is applied to a feature, all occurrences of
-the same  `projectId`and `tag` combination would have their `last_update` field updated with the same timestamp; this is
-to avoid an edge case where, is that a tag is already widely used in a project, is newly used for a an untagged feature,
-and then untagged, this tag wouldn't appear on the list of recent tags. That said, the recent list of tags functionality
-is **not prioritary** for the current scope.
+the same `projectId`and `tag` combination would have their `last_modified_at` field updated with the same timestamp;
+this is to avoid an edge case where, is that a tag is already widely used in a project, is newly used for a an untagged
+feature, and then untagged, this tag wouldn't appear on the list of recent tags. That said, the recent list of tags
+functionality is **not prioritary** for the current scope.
 
 Some other solutions considered were JSONB Arrays or an Array of text values, as an extra column on the `features`
 table, containing all the tags in plain text form. Although these are better performant solutions in some use cases (tag
@@ -108,7 +108,8 @@ the current time.
 
 - `DELETE /api/v1/geo-features/:featureId/tags/`
 
-Removes the tag for the given `featureId`. This means removing the corresponding row on the `feature_tags` table.
+Removes the tag for the given `featureId`. This means removing the corresponding row on the `project_feature_tags`
+table.
 
 ## Tag Managing
 

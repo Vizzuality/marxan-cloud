@@ -34,6 +34,7 @@ import { ApiCloningFilesRepositoryModule } from './modules/cloning-file-reposito
 import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-collector';
 import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { GeoFeatureTagsModule } from './modules/geo-feature-tags/geo-feature-tags.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CountriesModule,
     GeoModule,
     GeoFeaturesModule,
+    GeoFeatureTagsModule,
     OrganizationsModule,
     ProjectsModule,
     ProtectedAreasCrudModule,
