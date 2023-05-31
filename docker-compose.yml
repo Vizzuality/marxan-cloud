@@ -5,7 +5,7 @@ services:
       context: ./api
       dockerfile: api.Dockerfile
     ports:
-      - "${API_SERVICE_PORT}:3000"
+      - "${API_SERVICE_PORT:-3030}:3000"
       - "127.0.0.1:${API_DEBUG_INSPECT_PORT:-9230}:9229"
     container_name: marxan-api
     command: develop
@@ -41,7 +41,7 @@ services:
       context: ./app
       dockerfile: Dockerfile
     ports:
-      - "${APP_SERVICE_PORT}:3000"
+      - "${APP_SERVICE_PORT:-3000}:3000"
     container_name: marxan-app
     command: develop
     volumes:
@@ -57,7 +57,7 @@ services:
       context: ./api
       dockerfile: geo.Dockerfile
     ports:
-      - "${GEOPROCESSING_SERVICE_PORT}:3000"
+      - "${GEOPROCESSING_SERVICE_PORT:-3040}:3000"
       - "127.0.0.1:${GEOPROCESSING_DEBUG_INSPECT_PORT:-9240}:9229"
     container_name: marxan-geoprocessing
     command: develop
@@ -93,10 +93,10 @@ services:
     build:
       context: ./webshot
       dockerfile: Dockerfile
+    ports:
+      - "${WEBSHOT_SERVICE_PORT:-3060}:3000"
     container_name: marxan-webshot
     command: develop
-    environment:
-      - WEBSHOT_APP_PORT
     volumes:
       - ./webshot/src:/opt/marxan-webshot/src
 
@@ -106,7 +106,7 @@ services:
       dockerfile: apidb.Dockerfile
     container_name: marxan-postgresql-api
     ports:
-      - "${POSTGRES_API_SERVICE_PORT}:5432"
+      - "${POSTGRES_API_SERVICE_PORT:-3432}:5432"
     volumes:
       - "marxan-cloud-postgresql-api-data:/var/lib/postgresql/data"
       - "./api/apps/api/test/fixtures:/opt:ro"
@@ -124,7 +124,7 @@ services:
     shm_size: 16gb
     container_name: marxan-postgresql-geo-api
     ports:
-      - "${POSTGRES_GEO_SERVICE_PORT}:5432"
+      - "${POSTGRES_GEO_SERVICE_PORT:-3433}:5432"
     volumes:
       - marxan-cloud-postgresql-geo-data:/var/lib/postgresql/data
     environment:
@@ -141,7 +141,7 @@ services:
     container_name: marxan-redis
     command: ["redis-server"]
     ports:
-      - "${REDIS_API_SERVICE_PORT}:6379"
+      - "${REDIS_API_SERVICE_PORT:-3050}:6379"
     restart: on-failure
 
   # Admin gui for redis
