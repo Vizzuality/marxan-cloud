@@ -208,7 +208,7 @@ const getFixtures = async () => {
     projectId: project.projectId,
     anotherProjectId: anotherProject.projectId,
     cleanup: async () => {
-      await geoFeaturesApiRepo.clear();
+      await geoFeaturesApiRepo.delete({});
       await featuresDataRepo.delete({});
       await scenarioRepo.delete({});
       await project.cleanup();
