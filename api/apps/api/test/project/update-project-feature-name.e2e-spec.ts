@@ -198,7 +198,7 @@ const getFixtures = async () => {
         roleName: ProjectRoles.project_owner,
       });
 
-      await geoFeaturesApiRepo.clear();
+      await geoFeaturesApiRepo.delete({});
       await project.cleanup();
       await anotherProject.cleanup();
       await app.close();
