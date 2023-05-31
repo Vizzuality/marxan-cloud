@@ -57,6 +57,7 @@ export const generatePngImageFromPublishedProjectData = async (
       "--disable-features=IsolateOrigins",
       "--disable-site-isolation-trials",
     ],
+    headless: 'new',
   });
   const page = await browser.newPage();
   // Pass through browser console to our own service's console
