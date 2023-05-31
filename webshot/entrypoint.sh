@@ -4,8 +4,13 @@ set -e
 
 case "$1" in
     develop)
-        echo "Running development server"
-        exec yarn start:dev
+        if [ $ENABLE_DEBUG_MODE = "true" ]; then
+            echo "Running Development Server with inspector"
+            exec yarn start:debug
+        else
+            echo "Running Development Server"
+            exec yarn start:dev
+        fi
         ;;
     test)
         echo "Running tests"
