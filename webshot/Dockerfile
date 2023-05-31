@@ -4,6 +4,7 @@ LABEL maintainer="hello@vizzuality.com"
 ENV NAME marxan-webshot
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
+ENV PUPPETEER_CACHE_DIR $APP_HOME
 
 RUN curl -sSL https://dl.google.com/linux/linux_signing_key.pub | apt-key add -
 RUN echo "deb [arch=amd64] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
