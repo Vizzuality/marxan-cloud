@@ -95,10 +95,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "${WEBSHOT_SERVICE_PORT:-3060}:3000"
+      - "127.0.0.1:${WEBSHOT_DEBUG_INSPECT_PORT:-9240}:9229"
     container_name: marxan-webshot
     command: develop
     volumes:
       - ./webshot/src:/opt/marxan-webshot/src
+    environment:
+      - ENABLE_DEBUG_MODE=${ENABLE_DEBUG_MODE:-false}
 
   postgresql-api:
     build:
