@@ -2,7 +2,11 @@ import {
   forbiddenError,
   ProjectAccessControl,
 } from '@marxan-api/modules/access-control';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Either, isLeft, isRight, left, right } from 'fp-ts/Either';
@@ -100,6 +104,16 @@ import {
   CreateInitialScenarioBlm,
 } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { LegacyProjectImportRepository } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
+import {
+  unknownPdfWebshotError,
+  WebshotPdfConfig,
+  WebshotService,
+} from '@marxan/webshot';
+import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
+import stream from 'stream';
+import { AppConfig } from '@marxan-api/utils/config.utils';
+import { WebshotSFComparisonMapPdfConfig } from '@marxan/webshot/webshot.dto';
+import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -132,6 +146,8 @@ export class ProjectsService {
     private readonly blockGuard: BlockGuard,
     private readonly exportRepository: ExportRepository,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
+    private readonly webshotService: WebshotService,
+    private readonly scenarioService: ScenariosService,
   ) {}
 
   async findAllGeoFeatures(
@@ -757,6 +773,55 @@ export class ProjectsService {
     }
 
     return right(idsOrError.right);
+  }
+
+  async getScenarioFrequencyComparisonMap(
+    scenarioIdA: string,
+    scenarioIdB: string,
+    userId: string,
+    configForWebshot: WebshotSFComparisonMapPdfConfig,
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | GetScenarioFailure
+      | typeof unknownPdfWebshotError,
+      stream.Readable
+    >
+  > {
+    const scenarioA = await this.scenarioService.getById(scenarioIdA, {
+      authenticatedUser: { id: userId },
+    });
+    const scenarioB = await this.scenarioService.getById(scenarioIdB, {
+      authenticatedUser: { id: userId },
+    });
+
+    if (isLeft(scenarioA)) {
+      return scenarioA;
+    }
+
+    if (isLeft(scenarioB)) {
+      return scenarioB;
+    }
+
+    if (scenarioA.right.projectId !== scenarioB.right.projectId) {
+      throw new BadRequestException(
+        `Scenarios ${scenarioIdA} and ${scenarioIdB} are not in the same project.`,
+      );
+    }
+    const webshotUrl = AppConfig.get('webshot.url') as string;
+
+    /** @debt Refactor to use @nestjs/common's StreamableFile
+     (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
+     after upgrading NestJS to v8. **/
+    const pdfStream = await this.webshotService.getScenarioFrequencyComparisonMap(
+      scenarioIdA,
+      scenarioIdB,
+      scenarioA.right.projectId,
+      configForWebshot,
+      webshotUrl,
+    );
+
+    return pdfStream;
   }
 
   /**

@@ -9,4 +9,5 @@ export {
   WebshotConfig,
   WebshotPdfConfig,
   WebshotPngConfig,
+  WebshotSFComparisonMapPdfConfig,
 } from './webshot.dto';
