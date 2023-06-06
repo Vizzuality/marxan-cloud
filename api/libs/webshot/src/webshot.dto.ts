@@ -14,6 +14,10 @@ class ReportOptions {
   solutionId!: string;
 }
 
+class ComparisonMapOptions {
+  // TODO: add properties
+}
+
 export class WebshotConfig {
   @ApiProperty()
   @IsString()
@@ -40,4 +44,16 @@ export class WebshotPdfConfig extends WebshotConfig {
   @Type(() => ReportOptions)
   @ApiProperty()
   reportOptions!: ReportOptions;
+}
+
+export class WebshotSFComparisonMapPdfConfig extends WebshotConfig {
+  @ApiPropertyOptional()
+  @IsOptional()
+  pdfOptions?: PDFOptions;
+
+  @ValidateNested()
+  @IsObject()
+  @Type(() => ReportOptions)
+  @ApiProperty()
+  comparisonMapOptions!: ComparisonMapOptions;
 }

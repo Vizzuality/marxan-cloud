@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Readable } from 'stream';
 import { Either, left, right } from 'fp-ts/lib/Either';
-import { WebshotPdfConfig, WebshotPngConfig } from './webshot.dto';
+import {
+  WebshotPdfConfig,
+  WebshotPngConfig,
+  WebshotSFComparisonMapPdfConfig,
+} from './webshot.dto';
 import { lastValueFrom } from 'rxjs';
 
 export const unknownPdfWebshotError = Symbol(`unknown pdf webshot error`);
@@ -94,6 +98,35 @@ export class WebshotService {
       return right(pngBase64String);
     } catch (error) {
       return left(unknownPngWebshotError);
+    }
+  }
+  async getScenarioFrequencyComparisonMap(
+    scenarioIdA: string,
+    scenarioIdB: string,
+    projectId: string,
+    config: WebshotSFComparisonMapPdfConfig,
+    webshotUrl: string,
+  ) {
+    try {
+      const pdfBuffer = await lastValueFrom(
+        // TODO - define correct webshot url
+        this.httpService.post(`${webshotUrl}`, config, {
+          responseType: 'arraybuffer',
+        }),
+      )
+        .then((response) => response.data)
+        .catch((error) => {
+          throw new Error(error);
+        });
+
+      const stream = new Readable();
+
+      stream.push(pdfBuffer);
+      stream.push(null);
+
+      return right(stream);
+    } catch (error) {
+      return left(unknownPdfWebshotError);
     }
   }
 }
