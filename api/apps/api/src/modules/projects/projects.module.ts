@@ -43,6 +43,7 @@ import { TypeormExportRepository } from '../clone/export/adapters/typeorm-export
 import { LegacyProjectImportModule } from '../legacy-project-import/legacy-project-import.module';
 import { DeleteProjectModule } from './delete-project/delete-project.module';
 import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
+import { ProjectsProxyController } from '@marxan-api/modules/projects/projects-proxy.controller';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     ProjectCheckerModule,
     DeleteProjectModule,
     LegacyProjectImportRepositoryModule,
+    ScenariosModule,
   ],
   providers: [
     ProjectsCrudService,
@@ -98,6 +100,7 @@ import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/in
     ProjectsListingController,
     ProjectDetailsController,
     ProjectsController,
+    ProjectsProxyController,
   ],
   // @ToDo Remove TypeOrmModule after project publish will stop use the ProjectRepository
   exports: [ProjectsCrudService, TypeOrmModule, ProjectsService],
