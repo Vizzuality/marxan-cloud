@@ -109,10 +109,14 @@ export class WebshotService {
   ) {
     try {
       const pdfBuffer = await lastValueFrom(
-        // TODO - define correct webshot url
-        this.httpService.post(`${webshotUrl}`, config, {
-          responseType: 'arraybuffer',
-        }),
+        // TODO - the endpoint is not yet implemented (will be part of new webshot handler)
+        this.httpService.post(
+          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioIdA}/compare/${scenarioIdB}/frequency-map`,
+          config,
+          {
+            responseType: 'arraybuffer',
+          },
+        ),
       )
         .then((response) => response.data)
         .catch((error) => {
