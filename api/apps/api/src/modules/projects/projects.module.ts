@@ -44,6 +44,7 @@ import { LegacyProjectImportModule } from '../legacy-project-import/legacy-proje
 import { DeleteProjectModule } from './delete-project/delete-project.module';
 import { LegacyProjectImportRepositoryModule } from '../legacy-project-import/infra/legacy-project-import.repository.module';
 import { ProjectsProxyController } from '@marxan-api/modules/projects/projects-proxy.controller';
+import { WebshotModule } from '@marxan/webshot';
 import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
 
 @Module({
@@ -55,6 +56,7 @@ import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-f
     forwardRef(() => GeoFeaturesModule),
     GeoFeatureTagsModule,
     forwardRef(() => ScenariosModule),
+    forwardRef(() => WebshotModule),
     TypeOrmModule.forFeature([
       Project,
       ScenarioJobStatus,
