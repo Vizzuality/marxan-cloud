@@ -4,6 +4,8 @@ import {
 } from '@marxan-api/modules/access-control';
 import {
   BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -104,11 +106,7 @@ import {
   CreateInitialScenarioBlm,
 } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { LegacyProjectImportRepository } from '../legacy-project-import/domain/legacy-project-import/legacy-project-import.repository';
-import {
-  unknownPdfWebshotError,
-  WebshotPdfConfig,
-  WebshotService,
-} from '@marxan/webshot';
+import { unknownPdfWebshotError, WebshotService } from '@marxan/webshot';
 import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
@@ -147,7 +145,8 @@ export class ProjectsService {
     private readonly exportRepository: ExportRepository,
     private readonly legacyProjectImportRepository: LegacyProjectImportRepository,
     private readonly webshotService: WebshotService,
-    private readonly scenarioService: ScenariosService,
+    @Inject(forwardRef(() => ScenariosService))
+    private readonly scenariosService: ScenariosService,
   ) {}
 
   async findAllGeoFeatures(
@@ -788,10 +787,10 @@ export class ProjectsService {
       stream.Readable
     >
   > {
-    const scenarioA = await this.scenarioService.getById(scenarioIdA, {
+    const scenarioA = await this.scenariosService.getById(scenarioIdA, {
       authenticatedUser: { id: userId },
     });
-    const scenarioB = await this.scenarioService.getById(scenarioIdB, {
+    const scenarioB = await this.scenariosService.getById(scenarioIdB, {
       authenticatedUser: { id: userId },
     });
 
