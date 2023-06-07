@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Req,
   Res,
+  StreamableFile,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -46,14 +47,14 @@ export class ProjectsProxyController {
   })
   @Header('content-type', 'application/pdf')
   @Get('comparison-map/:scenarioIdA/compare/:scenarioIdB')
-  async proxyProtectedAreaTile(
+  async scenarioFrequencyComparisonMap(
     @Body() config: WebshotSFComparisonMapPdfConfig,
     @Param('scenarioIdA', ParseUUIDPipe) scenarioIdA: string,
     @Param('scenarioIdB', ParseUUIDPipe) scenarioIdB: string,
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
     @AppSessionTokenCookie() appSessionTokenCookie: string,
-  ) {
+  ): Promise<StreamableFile | InternalServerErrorException> {
     const configForWebshot = appSessionTokenCookie
       ? {
           ...config,
@@ -61,9 +62,6 @@ export class ProjectsProxyController {
         }
       : config;
 
-    // @debt Refactor to use @nestjs/common's StreamableFile
-    // (https://docs.nestjs.com/techniques/streaming-files#streamable-file-class)
-    // after upgrading NestJS to v8.
     const pdfStream = await this.projectsService.getScenarioFrequencyComparisonMap(
       scenarioIdA,
       scenarioIdB,
@@ -81,6 +79,6 @@ export class ProjectsProxyController {
       );
     }
 
-    pdfStream.right.pipe(res);
+    return new StreamableFile(pdfStream.right);
   }
 }
