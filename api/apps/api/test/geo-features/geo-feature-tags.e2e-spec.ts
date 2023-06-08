@@ -13,6 +13,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { v4 } from 'uuid';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -25,6 +26,42 @@ describe('GeoFeatureTag PATCH (e2e)', () => {
 
   afterEach(async () => {
     await fixtures?.cleanup();
+  });
+
+  test('should return error if feature is not found or not related to project', async () => {
+    //ARRANGE
+    const randomProjectId = v4();
+    const inexistentFeatureId = v4();
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId = await fixtures.GivenFeatureOnProject(
+      projectId,
+      'someFeat',
+    );
+
+    // ACT
+    const responseNotFound = await fixtures.WhenPatchingAGeoFeatureTag(
+      v4(),
+      inexistentFeatureId,
+      'sometag',
+    );
+    const responseNotRelated = await fixtures.WhenPatchingAGeoFeatureTag(
+      randomProjectId,
+      featureId,
+      'sometag',
+    );
+
+    //ASSERT
+    expect(responseNotFound.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotFoundErrorWasReturned(
+      responseNotFound,
+      inexistentFeatureId,
+    );
+    expect(responseNotRelated.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotRelatedErrorWasReturned(
+      responseNotRelated,
+      featureId,
+      randomProjectId,
+    );
   });
 
   test('should return error if the tag is empty', async () => {
@@ -268,6 +305,24 @@ const getFixtures = async () => {
       const error: any =
         response.body.errors[0].meta.rawError.response.message[0];
       expect(error).toContain(`tagName should not be empty`);
+    },
+    ThenFeatureNotFoundErrorWasReturned: (
+      response: request.Response,
+      featureId: string,
+    ) => {
+      const error: any = response.body.errors[0].title;
+      expect(error).toContain(`Feature with id ${featureId} not found`);
+    },
+
+    ThenFeatureNotRelatedErrorWasReturned: (
+      response: request.Response,
+      featureId: string,
+      projectId: string,
+    ) => {
+      const error: any = response.body.errors[0].title;
+      expect(error).toContain(
+        `Feature with id ${featureId} and Project with id ${projectId} are not related`,
+      );
     },
 
     ThenMaxLengthErrorWasReturned: (response: request.Response) => {
