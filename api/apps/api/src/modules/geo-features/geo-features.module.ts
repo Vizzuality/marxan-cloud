@@ -18,6 +18,7 @@ import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ProjectAclModule } from '@marxan-api/modules/access-control/projects-acl/project-acl.module';
 import { ScenarioFeaturesModule } from '@marxan-api/modules/scenarios-features';
+import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ScenarioFeaturesModule } from '@marxan-api/modules/scenarios-features';
     forwardRef(() => ProjectsModule),
     ProjectAclModule,
     forwardRef(() => ScenarioFeaturesModule),
+    GeoFeatureTagsModule,
   ],
   providers: [
     GeoFeaturesService,
