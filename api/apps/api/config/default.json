@@ -74,6 +74,7 @@
     }
   },
   "marxan": {
+    "maxTagLength": 30,
     "inputFiles": {
       "inputDat": {
         "ioSettings": {

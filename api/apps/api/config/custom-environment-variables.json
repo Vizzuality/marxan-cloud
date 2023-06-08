@@ -67,6 +67,7 @@
     "signingSecret": "CLONING_SIGNING_SECRET"
   },
   "marxan": {
+    "maxTagLength": "MARXAN_MAX_TAG_LENGTH",
     "inputFiles": {
       "inputDat": {
         "ioSettings": {
