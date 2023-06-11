@@ -7,7 +7,6 @@ import {
   forwardRef,
   Inject,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { FetchSpecification } from 'nestjs-base-service';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -110,7 +109,7 @@ import { unknownPdfWebshotError, WebshotService } from '@marxan/webshot';
 import { GetScenarioFailure } from '@marxan-api/modules/blm/values/blm-repos';
 import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
-import { WebshotSFComparisonMapPdfConfig } from '@marxan/webshot/webshot.dto';
+import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
 import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
 
 export { validationFailed } from '../planning-areas';
@@ -778,7 +777,7 @@ export class ProjectsService {
     scenarioIdA: string,
     scenarioIdB: string,
     userId: string,
-    configForWebshot: WebshotSFComparisonMapPdfConfig,
+    configForWebshot: WebshotBasicPdfConfig,
   ): Promise<
     Either<
       | typeof forbiddenError

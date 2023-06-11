@@ -3,9 +3,9 @@ import { HttpService } from '@nestjs/axios';
 import { Readable } from 'stream';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import {
-  WebshotPdfConfig,
+  WebshotBasicPdfConfig,
+  WebshotPdfReportConfig,
   WebshotPngConfig,
-  WebshotSFComparisonMapPdfConfig,
 } from './webshot.dto';
 import { lastValueFrom } from 'rxjs';
 
@@ -19,7 +19,7 @@ export class WebshotService {
   async getSummaryReportForScenario(
     scenarioId: string,
     projectId: string,
-    config: WebshotPdfConfig,
+    config: WebshotPdfReportConfig,
     webshotUrl: string,
   ): Promise<Either<typeof unknownPdfWebshotError, Readable>> {
     try {
@@ -104,14 +104,14 @@ export class WebshotService {
     scenarioIdA: string,
     scenarioIdB: string,
     projectId: string,
-    config: WebshotSFComparisonMapPdfConfig,
+    config: WebshotBasicPdfConfig,
     webshotUrl: string,
   ) {
     try {
       const pdfBuffer = await lastValueFrom(
         // TODO - the endpoint is not yet implemented (will be part of new webshot handler)
         this.httpService.post(
-          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioIdA}/compare/${scenarioIdB}/frequency-map`,
+          `${webshotUrl}/projects/${projectId}/scenarios/${scenarioIdA}/compare/${scenarioIdB}/comparison-map`,
           config,
           {
             responseType: 'arraybuffer',

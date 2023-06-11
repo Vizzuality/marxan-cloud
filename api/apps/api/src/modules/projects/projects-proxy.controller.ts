@@ -19,9 +19,9 @@ import { projectResource } from './project.api.entity';
 import { ProjectsService } from './projects.service';
 import { Response } from 'express';
 import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-cookie.decorator';
-import { WebshotSFComparisonMapPdfConfig } from '@marxan/webshot';
 import { isLeft } from 'fp-ts/Either';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
+import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
@@ -48,7 +48,7 @@ export class ProjectsProxyController {
   @Header('content-type', 'application/pdf')
   @Get('comparison-map/:scenarioIdA/compare/:scenarioIdB')
   async scenarioFrequencyComparisonMap(
-    @Body() config: WebshotSFComparisonMapPdfConfig,
+    @Body() config: WebshotBasicPdfConfig,
     @Param('scenarioIdA', ParseUUIDPipe) scenarioIdA: string,
     @Param('scenarioIdB', ParseUUIDPipe) scenarioIdB: string,
     @Res() res: Response,
