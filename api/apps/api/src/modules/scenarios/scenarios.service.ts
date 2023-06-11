@@ -105,7 +105,7 @@ import { FeatureCollection } from 'geojson';
 import {
   unknownPdfWebshotError,
   WebshotConfig,
-  WebshotPdfConfig,
+  WebshotPdfReportConfig,
   WebshotService,
 } from '@marxan/webshot';
 import { InjectEntityManager } from '@nestjs/typeorm';
@@ -1260,7 +1260,7 @@ export class ScenariosService {
   async getSummaryReportFor(
     scenarioId: string,
     userId: string,
-    configForWebshot: WebshotPdfConfig,
+    configForWebshot: WebshotPdfReportConfig,
   ): Promise<
     Either<
       | typeof forbiddenError

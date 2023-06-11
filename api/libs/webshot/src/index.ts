@@ -7,7 +7,6 @@ export {
 
 export {
   WebshotConfig,
-  WebshotPdfConfig,
+  WebshotPdfReportConfig,
   WebshotPngConfig,
-  WebshotSFComparisonMapPdfConfig,
 } from './webshot.dto';
