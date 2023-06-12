@@ -52,6 +52,21 @@ export const getFixtures = async () => {
       await app.close();
     },
 
+    WhenComparisonMapIsRequested: async (
+      scenarioIdA: string,
+      scenarioIdB: string,
+    ) =>
+      await request(app.getHttpServer())
+        .get(
+          `/api/v1/projects/comparison-map/${scenarioIdA}/compare/${scenarioIdB}`,
+        )
+        .set('Authorization', `Bearer ${randomUserToken}`)
+        .send({ baseUrl: 'webshorUrl' }),
+    ThenCorrectPdfBufferIsReceived: (response: request.Response) => {
+      expect(response.status).toEqual(200);
+      expect(response.body).toBeInstanceOf(Buffer);
+      expect(Object.keys(response.body).length).toBe(1214);
+    },
     WhenGettingPublicProject: async (projectId: string) =>
       await request(app.getHttpServer()).get(
         `/api/v1/published-projects/${projectId}`,
@@ -97,6 +112,28 @@ export const getFixtures = async () => {
       );
 
       return result.data.id;
+    },
+
+    GivenTwoScenariosWereCreated: async (projectId: string) => {
+      const scenarioA = await ScenariosTestUtils.createScenario(
+        app,
+        randomUserToken,
+        {
+          name: `Test scenario A`,
+          type: ScenarioType.marxan,
+          projectId,
+        },
+      );
+      const scenarioB = await ScenariosTestUtils.createScenario(
+        app,
+        randomUserToken,
+        {
+          name: `Test scenario B`,
+          type: ScenarioType.marxan,
+          projectId,
+        },
+      );
+      return { scenarioIdA: scenarioA.data.id, scenarioIdB: scenarioB.data.id };
     },
     GivenPublicProjectWasCreated: async () => {
       const { projectId, cleanup } = await GivenProjectExists(

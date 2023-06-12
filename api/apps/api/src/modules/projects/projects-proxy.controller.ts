@@ -8,9 +8,14 @@ import {
   ParseUUIDPipe,
   Req,
   Res,
-  StreamableFile,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { RequestWithAuthenticatedUser } from '@marxan-api/app.controller';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -22,12 +27,17 @@ import { AppSessionTokenCookie } from '@marxan-api/decorators/app-session-token-
 import { isLeft } from 'fp-ts/Either';
 import { mapAclDomainToHttpError } from '@marxan-api/utils/acl.utils';
 import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
+import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
+import { ImplementsAcl } from '@marxan-api/decorators/acl.decorator';
 
 @ApiTags(projectResource.className)
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
 export class ProjectsProxyController {
   constructor(public readonly projectsService: ProjectsService) {}
 
+  @ApiBearerAuth()
+  @ImplementsAcl()
+  @UseGuards(JwtAuthGuard)
   @ApiParam({
     name: 'scenarioIdA',
     description: 'First scenario to be compare',
@@ -46,6 +56,7 @@ export class ProjectsProxyController {
     description: 'Get comparison map for two scenarios in PDF format',
   })
   @Header('content-type', 'application/pdf')
+  //@Get('comparison-map/:scenarioIdA/compare/:scenarioIdB')
   @Get('comparison-map/:scenarioIdA/compare/:scenarioIdB')
   async scenarioFrequencyComparisonMap(
     @Body() config: WebshotBasicPdfConfig,
@@ -54,7 +65,7 @@ export class ProjectsProxyController {
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
     @AppSessionTokenCookie() appSessionTokenCookie: string,
-  ): Promise<StreamableFile | InternalServerErrorException> {
+  ): Promise<any> {
     const configForWebshot = appSessionTokenCookie
       ? {
           ...config,
@@ -79,6 +90,6 @@ export class ProjectsProxyController {
       );
     }
 
-    return new StreamableFile(pdfStream.right);
+    pdfStream.right.pipe(res);
   }
 }

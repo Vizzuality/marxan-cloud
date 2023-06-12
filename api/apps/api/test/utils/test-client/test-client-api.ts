@@ -39,6 +39,8 @@ import { OrganizationRequests } from './requests/organization-requests';
 import { E2E_CONFIG } from '../../e2e.config';
 import { EventBusTestUtils } from '../event-bus.test.utils';
 import { ModuleMetadata } from '@nestjs/common/interfaces/modules/module-metadata.interface';
+import { WebshotService } from '@marxan/webshot';
+import { FakeWebshotService } from '../webshot.service-fake';
 
 type Overrides = {
   classes: ClassProvider[];
@@ -59,6 +61,10 @@ export class TestClientApi {
       {
         provide: ScenarioCalibrationRepo,
         useClass: FakeScenarioCalibrationRepo,
+      },
+      {
+        provide: WebshotService,
+        useClass: FakeWebshotService,
       },
     ],
     values: [],

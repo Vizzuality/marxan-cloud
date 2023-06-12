@@ -5,7 +5,7 @@ import { waitForReportReady } from "../../utils/wait-function";
 import { ComparisonMapOptions } from "./comparison-map-options.dto";
 
 const appRouteTemplate =
-  "/reports/:projectId/:scenarioIdA/compare/:scenarioIdB/:param";
+  "/reports/:projectId/:scenarioIdA/compare/:scenarioIdB/comparison-map";
 
 export const generateSelectionFrequencyComparisonMapForScenarios = async (
   req: Request,
