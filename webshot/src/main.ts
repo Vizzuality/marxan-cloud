@@ -56,7 +56,7 @@ app.post(
 );
 
 app.post(
-  "/projects/:projectId/scenarios/:scenarioIdA/compare/:scenarioIdB/frequency-map",
+  "/projects/:projectId/scenarios/:scenarioIdA/compare/:scenarioIdB/comparison-map",
   async (req: Request, res: Response, next: NextFunction) => {
     await generateSelectionFrequencyComparisonMapForScenarios(req, res).catch(
       (error) => {
