@@ -125,16 +125,18 @@ export const getGeoFeatureTagsFixtures = async () => {
         response.body.errors[0].meta.rawError.response.message[0];
       expect(error).toContain(`The Tag cannot not be empty`);
     },
+
     ThenFeatureNotFoundWithinProjectErrorWasReturned: (
       response: request.Response,
-      featureId: string,
       projectId: string,
+      featureId: string,
     ) => {
       const error: any = response.body.errors[0].title;
       expect(error).toContain(
         `Feature with id ${featureId} is not available within Project with id ${projectId}`,
       );
     },
+
     ThenFeatureNotEditableWithinProjectErrorWasReturned: (
       response: request.Response,
       featureId: string,
@@ -171,6 +173,7 @@ export const getGeoFeatureTagsFixtures = async () => {
       expect(featureTags).toHaveLength(1);
       expect(featureTags[0].tag).toEqual(tag);
     },
+
     ThenFeatureDoesNotHaveTag: async (
       projectId: string,
       featureId: string,
