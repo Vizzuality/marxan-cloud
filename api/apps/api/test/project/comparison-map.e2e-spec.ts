@@ -9,10 +9,17 @@ beforeEach(async () => {
 
 test(`getting comparison map for scenarios in pdf`, async () => {
   const projectId = await fixtures.GivenPrivateProjectWasCreated();
-  const scenarioIds = await fixtures.GivenTwoScenariosWereCreated(projectId);
+  const scenarioIdA = await fixtures.GivenScenarioWasCreated(
+    projectId,
+    'Test Scenario A',
+  );
+  const scenarioIdB = await fixtures.GivenScenarioWasCreated(
+    projectId,
+    'Test Scenario B',
+  );
   const response = await fixtures.WhenComparisonMapIsRequested(
-    scenarioIds.scenarioIdA,
-    scenarioIds.scenarioIdB,
+    scenarioIdA,
+    scenarioIdB,
   );
   fixtures.ThenCorrectPdfBufferIsReceived(response);
 });
