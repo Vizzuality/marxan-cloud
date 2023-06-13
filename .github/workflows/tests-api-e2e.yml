@@ -25,6 +25,7 @@ jobs:
           - 'calculate-pu-protection-level'
           - 'cloning'
           - 'files-repository'
+          - 'geo-features'
           - 'implicit-permissions'
           - 'integration'
           - 'legacy-project-import'

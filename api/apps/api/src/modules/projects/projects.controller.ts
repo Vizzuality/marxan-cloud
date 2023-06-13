@@ -146,6 +146,8 @@ import {
   featureNotEditable,
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
+import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
+import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -156,6 +158,7 @@ export class ProjectsController {
     private readonly projectsService: ProjectsService,
     private readonly geoFeatureSerializer: GeoFeatureSerializer,
     private readonly geoFeatureService: GeoFeaturesService,
+    private readonly geoFeatureTagsService: GeoFeatureTagsService,
     private readonly projectSerializer: ProjectSerializer,
     private readonly jobsStatusSerializer: JobStatusSerializer,
     private readonly shapefileService: ShapefileService,
@@ -842,6 +845,43 @@ export class ProjectsController {
     }
 
     return;
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: `Updates A GeoFeature's tag for a given Project`,
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project that the Feature is part of',
+  })
+  @ApiParam({
+    name: 'featureId',
+    description: 'Id of the Feature whose tag will be patched',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Patch(':projectId/features/:featureId/tags')
+  async updateGeoFeatureTag(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Param('featureId', ParseUUIDPipe) featureId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UpdateGeoFeatureTagDTO,
+  ): Promise<void> {
+    const result = await this.geoFeatureTagsService.setOrUpdateTagForFeature(
+      req.user.id,
+      projectId,
+      featureId,
+      dto.tagName,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        featureId,
+        projectId: projectId,
+      });
+    }
   }
 
   @ImplementsAcl()

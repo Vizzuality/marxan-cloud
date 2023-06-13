@@ -57,6 +57,10 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_contributor,
     ProjectRoles.project_viewer,
   ];
+  private readonly canEditFeatureInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
   private readonly canDeleteFeatureInProjectRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
@@ -154,6 +158,16 @@ export class ProjectAclService implements ProjectAccessControl {
     );
 
     return userHasPermit || isPublic;
+  }
+
+  async canEditFeatureInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canEditFeatureInProjectRoles,
+    );
   }
 
   async canDeleteFeatureInProject(

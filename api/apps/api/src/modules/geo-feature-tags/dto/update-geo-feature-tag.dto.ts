@@ -1,16 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUUID, ValidateNested } from 'class-validator';
-import { TagInfoDTO } from '@marxan-api/modules/geo-feature-tags/dto/tag-info.dto';
-import { Type } from 'class-transformer';
+import { IsNotEmpty, MaxLength, Validate } from 'class-validator';
+import { IsValidTagNameValidator } from '@marxan-api/modules/geo-feature-tags/validators/is-valid-tag-name.custom.validator';
+
+export const tagMaxlength = 30;
+
+const tagMaxLengthErrorMessage = `A tag should not be longer than ${tagMaxlength} characters`;
 
 export class UpdateGeoFeatureTagDTO {
   @ApiProperty()
-  @IsUUID()
-  projectId!: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @ValidateNested({ each: true })
-  @Type(() => TagInfoDTO)
-  tagInfo!: TagInfoDTO;
+  @IsNotEmpty({ message: 'The Tag cannot not be empty' })
+  @Validate(IsValidTagNameValidator)
+  @MaxLength(tagMaxlength, {
+    message: tagMaxLengthErrorMessage,
+  })
+  tagName!: string;
 }
