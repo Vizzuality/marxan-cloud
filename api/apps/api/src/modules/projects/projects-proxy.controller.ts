@@ -65,7 +65,7 @@ export class ProjectsProxyController {
     @Res() res: Response,
     @Req() req: RequestWithAuthenticatedUser,
     @AppSessionTokenCookie() appSessionTokenCookie: string,
-  ): Promise<any> {
+  ): Promise<void> {
     const configForWebshot = appSessionTokenCookie
       ? {
           ...config,
@@ -82,12 +82,6 @@ export class ProjectsProxyController {
 
     if (isLeft(pdfStream)) {
       throw mapAclDomainToHttpError(pdfStream.left, {});
-    }
-
-    if (isLeft(pdfStream)) {
-      return new InternalServerErrorException(
-        'Unexpected error while preparing scenario frequency comparison map.',
-      );
     }
 
     pdfStream.right.pipe(res);
