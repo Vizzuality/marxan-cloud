@@ -100,12 +100,12 @@ export const getFixtures = async () => {
       cleanups.push(cleanup);
       return projectId;
     },
-    GivenScenarioWasCreated: async (projectId: string) => {
+    GivenScenarioWasCreated: async (projectId: string, name?: string) => {
       const result = await ScenariosTestUtils.createScenario(
         app,
         randomUserToken,
         {
-          name: `Test scenario`,
+          name: name || `Test scenario`,
           type: ScenarioType.marxan,
           projectId,
         },
