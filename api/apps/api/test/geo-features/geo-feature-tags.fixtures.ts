@@ -119,6 +119,12 @@ export const getGeoFeatureTagsFixtures = async () => {
         .set('Authorization', `Bearer ${userToken}`)
         .send({ tagName }),
 
+    WhenDeletingAGeoFeatureTag: (projectId: string, featureId: string) =>
+      request(app.getHttpServer())
+        .delete(`/api/v1/projects/${projectId}/features/${featureId}/tags`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send(),
+
     // ASSERT
     ThenEmptyErrorWasReturned: (response: request.Response) => {
       const error: any =
@@ -181,6 +187,12 @@ export const getGeoFeatureTagsFixtures = async () => {
     ) => {
       const featureTags = await geoFeatureTagRepo.find({
         where: { projectId, featureId, tag },
+      });
+      expect(featureTags).toHaveLength(0);
+    },
+    ThenFeatureDoesNotHaveTags: async (featureId: string) => {
+      const featureTags = await geoFeatureTagRepo.find({
+        where: { featureId },
       });
       expect(featureTags).toHaveLength(0);
     },

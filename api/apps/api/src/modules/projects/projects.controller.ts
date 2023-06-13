@@ -879,7 +879,42 @@ export class ProjectsController {
       throw mapAclDomainToHttpError(result.left, {
         userId: req.user.id,
         featureId,
-        projectId: projectId,
+        projectId,
+      });
+    }
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: `Deletes A GeoFeature's tag for a given Project`,
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project that the Feature is part of',
+  })
+  @ApiParam({
+    name: 'featureId',
+    description: 'Id of the Feature whose tag will be deleted',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Delete(':projectId/features/:featureId/tags')
+  async deleteGeoFeatureTag(
+    @Param('featureId', ParseUUIDPipe) featureId: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<void> {
+    const result = await this.geoFeatureTagsService.deleteTagForFeature(
+      req.user.id,
+      projectId,
+      featureId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        featureId,
+        projectId,
       });
     }
   }
