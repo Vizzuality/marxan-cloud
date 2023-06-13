@@ -18,37 +18,48 @@ describe('GeoFeatureTag PATCH (e2e)', () => {
   test('should return error if feature is not found or not related to project', async () => {
     //ARRANGE
     const randomProjectId = v4();
-    const inexistentFeatureId = v4();
+    const randomFeatureId = v4();
     const projectId = await fixtures.GivenProject('someProject');
     const featureId = await fixtures.GivenFeatureOnProject(
       projectId,
       'someFeat',
     );
 
-    // ACT
-    const responseNotFound = await fixtures.WhenPatchingAGeoFeatureTag(
-      v4(),
-      inexistentFeatureId,
+    // ACT // ASSERT
+    const response1 = await fixtures.WhenPatchingAGeoFeatureTag(
+      randomProjectId,
+      randomFeatureId,
       'sometag',
     );
-    const responseNotRelated = await fixtures.WhenPatchingAGeoFeatureTag(
+    expect(response1.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
+      response1,
       randomProjectId,
-      featureId,
-      'sometag',
+      randomFeatureId,
     );
 
-    //ASSERT
-    expect(responseNotFound.status).toBe(HttpStatus.NOT_FOUND);
-    fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
-      responseNotRelated,
-      featureId,
+    const response2 = await fixtures.WhenPatchingAGeoFeatureTag(
       randomProjectId,
+      featureId,
+      'sometag',
     );
-    expect(responseNotRelated.status).toBe(HttpStatus.NOT_FOUND);
+    expect(response2.status).toBe(HttpStatus.NOT_FOUND);
     fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
-      responseNotRelated,
-      featureId,
+      response2,
       randomProjectId,
+      featureId,
+    );
+
+    const response3 = await fixtures.WhenPatchingAGeoFeatureTag(
+      projectId,
+      randomFeatureId,
+      'sometag',
+    );
+    expect(response3.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
+      response3,
+      projectId,
+      randomFeatureId,
     );
   });
 
