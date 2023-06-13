@@ -6,6 +6,80 @@ import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-ge
 
 let fixtures: FixtureType<typeof getGeoFeatureTagsFixtures>;
 
+describe('GeoFeatureTag DELETE (e2)', () => {
+  beforeEach(async () => {
+    fixtures = await getGeoFeatureTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return error if feature is not found or not related to project', async () => {
+    //ARRANGE
+    const randomProjectId = v4();
+    const randomFeatureId = v4();
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId = await fixtures.GivenFeatureOnProject(
+      projectId,
+      'someFeat',
+    );
+
+    // ACT // ASSERT
+    const response1 = await fixtures.WhenDeletingAGeoFeatureTag(
+      randomProjectId,
+      randomFeatureId,
+    );
+    expect(response1.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
+      response1,
+      randomProjectId,
+      randomFeatureId,
+    );
+
+    const response2 = await fixtures.WhenDeletingAGeoFeatureTag(
+      randomProjectId,
+      featureId,
+    );
+    expect(response2.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
+      response2,
+      randomProjectId,
+      featureId,
+    );
+
+    const response3 = await fixtures.WhenDeletingAGeoFeatureTag(
+      projectId,
+      randomFeatureId,
+    );
+    expect(response3.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenFeatureNotFoundWithinProjectErrorWasReturned(
+      response3,
+      projectId,
+      randomFeatureId,
+    );
+  });
+
+  test(`should delete the feature's tag`, async () => {
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId = await fixtures.GivenFeatureOnProject(
+      projectId,
+      'someFeat',
+    );
+    await fixtures.GivenTagOnFeature(projectId, featureId, 'sometag');
+
+    //ACT
+    const response = await fixtures.WhenDeletingAGeoFeatureTag(
+      projectId,
+      featureId,
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    await fixtures.ThenFeatureDoesNotHaveTags(featureId);
+  });
+});
+
 describe('GeoFeatureTag PATCH (e2e)', () => {
   beforeEach(async () => {
     fixtures = await getGeoFeatureTagsFixtures();

@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  NotFoundException,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { geoFeatureResource, GeoFeatureResult } from './geo-feature.geo.entity';
 import { GeoFeaturesService } from './geo-features.service';
 import {

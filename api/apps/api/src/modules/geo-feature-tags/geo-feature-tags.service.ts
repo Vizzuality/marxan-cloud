@@ -78,4 +78,35 @@ export class GeoFeatureTagsService {
       await apiQueryRunner.release();
     }
   }
+
+  async deleteTagForFeature(
+    userId: string,
+    projectId: string,
+    featureId: string,
+  ): Promise<
+    Either<
+      | typeof featureNotFoundWithinProject
+      | typeof featureNotEditableByUserWithinProject,
+      any
+    >
+  > {
+    const geoFeature = await this.geoFeaturesRepo.findOne({
+      where: { id: featureId, projectId },
+    });
+
+    if (!geoFeature) {
+      return left(featureNotFoundWithinProject);
+    }
+
+    // RBAC checks
+    if (
+      !(await this.projectAclService.canEditFeatureInProject(userId, projectId))
+    ) {
+      return left(featureNotEditableByUserWithinProject);
+    }
+
+    await this.geoFeatureTagsRepo.delete({ featureId });
+
+    return right(true);
+  }
 }
