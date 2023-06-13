@@ -32,13 +32,7 @@ import {
 import { Request, Response } from 'express';
 import { ProxyService } from '@marxan-api/modules/proxy/proxy.service';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
-import {
-  featureNotFound,
-  featureProjectNotRelated,
-  GeoFeatureTagsService,
-} from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
-import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
-import { isLeft } from 'fp-ts/Either';
+import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
@@ -69,38 +63,6 @@ export class GeoFeaturesController {
   ): Promise<GeoFeatureResult> {
     const results = await this.service.findAllPaginated(fetchSpecification);
     return this.service.serialize(results.data, results.metadata);
-  }
-
-  @ApiOperation({
-    description: `Updates A GeoFeature's tag`,
-  })
-  @ApiParam({
-    name: 'featureId',
-    description: 'Id of the Feature whose tag will be patched',
-  })
-  @ApiUnauthorizedResponse()
-  @ApiForbiddenResponse()
-  @Patch(':featureId/tags')
-  async updateGeoFeatureTag(
-    @Param('featureId', ParseUUIDPipe) featureId: string,
-    @Body() dto: UpdateGeoFeatureTagDTO,
-  ): Promise<void> {
-    const result = await this.geoFeaturesTagService.updateTagForFeature(
-      dto.projectId,
-      featureId,
-      dto.tagInfo.tagName,
-    );
-
-    if (isLeft(result)) {
-      switch (result.left) {
-        case featureNotFound:
-          throw new NotFoundException(`Feature with id ${featureId} not found`);
-        case featureProjectNotRelated:
-          throw new NotFoundException(
-            `Feature with id ${featureId} and Project with id ${dto.projectId} are not related`,
-          );
-      }
-    }
   }
 
   @ApiOperation({

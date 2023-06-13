@@ -14,6 +14,6 @@ export class IsValidTagNameValidator implements ValidatorConstraintInterface {
   }
 
   defaultMessage(args: ValidationArguments) {
-    return `tagName cannot contain newline characters`;
+    return `A tag cannot contain line breaks`;
   }
 }

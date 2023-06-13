@@ -77,9 +77,15 @@ import {
   AclErrors,
   userNotFound,
 } from '@marxan-api/modules/access-control/access-control.types';
+import {
+  featureNotEditableByUserWithinProject,
+  featureNotFound,
+  featureNotFoundWithinProject,
+} from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
+  featureId?: string;
   range?: [number, number];
   resourceType?: string;
   scenarioId?: string;
@@ -134,6 +140,9 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished
     | typeof deleteScenarioFailed
+    | typeof featureNotFound
+    | typeof featureNotFoundWithinProject
+    | typeof featureNotEditableByUserWithinProject
     | ImportProjectError,
   options?: ErrorHandlerOptions,
 ) => {
@@ -281,6 +290,18 @@ export const mapAclDomainToHttpError = (
     case deleteScenarioFailed:
       return new BadRequestException(
         `Scenario ${options?.scenarioId} and associated resources could not be deleted.`,
+      );
+    case featureNotFound:
+      throw new NotFoundException(
+        `Feature with id ${options?.featureId} not found`,
+      );
+    case featureNotFoundWithinProject:
+      throw new NotFoundException(
+        `Feature with id ${options?.featureId} is not available within Project with id ${options?.projectId}`,
+      );
+    case featureNotEditableByUserWithinProject:
+      throw new ForbiddenException(
+        `Feature with id ${options?.featureId} is not editable by user ${options?.userId} within Project with id ${options?.projectId}`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;
