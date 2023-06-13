@@ -126,15 +126,14 @@ export const mapAclDomainToHttpError = (
     | typeof unknownPngWebshotError
     | typeof unknownError
     | typeof userNotFound
-    | typeof unknownPngWebshotError
-    | typeof unknownPdfWebshotError
     | typeof exportNotFound
     | typeof exportResourceKindIsNotProject
     | typeof exportIsNotStandalone
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished
     | typeof deleteScenarioFailed
-    | ImportProjectError,
+    | ImportProjectError
+    | GetScenarioFailure,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
