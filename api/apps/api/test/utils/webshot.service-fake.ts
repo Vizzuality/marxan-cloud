@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import { lastValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 
+// @todo: remove this service mock once comparison map in pdf feature is completed with FE, then real WebshotService will be used in e2e tests
 @Injectable()
 export class FakeWebshotService {
   constructor(private readonly httpService: HttpService) {}

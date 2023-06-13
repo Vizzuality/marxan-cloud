@@ -36,7 +36,11 @@ export class WebshotBasicPdfConfig extends WebshotConfig {
   pdfOptions?: PDFOptions;
 }
 
-export class WebshotPdfReportConfig extends WebshotBasicPdfConfig {
+export class WebshotPdfReportConfig extends WebshotConfig {
+  @ApiPropertyOptional()
+  @IsOptional()
+  pdfOptions?: PDFOptions;
+
   @ValidateNested()
   @IsObject()
   @Type(() => ReportOptions)
