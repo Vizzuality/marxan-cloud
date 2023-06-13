@@ -806,6 +806,14 @@ export class ProjectsService {
         `Scenarios ${scenarioIdA} and ${scenarioIdB} are not in the same project.`,
       );
     }
+    if (
+      !(await this.projectAclService.canViewProject(
+        userId,
+        scenarioA.right.projectId,
+      ))
+    ) {
+      return left(forbiddenError);
+    }
     const webshotUrl = AppConfig.get('webshot.url') as string;
 
     /** @debt Refactor to use @nestjs/common's StreamableFile
