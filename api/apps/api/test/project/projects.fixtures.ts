@@ -114,27 +114,6 @@ export const getFixtures = async () => {
       return result.data.id;
     },
 
-    GivenTwoScenariosWereCreated: async (projectId: string) => {
-      const scenarioA = await ScenariosTestUtils.createScenario(
-        app,
-        randomUserToken,
-        {
-          name: `Test scenario A`,
-          type: ScenarioType.marxan,
-          projectId,
-        },
-      );
-      const scenarioB = await ScenariosTestUtils.createScenario(
-        app,
-        randomUserToken,
-        {
-          name: `Test scenario B`,
-          type: ScenarioType.marxan,
-          projectId,
-        },
-      );
-      return { scenarioIdA: scenarioA.data.id, scenarioIdB: scenarioB.data.id };
-    },
     GivenPublicProjectWasCreated: async () => {
       const { projectId, cleanup } = await GivenProjectExists(
         app,
