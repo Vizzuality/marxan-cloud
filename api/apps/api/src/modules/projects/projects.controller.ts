@@ -140,12 +140,14 @@ import { updateSolutionsAreLockFailed } from '../legacy-project-import/applicati
 import { blmCreationFailure } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import {
-  featureNameAlreadyInUse,
   featureIsLinkedToOneOrMoreScenarios,
+  featureNameAlreadyInUse,
   featureNotDeletable,
   featureNotEditable,
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
+import { ApiConsumesCsv } from '@marxan-api/decorators/csv.decorator';
+import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
@@ -751,6 +753,39 @@ export class ProjectsController {
     );
 
     return { success: true };
+  }
+
+  @ImplementsAcl()
+  @ApiConsumesCsv({
+    description: 'Upload a csv with feature amount for each puid',
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project the feature is part of',
+  })
+  @UseInterceptors(
+    FileInterceptor('file', { limits: uploadOptions(50 * 1024 ** 2).limits }),
+  )
+  @Post(`:projectId/features/csv`)
+  async setFeatureAmountFromCSV(
+    @Param('projectId') projectId: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: RequestWithAuthenticatedUser,
+  ): Promise<FeatureAmountUploadRegistry> {
+    const result = await this.geoFeatureService.saveFeaturesToRegistry(
+      file.buffer,
+      projectId,
+      req.user.id,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        projectId,
+        resourceType: projectResource.name.plural,
+      });
+    }
+    return result.right;
   }
 
   @ImplementsAcl()
