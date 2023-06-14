@@ -34,6 +34,7 @@ import { ProjectAclService } from '@marxan-api/modules/access-control/projects-a
 import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
+import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -374,6 +375,14 @@ export class GeoFeaturesService extends AppBaseService<
         data,
       );
 
+      //Create Tag if provided
+      await this.createFeatureTag(
+        apiQueryRunner.manager,
+        projectId,
+        geofeature.id,
+        data.tagName,
+      );
+
       // Store geometries in features_data table
       for (const feature of features) {
         await this.createFeatureData(
@@ -525,6 +534,27 @@ export class GeoFeaturesService extends AppBaseService<
         creationStatus: JobStatus.done,
       }),
     );
+  }
+
+  private async createFeatureTag(
+    entityManager: EntityManager,
+    projectId: string,
+    featureId: string,
+    tagName?: string,
+  ): Promise<void> {
+    if (!tagName) {
+      return;
+    }
+    const repo = entityManager.getRepository(GeoFeatureTag);
+    await repo.save(
+      repo.create({
+        projectId,
+        featureId,
+        tag: tagName,
+      }),
+    );
+
+    //TODO Update the last modified at of all equivalent tag rows
   }
 
   private async createFeatureData(

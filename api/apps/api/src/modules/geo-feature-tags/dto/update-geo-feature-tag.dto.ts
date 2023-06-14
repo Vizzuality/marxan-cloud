@@ -4,7 +4,7 @@ import { IsValidTagNameValidator } from '@marxan-api/modules/geo-feature-tags/va
 
 export const tagMaxlength = 30;
 
-const tagMaxLengthErrorMessage = `A tag should not be longer than ${tagMaxlength} characters`;
+export const tagMaxLengthErrorMessage = `A tag should not be longer than ${tagMaxlength} characters`;
 
 export class UpdateGeoFeatureTagDTO {
   @ApiProperty()
