@@ -6,7 +6,7 @@ import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-ge
 
 let fixtures: FixtureType<typeof getGeoFeatureTagsFixtures>;
 
-describe('GeoFeatureTag DELETE (e2)', () => {
+describe('GeoFeatureTag DELETE (e2e)', () => {
   beforeEach(async () => {
     fixtures = await getGeoFeatureTagsFixtures();
   });

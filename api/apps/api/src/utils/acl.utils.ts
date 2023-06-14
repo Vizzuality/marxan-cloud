@@ -21,6 +21,8 @@ import {
   exportResourceKindIsNotProject,
   projectIsMissingInfoForRegularPus,
   projectIsNotPublished,
+  projectNotEditable,
+  projectNotFound,
   projectNotFoundForExport,
 } from '@marxan-api/modules/projects/projects.service';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
@@ -45,9 +47,9 @@ import { submissionFailed } from '@marxan-api/modules/scenarios/protected-area';
 import { invalidProtectedAreaId } from '@marxan-api/modules/scenarios/protected-area/selection/selection-update.service';
 import {
   bestSolutionNotFound,
+  lockedSolutions,
   projectDoesntExist,
   projectNotReady,
-  lockedSolutions,
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
@@ -138,10 +140,12 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotFoundForExport
     | typeof projectIsNotPublished
     | typeof deleteScenarioFailed
-    | ImportProjectError
     | typeof featureNotFound
     | typeof featureNotFoundWithinProject
-    | typeof featureNotEditableByUserWithinProject,
+    | typeof featureNotEditableByUserWithinProject
+    | typeof projectNotFound
+    | typeof projectNotEditable
+    | ImportProjectError,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -300,6 +304,14 @@ export const mapAclDomainToHttpError = (
     case featureNotEditableByUserWithinProject:
       throw new ForbiddenException(
         `Feature with id ${options?.featureId} is not editable by user ${options?.userId} within Project with id ${options?.projectId}`,
+      );
+    case projectNotEditable:
+      throw new ForbiddenException(
+        `Project with id ${options?.projectId} is not editable by user ${options?.userId}`,
+      );
+    case projectNotFound:
+      throw new NotFoundException(
+        `Project with id ${options?.projectId} not found`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;

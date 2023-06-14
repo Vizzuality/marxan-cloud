@@ -1,10 +1,15 @@
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, ILike, Repository } from 'typeorm';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { Either, left, right } from 'fp-ts/lib/Either';
 import { ProjectAclService } from '@marxan-api/modules/access-control/projects-acl/project-acl.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import {
+  projectNotEditable,
+  projectNotFound,
+} from '@marxan-api/modules/projects/projects.service';
 
 export const featureNotFound = Symbol('feature not found');
 export const featureNotFoundWithinProject = Symbol(
@@ -20,6 +25,8 @@ export class GeoFeatureTagsService {
     private readonly geoFeatureTagsRepo: Repository<GeoFeatureTag>,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepo: Repository<GeoFeature>,
+    @InjectRepository(Project)
+    private readonly projectsRepo: Repository<Project>,
     @InjectDataSource(DbConnections.default)
     private readonly apiDataSource: DataSource,
     private readonly projectAclService: ProjectAclService,
@@ -106,6 +113,32 @@ export class GeoFeatureTagsService {
     }
 
     await this.geoFeatureTagsRepo.delete({ featureId });
+
+    return right(true);
+  }
+
+  async deleteTagForProject(
+    userId: string,
+    projectId: string,
+    tag: string,
+  ): Promise<Either<typeof projectNotEditable | typeof projectNotFound, any>> {
+    const project = await this.projectsRepo.findOne({
+      where: { id: projectId },
+    });
+
+    if (!project) {
+      return left(projectNotFound);
+    }
+
+    // RBAC checks
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return left(projectNotEditable);
+    }
+
+    await this.geoFeatureTagsRepo.delete({
+      projectId,
+      tag: ILike(tag),
+    });
 
     return right(true);
   }
