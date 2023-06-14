@@ -35,6 +35,8 @@ import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/updat
 import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
+import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
+import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -57,6 +59,13 @@ export const featureNotDeletable = Symbol('feature cannot be deleted');
 export const featureIsLinkedToOneOrMoreScenarios = Symbol(
   'feature is linked to one or more scenarios',
 );
+export const overlappingFeatures = Symbol(
+  'there are overlapping features for given project',
+);
+
+export const missingPuidColumn = Symbol('missing puid column');
+
+export const unknownPuids = Symbol('there are unknown puids for given project');
 
 export type FindResult = {
   data: (Partial<GeoFeature> | undefined)[];
@@ -88,6 +97,7 @@ export class GeoFeaturesService extends AppBaseService<
     @Inject(forwardRef(() => ScenarioFeaturesService))
     private readonly scenarioFeaturesService: ScenarioFeaturesService,
     private readonly projectAclService: ProjectAclService,
+    private readonly featureAmountUploads: FeatureAmountUploadService,
   ) {
     super(
       geoFeaturesRepository,
@@ -618,5 +628,31 @@ export class GeoFeaturesService extends AppBaseService<
                $4);`,
       [geometry, properties, GeometrySource.user_imported, featureId],
     );
+  }
+
+  // TODO: this should be a 2 step process: We temporarily store the new features and their amounts
+  //       after a user confirms which ones actually include
+
+  async saveFeaturesToRegistry(
+    fileBuffer: Buffer,
+    projectId: string,
+    userId: string,
+  ): Promise<
+    Either<
+      typeof overlappingFeatures | typeof unknownPuids | typeof projectNotFound,
+      FeatureAmountUploadRegistry
+    >
+  > {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+    });
+    if (!project) {
+      return left(projectNotFound);
+    }
+    return this.featureAmountUploads.saveCsvToRegistry({
+      fileBuffer,
+      projectId,
+      userId,
+    });
   }
 }

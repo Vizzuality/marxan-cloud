@@ -19,6 +19,11 @@ import { ProjectsModule } from '@marxan-api/modules/projects/projects.module';
 import { ProjectAclModule } from '@marxan-api/modules/access-control/projects-acl/project-acl.module';
 import { ScenarioFeaturesModule } from '@marxan-api/modules/scenarios-features';
 import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.module';
+import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
+import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
+import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
+import { ApiEventsModule } from '@marxan-api/modules/api-events';
+import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
 
 @Module({
   imports: [
@@ -26,11 +31,18 @@ import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-f
       [GeoFeatureGeometry, GeoFeaturePropertySet, ScenarioFeaturesData],
       DbConnections.geoprocessingDB,
     ),
-    TypeOrmModule.forFeature([GeoFeature, Project, Scenario]),
+    TypeOrmModule.forFeature([
+      GeoFeature,
+      Project,
+      Scenario,
+      FeatureAmountUploadRegistry,
+      UploadedFeatureAmount,
+    ]),
     ProcessingModule,
     forwardRef(() => ProjectsModule),
     ProjectAclModule,
     forwardRef(() => ScenarioFeaturesModule),
+    ApiEventsModule,
     GeoFeatureTagsModule,
   ],
   providers: [
@@ -39,6 +51,8 @@ import { GeoFeatureTagsModule } from '@marxan-api/modules/geo-feature-tags/geo-f
     GeoFeatureSetService,
     GeoFeaturePropertySetService,
     ProxyService,
+    FeatureAmountUploadService,
+    FeatureImportEventsService,
   ],
   controllers: [GeoFeaturesController],
   exports: [

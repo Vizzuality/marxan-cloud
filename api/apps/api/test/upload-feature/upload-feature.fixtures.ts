@@ -3,11 +3,14 @@ import { GivenUserIsLoggedIn } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
+import { GivenProjectsPuExists } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
+import { HttpStatus } from '@nestjs/common';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 
@@ -25,6 +28,8 @@ export const getFixtures = async () => {
       name: `Organization ${Date.now()}`,
     },
   );
+  const customFeatureName = `User custom feature ${Date.now()}`;
+  const customFeatureDesc = `User custom feature desc`;
 
   const geoFeaturesApiRepo: Repository<GeoFeature> = app.get(
     getRepositoryToken(GeoFeature),
@@ -34,6 +39,14 @@ export const getFixtures = async () => {
   );
   const geoFeatureTagRepo: Repository<GeoFeatureTag> = app.get(
     getRepositoryToken(GeoFeatureTag),
+  );
+
+  const featureImportRegistry: Repository<FeatureAmountUploadRegistry> = app.get(
+    getRepositoryToken(FeatureAmountUploadRegistry, DbConnections.default),
+  );
+
+  const geoEntityManager: EntityManager = app.get(
+    getEntityManagerToken(DbConnections.geoprocessingDB),
   );
 
   return {
@@ -93,6 +106,45 @@ export const getFixtures = async () => {
         .set('Authorization', `Bearer ${token}`)
         .attach(`file`, __dirname + `/wetlands.zip`)
         .field(dto);
+    },
+    WhenUploadingCustomFeatureFromCSV: async () => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(`file`, __dirname + `/import-files/feature_amount_upload.csv`)
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
+    },
+    WhenUploadingCsvWithMissingPUIDColumn: async () => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(
+          `file`,
+          __dirname + `/import-files/missing_puid_feature_amount_upload.csv`,
+        )
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
+    },
+    WhenUploadingACSVWithDuplicatedHeaders: async () => {
+      await GivenProjectsPuExists(geoEntityManager, projectId);
+      return request(app.getHttpServer())
+        .post(`/api/v1/projects/${projectId}/features/csv`)
+        .set('Authorization', `Bearer ${token}`)
+        .attach(
+          `file`,
+          __dirname + `/import-files/duplicate_features_feature_upload.csv`,
+        )
+        .field({
+          name: customFeatureName,
+          description: customFeatureDesc,
+        });
     },
 
     // ASSERT
@@ -180,6 +232,25 @@ export const getFixtures = async () => {
           source: `user_imported`,
         },
       ]);
+    },
+    ThenFeatureUploadRegistryIsCreated: async () => {
+      const featureImportRegistryRecord = await featureImportRegistry.findOne({
+        where: { projectId },
+        relations: ['uploadedFeatures'],
+      });
+      expect(featureImportRegistryRecord?.projectId).toEqual(projectId);
+      expect(featureImportRegistryRecord?.uploadedFeatures).toHaveLength(6);
+    },
+    ThenMissingPUIDErrorIsReturned: async (result: request.Response) => {
+      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
+      expect(result.body.errors[0].title).toEqual('Missing PUID column');
+    },
+    AndNoFeatureUploadIsRegistered: async () => {
+      const featureImportRegistryRecord = await featureImportRegistry.findOne({
+        where: { projectId },
+        relations: ['uploadedFeatures'],
+      });
+      expect(featureImportRegistryRecord).toBeFalsy();
     },
   };
 };

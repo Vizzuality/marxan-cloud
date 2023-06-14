@@ -89,6 +89,9 @@ export enum API_EVENT_KINDS {
   project__legacy__import__piece__submitted__v1__alpha = 'project.legacy.import.piece.submitted/v1/alpha',
   project__legacy__import__piece__finished__v1__alpha = 'project.legacy.import.piece.finished/v1/alpha',
   project__legacy__import__piece__failed__v1__alpha = 'project.legacy.import.piece.failed/v1/alpha',
+  features__csv__import__submitted__v1__alpha = 'features.csv.import.submitted/v1/alpha',
+  features__csv__import__finished__v1__alpha = 'features.csv.import.finished/v1/alpha',
+  features__csv__import__failed__v1__alpha = 'features.csv.import.failed/v1/alpha',
 }
 
 export type ProjectEvents = Pick<
