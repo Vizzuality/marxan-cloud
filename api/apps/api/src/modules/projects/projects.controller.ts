@@ -921,6 +921,36 @@ export class ProjectsController {
 
   @ImplementsAcl()
   @ApiOperation({
+    description: `Deletes A Tag from a given Project, untagging all its features`,
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project that the tag to be removed pertains to',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Delete(':projectId/tags')
+  async deleteProjectTag(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() dto: UpdateGeoFeatureTagDTO,
+  ): Promise<void> {
+    const result = await this.geoFeatureTagsService.deleteTagForProject(
+      req.user.id,
+      projectId,
+      dto.tagName,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        projectId,
+      });
+    }
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
     description: 'Updates the project BLM range and calculate its values',
   })
   @ApiParam({

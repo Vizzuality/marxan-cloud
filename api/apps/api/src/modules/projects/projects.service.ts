@@ -115,6 +115,7 @@ import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.servic
 export { validationFailed } from '../planning-areas';
 
 export const projectNotFound = Symbol(`project not found`);
+export const projectNotEditable = Symbol(`project not editable`);
 export const projectIsMissingInfoForRegularPus = Symbol(
   `project is missing info for regular planning units`,
 );
