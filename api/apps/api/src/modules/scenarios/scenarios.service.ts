@@ -69,7 +69,10 @@ import { ScenarioAccessControl } from '@marxan-api/modules/access-control/scenar
 import { forbiddenError } from '@marxan-api/modules/access-control';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { LastUpdatedSpecificationError } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
-import { ScenariosPlanningUnitGeoEntity } from '@marxan/scenarios-planning-unit';
+import {
+  LockStatus,
+  ScenariosPlanningUnitGeoEntity,
+} from '@marxan/scenarios-planning-unit';
 import { PaginationMeta } from '@marxan-api/utils/app-base.service';
 import { ScenarioFeaturesData } from '@marxan/features';
 import { ScenariosOutputResultsApiEntity } from '@marxan/marxan-output';
@@ -429,6 +432,38 @@ export class ScenariosService {
     return right(void 0);
   }
 
+  async clearLockStatuses(
+    scenarioId: string,
+    userId: string,
+    kind: LockStatus,
+  ): Promise<
+    Either<
+      | typeof forbiddenError
+      | typeof noLockInPlace
+      | typeof lockedByAnotherUser
+      | typeof scenarioNotFound,
+      void
+    >
+  > {
+    if (await this.givenScenarioDoesNotExist(scenarioId))
+      return left(scenarioNotFound);
+
+    const userCanEditScenario = await this.scenarioAclService.canEditScenarioAndOwnsLock(
+      userId,
+      scenarioId,
+    );
+    if (isLeft(userCanEditScenario)) {
+      return userCanEditScenario;
+    }
+
+    const updateConstraints: AdjustPlanningUnitsInput = await this.mapCurrentPuStatusesAndClearRequested(
+      scenarioId,
+      kind,
+    );
+    await this.updatePlanningUnits.update(scenarioId, updateConstraints);
+    return right(void 0);
+  }
+
   private mapLockStatusDtoToAdjustPlanningUnitsInput(
     input: UpdateScenarioPlanningUnitLockStatusDto,
   ): AdjustPlanningUnitsInput {
@@ -445,6 +480,50 @@ export class ScenariosService {
         pu: input.byId?.makeAvailable,
         geo: input.byGeoJson?.makeAvailable,
       },
+    };
+  }
+
+  private async mapCurrentPuStatusesAndClearRequested(
+    scenarioId: string,
+    kindToClear: LockStatus,
+  ): Promise<AdjustPlanningUnitsInput> {
+    const lockedInPus = await this.planningUnitsService.getByStatus(
+      scenarioId,
+      LockStatus.LockedIn,
+    );
+
+    const lockedOutPus = await this.planningUnitsService.getByStatus(
+      scenarioId,
+      LockStatus.LockedOut,
+    );
+
+    const availablePus = await this.planningUnitsService.getByStatus(
+      scenarioId,
+      LockStatus.Available,
+    );
+
+    return {
+      ...(kindToClear !== LockStatus.LockedIn
+        ? {
+            include: {
+              pu: lockedInPus.map((pu) => pu.id),
+            },
+          }
+        : {}),
+      ...(kindToClear !== LockStatus.LockedOut
+        ? {
+            exclude: {
+              pu: lockedOutPus.map((pu) => pu.id),
+            },
+          }
+        : {}),
+      ...(kindToClear !== LockStatus.Available
+        ? {
+            makeAvailable: {
+              pu: availablePus.map((pu) => pu.id),
+            },
+          }
+        : {}),
     };
   }
   async processCostSurfaceShapefile(
