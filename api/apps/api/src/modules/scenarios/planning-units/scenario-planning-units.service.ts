@@ -28,6 +28,18 @@ export class ScenarioPlanningUnitsService {
     });
   }
 
+  async getByStatus(
+    scenarioId: string,
+    lockStatus: LockStatus,
+  ): Promise<ScenariosPlanningUnitGeoEntity[]> {
+    return this.puRepo.find({
+      where: {
+        scenarioId,
+        lockStatus,
+      },
+    });
+  }
+
   async resetLockStatus(scenarioId: string): Promise<void> {
     return await this.entityManager.transaction(async (manager) => {
       await manager.update(
