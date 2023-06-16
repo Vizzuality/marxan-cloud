@@ -530,7 +530,7 @@ export class ScenariosController {
   @Delete(':id/planning-units/status/:kind')
   async clearPlanningUnitsStatus(
     @Param('id', ParseUUIDPipe) id: string,
-    @Param('kind', ParseUUIDPipe) kind: LockStatus,
+    @Param('kind') kind: string,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<JsonApiAsyncJobMeta> {
     const result = await this.service.clearLockStatuses(id, req.user.id, kind);
