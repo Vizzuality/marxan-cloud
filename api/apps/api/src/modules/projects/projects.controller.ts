@@ -148,6 +148,8 @@ import {
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
+import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
+import { GetProjectTagsDTO } from '@marxan-api/modules/projects/dto/get-project-tags.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -917,6 +919,39 @@ export class ProjectsController {
         projectId,
       });
     }
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: `Returns all the tags for the given Project that match the filter`,
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project that the tag to be removed pertains to',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Get(':projectId/tags')
+  async getProjectTags(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Query() queryParams: GetProjectTagsDTO,
+  ): Promise<GetProjectTagsResponseDto> {
+    const result = await this.geoFeatureTagsService.getGeoFeatureTagsForProject(
+      req.user.id,
+      projectId,
+      queryParams.tag,
+      queryParams.order,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        projectId,
+      });
+    }
+
+    return { tags: result.right };
   }
 
   @ImplementsAcl()

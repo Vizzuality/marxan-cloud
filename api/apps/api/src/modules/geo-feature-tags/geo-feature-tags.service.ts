@@ -9,6 +9,7 @@ import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import {
   projectNotEditable,
   projectNotFound,
+  projectNotVisible,
 } from '@marxan-api/modules/projects/projects.service';
 
 export const featureNotFound = Symbol('feature not found');
@@ -32,6 +33,41 @@ export class GeoFeatureTagsService {
     private readonly projectAclService: ProjectAclService,
   ) {}
 
+  async getGeoFeatureTagsForProject(
+    userId: string,
+    projectId: string,
+    tagFilter?: string,
+    order?: string,
+  ): Promise<
+    Either<typeof projectNotVisible | typeof projectNotFound, string[]>
+  > {
+    const project = await this.projectsRepo.findOne({
+      where: { id: projectId },
+    });
+    if (!project) {
+      return left(projectNotFound);
+    }
+
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(projectNotVisible);
+    }
+
+    const query = this.geoFeatureTagsRepo
+      .createQueryBuilder('feature_tag')
+      .select('feature_tag.tag', 'tag')
+      .distinct(true)
+      .where({ projectId })
+      .orderBy('feature_tag.tag', order === 'DESC' ? 'DESC' : 'ASC');
+
+    if (tagFilter) {
+      query.andWhere({ tag: ILike(`%${tagFilter}%`) });
+    }
+
+    const result = await query.getRawMany();
+
+    return right(result.map((geoFeatureTag) => geoFeatureTag.tag));
+  }
+
   async setOrUpdateTagForFeature(
     userId: string,
     projectId: string,
@@ -41,7 +77,7 @@ export class GeoFeatureTagsService {
     Either<
       | typeof featureNotFoundWithinProject
       | typeof featureNotEditableByUserWithinProject,
-      any
+      true
     >
   > {
     const geoFeature = await this.geoFeaturesRepo.findOne({
@@ -94,7 +130,7 @@ export class GeoFeatureTagsService {
     Either<
       | typeof featureNotFoundWithinProject
       | typeof featureNotEditableByUserWithinProject,
-      any
+      true
     >
   > {
     const geoFeature = await this.geoFeaturesRepo.findOne({
@@ -121,7 +157,7 @@ export class GeoFeatureTagsService {
     userId: string,
     projectId: string,
     tag: string,
-  ): Promise<Either<typeof projectNotEditable | typeof projectNotFound, any>> {
+  ): Promise<Either<typeof projectNotEditable | typeof projectNotFound, true>> {
     const project = await this.projectsRepo.findOne({
       where: { id: projectId },
     });

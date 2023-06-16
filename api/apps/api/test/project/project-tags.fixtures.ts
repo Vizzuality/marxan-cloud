@@ -109,6 +109,21 @@ export const getProjectTagsFixtures = async () => {
             ('${projectId}', '${featureId}', '${tag}' ) `),
 
     // ACT
+    WhenGettingProjectTags: (
+      projectId: string,
+      tagName?: string,
+      order?: string,
+    ) => {
+      const queryParams: any = {};
+      tagName ? (queryParams.tag = tagName) : '';
+      order ? (queryParams.order = order) : '';
+
+      return request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/tags?`)
+        .query(queryParams)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({ tagName });
+    },
     WhenDeletingAProjectTag: (projectId: string, tagName: string) =>
       request(app.getHttpServer())
         .delete(`/api/v1/projects/${projectId}/tags`)
@@ -138,6 +153,22 @@ export const getProjectTagsFixtures = async () => {
       expect(error).toContain(
         `Project with id ${projectId} is not editable by user ${userId}`,
       );
+    },
+
+    ThenProjectNotVisibleErrorWasReturned: (
+      response: request.Response,
+      projectId: string,
+    ) => {
+      const error: any = response.body.errors[0].title;
+      expect(error).toContain(
+        `Project with id ${projectId} cannot be consulted by user ${userId}`,
+      );
+    },
+
+    ThenIncorrectOrderErrorWasReturned: (response: request.Response) => {
+      const error: any =
+        response.body.errors[0].meta.rawError.response.message[0];
+      expect(error).toContain(`order must be either ASC or DESC`);
     },
 
     ThenMaxLengthErrorWasReturned: (response: request.Response) => {
