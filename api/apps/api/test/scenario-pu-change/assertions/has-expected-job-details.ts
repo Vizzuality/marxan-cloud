@@ -34,3 +34,26 @@ export const HasExpectedJobDetails = (job: Job) =>
     }
   `,
   );
+
+export const HasExpectedJobDetailsWhenClearing = (job: Job) =>
+  expect(job.data).toMatchInlineSnapshot(
+    {
+      exclude: {
+        pu: expect.arrayContaining([expect.any(String)]),
+      },
+      scenarioId: expect.any(String),
+    },
+    `
+    Object {
+      "exclude": Object {
+        "pu": ArrayContaining [
+          Any<String>,
+        ],
+      },
+      "makeAvailable": Object {
+        "pu": Array [],
+      },
+      "scenarioId": Any<String>,
+    }
+  `,
+  );

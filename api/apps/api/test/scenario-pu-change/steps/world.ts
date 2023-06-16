@@ -7,7 +7,11 @@ import { v4 } from 'uuid';
 import { GivenScenarioPuDataExists } from '../../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { GivenProjectExists } from '../../steps/given-project';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
-import { WhenChangingPlanningUnitInclusivity } from './WhenChangingPlanningUnitInclusivity';
+import {
+  WhenChangingPlanningUnitInclusivity,
+  WhenClearingPuStatusesByKind,
+} from './WhenChangingPlanningUnitInclusivity';
+import { LockStatus } from '@marxan/scenarios-planning-unit';
 
 export const createWorld = async (app: INestApplication, jwt: string) => {
   const { projectId } = await GivenProjectExists(app, jwt, {
@@ -44,5 +48,7 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
         jwt,
         scenariosPuData.map((pu) => pu.id),
       ),
+    WhenClearingPuStatusesByKindWithExisitingPu: async () =>
+      WhenClearingPuStatusesByKind(app, scenarioId, jwt, LockStatus.LockedIn),
   };
 };
