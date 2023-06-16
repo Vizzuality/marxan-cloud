@@ -5,7 +5,7 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 
 let fixtures: FixtureType<typeof getProjectTagsFixtures>;
 
-describe('Projects Tag DELETE (e2e)', () => {
+describe('Projects Tag ACL DELETE (e2e)', () => {
   beforeEach(async () => {
     fixtures = await getProjectTagsFixtures();
   });
@@ -39,5 +39,44 @@ describe('Projects Tag DELETE (e2e)', () => {
       viewerProjectId,
     );
     await fixtures.ThenFeatureHasTag(viewerProjectId, viewerFeatureId, newTag);
+  });
+});
+
+describe('Projects Tag ACL GET (e2e)', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return error if Project not visible to user', async () => {
+    // ARRANGE
+    const externalProjectId = await fixtures.GivenProject('someProject', []);
+    const externalFeatureId = await fixtures.GivenFeatureOnProject(
+      externalProjectId,
+      'someFeature',
+    );
+    const newTag = 'valid-tag🙂';
+    await fixtures.GivenTagOnFeature(
+      externalProjectId,
+      externalFeatureId,
+      newTag,
+    );
+
+    // ACT
+    const response = await fixtures.WhenGettingProjectTags(
+      externalProjectId,
+      'valid',
+      'ASC',
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.FORBIDDEN);
+    await fixtures.ThenProjectNotVisibleErrorWasReturned(
+      response,
+      externalProjectId,
+    );
   });
 });

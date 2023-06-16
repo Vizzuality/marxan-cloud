@@ -5,6 +5,136 @@ import { getProjectTagsFixtures } from './project-tags.fixtures';
 
 let fixtures: FixtureType<typeof getProjectTagsFixtures>;
 
+describe('Projects Tag GET (e2e)', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return error if Project not found', async () => {
+    //ARRANGE
+    const randomProjectId = v4();
+
+    // ACT
+    const response = await fixtures.WhenGettingProjectTags(
+      randomProjectId,
+      'someTag',
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenProjectNotFoundErrorWasReturned(response, randomProjectId);
+  });
+  test('should return error if order query param is not correct', async () => {
+    //ARRANGE
+    const randomProjectId = v4();
+
+    // ACT
+    const response = await fixtures.WhenGettingProjectTags(
+      randomProjectId,
+      'aTag',
+      'NOT-CORRECT-ORDER',
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
+    fixtures.ThenIncorrectOrderErrorWasReturned(response);
+  });
+
+  test('should return all distinct tags that partially match the provided tag for the given project, with the order provided', async () => {
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const projectId2 = await fixtures.GivenProject('someProject2');
+    const featureId11 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name11',
+    );
+    const featureId12 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name12',
+    );
+    const featureId13 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name13',
+    );
+    const featureId14 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name14',
+    );
+    const featureId21 = await fixtures.GivenFeatureOnProject(
+      projectId2,
+      'name21',
+    );
+
+    await fixtures.GivenTagOnFeature(projectId1, featureId11, 'OneRepeatedTag');
+    await fixtures.GivenTagOnFeature(projectId1, featureId12, 'OneRepeatedTag');
+    await fixtures.GivenTagOnFeature(projectId1, featureId13, 'AnotherTag');
+    await fixtures.GivenTagOnFeature(
+      projectId1,
+      featureId14,
+      'another-repeated-tag',
+    );
+    await fixtures.GivenTagOnFeature(
+      projectId2,
+      featureId21,
+      'AnotherProjectTag',
+    );
+
+    // ACT
+    const response1 = await fixtures.WhenGettingProjectTags(
+      projectId1,
+      'repeated',
+      'DESC',
+    );
+    const response2 = await fixtures.WhenGettingProjectTags(
+      projectId1,
+      'ANOTHER',
+      'ASC',
+    );
+
+    //ASSERT
+    expect(response1.status).toBe(HttpStatus.OK);
+    expect(response1.body.tags).toEqual([
+      'another-repeated-tag',
+      'OneRepeatedTag',
+    ]);
+    expect(response2.status).toBe(HttpStatus.OK);
+    expect(response2.body.tags).toEqual(['AnotherTag', 'another-repeated-tag']);
+  });
+
+  test('should return all available distinct tags for the given project if no tag query param is provided', async () => {
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const featureId11 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name11',
+    );
+    const featureId12 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name12',
+    );
+    const featureId13 = await fixtures.GivenFeatureOnProject(
+      projectId1,
+      'name13',
+    );
+    await fixtures.GivenTagOnFeature(projectId1, featureId11, 'OneRepeatedTag');
+    await fixtures.GivenTagOnFeature(projectId1, featureId12, 'OneRepeatedTag');
+    await fixtures.GivenTagOnFeature(projectId1, featureId13, 'AnotherTag');
+
+    // ACT
+    const response = await fixtures.WhenGettingProjectTags(
+      projectId1,
+      undefined,
+      'ASC',
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.tags).toEqual(['AnotherTag', 'OneRepeatedTag']);
+  });
+});
+
 describe('Projects Tag DELETE (e2e)', () => {
   beforeEach(async () => {
     fixtures = await getProjectTagsFixtures();

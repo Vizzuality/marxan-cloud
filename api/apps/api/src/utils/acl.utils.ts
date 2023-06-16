@@ -24,6 +24,7 @@ import {
   projectNotEditable,
   projectNotFound,
   projectNotFoundForExport,
+  projectNotVisible,
 } from '@marxan-api/modules/projects/projects.service';
 import { notFound as notFoundSpec } from '@marxan-api/modules/scenario-specification/application/last-updated-specification.query';
 import {
@@ -145,6 +146,7 @@ export const mapAclDomainToHttpError = (
     | typeof featureNotEditableByUserWithinProject
     | typeof projectNotFound
     | typeof projectNotEditable
+    | typeof projectNotVisible
     | ImportProjectError,
   options?: ErrorHandlerOptions,
 ) => {
@@ -308,6 +310,10 @@ export const mapAclDomainToHttpError = (
     case projectNotEditable:
       throw new ForbiddenException(
         `Project with id ${options?.projectId} is not editable by user ${options?.userId}`,
+      );
+    case projectNotVisible:
+      throw new ForbiddenException(
+        `Project with id ${options?.projectId} cannot be consulted by user ${options?.userId}`,
       );
     case projectNotFound:
       throw new NotFoundException(
