@@ -35,7 +35,7 @@ export const HasExpectedJobDetails = (job: Job) =>
   `,
   );
 
-export const HasExpectedJobDetailsWhenClearing = (job: Job) =>
+export const HasExpectedJobDetailsWhenClearingLockedIn = (job: Job) =>
   expect(job.data).toMatchInlineSnapshot(
     {
       exclude: {
@@ -52,6 +52,69 @@ export const HasExpectedJobDetailsWhenClearing = (job: Job) =>
       },
       "makeAvailable": Object {
         "pu": Array [],
+      },
+      "scenarioId": Any<String>,
+    }
+  `,
+  );
+
+export const HasExpectedJobDetailsWhenClearingLockedOut = (job: Job) =>
+  expect(job.data).toMatchInlineSnapshot(
+    {
+      include: {
+        pu: expect.arrayContaining([
+          expect.any(String),
+          expect.any(String),
+          expect.any(String),
+        ]),
+      },
+      scenarioId: expect.any(String),
+    },
+    `
+    Object {
+      "include": Object {
+        "pu": ArrayContaining [
+          Any<String>,
+          Any<String>,
+          Any<String>,
+        ],
+      },
+      "makeAvailable": Object {
+        "pu": Array [],
+      },
+      "scenarioId": Any<String>,
+    }
+  `,
+  );
+
+export const HasExpectedJobDetailsWhenClearingAvailable = (job: Job) =>
+  expect(job.data).toMatchInlineSnapshot(
+    {
+      exclude: {
+        pu: expect.arrayContaining([expect.any(String)]),
+      },
+      include: {
+        pu: expect.arrayContaining([
+          expect.any(String),
+          expect.any(String),
+          expect.any(String),
+        ]),
+      },
+      scenarioId: expect.any(String),
+    },
+    `
+    Object {
+      "exclude": Object {
+        "pu": ArrayContaining [
+          Any<String>,
+        ],
+      },
+      "include": Object {
+        "pu": ArrayContaining [
+          Any<String>,
+          Any<String>,
+          Any<String>,
+        ],
       },
       "scenarioId": Any<String>,
     }
