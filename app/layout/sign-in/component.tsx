@@ -40,6 +40,7 @@ export const SignIn: React.FC<SignInProps> = () => {
           url: '/sign-in',
           data: omit(data, 'checkbox'),
         });
+
         if (signUpResponse.status === 201) {
           await signIn('credentials', { ...data, callbackUrl });
         }
