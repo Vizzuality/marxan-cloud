@@ -22,10 +22,18 @@ species AS (
 	FROM scenario_features_data sfd
 		inner JOIN features_data fd ON sfd.feature_class_id = fd.id and scenario_id = $1)
 UPDATE scenarios_pu_data
-SET feature_list = sub.feature_list
+SET
+  feature_list = sub.feature_list,
+  feature_amounts = sub.feature_amounts
 FROM (SELECT pu.scenario_id,
              pu.id                                        AS scenario_pu_id,
-             ARRAY_AGG(DISTINCT species.feature_id::text) AS feature_list
+             ARRAY_AGG(DISTINCT species.feature_id::text) AS feature_list,
+             (SELECT
+                ARRAY_AGG(random()) FROM
+                generate_series(1, cardinality(
+                  ARRAY_AGG(DISTINCT species.feature_id::text)
+                )
+              )) AS feature_amounts
 	    FROM pu, species
       WHERE st_intersects(species.the_geom, pu.the_geom)
       GROUP BY 1, 2) AS sub
