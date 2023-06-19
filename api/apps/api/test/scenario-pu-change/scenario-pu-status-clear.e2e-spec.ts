@@ -18,35 +18,39 @@ let queue: FakeQueue;
 
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
-beforeEach(async () => {
-  app = await bootstrapApplication();
-  jwtToken = await GivenUserIsLoggedIn(app);
-  queue = FakeQueue.getByName(updateQueueName);
-  world = await createWorld(app, jwtToken);
-});
-
 describe(`when requesting to clear PUs statuses by kind`, () => {
-  describe(`when desired PU ids are available`, () => {
-    it(` when clearing locked in PUs triggers the job`, async () => {
-      const result = await world.WhenClearingLockedInPUsStatusWithExisitingPu();
-      const job = Object.values(queue.jobs)[0];
-      expect(result.meta.started).toBeTruthy();
-      HasExpectedJobDetailsWhenClearingLockedIn(job);
-      HasRelevantJobName(job, world.scenarioId);
-    });
-    it(`when clearing locked out PUs triggers the job`, async () => {
-      const result = await world.WhenClearingLockedOutPUsStatusWithExisitingPu();
-      const job = Object.values(queue.jobs)[0];
-      expect(result.meta.started).toBeTruthy();
-      HasExpectedJobDetailsWhenClearingLockedOut(job);
-      HasRelevantJobName(job, world.scenarioId);
-    });
-    it(`when clearing available PUs triggers the job`, async () => {
-      const result = await world.WhenClearingAvailablePUsStatusWithExisitingPu();
-      const job = Object.values(queue.jobs)[0];
-      expect(result.meta.started).toBeTruthy();
-      HasExpectedJobDetailsWhenClearingAvailable(job);
-      HasRelevantJobName(job, world.scenarioId);
-    });
+  beforeEach(async () => {
+    app = await bootstrapApplication();
+    jwtToken = await GivenUserIsLoggedIn(app);
+    queue = FakeQueue.getByName(updateQueueName);
+    world = await createWorld(app, jwtToken);
+  });
+
+  afterEach(async () => {
+    queue.disposeFakeJobs();
+  });
+
+  it(` clearing locked in PUs triggers the job`, async () => {
+    const result = await world.WhenClearingLockedInPUsStatusWithExisitingPu();
+    const job = Object.values(queue.jobs)[0];
+    expect(result.meta.started).toBeTruthy();
+    HasExpectedJobDetailsWhenClearingLockedIn(job);
+    HasRelevantJobName(job, world.scenarioId);
+  });
+
+  it(`clearing when clearing locked out PUs triggers the job`, async () => {
+    const result = await world.WhenClearingLockedOutPUsStatusWithExisitingPu();
+    const job = Object.values(queue.jobs)[0];
+    expect(result.meta.started).toBeTruthy();
+    HasExpectedJobDetailsWhenClearingLockedOut(job);
+    HasRelevantJobName(job, world.scenarioId);
+  });
+
+  it(`clearing available PUs triggers the job`, async () => {
+    const result = await world.WhenClearingAvailablePUsStatusWithExisitingPu();
+    const job = Object.values(queue.jobs)[0];
+    expect(result.meta.started).toBeTruthy();
+    HasExpectedJobDetailsWhenClearingAvailable(job);
+    HasRelevantJobName(job, world.scenarioId);
   });
 });
