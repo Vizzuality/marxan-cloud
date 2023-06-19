@@ -226,4 +226,59 @@ describe(`when planning units exist for a scenario`, () => {
       ).rejects.toThrow(/Contrasting claims/);
     }, 10000);
   });
+
+  describe('When clearing particular type of status (not receiving claims for this type of status)', () => {
+    const forCase: ForCase = 'multipleFeatures';
+    beforeEach(async () => {
+      await world.GivenPlanningUnitsExist(forCase, areaUnitsSample(forCase));
+    });
+
+    afterEach(async () => {
+      await world?.cleanup('multipleFeatures');
+    });
+
+    it(`clears out PUs statuses by kind`, async () => {
+      /** Locking and locking out PUs **/
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          include: {
+            geo: [includeSample()],
+          },
+          exclude: {
+            geo: [excludeSample()],
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      const lockedInPUs = await world.GetLockedInPlanningUnits();
+      const lockedOutPUs = await world.GetLockedOutPlanningUnits();
+
+      expect(lockedInPUs).toEqual(world.planningUnitsToBeIncluded(forCase));
+      expect(lockedOutPUs).toEqual(world.planningUnitsToBeExcluded(forCase));
+
+      /** Clearing locked in PUs statuses **/
+
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          exclude: {
+            pu: lockedOutPUs,
+          },
+          makeAvailable: {
+            pu: [],
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      const lockedInByUserPUs = await world.GetLockedInByUserPlanningUnits();
+      const lockedIbByProtectedAreaPUs = await world.GetLockedInByProtectedAreaPlanningUnits();
+
+      /** Now excluded PUs should remain as set by user and included PUs should be cleared,
+       * leaving as locked in only PUs within protecting area that have setByUser value as false*/
+      expect(lockedOutPUs).toEqual(world.planningUnitsToBeExcluded(forCase));
+      expect(lockedInByUserPUs).toEqual([]);
+      expect(lockedIbByProtectedAreaPUs.length).toEqual(7);
+    }, 10000);
+  });
 });
