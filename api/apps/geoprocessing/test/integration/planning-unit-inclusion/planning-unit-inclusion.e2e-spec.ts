@@ -157,7 +157,7 @@ describe(`when planning units exist for a scenario`, () => {
         },
       } as unknown) as Job<JobInput>);
 
-      const lockedInPUs = await world.GetLockedInByProtectedAreaPlanningUnits();
+      const lockedInPUs = await world.GetPlanningUnitsLockedInByProtectedArea();
       const availablePUsSetByUser = await world.GetAvailablePlanningUnitsChangedByUser();
 
       expect(lockedInPUs.length).toEqual(7);
@@ -175,7 +175,7 @@ describe(`when planning units exist for a scenario`, () => {
         },
       } as unknown) as Job<JobInput>);
 
-      expect(await world.GetLockedInByProtectedAreaPlanningUnits()).toEqual(
+      expect(await world.GetPlanningUnitsLockedInByProtectedArea()).toEqual(
         lockedInPUs.slice(-4),
       );
       expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
@@ -271,14 +271,16 @@ describe(`when planning units exist for a scenario`, () => {
         },
       } as unknown) as Job<JobInput>);
 
-      const lockedInByUserPUs = await world.GetLockedInByUserPlanningUnits();
-      const lockedIbByProtectedAreaPUs = await world.GetLockedInByProtectedAreaPlanningUnits();
+      const PUsLockedInByUser = await world.GetPlanningUnitsLockedInByUser();
+      const PUsLockedInByProtectedArea = await world.GetPlanningUnitsLockedInByProtectedArea();
 
       /** Now excluded PUs should remain as set by user and included PUs should be cleared,
        * leaving as locked in only PUs within protecting area that have setByUser value as false*/
       expect(lockedOutPUs).toEqual(world.planningUnitsToBeExcluded(forCase));
-      expect(lockedInByUserPUs).toEqual([]);
-      expect(lockedIbByProtectedAreaPUs.length).toEqual(7);
+      expect(PUsLockedInByUser).toEqual([]);
+      expect(PUsLockedInByProtectedArea.length).toEqual(
+        world.planningUnitsToBeIncluded(forCase).length,
+      );
     }, 10000);
   });
 });

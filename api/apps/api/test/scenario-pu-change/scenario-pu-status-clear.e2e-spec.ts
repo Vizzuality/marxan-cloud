@@ -31,7 +31,7 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
   });
 
   it(`clearing locked in PUs triggers the job`, async () => {
-    const result = await world.WhenClearingLockedInPUsStatusWithExisitingPu();
+    const result = await world.WhenClearingLockedInPUsStatusWithExistingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
     HasExpectedJobDetailsWhenClearingLockedIn(job);
@@ -39,7 +39,7 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
   });
 
   it(`clearing locked out PUs triggers the job`, async () => {
-    const result = await world.WhenClearingLockedOutPUsStatusWithExisitingPu();
+    const result = await world.WhenClearingLockedOutPUsStatusWithExistingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
     HasExpectedJobDetailsWhenClearingLockedOut(job);
@@ -47,7 +47,7 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
   });
 
   it(`clearing available PUs triggers the job`, async () => {
-    const result = await world.WhenClearingAvailablePUsStatusWithExisitingPu();
+    const result = await world.WhenClearingAvailablePUsStatusWithExistingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
     HasExpectedJobDetailsWhenClearingAvailable(job);
