@@ -30,7 +30,7 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
     queue.disposeFakeJobs();
   });
 
-  it(` clearing locked in PUs triggers the job`, async () => {
+  it(`clearing locked in PUs triggers the job`, async () => {
     const result = await world.WhenClearingLockedInPUsStatusWithExisitingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
