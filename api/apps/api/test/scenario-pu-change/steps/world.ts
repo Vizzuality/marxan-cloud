@@ -48,11 +48,11 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
         jwt,
         scenariosPuData.map((pu) => pu.id),
       ),
-    WhenClearingLockedInPUsStatusWithExisitingPu: async () =>
+    WhenClearingLockedInPUsStatusWithExistingPu: async () =>
       WhenClearingPuStatusesByKind(app, scenarioId, jwt, LockStatus.LockedIn),
-    WhenClearingLockedOutPUsStatusWithExisitingPu: async () =>
+    WhenClearingLockedOutPUsStatusWithExistingPu: async () =>
       WhenClearingPuStatusesByKind(app, scenarioId, jwt, LockStatus.LockedOut),
-    WhenClearingAvailablePUsStatusWithExisitingPu: async () =>
+    WhenClearingAvailablePUsStatusWithExistingPu: async () =>
       WhenClearingPuStatusesByKind(app, scenarioId, jwt, LockStatus.Available),
   };
 };
