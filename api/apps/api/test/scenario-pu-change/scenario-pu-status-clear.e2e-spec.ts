@@ -38,7 +38,7 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
     HasRelevantJobName(job, world.scenarioId);
   });
 
-  it(`clearing when clearing locked out PUs triggers the job`, async () => {
+  it(`clearing locked out PUs triggers the job`, async () => {
     const result = await world.WhenClearingLockedOutPUsStatusWithExisitingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
