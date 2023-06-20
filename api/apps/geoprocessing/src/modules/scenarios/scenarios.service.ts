@@ -33,8 +33,8 @@ const includeSelections: IncludeSelections = {
     select: 'lockin_status as "lockinStatus"',
   },
   features: {
-    attributes: ', "featureList"',
-    select: 'array_to_string(feature_list, \',\') as "featureList"',
+    attributes: ', "featureList", "featureAmounts"',
+    select: 'array_to_string(feature_list, \',\') as "featureList", array_to_string(feature_amounts, \',\') as "featureAmounts"',
     alias: 'features',
   },
   cost: {
