@@ -32,7 +32,7 @@ export class ScenarioPlanningUnitsService {
     scenarioId: string,
     lockStatus: LockStatus,
   ): Promise<ScenariosPlanningUnitGeoEntity[]> {
-    return this.puRepo.find({
+    return await this.puRepo.find({
       where: {
         scenarioId,
         lockStatus,

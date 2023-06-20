@@ -236,7 +236,7 @@ export const createWorld = async (app: INestApplication) => {
       )
         .map((entity) => entity.id)
         .sort(sortUuid),
-    GetLockedInByUserPlanningUnits: async () =>
+    GetPlanningUnitsLockedInByUser: async () =>
       (
         await scenarioPuDataRepo.find({
           where: {
@@ -248,7 +248,7 @@ export const createWorld = async (app: INestApplication) => {
       )
         .map((entity) => entity.id)
         .sort(sortUuid),
-    GetLockedInByProtectedAreaPlanningUnits: async () =>
+    GetPlanningUnitsLockedInByProtectedArea: async () =>
       (
         await scenarioPuDataRepo.find({
           where: {

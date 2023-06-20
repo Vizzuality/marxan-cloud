@@ -435,7 +435,7 @@ export class ScenariosService {
   async clearLockStatuses(
     scenarioId: string,
     userId: string,
-    kind: string,
+    kind: LockStatus,
   ): Promise<
     Either<
       | typeof forbiddenError
@@ -485,7 +485,7 @@ export class ScenariosService {
 
   private async mapCurrentPuStatusesAndClearRequested(
     scenarioId: string,
-    kindToClear: string,
+    kindToClear: LockStatus,
   ): Promise<AdjustPlanningUnitsInput> {
     const lockedInPus = await this.planningUnitsService.getByStatus(
       scenarioId,
