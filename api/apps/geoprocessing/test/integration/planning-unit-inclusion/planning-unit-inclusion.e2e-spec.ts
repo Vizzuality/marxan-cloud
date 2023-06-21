@@ -239,6 +239,7 @@ describe(`when planning units exist for a scenario`, () => {
 
     it(`clears out PUs statuses by kind`, async () => {
       /** Locking and locking out PUs **/
+
       await sut.process(({
         data: {
           scenarioId: world.scenarioId,
@@ -273,14 +274,35 @@ describe(`when planning units exist for a scenario`, () => {
 
       const PUsLockedInByUser = await world.GetPlanningUnitsLockedInByUser();
       const PUsLockedInByProtectedArea = await world.GetPlanningUnitsLockedInByProtectedArea();
+      const lockedOutPUsAfterClearingIncluded = await world.GetLockedOutPlanningUnits();
 
       /** Now excluded PUs should remain as set by user and included PUs should be cleared,
        * leaving as locked in only PUs within protecting area that have setByUser value as false*/
-      expect(lockedOutPUs).toEqual(world.planningUnitsToBeExcluded(forCase));
+      expect(lockedOutPUsAfterClearingIncluded).toEqual(
+        world.planningUnitsToBeExcluded(forCase),
+      );
       expect(PUsLockedInByUser).toEqual([]);
       expect(PUsLockedInByProtectedArea.length).toEqual(
         world.planningUnitsToBeIncluded(forCase).length,
       );
+
+      /** Clearing locked out PUs statuses **/
+
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          include: {
+            pu: PUsLockedInByProtectedArea,
+          },
+          makeAvailable: {
+            pu: [],
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      const lockedOutPUsAfterClearingExcluded = await world.GetLockedOutPlanningUnits();
+
+      expect(lockedOutPUsAfterClearingExcluded).toEqual([]);
     }, 10000);
   });
 });
