@@ -54,5 +54,12 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
       WhenClearingPuStatusesByKind(app, scenarioId, jwt, LockStatus.LockedOut),
     WhenClearingAvailablePUsStatusWithExistingPu: async () =>
       WhenClearingPuStatusesByKind(app, scenarioId, jwt, LockStatus.Available),
+    WhenClearingAvailablePUsStatusWithIncorrectStatusType: async () =>
+      WhenClearingPuStatusesByKind(
+        app,
+        scenarioId,
+        jwt,
+        'incorrect-status-type',
+      ),
   };
 };
