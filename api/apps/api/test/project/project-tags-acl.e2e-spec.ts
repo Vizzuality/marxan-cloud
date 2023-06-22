@@ -69,7 +69,7 @@ describe('Projects Tag ACL GET (e2e)', () => {
     const response = await fixtures.WhenGettingProjectTags(
       externalProjectId,
       'valid',
-      'ASC',
+      'tag',
     );
 
     // ASSERT
