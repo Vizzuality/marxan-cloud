@@ -36,8 +36,8 @@ export class GeoFeatureTagsService {
   async getGeoFeatureTagsForProject(
     userId: string,
     projectId: string,
-    tagFilter?: string,
-    order?: string,
+    tagFilter?: string[],
+    sort?: string[],
   ): Promise<
     Either<typeof projectNotVisible | typeof projectNotFound, string[]>
   > {
@@ -56,11 +56,30 @@ export class GeoFeatureTagsService {
       .createQueryBuilder('feature_tag')
       .select('feature_tag.tag', 'tag')
       .distinct(true)
-      .where({ projectId })
-      .orderBy('feature_tag.tag', order === 'DESC' ? 'DESC' : 'ASC');
+      .where({ projectId });
+
+    /** @debt
+     * Even tho this is a highly focused endpoint returning only a list of, it should conform to JSON:API standards as well
+     * FechSpecification constucted is reused for this purposed, but only a single property matter for this query, tag
+     * anything else will be ignored
+     */
+    if (sort) {
+      const tagSorting = sort.find(
+        (element) => element === 'tag' || element === '-tag',
+      );
+      if (tagSorting) {
+        const order = tagSorting.startsWith('-') ? 'DESC' : 'ASC';
+        query.orderBy('feature_tag.tag', order);
+      }
+    }
 
     if (tagFilter) {
-      query.andWhere({ tag: ILike(`%${tagFilter}%`) });
+      query.andWhere(
+        `feature_tag.tag ILIKE ANY (array[:...partialTagFilters])`,
+        {
+          partialTagFilters: tagFilter.map((tagFilter) => `%${tagFilter}%`),
+        },
+      );
     }
 
     const result = await query.getRawMany();

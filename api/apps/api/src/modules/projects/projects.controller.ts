@@ -149,7 +149,6 @@ import {
 import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
-import { GetProjectTagsDTO } from '@marxan-api/modules/projects/dto/get-project-tags.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -935,13 +934,16 @@ export class ProjectsController {
   async getProjectTags(
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
-    @Query() queryParams: GetProjectTagsDTO,
+    @ProcessFetchSpecification() fetchSpecification: FetchSpecification,
   ): Promise<GetProjectTagsResponseDto> {
+    const tagFilters = Array.isArray(fetchSpecification.filter?.tag)
+      ? fetchSpecification.filter?.tag
+      : undefined;
     const result = await this.geoFeatureTagsService.getGeoFeatureTagsForProject(
       req.user.id,
       projectId,
-      queryParams.tag,
-      queryParams.order,
+      tagFilters,
+      fetchSpecification.sort,
     );
 
     if (isLeft(result)) {
@@ -951,7 +953,7 @@ export class ProjectsController {
       });
     }
 
-    return { tags: result.right };
+    return { data: result.right };
   }
 
   @ImplementsAcl()

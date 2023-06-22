@@ -112,17 +112,20 @@ export const getProjectTagsFixtures = async () => {
     WhenGettingProjectTags: (
       projectId: string,
       tagName?: string,
-      order?: string,
+      sort?: string,
     ) => {
       const queryParams: any = {};
-      tagName ? (queryParams.tag = tagName) : '';
-      order ? (queryParams.order = order) : '';
+      if (tagName) {
+        queryParams.filter = {};
+        queryParams.filter.tag = [tagName, 'something'].join(',');
+      }
+      sort ? (queryParams.sort = sort) : '';
 
       return request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/tags?`)
         .query(queryParams)
         .set('Authorization', `Bearer ${userToken}`)
-        .send({ tagName });
+        .send();
     },
     WhenDeletingAProjectTag: (projectId: string, tagName: string) =>
       request(app.getHttpServer())

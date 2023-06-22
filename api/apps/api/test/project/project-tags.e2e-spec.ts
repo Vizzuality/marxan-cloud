@@ -28,20 +28,24 @@ describe('Projects Tag GET (e2e)', () => {
     expect(response.status).toBe(HttpStatus.NOT_FOUND);
     fixtures.ThenProjectNotFoundErrorWasReturned(response, randomProjectId);
   });
-  test('should return error if order query param is not correct', async () => {
-    //ARRANGE
-    const randomProjectId = v4();
+
+  test('should return all distinct tags that partially match the provided tag for the given project, ascending by default, and other sorts ignored', async () => {
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const featureId1 = await fixtures.GivenFeatureOnProject(projectId1, 'f1');
+    const featureId2 = await fixtures.GivenFeatureOnProject(projectId1, 'f2');
+
+    await fixtures.GivenTagOnFeature(projectId1, featureId1, 'TAG Overground');
+    await fixtures.GivenTagOnFeature(projectId1, featureId2, 'TAG Underground');
 
     // ACT
     const response = await fixtures.WhenGettingProjectTags(
-      randomProjectId,
-      'aTag',
-      'NOT-CORRECT-ORDER',
+      projectId1,
+      'ground',
     );
 
-    // ASSERT
-    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    fixtures.ThenIncorrectOrderErrorWasReturned(response);
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.data).toEqual(['TAG Overground', 'TAG Underground']);
   });
 
   test('should return all distinct tags that partially match the provided tag for the given project, with the order provided', async () => {
@@ -86,22 +90,22 @@ describe('Projects Tag GET (e2e)', () => {
     const response1 = await fixtures.WhenGettingProjectTags(
       projectId1,
       'repeated',
-      'DESC',
+      '-tag',
     );
     const response2 = await fixtures.WhenGettingProjectTags(
       projectId1,
       'ANOTHER',
-      'ASC',
+      'tag',
     );
 
     //ASSERT
     expect(response1.status).toBe(HttpStatus.OK);
-    expect(response1.body.tags).toEqual([
+    expect(response1.body.data).toEqual([
       'another-repeated-tag',
       'OneRepeatedTag',
     ]);
     expect(response2.status).toBe(HttpStatus.OK);
-    expect(response2.body.tags).toEqual(['AnotherTag', 'another-repeated-tag']);
+    expect(response2.body.data).toEqual(['AnotherTag', 'another-repeated-tag']);
   });
 
   test('should return all available distinct tags for the given project if no tag query param is provided', async () => {
@@ -126,12 +130,12 @@ describe('Projects Tag GET (e2e)', () => {
     const response = await fixtures.WhenGettingProjectTags(
       projectId1,
       undefined,
-      'ASC',
+      'tag',
     );
 
     //ASSERT
     expect(response.status).toBe(HttpStatus.OK);
-    expect(response.body.tags).toEqual(['AnotherTag', 'OneRepeatedTag']);
+    expect(response.body.data).toEqual(['AnotherTag', 'OneRepeatedTag']);
   });
 });
 
