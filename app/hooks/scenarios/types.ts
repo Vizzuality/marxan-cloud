@@ -132,3 +132,12 @@ export interface DownloadScenarioReportProps {
 export interface UseBlmImageProps {
   [q: string]: any;
 }
+
+export type PlanningUnitState = 'available' | 'locked-in' | 'locked-out';
+
+export interface ScenarioPlanningUnit {
+  id: string;
+  defaultStatus: PlanningUnitState;
+  inclusionStatus: PlanningUnitState;
+  setByUser: boolean;
+}

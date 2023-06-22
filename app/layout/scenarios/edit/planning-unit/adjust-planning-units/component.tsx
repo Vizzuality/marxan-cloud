@@ -1,30 +1,28 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
+import { PUAction } from 'store/slices/scenarios/types';
 
 import { motion } from 'framer-motion';
 import { xor } from 'lodash';
 
 import { useCanEditScenario } from 'hooks/permissions';
-import { useScenarioPU, useSaveScenarioPU } from 'hooks/scenarios';
-import { useToasts } from 'hooks/toast';
+import { useScenarioPU } from 'hooks/scenarios';
 
-import Button from 'components/button';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
-import Loading from 'components/loading';
 
 import LOCK_IN_OUT_IMG from 'images/info-buttons/img_lockin_lock_out.png';
 
 import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
-import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
-import Buttons from './buttons';
+import PlanningUnitMethods from './actions';
 import Tabs from './tabs';
+import type { PlanningUnitTabsProps } from './tabs';
 
 export interface ScenariosSidebarAnalysisSectionsProps {
   onChangeSection: (s: string) => void;
@@ -33,152 +31,32 @@ export interface ScenariosSidebarAnalysisSectionsProps {
 export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysisSectionsProps> = ({
   onChangeSection,
 }: ScenariosSidebarAnalysisSectionsProps) => {
-  const [clearing, setClearing] = useState(false);
-
   const dispatch = useDispatch();
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
 
-  const {
-    setJob,
-    setPUAction,
-    setPuIncludedValue,
-    setPuExcludedValue,
-    setTmpPuIncludedValue,
-    setTmpPuExcludedValue,
-  } = scenarioSlice.actions;
+  const { setPUAction, setPuIncludedValue, setPuExcludedValue, setPuAvailableValue } =
+    scenarioSlice.actions;
 
-  const {
-    clicking,
-    puAction,
-    puIncludedValue,
-    puExcludedValue,
-    puTmpIncludedValue,
-    puTmpExcludedValue,
-  } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
-
-  const { addToast } = useToasts();
+  const { puAction } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const editable = useCanEditScenario(pid, sid);
-  const { data: PUData, isFetched: PUisFetched } = useScenarioPU(sid);
-  const scenarioPUMutation = useSaveScenarioPU({});
-
-  useEffect(() => {
-    if (PUData && PUisFetched) {
-      const { included, excluded } = PUData;
-
-      // If PUData.included is different from puIncluded
-      if (xor(included, puIncludedValue).length > 0) {
-        dispatch(setPuIncludedValue(included));
-      }
-
-      // If PUData.excluded is different from puExcluded
-      if (xor(excluded, puExcludedValue).length > 0) {
-        dispatch(setPuExcludedValue(excluded));
-      }
-
-      // If the user is clicking on the map, we don't want to touch the
-      // temporary PU included/excluded values as they're being handled.
-      if (clicking) return;
-
-      // If PUData.included is different from tmp puIncluded
-      if (xor(included, puTmpIncludedValue).length > 0) {
-        dispatch(setTmpPuIncludedValue(included));
-      }
-
-      // If PUData.excluded is different from tmp puExcluded
-      if (xor(excluded, puTmpExcludedValue).length > 0) {
-        dispatch(setTmpPuExcludedValue(excluded));
-      }
-    }
-  }, [
-    PUData,
-    PUisFetched,
-    clicking,
-    dispatch,
-    puExcludedValue,
-    puIncludedValue,
-    puTmpExcludedValue,
-    puTmpIncludedValue,
-    setPuExcludedValue,
-    setPuIncludedValue,
-    setTmpPuExcludedValue,
-    setTmpPuIncludedValue,
-  ]);
+  const { data: PUData } = useScenarioPU(sid, {
+    onSuccess: ({ included, excluded, available }) => {
+      dispatch(setPuIncludedValue(included));
+      dispatch(setPuExcludedValue(excluded));
+      dispatch(setPuAvailableValue(available));
+    },
+  });
 
   const onChangeTab = useCallback(
-    (t) => {
+    (t: Parameters<PlanningUnitTabsProps['onChange']>[0]) => {
       dispatch(setPUAction(t));
     },
     [dispatch, setPUAction]
   );
-
-  const onClear = useCallback(() => {
-    const { includedDefault, excludedDefault } = PUData;
-    setClearing(true);
-
-    // Clear all temp PU values
-    dispatch(setTmpPuIncludedValue(includedDefault));
-    dispatch(setTmpPuExcludedValue(excludedDefault));
-
-    // Save current clicked pu ids
-    scenarioPUMutation.mutate(
-      {
-        id: `${sid}`,
-        data: {
-          byId: {
-            include: includedDefault,
-            exclude: excludedDefault,
-          },
-        },
-      },
-      {
-        onSuccess: ({ data: { meta } }) => {
-          dispatch(setJob(new Date(meta.isoDate).getTime()));
-          addToast(
-            'clear-planning-units-success',
-            <>
-              <h2 className="font-medium">Success!</h2>
-              <ul className="text-sm">
-                <li>Planning units cleared</li>
-              </ul>
-            </>,
-            {
-              level: 'success',
-            }
-          );
-        },
-        onError: () => {
-          addToast(
-            'clear-planning-units-error',
-            <>
-              <h2 className="font-medium">Error!</h2>
-              <ul className="text-sm">
-                <li>Ooops! Something went wrong. Try again</li>
-              </ul>
-            </>,
-            {
-              level: 'error',
-            }
-          );
-        },
-        onSettled: () => {
-          setClearing(false);
-        },
-      }
-    );
-  }, [
-    PUData,
-    dispatch,
-    scenarioPUMutation,
-    sid,
-    setJob,
-    setTmpPuIncludedValue,
-    setTmpPuExcludedValue,
-    addToast,
-  ]);
 
   return (
     <motion.div
@@ -232,41 +110,21 @@ export const ScenariosSidebarAnalysisSections: React.FC<ScenariosSidebarAnalysis
         </InfoButton>
       </header>
 
-      <div className="mt-2.5 flex w-full items-center justify-between border-t border-gray-500">
-        <Tabs type={puAction} onChange={onChangeTab} />
-
-        {PUData && (!!PUData.included.length || !!PUData.excluded.length) && editable && (
-          <Button
-            className="relative"
-            theme="secondary"
-            size="s"
-            disabled={clearing}
-            onClick={onClear}
-          >
-            <div className="flex items-center space-x-2">
-              <span>Clear</span>
-              <Icon icon={CLOSE_SVG} className="h-2 w-2" />
-            </div>
-
-            <Loading
-              visible={clearing}
-              className="absolute left-0 top-0 z-40 flex h-full w-full items-center justify-center rounded-3xl bg-gray-600 bg-opacity-90"
-              iconClassName="w-10 h-5 text-primary-500"
-            />
-          </Button>
-        )}
+      <div className="mt-2.5 flex w-full items-center justify-between border-b border-gray-500">
+        <Tabs type={puAction as PUAction} onChange={onChangeTab} />
       </div>
 
       <div className="relative flex min-h-0 w-full flex-grow flex-col overflow-hidden">
         <div className="absolute left-0 top-0 z-10 h-3 w-full bg-gradient-to-b from-gray-700 via-gray-700" />
         <div className="relative overflow-y-auto overflow-x-visible px-0.5">
           <div className="py-3">
-            {editable && <Buttons type={puAction} />}
+            {editable && <PlanningUnitMethods />}
+            {/* // todo: I think this part should be updated in terms of UI */}
             {!editable && (
               <div className="mt-4 space-y-3 text-xs">
-                {puAction === 'include' && <p>{PUData.included.length} PU</p>}
-
-                {puAction === 'exclude' && <p>{PUData.excluded.length} PU</p>}
+                {(puAction as PUAction) === 'include' && <p>{PUData.included.length} PU</p>}
+                {(puAction as PUAction) === 'exclude' && <p>{PUData.excluded.length} PU</p>}
+                {(puAction as PUAction) === 'available' && <p>{PUData.available.length} PU</p>}
               </div>
             )}
           </div>

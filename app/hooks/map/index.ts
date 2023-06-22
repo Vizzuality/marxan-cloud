@@ -611,6 +611,7 @@ export function usePUGridLayer({
       },
       puIncludedValue,
       puExcludedValue,
+      puAvailableValue,
       features = [],
       preHighlightFeatures = [],
       postHighlightFeatures = [],
@@ -625,6 +626,7 @@ export function usePUGridLayer({
       cost: CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
+      'lock-available': LockAvailableSettings = {},
       frequency: FrequencySettings = {},
       solution: SolutionSettings = {},
     } = settings;
@@ -641,6 +643,8 @@ export function usePUGridLayer({
     const { opacity: CostOpacity = 1, visibility: CostVisibility = true } = CostSettings;
     const { opacity: LockInOpacity = 1, visibility: LockInVisibility = true } = LockInSettings;
     const { opacity: LockOutOpacity = 1, visibility: LockOutVisibility = true } = LockOutSettings;
+    const { opacity: LockAvailableOpacity = 1, visibility: LockAvailableVisibility = true } =
+      LockAvailableSettings;
     const { opacity: FrequencyOpacity = 1, visibility: FrequencyVisibility = true } =
       FrequencySettings;
     const { opacity: SolutionOpacity = 1, visibility: SolutionVisibility = true } =
@@ -848,6 +852,24 @@ export function usePUGridLayer({
                   paint: {
                     'line-color': COLORS.exclude,
                     'line-opacity': 1 * LockOutOpacity,
+                    'line-width': 1.5,
+                    'line-offset': 0.75,
+                  },
+                },
+              ]
+            : []),
+          ...(sublayers.includes('lock-available') && !!puAvailableValue
+            ? [
+                {
+                  type: 'line',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(LockAvailableVisibility),
+                  },
+                  filter: ['all', ['in', ['get', 'scenarioPuId'], ['literal', puAvailableValue]]],
+                  paint: {
+                    'line-color': COLORS.available,
+                    'line-opacity': 1 * LockAvailableOpacity,
                     'line-width': 1.5,
                     'line-offset': 0.75,
                   },

@@ -13,7 +13,7 @@ export interface SelectedSolutionPageProps {}
 
 export const SelectedSolutionPage: React.FC<SelectedSolutionPageProps> = () => {
   const { query } = useRouter();
-  const { sid, solutionId } = query;
+  const { sid, solutionId } = query as { sid: string; solutionId: string };
 
   const { data: scenarioData } = useScenario(sid);
 

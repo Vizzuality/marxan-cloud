@@ -14,7 +14,7 @@ interface SelectStatusProps {
 }
 
 interface SelectDataProps {
-  options?: SelectOptionProps[];
+  options?: Readonly<SelectOptionProps[]>;
   placeholder?: string;
   prefix?: string;
   initialSelected?: string | string[];

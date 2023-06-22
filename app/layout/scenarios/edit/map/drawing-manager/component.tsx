@@ -76,10 +76,12 @@ export const ScenariosDrawingManager: React.FC<ScenariosDrawingManagerProps> = (
         const { data, editType } = s;
         const EDITION_TYPES = ['addFeature'];
         const UPDATE_TYPES = ['addFeature', 'addPosition', 'movePosition'];
+        const EDITOR = editorRef?.current;
 
         if (EDITION_TYPES.includes(editType)) {
           dispatch(setDrawing('editing'));
           dispatch(setDrawingValue(data));
+          EDITOR.deleteFeatures(drawingValue);
         }
 
         if (UPDATE_TYPES.includes(editType)) {

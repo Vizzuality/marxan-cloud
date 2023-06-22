@@ -1,8 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import type { ScenarioPlanningUnit } from 'hooks/scenarios/types';
+
 import { injectReducer } from 'store';
 import { Solution } from 'types/project-model';
 import { ScenarioSidebarTabs } from 'utils/tabs';
+
+import type { PUAction } from './types';
 
 interface ScenarioEditStateProps {
   tab: string;
@@ -21,11 +25,13 @@ interface ScenarioEditStateProps {
 
   // ADJUST PLANNING UNITS
   cache: number;
-  puAction: string;
-  puIncludedValue: string[];
-  puExcludedValue: string[];
-  puTmpIncludedValue: string[];
-  puTmpExcludedValue: string[];
+  puAction: PUAction;
+  puIncludedValue: ScenarioPlanningUnit['id'][];
+  puExcludedValue: ScenarioPlanningUnit['id'][];
+  puAvailableValue: ScenarioPlanningUnit['id'][];
+  puTmpIncludedValue: ScenarioPlanningUnit['id'][];
+  puTmpExcludedValue: ScenarioPlanningUnit['id'][];
+  puTmpAvailableValue: ScenarioPlanningUnit['id'][];
 
   clicking: boolean;
 
@@ -71,8 +77,10 @@ const initialState = {
   clicking: false,
   puIncludedValue: [],
   puExcludedValue: [],
+  puAvailableValue: [],
   puTmpIncludedValue: [],
   puTmpExcludedValue: [],
+  puTmpAvailableValue: [],
   drawing: null,
   drawingValue: null,
   uploading: false,
@@ -134,20 +142,26 @@ export function getScenarioEditSlice(id) {
       setCache: (state, action: PayloadAction<number>) => {
         state.cache = action.payload;
       },
-      setPUAction: (state, action: PayloadAction<string>) => {
+      setPUAction: (state, action: PayloadAction<PUAction>) => {
         state.puAction = action.payload;
       },
-      setPuIncludedValue: (state, action: PayloadAction<string[]>) => {
+      setPuIncludedValue: (state, action: PayloadAction<ScenarioPlanningUnit['id'][]>) => {
         state.puIncludedValue = action.payload;
       },
-      setPuExcludedValue: (state, action: PayloadAction<string[]>) => {
+      setPuExcludedValue: (state, action: PayloadAction<ScenarioPlanningUnit['id'][]>) => {
         state.puExcludedValue = action.payload;
       },
-      setTmpPuIncludedValue: (state, action: PayloadAction<string[]>) => {
+      setPuAvailableValue: (state, action: PayloadAction<ScenarioPlanningUnit['id'][]>) => {
+        state.puAvailableValue = action.payload;
+      },
+      setTmpPuIncludedValue: (state, action: PayloadAction<ScenarioPlanningUnit['id'][]>) => {
         state.puTmpIncludedValue = action.payload;
       },
-      setTmpPuExcludedValue: (state, action: PayloadAction<string[]>) => {
+      setTmpPuExcludedValue: (state, action: PayloadAction<ScenarioPlanningUnit['id'][]>) => {
         state.puTmpExcludedValue = action.payload;
+      },
+      setTmpPuAvailableValue: (state, action: PayloadAction<ScenarioPlanningUnit['id'][]>) => {
+        state.puTmpAvailableValue = action.payload;
       },
       setClicking: (state, action: PayloadAction<boolean>) => {
         state.clicking = action.payload;
