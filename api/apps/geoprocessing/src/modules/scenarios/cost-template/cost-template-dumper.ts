@@ -14,10 +14,7 @@ export class CostTemplateDumper {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async dumpGeoJson(
-    scenarioId: string,
-    destinationPath: string,
-  ): Promise<void> {
+  async dumpGeoJson(projectId: string, destinationPath: string): Promise<void> {
     await this.entityManager.transaction(
       async (transactionalEntityManager) =>
         new Promise(async (resolve, reject) => {
@@ -40,12 +37,11 @@ export class CostTemplateDumper {
                       ) properties_attributes
                   ) AS "properties"
                 FROM
-                  scenarios_pu_data spd
-                    INNER JOIN projects_pu ppu ON ppu.id = spd.project_pu_id
+                  projects_pu ppu
                     INNER JOIN planning_units_geom pug ON pug.id = ppu.geom_id
                 WHERE
-                  spd.scenario_id = $1`,
-            [scenarioId],
+                  ppu.project_id = $1`,
+            [projectId],
             undefined,
             reject,
           );

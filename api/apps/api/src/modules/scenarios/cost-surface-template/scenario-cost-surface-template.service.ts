@@ -8,7 +8,7 @@ export const FilePiped = Symbol('file piped');
 
 export abstract class ScenarioCostSurfaceTemplateService {
   abstract getTemplateShapefile(
-    scenarioId: string,
+    projectId: string,
     stream: stream.Writable,
   ): Promise<typeof FileNotReady | typeof FilePiped>;
 }

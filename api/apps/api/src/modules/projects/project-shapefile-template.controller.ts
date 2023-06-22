@@ -16,24 +16,24 @@ import {
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
 import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
-import { scenarioResource } from '../scenario.api.entity';
+
+import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import {
   FileNotReady,
   ScenarioCostSurfaceTemplateService,
-} from './scenario-cost-surface-template.service';
-import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
+} from '@marxan-api/modules/scenarios/cost-surface-template/scenario-cost-surface-template.service';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
-@ApiTags(scenarioResource.className)
-@Controller(`${apiGlobalPrefixes.v1}/scenarios/:projectId/cost-surface`)
-export class CostSurfaceTemplateController {
+@ApiTags()
+@Controller(`${apiGlobalPrefixes.v1}/projects`)
+export class ProjectShapefileTemplateController {
   constructor(
     private readonly scenarioCostSurfaceTemplateService: ScenarioCostSurfaceTemplateService,
   ) {}
 
-  @Get('shapefile-template')
+  @Get(':projectId/shapefile-template')
   @ApiAcceptedResponse()
   @ApiOkResponse({
     schema: {
@@ -43,11 +43,11 @@ export class CostSurfaceTemplateController {
   })
   @Header('Content-Type', 'application/zip')
   async shapefileTemplate(
-    @Param('projectId') projectId: string,
+    @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
     const shapefileStatus = await this.scenarioCostSurfaceTemplateService.getTemplateShapefile(
-      projectId,
+      id,
       res,
     );
 

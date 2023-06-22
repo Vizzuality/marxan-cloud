@@ -16,15 +16,15 @@ export class WaitingCostTemplateService
   constructor(private readonly templateService: QueuedCostTemplateService) {}
 
   async getTemplateShapefile(
-    scenarioId: string,
+    projectId: string,
     stream: stream.Writable,
   ): Promise<typeof FileNotReady | typeof FilePiped> {
     let result = await this.templateService.getTemplateShapefile(
-      scenarioId,
+      projectId,
       stream,
     );
     if (result === FileNotFound) {
-      await this.templateService.scheduleTemplateShapefileCreation(scenarioId);
+      await this.templateService.scheduleTemplateShapefileCreation(projectId);
     }
     if (result === FilePiped) {
       return FilePiped;
@@ -33,7 +33,7 @@ export class WaitingCostTemplateService
     const retries = 150;
     for await (const attemptNumber of this.retry(retries, retryDelay)) {
       result = await this.templateService.getTemplateShapefile(
-        scenarioId,
+        projectId,
         stream,
       );
       if (result === FilePiped) {
