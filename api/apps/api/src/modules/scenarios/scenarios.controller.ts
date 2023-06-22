@@ -108,8 +108,8 @@ import { forbiddenError } from '../access-control';
 import { scenarioNotFound } from '../blm/values/blm-repos';
 import { RequestScenarioCloneResponseDto } from './dto/scenario-clone.dto';
 import { ensureShapefileHasRequiredFiles } from '@marxan-api/utils/file-uploads.utils';
-import { LockStatus } from '@marxan/scenarios-planning-unit';
 import { WebshotPdfReportConfig } from '@marxan/webshot/webshot.dto';
+import { ClearLockStatusParams } from '@marxan-api/modules/scenarios/dto/clear-lock-status-param.dto';
 
 const basePath = `${apiGlobalPrefixes.v1}/scenarios`;
 const solutionsSubPath = `:id/marxan/solutions`;
@@ -529,14 +529,17 @@ export class ScenariosController {
   @ApiOkResponse()
   @Delete(':id/planning-units/status/:kind')
   async clearPlanningUnitsStatus(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('kind') kind: LockStatus,
+    @Param() params: ClearLockStatusParams,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<JsonApiAsyncJobMeta> {
-    const result = await this.service.clearLockStatuses(id, req.user.id, kind);
+    const result = await this.service.clearLockStatuses(
+      params.id,
+      req.user.id,
+      params.kind,
+    );
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
-        scenarioId: id,
+        scenarioId: params.id,
         userId: req.user.id,
         resourceType: scenarioResource.name.plural,
       });
