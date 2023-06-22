@@ -16,10 +16,10 @@ export class QueuedCostTemplateService {
   ) {}
 
   async getTemplateShapefile(
-    scenarioId: string,
+    projectId: string,
     writable: stream.Writable,
   ): Promise<typeof FileNotFound | typeof FileNotReady | typeof FilePiped> {
-    const filestream = await this.storage.getStream(scenarioId);
+    const filestream = await this.storage.getStream(projectId);
     if (filestream) {
       return new Promise((resolve, reject) => {
         filestream.pipe(writable).on(`error`, reject);
@@ -28,7 +28,7 @@ export class QueuedCostTemplateService {
         });
       });
     }
-    const isPending = await this.queue.isPending(scenarioId);
+    const isPending = await this.queue.isPending(projectId);
     if (isPending) {
       return FileNotReady;
     } else {
@@ -36,7 +36,7 @@ export class QueuedCostTemplateService {
     }
   }
 
-  scheduleTemplateShapefileCreation(scenarioId: string): void {
-    this.queue.startProcessing(scenarioId);
+  scheduleTemplateShapefileCreation(projectId: string): void {
+    this.queue.startProcessing(projectId);
   }
 }

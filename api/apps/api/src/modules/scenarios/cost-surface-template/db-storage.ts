@@ -16,7 +16,7 @@ export class DbStorage extends Storage {
     super();
   }
 
-  getStream(scenarioId: string): Promise<stream.Readable | undefined> {
+  getStream(projectId: string): Promise<stream.Readable | undefined> {
     return new Promise((resolve, reject) => {
       const passThrough = new stream.PassThrough();
       passThrough
@@ -34,7 +34,7 @@ export class DbStorage extends Storage {
           resolve(passThrough);
         });
       this.scenarioCostSurfaceRepository
-        .read(scenarioId, ArtifactType.CostTemplate, passThrough)
+        .read(projectId, ArtifactType.CostTemplate, passThrough)
         .catch(reject);
     });
   }
