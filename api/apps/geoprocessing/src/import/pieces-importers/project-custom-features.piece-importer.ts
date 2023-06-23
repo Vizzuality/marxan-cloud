@@ -83,23 +83,44 @@ export class ProjectCustomFeaturesPieceImporter
 
       await this.apiEntityManager.transaction(async (apiEm) => {
         const featureIdByClassName: Record<string, string> = {};
-        const insertValues = features.map(({ data, ...feature }) => {
+        const featureInsertValues: any[] = [];
+        const featureTagnsertValues: any[] = [];
+        features.forEach(({ data, tag, ...feature }) => {
           const featureId = v4();
           featureIdByClassName[feature.feature_class_name] = featureId;
 
-          return {
+          featureInsertValues.push({
             ...feature,
             project_id: projectId,
             id: featureId,
-          };
+          });
+
+          if (tag) {
+            featureTagnsertValues.push({
+              project_id: projectId,
+              feature_id: featureId,
+              tag,
+            });
+          }
         });
 
         await Promise.all(
-          insertValues.map((values) =>
+          featureInsertValues.map((values) =>
             apiEm
               .createQueryBuilder()
               .insert()
               .into('features')
+              .values(values)
+              .execute(),
+          ),
+        );
+
+        await Promise.all(
+          featureTagnsertValues.map((values) =>
+            apiEm
+              .createQueryBuilder()
+              .insert()
+              .into('project_feature_tags')
               .values(values)
               .execute(),
           ),

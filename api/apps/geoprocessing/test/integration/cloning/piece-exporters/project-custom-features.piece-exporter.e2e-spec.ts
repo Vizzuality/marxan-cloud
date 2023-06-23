@@ -45,10 +45,15 @@ describe(ProjectCustomFeaturesPieceExporter, () => {
   it('saves succesfully features data when the project has custom features', async () => {
     const input = fixtures.GivenAProjectCustomFeaturesExportJob();
     await fixtures.GivenProjectExist();
-    await fixtures.GivenCustomFeaturesForProject();
+    const featureIds = await fixtures.GivenCustomFeaturesForProject();
+    await fixtures.GivenTagOnFeature(featureIds[0], 'tagged');
+    await fixtures.GivenTagOnFeature(featureIds[1], 'also-tagged');
     await fixtures
       .WhenPieceExporterIsInvoked(input)
-      .ThenAProjectCustomFeaturesFileIsSaved();
+      .ThenAProjectCustomFeaturesFileIsSaved({
+        isLegacy: false,
+        tags: ['tagged', 'also-tagged', null, null, null],
+      });
   });
 
   it('saves succesfully features data when the project has legacy feature', async () => {
@@ -107,6 +112,11 @@ const getFixtures = async () => {
         organizationId,
       );
       await featuresDataRepo.delete({ featureId: In(featureIds) });
+      await apiEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from('project_feature_tags', 'pft')
+        .where({ featureId: In(featureIds) });
     },
     GivenAProjectCustomFeaturesExportJob: (): ExportJobInput => {
       return {
@@ -144,7 +154,14 @@ const getFixtures = async () => {
         recordsOfDataForEachCustomFeature,
         featureIds,
       );
+      return featureIds;
     },
+    GivenTagOnFeature: async (featureId: string, tag: string) =>
+      await apiEntityManager.query(`INSERT INTO project_feature_tags
+            (project_id, feature_id, tag)
+          VALUES
+            ('${projectId}', '${featureId}', '${tag}' ) `),
+
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
         ThenAnEmptyProjectCustomFeaturesFileIsSaved: async () => {
@@ -159,7 +176,9 @@ const getFixtures = async () => {
           expect(content.features).toEqual([]);
         },
         ThenAProjectCustomFeaturesFileIsSaved: async (
-          opts: { isLegacy: boolean } = { isLegacy: false },
+          opts: { isLegacy: boolean; tags?: (string | null)[] } = {
+            isLegacy: false,
+          },
         ) => {
           const result = await sut.run(input);
           const file = await fileRepository.get(result.uris[0].uri);
@@ -175,6 +194,11 @@ const getFixtures = async () => {
             .fill(0)
             .map((_, index) => `custom-${projectId}-${index}`);
 
+          if (opts.tags && opts.tags.length) {
+            expect(featuresExported.map((feature) => feature.tag)).toEqual(
+              opts.tags,
+            );
+          }
           expect(
             featuresExported.every(
               ({ is_legacy, data, feature_class_name }) =>
