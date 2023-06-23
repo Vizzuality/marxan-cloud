@@ -127,6 +127,17 @@ export const getProjectTagsFixtures = async () => {
         .set('Authorization', `Bearer ${userToken}`)
         .send();
     },
+
+    WhenPatchingAProjectTag: (
+      projectId: string,
+      tagName: string,
+      updatedTagName: string,
+    ) =>
+      request(app.getHttpServer())
+        .patch(`/api/v1/projects/${projectId}/tags`)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({ tagName, updatedTagName }),
+
     WhenDeletingAProjectTag: (projectId: string, tagName: string) =>
       request(app.getHttpServer())
         .delete(`/api/v1/projects/${projectId}/tags`)

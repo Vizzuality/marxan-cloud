@@ -139,6 +139,91 @@ describe('Projects Tag GET (e2e)', () => {
   });
 });
 
+describe('Projects Tag PATCH (e2e)', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return Error if Project not found', async () => {
+    //ARRANGE
+    const randomProjectId = v4();
+
+    // ACT
+    const response = await fixtures.WhenPatchingAProjectTag(
+      randomProjectId,
+      'irrelevant',
+      'irrelevant',
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenProjectNotFoundErrorWasReturned(response, randomProjectId);
+  });
+
+  test('should return error if tag fields are not valid', async () => {
+    // ARRANGE
+    const oldTag = 'oldTag';
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId = await fixtures.GivenFeatureOnProject(projectId, 'f');
+    await fixtures.GivenTagOnFeature(projectId, featureId, oldTag);
+
+    // ACT / ASSERT
+    const response1 = await fixtures.WhenPatchingAProjectTag(
+      projectId,
+      'INVALID TAG with\r\nnewline',
+      `something`,
+    );
+    expect(response1.status).toBe(HttpStatus.BAD_REQUEST);
+    fixtures.ThenInvalidTagErrorWasReturned(response1);
+    await fixtures.ThenFeatureHasTag(projectId, featureId, oldTag);
+
+    const response2 = await fixtures.WhenPatchingAProjectTag(
+      projectId,
+      'something',
+      `t${'a'.repeat(tagMaxlength + 1)}g`,
+    );
+    expect(response2.status).toBe(HttpStatus.BAD_REQUEST);
+    fixtures.ThenMaxLengthErrorWasReturned(response2);
+  });
+
+  test('should update all feature tag rows that match exactly with the tag to be updated, for the given Project', async () => {
+    // ARRANGE
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const projectId2 = await fixtures.GivenProject('someProject2');
+    const featureId11 = await fixtures.GivenFeatureOnProject(projectId1, 'f11');
+    const featureId12 = await fixtures.GivenFeatureOnProject(projectId1, 'f12');
+    const featureId13 = await fixtures.GivenFeatureOnProject(projectId1, 'f13');
+    const featureId14 = await fixtures.GivenFeatureOnProject(projectId1, 'f14');
+    const featureId21 = await fixtures.GivenFeatureOnProject(projectId2, 'f21');
+
+    await fixtures.GivenTagOnFeature(projectId1, featureId11, 'toBeUpdated');
+    await fixtures.GivenTagOnFeature(projectId1, featureId12, 'notupdated');
+    await fixtures.GivenTagOnFeature(projectId1, featureId13, 'NOTupdated');
+    await fixtures.GivenTagOnFeature(projectId1, featureId14, 'TOBEUPDATED');
+    await fixtures.GivenTagOnFeature(projectId2, featureId21, 'toBeUpdated');
+
+    //ACT
+    const response = await fixtures.WhenPatchingAProjectTag(
+      projectId1,
+      'toBeUpdated',
+      'updatedTAG',
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    await fixtures.ThenFeatureHasTag(projectId1, featureId12, 'notupdated');
+    await fixtures.ThenFeatureHasTag(projectId1, featureId13, 'notupdated');
+    await fixtures.ThenFeatureHasTag(projectId2, featureId21, 'toBeUpdated');
+
+    await fixtures.ThenFeatureHasTag(projectId1, featureId11, 'updatedTAG');
+    await fixtures.ThenFeatureHasTag(projectId1, featureId14, 'updatedTAG');
+  });
+});
+
 describe('Projects Tag DELETE (e2e)', () => {
   beforeEach(async () => {
     fixtures = await getProjectTagsFixtures();

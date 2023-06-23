@@ -149,6 +149,7 @@ import {
 import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
+import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -954,6 +955,37 @@ export class ProjectsController {
     }
 
     return { data: result.right };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description: `Updates the label of a tag for a given Project`,
+  })
+  @ApiParam({
+    name: 'projectId',
+    description: 'Id of the Project that the tag to be updated pertains to',
+  })
+  @ApiUnauthorizedResponse()
+  @ApiForbiddenResponse()
+  @Patch(':projectId/tags')
+  async updateProjectTag(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Body() body: UpdateProjectTagDTO,
+  ): Promise<void> {
+    const result = await this.geoFeatureTagsService.updateTagForProject(
+      req.user.id,
+      projectId,
+      body.tagName,
+      body.updatedTagName,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        userId: req.user.id,
+        projectId,
+      });
+    }
   }
 
   @ImplementsAcl()
