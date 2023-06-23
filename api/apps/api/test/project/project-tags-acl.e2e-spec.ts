@@ -42,6 +42,43 @@ describe('Projects Tag ACL DELETE (e2e)', () => {
   });
 });
 
+describe('Projects Tag ACL PATCH (e2e)', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return error if Project not editable by user', async () => {
+    // ARRANGE
+    const viewerProjectId = await fixtures.GivenProject('p', [
+      ProjectRoles.project_viewer,
+    ]);
+    const viewerFeatureId = await fixtures.GivenFeatureOnProject(
+      viewerProjectId,
+      'f',
+    );
+    const tag = 'valid-tag🙂';
+    await fixtures.GivenTagOnFeature(viewerProjectId, viewerFeatureId, tag);
+
+    // ACT
+    const response = await fixtures.WhenPatchingAProjectTag(
+      viewerProjectId,
+      tag,
+      'FANCY-NEW-TAG',
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.FORBIDDEN);
+    await fixtures.ThenProjectNotEditableErrorWasReturned(
+      response,
+      viewerProjectId,
+    );
+    await fixtures.ThenFeatureHasTag(viewerProjectId, viewerFeatureId, tag);
+  });
+});
 describe('Projects Tag ACL GET (e2e)', () => {
   beforeEach(async () => {
     fixtures = await getProjectTagsFixtures();

@@ -87,6 +87,31 @@ export class GeoFeatureTagsService {
     return right(result.map((geoFeatureTag) => geoFeatureTag.tag));
   }
 
+  async updateTagForProject(
+    userId: string,
+    projectId: string,
+    tagToBeUpdate: string,
+    updatedTag: string,
+  ): Promise<Either<typeof projectNotEditable | typeof projectNotFound, true>> {
+    const project = await this.projectsRepo.findOne({
+      where: { id: projectId },
+    });
+    if (!project) {
+      return left(projectNotFound);
+    }
+
+    if (!(await this.projectAclService.canEditProject(userId, projectId))) {
+      return left(projectNotEditable);
+    }
+
+    await this.geoFeatureTagsRepo.update(
+      { projectId, tag: tagToBeUpdate },
+      { tag: updatedTag },
+    );
+
+    return right(true);
+  }
+
   async setOrUpdateTagForFeature(
     userId: string,
     projectId: string,
