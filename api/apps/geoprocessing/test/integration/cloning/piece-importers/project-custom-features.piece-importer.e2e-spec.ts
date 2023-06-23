@@ -59,23 +59,30 @@ describe(ProjectCustomFeaturesPieceImporter, () => {
   });
 
   it('imports project custom features', async () => {
-    const archiveLocation = await fixtures.GivenValidProjectCustomFeaturesFile();
-    await fixtures.GivenProject();
-    const input = fixtures.GivenJobInput(archiveLocation);
-    await fixtures
-      .WhenPieceImporterIsInvoked(input)
-      .ThenCustomFeaturesShouldBeAddedToProject();
-  });
-
-  it('imports project leagcy features', async () => {
     const archiveLocation = await fixtures.GivenValidProjectCustomFeaturesFile({
-      isLegacy: true,
+      isLegacy: false,
+      tags: ['someTAG', 'anotherTag', undefined, 'someTag', undefined],
     });
     await fixtures.GivenProject();
     const input = fixtures.GivenJobInput(archiveLocation);
     await fixtures
       .WhenPieceImporterIsInvoked(input)
-      .ThenCustomFeaturesShouldBeAddedToProject({ isLegacy: true });
+      .ThenCustomFeaturesShouldBeAddedToProject({
+        isLegacy: false,
+        tags: ['someTAG', 'anotherTag'],
+      });
+  });
+
+  it('imports project leagcy features', async () => {
+    const archiveLocation = await fixtures.GivenValidProjectCustomFeaturesFile({
+      isLegacy: true,
+      tags: [],
+    });
+    await fixtures.GivenProject();
+    const input = fixtures.GivenJobInput(archiveLocation);
+    await fixtures
+      .WhenPieceImporterIsInvoked(input)
+      .ThenCustomFeaturesShouldBeAddedToProject({ isLegacy: true, tags: [] });
   });
 });
 
@@ -136,9 +143,15 @@ const getFixtures = async () => {
         .where('project_id = :projectId', { projectId })
         .execute();
 
+      const featureIds = features.map((feature) => feature.id);
       await featuresDataRepo.delete({
-        featureId: In(features.map((feature) => feature.id)),
+        featureId: In(featureIds),
       });
+      await apiEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from('project_feature_tags', 'pft')
+        .where({ featureId: In(featureIds) });
 
       await DeleteProjectAndOrganization(
         apiEntityManager,
@@ -179,7 +192,10 @@ const getFixtures = async () => {
       return new ArchiveLocation('not found');
     },
     GivenValidProjectCustomFeaturesFile: async (
-      opts: { isLegacy: boolean } = { isLegacy: false },
+      opts: { isLegacy: boolean; tags: (string | undefined)[] } = {
+        isLegacy: false,
+        tags: [],
+      },
     ) => {
       const geometries = await GenerateRandomGeometries(
         geoEntityManager,
@@ -210,6 +226,11 @@ const getFixtures = async () => {
               })),
           })),
       };
+      if (opts.tags && opts.tags.length) {
+        validProjectCustomFeaturesFile.features?.forEach((value, index) => {
+          value.tag = opts.tags[index];
+        });
+      }
 
       const exportId = v4();
       const relativePath = ClonePieceRelativePathResolver.resolveFor(
@@ -236,19 +257,25 @@ const getFixtures = async () => {
           );
         },
         ThenCustomFeaturesShouldBeAddedToProject: async (
-          opts: { isLegacy: boolean } = { isLegacy: false },
+          opts: { isLegacy: boolean; tags?: string[] } = {
+            isLegacy: false,
+            tags: [],
+          },
         ) => {
           await sut.run(input);
 
           const customFeatures: {
             id: string;
             isLegacy: boolean;
+            tag: string;
           }[] = await apiEntityManager
             .createQueryBuilder()
-            .select('id')
-            .addSelect('is_legacy', 'isLegacy')
+            .select('f.id')
+            .addSelect('f.is_legacy', 'isLegacy')
+            .addSelect('pft.tag', 'tag')
             .from('features', 'f')
-            .where('project_id = :projectId', { projectId })
+            .leftJoin('project_feature_tags', 'pft', 'pft.feature_id = f.id')
+            .where('f.project_id = :projectId', { projectId })
             .execute();
 
           expect(
@@ -265,6 +292,15 @@ const getFixtures = async () => {
           expect(featuresData).toHaveLength(
             amountOfCustomFeatures * recordsOfDataForEachCustomFeature,
           );
+
+          if (opts.tags) {
+            const savedTags = customFeatures
+              .map((feature) => feature.tag)
+              .filter((tag) => tag !== null)
+              .filter((tag, index, array) => array.indexOf(tag) === index);
+            expect(savedTags.length).toEqual(opts.tags.length);
+            expect(savedTags).toEqual(expect.arrayContaining(opts.tags));
+          }
         },
       };
     },

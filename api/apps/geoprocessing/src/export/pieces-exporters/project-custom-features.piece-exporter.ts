@@ -31,6 +31,7 @@ type ProjectCustomFeaturesSelectResult = {
   creation_status: CreationStatus;
   list_property_keys: string[];
   is_legacy: boolean;
+  tag: string;
 };
 
 type FeaturesDataSelectResult = {
@@ -69,18 +70,20 @@ export class ProjectCustomFeaturesPieceExporter
     const customFeatures: ProjectCustomFeaturesSelectResult[] = await this.apiEntityManager
       .createQueryBuilder()
       .select([
-        'id',
-        'feature_class_name',
-        'alias',
-        'description',
-        'property_name',
-        'intersection',
-        'creation_status',
-        'list_property_keys',
-        'is_legacy',
+        'f.id',
+        'f.feature_class_name',
+        'f.alias',
+        'f.description',
+        'f.property_name',
+        'f.intersection',
+        'f.creation_status',
+        'f.list_property_keys',
+        'f.is_legacy',
+        'pft.tag',
       ])
       .from('features', 'f')
-      .where('project_id = :projectId', { projectId: input.resourceId })
+      .leftJoin('project_feature_tags', 'pft', 'pft.feature_id = f.id')
+      .where('f.project_id = :projectId', { projectId: input.resourceId })
       .execute();
 
     const customFeaturesIds = customFeatures.map((feature) => feature.id);
