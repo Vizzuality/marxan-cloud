@@ -2,6 +2,7 @@ import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { v4 } from 'uuid';
 import { HttpStatus } from '@nestjs/common';
 import { getProjectTagsFixtures } from './project-tags.fixtures';
+import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 
 let fixtures: FixtureType<typeof getProjectTagsFixtures>;
 
