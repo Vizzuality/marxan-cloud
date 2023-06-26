@@ -38,8 +38,8 @@
       "@marxan-jobs/planning-unit-protection-level/*": [
         "libs/planning-unit-protection-level/src/*"
       ],
-      "@marxan/scenario-cost-surface": ["libs/scenario-cost-surface/src"],
-      "@marxan/scenario-cost-surface/*": ["libs/scenario-cost-surface/src/*"],
+      "@marxan/project-template-file": ["libs/project-template-file/src"],
+      "@marxan/project-template-file/*": ["libs/project-template-file/src/*"],
       "@marxan/marxan-input": ["libs/marxan-input/src"],
       "@marxan/marxan-input/*": ["libs/marxan-input/src/*"],
       "@marxan/marxan-output": ["libs/marxan-output/src"],

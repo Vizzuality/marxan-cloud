@@ -5,13 +5,13 @@ import {
   ArtifactType,
   CacheNotFound,
   ErrorWithSymbol,
-  ScenarioCostSurfaceRepository,
-} from '@marxan/scenario-cost-surface';
+  ProjectTemplateFileRepository,
+} from '@marxan/project-template-file';
 
 @Injectable()
 export class DbStorage extends Storage {
   constructor(
-    private readonly scenarioCostSurfaceRepository: ScenarioCostSurfaceRepository,
+    private readonly projectTemplateFileRepository: ProjectTemplateFileRepository,
   ) {
     super();
   }
@@ -33,7 +33,7 @@ export class DbStorage extends Storage {
         .on(`pipe`, () => {
           resolve(passThrough);
         });
-      this.scenarioCostSurfaceRepository
+      this.projectTemplateFileRepository
         .read(projectId, ArtifactType.CostTemplate, passThrough)
         .catch(reject);
     });
