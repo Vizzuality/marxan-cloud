@@ -12,7 +12,7 @@ export enum ArtifactType {
   ProjectShapefile = 'ProjectShapefile',
 }
 
-@Entity('project_file_cache')
+@Entity('project_template_file_cache')
 @Index(['pojectId', 'artifactType'])
 export class ProjectTemplateFileCache {
   @PrimaryColumn({
