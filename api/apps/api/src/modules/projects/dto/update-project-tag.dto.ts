@@ -9,10 +9,6 @@ import {
 export class UpdateProjectTagDTO {
   @ApiProperty()
   @IsNotEmpty({ message: 'The Tag cannot not be empty' })
-  @Validate(IsValidTagNameValidator)
-  @MaxLength(tagMaxlength, {
-    message: tagMaxLengthErrorMessage,
-  })
   tagName!: string;
 
   @ApiProperty()

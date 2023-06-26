@@ -175,8 +175,8 @@ describe('Projects Tag PATCH (e2e)', () => {
     // ACT / ASSERT
     const response1 = await fixtures.WhenPatchingAProjectTag(
       projectId,
-      'INVALID TAG with\r\nnewline',
-      `something`,
+      'sometag',
+      `INVALID TAG with\r\nnewline`,
     );
     expect(response1.status).toBe(HttpStatus.BAD_REQUEST);
     fixtures.ThenInvalidTagErrorWasReturned(response1);
@@ -189,6 +189,25 @@ describe('Projects Tag PATCH (e2e)', () => {
     );
     expect(response2.status).toBe(HttpStatus.BAD_REQUEST);
     fixtures.ThenMaxLengthErrorWasReturned(response2);
+  });
+
+  test("should return error if tag to be updated doesn't exist for the given project", async () => {
+    // ARRANGE
+    const oldTag = 'oldTag';
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId = await fixtures.GivenFeatureOnProject(projectId, 'f');
+    await fixtures.GivenTagOnFeature(projectId, featureId, oldTag);
+
+    // ACT
+    const response = await fixtures.WhenPatchingAProjectTag(
+      projectId,
+      'inexistentTag',
+      `newTag`,
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenTagNotFoundErrorWasReturned(response, projectId);
   });
 
   test('should update all feature tag rows that match exactly with the tag to be updated, for the given Project', async () => {

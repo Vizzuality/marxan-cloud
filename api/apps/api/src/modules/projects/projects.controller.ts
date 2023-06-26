@@ -976,8 +976,7 @@ export class ProjectsController {
     const result = await this.geoFeatureTagsService.updateTagForProject(
       req.user.id,
       projectId,
-      body.tagName,
-      body.updatedTagName,
+      body,
     );
 
     if (isLeft(result)) {

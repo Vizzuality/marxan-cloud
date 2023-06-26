@@ -84,6 +84,7 @@ import {
   featureNotEditableByUserWithinProject,
   featureNotFound,
   featureNotFoundWithinProject,
+  tagNotFoundForProject,
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 
 interface ErrorHandlerOptions {
@@ -147,6 +148,7 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotFound
     | typeof projectNotEditable
     | typeof projectNotVisible
+    | typeof tagNotFoundForProject
     | ImportProjectError,
   options?: ErrorHandlerOptions,
 ) => {
@@ -318,6 +320,10 @@ export const mapAclDomainToHttpError = (
     case projectNotFound:
       throw new NotFoundException(
         `Project with id ${options?.projectId} not found`,
+      );
+    case tagNotFoundForProject:
+      throw new NotFoundException(
+        `Tag for Project with id ${options?.projectId} not found`,
       );
     default:
       const _exhaustiveCheck: never = errorToCheck;
