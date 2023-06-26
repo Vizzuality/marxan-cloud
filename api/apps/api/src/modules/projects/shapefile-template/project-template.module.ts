@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ScenarioCostSurfaceModule } from '@marxan/scenario-cost-surface';
+import { ProjectTemplateFileModule } from '@marxan/scenario-cost-surface';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { QueueModule } from '@marxan-api/modules/queue/queue.module';
 import { DbStorage } from './db-storage';
@@ -15,7 +15,7 @@ import { ProjectTemplateController } from '@marxan-api/modules/projects/shapefil
     QueueModule.register({
       name: queueName,
     }),
-    ScenarioCostSurfaceModule.for(apiConnections.default.name),
+    ProjectTemplateFileModule.for(apiConnections.default.name),
   ],
   providers: [
     {

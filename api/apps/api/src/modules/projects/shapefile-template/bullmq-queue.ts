@@ -4,10 +4,10 @@ import { Inject, Provider } from '@nestjs/common';
 import { QueueToken } from '@marxan-api/modules/queue/queue.tokens';
 
 export const costSurfaceTemplateCreationQueue = Symbol(
-  'cost-surface-template-creation-queue',
+  'project-template-creation-queue',
 );
 // wish to have it in provider
-export const queueName = 'cost-surface-template-creation';
+export const queueName = 'project-template-creation';
 export const queueProvider: Provider<UnderlyingBullQueue<unknown, unknown>> = {
   provide: costSurfaceTemplateCreationQueue,
   useExisting: QueueToken,
@@ -32,14 +32,14 @@ export class BullmqQueue extends Queue {
     );
   }
 
-  async startProcessing(scenarioId: string): Promise<void> {
-    const job = await this.underlyingQueue.getJob(scenarioId);
+  async startProcessing(projectId: string): Promise<void> {
+    const job = await this.underlyingQueue.getJob(projectId);
     if (await job?.isFailed()) {
       // sometimes, even with `removeOnFail` flag is still kept in a queue 🤷
       await job?.remove();
     }
-    await this.underlyingQueue.add(scenarioId, undefined, {
-      jobId: scenarioId,
+    await this.underlyingQueue.add(projectId, undefined, {
+      jobId: projectId,
       removeOnFail: true,
       removeOnComplete: true,
     });

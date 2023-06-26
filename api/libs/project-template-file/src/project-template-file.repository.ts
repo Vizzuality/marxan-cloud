@@ -8,9 +8,9 @@ import { pick } from 'lodash';
 import { isDefined } from '@marxan/utils';
 import {
   ArtifactType,
-  CostSurfaceFileCache,
-  createCostSurfaceFileCacheFields,
-} from './cost-surface-file-cache.api.entity';
+  ProjectTemplateFileCache,
+  createProjectTemplateFileCacheFields,
+} from './project-template-file-cache.api.entity';
 
 export const CacheNotFound = Symbol('entity not found');
 export class ErrorWithSymbol extends Error {
@@ -21,7 +21,7 @@ export class ErrorWithSymbol extends Error {
 export const StreamPiped = Symbol('stream piped');
 export const EntityManagerToken = Symbol();
 @Injectable()
-export class ScenarioCostSurfaceRepository {
+export class ProjectTemplateFileRepository {
   /**
    * 2048 is a minimum, and bufferSize should be divisible by it
    */
@@ -34,18 +34,18 @@ export class ScenarioCostSurfaceRepository {
 
   async save(
     entityToSave: Pick<
-      CostSurfaceFileCache,
-      typeof createCostSurfaceFileCacheFields[number]
+      ProjectTemplateFileCache,
+      typeof createProjectTemplateFileCacheFields[number]
     >,
     artifactStream: Readable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        CostSurfaceFileCache,
+        ProjectTemplateFileCache,
       );
       const existingEntity = await repository.findOne({
         where: {
-          scenarioId: entityToSave.scenarioId,
+          projectId: entityToSave.projectId,
           artifactType: entityToSave.artifactType,
         },
       });
@@ -60,7 +60,7 @@ export class ScenarioCostSurfaceRepository {
 
       const savedEntity = await repository.save({
         ...existingEntity,
-        ...pick(entityToSave, createCostSurfaceFileCacheFields),
+        ...pick(entityToSave, createProjectTemplateFileCacheFields),
       });
 
       await this.saveArtifact(
@@ -73,17 +73,17 @@ export class ScenarioCostSurfaceRepository {
   }
 
   async read(
-    scenarioId: string,
+    projectId: string,
     type: ArtifactType,
     output: Writable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        CostSurfaceFileCache,
+        ProjectTemplateFileCache,
       );
       const cacheEntity = await repository.findOne({
         where: {
-          scenarioId,
+          projectId,
           artifactType: type,
         },
       });
@@ -109,14 +109,14 @@ export class ScenarioCostSurfaceRepository {
     });
   }
 
-  async remove(scenarioId: string, artifactType: ArtifactType): Promise<void> {
+  async remove(projectId: string, artifactType: ArtifactType): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        CostSurfaceFileCache,
+        ProjectTemplateFileCache,
       );
       const cacheEntity = await repository.findOne({
         where: {
-          scenarioId,
+          projectId,
           artifactType,
         },
       });
@@ -137,7 +137,7 @@ export class ScenarioCostSurfaceRepository {
   private async saveArtifact(
     largeObjectManager: LargeObjectManager,
     artifactStream: Readable,
-    repository: Repository<CostSurfaceFileCache>,
+    repository: Repository<ProjectTemplateFileCache>,
     savedEntityId: string,
   ) {
     const [

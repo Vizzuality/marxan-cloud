@@ -1,27 +1,27 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
-import { CostSurfaceFileCache } from './cost-surface-file-cache.api.entity';
+import { ProjectTemplateFileCache } from './project-template-file-cache.api.entity';
 import {
   EntityManagerToken,
-  ScenarioCostSurfaceRepository,
-} from './scenario-cost-surface.repository';
+  ProjectTemplateFileRepository,
+} from './project-template-file.repository';
 
 @Module({})
-export class ScenarioCostSurfaceModule {
+export class ProjectTemplateFileModule {
   static for(connectionName?: string): DynamicModule {
     return {
-      module: ScenarioCostSurfaceModule,
+      module: ProjectTemplateFileModule,
       imports: [
-        TypeOrmModule.forFeature([CostSurfaceFileCache], connectionName),
+        TypeOrmModule.forFeature([ProjectTemplateFileCache], connectionName),
       ],
       providers: [
-        ScenarioCostSurfaceRepository,
+        ProjectTemplateFileRepository,
         {
           provide: EntityManagerToken,
           useExisting: getEntityManagerToken(connectionName),
         },
       ],
-      exports: [ScenarioCostSurfaceRepository],
+      exports: [ProjectTemplateFileRepository],
     };
   }
 }

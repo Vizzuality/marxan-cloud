@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ScenarioCostSurfaceModule } from '@marxan/scenario-cost-surface';
+import { ProjectTemplateFileModule } from '@marxan/scenario-cost-surface';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { CostTemplateGenerator } from './cost-template-generator';
 import { CostTemplateWorkerProcessor } from './cost-template-worker-processor';
@@ -9,7 +9,7 @@ import { Storage } from './storage';
 
 @Module({
   imports: [
-    ScenarioCostSurfaceModule.for(geoprocessingConnections.apiDB.name),
+    ProjectTemplateFileModule.for(geoprocessingConnections.apiDB.name),
     WorkerModule,
   ],
   providers: [
