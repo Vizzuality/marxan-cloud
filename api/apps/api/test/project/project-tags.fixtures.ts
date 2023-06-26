@@ -199,6 +199,14 @@ export const getProjectTagsFixtures = async () => {
       expect(error).toContain(`A tag cannot contain line breaks`);
     },
 
+    ThenTagNotFoundErrorWasReturned: (
+      response: request.Response,
+      projectId: string,
+    ) => {
+      const error: any = response.body.errors[0].meta.rawError.response.message;
+      expect(error).toContain(`Tag for Project with id ${projectId} not found`);
+    },
+
     ThenFeatureHasTag: async (
       projectId: string,
       featureId: string,

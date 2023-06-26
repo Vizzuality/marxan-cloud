@@ -11,6 +11,7 @@ import {
   projectNotFound,
   projectNotVisible,
 } from '@marxan-api/modules/projects/projects.service';
+import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
 
 export const featureNotFound = Symbol('feature not found');
 export const featureNotFoundWithinProject = Symbol(
@@ -19,6 +20,7 @@ export const featureNotFoundWithinProject = Symbol(
 export const featureNotEditableByUserWithinProject = Symbol(
   'feature not editable by user within project',
 );
+export const tagNotFoundForProject = Symbol('tag not found for Project');
 
 export class GeoFeatureTagsService {
   constructor(
@@ -90,9 +92,15 @@ export class GeoFeatureTagsService {
   async updateTagForProject(
     userId: string,
     projectId: string,
-    tagToBeUpdate: string,
-    updatedTag: string,
-  ): Promise<Either<typeof projectNotEditable | typeof projectNotFound, true>> {
+    dto: UpdateProjectTagDTO,
+  ): Promise<
+    Either<
+      | typeof projectNotEditable
+      | typeof projectNotFound
+      | typeof tagNotFoundForProject,
+      true
+    >
+  > {
     const project = await this.projectsRepo.findOne({
       where: { id: projectId },
     });
@@ -100,13 +108,20 @@ export class GeoFeatureTagsService {
       return left(projectNotFound);
     }
 
+    const existingTag = await this.geoFeatureTagsRepo.findOne({
+      where: { tag: dto.tagName },
+    });
+    if (!existingTag) {
+      return left(tagNotFoundForProject);
+    }
+
     if (!(await this.projectAclService.canEditProject(userId, projectId))) {
       return left(projectNotEditable);
     }
 
     await this.geoFeatureTagsRepo.update(
-      { projectId, tag: tagToBeUpdate },
-      { tag: updatedTag },
+      { projectId, tag: dto.tagName },
+      { tag: dto.updatedTagName },
     );
 
     return right(true);
