@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProjectTemplateFileModule } from '@marxan/scenario-cost-surface';
+import { ProjectTemplateFileModule } from '@marxan/project-template-file';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { QueueModule } from '@marxan-api/modules/queue/queue.module';
 import { DbStorage } from './db-storage';
