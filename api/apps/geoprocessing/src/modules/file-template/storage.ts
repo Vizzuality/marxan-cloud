@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import {
   ArtifactType,
-  ScenarioCostSurfaceRepository,
-} from '@marxan/scenario-cost-surface';
+  ProjectTemplateFileRepository,
+} from '@marxan/project-template-file';
 import * as archiver from 'archiver';
 import * as stream from 'stream';
 
 @Injectable()
 export class Storage {
   constructor(
-    private readonly scenarioFilesRepository: ScenarioCostSurfaceRepository,
+    private readonly projectFilesRepository: ProjectTemplateFileRepository,
   ) {}
 
-  async save(scenarioId: string, shapefileDirectory: string) {
+  async save(projectId: string, shapefileDirectory: string) {
     const shapefileArchive = new ZipArchive();
-    const savePromise = this.scenarioFilesRepository.save(
+    const savePromise = this.projectFilesRepository.save(
       {
         contentType: `application/zip`,
-        scenarioId,
+        projectId,
         artifactType: ArtifactType.CostTemplate,
       },
       shapefileArchive.stream(),
