@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
-import { FakeCostTemplateService } from './__mocks__/fake-cost-template.service';
+import { FakeProjectTemplateService } from './__mocks__/fake-project-template.service';
 import { ProjectTemplateService } from '@marxan-api/modules/projects/shapefile-template/project-template.service';
 import { ProjectTemplateController } from '@marxan-api/modules/projects/shapefile-template/project-template.controller';
 
@@ -47,7 +47,7 @@ const getFixtures = async () => {
     providers: [
       {
         provide: ProjectTemplateService,
-        useClass: FakeCostTemplateService,
+        useClass: FakeProjectTemplateService,
       },
     ],
     controllers: [ProjectTemplateController],
@@ -56,7 +56,7 @@ const getFixtures = async () => {
   app = moduleFixture.createNestApplication();
   await app.init();
 
-  const fakeShapefileService: FakeCostTemplateService = app.get(
+  const fakeShapefileService: FakeProjectTemplateService = app.get(
     ProjectTemplateService,
   );
 

@@ -1,11 +1,11 @@
 import * as stream from 'stream';
 import {
-  ScenarioCostSurfaceTemplateService,
+  ProjectTemplateService,
   FileNotReady,
   FilePiped,
 } from '../project-template.service';
 
-export class FakeCostTemplateService extends ScenarioCostSurfaceTemplateService {
+export class FakeProjectTemplateService extends ProjectTemplateService {
   scheduledTemplateCreation: string[] = [];
   templatesInProgress: string[] = [];
   availableTemplatesForScenarios: Record<string, string> = {};

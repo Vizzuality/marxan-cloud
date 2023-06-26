@@ -3,7 +3,10 @@ import {
   CreateWithEventFactory,
   QueueEventsAdapterFactory,
 } from '@marxan-api/modules/queue-api-events';
-import { JobInput, surfaceCostQueueName } from '@marxan/scenario-cost-surface';
+import {
+  JobInput,
+  projectTemplateFileQueueName,
+} from '@marxan/scenario-cost-surface';
 import { FactoryProvider } from '@nestjs/common';
 import { Queue, QueueEvents } from 'bullmq';
 
@@ -16,14 +19,14 @@ export const surfaceCostEventsFactoryToken = Symbol(
 export const surfaceCostQueueProvider: FactoryProvider<Queue<JobInput>> = {
   provide: surfaceCostQueueToken,
   useFactory: (queueBuilder: QueueBuilder<JobInput>) => {
-    return queueBuilder.buildQueue(surfaceCostQueueName);
+    return queueBuilder.buildQueue(projectTemplateFileQueueName);
   },
   inject: [QueueBuilder],
 };
 export const surfaceCostQueueEventsProvider: FactoryProvider<QueueEvents> = {
   provide: surfaceCostEventsToken,
   useFactory: (eventsBuilder: QueueEventsBuilder) => {
-    return eventsBuilder.buildQueueEvents(surfaceCostQueueName);
+    return eventsBuilder.buildQueueEvents(projectTemplateFileQueueName);
   },
   inject: [QueueEventsBuilder],
 };

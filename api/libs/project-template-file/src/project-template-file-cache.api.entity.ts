@@ -9,11 +9,12 @@ import {
 
 export enum ArtifactType {
   CostTemplate = 'CostTemplate',
+  ProjectShapefile = 'ProjectShapefile',
 }
 
-@Entity('cost_surface_file_cache')
-@Index(['scenarioId', 'artifactType'])
-export class CostSurfaceFileCache {
+@Entity('project_file_cache')
+@Index(['pojectId', 'artifactType'])
+export class ProjectTemplateFileCache {
   @PrimaryColumn({
     generated: 'uuid',
     type: 'uuid',
@@ -21,7 +22,7 @@ export class CostSurfaceFileCache {
   id!: string;
 
   @Column()
-  scenarioId!: string;
+  projectId!: string;
 
   @Column({ type: 'int4', nullable: true })
   artifact?: number;
@@ -42,11 +43,11 @@ export class CostSurfaceFileCache {
   lastModifiedAt!: Date;
 }
 
-export const createCostSurfaceFileCacheFields = [
-  'scenarioId',
+export const createProjectTemplateFileCacheFields = [
+  'projectId',
   'artifactType',
   'contentType',
 ] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const typecheckFields: readonly (keyof CostSurfaceFileCache)[] = createCostSurfaceFileCacheFields;
+const typecheckFields: readonly (keyof ProjectTemplateFileCache)[] = createProjectTemplateFileCacheFields;

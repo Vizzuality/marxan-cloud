@@ -1,5 +1,5 @@
 export type ParentJobInput = {
-  scenarioId: string;
+  projectId: string;
 };
 
 export type FromShapefileJobInput = ParentJobInput & {
