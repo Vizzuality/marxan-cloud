@@ -3,7 +3,7 @@ import {
   ScenarioCostSurfaceTemplateService,
   FileNotReady,
   FilePiped,
-} from '../scenario-cost-surface-template.service';
+} from '../project-template.service';
 
 export class FakeCostTemplateService extends ScenarioCostSurfaceTemplateService {
   scheduledTemplateCreation: string[] = [];

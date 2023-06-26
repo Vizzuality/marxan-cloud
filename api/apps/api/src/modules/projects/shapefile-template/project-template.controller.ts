@@ -20,20 +20,20 @@ import { JwtAuthGuard } from '@marxan-api/guards/jwt-auth.guard';
 import { IsMissingAclImplementation } from '@marxan-api/decorators/acl.decorator';
 import {
   FileNotReady,
-  ScenarioCostSurfaceTemplateService,
-} from '@marxan-api/modules/scenarios/cost-surface-template/scenario-cost-surface-template.service';
+  ProjectTemplateService,
+} from '@marxan-api/modules/projects/shapefile-template/project-template.service';
 
 @IsMissingAclImplementation()
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags()
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
-export class ProjectShapefileTemplateController {
+export class ProjectTemplateController {
   constructor(
-    private readonly scenarioCostSurfaceTemplateService: ScenarioCostSurfaceTemplateService,
+    private readonly projectTemplateService: ProjectTemplateService,
   ) {}
 
-  @Get(':projectId/shapefile-template')
+  @Get('cost-surface-template')
   @ApiAcceptedResponse()
   @ApiOkResponse({
     schema: {
@@ -42,11 +42,35 @@ export class ProjectShapefileTemplateController {
     },
   })
   @Header('Content-Type', 'application/zip')
-  async shapefileTemplate(
+  async costSurfaceShapefileTemplate(
+    @Param('projectId') projectId: string,
+    @Res() res: express.Response,
+  ): Promise<void> {
+    const shapefileStatus = await this.projectTemplateService.getTemplateShapefile(
+      projectId,
+      res,
+    );
+
+    if (shapefileStatus === FileNotReady) {
+      res.status(HttpStatus.GATEWAY_TIMEOUT).send();
+      return;
+    }
+  }
+
+  @Get(':projectId/project-shapefile-template')
+  @ApiAcceptedResponse()
+  @ApiOkResponse({
+    schema: {
+      type: 'string',
+      format: 'binary',
+    },
+  })
+  @Header('Content-Type', 'application/zip')
+  async projectShapefileTemplate(
     @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
-    const shapefileStatus = await this.scenarioCostSurfaceTemplateService.getTemplateShapefile(
+    const shapefileStatus = await this.projectTemplateService.getTemplateShapefile(
       id,
       res,
     );

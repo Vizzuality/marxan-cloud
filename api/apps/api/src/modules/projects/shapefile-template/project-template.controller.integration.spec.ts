@@ -3,9 +3,9 @@ import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
-import { CostSurfaceTemplateController } from './cost-surface-template.controller';
-import { ScenarioCostSurfaceTemplateService } from './scenario-cost-surface-template.service';
 import { FakeCostTemplateService } from './__mocks__/fake-cost-template.service';
+import { ProjectTemplateService } from '@marxan-api/modules/projects/shapefile-template/project-template.service';
+import { ProjectTemplateController } from '@marxan-api/modules/projects/shapefile-template/project-template.controller';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let app: INestApplication;
@@ -42,22 +42,22 @@ it(`should return a timeout when file is in progress`, async () => {
 
 const getFixtures = async () => {
   // not testing auth at the moment
-  Reflect.deleteMetadata(GUARDS_METADATA, CostSurfaceTemplateController);
+  Reflect.deleteMetadata(GUARDS_METADATA, ProjectTemplateController);
   const moduleFixture: TestingModule = await Test.createTestingModule({
     providers: [
       {
-        provide: ScenarioCostSurfaceTemplateService,
+        provide: ProjectTemplateService,
         useClass: FakeCostTemplateService,
       },
     ],
-    controllers: [CostSurfaceTemplateController],
+    controllers: [ProjectTemplateController],
   }).compile();
 
   app = moduleFixture.createNestApplication();
   await app.init();
 
   const fakeShapefileService: FakeCostTemplateService = app.get(
-    ScenarioCostSurfaceTemplateService,
+    ProjectTemplateService,
   );
 
   const fixtures = {

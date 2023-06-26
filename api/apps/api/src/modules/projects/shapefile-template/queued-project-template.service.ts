@@ -2,14 +2,14 @@ import {
   FileNotFound,
   FileNotReady,
   FilePiped,
-} from './scenario-cost-surface-template.service';
+} from './project-template.service';
 import * as stream from 'stream';
 import { Injectable } from '@nestjs/common';
 import { Queue } from './queue';
 import { Storage } from './storage';
 
 @Injectable()
-export class QueuedCostTemplateService {
+export class QueuedProjectTemplateService {
   constructor(
     private readonly queue: Queue,
     private readonly storage: Storage,

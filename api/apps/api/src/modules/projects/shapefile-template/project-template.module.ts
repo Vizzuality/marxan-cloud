@@ -6,11 +6,10 @@ import { DbStorage } from './db-storage';
 import { Storage } from './storage';
 import { Queue } from './queue';
 import { BullmqQueue, queueName, queueProvider } from './bullmq-queue';
-import { ScenarioCostSurfaceTemplateService } from './scenario-cost-surface-template.service';
-import { QueuedCostTemplateService } from './queued-cost-template.service';
-import { WaitingCostTemplateService } from './waiting-cost-template.service';
-import { CostSurfaceTemplateController } from './cost-surface-template.controller';
-
+import { ProjectTemplateService } from './project-template.service';
+import { QueuedProjectTemplateService } from '@marxan-api/modules/projects/shapefile-template/queued-project-template.service';
+import { WaitingProjectTemplateService } from '@marxan-api/modules/projects/shapefile-template/waiting-project-template.service';
+import { ProjectTemplateController } from '@marxan-api/modules/projects/shapefile-template/project-template.controller';
 @Module({
   imports: [
     QueueModule.register({
@@ -28,13 +27,13 @@ import { CostSurfaceTemplateController } from './cost-surface-template.controlle
       useClass: BullmqQueue,
     },
     queueProvider,
-    QueuedCostTemplateService,
-    WaitingCostTemplateService,
+    QueuedProjectTemplateService,
+    WaitingProjectTemplateService,
     {
-      provide: ScenarioCostSurfaceTemplateService,
-      useExisting: WaitingCostTemplateService,
+      provide: ProjectTemplateService,
+      useExisting: WaitingProjectTemplateService,
     },
   ],
-  controllers: [CostSurfaceTemplateController],
+  controllers: [ProjectTemplateController],
 })
-export class CostSurfaceTemplateModule {}
+export class ProjectTemplateModule {}

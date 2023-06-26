@@ -1,19 +1,18 @@
 import * as stream from 'stream';
 import { Injectable, Logger } from '@nestjs/common';
-import { QueuedCostTemplateService } from './queued-cost-template.service';
 import {
-  ScenarioCostSurfaceTemplateService,
   FileNotFound,
   FileNotReady,
   FilePiped,
-} from './scenario-cost-surface-template.service';
+  ProjectTemplateService,
+} from './project-template.service';
+import { QueuedProjectTemplateService } from '@marxan-api/modules/projects/shapefile-template/queued-project-template.service';
 
 @Injectable()
-export class WaitingCostTemplateService
-  implements ScenarioCostSurfaceTemplateService {
+export class WaitingProjectTemplateService implements ProjectTemplateService {
   private readonly logger = new Logger(this.constructor.name);
 
-  constructor(private readonly templateService: QueuedCostTemplateService) {}
+  constructor(private readonly templateService: QueuedProjectTemplateService) {}
 
   async getTemplateShapefile(
     projectId: string,
