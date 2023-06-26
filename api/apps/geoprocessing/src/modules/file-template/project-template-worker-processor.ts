@@ -4,7 +4,7 @@ import {
   WorkerProcessor,
 } from '@marxan-geoprocessing/modules/worker';
 import { Job, Worker } from 'bullmq';
-import { CostTemplateGenerator } from './cost-template-generator';
+import { ProjectTemplateGenerator } from './project-template-generator';
 import { assertDefined } from '@marxan/utils';
 import { IsUUID, validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
@@ -12,13 +12,13 @@ import { plainToClass } from 'class-transformer';
 export const queueName = 'cost-surface-template-creation';
 
 @Injectable()
-export class CostTemplateWorkerProcessor
+export class ProjectTemplateWorkerProcessor
   implements WorkerProcessor<void, void> {
   private readonly worker: Worker;
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(
-    private readonly costTemplateGenerator: CostTemplateGenerator,
+    private readonly projectTemplateGenerator: ProjectTemplateGenerator,
     workerBuilder: WorkerBuilder,
   ) {
     this.worker = workerBuilder.build(queueName, this);
@@ -29,7 +29,7 @@ export class CostTemplateWorkerProcessor
     new Logger().log({ got: jobId });
     assertDefined(jobId);
     await this.validateJob(job);
-    await this.costTemplateGenerator
+    await this.projectTemplateGenerator
       .createTemplateShapefile(jobId)
       .catch(console.log);
   }

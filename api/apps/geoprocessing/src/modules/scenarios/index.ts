@@ -1,1 +1,1 @@
-export { CostTemplateModule } from './cost-template';
+export { FileTemplateModule } from '../file-template';

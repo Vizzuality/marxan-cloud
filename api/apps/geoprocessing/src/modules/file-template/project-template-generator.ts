@@ -5,24 +5,24 @@ import { mkdir, rm } from 'fs/promises';
 import * as path from 'path';
 import * as uuid from 'uuid';
 import { runCommandsXL } from 'mapshaper';
-import { ScenarioCostSurfaceRepository } from '@marxan/scenario-cost-surface';
+import { ProjectTemplateFileRepository } from '@marxan/project-template-file';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
-import { CostTemplateDumper } from './cost-template-dumper';
+import { FileTemplateDumper } from './file-template-dumper';
 import { Storage } from './storage';
 
 @Injectable()
-export class CostTemplateGenerator {
+export class ProjectTemplateGenerator {
   constructor(
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly scenarioFilesRepository: ScenarioCostSurfaceRepository,
-    private readonly scenarioGeoJsonCostTemplateDumper: CostTemplateDumper,
+    private readonly projectTemplateFilesRepository: ProjectTemplateFileRepository,
+    private readonly projectGeoJsonCostTemplateDumper: FileTemplateDumper,
     private readonly storage: Storage,
   ) {}
 
-  async createTemplateShapefile(scenarioId: string) {
+  async createTemplateShapefile(projectId: string) {
     const storagePath = AppConfig.get<string>(
       'storage.sharedFileStorage.localPath',
     );
@@ -40,14 +40,14 @@ export class CostTemplateGenerator {
      * ISO8601-ish timestamp (YYYYMMDDTHHMMSS) in the prefix of each component
      * file.
      */
-    const resultFilePrefix = `cost-surface-template_${scenarioId}_${new Date()
+    const resultFilePrefix = `cost-surface-template_${projectId}_${new Date()
       .toISOString()
       .replace(/\..+?Z$/, '')
       .replace(/[:\-.]/g, '')}`;
 
     try {
-      await this.scenarioGeoJsonCostTemplateDumper.dumpGeoJson(
-        scenarioId,
+      await this.projectGeoJsonCostTemplateDumper.dumpGeoJson(
+        projectId,
         path.join(transformationDirectory, resultFilePrefix + '.json'),
       );
 
@@ -59,7 +59,7 @@ export class CostTemplateGenerator {
           `'${path.join(shapefileDirectory, resultFilePrefix + `.shp`)}'`,
         ].join(' '),
       );
-      await this.storage.save(scenarioId, path.join(shapefileDirectory));
+      await this.storage.save(projectId, path.join(shapefileDirectory));
     } finally {
       /**
        * Leave temporary folder on filesystem according to feature flag.

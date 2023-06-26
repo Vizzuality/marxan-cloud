@@ -8,7 +8,7 @@ import { FeatureCollectionWrapper } from './feature-collection-wrapper';
 // sometimes is not imported by TypeORM in tests
 require(`pg-query-stream`);
 
-export class CostTemplateDumper {
+export class FileTemplateDumper {
   constructor(
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
