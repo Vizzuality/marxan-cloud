@@ -4,7 +4,7 @@ import {
   costSurfaceTemplateCreationQueue,
   queueName as baseQueueName,
   queueProvider,
-} from '@marxan-api/modules/scenarios/cost-surface-template/bullmq-queue';
+} from '@marxan-api/modules/projects/shapefile-template/bullmq-queue';
 import { Test } from '@nestjs/testing';
 import { Queue, Worker } from 'bullmq';
 import * as config from 'config';

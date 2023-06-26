@@ -3,17 +3,17 @@ import {
   FileNotFound,
   FileNotReady,
   FilePiped,
-} from './scenario-cost-surface-template.service';
+} from './project-template.service';
 import * as stream from 'stream';
 import { Test } from '@nestjs/testing';
-import { QueuedCostTemplateService } from './queued-cost-template.service';
+import { QueuedProjectTemplateService } from './queued-project-template.service';
 import { Queue } from './queue';
 import { Storage } from './storage';
 import { FakeStorage } from './__mocks__/fake.storage';
 import { FakeQueue } from './__mocks__/fake.queue';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
-let service: QueuedCostTemplateService;
+let service: QueuedProjectTemplateService;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
@@ -106,7 +106,7 @@ const getFixtures = async () => {
         provide: Queue,
         useClass: FakeQueue,
       },
-      QueuedCostTemplateService,
+      QueuedProjectTemplateService,
     ],
   }).compile();
   const storage: FakeStorage = testingModule.get(Storage);
@@ -119,8 +119,8 @@ const getFixtures = async () => {
     noPendingJobs() {
       queue.activeJobs = [];
     },
-    getService(): QueuedCostTemplateService {
-      return testingModule.get(QueuedCostTemplateService);
+    getService(): QueuedProjectTemplateService {
+      return testingModule.get(QueuedProjectTemplateService);
     },
     setPendingJobFor(scenarioId: string) {
       queue.activeJobs.push(scenarioId);

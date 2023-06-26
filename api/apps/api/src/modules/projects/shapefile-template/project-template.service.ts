@@ -6,7 +6,7 @@ export const FileNotReady = Symbol('file not ready');
 
 export const FilePiped = Symbol('file piped');
 
-export abstract class ScenarioCostSurfaceTemplateService {
+export abstract class ProjectTemplateService {
   abstract getTemplateShapefile(
     projectId: string,
     stream: stream.Writable,

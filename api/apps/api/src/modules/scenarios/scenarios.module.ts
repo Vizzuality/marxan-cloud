@@ -16,7 +16,7 @@ import { CostSurfaceModule } from './cost-surface/cost-surface.module';
 import { ScenariosService } from './scenarios.service';
 import { ScenarioSerializer } from './dto/scenario.serializer';
 import { ScenarioFeatureSerializer } from './dto/scenario-feature.serializer';
-import { CostSurfaceTemplateModule } from './cost-surface-template';
+import { ProjectTemplateModule } from '../projects/shapefile-template';
 import { SolutionResultCrudService } from './solutions-result/solution-result-crud.service';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { ApiEventsModule } from '@marxan-api/modules/api-events';
@@ -80,7 +80,7 @@ import { LegacyProjectImportCheckerModule } from '../legacy-project-import/domai
     AnalysisModule,
     CostSurfaceModule,
     HttpModule,
-    CostSurfaceTemplateModule,
+    ProjectTemplateModule,
     InputFilesModule,
     PlanningUnitsProtectionLevelModule,
     OutputFilesModule,
