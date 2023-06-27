@@ -122,8 +122,8 @@ const getFixtures = async () => {
     getService(): QueuedProjectTemplateService {
       return testingModule.get(QueuedProjectTemplateService);
     },
-    setPendingJobFor(scenarioId: string) {
-      queue.activeJobs.push(scenarioId);
+    setPendingJobFor(projectId: string) {
+      queue.activeJobs.push(projectId);
     },
     fileInStorage(scenarioId: string, buffer: string) {
       const readableStream = new stream.Readable();
@@ -145,8 +145,8 @@ const getFixtures = async () => {
       })();
       return writableStream;
     },
-    hasQueuedPendingJobs(scenarioIds: string[]) {
-      expect(queue.activeJobs).toStrictEqual(scenarioIds);
+    hasQueuedPendingJobs(projectIds: string[]) {
+      expect(queue.activeJobs).toStrictEqual(projectIds);
     },
   };
   return fixtures;

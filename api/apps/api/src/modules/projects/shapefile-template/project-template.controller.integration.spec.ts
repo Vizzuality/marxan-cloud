@@ -21,7 +21,7 @@ test(`should return a file when it is calculated`, async () => {
   fixtures.templateAvailable('123', 'sample shapefile');
   // when
   const test = request(app.getHttpServer()).get(
-    '/api/v1/scenarios/123/cost-surface/shapefile-template',
+    '/api/v1/projects/123/cost-surface/shapefile-template',
   );
   // then
   const response = await test.expect(200);
@@ -34,7 +34,7 @@ it(`should return a timeout when file is in progress`, async () => {
   fixtures.templateInProgress(`123`);
   // when
   const test = request(app.getHttpServer()).get(
-    '/api/v1/scenarios/123/cost-surface/shapefile-template',
+    '/api/v1/projects/123/cost-surface/shapefile-template',
   );
   // then
   await test.expect(504);
@@ -62,18 +62,18 @@ const getFixtures = async () => {
 
   const fixtures = {
     noRequestedTemplates() {
-      fakeShapefileService.availableTemplatesForScenarios = {};
+      fakeShapefileService.availableTemplatesForProject = {};
       fakeShapefileService.templatesInProgress = [];
     },
     getApp() {
       return app;
     },
-    templateInProgress(scenarioId: string) {
-      fakeShapefileService.templatesInProgress.push(scenarioId);
+    templateInProgress(projectId: string) {
+      fakeShapefileService.templatesInProgress.push(projectId);
     },
-    templateAvailable(scenarioId: string, fileContent: string) {
-      fakeShapefileService.availableTemplatesForScenarios[
-        scenarioId
+    templateAvailable(projectId: string, fileContent: string) {
+      fakeShapefileService.availableTemplatesForProject[
+        projectId
       ] = fileContent;
     },
   };
