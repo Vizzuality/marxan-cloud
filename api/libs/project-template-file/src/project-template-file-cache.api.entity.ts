@@ -13,7 +13,7 @@ export enum ArtifactType {
 }
 
 @Entity('project_template_file_cache')
-@Index(['pojectId', 'artifactType'])
+@Index(['projectId', 'artifactType'])
 export class ProjectTemplateFileCache {
   @PrimaryColumn({
     generated: 'uuid',

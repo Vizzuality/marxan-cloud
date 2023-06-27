@@ -26,7 +26,7 @@ export class AddProjectFileCacheTable1687796245859
       );
     `);
     await queryRunner.query(`
-        CREATE UNIQUE INDEX ON "project_file_cache" ("projectId", "artifactType")
+        CREATE UNIQUE INDEX ON "project_template_file_cache" ("projectId", "artifactType")
     `);
   }
 
