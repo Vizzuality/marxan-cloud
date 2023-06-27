@@ -6,7 +6,7 @@ import {
 import {
   JobInput,
   projectTemplateFileQueueName,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { FactoryProvider } from '@nestjs/common';
 import { Queue, QueueEvents } from 'bullmq';
 

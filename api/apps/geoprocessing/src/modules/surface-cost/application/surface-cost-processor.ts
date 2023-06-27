@@ -3,7 +3,7 @@ import {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
@@ -27,7 +27,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
     const surfaceCosts = this.puExtractor.extract(geoJson);
     const scenarioPlanningUnits = await this.availablePlanningUnits.get(
-      job.data.scenarioId,
+      job.data.projectId,
     );
     const puids = scenarioPlanningUnits.map((spu) => spu.puid);
 
@@ -55,9 +55,9 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   }
 
   private async initialCostProcessor({
-    data: { scenarioId },
+    data: { projectId },
   }: Job<InitialCostJobInput, true>): Promise<true> {
-    await this.repo.generateInitialCostSurface(scenarioId);
+    await this.repo.generateInitialCostSurface(projectId);
 
     return true;
   }

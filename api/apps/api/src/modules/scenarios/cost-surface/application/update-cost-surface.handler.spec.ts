@@ -2,7 +2,7 @@ import { FakeLogger } from '@marxan-api/utils/__mocks__/fake-logger';
 import { Test } from '@nestjs/testing';
 import { Queue } from 'bullmq';
 import { Either, Left, Right } from 'fp-ts/lib/Either';
-import { jobSubmissionFailed } from '@marxan/scenario-cost-surface';
+import { jobSubmissionFailed } from '@marxan/project-template-file';
 import { surfaceCostQueueToken } from '../infra/surface-cost-queue.provider';
 import { CostSurfaceEventsPort } from '../ports/cost-surface-events.port';
 import { UpdateCostSurface } from './update-cost-surface.command';

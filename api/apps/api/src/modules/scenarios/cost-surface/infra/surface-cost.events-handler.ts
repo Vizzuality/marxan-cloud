@@ -6,7 +6,7 @@ import {
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { FromShapefileJobInput, JobInput } from '@marxan/scenario-cost-surface';
+import { FromShapefileJobInput, JobInput } from '@marxan/project-template-file';
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeleteScenario } from './delete-scenario.command';
@@ -42,7 +42,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     const kind = this.successEventsMapper.event;
 
     return {
-      topic: data.scenarioId,
+      topic: data.projectId,
       kind,
       data: {},
     };
@@ -55,7 +55,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     const kind = this.failEventsMapper.event;
 
     return {
-      topic: data.scenarioId,
+      topic: data.projectId,
       kind,
       data: {},
     };
@@ -68,7 +68,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
       (jobInput as FromShapefileJobInput).shapefile,
     );
     if (!isFromShapefileJob) {
-      await this.commandBus.execute(new DeleteScenario(jobInput.scenarioId));
+      await this.commandBus.execute(new DeleteScenario(jobInput.projectId));
     }
   }
 }

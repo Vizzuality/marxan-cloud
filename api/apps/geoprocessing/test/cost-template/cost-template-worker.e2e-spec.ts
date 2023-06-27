@@ -17,8 +17,8 @@ import {
   ArtifactType,
   CacheNotFound,
   ErrorWithSymbol,
-  ScenarioCostSurfaceRepository,
-} from '@marxan/scenario-cost-surface';
+  ProjectTemplateFileRepository,
+} from '@marxan/project-template-file';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { getRedisConfig } from '@marxan-geoprocessing/utils/redisConfig.utils';
 
@@ -108,7 +108,7 @@ async function getFixtures() {
   );
   assertDefined(storagePath);
 
-  const fileRepository = application.get(ScenarioCostSurfaceRepository);
+  const fileRepository = application.get(ProjectTemplateFileRepository);
 
   const queue = new Queue(`cost-surface-template-creation`, {
     ...getRedisConfig(),
