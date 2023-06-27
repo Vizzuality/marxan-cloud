@@ -103,6 +103,9 @@ export class GeoFeature extends BaseEntity {
 
   @Column('text', { name: 'geoprocessing_ops_hash', nullable: true })
   geoprocessingOpsHash?: string;
+
+  @ApiPropertyOptional()
+  tag?: string;
 }
 
 export class JSONAPIGeoFeaturesData {

@@ -117,3 +117,39 @@ describe('Projects Tag ACL GET (e2e)', () => {
     );
   });
 });
+
+// @todo Skipped because projects/:id/features doesn't currently implement ACL checks and is TODO
+// First implementation for future use/tweaks
+describe.skip('Projects Tag ACL GET Features (e2e)', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return error if Project not visible to user', async () => {
+    // ARRANGE
+    const externalProjectId = await fixtures.GivenProject('someProject', []);
+    const externalFeatureId = await fixtures.GivenFeatureOnProject(
+      externalProjectId,
+      'someFeature',
+    );
+    const newTag = 'valid-tag🙂';
+    await fixtures.GivenTagOnFeature(
+      externalProjectId,
+      externalFeatureId,
+      newTag,
+    );
+
+    // ACT
+    const response = await fixtures.WhenGettingFeaturesFromProject(
+      externalProjectId,
+      ['valid'],
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.FORBIDDEN);
+  });
+});

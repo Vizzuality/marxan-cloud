@@ -290,3 +290,124 @@ describe('Projects Tag DELETE (e2e)', () => {
     await fixtures.ThenFeatureHasTag(projectId, featureId3, 'differentTag');
   });
 });
+
+describe('Projects Tag GET Features (e2e)', () => {
+  beforeEach(async () => {
+    fixtures = await getProjectTagsFixtures();
+  });
+
+  afterEach(async () => {
+    await fixtures?.cleanup();
+  });
+
+  test('should return error if Project not found', async () => {
+    //ARRANGE
+    const randomProjectId = v4();
+
+    // ACT
+    const response = await fixtures.WhenGettingFeaturesFromProject(
+      randomProjectId,
+      ['someTag'],
+    );
+
+    // ASSERT
+    expect(response.status).toBe(HttpStatus.NOT_FOUND);
+    fixtures.ThenNotFoundErrorWasReturned(response);
+  });
+
+  test('should return features for the given project, that match any of the provided tags exactly provided as a filter on the request', async () => {
+    // ARRANGE
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const projectId2 = await fixtures.GivenProject('someProject2');
+    const featureId11 = await fixtures.GivenFeatureOnProject(projectId1, 'f11');
+    const featureId12 = await fixtures.GivenFeatureOnProject(projectId1, 'f12');
+    const featureId13 = await fixtures.GivenFeatureOnProject(projectId1, 'f13');
+    const featureId14 = await fixtures.GivenFeatureOnProject(projectId1, 'f14');
+    const featureId21 = await fixtures.GivenFeatureOnProject(projectId2, 'f21');
+
+    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
+      [featureId11, featureId12, featureId13, featureId14],
+    );
+
+    await fixtures.GivenTagOnFeature(projectId1, featureId11, 'fire');
+    await fixtures.GivenTagOnFeature(projectId1, featureId12, 'earth');
+
+    await fixtures.GivenTagOnFeature(projectId1, featureId14, 'wind');
+    await fixtures.GivenTagOnFeature(projectId2, featureId21, 'fire');
+
+    // ACT
+    const response1 = await fixtures.WhenGettingFeaturesFromProject(
+      projectId1,
+      ['fire', 'water', 'EARTH'],
+    );
+
+    //ASSERT
+    expect(response1.status).toBe(HttpStatus.OK);
+    expect(response1.body.data.length).toEqual(1);
+    expect(response1.body.data[0].id).toEqual(featureId11);
+
+    mockedIntersectingProjectFeature.mockRestore();
+  });
+
+  test('should return all features if no tag filters are provided', async () => {
+    // ARRANGE
+    const projectId = await fixtures.GivenProject('someProject');
+    const featureId1 = await fixtures.GivenFeatureOnProject(projectId, 'f1');
+    const featureId2 = await fixtures.GivenFeatureOnProject(projectId, 'f2');
+    const featureId3 = await fixtures.GivenFeatureOnProject(projectId, 'f3');
+    await fixtures.GivenTagOnFeature(projectId, featureId1, 'OneRepeatedTag');
+    await fixtures.GivenTagOnFeature(projectId, featureId2, 'OneRepeatedTag');
+    await fixtures.GivenTagOnFeature(projectId, featureId3, 'AnotherTag');
+
+    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
+      [featureId1, featureId2, featureId3],
+    );
+
+    // ACT
+    const response = await fixtures.WhenGettingFeaturesFromProject(projectId);
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.data.length).toEqual(3);
+    expect(response.body.data.map((feature: any) => feature.id)).toEqual(
+      expect.arrayContaining([featureId1, featureId2, featureId3]),
+    );
+
+    mockedIntersectingProjectFeature.mockRestore();
+  });
+
+  test.skip('should return tags in the response if indicated so in the getOne request', async () => {
+    // currently there's no place in the code that utilizes GeoFeature's getById method
+    // included tag functionality is still there, but not tested, because it's currently unused
+  });
+
+  test('should return tags in the response if indicated so in the request', async () => {
+    // ARRANGE
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const featureId1 = await fixtures.GivenFeatureOnProject(projectId1, 'f1');
+    const featureId2 = await fixtures.GivenFeatureOnProject(projectId1, 'f2');
+    const featureId3 = await fixtures.GivenFeatureOnProject(projectId1, 'f3');
+    await fixtures.GivenTagOnFeature(projectId1, featureId1, 'someTAG');
+    await fixtures.GivenTagOnFeature(projectId1, featureId2, 'another');
+
+    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
+      [featureId1, featureId2, featureId3],
+    );
+
+    // ACT
+    const response = await fixtures.WhenGettingFeaturesFromProject(
+      projectId1,
+      [],
+      true,
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.data.length).toEqual(3);
+    expect(
+      response.body.data.map((feature: any) => feature.attributes.tag),
+    ).toEqual(expect.arrayContaining(['someTAG', 'another']));
+
+    mockedIntersectingProjectFeature.mockRestore();
+  });
+});

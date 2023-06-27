@@ -1,7 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
-import { AppInfoDTO } from '@marxan-api/dto/info.dto';
 import {
   DataSource,
   EntityManager,
@@ -12,7 +11,7 @@ import { GeoFeatureGeometry, GeometrySource } from '@marxan/geofeatures';
 import { geoFeatureResource } from './geo-feature.geo.entity';
 import { GeoFeatureSetSpecification } from './dto/geo-feature-set-specification.dto';
 
-import { Geometry } from 'geojson';
+import { BBox, Geometry } from 'geojson';
 import {
   AppBaseService,
   JSONAPISerializerConfig,
@@ -35,6 +34,7 @@ import { projectNotFound } from '@marxan-api/modules/projects/projects.service';
 import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
+import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -84,6 +84,7 @@ export class GeoFeaturesService extends AppBaseService<
     @InjectRepository(Scenario)
     private readonly scenarioRepository: Repository<Scenario>,
     private readonly geoFeaturesPropertySet: GeoFeaturePropertySetService,
+    private readonly geoFeatureTagsServices: GeoFeatureTagsService,
     @Inject(forwardRef(() => ScenarioFeaturesService))
     private readonly scenarioFeaturesService: ScenarioFeaturesService,
     private readonly projectAclService: ProjectAclService,
@@ -109,6 +110,7 @@ export class GeoFeaturesService extends AppBaseService<
         'intersection',
         'properties',
         'isCustom',
+        'tag',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -180,94 +182,37 @@ export class GeoFeaturesService extends AppBaseService<
      *    * searching within one query (table) and single db
      *    * unnecessary relations and system accidental complexity
      */
-    if (projectId && info?.params?.bbox) {
-      const { westBbox, eastBbox } = antimeridianBbox(
-        nominatim2bbox(info.params.bbox),
-      );
-      /**
-       * First get all feature ids that _may_ be relevant to the project
-       * (irrespective of whether they intersect the project's bbox, which we
-       * check later).
-       *
-       * Moreover, never include features that have been obtained by splitting
-       * (or, in the future, stratifying) other features - that is, features
-       * obtained through geoprocessing operations on "raw"/original features.
-       *
-       * In practice, this would be done nevertheless at this stage when only
-       * the `split` geoprocessing operation is actively supported, because only
-       * ids of "raw"/original features are ever used in
-       * `(geodb)features_data.feature_id (i.e. not ids of features obtained by
-       * splitting a "raw" feature), but we add here this guard as a proper
-       * filter on the `(apidb).features` data alone, in case the filtering by
-       * bbox below is changed or replaced in any way that may affect the
-       * "implicit" exclusion of geoprocessed feature ids.
-       *
-       * This filter will need to be revisited if/when enabling stratification,
-       * as that geoprocessing operation _will_ create new
-       * `(geodb)features_data` rows, which will likely reference the
-       * intersected feature stored in `(apidb)features` (which will have a
-       * non-null `geoprocessing_ops_hash` value).
-       */
-      const publicOrProjectSpecificFeatures = await this.geoFeaturesRepository
-        .query(
-          `
-        SELECT id FROM features
-          WHERE
-            project_id IS NULL
-            AND
-            geoprocessing_ops_hash IS NULL
-        UNION
-        SELECT id FROM features
-          WHERE
-            project_id = $1
-            AND
-            geoprocessing_ops_hash IS NULL;
-        `,
-          [projectId],
-        )
-        .then((result) => result.map((i: { id: string }) => i.id));
-
-      /**
-       * Then narrow down the list of features relevant to the project to those
-       * that effectively intersect the project's bbox.
-       */
-      const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
-        .createQueryBuilder('geoFeatureGeometries')
-        .select('"geoFeatureGeometries"."feature_id"', 'featureId')
-        .distinctOn(['"geoFeatureGeometries"."feature_id"'])
-        .where(`feature_id IN (:...featureIds)`)
-        .andWhere(
-          `(st_intersects(
-            st_intersection(st_makeenvelope(:...eastBbox, 4326),
-            ST_MakeEnvelope(0, -90, 180, 90, 4326)),
-        "geoFeatureGeometries".the_geom
-      ) or st_intersects(
-        st_intersection(st_makeenvelope(:...westBbox, 4326),
-          ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
-          "geoFeatureGeometries".the_geom
-      ))`,
-          {
-            featureIds: publicOrProjectSpecificFeatures,
-            westBbox: westBbox,
-            eastBbox: eastBbox,
-          },
-        )
-        .getRawMany()
-        .then((result) => result.map((i) => i.featureId))
-        .catch((error) => {
-          throw new Error(error);
-        });
-
-      // Only apply narrowing by intersection with project bbox if there are
-      // features falling within said bbox; otherwise return an empty set
-      // by short-circuiting the query.
-      if (geoFeaturesWithinProjectBbox?.length > 0) {
-        query.andWhere(
-          `${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
-          { geoFeaturesWithinProjectBbox },
+    if (projectId) {
+      if (info?.params?.bbox) {
+        const geoFeaturesWithinProjectBbox = await this.getIntersectingProjectFeatures(
+          info.params.bbox,
+          projectId,
         );
-      } else {
-        query.andWhere('false');
+
+        // Only apply narrowing by intersection with project bbox if there are
+        // features falling within said bbox; otherwise return an empty set
+        // by short-circuiting the query.
+        if (geoFeaturesWithinProjectBbox?.length > 0) {
+          query.andWhere(
+            `${this.alias}.id IN (:...geoFeaturesWithinProjectBbox)`,
+            { geoFeaturesWithinProjectBbox },
+          );
+        } else {
+          query.andWhere('false');
+        }
+      }
+
+      const tagFilters = fetchSpecification.filter?.tag;
+      if (tagFilters && Array.isArray(tagFilters) && tagFilters.length) {
+        query
+          .leftJoin(
+            GeoFeatureTag,
+            'feature_tag',
+            `feature_tag.feature_id = ${this.alias}.id`,
+          )
+          .andWhere(`feature_tag.tag IN (:...tagFilters)`, {
+            tagFilters,
+          });
       }
 
       queryFilteredByPublicOrProjectSpecificFeatures = query.andWhere(
@@ -304,6 +249,14 @@ export class GeoFeaturesService extends AppBaseService<
     fetchSpecification?: DeepReadonly<FetchSpecification>,
     info?: GeoFeaturesRequestInfo,
   ): Promise<[any[], number]> {
+    if (entitiesAndCount[1] === 0) {
+      return entitiesAndCount;
+    }
+
+    const extendedResults = entitiesAndCount;
+    const omitFields = fetchSpecification?.omitFields;
+    const fields = fetchSpecification?.include;
+
     /**
      * Short-circuit if there's no result to extend, or if the API client has
      * asked to omit specific fields and these do include `properties`.
@@ -318,27 +271,34 @@ export class GeoFeaturesService extends AppBaseService<
      * 'result DTO'.
      */
     if (
-      !(entitiesAndCount[1] > 0) ||
-      (fetchSpecification?.omitFields &&
-        fetchSpecification.omitFields.includes('properties')) ||
-      (fetchSpecification?.fields &&
-        !fetchSpecification.fields.includes('properties'))
+      !(omitFields && omitFields.includes('properties')) &&
+      fields &&
+      fields.includes('properties')
     ) {
-      return entitiesAndCount;
-    }
-    const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
-      (i) => i.id,
-    );
+      const geoFeatureIds = (entitiesAndCount[0] as GeoFeature[]).map(
+        (i) => i.id,
+      );
 
-    const entitiesWithProperties = await this.geoFeaturesPropertySet
-      .getFeaturePropertySetsForFeatures(geoFeatureIds, info?.params?.bbox)
-      .then((results) => {
-        return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
-          entitiesAndCount[0],
-          results,
-        );
-      });
-    return [entitiesWithProperties, entitiesAndCount[1]];
+      extendedResults[0] = await this.geoFeaturesPropertySet
+        .getFeaturePropertySetsForFeatures(geoFeatureIds, info?.params?.bbox)
+        .then((results) => {
+          return this.geoFeaturesPropertySet.extendGeoFeaturesWithPropertiesFromPropertySets(
+            entitiesAndCount[0],
+            results,
+          );
+        });
+    }
+
+    if (
+      !(omitFields && omitFields.includes('tag')) &&
+      info?.params?.includeTagInfo
+    ) {
+      extendedResults[0] = await this.geoFeatureTagsServices.extendFindAllGeoFeaturesWithTags(
+        extendedResults[0],
+      );
+    }
+
+    return extendedResults;
   }
 
   /**
@@ -348,9 +308,21 @@ export class GeoFeaturesService extends AppBaseService<
   async extendGetByIdResult(
     entity: GeoFeature,
     _fetchSpecification?: FetchSpecification,
-    _info?: AppInfoDTO,
+    _info?: GeoFeaturesRequestInfo,
   ): Promise<GeoFeature> {
-    return entity;
+    const omitFields = _fetchSpecification?.omitFields;
+    let extendedResult = entity;
+
+    if (
+      !(omitFields && omitFields.includes('tag')) &&
+      _info?.params?.includeTagInfo
+    ) {
+      extendedResult = await this.geoFeatureTagsServices.extendFindGeoFeatureWithTag(
+        entity,
+      );
+    }
+
+    return extendedResult;
   }
 
   public async createFeaturesForShapefile(
@@ -517,6 +489,88 @@ export class GeoFeaturesService extends AppBaseService<
     await this.repository.delete(featureId);
 
     return right(true);
+  }
+
+  private async getIntersectingProjectFeatures(
+    bbox: BBox,
+    projectId: string,
+  ): Promise<any[]> {
+    const { westBbox, eastBbox } = antimeridianBbox(nominatim2bbox(bbox));
+    /**
+     * First get all feature ids that _may_ be relevant to the project
+     * (irrespective of whether they intersect the project's bbox, which we
+     * check later).
+     *
+     * Moreover, never include features that have been obtained by splitting
+     * (or, in the future, stratifying) other features - that is, features
+     * obtained through geoprocessing operations on "raw"/original features.
+     *
+     * In practice, this would be done nevertheless at this stage when only
+     * the `split` geoprocessing operation is actively supported, because only
+     * ids of "raw"/original features are ever used in
+     * `(geodb)features_data.feature_id (i.e. not ids of features obtained by
+     * splitting a "raw" feature), but we add here this guard as a proper
+     * filter on the `(apidb).features` data alone, in case the filtering by
+     * bbox below is changed or replaced in any way that may affect the
+     * "implicit" exclusion of geoprocessed feature ids.
+     *
+     * This filter will need to be revisited if/when enabling stratification,
+     * as that geoprocessing operation _will_ create new
+     * `(geodb)features_data` rows, which will likely reference the
+     * intersected feature stored in `(apidb)features` (which will have a
+     * non-null `geoprocessing_ops_hash` value).
+     */
+    const publicOrProjectSpecificFeatures = await this.geoFeaturesRepository
+      .query(
+        `
+          SELECT id FROM features
+            WHERE
+              project_id IS NULL
+              AND
+              geoprocessing_ops_hash IS NULL
+          UNION
+          SELECT id FROM features
+            WHERE
+              project_id = $1
+              AND
+              geoprocessing_ops_hash IS NULL;
+          `,
+        [projectId],
+      )
+      .then((result) => result.map((i: { id: string }) => i.id));
+
+    /**
+     * Then narrow down the list of features relevant to the project to those
+     * that effectively intersect the project's bbox.
+     */
+    const geoFeaturesWithinProjectBbox = await this.geoFeaturesGeometriesRepository
+      .createQueryBuilder('geoFeatureGeometries')
+      .select('"geoFeatureGeometries"."feature_id"', 'featureId')
+      .distinctOn(['"geoFeatureGeometries"."feature_id"'])
+      .where(`feature_id IN (:...featureIds)`)
+      .andWhere(
+        `(st_intersects(
+              st_intersection(st_makeenvelope(:...eastBbox, 4326),
+              ST_MakeEnvelope(0, -90, 180, 90, 4326)),
+          "geoFeatureGeometries".the_geom
+        ) or st_intersects(
+          st_intersection(st_makeenvelope(:...westBbox, 4326),
+            ST_MakeEnvelope(-180, -90, 0, 90, 4326)),
+            "geoFeatureGeometries".the_geom
+        ))`,
+        {
+          featureIds: publicOrProjectSpecificFeatures,
+          westBbox: westBbox,
+          eastBbox: eastBbox,
+        },
+      )
+      .getRawMany()
+      .then((result) => result.map((i) => i.featureId))
+      .catch((error) => {
+        throw new Error(error);
+      });
+
+    return geoFeaturesWithinProjectBbox;
   }
 
   private async createFeature(

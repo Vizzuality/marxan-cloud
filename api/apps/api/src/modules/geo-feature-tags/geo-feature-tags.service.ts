@@ -237,4 +237,49 @@ export class GeoFeatureTagsService {
 
     return right(true);
   }
+
+  async extendFindAllGeoFeaturesWithTags(
+    geoFeatures: GeoFeature[],
+  ): Promise<GeoFeature[]> {
+    const featureIds = geoFeatures.map((i) => i.id);
+
+    const featureTags: {
+      id: string;
+      tag: string;
+    }[] = await this.geoFeatureTagsRepo
+      .createQueryBuilder()
+      .select('feature_id', 'id')
+      .addSelect('tag', 'tag')
+      .where('feature_id IN (:...featureIds)', { featureIds })
+      .execute();
+
+    return geoFeatures.map((feature) => {
+      const featureTag = featureTags.find(
+        (element) => element.id === feature.id,
+      );
+
+      return {
+        ...feature,
+        tag: featureTag ? featureTag.tag : undefined,
+      } as GeoFeature;
+    });
+  }
+
+  async extendFindGeoFeatureWithTag(
+    geoFeature: GeoFeature,
+  ): Promise<GeoFeature> {
+    const featureTag: {
+      feature_id: string;
+      tag: string;
+    }[] = await this.geoFeatureTagsRepo
+      .createQueryBuilder()
+      .select('feature_id', 'tag')
+      .where('feature_id = :featureId)', { featureId: geoFeature.id })
+      .execute();
+
+    return {
+      ...geoFeature,
+      tag: featureTag.length ? featureTag[0].tag : undefined,
+    } as GeoFeature;
+  }
 }
