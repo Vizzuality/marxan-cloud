@@ -8,19 +8,19 @@ import {
 export class FakeProjectTemplateService extends ProjectTemplateService {
   scheduledTemplateCreation: string[] = [];
   templatesInProgress: string[] = [];
-  availableTemplatesForScenarios: Record<string, string> = {};
+  availableTemplatesForProject: Record<string, string> = {};
 
   async getTemplateShapefile(
-    scenarioId: string,
+    projectId: string,
     writableStream: stream.Writable,
   ) {
-    if (this.templatesInProgress.includes(scenarioId)) {
+    if (this.templatesInProgress.includes(projectId)) {
       return FileNotReady;
     }
 
     const readableStream = new stream.Readable();
     readableStream.pipe(writableStream);
-    readableStream.push(this.availableTemplatesForScenarios[scenarioId]);
+    readableStream.push(this.availableTemplatesForProject[projectId]);
     readableStream.push(null);
     return FilePiped;
   }
