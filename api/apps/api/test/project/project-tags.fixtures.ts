@@ -15,6 +15,7 @@ import { ProjectRoles } from '@marxan-api/modules/access-control/projects-acl/dt
 import { UsersProjectsApiEntity } from '@marxan-api/modules/access-control/projects-acl/entity/users-projects.api.entity';
 import { GivenUserExists } from '../steps/given-user-exists';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
+import { GeoFeaturesService } from '@marxan-api/modules/geo-features';
 
 export const getProjectTagsFixtures = async () => {
   const app = await bootstrapApplication();
@@ -56,6 +57,14 @@ export const getProjectTagsFixtures = async () => {
     },
 
     // ARRANGE
+    GivenGeoFeatureServiceIntersectingFeaturesMock: (featureIds: string[]) =>
+      jest
+        .spyOn(
+          GeoFeaturesService.prototype as any,
+          'getIntersectingProjectFeatures',
+        )
+        .mockResolvedValue(featureIds),
+
     GivenProject: async (projectName: string, roles?: ProjectRoles[]) => {
       const projectDTO = {
         ...E2E_CONFIG.projects.valid.minimalInGivenAdminArea({
@@ -109,6 +118,22 @@ export const getProjectTagsFixtures = async () => {
             ('${projectId}', '${featureId}', '${tag}' ) `),
 
     // ACT
+    WhenGettingFeaturesFromProject: (
+      projectId: string,
+      tags?: string[],
+      includeTag?: boolean,
+    ) => {
+      const queryParams: any = {};
+      queryParams.filter = {};
+      tags?.length ? (queryParams.filter.tag = tags.join(',')) : '';
+      includeTag ? (queryParams.includeTagInfo = 'true') : '';
+
+      return request(app.getHttpServer())
+        .get(`/api/v1/projects/${projectId}/features?`)
+        .query(queryParams)
+        .set('Authorization', `Bearer ${userToken}`)
+        .send();
+    },
     WhenGettingProjectTags: (
       projectId: string,
       tagName?: string,
@@ -159,6 +184,11 @@ export const getProjectTagsFixtures = async () => {
       expect(error).toContain(`Project with id ${projectId} not found`);
     },
 
+    ThenNotFoundErrorWasReturned: (response: request.Response) => {
+      const error: any = response.body.errors[0].title;
+      expect(error).toContain(`Not Found`);
+    },
+
     ThenProjectNotEditableErrorWasReturned: (
       response: request.Response,
       projectId: string,
@@ -177,12 +207,6 @@ export const getProjectTagsFixtures = async () => {
       expect(error).toContain(
         `Project with id ${projectId} cannot be consulted by user ${userId}`,
       );
-    },
-
-    ThenIncorrectOrderErrorWasReturned: (response: request.Response) => {
-      const error: any =
-        response.body.errors[0].meta.rawError.response.message[0];
-      expect(error).toContain(`order must be either ASC or DESC`);
     },
 
     ThenMaxLengthErrorWasReturned: (response: request.Response) => {
