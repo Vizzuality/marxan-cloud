@@ -2,19 +2,19 @@ import {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Job } from 'bullmq';
 
 export const getFromShapeFileJob = (
-  scenarioId: string,
+  projectId: string,
 ): Job<FromShapefileJobInput, true> => {
   const input: FromShapefileJobInput = {
     shapefile: {
       filename: '',
       path: '',
     } as Express.Multer.File,
-    scenarioId,
+    projectId,
   };
   return ({
     data: input,
@@ -22,10 +22,10 @@ export const getFromShapeFileJob = (
 };
 
 export const getInitialCostJob = (
-  scenarioId: string,
+  projectId: string,
 ): Job<InitialCostJobInput, true> => {
   const input: InitialCostJobInput = {
-    scenarioId,
+    projectId,
   };
   return ({
     data: input,

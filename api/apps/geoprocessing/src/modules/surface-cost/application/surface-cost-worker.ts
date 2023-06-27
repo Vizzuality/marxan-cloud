@@ -5,7 +5,7 @@ import { Worker } from 'bullmq';
 import {
   JobInput,
   projectTemplateFileQueueName,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 
 import { SurfaceCostProcessor } from './surface-cost-processor';

@@ -3,7 +3,7 @@ import {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';
@@ -104,12 +104,12 @@ const getFixtures = async () => {
   return {
     GivenInitialCostJob: (): InitialCostJobInput => {
       return {
-        scenarioId: v4(),
+        projectId: v4(),
       };
     },
     GivenFromShapeFileJob: (): FromShapefileJobInput => {
       return {
-        scenarioId: v4(),
+        projectId: v4(),
         shapefile: {
           filename: 'file-name',
         } as Express.Multer.File,

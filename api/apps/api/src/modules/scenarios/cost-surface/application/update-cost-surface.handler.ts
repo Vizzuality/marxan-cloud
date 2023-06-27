@@ -1,7 +1,7 @@
 import {
   FromShapefileJobInput,
   jobSubmissionFailed,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
@@ -30,7 +30,7 @@ export class UpdateCostSurfaceHandler
   }: UpdateCostSurface): Promise<Either<typeof jobSubmissionFailed, true>> {
     try {
       await this.queue.add(`cost-surface-for-${scenarioId}`, {
-        scenarioId,
+        projectId: scenarioId,
         shapefile,
       });
 

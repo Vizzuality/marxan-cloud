@@ -1,4 +1,4 @@
-import { FromShapefileJobInput } from '@marxan/scenario-cost-surface';
+import { FromShapefileJobInput } from '@marxan/project-template-file';
 import { Injectable } from '@nestjs/common';
 import { GeoJSON } from 'geojson';
 import { ShapefileConverterPort } from '../../ports/shapefile-converter/shapefile-converter.port';

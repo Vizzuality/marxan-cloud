@@ -1,7 +1,7 @@
 import {
   InitialCostJobInput,
   jobSubmissionFailed,
-} from '@marxan/scenario-cost-surface';
+} from '@marxan/project-template-file';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';
@@ -34,7 +34,7 @@ export class SetInitialCostSurfaceHandler
   }: SetInitialCostSurface): Promise<Either<SetInitialCostSurfaceError, true>> {
     try {
       await this.queue.add(`set-initial-cost-surface`, {
-        scenarioId,
+        projectId: scenarioId,
       });
       await this.events.event(scenarioId, CostSurfaceState.Submitted);
     } catch (error) {
