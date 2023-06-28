@@ -5,13 +5,13 @@ import {
   ArtifactType,
   CacheNotFound,
   ErrorWithSymbol,
-  ProjectTemplateFileRepository,
-} from '@marxan/project-template-file';
+  ArtifactCacheRepository,
+} from '@marxan/artifact-cache';
 
 @Injectable()
 export class DbStorage extends Storage {
   constructor(
-    private readonly projectTemplateFileRepository: ProjectTemplateFileRepository,
+    private readonly artifactCacheRepository: ArtifactCacheRepository,
   ) {
     super();
   }
@@ -33,7 +33,7 @@ export class DbStorage extends Storage {
         .on(`pipe`, () => {
           resolve(passThrough);
         });
-      this.projectTemplateFileRepository
+      this.artifactCacheRepository
         .read(projectId, ArtifactType.CostTemplate, passThrough)
         .catch(reject);
     });

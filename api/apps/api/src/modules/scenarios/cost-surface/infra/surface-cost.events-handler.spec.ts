@@ -3,7 +3,7 @@ import {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/project-template-file';
+} from '@marxan/artifact-cache';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { CommandBus, CommandHandler, CqrsModule, ICommand } from '@nestjs/cqrs';
 import { Test } from '@nestjs/testing';

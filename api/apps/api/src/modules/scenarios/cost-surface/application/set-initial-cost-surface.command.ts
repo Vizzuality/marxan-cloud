@@ -1,6 +1,6 @@
 import { Command } from '@nestjs-architects/typed-cqrs';
 import { Either } from 'fp-ts/lib/Either';
-import { jobSubmissionFailed } from '@marxan/project-template-file';
+import { jobSubmissionFailed } from '@marxan/artifact-cache';
 
 export type SetInitialCostSurfaceError = typeof jobSubmissionFailed;
 

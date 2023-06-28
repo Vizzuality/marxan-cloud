@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {
-  ArtifactType,
-  ProjectTemplateFileRepository,
-} from '@marxan/project-template-file';
+import { ArtifactType, ArtifactCacheRepository } from '@marxan/artifact-cache';
 import * as archiver from 'archiver';
 import * as stream from 'stream';
 
 @Injectable()
 export class Storage {
   constructor(
-    private readonly projectFilesRepository: ProjectTemplateFileRepository,
+    private readonly projectFilesRepository: ArtifactCacheRepository,
   ) {}
 
   async save(projectId: string, shapefileDirectory: string) {

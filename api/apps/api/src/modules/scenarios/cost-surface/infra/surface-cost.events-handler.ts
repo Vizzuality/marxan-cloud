@@ -6,7 +6,7 @@ import {
   QueueEventsAdapter,
 } from '@marxan-api/modules/queue-api-events';
 import { API_EVENT_KINDS } from '@marxan/api-events';
-import { FromShapefileJobInput, JobInput } from '@marxan/project-template-file';
+import { FromShapefileJobInput, JobInput } from '@marxan/artifact-cache';
 import { Inject, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { DeleteScenario } from './delete-scenario.command';

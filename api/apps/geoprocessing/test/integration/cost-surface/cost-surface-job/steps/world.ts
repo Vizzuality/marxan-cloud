@@ -7,7 +7,7 @@ import { Feature, Polygon } from 'geojson';
 import { Job } from 'bullmq';
 
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
-import { FromShapefileJobInput } from '@marxan/project-template-file';
+import { FromShapefileJobInput } from '@marxan/artifact-cache';
 import { defaultSrid } from '@marxan/utils/geo/spatial-data-format';
 
 import { getFixtures } from '../../planning-unit-fixtures';

@@ -2,7 +2,7 @@ import { Command } from '@nestjs-architects/typed-cqrs';
 import {
   FromShapefileJobInput,
   jobSubmissionFailed,
-} from '@marxan/project-template-file';
+} from '@marxan/artifact-cache';
 import { Either } from 'fp-ts/lib/Either';
 
 export class UpdateCostSurface extends Command<

@@ -38,8 +38,8 @@
       "@marxan-jobs/planning-unit-protection-level/*": [
         "libs/planning-unit-protection-level/src/*"
       ],
-      "@marxan/project-template-file": ["libs/project-template-file/src"],
-      "@marxan/project-template-file/*": ["libs/project-template-file/src/*"],
+      "@marxan/artifact-cache": ["libs/artifact-cache/src"],
+      "@marxan/artifact-cache/*": ["libs/artifact-cache/src/*"],
       "@marxan/marxan-input": ["libs/marxan-input/src"],
       "@marxan/marxan-input/*": ["libs/marxan-input/src/*"],
       "@marxan/marxan-output": ["libs/marxan-output/src"],

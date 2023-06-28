@@ -42,8 +42,8 @@
     "^@marxan-jobs/planning-unit-geometry/(.*)$": [
       "<rootDir>/../../../libs/planning-unit-geometry/src/$1"
     ],
-    "@marxan/project-template-file/(.*)": "<rootDir>/../../../libs/project-template-file/src/$1",
-    "@marxan/project-template-file": "<rootDir>/../../../libs/project-template-file/src",
+    "@marxan/artifact-cache/(.*)": "<rootDir>/../../../libs/artifact-cache/src/$1",
+    "@marxan/artifact-cache": "<rootDir>/../../../libs/artifact-cache/src",
     "@marxan/marxan-input/(.*)": "<rootDir>/../../../libs/marxan-input/src/$1",
     "@marxan/marxan-input": "<rootDir>/../../../libs/marxan-input/src",
     "@marxan/marxan-output": "<rootDir>/../../../libs/marxan-output/src",

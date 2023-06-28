@@ -2,7 +2,7 @@ import {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/project-template-file';
+} from '@marxan/artifact-cache';
 import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Job } from 'bullmq';
 

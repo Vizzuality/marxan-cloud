@@ -1,7 +1,7 @@
 import {
   FromShapefileJobInput,
   jobSubmissionFailed,
-} from '@marxan/project-template-file';
+} from '@marxan/artifact-cache';
 import { Inject, Logger } from '@nestjs/common';
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
 import { Queue } from 'bullmq';

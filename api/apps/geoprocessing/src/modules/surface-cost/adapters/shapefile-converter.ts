@@ -1,4 +1,4 @@
-import { FromShapefileJobInput } from '@marxan/project-template-file';
+import { FromShapefileJobInput } from '@marxan/artifact-cache';
 import { ShapefileService } from '@marxan/shapefile-converter';
 import { Injectable } from '@nestjs/common';
 import { GeoJSON } from 'geojson';
