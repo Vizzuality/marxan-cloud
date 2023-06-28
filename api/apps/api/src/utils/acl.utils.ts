@@ -54,7 +54,7 @@ import {
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
-import { jobSubmissionFailed } from '@marxan/project-template-file';
+import { jobSubmissionFailed } from '@marxan/artifact-cache';
 import {
   unknownPdfWebshotError,
   unknownPngWebshotError,

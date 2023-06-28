@@ -12,7 +12,7 @@ export enum ArtifactType {
   ProjectShapefile = 'ProjectShapefile',
 }
 
-@Entity('project_template_file_cache')
+@Entity('artifact_cache')
 @Index(['projectId', 'artifactType'])
 export class ProjectTemplateFileCache {
   @PrimaryColumn({
@@ -21,7 +21,7 @@ export class ProjectTemplateFileCache {
   })
   id!: string;
 
-  @Column()
+  @Column({ name: 'project_id' })
   projectId!: string;
 
   @Column({ type: 'int4', nullable: true })
@@ -29,17 +29,21 @@ export class ProjectTemplateFileCache {
 
   @Column({
     type: 'enum',
+    name: 'artifact_type',
     enum: ArtifactType,
   })
   artifactType!: ArtifactType;
 
-  @Column()
+  @Column({ name: 'content_type' })
   contentType!: string;
 
-  @CreateDateColumn({ type: 'timestamp without time zone' })
+  @CreateDateColumn({ type: 'timestamp without time zone', name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'timestamp without time zone' })
+  @UpdateDateColumn({
+    type: 'timestamp without time zone',
+    name: 'last_modified_at',
+  })
   lastModifiedAt!: Date;
 }
 

@@ -10,7 +10,7 @@ import {
   ArtifactType,
   ProjectTemplateFileCache,
   createProjectTemplateFileCacheFields,
-} from './project-template-file-cache.api.entity';
+} from './artifact-cache.api.entity';
 
 export const CacheNotFound = Symbol('entity not found');
 export class ErrorWithSymbol extends Error {
@@ -21,7 +21,7 @@ export class ErrorWithSymbol extends Error {
 export const StreamPiped = Symbol('stream piped');
 export const EntityManagerToken = Symbol();
 @Injectable()
-export class ProjectTemplateFileRepository {
+export class ArtifactCacheRepository {
   /**
    * 2048 is a minimum, and bufferSize should be divisible by it
    */

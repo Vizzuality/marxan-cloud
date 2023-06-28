@@ -1,27 +1,27 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { getEntityManagerToken, TypeOrmModule } from '@nestjs/typeorm';
-import { ProjectTemplateFileCache } from './project-template-file-cache.api.entity';
+import { ProjectTemplateFileCache } from './artifact-cache.api.entity';
 import {
   EntityManagerToken,
-  ProjectTemplateFileRepository,
-} from './project-template-file.repository';
+  ArtifactCacheRepository,
+} from './artifact-cache.repository';
 
 @Module({})
-export class ProjectTemplateFileModule {
+export class ArtifactCacheModule {
   static for(connectionName?: string): DynamicModule {
     return {
-      module: ProjectTemplateFileModule,
+      module: ArtifactCacheModule,
       imports: [
         TypeOrmModule.forFeature([ProjectTemplateFileCache], connectionName),
       ],
       providers: [
-        ProjectTemplateFileRepository,
+        ArtifactCacheRepository,
         {
           provide: EntityManagerToken,
           useExisting: getEntityManagerToken(connectionName),
         },
       ],
-      exports: [ProjectTemplateFileRepository],
+      exports: [ArtifactCacheRepository],
     };
   }
 }

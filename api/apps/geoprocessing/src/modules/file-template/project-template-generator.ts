@@ -5,7 +5,7 @@ import { mkdir, rm } from 'fs/promises';
 import * as path from 'path';
 import * as uuid from 'uuid';
 import { runCommandsXL } from 'mapshaper';
-import { ProjectTemplateFileRepository } from '@marxan/project-template-file';
+import { ArtifactCacheRepository } from '@marxan/artifact-cache';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { AppConfig } from '@marxan-geoprocessing/utils/config.utils';
 import { assertDefined } from '@marxan/utils';
@@ -17,7 +17,7 @@ export class ProjectTemplateGenerator {
   constructor(
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
-    private readonly projectTemplateFilesRepository: ProjectTemplateFileRepository,
+    private readonly projectTemplateFilesRepository: ArtifactCacheRepository,
     private readonly projectGeoJsonCostTemplateDumper: FileTemplateDumper,
     private readonly storage: Storage,
   ) {}

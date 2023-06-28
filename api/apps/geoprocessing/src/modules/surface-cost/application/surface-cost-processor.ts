@@ -3,7 +3,7 @@ import {
   FromShapefileJobInput,
   InitialCostJobInput,
   JobInput,
-} from '@marxan/project-template-file';
+} from '@marxan/artifact-cache';
 import { canPlanningUnitsBeLocked } from '@marxan/scenarios-planning-unit';
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';

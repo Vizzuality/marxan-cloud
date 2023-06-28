@@ -1,4 +1,4 @@
-import { FromShapefileJobInput } from '@marxan/project-template-file';
+import { FromShapefileJobInput } from '@marxan/artifact-cache';
 import { GeoJSON } from 'geojson';
 
 export abstract class ShapefileConverterPort {

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProjectTemplateFileModule } from '@marxan/project-template-file';
+import { ArtifactCacheModule } from '@marxan/artifact-cache';
 import { apiConnections } from '@marxan-api/ormconfig';
 import { QueueModule } from '@marxan-api/modules/queue/queue.module';
 import { DbStorage } from './db-storage';
@@ -15,7 +15,7 @@ import { ProjectTemplateController } from '@marxan-api/modules/projects/shapefil
     QueueModule.register({
       name: queueName,
     }),
-    ProjectTemplateFileModule.for(apiConnections.default.name),
+    ArtifactCacheModule.for(apiConnections.default.name),
   ],
   providers: [
     {

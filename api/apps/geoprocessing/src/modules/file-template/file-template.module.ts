@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ProjectTemplateFileModule } from '@marxan/project-template-file';
+import { ArtifactCacheModule } from '@marxan/artifact-cache';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import { ProjectTemplateGenerator } from './project-template-generator';
 import { ProjectTemplateWorkerProcessor } from './project-template-worker-processor';
@@ -9,7 +9,7 @@ import { Storage } from './storage';
 
 @Module({
   imports: [
-    ProjectTemplateFileModule.for(geoprocessingConnections.apiDB.name),
+    ArtifactCacheModule.for(geoprocessingConnections.apiDB.name),
     WorkerModule,
   ],
   providers: [
