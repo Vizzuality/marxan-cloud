@@ -398,7 +398,7 @@ describe('Projects Tag GET Features (e2e)', () => {
     const response = await fixtures.WhenGettingFeaturesFromProject(
       projectId1,
       [],
-      true,
+      false,
     );
 
     //ASSERT
@@ -407,6 +407,36 @@ describe('Projects Tag GET Features (e2e)', () => {
     expect(
       response.body.data.map((feature: any) => feature.attributes.tag),
     ).toEqual(expect.arrayContaining(['someTAG', 'another']));
+
+    mockedIntersectingProjectFeature.mockRestore();
+  });
+
+  test('should not return tags in the response if tag is included in "omitFields"', async () => {
+    // ARRANGE
+    const projectId1 = await fixtures.GivenProject('someProject');
+    const featureId1 = await fixtures.GivenFeatureOnProject(projectId1, 'f1');
+    const featureId2 = await fixtures.GivenFeatureOnProject(projectId1, 'f2');
+    const featureId3 = await fixtures.GivenFeatureOnProject(projectId1, 'f3');
+    await fixtures.GivenTagOnFeature(projectId1, featureId1, 'someTAG');
+    await fixtures.GivenTagOnFeature(projectId1, featureId2, 'another');
+
+    const mockedIntersectingProjectFeature = fixtures.GivenGeoFeatureServiceIntersectingFeaturesMock(
+      [featureId1, featureId2, featureId3],
+    );
+
+    // ACT
+    const response = await fixtures.WhenGettingFeaturesFromProject(
+      projectId1,
+      [],
+      true,
+    );
+
+    //ASSERT
+    expect(response.status).toBe(HttpStatus.OK);
+    expect(response.body.data.length).toEqual(3);
+    expect(
+      response.body.data.map((feature: any) => feature.attributes.tag),
+    ).toEqual([undefined, undefined, undefined]);
 
     mockedIntersectingProjectFeature.mockRestore();
   });
