@@ -34,7 +34,7 @@ export class SetInitialCostSurfaceHandler
   }: SetInitialCostSurface): Promise<Either<SetInitialCostSurfaceError, true>> {
     try {
       await this.queue.add(`set-initial-cost-surface`, {
-        scenarioId: scenarioId,
+        scenarioId,
       });
       await this.events.event(scenarioId, CostSurfaceState.Submitted);
     } catch (error) {

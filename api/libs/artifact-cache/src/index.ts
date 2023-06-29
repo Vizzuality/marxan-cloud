@@ -7,5 +7,5 @@ export {
   InitialCostJobInput,
   JobInput,
   jobSubmissionFailed,
-} from './cost-surface-job-input';
-export { costSurfaceQueueName } from './cost-surface-queue-name';
+} from './surface-cost-job-input';
+export { surfaceCostQueueName } from './surface-cost-queue-name';
