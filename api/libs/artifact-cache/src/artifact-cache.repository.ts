@@ -8,7 +8,7 @@ import { pick } from 'lodash';
 import { isDefined } from '@marxan/utils';
 import {
   ArtifactType,
-  ProjectTemplateFileCache,
+  ArtifactCache,
   createProjectTemplateFileCacheFields,
 } from './artifact-cache.api.entity';
 
@@ -34,14 +34,14 @@ export class ArtifactCacheRepository {
 
   async save(
     entityToSave: Pick<
-      ProjectTemplateFileCache,
+      ArtifactCache,
       typeof createProjectTemplateFileCacheFields[number]
     >,
     artifactStream: Readable,
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        ProjectTemplateFileCache,
+        ArtifactCache,
       );
       const existingEntity = await repository.findOne({
         where: {
@@ -79,7 +79,7 @@ export class ArtifactCacheRepository {
   ): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        ProjectTemplateFileCache,
+        ArtifactCache,
       );
       const cacheEntity = await repository.findOne({
         where: {
@@ -112,7 +112,7 @@ export class ArtifactCacheRepository {
   async remove(projectId: string, artifactType: ArtifactType): Promise<void> {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const repository = transactionalEntityManager.getRepository(
-        ProjectTemplateFileCache,
+        ArtifactCache,
       );
       const cacheEntity = await repository.findOne({
         where: {
@@ -137,7 +137,7 @@ export class ArtifactCacheRepository {
   private async saveArtifact(
     largeObjectManager: LargeObjectManager,
     artifactStream: Readable,
-    repository: Repository<ProjectTemplateFileCache>,
+    repository: Repository<ArtifactCache>,
     savedEntityId: string,
   ) {
     const [
