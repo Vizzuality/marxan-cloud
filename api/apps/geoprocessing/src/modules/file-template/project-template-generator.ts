@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { EntityManager } from 'typeorm';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { mkdir, rm } from 'fs/promises';
@@ -14,6 +14,7 @@ import { Storage } from './storage';
 
 @Injectable()
 export class ProjectTemplateGenerator {
+  private readonly logger: Logger = new Logger(ProjectTemplateGenerator.name);
   constructor(
     @InjectEntityManager(geoprocessingConnections.default)
     private readonly entityManager: EntityManager,
@@ -60,6 +61,11 @@ export class ProjectTemplateGenerator {
         ].join(' '),
       );
       await this.storage.save(projectId, path.join(shapefileDirectory));
+    } catch (error) {
+      this.logger.error(
+        `Failed to generate template file for project ${projectId}`,
+        String(error),
+      );
     } finally {
       /**
        * Leave temporary folder on filesystem according to feature flag.
