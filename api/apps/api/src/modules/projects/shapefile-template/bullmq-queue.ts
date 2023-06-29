@@ -21,8 +21,8 @@ export class BullmqQueue extends Queue {
     super();
   }
 
-  async isPending(scenarioId: string): Promise<boolean> {
-    const job = await this.underlyingQueue.getJob(scenarioId);
+  async isPending(projectId: string): Promise<boolean> {
+    const job = await this.underlyingQueue.getJob(projectId);
 
     return (
       ((await job?.isActive()) ||

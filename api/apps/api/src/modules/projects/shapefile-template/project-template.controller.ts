@@ -28,6 +28,8 @@ import {
 @ApiBearerAuth()
 @ApiTags()
 @Controller(`${apiGlobalPrefixes.v1}/projects`)
+
+// @todo:use Either for error handing,return a stream to the the controller
 export class ProjectTemplateController {
   constructor(
     private readonly projectTemplateService: ProjectTemplateService,
