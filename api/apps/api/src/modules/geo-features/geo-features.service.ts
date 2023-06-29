@@ -289,10 +289,7 @@ export class GeoFeaturesService extends AppBaseService<
         });
     }
 
-    if (
-      !(omitFields && omitFields.includes('tag')) &&
-      info?.params?.includeTagInfo
-    ) {
+    if (!(omitFields && omitFields.includes('tag'))) {
       extendedResults[0] = await this.geoFeatureTagsServices.extendFindAllGeoFeaturesWithTags(
         extendedResults[0],
       );
@@ -313,10 +310,7 @@ export class GeoFeaturesService extends AppBaseService<
     const omitFields = _fetchSpecification?.omitFields;
     let extendedResult = entity;
 
-    if (
-      !(omitFields && omitFields.includes('tag')) &&
-      _info?.params?.includeTagInfo
-    ) {
+    if (!(omitFields && omitFields.includes('tag'))) {
       extendedResult = await this.geoFeatureTagsServices.extendFindGeoFeatureWithTag(
         entity,
       );

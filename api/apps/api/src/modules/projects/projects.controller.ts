@@ -183,14 +183,12 @@ export class ProjectsController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @Req() req: RequestWithAuthenticatedUser,
     @Query('q') featureClassAndAliasFilter?: string,
-    @Query('includeTagInfo') includeTagInfo?: string,
   ): Promise<GeoFeatureResult> {
     const result = await this.projectsService.findAllGeoFeatures(
       fetchSpecification,
       {
         authenticatedUser: req.user,
         params: {
-          includeTagInfo: includeTagInfo ? includeTagInfo === 'true' : false,
           projectId: projectId,
           featureClassAndAliasFilter: featureClassAndAliasFilter,
         },

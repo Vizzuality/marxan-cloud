@@ -121,12 +121,12 @@ export const getProjectTagsFixtures = async () => {
     WhenGettingFeaturesFromProject: (
       projectId: string,
       tags?: string[],
-      includeTag?: boolean,
+      omitTag?: boolean,
     ) => {
       const queryParams: any = {};
       queryParams.filter = {};
       tags?.length ? (queryParams.filter.tag = tags.join(',')) : '';
-      includeTag ? (queryParams.includeTagInfo = 'true') : '';
+      omitTag ? (queryParams.omitFields = ['tag'].join(',')) : '';
 
       return request(app.getHttpServer())
         .get(`/api/v1/projects/${projectId}/features?`)
