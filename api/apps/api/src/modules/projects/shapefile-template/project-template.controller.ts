@@ -12,6 +12,7 @@ import {
   ApiAcceptedResponse,
   ApiBearerAuth,
   ApiOkResponse,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import { apiGlobalPrefixes } from '@marxan-api/api.config';
@@ -35,7 +36,7 @@ export class ProjectTemplateController {
     private readonly projectTemplateService: ProjectTemplateService,
   ) {}
 
-  @Get(':projectId/cost-surface/shapefile-template')
+  @Get(':id/cost-surface/shapefile-template')
   @ApiAcceptedResponse()
   @ApiOkResponse({
     schema: {
@@ -43,13 +44,20 @@ export class ProjectTemplateController {
       format: 'binary',
     },
   })
+  @ApiParam({
+    name: 'id',
+    description: 'project id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
   @Header('Content-Type', 'application/zip')
   async costSurfaceShapefileTemplate(
-    @Param('projectId') projectId: string,
+    @Param('id') id: string,
     @Res() res: express.Response,
   ): Promise<void> {
     const shapefileStatus = await this.projectTemplateService.getTemplateShapefile(
-      projectId,
+      id,
       res,
     );
 
@@ -59,13 +67,20 @@ export class ProjectTemplateController {
     }
   }
 
-  @Get(':projectId/project-shapefile-template')
+  @Get(':id/project-shapefile-template')
   @ApiAcceptedResponse()
   @ApiOkResponse({
     schema: {
       type: 'string',
       format: 'binary',
     },
+  })
+  @ApiParam({
+    name: 'id',
+    description: 'project id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
   })
   @Header('Content-Type', 'application/zip')
   async projectShapefileTemplate(
