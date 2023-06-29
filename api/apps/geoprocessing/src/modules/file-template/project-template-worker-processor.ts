@@ -9,7 +9,7 @@ import { assertDefined } from '@marxan/utils';
 import { IsUUID, validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 
-export const queueName = 'cost-surface-template-creation';
+export const queueName = 'project-template-creation';
 
 @Injectable()
 export class ProjectTemplateWorkerProcessor

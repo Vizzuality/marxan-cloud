@@ -6,7 +6,6 @@ import { QueueToken } from '@marxan-api/modules/queue/queue.tokens';
 export const costSurfaceTemplateCreationQueue = Symbol(
   'project-template-creation-queue',
 );
-// wish to have it in provider
 export const queueName = 'project-template-creation';
 export const queueProvider: Provider<UnderlyingBullQueue<unknown, unknown>> = {
   provide: costSurfaceTemplateCreationQueue,
