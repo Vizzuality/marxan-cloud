@@ -61,7 +61,7 @@ describe(`when job submits successfully`, () => {
       Array [
         "cost-surface-for-scenarioId-id",
         Object {
-          "projectId": "scenarioId-id",
+          "scenarioId": "scenarioId-id",
           "shapefile": Object {
             "filename": "file-name",
           },
