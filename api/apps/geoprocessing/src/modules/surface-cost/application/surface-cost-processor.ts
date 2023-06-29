@@ -27,7 +27,7 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
     const geoJson = await this.shapefileConverter.convert(job.data.shapefile);
     const surfaceCosts = this.puExtractor.extract(geoJson);
     const scenarioPlanningUnits = await this.availablePlanningUnits.get(
-      job.data.projectId,
+      job.data.scenarioId,
     );
     const puids = scenarioPlanningUnits.map((spu) => spu.puid);
 
@@ -55,9 +55,10 @@ export class SurfaceCostProcessor implements WorkerProcessor<JobInput, true> {
   }
 
   private async initialCostProcessor({
-    data: { projectId },
+    // Requires scenario id!!!!!!!!!!!!
+    data: { scenarioId },
   }: Job<InitialCostJobInput, true>): Promise<true> {
-    await this.repo.generateInitialCostSurface(projectId);
+    await this.repo.generateInitialCostSurface(scenarioId);
 
     return true;
   }

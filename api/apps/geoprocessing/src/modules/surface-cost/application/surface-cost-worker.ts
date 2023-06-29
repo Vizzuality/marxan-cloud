@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Worker } from 'bullmq';
 
-import { JobInput, artifactCacheQueueName } from '@marxan/artifact-cache';
+import { JobInput, costSurfaceQueueName } from '@marxan/artifact-cache';
 import { WorkerBuilder } from '@marxan-geoprocessing/modules/worker';
 
 import { SurfaceCostProcessor } from './surface-cost-processor';
@@ -16,6 +16,6 @@ export class SurfaceCostWorker {
     private readonly processor: SurfaceCostProcessor,
     private readonly eventBus: EventBus,
   ) {
-    this.#worker = wrapper.build(artifactCacheQueueName, processor);
+    this.#worker = wrapper.build(costSurfaceQueueName, processor);
   }
 }

@@ -7,14 +7,14 @@ import { PlanningUnitGridShape } from '@marxan/scenarios-planning-unit';
 import { Job } from 'bullmq';
 
 export const getFromShapeFileJob = (
-  projectId: string,
+  scenarioId: string,
 ): Job<FromShapefileJobInput, true> => {
   const input: FromShapefileJobInput = {
     shapefile: {
       filename: '',
       path: '',
     } as Express.Multer.File,
-    projectId,
+    scenarioId,
   };
   return ({
     data: input,
@@ -22,10 +22,10 @@ export const getFromShapeFileJob = (
 };
 
 export const getInitialCostJob = (
-  projectId: string,
+  scenarioId: string,
 ): Job<InitialCostJobInput, true> => {
   const input: InitialCostJobInput = {
-    projectId,
+    scenarioId,
   };
   return ({
     data: input,

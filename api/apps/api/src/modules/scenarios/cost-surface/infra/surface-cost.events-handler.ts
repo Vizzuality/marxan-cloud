@@ -42,7 +42,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     const kind = this.successEventsMapper.event;
 
     return {
-      topic: data.projectId,
+      topic: data.scenarioId,
       kind,
       data: {},
     };
@@ -55,7 +55,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
     const kind = this.failEventsMapper.event;
 
     return {
-      topic: data.projectId,
+      topic: data.scenarioId,
       kind,
       data: {},
     };
@@ -68,7 +68,7 @@ export class SurfaceCostEventsHandler implements EventFactory<JobInput, true> {
       (jobInput as FromShapefileJobInput).shapefile,
     );
     if (!isFromShapefileJob) {
-      await this.commandBus.execute(new DeleteScenario(jobInput.projectId));
+      await this.commandBus.execute(new DeleteScenario(jobInput.scenarioId));
     }
   }
 }

@@ -1,5 +1,7 @@
+// These types are here for historical reasons and not related to Artefact Cache
+
 export type ParentJobInput = {
-  projectId: string;
+  scenarioId: string;
 };
 
 export type FromShapefileJobInput = ParentJobInput & {

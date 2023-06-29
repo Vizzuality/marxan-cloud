@@ -1,5 +1,5 @@
 export abstract class Queue {
-  abstract isPending(scenarioId: string): Promise<boolean>;
+  abstract isPending(projectId: string): Promise<boolean>;
 
-  abstract startProcessing(scenarioId: string): void;
+  abstract startProcessing(projectId: string): void;
 }

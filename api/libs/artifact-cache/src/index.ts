@@ -7,5 +7,5 @@ export {
   InitialCostJobInput,
   JobInput,
   jobSubmissionFailed,
-} from './artifact-cache-job-input';
-export { artifactCacheQueueName } from './artifact-cache-queue-name';
+} from './cost-surface-job-input';
+export { costSurfaceQueueName } from './cost-surface-queue-name';

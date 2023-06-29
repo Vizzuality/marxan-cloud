@@ -104,12 +104,12 @@ const getFixtures = async () => {
   return {
     GivenInitialCostJob: (): InitialCostJobInput => {
       return {
-        projectId: v4(),
+        scenarioId: v4(),
       };
     },
     GivenFromShapeFileJob: (): FromShapefileJobInput => {
       return {
-        projectId: v4(),
+        scenarioId: v4(),
         shapefile: {
           filename: 'file-name',
         } as Express.Multer.File,

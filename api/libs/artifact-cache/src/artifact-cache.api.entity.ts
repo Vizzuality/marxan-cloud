@@ -14,7 +14,7 @@ export enum ArtifactType {
 
 @Entity('artifact_cache')
 @Index(['projectId', 'artifactType'])
-export class ProjectTemplateFileCache {
+export class ArtifactCache {
   @PrimaryColumn({
     generated: 'uuid',
     type: 'uuid',
@@ -54,4 +54,4 @@ export const createProjectTemplateFileCacheFields = [
 ] as const;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const typecheckFields: readonly (keyof ProjectTemplateFileCache)[] = createProjectTemplateFileCacheFields;
+const typecheckFields: readonly (keyof ArtifactCache)[] = createProjectTemplateFileCacheFields;

@@ -30,7 +30,7 @@ export class UpdateCostSurfaceHandler
   }: UpdateCostSurface): Promise<Either<typeof jobSubmissionFailed, true>> {
     try {
       await this.queue.add(`cost-surface-for-${scenarioId}`, {
-        projectId: scenarioId,
+        scenarioId,
         shapefile,
       });
 
