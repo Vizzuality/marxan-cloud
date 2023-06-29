@@ -543,6 +543,19 @@ export class ScenariosController {
     example: 'locked-in',
   })
   @ApiOkResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'Scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiParam({
+    name: 'kind',
+    description:
+      'Status kind to be cleared - locked-in, locked-out or available',
+    example: 'locked-in',
+  })
   @Delete(':id/planning-units/status/:kind')
   async clearPlanningUnitsStatus(
     @Param() params: ClearLockStatusParams,
