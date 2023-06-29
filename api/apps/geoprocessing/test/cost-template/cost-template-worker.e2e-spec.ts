@@ -110,7 +110,7 @@ async function getFixtures() {
 
   const fileRepository = application.get(ArtifactCacheRepository);
 
-  const queue = new Queue(`cost-surface-template-creation`, {
+  const queue = new Queue(`project-template-creation`, {
     ...getRedisConfig(),
   });
 
