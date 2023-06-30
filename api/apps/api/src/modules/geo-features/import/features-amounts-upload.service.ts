@@ -6,8 +6,8 @@ import { featureAmountCsvParser } from '@marxan-api/modules/geo-features/import/
 import { FeatureAmountCSVDto } from '@marxan-api/modules/geo-features/dto/feature-amount-csv.dto';
 import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import {
-  overlappingFeatures,
-  unknownPuids,
+  importedFeatureNameAlreadyExist,
+  unknownPuidsInFeatureAmountCsvUpload,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { isLeft, left, right } from 'fp-ts/Either';
 import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
@@ -28,26 +28,31 @@ export class FeatureAmountUploadService {
     userId: string;
   }): Promise<any> {
     try {
-      await this.events.registerEvent(this.events.submit(), data);
+      await this.events.createEvent(data);
 
       const parsedFile = await featureAmountCsvParser(data.fileBuffer);
 
       const { featureNames, puids } = this.getFeatureNamesAndPuids(parsedFile);
-      if (await this.areFeaturesAlreadyPresent(data.projectId, featureNames)) {
-        return left(overlappingFeatures);
+      if (
+        await this.areFeatureNamesNotAlreadyUsedInProject(
+          data.projectId,
+          featureNames,
+        )
+      ) {
+        return left(importedFeatureNameAlreadyExist);
       }
-      if (!(await this.validateMaxPuidForProject(data.projectId, puids))) {
-        return left(unknownPuids);
+      if (!(await this.allInputPuidsKnownInProject(data.projectId, puids))) {
+        return left(unknownPuidsInFeatureAmountCsvUpload);
       }
       const importedRegistry = await this.saveFeaturesToRegistry(
         parsedFile,
         data.projectId,
         data.userId,
       );
-      await this.events.registerEvent(this.events.finish(), data);
+      await this.events.finishEvent();
       return right(importedRegistry);
     } catch (e) {
-      await this.events.registerEvent(this.events.fail(), e);
+      await this.events.failEvent(e);
       if (isLeft(e)) {
         return e;
       }
@@ -69,7 +74,7 @@ export class FeatureAmountUploadService {
       });
   }
 
-  private async areFeaturesAlreadyPresent(
+  private async areFeatureNamesNotAlreadyUsedInProject(
     projectId: string,
     featureNames: string[],
   ): Promise<boolean> {
@@ -87,7 +92,7 @@ export class FeatureAmountUploadService {
     return !!featuresInDB.length;
   }
 
-  private async validateMaxPuidForProject(
+  private async allInputPuidsKnownInProject(
     projectId: string,
     puids: number[],
   ): Promise<boolean> {

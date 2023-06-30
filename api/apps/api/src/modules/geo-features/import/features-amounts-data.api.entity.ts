@@ -12,13 +12,13 @@ export class UploadedFeatureAmount {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'feature_name' })
+  @Column({ name: 'feature_name', type: 'varchar' })
   featureName!: string;
 
-  @Column()
+  @Column({ type: 'int' })
   puid!: number;
 
-  @Column()
+  @Column({ type: 'int' })
   amount!: number;
 
   @ManyToOne(

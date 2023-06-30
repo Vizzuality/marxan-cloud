@@ -768,7 +768,7 @@ export class ProjectsController {
   )
   @Post(`:projectId/features/csv`)
   async setFeatureAmountFromCSV(
-    @Param('projectId') projectId: string,
+    @Param('projectId', ParseUUIDPipe) projectId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<FeatureAmountUploadRegistry> {

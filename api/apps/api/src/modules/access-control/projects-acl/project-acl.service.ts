@@ -61,6 +61,10 @@ export class ProjectAclService implements ProjectAccessControl {
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
   ];
+  private readonly canUploadFeatureDataWithCsvInProjectRoles = [
+    ProjectRoles.project_owner,
+    ProjectRoles.project_contributor,
+  ];
   private readonly canDeleteFeatureInProjectRoles = [
     ProjectRoles.project_owner,
     ProjectRoles.project_contributor,
@@ -167,6 +171,16 @@ export class ProjectAclService implements ProjectAccessControl {
     return this.doesUserHaveRole(
       await this.getRolesWithinProjectForUser(userId, projectId),
       this.canEditFeatureInProjectRoles,
+    );
+  }
+
+  async canUploadFeatureDataWithCsvInProject(
+    userId: string,
+    projectId: string,
+  ): Promise<Permit> {
+    return this.doesUserHaveRole(
+      await this.getRolesWithinProjectForUser(userId, projectId),
+      this.canUploadFeatureDataWithCsvInProjectRoles,
     );
   }
 

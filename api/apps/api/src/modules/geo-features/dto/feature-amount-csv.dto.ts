@@ -1,5 +1,6 @@
 import {
   IsDefined,
+  IsInt,
   IsNotEmpty,
   IsPositive,
   IsString,
@@ -8,6 +9,7 @@ import {
 
 export class FeatureAmountCSVDto {
   @IsDefined()
+  @IsInt()
   @IsPositive()
   puid: number;
 

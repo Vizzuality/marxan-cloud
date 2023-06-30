@@ -54,18 +54,26 @@ type GeoFeatureFilters = Record<GeoFeatureFilterKeys, string[]>;
 
 export const featureNotFound = Symbol('feature not found');
 export const featureNotEditable = Symbol('feature cannot be edited');
+
+export const featureDataCannotBeUploadedWithCsv = Symbol(
+  'feature data cannot be uploaded with csv',
+);
 export const featureNameAlreadyInUse = Symbol('feature name already in use');
 export const featureNotDeletable = Symbol('feature cannot be deleted');
 export const featureIsLinkedToOneOrMoreScenarios = Symbol(
   'feature is linked to one or more scenarios',
 );
-export const overlappingFeatures = Symbol(
-  'there are overlapping features for given project',
+export const importedFeatureNameAlreadyExist = Symbol(
+  'imported feature cannot have the same name as existing feature',
 );
 
-export const missingPuidColumn = Symbol('missing puid column');
+export const missingPuidColumnInFeatureAmountCsvUpload = Symbol(
+  'missing puid column in feature amount csv upload',
+);
 
-export const unknownPuids = Symbol('there are unknown puids for given project');
+export const unknownPuidsInFeatureAmountCsvUpload = Symbol(
+  'there are unknown PUids in feature amount csv upload',
+);
 
 export type FindResult = {
   data: (Partial<GeoFeature> | undefined)[];
@@ -639,7 +647,10 @@ export class GeoFeaturesService extends AppBaseService<
     userId: string,
   ): Promise<
     Either<
-      typeof overlappingFeatures | typeof unknownPuids | typeof projectNotFound,
+      | typeof importedFeatureNameAlreadyExist
+      | typeof unknownPuidsInFeatureAmountCsvUpload
+      | typeof projectNotFound
+      | typeof featureDataCannotBeUploadedWithCsv,
       FeatureAmountUploadRegistry
     >
   > {
@@ -649,6 +660,16 @@ export class GeoFeaturesService extends AppBaseService<
     if (!project) {
       return left(projectNotFound);
     }
+
+    if (
+      !(await this.projectAclService.canUploadFeatureDataWithCsvInProject(
+        userId,
+        projectId,
+      ))
+    ) {
+      return left(featureDataCannotBeUploadedWithCsv);
+    }
+
     return this.featureAmountUploads.saveCsvToRegistry({
       fileBuffer,
       projectId,
