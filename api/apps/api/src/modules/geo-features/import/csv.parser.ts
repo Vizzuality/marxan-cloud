@@ -2,14 +2,20 @@ import { FeatureAmountCSVDto } from '@marxan-api/modules/geo-features/dto/featur
 import { Stream } from 'stream';
 import { parseStream } from 'fast-csv';
 import { validateOrReject } from 'class-validator';
-import { missingPuidColumn } from '@marxan-api/modules/geo-features/geo-features.service';
+import { missingPuidColumnInFeatureAmountCsvUpload } from '@marxan-api/modules/geo-features/geo-features.service';
 import { left } from 'fp-ts/Either';
 
-export const nofeaturesFoundInCsv = Symbol('No features found in csv');
+export const noFeaturesFoundInInFeatureAmountCsvUpload = Symbol(
+  'No features found in feature amount csv upload',
+);
 
-export const duplicateHeadersInCsv = Symbol('Duplicate headers found in csv');
+export const duplicateHeadersInFeatureAmountCsvUpload = Symbol(
+  'Duplicate headers found in feature amount csv upload',
+);
 
-export const duplicatePuidsInCsv = Symbol('Duplicate puids found in csv');
+export const duplicatePuidsInFeatureAmountCsvUpload = Symbol(
+  'Duplicate puids found in feature amount csv upload',
+);
 
 export async function featureAmountCsvParser(
   fileBuffer: Buffer,
@@ -23,25 +29,21 @@ export async function featureAmountCsvParser(
 
     parseStream(stream, { headers: true })
       .on('headers', (h) => {
-        const seenHeaders = new Set();
-        for (const header of h) {
-          if (seenHeaders.has(header)) {
-            reject(left(duplicateHeadersInCsv));
-          } else {
-            seenHeaders.add(header);
-          }
+        const uniqueHeaders = [...new Set(h)];
+        if (uniqueHeaders.length !== h.length) {
+          reject(left(duplicateHeadersInFeatureAmountCsvUpload));
         }
         if (!h.includes('puid')) {
-          reject(left(missingPuidColumn));
+          reject(left(missingPuidColumnInFeatureAmountCsvUpload));
         }
         if (h.length < 2) {
-          reject(left(nofeaturesFoundInCsv));
+          reject(left(noFeaturesFoundInInFeatureAmountCsvUpload));
         }
       })
       .on('data', (data) => {
         const puid: number = parseInt(data.puid);
         if (seenPuids.has(puid)) {
-          reject(duplicatePuidsInCsv);
+          reject(duplicatePuidsInFeatureAmountCsvUpload);
         }
         seenPuids.add(puid);
         for (const key in data) {

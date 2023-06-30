@@ -81,14 +81,15 @@ import {
   userNotFound,
 } from '@marxan-api/modules/access-control/access-control.types';
 import {
-  missingPuidColumn,
-  overlappingFeatures,
-  unknownPuids,
+  missingPuidColumnInFeatureAmountCsvUpload,
+  importedFeatureNameAlreadyExist,
+  unknownPuidsInFeatureAmountCsvUpload,
+  featureDataCannotBeUploadedWithCsv,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import {
-  duplicateHeadersInCsv,
-  duplicatePuidsInCsv,
-  nofeaturesFoundInCsv,
+  duplicateHeadersInFeatureAmountCsvUpload,
+  duplicatePuidsInFeatureAmountCsvUpload,
+  noFeaturesFoundInInFeatureAmountCsvUpload,
 } from '@marxan-api/modules/geo-features/import/csv.parser';
 import {
   featureNotEditableByUserWithinProject,
@@ -159,14 +160,16 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotEditable
     | typeof projectNotVisible
     | typeof tagNotFoundForProject
-    | typeof overlappingFeatures
-    | typeof unknownPuids
+    | typeof importedFeatureNameAlreadyExist
+    | typeof unknownPuidsInFeatureAmountCsvUpload
     | typeof projectNotFound
-    | typeof missingPuidColumn
-    | typeof duplicatePuidsInCsv
-    | typeof duplicateHeadersInCsv
-    | typeof nofeaturesFoundInCsv
-    | ImportProjectError,
+    | typeof missingPuidColumnInFeatureAmountCsvUpload
+    | typeof duplicatePuidsInFeatureAmountCsvUpload
+    | typeof duplicateHeadersInFeatureAmountCsvUpload
+    | typeof noFeaturesFoundInInFeatureAmountCsvUpload
+    | ImportProjectError
+    | typeof featureDataCannotBeUploadedWithCsv,
+
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -342,20 +345,31 @@ export const mapAclDomainToHttpError = (
       throw new NotFoundException(
         `Tag for Project with id ${options?.projectId} not found`,
       );
-    case overlappingFeatures:
+    case importedFeatureNameAlreadyExist:
       return new BadRequestException('Imported Features already present');
-    case unknownPuids:
+    case unknownPuidsInFeatureAmountCsvUpload:
       return new BadRequestException('Unknown PUIDs');
     case projectNotFound:
       return new NotFoundException(`Project ${options?.scenarioId} not found`);
-    case missingPuidColumn:
+    case missingPuidColumnInFeatureAmountCsvUpload:
       return new BadRequestException('Missing PUID column');
-    case nofeaturesFoundInCsv:
-      return new BadRequestException('No features found in CSV');
-    case duplicateHeadersInCsv:
-      return new BadRequestException('Duplicate headers in CSV');
-    case duplicatePuidsInCsv:
-      return new BadRequestException('Duplicate PUIDs in CSV');
+    case noFeaturesFoundInInFeatureAmountCsvUpload:
+      return new BadRequestException(
+        'No features found in feature amount CSV upload',
+      );
+    case duplicateHeadersInFeatureAmountCsvUpload:
+      return new BadRequestException(
+        'Duplicate headers in feature amount CSV upload',
+      );
+    case duplicatePuidsInFeatureAmountCsvUpload:
+      return new BadRequestException(
+        'Duplicate PUIDs in feature amount CSV upload',
+      );
+    case featureDataCannotBeUploadedWithCsv:
+      throw new ForbiddenException(
+        `User with id ${options?.userId} cannot upload feature data with csv for project with id ${options?.projectId}`,
+      );
+
     default:
       const _exhaustiveCheck: never = errorToCheck;
       return _exhaustiveCheck;

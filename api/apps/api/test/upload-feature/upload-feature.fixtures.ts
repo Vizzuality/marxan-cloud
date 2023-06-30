@@ -104,7 +104,7 @@ export const getFixtures = async () => {
       return request(app.getHttpServer())
         .post(`/api/v1/projects/${projectId}/features/shapefile`)
         .set('Authorization', `Bearer ${token}`)
-        .attach(`file`, __dirname + `/wetlands.zip`)
+        .attach(`file`, __dirname + `/import-files/wetlands.zip`)
         .field(dto);
     },
     WhenUploadingCustomFeatureFromCSV: async () => {
