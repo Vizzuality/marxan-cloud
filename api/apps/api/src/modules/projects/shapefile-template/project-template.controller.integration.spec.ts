@@ -16,12 +16,25 @@ beforeEach(async () => {
   app = fixtures.getApp();
 });
 
-test(`should return a file when it is calculated`, async () => {
+test(`cost surface template - should return a file when it is calculated`, async () => {
   // given
   fixtures.templateAvailable('123', 'sample shapefile');
   // when
   const test = request(app.getHttpServer()).get(
     '/api/v1/projects/123/cost-surface/shapefile-template',
+  );
+  // then
+  const response = await test.expect(200);
+  expect(response.text).toBe(`sample shapefile`);
+  expect(response.headers['content-type']).toBe(`application/zip`);
+});
+
+test(`project shapefile template - should return a file when it is calculated`, async () => {
+  // given
+  fixtures.templateAvailable('123', 'sample shapefile');
+  // when
+  const test = request(app.getHttpServer()).get(
+    '/api/v1/projects/123/project-shapefile-template',
   );
   // then
   const response = await test.expect(200);
