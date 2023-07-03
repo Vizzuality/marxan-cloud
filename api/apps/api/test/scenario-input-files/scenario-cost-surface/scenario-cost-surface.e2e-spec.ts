@@ -25,21 +25,25 @@ describe(`As owner, when scenario has PUs with cost and lock status`, () => {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'available',
+        setByUser: false,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
+        setByUser: true,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
+        setByUser: true,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'available',
+        setByUser: false,
       },
     ]);
   });
@@ -63,21 +67,25 @@ describe(`As contributor, when scenario has PUs with cost and lock status`, () =
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'available',
+        setByUser: false,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
+        setByUser: true,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
+        setByUser: true,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'available',
+        setByUser: false,
       },
     ]);
   });
@@ -101,21 +109,25 @@ describe(`As viewer, when scenario has PUs with cost and lock status`, () => {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'available',
+        setByUser: false,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-in',
+        setByUser: true,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'locked-out',
+        setByUser: true,
       },
       {
         defaultStatus: 'available',
         id: expect.any(String),
         inclusionStatus: 'available',
+        setByUser: false,
       },
     ]);
   });
