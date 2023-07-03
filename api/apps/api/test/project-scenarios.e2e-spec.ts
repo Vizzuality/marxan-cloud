@@ -8,7 +8,10 @@ import { GivenUserIsCreated } from './steps/given-user-is-created';
 import { queueName } from '@marxan-api/modules/planning-units-protection-level/queue.name';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
 import { ScenariosTestUtils } from './utils/scenarios.test.utils';
-import { ScenarioType } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import {
+  Scenario,
+  ScenarioType,
+} from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Repository } from 'typeorm';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -34,6 +37,38 @@ describe('ScenariosModule (e2e)', () => {
   it('Creating a scenario with minimum required data should succeed', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     fixtures.ThenScenarioIsCreatedAndNoJobHasBeenSubmitted(response);
+  });
+
+  it('Creating a scenario has its internal project-scope id properly informed', async () => {
+    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
+    //ProjectScenarioId will be one because it's the first Scenario in the project
+    fixtures.ThenScenarioIsCreatedWithProjectScenarioId(response, 1);
+  });
+
+  it('Creating a scenario has its internal project-scope id properly informed with the max existing project-scope id +1', async () => {
+    const projectScenarioIdPreviousMax = 572;
+    await fixtures.GivenPreviousScenario(
+      'existing',
+      projectScenarioIdPreviousMax,
+    );
+    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
+    //ProjectScenarioId will be one because it's the first Scenario in the project
+    fixtures.ThenScenarioIsCreatedWithProjectScenarioId(
+      response,
+      projectScenarioIdPreviousMax + 1,
+    );
+  });
+
+  it('Creating a scenario that has an internal project-scope id greater then the allowed max (999) will fail', async () => {
+    const projectScenarioIdPreviousMax = 999;
+    await fixtures.GivenPreviousScenario(
+      'existing',
+      projectScenarioIdPreviousMax,
+    );
+    const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner(
+      false,
+    );
+    fixtures.ThenScenarioCouldNotBeCreatedMessageIsReturned(response);
   });
 
   it('Creating a scenario will succeed because the user is a project contributor', async () => {
@@ -165,6 +200,9 @@ async function getFixtures() {
   const userProjectsRepo: Repository<UsersProjectsApiEntity> = app.get(
     getRepositoryToken(UsersProjectsApiEntity),
   );
+  const scenariosRepo: Repository<Scenario> = app.get(
+    getRepositoryToken(Scenario),
+  );
 
   return {
     GivenUserIsLoggedIn: async (user: string) => {
@@ -223,13 +261,36 @@ async function getFixtures() {
       });
     },
 
+    GivenPreviousScenario: async (name: string, projectScenarioId: number) => {
+      await scenariosRepo.save({
+        name,
+        projectScenarioId,
+        type: ScenarioType.marxan,
+        projectId,
+      });
+    },
+
     WhenCreatingAScenarioWithIncompleteData: async () =>
       await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
         .send(E2E_CONFIG.scenarios.invalid.missingRequiredFields()),
 
-    WhenCreatingAScenarioWithMinimumRequiredDataAsOwner: async () => {
+    WhenCreatingAScenarioWithMinimumRequiredDataAsOwner: async (
+      grabId = true,
+    ) => {
+      const response = await request(app.getHttpServer())
+        .post('/api/v1/scenarios')
+        .set('Authorization', `Bearer ${ownerToken}`)
+        .send(minimalCreateScenarioDTO);
+
+      if (grabId) {
+        scenarioId = response.body.data.id;
+      }
+      return response;
+    },
+
+    WhenCreatingAScenarioWithOverMaxProjectScenarioId: async () => {
       const response = await request(app.getHttpServer())
         .post('/api/v1/scenarios')
         .set('Authorization', `Bearer ${ownerToken}`)
@@ -356,6 +417,25 @@ async function getFixtures() {
       // Minimal data - no job submitted
       expect(Object.values(queue.jobs).length).toEqual(0);
     },
+
+    ThenScenarioIsCreatedWithProjectScenarioId: (
+      response: request.Response,
+      projectScenarioId: number,
+    ) => {
+      expect(response.body.data.type).toBe('scenarios');
+      expect(response.body.data.attributes.projectScenarioId).toEqual(
+        projectScenarioId,
+      );
+    },
+
+    ThenScenarioCouldNotBeCreatedMessageIsReturned: (
+      response: request.Response,
+    ) => {
+      expect(response.body.errors[0].title).toEqual(
+        `Scenario for Project with id ${projectId} could not be created`,
+      );
+    },
+
     ThenScenarioAndJobAreCreated: (response: request.Response) => {
       expect(response.body.data.type).toBe('scenarios');
       expect(response.body.data.attributes.name).toEqual(

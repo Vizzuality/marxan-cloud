@@ -334,6 +334,7 @@ export class ScenariosController {
     if (isLeft(result)) {
       throw mapAclDomainToHttpError(result.left, {
         userId: req.user.id,
+        projectId: dto.projectId,
         resourceType: scenarioResource.name.plural,
       });
     }

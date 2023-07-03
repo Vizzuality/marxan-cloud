@@ -131,6 +131,7 @@ const EmptyGeoFeaturesSpecification: GeoFeatureSetSpecification = {
 
 export const projectNotReady = Symbol('project not ready');
 export type ProjectNotReady = typeof projectNotReady;
+export const scenarioNotCreated = Symbol('scenario not created');
 
 export const bestSolutionNotFound = Symbol('best solution not found');
 
@@ -263,7 +264,8 @@ export class ScenariosService {
       | typeof blmCreationFailure
       | ProjectNotReady
       | ProjectDoesntExist
-      | SetInitialCostSurfaceError,
+      | SetInitialCostSurfaceError
+      | typeof scenarioNotCreated,
       Scenario
     >
   > {
@@ -295,7 +297,15 @@ export class ScenariosService {
     if (isRight(isLegacyProjectCompleted) && !isLegacyProjectCompleted.right)
       return left(projectNotReady);
 
-    const scenario = await this.crudService.create(validatedMetadata, info);
+    const scenarioResult = await this.crudService.createWithProjectScenarioId(
+      validatedMetadata,
+      info,
+    );
+    if (isLeft(scenarioResult)) {
+      return scenarioResult;
+    }
+    const scenario = scenarioResult.right;
+
     const blmCreationResult = await this.commandBus.execute(
       new CreateInitialScenarioBlm(scenario.id, scenario.projectId),
     );
@@ -525,6 +535,7 @@ export class ScenariosService {
         : {}),
     };
   }
+
   async processCostSurfaceShapefile(
     scenarioId: string,
     userId: string,
