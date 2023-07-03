@@ -51,6 +51,7 @@ import {
   lockedSolutions,
   projectDoesntExist,
   projectNotReady,
+  scenarioNotCreated,
 } from '@marxan-api/modules/scenarios/scenarios.service';
 import { internalError } from '@marxan-api/modules/specification/application/submit-specification.command';
 import { notFound as protectedAreaProjectNotFound } from '@marxan/projects';
@@ -160,6 +161,7 @@ export const mapAclDomainToHttpError = (
     | typeof projectNotEditable
     | typeof projectNotVisible
     | typeof tagNotFoundForProject
+    | typeof scenarioNotCreated
     | typeof importedFeatureNameAlreadyExist
     | typeof unknownPuidsInFeatureAmountCsvUpload
     | typeof missingPuidColumnInFeatureAmountCsvUpload
@@ -343,6 +345,10 @@ export const mapAclDomainToHttpError = (
     case tagNotFoundForProject:
       throw new NotFoundException(
         `Tag for Project with id ${options?.projectId} not found`,
+      );
+    case scenarioNotCreated:
+      throw new NotFoundException(
+        `Scenario for Project with id ${options?.projectId} could not be created`,
       );
     case importedFeatureNameAlreadyExist:
       return new BadRequestException('Imported Features already present');
