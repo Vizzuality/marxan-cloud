@@ -301,6 +301,19 @@ export const createWorld = async (app: INestApplication) => {
       )
         .map((entity) => entity.id)
         .sort(sortUuid),
+
+    GetAvailablePlanningUnitsNotSetByUser: async () =>
+      (
+        await scenarioPuDataRepo
+          .createQueryBuilder('scenarioPuData')
+          .where('scenarioPuData.scenario_id = :scenarioId', { scenarioId })
+          .andWhere('scenarioPuData.lockin_status IS NULL')
+          .andWhere('scenarioPuData.lock_status_set_by_user = false')
+          .andWhere('scenarioPuData.protected_by_default = false')
+          .getMany()
+      )
+        .map((entity) => entity.id)
+        .sort(sortUuid),
     cleanup: async (forCase: ForCase) => {
       await puGeometryRepo.delete({
         id: In(geometriesByCase[forCase].storedGeometries),

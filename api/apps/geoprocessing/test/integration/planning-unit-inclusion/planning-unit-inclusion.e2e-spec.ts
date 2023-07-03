@@ -74,6 +74,33 @@ describe(`when planning units exist for a scenario`, () => {
     }, 10000);
   });
 
+  describe(`when changing lock status from available to available via puids with one single feature per feature collection`, () => {
+    const forCase: ForCase = 'singleFeature';
+    beforeEach(async () => {
+      await world.GivenPlanningUnitsExist(forCase, areaUnitsSample(forCase));
+    });
+
+    afterEach(async () => {
+      await world?.cleanup('singleFeature');
+    });
+
+    it(`marks relevant pu in desired state with setByUser = true`, async () => {
+      const availablePUsNotSetByUser = await world.GetAvailablePlanningUnitsNotSetByUser();
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          makeAvailable: {
+            pu: availablePUsNotSetByUser,
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      expect(await world.GetAvailablePlanningUnitsChangedByUser()).toEqual(
+        availablePUsNotSetByUser,
+      );
+    }, 10000);
+  });
+
   describe(`when changing lock status via GeoJSON with multiple features per feature collection`, () => {
     const forCase: ForCase = 'multipleFeatures';
     beforeEach(async () => {
