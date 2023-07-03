@@ -4,7 +4,10 @@ import { INestApplication } from '@nestjs/common';
 import { getEntityManagerToken } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 import { v4 } from 'uuid';
-import { GivenScenarioPuDataExists } from '../../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
+import {
+  GivenScenarioPuDataExists,
+  GivenScenarioPuDataWithStatusesSetByUserExists,
+} from '../../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { GivenProjectExists } from '../../steps/given-project';
 import { ScenariosTestUtils } from '../../utils/scenarios.test.utils';
 import {
@@ -31,7 +34,7 @@ export const createWorld = async (app: INestApplication, jwt: string) => {
     })
   ).data.id;
 
-  const scenariosPuData = await GivenScenarioPuDataExists(
+  const scenariosPuData = await GivenScenarioPuDataWithStatusesSetByUserExists(
     entityManager,
     projectId,
     scenarioId,
