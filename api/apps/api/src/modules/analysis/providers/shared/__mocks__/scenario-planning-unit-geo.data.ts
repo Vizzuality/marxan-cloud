@@ -15,4 +15,5 @@ export const validDataWithGivenPuIds = (
     projectPuId: v4(),
     id: id,
     featureList: [],
+    setByUser: false,
   }));
