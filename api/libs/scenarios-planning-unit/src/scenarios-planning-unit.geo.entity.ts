@@ -80,7 +80,7 @@ export class ScenariosPlanningUnitGeoEntity {
     default: false,
     name: `lock_status_set_by_user`,
   })
-  setByUser?: boolean;
+  setByUser!: boolean;
 
   @Column({
     type: 'float8',
