@@ -61,6 +61,104 @@ export const GivenScenarioPuDataExists = async (
   return rows as ScenariosPuPaDataGeo[];
 };
 
+export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
+  entityManager: EntityManager,
+  projectId: string,
+  scenarioId: string,
+  {
+    protectedByDefault,
+  }: GivenScenarioPuDataExistsOpts = defaultGivenScenarioPuDataExistsOpts,
+): Promise<ScenariosPuPaDataGeo[]> => {
+  const [first, second, third] = await GivenProjectsPuExists(
+    entityManager,
+    projectId,
+  );
+
+  const rows = await entityManager.save(ScenariosPuPaDataGeo, [
+    {
+      scenarioId,
+      lockStatus: LockStatus.Available,
+      projectPuId: first.id,
+      projectPu: first,
+      protectedByDefault,
+      setByUser: false,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.Available,
+      projectPuId: first.id,
+      projectPu: first,
+      protectedByDefault,
+      setByUser: false,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.Available,
+      projectPuId: first.id,
+      projectPu: first,
+      protectedByDefault,
+      setByUser: true,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.Available,
+      projectPuId: first.id,
+      projectPu: first,
+      protectedByDefault,
+      setByUser: true,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.Available,
+      projectPuId: first.id,
+      projectPu: first,
+      protectedByDefault,
+      setByUser: true,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.LockedOut,
+      projectPuId: second.id,
+      projectPu: second,
+      protectedByDefault,
+      setByUser: true,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.LockedOut,
+      projectPuId: second.id,
+      projectPu: second,
+      protectedByDefault,
+      setByUser: false,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.LockedIn,
+      projectPuId: third.id,
+      projectPu: third,
+      protectedByDefault,
+      setByUser: true,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.LockedIn,
+      projectPuId: third.id,
+      projectPu: third,
+      protectedByDefault,
+      setByUser: false,
+    },
+    {
+      scenarioId,
+      lockStatus: LockStatus.LockedIn,
+      projectPuId: third.id,
+      projectPu: third,
+      protectedByDefault,
+      setByUser: false,
+    },
+  ]);
+  return rows as ScenariosPuPaDataGeo[];
+};
+
 export const GivenScenarioPuData = async (
   entityManager: EntityManager,
   projectId: string,

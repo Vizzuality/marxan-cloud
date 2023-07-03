@@ -28,7 +28,7 @@ export class ScenarioPlanningUnitsService {
     });
   }
 
-  async getByStatus(
+  async getByStatusSetByUser(
     scenarioId: string,
     lockStatus: LockStatus,
   ): Promise<ScenariosPlanningUnitGeoEntity[]> {
@@ -36,8 +36,20 @@ export class ScenarioPlanningUnitsService {
       where: {
         scenarioId,
         lockStatus,
+        setByUser: true,
       },
     });
+  }
+
+  async getAvailablePUsSetByUser(
+    scenarioId: string,
+  ): Promise<ScenariosPlanningUnitGeoEntity[]> {
+    return await this.puRepo
+      .createQueryBuilder('scenarioPuData')
+      .where('scenarioPuData.scenario_id = :scenarioId', { scenarioId })
+      .andWhere('scenarioPuData.lockin_status IS NULL')
+      .andWhere('scenarioPuData.lock_status_set_by_user = false')
+      .getMany();
   }
 
   async resetLockStatus(scenarioId: string): Promise<void> {
@@ -50,6 +62,7 @@ export class ScenarioPlanningUnitsService {
         },
         {
           lockStatus: LockStatus.Available,
+          setByUser: false,
         },
       );
 
@@ -61,6 +74,7 @@ export class ScenarioPlanningUnitsService {
         },
         {
           lockStatus: LockStatus.LockedIn,
+          setByUser: false,
         },
       );
     });

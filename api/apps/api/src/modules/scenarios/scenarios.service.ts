@@ -487,19 +487,18 @@ export class ScenariosService {
     scenarioId: string,
     kindToClear: LockStatus,
   ): Promise<AdjustPlanningUnitsInput> {
-    const lockedInPus = await this.planningUnitsService.getByStatus(
+    const lockedInPus = await this.planningUnitsService.getByStatusSetByUser(
       scenarioId,
       LockStatus.LockedIn,
     );
 
-    const lockedOutPus = await this.planningUnitsService.getByStatus(
+    const lockedOutPus = await this.planningUnitsService.getByStatusSetByUser(
       scenarioId,
       LockStatus.LockedOut,
     );
 
-    const availablePus = await this.planningUnitsService.getByStatus(
+    const availablePus = await this.planningUnitsService.getAvailablePUsSetByUser(
       scenarioId,
-      LockStatus.Available,
     );
 
     return {
