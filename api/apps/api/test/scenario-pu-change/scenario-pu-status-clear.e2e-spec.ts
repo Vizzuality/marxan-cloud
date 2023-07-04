@@ -42,6 +42,8 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
     const result = await world.WhenClearingLockedInPUsStatusWithExistingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
+    expect(job.data.makeAvailable.pu.length).toBe(3);
+    expect(job.data.exclude.pu.length).toBe(1);
     HasExpectedJobDetailsWhenClearingLockedIn(job);
     HasRelevantJobName(job, world.scenarioId);
   });
@@ -50,6 +52,8 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
     const result = await world.WhenClearingLockedOutPUsStatusWithExistingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
+    expect(job.data.makeAvailable.pu.length).toBe(3);
+    expect(job.data.include.pu.length).toBe(1);
     HasExpectedJobDetailsWhenClearingLockedOut(job);
     HasRelevantJobName(job, world.scenarioId);
   });
@@ -58,6 +62,8 @@ describe(`when requesting to clear PUs statuses by kind`, () => {
     const result = await world.WhenClearingAvailablePUsStatusWithExistingPu();
     const job = Object.values(queue.jobs)[0];
     expect(result.meta.started).toBeTruthy();
+    expect(job.data.include.pu.length).toBe(1);
+    expect(job.data.exclude.pu.length).toBe(1);
     HasExpectedJobDetailsWhenClearingAvailable(job);
     HasRelevantJobName(job, world.scenarioId);
   });

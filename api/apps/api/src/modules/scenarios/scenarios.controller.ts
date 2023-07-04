@@ -526,6 +526,21 @@ export class ScenariosController {
   }
 
   @ApiTags(asyncJobTag)
+  @ApiParam({
+    name: 'id',
+    description: 'scenario id',
+    type: String,
+    required: true,
+    example: 'e5c3b978-908c-49d3-b1e3-89727e9f999c',
+  })
+  @ApiQuery({
+    name: 'kind',
+    description:
+      'status kind to be cleared - locked-in, locked-out or available',
+    type: String,
+    required: true,
+    example: 'locked-in',
+  })
   @ApiOkResponse()
   @Delete(':id/planning-units/status/:kind')
   async clearPlanningUnitsStatus(
