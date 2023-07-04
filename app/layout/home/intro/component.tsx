@@ -3,15 +3,14 @@ import React, { useCallback } from 'react';
 import { motion } from 'framer-motion';
 
 import Button from 'components/button';
+import Icon from 'components/icon';
 import Wrapper from 'layout/wrapper';
 
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 
 import HeroAnimation, { BACKGROUND_IMAGES } from './intro-animation';
 
-export interface HomeIntroProps {}
-
-export const HomeIntro: React.FC<HomeIntroProps> = () => {
+export const HomeIntro: React.FC = () => {
   const { backgroundColor } = BACKGROUND_IMAGES[0];
 
   const onDiscover = useCallback(() => {
@@ -93,7 +92,7 @@ export const HomeIntro: React.FC<HomeIntroProps> = () => {
           >
             <button className="mt-8 focus:outline-none" type="button" onClick={onDiscover}>
               Discover more
-              <ARROW_DOWN_SVG className="ml-3.5 inline w-3.5 animate-bounce" fill="white" />
+              <Icon icon={ARROW_DOWN_SVG} className="ml-3.5 inline w-3.5 animate-bounce" />
             </button>
           </motion.div>
         </div>

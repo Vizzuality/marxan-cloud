@@ -6,6 +6,9 @@ const colors = require('tailwindcss/colors');
 
 const SCREENS = require('./utils/media');
 
+/**
+ * @type {import('tailwindcss').Config}
+ */
 module.exports = {
   content: ['./components/**/*.@(tsx|ts)', './layout/**/*.@(tsx|ts)', './pages/**/*.tsx'],
   presets: [],
@@ -878,6 +881,9 @@ module.exports = {
       1: 1,
       2: 2,
       3: 3,
+    },
+    dropShadow: {
+      blue: '1px 0px 3px #00BFFF',
     },
   },
   variantOrder: [

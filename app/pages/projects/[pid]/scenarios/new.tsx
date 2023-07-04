@@ -4,9 +4,9 @@ import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 
 import Header from 'layout/header';
-import Help from 'layout/help/button';
 import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
+import ProjectLayout from 'layout/project';
 import Protected from 'layout/protected';
 import ScenarioNewMap from 'layout/scenarios/new/map';
 import SidebarName from 'layout/scenarios/new/name';
@@ -23,23 +23,24 @@ const NewScenarioPage: React.FC = () => {
 
       <MetaIcons />
 
-      <main className="flex h-screen w-screen flex-col">
-        <Header size="base" />
+      <ProjectLayout>
+        <main className="flex h-screen w-screen flex-col">
+          <Header size="base" />
 
-        <div className="overflow-hidden py-2.5 md:flex-grow">
-          <Wrapper>
-            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
-              <ScenariosSidebar>
-                <SidebarName />
-              </ScenariosSidebar>
-              <ScenarioNewMap />
-            </div>
-          </Wrapper>
-        </div>
+          <div className="overflow-hidden py-2.5 md:flex-grow">
+            <Wrapper>
+              <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
+                <ScenariosSidebar>
+                  <SidebarName />
+                </ScenariosSidebar>
+                <ScenarioNewMap />
+              </div>
+            </Wrapper>
+          </div>
 
-        <DocumentationLink />
-        <Help />
-      </main>
+          <DocumentationLink />
+        </main>
+      </ProjectLayout>
     </Protected>
   );
 };
