@@ -10,8 +10,6 @@ import { withScenario, withScenarioLock } from 'hoc/scenarios';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import { useSaveScenario, useScenario } from 'hooks/scenarios';
-
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
 import Sidebar from 'layout/project/sidebar';
@@ -26,6 +24,8 @@ import ScenarioStatus from 'layout/scenarios/edit/status';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
 import { ScenarioSidebarTabs } from 'utils/tabs';
+
+import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
 export const getServerSideProps = withProtection(
   withUser(withProject(withScenario(withScenarioLock())))
