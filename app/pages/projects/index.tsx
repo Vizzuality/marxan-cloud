@@ -3,9 +3,9 @@ import React from 'react';
 import { withProtection, withUser } from 'hoc/auth';
 
 import Header from 'layout/header';
-import Help from 'layout/help/button';
 import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
+import ProjectLayout from 'layout/project';
 import ProjectsList from 'layout/projects/all/list';
 import ProjectsToolbar from 'layout/projects/all/toolbar';
 import ProjectsWelcome from 'layout/projects/all/welcome';
@@ -21,16 +21,17 @@ const ProjectsPage: React.FC = () => {
 
       <MetaIcons />
 
-      <main>
-        <Header size="base" />
+      <ProjectLayout className="justify-center">
+        <main className="flex flex-col">
+          <Header size="base" />
 
-        <ProjectsWelcome />
-        <ProjectsToolbar />
-        <ProjectsList />
+          <ProjectsWelcome />
+          <ProjectsToolbar />
+          <ProjectsList />
 
-        <DocumentationLink />
-        <Help />
-      </main>
+          <DocumentationLink />
+        </main>
+      </ProjectLayout>
     </Protected>
   );
 };

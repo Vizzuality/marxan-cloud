@@ -6,9 +6,9 @@ import { withProtection, withUser } from 'hoc/auth';
 
 import Breadcrumb from 'components/breadcrumb';
 import Header from 'layout/header';
-import Help from 'layout/help/button';
 import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
+import ProjectLayout from 'layout/project';
 import ProjectNewForm from 'layout/projects/new/form';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
@@ -25,27 +25,28 @@ const NewProjectsPage: React.FC = () => {
 
       <MetaIcons />
 
-      <main className="flex h-screen w-screen flex-col">
-        <Header size="base" />
-        <DocumentationLink />
-        <Help />
+      <ProjectLayout>
+        <main className="flex h-screen w-screen flex-col">
+          <Header size="base" />
+          <DocumentationLink />
 
-        <div className="flex flex-grow flex-col overflow-hidden py-2.5">
-          <Wrapper>
-            <Breadcrumb
-              onClick={() => {
-                push('/projects');
-              }}
-            >
-              All projects
-            </Breadcrumb>
+          <div className="flex flex-grow flex-col overflow-hidden py-2.5">
+            <Wrapper>
+              <Breadcrumb
+                onClick={() => {
+                  push('/projects');
+                }}
+              >
+                All projects
+              </Breadcrumb>
 
-            <div className="flex flex-grow flex-col overflow-hidden pt-5">
-              <ProjectNewForm />
-            </div>
-          </Wrapper>
-        </div>
-      </main>
+              <div className="flex flex-grow flex-col overflow-hidden pt-5">
+                <ProjectNewForm />
+              </div>
+            </Wrapper>
+          </div>
+        </main>
+      </ProjectLayout>
     </Protected>
   );
 };
