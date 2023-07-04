@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 
-import Breadcrumb from 'components/breadcrumb';
 import HelpBeacon from 'layout/help/beacon';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
@@ -16,6 +15,8 @@ import { NewProjectFields } from 'layout/projects/new/form';
 import ProjectNewMap from 'layout/projects/new/map';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
+
+import Breadcrumb from 'components/breadcrumb';
 
 export const getServerSideProps = withProtection(withUser());
 
