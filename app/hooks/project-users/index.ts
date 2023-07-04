@@ -19,7 +19,7 @@ import {
   SaveProjectUserRoleProps,
 } from './types';
 
-const COLOR_ME = '#1b72f5';
+export const COLOR_ME = '#1b72f5';
 const COLORS = [
   '#03E7D1',
   '#A8FFED',
