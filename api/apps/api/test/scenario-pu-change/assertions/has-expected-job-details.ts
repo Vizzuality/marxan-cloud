@@ -107,7 +107,7 @@ export const HasExpectedJobDetailsWhenClearingAvailable = (job: Job) =>
   expect(job.data).toMatchInlineSnapshot(
     {
       exclude: {
-        pu: expect.arrayContaining([expect.any(String), expect.any(String)]),
+        pu: expect.arrayContaining([expect.any(String)]),
       },
       include: {
         pu: expect.arrayContaining([expect.any(String)]),
@@ -118,7 +118,6 @@ export const HasExpectedJobDetailsWhenClearingAvailable = (job: Job) =>
     Object {
       "exclude": Object {
         "pu": ArrayContaining [
-          Any<String>,
           Any<String>,
         ],
       },

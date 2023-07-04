@@ -41,6 +41,7 @@ export class ScenarioPlanningUnitsService {
     });
   }
 
+  // @todo: Review the possibility to use @IsNull() in getByStatusSetByUser instead of having this method
   async getAvailablePUsSetByUser(
     scenarioId: string,
   ): Promise<ScenariosPlanningUnitGeoEntity[]> {
@@ -48,7 +49,7 @@ export class ScenarioPlanningUnitsService {
       .createQueryBuilder('scenarioPuData')
       .where('scenarioPuData.scenario_id = :scenarioId', { scenarioId })
       .andWhere('scenarioPuData.lockin_status IS NULL')
-      .andWhere('scenarioPuData.lock_status_set_by_user = false')
+      .andWhere('scenarioPuData.lock_status_set_by_user = true')
       .getMany();
   }
 
