@@ -4,9 +4,9 @@ import { withProtection, withUser } from 'hoc/auth';
 import { withProject } from 'hoc/projects';
 
 import Header from 'layout/header';
-import Help from 'layout/help/button';
 import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
+import ProjectLayout from 'layout/project';
 import ProjectHeader from 'layout/projects/show/header';
 import ProjectMap from 'layout/projects/show/map';
 import ProjectScenarios from 'layout/projects/show/scenarios';
@@ -24,27 +24,28 @@ const ShowProjectsPage: React.FC = () => {
 
       <MetaIcons />
 
-      <main className="flex h-screen w-screen flex-col">
-        <Header size="base" />
+      <ProjectLayout>
+        <main className="flex h-screen w-screen flex-col">
+          <Header size="base" />
 
-        <DocumentationLink />
-        <Help />
+          <DocumentationLink />
 
-        <ProjectStatus />
+          <ProjectStatus />
 
-        <div className="pt-2.5">
-          <ProjectHeader />
-        </div>
+          <div className="pt-2.5">
+            <ProjectHeader />
+          </div>
 
-        <div className="overflow-hidden py-5 md:flex-grow">
-          <Wrapper>
-            <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-12">
-              <ProjectScenarios />
-              <ProjectMap />
-            </div>
-          </Wrapper>
-        </div>
-      </main>
+          <div className="overflow-hidden py-5 md:flex-grow">
+            <Wrapper>
+              <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-12">
+                <ProjectScenarios />
+                <ProjectMap />
+              </div>
+            </Wrapper>
+          </div>
+        </main>
+      </ProjectLayout>
     </Protected>
   );
 };

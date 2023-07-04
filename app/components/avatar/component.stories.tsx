@@ -4,7 +4,7 @@ import { Story } from '@storybook/react/types-6-0';
 
 import Icon from 'components/icon';
 
-import HELP_SVG from 'svgs/ui/help.svg';
+import HELP_2_SVG from 'svgs/ui/help-2.svg?sprite';
 
 import Avatar, { AvatarProps } from './component';
 
@@ -20,7 +20,6 @@ const Template: Story<AvatarProps> = ({ children, ...args }: AvatarProps) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  // children: <Icon icon={HELP_SVG} className="w-5 h-5" />,
   bgImage: '/images/avatar.png',
 };
 
@@ -41,7 +40,7 @@ export const Groups = () => {
       </li>
       <li className="ml-3">
         <Avatar className="bg-white">
-          <Icon icon={HELP_SVG} className="h-5 w-5" />
+          <Icon icon={HELP_2_SVG} className="h-5 w-5" />
         </Avatar>
       </li>
     </ul>

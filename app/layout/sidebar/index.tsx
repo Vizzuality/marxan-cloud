@@ -1,0 +1,295 @@
+import { PropsWithChildren, useCallback, useState } from 'react';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
+import { TippyProps } from '@tippyjs/react/headless';
+
+import Icon from 'components/icon';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
+import Tooltip from 'components/tooltip';
+import { cn } from 'utils/cn';
+
+import ADVANCED_SETTINGS_SVG from 'svgs/sidebar/advanced-settings.svg?sprite';
+import GRID_SETUP_SVG from 'svgs/sidebar/grid-setup.svg?sprite';
+import INVENTORY_SVG from 'svgs/sidebar/inventory.svg?sprite';
+import WHITE_LOGO_SVG from 'svgs/sidebar/logo-white.svg';
+import MENU_SVG from 'svgs/sidebar/menu.svg?sprite';
+import RUN_SCENARIO_SVG from 'svgs/sidebar/run-scenario.svg?sprite';
+import SCENARIO_LIST_SVG from 'svgs/sidebar/scenario-list.svg?sprite';
+import SOLUTIONS_SVG from 'svgs/sidebar/solutions.svg?sprite';
+
+import {
+  MENU_COMMON_CLASSES,
+  MENU_ITEM_COMMON_CLASSES,
+  MENU_ITEM_ACTIVE_CLASSES,
+  MENU_ITEM_BUTTON_COMMON_CLASSES,
+  ICONS_COMMON_CLASSES,
+  SIDEBAR_TREE,
+} from './constants';
+import {
+  useInventoryItems,
+  useGridSetupItems,
+  useSolutionItems,
+  useAdvancedSettingsItems,
+} from './hooks';
+import SubMenu from './submenu';
+import type { SidebarTreeCategories } from './types';
+import UserMenu from './user-menu';
+
+export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
+  return (
+    <div className="rounded-xl border border-gray-400 bg-gray-700 px-2 py-[0.5px] text-sm text-blue-300">
+      {children}
+    </div>
+  );
+};
+
+export const TOOLTIP_OFFSET: TippyProps['offset'] = [0, 10];
+
+export const Sidebar = (): JSX.Element => {
+  const { query, route } = useRouter();
+  const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
+
+  const isProjectRoute = route === '/projects/[pid]';
+  const isScenarioRoute = route === '/projects/[pid]/scenarios/[sid]/edit';
+
+  const [submenuState, setSubmenuState] = useState<{ [key in SidebarTreeCategories]: boolean }>({
+    user: false,
+    inventory: isProjectRoute && SIDEBAR_TREE.inventory.includes(tab),
+    gridSetup: isScenarioRoute && SIDEBAR_TREE.gridSetup.includes(tab),
+    solutions: isScenarioRoute && SIDEBAR_TREE.solutions.includes(tab),
+    advancedSettings: isScenarioRoute && SIDEBAR_TREE.advancedSettings.includes(tab),
+  });
+
+  const inventoryItems = useInventoryItems();
+  const gridSetupItems = useGridSetupItems();
+  const solutionsItems = useSolutionItems();
+  const advancedSettingsItems = useAdvancedSettingsItems();
+
+  const toggleSubmenu = useCallback((submenuKey: SidebarTreeCategories) => {
+    if (submenuKey === 'user') {
+      return setSubmenuState((prevState) => ({
+        ...prevState,
+        [submenuKey]: !prevState[submenuKey],
+      }));
+    }
+
+    return setSubmenuState((prevState) => {
+      return Object.keys(prevState).reduce<typeof submenuState>(
+        (acc, key) => ({
+          ...acc,
+          [key]: key === submenuKey ? !prevState[key] : false,
+        }),
+        prevState
+      );
+    });
+  }, []);
+
+  const handleRunScenario = useCallback(() => {
+    // todo: define run scenario button behaviour
+    console.log('handleRunScenario', sid);
+  }, [sid]);
+
+  return (
+    <nav className="flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
+      <div className="flex flex-col">
+        <Link href="/">
+          <Image alt="Marxan logo" width={55} height={7} src={WHITE_LOGO_SVG} />
+        </Link>
+        <div className="space-y-2 divide-y divide-gray-400">
+          {/* // ? Common menu */}
+          <div className="flex flex-col items-center">
+            <ul className={MENU_COMMON_CLASSES}>
+              <li
+                className={cn({
+                  [MENU_ITEM_COMMON_CLASSES]: true,
+                  [MENU_ITEM_ACTIVE_CLASSES]: submenuState.user,
+                })}
+              >
+                <Tooltip
+                  placement="right"
+                  offset={TOOLTIP_OFFSET}
+                  content={<MenuTooltip>Menu</MenuTooltip>}
+                >
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className={MENU_ITEM_BUTTON_COMMON_CLASSES}
+                        onClick={() => toggleSubmenu('user')}
+                      >
+                        <Icon className={ICONS_COMMON_CLASSES} icon={MENU_SVG} />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      side="right"
+                      sideOffset={20}
+                      className="w-80 rounded-b-4xl rounded-tl-xl rounded-tr-4xl bg-white p-4"
+                      collisionPadding={48}
+                      onInteractOutside={() => toggleSubmenu('user')}
+                    >
+                      <UserMenu />
+                    </PopoverContent>
+                  </Popover>
+                </Tooltip>
+              </li>
+            </ul>
+          </div>
+          {/* // ? Project menu */}
+          {(isProjectRoute || isScenarioRoute) && (
+            <ul className={MENU_COMMON_CLASSES}>
+              <li
+                className={cn({
+                  [MENU_ITEM_COMMON_CLASSES]: true,
+                  [MENU_ITEM_ACTIVE_CLASSES]: isProjectRoute && tab,
+                })}
+              >
+                <Tooltip
+                  placement="right"
+                  offset={TOOLTIP_OFFSET}
+                  content={<MenuTooltip>Inventory</MenuTooltip>}
+                >
+                  <button
+                    type="button"
+                    className={MENU_ITEM_BUTTON_COMMON_CLASSES}
+                    onClick={() => toggleSubmenu('inventory')}
+                  >
+                    <Icon
+                      className={cn({
+                        [ICONS_COMMON_CLASSES]: true,
+                        'pointer-events-none': true,
+                      })}
+                      icon={INVENTORY_SVG}
+                    />
+                  </button>
+                </Tooltip>
+              </li>
+              {submenuState.inventory && (
+                <li>
+                  <SubMenu items={inventoryItems} />
+                </li>
+              )}
+              <li
+                className={cn({
+                  [MENU_ITEM_COMMON_CLASSES]: true,
+                  [MENU_ITEM_ACTIVE_CLASSES]: isProjectRoute && !tab,
+                })}
+              >
+                <Tooltip
+                  placement="right"
+                  offset={TOOLTIP_OFFSET}
+                  content={<MenuTooltip>Scenario</MenuTooltip>}
+                >
+                  <Link href={`/projects/${pid}`} className={MENU_ITEM_BUTTON_COMMON_CLASSES}>
+                    <Icon className={ICONS_COMMON_CLASSES} icon={SCENARIO_LIST_SVG} />
+                  </Link>
+                </Tooltip>
+              </li>
+            </ul>
+          )}
+          {/* // ? Scenario menu */}
+          {isScenarioRoute && (
+            <ul className={MENU_COMMON_CLASSES}>
+              <li
+                className={cn({
+                  [MENU_ITEM_COMMON_CLASSES]: true,
+                  [MENU_ITEM_ACTIVE_CLASSES]:
+                    isScenarioRoute && SIDEBAR_TREE.gridSetup.includes(tab),
+                })}
+              >
+                <Tooltip
+                  placement="right"
+                  offset={TOOLTIP_OFFSET}
+                  content={<MenuTooltip>Grid setup</MenuTooltip>}
+                >
+                  <button
+                    type="button"
+                    className={MENU_ITEM_BUTTON_COMMON_CLASSES}
+                    onClick={() => toggleSubmenu('gridSetup')}
+                  >
+                    <Icon className={ICONS_COMMON_CLASSES} icon={GRID_SETUP_SVG} />
+                  </button>
+                </Tooltip>
+              </li>
+              {submenuState.gridSetup && (
+                <li>
+                  <SubMenu items={gridSetupItems} />
+                </li>
+              )}
+              <li
+                className={cn({
+                  [MENU_ITEM_COMMON_CLASSES]: true,
+                  [MENU_ITEM_ACTIVE_CLASSES]:
+                    isScenarioRoute && SIDEBAR_TREE.advancedSettings.includes(tab),
+                })}
+              >
+                <Tooltip
+                  placement="right"
+                  offset={TOOLTIP_OFFSET}
+                  content={<MenuTooltip>Advanced settings</MenuTooltip>}
+                >
+                  <button
+                    type="button"
+                    className={MENU_ITEM_BUTTON_COMMON_CLASSES}
+                    onClick={() => toggleSubmenu('advancedSettings')}
+                  >
+                    <Icon className={ICONS_COMMON_CLASSES} icon={ADVANCED_SETTINGS_SVG} />
+                  </button>
+                </Tooltip>
+              </li>
+              {submenuState.advancedSettings && (
+                <li>
+                  <SubMenu items={advancedSettingsItems} />
+                </li>
+              )}
+              <li
+                className={cn({
+                  [MENU_ITEM_COMMON_CLASSES]: true,
+                  [MENU_ITEM_ACTIVE_CLASSES]:
+                    isScenarioRoute && SIDEBAR_TREE.solutions.includes(tab),
+                })}
+              >
+                <Tooltip
+                  placement="right"
+                  offset={TOOLTIP_OFFSET}
+                  content={<MenuTooltip>Solutions</MenuTooltip>}
+                >
+                  <button
+                    type="button"
+                    className={MENU_ITEM_BUTTON_COMMON_CLASSES}
+                    onClick={() => toggleSubmenu('solutions')}
+                  >
+                    <Icon className={ICONS_COMMON_CLASSES} icon={SOLUTIONS_SVG} />
+                  </button>
+                </Tooltip>
+              </li>
+              {submenuState.solutions && (
+                <li>
+                  <SubMenu items={solutionsItems} />
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+      </div>
+      {sid && (
+        <div className="group flex flex-col-reverse items-center">
+          <button
+            type="button"
+            className="peer relative flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tl from-[#01BDFE] to-[#843DC0] transition-colors after:absolute after:left-1/2 after:top-1/2 after:block after:h-[calc(100%-1px)] after:w-[calc(100%-1px)] after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:border after:border-transparent after:bg-gray-700 hover:after:bg-transparent"
+            onClick={handleRunScenario}
+          >
+            <Icon className="z-10 h-6 w-6" icon={RUN_SCENARIO_SVG} />
+          </button>
+          <span className="mb-2 block text-center text-xs text-gray-400 transition-colors peer-hover:text-primary-200">
+            Run scenario
+          </span>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Sidebar;
