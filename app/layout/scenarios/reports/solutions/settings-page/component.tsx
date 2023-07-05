@@ -13,7 +13,7 @@ export interface SettingsPageProps {}
 
 export const SettingsPage: React.FC<SettingsPageProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
 

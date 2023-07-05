@@ -1,3 +1,5 @@
+import { PUAction } from 'store/slices/scenarios/types';
+
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
 
@@ -109,9 +111,10 @@ export interface UsePUGridLayer {
   options?: {
     wdpaIucnCategories?: string[];
     wdpaThreshold?: number;
-    puAction?: string;
+    puAction?: PUAction;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
+    puAvailableValue?: string[];
     runId?: string;
     features?: string[];
     preHighlightFeatures?: Array<string>;
@@ -146,6 +149,10 @@ export interface UsePUGridLayer {
         visibility?: boolean;
       };
       'lock-out'?: {
+        opacity?: number;
+        visibility?: boolean;
+      };
+      'lock-available'?: {
         opacity?: number;
         visibility?: boolean;
       };
@@ -186,9 +193,10 @@ export interface UseLegend {
       max: number;
     };
     items?: string[];
-    puAction?: string;
+    puAction?: PUAction;
     puIncludedValue?: string[];
     puExcludedValue?: string[];
+    puAvailableValue?: string[];
     runId?: string;
     numberOfRuns?: number;
     layerSettings?: Record<string, Record<string, unknown>>;

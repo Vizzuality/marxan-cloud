@@ -23,7 +23,7 @@ import {
   useTargetedPreviewLayers,
 } from 'hooks/map';
 import { useProject } from 'hooks/projects';
-import { useCostSurfaceRange, useScenario } from 'hooks/scenarios';
+import { useCostSurfaceRange, useScenario, useScenarioPU } from 'hooks/scenarios';
 import { useBestSolution } from 'hooks/solutions';
 import { useWDPACategories } from 'hooks/wdpa';
 
@@ -43,9 +43,7 @@ import LegendTypeMatrix from 'components/map/legend/types/matrix';
 import ScenariosDrawingManager from 'layout/scenarios/edit/map/drawing-manager';
 import { ScenarioSidebarTabs, ScenarioSidebarSubTabs } from 'utils/tabs';
 
-export interface ScenariosEditMapProps {}
-
-export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
+export const ScenariosEditMap: React.FC = () => {
   const [open, setOpen] = useState(true);
   const [mapInteractive, setMapInteractive] = useState(false);
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
@@ -54,10 +52,18 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
 
   const { query } = useRouter();
 
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
-  const { setTmpPuIncludedValue, setTmpPuExcludedValue, setLayerSettings } = scenarioSlice.actions;
+  const {
+    setTmpPuIncludedValue,
+    setTmpPuExcludedValue,
+    setTmpPuAvailableValue,
+    setLayerSettings,
+    setPuAvailableValue,
+    setPuIncludedValue,
+    setPuExcludedValue,
+  } = scenarioSlice.actions;
 
   const dispatch = useDispatch();
 
@@ -82,6 +88,10 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
     puAction,
     puTmpIncludedValue,
     puTmpExcludedValue,
+    puTmpAvailableValue,
+    puIncludedValue,
+    puExcludedValue,
+    puAvailableValue,
 
     // Solutions
     selectedSolution,
@@ -98,6 +108,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
   });
 
   const { data: scenarioData } = useScenario(sid);
+  const {
+    data: { excluded, included, available },
+  } = useScenarioPU(sid);
 
   const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
 
@@ -224,7 +237,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       tab === ScenarioSidebarTabs.PLANNING_UNIT &&
       subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
     )
-      return ['wdpa-percentage', 'lock-in', 'lock-out'];
+      return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out'];
 
     if (
       tab === ScenarioSidebarTabs.FEATURES &&
@@ -264,7 +277,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       tab === ScenarioSidebarTabs.PLANNING_UNIT &&
       subtab === ScenarioSidebarSubTabs.ADJUST_PLANNING_UNITS
     )
-      return ['wdpa-percentage', 'lock-in', 'lock-out', 'pugrid'];
+      return ['wdpa-percentage', 'lock-available', 'lock-in', 'lock-out', 'pugrid'];
 
     if (
       tab === ScenarioSidebarTabs.PLANNING_UNIT &&
@@ -402,8 +415,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
           ? wdpaThreshold * 100
           : scenarioData?.wdpaThreshold,
       puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
+      puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
+      puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
+      puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
       features: featuresIds,
       preHighlightFeatures,
       postHighlightFeatures: postHighlightedFeaturesIds,
@@ -417,6 +431,7 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
         cost: layerSettings.cost,
         'lock-in': layerSettings['lock-in'],
         'lock-out': layerSettings['lock-out'],
+        'lock-available': layerSettings['lock-available'],
         frequency: layerSettings.frequency,
         solution: layerSettings.solution,
       },
@@ -444,8 +459,9 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
       cost: costSurfaceRangeData,
       items: selectedPreviewFeatures,
       puAction,
-      puIncludedValue: puTmpIncludedValue,
-      puExcludedValue: puTmpExcludedValue,
+      puIncludedValue: [...puIncludedValue, ...puTmpIncludedValue],
+      puExcludedValue: [...puExcludedValue, ...puTmpExcludedValue],
+      puAvailableValue: [...puAvailableValue, ...puTmpAvailableValue],
       runId: selectedSolution?.runId || bestSolution?.runId,
       numberOfRuns: scenarioData?.numberOfRuns || 0,
       layerSettings,
@@ -494,41 +510,105 @@ export const ScenariosEditMap: React.FC<ScenariosEditMapProps> = () => {
           const { properties } = pUGridLayer;
           const { scenarioPuId } = properties;
 
-          const newClickingValue =
-            puAction === 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
-          const newAction = puAction === 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
+          const newClickingValue = [
+            ...(puAction === 'include' ? [...puTmpIncludedValue] : []),
+            ...(puAction === 'exclude' ? [...puTmpExcludedValue] : []),
+            ...(puAction === 'available' ? [...puTmpAvailableValue] : []),
+          ];
 
-          const newOpositeClickingValue =
-            puAction !== 'include' ? [...puTmpIncludedValue] : [...puTmpExcludedValue];
-          const newOpositeAction =
-            puAction !== 'include' ? setTmpPuIncludedValue : setTmpPuExcludedValue;
+          const indexAlreadyAddedUnit = newClickingValue.findIndex((s) => s === scenarioPuId);
 
-          const index = newClickingValue.findIndex((s) => s === scenarioPuId);
-          const indexOposite = newOpositeClickingValue.findIndex((s) => s === scenarioPuId);
-
-          if (index > -1) {
-            newClickingValue.splice(index, 1);
+          if (indexAlreadyAddedUnit > -1) {
+            newClickingValue.splice(indexAlreadyAddedUnit, 1);
           } else {
             newClickingValue.push(scenarioPuId);
           }
 
-          if (indexOposite > -1) {
-            newOpositeClickingValue.splice(indexOposite, 1);
-            dispatch(newOpositeAction(newOpositeClickingValue));
-          }
+          const includePU = puTmpIncludedValue.filter((pu) => pu !== scenarioPuId);
+          const excludedPU = puTmpExcludedValue.filter((pu) => pu !== scenarioPuId);
+          const availablePU = puTmpAvailableValue.filter((pu) => pu !== scenarioPuId);
 
-          dispatch(newAction(newClickingValue));
+          switch (puAction) {
+            case 'include':
+              dispatch(
+                setTmpPuIncludedValue(
+                  newClickingValue.filter((id) => !puIncludedValue.includes(id))
+                )
+              );
+              dispatch(setTmpPuExcludedValue(excludedPU));
+              dispatch(setTmpPuAvailableValue(availablePU));
+
+              dispatch(
+                setPuIncludedValue(puIncludedValue.filter((id) => !newClickingValue.includes(id)))
+              );
+              dispatch(
+                setPuAvailableValue(puAvailableValue.filter((id) => !newClickingValue.includes(id)))
+              );
+              dispatch(
+                setPuExcludedValue(puExcludedValue.filter((id) => !newClickingValue.includes(id)))
+              );
+              break;
+            case 'exclude':
+              dispatch(
+                setTmpPuExcludedValue(
+                  newClickingValue.filter((id) => !puExcludedValue.includes(id))
+                )
+              );
+              dispatch(setTmpPuIncludedValue(includePU));
+              dispatch(setTmpPuAvailableValue(availablePU));
+
+              dispatch(
+                setPuExcludedValue(puExcludedValue.filter((id) => !newClickingValue.includes(id)))
+              );
+
+              dispatch(
+                setPuIncludedValue(puIncludedValue.filter((id) => !newClickingValue.includes(id)))
+              );
+              dispatch(
+                setPuAvailableValue(puAvailableValue.filter((id) => !newClickingValue.includes(id)))
+              );
+
+              break;
+            case 'available':
+              dispatch(
+                setTmpPuAvailableValue(
+                  newClickingValue.filter((id) => !puAvailableValue.includes(id))
+                )
+              );
+              dispatch(setTmpPuIncludedValue(includePU));
+              dispatch(setTmpPuExcludedValue(excludedPU));
+
+              dispatch(
+                setPuExcludedValue(puExcludedValue.filter((id) => !newClickingValue.includes(id)))
+              );
+
+              dispatch(
+                setPuIncludedValue(puIncludedValue.filter((id) => !newClickingValue.includes(id)))
+              );
+              dispatch(
+                setPuAvailableValue(puAvailableValue.filter((id) => !newClickingValue.includes(id)))
+              );
+              break;
+          }
         }
       }
     },
     [
       clicking,
       puAction,
+      puIncludedValue,
+      puExcludedValue,
+      puAvailableValue,
       puTmpIncludedValue,
       puTmpExcludedValue,
+      puTmpAvailableValue,
       dispatch,
       setTmpPuIncludedValue,
       setTmpPuExcludedValue,
+      setTmpPuAvailableValue,
+      setPuAvailableValue,
+      setPuExcludedValue,
+      setPuIncludedValue,
       cache,
     ]
   );

@@ -34,8 +34,9 @@ export const COLORS = {
   wdpa: '#00F',
   features: '#6F53F7',
   highlightFeatures: '#BE6BFF',
-  include: '#0F0',
-  exclude: '#F00',
+  include: '#03E7D1',
+  exclude: '#FF472E',
+  available: '#FFCA42',
   cost: ['#FFBFB7', '#C21701'],
   frequency: ['#0C2C32', '#006D83', '#008B8C', '#0BC6C2'],
   compare: {
@@ -265,6 +266,26 @@ export const LEGEND_LAYERS = {
           value: `${cost.max}`,
         },
       ],
+    };
+  },
+  'lock-available': (options) => {
+    const { puAvailableValue } = options;
+
+    return {
+      id: 'lock-available',
+      name: 'Available areas',
+      icon: (
+        <Icon
+          icon={HEXAGON_SVG}
+          className="fill-none mt-0.5 h-3.5 w-3.5 stroke-current stroke-2"
+          style={{ color: COLORS.available }}
+        />
+      ),
+      settingsManager: {
+        opacity: true,
+        visibility: true,
+      },
+      description: <div className="pl-5">{puAvailableValue.length} PU</div>,
     };
   },
   'lock-in': (options) => {

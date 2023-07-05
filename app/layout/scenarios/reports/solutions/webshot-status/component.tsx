@@ -18,7 +18,7 @@ globalThis.MARXAN = {
 
 export const WebShotStatus: React.FC<WebShotStatusProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { maps } = useSelector((state) => state['/reports/solutions']);
 

@@ -1,10 +1,17 @@
 import { useMemo } from 'react';
 
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient, useQueries } from 'react-query';
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  useQueries,
+  UseQueryOptions,
+} from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { formatDistanceToNow } from 'date-fns';
 import flatten from 'lodash/flatten';
 import { useSession } from 'next-auth/react';
@@ -50,6 +57,7 @@ import {
   UseDownloadScenarioReportProps,
   DownloadScenarioReportProps,
   UseBlmImageProps,
+  ScenarioPlanningUnit,
 } from './types';
 
 function fetchScenarioBLMImage(sId, blmValue, session) {
@@ -730,13 +738,26 @@ export function useUploadCostSurface({
 }
 
 // PLANNING UNITS
-export function useScenarioPU(sid) {
+export function useScenarioPU(
+  sid: string,
+  queryOptions?: UseQueryOptions<
+    ScenarioPlanningUnit[],
+    AxiosError,
+    {
+      excluded: ScenarioPlanningUnit['id'][];
+      included: ScenarioPlanningUnit['id'][];
+      available: ScenarioPlanningUnit['id'][];
+      // includedDefault: ScenarioPlanningUnit['id'][];
+      // excludedDefault: ScenarioPlanningUnit['id'][];
+    }
+  >
+) {
   const { data: session } = useSession();
 
-  const query = useQuery(
+  return useQuery(
     ['scenarios-pu', sid],
     async () =>
-      SCENARIOS.request({
+      SCENARIOS.request<ScenarioPlanningUnit[]>({
         method: 'GET',
         url: `/${sid}/planning-units`,
         headers: {
@@ -757,35 +778,22 @@ export function useScenarioPU(sid) {
       refetchOnMount: 'always',
       refetchOnWindowFocus: false,
       placeholderData: [],
+      select: (data) => {
+        const included = data.filter((p) => p.inclusionStatus === 'locked-in').map((p) => p.id);
+        const excluded = data.filter((p) => p.inclusionStatus === 'locked-out').map((p) => p.id);
+        const available = data
+          .filter((p) => p.inclusionStatus === 'available' && p.setByUser)
+          .map((p) => p.id);
+
+        return {
+          included,
+          excluded,
+          available,
+        };
+      },
+      ...queryOptions,
     }
   );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    const parsedData = data || [];
-    const included = parsedData.filter((p) => p.inclusionStatus === 'locked-in').map((p) => p.id);
-
-    const includedDefault = parsedData
-      .filter((p) => p.defaultStatus === 'locked-in')
-      .map((p) => p.id);
-
-    const excluded = parsedData.filter((p) => p.inclusionStatus === 'locked-out').map((p) => p.id);
-
-    const excludedDefault = parsedData
-      .filter((p) => p.defaultStatus === 'locked-out')
-      .map((p) => p.id);
-
-    return {
-      ...query,
-      data: {
-        included,
-        excluded,
-        includedDefault,
-        excludedDefault,
-      },
-    };
-  }, [query, data]);
 }
 
 export function useSaveScenarioPU({
@@ -1095,6 +1103,35 @@ export function useDownloadScenarioReport({
     },
     onError: (error, variables, context) => {
       // An error happened!
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDeletePUScenaro() {
+  const { data: session } = useSession();
+
+  const deletePUScenario = ({
+    sid,
+    PUKind,
+  }: {
+    sid: string;
+    PUKind: 'locked-in' | 'locked-out' | 'available';
+  }) => {
+    return SCENARIOS.delete(`/${sid}/planning-units/status/${PUKind}`, {
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(deletePUScenario, {
+    onSuccess: (data: any, variables, context) => {
+      console.info('Success', data, variables, context);
+      // const { id } = variables;
+      // queryClient.invalidateQueries(['scenarios-pu', id]);
+    },
+    onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
     },
   });

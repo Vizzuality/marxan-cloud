@@ -112,6 +112,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
         cost: layerSettings.cost,
         'lock-in': layerSettings['lock-in'],
         'lock-out': layerSettings['lock-out'],
+        'lock-available': layerSettings['lock-available'],
         frequency: layerSettings.frequency,
         solution: layerSettings.solution,
       },
