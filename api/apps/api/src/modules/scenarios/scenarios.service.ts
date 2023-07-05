@@ -297,14 +297,13 @@ export class ScenariosService {
     if (isRight(isLegacyProjectCompleted) && !isLegacyProjectCompleted.right)
       return left(projectNotReady);
 
-    const scenarioResult = await this.crudService.createWithProjectScenarioId(
-      validatedMetadata,
-      info,
-    );
-    if (isLeft(scenarioResult)) {
-      return scenarioResult;
+    let scenario;
+    try {
+      scenario = await this.crudService.create(validatedMetadata, info);
+      scenario = await this.crudService.getById(scenario.id);
+    } catch (e) {
+      return left(scenarioNotCreated);
     }
-    const scenario = scenarioResult.right;
 
     const blmCreationResult = await this.commandBus.execute(
       new CreateInitialScenarioBlm(scenario.id, scenario.projectId),
