@@ -95,8 +95,7 @@ export class Scenario extends TimeUserEntityMetadata {
   projectId!: string;
 
   @Column('integer', { name: 'project_scenario_id' })
-  @IsOptional()
-  projectScenarioId?: number;
+  projectScenarioId!: number;
 
   /**
    * List of ids of protected areas associated to the scenario.

@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FetchSpecification } from 'nestjs-base-service';
 import { AppInfoDTO } from '@marxan-api/dto/info.dto';
@@ -16,8 +16,6 @@ import { assertDefined } from '@marxan/utils';
 import { UsersScenariosApiEntity } from '@marxan-api/modules/access-control/scenarios-acl/entity/users-scenarios.api.entity';
 import { ScenarioRoles } from '@marxan-api/modules/access-control/scenarios-acl/dto/user-role-scenario.dto';
 import { Roles } from '@marxan-api/modules/access-control/role.api.entity';
-import { Either, left, right } from 'fp-ts/Either';
-import { scenarioNotCreated } from '@marxan-api/modules/scenarios/scenarios.service';
 
 const scenarioFilterKeyNames = ['name', 'type', 'projectId', 'status'] as const;
 type ScenarioFilterKeys = keyof Pick<
@@ -220,30 +218,5 @@ export class ScenariosCrudService extends AppBaseService<
     }
 
     return query;
-  }
-
-  async createWithProjectScenarioId(
-    dto: CreateScenarioDTO,
-    info?: AppInfoDTO,
-  ): Promise<Either<typeof scenarioNotCreated, Scenario>> {
-    const scenario = await this.create(dto, info);
-    try {
-      await this.repository.query(
-        `UPDATE scenarios
-          SET project_scenario_id = (SELECT COALESCE(MAX(sub.project_scenario_id), 0) FROM scenarios sub WHERE sub.project_id = $1) + 1
-          WHERE id = $2
-          RETURNING *`,
-        [scenario.projectId, scenario.id],
-      );
-
-      return right(
-        await this.repository.findOneOrFail({
-          where: { id: scenario.id },
-        }),
-      );
-    } catch (e) {
-      await this.repository.delete(scenario.id);
-      return left(scenarioNotCreated);
-    }
   }
 }
