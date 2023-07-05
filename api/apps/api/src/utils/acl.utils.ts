@@ -162,7 +162,6 @@ export const mapAclDomainToHttpError = (
     | typeof tagNotFoundForProject
     | typeof importedFeatureNameAlreadyExist
     | typeof unknownPuidsInFeatureAmountCsvUpload
-    | typeof projectNotFound
     | typeof missingPuidColumnInFeatureAmountCsvUpload
     | typeof duplicatePuidsInFeatureAmountCsvUpload
     | typeof duplicateHeadersInFeatureAmountCsvUpload
@@ -349,8 +348,6 @@ export const mapAclDomainToHttpError = (
       return new BadRequestException('Imported Features already present');
     case unknownPuidsInFeatureAmountCsvUpload:
       return new BadRequestException('Unknown PUIDs');
-    case projectNotFound:
-      return new NotFoundException(`Project ${options?.scenarioId} not found`);
     case missingPuidColumnInFeatureAmountCsvUpload:
       return new BadRequestException('Missing PUID column');
     case noFeaturesFoundInInFeatureAmountCsvUpload:
