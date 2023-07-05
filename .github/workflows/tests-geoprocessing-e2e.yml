@@ -5,7 +5,6 @@ on:
       - 'api/**'
       - 'geoprocessing/**'
       - '.github/**'
-  pull_request:
   workflow_dispatch:
 
 jobs:
