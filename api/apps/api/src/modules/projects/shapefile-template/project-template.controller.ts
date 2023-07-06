@@ -67,7 +67,7 @@ export class ProjectTemplateController {
     }
   }
 
-  @Get(':id/project-shapefile-template')
+  @Get(':id/project-grid/shapefile-template')
   @ApiAcceptedResponse()
   @ApiOkResponse({
     schema: {

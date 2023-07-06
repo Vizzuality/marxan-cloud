@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+// Currently we are using 'CostTemplate' artifact type for 2 cases of templates we have (project grid and cost surface template), since the output file is the same
 export enum ArtifactType {
   CostTemplate = 'CostTemplate',
   ProjectShapefile = 'ProjectShapefile',

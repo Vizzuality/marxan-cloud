@@ -34,7 +34,7 @@ test(`project shapefile template - should return a file when it is calculated`, 
   fixtures.templateAvailable('123', 'sample shapefile');
   // when
   const test = request(app.getHttpServer()).get(
-    '/api/v1/projects/123/project-shapefile-template',
+    '/api/v1/projects/123/project-grid/shapefile-template',
   );
   // then
   const response = await test.expect(200);
