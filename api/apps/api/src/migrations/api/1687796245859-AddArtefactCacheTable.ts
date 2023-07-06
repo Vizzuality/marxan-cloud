@@ -8,7 +8,7 @@ export class AddArtifactCacheTable1687796245859 implements MigrationInterface {
     );
 
     await queryRunner.query(`
-      CREATE TYPE "artifact_cache_artifact_type_enum" AS ENUM('ProjectTemplate');
+      CREATE TYPE "artifact_cache_artifact_type_enum" AS ENUM('ProjectTemplate', 'CostTemplate');
     `);
     await queryRunner.query(`
       CREATE TABLE "artifact_cache" (
