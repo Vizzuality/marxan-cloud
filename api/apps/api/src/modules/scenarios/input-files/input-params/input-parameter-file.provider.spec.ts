@@ -246,6 +246,7 @@ async function getFixtures() {
         users: [],
         ranAtLeastOnce: false,
         solutionsAreLocked: false,
+        projectScenarioId: 1,
       };
     },
     withInputParameters() {
