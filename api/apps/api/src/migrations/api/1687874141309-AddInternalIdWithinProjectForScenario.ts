@@ -56,12 +56,4 @@ export class AddInternalIdWithinProjectForScenario1687874141309
     `);
   }
 }
-/*
-move logic to trigger on create
-not worth locking, considering it's fast, enough, and only affects data freshness, not integrity
-not nullable
 
-migration -> nullable, migration to set id on staging on production, set not null
-
-suboflder with files, and zip the folder
-*/
