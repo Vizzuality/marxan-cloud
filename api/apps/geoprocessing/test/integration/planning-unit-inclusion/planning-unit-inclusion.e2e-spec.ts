@@ -221,6 +221,36 @@ describe(`when planning units exist for a scenario`, () => {
       await world?.cleanup('multipleFeatures');
     });
 
+    it(`and PUs from Ids overlap with PUs from Geo, PUs from Geo should prevail`, async () => {
+      const puIdsToIncludeFromGeo = await sut.getPuIdsFromGeo(
+        [includeSample()],
+        world.scenarioId,
+      );
+
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          include: {
+            geo: [includeSample()],
+          },
+          exclude: {
+            geo: [excludeSample()],
+            pu: puIdsToIncludeFromGeo.slice(0, 2),
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      expect(await world.GetLockedInPlanningUnits()).toEqual(
+        world.planningUnitsToBeIncluded(forCase),
+      );
+      expect(await world.GetLockedOutPlanningUnits()).toEqual(
+        world.planningUnitsToBeExcluded(forCase),
+      );
+      expect(await world.GetAvailablePlanningUnits()).toEqual(
+        world.planningUnitsToBeUntouched(forCase),
+      );
+    }, 10000);
+
     it(`the operation should be rejected with an error when include and exclude PUs overlap`, async () => {
       await expect(
         sut.process(({

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, EntityManager, In, Repository } from 'typeorm';
-import { MultiPolygon, Polygon } from 'geojson';
-import { flatMap, intersection } from 'lodash';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
+import { FeatureCollection, MultiPolygon, Polygon } from 'geojson';
+import { difference, flatMap, intersection } from 'lodash';
 import { Job } from 'bullmq';
 
 import { WorkerProcessor } from '@marxan-geoprocessing/modules/worker';
@@ -11,7 +11,6 @@ import {
   LockStatus,
   ScenariosPlanningUnitGeoEntity,
 } from '@marxan/scenarios-planning-unit';
-import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 
 @Injectable()
 export class ScenarioPlanningUnitsInclusionProcessor
@@ -56,50 +55,22 @@ export class ScenarioPlanningUnitsInclusionProcessor
 
     const puIdsToIncludeFromGeo: string[] = [];
     if (includeGeo) {
-      const targetGeometries = flatMap(
-        includeGeo,
-        (collection) => collection.features,
-      ).map((feature) => feature.geometry);
-
       puIdsToIncludeFromGeo.push(
-        ...(
-          await this.getPlanningUnitsIntersectingGeometriesFor(
-            scenarioId,
-            targetGeometries,
-          )
-        ).map(({ spd_id: id }) => id),
+        ...(await this.getPuIdsFromGeo(includeGeo, scenarioId)),
       );
     }
 
     const puIdsToExcludeFromGeo: string[] = [];
     if (excludeGeo) {
-      const targetGeometries = flatMap(
-        excludeGeo,
-        (collection) => collection.features,
-      ).map((feature) => feature.geometry);
       puIdsToExcludeFromGeo.push(
-        ...(
-          await this.getPlanningUnitsIntersectingGeometriesFor(
-            scenarioId,
-            targetGeometries,
-          )
-        ).map(({ spd_id: id }) => id),
+        ...(await this.getPuIdsFromGeo(excludeGeo, scenarioId)),
       );
     }
 
     const puIdsToMakeAvailableFromGeo: string[] = [];
     if (makeAvailableGeo) {
-      const targetGeometries = flatMap(
-        makeAvailableGeo,
-        (collection) => collection.features,
-      ).map((feature) => feature.geometry);
       puIdsToMakeAvailableFromGeo.push(
-        ...(
-          await this.getPlanningUnitsIntersectingGeometriesFor(
-            scenarioId,
-            targetGeometries,
-          )
-        ).map(({ spd_id: id }) => id),
+        ...(await this.getPuIdsFromGeo(makeAvailableGeo, scenarioId)),
       );
     }
 
@@ -107,48 +78,107 @@ export class ScenarioPlanningUnitsInclusionProcessor
     const puIdsToExcludeFromIds = job.data.exclude?.pu ?? [];
     const puIdsToMakeAvailableFromIds = job.data.makeAvailable?.pu ?? [];
 
+    const allPusInAnyClaimsFromGeoJson = [
+      ...puIdsToMakeAvailableFromGeo,
+      ...puIdsToIncludeFromGeo,
+      ...puIdsToExcludeFromGeo,
+    ];
+
+    const puIdsToIncludeFromIdsNotPresentInAnyClaimsFromGeo = difference(
+      puIdsToIncludeFromIds,
+      allPusInAnyClaimsFromGeoJson,
+    );
+    const puIdsToExcludeFromIdsNotPresentInAnyClaimsFromGeo = difference(
+      puIdsToExcludeFromIds,
+      allPusInAnyClaimsFromGeoJson,
+    );
+    const puIdsToMakeAvailableFromIdsNotPresentInAnyClaimsFromGeo = difference(
+      puIdsToMakeAvailableFromIds,
+      allPusInAnyClaimsFromGeoJson,
+    );
+
     // Union of claims byId and byGeoJSON, for inclusions and for exclusions
     puIdsToInclude.push(
-      ...[...puIdsToIncludeFromIds, ...puIdsToIncludeFromGeo],
+      ...[
+        ...puIdsToIncludeFromIdsNotPresentInAnyClaimsFromGeo,
+        ...puIdsToIncludeFromGeo,
+      ],
     );
     puIdsToExclude.push(
-      ...[...puIdsToExcludeFromIds, ...puIdsToExcludeFromGeo],
+      ...[
+        ...puIdsToExcludeFromIdsNotPresentInAnyClaimsFromGeo,
+        ...puIdsToExcludeFromGeo,
+      ],
     );
 
     puIdsToMakeAvailable.push(
-      ...[...puIdsToMakeAvailableFromIds, ...puIdsToMakeAvailableFromGeo],
+      ...[
+        ...puIdsToMakeAvailableFromIdsNotPresentInAnyClaimsFromGeo,
+        ...puIdsToMakeAvailableFromGeo,
+      ],
     );
     const uniquePuIdsToInclude = new Set(puIdsToInclude);
     const uniquePuIdsToExclude = new Set(puIdsToExclude);
     const uniquePuIdsToMakeAvailable = new Set(puIdsToMakeAvailable);
 
-    if (this.doClaimsIntersect([...uniquePuIdsToInclude], [...uniquePuIdsToExclude], [...uniquePuIdsToMakeAvailable])) {
+    if (
+      this.doClaimsIntersect(
+        [...uniquePuIdsToInclude],
+        [...uniquePuIdsToExclude],
+        [...uniquePuIdsToMakeAvailable],
+      )
+    ) {
       throw new Error(
         'Contrasting claims to include, exclude or make available some of the planning units have been made: please check your selections.',
       );
     }
 
-    await this.scenarioPlanningUnitsRepo.manager.transaction(async (transactionalEntityManager) => {
-      await this.applyClaims(
-        transactionalEntityManager,
-        scenarioId,
-        uniquePuIdsToInclude,
-        uniquePuIdsToExclude,
-        uniquePuIdsToMakeAvailable,
-      );
-    });
+    await this.scenarioPlanningUnitsRepo.manager.transaction(
+      async (transactionalEntityManager) => {
+        await this.applyClaims(
+          transactionalEntityManager,
+          scenarioId,
+          uniquePuIdsToInclude,
+          uniquePuIdsToExclude,
+          uniquePuIdsToMakeAvailable,
+        );
+      },
+    );
 
     return true;
   }
 
-  private doClaimsIntersect(puIdsToInclude: string[], puIdsToExclude: string[], puIdsToMakeAvailable: string[]): boolean {
-    const allClaims = [...puIdsToInclude, ...puIdsToExclude, ...puIdsToMakeAvailable];
+  private doClaimsIntersect(
+    puIdsToInclude: string[],
+    puIdsToExclude: string[],
+    puIdsToMakeAvailable: string[],
+  ): boolean {
+    const allClaims = [
+      ...puIdsToInclude,
+      ...puIdsToExclude,
+      ...puIdsToMakeAvailable,
+    ];
     const duplicateElements = allClaims.filter((element, index) => {
       return allClaims.indexOf(element) !== index;
     });
     return duplicateElements.length > 0;
   }
 
+  async getPuIdsFromGeo(
+    geo: FeatureCollection<Polygon | MultiPolygon>[],
+    scenarioId: string,
+  ) {
+    const targetGeometries = flatMap(
+      geo,
+      (collection) => collection.features,
+    ).map((feature) => feature.geometry);
+    return (
+      await this.getPlanningUnitsIntersectingGeometriesFor(
+        scenarioId,
+        targetGeometries,
+      )
+    ).map(({ spd_id: id }) => id);
+  }
   private async applyClaims(
     transactionalEntityManager: EntityManager,
     scenarioId: string,
