@@ -12,13 +12,13 @@ export class FeatureAmountUploadRegistry {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'project_id' })
+  @Column({ name: 'project_id', type: 'varchar' })
   projectId!: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp without time zone' })
   timestamp!: Date;
 
-  @Column({ name: 'user_id' })
+  @Column({ name: 'user_id', type: 'varchar' })
   userId!: string;
 
   @OneToMany(
