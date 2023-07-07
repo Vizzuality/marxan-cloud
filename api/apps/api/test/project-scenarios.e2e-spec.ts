@@ -26,24 +26,24 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-}, 20000000);
+}, 12_000);
 
 describe('ScenariosModule (e2e)', () => {
   it('Creating a scenario with incomplete data should fail', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithIncompleteData();
     fixtures.ThenBadRequestIsReturned(response);
-  }, 20000000);
+  });
 
   it('Creating a scenario with minimum required data should succeed', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     fixtures.ThenScenarioIsCreatedAndNoJobHasBeenSubmitted(response);
-  }, 20000000);
+  });
 
   it('Creating a scenario has its internal project-scope id properly informed', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsOwner();
     //ProjectScenarioId will be one because it's the first Scenario in the project
     fixtures.ThenScenarioIsCreatedWithProjectScenarioId(response, 1);
-  }, 20000000);
+  });
 
   it('Creating a scenario has its internal project-scope id properly informed with the max existing project-scope id +1', async () => {
     const projectScenarioIdPreviousMax = 572;
@@ -57,7 +57,7 @@ describe('ScenariosModule (e2e)', () => {
       response,
       projectScenarioIdPreviousMax + 1,
     );
-  }, 20000000);
+  });
 
   it('Creating a scenario that has an internal project-scope id greater then the allowed max (999) will fail', async () => {
     const projectScenarioIdPreviousMax = 999;
@@ -69,29 +69,29 @@ describe('ScenariosModule (e2e)', () => {
       false,
     );
     fixtures.ThenScenarioCouldNotBeCreatedMessageIsReturned(response);
-  }, 20000000);
+  });
 
   it('Creating a scenario will succeed because the user is a project contributor', async () => {
     await fixtures.GivenContributorWasAddedToProject();
     const response = await fixtures.WhenCreatingAScenarioWithMinimumRequiredDataAsContributor();
     fixtures.ThenScenarioIsCreated(response);
-  }, 20000000);
+  });
 
   it('Creating a scenario will fail because the user is a project viewer', async () => {
     await fixtures.GivenViewerWasAddedToProject();
     const response = await fixtures.WhenCreatingAScenarioAsAProjectViewer();
     fixtures.ThenForbiddenIsReturned(response);
-  }, 20000000);
+  });
 
   it('Creating a scenario with complete data should succeed', async () => {
     const response = await fixtures.WhenCreatingAScenarioWithCompleteDataAsOwner();
     fixtures.ThenScenarioAndJobAreCreated(response);
-  }, 20000000);
+  });
 
   it('Gets scenarios as a scenario owner', async () => {
     const response = await fixtures.WhenGettingScenariosAsOwner();
     fixtures.ThenAllScenariosFromOwnerAreReturned(response);
-  }, 20000000);
+  });
 
   it('Gets scenarios as a scenario contributor', async () => {
     const scenarioId = await fixtures.GivenScenarioWasCreated();
@@ -100,29 +100,29 @@ describe('ScenariosModule (e2e)', () => {
     const response = await fixtures.WhenGettingScenariosAsContributor();
 
     fixtures.ThenAllScenariosFromContributorAreReturned(response);
-  }, 20000000);
+  });
 
   it('Gets scenarios as a scenario viewer', async () => {
     const scenarioId = await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenViewerWasAddedToScenario(scenarioId);
     const response = await fixtures.WhenGettingScenariosAsViewer();
     fixtures.ThenAllScenariosFromViewerAreReturned(response);
-  }, 20000000);
+  });
 
   it('Gets no scenarios as a user not assigned to any scenario', async () => {
     const response = await fixtures.WhenGettingScenariosAsUserWithNoScenarios();
     fixtures.ThenNoScenarioIsReturned(response);
-  }, 20000000);
+  });
 
   it('Gets scenarios (paginated; pages of up to 5 items, no explicit page number - should default to 1)', async () => {
     const response = await fixtures.WhenGettingPaginatedScenariosAsOwner();
     fixtures.ThenProperLengthIsReturned(response);
-  }, 20000000);
+  });
 
   it('Gets scenarios (paginated; pages of up to 5 items, first page)', async () => {
     const response = await fixtures.WhenGettingPaginatedScenariosWithPageNumberAsOwner();
     fixtures.ThenProperLengthIsReturned(response);
-  }, 20000000);
+  });
 
   it(`Gets scenarios with a free search`, async () => {
     const name = 'Find me!';
@@ -134,7 +134,7 @@ describe('ScenariosModule (e2e)', () => {
     );
 
     fixtures.ThenCorrectScenariosAreReturned(response, { scenarioId, name });
-  }, 20000000);
+  });
 
   it('Contributor fails to delete scenario', async () => {
     const scenarioId = await fixtures.GivenScenarioWasCreated();
@@ -143,26 +143,26 @@ describe('ScenariosModule (e2e)', () => {
     const response = await fixtures.WhenDeletingScenarioAsContributor();
 
     fixtures.ThenForbiddenIsReturned(response);
-  }, 20000000);
+  });
 
   it('Viewer fails to delete scenario', async () => {
     const scenarioId = await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenViewerWasAddedToScenario(scenarioId);
     const response = await fixtures.WhenDeletingScenarioAsViewer();
     fixtures.ThenForbiddenIsReturned(response);
-  }, 20000000);
+  });
 
   it('Owner successfully deletes the newly created scenario', async () => {
     const scenarioId = await fixtures.GivenScenarioWasCreated();
     await fixtures.GivenViewerWasAddedToScenario(scenarioId);
     const response = await fixtures.WhenDeletingScenarioAsOwner();
     fixtures.ThenOkIsReturned(response);
-  }, 20000000);
+  });
 
   it('should not allow to create scenario with invalid marxan properties', async () => {
     const response = await fixtures.WhenCreatingScenarioWithInvalidMarxanProperties();
     fixtures.ThenInvalidEnumValueMessageIsReturned(response);
-  }, 20000000);
+  });
 });
 
 async function getFixtures() {
@@ -290,16 +290,6 @@ async function getFixtures() {
       if (grabId) {
         scenarioId = response.body.data.id;
       }
-      return response;
-    },
-
-    WhenCreatingAScenarioWithOverMaxProjectScenarioId: async () => {
-      const response = await request(app.getHttpServer())
-        .post('/api/v1/scenarios')
-        .set('Authorization', `Bearer ${ownerToken}`)
-        .send(minimalCreateScenarioDTO);
-
-      scenarioId = response.body.data.id;
       return response;
     },
 

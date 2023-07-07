@@ -51,7 +51,7 @@ export class AddInternalIdWithinProjectForScenario1687874141309
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-        DROP FUNCTION tr_next_project_scenario_id_insert cascade;
+        DROP FUNCTION tr_next_project_scenario_id cascade;
         ALTER TABLE scenarios DROP COLUMN project_scenario_id;
     `);
   }
