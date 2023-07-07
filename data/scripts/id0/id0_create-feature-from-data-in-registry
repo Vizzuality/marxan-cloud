@@ -1,0 +1,69 @@
+import psycopg2
+from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_POSTGRES_DB = environ.get('API_POSTGRES_DB')
+API_POSTGRES_USER = environ.get('API_POSTGRES_USER')
+API_POSTGRES_PASSWORD = environ.get('API_POSTGRES_PASSWORD')
+API_POSTGRES_HOST = environ.get('API_POSTGRES_HOST')
+API_POSTGRES_PORT = environ.get('API_POSTGRES_PORT')
+GEO_POSTGRES_DB = environ.get('GEO_POSTGRES_DB')
+GEO_POSTGRES_USER = environ.get('GEO_POSTGRES_USER')
+GEO_POSTGRES_PASSWORD = environ.get('GEO_POSTGRES_PASSWORD')
+GEO_POSTGRES_HOST = environ.get('GEO_POSTGRES_HOST')
+GEO_POSTGRES_PORT = environ.get('GEO_POSTGRES_PORT')
+ID0_FEATURE_NAME = environ.get('ID0_FEATURE_NAME')
+ID0_FEATURE_ID = environ.get('ID0_FEATURE_ID')
+ID0_UPLOAD_ID = environ.get('ID0_UPLOAD_ID')
+ID0_PROJECT_ID = environ.get('ID0_PROJECT_ID')
+
+# raise an error unless all the variables above are defined
+assert API_POSTGRES_DB, "API_POSTGRES_DB is not defined"
+assert API_POSTGRES_USER, "API_POSTGRES_USER is not defined"
+assert API_POSTGRES_PASSWORD, "API_POSTGRES_PASSWORD is not defined"
+assert API_POSTGRES_HOST, "API_POSTGRES_HOST is not defined"
+assert API_POSTGRES_PORT, "API_POSTGRES_PORT is not defined"
+assert GEO_POSTGRES_DB, "GEO_POSTGRES_DB is not defined"
+assert GEO_POSTGRES_USER, "GEO_POSTGRES_USER is not defined"
+assert GEO_POSTGRES_PASSWORD, "GEO_POSTGRES_PASSWORD is not defined"
+assert GEO_POSTGRES_HOST, "GEO_POSTGRES_HOST is not defined"
+assert GEO_POSTGRES_PORT, "GEO_POSTGRES_PORT is not defined"
+assert ID0_FEATURE_NAME, "ID0_FEATURE_NAME is not defined"
+assert ID0_UPLOAD_ID, "ID0_UPLOAD_ID is not defined"
+assert ID0_PROJECT_ID, "ID0_PROJECT_ID is not defined"
+
+# Connect to the databases
+api_connection = psycopg2.connect(dbname = API_POSTGRES_DB, user = API_POSTGRES_USER, password = API_POSTGRES_PASSWORD, host = API_POSTGRES_HOST, port = API_POSTGRES_PORT)
+geo_connection = psycopg2.connect(dbname = GEO_POSTGRES_DB, user = GEO_POSTGRES_USER, password = GEO_POSTGRES_PASSWORD, host = GEO_POSTGRES_HOST, port = GEO_POSTGRES_PORT)
+
+api_cursor = api_connection.cursor()
+geo_cursor = geo_connection.cursor()
+
+# Get the feature id and amount from the API database
+api_cursor.execute("SELECT puid, amount FROM features_amounts where feature_name = %s and upload_id = %s", (ID0_FEATURE_NAME, ID0_UPLOAD_ID))
+
+# Persist feature data to the geo database
+for row in api_cursor:
+    print(row)
+    query = geo_cursor.mogrify("""
+    WITH project_pus AS (
+        SELECT ppu.id, ppu.puid, pug.the_geom FROM projects_pu ppu JOIN planning_units_geom pug ON pug.id = ppu.geom_id WHERE ppu.project_id = %s
+    )
+    INSERT INTO features_data (the_geom, feature_id, amount_from_legacy_project, project_pu_id)
+    VALUES
+    (
+        (SELECT the_geom FROM project_pus WHERE puid = %s),
+        %s,
+        %s,
+        (SELECT id FROM project_pus WHERE puid = %s)
+    )
+    RETURNING *;
+    """,
+    (ID0_PROJECT_ID, row[0], ID0_FEATURE_ID, row[1], row[0]))
+    print(query)
+    result = geo_cursor.execute(query)
+    print(result)
+
+geo_connection.commit()
