@@ -39,7 +39,7 @@ type FeaturesDataSelectResult = {
   the_geom: string;
   properties: Record<string, string | number>;
   source: GeometrySource;
-  amount_from_legacy_project: number | null;
+  amount: number | null;
   project_pu_id: string | null;
 };
 
@@ -97,7 +97,7 @@ export class ProjectCustomFeaturesPieceExporter
           'the_geom',
           'properties',
           'source',
-          'amount_from_legacy_project',
+          'amount',
           'project_pu_id',
         ])
         .from('features_data', 'fd')
