@@ -139,7 +139,7 @@ export class ProjectCustomFeaturesPieceImporter
             properties: data.properties,
             source: data.source,
             featureId: featureIdByClassName[feature_class_name],
-            amountFromLegacyProject: data.amount,
+            amount: data.amount,
             projectPuId: projectPuPuid
               ? projectPusMap[projectPuPuid]
               : undefined,
