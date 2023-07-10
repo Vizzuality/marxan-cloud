@@ -335,7 +335,7 @@ const getFixtures = async () => {
     return [firstFeature, secondFeature, thirdFeature, fourthFeature];
   };
 
-  const expectedAmountFromLegacyProject = 100;
+  const expectedAmount = 100;
   const pus = await GivenProjectPus(
     geoEntityManager,
     projectId,
@@ -442,7 +442,7 @@ const getFixtures = async () => {
       const puvsprRows = featuresWithPuids.flatMap(({ id, puids }) => {
         return puids.map((puid) => ({
           species: id,
-          amount: expectedAmountFromLegacyProject,
+          amount: expectedAmount,
           pu: puid,
         }));
       });
@@ -520,8 +520,8 @@ const getFixtures = async () => {
           );
           expect(
             insertedFeaturesData.every(
-              ({ amountFromLegacyProject, projectPuId }) =>
-                amountFromLegacyProject === expectedAmountFromLegacyProject &&
+              ({ amount, projectPuId }) =>
+                amount === expectedAmount &&
                 projectPuId &&
                 pus.map(({ id }) => id).includes(projectPuId),
             ),

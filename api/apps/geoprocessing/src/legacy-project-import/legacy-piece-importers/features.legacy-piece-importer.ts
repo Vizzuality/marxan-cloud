@@ -185,7 +185,7 @@ export class FeaturesLegacyProjectPieceImporter
       theGeom: string;
       properties: Record<string, string | number>;
       source: GeometrySource;
-      amountFromLegacyProject: number;
+      amount: number;
       projectPuId: string;
     }[] = [];
     const nonExistingPus: number[] = [];
@@ -197,7 +197,7 @@ export class FeaturesLegacyProjectPieceImporter
 
       filteredPuvspr.forEach((filteredRow) => {
         const geomAndPuId = projectPusGeomsMap[filteredRow.pu];
-        const amountFromLegacyProject = filteredRow.amount;
+        const amount = filteredRow.amount;
 
         if (!geomAndPuId) {
           nonExistingPus.push(filteredRow.pu);
@@ -216,7 +216,7 @@ export class FeaturesLegacyProjectPieceImporter
             [specDatPuidPropertyKey]: filteredRow.pu,
           },
           source: GeometrySource.user_imported,
-          amountFromLegacyProject,
+          amount,
           projectPuId,
         });
       });
