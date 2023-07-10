@@ -55,7 +55,7 @@ export class PuvsprCalculationsService {
       amount: number;
     }[] = await this.geoEntityManager.query(
       `
-          WITH all_amount_per_planning_unit as 
+          WITH all_amount_per_planning_unit as
           ( select
             $2 as featureId,
             pu.puid as puid,
@@ -109,19 +109,19 @@ export class PuvsprCalculationsService {
       amount: number;
     }[] = await this.geoEntityManager.query(
       `
-          WITH all_amount_per_planning_unit as 
+          WITH all_amount_per_planning_unit as
           ( select
             pu.puid as puid,
             pu.id as projectpuid,
             $2 as featureid,
-            species.amount_from_legacy_project as amount
+            species.amount as amount
           from
           (
               select
                fd.project_pu_id as puid,
-               fd.amount_from_legacy_project as amount_from_legacy_project
+               fd.amount as amount
               from scenario_features_data sfd
-              inner join features_data fd on 
+              inner join features_data fd on
               sfd.feature_class_id = fd.id where sfd.scenario_id = $1
               AND sfd.api_feature_id = $2
           ) species

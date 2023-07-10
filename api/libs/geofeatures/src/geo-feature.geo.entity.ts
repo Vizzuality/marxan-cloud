@@ -27,11 +27,11 @@ export class GeoFeatureGeometry {
   featureId?: string;
 
   @Column({
-    name: 'amount_from_legacy_project',
+    name: 'amount',
     type: 'double precision',
     nullable: true,
   })
-  amountFromLegacyProject?: number | null;
+  amount?: number | null;
 
   @ApiProperty()
   @Column({ name: 'hash', insert: false, update: false })
