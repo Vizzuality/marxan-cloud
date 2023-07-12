@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { DropzoneProps, FileError, useDropzone } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
@@ -34,20 +34,21 @@ import ARROW_LEFT_SVG from 'svgs/ui/arrow-right-2.svg?sprite';
 import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 
 export interface ScenariosCostSurfaceProps {
+  // todo: improve typing of "s"
   onChangeSection: (s: string) => void;
 }
 
-export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
+export const ScenariosCostSurface = ({
   onChangeSection,
-}: ScenariosCostSurfaceProps) => {
+}: ScenariosCostSurfaceProps): JSX.Element => {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [successFile, setSuccessFile] = useState(null);
+  const [successFile, setSuccessFile] = useState<{ name: string }>(null);
 
   const { addToast } = useToasts();
   const plausible = usePlausible();
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
   const scenarioSlice = getScenarioEditSlice(sid);
@@ -55,7 +56,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
   const { user } = useMe();
   const editable = useCanEditScenario(pid, sid);
-  const downloadMutation = useDownloadCostSurface({});
+  const downloadMutation = useDownloadCostSurface();
   const uploadMutation = useUploadCostSurface({
     requestConfig: {
       method: 'POST',
@@ -64,7 +65,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
 
   const onDownload = useCallback(() => {
     downloadMutation.mutate(
-      { id: `${sid}` },
+      { pid },
       {
         onSuccess: () => {},
         onError: () => {
@@ -81,9 +82,9 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
         },
       }
     );
-  }, [sid, downloadMutation, addToast]);
+  }, [pid, downloadMutation, addToast]);
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     setLoading(true);
 
     const f = acceptedFiles[0];
@@ -147,11 +148,11 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
-    // `file-too-large` backend error message is not friendly.
-    // It'll display the max size in bytes which the average user may not understand.
+    // ? `file-too-large` backend error message is not friendly.
+    // ? It'll display the max size in bytes which the average user may not understand.
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
@@ -166,7 +167,7 @@ export const ScenariosCostSurface: React.FC<ScenariosCostSurfaceProps> = ({
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e) => (
+          {errors.map((e: FileError) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>

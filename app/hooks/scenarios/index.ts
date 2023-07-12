@@ -20,6 +20,7 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
+import type { Project } from 'types/project-model';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -32,8 +33,6 @@ import {
   SaveScenarioProps,
   UseDeleteScenarioProps,
   DeleteScenarioProps,
-  UseDownloadScenarioCostSurfaceProps,
-  DownloadScenarioCostSurfaceProps,
   UseUploadScenarioCostSurfaceProps,
   UploadScenarioCostSurfaceProps,
   UseUploadScenarioPUProps,
@@ -667,34 +666,28 @@ export function useCostSurfaceRange(id) {
   }, [query, data]);
 }
 
-export function useDownloadCostSurface({
-  requestConfig = {
-    method: 'GET',
-  },
-}: UseDownloadScenarioCostSurfaceProps) {
+export function useDownloadCostSurface() {
   const { data: session } = useSession();
 
-  const downloadScenarioCostSurface = ({ id }: DownloadScenarioCostSurfaceProps) => {
-    return DOWNLOADS.request({
-      url: `/scenarios/${id}/cost-surface/shapefile-template`,
+  const downloadScenarioCostSurface = ({ pid }: { pid: Project['id'] }) => {
+    return DOWNLOADS.get<ArrayBuffer>(`/projects/${pid}/project-grid/shapefile-template`, {
       responseType: 'arraybuffer',
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         'Content-Type': 'application/zip',
       },
-      ...requestConfig,
     });
   };
 
   return useMutation(downloadScenarioCostSurface, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables, context) => {
       const { data: blob } = data;
-      const { id } = variables;
+      const { pid } = variables;
 
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `cost-surface-${id}.zip`);
+      link.setAttribute('download', `cost-surface-${pid}.zip`);
       document.body.appendChild(link);
       link.click();
       link.remove();
