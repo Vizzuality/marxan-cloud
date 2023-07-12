@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 
 import chroma from 'chroma-js';
+import { Visibility } from 'mapbox-gl';
 
 import { COLORS, LEGEND_LAYERS } from './constants';
 import {
@@ -294,7 +295,7 @@ export function useFeaturePreviewLayers({
 
     const { opacity = 1, visibility = true } = options || {};
 
-    const getLayerVisibility = () => {
+    const getLayerVisibility = (): Visibility => {
       if (!visibility) {
         return 'none';
       }
@@ -395,7 +396,7 @@ export function useTargetedPreviewLayers({
 
     const { opacity = 1, visibility = true } = options || {};
 
-    const getLayerVisibility = () => {
+    const getLayerVisibility = (): Visibility => {
       if (!visibility) {
         return 'none';
       }
@@ -485,7 +486,7 @@ export function usePUGridPreviewLayer({
       },
     } = options;
 
-    const getLayerVisibility = () => {
+    const getLayerVisibility = (): Visibility => {
       if (!settings?.visibility) {
         return 'none';
       }
@@ -623,6 +624,7 @@ export function usePUGridLayer({
       'wdpa-percentage': WdpaPercentageSettings = {},
       features: FeaturesSettings = {},
       'features-highlight': FeaturesHighlightSettings = {},
+      'features-amount': FeaturesAmountSettings = {},
       cost: CostSettings = {},
       'lock-in': LockInSettings = {},
       'lock-out': LockOutSettings = {},
@@ -640,6 +642,9 @@ export function usePUGridLayer({
       opacity: FeaturesHighlightOpacity = 1,
       visibility: FeaturesHighlightVisibility = true,
     } = FeaturesHighlightSettings;
+    const { opacity: FeaturesAmountOpacity = 1, visibility: FeaturesAmountVisibility = true } =
+      FeaturesAmountSettings;
+
     const { opacity: CostOpacity = 1, visibility: CostVisibility = true } = CostSettings;
     const { opacity: LockInOpacity = 1, visibility: LockInVisibility = true } = LockInSettings;
     const { opacity: LockOutOpacity = 1, visibility: LockOutVisibility = true } = LockOutSettings;
@@ -650,7 +655,7 @@ export function usePUGridLayer({
     const { opacity: SolutionOpacity = 1, visibility: SolutionVisibility = true } =
       SolutionSettings;
 
-    const getLayerVisibility = (layer) => {
+    const getLayerVisibility = (layer): Visibility => {
       if (!layer) {
         return 'none';
       }
@@ -761,6 +766,27 @@ export function usePUGridLayer({
                         }),
                       ],
                       0.5 * FeaturesOpacity,
+                      0,
+                    ],
+                  },
+                },
+                {
+                  type: 'fill',
+                  'source-layer': 'layer0',
+                  layout: {
+                    visibility: getLayerVisibility(FeaturesAmountVisibility),
+                  },
+                  paint: {
+                    'fill-color': COLORS.featuresAmount,
+                    'fill-opacity': [
+                      'case',
+                      [
+                        'any',
+                        ...features.map((id) => {
+                          return ['get', `featureAmount-${id}`];
+                        }),
+                      ],
+                      0.5 * FeaturesAmountOpacity,
                       0,
                     ],
                   },

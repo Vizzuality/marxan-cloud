@@ -2,6 +2,7 @@ import { PUAction } from 'store/slices/scenarios/types';
 
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
 import { TargetSPFItemProps } from 'components/features/target-spf-item/types';
+import { Project } from 'types/project-model';
 
 export interface UseGeoJSONLayer {
   cache?: number;
@@ -35,13 +36,13 @@ export interface UseGridPreviewLayer {
 export interface UseProyectPlanningAreaLayer {
   cache?: number;
   active?: boolean;
-  pId: string;
+  pId: Project['id'];
 }
 
 export interface UseProyectGridLayer {
   cache?: number;
   active?: boolean;
-  pId: string;
+  pId: Project['id'];
 }
 
 export interface UsePUGridPreviewLayer {
@@ -59,7 +60,7 @@ export interface UsePUGridPreviewLayer {
 }
 
 export interface UseWDPAPreviewLayer {
-  pid: string;
+  pid: Project['id'];
   cache?: number;
   active?: boolean;
   bbox?: number[] | unknown;
@@ -101,6 +102,11 @@ export interface UseTargetedPreviewLayers {
   };
 }
 
+interface PUGridLayerSettings {
+  opacity?: number;
+  visibility?: boolean;
+}
+
 export interface UsePUGridLayer {
   cache?: number;
   sid?: string;
@@ -124,46 +130,17 @@ export interface UsePUGridLayer {
       max: number;
     };
     settings?: {
-      pugrid?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      'wdpa-percentage'?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      features?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      'features-highlight'?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      cost?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      'lock-in'?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      'lock-out'?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      'lock-available'?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      frequency?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
-      solution?: {
-        opacity?: number;
-        visibility?: boolean;
-      };
+      pugrid?: PUGridLayerSettings;
+      'wdpa-percentage'?: PUGridLayerSettings;
+      features?: PUGridLayerSettings;
+      'features-highlight'?: PUGridLayerSettings;
+      'features-amount'?: PUGridLayerSettings;
+      cost?: PUGridLayerSettings;
+      'lock-in'?: PUGridLayerSettings;
+      'lock-out'?: PUGridLayerSettings;
+      'lock-available'?: PUGridLayerSettings;
+      frequency?: PUGridLayerSettings;
+      solution?: PUGridLayerSettings;
     };
   };
 }

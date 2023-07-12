@@ -33,6 +33,8 @@ export const COLORS = {
   },
   wdpa: '#00F',
   features: '#6F53F7',
+  // todo: agree with design about color. This is a temporary one
+  featuresAmount: '#a1dab4',
   highlightFeatures: '#BE6BFF',
   include: '#03E7D1',
   exclude: '#FF472E',
