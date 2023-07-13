@@ -1,51 +1,81 @@
-import React from 'react';
+import { useState, useCallback } from 'react';
+
+import { useSelector } from 'react-redux';
 
 import { useRouter } from 'next/router';
 
 import { withProtection, withUser } from 'hoc/auth';
 
 import Breadcrumb from 'components/breadcrumb';
-import Header from 'layout/header';
-import DocumentationLink from 'layout/help/documentation';
+import HelpBeacon from 'layout/help/beacon';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
+import Sidebar from 'layout/project/sidebar';
 import ProjectNewForm from 'layout/projects/new/form';
+import { NewProjectFields } from 'layout/projects/new/form';
+import ProjectNewMap from 'layout/projects/new/map';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
-import Wrapper from 'layout/wrapper';
 
 export const getServerSideProps = withProtection(withUser());
 
-const NewProjectsPage: React.FC = () => {
+const NewProjectsPage = (): JSX.Element => {
   const { push } = useRouter();
+  const [formValues, setFormValues] = useState<NewProjectFields>();
+
+  const { bbox } = useSelector((state) => state['/projects/new']);
+
+  const handleClickBreadcrumb = useCallback(() => {
+    push('/projects');
+  }, [push]);
 
   return (
     <Protected>
       <ProjectTitle title="New" />
-
       <MetaIcons />
-
-      <ProjectLayout>
-        <main className="flex h-screen w-screen flex-col">
-          <Header size="base" />
-          <DocumentationLink />
-
-          <div className="flex flex-grow flex-col overflow-hidden py-2.5">
-            <Wrapper>
-              <Breadcrumb
-                onClick={() => {
-                  push('/projects');
-                }}
-              >
-                All projects
-              </Breadcrumb>
-
-              <div className="flex flex-grow flex-col overflow-hidden pt-5">
-                <ProjectNewForm />
-              </div>
-            </Wrapper>
+      <ProjectLayout className="z-10">
+        <Sidebar>
+          <div className="flex flex-col">
+            <Breadcrumb onClick={handleClickBreadcrumb}>All projects</Breadcrumb>
+            <ProjectNewForm
+              onFormUpdate={(_formValues) => {
+                setFormValues(_formValues);
+              }}
+            />
           </div>
-        </main>
+        </Sidebar>
+
+        <HelpBeacon
+          id="project-new-map"
+          title="MAP VIEW"
+          subtitle="New planning area and grid"
+          content={
+            <div className="space-y-2">
+              <p>
+                On the map you will be able to see your selected or uploaded planning area and grid.
+              </p>
+              <p>
+                If you are creating a new grid, you can change the shape and size of the planning
+                units and look at the different results here to find the best combination for your
+                conservation plan.
+              </p>
+            </div>
+          }
+          modifiers={['flip']}
+          tooltipPlacement="right"
+        >
+          <div className="h-full w-full">
+            <ProjectNewMap
+              bbox={bbox}
+              country={formValues?.countryId}
+              region={formValues?.adminAreaLevel1Id}
+              subregion={formValues?.adminAreaLevel2Id}
+              planningUnitGridShape={formValues?.planningUnitGridShape}
+              planningUnitAreakm2={formValues?.planningUnitAreakm2}
+              PAOptionSelected={formValues?.PAOptionSelected}
+            />
+          </div>
+        </HelpBeacon>
       </ProjectLayout>
     </Protected>
   );

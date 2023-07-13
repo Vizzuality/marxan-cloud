@@ -27,7 +27,10 @@ const projectsNewSlice = createSlice({
   initialState,
   reducers: {
     setBbox: (state, action: PayloadAction<number[]>) => {
-      state.bbox = action.payload;
+      return {
+        ...state,
+        bbox: action.payload,
+      };
     },
     setMinPuAreaSize: (state, action: PayloadAction<number>) => {
       state.minPuAreaSize = action.payload;

@@ -8,13 +8,12 @@ export interface ControlsProps {
 }
 
 export const Controls: React.FC<ControlsProps> = ({
-  className = 'absolute bottom-14 left-5',
+  className = 'absolute w-6 top-14 right-5',
   children,
 }: ControlsProps) => {
   return (
     <div
       className={cx({
-        'w-10': true,
         [className]: !!className,
       })}
     >

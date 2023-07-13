@@ -471,7 +471,7 @@ export const ScenariosEditMap: React.FC = () => {
   useEffect(() => {
     setBounds({
       bbox: BBOX,
-      options: { padding: 50 },
+      options: { padding: { top: 50, right: 50, bottom: 50, left: 575 } },
       viewportOptions: { transitionDuration: 0 },
     });
   }, [BBOX]);
@@ -655,7 +655,7 @@ export const ScenariosEditMap: React.FC = () => {
   );
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-4xl">
+    <div className="relative h-full w-full overflow-hidden">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -690,8 +690,6 @@ export const ScenariosEditMap: React.FC = () => {
 
       {/* Controls */}
       <Controls>
-        <LoadingControl loading={!mapTilesLoaded} />
-
         <ZoomControl
           viewport={{
             ...viewport,
@@ -710,6 +708,7 @@ export const ScenariosEditMap: React.FC = () => {
           }}
           onFitBoundsChange={handleFitBoundsChange}
         />
+        <LoadingControl loading={!mapTilesLoaded} />
       </Controls>
 
       {/* Legend */}
