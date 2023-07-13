@@ -1,4 +1,4 @@
-export type SidebarTreeCategories =
+export type NavigationTreeCategories =
   | 'user'
   | 'inventory'
   | 'gridSetup'

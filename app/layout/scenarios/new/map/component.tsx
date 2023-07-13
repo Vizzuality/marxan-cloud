@@ -110,7 +110,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
   );
 
   return (
-    <div className="relative h-full w-full overflow-hidden rounded-4xl">
+    <div className="relative h-full w-full overflow-hidden">
       <Map
         key={accessToken}
         bounds={bounds}
@@ -145,8 +145,6 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
       {/* Controls */}
       <Controls>
-        <LoadingControl loading={!mapTilesLoaded} />
-
         <ZoomControl
           viewport={{
             ...viewport,
@@ -165,6 +163,8 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
           }}
           onFitBoundsChange={handleFitBoundsChange}
         />
+
+        <LoadingControl loading={!mapTilesLoaded} />
       </Controls>
 
       {/* Legend */}

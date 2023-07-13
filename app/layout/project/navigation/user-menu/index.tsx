@@ -18,8 +18,8 @@ import { Switch } from 'components/forms/switch';
 import Icon from 'components/icon';
 import { cn } from 'utils/cn';
 
-import HELP_GUIDE_SVG from 'svgs/sidebar/help-guide.svg?sprite';
-import EDIT_PROFILE_SVG from 'svgs/sidebar/pencil.svg?sprite';
+import HELP_GUIDE_SVG from 'svgs/navigation/help-guide.svg?sprite';
+import EDIT_PROFILE_SVG from 'svgs/navigation/pencil.svg?sprite';
 import DOCUMENTATION_SVG from 'svgs/ui/documentation.svg?sprite';
 import SIGN_OUT_SVG from 'svgs/ui/sign-out.svg?sprite';
 

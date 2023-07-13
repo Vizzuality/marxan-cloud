@@ -11,14 +11,14 @@ import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
 import { cn } from 'utils/cn';
 
-import ADVANCED_SETTINGS_SVG from 'svgs/sidebar/advanced-settings.svg?sprite';
-import GRID_SETUP_SVG from 'svgs/sidebar/grid-setup.svg?sprite';
-import INVENTORY_SVG from 'svgs/sidebar/inventory.svg?sprite';
-import WHITE_LOGO_SVG from 'svgs/sidebar/logo-white.svg';
-import MENU_SVG from 'svgs/sidebar/menu.svg?sprite';
-import RUN_SCENARIO_SVG from 'svgs/sidebar/run-scenario.svg?sprite';
-import SCENARIO_LIST_SVG from 'svgs/sidebar/scenario-list.svg?sprite';
-import SOLUTIONS_SVG from 'svgs/sidebar/solutions.svg?sprite';
+import ADVANCED_SETTINGS_SVG from 'svgs/navigation/advanced-settings.svg?sprite';
+import GRID_SETUP_SVG from 'svgs/navigation/grid-setup.svg?sprite';
+import INVENTORY_SVG from 'svgs/navigation/inventory.svg?sprite';
+import WHITE_LOGO_SVG from 'svgs/navigation/logo-white.svg';
+import MENU_SVG from 'svgs/navigation/menu.svg?sprite';
+import RUN_SCENARIO_SVG from 'svgs/navigation/run-scenario.svg?sprite';
+import SCENARIO_LIST_SVG from 'svgs/navigation/scenario-list.svg?sprite';
+import SOLUTIONS_SVG from 'svgs/navigation/solutions.svg?sprite';
 
 import {
   MENU_COMMON_CLASSES,
@@ -26,7 +26,7 @@ import {
   MENU_ITEM_ACTIVE_CLASSES,
   MENU_ITEM_BUTTON_COMMON_CLASSES,
   ICONS_COMMON_CLASSES,
-  SIDEBAR_TREE,
+  NAVIGATION_TREE,
 } from './constants';
 import {
   useInventoryItems,
@@ -35,7 +35,7 @@ import {
   useAdvancedSettingsItems,
 } from './hooks';
 import SubMenu from './submenu';
-import type { SidebarTreeCategories } from './types';
+import type { NavigationTreeCategories } from './types';
 import UserMenu from './user-menu';
 
 export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
@@ -48,19 +48,19 @@ export const MenuTooltip = ({ children }: PropsWithChildren): JSX.Element => {
 
 export const TOOLTIP_OFFSET: TippyProps['offset'] = [0, 10];
 
-export const Sidebar = (): JSX.Element => {
+export const Navigation = (): JSX.Element => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
-  const isProjectRoute = route === '/projects/[pid]';
-  const isScenarioRoute = route === '/projects/[pid]/scenarios/[sid]/edit';
+  const isProjectRoute = route.startsWith('/projects/[pid]');
+  const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/');
 
-  const [submenuState, setSubmenuState] = useState<{ [key in SidebarTreeCategories]: boolean }>({
+  const [submenuState, setSubmenuState] = useState<{ [key in NavigationTreeCategories]: boolean }>({
     user: false,
-    inventory: isProjectRoute && SIDEBAR_TREE.inventory.includes(tab),
-    gridSetup: isScenarioRoute && SIDEBAR_TREE.gridSetup.includes(tab),
-    solutions: isScenarioRoute && SIDEBAR_TREE.solutions.includes(tab),
-    advancedSettings: isScenarioRoute && SIDEBAR_TREE.advancedSettings.includes(tab),
+    inventory: isProjectRoute && NAVIGATION_TREE.inventory.includes(tab),
+    gridSetup: isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab),
+    solutions: isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
+    advancedSettings: isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
   });
 
   const inventoryItems = useInventoryItems();
@@ -68,7 +68,7 @@ export const Sidebar = (): JSX.Element => {
   const solutionsItems = useSolutionItems();
   const advancedSettingsItems = useAdvancedSettingsItems();
 
-  const toggleSubmenu = useCallback((submenuKey: SidebarTreeCategories) => {
+  const toggleSubmenu = useCallback((submenuKey: NavigationTreeCategories) => {
     if (submenuKey === 'user') {
       return setSubmenuState((prevState) => ({
         ...prevState,
@@ -93,7 +93,7 @@ export const Sidebar = (): JSX.Element => {
   }, [sid]);
 
   return (
-    <nav className="flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
+    <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
       <div className="flex flex-col">
         <Link href="/">
           <Image alt="Marxan logo" width={55} height={7} src={WHITE_LOGO_SVG} />
@@ -196,7 +196,7 @@ export const Sidebar = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && SIDEBAR_TREE.gridSetup.includes(tab),
+                    isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab),
                 })}
               >
                 <Tooltip
@@ -222,7 +222,7 @@ export const Sidebar = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && SIDEBAR_TREE.advancedSettings.includes(tab),
+                    isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
                 })}
               >
                 <Tooltip
@@ -248,7 +248,7 @@ export const Sidebar = (): JSX.Element => {
                 className={cn({
                   [MENU_ITEM_COMMON_CLASSES]: true,
                   [MENU_ITEM_ACTIVE_CLASSES]:
-                    isScenarioRoute && SIDEBAR_TREE.solutions.includes(tab),
+                    isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
                 })}
               >
                 <Tooltip
@@ -292,4 +292,4 @@ export const Sidebar = (): JSX.Element => {
   );
 };
 
-export default Sidebar;
+export default Navigation;
