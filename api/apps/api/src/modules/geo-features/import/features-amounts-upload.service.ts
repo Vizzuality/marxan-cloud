@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
-import { EntityManager } from 'typeorm';
-import { InjectEntityManager } from '@nestjs/typeorm';
+import { DataSource, EntityManager, QueryRunner } from 'typeorm';
+import { InjectDataSource, InjectEntityManager } from '@nestjs/typeorm';
 import { featureAmountCsvParser } from '@marxan-api/modules/geo-features/import/csv.parser';
 import { FeatureAmountCSVDto } from '@marxan-api/modules/geo-features/dto/feature-amount-csv.dto';
 import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
@@ -11,10 +11,19 @@ import {
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { isLeft, left, right } from 'fp-ts/Either';
 import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
+import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import { v4 } from 'uuid';
+import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 
 @Injectable()
 export class FeatureAmountUploadService {
+  private readonly logger = new Logger(this.constructor.name);
   constructor(
+    @InjectDataSource(DbConnections.default)
+    private readonly apiDataSource: DataSource,
+    @InjectDataSource(DbConnections.geoprocessingDB)
+    private readonly geoDataSource: DataSource,
     @InjectEntityManager(DbConnections.geoprocessingDB)
     private readonly geoEntityManager: EntityManager,
     @InjectEntityManager(DbConnections.default)
@@ -22,11 +31,91 @@ export class FeatureAmountUploadService {
     private readonly events: FeatureImportEventsService,
   ) {}
 
-  async saveCsvToRegistry(data: {
+  async uploadFeatureFromCsv(data: {
     fileBuffer: Buffer;
     projectId: string;
     userId: string;
-  }): Promise<any> {
+  }) {
+    let newFeatures: GeoFeature[];
+    const apiQueryRunner = this.apiDataSource.createQueryRunner();
+    const geoQueryRunner = this.geoDataSource.createQueryRunner();
+
+    await apiQueryRunner.connect();
+    await geoQueryRunner.connect();
+
+    await apiQueryRunner.startTransaction();
+    await geoQueryRunner.startTransaction();
+
+    try {
+      // saving feature data to temporary table
+      const featuresRegistry = await this.saveCsvToRegistry(
+        data,
+        apiQueryRunner,
+      );
+
+      if (isLeft(featuresRegistry)) {
+        return left(featuresRegistry);
+      }
+      // Saving features and features amounts
+
+      const apiFeaturesRepository = apiQueryRunner.manager.getRepository(
+        GeoFeature,
+      );
+      const geoFeaturesDataRepository = geoQueryRunner.manager.getRepository(
+        GeoFeatureGeometry,
+      );
+      newFeatures = await Promise.all(
+        featuresRegistry.uploadedFeatures.map(
+          async (feature: FeatureAmountCSVDto) => {
+            const savedFeature = await apiFeaturesRepository.save(
+              apiFeaturesRepository.create({
+                id: v4(),
+                featureClassName: feature.featureName,
+                projectId: data.projectId,
+                creationStatus: JobStatus.done,
+              }),
+            );
+
+            await geoFeaturesDataRepository.save(
+              geoFeaturesDataRepository.create({
+                featureId: savedFeature.id,
+                amount: feature.amount,
+              }),
+            );
+
+            return savedFeature;
+          },
+        ),
+      );
+
+      // Removing temporary data
+
+      await apiQueryRunner.commitTransaction();
+      await geoQueryRunner.commitTransaction();
+    } catch (err) {
+      await apiQueryRunner.rollbackTransaction();
+      await geoQueryRunner.rollbackTransaction();
+
+      this.logger.error(
+        'An error occurred creating features and saving amounts from csv (changes have been rolled back)',
+        String(err),
+      );
+      return left(err);
+    } finally {
+      // you need to release a queryRunner which was manually instantiated
+      await apiQueryRunner.release();
+      await geoQueryRunner.release();
+    }
+    return right(newFeatures);
+  }
+  async saveCsvToRegistry(
+    data: {
+      fileBuffer: Buffer;
+      projectId: string;
+      userId: string;
+    },
+    queryRunner: QueryRunner,
+  ): Promise<any> {
     try {
       await this.events.createEvent(data);
 
@@ -37,6 +126,7 @@ export class FeatureAmountUploadService {
         await this.areFeatureNamesNotAlreadyUsedInProject(
           data.projectId,
           featureNames,
+          queryRunner.manager,
         )
       ) {
         return left(importedFeatureNameAlreadyExist);
@@ -48,13 +138,14 @@ export class FeatureAmountUploadService {
         parsedFile,
         data.projectId,
         data.userId,
+        queryRunner.manager,
       );
       await this.events.finishEvent();
       return right(importedRegistry);
     } catch (e) {
       await this.events.failEvent(e);
       if (isLeft(e)) {
-        return e;
+        return left(e);
       }
       throw e;
     }
@@ -64,21 +155,21 @@ export class FeatureAmountUploadService {
     features: FeatureAmountCSVDto[],
     projectId: string,
     userId: string,
+    entityManager: EntityManager,
   ): Promise<FeatureAmountUploadRegistry> {
-    return this.apiEntityManager
-      .getRepository(FeatureAmountUploadRegistry)
-      .save({
-        projectId,
-        userId,
-        uploadedFeatures: features,
-      });
+    return entityManager.getRepository(FeatureAmountUploadRegistry).save({
+      projectId,
+      userId,
+      uploadedFeatures: features,
+    });
   }
 
   private async areFeatureNamesNotAlreadyUsedInProject(
     projectId: string,
     featureNames: string[],
+    entityManager: EntityManager,
   ): Promise<boolean> {
-    const featuresInDB = await this.apiEntityManager
+    const featuresInDB = await entityManager
       .createQueryBuilder()
       .select('features.feature_class_name')
       .from('features', 'features')

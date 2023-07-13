@@ -651,7 +651,7 @@ export class GeoFeaturesService extends AppBaseService<
       | typeof unknownPuidsInFeatureAmountCsvUpload
       | typeof projectNotFound
       | typeof featureDataCannotBeUploadedWithCsv,
-      FeatureAmountUploadRegistry
+      GeoFeature[]
     >
   > {
     const project = await this.projectRepository.findOne({
@@ -670,7 +670,7 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureDataCannotBeUploadedWithCsv);
     }
 
-    return this.featureAmountUploads.saveCsvToRegistry({
+    return this.featureAmountUploads.uploadFeatureFromCsv({
       fileBuffer,
       projectId,
       userId,
