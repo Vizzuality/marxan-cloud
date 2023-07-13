@@ -1,18 +1,18 @@
 import { useRouter } from 'next/router';
 
-import COST_SURFACE_SVG from 'svgs/sidebar/cost-surface.svg?sprite';
-import FEATURES_SVG from 'svgs/sidebar/features.svg?sprite';
-import PLANNING_UNIT_STATUS_SVG from 'svgs/sidebar/planning-unit-status.svg?sprite';
-import PROTECTED_AREA_SVG from 'svgs/sidebar/protected-area.svg?sprite';
+import COST_SURFACE_SVG from 'svgs/navigation/cost-surface.svg?sprite';
+import FEATURES_SVG from 'svgs/navigation/features.svg?sprite';
+import PLANNING_UNIT_STATUS_SVG from 'svgs/navigation/planning-unit-status.svg?sprite';
+import PROTECTED_AREA_SVG from 'svgs/navigation/protected-area.svg?sprite';
 
 import type { SubMenuItem } from './submenu';
 
-const SCENARIO_ROUTE = '/projects/[pid]/scenarios/[sid]/edit';
+const SCENARIO_ROUTE = '/projects/[pid]/scenarios/';
 
 export const useInventoryItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, tab } = query as { pid: string; tab: string };
-  const isProjectRoute = route === '/projects/[pid]';
+  const isProjectRoute = route.startsWith('/projects/[pid]');
 
   return [
     {
@@ -40,7 +40,7 @@ export const useInventoryItems = (): SubMenuItem[] => {
 export const useGridSetupItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
-  const isScenarioRoute = route === SCENARIO_ROUTE;
+  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [
     {
@@ -73,7 +73,7 @@ export const useGridSetupItems = (): SubMenuItem[] => {
 export const useSolutionItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
-  const isScenarioRoute = route === SCENARIO_ROUTE;
+  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [
     {
@@ -94,7 +94,7 @@ export const useSolutionItems = (): SubMenuItem[] => {
 export const useAdvancedSettingsItems = (): SubMenuItem[] => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
-  const isScenarioRoute = route === SCENARIO_ROUTE;
+  const isScenarioRoute = route.startsWith(SCENARIO_ROUTE);
 
   return [
     {

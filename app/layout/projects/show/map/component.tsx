@@ -287,7 +287,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
       {id && (
         <motion.div
           key="project-map"
-          className="relative col-span-5 h-full w-full overflow-hidden rounded-4xl"
+          className="relative col-span-5 h-full w-full overflow-hidden"
           initial={{ y: -10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
@@ -352,8 +352,6 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </HelpBeacon>
 
           <Controls>
-            <LoadingControl loading={!mapTilesLoaded} />
-
             <ZoomControl
               viewport={{
                 ...viewport,
@@ -372,6 +370,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
               }}
               onFitBoundsChange={handleFitBoundsChange}
             />
+            <LoadingControl loading={!mapTilesLoaded} />
           </Controls>
 
           {/* Legend */}
@@ -420,8 +419,8 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
           </div>
 
           {!!SCENARIOS_RUNNED.sid1Options.length && (
-            <div className="absolute left-0 top-0 flex w-full space-x-5 p-5">
-              <div className="w-full">
+            <div className="absolute right-24 top-0 flex space-x-5 p-5">
+              <div>
                 <Select
                   theme="dark"
                   size="base"
@@ -435,7 +434,6 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
 
               <div
                 className={cx({
-                  'w-full': true,
                   'invisible opacity-0': SCENARIOS_RUNNED.sid1Options.length <= 1,
                 })}
               >
