@@ -7,7 +7,6 @@ import Contributors from 'layout/projects/show/header/contributors';
 import Title from 'layout/projects/show/header/title';
 import Toolbar from 'layout/projects/show/header/toolbar';
 import UnderModeration from 'layout/projects/show/header/under-moderation';
-import Wrapper from 'layout/wrapper';
 
 export interface ProjectsHeaderProps {}
 
@@ -15,7 +14,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
   const { push } = useRouter();
 
   return (
-    <Wrapper>
+    <>
       <Breadcrumb
         onClick={() => {
           push('/projects');
@@ -24,7 +23,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
         All projects
       </Breadcrumb>
 
-      <div className="mt-5 flex items-end justify-between space-x-10">
+      <div className="mt-5 flex flex-col justify-between space-x-10">
         <div>
           <UnderModeration />
           <Title />
@@ -35,7 +34,7 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
           <Toolbar />
         </div>
       </div>
-    </Wrapper>
+    </>
   );
 };
 

@@ -1,12 +1,12 @@
-import { SidebarTreeCategories } from './types';
+import { NavigationTreeCategories } from './types';
 
-export const SIDEBAR_TREE = {
+export const NAVIGATION_TREE = {
   user: [],
   inventory: ['protected-areas', 'cost-surface', 'features'],
   gridSetup: ['protected-areas', 'cost-surface', 'planning-unit-status'],
   solutions: ['solutions', 'target-achievement'],
   advancedSettings: ['advanced-settings', 'blm-calibration'],
-} satisfies { [key in SidebarTreeCategories]: string[] };
+} satisfies { [key in NavigationTreeCategories]: string[] };
 
 export const MENU_COMMON_CLASSES = 'flex flex-col items-center space-y-2';
 export const MENU_ITEM_COMMON_CLASSES =
