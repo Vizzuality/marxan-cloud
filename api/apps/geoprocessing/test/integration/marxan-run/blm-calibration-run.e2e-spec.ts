@@ -24,7 +24,7 @@ import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
-import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
+import { GivenScenarioAndProjectPuData } from '../../steps/given-scenario-pu-data-exists';
 import { Test } from '@nestjs/testing';
 import { geoprocessingConnections } from '@marxan-geoprocessing/ormconfig';
 import {
@@ -230,7 +230,7 @@ const getFixtures = async () => {
     GivenScenarioPuDataExists: async () => {
       outputsIds.push(
         ...(
-          await GivenScenarioPuData(
+          await GivenScenarioAndProjectPuData(
             entityManager,
             projectId,
             scenarioId,

@@ -25,6 +25,7 @@ import { RunHandler } from './run.handler';
 import { CancelHandler } from './cancel.handler';
 import { EventsHandler } from './events.handler';
 import { ScenarioJobService } from '../scenario-job/scenario-job.service';
+import { OutputProjectSummariesService } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 let runService: RunService;
@@ -176,6 +177,7 @@ test(`completed job`, async () => {
     API_EVENT_KINDS.scenario__run__outputSaved__v1__alpha1,
   );
   fixtures.ThenOutputPersisted();
+  fixtures.ThenOutputProjectSummaryPersisted();
 });
 
 test(`duplicated completed job`, async () => {
@@ -198,6 +200,7 @@ test(`duplicated completed job`, async () => {
     `eventId2`,
   );
   fixtures.ThenOutputNotPersisted();
+  fixtures.ThenOutputProjectSummaryNotPersisted();
 });
 
 test(`completed job with failing save`, async () => {
@@ -270,6 +273,8 @@ async function getFixtures() {
     forScenario: jest.fn(),
   };
 
+  const saveOutputProjectSummaryMock = jest.fn();
+
   class FakeOutputRepository implements FieldsOf<OutputRepository> {
     db: ScenariosOutputResultsApiEntity[] = [];
 
@@ -319,6 +324,12 @@ async function getFixtures() {
       {
         provide: AssetsService,
         useValue: fakeAssets,
+      },
+      {
+        provide: OutputProjectSummariesService,
+        useValue: {
+          saveSummaryForProjectOfScenario: saveOutputProjectSummaryMock,
+        },
       },
       RunService,
       ScenarioJobService,
@@ -496,6 +507,12 @@ async function getFixtures() {
           scoreValue: 100,
         },
       ]);
+    },
+    ThenOutputProjectSummaryPersisted() {
+      expect(saveOutputProjectSummaryMock).toHaveBeenCalledTimes(1);
+    },
+    ThenOutputProjectSummaryNotPersisted() {
+      expect(saveOutputProjectSummaryMock).not.toHaveBeenCalled();
     },
     ThenOutputNotPersisted() {
       expect(fakeOutputRepository.db).toStrictEqual([]);

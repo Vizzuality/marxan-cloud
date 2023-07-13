@@ -268,6 +268,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/code-guide/tsconfig.lib.json"
       }
+    },
+    "output-project-summaries": {
+      "type": "library",
+      "root": "libs/output-project-summaries",
+      "entryFile": "index",
+      "sourceRoot": "libs/output-project-summaries/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/output-project-summaries/tsconfig.lib.json"
+      }
     }
   }
 }

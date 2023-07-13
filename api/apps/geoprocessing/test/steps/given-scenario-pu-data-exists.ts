@@ -9,6 +9,7 @@ import {
   GivenProjectsPu,
   GivenProjectsPuExists,
 } from './given-projects-pu-exists';
+import { ProjectsPuEntity } from '@marxan-jobs/planning-unit-geometry';
 
 export interface GivenScenarioPuDataExistsOpts {
   protectedByDefault: boolean;
@@ -159,7 +160,7 @@ export const GivenScenarioPuDataWithStatusesSetByUserExists = async (
   return rows as ScenariosPuPaDataGeo[];
 };
 
-export const GivenScenarioPuData = async (
+export const GivenScenarioAndProjectPuData = async (
   entityManager: EntityManager,
   projectId: string,
   scenarioId: string,
@@ -172,6 +173,43 @@ export const GivenScenarioPuData = async (
   return entityManager.transaction(async (em) => {
     const projectPus = await GivenProjectsPu(em, projectId, count, geomType);
 
+    const scenarioPuData: DeepPartial<ScenariosPuPaDataGeo>[] = projectPus.map(
+      (projectPu) => ({
+        scenarioId,
+        lockStatus: LockStatus.Available,
+        projectPuId: projectPu.id,
+      }),
+    );
+
+    const rows = await em.save(ScenariosPuPaDataGeo, scenarioPuData);
+    return {
+      scenarioId,
+      rows: rows as ScenariosPlanningUnitGeoEntity[],
+    };
+  });
+};
+
+export const GivenProjectPuData = async (
+  entityManager: EntityManager,
+  projectId: string,
+  count = 100,
+  geomType: PlanningUnitGridShape = PlanningUnitGridShape.Square,
+): Promise<ProjectsPuEntity[]> => {
+  return entityManager.transaction(async (em) => {
+    return GivenProjectsPu(em, projectId, count, geomType);
+  });
+};
+
+export const GivenScenarioPuData = async (
+  entityManager: EntityManager,
+  projectId: string,
+  scenarioId: string,
+  projectPus: ProjectsPuEntity[],
+): Promise<{
+  scenarioId: string;
+  rows: ScenariosPlanningUnitGeoEntity[];
+}> => {
+  return entityManager.transaction(async (em) => {
     const scenarioPuData: DeepPartial<ScenariosPuPaDataGeo>[] = projectPus.map(
       (projectPu) => ({
         scenarioId,

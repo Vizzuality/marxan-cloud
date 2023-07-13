@@ -118,6 +118,8 @@
     "@marxan/webshot/(.*)": "<rootDir>../../libs/webshot/src/$1",
     "@marxan/webshot": "<rootDir>../../libs/webshot/src",
     "@marxan/domain-ids/(.*)": "<rootDir>../../libs/domain-ids/src/$1",
-    "@marxan/domain-ids": "<rootDir>../../libs/domain-ids/src"
+    "@marxan/domain-ids": "<rootDir>../../libs/domain-ids/src",
+    "@marxan/output-project-summaries/(.*)": "<rootDir>../../libs/output-project-summaries/src/$1",
+    "@marxan/output-project-summaries": "<rootDir>../../libs/output-project-summaries/src"
   }
 }

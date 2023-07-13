@@ -20,8 +20,8 @@ import * as nock from 'nock';
 import { EntityManager, In, Repository } from 'typeorm';
 import { PromiseType } from 'utility-types';
 import { v4 } from 'uuid';
-import { GivenScenarioPuData } from '../../steps/given-scenario-pu-data-exists';
-import { bootstrapApplication, delay } from '../../utils';
+import { GivenScenarioAndProjectPuData } from '../../steps/given-scenario-pu-data-exists';
+import { bootstrapApplication } from '../../utils';
 
 const TEST_TIMEOUT_MULTIPLIER = 35000;
 
@@ -186,7 +186,7 @@ const getFixtures = async () => {
     GivenScenarioPuDataExists: async () => {
       outputsIds.push(
         ...(
-          await GivenScenarioPuData(
+          await GivenScenarioAndProjectPuData(
             entityManager,
             projectId,
             scenarioId,

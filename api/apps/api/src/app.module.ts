@@ -35,6 +35,7 @@ import { AsyncJobsGarbageCollectorModule } from './modules/async-jobs-garbage-co
 import { ExportCleanupModule } from './modules/export-cleanup/export-cleanup.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GeoFeatureTagsModule } from './modules/geo-feature-tags/geo-feature-tags.module';
+import { OutputProjectSummariesModule } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { GeoFeatureTagsModule } from './modules/geo-feature-tags/geo-feature-tag
     ThrottlerModule.forRoot(),
     ExportCleanupModule,
     ScheduleModule.forRoot(),
+    OutputProjectSummariesModule,
   ],
   controllers: [AppController, PingController],
   providers: [
