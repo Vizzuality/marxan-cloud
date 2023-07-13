@@ -89,6 +89,10 @@ export class FeatureAmountUploadService {
       );
 
       // Removing temporary data
+      await apiQueryRunner.manager.delete(FeatureAmountUploadRegistry, {
+        id: featuresRegistry.id,
+      });
+      // Committing transaction
 
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
