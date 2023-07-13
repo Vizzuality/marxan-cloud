@@ -99,7 +99,9 @@
       "@marxan/geofeatures": ["libs/geofeatures/src"],
       "@marxan/geofeatures/*": ["libs/geofeatures/src/*"],
       "@marxan/domain-ids": ["libs/domain-ids/src"],
-      "@marxan/domain-ids/*": ["libs/domain-ids/src/*"]
+      "@marxan/domain-ids/*": ["libs/domain-ids/src/*"],
+      "@marxan/output-project-summaries": ["libs/output-project-summaries/src"],
+      "@marxan/output-project-summaries/*": ["libs/output-project-summaries/src/*"],
     }
   },
   "exclude": ["node_modules", "dist"]

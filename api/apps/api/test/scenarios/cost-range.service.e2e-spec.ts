@@ -13,7 +13,7 @@ import {
 } from '@nestjs/typeorm';
 import { EntityManager, In, Repository } from 'typeorm';
 import { v4 } from 'uuid';
-import { GivenScenarioPuData } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
+import { GivenScenarioAndProjectPuData } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { bootstrapApplication } from '../utils/api-application';
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -71,13 +71,15 @@ async function getFixtures() {
 
   return {
     async GivenCostDataInDbForMultipleScenarios() {
-      const { rows: firstScenarioPuData } = await GivenScenarioPuData(
+      const { rows: firstScenarioPuData } = await GivenScenarioAndProjectPuData(
         entityManager,
         projectId,
         scenarioId,
         3,
       );
-      const { rows: secondScenarioPuData } = await GivenScenarioPuData(
+      const {
+        rows: secondScenarioPuData,
+      } = await GivenScenarioAndProjectPuData(
         entityManager,
         anotherProjectId,
         anotherScenarioId,

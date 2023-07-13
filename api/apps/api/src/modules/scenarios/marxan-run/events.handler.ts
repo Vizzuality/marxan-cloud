@@ -12,6 +12,7 @@ import {
 import { ScenarioRunProgressV1Alpha1DTO } from '@marxan-api/modules/api-events/dto/scenario-run-progress-v1-alpha-1';
 import { runEventsToken, runQueueToken } from './tokens';
 import { OutputRepository } from './output.repository';
+import { OutputProjectSummariesService } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
 
 @Injectable()
 export class EventsHandler {
@@ -22,6 +23,7 @@ export class EventsHandler {
     queueEvents: QueueEvents,
     private readonly apiEvents: ApiEventsService,
     private readonly outputs: OutputRepository,
+    private readonly outputProjectSummaryService: OutputProjectSummariesService,
   ) {
     queueEvents.on(`completed`, ({ jobId }, eventId) =>
       this.handleFinished(jobId, eventId),
@@ -83,6 +85,10 @@ export class EventsHandler {
   private async saveOutput(job: Job<JobData, ExecutionResult>) {
     try {
       await this.outputs.saveOutput(job);
+
+      await this.outputProjectSummaryService.saveSummaryForProjectOfScenario(
+        job.data.scenarioId,
+      );
     } catch (error) {
       await this.apiEvents.create({
         topic: job.data.scenarioId,

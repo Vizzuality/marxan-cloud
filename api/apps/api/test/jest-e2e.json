@@ -96,6 +96,8 @@
     "@marxan/geofeatures/(.*)": "<rootDir>/../../../libs/geofeatures/src/$1",
     "@marxan/geofeatures": "<rootDir>/../../../libs/geofeatures/src",
     "@marxan/domain-ids/(.*)": "<rootDir>/../../../libs/domain-ids/src/$1",
-    "@marxan/domain-ids": "<rootDir>/../../../libs/domain-ids/src"
+    "@marxan/domain-ids": "<rootDir>/../../../libs/domain-ids/src",
+    "@marxan/output-project-summaries/(.*)": "<rootDir>/../../../libs/output-project-summaries/src/$1",
+    "@marxan/output-project-summaries": "<rootDir>/../../../libs/output-project-summaries/src"
   }
 }
