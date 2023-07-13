@@ -22,20 +22,26 @@ import Controls from 'components/map/controls';
 import FitBoundsControl from 'components/map/controls/fit-bounds';
 import LoadingControl from 'components/map/controls/loading';
 import ZoomControl from 'components/map/controls/zoom';
+import type { NewProjectFields } from 'layout/projects/new/form';
 
-import ProjectMapProps from './types';
+const minZoom = 2;
+const maxZoom = 20;
 
-export const ProjectNewMap: React.FC<ProjectMapProps> = ({
-  country,
+export const ProjectNewMap = ({
+  bbox,
+  countryId,
   region,
   subregion,
   planningUnitAreakm2,
   planningUnitGridShape,
-  paOptionSelected,
-}: ProjectMapProps) => {
-  const minZoom = 2;
-  const maxZoom = 20;
-  const { bbox, uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId } = useSelector(
+  PAOptionSelected,
+}: Partial<NewProjectFields> & {
+  bbox: [number, number, number, number];
+  country: NewProjectFields['countryId'];
+  region: NewProjectFields['adminAreaLevel1Id'];
+  subregion: NewProjectFields['adminAreaLevel2Id'];
+}): JSX.Element => {
+  const { uploadingPlanningArea, uploadingPlanningAreaId, uploadingGridId } = useSelector(
     (state) => state['/projects/new']
   );
 
@@ -54,7 +60,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       active: !!uploadingPlanningArea,
       data: uploadingPlanningArea,
       options: {
-        customPAshapefileGrid: paOptionSelected === 'customPAshapefileGrid',
+        customPAshapefileGrid: PAOptionSelected === 'customPAshapefileGrid',
       },
     }),
     usePlanningAreaPreviewLayer({
@@ -67,12 +73,12 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
     }),
     useAdminPreviewLayer({
       active: true,
-      country,
+      country: countryId,
       region,
       subregion,
     }),
     usePUGridPreviewLayer({
-      active: paOptionSelected !== 'customPAshapefileGrid',
+      active: PAOptionSelected !== 'customPAshapefileGrid',
       bbox,
       planningUnitGridShape,
       planningUnitAreakm2,
@@ -84,7 +90,7 @@ export const ProjectNewMap: React.FC<ProjectMapProps> = ({
       setBounds({
         bbox: BBOX,
         options: {
-          padding: 50,
+          padding: { top: 50, right: 50, bottom: 50, left: 575 },
         },
         viewportOptions: {
           transitionDuration: 1000,

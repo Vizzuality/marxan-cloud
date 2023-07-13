@@ -167,7 +167,7 @@ export const ProjectsList: React.FC<ProjectsListProps> = () => {
 
   return (
     <Wrapper>
-      <div className="relative pb-10">
+      <div className="relative w-full pb-10">
         <Loading
           visible={isFetching && !isFetched}
           className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-black bg-opacity-90"

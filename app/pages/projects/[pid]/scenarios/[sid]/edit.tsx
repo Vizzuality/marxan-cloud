@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -12,10 +12,9 @@ import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
-import Header from 'layout/header';
-import DocumentationLink from 'layout/help/documentation';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
+import Sidebar from 'layout/project/sidebar';
 import Protected from 'layout/protected';
 import SidebarEditFeatures from 'layout/scenarios/edit/features';
 import ScenarioLock from 'layout/scenarios/edit/lock';
@@ -26,14 +25,13 @@ import SidebarSolutions from 'layout/scenarios/edit/solutions';
 import ScenarioStatus from 'layout/scenarios/edit/status';
 import ScenariosEditSidebar from 'layout/scenarios/sidebar';
 import Title from 'layout/title/scenario-title';
-import Wrapper from 'layout/wrapper';
 import { ScenarioSidebarTabs } from 'utils/tabs';
 
 export const getServerSideProps = withProtection(
   withUser(withProject(withScenario(withScenarioLock())))
 );
 
-const EditScenarioPage: React.FC = () => {
+const EditScenarioPage = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
   const { sid } = query;
@@ -91,31 +89,19 @@ const EditScenarioPage: React.FC = () => {
   return (
     <Protected>
       <Title title="Edit" />
-
       <MetaIcons />
-
-      <DocumentationLink />
-
-      <ProjectLayout>
-        <main className="flex h-screen w-screen flex-col">
-          <Header size="base" />
-
-          <div className="flex flex-grow flex-col overflow-hidden py-2.5">
-            <Wrapper>
-              <div className="grid h-full grid-cols-1 gap-10 md:grid-cols-2">
-                <ScenariosEditSidebar>
-                  <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
-                  <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
-                  <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
-                  <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
-                </ScenariosEditSidebar>
-                <ScenarioEditMap />
-              </div>
-            </Wrapper>
-          </div>
-          <ScenarioStatus />
-          <ScenarioLock />
-        </main>
+      <ProjectLayout className="z-10">
+        <Sidebar>
+          <ScenariosEditSidebar>
+            <SidebarEditPlanningUnit key={ScenarioSidebarTabs.PLANNING_UNIT} />
+            <SidebarEditFeatures key={ScenarioSidebarTabs.FEATURES} />
+            <SidebarEditAnalysis key={ScenarioSidebarTabs.PARAMETERS} />
+            <SidebarSolutions key={ScenarioSidebarTabs.SOLUTIONS} />
+          </ScenariosEditSidebar>
+        </Sidebar>
+        <ScenarioEditMap />
+        <ScenarioStatus />
+        <ScenarioLock />
       </ProjectLayout>
     </Protected>
   );
