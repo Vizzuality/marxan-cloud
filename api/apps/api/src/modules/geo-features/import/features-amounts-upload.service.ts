@@ -36,7 +36,6 @@ export class FeatureAmountUploadService {
     projectId: string;
     userId: string;
   }) {
-    let newFeatures: GeoFeature[];
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
@@ -46,6 +45,7 @@ export class FeatureAmountUploadService {
     await apiQueryRunner.startTransaction();
     await geoQueryRunner.startTransaction();
 
+    const newSavedFeatures: GeoFeature[] = [];
     try {
       // saving feature data to temporary table
       const featuresRegistry = await this.saveCsvToRegistry(
@@ -64,29 +64,34 @@ export class FeatureAmountUploadService {
       const geoFeaturesDataRepository = geoQueryRunner.manager.getRepository(
         GeoFeatureGeometry,
       );
-      newFeatures = await Promise.all(
-        featuresRegistry.uploadedFeatures.map(
-          async (feature: FeatureAmountCSVDto) => {
-            const savedFeature = await apiFeaturesRepository.save(
-              apiFeaturesRepository.create({
-                id: v4(),
-                featureClassName: feature.featureName,
-                projectId: data.projectId,
-                creationStatus: JobStatus.done,
-              }),
-            );
 
-            await geoFeaturesDataRepository.save(
-              geoFeaturesDataRepository.create({
-                featureId: savedFeature.id,
-                amount: feature.amount,
-              }),
-            );
+      let currentFeature: GeoFeature | undefined;
+      let currentFeatureName = 'none';
 
-            return savedFeature;
-          },
-        ),
-      );
+      for (const featureRecord of featuresRegistry.uploadedFeatures) {
+        if (
+          !currentFeature ||
+          featureRecord.featureName !== currentFeatureName
+        ) {
+          currentFeature = await apiFeaturesRepository.save(
+            apiFeaturesRepository.create({
+              id: v4(),
+              featureClassName: featureRecord.featureName,
+              projectId: data.projectId,
+              creationStatus: JobStatus.done,
+            }),
+          );
+          currentFeatureName = featureRecord.featureName;
+          newSavedFeatures.push(currentFeature);
+        }
+
+        await geoFeaturesDataRepository.save(
+          geoFeaturesDataRepository.create({
+            featureId: currentFeature.id,
+            amount: featureRecord.amount,
+          }),
+        );
+      }
 
       // Removing temporary data
       await apiQueryRunner.manager.delete(FeatureAmountUploadRegistry, {
@@ -110,7 +115,7 @@ export class FeatureAmountUploadService {
       await apiQueryRunner.release();
       await geoQueryRunner.release();
     }
-    return right(newFeatures);
+    return right(newSavedFeatures);
   }
   async saveCsvToRegistry(
     data: {
