@@ -6,12 +6,14 @@ import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
 
-import { useRunScenario } from 'hooks/scenarios';
+import { useSelectedFeatures } from 'hooks/features';
+import { useRunScenario, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
+import { useScenarioJobs } from 'layout/scenarios/edit/status/utils';
 import { cn } from 'utils/cn';
 
 import ADVANCED_SETTINGS_SVG from 'svgs/navigation/advanced-settings.svg?sprite';
@@ -67,12 +69,19 @@ export const Navigation = (): JSX.Element => {
     solutions: isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
     advancedSettings: isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
   });
-  const [scenarioRunning, setScenarioRunning] = useState(false);
 
   const inventoryItems = useInventoryItems();
   const gridSetupItems = useGridSetupItems();
   const solutionsItems = useSolutionItems();
   const advancedSettingsItems = useAdvancedSettingsItems();
+
+  const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
+
+  const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
+  const { jobs = [] } = scenarioStatusData || {};
+  const JOBS = useScenarioJobs(jobs);
+
+  const scenarioIsRunning = JOBS.find((j) => j.kind === 'run').status === 'running';
 
   const runScenarioMutation = useRunScenario({});
 
@@ -96,13 +105,10 @@ export const Navigation = (): JSX.Element => {
   }, []);
 
   const handleRunScenario = useCallback(() => {
-    setScenarioRunning(true);
-
     runScenarioMutation.mutate(
-      { id: `${sid}` },
+      { id: sid },
       {
-        onSuccess: ({ data: { data: s } }) => {
-          setScenarioRunning(false);
+        onSuccess: () => {
           addToast(
             'run-start',
             <>
@@ -113,10 +119,8 @@ export const Navigation = (): JSX.Element => {
               level: 'success',
             }
           );
-          console.info('Scenario runned succesfully', s);
         },
         onError: () => {
-          setScenarioRunning(false);
           addToast(
             'error-run-start',
             <>
@@ -314,7 +318,7 @@ export const Navigation = (): JSX.Element => {
           )}
         </div>
       </div>
-      {sid && !scenarioRunning && (
+      {sid && !!selectedFeaturesData.length && !scenarioIsRunning && (
         <div className="group flex flex-col-reverse items-center">
           <button
             type="button"
