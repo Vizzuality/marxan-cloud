@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -46,8 +46,6 @@ export const ActionsSummary = ({
     puTmpExcludedValue,
     puTmpAvailableValue,
     puAction,
-    drawingValue,
-    uploadingValue,
     puIncludedValue,
     puExcludedValue,
     puAvailableValue,
@@ -177,39 +175,6 @@ export const ActionsSummary = ({
       setUploadingValue,
     ]
   );
-
-  const showSaveAvailableSelection = useMemo<boolean>(() => {
-    if (puAction === 'available') {
-      return (
-        (method === 'select' && puTmpAvailableValue.length > 0) ||
-        (method === 'draw' && drawingValue?.length > 0) ||
-        (method === 'upload' && uploadingValue)
-      );
-    }
-    return false;
-  }, [puAction, puTmpAvailableValue, drawingValue, uploadingValue, method]);
-
-  const showSaveIncludeSelection = useMemo<boolean>(() => {
-    if (puAction === 'include') {
-      return (
-        (method === 'select' && puTmpIncludedValue.length > 0) ||
-        (method === 'draw' && drawingValue?.length > 0) ||
-        (method === 'upload' && uploadingValue)
-      );
-    }
-    return false;
-  }, [puAction, puTmpIncludedValue, drawingValue, uploadingValue, method]);
-
-  const showSaveExcludeSelection = useMemo<boolean>(() => {
-    if (puAction === 'exclude') {
-      return (
-        (method === 'select' && puTmpExcludedValue.length > 0) ||
-        (method === 'draw' && drawingValue?.length > 0) ||
-        (method === 'upload' && uploadingValue)
-      );
-    }
-    return false;
-  }, [puAction, puTmpExcludedValue, drawingValue, uploadingValue, method]);
 
   return (
     <div className="flex flex-col divide-y-2 divide-gray-500">
