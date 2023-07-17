@@ -50,7 +50,10 @@ import {
   FetchSpecification,
   ProcessFetchSpecification,
 } from 'nestjs-base-service';
-import { GeoFeatureResult } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
+import {
+  GeoFeature,
+  GeoFeatureResult,
+} from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { ApiConsumesShapefile } from '../../decorators/shapefile.decorator';
 import {
   notAllowed,
@@ -773,7 +776,7 @@ export class ProjectsController {
     @Param('projectId', ParseUUIDPipe) projectId: string,
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
-  ): Promise<FeatureAmountUploadRegistry> {
+  ): Promise<GeoFeature[]> {
     const result = await this.geoFeatureService.saveFeaturesToRegistry(
       file.buffer,
       projectId,

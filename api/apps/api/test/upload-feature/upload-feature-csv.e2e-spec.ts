@@ -12,7 +12,7 @@ afterEach(async () => {
 });
 
 test(`custom feature csv upload`, async () => {
-  await fixtures.WhenUploadingCustomFeatureFromCSV();
+  const result = await fixtures.WhenUploadingCustomFeatureFromCSV();
   await fixtures.ThenFeatureUploadRegistryIsCreated();
 });
 test('custom feature csv upload with missing puids', async () => {

@@ -15,6 +15,10 @@ import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.ent
 import { v4 } from 'uuid';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
+import {
+  PlanningUnitsGeom,
+  ProjectsPuEntity,
+} from '@marxan-jobs/planning-unit-geometry';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -68,7 +72,7 @@ export class FeatureAmountUploadService {
       let currentFeature: GeoFeature | undefined;
       let currentFeatureName = 'none';
 
-      for (const featureRecord of featuresRegistry.uploadedFeatures) {
+      for (const featureRecord of featuresRegistry.right.uploadedFeatures) {
         if (
           !currentFeature ||
           featureRecord.featureName !== currentFeatureName
@@ -85,10 +89,28 @@ export class FeatureAmountUploadService {
           newSavedFeatures.push(currentFeature);
         }
 
+        const projectPu = await geoQueryRunner.manager.findOne(
+          ProjectsPuEntity,
+          {
+            where: {
+              projectId: data.projectId,
+              puid: featureRecord.puId,
+            },
+          },
+        );
+
+        const puGeometry = await geoQueryRunner.manager
+          .createQueryBuilder()
+          .select('geom.the_geom', 'theGeom')
+          .from('planning_units_geom', 'geom')
+          .where('geom.id = :id', { id: projectPu?.geomId })
+          .getRawOne();
+
         await geoFeaturesDataRepository.save(
           geoFeaturesDataRepository.create({
             featureId: currentFeature.id,
             amount: featureRecord.amount,
+            theGeom: puGeometry?.theGeom,
           }),
         );
       }
