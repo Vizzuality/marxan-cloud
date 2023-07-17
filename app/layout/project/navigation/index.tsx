@@ -6,6 +6,9 @@ import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
 
+import { useRunScenario } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
 import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
@@ -55,6 +58,8 @@ export const Navigation = (): JSX.Element => {
   const isProjectRoute = route.startsWith('/projects/[pid]');
   const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/');
 
+  const { addToast } = useToasts();
+
   const [submenuState, setSubmenuState] = useState<{ [key in NavigationTreeCategories]: boolean }>({
     user: false,
     inventory: isProjectRoute && NAVIGATION_TREE.inventory.includes(tab),
@@ -62,11 +67,14 @@ export const Navigation = (): JSX.Element => {
     solutions: isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
     advancedSettings: isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
   });
+  const [scenarioRunning, setScenarioRunning] = useState(false);
 
   const inventoryItems = useInventoryItems();
   const gridSetupItems = useGridSetupItems();
   const solutionsItems = useSolutionItems();
   const advancedSettingsItems = useAdvancedSettingsItems();
+
+  const runScenarioMutation = useRunScenario({});
 
   const toggleSubmenu = useCallback((submenuKey: NavigationTreeCategories) => {
     if (submenuKey === 'user') {
@@ -88,9 +96,41 @@ export const Navigation = (): JSX.Element => {
   }, []);
 
   const handleRunScenario = useCallback(() => {
-    // todo: define run scenario button behaviour
-    console.log('handleRunScenario', sid);
-  }, [sid]);
+    setScenarioRunning(true);
+
+    runScenarioMutation.mutate(
+      { id: `${sid}` },
+      {
+        onSuccess: ({ data: { data: s } }) => {
+          setScenarioRunning(false);
+          addToast(
+            'run-start',
+            <>
+              <h2 className="font-medium">Success!</h2>
+              <p className="text-sm">Run started</p>
+            </>,
+            {
+              level: 'success',
+            }
+          );
+          console.info('Scenario runned succesfully', s);
+        },
+        onError: () => {
+          setScenarioRunning(false);
+          addToast(
+            'error-run-start',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">Scenario run failed</p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [addToast, runScenarioMutation, sid]);
 
   return (
     <nav className="z-20 flex h-screen max-w-[70px] flex-col items-center justify-between bg-gray-700 px-2 py-8">
@@ -274,7 +314,7 @@ export const Navigation = (): JSX.Element => {
           )}
         </div>
       </div>
-      {sid && (
+      {sid && !scenarioRunning && (
         <div className="group flex flex-col-reverse items-center">
           <button
             type="button"
