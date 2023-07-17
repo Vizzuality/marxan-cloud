@@ -361,5 +361,57 @@ describe(`when planning units exist for a scenario`, () => {
 
       expect(lockedOutPUsAfterClearingExcluded).toEqual([]);
     }, 10000);
+
+    it(`updates protected by default PUs once made available back to locked-in after clearing makeAvailable selection`, async () => {
+      /**
+       * Running the processor with no claims to make sure protected by default PUs
+       * are marked as locked in and value of lock status set by user is false
+       **/
+
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+        },
+      } as unknown) as Job<JobInput>);
+
+      const lockedInPUs = await world.GetPlanningUnitsLockedInByProtectedArea();
+      const availablePUsSetByUser = await world.GetAvailablePlanningUnitsChangedByUser();
+
+      expect(lockedInPUs.length).toEqual(7);
+      expect(availablePUsSetByUser.length).toEqual(0);
+
+      /**
+       * Making all protectedByDefault PUs available
+       **/
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+          makeAvailable: {
+            pu: lockedInPUs,
+          },
+        },
+      } as unknown) as Job<JobInput>);
+
+      expect(
+        await world.GetPlanningUnitsLockedInByProtectedArea(),
+      ).toHaveLength(0);
+      expect(await world.GetAvailablePlanningUnitsChangedByUser()).toHaveLength(
+        7,
+      );
+
+      // Clearing makeAvailable selection
+      await sut.process(({
+        data: {
+          scenarioId: world.scenarioId,
+        },
+      } as unknown) as Job<JobInput>);
+
+      expect(
+        await world.GetPlanningUnitsLockedInByProtectedArea(),
+      ).toHaveLength(7);
+      expect(await world.GetAvailablePlanningUnitsChangedByUser()).toHaveLength(
+        0,
+      );
+    }, 10000);
   });
 });
