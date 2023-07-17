@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 
 import { TippyProps } from '@tippyjs/react/headless';
 
-import { useSelectedFeatures } from 'hooks/features';
 import { useRunScenario, useScenarioStatus } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
@@ -75,13 +74,11 @@ export const Navigation = (): JSX.Element => {
   const solutionsItems = useSolutionItems();
   const advancedSettingsItems = useAdvancedSettingsItems();
 
-  const { data: selectedFeaturesData } = useSelectedFeatures(sid, {});
-
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
   const { jobs = [] } = scenarioStatusData || {};
   const JOBS = useScenarioJobs(jobs);
 
-  const scenarioIsRunning = JOBS.find((j) => j.kind === 'run').status === 'running';
+  const scenarioIsRunning = JOBS.find((j) => j.kind === 'run')?.status === 'running';
 
   const runScenarioMutation = useRunScenario({});
 
@@ -318,7 +315,7 @@ export const Navigation = (): JSX.Element => {
           )}
         </div>
       </div>
-      {sid && !!selectedFeaturesData.length && !scenarioIsRunning && (
+      {sid && !scenarioIsRunning && (
         <div className="group flex flex-col-reverse items-center">
           <button
             type="button"
