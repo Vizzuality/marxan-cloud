@@ -20,7 +20,9 @@ import { useMe } from 'hooks/me';
 import { useProjectUsers } from 'hooks/project-users';
 
 import { ItemProps } from 'components/scenarios/item/component';
-import type { Project } from 'types/api/project';
+import { Project } from 'types/api/project';
+import { Job } from 'types/job';
+import { Scenario } from 'types/scenario';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -120,13 +122,21 @@ export function useScenariosStatus(pId, requestConfig = {}, queryConfig = {}) {
   }, [query, data?.data]);
 }
 
-export function useScenarioStatus(pId, sId) {
+export function useScenarioStatus(pId: Project['id'], sId: Scenario['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['scenarios-status', pId, sId],
-    async () =>
-      PROJECTS.request({
+  return useQuery({
+    queryKey: ['scenarios-status', pId, sId],
+    queryFn: async () =>
+      PROJECTS.request<{
+        data: {
+          id: string;
+          type: 'project-jobs';
+          jobs: Job[];
+          scenarios: { id: Scenario['id']; jobs: Job[] }[];
+        };
+        meta: unknown;
+      }>({
         method: 'GET',
         url: `/${pId}/scenarios/status`,
         headers: {
@@ -135,28 +145,21 @@ export function useScenarioStatus(pId, sId) {
       }).then((response) => {
         return response.data;
       }),
-    {
-      enabled: !!sId,
-      placeholderData: {
-        data: {
-          scenarios: [],
-        },
+    enabled: !!sId,
+    placeholderData: {
+      data: {
+        scenarios: [],
+        jobs: [],
+        id: 'placeholder',
+        type: 'project-jobs',
       },
-      refetchInterval: 1000,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    const scenarios = data?.data?.scenarios || [];
-    const CURRENT = scenarios.find((s) => s.id === sId);
-
-    return {
-      ...query,
-      data: CURRENT || {},
-    };
-  }, [query, data?.data, sId]);
+      meta: {},
+    },
+    refetchInterval: 1000,
+    select: ({ data }) => {
+      return (data?.scenarios || []).find((s) => s.id === sId);
+    },
+  });
 }
 
 export function useScenariosStatusOnce({
