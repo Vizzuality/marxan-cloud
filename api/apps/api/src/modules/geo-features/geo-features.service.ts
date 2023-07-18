@@ -37,6 +37,7 @@ import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
 import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
+import { isLeft } from 'fp-ts/Either';
 
 const geoFeatureFilterKeyNames = [
   'featureClassName',
@@ -641,7 +642,7 @@ export class GeoFeaturesService extends AppBaseService<
   // TODO: this should be a 2 step process: We temporarily store the new features and their amounts
   //       after a user confirms which ones actually include
 
-  async saveFeaturesToRegistry(
+  async saveFeaturesFromCsv(
     fileBuffer: Buffer,
     projectId: string,
     userId: string,
@@ -670,10 +671,15 @@ export class GeoFeaturesService extends AppBaseService<
       return left(featureDataCannotBeUploadedWithCsv);
     }
 
-    return this.featureAmountUploads.uploadFeatureFromCsv({
+    const newFeatures = await this.featureAmountUploads.uploadFeatureFromCsv({
       fileBuffer,
       projectId,
       userId,
     });
+
+    if (isLeft(newFeatures)) {
+      return newFeatures.left;
+    }
+    return newFeatures;
   }
 }

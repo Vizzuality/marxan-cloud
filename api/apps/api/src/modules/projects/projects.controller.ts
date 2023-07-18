@@ -777,7 +777,7 @@ export class ProjectsController {
     @UploadedFile() file: Express.Multer.File,
     @Req() req: RequestWithAuthenticatedUser,
   ): Promise<GeoFeature[]> {
-    const result = await this.geoFeatureService.saveFeaturesToRegistry(
+    const result = await this.geoFeatureService.saveFeaturesFromCsv(
       file.buffer,
       projectId,
       req.user.id,
