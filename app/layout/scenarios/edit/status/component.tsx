@@ -28,7 +28,7 @@ export interface ScenarioStatusProps {}
 
 export const ScenarioStatus: React.FC<ScenarioStatusProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: scenarioData } = useScenario(sid);
   const { data: scenarioStatusData } = useScenarioStatus(pid, sid);
