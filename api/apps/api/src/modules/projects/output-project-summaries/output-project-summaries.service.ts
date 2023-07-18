@@ -41,7 +41,7 @@ export class OutputProjectSummariesService {
 
     const planningUnits = (await this.projectsPU.find({ where: { projectId } }))
       .map((pu) => pu.puid)
-      .sort();
+      .sort((a, b) => a - b);
 
     const scenarios = await this.scenarioRepo.find({
       select: { id: true, projectScenarioId: true, name: true },
@@ -95,7 +95,7 @@ export class OutputProjectSummariesService {
   ): CsvFormatterStream<FormatterRow, FormatterRow> {
     const projectScenarioIds = scenarios
       .map((scenario) => scenario.projectScenarioId)
-      .sort();
+      .sort((a, b) => a - b);
 
     // The headers of the CSV file is dependent on the set of scenarios for the project
     // it needs to be preocomputed in ascending order
@@ -113,7 +113,7 @@ export class OutputProjectSummariesService {
 
     const csvData = [];
     csvData.push(headers);
-    for (const planningUnit of planningUnits.sort()) {
+    for (const planningUnit of planningUnits.sort((a, b) => a - b)) {
       const row = [planningUnit];
 
       for (const projectScenarioId of projectScenarioIds) {
