@@ -12,6 +12,7 @@ import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
+import { OutputProjectSummaryApiEntity } from '@marxan/output-project-summaries';
 
 @Injectable()
 @PieceImportProvider()
@@ -176,6 +177,19 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
           .insert()
           .into('project_blms')
           .values({ id: projectId, ...projectMetadata.blmRange })
+          .execute();
+
+        await em
+          .createQueryBuilder()
+          .insert()
+          .into(OutputProjectSummaryApiEntity)
+          .values({
+            projectId: projectId,
+            summaryZippedData: Buffer.from(
+              projectMetadata.outputSummaryZip,
+              'base64',
+            ),
+          })
           .execute();
       });
     } catch (e) {

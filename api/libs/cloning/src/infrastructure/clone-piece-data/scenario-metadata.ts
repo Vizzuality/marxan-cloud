@@ -13,6 +13,7 @@ export type ScenarioMetadataContent = {
   ranAtLeastOnce: boolean;
   solutionsAreLocked: boolean;
   type: string;
+  projectScenarioId: number;
 };
 
 export const scenarioMetadataRelativePath = `scenario-metadata.json`;

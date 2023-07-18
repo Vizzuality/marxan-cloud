@@ -30,6 +30,8 @@ import {
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { ProjectSourcesEnum } from '@marxan/projects';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
+import * as archiver from 'archiver';
+import { readableToBuffer } from '@marxan/utils';
 
 interface ProjectSelectResult {
   name: string;
@@ -175,6 +177,14 @@ const getFixtures = async () => {
 
   const expectedMetadata = { foo: 'bar' };
 
+  const summaryZipStream = archiver('zip', { zlib: { level: 9 } });
+  summaryZipStream.append('This is a test of super awesome zipping', {
+    name: 'awesome-test.txt',
+  });
+  await summaryZipStream.finalize();
+  const summaryZipBuffer = await readableToBuffer(summaryZipStream);
+  const summaryZipEncoded = summaryZipBuffer.toString('base64');
+
   const validProjectMetadataFileContent: (
     sources: ProjectSourcesEnum,
   ) => ProjectMetadataContent = (sources: ProjectSourcesEnum) => ({
@@ -187,6 +197,7 @@ const getFixtures = async () => {
       values: [],
     },
     metadata: expectedMetadata,
+    outputSummaryZip: summaryZipEncoded,
     sources,
   });
 
@@ -306,6 +317,16 @@ const getFixtures = async () => {
             .execute();
 
           expect(blmRange).toMatchObject(validFileContent.blmRange);
+
+          const [outputSummary]: {
+            summaryZip: Buffer;
+          }[] = await entityManager
+            .createQueryBuilder()
+            .select('summary_zipped_data', 'summaryZip')
+            .from('output_project_summaries', 'ops')
+            .where('ops.project_id = :projectId', { projectId })
+            .execute();
+          expect(outputSummary.summaryZip).toMatchObject(summaryZipBuffer);
         },
       };
     },
