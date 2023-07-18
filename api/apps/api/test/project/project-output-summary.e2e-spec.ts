@@ -16,21 +16,21 @@ let fixtures: FixtureType<typeof getFixtures>;
 
 beforeEach(async () => {
   fixtures = await getFixtures();
-}, 100000);
+}, 12_000);
 
 describe('Projects - Output Project Summary', () => {
   it('when project summary is not found for a given project, return error', async () => {
     await fixtures.GivenNoOutputSummaryForProject();
     const response = await fixtures.WhenGettingOutputProjectSummaryWithError();
     fixtures.ThenNotFoundErrorIsReturned(response);
-  }, 100000);
+  });
 
   it("should download a proper zip file with the project's summary", async () => {
     // NOTE: The exact contents of the zip file and CSV format is tested more thoroughly on output-project-summaries.e2e-spec.ts
     await fixtures.GivenTestOutputSummaryForProjectExists();
     const response = await fixtures.WhenGettingOutputProjectSummary();
     await fixtures.ThenValidZipWasReturned(response);
-  }, 100000);
+  });
 });
 
 async function getFixtures() {
