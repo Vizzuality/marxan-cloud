@@ -9,12 +9,13 @@ import {
   importedFeatureNameAlreadyExist,
   unknownPuidsInFeatureAmountCsvUpload,
 } from '@marxan-api/modules/geo-features/geo-features.service';
-import { isLeft, left, right } from 'fp-ts/Either';
+import { isLeft, left, Right, right } from 'fp-ts/Either';
 import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/import/feature-import.events';
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { chunk } from 'lodash';
 import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan/utils/chunk-size-for-batch-geodb-operations';
+import { Left } from 'fp-ts/lib/Either';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -35,7 +36,7 @@ export class FeatureAmountUploadService {
     fileBuffer: Buffer;
     projectId: string;
     userId: string;
-  }) {
+  }): Promise<Left<any> | Right<GeoFeature[]>> {
     const apiQueryRunner = this.apiDataSource.createQueryRunner();
     const geoQueryRunner = this.geoDataSource.createQueryRunner();
 
@@ -45,8 +46,9 @@ export class FeatureAmountUploadService {
     await apiQueryRunner.startTransaction();
     await geoQueryRunner.startTransaction();
 
-    let newSavedFeatures;
+    let newFeaturesFromCsvUpload;
     try {
+      await this.events.createEvent(data);
       // saving feature data to temporary table
       const featuresRegistry = await this.saveCsvToRegistry(
         data,
@@ -54,84 +56,26 @@ export class FeatureAmountUploadService {
       );
 
       if (isLeft(featuresRegistry)) {
-        return left(featuresRegistry);
+        return featuresRegistry;
       }
-      // Saving features and features amounts
+      // Saving new features to apiDB 'features' table
 
-      const newFeaturesToCreate = (
-        await apiQueryRunner.manager
-          .createQueryBuilder()
-          .select('feature_name')
-          .from('features_amounts', 'fa')
-          .distinct(true)
-          .where('fa.upload_id = :id', { id: featuresRegistry.right.id })
-          .getRawMany()
-      ).map((feature) => {
-        return {
-          featureClassName: feature.feature_name,
-          projectId: data.projectId,
-          creationStatus: JobStatus.done,
-        };
-      });
+      newFeaturesFromCsvUpload = await this.saveNewFeaturesFromCsvUpload(
+        apiQueryRunner,
+        featuresRegistry.right.id,
+        data.projectId,
+      );
 
-      const newFeatures = await apiQueryRunner.manager
-        .createQueryBuilder()
-        .insert()
-        .into(GeoFeature)
-        .values(newFeaturesToCreate)
-        .returning('*')
-        .execute();
+      // Saving new features amounts and geoms to geoDB 'features_amounts' table
+      await this.saveNewFeaturesAmountsFromCsvUpload(
+        newFeaturesFromCsvUpload,
+        apiQueryRunner,
+        geoQueryRunner,
+        featuresRegistry.right.id,
+        data.projectId,
+      );
 
-      newSavedFeatures = newFeatures.raw;
-
-      for (const newFeature of newFeatures.raw) {
-        const featureAmounts = await apiQueryRunner.manager
-          .createQueryBuilder()
-          .select(['fa.puid', 'fa.amount'])
-          .from('features_amounts', 'fa')
-          .where('fa.upload_id = :id', { id: featuresRegistry.right.id })
-          .andWhere('fa.feature_name = :featureName', {
-            featureName: newFeature.feature_class_name,
-          })
-          .getRawMany();
-
-        const valuesToInsert = [];
-
-        for (const featureAmount of featureAmounts) {
-          valuesToInsert.push(
-            `
-            (
-                (SELECT the_geom FROM project_pus WHERE puid = ${featureAmount.fa_puid}),
-                '${newFeature.id}',
-                ${featureAmount.fa_amount},
-                (SELECT id FROM project_pus WHERE puid = ${featureAmount.fa_puid})
-            )
-            `,
-          );
-        }
-
-        const chunks = chunk(
-          valuesToInsert,
-          CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
-        );
-
-        for (const chunk of chunks) {
-          await geoQueryRunner.manager.query(
-            `
-           WITH project_pus AS (
-                SELECT ppu.id, ppu.puid, pug.the_geom FROM projects_pu ppu JOIN planning_units_geom pug ON pug.id = ppu.geom_id WHERE ppu.project_id = $1
-            )
-            INSERT INTO features_data (the_geom, feature_id, amount, project_pu_id)
-            VALUES
-              ${chunk.join(', ')}
-            RETURNING *
-          `,
-            [data.projectId],
-          );
-        }
-      }
-
-      // Removing temporary data
+      // Removing temporary data from apiDB uploads tables
       await apiQueryRunner.manager.delete(FeatureAmountUploadRegistry, {
         id: featuresRegistry.right.id,
       });
@@ -140,6 +84,7 @@ export class FeatureAmountUploadService {
       await apiQueryRunner.commitTransaction();
       await geoQueryRunner.commitTransaction();
     } catch (err) {
+      await this.events.failEvent(err);
       await apiQueryRunner.rollbackTransaction();
       await geoQueryRunner.rollbackTransaction();
 
@@ -152,8 +97,9 @@ export class FeatureAmountUploadService {
       // you need to release a queryRunner which was manually instantiated
       await apiQueryRunner.release();
       await geoQueryRunner.release();
+      await this.events.finishEvent();
     }
-    return right(newSavedFeatures);
+    return right(newFeaturesFromCsvUpload);
   }
   async saveCsvToRegistry(
     data: {
@@ -164,8 +110,6 @@ export class FeatureAmountUploadService {
     queryRunner: QueryRunner,
   ): Promise<any> {
     try {
-      await this.events.createEvent(data);
-
       const parsedFile = await featureAmountCsvParser(data.fileBuffer);
 
       const { featureNames, puids } = this.getFeatureNamesAndPuids(parsedFile);
@@ -187,10 +131,8 @@ export class FeatureAmountUploadService {
         data.userId,
         queryRunner.manager,
       );
-      await this.events.finishEvent();
       return right(importedRegistry);
     } catch (e) {
-      await this.events.failEvent(e);
       if (isLeft(e)) {
         return left(e);
       }
@@ -209,6 +151,93 @@ export class FeatureAmountUploadService {
       userId,
       uploadedFeatures: features,
     });
+  }
+
+  private async saveNewFeaturesFromCsvUpload(
+    queryRunner: QueryRunner,
+    uploadId: string,
+    projectId: string,
+  ) {
+    const newFeaturesToCreate = (
+      await queryRunner.manager
+        .createQueryBuilder()
+        .select('feature_name')
+        .from('features_amounts', 'fa')
+        .distinct(true)
+        .where('fa.upload_id = :id', { id: uploadId })
+        .getRawMany()
+    ).map((feature) => {
+      return {
+        featureClassName: feature.feature_name,
+        projectId: projectId,
+        creationStatus: JobStatus.done,
+      };
+    });
+
+    const newFeatures = await queryRunner.manager
+      .createQueryBuilder()
+      .insert()
+      .into(GeoFeature)
+      .values(newFeaturesToCreate)
+      .returning('*')
+      .execute();
+
+    return newFeatures.raw;
+  }
+
+  private async saveNewFeaturesAmountsFromCsvUpload(
+    newFeaturesFromCsvUpload: any[],
+    apiQueryRunner: QueryRunner,
+    geoQueryRunner: QueryRunner,
+    uploadId: string,
+    projectId: string,
+  ) {
+    for (const newFeature of newFeaturesFromCsvUpload) {
+      const featureAmounts = await apiQueryRunner.manager
+        .createQueryBuilder()
+        .select(['fa.puid', 'fa.amount'])
+        .from('features_amounts', 'fa')
+        .where('fa.upload_id = :uploadId', { uploadId })
+        .andWhere('fa.feature_name = :featureName', {
+          featureName: newFeature.feature_class_name,
+        })
+        .getRawMany();
+
+      const valuesToInsert = [];
+
+      for (const featureAmount of featureAmounts) {
+        valuesToInsert.push(
+          `
+            (
+                (SELECT the_geom FROM project_pus WHERE puid = ${featureAmount.fa_puid}),
+                '${newFeature.id}',
+                ${featureAmount.fa_amount},
+                (SELECT id FROM project_pus WHERE puid = ${featureAmount.fa_puid})
+            )
+            `,
+        );
+      }
+
+      const chunks = chunk(
+        valuesToInsert,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+      );
+
+      for (const chunk of chunks) {
+        await geoQueryRunner.manager.query(
+          `
+           WITH project_pus AS (
+                SELECT ppu.id, ppu.puid, pug.the_geom FROM projects_pu ppu JOIN planning_units_geom pug ON pug.id = ppu.geom_id WHERE ppu.project_id = $1
+            )
+            INSERT INTO features_data (the_geom, feature_id, amount, project_pu_id)
+            VALUES
+              ${chunk.join(', ')}
+            RETURNING *
+          `,
+          [projectId],
+        );
+      }
+    }
   }
 
   private async areFeatureNamesNotAlreadyUsedInProject(
