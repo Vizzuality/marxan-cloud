@@ -204,23 +204,40 @@ export class FeatureAmountUploadService {
         .getRawMany();
 
       const valuesToInsert = [];
+      const parameters: any[] = [projectId];
+      let nextParameterIndex = 2;
 
       for (const featureAmount of featureAmounts) {
         valuesToInsert.push(
           `
             (
-                (SELECT the_geom FROM project_pus WHERE puid = ${featureAmount.fa_puid}),
-                '${newFeature.id}',
-                ${featureAmount.fa_amount},
-                (SELECT id FROM project_pus WHERE puid = ${featureAmount.fa_puid})
+                (SELECT the_geom FROM project_pus WHERE puid = $${nextParameterIndex}),
+                $${nextParameterIndex + 1},
+                $${nextParameterIndex + 2},
+                (SELECT id FROM project_pus WHERE puid = $${
+                  nextParameterIndex + 3
+                })
             )
             `,
         );
+        parameters.push(
+          ...[
+            featureAmount.fa_puid,
+            newFeature.id,
+            featureAmount.fa_amount,
+            featureAmount.fa_puid,
+          ],
+        );
+        if (nextParameterIndex >= 4002) {
+          nextParameterIndex = 2;
+        } else {
+          nextParameterIndex += 4;
+        }
       }
 
       const chunks = chunk(
         valuesToInsert,
-        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS,
+        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS || 1000,
       );
 
       for (const chunk of chunks) {
@@ -234,7 +251,7 @@ export class FeatureAmountUploadService {
               ${chunk.join(', ')}
             RETURNING *
           `,
-          [projectId],
+          parameters,
         );
       }
     }
