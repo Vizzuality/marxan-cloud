@@ -24,3 +24,9 @@ test('custom feature csv upload with missing puids', async () => {
   await fixtures.ThenMissingPUIDErrorIsReturned(response);
   await fixtures.AndNoFeatureUploadIsRegistered();
 });
+
+test('custom feature csv upload with duplicated header', async () => {
+  const response = await fixtures.WhenUploadingACSVWithDuplicatedHeaders();
+  await fixtures.ThenDuplicatedHeaderErrorIsReturned(response);
+  await fixtures.AndNoFeatureUploadIsRegistered();
+});

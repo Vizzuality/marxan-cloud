@@ -290,6 +290,12 @@ export const getFixtures = async () => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
       expect(result.body.errors[0].title).toEqual('Missing PUID column');
     },
+    ThenDuplicatedHeaderErrorIsReturned: async (result: request.Response) => {
+      expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
+      expect(result.body.errors[0].title).toEqual(
+        'Duplicate headers found ["feat_1d666bd"]',
+      );
+    },
     AndNoFeatureUploadIsRegistered: async () => {
       const featureImportRegistryRecord = await featureImportRegistry.findOne({
         where: { projectId },

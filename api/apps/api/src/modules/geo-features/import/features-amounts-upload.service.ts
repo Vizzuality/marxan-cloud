@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { DataSource, EntityManager, QueryRunner } from 'typeorm';
 import { InjectDataSource, InjectEntityManager } from '@nestjs/typeorm';
@@ -92,7 +92,7 @@ export class FeatureAmountUploadService {
         'An error occurred creating features and saving amounts from csv (changes have been rolled back)',
         String(err),
       );
-      return left(err);
+      throw new BadRequestException(err);
     } finally {
       // you need to release a queryRunner which was manually instantiated
       await apiQueryRunner.release();
