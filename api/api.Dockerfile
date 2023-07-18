@@ -5,7 +5,7 @@ ENV NAME marxan-api
 ENV USER $NAME
 ENV APP_HOME /opt/$NAME
 
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash zip
 RUN addgroup $USER && adduser -s /bin/bash -D -G $USER $USER
 
 WORKDIR $APP_HOME
