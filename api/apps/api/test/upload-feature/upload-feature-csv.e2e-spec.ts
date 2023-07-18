@@ -13,7 +13,11 @@ afterEach(async () => {
 
 test(`custom feature csv upload`, async () => {
   const result = await fixtures.WhenUploadingCustomFeatureFromCSV();
-  await fixtures.ThenFeatureUploadRegistryIsCreated();
+
+  expect(result.body).toHaveLength(2);
+  await fixtures.ThenNewFeaturesAreCreated();
+  await fixtures.ThenNewFeaturesAmountsAreCreated();
+  await fixtures.ThenFeatureUploadRegistryIsCleared();
 });
 test('custom feature csv upload with missing puids', async () => {
   const response = await fixtures.WhenUploadingCsvWithMissingPUIDColumn();

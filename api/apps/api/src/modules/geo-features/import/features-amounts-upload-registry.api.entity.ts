@@ -24,7 +24,7 @@ export class FeatureAmountUploadRegistry {
   @OneToMany(
     () => UploadedFeatureAmount,
     (uploadedFeature) => uploadedFeature.upload,
-    { cascade: true },
+    { cascade: true, onDelete: 'CASCADE' },
   )
   uploadedFeatures!: UploadedFeatureAmount[];
 }
