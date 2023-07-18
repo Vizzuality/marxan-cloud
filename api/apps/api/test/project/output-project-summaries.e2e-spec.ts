@@ -182,6 +182,8 @@ const getFixtures = async () => {
 
       await clearTable(geoEntityManager, 'output_scenarios_pu_data');
       await clearTable(geoEntityManager, 'features_data');
+      await clearTable(geoEntityManager, 'scenarios_pu_data');
+      await clearTable(geoEntityManager, 'projects_pu');
       await clearTable(geoEntityManager, 'planning_units_geom');
     },
 
