@@ -143,6 +143,7 @@ export const getFixtures = async () => {
           values: [],
         },
         sources: ProjectSourcesEnum.marxanCloud,
+        outputSummaryZip: Buffer.from('Mock_zip_file.zip').toString('base64'),
       };
 
       await cloningFilesRepo.saveCloningFile(
