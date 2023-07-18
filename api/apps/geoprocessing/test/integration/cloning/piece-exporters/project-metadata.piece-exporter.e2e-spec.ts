@@ -20,6 +20,9 @@ import {
 import { GeoCloningFilesRepositoryModule } from '@marxan-geoprocessing/modules/cloning-files-repository';
 import { ProjectSourcesEnum } from '@marxan/projects';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
+import * as archiver from 'archiver';
+import { readableToBuffer } from '@marxan/utils';
+import { OutputProjectSummaryApiEntity } from '@marxan/output-project-summaries';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -39,9 +42,18 @@ describe(ProjectMetadataPieceExporter, () => {
       .ThenAProjectExistErrorShouldBeThrown();
   });
 
+  it('fails when project output summary is not found', async () => {
+    await fixtures.GivenProjectExist(ProjectSourcesEnum.marxanCloud);
+    const input = fixtures.GivenAProjectMetadataExportJob();
+    await fixtures
+      .WhenPieceExporterIsInvoked(input)
+      .ThenAnOtuputSummaryExistErrorShouldBeThrown();
+  });
+
   it('fails when project blm range is not found', async () => {
     await fixtures.GivenProjectExist(ProjectSourcesEnum.marxanCloud);
     const input = fixtures.GivenAProjectMetadataExportJob();
+    await fixtures.GivenOutputProjectSummaryExists();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenAProjectBlmExistErrorShouldBeThrown();
@@ -52,6 +64,7 @@ describe(ProjectMetadataPieceExporter, () => {
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures.GivenProjectExist(marxanSource);
     await fixtures.GivenProjectBlmRangeExist();
+    await fixtures.GivenOutputProjectSummaryExists();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenProjectMetadataFileIsSaved(marxanSource);
@@ -62,6 +75,7 @@ describe(ProjectMetadataPieceExporter, () => {
     const input = fixtures.GivenAProjectMetadataExportJob();
     await fixtures.GivenProjectExist(legacySource);
     await fixtures.GivenProjectBlmRangeExist();
+    await fixtures.GivenOutputProjectSummaryExists();
     await fixtures
       .WhenPieceExporterIsInvoked(input)
       .ThenProjectMetadataFileIsSaved(legacySource);
@@ -93,6 +107,14 @@ const getFixtures = async () => {
   const fileRepository = sandbox.get(CloningFilesRepository);
   const metadata = { foo: 'bar' };
 
+  const summaryZipStream = archiver('zip', { zlib: { level: 9 } });
+  summaryZipStream.append('This is a test of super awesome zipping', {
+    name: 'awesome-test.txt',
+  });
+  await summaryZipStream.finalize();
+  const summaryZipBuffer = await readableToBuffer(summaryZipStream);
+  const summaryZipEncoded = summaryZipBuffer.toString('base64');
+
   const expectedContent: (
     sources: ProjectSourcesEnum,
   ) => ProjectMetadataContent = (sources: ProjectSourcesEnum) => ({
@@ -103,6 +125,7 @@ const getFixtures = async () => {
       range: [0, 100],
       values: [],
     },
+    outputSummaryZip: summaryZipEncoded,
     metadata,
     sources,
   });
@@ -146,6 +169,17 @@ const getFixtures = async () => {
         })
         .execute();
     },
+    GivenOutputProjectSummaryExists: async () => {
+      return apiEntityManager
+        .createQueryBuilder()
+        .insert()
+        .into(OutputProjectSummaryApiEntity)
+        .values({
+          projectId: projectId,
+          summaryZippedData: summaryZipBuffer,
+        })
+        .execute();
+    },
     WhenPieceExporterIsInvoked: (input: ExportJobInput) => {
       return {
         ThenAProjectExistErrorShouldBeThrown: async () => {
@@ -153,6 +187,11 @@ const getFixtures = async () => {
         },
         ThenAProjectBlmExistErrorShouldBeThrown: async () => {
           await expect(sut.run(input)).rejects.toThrow(/blm.*does not exist/gi);
+        },
+        ThenAnOtuputSummaryExistErrorShouldBeThrown: async () => {
+          await expect(sut.run(input)).rejects.toThrow(
+            /Output Summary.*does not exist/gi,
+          );
         },
         ThenProjectMetadataFileIsSaved: async (sources: ProjectSourcesEnum) => {
           const result = await sut.run(input);

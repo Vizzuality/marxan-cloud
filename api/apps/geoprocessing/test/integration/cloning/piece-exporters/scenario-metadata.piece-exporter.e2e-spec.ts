@@ -104,6 +104,7 @@ const getFixtures = async () => {
     },
     ranAtLeastOnce: false,
     solutionsAreLocked,
+    projectScenarioId: 1,
     type: 'marxan',
   });
 
@@ -139,6 +140,7 @@ const getFixtures = async () => {
           number_of_runs: 6,
           metadata: { marxanInputParameterFile: { meta: '1' } },
           solutions_are_locked: solutionsAreLocked,
+          // ProjectScenarioId is informed automatically by a trigger, it will be 1, if it's the first scenario in the project
         },
       );
     },

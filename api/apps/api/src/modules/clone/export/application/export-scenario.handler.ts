@@ -39,6 +39,7 @@ export class ExportScenarioHandler
       projectId: scenario.projectId,
       metadata: scenario.metadata,
     });
+    // No need to inform projectScenarioId, because it will be generated automatically by the trigger
   }
 
   async execute({

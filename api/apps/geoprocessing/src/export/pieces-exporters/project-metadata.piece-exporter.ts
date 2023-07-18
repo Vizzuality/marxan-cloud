@@ -68,6 +68,22 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       throw new Error(errorMessage);
     }
 
+    const [outputSummary]: {
+      summaryZip: Buffer;
+    }[] = await this.entityManager
+      .createQueryBuilder()
+      .select('summary_zipped_data', 'summaryZip')
+      .from('output_project_summaries', 'ops')
+      .where('ops.project_id = :projectId', { projectId })
+      .execute();
+
+    if (!outputSummary) {
+      const errorMessage = `${ProjectMetadataPieceExporter.name} - Output Summary for project with id ${projectId} does not exist.`;
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    const summaryZip64 = outputSummary.summaryZip.toString('base64');
+
     const [blmRange]: [
       SelectProjectBlmResult,
     ] = await this.entityManager
@@ -90,6 +106,7 @@ export class ProjectMetadataPieceExporter implements ExportPieceProcessor {
       blmRange,
       metadata: projectData.metadata ?? undefined,
       sources: projectData.sources,
+      outputSummaryZip: summaryZip64,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
