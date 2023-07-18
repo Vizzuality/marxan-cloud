@@ -21,8 +21,8 @@ import {
   exportResourceKindIsNotProject,
   projectIsMissingInfoForRegularPus,
   projectIsNotPublished,
-  projectNotFound,
   projectNotEditable,
+  projectNotFound,
   projectNotFoundForExport,
   projectNotVisible,
 } from '@marxan-api/modules/projects/projects.service';
@@ -82,10 +82,10 @@ import {
   userNotFound,
 } from '@marxan-api/modules/access-control/access-control.types';
 import {
-  missingPuidColumnInFeatureAmountCsvUpload,
-  importedFeatureNameAlreadyExist,
-  unknownPuidsInFeatureAmountCsvUpload,
   featureDataCannotBeUploadedWithCsv,
+  importedFeatureNameAlreadyExist,
+  missingPuidColumnInFeatureAmountCsvUpload,
+  unknownPuidsInFeatureAmountCsvUpload,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import {
   duplicateHeadersInFeatureAmountCsvUpload,
@@ -98,6 +98,7 @@ import {
   featureNotFoundWithinProject,
   tagNotFoundForProject,
 } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
+import { outputProjectSummaryNotFound } from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
 
 interface ErrorHandlerOptions {
   projectId?: string;
@@ -169,8 +170,8 @@ export const mapAclDomainToHttpError = (
     | typeof duplicateHeadersInFeatureAmountCsvUpload
     | typeof noFeaturesFoundInInFeatureAmountCsvUpload
     | ImportProjectError
-    | typeof featureDataCannotBeUploadedWithCsv,
-
+    | typeof featureDataCannotBeUploadedWithCsv
+    | typeof outputProjectSummaryNotFound,
   options?: ErrorHandlerOptions,
 ) => {
   switch (errorToCheck) {
@@ -371,6 +372,10 @@ export const mapAclDomainToHttpError = (
     case featureDataCannotBeUploadedWithCsv:
       throw new ForbiddenException(
         `User with id ${options?.userId} cannot upload feature data with csv for project with id ${options?.projectId}`,
+      );
+    case outputProjectSummaryNotFound:
+      throw new NotFoundException(
+        `Output Summary for Project with id: ${options?.projectId} not found`,
       );
 
     default:
