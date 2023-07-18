@@ -172,31 +172,7 @@ export const GivenScenarioAndProjectPuData = async (
 }> => {
   return entityManager.transaction(async (em) => {
     const projectPus = await GivenProjectsPu(em, projectId, count, geomType);
-
-    const scenarioPuData: DeepPartial<ScenariosPuPaDataGeo>[] = projectPus.map(
-      (projectPu) => ({
-        scenarioId,
-        lockStatus: LockStatus.Available,
-        projectPuId: projectPu.id,
-      }),
-    );
-
-    const rows = await em.save(ScenariosPuPaDataGeo, scenarioPuData);
-    return {
-      scenarioId,
-      rows: rows as ScenariosPlanningUnitGeoEntity[],
-    };
-  });
-};
-
-export const GivenProjectPuData = async (
-  entityManager: EntityManager,
-  projectId: string,
-  count = 100,
-  geomType: PlanningUnitGridShape = PlanningUnitGridShape.Square,
-): Promise<ProjectsPuEntity[]> => {
-  return entityManager.transaction(async (em) => {
-    return GivenProjectsPu(em, projectId, count, geomType);
+    return await GivenScenarioPuData(em, projectId, scenarioId, projectPus);
   });
 };
 
@@ -209,19 +185,17 @@ export const GivenScenarioPuData = async (
   scenarioId: string;
   rows: ScenariosPlanningUnitGeoEntity[];
 }> => {
-  return entityManager.transaction(async (em) => {
-    const scenarioPuData: DeepPartial<ScenariosPuPaDataGeo>[] = projectPus.map(
-      (projectPu) => ({
-        scenarioId,
-        lockStatus: LockStatus.Available,
-        projectPuId: projectPu.id,
-      }),
-    );
-
-    const rows = await em.save(ScenariosPuPaDataGeo, scenarioPuData);
-    return {
+  const scenarioPuData: DeepPartial<ScenariosPuPaDataGeo>[] = projectPus.map(
+    (projectPu) => ({
       scenarioId,
-      rows: rows as ScenariosPlanningUnitGeoEntity[],
-    };
-  });
+      lockStatus: LockStatus.Available,
+      projectPuId: projectPu.id,
+    }),
+  );
+
+  const rows = await entityManager.save(ScenariosPuPaDataGeo, scenarioPuData);
+  return {
+    scenarioId,
+    rows: rows as ScenariosPlanningUnitGeoEntity[],
+  };
 };

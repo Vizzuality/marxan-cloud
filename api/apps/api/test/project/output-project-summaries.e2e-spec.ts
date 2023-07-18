@@ -14,14 +14,12 @@ import { parseStream } from 'fast-csv';
 import { Readable } from 'stream';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { bootstrapApplication } from '../utils/api-application';
-import {
-  GivenProjectPuData,
-  GivenScenarioPuData,
-} from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
+import { GivenScenarioPuData } from '../../../geoprocessing/test/steps/given-scenario-pu-data-exists';
 import { Scenario } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
 import { Organization } from '@marxan-api/modules/organizations/organization.api.entity';
 import { Parse, ParseStream } from 'unzipper';
+import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-projects-pu-exists';
 
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 beforeEach(async () => {
@@ -202,7 +200,7 @@ const getFixtures = async () => {
     },
 
     GivenProjectPuDataExists: async (projectId: string) => {
-      return GivenProjectPuData(
+      return GivenProjectsPu(
         geoEntityManager,
         projectId,
         NUMBER_OF_PU_IN_SAMPLE,
