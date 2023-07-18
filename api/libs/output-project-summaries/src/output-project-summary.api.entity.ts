@@ -1,5 +1,14 @@
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { BaseServiceResource } from '@marxan-api/types/resource.interface';
+
+export const outputProjectSummaryResource: BaseServiceResource = {
+  className: 'OutputProjectSummary',
+  name: {
+    singular: 'outputProjectSummary',
+    plural: 'outputProjectSummaries',
+  },
+};
 
 @Entity('output_project_summaries')
 export class OutputProjectSummaryApiEntity {

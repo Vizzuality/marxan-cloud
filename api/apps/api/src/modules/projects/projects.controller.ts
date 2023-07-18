@@ -30,6 +30,7 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
+  ApiProduces,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -152,6 +153,7 @@ import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
+import { outputProjectSummaryResource } from '@marxan/output-project-summaries/output-project-summary.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
@@ -1323,6 +1325,41 @@ export class ProjectsController {
       }
     }
     return { exports: resultOrError.right };
+  }
+
+  @ImplementsAcl()
+  @ApiOperation({
+    description:
+      "Returns a zip file containing CSVs with summary information for the execution of all the Project's Scenarios",
+  })
+  @ApiParam({ name: 'projectId', description: 'Id of the Project' })
+  @ApiProduces('application/zip')
+  @Header('Content-Type', 'application/zip')
+  @Get(':projectId/output-summary')
+  async getOutputSummary(
+    @Param('projectId') projectId: string,
+    @Req() req: RequestWithAuthenticatedUser,
+    @Res() response: Response,
+  ) {
+    const result = await this.projectsService.getOutputSummary(
+      req.user.id,
+      projectId,
+    );
+
+    if (isLeft(result)) {
+      throw mapAclDomainToHttpError(result.left, {
+        resourceType: outputProjectSummaryResource.name.singular,
+        projectId,
+        userId: req.user.id,
+      });
+    }
+
+    response.set(
+      'Content-Disposition',
+      `attachment; filename="output-summary-${projectId}"`,
+    );
+
+    response.send(result.right); // @debt should refactored to use StreameableFile or at least use streams, but doesn't seem to work right away
   }
 
   @ImplementsAcl()

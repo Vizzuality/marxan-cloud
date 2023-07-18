@@ -111,6 +111,10 @@ import stream from 'stream';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 import { WebshotBasicPdfConfig } from '@marxan/webshot/webshot.dto';
 import { ScenariosService } from '@marxan-api/modules/scenarios/scenarios.service';
+import {
+  OutputProjectSummariesService,
+  outputProjectSummaryNotFound,
+} from '@marxan-api/modules/projects/output-project-summaries/output-project-summaries.service';
 
 export { validationFailed } from '../planning-areas';
 
@@ -148,6 +152,7 @@ export class ProjectsService {
     private readonly webshotService: WebshotService,
     @Inject(forwardRef(() => ScenariosService))
     private readonly scenariosService: ScenariosService,
+    private readonly outputProjectSummariesService: OutputProjectSummariesService,
   ) {}
 
   async findAllGeoFeatures(
@@ -620,15 +625,6 @@ export class ProjectsService {
     this.planningAreaService,
   );
 
-  private async assertProject(
-    projectId = '',
-    forUser: ProjectsRequest['authenticatedUser'],
-  ) {
-    return await this.queryBus.execute(
-      new GetProjectQuery(projectId, forUser?.id),
-    );
-  }
-
   async getExportedArchive(
     projectId: string,
     userId: string,
@@ -830,6 +826,35 @@ export class ProjectsService {
     );
 
     return pdfStream;
+  }
+
+  async getOutputSummary(
+    userId: string,
+    projectId: string,
+  ): Promise<
+    Either<typeof outputProjectSummaryNotFound | typeof forbiddenError, Buffer>
+  > {
+    if (!(await this.projectAclService.canViewProject(userId, projectId))) {
+      return left(forbiddenError);
+    }
+
+    const summary = await this.outputProjectSummariesService.getOutputSummaryForProject(
+      projectId,
+    );
+    if (!summary) {
+      return left(outputProjectSummaryNotFound);
+    }
+
+    return right(summary?.summaryZippedData);
+  }
+
+  private async assertProject(
+    projectId = '',
+    forUser: ProjectsRequest['authenticatedUser'],
+  ) {
+    return await this.queryBus.execute(
+      new GetProjectQuery(projectId, forUser?.id),
+    );
   }
 
   /**

@@ -15,6 +15,10 @@ import { mkdir, rm } from 'fs/promises';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { AppConfig } from '@marxan-api/utils/config.utils';
 
+export const outputProjectSummaryNotFound = Symbol(
+  'output project summary not found',
+);
+
 export const outputProjectSummaryFolder = 'output-project-summary/';
 export const outputProjectSummaryFilename = 'summary.csv';
 export const outputProjectSummaryScenariosFilename = 'scenarios.csv';
@@ -33,6 +37,12 @@ export class OutputProjectSummariesService {
     @InjectRepository(OutputProjectSummaryApiEntity)
     private readonly outputSummaryRepo: Repository<OutputProjectSummaryApiEntity>,
   ) {}
+
+  async getOutputSummaryForProject(
+    projectId: string,
+  ): Promise<OutputProjectSummaryApiEntity | null> {
+    return this.outputSummaryRepo.findOne({ where: { projectId } });
+  }
 
   async saveSummaryForProjectOfScenario(scenarioId: string): Promise<void> {
     const { projectId } = await this.scenarioRepo.findOneOrFail({
