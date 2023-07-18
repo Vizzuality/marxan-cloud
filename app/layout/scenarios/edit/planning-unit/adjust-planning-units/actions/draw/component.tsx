@@ -6,8 +6,6 @@ import { useRouter } from 'next/router';
 
 import { getScenarioEditSlice } from 'store/slices/scenarios/edit';
 
-import ActionsSummary from 'layout/scenarios/edit/planning-unit/adjust-planning-units/actions-summary';
-
 export const DrawPUMethod = (): JSX.Element => {
   const { query } = useRouter();
   const { sid } = query as { sid: string };
@@ -26,12 +24,9 @@ export const DrawPUMethod = (): JSX.Element => {
   }, []);
 
   return (
-    <>
-      <span className="text-sm text-gray-400">
-        Click over the map and draw a shape to include them it the analysis
-      </span>
-      <ActionsSummary method="draw" />
-    </>
+    <span className="text-sm text-gray-400">
+      Click over the map and draw a shape to include them it the analysis
+    </span>
   );
 };
 

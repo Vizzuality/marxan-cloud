@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { useDispatch } from 'react-redux';
 
 import { useRouter } from 'next/router';
@@ -14,7 +14,6 @@ import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
 import { PLANNING_UNIT_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
-import ActionsSummary from 'layout/scenarios/edit/planning-unit/adjust-planning-units/actions-summary';
 import { cn } from 'utils/cn';
 import { bytesToMegabytes } from 'utils/units';
 
@@ -31,7 +30,7 @@ export const UploadPUMethod = (): JSX.Element => {
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setUploading, setUploadingValue } = scenarioSlice.actions;
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     setLoading(true);
     const f = acceptedFiles[0];
 
@@ -40,7 +39,7 @@ export const UploadPUMethod = (): JSX.Element => {
 
     dispatch(setUploading(true));
 
-    await uploadScenarioPUMutation.mutate(
+    uploadScenarioPUMutation.mutate(
       { id: `${sid}`, data },
       {
         onSuccess: ({ data: { data: g } }) => {
@@ -118,7 +117,7 @@ export const UploadPUMethod = (): JSX.Element => {
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -126,7 +125,7 @@ export const UploadPUMethod = (): JSX.Element => {
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            code: error.code,
             message: `File is larger than ${bytesToMegabytes(PLANNING_UNIT_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
@@ -242,8 +241,6 @@ export const UploadPUMethod = (): JSX.Element => {
           </div>
         </div>
       )}
-
-      <ActionsSummary method="upload" />
     </>
   );
 };

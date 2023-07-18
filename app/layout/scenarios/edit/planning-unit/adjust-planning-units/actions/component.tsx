@@ -11,6 +11,7 @@ import { useSaveScenarioPU } from 'hooks/scenarios';
 import { useToasts } from 'hooks/toast';
 
 import Select from 'components/forms/select';
+import ActionsSummary from 'layout/scenarios/edit/planning-unit/adjust-planning-units/actions-summary';
 
 import DrawPUMethod from './draw';
 import SelectPUMethod from './select';
@@ -204,6 +205,7 @@ export const PlanningUnitMethods = () => {
             {values['pu-method'] === 'select' && <SelectPUMethod />}
             {values['pu-method'] === 'draw' && <DrawPUMethod />}
             {values['pu-method'] === 'upload' && <UploadPUMethod />}
+            <ActionsSummary method={values['pu-method']} />
           </form>
         );
       }}
