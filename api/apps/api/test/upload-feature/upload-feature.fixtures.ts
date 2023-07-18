@@ -4,7 +4,7 @@ import { GivenProjectExists } from '../steps/given-project';
 
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { GeoFeatureGeometry } from '@marxan/geofeatures';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
@@ -43,6 +43,13 @@ export const getFixtures = async () => {
 
   const featureImportRegistry: Repository<FeatureAmountUploadRegistry> = app.get(
     getRepositoryToken(FeatureAmountUploadRegistry, DbConnections.default),
+  );
+  const featuresRepository: Repository<GeoFeature> = app.get(
+    getRepositoryToken(GeoFeature, DbConnections.default),
+  );
+
+  const featuresAmounsGeoDbRepository: Repository<GeoFeatureGeometry> = app.get(
+    getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
   );
 
   const geoEntityManager: EntityManager = app.get(
@@ -233,13 +240,51 @@ export const getFixtures = async () => {
         },
       ]);
     },
-    ThenFeatureUploadRegistryIsCreated: async () => {
+    ThenNewFeaturesAreCreated: async () => {
+      const newFeaturesAdded = await featuresRepository.find({
+        where: {
+          featureClassName: In(['feat_1d666bd', 'feat_28135ef']),
+        },
+      });
+      expect(newFeaturesAdded).toHaveLength(2);
+      expect(newFeaturesAdded[0].projectId).toBe(projectId);
+    },
+
+    ThenNewFeaturesAmountsAreCreated: async () => {
+      const newFeatures1 = await featuresRepository.findOne({
+        where: {
+          featureClassName: 'feat_1d666bd',
+        },
+      });
+      const newFeatures2 = await featuresRepository.findOne({
+        where: {
+          featureClassName: 'feat_28135ef',
+        },
+      });
+      const newFeature1Amounts = await featuresAmounsGeoDbRepository.find({
+        where: { featureId: newFeatures1?.id },
+      });
+      const newFeature2Amounts = await featuresAmounsGeoDbRepository.find({
+        where: { featureId: newFeatures2?.id },
+      });
+
+      expect(newFeature1Amounts).toHaveLength(3);
+      expect(newFeature2Amounts).toHaveLength(3);
+      expect(newFeature1Amounts[0].amount).toBe(4.245387225);
+      expect(newFeature1Amounts[1].amount).toBe(4.245387225);
+      expect(newFeature1Amounts[2].amount).toBe(4.245387225);
+
+      expect(newFeature2Amounts[0].amount).toBe(0);
+      expect(newFeature2Amounts[1].amount).toBe(0);
+      expect(newFeature2Amounts[2].amount).toBe(0);
+    },
+    ThenFeatureUploadRegistryIsCleared: async () => {
       const featureImportRegistryRecord = await featureImportRegistry.findOne({
         where: { projectId },
         relations: ['uploadedFeatures'],
       });
-      expect(featureImportRegistryRecord?.projectId).toEqual(projectId);
-      expect(featureImportRegistryRecord?.uploadedFeatures).toHaveLength(6);
+      expect(featureImportRegistryRecord?.projectId).toBeUndefined();
+      expect(featureImportRegistryRecord?.uploadedFeatures).toBeUndefined();
     },
     ThenMissingPUIDErrorIsReturned: async (result: request.Response) => {
       expect(result.body.errors[0].status).toEqual(HttpStatus.BAD_REQUEST);
