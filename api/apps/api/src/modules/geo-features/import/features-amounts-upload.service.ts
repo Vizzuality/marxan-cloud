@@ -14,8 +14,8 @@ import { FeatureImportEventsService } from '@marxan-api/modules/geo-features/imp
 import { GeoFeature } from '@marxan-api/modules/geo-features/geo-feature.api.entity';
 import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { chunk } from 'lodash';
-import { CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS } from '@marxan/utils/chunk-size-for-batch-geodb-operations';
 import { Left } from 'fp-ts/lib/Either';
+import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -203,44 +203,36 @@ export class FeatureAmountUploadService {
         })
         .getRawMany();
 
-      const valuesToInsert = [];
-      const parameters: any[] = [projectId];
-      let nextParameterIndex = 2;
-
-      for (const featureAmount of featureAmounts) {
-        valuesToInsert.push(
-          `
-            (
-                (SELECT the_geom FROM project_pus WHERE puid = $${nextParameterIndex}),
-                $${nextParameterIndex + 1},
-                $${nextParameterIndex + 2},
-                (SELECT id FROM project_pus WHERE puid = $${
-                  nextParameterIndex + 3
-                })
-            )
-            `,
-        );
-        parameters.push(
-          ...[
-            featureAmount.fa_puid,
-            newFeature.id,
-            featureAmount.fa_amount,
-            featureAmount.fa_puid,
-          ],
-        );
-        if (nextParameterIndex >= 4002) {
-          nextParameterIndex = 2;
-        } else {
-          nextParameterIndex += 4;
-        }
-      }
-
-      const chunks = chunk(
-        valuesToInsert,
-        CHUNK_SIZE_FOR_BATCH_GEODB_OPERATIONS || 1000,
+      const featuresChunks = chunk(
+        featureAmounts,
+        CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS,
       );
 
-      for (const chunk of chunks) {
+      for (const featureChunk of featuresChunks) {
+        const firstParameterNumber = 2;
+        const parameters: any[] = [projectId];
+        const valuesToInsert = featureChunk.map((featureAmount, index) => {
+          parameters.push(
+            ...[
+              featureAmount.fa_puid,
+              newFeature.id,
+              featureAmount.fa_amount,
+              featureAmount.fa_puid,
+            ],
+          );
+          return `
+            (
+                (SELECT the_geom FROM project_pus WHERE puid = $${
+                  firstParameterNumber + index * 4
+                }),
+                $${firstParameterNumber + index * 4 + 1},
+                $${firstParameterNumber + index * 4 + 2},
+                (SELECT id FROM project_pus WHERE puid = $${
+                  firstParameterNumber + index * 4 + 3
+                })
+            )
+            `;
+        });
         await geoQueryRunner.manager.query(
           `
            WITH project_pus AS (
@@ -248,7 +240,7 @@ export class FeatureAmountUploadService {
             )
             INSERT INTO features_data (the_geom, feature_id, amount, project_pu_id)
             VALUES
-              ${chunk.join(', ')}
+              ${valuesToInsert.join(', ')}
             RETURNING *
           `,
           parameters,
