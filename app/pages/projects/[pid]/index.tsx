@@ -6,6 +6,7 @@ import { withProject } from 'hoc/projects';
 import MetaIcons from 'layout/meta-icons';
 import ProjectLayout from 'layout/project';
 import Sidebar from 'layout/project/sidebar';
+import InventoryProjectHeader from 'layout/project/sidebar/project/header';
 import InventoryPanelCostSurface from 'layout/project/sidebar/project/inventory-panel/cost-surface';
 import InventoryPanelFeatures from 'layout/project/sidebar/project/inventory-panel/features';
 import InventoryPanelProtectedAreas from 'layout/project/sidebar/project/inventory-panel/protected-areas';
@@ -28,7 +29,9 @@ const ShowProjectsPage = (): JSX.Element => {
       <MetaIcons />
       <ProjectLayout className="relative z-10">
         <Sidebar className="flex-col">
+          {/* // !TODO: Remove this component */}
           <ProjectHeader />
+          <InventoryProjectHeader />
           {tab === 'features' && <InventoryPanelFeatures />}
           {tab === 'protected-areas' && <InventoryPanelProtectedAreas />}
           {tab === 'cost-surface' && <InventoryPanelCostSurface />}
