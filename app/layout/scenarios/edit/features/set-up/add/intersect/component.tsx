@@ -4,7 +4,11 @@ import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import { useRouter } from 'next/router';
 
-import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import {
+  useAllPaginatedFeatures,
+  useSaveSelectedFeatures,
+  useSelectedFeatures,
+} from 'hooks/features';
 
 import Button from 'components/button';
 import { composeValidators } from 'components/forms/validations';
@@ -37,7 +41,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
 
   const intersectingCurrent = selectedFeaturesData.find((s) => s.id === intersecting);
 
-  const { isFetched: allFeaturesIsFetched } = useAllFeatures(pid, {
+  const { isFetched: allFeaturesIsFetched } = useAllPaginatedFeatures(pid, {
     search,
   });
 

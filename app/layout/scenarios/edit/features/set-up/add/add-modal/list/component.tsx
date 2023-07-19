@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
-import { useAllFeatures } from 'hooks/features';
+import { useAllPaginatedFeatures } from 'hooks/features';
 import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/features/raw-item';
@@ -26,7 +26,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
   onToggleSelected,
 }: ScenariosFeaturesAddListProps) => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const {
     data: allFeaturesData,
@@ -34,7 +34,7 @@ export const ScenariosFeaturesAddList: React.FC<ScenariosFeaturesAddListProps> =
     hasNextPage,
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
-  } = useAllFeatures(pid, {
+  } = useAllPaginatedFeatures(pid, {
     search,
     filters,
     sort,
