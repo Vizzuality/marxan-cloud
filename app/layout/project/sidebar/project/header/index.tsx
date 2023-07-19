@@ -28,6 +28,8 @@ const InventoryProjectHeader = (): JSX.Element => {
 
   const { data: projectData } = useProject(pid);
 
+  console.log({ projectData });
+
   const editable = useCanEditProject(pid);
 
   const saveProjectMutation = useSaveProject({
