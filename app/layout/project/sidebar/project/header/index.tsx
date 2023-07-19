@@ -4,7 +4,7 @@ import ProjectTitle from 'layout/project/sidebar/project/header/title';
 
 const InventoryProjectHeader = (): JSX.Element => {
   return (
-    <div className="flex items-start justify-between">
+    <div className="mb-6 flex items-start justify-between">
       <ProjectTitle />
       <div className="mt-4 flex items-center space-x-5">
         <Contributors />
