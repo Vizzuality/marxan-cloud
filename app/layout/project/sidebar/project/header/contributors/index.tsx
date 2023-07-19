@@ -59,7 +59,7 @@ export const Contributors: React.FC = () => {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -10, opacity: 0 }}
         >
-          <div className="mt-4 flex items-center">
+          <div className="flex items-center">
             <ul className="ml-2.5 flex">
               {!!projectUsersVisible?.length &&
                 projectUsersVisible.map((u, i) => {
