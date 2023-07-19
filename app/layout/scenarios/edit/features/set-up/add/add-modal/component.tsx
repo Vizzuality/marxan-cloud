@@ -5,7 +5,11 @@ import { useQueryClient } from 'react-query';
 
 import { useRouter } from 'next/router';
 
-import { useAllFeatures, useSaveSelectedFeatures, useSelectedFeatures } from 'hooks/features';
+import {
+  useAllPaginatedFeatures,
+  useSaveSelectedFeatures,
+  useSelectedFeatures,
+} from 'hooks/features';
 import { useCanEditScenario } from 'hooks/permissions';
 import { useSaveScenario, useScenario } from 'hooks/scenarios';
 
@@ -49,7 +53,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
 
   const { data: initialSelectedFeatures } = useSelectedFeatures(sid, {});
 
-  const { isFetched: allFeaturesIsFetched } = useAllFeatures(pid, {
+  const { isFetched: allFeaturesIsFetched } = useAllPaginatedFeatures(pid, {
     search,
     filters,
     sort,
@@ -154,7 +158,8 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
 
   return (
     <>
-      {editable && (
+      {/* // ! revert to "editable" later */}
+      {true && (
         <Button theme="primary" size="base" onClick={() => setOpen(true)}>
           <span className="mr-3">Add features</span>
           <Icon icon={PLUS_SVG} className="h-4 w-4" />

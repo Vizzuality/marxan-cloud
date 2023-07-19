@@ -58,3 +58,18 @@ export interface Solution {
   planningUnits: number;
   missingValues: number;
 }
+
+export interface ProjectFeature {
+  id: string;
+  type: 'geo_features';
+  description: string;
+  propertyName: string;
+  isCustom: boolean;
+  intersection: unknown;
+  featureClassName: string;
+  alias: string;
+  properties: Record<string, unknown>[];
+  // ! these new properties are not in the API yet
+  tag?: string;
+  scenarios?: number;
+}

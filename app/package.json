@@ -70,6 +70,7 @@
     "jsona": "^1.9.2",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
+    "lucide-react": "0.261.0",
     "luma.gl": "7.3.2",
     "next": "13.2.4",
     "next-auth": "4.21.1",

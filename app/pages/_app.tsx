@@ -31,7 +31,13 @@ const MarxanApp = ({ Component, pageProps }: AppProps) => {
   });
   const queryClientRef = useRef(null);
   if (!queryClientRef.current) {
-    queryClientRef.current = new QueryClient();
+    queryClientRef.current = new QueryClient({
+      defaultOptions: {
+        queries: {
+          refetchOnWindowFocus: false,
+        },
+      },
+    });
   }
 
   const router = useRouter();
