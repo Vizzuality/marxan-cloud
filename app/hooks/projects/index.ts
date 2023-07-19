@@ -4,7 +4,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-q
 
 import { useRouter } from 'next/router';
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { formatDistance } from 'date-fns';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
@@ -18,6 +18,7 @@ import UPLOADS from 'services/uploads';
 
 import {
   UseProjectsOptionsProps,
+  UseProjectProps,
   UseSaveProjectProps,
   SaveProjectProps,
   UseDeleteProjectProps,
@@ -188,9 +189,7 @@ export function useProject(id) {
         params: {
           include: 'scenarios,users',
         },
-      }).then((response) => {
-        return response.data;
-      }),
+      }).then((response: AxiosResponse) => response.data),
     {
       enabled: !!id,
     }
@@ -198,12 +197,12 @@ export function useProject(id) {
 
   const { data } = query;
 
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
+  const DATA: UseProjectProps = data?.data || {};
+
+  return {
+    ...query,
+    data: DATA,
+  } as typeof query;
 }
 
 export function useSaveProject({
