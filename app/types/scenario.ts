@@ -49,3 +49,14 @@ export interface Scenario {
   // todo: keep typing scenario as much as posible
 >>>>>>> 054838821 (improves jobs typing)
 }
+
+export interface ScenarioFeature {
+  id: string;
+  type: 'scenario_features';
+  onTarget: boolean;
+  metArea: number;
+  met: number;
+  totalArea: number;
+  coverageTargetArea: number;
+  coverageTarget: number;
+}

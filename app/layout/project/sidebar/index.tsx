@@ -18,13 +18,12 @@ export const Sidebar = ({
   return (
     <aside
       className={cn({
-        'absolute z-20 flex h-full w-[550px] rounded-r-2xl bg-black px-8 py-6 transition-transform':
-          true,
+        'absolute z-20 flex h-full w-[550px] rounded-r-2xl bg-black  transition-transform': true,
         '-translate-x-full': !isOpen,
         [className]: !!className,
       })}
     >
-      {children}
+      <div className="overflow-hidden px-8 py-6">{children}</div>
       <button
         type="button"
         onClick={handleSidebar}

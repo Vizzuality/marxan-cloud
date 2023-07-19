@@ -7936,6 +7936,7 @@ __metadata:
     jsonwebtoken: ^8.5.1
     lint-staged: ^10.5.2
     lodash: ^4.17.20
+    lucide-react: 0.261.0
     luma.gl: 7.3.2
     next: 13.2.4
     next-auth: 4.21.1
@@ -15890,6 +15891,15 @@ __metadata:
   version: 7.18.3
   resolution: "lru-cache@npm:7.18.3"
   checksum: e550d772384709deea3f141af34b6d4fa392e2e418c1498c078de0ee63670f1f46f5eee746e8ef7e69e1c895af0d4224e62ee33e66a543a14763b0f2e74c1356
+  languageName: node
+  linkType: hard
+
+"lucide-react@npm:0.261.0":
+  version: 0.261.0
+  resolution: "lucide-react@npm:0.261.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0
+  checksum: 49557c5fe53c4a93e70f407141bf2aa11c8b0050fec34fc2d1f001ee61a1a6d285ca7125d959a3ef11a4d601de2e63ce81f1804493f6d512e637e80a2d5ba017
   languageName: node
   linkType: hard
 

@@ -3,3 +3,10 @@ export interface Response {
   isFetched: boolean;
   data: any;
 }
+
+export interface Pagination {
+  page: number;
+  size: number;
+  totalItems: number;
+  totalPages: number;
+}
