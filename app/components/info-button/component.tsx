@@ -16,6 +16,10 @@ const THEME = {
     button: 'bg-black',
     icon: 'text-white',
   },
+  tertiary: {
+    button: 'bg-gray-400',
+    icon: 'text-white',
+  },
 };
 
 const SIZE = {
@@ -34,7 +38,7 @@ const SIZE = {
 export interface InfoButtonProps {
   children: ReactElement;
   className?: string;
-  theme?: 'primary' | 'secondary';
+  theme?: 'primary' | 'secondary' | 'tertiary';
   size?: 's' | 'base' | 'lg';
 }
 
