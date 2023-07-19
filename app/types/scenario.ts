@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { Job } from 'types/job';
 
 export interface Scenario {
@@ -43,9 +42,15 @@ export interface Scenario {
   solutionsAreLocked: boolean;
   wdpaIucnCategories: string[];
   wdpaThreshold: number;
-=======
-export interface Scenario {
+}
+
+export interface ScenarioFeature {
   id: string;
-  // todo: keep typing scenario as much as posible
->>>>>>> 054838821 (improves jobs typing)
+  type: 'scenario_features';
+  onTarget: boolean;
+  metArea: number;
+  met: number;
+  totalArea: number;
+  coverageTargetArea: number;
+  coverageTarget: number;
 }

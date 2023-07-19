@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import { useRouter } from 'next/router';
 
-import { useAllFeatures } from 'hooks/features';
+import { useAllPaginatedFeatures } from 'hooks/features';
 import useBottomScrollListener from 'hooks/scroll';
 
 import Item from 'components/features/intersect-item';
@@ -26,7 +26,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
   onSplitFeaturesSelected,
 }: ScenariosFeaturesIntersectListProps) => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const {
     data: allFeaturesData,
@@ -35,7 +35,7 @@ export const ScenariosFeaturesIntersectList: React.FC<ScenariosFeaturesIntersect
     isFetching: allFeaturesIsFetching,
     isFetchingNextPage: allFeaturesIsFetchingNextPage,
     isFetched: allFeaturesIsFetched,
-  } = useAllFeatures(pid, {
+  } = useAllPaginatedFeatures(pid, {
     search,
   });
 
