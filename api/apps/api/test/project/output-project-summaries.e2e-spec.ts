@@ -24,7 +24,6 @@ import { GivenProjectsPu } from '../../../geoprocessing/test/steps/given-project
 let fixtures: PromiseType<ReturnType<typeof getFixtures>>;
 beforeEach(async () => {
   fixtures = await getFixtures();
-  await fixtures.cleanup();
 });
 
 afterEach(async () => {
@@ -147,7 +146,7 @@ describe('when generating output summary metadata for a project', () => {
         name: 'scenario2Name',
       },
     ]);
-  });
+  }, 100000);
 });
 
 const NUMBER_OF_PU_IN_SAMPLE = 5;
@@ -185,6 +184,7 @@ const getFixtures = async () => {
       await clearTable(geoEntityManager, 'scenarios_pu_data');
       await clearTable(geoEntityManager, 'projects_pu');
       await clearTable(geoEntityManager, 'planning_units_geom');
+      await app.close();
     },
 
     GivenProjectExistsOnAPI: async (name: string) => {
