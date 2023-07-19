@@ -1,6 +1,12 @@
 import { useMemo } from 'react';
 
-import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+  QueryObserverOptions,
+} from 'react-query';
 
 import Fuse from 'fuse.js';
 import flatten from 'lodash/flatten';
@@ -11,6 +17,7 @@ import { useSession } from 'next-auth/react';
 import { ItemProps as IntersectItemProps } from 'components/features/intersect-item/component';
 import { ItemProps as RawItemProps } from 'components/features/raw-item/component';
 import { ItemProps as SelectedItemProps } from 'components/features/selected-item/component';
+import { Project, ProjectFeature } from 'types/project-model';
 
 import GEOFEATURES from 'services/geo-features';
 import PROJECTS from 'services/projects';
@@ -28,7 +35,7 @@ import {
 
 interface AllItemProps extends IntersectItemProps, RawItemProps {}
 
-export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
+export function useAllPaginatedFeatures(projectId, options: UseFeaturesOptionsProps = {}) {
   const { data: session } = useSession();
 
   const { filters = {}, search, sort } = options;
@@ -61,7 +68,7 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
     });
 
   const query = useInfiniteQuery(
-    ['all-features', projectId, JSON.stringify(options)],
+    ['all-paginated-features', projectId, JSON.stringify(options)],
     fetchFeatures,
     {
       retry: false,
@@ -155,6 +162,47 @@ export function useAllFeatures(projectId, options: UseFeaturesOptionsProps = {})
       data: sortedByCustomFeature,
     };
   }, [query, pages]);
+}
+
+export function useAllFeatures<T = { data: ProjectFeature[] }>(
+  projectId: Project['id'],
+  options: UseFeaturesOptionsProps = {},
+  queryOptions: QueryObserverOptions<{ data: ProjectFeature[] }, Error, T> = {}
+) {
+  const { data: session } = useSession();
+
+  const { filters = {}, search, sort } = options;
+
+  const parsedFilters = Object.keys(filters).reduce((acc, k) => {
+    return {
+      ...acc,
+      [`filter[${k}]`]: filters[k].toString(),
+    };
+  }, {});
+
+  const fetchFeatures = () =>
+    PROJECTS.request<{ data: ProjectFeature[] }>({
+      method: 'GET',
+      url: `/${projectId}/features`,
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      params: {
+        ...parsedFilters,
+        ...(search && {
+          q: search,
+        }),
+        ...(sort && {
+          sort,
+        }),
+      },
+    }).then(({ data }) => data);
+
+  return useQuery({
+    queryKey: ['all-features', projectId, JSON.stringify(options)],
+    queryFn: fetchFeatures,
+    ...queryOptions,
+  });
 }
 
 export function useSelectedFeatures(sid, filters: UseFeaturesFiltersProps = {}, queryOptions = {}) {
@@ -560,4 +608,54 @@ export function useUploadFeaturesShapefile({
       console.info('Error', error, variables, context);
     },
   });
+}
+
+export function useDeleteProjectFeature() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const deleteProjectFeature = ({
+    pid,
+    fid,
+  }: {
+    pid: Project['id'];
+    fid: ProjectFeature['id'];
+  }) => {
+    return PROJECTS.delete(`/${pid}/features/${fid}`, {
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+    });
+  };
+
+  return useMutation(deleteProjectFeature);
+}
+
+export function useEditProjectFeature() {
+  const queryClient = useQueryClient();
+  const { data: session } = useSession();
+
+  const editProjectFeature = ({
+    pid,
+    fid,
+    body = {},
+  }: {
+    pid: Project['id'];
+    fid: ProjectFeature['id'];
+    body: Record<string, unknown>;
+  }) => {
+    return PROJECTS.patch<ProjectFeature>(
+      `/${pid}/features/${fid}`,
+      {
+        ...body,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      }
+    );
+  };
+
+  return useMutation(editProjectFeature);
 }
