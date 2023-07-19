@@ -47,7 +47,7 @@ intersection area as "amount" of the feature).
 
 In the case of features from legacy projects or features from puvspr data, all
 we have in terms of spatial data for a feature is the list of PUs in which the
-feature is present (where `amount >=1`): so, when importing these features, we
+feature is present (where `amount > 0`): so, when importing these features, we
 create one row in `(geodb)features_data` for each PU in which the feature is
 present, where the geometry for the row (`the_geom` column) is an exact copy of
 the geometry of the relevant planning unit (which we get from
