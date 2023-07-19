@@ -1,11 +1,15 @@
 import Contributors from 'layout/project/sidebar/project/header/contributors';
+import ProjectButton from 'layout/project/sidebar/project/header/project-button';
 import ProjectTitle from 'layout/project/sidebar/project/header/title';
 
 const InventoryProjectHeader = (): JSX.Element => {
   return (
     <div className="flex items-start justify-between">
       <ProjectTitle />
-      <Contributors />
+      <div className="mt-4 flex items-center space-x-5">
+        <Contributors />
+        <ProjectButton />
+      </div>
     </div>
   );
 };
