@@ -15,7 +15,7 @@ export interface UnderModerationProps {}
 
 export const UnderModeration: React.FC<UnderModerationProps> = () => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
 

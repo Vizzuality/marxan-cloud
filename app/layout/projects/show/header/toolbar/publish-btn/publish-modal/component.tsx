@@ -74,7 +74,7 @@ export const PublishProjectModal: React.FC<PublishProjectModalProps> = ({
   const accessToken = useAccessToken();
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
   const { bbox, isPublic } = projectData;

@@ -13,7 +13,7 @@ export interface ToolbarProps {}
 
 export const Toolbar: React.FC<ToolbarProps> = () => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
 

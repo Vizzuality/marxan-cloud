@@ -20,7 +20,7 @@ export interface ContributorsProps {}
 
 export const Contributors: React.FC<ContributorsProps> = () => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const [open, setOpen] = useState(false);
 

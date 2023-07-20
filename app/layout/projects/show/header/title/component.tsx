@@ -27,7 +27,7 @@ export const Title: React.FC<TitleProps> = () => {
   const textRefArea = useRef(null);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
 
