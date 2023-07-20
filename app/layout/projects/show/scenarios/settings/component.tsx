@@ -17,7 +17,7 @@ export const ProjectScenariosSettings: React.FC<ProjectScenariosSettingsProps> =
   sid,
 }: ProjectScenariosSettingsProps) => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: scenarioData, isFetching: scenarioIsFetching } = useScenario(sid);
 

@@ -12,7 +12,8 @@ export interface TitleProps {
 
 export const Title: React.FC<TitleProps> = ({ title }: TitleProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
+
   const { data: projectData } = useProject(pid);
   const { data: scenarioData } = useScenario(sid);
 

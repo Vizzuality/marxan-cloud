@@ -7,28 +7,6 @@ export interface UseProjectsOptionsProps {
   filters?: Record<string, unknown>;
 }
 
-// useProject
-export interface UseProjectProps {
-  adminAreaLevel1Id?: string;
-  adminAreaLevel2Id?: string;
-  bbox: number[];
-  countryId?: string;
-  createdAt: string;
-  customProtectedAreas: Record<string, unknown>[];
-  description: string;
-  id: string;
-  lastModifiedAt: string;
-  metadata: {
-    [key: string]: unknown;
-  };
-  name: string;
-  planningAreaId: string;
-  planningUnitAreakm2?: number;
-  planningUnitGridShape: string;
-  publicMetadata: unknown;
-  type: string;
-}
-
 // useSaveProject
 export interface UseSaveProjectProps {
   requestConfig?: AxiosRequestConfig;

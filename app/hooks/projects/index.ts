@@ -4,13 +4,14 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-q
 
 import { useRouter } from 'next/router';
 
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import { formatDistance } from 'date-fns';
 import flatten from 'lodash/flatten';
 import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
+import { Project } from 'types/api/project';
 import { createDownloadLink } from 'utils/download';
 
 import PROJECTS from 'services/projects';
@@ -18,7 +19,6 @@ import UPLOADS from 'services/uploads';
 
 import {
   UseProjectsOptionsProps,
-  UseProjectProps,
   UseSaveProjectProps,
   SaveProjectProps,
   UseDeleteProjectProps,
@@ -111,6 +111,7 @@ export function useProjects(options: UseProjectsOptionsProps) {
               data: { data: pageData },
             } = p;
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return pageData.map((d): ItemProps => {
               const {
                 id,
@@ -174,13 +175,13 @@ export function useProjects(options: UseProjectsOptionsProps) {
   }, [query, pages, push]);
 }
 
-export function useProject(id) {
+export function useProject(id: Project['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['projects', id],
-    async () =>
-      PROJECTS.request({
+  return useQuery({
+    queryKey: ['project', id],
+    queryFn: async () =>
+      PROJECTS.request<{ data: Partial<Project> }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
@@ -189,20 +190,10 @@ export function useProject(id) {
         params: {
           include: 'scenarios,users',
         },
-      }).then((response: AxiosResponse) => response.data),
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data } = query;
-
-  const DATA: UseProjectProps = data?.data || {};
-
-  return {
-    ...query,
-    data: DATA,
-  } as typeof query;
+      }).then((response) => response.data.data),
+    enabled: !!id,
+    placeholderData: {},
+  });
 }
 
 export function useSaveProject({
@@ -228,7 +219,7 @@ export function useSaveProject({
     onSuccess: (data: any, variables, context) => {
       const { id } = data;
       queryClient.invalidateQueries('projects');
-      queryClient.invalidateQueries(['projects', id]);
+      queryClient.invalidateQueries(['project', id]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
