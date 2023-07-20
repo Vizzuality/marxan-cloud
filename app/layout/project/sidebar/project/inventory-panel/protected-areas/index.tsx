@@ -1,3 +1,5 @@
+// import ProtectedAreasUploader from 'layout/project/sidebar/project/inventory-panel/protected-areas/protected-areas-uploader';
+
 const InventoryPanelProtectedAreas = (): JSX.Element => {
   return (
     <div className="flex items-start justify-between rounded-xl bg-gray-700 p-6">
@@ -7,29 +9,9 @@ const InventoryPanelProtectedAreas = (): JSX.Element => {
 
           <div className="flex items-baseline space-x-2">
             <h4 className="font-heading text-lg font-medium text-white">Protected Areas</h4>
-            {/* <InfoButton theme="tertiary">
-              <div>
-                <h4 className="mb-2.5 font-heading text-lg">What are features?</h4>
-                <div className="space-y-2">
-                  <p>
-                    Features are the important habitats, species, processes, activities, and
-                    discrete areas that you want to consider in your planning process. Common
-                    feature data formats are range maps, polygons, abundances, and continuous scale
-                    or probability of occurrence maps (e.g. 0-1). Features can include more than
-                    just ecological data but also be cultural and socio-economic areas like
-                    community fishing grounds or traditional-use areas, and other human activities
-                    and industries. Every feature must have a minimum target amount set. Some
-                    examples include:
-                  </p>
-                  <Image src={FEATURE_SPECIES_IMG} alt="Feature-Range" width={280} height={100} />
-                  <Image src={FEATURE_ABUND_IMG} alt="Feature-Abundance" width={280} height={100} />
-                  <Image src={FEATURE_SOCIAL_IMG} alt="Feature-Social" width={280} height={100} />
-                </div>
-              </div>
-            </InfoButton> */}
           </div>
         </div>
-        {/* <FeaturesUploader /> */}
+        {/* <ProtectedAreasUploader /> */}
       </div>
     </div>
   );
