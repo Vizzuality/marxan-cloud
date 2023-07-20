@@ -27,7 +27,6 @@ import Loading from 'components/loading';
 import Modal from 'components/modal';
 import HelpBeacon from 'layout/help/beacon';
 import ScenarioItem from 'layout/project/sidebar/project/scenarios-list/scenario-item';
-import ScenarioSettings from 'layout/projects/show/scenarios/settings';
 import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import { cn } from 'utils/cn';
@@ -163,7 +162,7 @@ export const ScenariosList: React.FC = () => {
       cancelRunMutation.mutate(
         { id: scenarioId },
         {
-          onSuccess: ({ data: { data: s } }) => {
+          onSuccess: () => {
             addToast(
               'success-cancel-scenario',
               <>

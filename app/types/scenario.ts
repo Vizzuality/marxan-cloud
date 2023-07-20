@@ -1,4 +1,14 @@
 export interface Scenario {
   id: string;
-  // todo: keep typing scenario as much as posible
+  name: string;
+  warnings: boolean;
+  progress?: number;
+  lastUpdate: string;
+  jobs?: Record<string, any>[];
+  runStatus: 'created' | 'running' | 'done' | 'failure';
+  lock?: Record<string, any>;
+  lastUpdateDistance: string;
+  className?: string;
+  ranAtLeastOnce: boolean;
+  numberOfRuns: number;
 }
