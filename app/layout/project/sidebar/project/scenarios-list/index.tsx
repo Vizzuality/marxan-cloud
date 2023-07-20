@@ -247,12 +247,12 @@ export const ScenariosList: React.FC = () => {
                       >
                         <ScenarioItem
                           {...s}
+                          id={s.id}
                           onDelete={() => {
                             setDelete(s);
                           }}
                           onDuplicate={() => onDuplicate(s.id, s.name)}
                           onCancelRun={() => onCancelRun(s.id, s.name)}
-                          SettingsC={<ScenarioSettings sid={s.id} />}
                         />
                       </div>
                     </TAG>
