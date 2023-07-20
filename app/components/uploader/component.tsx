@@ -14,6 +14,7 @@ export const Uploader: React.FC<UploaderProps> = ({
   caption,
   children,
   disabled,
+  theme = 'secondary',
   onOpen,
   onClose,
 }: UploaderProps) => {
@@ -21,7 +22,7 @@ export const Uploader: React.FC<UploaderProps> = ({
     <div className="mb-5 mt-3">
       <Button
         className="dropzone w-full cursor-pointer py-1 text-xs hover:bg-gray-500"
-        theme="secondary"
+        theme={theme}
         size="base"
         disabled={disabled}
         onClick={onOpen}
