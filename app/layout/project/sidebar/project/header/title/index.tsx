@@ -21,7 +21,7 @@ import CLOSE_SVG from 'svgs/ui/close.svg?sprite';
 const ProjectTitle = (): JSX.Element => {
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const [editting, setEditting] = useState(false);
   const textRefArea = useRef(null);
