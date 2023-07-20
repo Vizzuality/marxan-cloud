@@ -11,4 +11,8 @@ export interface Scenario {
   className?: string;
   ranAtLeastOnce: boolean;
   numberOfRuns: number;
+  boundaryLengthModifier: number;
+  metadata: any;
+  solutionsAreLocked: boolean;
+  wdpaThreshold: number;
 }
