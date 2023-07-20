@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import Image from 'next/image';
 
 import Button from 'components/button';
@@ -12,9 +10,9 @@ import FEATURE_SPECIES_IMG from 'images/info-buttons/img_species_range.png';
 
 import UPLOADER_SVG from 'svgs/ui/uploader.svg?sprite';
 
-const InventoryPanelFeatures = (): JSX.Element => {
-  const [open, setOpen] = useState(false);
+import FeaturesUploader from './features-uploader';
 
+const InventoryPanelFeatures = (): JSX.Element => {
   return (
     <div className="flex items-start justify-between rounded-xl bg-gray-700 p-6">
       <div>
@@ -43,10 +41,11 @@ const InventoryPanelFeatures = (): JSX.Element => {
           </InfoButton>
         </div>
       </div>
-      <Button className="h-10 !px-4" theme="primary" size="s" onClick={() => setOpen(true)}>
+      {/* <Button className="h-10 !px-4" theme="primary" size="s" onClick={() => setOpen(true)}>
         <span className="mr-1 text-sm">Upload</span>
         <Icon icon={UPLOADER_SVG} className="h-6 w-6 text-black" />
-      </Button>
+      </Button> */}
+      <FeaturesUploader />
     </div>
   );
 };

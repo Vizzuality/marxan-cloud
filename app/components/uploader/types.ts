@@ -6,6 +6,7 @@ export interface UploaderProps {
   caption?: string;
   disabled?: boolean;
   children: ReactChild | ReactChild[];
+  theme?: 'primary' | 'secondary';
   onOpen: () => void;
   onClose: () => void;
 }
