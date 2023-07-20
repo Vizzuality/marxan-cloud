@@ -152,7 +152,7 @@ export function useDuplicatePublishedProject({
     onSuccess: (data: any, variables, context) => {
       const { id } = data;
       queryClient.invalidateQueries('projects');
-      queryClient.invalidateQueries(['projects', id]);
+      queryClient.invalidateQueries(['project', id]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {

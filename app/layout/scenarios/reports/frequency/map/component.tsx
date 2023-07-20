@@ -29,7 +29,7 @@ export const ScreenshotBLMMap: React.FC<ScreenshotBLMMapProps> = ({
 
   const { query } = useRouter();
 
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
 

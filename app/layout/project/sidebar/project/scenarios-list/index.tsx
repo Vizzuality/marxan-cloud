@@ -47,7 +47,7 @@ export const ScenariosList: React.FC = () => {
   const { search, filters, sort } = useSelector((state) => state['/projects/[id]']);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const editable = useCanEditProject(pid);
 

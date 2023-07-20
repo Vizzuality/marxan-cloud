@@ -56,7 +56,7 @@ export const ProjectMap: React.FC<ProjectMapProps> = () => {
   const [mapTilesLoaded, setMapTilesLoaded] = useState(false);
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
   const { data = {} } = useProject(pid);
   const {
     id,
