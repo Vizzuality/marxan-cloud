@@ -21,7 +21,7 @@ export interface ScenariosSidebarSetUpProps {}
 
 export const ScenariosSidebarSetUp: React.FC<ScenariosSidebarSetUpProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSubTab } = scenarioSlice.actions;

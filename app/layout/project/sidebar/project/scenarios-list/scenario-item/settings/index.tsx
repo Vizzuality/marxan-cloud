@@ -42,8 +42,6 @@ const ScenarioSettings: React.FC = (id: Scenario['id']) => {
     );
   }
 
-  const { numberOfRuns, boundaryLengthModifier } = scenarioData;
-
   return (
     <dl className="grid w-full grid-cols-2 flex-col gap-x-10 gap-y-2 rounded-b-3xl bg-gray-700 px-8 pb-4 pt-6 text-xs">
       <div className="flex space-x-2">
@@ -61,13 +59,13 @@ const ScenarioSettings: React.FC = (id: Scenario['id']) => {
       <div className="flex space-x-2">
         <dt>Runs:</dt>
         <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
-          {numberOfRuns || '-'}
+          {scenarioData.numberOfRuns || '-'}
         </dd>
       </div>
       <div className="flex space-x-2">
         <dt>BLM:</dt>
         <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
-          {boundaryLengthModifier || '-'}
+          {scenarioData.boundaryLengthModifier || '-'}
         </dd>
       </div>
     </dl>
