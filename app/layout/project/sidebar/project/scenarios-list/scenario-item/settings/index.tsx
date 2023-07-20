@@ -8,8 +8,9 @@ import { useScenario } from 'hooks/scenarios';
 import { useWDPACategories } from 'hooks/wdpa';
 
 import Loading from 'components/loading';
+import { Scenario } from 'types/scenario';
 
-const ScenarioSettings: React.FC = ({ id }: { id: string }) => {
+const ScenarioSettings: React.FC = (id: Scenario['id']) => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
