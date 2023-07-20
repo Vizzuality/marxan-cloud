@@ -1,14 +1,23 @@
 import React, { ReactNode, useCallback, useMemo, useState } from 'react';
 
+import { useRouter } from 'next/router';
+
+import { useCanEditProject } from 'hooks/permissions';
+
 import Button from 'components/button';
 import Icon from 'components/icon';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import ProgressBar from 'components/progress-bar';
 import Tooltip from 'components/tooltip';
 import Settings from 'layout/project/sidebar/project/scenarios-list/scenario-item/settings';
 import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
+import DOTS_SVG from 'svgs/ui/dots.svg?sprite';
 import LOCK_SVG from 'svgs/ui/lock.svg?sprite';
+import DELETE_SVG from 'svgs/ui/new-layout/delete.svg?sprite';
+import DUPLICATE_SVG from 'svgs/ui/new-layout/duplicate.svg?sprite';
+import TOGGLE_SCENARIO_SVG from 'svgs/ui/new-layout/toggle-scenario.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
 const SCENARIO_STATES = {
@@ -22,7 +31,7 @@ const SCENARIO_STATES = {
   },
   'run-done': {
     text: 'Run Scenario',
-    styles: 'text-green-500',
+    styles: 'text-blue-500',
   },
   'calibration-running': {
     text: 'Running Calibration',
@@ -106,6 +115,10 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
   onDuplicate,
   SettingsC,
 }: ScenarioItemProps) => {
+  const { query } = useRouter();
+  const { pid } = query as { pid: string };
+  const editable = useCanEditProject(pid);
+
   const [settings, setSettings] = useState(false);
 
   const status = useMemo(() => {
@@ -251,16 +264,61 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
 
               {status !== 'run-running' && (
                 <>
-                  <Button
-                    className="flex-shrink-0"
-                    size="s"
-                    theme={settings ? 'white' : 'secondary'}
-                    onClick={onSettings}
-                  >
-                    {settings && 'Close'}
-                    {!settings && 'Settings'}
-                  </Button>
+                  <button className="flex-shrink-0" onClick={onSettings}>
+                    <Icon
+                      className={cn({
+                        'h-5 w-5 transition-colors': true,
+                        'text-primary-500': settings,
+                        'text-gray-400': !settings,
+                      })}
+                      icon={TOGGLE_SCENARIO_SVG}
+                    />
+                  </button>
                 </>
+              )}
+
+              {status !== 'run-running' && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-gray-500">
+                      <Icon
+                        icon={DOTS_SVG}
+                        className={cn({
+                          'h-4 w-4 rotate-90 text-white': true,
+                        })}
+                      />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    side="right"
+                    sideOffset={20}
+                    className="w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+                    collisionPadding={50}
+                  >
+                    <button
+                      className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                      disabled={!editable}
+                      onClick={onDuplicate}
+                    >
+                      <Icon
+                        className="h-5 w-5 text-gray-500 transition-colors group-hover:text-white"
+                        icon={DUPLICATE_SVG}
+                      />
+                      <p>Duplicate</p>
+                    </button>
+                    <button
+                      className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-500"
+                      disabled={!editable}
+                      onClick={onDelete}
+                    >
+                      <Icon
+                        className="h-5 w-5 text-gray-500 transition-colors group-hover:text-white"
+                        icon={DELETE_SVG}
+                      />
+                      <p>Delete</p>
+                    </button>
+                  </PopoverContent>
+                </Popover>
               )}
 
               {status === 'run-running' && (
@@ -288,11 +346,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
         </button>
       </div>
 
-      {settings && (
-        <Settings onDelete={onDelete} onDuplicate={onDuplicate}>
-          {SettingsC}
-        </Settings>
-      )}
+      {settings && <Settings>{SettingsC}</Settings>}
     </div>
   );
 };
