@@ -9,7 +9,9 @@ import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import ProgressBar from 'components/progress-bar';
 import Tooltip from 'components/tooltip';
+import { SCENARIO_STATES } from 'layout/project/sidebar/project/scenarios-list/scenario-item/constants';
 import ScenarioSettings from 'layout/project/sidebar/project/scenarios-list/scenario-item/settings';
+import { Scenario } from 'types/scenario';
 import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
@@ -20,78 +22,7 @@ import DUPLICATE_SVG from 'svgs/ui/new-layout/duplicate.svg?sprite';
 import TOGGLE_SCENARIO_SVG from 'svgs/ui/new-layout/toggle-scenario.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
-const SCENARIO_STATES = {
-  'run-running': {
-    text: 'Running Scenario',
-    styles: 'text-white',
-  },
-  'run-failure': {
-    text: 'Fail Running Scenario',
-    styles: 'text-red-500',
-  },
-  'run-done': {
-    text: 'Run Scenario',
-    styles: 'text-blue-500',
-  },
-  'calibration-running': {
-    text: 'Running Calibration',
-    styles: 'text-white',
-  },
-  'calibration-failure': {
-    text: 'Fail Running Calibration',
-    styles: 'text-red-500',
-  },
-  'pa-running': {
-    text: 'Running PA percentage',
-    styles: 'text-white',
-  },
-  'pa-failure': {
-    text: 'Fail PA percentage',
-    styles: 'text-red-500',
-  },
-  'pu-running': {
-    text: 'Running PU inclusion',
-    styles: 'text-white',
-  },
-  'pu-failure': {
-    text: 'Fail PU inclusion',
-    styles: 'text-red-500',
-  },
-  'features-running': {
-    text: 'Running Features',
-    styles: 'text-white',
-  },
-  'features-failure': {
-    text: 'Fail Features',
-    styles: 'text-red-500',
-  },
-  'clone-running': {
-    text: 'Running cloning',
-    styles: 'text-white',
-  },
-  'clone-failure': {
-    text: 'Fail cloning scenario',
-    styles: 'text-red-500',
-  },
-  draft: {
-    text: 'Edited',
-    styles: 'text-gray-400',
-  },
-};
-
-export interface ScenarioItemProps {
-  id: string;
-  name: string;
-  warnings: boolean;
-  progress?: number;
-  lastUpdate: string;
-  jobs?: Record<string, any>[];
-  runStatus: 'created' | 'running' | 'done' | 'failure';
-  lock?: Record<string, any>;
-  lastUpdateDistance: string;
-  className?: string;
-  ranAtLeastOnce: boolean;
-  numberOfRuns: number;
+export interface ScenarioItemProps extends Scenario {
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -199,7 +130,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
       >
         <div
           className={cn({
-            'flex flex-grow flex-col rounded-l-3xl bg-gray-700 pl-8': true,
+            'flex flex-grow flex-col rounded-l-[20px] bg-gray-700 pl-8': true,
             'rounded-bl-none': settings,
           })}
         >
@@ -334,7 +265,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
           type="button"
           onClick={onEdit}
           className={cn({
-            'flex-column flex h-full items-center rounded-r-3xl bg-gray-700 px-8': true,
+            'flex-column flex h-full items-center rounded-r-[20px] bg-gray-700 px-8': true,
             'text-primary-500 transition-colors hover:bg-primary-500 hover:text-black focus:bg-primary-300 focus:text-black focus:outline-none':
               true,
             'rounded-br-none': settings,
