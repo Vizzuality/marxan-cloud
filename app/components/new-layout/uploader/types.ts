@@ -1,11 +1,9 @@
-import { ReactChild } from 'react';
-
 export interface UploaderProps {
   id?: string;
   open?: boolean;
   caption?: string;
   disabled?: boolean;
-  children: ReactChild | ReactChild[];
+  children: React.ReactNode | React.ReactNode[];
   onOpen: () => void;
   onClose: () => void;
 }

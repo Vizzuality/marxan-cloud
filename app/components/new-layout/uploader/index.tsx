@@ -4,30 +4,22 @@ import Button from 'components/button';
 import Icon from 'components/icon';
 import Modal from 'components/modal';
 
-import UPLOAD_SVG from 'svgs/ui/upload.svg?sprite';
+import UPLOADER_SVG from 'svgs/ui/uploader.svg?sprite';
 
 import { UploaderProps } from './types';
 
-export const Uploader: React.FC<UploaderProps> = ({
-  id,
-  open,
-  caption,
-  children,
-  disabled,
-  onOpen,
-  onClose,
-}: UploaderProps) => {
+const Uploader = ({ id, open, caption, children, disabled, onOpen, onClose }: UploaderProps) => {
   return (
-    <div className="mb-5 mt-3">
+    <div>
       <Button
-        className="dropzone w-full cursor-pointer py-1 text-xs hover:bg-gray-500"
-        theme="secondary"
+        className="dropzone flex w-full cursor-pointer space-x-2 !px-5 py-1 text-sm hover:opacity-80"
+        theme="primary"
         size="base"
         disabled={disabled}
         onClick={onOpen}
       >
-        {caption || 'Upload'}
-        <Icon className="absolute right-6 h-4 w-4 text-white" icon={UPLOAD_SVG} />
+        <span>{caption || 'Upload'}</span>
+        <Icon className="h-6 w-6 text-black" icon={UPLOADER_SVG} />
       </Button>
 
       <Modal id={id} open={open} size="narrow" onDismiss={onClose}>

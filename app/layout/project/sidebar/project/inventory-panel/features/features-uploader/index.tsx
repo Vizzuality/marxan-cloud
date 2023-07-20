@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
-import cx from 'classnames';
+import cn from 'classnames';
 
 import { useRouter } from 'next/router';
 
@@ -20,7 +20,7 @@ import { composeValidators } from 'components/forms/validations';
 import Icon from 'components/icon';
 import InfoButton from 'components/info-button';
 import Loading from 'components/loading';
-import Uploader from 'components/uploader';
+import Uploader from 'components/new-layout/uploader';
 import { FEATURES_UPLOADER_MAX_SIZE } from 'constants/file-uploader-size-limits';
 import { bytesToMegabytes } from 'utils/units';
 
@@ -160,14 +160,7 @@ export const FeaturesUploader = () => {
   });
 
   return (
-    <Uploader
-      id="upload-features"
-      caption="Upload"
-      theme="primary"
-      open={opened}
-      onOpen={onOpen}
-      onClose={onClose}
-    >
+    <Uploader id="upload-features" caption="Upload" open={opened} onOpen={onOpen} onClose={onClose}>
       <FormRFF
         ref={formRef}
         onSubmit={onUploadSubmit}
@@ -240,7 +233,7 @@ export const FeaturesUploader = () => {
                           <div
                             {...props}
                             {...getRootProps()}
-                            className={cx({
+                            className={cn({
                               'relative w-full cursor-pointer border border-dotted border-gray-300 bg-gray-100 bg-opacity-20 py-10 hover:bg-gray-100':
                                 true,
                               'bg-gray-500': isDragActive,
