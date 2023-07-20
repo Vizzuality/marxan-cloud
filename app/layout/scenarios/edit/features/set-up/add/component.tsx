@@ -25,7 +25,7 @@ export interface ScenariosSidebarEditFeaturesProps {}
 
 export const ScenariosSidebarEditFeatures: React.FC<ScenariosSidebarEditFeaturesProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
   const { tab } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 
   const { data: scenarioData } = useScenario(sid);

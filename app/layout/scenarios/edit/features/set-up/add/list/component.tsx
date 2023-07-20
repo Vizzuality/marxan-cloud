@@ -33,7 +33,7 @@ export const ScenariosFeaturesList: React.FC<ScenariosFeaturesListProps> = () =>
   const [deleteFeature, setDeleteFeature] = useState(null);
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setFeatures, setSubTab, setSelectedFeatures } = scenarioSlice.actions;

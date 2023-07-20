@@ -32,7 +32,7 @@ export const ScenariosFeaturesAdd: React.FC<ScenariosFeaturesAddProps> = () => {
   const [sort, setSort] = useState('featureClassName');
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const queryClient = useQueryClient();
 

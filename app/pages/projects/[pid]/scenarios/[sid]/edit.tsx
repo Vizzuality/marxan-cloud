@@ -34,7 +34,7 @@ export const getServerSideProps = withProtection(
 const EditScenarioPage = (): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
   const { data: scenarioData } = useScenario(sid);
   const { metadata } = scenarioData || {};
   const { scenarioEditingMetadata } = metadata || {};

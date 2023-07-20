@@ -33,7 +33,7 @@ export const ScenariosAdvancedSettings: React.FC<ScenariosAdvancedSettingsProps>
   const { addToast } = useToasts();
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);

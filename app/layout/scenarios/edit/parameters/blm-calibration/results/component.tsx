@@ -36,7 +36,7 @@ export const ScenariosBlmResults: React.FC<ScenariosBlmResultsProps> = ({
   const [submitting, setSubmitting] = useState(false);
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { addToast } = useToasts();
 

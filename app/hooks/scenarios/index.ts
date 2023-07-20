@@ -479,34 +479,21 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   ]);
 }
 
-export function useScenario(id) {
+export function useScenario(id: Scenario['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['scenarios', id],
-    async () =>
-      SCENARIOS.request({
+  return useQuery({
+    queryKey: ['scenarios', id],
+    queryFn: async () =>
+      SCENARIOS.request<{ data: Partial<Scenario> }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-      }).then((response) => {
-        return response.data;
-      }),
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
+      }).then((response) => response.data.data),
+    enabled: !!id,
+  });
 }
 
 export function useSaveScenario({

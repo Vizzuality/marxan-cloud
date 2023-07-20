@@ -24,7 +24,7 @@ export const ScenariosPostGapAnalysisList: React.FC<ScenariosPostGapAnalysisList
   search,
 }: ScenariosPostGapAnalysisListProps) => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setPostHighlightFeatures } = scenarioSlice.actions;
