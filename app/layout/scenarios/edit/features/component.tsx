@@ -38,7 +38,7 @@ export interface ScenariosSidebarFeaturesProps {}
 
 export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
