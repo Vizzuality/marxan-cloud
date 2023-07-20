@@ -40,7 +40,7 @@ export const SolutionsTableForm: React.FC<SolutionsTableFormProps> = ({
 
   const [mostDifSolutions, setMostDifSolutions] = useState<boolean>(false);
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSelectedSolution } = scenarioSlice.actions;
