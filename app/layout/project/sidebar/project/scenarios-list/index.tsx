@@ -32,7 +32,7 @@ import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
 import { cn } from 'utils/cn';
 
-import bgScenariosDashboard from 'images/bg-scenarios-dashboard.png';
+import bgScenariosDashboard from 'images/new-layout/bg-scenarios-dashboard.png';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
@@ -282,12 +282,12 @@ export const ScenariosList: React.FC = () => {
                 initial={{ y: -10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -10, opacity: 0 }}
-                className="h-fit flex flex-col items-center space-y-9 rounded-3xl bg-gray-700 bg-contain bg-right bg-no-repeat py-10"
+                className="flex flex-col items-center space-y-9 rounded-3xl bg-gray-700 bg-cover bg-right bg-no-repeat py-10"
                 style={{
                   backgroundImage: `url(${bgScenariosDashboard})`,
                 }}
               >
-                <div className="mx-12 flex flex-col items-center">
+                <div className="mx-12 mt-48 flex flex-col items-center">
                   <p className="mt-1 text-center font-sans text-xs font-medium text-gray-300">
                     Before we can show you any results, we&lsquo;ll need you to{' '}
                     <span className="text-white">
