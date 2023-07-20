@@ -28,7 +28,7 @@ export const PublishProjectButton: React.FC<PublishProjectButtonProps> = () => {
   const [confirmUnPublish, setConfirmUnPublish] = useState<Record<string, any>>();
 
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
 

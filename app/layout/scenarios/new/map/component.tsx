@@ -34,7 +34,7 @@ export const ScenarioNewMap: React.FC<ScenarioNewMapProps> = () => {
 
   const { query } = useRouter();
 
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
   const { bbox } = projectData;

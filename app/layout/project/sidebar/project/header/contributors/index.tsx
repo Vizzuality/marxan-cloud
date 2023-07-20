@@ -17,11 +17,12 @@ import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 
 export const Contributors: React.FC = () => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const [open, setOpen] = useState(false);
 
-  const { data = {} } = useProject(pid);
+  const { data } = useProject(pid);
+
   const { data: projectsUsersData } = useProjectsUsers([pid]);
 
   const { data: projectUsers } = useProjectUsers(pid);

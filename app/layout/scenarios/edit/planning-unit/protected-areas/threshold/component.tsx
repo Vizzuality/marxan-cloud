@@ -36,7 +36,7 @@ export const WDPAThreshold: React.FC<WDPAThresholdCategories> = ({
 
   const { addToast } = useToasts();
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { wdpaCategories } = useSelector((state) => state[`/scenarios/${sid}/edit`]);
 

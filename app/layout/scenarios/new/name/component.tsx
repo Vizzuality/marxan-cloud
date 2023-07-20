@@ -26,7 +26,7 @@ export interface ScenariosSidebarNameProps {}
 export const ScenariosSidebarName: React.FC<ScenariosSidebarNameProps> = () => {
   const [submitting, setSubmitting] = useState(false);
   const { query, push } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
   const plausible = usePlausible();
   const { addToast } = useToasts();
 

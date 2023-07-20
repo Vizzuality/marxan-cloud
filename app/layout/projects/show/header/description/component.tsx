@@ -20,7 +20,7 @@ export interface DescriptionProps {
 export const Description: React.FC<DescriptionProps> = ({ editable = false }: DescriptionProps) => {
   const { query } = useRouter();
   const { addToast } = useToasts();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
   const { data: projectData, isLoading: projectIsLoading } = useProject(pid);
 
   // Project mutation and submit

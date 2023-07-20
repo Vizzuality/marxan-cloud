@@ -14,7 +14,7 @@ export interface IntroPageProps {}
 
 export const IntroPage: React.FC<IntroPageProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
 
