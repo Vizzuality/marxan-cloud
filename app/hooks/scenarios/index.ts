@@ -740,8 +740,6 @@ export function useScenarioPU(
       excluded: ScenarioPlanningUnit['id'][];
       included: ScenarioPlanningUnit['id'][];
       available: ScenarioPlanningUnit['id'][];
-      // includedDefault: ScenarioPlanningUnit['id'][];
-      // excludedDefault: ScenarioPlanningUnit['id'][];
     }
   >
 ) {
@@ -772,8 +770,12 @@ export function useScenarioPU(
       refetchOnWindowFocus: false,
       placeholderData: [],
       select: (data) => {
-        const included = data.filter((p) => p.inclusionStatus === 'locked-in').map((p) => p.id);
-        const excluded = data.filter((p) => p.inclusionStatus === 'locked-out').map((p) => p.id);
+        const included = data
+          .filter((p) => p.inclusionStatus === 'locked-in' && p.setByUser)
+          .map((p) => p.id);
+        const excluded = data
+          .filter((p) => p.inclusionStatus === 'locked-out' && p.setByUser)
+          .map((p) => p.id);
         const available = data
           .filter((p) => p.inclusionStatus === 'available' && p.setByUser)
           .map((p) => p.id);
