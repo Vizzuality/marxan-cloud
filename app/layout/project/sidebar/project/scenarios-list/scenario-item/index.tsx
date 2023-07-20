@@ -1,4 +1,4 @@
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
@@ -9,7 +9,7 @@ import Icon from 'components/icon';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import ProgressBar from 'components/progress-bar';
 import Tooltip from 'components/tooltip';
-import Settings from 'layout/project/sidebar/project/scenarios-list/scenario-item/settings';
+import ScenarioSettings from 'layout/project/sidebar/project/scenarios-list/scenario-item/settings';
 import { cn } from 'utils/cn';
 
 import ARROW_RIGHT_SVG from 'svgs/ui/arrow-right.svg?sprite';
@@ -96,10 +96,10 @@ export interface ScenarioItemProps {
   onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDuplicate?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  SettingsC?: ReactNode;
 }
 
 export const ScenarioItem: React.FC<ScenarioItemProps> = ({
+  id,
   name,
   warnings,
   progress,
@@ -113,7 +113,6 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
   onCancelRun,
   onDelete,
   onDuplicate,
-  SettingsC,
 }: ScenarioItemProps) => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
@@ -346,7 +345,7 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
         </button>
       </div>
 
-      {settings && <Settings>{SettingsC}</Settings>}
+      {settings && <ScenarioSettings id={id} />}
     </div>
   );
 };
