@@ -25,8 +25,8 @@ import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
-import ScenarioItem from 'components/scenarios/item';
 import HelpBeacon from 'layout/help/beacon';
+import ScenarioItem from 'layout/project/sidebar/project/scenarios-list/scenario-item';
 import ScenarioSettings from 'layout/projects/show/scenarios/settings';
 import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
 import ScenarioTypes from 'layout/projects/show/scenarios/types';
@@ -337,22 +337,18 @@ export const ScenariosList: React.FC = () => {
           )}
 
           {(hasScenarios || search || hasFilters) && (
-            <button
-              type="button"
-              className={cn({
-                'group flex h-16 w-full flex-shrink-0 items-center justify-center space-x-3 rounded-3xl bg-gray-700 px-8 text-sm text-primary-500 transition hover:bg-gray-800':
-                  true,
-                'pointer-events-none opacity-50': !editable,
-              })}
-              disabled={!editable}
-              onClick={() => setModal(true)}
-            >
-              <span>Create scenario</span>
-              <Icon
-                icon={PLUS_SVG}
-                className="h-4 w-4 transform transition group-hover:rotate-90"
-              />
-            </button>
+            <div className="flex w-full flex-shrink-0 items-center justify-center rounded-[20px] bg-gray-700 p-6">
+              <Button
+                theme="primary"
+                size="base"
+                className="!px-5"
+                disabled={!editable}
+                onClick={() => setModal(true)}
+              >
+                <span className="mr-5">Create scenario</span>
+                <Icon icon={PLUS_SVG} className="h-4 w-4" />
+              </Button>
+            </div>
           )}
         </div>
 
