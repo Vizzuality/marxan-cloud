@@ -483,16 +483,17 @@ export function useScenario(id: Scenario['id']) {
   const { data: session } = useSession();
 
   return useQuery({
-    queryKey: ['scenarios', id],
+    queryKey: ['scenario', id],
     queryFn: async () =>
-      SCENARIOS.request<{ data: Partial<Scenario> }>({
+      SCENARIOS.request<Partial<Scenario>>({
         method: 'GET',
         url: `/${id}`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-      }).then((response) => response.data.data),
+      }).then((response) => response.data),
     enabled: !!id,
+    placeholderData: {},
   });
 }
 
@@ -520,7 +521,7 @@ export function useSaveScenario({
       const { id, projectId } = data?.data?.data;
       // const { isoDate, started } = data?.data?.meta;
       queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.setQueryData(['scenarios', id], data?.data);
+      queryClient.setQueryData(['scenario', id], data?.data);
 
       console.info('Success', data, variables, context);
     },
