@@ -406,14 +406,14 @@ export function usePublishProject({
   };
 
   return useMutation(publishProject, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables) => {
+      const { pid } = variables;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['project', pid]);
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
-      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
@@ -438,14 +438,12 @@ export function useUnPublishProject({
   };
 
   return useMutation(unpublishProject, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+    onSuccess: () => {
       queryClient.invalidateQueries('projects');
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
