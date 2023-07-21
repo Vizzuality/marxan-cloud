@@ -49,10 +49,9 @@ export class OutputProjectSummariesService {
       where: { id: scenarioId },
     });
 
-    const planningUnits = (await this.projectsPU.find({ where: { projectId } }))
-      .map((pu) => pu.puid)
-      .sort((a, b) => a - b);
-
+    const planningUnits = (
+      await this.projectsPU.find({ where: { projectId } })
+    ).map((pu) => pu.puid);
     const scenarios = await this.scenarioRepo.find({
       select: { id: true, projectScenarioId: true, name: true },
       where: { projectId },
@@ -123,7 +122,7 @@ export class OutputProjectSummariesService {
 
     const csvData = [];
     csvData.push(headers);
-    for (const planningUnit of planningUnits.sort((a, b) => a - b)) {
+    for (const planningUnit of [...planningUnits].sort((a, b) => a - b)) {
       const row = [planningUnit];
 
       for (const projectScenarioId of projectScenarioIds) {
@@ -149,11 +148,13 @@ export class OutputProjectSummariesService {
 
     csvData.push(headers);
     csvData = csvData.concat(
-      scenarios.map((scenario) => [
-        this.formatProjectScenarioId(scenario.projectScenarioId),
-        scenario.id,
-        scenario.name,
-      ]),
+      [...scenarios]
+        .sort((a, b) => a.projectScenarioId - b.projectScenarioId)
+        .map((scenario) => [
+          this.formatProjectScenarioId(scenario.projectScenarioId),
+          scenario.id,
+          scenario.name,
+        ]),
     );
 
     return write(csvData, {
