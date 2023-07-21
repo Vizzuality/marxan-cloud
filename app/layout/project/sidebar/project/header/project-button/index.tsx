@@ -1,23 +1,138 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useRouter } from 'next/router';
 
-import { useProject } from 'hooks/projects';
+import omit from 'lodash/omit';
 
+import { useOwnsProject } from 'hooks/permissions';
+import { useProject, usePublishProject, useUnPublishProject } from 'hooks/projects';
+import { useScenarios } from 'hooks/scenarios';
+import { useToasts } from 'hooks/toast';
+
+import ConfirmationPrompt from 'components/confirmation-prompt';
 import Icon from 'components/icon/component';
 import Modal from 'components/modal';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
+import Tooltip from 'components/tooltip';
 import DownloadProjectModal from 'layout/projects/common/download-modal';
+import PublishModal from 'layout/projects/show/header/toolbar/publish-btn/publish-modal';
 import { cn } from 'utils/cn';
 
+import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import DOTS_SVG from 'svgs/ui/dots.svg?sprite';
 
 const ProjectButton = (): JSX.Element => {
+  const { addToast } = useToasts();
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
+  const isOwner = useOwnsProject(pid);
+
   const { data: projectData } = useProject(pid);
+  const { isPublic } = projectData;
+
   const [downloadModal, setDownloadModal] = useState<boolean>(false);
+  const [publishModal, setPublishModal] = useState<boolean>(false);
+
+  const [publishing, setPublishing] = useState<boolean>(false);
+  const [confirmUnPublish, setConfirmUnPublish] = useState();
+
+  const publishProjectMutation = usePublishProject({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
+  const unpublishProjectMutation = useUnPublishProject({
+    requestConfig: {
+      method: 'POST',
+    },
+  });
+
+  const { data: rawScenariosData } = useScenarios(pid, {
+    filters: {
+      projectId: pid,
+    },
+    sort: '-lastModifiedAt',
+  });
+
+  const SCENARIOS_RUNNED = useMemo(() => {
+    return rawScenariosData.some((s) => {
+      return s.ranAtLeastOnce;
+    });
+  }, [rawScenariosData]);
+
+  const handlePublish = useCallback(
+    (values) => {
+      setPublishing(true);
+      const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
+
+      publishProjectMutation.mutate(
+        { pid: `${pid}`, data },
+        {
+          onSuccess: () => {
+            setPublishing(false);
+            setPublishModal(false);
+            addToast(
+              'success-publish-project',
+              <>
+                <h2 className="font-medium">Success!</h2>
+                <p className="text-sm">You have published the project in the community.</p>
+              </>,
+              {
+                level: 'success',
+              }
+            );
+          },
+          onError: () => {
+            setPublishing(false);
+            addToast(
+              'error-publish-project',
+              <>
+                <h2 className="font-medium">Error!</h2>
+                <p className="text-sm">
+                  It has not been possible to publish the project in the community.
+                </p>
+              </>,
+              {
+                level: 'error',
+              }
+            );
+          },
+        }
+      );
+    },
+    [pid, publishProjectMutation, addToast]
+  );
+
+  const handleUnpublish = useCallback(() => {
+    unpublishProjectMutation.mutate(
+      {
+        id: confirmUnPublish.id,
+      },
+      {
+        onSuccess: () => {
+          setConfirmUnPublish(null);
+        },
+        onError: () => {
+          addToast(
+            'delete-admin-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <p className="text-sm">
+                Oops! Something went wrong.
+                <br />
+                Please, try again!
+              </p>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [unpublishProjectMutation, confirmUnPublish, addToast]);
 
   return (
     <>
@@ -35,29 +150,76 @@ const ProjectButton = (): JSX.Element => {
         <PopoverContent
           side="left"
           sideOffset={20}
-          className="w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+          className="!z-40 w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
           collisionPadding={48}
         >
-          <button
-            className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
-            // disabled={!editable}
-            onClick={() => console.log('publish project')}
-          >
-            {/* <Icon
-            className="h-5 w-5 text-gray-500 transition-colors group-hover:text-white"
-            icon={DUPLICATE_SVG}
-          /> */}
-            <p>Publish/Unpublish</p>
-          </button>
+          {!isPublic && (
+            <>
+              <Tooltip
+                disabled={isOwner && SCENARIOS_RUNNED}
+                arrow
+                placement="top"
+                content={
+                  <div
+                    className="rounded bg-white p-4 text-xs text-gray-500"
+                    style={{
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                      maxWidth: 200,
+                    }}
+                  >
+                    You need to be the owner and have at least one scenario runned to publish the
+                    project.
+                  </div>
+                }
+              >
+                <button
+                  className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                  disabled={!isOwner || !SCENARIOS_RUNNED}
+                  onClick={() => setPublishModal(true)}
+                >
+                  <p>Publish</p>
+                </button>
+              </Tooltip>
+              <Modal
+                id="publish-project-modal"
+                dismissable
+                open={publishModal}
+                size="narrow"
+                title="Publish to community"
+                onDismiss={() => setPublishModal(false)}
+              >
+                <PublishModal
+                  publishing={publishing}
+                  onSubmit={handlePublish}
+                  onCancel={() => setPublishModal(false)}
+                />
+              </Modal>
+            </>
+          )}
+          {isPublic && (
+            <>
+              <button
+                className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                disabled={!isOwner}
+                onClick={() => setConfirmUnPublish(projectData)}
+              >
+                <p>Unpublish</p>
+              </button>
+              <ConfirmationPrompt
+                title={`Are you sure you want unpublish "${projectData?.name}"?`}
+                icon={DELETE_WARNING_SVG}
+                open={!!confirmUnPublish}
+                onAccept={handleUnpublish}
+                onRefuse={() => setConfirmUnPublish(null)}
+                onDismiss={() => setConfirmUnPublish(null)}
+              />
+            </>
+          )}
+
           <button
             className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-500"
-            // disabled={!editable}
             onClick={() => setDownloadModal(true)}
           >
-            {/* <Icon
-            className="h-5 w-5 text-gray-500 transition-colors group-hover:text-white"
-            icon={DELETE_SVG}
-          /> */}
             <p>Download</p>
           </button>
         </PopoverContent>
