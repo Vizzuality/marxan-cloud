@@ -275,7 +275,6 @@ export const ScenarioItem: React.FC<ScenarioItemProps> = ({
           <Icon className="h-3 w-3" icon={ARROW_RIGHT_SVG} />
         </button>
       </div>
-
       {settings && <ScenarioSettings id={id} />}
     </div>
   );
