@@ -38,7 +38,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
   input,
 }: ProtectedAreaUploaderProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
   const formRef = useRef(null);
 
   const [opened, setOpened] = useState(false);

@@ -24,7 +24,7 @@ export const ScenarioLock: React.FC<ScenarioLockProps> = () => {
   const beforeunload = useRef(false);
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: projectUsersData = [] } = useProjectUsers(pid);
   const { data: scenarioLockData } = useScenarioLock(sid);

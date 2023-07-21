@@ -24,7 +24,7 @@ export const ProtectedAreasSelected: React.FC<ProtectedAreasSelectedProps> = ({
   wdpaIucnCategories,
 }: ProtectedAreasSelectedProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const editable = useCanEditScenario(pid, sid);
 

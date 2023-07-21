@@ -30,7 +30,7 @@ export const ScenariosRunField: React.FC<ScenariosRunFieldProps> = ({
   validations,
 }: ScenariosRunFieldProps) => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
   const editable = useCanEditScenario(pid, sid);
 
   return (
