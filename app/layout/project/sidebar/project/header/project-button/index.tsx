@@ -32,13 +32,12 @@ const ProjectButton = (): JSX.Element => {
   const { isPublic } = projectData;
 
   const [content, setContent] = useState<boolean>(false);
-  console.log({ content });
 
   const [downloadModal, setDownloadModal] = useState<boolean>(false);
   const [publishModal, setPublishModal] = useState<boolean>(false);
 
   const [publishing, setPublishing] = useState<boolean>(false);
-  const [confirmUnPublish, setConfirmUnPublish] = useState();
+  const [confirmUnPublish, setConfirmUnPublish] = useState<Record<string, any>>();
 
   const publishProjectMutation = usePublishProject({
     requestConfig: {
@@ -113,7 +112,7 @@ const ProjectButton = (): JSX.Element => {
   const handleUnpublish = useCallback(() => {
     unpublishProjectMutation.mutate(
       {
-        id: confirmUnPublish.id,
+        id: confirmUnPublish?.id,
       },
       {
         onSuccess: () => {
