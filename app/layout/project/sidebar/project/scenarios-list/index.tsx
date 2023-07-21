@@ -26,15 +26,16 @@ import Icon from 'components/icon';
 import Loading from 'components/loading';
 import Modal from 'components/modal';
 import HelpBeacon from 'layout/help/beacon';
-import ScenarioItem from 'layout/project/sidebar/project/scenarios-list/scenario-item';
-import ScenarioToolbar from 'layout/projects/show/scenarios/toolbar';
-import ScenarioTypes from 'layout/projects/show/scenarios/types';
+import ScenarioToolbar from 'layout/project/sidebar/project/scenarios-list/toolbar';
 import { cn } from 'utils/cn';
 
 import bgScenariosDashboard from 'images/new-layout/bg-scenarios-dashboard.png';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import PLUS_SVG from 'svgs/ui/plus.svg?sprite';
+
+import ScenarioItem from './scenario-item';
+import ScenarioTypes from './types';
 
 export const ScenariosList: React.FC = () => {
   const queryClient = useQueryClient();
