@@ -438,8 +438,10 @@ export function useUnPublishProject({
   };
 
   return useMutation(unpublishProject, {
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      const { id } = variables;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['project', id]);
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
     },

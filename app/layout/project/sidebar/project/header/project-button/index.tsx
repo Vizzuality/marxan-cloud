@@ -31,6 +31,9 @@ const ProjectButton = (): JSX.Element => {
   const { data: projectData } = useProject(pid);
   const { isPublic } = projectData;
 
+  const [content, setContent] = useState<boolean>(false);
+  console.log({ content });
+
   const [downloadModal, setDownloadModal] = useState<boolean>(false);
   const [publishModal, setPublishModal] = useState<boolean>(false);
 
@@ -68,6 +71,7 @@ const ProjectButton = (): JSX.Element => {
       const data = omit(values, 'scenarioId'); // TODO: Remove this when the API supports it
 
       publishProjectMutation.mutate(
+        // @ts-ignore
         { pid: `${pid}`, data },
         {
           onSuccess: () => {
@@ -83,6 +87,7 @@ const ProjectButton = (): JSX.Element => {
                 level: 'success',
               }
             );
+            setContent(false);
           },
           onError: () => {
             setPublishing(false);
@@ -113,6 +118,7 @@ const ProjectButton = (): JSX.Element => {
       {
         onSuccess: () => {
           setConfirmUnPublish(null);
+          confirmUnPublish && setContent(false);
         },
         onError: () => {
           addToast(
@@ -138,7 +144,10 @@ const ProjectButton = (): JSX.Element => {
     <>
       <Popover>
         <PopoverTrigger asChild>
-          <button className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-400 hover:border-white">
+          <button
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-400 hover:border-white"
+            onClick={() => setContent(true)}
+          >
             <Icon
               icon={DOTS_SVG}
               className={cn({
@@ -147,82 +156,85 @@ const ProjectButton = (): JSX.Element => {
             />
           </button>
         </PopoverTrigger>
-        <PopoverContent
-          side="left"
-          sideOffset={20}
-          className="!z-40 w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
-          collisionPadding={48}
-        >
-          {!isPublic && (
-            <>
-              <Tooltip
-                disabled={isOwner && SCENARIOS_RUNNED}
-                arrow
-                placement="top"
-                content={
-                  <div
-                    className="rounded bg-white p-4 text-xs text-gray-500"
-                    style={{
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
-                      maxWidth: 200,
-                    }}
+        {content && (
+          <PopoverContent
+            side="left"
+            sideOffset={20}
+            className="!z-40 w-32 rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+            collisionPadding={48}
+            onInteractOutside={() => setContent(false)}
+          >
+            {!isPublic && (
+              <>
+                <Tooltip
+                  disabled={isOwner && SCENARIOS_RUNNED}
+                  arrow
+                  placement="top"
+                  content={
+                    <div
+                      className="rounded bg-white p-4 text-xs text-gray-500"
+                      style={{
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.25)',
+                        maxWidth: 200,
+                      }}
+                    >
+                      You need to be the owner and have at least one scenario runned to publish the
+                      project.
+                    </div>
+                  }
+                >
+                  <button
+                    className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
+                    disabled={!isOwner || !SCENARIOS_RUNNED}
+                    onClick={() => setPublishModal(true)}
                   >
-                    You need to be the owner and have at least one scenario runned to publish the
-                    project.
-                  </div>
-                }
-              >
+                    <p>Publish</p>
+                  </button>
+                </Tooltip>
+                <Modal
+                  id="publish-project-modal"
+                  dismissable
+                  open={publishModal}
+                  size="narrow"
+                  title="Publish to community"
+                  onDismiss={() => setPublishModal(false)}
+                >
+                  <PublishModal
+                    publishing={publishing}
+                    onSubmit={handlePublish}
+                    onCancel={() => setPublishModal(false)}
+                  />
+                </Modal>
+              </>
+            )}
+            {isPublic && (
+              <>
                 <button
                   className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
-                  disabled={!isOwner || !SCENARIOS_RUNNED}
-                  onClick={() => setPublishModal(true)}
+                  disabled={!isOwner}
+                  onClick={() => setConfirmUnPublish(projectData)}
                 >
-                  <p>Publish</p>
+                  <p>Unpublish</p>
                 </button>
-              </Tooltip>
-              <Modal
-                id="publish-project-modal"
-                dismissable
-                open={publishModal}
-                size="narrow"
-                title="Publish to community"
-                onDismiss={() => setPublishModal(false)}
-              >
-                <PublishModal
-                  publishing={publishing}
-                  onSubmit={handlePublish}
-                  onCancel={() => setPublishModal(false)}
+                <ConfirmationPrompt
+                  title={`Are you sure you want unpublish "${projectData?.name}"?`}
+                  icon={DELETE_WARNING_SVG}
+                  open={!!confirmUnPublish}
+                  onAccept={handleUnpublish}
+                  onRefuse={() => setConfirmUnPublish(null)}
+                  onDismiss={() => setConfirmUnPublish(null)}
                 />
-              </Modal>
-            </>
-          )}
-          {isPublic && (
-            <>
-              <button
-                className="group flex w-full cursor-pointer items-center space-x-3 rounded-t-2xl px-2.5 py-2 hover:bg-gray-500"
-                disabled={!isOwner}
-                onClick={() => setConfirmUnPublish(projectData)}
-              >
-                <p>Unpublish</p>
-              </button>
-              <ConfirmationPrompt
-                title={`Are you sure you want unpublish "${projectData?.name}"?`}
-                icon={DELETE_WARNING_SVG}
-                open={!!confirmUnPublish}
-                onAccept={handleUnpublish}
-                onRefuse={() => setConfirmUnPublish(null)}
-                onDismiss={() => setConfirmUnPublish(null)}
-              />
-            </>
-          )}
+              </>
+            )}
 
-          <button
-            className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-500"
-            onClick={() => setDownloadModal(true)}
-          >
-            <p>Download</p>
-          </button>
-        </PopoverContent>
+            <button
+              className="group flex w-full cursor-pointer items-center space-x-3 rounded-b-2xl px-2.5 py-2 hover:bg-gray-500"
+              onClick={() => setDownloadModal(true)}
+            >
+              <p>Download</p>
+            </button>
+          </PopoverContent>
+        )}
       </Popover>
       <Modal
         id="download-project-modal"
