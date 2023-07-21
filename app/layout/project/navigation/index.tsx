@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -100,6 +100,13 @@ export const Navigation = (): JSX.Element => {
       );
     });
   }, []);
+
+  useEffect(() => {
+    isProjectRoute &&
+      !isScenarioRoute &&
+      NAVIGATION_TREE.inventory.includes(tab) &&
+      toggleSubmenu('inventory');
+  }, [tab, isProjectRoute, toggleSubmenu, isScenarioRoute]);
 
   const handleRunScenario = useCallback(() => {
     runScenarioMutation.mutate(
