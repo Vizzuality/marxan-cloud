@@ -36,7 +36,6 @@ interface ScenarioSelectResult {
   solutions_are_locked: boolean;
   type: string;
   created_by: string;
-  project_scenario_id: number;
 }
 
 let fixtures: FixtureType<typeof getFixtures>;
@@ -297,9 +296,6 @@ const getFixtures = async () => {
           expect(scenario.solutions_are_locked).toEqual(solutionsAreLocked);
           expect(scenario.type).toEqual(validScenarioMetadataContent.type);
           expect(scenario.created_by).toEqual(userId);
-          expect(scenario.project_scenario_id).toEqual(
-            validScenarioMetadataContent.projectScenarioId,
-          );
 
           const [blmRange]: [
             BlmRange,

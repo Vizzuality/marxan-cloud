@@ -24,7 +24,6 @@ type SelectScenarioResult = {
   solutions_are_locked: boolean;
   status: ScenarioMetadataContent['status'] | null;
   type: string;
-  project_scenario_id: number;
 };
 
 type SelectScenarioBlmResult = {
@@ -67,7 +66,6 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
         'status',
         'ran_at_least_once',
         'solutions_are_locked',
-        'project_scenario_id',
       ])
       .from('scenarios', 's')
       .where('s.id = :scenarioId', { scenarioId })
@@ -105,7 +103,6 @@ export class ScenarioMetadataPieceExporter implements ExportPieceProcessor {
       solutionsAreLocked: scenario.solutions_are_locked,
       type: scenario.type,
       status: scenario.status ?? undefined,
-      projectScenarioId: scenario.project_scenario_id,
     };
 
     const relativePath = ClonePieceRelativePathResolver.resolveFor(
