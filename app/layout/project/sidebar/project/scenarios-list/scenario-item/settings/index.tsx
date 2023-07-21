@@ -10,7 +10,7 @@ import { useWDPACategories } from 'hooks/wdpa';
 import Loading from 'components/loading';
 import { Scenario } from 'types/scenario';
 
-const ScenarioSettings: React.FC = (id: Scenario['id']) => {
+const ScenarioSettings: React.FC = ({ id }: { id: Scenario['id'] }) => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
@@ -59,13 +59,13 @@ const ScenarioSettings: React.FC = (id: Scenario['id']) => {
       <div className="flex space-x-2">
         <dt>Runs:</dt>
         <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
-          {scenarioData.numberOfRuns || '-'}
+          {scenarioData?.numberOfRuns || '-'}
         </dd>
       </div>
       <div className="flex space-x-2">
         <dt>BLM:</dt>
         <dd className="rounded bg-blue-400 bg-opacity-30 px-1.5 text-sm text-blue-400">
-          {scenarioData.boundaryLengthModifier || '-'}
+          {scenarioData?.boundaryLengthModifier || '-'}
         </dd>
       </div>
     </dl>
