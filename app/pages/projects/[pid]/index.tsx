@@ -11,10 +11,8 @@ import InventoryProjectHeader from 'layout/project/sidebar/project/header';
 import InventoryPanelCostSurface from 'layout/project/sidebar/project/inventory-panel/cost-surface';
 import InventoryPanelFeatures from 'layout/project/sidebar/project/inventory-panel/features';
 import InventoryPanelProtectedAreas from 'layout/project/sidebar/project/inventory-panel/protected-areas';
-// import ProjectHeader from 'layout/projects/show/header';
 import ScenariosList from 'layout/project/sidebar/project/scenarios-list';
 import ProjectMap from 'layout/projects/show/map';
-// import ProjectScenarios from 'layout/projects/show/scenarios';
 import ProjectStatus from 'layout/projects/show/status';
 import Protected from 'layout/protected';
 import ProjectTitle from 'layout/title/project-title';
@@ -31,8 +29,6 @@ const ShowProjectsPage = (): JSX.Element => {
       <MetaIcons />
       <ProjectLayout className="relative z-10">
         <Sidebar className="flex-col">
-          {/* // !TODO: Remove this component */}
-          {/* <ProjectHeader /> */}
           <Breadcrumb
             onClick={() => {
               push('/projects');
@@ -47,8 +43,6 @@ const ShowProjectsPage = (): JSX.Element => {
           {tab === 'protected-areas' && <InventoryPanelProtectedAreas />}
           {tab === 'cost-surface' && <InventoryPanelCostSurface />}
           {!tab && <ScenariosList />}
-          {/* // !TODO: Remove this component */}
-          {/* <ProjectScenarios /> */}
         </Sidebar>
         <ProjectStatus />
         <ProjectMap />
