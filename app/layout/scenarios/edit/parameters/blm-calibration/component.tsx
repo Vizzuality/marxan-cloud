@@ -34,7 +34,7 @@ export const ScenariosBLMCalibration: React.FC<ScenariosBLMCalibrationProps> = (
 }: ScenariosBLMCalibrationProps) => {
   const [loading, setLoading] = useState(false);
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { addToast } = useToasts();
   const plausible = usePlausible();
