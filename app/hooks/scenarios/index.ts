@@ -1134,3 +1134,42 @@ export function useDeletePUScenaro() {
     },
   });
 }
+
+export function useDownloadSolutionsSummary({
+  requestConfig = {
+    method: 'GET',
+  },
+}) {
+  const { data: session } = useSession();
+
+  const downloadScenarioSolutionsSummary = ({ id }: { id: Project['id'] }) => {
+    return DOWNLOADS.request({
+      url: `/projects/${id}/output-summary`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+      ...requestConfig,
+    });
+  };
+
+  return useMutation(downloadScenarioSolutionsSummary, {
+    onSuccess: (data, variables, context) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `solutions-${id}.zip`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      console.info('Success', data, variables, context);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
