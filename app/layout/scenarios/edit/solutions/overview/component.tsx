@@ -10,7 +10,11 @@ import { motion } from 'framer-motion';
 
 // import { LEGEND_LAYERS } from 'hooks/map/constants';
 import { useProject } from 'hooks/projects';
-import { useScenario, useDownloadScenarioReport } from 'hooks/scenarios';
+import {
+  useScenario,
+  useDownloadScenarioReport,
+  useDownloadSolutionsSummary,
+} from 'hooks/scenarios';
 import { useSolution, useBestSolution } from 'hooks/solutions';
 import { useToasts } from 'hooks/toast';
 
@@ -30,8 +34,9 @@ import { ScenariosSolutionsOverviewProps } from './types';
 
 export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
   const [PDFLoader, setPDFLoader] = useState<boolean>(false);
+  const [solutionsReportLoader, setSolutionsReportLoader] = useState<boolean>(false);
   const [showTable, setShowTable] = useState<boolean>(false);
   const { addToast } = useToasts();
 
@@ -68,6 +73,8 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     runId: `${(selectedSolutionData || bestSolutionData).runId}`,
   });
 
+  const downloadSolutionsSummary = useDownloadSolutionsSummary({});
+
   const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
   const isBestSolution =
@@ -78,7 +85,30 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     (bestSolutionisFetching && !bestSolutionisFetched) ||
     (selectedSolutionisFetching && !selectedSolutionisFetched);
 
-  // const frequencyLegendValues = LEGEND_LAYERS.frequency().items;
+  const onDownloadSolutionsSummary = useCallback(() => {
+    setSolutionsReportLoader(true);
+    downloadSolutionsSummary.mutate(
+      { id: pid },
+      {
+        onSuccess: () => {
+          setSolutionsReportLoader(false);
+        },
+        onError: () => {
+          setSolutionsReportLoader(false);
+          addToast(
+            'download-error',
+            <>
+              <h2 className="font-medium">Error!</h2>
+              <ul className="text-sm">Solutions report not downloaded</ul>
+            </>,
+            {
+              level: 'error',
+            }
+          );
+        },
+      }
+    );
+  }, [downloadSolutionsSummary, addToast, pid]);
 
   const onDownloadReport = useCallback(() => {
     setPDFLoader(true);
@@ -174,19 +204,24 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
             </div>
 
             <Button
-              theme="primary"
+              theme="primary-alt"
               size="base"
-              className="mb-4 flex h-12"
-              onClick={() => setShowTable(true)}
+              className="mb-4 flex h-12 overflow-hidden uppercase"
+              disabled={solutionsReportLoader}
+              onClick={onDownloadSolutionsSummary}
             >
-              View solutions table
-              <Icon icon={TABLE_SVG} className="absolute right-8 h-4 w-4" />
+              <Loading
+                visible={solutionsReportLoader}
+                className="absolute bottom-0 left-0 right-0 top-0 z-40 flex h-full w-full items-center justify-center bg-gray-800 bg-opacity-90"
+                iconClassName="w-10 h-10 text-primary-500"
+              />
+              Export solutions summary
             </Button>
 
             <Button
               theme="primary-alt"
               size="base"
-              className="mb-4 flex h-12 overflow-hidden"
+              className="mb-4 flex h-12 overflow-hidden uppercase"
               disabled={PDFLoader}
               onClick={onDownloadReport}
             >
@@ -196,6 +231,15 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
                 iconClassName="w-10 h-10 text-primary-500"
               />
               Download report
+            </Button>
+            <Button
+              theme="primary"
+              size="base"
+              className="mb-4 flex h-12 uppercase"
+              onClick={() => setShowTable(true)}
+            >
+              View solutions table
+              <Icon icon={TABLE_SVG} className="absolute right-8 h-4 w-4" />
             </Button>
 
             <Modal
