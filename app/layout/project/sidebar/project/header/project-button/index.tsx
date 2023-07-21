@@ -15,11 +15,12 @@ import Modal from 'components/modal';
 import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import Tooltip from 'components/tooltip';
 import DownloadProjectModal from 'layout/projects/common/download-modal';
-import PublishModal from 'layout/projects/show/header/toolbar/publish-btn/publish-modal';
 import { cn } from 'utils/cn';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
 import DOTS_SVG from 'svgs/ui/dots.svg?sprite';
+
+import PublishModal from './publish-modal';
 
 const ProjectButton = (): JSX.Element => {
   const { addToast } = useToasts();
