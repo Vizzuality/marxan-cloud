@@ -15,4 +15,5 @@ export interface Scenario {
   metadata: any;
   solutionsAreLocked: boolean;
   wdpaThreshold: number;
+  wdpaIucnCategories: string[];
 }
