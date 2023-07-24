@@ -18,6 +18,7 @@ import { Left } from 'fp-ts/lib/Either';
 import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { ProjectSourcesEnum } from '@marxan/projects';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -84,12 +85,11 @@ export class FeatureAmountUploadService {
 
       // Setting project source to legacy-import to create puvspr.dat files from pre-calculated amounts, to allow to use new features after upload
 
-      await apiQueryRunner.manager
-        .createQueryBuilder()
-        .update(Project)
-        .set({ sources: 'legacy_import' })
-        .where('id = :projectId', { projectId: data.projectId })
-        .execute();
+      await this.updateProjectSources(
+        data.projectId,
+        ProjectSourcesEnum.legacyImport,
+        apiQueryRunner.manager,
+      );
 
       // Committing transaction
 
@@ -329,5 +329,18 @@ export class FeatureAmountUploadService {
     );
 
     return { featureNames: Array.from(featureNames), puids: Array.from(puids) };
+  }
+
+  private async updateProjectSources(
+    projectId: string,
+    sources: ProjectSourcesEnum,
+    entityManager: EntityManager,
+  ) {
+    await entityManager
+      .createQueryBuilder()
+      .update(Project)
+      .set({ sources })
+      .where('id = :projectId', { projectId })
+      .execute();
   }
 }
