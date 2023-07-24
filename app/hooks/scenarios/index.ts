@@ -1155,18 +1155,17 @@ export function useDownloadSolutionsSummary({
   };
 
   return useMutation(downloadScenarioSolutionsSummary, {
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data, variables) => {
       const { data: blob } = data;
       const { id } = variables;
 
       const url = window.URL.createObjectURL(new Blob([blob]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `solutions-${id}.zip`);
+      link.setAttribute('download', `solutions-summary-${id}.zip`);
       document.body.appendChild(link);
       link.click();
       link.remove();
-      console.info('Success', data, variables, context);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
