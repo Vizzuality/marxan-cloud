@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
 import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
@@ -44,7 +44,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
   const cancelUploadLegacyProjectFileMutation = useCancelUploadLegacyProjectFile({});
 
   // ADD DATA FILE
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const fl = acceptedFiles[0];
 
     setSuccessFile(fl);
@@ -82,7 +82,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -99,7 +99,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e) => (
+          {errors.map((e: FileError) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
