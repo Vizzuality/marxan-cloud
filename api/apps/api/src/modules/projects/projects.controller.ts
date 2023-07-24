@@ -151,7 +151,6 @@ import {
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { ApiConsumesCsv } from '@marxan-api/decorators/csv.decorator';
-import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
@@ -557,7 +556,7 @@ export class ProjectsController {
       file,
     );
     if (isLeft(result)) {
-      const mapping: Record<(typeof result)['left'], () => never> = {
+      const mapping: Record<typeof result['left'], () => never> = {
         [validationFailed]: () => {
           throw new BadRequestException();
         },
@@ -587,11 +586,10 @@ export class ProjectsController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ) {
-    const checkPlanningAreaBelongsToProject =
-      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-        planningAreaId,
-        req.user.id,
-      );
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      planningAreaId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -616,11 +614,10 @@ export class ProjectsController {
     @Res() response: Response,
     @Param('id', ParseUUIDPipe) planningAreaId: string,
   ): Promise<void> {
-    const checkPlanningAreaBelongsToProject =
-      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-        planningAreaId,
-        req.user.id,
-      );
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      planningAreaId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
@@ -649,23 +646,21 @@ export class ProjectsController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
-    const checkPlanningAreaBelongsToProject =
-      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-        projectId,
-        req.user.id,
-      );
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      projectId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
 
-    const result =
-      await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
-        projectId,
-        req.user.id,
-        z,
-        x,
-        y,
-      );
+    const result = await this.projectsService.getActualUrlForProjectPlanningAreaTiles(
+      projectId,
+      req.user.id,
+      z,
+      x,
+      y,
+    );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
@@ -700,23 +695,21 @@ export class ProjectsController {
     @Param('x', ParseIntPipe) x: number,
     @Param('y', ParseIntPipe) y: number,
   ) {
-    const checkPlanningAreaBelongsToProject =
-      await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
-        projectId,
-        req.user.id,
-      );
+    const checkPlanningAreaBelongsToProject = await this.projectsService.doesPlanningAreaBelongToProjectAndCanUserViewIt(
+      projectId,
+      req.user.id,
+    );
     if (isLeft(checkPlanningAreaBelongsToProject)) {
       throw new ForbiddenException();
     }
 
-    const result =
-      await this.projectsService.getActualUrlForProjectPlanningGridTiles(
-        projectId,
-        req.user.id,
-        z,
-        x,
-        y,
-      );
+    const result = await this.projectsService.getActualUrlForProjectPlanningGridTiles(
+      projectId,
+      req.user.id,
+      z,
+      x,
+      y,
+    );
 
     if (isLeft(result)) {
       throw new ForbiddenException();
