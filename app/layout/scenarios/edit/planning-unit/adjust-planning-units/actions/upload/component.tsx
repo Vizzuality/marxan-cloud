@@ -125,7 +125,7 @@ export const UploadPUMethod = (): JSX.Element => {
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            code: error.code,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(PLANNING_UNIT_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;

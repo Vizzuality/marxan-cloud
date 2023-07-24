@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 
 import { motion } from 'framer-motion';
 
@@ -38,7 +38,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeP
     onChange(null);
   };
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = async (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
 
     const url = await toBase64(f);
@@ -46,7 +46,7 @@ export const AvatarMe: React.FC<AvatarMeProps> = ({ value, onChange }: AvatarMeP
     onChange(`${url}`);
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
     const { errors } = r;
 
