@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
@@ -68,7 +68,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = async (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     setLoading(true);
     const f = acceptedFiles[0];
 
@@ -89,7 +89,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -108,7 +108,7 @@ export const ProtectedAreaUploader: React.FC<ProtectedAreaUploaderProps> = ({
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e) => (
+          {errors.map((e: FileError) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
