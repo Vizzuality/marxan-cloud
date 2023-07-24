@@ -101,8 +101,12 @@ export const Navigation = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
-  }, [tab, toggleSubmenu, isProjectRoute]);
+    if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
+    if (isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab)) toggleSubmenu('gridSetup');
+    if (isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab)) toggleSubmenu('solutions');
+    if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
+      toggleSubmenu('advancedSettings');
+  }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
 
   const handleRunScenario = useCallback(() => {
     runScenarioMutation.mutate(
