@@ -22,7 +22,6 @@ import { ProjectSourcesEnum } from '@marxan/projects';
 import { FakeLogger } from '@marxan-geoprocessing/utils/__mocks__/fake-logger';
 import * as archiver from 'archiver';
 import { readableToBuffer } from '@marxan/utils';
-import { OutputProjectSummaryApiEntity } from '@marxan/output-project-summaries';
 
 let fixtures: FixtureType<typeof getFixtures>;
 
@@ -173,10 +172,10 @@ const getFixtures = async () => {
       return apiEntityManager
         .createQueryBuilder()
         .insert()
-        .into(OutputProjectSummaryApiEntity)
+        .into('output_project_summaries')
         .values({
-          projectId: projectId,
-          summaryZippedData: summaryZipBuffer,
+          project_id: projectId,
+          summary_zipped_data: summaryZipBuffer,
         })
         .execute();
     },

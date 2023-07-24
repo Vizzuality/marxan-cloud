@@ -3,7 +3,6 @@ import { GivenUserIsLoggedIn, userObj } from '../steps/given-user-is-logged-in';
 import { GivenProjectExists } from '../steps/given-project';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { OutputProjectSummaryApiEntity } from '@marxan/output-project-summaries';
 import * as archiver from 'archiver';
 import { readableToBuffer } from '@marxan/utils';
 import { FixtureType } from '@marxan/utils/tests/fixture-type';
@@ -11,6 +10,7 @@ import * as request from 'supertest';
 import * as unzipper from 'unzipper';
 import { HttpStatus } from '@nestjs/common';
 import { Project } from '@marxan-api/modules/projects/project.api.entity';
+import { OutputProjectSummaryApiEntity } from '@marxan-api/modules/projects/output-project-summaries/output-project-summary.api.entity';
 
 let fixtures: FixtureType<typeof getFixtures>;
 

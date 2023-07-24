@@ -10,10 +10,10 @@ import { createWriteStream, existsSync, readFileSync } from 'fs';
 import { pipeline } from 'stream/promises';
 import { join as joinPath } from 'path';
 import { Injectable, Logger } from '@nestjs/common';
-import { OutputProjectSummaryApiEntity } from '@marxan/output-project-summaries';
 import { mkdir, rm } from 'fs/promises';
 import { DbConnections } from '@marxan-api/ormconfig.connections';
 import { AppConfig } from '@marxan-api/utils/config.utils';
+import { OutputProjectSummaryApiEntity } from '@marxan-api/modules/projects/output-project-summaries/output-project-summary.api.entity';
 
 export const outputProjectSummaryNotFound = Symbol(
   'output project summary not found',
