@@ -42,10 +42,9 @@ export const getFixtures = async () => {
     getRepositoryToken(GeoFeatureTag),
   );
 
-  const featureImportRegistry: Repository<FeatureAmountUploadRegistry> =
-    app.get(
-      getRepositoryToken(FeatureAmountUploadRegistry, DbConnections.default),
-    );
+  const featureImportRegistry: Repository<FeatureAmountUploadRegistry> = app.get(
+    getRepositoryToken(FeatureAmountUploadRegistry, DbConnections.default),
+  );
   const featuresRepository: Repository<GeoFeature> = app.get(
     getRepositoryToken(GeoFeature, DbConnections.default),
   );

@@ -310,7 +310,9 @@ export class FeatureAmountUploadService {
     return maxInputPuid <= maxDbPuid.maxPuid;
   }
 
-  private getFeatureNamesAndPuids(parsedCsv: FeatureAmountCSVDto[]): {
+  private getFeatureNamesAndPuids(
+    parsedCsv: FeatureAmountCSVDto[],
+  ): {
     featureNames: string[];
     puids: number[];
   } {
