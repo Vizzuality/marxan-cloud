@@ -22,7 +22,7 @@ import UserCard from './card';
 
 export const EditContributorsDropdown: React.FC = () => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { addToast } = useToasts();
 

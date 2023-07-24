@@ -50,41 +50,41 @@ const EditScenarioPage = (): JSX.Element => {
     },
   });
 
-  useEffect(() => {
-    if (metaTab) dispatch(setTab(metaTab));
-    if (metaSubtab) dispatch(setSubTab(metaSubtab));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [metaTab, metaSubtab]);
+  // useEffect(() => {
+  //   if (metaTab) dispatch(setTab(metaTab));
+  //   if (metaSubtab) dispatch(setSubTab(metaSubtab));
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [metaTab, metaSubtab]);
 
-  // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
-  useEffect(() => {
-    if (!lastJobCheck && !submitting) {
-      setSubmitting(true);
+  // // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
+  // useEffect(() => {
+  //   if (!lastJobCheck && !submitting) {
+  //     setSubmitting(true);
 
-      saveScenarioMutation.mutate(
-        {
-          id: `${sid}`,
-          data: {
-            metadata: {
-              ...metadata,
-              scenarioEditingMetadata: {
-                lastJobCheck: new Date().getTime(),
-                ...scenarioEditingMetadata,
-              },
-            },
-          },
-        },
-        {
-          onSuccess: () => {
-            setSubmitting(false);
-          },
-          onError: () => {
-            setSubmitting(false);
-          },
-        }
-      );
-    }
-  }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
+  //     saveScenarioMutation.mutate(
+  //       {
+  //         id: `${sid}`,
+  //         data: {
+  //           metadata: {
+  //             ...metadata,
+  //             scenarioEditingMetadata: {
+  //               lastJobCheck: new Date().getTime(),
+  //               ...scenarioEditingMetadata,
+  //             },
+  //           },
+  //         },
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           setSubmitting(false);
+  //         },
+  //         onError: () => {
+  //           setSubmitting(false);
+  //         },
+  //       }
+  //     );
+  //   }
+  // }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
 
   return (
     <Protected>
