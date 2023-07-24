@@ -10,10 +10,11 @@ import { useProject } from 'hooks/projects';
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
 import Tooltip from 'components/tooltip';
-import EditDropdown from 'layout/projects/show/header/contributors/edit-dropdown';
 import { cn } from 'utils/cn';
 
 import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
+
+import EditDropdown from './edit-dropdown';
 
 export const Contributors: React.FC = () => {
   const { query } = useRouter();

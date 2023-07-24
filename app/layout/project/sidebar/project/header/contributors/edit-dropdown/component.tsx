@@ -17,18 +17,17 @@ import { useToasts } from 'hooks/toast';
 
 import Button from 'components/button';
 import Search from 'components/search';
-import UserCard from 'layout/projects/show/header/contributors/edit-dropdown/card';
 
-export interface EditContributorsDropdownProps {}
+import UserCard from './card';
 
-export const EditContributorsDropdown: React.FC<EditContributorsDropdownProps> = () => {
+export const EditContributorsDropdown: React.FC = () => {
   const { query } = useRouter();
   const { pid } = query;
 
   const { addToast } = useToasts();
 
-  const [search, setSearch] = useState(null);
-  const [email, setEmail] = useState(null);
+  const [search, setSearch] = useState<string>(null);
+  const [email, setEmail] = useState<boolean>(null);
 
   const isOwner = useOwnsProject(pid);
 
