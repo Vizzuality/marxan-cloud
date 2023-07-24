@@ -12,7 +12,6 @@ import {
   ImportPieceProcessor,
   PieceImportProvider,
 } from '../pieces/import-piece-processor';
-import { OutputProjectSummaryApiEntity } from '@marxan/output-project-summaries';
 
 @Injectable()
 @PieceImportProvider()
@@ -182,10 +181,10 @@ export class ProjectMetadataPieceImporter implements ImportPieceProcessor {
         await em
           .createQueryBuilder()
           .insert()
-          .into(OutputProjectSummaryApiEntity)
+          .into('output_project_summaries')
           .values({
-            projectId: projectId,
-            summaryZippedData: Buffer.from(
+            project_id: projectId,
+            summary_zipped_data: Buffer.from(
               projectMetadata.outputSummaryZip,
               'base64',
             ),

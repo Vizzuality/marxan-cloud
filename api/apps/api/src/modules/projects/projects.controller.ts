@@ -156,7 +156,7 @@ import { UpdateGeoFeatureTagDTO } from '@marxan-api/modules/geo-feature-tags/dto
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { GetProjectTagsResponseDto } from '@marxan-api/modules/projects/dto/get-project-tags-response.dto';
 import { UpdateProjectTagDTO } from '@marxan-api/modules/projects/dto/update-project-tag.dto';
-import { outputProjectSummaryResource } from '@marxan/output-project-summaries/output-project-summary.api.entity';
+import { outputProjectSummaryResource } from '@marxan-api/modules/projects/output-project-summaries/output-project-summary.api.entity';
 
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
