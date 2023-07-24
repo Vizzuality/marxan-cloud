@@ -11,9 +11,7 @@ import Tooltip from 'components/tooltip';
 
 import UNDER_MODERATION_SVG from 'svgs/ui/under-moderation.svg?sprite';
 
-export interface UnderModerationProps {}
-
-export const UnderModeration: React.FC<UnderModerationProps> = () => {
+const UnderModeration: React.FC = () => {
   const { query } = useRouter();
   const { pid } = query as { pid: string };
 
