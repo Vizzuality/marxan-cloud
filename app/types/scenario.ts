@@ -39,5 +39,6 @@ export interface Scenario {
   ranAtLeastOnce: boolean;
   runStatus: Job['status'];
   solutionsAreLocked: boolean;
+  wdpaIucnCategories: string[];
   wdpaThreshold: number;
 }

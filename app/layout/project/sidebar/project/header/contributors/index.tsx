@@ -9,12 +9,14 @@ import { useProject } from 'hooks/projects';
 
 import Avatar from 'components/avatar';
 import Icon from 'components/icon';
-import Tooltip from 'components/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from 'components/popover';
 import { cn } from 'utils/cn';
 
 import ADD_USER_SVG from 'svgs/ui/add-user.svg?sprite';
 
 import EditDropdown from './edit-dropdown';
+
+const PROJECT_USERS_SIZE = 3;
 
 export const Contributors: React.FC = () => {
   const { query } = useRouter();
@@ -28,29 +30,9 @@ export const Contributors: React.FC = () => {
 
   const { data: projectUsers } = useProjectUsers(pid);
 
-  const projectUsersVisibleSize = 3;
-  const projectUsersVisible = projectUsers?.slice(0, projectUsersVisibleSize);
+  const projectUsersVisible = projectUsers?.slice(0, PROJECT_USERS_SIZE);
 
-  const handleClick = useCallback(() => {
-    setOpen(!open);
-  }, [open, setOpen]);
-
-  const handleClickOutside = useCallback(
-    (event) => {
-      const $overlay = document.getElementById('overlay');
-      const $select = document.querySelectorAll('.c-select-dropdown');
-      const $multiselect = document.querySelectorAll('.c-multi-select-dropdown');
-
-      const isSelect = !!$select && [...$select].some((s) => s.contains(event.target));
-      const isMultiSelect =
-        !!$multiselect && [...$multiselect].some((s) => s.contains(event.target));
-
-      if (!((!!$overlay && $overlay.contains(event.target)) || isSelect || isMultiSelect)) {
-        setOpen(false);
-      }
-    },
-    [setOpen]
-  );
+  const handleClick = () => setOpen((open) => !open);
 
   return (
     <AnimatePresence>
@@ -89,43 +71,47 @@ export const Contributors: React.FC = () => {
                   );
                 })}
 
-              {projectUsers?.length > projectUsersVisibleSize && (
+              {projectUsers?.length > PROJECT_USERS_SIZE && (
                 <Avatar size="s" className="-ml-3 bg-primary-700 text-sm uppercase text-white">
-                  {`+${projectUsers.length - projectUsersVisibleSize}`}
+                  {`+${projectUsers.length - PROJECT_USERS_SIZE}`}
                 </Avatar>
               )}
 
-              <Tooltip
-                animation
-                placement="bottom-end"
-                interactive
-                popup
-                visible={open}
-                onClickOutside={handleClickOutside}
-                zIndex={49}
-                content={<EditDropdown />}
-              >
-                <button
-                  aria-label="add-contributor"
-                  type="button"
-                  className={cn({
-                    'z-50 -ml-3 rounded-full border border-gray-500 hover:border-white': true,
-                    'bg-gray-500': !open,
-                  })}
-                  onClick={handleClick}
-                >
-                  <Avatar
-                    size="s"
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    aria-label="add-contributor"
+                    type="button"
                     className={cn({
-                      'border-none': true,
-                      'bg-gray-500 text-white': !open,
-                      'bg-white text-gray-500': open,
+                      'z-50 -ml-3 rounded-full border border-gray-500 hover:border-white': true,
+                      'bg-gray-500': !open,
                     })}
+                    onClick={handleClick}
                   >
-                    <Icon icon={ADD_USER_SVG} className="h-4 w-4" />
-                  </Avatar>
-                </button>
-              </Tooltip>
+                    <Avatar
+                      size="s"
+                      className={cn({
+                        'border-none': true,
+                        'bg-gray-500 text-white': !open,
+                        'bg-white text-gray-500': open,
+                      })}
+                    >
+                      <Icon icon={ADD_USER_SVG} className="h-4 w-4" />
+                    </Avatar>
+                  </button>
+                </PopoverTrigger>
+                {open && (
+                  <PopoverContent
+                    side="right"
+                    sideOffset={20}
+                    className="!z-50 w-full rounded-2xl !border-none bg-gray-700 !p-0 font-sans text-xs"
+                    collisionPadding={48}
+                    onInteractOutside={() => setOpen(false)}
+                  >
+                    <EditDropdown />
+                  </PopoverContent>
+                )}
+              </Popover>
             </ul>
           </div>
         </motion.div>
