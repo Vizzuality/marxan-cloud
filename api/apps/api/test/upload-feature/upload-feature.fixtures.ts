@@ -13,6 +13,7 @@ import { GivenProjectsPuExists } from '../../../geoprocessing/test/steps/given-p
 import { HttpStatus } from '@nestjs/common';
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { tagMaxlength } from '@marxan-api/modules/geo-feature-tags/dto/update-geo-feature-tag.dto';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 export const getFixtures = async () => {
   const app = await bootstrapApplication();
@@ -41,11 +42,16 @@ export const getFixtures = async () => {
     getRepositoryToken(GeoFeatureTag),
   );
 
-  const featureImportRegistry: Repository<FeatureAmountUploadRegistry> = app.get(
-    getRepositoryToken(FeatureAmountUploadRegistry, DbConnections.default),
-  );
+  const featureImportRegistry: Repository<FeatureAmountUploadRegistry> =
+    app.get(
+      getRepositoryToken(FeatureAmountUploadRegistry, DbConnections.default),
+    );
   const featuresRepository: Repository<GeoFeature> = app.get(
     getRepositoryToken(GeoFeature, DbConnections.default),
+  );
+
+  const projectsRepository: Repository<Project> = app.get(
+    getRepositoryToken(Project, DbConnections.default),
   );
 
   const featuresAmounsGeoDbRepository: Repository<GeoFeatureGeometry> = app.get(
@@ -302,6 +308,12 @@ export const getFixtures = async () => {
         relations: ['uploadedFeatures'],
       });
       expect(featureImportRegistryRecord).toBeFalsy();
+    },
+    ThenProjectSourcesIsSetToLegacyProject: async () => {
+      const project = await projectsRepository.findOne({
+        where: { id: projectId },
+      });
+      expect(project?.sources).toEqual('legacy_import');
     },
   };
 };
