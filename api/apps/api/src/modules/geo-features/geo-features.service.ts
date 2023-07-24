@@ -1,5 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import {
+  InjectDataSource,
+  InjectEntityManager,
+  InjectRepository,
+} from '@nestjs/typeorm';
 import { DeepReadonly } from 'utility-types';
 import {
   DataSource,
@@ -94,6 +98,8 @@ export class GeoFeaturesService extends AppBaseService<
     private readonly geoDataSource: DataSource,
     @InjectRepository(GeoFeatureGeometry, DbConnections.geoprocessingDB)
     private readonly geoFeaturesGeometriesRepository: Repository<GeoFeatureGeometry>,
+    @InjectEntityManager(DbConnections.geoprocessingDB)
+    private readonly geoEntityManager: EntityManager,
     @InjectRepository(GeoFeature)
     private readonly geoFeaturesRepository: Repository<GeoFeature>,
     @InjectRepository(Project)
@@ -129,6 +135,7 @@ export class GeoFeaturesService extends AppBaseService<
         'properties',
         'isCustom',
         'tag',
+        'scenarioUsageCount',
       ],
       keyForAttribute: 'camelCase',
     };
@@ -313,6 +320,12 @@ export class GeoFeaturesService extends AppBaseService<
       );
     }
 
+    if (!(omitFields && omitFields.includes('scenarioUsageCount'))) {
+      extendedResults[0] = await this.extendFindAllGeoFeatureWithScenarioUsage(
+        extendedResults[0],
+      );
+    }
+
     return extendedResults;
   }
 
@@ -332,6 +345,10 @@ export class GeoFeaturesService extends AppBaseService<
       extendedResult = await this.geoFeatureTagsServices.extendFindGeoFeatureWithTag(
         entity,
       );
+    }
+
+    if (!(omitFields && omitFields.includes('scenarioUsageCount'))) {
+      extendedResult = await this.extendFindGeoFeatureWithScenarioUsage(entity);
     }
 
     return extendedResult;
@@ -675,5 +692,50 @@ export class GeoFeaturesService extends AppBaseService<
       return newFeatures.left;
     }
     return newFeatures;
+  }
+
+  private async extendFindAllGeoFeatureWithScenarioUsage(
+    geoFeatures: GeoFeature[],
+  ): Promise<GeoFeature[]> {
+    const featureIds = geoFeatures.map((i) => i.id);
+
+    const scenarioUsages: {
+      id: string;
+      usage: number;
+    }[] = await this.geoEntityManager
+      .createQueryBuilder()
+      .select('api_feature_id', 'id')
+      .addSelect('COUNT(DISTINCT sfd.scenario_id)', 'usage')
+      .from('scenario_features_data', 'sfd')
+      .where('sfd.api_feature_id IN (:...featureIds)', { featureIds })
+      .groupBy('api_feature_id')
+      .execute();
+
+    return geoFeatures.map((feature) => {
+      const scenarioUsage = scenarioUsages.find((el) => el.id === feature.id);
+
+      return {
+        ...feature,
+        scenarioUsageCount: scenarioUsage ? Number(scenarioUsage.usage) : 0,
+      } as GeoFeature;
+    });
+  }
+
+  private async extendFindGeoFeatureWithScenarioUsage(
+    feature: GeoFeature,
+  ): Promise<GeoFeature> {
+    const [usage]: {
+      count: number;
+    }[] = await this.geoEntityManager
+      .createQueryBuilder()
+      .select('COUNT(DISTINCT sfd.scenario_id', 'count')
+      .from('scenario_features_data', 'sfd')
+      .where('sfd.api_feature_id = featureId', { featureId: feature.id })
+      .execute();
+
+    return {
+      ...feature,
+      scenarioUsageCount: usage ? Number(usage.count) : 0,
+    } as GeoFeature;
   }
 }

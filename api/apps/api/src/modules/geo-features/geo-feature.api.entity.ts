@@ -106,6 +106,9 @@ export class GeoFeature extends BaseEntity {
 
   @ApiPropertyOptional()
   tag?: string;
+
+  @ApiPropertyOptional()
+  scenarioUsageCount?: number;
 }
 
 export class JSONAPIGeoFeaturesData {
