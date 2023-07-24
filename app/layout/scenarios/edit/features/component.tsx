@@ -48,6 +48,7 @@ export const ScenariosSidebarFeatures: React.FC<ScenariosSidebarFeaturesProps> =
 
   const editable = useCanEditScenario(pid, sid);
   const { data: scenarioData } = useScenario(sid);
+
   const scenarioMutation = useSaveScenario({
     requestConfig: {
       method: 'PATCH',

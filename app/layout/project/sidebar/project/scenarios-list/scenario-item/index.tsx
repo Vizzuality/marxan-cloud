@@ -23,6 +23,8 @@ import TOGGLE_SCENARIO_SVG from 'svgs/ui/new-layout/toggle-scenario.svg?sprite';
 import WARNING_SVG from 'svgs/ui/warning.svg?sprite';
 
 export interface ScenarioItemProps extends Scenario {
+  className?: string;
+  warnings: boolean;
   onEdit: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onCancelRun?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onDelete?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
