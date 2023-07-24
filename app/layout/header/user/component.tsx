@@ -13,9 +13,7 @@ import Tooltip from 'components/tooltip';
 import ARROW_DOWN_SVG from 'svgs/ui/arrow-down.svg?sprite';
 import SIGN_OUT_SVG from 'svgs/ui/sign-out.svg?sprite';
 
-export interface HeaderUserProps {}
-
-export const HeaderUser: React.FC<HeaderUserProps> = () => {
+export const HeaderUser: React.FC = () => {
   const { user } = useMe();
   const [open, setOpen] = useState(false);
 
