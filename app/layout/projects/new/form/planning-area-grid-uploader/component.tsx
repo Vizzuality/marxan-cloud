@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -56,7 +56,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
 
   const { uploadingGridId } = useSelector((state) => state['/projects/new']);
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = async (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
 
     const data = new FormData();
@@ -108,7 +108,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -129,7 +129,7 @@ export const PlanningAreaGridUploader: React.FC<PlanningAreaGridUploaderProps> =
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e) => (
+          {errors.map((e: FileError) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>

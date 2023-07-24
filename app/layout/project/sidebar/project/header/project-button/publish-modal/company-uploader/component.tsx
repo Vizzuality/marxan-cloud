@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
 
 import cx from 'classnames';
@@ -40,7 +40,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
 
   const { addToast } = useToasts();
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     setLoading(true);
     const f = acceptedFiles[0];
 
@@ -58,7 +58,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
     };
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -77,7 +77,7 @@ export const CompanyUploader: React.FC<CompanyUploaderProps> = ({
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e) => (
+          {errors.map((e: FileError) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
