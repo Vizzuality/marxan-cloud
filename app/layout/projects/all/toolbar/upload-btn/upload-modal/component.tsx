@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
 
 import cx from 'classnames';
@@ -36,14 +36,14 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onDismiss }: UploadMod
 
   const importMutation = useImportProject({});
 
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = async (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
 
     setSuccessFile(f);
     formRef.current.change('file', f);
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -62,7 +62,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onDismiss }: UploadMod
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e) => (
+          {errors.map((e: FileError) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
