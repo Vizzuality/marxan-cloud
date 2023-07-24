@@ -11,7 +11,6 @@ import SQUARE_SELECTED_SVG from 'svgs/project/square-selected.svg?sprite';
 import SQUARE_SVG from 'svgs/project/square.svg?sprite';
 // TEMPORARILY DISABLED until this is implemented
 // import UPLOAD_SVG from 'svgs/project/upload.svg?sprite';
-// import UPLOAD_SVG_SELECTED from 'svgs/project/upload-selected.svg?sprite';
 
 import { PlanningUnitButtonSizeProps, PlanningUnitButtonProps } from './types';
 
