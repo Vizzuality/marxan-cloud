@@ -49,7 +49,7 @@ function fetchProjectUsers(pId, session) {
   });
 }
 
-export function useProjectsUsers(projectsIds) {
+export function useProjectsUsers(projectsIds: string[]) {
   const { data: session } = useSession();
   const { user } = useMe();
 
