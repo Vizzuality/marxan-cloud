@@ -16,6 +16,7 @@ import { JobStatus } from '@marxan-api/modules/scenarios/scenario.api.entity';
 import { chunk } from 'lodash';
 import { Left } from 'fp-ts/lib/Either';
 import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
+import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -125,6 +126,7 @@ export class FeatureAmountUploadService {
       if (!(await this.allInputPuidsKnownInProject(data.projectId, puids))) {
         return left(unknownPuidsInFeatureAmountCsvUpload);
       }
+
       const importedRegistry = await this.saveFeaturesToRegistry(
         parsedFile,
         data.projectId,
@@ -146,11 +148,25 @@ export class FeatureAmountUploadService {
     userId: string,
     entityManager: EntityManager,
   ): Promise<FeatureAmountUploadRegistry> {
-    return entityManager.getRepository(FeatureAmountUploadRegistry).save({
-      projectId,
-      userId,
-      uploadedFeatures: features,
-    });
+    const featuresChunks = chunk(
+      features,
+      CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS,
+    );
+    const newUpload = await entityManager
+      .getRepository(FeatureAmountUploadRegistry)
+      .save({
+        projectId,
+        userId,
+      });
+    for (const chunk of featuresChunks) {
+      await entityManager
+        .createQueryBuilder()
+        .insert()
+        .into(UploadedFeatureAmount)
+        .values(chunk.map((feature) => ({ ...feature, upload: newUpload })))
+        .execute();
+    }
+    return newUpload;
   }
 
   private async saveNewFeaturesFromCsvUpload(
@@ -283,9 +299,10 @@ export class FeatureAmountUploadService {
     return maxInputPuid <= maxDbPuid.maxPuid;
   }
 
-  private getFeatureNamesAndPuids(
-    parsedCsv: FeatureAmountCSVDto[],
-  ): { featureNames: string[]; puids: number[] } {
+  private getFeatureNamesAndPuids(parsedCsv: FeatureAmountCSVDto[]): {
+    featureNames: string[];
+    puids: number[];
+  } {
     const { featureNames, puids } = parsedCsv.reduce(
       (acc, dto) => {
         acc.featureNames.add(dto.featureName);
