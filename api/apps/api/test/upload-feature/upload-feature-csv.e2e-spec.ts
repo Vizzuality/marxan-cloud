@@ -18,6 +18,7 @@ test(`custom feature csv upload`, async () => {
   await fixtures.ThenNewFeaturesAreCreated();
   await fixtures.ThenNewFeaturesAmountsAreCreated();
   await fixtures.ThenFeatureUploadRegistryIsCleared();
+  await fixtures.ThenProjectSourcesIsSetToLegacyProject();
 });
 test('custom feature csv upload with missing puids', async () => {
   const response = await fixtures.WhenUploadingCsvWithMissingPUIDColumn();

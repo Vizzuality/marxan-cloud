@@ -17,6 +17,7 @@ import { chunk } from 'lodash';
 import { Left } from 'fp-ts/lib/Either';
 import { CHUNK_SIZE_FOR_BATCH_APIDB_OPERATIONS } from '@marxan-api/utils/chunk-size-for-batch-apidb-operations';
 import { UploadedFeatureAmount } from '@marxan-api/modules/geo-features/import/features-amounts-data.api.entity';
+import { Project } from '@marxan-api/modules/projects/project.api.entity';
 
 @Injectable()
 export class FeatureAmountUploadService {
@@ -80,6 +81,16 @@ export class FeatureAmountUploadService {
       await apiQueryRunner.manager.delete(FeatureAmountUploadRegistry, {
         id: featuresRegistry.right.id,
       });
+
+      // Setting project source to legacy-import to create puvspr.dat files from pre-calculated amounts, to allow to use new features after upload
+
+      await apiQueryRunner.manager
+        .createQueryBuilder()
+        .update(Project)
+        .set({ sources: 'legacy_import' })
+        .where('id = :projectId', { projectId: data.projectId })
+        .execute();
+
       // Committing transaction
 
       await apiQueryRunner.commitTransaction();
