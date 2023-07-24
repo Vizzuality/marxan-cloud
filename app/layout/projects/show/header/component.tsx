@@ -3,7 +3,6 @@ import React from 'react';
 import { useRouter } from 'next/router';
 
 import Breadcrumb from 'components/breadcrumb';
-import Contributors from 'layout/projects/show/header/contributors';
 import Title from 'layout/projects/show/header/title';
 import Toolbar from 'layout/projects/show/header/toolbar';
 import UnderModeration from 'layout/projects/show/header/under-moderation';
@@ -30,7 +29,6 @@ export const ProjectsHeader: React.FC<ProjectsHeaderProps> = () => {
         </div>
 
         <div className="flex flex-shrink-0 flex-col items-end space-y-6">
-          <Contributors />
           <Toolbar />
         </div>
       </div>
