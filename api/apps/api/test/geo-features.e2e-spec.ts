@@ -10,6 +10,14 @@ import { bootstrapApplication } from './utils/api-application';
 import { GivenUserIsLoggedIn } from './steps/given-user-is-logged-in';
 
 import { createWorld } from './project/projects-world';
+import { Repository } from 'typeorm';
+import { ScenarioFeaturesData } from '@marxan/features';
+import { v4 } from 'uuid';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { getEntityManagerToken, getRepositoryToken } from '@nestjs/typeorm';
+import { DbConnections } from '@marxan-api/ormconfig.connections';
+import { range } from 'lodash';
+import { GeoFeatureGeometry } from '@marxan/geofeatures';
 
 let world: PromiseType<ReturnType<typeof createWorld>>;
 
@@ -50,6 +58,38 @@ describe('GeoFeaturesModule (e2e)', () => {
     const geoFeaturesForProject: GeoFeature[] = response.body.data;
     expect(geoFeaturesForProject.length).toBeGreaterThan(0);
     expect(response.body.data[0].type).toBe(geoFeatureResource.name.plural);
+  });
+
+  test('should include scenarioUsageCount', async () => {
+    //ARRANGE
+    await GivenScenarioFeaturesData(app, 'demo_panthera_pardus', 3);
+    await GivenScenarioFeaturesData(app, 'demo_kobus_leche', 5);
+
+    //ACT
+    const multipleResponse = await request(app.getHttpServer())
+      .get(`/api/v1/projects/${world.projectWithCountry}/features`)
+      .set('Authorization', `Bearer ${jwtToken}`)
+      .expect(HttpStatus.OK);
+
+    // endpoint for retrieving a single feature by id is not implmenented, however the usageCount functionality is still there
+
+    //ASSERT
+    const geoFeaturesForProject = multipleResponse.body.data;
+    expect(geoFeaturesForProject.length).toBeGreaterThan(0);
+    expect(multipleResponse.body.data[0].type).toBe(
+      geoFeatureResource.name.plural,
+    );
+    for (const geoFeature of geoFeaturesForProject) {
+      if (geoFeature.attributes.featureClassName === 'demo_panthera_pardus') {
+        expect(geoFeature.attributes.scenarioUsageCount).toBe(3);
+      } else if (
+        geoFeature.attributes.featureClassName === 'demo_kobus_leche'
+      ) {
+        expect(geoFeature.attributes.scenarioUsageCount).toBe(5);
+      } else {
+        expect(geoFeature.attributes.scenarioUsageCount).toBe(0);
+      }
+    }
   });
 
   test.todo(
@@ -110,3 +150,43 @@ describe('GeoFeaturesModule (e2e)', () => {
     });
   });
 });
+
+export async function GivenScenarioFeaturesData(
+  app: INestApplication,
+  featureClassName: string,
+  amountOfScenariosForFeature: number,
+) {
+  const geoEM = app.get(getEntityManagerToken(DbConnections.geoprocessingDB));
+  const featureRepo: Repository<GeoFeature> = app.get(
+    getRepositoryToken(GeoFeature),
+  );
+  const featureGeoRepo: Repository<GeoFeatureGeometry> = app.get(
+    getRepositoryToken(GeoFeatureGeometry, DbConnections.geoprocessingDB),
+  );
+
+  const feature = await featureRepo.findOneOrFail({
+    where: { featureClassName },
+  });
+  const featureGeo = await featureGeoRepo.findOneOrFail({
+    where: { featureId: feature.id },
+  });
+
+  const insertValues = range(1, amountOfScenariosForFeature + 1).map((data) => {
+    return {
+      id: v4(),
+      featureDataId: featureGeo.id,
+      scenarioId: v4(), //there's no relational integratity with the API,
+      apiFeatureId: feature.id,
+      featureId: data,
+    };
+  });
+
+  await geoEM
+    .createQueryBuilder()
+    .insert()
+    .into(ScenarioFeaturesData)
+    .values(insertValues as QueryDeepPartialEntity<ScenarioFeaturesData>[])
+    .execute();
+
+  return insertValues;
+}
