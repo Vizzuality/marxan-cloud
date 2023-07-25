@@ -86,13 +86,10 @@ export const ScenariosSolutionsOverview = (): JSX.Element => {
 
   const onDownloadSolutionsSummary = useCallback(() => {
     setSolutionsReportLoader(true);
+
     downloadSolutionsSummary.mutate(
       { id: pid },
       {
-        onSuccess: () => {},
-        onSettled: () => {
-          setSolutionsReportLoader(false);
-        },
         onError: () => {
           addToast(
             'download-error',
@@ -104,6 +101,9 @@ export const ScenariosSolutionsOverview = (): JSX.Element => {
               level: 'error',
             }
           );
+        },
+        onSettled: () => {
+          setSolutionsReportLoader(false);
         },
       }
     );
