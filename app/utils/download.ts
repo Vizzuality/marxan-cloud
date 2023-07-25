@@ -1,4 +1,4 @@
-export const createDownloadLink = (file: BlobPart, fileName: string) => {
+export const createDownloadLink = (file: ArrayBuffer, fileName: string) => {
   const url = window.URL.createObjectURL(new Blob([file]));
   const link = document.createElement('a');
   link.href = url;
