@@ -34,7 +34,7 @@ export const ScenariosFeaturesTargets: React.FC<ScenariosFeaturesTargetsProps> =
   const [confirmationFPF, setConfirmationFPF] = useState(null);
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const dispatch = useDispatch();
 

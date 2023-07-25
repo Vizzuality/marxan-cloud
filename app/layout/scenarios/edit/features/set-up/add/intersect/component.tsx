@@ -23,7 +23,7 @@ export const ScenariosFeaturesIntersect: React.FC<ScenariosFeaturesIntersectProp
   const [submitting, setSubmitting] = useState(null);
   const [search, setSearch] = useState(null);
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const selectedFeaturesMutation = useSaveSelectedFeatures({});
 

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { DropzoneProps, FileError, useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch } from 'react-redux';
 
@@ -156,7 +156,7 @@ export const ScenariosCostSurface = ({
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(COST_SURFACE_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
@@ -167,7 +167,7 @@ export const ScenariosCostSurface = ({
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e: FileError) => (
+          {errors.map((e) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>

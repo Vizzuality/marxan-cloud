@@ -16,7 +16,7 @@ export interface SelectionFrequencyPageProps {}
 
 export const SelectionFrequencyPage: React.FC<SelectionFrequencyPageProps> = () => {
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { data: projectData, isFetched: projectDataIsFetched } = useProject(pid);
 

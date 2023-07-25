@@ -29,7 +29,7 @@ export interface ProjectStatusProps {}
 
 export const ProjectStatus: React.FC<ProjectStatusProps> = () => {
   const { query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
 
   const { data: projectData } = useProject(pid);
   const { data: scenarioStatusData } = useScenariosStatus(pid);

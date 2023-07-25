@@ -11,6 +11,7 @@ import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
+import { Project } from 'types/project-model';
 import { createDownloadLink } from 'utils/download';
 
 import PROJECTS from 'services/projects';
@@ -111,6 +112,7 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
               data: { data: pageData },
             } = p;
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
             return pageData.map((d): ItemProps => {
               const {
                 id,
@@ -174,13 +176,13 @@ export function useProjects(options: UseProjectsOptionsProps): UseProjectsRespon
   }, [query, pages, push]);
 }
 
-export function useProject(id) {
+export function useProject(id: Project['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['projects', id],
-    async () =>
-      PROJECTS.request({
+  return useQuery({
+    queryKey: ['project', id],
+    queryFn: async () =>
+      PROJECTS.request<{ data: Partial<Project> }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
@@ -189,22 +191,10 @@ export function useProject(id) {
         params: {
           include: 'scenarios,users',
         },
-      }).then((response) => {
-        return response.data;
-      }),
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
+      }).then((response) => response.data.data),
+    enabled: !!id,
+    placeholderData: {},
+  });
 }
 
 export function useSaveProject({
@@ -230,7 +220,7 @@ export function useSaveProject({
     onSuccess: (data: any, variables, context) => {
       const { id } = data;
       queryClient.invalidateQueries('projects');
-      queryClient.invalidateQueries(['projects', id]);
+      queryClient.invalidateQueries(['project', id]);
       console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
@@ -417,14 +407,14 @@ export function usePublishProject({
   };
 
   return useMutation(publishProject, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables) => {
+      const { pid } = variables;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['project', pid]);
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
-      console.info('Succces', data, variables, context);
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });
@@ -449,14 +439,14 @@ export function useUnPublishProject({
   };
 
   return useMutation(unpublishProject, {
-    onSuccess: (data: any, variables, context) => {
-      console.info('Succces', data, variables, context);
+    onSuccess: (data, variables) => {
+      const { id } = variables;
       queryClient.invalidateQueries('projects');
+      queryClient.invalidateQueries(['project', id]);
       queryClient.invalidateQueries('published-projects');
       queryClient.invalidateQueries('admin-published-projects');
     },
     onError: (error, variables, context) => {
-      // An error happened!
       console.info('Error', error, variables, context);
     },
   });

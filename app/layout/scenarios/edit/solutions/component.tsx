@@ -41,7 +41,7 @@ export const SECTIONS = [
 
 export const ScenariosSidebarShowSolutions: React.FC<ScenariosSidebarShowSolutionsProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setSelectedSolution, setSubTab } = scenarioSlice.actions;

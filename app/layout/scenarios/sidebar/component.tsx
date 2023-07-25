@@ -19,7 +19,8 @@ export const ScenariosEditSidebar: React.FC<ScenariosEditSidebarProps> = ({
   children,
 }: ScenariosEditSidebarProps) => {
   const { push, query } = useRouter();
-  const { pid } = query;
+  const { pid } = query as { pid: string };
+
   const { data = {} } = useProject(pid);
 
   const { id, name } = data;

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import cx from 'classnames';
@@ -61,14 +61,14 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     setSuccessFile(null);
   }, []);
 
-  const onDropAccepted = (acceptedFiles) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const f = acceptedFiles[0];
     setSuccessFile({ name: f.name });
 
     formRef.current.change('file', f);
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -76,7 +76,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;

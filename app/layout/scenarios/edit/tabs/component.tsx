@@ -24,7 +24,7 @@ import { ScenariosSidebarTabsProps } from './types';
 
 export const ScenariosSidebarTabs: React.FC<ScenariosSidebarTabsProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
   const { data: scenarioData, isFetched: scenarioFetched } = useScenario(sid);
 
   const { metadata } = scenarioData || {};

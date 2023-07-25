@@ -22,7 +22,7 @@ export interface ScenariosSidebarEditWDPAProps {}
 
 export const ScenariosSidebarEditWDPA: React.FC<ScenariosSidebarEditWDPAProps> = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;

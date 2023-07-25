@@ -30,7 +30,7 @@ const styles = {
 
 const SolutionsReport: React.FC = () => {
   const { query } = useRouter();
-  const { sid, solutionId } = query;
+  const { sid, solutionId } = query as { sid: string; solutionId: string };
 
   const { data: scenarioData } = useScenario(sid);
 

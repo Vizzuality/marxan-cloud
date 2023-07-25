@@ -1,4 +1,4 @@
-import { PropsWithChildren, useCallback, useState } from 'react';
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -56,14 +56,13 @@ export const Navigation = (): JSX.Element => {
   const { query, route } = useRouter();
   const { pid, sid, tab } = query as { pid: string; sid: string; tab: string };
 
-  const isProjectRoute = route.startsWith('/projects/[pid]');
+  const isProjectRoute = route === '/projects/[pid]';
   const isScenarioRoute = route.startsWith('/projects/[pid]/scenarios/');
-
   const { addToast } = useToasts();
 
   const [submenuState, setSubmenuState] = useState<{ [key in NavigationTreeCategories]: boolean }>({
     user: false,
-    inventory: isProjectRoute && NAVIGATION_TREE.inventory.includes(tab),
+    inventory: NAVIGATION_TREE.inventory.includes(tab),
     gridSetup: isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab),
     solutions: isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab),
     advancedSettings: isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab),
@@ -100,6 +99,14 @@ export const Navigation = (): JSX.Element => {
       );
     });
   }, []);
+
+  useEffect(() => {
+    if (isProjectRoute && NAVIGATION_TREE.inventory.includes(tab)) toggleSubmenu('inventory');
+    if (isScenarioRoute && NAVIGATION_TREE.gridSetup.includes(tab)) toggleSubmenu('gridSetup');
+    if (isScenarioRoute && NAVIGATION_TREE.solutions.includes(tab)) toggleSubmenu('solutions');
+    if (isScenarioRoute && NAVIGATION_TREE.advancedSettings.includes(tab))
+      toggleSubmenu('advancedSettings');
+  }, [tab, isProjectRoute, isScenarioRoute, toggleSubmenu]);
 
   const handleRunScenario = useCallback(() => {
     runScenarioMutation.mutate(

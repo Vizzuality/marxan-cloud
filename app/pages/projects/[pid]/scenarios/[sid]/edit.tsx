@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { useDispatch } from 'react-redux';
 
@@ -32,19 +32,19 @@ export const getServerSideProps = withProtection(
 );
 
 const EditScenarioPage = (): JSX.Element => {
-  const [submitting, setSubmitting] = useState(false);
   const { query } = useRouter();
-  const { sid } = query;
-  const { data: scenarioData } = useScenario(sid);
-  const { metadata } = scenarioData || {};
+  const { sid } = query as { sid: string };
+  const scenarioQuery = useScenario(sid);
+  const { metadata } = scenarioQuery.data || {};
   const { scenarioEditingMetadata } = metadata || {};
+
   const { tab: metaTab, subtab: metaSubtab, lastJobCheck } = scenarioEditingMetadata || {};
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setTab, setSubTab } = scenarioSlice.actions;
   const dispatch = useDispatch();
 
-  const saveScenarioMutation = useSaveScenario({
+  const { mutate } = useSaveScenario({
     requestConfig: {
       method: 'PATCH',
     },
@@ -58,33 +58,21 @@ const EditScenarioPage = (): JSX.Element => {
 
   // If fo some reason we dont't have lastJobCheck set in the metadata, let's add one
   useEffect(() => {
-    if (!lastJobCheck && !submitting) {
-      setSubmitting(true);
-
-      saveScenarioMutation.mutate(
-        {
-          id: `${sid}`,
-          data: {
-            metadata: {
-              ...metadata,
-              scenarioEditingMetadata: {
-                lastJobCheck: new Date().getTime(),
-                ...scenarioEditingMetadata,
-              },
+    if (!lastJobCheck && !scenarioQuery.isSuccess) {
+      mutate({
+        id: `${sid}`,
+        data: {
+          metadata: {
+            ...metadata,
+            scenarioEditingMetadata: {
+              lastJobCheck: new Date().getTime(),
+              ...scenarioEditingMetadata,
             },
           },
         },
-        {
-          onSuccess: () => {
-            setSubmitting(false);
-          },
-          onError: () => {
-            setSubmitting(false);
-          },
-        }
-      );
+      });
     }
-  }, [sid, submitting, metadata, scenarioEditingMetadata, lastJobCheck, saveScenarioMutation]);
+  }, [lastJobCheck, metadata, mutate, scenarioEditingMetadata, scenarioQuery.isSuccess, sid]);
 
   return (
     <Protected>

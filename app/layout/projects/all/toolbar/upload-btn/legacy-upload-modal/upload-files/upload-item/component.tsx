@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { useSelector } from 'react-redux';
 
 import cx from 'classnames';
@@ -44,7 +44,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
   const cancelUploadLegacyProjectFileMutation = useCancelUploadLegacyProjectFile({});
 
   // ADD DATA FILE
-  const onDropAccepted = async (acceptedFiles) => {
+  const onDropAccepted = (acceptedFiles: Parameters<DropzoneProps['onDropAccepted']>[0]) => {
     const fl = acceptedFiles[0];
 
     setSuccessFile(fl);
@@ -82,7 +82,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
     );
   };
 
-  const onDropRejected = (rejectedFiles) => {
+  const onDropRejected = (rejectedFiles: Parameters<DropzoneProps['onDropRejected']>[0]) => {
     const r = rejectedFiles[0];
 
     // `file-too-large` backend error message is not friendly.
@@ -90,7 +90,7 @@ export const UploadItem: React.FC<UploadItemProps> = ({ f, input, ...fprops }: U
     const errors = r.errors.map((error) => {
       // TODO: Read mazSize per each field
       return error.code === 'file-too-large'
-        ? { error, message: `File is larger than ${bytesToMegabytes(f.maxSize)} MB` }
+        ? { ...error, message: `File is larger than ${bytesToMegabytes(f.maxSize)} MB` }
         : error;
     });
 

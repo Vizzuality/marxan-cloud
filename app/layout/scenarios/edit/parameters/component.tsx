@@ -44,7 +44,7 @@ export const ScenariosSidebarEditAnalysis: React.FC<ScenariosSidebarEditAnalysis
   const { addToast } = useToasts();
   const plausible = usePlausible();
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const { user } = useMe();
 

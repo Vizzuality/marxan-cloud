@@ -14,7 +14,7 @@ import { mergeScenarioStatusMetaData } from 'utils/utils-scenarios';
 
 export const useScenarioActionsFailure = () => {
   const { query } = useRouter();
-  const { sid } = query;
+  const { sid } = query as { sid: string };
 
   const dispatch = useDispatch();
   const scenarioSlice = getScenarioEditSlice(sid);

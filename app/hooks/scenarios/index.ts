@@ -479,34 +479,23 @@ export function useScenarios(pId, options: UseScenariosOptionsProps = {}) {
   ]);
 }
 
-export function useScenario(id) {
+export function useScenario(id: Scenario['id']) {
   const { data: session } = useSession();
 
-  const query = useQuery(
-    ['scenarios', id],
-    async () =>
-      SCENARIOS.request({
+  return useQuery({
+    queryKey: ['scenario', id],
+    queryFn: async () =>
+      SCENARIOS.request<{ data?: Scenario }>({
         method: 'GET',
         url: `/${id}`,
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
-      }).then((response) => {
-        return response.data;
-      }),
-    {
-      enabled: !!id,
-    }
-  );
-
-  const { data } = query;
-
-  return useMemo(() => {
-    return {
-      ...query,
-      data: data?.data,
-    };
-  }, [query, data?.data]);
+      }).then((response) => response.data),
+    enabled: !!id,
+    placeholderData: {},
+    select: ({ data }) => data,
+  });
 }
 
 export function useSaveScenario({
@@ -529,13 +518,12 @@ export function useSaveScenario({
   };
 
   return useMutation(saveScenario, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: async (data: any) => {
       const { id, projectId } = data?.data?.data;
-      // const { isoDate, started } = data?.data?.meta;
-      queryClient.invalidateQueries(['scenarios', projectId]);
-      queryClient.setQueryData(['scenarios', id], data?.data);
 
-      console.info('Success', data, variables, context);
+      await queryClient.invalidateQueries(['scenarios', projectId]);
+      await queryClient.invalidateQueries(['scenario', id]);
+      queryClient.setQueryData(['scenario', id], data?.data?.data);
     },
     onError: (error, variables, context) => {
       // An error happened!

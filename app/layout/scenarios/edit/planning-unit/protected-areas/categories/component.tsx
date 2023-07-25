@@ -37,7 +37,7 @@ export const WDPACategories: React.FC<WDPACategoriesProps> = ({
   const formRef = useRef(null);
 
   const { query } = useRouter();
-  const { pid, sid } = query;
+  const { pid, sid } = query as { pid: string; sid: string };
 
   const scenarioSlice = getScenarioEditSlice(sid);
   const { setWDPACategories, setWDPAThreshold } = scenarioSlice.actions;
