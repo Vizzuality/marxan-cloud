@@ -1,7 +1,3 @@
-import { useRouter } from 'next/router';
-
-import { setSelectedFeatures } from 'store/slices/projects/[id]';
-
 import InfoButton from 'components/info-button';
 import AddFeaturesModal from 'layout/scenarios/edit/features/set-up/add/add-modal';
 
@@ -13,9 +9,6 @@ import FeaturesBulkActionMenu from './bulk-action-menu';
 import ProjectFeatureList from './list';
 
 const InventoryPanelFeatures = (): JSX.Element => {
-  const { query } = useRouter();
-  const { pid } = query as { pid: string };
-
   return (
     <section className="relative space-y-2 rounded-[20px] bg-gray-700 p-6">
       <header className="flex items-center justify-between">
@@ -51,7 +44,7 @@ const InventoryPanelFeatures = (): JSX.Element => {
       <div className="h-full">
         <ProjectFeatureList />
       </div>
-      <FeaturesBulkActionMenu selectedFeatureIds={[]} />
+      <FeaturesBulkActionMenu />
     </section>
   );
 };

@@ -110,31 +110,30 @@ const FeatureActions = ({
             <span>Edit Type</span>
           </button>
         </li>
-        {/* {isDeletable && ( */}
-        <li>
-          <button
-            type="button"
-            onClick={triggerDeleteModal}
-            className={cn({
-              [BUTTON_CLASSES]: true,
-              'rounded-b-2xl': true,
-            })}
-          >
-            <Trash2 className={ICON_CLASSES} size={20} />
-            <span>Delete</span>
-          </button>
-          <Modal
-            id="delete-modal"
-            dismissable
-            open={isDeleteModalOpen}
-            size="narrow"
-            title="Delete feature"
-            onDismiss={() => setDeleteModalOpen(false)}
-          >
-            <DeleteModal selectedFeatures={[feature]} setDeleteModal={setDeleteModalOpen} />
-          </Modal>
-        </li>
-        {/* )} */}
+        {isDeletable && (
+          <li>
+            <button
+              type="button"
+              onClick={triggerDeleteModal}
+              className={cn({
+                [BUTTON_CLASSES]: true,
+                'rounded-b-2xl': true,
+              })}
+            >
+              <Trash2 className={ICON_CLASSES} size={20} />
+              <span>Delete</span>
+            </button>
+            <Modal
+              id="delete-feature-modal"
+              dismissable
+              open={isDeleteModalOpen}
+              size="narrow"
+              onDismiss={() => setDeleteModalOpen(false)}
+            >
+              <DeleteModal selectedFeatures={[feature]} setDeleteModal={setDeleteModalOpen} />
+            </Modal>
+          </li>
+        )}
       </ul>
       {isDeletable && (
         <ConfirmationPrompt

@@ -27,7 +27,8 @@ const DeleteModal = ({
   const { query } = useRouter();
   const { pid } = query as { pid: string };
   const { addToast } = useToasts();
-  // TODO: figure out if this feature is used in any other scenario
+
+  console.log({ selectedFeatures });
 
   const selectedFeatureIds = selectedFeatures.map((f) => f.id);
   const selectedFeatureNames = selectedFeatures.map((f) => f.featureClassName);
@@ -65,7 +66,9 @@ const DeleteModal = ({
 
   return (
     <div className="flex flex-col space-y-5 px-8 py-1">
-      <h2 className="font-heading font-bold text-black">Delete feauture</h2>
+      <h2 className="font-heading font-bold text-black">
+        {selectedFeatures.length > 0 ? 'Delete feautures' : 'Delete feature'}
+      </h2>
       <p className="font-heading text-sm font-medium text-black">
         Are you sure you want to delete &quot;{selectedFeatureNames}&quot;? You can’t undo this
         action.

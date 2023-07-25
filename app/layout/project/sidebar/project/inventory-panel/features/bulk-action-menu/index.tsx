@@ -1,17 +1,16 @@
 import { useState } from 'react';
 
+import { useSelector } from 'react-redux';
+
 import Button from 'components/button';
 import Modal from 'components/modal/component';
-import { ProjectFeature } from 'types/project-model';
 
 import DeleteModal from '../modals/delete';
 
-const FeaturesBulkActionMenu = ({
-  selectedFeatureIds,
-}: {
-  selectedFeatureIds: ProjectFeature['id'][];
-}): JSX.Element => {
+const FeaturesBulkActionMenu = (): JSX.Element => {
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+
+  const { selectedFeatures } = useSelector((state) => state['/projects/[id]']);
 
   return (
     <div className="absolute bottom-0 left-0 z-10 flex w-full items-center space-x-4 bg-black px-10 py-4">
@@ -22,14 +21,13 @@ const FeaturesBulkActionMenu = ({
         Delete
       </Button>
       <Modal
-        id="delete-modal"
+        id="delete-features-modal"
         dismissable
         open={deleteModal}
         size="narrow"
-        title="Delete feature"
         onDismiss={() => setDeleteModal(false)}
       >
-        <DeleteModal selectedFeatures={selectedFeatureIds} setDeleteModal={setDeleteModal} />
+        <DeleteModal selectedFeatures={selectedFeatures} setDeleteModal={setDeleteModal} />
       </Modal>
     </div>
   );
