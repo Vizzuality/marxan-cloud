@@ -23,6 +23,7 @@ import { ItemProps } from 'components/scenarios/item/component';
 import { Job } from 'types/job';
 import { Project } from 'types/project-model';
 import { Scenario } from 'types/scenario';
+import { createDownloadLink } from 'utils/download';
 
 import DOWNLOADS from 'services/downloads';
 import PROJECTS from 'services/projects';
@@ -1128,6 +1129,34 @@ export function useDeletePUScenaro() {
       console.info('Success', data, variables, context);
       // const { id } = variables;
       // queryClient.invalidateQueries(['scenarios-pu', id]);
+    },
+    onError: (error, variables, context) => {
+      console.info('Error', error, variables, context);
+    },
+  });
+}
+
+export function useDownloadSolutionsSummary() {
+  const { data: session } = useSession();
+
+  const downloadScenarioSolutionsSummary = ({ id }: { id: Project['id'] }) => {
+    return DOWNLOADS.request<ArrayBuffer>({
+      method: 'GET',
+      url: `/projects/${id}/output-summary`,
+      responseType: 'arraybuffer',
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`,
+        'Content-Type': 'application/zip',
+      },
+    });
+  };
+
+  return useMutation(downloadScenarioSolutionsSummary, {
+    onSuccess: (data, variables) => {
+      const { data: blob } = data;
+      const { id } = variables;
+
+      createDownloadLink(blob, `solutions-${id}.zip`);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
