@@ -30,9 +30,8 @@ import { formatFileName } from 'utils/units';
 import TABLE_SVG from 'svgs/ui/table.svg?sprite';
 
 import SolutionsTableForm from './table/table-form/component';
-import { ScenariosSolutionsOverviewProps } from './types';
 
-export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProps> = () => {
+export const ScenariosSolutionsOverview = (): JSX.Element => {
   const { query } = useRouter();
   const { pid, sid } = query as { pid: string; sid: string };
   const [PDFLoader, setPDFLoader] = useState<boolean>(false);
@@ -73,7 +72,7 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     runId: `${(selectedSolutionData || bestSolutionData).runId}`,
   });
 
-  const downloadSolutionsSummary = useDownloadSolutionsSummary({});
+  const downloadSolutionsSummary = useDownloadSolutionsSummary();
 
   const SOLUTION_DATA = selectedSolutionData || bestSolutionData;
 
@@ -90,11 +89,11 @@ export const ScenariosSolutionsOverview: React.FC<ScenariosSolutionsOverviewProp
     downloadSolutionsSummary.mutate(
       { id: pid },
       {
-        onSuccess: () => {
+        onSuccess: () => {},
+        onSettled: () => {
           setSolutionsReportLoader(false);
         },
         onError: () => {
-          setSolutionsReportLoader(false);
           addToast(
             'download-error',
             <>
