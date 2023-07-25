@@ -11,6 +11,7 @@ import orderBy from 'lodash/orderBy';
 import { useSession } from 'next-auth/react';
 
 import { ItemProps } from 'layout/projects/all/list/item/component';
+import { createDownloadLink } from 'utils/download';
 
 import PROJECTS from 'services/projects';
 import UPLOADS from 'services/uploads';
@@ -567,7 +568,7 @@ export function useDownloadExport({
   const { data: session } = useSession();
 
   const downloadProject = ({ pid, exportId }: DownloadExportProps) => {
-    return PROJECTS.request({
+    return PROJECTS.request<BlobPart>({
       url: `/${pid}/export/${exportId}`,
       responseType: 'arraybuffer',
       headers: {
@@ -579,18 +580,11 @@ export function useDownloadExport({
   };
 
   return useMutation(downloadProject, {
-    onSuccess: (data: any, variables, context) => {
+    onSuccess: (data, variables) => {
       const { data: blob } = data;
       const { pid } = variables;
 
-      const url = window.URL.createObjectURL(new Blob([blob]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `project-${pid}.zip`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      console.info('Success', data, variables, context);
+      createDownloadLink(blob, `project-${pid}.zip`);
     },
     onError: (error, variables, context) => {
       console.info('Error', error, variables, context);
