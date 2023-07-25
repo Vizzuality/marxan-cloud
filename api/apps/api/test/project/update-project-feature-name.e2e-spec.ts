@@ -23,21 +23,10 @@ afterEach(async () => {
 });
 
 describe('Project - update feature Name', () => {
-  test('should return NotFound error when project does not exist', async () => {
-    const nonExistentProjectId = v4();
-    const result = await fixtures.WhenUpdatingFeatureForProject(
-      nonExistentProjectId,
-      v4(),
-      'nonexistent project',
-    );
-    await fixtures.ThenProjectWasNotFound(result, nonExistentProjectId);
-  });
-
   test('should return NotFound error when feature does not exist', async () => {
     const featureId = v4();
     const projectId = fixtures.projectId;
     const result = await fixtures.WhenUpdatingFeatureForProject(
-      projectId,
       featureId,
       'nonexistent feature',
     );
@@ -53,7 +42,6 @@ describe('Project - update feature Name', () => {
       anotherProjectId,
     );
     const result = await fixtures.WhenUpdatingFeatureForProject(
-      projectId,
       featureId,
       'forbidden update',
     );
@@ -61,7 +49,7 @@ describe('Project - update feature Name', () => {
       result,
       featureId,
       originalName,
-      `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
+      `Feature with id ${featureId} is not editable`,
     );
   });
 
@@ -70,7 +58,6 @@ describe('Project - update feature Name', () => {
     const projectId = fixtures.projectId;
     const featureId = await fixtures.GivenBaseFeature(originalName);
     const result = await fixtures.WhenUpdatingFeatureForProject(
-      projectId,
       featureId,
       'forbidden update',
     );
@@ -78,7 +65,7 @@ describe('Project - update feature Name', () => {
       result,
       featureId,
       originalName,
-      `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
+      `Feature with id ${featureId} is not editable`,
     );
   });
 
@@ -90,7 +77,6 @@ describe('Project - update feature Name', () => {
       viewOnlyProject,
     );
     const result = await fixtures.WhenUpdatingFeatureForProject(
-      viewOnlyProject,
       featureId,
       'forbidden update',
     );
@@ -98,7 +84,7 @@ describe('Project - update feature Name', () => {
       result,
       featureId,
       originalName,
-      `Feature with id ${featureId}, for project with id ${viewOnlyProject}, not editable`,
+      `Feature with id ${featureId} is not editable`,
     );
   });
 
@@ -110,7 +96,6 @@ describe('Project - update feature Name', () => {
     await fixtures.GivenBaseFeature(sameName, projectId);
 
     const result = await fixtures.WhenUpdatingFeatureForProject(
-      projectId,
       featureId,
       sameName,
     );
@@ -118,7 +103,7 @@ describe('Project - update feature Name', () => {
       result,
       featureId,
       originalName,
-      `Feature with id ${featureId}, for project with id ${projectId}, cannot be updated: name is already in use`,
+      `Feature with id ${featureId} cannot be updated: name is already in use (${sameName})`,
     );
   });
 
@@ -127,7 +112,6 @@ describe('Project - update feature Name', () => {
     const projectId = fixtures.projectId;
     const featureId = await fixtures.GivenBaseFeature('someName', projectId);
     const result = await fixtures.WhenUpdatingFeatureForProject(
-      projectId,
       featureId,
       newName,
     );
@@ -220,12 +204,11 @@ const getFixtures = async () => {
 
     // ACT
     WhenUpdatingFeatureForProject: async (
-      projectId: string,
       featureId: string,
       updatedName: string,
     ) =>
       request(app.getHttpServer())
-        .patch(`/api/v1/projects/${projectId}/features/${featureId}`)
+        .patch(`/api/v1/geo-features/${featureId}`)
         .set('Authorization', `Bearer ${userToken}`)
         .send({
           featureClassName: updatedName,
@@ -249,9 +232,7 @@ const getFixtures = async () => {
     ) => {
       expect(response.status).toEqual(404);
       const error: any = response.body.errors[0];
-      expect(error.title).toEqual(
-        `Feature with id ${featureId}, for project with id ${projectId}, not found`,
-      );
+      expect(error.title).toEqual(`Feature with id ${featureId} not found`);
     },
     ThenUpdateWasForbidden: async (
       response: request.Response,
