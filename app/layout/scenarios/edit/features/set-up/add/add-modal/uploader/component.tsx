@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form as FormRFF, Field as FieldRFF } from 'react-final-form';
 
 import cx from 'classnames';
@@ -76,7 +76,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(FEATURES_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
@@ -87,7 +87,7 @@ export const ScenariosFeaturesAddUploader: React.FC<ScenariosFeaturesAddUploader
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e: FileError) => (
+          {errors.map((e) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>

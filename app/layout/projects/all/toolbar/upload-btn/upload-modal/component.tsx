@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 
-import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field as FieldRFF } from 'react-final-form';
 
 import cx from 'classnames';
@@ -51,7 +51,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onDismiss }: UploadMod
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(PROJECT_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
@@ -62,7 +62,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({ onDismiss }: UploadMod
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e: FileError) => (
+          {errors.map((e) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
