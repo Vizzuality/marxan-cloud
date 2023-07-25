@@ -407,7 +407,7 @@ export class GeoFeaturesService extends AppBaseService<
       | typeof featureNotEditable
       | typeof projectNotFound
       | typeof featureNameAlreadyInUse,
-      true
+      GeoFeature
     >
   > {
     const project = await this.projectRepository.findOne({
@@ -446,7 +446,8 @@ export class GeoFeaturesService extends AppBaseService<
       featureClassName: updateFeatureNameDto.featureClassName,
     });
 
-    return right(true);
+    const updatedFeature = await this.geoFeaturesRepository.findOneOrFail({ where: { id: featureId }})
+    return right(updatedFeature);
   }
 
   public async deleteFeature(
