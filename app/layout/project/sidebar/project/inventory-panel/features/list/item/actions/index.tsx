@@ -8,10 +8,13 @@ import { useDeleteProjectFeature } from 'hooks/features';
 import { useToasts } from 'hooks/toast';
 
 import ConfirmationPrompt from 'components/confirmation-prompt';
+import Modal from 'components/modal/component';
 import { Project, ProjectFeature } from 'types/project-model';
 import { cn } from 'utils/cn';
 
 import DELETE_WARNING_SVG from 'svgs/notifications/delete-warning.svg?sprite';
+
+import DeleteModal from '../../../modals/delete';
 
 const BUTTON_CLASSES =
   'flex items-center px-4 py-2 w-full text-sm cursor-pointer bg-gray-700 hover:bg-gray-500 transition transition-colors space-x-2 group';
@@ -107,21 +110,31 @@ const FeatureActions = ({
             <span>Edit Type</span>
           </button>
         </li>
-        {isDeletable && (
-          <li>
-            <button
-              type="button"
-              onClick={triggerDeleteModal}
-              className={cn({
-                [BUTTON_CLASSES]: true,
-                'rounded-b-2xl': true,
-              })}
-            >
-              <Trash2 className={ICON_CLASSES} size={20} />
-              <span>Delete</span>
-            </button>
-          </li>
-        )}
+        {/* {isDeletable && ( */}
+        <li>
+          <button
+            type="button"
+            onClick={triggerDeleteModal}
+            className={cn({
+              [BUTTON_CLASSES]: true,
+              'rounded-b-2xl': true,
+            })}
+          >
+            <Trash2 className={ICON_CLASSES} size={20} />
+            <span>Delete</span>
+          </button>
+          <Modal
+            id="delete-modal"
+            dismissable
+            open={isDeleteModalOpen}
+            size="narrow"
+            title="Delete feature"
+            onDismiss={() => setDeleteModalOpen(false)}
+          >
+            <DeleteModal selectedFeatures={[feature]} setDeleteModal={setDeleteModalOpen} />
+          </Modal>
+        </li>
+        {/* )} */}
       </ul>
       {isDeletable && (
         <ConfirmationPrompt

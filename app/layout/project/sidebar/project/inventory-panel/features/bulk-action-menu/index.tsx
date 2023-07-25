@@ -29,7 +29,7 @@ const FeaturesBulkActionMenu = ({
         title="Delete feature"
         onDismiss={() => setDeleteModal(false)}
       >
-        <DeleteModal selectedFeatureIds={selectedFeatureIds} setDeleteModal={setDeleteModal} />
+        <DeleteModal selectedFeatures={selectedFeatureIds} setDeleteModal={setDeleteModal} />
       </Modal>
     </div>
   );
