@@ -142,12 +142,9 @@ import {
 import { deleteProjectFailed } from './delete-project/delete-project.command';
 import { updateSolutionsAreLockFailed } from '../legacy-project-import/application/update-solutions-are-locked-to-legacy-project-import.command';
 import { blmCreationFailure } from '../scenarios/blm-calibration/create-initial-scenario-blm.command';
-import { UpdateFeatureNameDto } from '@marxan-api/modules/geo-features/dto/update-feature-name.dto';
 import {
   featureIsLinkedToOneOrMoreScenarios,
-  featureNameAlreadyInUse,
   featureNotDeletable,
-  featureNotEditable,
   featureNotFound,
 } from '@marxan-api/modules/geo-features/geo-features.service';
 import { ApiConsumesCsv } from '@marxan-api/decorators/csv.decorator';
@@ -790,55 +787,6 @@ export class ProjectsController {
       });
     }
     return result.right;
-  }
-
-  @ImplementsAcl()
-  @ApiOperation({
-    description: `Updates the name of a feature for the given id and project id`,
-  })
-  @ApiParam({
-    name: 'projectId',
-    description: 'Id of the Project the feature is part of',
-  })
-  @ApiParam({
-    name: 'featureId',
-    description: 'Id of the Feature to be edited',
-  })
-  @ApiTags(inlineJobTag)
-  @Patch(`:projectId/features/:featureId`)
-  async updateGeoFeature(
-    @Param('projectId') projectId: string,
-    @Param('featureId') featureId: string,
-    @Req() req: RequestWithAuthenticatedUser,
-    @Body() body: UpdateFeatureNameDto,
-  ) {
-    const result = await this.geoFeatureService.updateFeatureForProject(
-      req.user.id,
-      projectId,
-      featureId,
-      body,
-    );
-
-    if (isLeft(result)) {
-      switch (result.left) {
-        case projectNotFound:
-          throw new NotFoundException(`Project with id ${projectId} not found`);
-        case featureNotFound:
-          throw new NotFoundException(
-            `Feature with id ${featureId}, for project with id ${projectId}, not found`,
-          );
-        case featureNotEditable:
-          throw new ForbiddenException(
-            `Feature with id ${featureId}, for project with id ${projectId}, not editable`,
-          );
-        case featureNameAlreadyInUse:
-          throw new ForbiddenException(
-            `Feature with id ${featureId}, for project with id ${projectId}, cannot be updated: name is already in use`,
-          );
-      }
-    }
-
-    return this.geoFeatureService.serialize(result.right);
   }
 
   @ImplementsAcl()
