@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 
-import { useDropzone, DropzoneProps, FileError } from 'react-dropzone';
+import { useDropzone, DropzoneProps } from 'react-dropzone';
 import { Form, Field } from 'react-final-form';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -116,7 +116,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
     const errors = r.errors.map((error) => {
       return error.code === 'file-too-large'
         ? {
-            error,
+            ...error,
             message: `File is larger than ${bytesToMegabytes(PLANNING_AREA_UPLOADER_MAX_SIZE)} MB`,
           }
         : error;
@@ -127,7 +127,7 @@ export const PlanningAreUploader: React.FC<PlanningAreUploaderProps> = ({
       <>
         <h2 className="font-medium">Error!</h2>
         <ul className="text-sm">
-          {errors.map((e: FileError) => (
+          {errors.map((e) => (
             <li key={`${e.code}`}>{e.message}</li>
           ))}
         </ul>
