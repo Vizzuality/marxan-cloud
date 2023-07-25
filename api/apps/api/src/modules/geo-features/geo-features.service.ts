@@ -36,7 +36,6 @@ import { ScenarioFeaturesService } from '@marxan-api/modules/scenarios-features'
 import { GeoFeatureTag } from '@marxan-api/modules/geo-feature-tags/geo-feature-tag.api.entity';
 import { GeoFeatureTagsService } from '@marxan-api/modules/geo-feature-tags/geo-feature-tags.service';
 import { FeatureAmountUploadService } from '@marxan-api/modules/geo-features/import/features-amounts-upload.service';
-import { FeatureAmountUploadRegistry } from '@marxan-api/modules/geo-features/import/features-amounts-upload-registry.api.entity';
 import { isLeft } from 'fp-ts/Either';
 
 const geoFeatureFilterKeyNames = [
@@ -398,47 +397,39 @@ export class GeoFeaturesService extends AppBaseService<
 
   public async updateFeatureForProject(
     userId: string,
-    projectId: string,
     featureId: string,
     updateFeatureNameDto: UpdateFeatureNameDto,
   ): Promise<
     Either<
       | typeof featureNotFound
       | typeof featureNotEditable
-      | typeof projectNotFound
       | typeof featureNameAlreadyInUse,
       GeoFeature
     >
   > {
-    const project = await this.projectRepository.findOne({
-      where: { id: projectId },
-    });
-    if (!project) {
-      return left(projectNotFound);
-    }
-
     const feature = await this.geoFeaturesRepository.findOne({
       where: { id: featureId },
     });
     if (!feature) {
       return left(featureNotFound);
     }
+    if (!feature.isCustom || !feature.projectId) {
+      return left(featureNotEditable);
+    }
 
     if (
-      !feature.isCustom ||
-      feature.projectId !== projectId ||
-      !(await this.projectAclService.canEditProject(userId, projectId))
+      !(await this.projectAclService.canEditProject(userId, feature.projectId))
     ) {
       return left(featureNotEditable);
     }
 
-    const projectsWithSameName = await this.geoFeaturesRepository.count({
+    const projectFeaturesWithSameName = await this.geoFeaturesRepository.count({
       where: {
         featureClassName: updateFeatureNameDto.featureClassName,
-        projectId,
+        projectId: feature.projectId,
       },
     });
-    if (projectsWithSameName > 0) {
+    if (projectFeaturesWithSameName > 0) {
       return left(featureNameAlreadyInUse);
     }
 
@@ -446,7 +437,9 @@ export class GeoFeaturesService extends AppBaseService<
       featureClassName: updateFeatureNameDto.featureClassName,
     });
 
-    const updatedFeature = await this.geoFeaturesRepository.findOneOrFail({ where: { id: featureId }})
+    const updatedFeature = await this.geoFeaturesRepository.findOneOrFail({
+      where: { id: featureId },
+    });
     return right(updatedFeature);
   }
 
