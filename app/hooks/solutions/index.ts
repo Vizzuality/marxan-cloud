@@ -241,7 +241,7 @@ export function useDownloadSolutions({
   const { data: session } = useSession();
 
   const downloadScenarioSolutions = ({ id }: DownloadScenarioSolutionsProps) => {
-    return DOWNLOADS.request({
+    return DOWNLOADS.request<ArrayBuffer>({
       url: `/scenarios/${id}/marxan/output`,
       responseType: 'arraybuffer',
       headers: {
