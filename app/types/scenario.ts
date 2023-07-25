@@ -30,6 +30,7 @@ export interface Scenario {
       STARTTEMP: number;
       THRESHPEN1: number;
       THRESHPEN2: number;
+      VERBOSITY: number;
     };
     scenarioEditingMetadata: any;
   };
